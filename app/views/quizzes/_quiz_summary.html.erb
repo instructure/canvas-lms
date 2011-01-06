@@ -1,6 +1,7 @@
 <% q = quiz_summary || nil 
   submission = nil
   submission = @submissions_hash[q.id] if q
+  submission = nil if submission && submission.settings_only?
   unpublished ||= false
   start = Time.now
 %>

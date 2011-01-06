@@ -46,6 +46,9 @@ class QuizSubmission < ActiveRecord::Base
     state :complete do
       event :retake, :transitions_to => :untaken
     end
+    state :settings_only do
+      event :retake, :transitions_to => :untaken
+    end
     state :preview
   end
   
@@ -98,12 +101,21 @@ class QuizSubmission < ActiveRecord::Base
     end
   end
   
-  def needs_grading?
-    if !self.completed? && self.overdue?(true)
+  def needs_grading?(strict=false)
+    if strict && self.untaken? && self.overdue?(true)
+      true
+    elsif self.untaken? && self.end_at && !self.extendable?
       true
     elsif self.completed? && self.submission_data && self.submission_data.is_a?(Hash)
       true
+    else
+      false
     end
+  end
+  
+  def finished_in_words
+    extend ActionView::Helpers::DateHelper
+    started_at && finished_at && time_ago_in_words(Time.now - (finished_at - started_at))
   end
   
   def points_possible_at_submission_time
@@ -184,8 +196,13 @@ class QuizSubmission < ActiveRecord::Base
   
   def overdue?(strict=false)
     now = (Time.now - ((strict ? 1 : 5) * 60))
-    !!(self.end_at && self.end_at.localtime < now)
+    !!(end_at && end_at.localtime < now)
   end
+  
+  def extendable?
+    !!(untaken? && end_at && end_at < 1.hour.from_now)
+  end
+  
   protected :update_assignment_submission
   
   def submitted_versions
@@ -205,7 +222,8 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def attempts_left
-    [0, self.quiz.allowed_attempts - self.attempt + (self.extra_attempts || 0)].max
+    return -1 if self.quiz.allowed_attempts < 0
+    [0, self.quiz.allowed_attempts - (self.attempt || 0) + (self.extra_attempts || 0)].max
   end
   
   def mark_completed
@@ -231,6 +249,7 @@ class QuizSubmission < ActiveRecord::Base
     end
     self.context_module_action
     self.finished_at = Time.now
+    self.manually_unlocked = nil
     self.finished_at = opts[:finished_at] if opts[:finished_at]
     if self.quiz.for_assignment?
       assignment_submission = self.quiz.assignment.find_or_create_submission(self.user_id)
@@ -533,5 +552,13 @@ class QuizSubmission < ActiveRecord::Base
   
   named_scope :before, lambda{|date|
     {:conditions => ['quiz_submissions.created_at < ?', date]}
+  }
+  named_scope :updated_after, lambda{|date|
+    if date
+      {:conditions => ['quiz_submissions.updated_at > ?', date]}
+    end
+  }
+  named_scope :for_user_ids, lambda{|user_ids|
+    {:conditions => {:user_id => user_ids} }
   }
 end

@@ -14,6 +14,9 @@
         <% end %>
         <% if can_do(@quiz, @current_user, :update) %>
           <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="button button-sidebar button-sidebar-wide"><%= image_tag "edit.png" %> Edit This <%= @quiz.readable_type %></a>
+          <% if can_do(@quiz, @current_user, :manage) %>
+            <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>" class="button button-sidebar button-sidebar-wide"><%= image_tag "ball.png" %> Moderate This <%= @quiz.readable_type %></a>
+          <% end %>
           <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link button button-sidebar button-sidebar-wide"><%= image_tag "delete.png" %> Delete This <%= @quiz.readable_type %></a>
           <% if @quiz.locked? %>
             <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id, :id => 'quiz_unlock_form') do |f| %>
@@ -69,7 +72,7 @@
       <div class="rs-margin-lr rs-margin-top">
         <% if @submission && @submission.completed? %>
           <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => !@locked} %>
-        <% elsif @submission && !@submission.completed? %>
+        <% elsif @submission && @submission.untaken? %>
           <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
             You're in the middle of taking this <%= @quiz.readable_type.downcase %>.<br/>
             <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>">Resume <%= @quiz.readable_type %></a>
@@ -184,13 +187,13 @@
       <div style="text-align: left; margin-top: 20px;">
         Only registered, enrolled users can take graded quizzes
       </div>
-    <% elsif @submission && !@submission.completed? %>
+    <% elsif @submission && @submission.untaken? %>
       <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
         <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" target="_top">Resume <%= @quiz.readable_type %></a>
       </div>
     <% elsif can_do(@quiz, @current_user, :submit) %>
       <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
-        <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" target="_top">Take the <%= @quiz.readable_type %> <%= 'Again' if @submission %></a>
+        <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" target="_top">Take the <%= @quiz.readable_type %> <%= 'Again' if @submission && !@submission.settings_only? %></a>
       </div>
     <% end %>
   <% end %>

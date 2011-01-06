@@ -754,8 +754,8 @@ class User < ActiveRecord::Base
     @submissions.detect{|s| s.assignment_id == assignment_id }
   end
   
-  def quiz_submission_for(quiz_id)
-    @quiz_submissions ||= self.quiz_submissions.to_a
+  def attempted_quiz_submission_for(quiz_id)
+    @quiz_submissions ||= self.quiz_submissions.select{|s| !s.settings_only? }
     @quiz_submissions.detect{|qs| qs.quiz_id == quiz_id }
   end
   

@@ -374,8 +374,9 @@ class Quiz < ActiveRecord::Base
     q
   end
   
-  def find_or_create_submission(user, temporary=false)
+  def find_or_create_submission(user, temporary=false, state=nil)
     s = nil
+    state ||= 'untaken'
     attempts = 0
     user_id = user.is_a?(User) ? user.id : user
     begin
@@ -383,9 +384,11 @@ class Quiz < ActiveRecord::Base
         user_code = "#{user.to_s}"
         user_code = "user_#{user.id}" if user.is_a?(User)
         s = QuizSubmission.find_or_initialize_by_quiz_id_and_temporary_user_code(self.id, user_code)
+        s.workflow_state ||= state
         s.save
       else
         s = QuizSubmission.find_or_initialize_by_quiz_id_and_user_id(self.id, user_id)
+        s.workflow_state ||= state
         s.save
       end
     rescue => e
@@ -399,7 +402,7 @@ class Quiz < ActiveRecord::Base
   # on the SAVED version of the quiz.  Does not consider permissions.
   def generate_submission(user, preview=false)
     submission = nil
-    submission = self.find_or_create_submission(user, preview) #quiz_submissions.find_or_create_by_user_id(user_id)
+    submission = self.find_or_create_submission(user, preview)
     submission.retake
     submission.attempt = (submission.attempt + 1) rescue 1
     user_questions = []
@@ -445,6 +448,7 @@ class Quiz < ActiveRecord::Base
     submission.started_at = Time.now
     submission.end_at = nil
     submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
+    submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
     submission.finished_at = nil
     submission.submission_data = nil
     submission.workflow_state = 'preview' if preview
@@ -507,13 +511,25 @@ class Quiz < ActiveRecord::Base
     @locks[user ? user.id : 0] ||= Rails.cache.fetch(['_locked_for', self, user].cache_key, :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && self.unlock_at > Time.now)
-        locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
+        sub = user && quiz_submissions.find_by_user_id(user.id)
+        if !sub || !sub.manually_unlocked
+          locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
+        end
       elsif (self.lock_at && self.lock_at <= Time.now)
-        locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
+        sub = user && quiz_submissions.find_by_user_id(user.id)
+        if !sub || !sub.manually_unlocked
+          locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
+        end
       elsif (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
-        locked = l
+        sub = user && quiz_submissions.find_by_user_id(user.id)
+        if !sub || !sub.manually_unlocked
+          locked = l
+        end
       elsif (self.context_module_tag && !self.context_module_tag.available_for?(user, opts[:deep_check_if_needed]))
-        locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
+        sub = user && quiz_submissions.find_by_user_id(user.id)
+        if !sub || !sub.manually_unlocked
+          locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
+        end
       end
       locked
     end

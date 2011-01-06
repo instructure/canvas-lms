@@ -13,14 +13,14 @@
         </td>
         <td style="padding: 5px 10px; white-space: nowrap;">
           <% if @quiz.time_limit %>
-            <%= @quiz.time_limit %> Minutes
+            <%= @quiz.time_limit + ((@submission && @submission.extra_time) || 0) %> Minutes
           <% else %>
             No Time Limit
           <% end %>
           <div>
             <% if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %>
               <% if @quiz.allowed_attempts > 0 %>
-                Allowed Attempts: <%= @quiz.allowed_attempts %><br/>
+                Allowed Attempts: <%= ((@submission && @submission.extra_attempts) || 0) + @quiz.allowed_attempts %><br/>
               <% else %>
                 Unlimited Attempts<br/>
               <% end %>

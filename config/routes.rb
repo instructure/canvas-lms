@@ -171,13 +171,14 @@ ActionController::Routing::Routes.draw do |map|
       quiz.history "history", :controller => "quizzes", :action => "history"
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
       quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put} do |submission|
-        submission.add_attempts 'add_attempts', :controller => 'quiz_submissions', :action => 'add_attempts'
       end
+      quiz.extensions 'extensions/:user_id', :controller => 'quiz_submissions', :action => 'extensions', :conditions => {:method => :post}
       quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy)
       quiz.resources :quiz_groups, :as => "groups", :only => %w(create update destroy) do |group|
         group.reorder "reorder", :controller => "quiz_groups", :action => "reorder"
       end
       quiz.take "take", :controller => "quizzes", :action => "show", :take => '1'
+      quiz.moderate "moderate", :controller => "quizzes", :action => "moderate"
     end
     
     course.resources :collaborations

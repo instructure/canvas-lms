@@ -147,7 +147,7 @@ class GradebooksController < ApplicationController
       newest = Time.parse("Jan 1 2010")
       @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
       @assignments = @just_assignments.dup
-      @gradebook_upload = @context.build_gradebook_upload
+      @gradebook_upload = @context.build_gradebook_upload      
       @submissions = []
       @submissions = @context.submissions
       @new_submissions = @submissions
@@ -177,15 +177,15 @@ class GradebooksController < ApplicationController
         else
           format.html { render :action => "show" }
         end
-        format.csv {
+        format.csv { 
           headers["Pragma"] = "no-cache"
           headers["Cache-Control"] = "no-cache"
           send_data(
-            @context.gradebook_to_csv,
-            :type => "text/csv",
-            :filename => "Grades-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
+            @context.gradebook_to_csv, 
+            :type => "text/csv", 
+            :filename => "Grades-" + @context.name.to_s.gsub(/ /, "_") + ".csv", 
             :disposition => "attachment"
-          )
+          ) 
         }
         format.xml  { render :xml => @gradebook.to_xml }
         format.json  { render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments]) }
@@ -197,27 +197,16 @@ class GradebooksController < ApplicationController
     # res = "{"
     if params[:assignments]
       # you need to specify specifically which assignment fields you want returned to the gradebook via json here
-      # that makes it so we do a lot less querying to the db, which means less active record instanciation, 
+      # that makes it so we do a lot less querying to the db, which means less active record instantiation, 
       # which means less AR -> JSON serialization overhead which means less data transfer over the wire and faster request.
       # (in this case, the worst part was the assignment 'description' which could be a massive wikipage)
       render :json => @context.assignments.active.gradeable.scoped(
         :select => ["id", "title", "due_at", "unlock_at", "lock_at", "points_possible", "min_score", "max_score", "mastery_score", "grading_type", "submission_types", "assignment_group_id", "grading_scheme_id", "grading_standard_id", "group_category", "grade_group_students_individually"].join(", ")
       )
-      # @context.assignments.active.gradeable.each do |assignment|
-        # res += "\"assignment_#{assignment.id}\": #{assignment.to_json},"
-      # end
-      # res += "\"assignments\": true"
     elsif params[:students]
       # you need to specify specifically which student fields you want returned to the gradebook via json here
       render :json => @context.students_visible_to(@current_user).to_json(:only => ["id", "name", "sortable_name", "short_name"])
-      # @context.students.each do |student|
-        # res += "\"student_#{student.id}\": #{student.to_json},"
-      # end
-      # res += "\"students\": true";
     else
-      # @submissions = @context.submissions.find(:all, :include => [:quiz_submission,:attachments,:submission_comments])
-      # res += Rails.cache.fetch(['gradebook_submission_json', @submissions.sort_by{|s| s.updated_at }.last].cache_key) do
-        # val = ""
         params[:user_ids] ||= params[:user_id]
         user_ids = params[:user_ids].split(",").map(&:to_i) if params[:user_ids]
         assignment_ids = params[:assignment_ids].split(",").map(&:to_i) if params[:assignment_ids]
@@ -232,15 +221,8 @@ class GradebooksController < ApplicationController
         else
           @submissions = @context.submissions.scoped(scope_options)
         end
-        render :json => @submissions #(:include => [:attachments,:quiz_submission,:submission_comments])
-        # @submissions.each do |submission|
-          # res += "\"submission_#{submission.user_id}_#{submission.assignment_id}\": #{submission.to_json(:include => [:attachments,:quiz_submission,:submission_comments])},"
-        # end
-        # res += "\"submissions\": true";
-      # end
+        render :json => @submissions
     end
-    # res += "}"
-    # render :json => res
   end
   protected :gradebook_init_json
   

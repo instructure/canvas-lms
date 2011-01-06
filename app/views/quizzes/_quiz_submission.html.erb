@@ -4,7 +4,9 @@
       until they have submitted their last attempt<% end %>.
   </h4>
 <% end %>
-<% if !(@current_submission || @submission).results_visible? && !can_do(@quiz, @current_user, :grade) %>
+<% if !(@current_submission || @submission) || (@current_submission || @submission).settings_only? %>
+  The <%= @quiz.readable_type.downcase %> hasn't been taken yet.
+<% elsif !(@current_submission || @submission).results_visible? && !can_do(@quiz, @current_user, :grade) %>
   <div class="quiz_score" style="<%= hidden if @quiz.quiz_type == 'survey' %>">
     <% if @quiz.allowed_attempts == 1 %>
       Score for this <%= @quiz.readable_type.downcase %>: 
