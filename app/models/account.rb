@@ -21,7 +21,7 @@ class Account < ActiveRecord::Base
   attr_accessible :name, :parent_account_id, :turnitin_account_id,
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
-    :storage_quota
+    :storage_quota, :ip_filters
 
   include Workflow
   adheres_to_policy
@@ -129,6 +129,25 @@ class Account < ActiveRecord::Base
       end
     end
     settings
+  end
+  
+  def ip_filters=(params)
+    filters = {}
+    require 'ipaddr'
+    params.each do |key, str|
+      ips = []
+      vals = str.split(/,/)
+      vals.each do |val|
+        ip = IPAddr.new(val) rescue nil
+        # right now the ip_filter column on quizzes is just a string,
+        # so it has a max length.  I figure whatever we set it to this
+        # setter should at the very least limit stored values to that
+        # length.
+        ips << val if ip && val.length <= 255 
+      end
+      filters[key] = ips.join(',') unless ips.empty?
+    end
+    settings[:ip_filters] = filters
   end
   
   def ensure_defaults

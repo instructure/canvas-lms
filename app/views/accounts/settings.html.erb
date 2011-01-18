@@ -98,6 +98,50 @@
             </tr>
           <% end %>
         <% end %>
+        <tr>
+          <td style="padding-top: 10px; padding-bottom: 10px;">
+            Quiz IP Filters:
+            <%= link_to(image_tag('help.png'), '#', :class => 'ip_help_link no-hover', :title => "What are Quiz IP Filters?") %>
+          </td>
+          <td style="padding-top: 10px; padding-bottom: 10px;">
+            <div id="ip_filters_dialog" style="display: none;">
+              <h2>What are Quiz IP Filters?</h2>
+              <p>Quiz IP filters are a way to limit access to quizzes to 
+              computers in a specified IP range.</p>
+              
+              <p>Specify a set of IP address filters that teachers can use to 
+              protect access to quizzes.  Filters can be a comma-separated
+              list of addresses, or an address followed by a mask
+              ("192.168.217.1/24" or "192.168.217.1/255.255.255.0").</p>
+            </div>
+              
+            <table>
+              <tbody id="ip_filters">
+                <% (@account.settings[:ip_filters] || {}).sort_by(&:first).each do |key, filter| %>
+                  <tr class="ip_filter">
+                    <td>Name:</td>
+                    <td><input type="text" style="width: 75px;" class="name" value="<%= key %>"/></td>
+                    <td>Filter:</td>
+                    <td><input type="text" style="width: 100px;" class="value" value="<%= filter %>" maxlength="255"/></td>
+                    <td>
+                      <a href="#" class="delete_filter_link"><%= image_tag "delete_circle.png" %></a>
+                    </td>
+                  </tr>
+                <% end %>
+                <tr class="ip_filter blank" style="display: none;">
+                  <td>Name:</td>
+                  <td><input type="text" class="name" style="width: 75px;"/></td>
+                  <td>Filter:</td>
+                  <td><input type="text" class="value" style="width: 100px;"/></td>
+                  <td>
+                    <a href="#" class="delete_filter_link"><%= image_tag "delete_circle.png" %></a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <a href="#" class="add-small add_ip_filter_link" style="font-size: 0.8em;">Add another filter</a>
+          </td>
+        </tr>
         <tr style="<%= hidden unless RAILS_ENV == 'development' %>">
           <td colspan="2">
             <div style="margin-top: 10px;">
@@ -240,7 +284,37 @@
 <% js_block do %>
 <script>
 $(document).ready(function() {
+  $("#account_settings").submit(function() {
+    $(".ip_filter .value").each(function() {
+      $(this).removeAttr('name');
+    }).filter(":not(.blank)").each(function() {
+      var name = $.trim($(this).parents(".ip_filter").find(".name").val().replace(/\[|\]/g, '_'));
+      if(name) {
+        $(this).attr('name', 'account[ip_filters][' + name + ']');
+      }
+    });
+  });
   $("#account_settings_tabs").tabs().show();
+  $(".add_ip_filter_link").click(function(event) {
+    event.preventDefault();
+    var $filter = $(".ip_filter.blank:first").clone(true).removeClass('blank');
+    $("#ip_filters").append($filter.show());
+  });
+  $(".delete_filter_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".ip_filter").remove();
+  });
+  if($(".ip_filter:not(.blank)").length == 0) {
+    $(".add_ip_filter_link").click();
+  }
+  $(".ip_help_link").click(function(event) {
+    event.preventDefault();
+    $("#ip_filters_dialog").dialog('close').dialog({
+      autoOpen: false,
+      title: "What are Quiz IP Filters?",
+      width: 400
+    }).dialog('open');
+  });
   $(".remove_account_user_link").click(function(event) {
     event.preventDefault();
     var $item = $(this).parent("li");

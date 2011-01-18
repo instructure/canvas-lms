@@ -878,6 +878,58 @@ var quiz = {};
         $item.val('--');
       }
     }).triggerHandler('change');
+  $("#protect_quiz").change(function() {
+    var checked = $(this).attr('checked');
+    $(".protected_options").showIf(checked).find(":checkbox").each(function() {
+      if(!checked) {
+        $(this).attr('checked', false).change();
+      }
+    });
+  }).triggerHandler('change');
+  $("#ip_filter").change(function() {
+    $("#ip_filter_suboptions").showIf($(this).attr('checked'));
+    if(!$(this).attr('checked')) {
+      $("#quiz_ip_filter").val("");
+    }
+  }).triggerHandler('change');
+  $("#ip_filters_dialog").delegate('.ip_filter', 'click', function(event) {
+    event.preventDefault();
+    var filter = $(this).getTemplateData({textValues: ['filter']}).filter;
+    $("#protect_quiz").attr('checked', true).triggerHandler('change');
+    $("#ip_filter").attr('checked', true).triggerHandler('change');
+    $("#quiz_ip_filter").val(filter);
+    $("#ip_filters_dialog").dialog('close');
+  });
+  $(".ip_filtering_link").click(function(event) {
+    event.preventDefault();
+    var $dialog = $("#ip_filters_dialog");
+    $dialog.dialog('close').dialog({
+      autoOpen: false,
+      width: 400,
+      title: "IP Address Filtering"
+    }).dialog('open');
+    if(!$dialog.hasClass('loaded')) {
+      $dialog.find(".searching_message").text("Retrieving Filters...");
+      var url = $("#quiz_urls .filters_url").attr('href');
+      $.ajaxJSON(url, 'GET', {}, function(data) {
+        $dialog.addClass('loaded');
+        if(data.length) {
+          for(var idx in data) {
+            var filter = data[idx];
+            var $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
+            $filter.fillTemplateData({data: filter});
+            $dialog.find(".filters tbody").append($filter.show());
+          }
+          $dialog.find(".searching_message").hide().end()
+            .find(".filters").show();
+        } else {
+          $dialog.find(".searching_message").text("No filters found");
+        }
+      }, function(data) {
+        $dialog.find(".searching_message").text("Retrieving Filters Failed");
+      });
+    }
+  });
     $("#require_access_code").change(function(event) {
       $("#access_code_suboptions").showIf($(this).attr('checked'));
       if(!$(this).attr('checked')) {
@@ -966,6 +1018,11 @@ var quiz = {};
           $.flashMessage("Quiz data saved");
         }
         quiz.updateDisplayComments();
+    },
+    error: function(data) {
+      $(this).formErrors(data);
+      $(this).find(".button.save_quiz_button").attr('disabled', false);
+      $(this).find(".button.publish_quiz_button").attr('disabled', false);
       }
     });
     $quiz_options_form.find(".save_quiz_button").click(function(event) {

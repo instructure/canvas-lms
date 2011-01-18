@@ -182,6 +182,7 @@ $(document).ready(function(event) {
       width: 400
     }).dialog('open');
   });
+
   $(".moderate_student_link").live('click', function(event) {
     event.preventDefault();
     var $student = $(this).parents(".student");

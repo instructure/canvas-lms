@@ -28,7 +28,9 @@ class QuizSubmissionsController < ApplicationController
   # submits the quiz as final
   def create
     @quiz = @context.quizzes.find(params[:quiz_id])
-    if @quiz.grants_right?(@current_user, :submit)
+    if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+      flash[:error] = "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz."
+    elsif @quiz.grants_right?(@current_user, :submit)
       @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id) if @current_user
       # If the submission is a preview, we don't add it to the user's submission history,
       # and it actually gets keyed by the temporary_user_code column instead of 
@@ -70,7 +72,8 @@ class QuizSubmissionsController < ApplicationController
       @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id)
     end
 
-    if preview || (@submission && @submission.temporary_user_code == temporary_user_code(false)) || (@submission && @submission.grants_right?(@current_user, session, :update))
+    if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+    elsif preview || (@submission && @submission.temporary_user_code == temporary_user_code(false)) || (@submission && @submission.grants_right?(@current_user, session, :update))
       if !@submission.completed? && !@submission.overdue?
         @submission.backup_submission_data(params)
         render :json => {:backup => true, :end_at => @submission && @submission.end_at}.to_json

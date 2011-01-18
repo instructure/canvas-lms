@@ -20,7 +20,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb("Quizzes") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters]
   
   def index
     if authorized_action(@context, @current_user, :read)
@@ -144,6 +144,9 @@ class QuizzesController < ApplicationController
       if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] != @quiz.access_code
         render :action => 'access_code'
         return
+      elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+        render :action => 'invalid_ip'
+        return
       else
         user_code = @current_user 
         user_code = nil if preview
@@ -153,11 +156,13 @@ class QuizzesController < ApplicationController
     end
     
     if @submission && @submission.untaken? && !@just_graded
-      if !@quiz.access_code || @quiz.access_code.empty? || params[:access_code] == @quiz.access_code
+      if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] != @quiz.access_code
+        render :action => 'access_code'
+      elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+        render :action => 'invalid_ip'
+      else
         log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
         render :action => "take_quiz"
-      else
-        render :action => 'access_code'
       end
     else
       if @just_graded
@@ -182,6 +187,31 @@ class QuizzesController < ApplicationController
       end
       flash[:notice] = "#{@quizzes.length} quizzes successfully published!"
       redirect_to named_context_url(@context, :context_quizzes_url)
+    end
+  end
+  
+  def filters
+    if authorized_action(@quiz, @current_user, :update)
+      @filters = []
+      @account = @quiz.context.account
+      if @quiz.ip_filter
+        @filters << {
+          :name => 'Current Filter',
+          :account => @quiz.title,
+          :filter => @quiz.ip_filter
+        }
+      end
+      while @account
+        (@account.settings[:ip_filters] || {}).sort_by(&:first).each do |key, filter|
+          @filters << {
+            :name => key,
+            :account => @account.name,
+            :filter => filter
+          }
+        end
+        @account = @account.parent_account
+      end
+      render :json => @filters.to_json
     end
   end
   
@@ -303,7 +333,6 @@ class QuizzesController < ApplicationController
   def update
     n = Time.now.to_f
     if authorized_action(@quiz, @current_user, :update)
-      logger.warn "QUIZZES_CONTROLLER: parsing parameters #{Time.now.to_f - n}"
       params[:quiz] ||= {}
       params[:quiz][:title] = "New Quiz" if params[:quiz][:title] == "undefined"
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
@@ -316,7 +345,6 @@ class QuizzesController < ApplicationController
         params[:quiz][:assignment_group_id] = @assignment_group && @assignment_group.id
       end
       
-      logger.warn "QUIZZES_CONTROLLER: activating quiz #{Time.now.to_f - n}"
       if params[:activate]
         @quiz.with_versioning(true) do
           @quiz.generate_quiz_data
@@ -328,7 +356,6 @@ class QuizzesController < ApplicationController
 
       params[:quiz][:lock_at] = nil if params[:quiz].delete(:do_lock_at) == 'false'
 
-      logger.warn "QUIZZES_CONTROLLER: marking as edited #{Time.now.to_f - n}"
       @quiz.with_versioning(false) do
         @quiz.did_edit if @quiz.created?
       end
@@ -339,11 +366,8 @@ class QuizzesController < ApplicationController
         @quiz.with_versioning(false) do
           res = @quiz.update_attributes(params[:quiz])
         end
-        logger.warn "QUIZZES_CONTROLLER: updating attributes #{Time.now.to_f - n}"
         if res
-          logger.warn "QUIZZES_CONTROLLER: reloading quiz #{Time.now.to_f - n}"
           @quiz.reload
-          logger.warn "QUIZZES_CONTROLLER: rendering response #{Time.now.to_f - n}"
           flash[:notice] = "Quiz successfully updated"
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
           format.json {render :json =>  @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})}

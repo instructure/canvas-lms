@@ -271,6 +271,25 @@ describe QuizzesController do
       assigns[:submission].user.should eql(@user)
       (assigns[:submission].end_at - assigns[:submission].started_at).to_i.should eql(90.minutes.to_i)
     end
+
+    it "should render ip_filter page if ip_filter doesn't match" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.ip_filter = '123.123.123.123'
+      @quiz.save!
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('invalid_ip')
+    end
+    
+    it" should let the user take the page if the ip_filter matches" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.ip_filter = '123.123.123.123'
+      @quiz.save!
+      request.env['REMOTE_ADDR'] = '123.123.123.123'
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('take_quiz')
+    end
   end
   
   describe "GET 'history'" do

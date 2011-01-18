@@ -131,15 +131,40 @@
             </tr>
             <tr>
               <td colspan="2">
-                <input type="checkbox" <%= 'checked' if @quiz.access_code && !@quiz.access_code.empty? %> name="require_access_code" id="require_access_code"/><label for="require_access_code">Require an access code for this quiz</label>
+                <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? || !@quiz.ip_filter.blank? %> name="protect_quiz" id="protect_quiz"/>
+                <label for="protect_quiz">Restrict this Quiz</label>
+              </td>
+            </tr>
+            <tr class="protected_options">
+              <td colspan="2">
+                <div style="padding-left: 20px;">
+                  <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? %> name="require_access_code" id="require_access_code"/>
+                  <label for="require_access_code">Require an access code</label>
+                </div>
               </td>
             </tr>
             <tr id="access_code_suboptions" style="display: none;">
               <td>
-                <label class="nobr" style="padding-left: 20px;" for="quiz_access_code">Access Code:</label>
+                <label class="nobr" style="padding-left: 40px;" for="quiz_access_code">Code:</label>
               </td>
               <td>
                 <input style="width:100%;" type="text" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>"/>
+              </td>
+            </tr>
+            <tr class="protected_options">
+              <td colspan="2">
+                <div style="padding-left: 20px;">
+                  <input type="checkbox" <%= 'checked' if !@quiz.ip_filter.blank? %> name="ip_filter" id="ip_filter">
+                  <label for="ip_filter">Filter IP Addresses</label>
+              </td>
+            </tr>
+            <tr id="ip_filter_suboptions" style="display: none;">
+              <td>
+                <label class="nobr" style="padding-left: 40px;" for="quiz_ip_filter">Filter:</label>
+              </td>
+              <td>
+                <input type="text" style="width: 100px;" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255"/>
+                <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => 'Find IP Address Filter') %>
               </td>
             </tr>
             <tr>
@@ -227,6 +252,7 @@ $(document).ready(function() {
   <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_question_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_reorder_url, @quiz.id) %>" class="reorder_questions_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_group_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_quiz_filters_url, @quiz.id) %>" class="filters_url">&nbsp;</a>
 </div>
 <%= render :partial => "quiz_preview" %>
 <% if @has_student_submissions %>
@@ -349,4 +375,23 @@ $(document).ready(function() {
       </p>
     </div>
   </div>
+</div>
+<div id="ip_filters_dialog" style="display: none;">
+  <h2>What are Quiz IP Filters?</h2>
+  <p class="explanation">Quiz IP filters are a way to limit access to quizzes to 
+  computers in a specified IP range.  Filters can be a comma-separated
+  list of addresses, or an address followed by a mask
+  ("192.168.217.1", "192.168.217.1/24" or "192.168.217.1/255.255.255.0").</p>
+  <p class="searching_message">Retrieving Filters...</p>
+  <table class="filters" style="display: none;">
+    <tbody>
+      <tr class="ip_filter blank" style="display: none;" title="Click to select this filter">
+        <td class="name_and_account">
+          <div class="name">&nbsp;</div>
+          <div class="account">&nbsp;</div>
+        </td>
+        <td class="filter">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

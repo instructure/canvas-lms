@@ -23,7 +23,7 @@ class Quiz < ActiveRecord::Base
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
-    :hide_results, :locked
+    :hide_results, :locked, :ip_filter
   attr_readonly :context_id, :context_type
   
   has_many :quiz_questions, :dependent => :destroy, :order => 'position'
@@ -48,7 +48,7 @@ class Quiz < ActiveRecord::Base
   serialize :quiz_data
   
   simply_versioned
-
+  
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
     self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
@@ -61,6 +61,7 @@ class Quiz < ActiveRecord::Base
     self.allowed_attempts = 1 if self.allowed_attempts == nil
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= [[self.lock_at, self.due_at].compact.min, self.unlock_at].compact.max
+    self.ip_filter = nil if self.ip_filter && self.ip_filter.strip.empty?
     if !self.available? && self.quiz_type != 'survey' && self.quiz_type != 'graded_survey'
       self.points_possible = self.current_points_possible
     end
@@ -91,6 +92,15 @@ class Quiz < ActiveRecord::Base
   
   def readable_type
     (self.quiz_type || "").match(/survey/) ? "Survey" : "Quiz"
+  end
+  
+  def valid_ip?(ip)
+    require 'ipaddr'
+    ip_filter.split(/,/).any? do |filter|
+      addr_range = IPAddr.new(filter) rescue nil
+      addr = IPAddr.new(ip) rescue nil
+      addr && addr_range && addr_range.include?(addr)
+    end
   end
   
   def survey?
@@ -906,6 +916,8 @@ class Quiz < ActiveRecord::Base
     context.imported_migration_items << item if context.imported_migration_items
     item
   end
+  
+  def self.serialization_excludes; [:access_code]; end
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#admins.include? user }
