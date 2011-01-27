@@ -215,7 +215,7 @@
         event.preventDefault();
         event.stopPropagation();
         if(event.keyString == 'return' || event.keyString == 'tab') { //Code == 13 || event.keyCode == 9) {
-          $(this).blur();
+          $(this).triggerHandler('blur', true);
           if(event.keyString == 'return') { //Code == 13) {
             datagrid.moveDown();
           } else {
@@ -231,14 +231,14 @@
           $gridcell.focus();
         }
       });
-      $(".grading_value").blur(function() {
+      $(".grading_value").blur(function(event, forceUpdate) {
         var $td = $(this).parents(".table_entry").parents("div.cell");
         if($td.length > 0) {
           var $box = $(this);
           if($box.parents(".grading_box").length) {
             $box = $box.parents(".grading_box");
           }
-          updateDataEntry($box);
+          updateDataEntry($box, forceUpdate);
           datagrid.blur();
         }
       });
@@ -1091,7 +1091,7 @@
     }
     return result;
   }
-  function updateDataEntry($box) {
+  function updateDataEntry($box, forceUpdate) {
     var $input = $box;
     var $parent = $input.parents(".table_entry");
     if(!$box.hasClass('grading_value')) {
@@ -1119,7 +1119,7 @@
     data.assignment_id = submission.assignment_id;
     data.student_id = submission.user_id;
     data.grade = sendVal;
-    if(sendVal != oldVal) {
+    if(sendVal != oldVal || (sendVal && forceUpdate)) {
       submitDataEntry(data);
     }
     if(!val || val == "") {
