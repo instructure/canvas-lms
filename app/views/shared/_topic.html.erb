@@ -43,7 +43,7 @@
     <div class="link_box">
       <span class="links">
         <% if single_topic && topic && can_do(topic, @current_user, :reply) %>
-          <a href="#" class="add_entry_link atr-reply">Reply</a>
+          <a href="#" class="add_entry_link atr-reply" title="Reply">Reply</a>
         <% end %>
         <a style="<%= "display: none;" if !can_do(topic, @current_user, :update) %>" href="<%= context_url(topic_context, :controller => :discussion_topics, :action => :update, :id => topic_id) %>" class="edit_topic_link no-hover"><%= image_tag "edit.png", :alt => "Edit", :title => "Edit " + topic_desc %></a>
         <a style="<%= "display: none;" if !can_do(topic, @current_user, :delete) %>" href="<%= context_url(topic_context, :controller => :discussion_topics, :action => :destroy, :id => topic_id) %>" class="delete_topic_link no-hover"><%= image_tag "delete.png", :alt => "Delete", :title => "Delete " + topic_desc %></a>
