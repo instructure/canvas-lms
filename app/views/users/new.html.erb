@@ -43,14 +43,30 @@ $(function(){
 });
 </script>
 <% end %>
-<div id="modal-box" class="modal-box-tall">
-  <div style="margin: 120px 80px 0; position: relative;">
-    <h2>Register a new account</h2>
+<div id="modal-box-top"></div>
+<div id="modal-box-arbitrary-size">
+  <div style="margin: 30px 80px 0; position: relative;">
+    <h2>Register for a new account</h2>
     <% form_for @pseudonym, :url => users_path, :html => {:id => "register_form", :method => :post} do |form|  %>
-      <input type="hidden" name="new_teacher" value="1"/>
-      <span class="field-with-fancyplaceholder"><%= label :user, :name, "Your name" %><%= text_field :user, :name, :class => "text" %></span>
-      <span class="field-with-fancyplaceholder"><%= form.label :unique_id, "Email address" %><%= form.text_field :unique_id, :class => "text", :value => !@pseudonym || @pseudonym.deleted? ? (@pseudonym.deleted_unique_id rescue nil) : @pseudonym.unique_id %></span>
-      <button type="submit" class="button">Register</button>
+      <table>
+        <tr>
+          <td colspan="2">
+            <input type="hidden" name="new_teacher" value="1"/>
+            <span class="field-with-fancyplaceholder"><%= label :user, :name, "Your name" %><%= text_field :user, :name, :class => "text" %></span>
+            <span class="field-with-fancyplaceholder"><%= form.label :unique_id, "Email address" %><%= form.text_field :unique_id, :class => "text", :value => !@pseudonym || @pseudonym.deleted? ? (@pseudonym.deleted_unique_id rescue nil) : @pseudonym.unique_id %></span>
+          </td>
+        </tr>
+        <% Canvas::Plugin.all_for_tag('registration_form').each do |plugin| %>
+          <%= render :partial => plugin.settings[:registration_partial] %>
+        <% end %>
+        <tr>
+          <td colspan="2">
+            <button type="submit" class="button">Register</button>
+          </td>
+        </tr>
+      </table>
     <% end %>
   </div>
+  <div class="clear"></div>
 </div>
+<div id="modal-box-bottom"></div>

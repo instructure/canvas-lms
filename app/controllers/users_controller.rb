@@ -304,11 +304,11 @@ class UsersController < ApplicationController
     # If a teacher created the student, and the student then comes to register, they
     # should still be allowed to.
     if @active_cc && @active_cc.user && !@pseudonym.user
-      @user = @active_cc.user
+      @user ||= @active_cc.user
     elsif @any_cc && @any_cc.user && !@pseudonym.user
-      @user = @any_cc.user
+      @user ||= @any_cc.user
     elsif @pseudonym && (!@pseudonym.user || @pseudonym.user.creation_pending?)
-      @user = @pseudonym.user
+      @user ||= @pseudonym.user
     else
       # If not creation_pending, we want to throw an already_exists error, which
       # we'll get if we set this to nil, since then a few lines down will try to
@@ -318,7 +318,7 @@ class UsersController < ApplicationController
     @user ||= User.new
     @user.attributes = params[:user]
     @user.name ||= params[:pseudonym][:unique_id]
-    if @user.save
+    if @user.errors.empty? && @user.save
       @pseudonym ||= @user.pseudonyms.build
       @pseudonym.attributes = params[:pseudonym]
       @pseudonym.account_id = @domain_root_account.id
