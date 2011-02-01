@@ -18,6 +18,7 @@ $(document).ready(function() {
     if($(this).attr('id') == 'submit_online_upload_form') {
       event.preventDefault();
       event.stopPropagation();
+      console.log("uploading files");
       $.ajaxJSONPreparedFiles.call(this, {
         handle_files: function(attachments, data) {
           var ids = (data['submission[attachment_ids]'] || "").split(",")
@@ -32,10 +33,12 @@ $(document).ready(function() {
         data: $(this).getFormData(),
         url: $(this).attr('action'),
         success: function(data) {
+          console.log("successfully uploaded files");
           submitting = true;
           window.location = window.location.href.replace(window.location.hash, "");
         },
         error: function(data) {
+          console.log("failed uploading files");
           $(this).find("button[type='submit']").text("Submit Failed, please try again");
           $(this).find("button").attr('disabled', false);
         }
