@@ -53,7 +53,7 @@ describe Mailbox do
     mailbox_model
     @p = @m.path
     @m.handle.should_not be_nil
-    @p.should match(Regexp.new(@m.handle + "@unknowndomain.example.com"))
+    @p.should match(Regexp.new(@m.handle + "@" + HostUrl.outgoing_email_domain))
   end
   
 end

@@ -41,7 +41,7 @@ class Mailbox < ActiveRecord::Base
   # Something like broadcast-t5K8Re@instructure.com
   def path
     generate_handle unless self.handle
-    HostUrl.outgoing_email_address(self.handle)
+    self.handle + "@" + HostUrl.outgoing_email_domain
   end
   
   def generate_handle
