@@ -46,12 +46,6 @@ module SeleniumTestsHelperMethods
       exec(File.expand_path(File.dirname(__FILE__) +
           "/../../script/server -p #{SERVER_PORT} -e #{RAILS_ENV}"))
     end
-    at_exit do
-      Process.kill 'KILL', server_pid
-      Process.wait server_pid
-      domain_conf[RAILS_ENV]["domain"] = old_domain
-      File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-    end
     for i in 0..MAX_SERVER_START_TIME
       s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
       break if s
@@ -59,6 +53,18 @@ module SeleniumTestsHelperMethods
     end
     raise "Failed starting script/server" unless s
     s.close
+    closed = false
+    shutdown = lambda do
+      unless closed
+        Process.kill 'KILL', server_pid
+        Process.wait server_pid
+        domain_conf[RAILS_ENV]["domain"] = old_domain
+        File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
+        closed = true
+      end
+    end
+    at_exit { shutdown.call }
+    return shutdown
   end
 end
 
@@ -99,8 +105,14 @@ shared_examples_for "all selenium tests" do
       STDERR.puts "Problem while setting context on example start" + e
     end
   end
+  
+  append_before(:all) do
+    @webserver_shutdown = SeleniumTestsHelperMethods.start_webrick_server
+  end
+
+  append_after(:all) do
+    @webserver_shutdown.call
+  end
  
 end
-
-SeleniumTestsHelperMethods.start_webrick_server
 
