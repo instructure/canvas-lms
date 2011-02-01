@@ -1064,7 +1064,7 @@ namespace :db do
 
     gather_data = "opt_out"
     
-    if Rails.env.production?
+    if !Rails.env.test?
       choose do |menu|
         menu.header = "To help our developers better serve you, Instructure would like to collect some usage data about your Canvas installation. You can change this setting at any time."
         menu.prompt = "> "
@@ -1104,11 +1104,13 @@ namespace :db do
   task :configure_account_name => :load_environment do
     require 'highline/import'
     
-    name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = true }
+    if !Rails.env.test?
+      name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = true }
     
-    a = Account.default
-    a.name = name
-    a.save!
+      a = Account.default
+      a.name = name
+      a.save!
+    end
   end
   
   desc "Create all the initial data, including notifications and admin account"

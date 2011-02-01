@@ -100,7 +100,8 @@ class ReportSnapshot < ActiveRecord::Base
           "collection_type" => collection_type,
           "installation_uuid" => installation_uuid,
           "report_type" => self.report_type,
-          "data" => self.data
+          "data" => self.data,
+          "rails_env" => RAILS_ENV
         }
 
       if collection_type == "opt_in"
