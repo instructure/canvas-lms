@@ -72,6 +72,65 @@ shared_examples_for "file uploads selenium tests" do
       page.is_text_present("No Files").should be_false
     end
   end
+
+  it "should upload a file on the homework submissions page" do
+    # set up basic objects
+    t = user_with_pseudonym :active_user => true,
+                            :username => "teacher@example.com",
+                            :password => "asdfasdf"
+    t.save!
+    s = user_with_pseudonym :active_user => true,
+                            :username => "student@example.com",
+                            :password => "asdfasdf"
+    s.save!
+    c = course              :active_course => true
+    c.enroll_teacher(t).accept!
+    c.enroll_student(s).accept!
+    c.reload
+    
+    a = Assignment.new(:submission_types => "online_upload", :context => c)
+    a.save!
+
+    # log out (just in case) and log in
+    page.open "/logout"
+    page.type "pseudonym_session_unique_id", "student@example.com"
+    page.type "pseudonym_session_password", "asdfasdf"
+    page.click "//button[@type='submit']"
+    page.wait_for_page_to_load "30000"
+    
+    # go to our new assignment page
+    page.open "/courses/#{c.id}/assignments/#{a.id}"
+    sleep 5
+    # and attempt some assignment submissions
+    first = true
+
+    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |filename|
+      if first
+        page.click "link=Submit Assignment"
+        first = false
+      else
+        page.click "link=Re-Submit Assignment"
+      end
+      sleep 8
+      !60.times{ break if (page.is_element_present("attachments[0][uploaded_data]") rescue false); sleep 1 }
+      page.type "attachments[0][uploaded_data]", "C:\\testfiles\\#{filename}"
+      page.click "//form[@id='submit_online_upload_form']//button[@id='submit_file_button']"
+      page.wait_for_page_to_load "30000"
+      sleep 5
+      page.click "link=Submission Details"
+      page.wait_for_page_to_load "30000"
+      sleep 5
+      !60.times{ break if (page.is_element_present("//iframe[@id='preview_frame']") rescue false); sleep 1 }
+      page.select_frame "//iframe[@id='preview_frame']"
+      !60.times{ break if (page.is_element_present("link=#{filename}") rescue false); sleep 1 }
+      page.click "link=#{filename}"
+      sleep 5
+      !60.times{ break if (page.is_text_present(TEST_FILE_UUIDS[filename]) rescue false); sleep 1 }
+      page.is_text_present(TEST_FILE_UUIDS[filename]).should be_true
+      page.select_frame "relative=top"
+    end
+  end
+
 end
 
 describe "file uploads Windows-Firefox-Local-Tests" do
