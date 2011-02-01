@@ -5,7 +5,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
   var submitting = false;
-  $("form").submit(function(event) {
+  $(".submit_assignment_form").submit(function(event) {
     var $turnitin = $(this).find(".turnitin_pledge");
     if($turnitin.length > 0 && !$turnitin.attr('checked')) {
       alert('You must agree to the submission pledge before you can submit this assignment.');
@@ -15,7 +15,34 @@ $(document).ready(function() {
     }
     $(this).find("button[type='submit']").text("Submitting...");
     $(this).find("button").attr('disabled', true);
-    submitting = true;
+    if($(this).attr('id') == 'submit_online_upload_form') {
+      event.preventDefault();
+      event.stopPropagation();
+      $.ajaxJSONPreparedFiles.call(this, {
+        handle_files: function(attachments, data) {
+          var ids = (data['submission[attachment_ids]'] || "").split(",")
+          for(var idx in attachments) {
+            ids.push(attachments[idx].attachment.id);
+          }
+          data['submission[attachment_ids]'] = ids.join(",");
+          return data;
+        },
+        context_code: $("#submit_assignment .context_code").text(),
+        file_elements: $(this).find("input[type='file']:visible"),
+        data: $(this).getFormData(),
+        url: $(this).attr('action'),
+        success: function(data) {
+          submitting = true;
+          window.location = window.location.href.replace(window.location.hash, "");
+        },
+        error: function(data) {
+          $(this).find("button[type='submit']").text("Submit Failed, please try again");
+          $(this).find("button").attr('disabled', false);
+        }
+      });
+    } else {
+      submitting = true;
+    }
   });
   window.onbeforeunload = function() {
     if($("#submit_assignment:visible").length > 0 && !submitting) {
@@ -122,6 +149,7 @@ var submissionAttachmentIndex = -1;
   var allowed_extensions = <%= raw((@assignment.allowed_extensions || []).to_json) %>
 </script>
 <div style="display: none;" id="submit_assignment">
+  <span class="context_code" style="display: none;"><%= @current_user.asset_string %></span>
   <div class="content" id="submit_assignment_tabs">
     <ul>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>

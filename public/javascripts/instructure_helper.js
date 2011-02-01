@@ -189,6 +189,18 @@
         if($.isFunction(options.success)) {
           options.success.call($form, formData, submitParam);
         }
+      } else if(doUploadFile && options.preparedFileUpload && options.context_code) {
+        $.ajaxJSONPreparedFiles.call(this, {
+          handle_files: (options.upload_only ? options.success : options.handle_files),
+          single_file: options.singleFile,
+          context_code: $.isFunction(options.context_code) ? (options.context_code.call($form)) : options.context_code,
+          intent: options.intent,
+          folder_id: $.isFunction(options.folder_id) ? (options.folder_id.call($form)) : options.folder_id,
+          file_elements: $form.find("input[type='file']"),
+          url: (options.upload_only ? null : action),
+          success: options.success,
+          error: options.error
+        });
       } else if(doUploadFile && $.handlesHTML5Files && $form.hasClass('handlingHTML5Files')) {
         var args = $.extend({}, formData);
         $form.find("input[type='file']").each(function() {
@@ -243,13 +255,17 @@
             request       = new $.fakeXHR(0, ""),
             $originalForm = $form;
 
-            
         $frameForm.attr({
           'method' : method,
           'action' : action,
           'ENCTYPE' : 'multipart/form-data',
+          'encoding' : 'multipart/form-data',
           'target' :"frame_" + id
         });
+        if(options.onlyGivenParameters) {
+          $frameForm.find("input[name='_method']").remove();
+          $frameForm.find("input[name='authenticity_token']").remove();
+        }
 
         $.ajaxJSON.storeRequest(request, action, method, formData);
         
@@ -265,13 +281,16 @@
           } else {
             doc = window.frames[id].document;
           }
-          var text = "(" + $(doc).text() + ")";
-          if(doc.location.href == "about:blank") {
-            return;
-          }
+          var text = "";
+          var href = null;
+          var exception = null;
           try {
-            var data = eval(text);
-            if($.isFunction(options.success) && data && !data.errors) {
+            if(doc.location.href == "about:blank") {
+              return;
+            }
+            text = $(doc).text();
+            var data = JSON.parse(text);
+            if(options.success && $.isFunction(options.success) && data && !data.errors) {
               options.success.call($form, data, submitParam);
             }
           } catch(e) {
@@ -302,6 +321,7 @@
           setTimeout(function() {
             $form.attr({
               'ENCTYPE': priorEnctype,
+              'encoding': priorEnctype,
               'target':  priorTarget
             });
             $("#box_" + id).remove();
@@ -390,7 +410,7 @@
     if(xhr.upload) {
       xhr.upload.addEventListener('progress', function(event) {
         if(event && event.lengthComputable) {
-          console.log(event.loaded + " out of " + event.total);
+//          console.log(event.loaded + " out of " + event.total);
         }
         if(options.progress && $.isFunction(options.progress)) {
           options.progress.call(this, event); //xhr.upload.addEventListener('progress', options.progress, false);
@@ -1815,7 +1835,81 @@
     $.ajaxJSON.storeRequest(xhr, url, 'GET', data);
     return xhr;
   };
-  $.ajaxJSONFiles = function(url, submit_type, formData, files, success, error) {
+  var assert_option = function(data, arg) {
+    if(!data[arg]) {
+      throw arg + " option is required";
+    }
+  }
+  $.ajaxJSONPreparedFiles = function(options) {
+    assert_option(options, 'context_code');
+    var list = [];
+    var $this = this;
+    var pre_list = options.files || options.file_elements || [];
+    for(var idx = 0; idx < pre_list.length; idx++) {
+      var item = pre_list[idx];
+      item.name = (item.value || item.name).split(/(\/|\\)/).pop();
+      list.push(item);
+    }
+    var attachments = [];
+    var ready = function() {
+      var data = options.data;
+      if(options.handle_files) {
+        var result = attachments;
+        if(options.single_file) {
+          result = attachments[0];
+        }
+        data = options.handle_files.call(this, result, data);
+      }
+      if(options.url && options.success && data != false) {
+        $.ajaxJSON(options.url, options.method, data, options.success, options.error);
+      }
+    }
+    var uploadFile = function(parameters, file) {
+      $.ajaxJSON("/files/pending", 'POST', parameters, function(data) {
+        try {
+        if(data && data.upload_url) {
+          if(window.File && (file instanceof window.File)) {
+            data.upload_url = data.proxied_upload_url || data.upload_url;
+            
+          } else {
+            var post_params = data.upload_params;
+            var old_name = $(file).attr('name');
+            $(file).attr('name', data.file_param);
+            $.ajaxJSONFiles(data.upload_url, 'POST', post_params, $(file), function(data) {
+              attachments.push(data);
+              $(file).attr('name', old_name);
+              next.call($this);
+            }, function(data) {
+              $(file).attr('name', old_name);
+              (options.upload_error || options.error).call($this, data);
+            }, {onlyGivenParameters: data.remote_url});
+          }
+        } else {
+          (options.upload_error || options.error).call($this, data);
+        }
+        } catch(e) {
+          var ex = e;
+          debugger;
+          ex;
+        }
+      }, options.upload_error || options.error)
+    }
+    var next = function() {
+      var item = list.shift();
+      if(item) {
+        uploadFile.call($this, {
+          'attachment[folder_id]': options.folder_id,
+          'attachment[intent]': options.intent,
+          'attachment[filename]': item.name,
+          'attachment[context_code]': options.context_code
+        }, item);
+      } else {
+        ready.call($this);
+      }
+    }
+    next.call($this);
+  }
+  $.ajaxJSONFiles = function(url, submit_type, formData, files, success, error, options) {
     var $newForm = $(document.createElement("form"));
     $newForm.attr('action', url).attr('method', submit_type);
     if(!formData.authenticity_token) {
@@ -1824,10 +1918,6 @@
     var fileNames = {};
     files.each(function() {
       fileNames[$(this).attr('name')] = true;
-      var $newFile = $(this).clone(true);
-      $(this).after($newFile);
-      $newForm.append($(this));
-      $(this).removeAttr('id');
     });
     for(var idx in formData) {
       if(!fileNames[idx]) {
@@ -1836,13 +1926,22 @@
         $newForm.append($input);
       }
     }
+    files.each(function() {
+      var $newFile = $(this).clone(true);
+      $(this).after($newFile);
+      $newForm.append($(this));
+      $(this).removeAttr('id');
+    });
     $("body").append($newForm.hide());
     $newForm.formSubmit({
       fileUpload: true,
       success: success,
+      onlyGivenParameters: options.onlyGivenParameters,
       error: error
     });
-    $newForm.submit();
+    (function() {
+      $newForm.submit();
+    }).call($newForm);
   };
   // Wrapper for default $.ajax behavior.  On error will call
   // the default error method if no error method is provided.

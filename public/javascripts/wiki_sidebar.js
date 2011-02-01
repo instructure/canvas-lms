@@ -523,6 +523,13 @@
         });
         $sidebar_upload_image_form.formSubmit({
           fileUpload: true,
+          preparedFileUpload: true,
+          singleFile: true,
+          context_code: $("#editor_tabs .context_code").text(),
+          folder_id: function() {
+            return $(this).find("[name='attachment[folder_id]']").val();
+          },
+          upload_only: true,
           object_name: 'attachment',
           processData: function(data) {
             data['attachment[display_name]'] = $(this).find(".file_name").val();
@@ -555,7 +562,14 @@
         });
         $sidebar_upload_file_form.formSubmit({
           fileUpload: true,
+          preparedFileUpload: true,
+          singleFile: true,
           object_name: 'attachment',
+          context_code: $("#editor_tabs .context_code").text(),
+          folder_id: function() {
+            return $(this).find("[name='attachment[folder_id]']").val();
+          },
+          upload_only: true,
           processData: function(data) {
             data['attachment[display_name]'] = $sidebar_upload_file_form.find(".file_name").val();
             return data;
@@ -563,8 +577,10 @@
           beforeSubmit: function(data) {
             $sidebar_upload_file_form.find(".uploading").slideDown();
             $sidebar_upload_file_form.attr('action', $sidebar_upload_file_form.find(".json_upload_url").attr('href'));
+            $(this).find("button").attr('disabled', true).text("Uploading...");
           },
           success: function(data) {
+            $(this).find("button").attr('disabled', false).text("Upload");
             $sidebar_upload_file_form.slideUp(function() {
               $sidebar_upload_file_form.find(".uploading").hide();
             });
@@ -605,6 +621,7 @@
             wikiSidebar.fileSelected($attachment);
           },
           error: function(data) {
+            $(this).find("button").attr('disabled', false).text("Upload Failed, please try again");
             $sidebar_upload_file_form.find(".uploading").slideUp();
           }
         });

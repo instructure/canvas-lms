@@ -2032,7 +2032,7 @@ var files = {};
         upload_start_handler: fileUpload.uploadStart,
         upload_success_handler : fileUpload.uploadSuccess,
         upload_complete_handler : fileUpload.uploadComplete,
-        button_placeholder_id : "blech",
+        button_placeholder_id : "file_swf",
         button_width: 50,
         button_height: 22,
         button_text : '<span class="link">&nbsp;</span>',

@@ -27,7 +27,7 @@
     </div>
     <ul id="files_structure_list">
       <li id="swfupload_holder">
-        <div id="blech"></div>
+        <div id="file_swf"></div>
       </li>
       <% @file_structures.each do |context, structure| %>
         <% root_folder = structure[:folders].select{|f| f.root_folder? && f.context_id == context.id && f.context_type == context.class.base_ar_class.to_s }.first %>
