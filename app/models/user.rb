@@ -20,8 +20,7 @@ class User < ActiveRecord::Base
   include Context
 
   attr_accessible :name, :short_name, :time_zone, :subscribe_to_emails, :school_name, :school_position, :phone, :referrer, :show_user_services, :gender, :visible_inbox_types, :avatar_image
-  attr_accessor :original_id
-  attr_accessor :referrer, :location, :assigned_salesperson
+  attr_accessor :original_id, :referrer
   
   before_save :infer_defaults
   serialize :preferences
