@@ -1,1 +1,0 @@
-<%@ Page Language="VB" AutoEventWireup="true" CodeFile="ShowThumbnail.aspx.vb" Inherits="ShowThumbnail" %>
