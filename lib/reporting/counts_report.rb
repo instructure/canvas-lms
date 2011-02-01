@@ -69,12 +69,14 @@ class CountsReport
 
     each_account do |a|
       next if a.external_status == 'test'
+      activity = last_activity(a.id)
+      next unless activity
 
       account = {}
       account[:id] = a.id
       account[:name] = a.name
       account[:external_status] = a.external_status
-      account[:last_activity] = last_activity(a.id)
+      account[:last_activity] = activity
       account[:page_views_in_last_week] = get_count_from_query(PAGE_VIEWS_FOR_ACCOUNT % [a.id, (@yesterday - 1.week).to_s(:db), @yesterday.to_s(:db)])
       account[:page_views_in_last_month] = get_count_from_query(PAGE_VIEWS_FOR_ACCOUNT % [a.id, (@yesterday - 1.month).to_s(:db), @yesterday.to_s(:db)])
 
@@ -221,7 +223,7 @@ class CountsReport
   def last_activity(account_id)
     query = "SELECT max(created_at) FROM `#{PageView.table_name}` WHERE account_id = #{account_id}"
     res = ActiveRecord::Base.connection.execute(query)
-    res.fetch_row[0]
+    res.fetch_row[0] rescue nil
   end
 
   def get_course_ids(account, course_ids)
