@@ -1,0 +1,106 @@
+<% jammit_css :login %>
+<% @body_classes << "modal" if @body_classes %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $("#register_link").click(function(){
+    $.trackPageview("/clicked_register_on_login_form");
+  });
+  
+  $(".field-with-fancyplaceholder input").fancyPlaceholder();
+  $("#forgot_password_form").formSubmit({
+    object_name: 'pseudonym_session',
+    required: ['unique_id_forgot'],
+    beforeSubmit: function(data) {
+      $(this).loadingImage();
+    },
+    success: function(data) {
+      $(this).loadingImage('remove');
+      $.flashMessage("Password confirmation sent to " + $(this).find(".email_address").val() + ".  Make sure you check your spam box.");
+      $(".login_link:first").click();
+    },
+    error: function(data) {
+      $(this).loadingImage('remove');
+    }
+  });
+  $(".forgot_password_link").click(function(event) {
+    event.preventDefault();
+    $("#login_form").hide();
+    $("#forgot_password_form").show();
+  });
+  $(".login_link").click(function(event) {
+    event.preventDefault();
+    $("#login_form").show();
+    $("#forgot_password_form").hide();
+  });
+  
+  $("#login_form")
+    .submit(function(event) {
+      var data = $(this).getFormData({object_name: 'pseudonym_session'});
+      var success = true;
+      if(!data.unique_id || data.unique_id.length < 1) {
+        $(this).formErrors({
+          unique_id: 'Invalid login'
+        });
+        success = false;
+      } else if(!data.password || data.password.length < 1) {
+        $(this).formErrors({
+          password: 'Invalid password'
+        });
+        success = false;
+      }
+      return success;
+    })
+    .find(":text:first")
+      .focus().select();
+});
+</script>
+<% end %>
+<% login_handle_name = @domain_root_account.login_handle_name rescue "Email Address" %>
+<% @is_saml = @domain_root_account.saml_authentication? if @domain_root_account and @is_saml.nil? %>
+<div id="modal-box">
+  <div id="modal-box-inner">
+    <% if @is_saml %>
+        <div id="login_form">
+            <% if flash[:saml_message] %>
+                <div class="error_box errorBox" style="display: block; position:relative; top: auto; left: auto; max-width: 400px">
+                  <div class="error_text"><%= flash[:saml_message] %></div>
+                </div>
+        <% end %>
+            <a href="<%= login_path %>" style="font-size: 1.3em;" class="button">Log in at <%= @domain_root_account.display_name rescue "your institution" %></a>
+        </div>
+    <% else %>
+        <% form_for :pseudonym_session, :url => login_path(:secure => true), :html => {:id => "login_form"} do |f| %>
+          <%= link_to "Click to register",  Setting.get_cached("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account && @domain_root_account.settings[:open_registration] %>
+          <h2 class="ui-helper-hidden-accessible">Login</h2>
+          <% login_inner_dialog = yield :login_inner_dialog %>
+          <%= login_inner_dialog if login_inner_dialog && !login_inner_dialog.strip.empty? %>
+          <input type="hidden" name="redirect_to_ssl" value="1"/>
+          <div>
+            <span class=" field-with-fancyplaceholder"><%= f.label :unique_id, login_handle_name %><%= f.text_field :unique_id, :class => "text", :value => (@unauthorized_user.email rescue '') %></span>
+            <span class=" field-with-fancyplaceholder"><%= f.label :password, "Password" %><%= f.password_field :password, :class => "text" %></span>
+          </div>
+          <div>
+            <div style="float: left;">
+              <%= f.check_box :remember_me %><%= f.label :remember_me, "Stay logged in" %>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <a href="#" class="forgot_password_link">I don't know my password</a>
+            </div>
+            <button type="submit" class="button">Login</button> 
+          </div>
+        <% end %>
+    <% end %>
+
+    <% form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :style => "display: none;"} do |f| %>
+
+      <p>Enter your <%= login_handle_name %> and we'll send you a link to change your password.</p>
+      <div>
+        <span class=" field-with-fancyplaceholder"><label for="pseudonym_session_unique_id_forgot"><%= login_handle_name %></label><input class="email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" /></span>
+        <button type="submit" class="button">Request Password</button>
+      </div>
+
+      &larr; <%= link_to "Back to Login", login_path, :class => "login_link" %>
+    <% end %>
+  </div>
+</div>
+<%= render "shared/login_trailer" %>

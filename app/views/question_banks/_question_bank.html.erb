@@ -1,0 +1,24 @@
+<% context = question_bank ? question_bank.context : @context %>
+<div class="question_bank" id="question_bank_<%= question_bank ? question_bank.id : "blank" %>" style="<%= hidden unless question_bank %>">
+  <div class="header">
+    <div class="header_content">
+      <a class="title" href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>"><%= question_bank.try_rescue(:title) || "No Name" %></a>
+    </div>
+    <div class="links">
+      <% not_yet_bookmarked = question_bank && !question_bank.bookmarked_for?(@current_user) %>
+      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}") %>" class="bookmark_bank_link no-hover" title="Bookmark this Question Bank" style="<%= hidden unless not_yet_bookmarked %>"><%= image_tag "bookmark_gray.png" %></a>
+      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="bookmark_bank_link no-hover" title="Unbookmark this Question Bank" style="<%= hidden if not_yet_bookmarked %>"><%= image_tag "bookmark.png" %></a>
+      <% if context == @context %>
+        <span style="<%= hidden if question_bank && !can_do(question_bank, @current_user, :update) %>">
+          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="edit_bank_link no-hover"><%= image_tag "edit.png" %></a>
+          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="delete_bank_link no-hover"><%= image_tag "delete.png" %></a>
+        </span>
+      <% end %>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="content">
+    <div><%= question_bank ? pluralize(question_bank.assessment_questions.active.count, "Question") : "No Questions" %></div>
+    <div>Last Updated: <span class="last_updated_at"><%= datetime_string(question_bank.try_rescue(:updated_at)) || nbsp %></span></div>
+  </div>
+</div>

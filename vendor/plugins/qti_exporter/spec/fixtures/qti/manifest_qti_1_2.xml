@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<manifest identifier="MANIFEST1" xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" 
+    xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_v1p2" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd http://www.imsglobal.org/xsd/imsmd_v1p2 imsmd_v1p2p2.xsd">
+	<metadata>
+		<schema>IMS Content</schema>
+		<schemaversion>1.1.3</schemaversion>
+		<imsmd:lom>
+			<imsmd:general>
+				<imsmd:identifier>
+					<imsmd:langstring xml:lang="en-US">52BF3E44F087427782489C7DC5CAB5FD</imsmd:langstring>
+				</imsmd:identifier>
+				<imsmd:title>
+					<imsmd:langstring xml:lang="en-US">ISOrientationQuiz (Respondus IMS QTI export)</imsmd:langstring>
+				</imsmd:title>
+			</imsmd:general>
+		</imsmd:lom>
+	</metadata>
+	<organizations default="EXAM1">
+		<organization identifier="EXAM1" structure="hierarchical">
+			<title>default</title>
+			<item identifier="ITEM1" identifierref="RESOURCE1">
+				<title>Exam 1</title>
+			</item>
+		</organization>
+	</organizations>
+	<resources>
+		<resource identifier="RESOURCE1" type="imsqti_xmlv1p1" href="ISOrientationQuiz.xml">
+			<file href="ISOrientationQuiz.xml" />
+			<file href="rcline pic &amp; contact info.png" />
+		</resource>
+	</resources>
+</manifest>

@@ -1,0 +1,326 @@
+<% content_for :page_title do %>Account Settings<% end %>
+
+<% content_for :right_side do %>
+  <%= render :partial => "courses_right_side" %>
+<% end %>
+<%
+  @active_tab = "settings"
+  add_crumb "Settings"
+%>
+
+<div id="account_settings_tabs" style="display:none;">
+  <ul>
+    <li><a href="#tab-settings">Settings</a></li>
+    <li><a href="#tab-users" id="tab-users-link">Admins</a></li>
+    <% if @available_reports %>
+      <li><a href="#tab-reports" id="tab-reports-link">Reports</a></li>
+    <% end %>
+  </ul>
+  <div id="tab-settings">
+    <h2>Account Settings</h2>
+    <% if can_do(@context, @current_user, :manage_account_settings) %>
+      <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings"} do |f| %>
+      <table class="formtable">
+        <tr>
+          <td><%= f.label :name, "Account Name:" %></td>
+          <td><%= f.text_field :name %></td>
+        </tr>
+        <tr>
+          <td>
+            <%= f.label :default_storage_quota, "Default File Quota:" %>
+          </td>
+          <td><%= f.text_field :default_storage_quota, :style => "width: 50px;", :title => "megabytes" %> megabytes</td>
+        </tr>
+        <% if @account.root_account_id == nil %>
+          <tr>
+            <td><%= f.label :default_time_zone, "Default Time Zone:" %></td>
+            <td>
+              <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
+            </td>
+          </tr>
+          <% if current_user_is_site_admin? %>
+            <% f.fields_for :settings do |settings| %>
+              <tr>
+                <td style="padding-top: 15px;"><%= f.label :enable_user_notes, "Faculty Journal:" %></td>
+                <td style="padding-top: 15px;"><%= f.select :enable_user_notes, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.enable_user_notes) %></td>
+              </tr>
+              <tr>
+                <td><%= settings.label :admins_can_change_passwords, "Password Setting by Admins:" %></td>
+                <td><%= settings.select :admins_can_change_passwords, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.settings[:admins_can_change_passwords] == true) %></td>
+              </tr>
+              <tr>
+                <td><%= settings.label :global_includes, "External CSS/JS:" %></td>
+                <td><%= settings.select :global_includes, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.settings[:global_includes] == true) %></td>
+              </tr>
+              <% unless @account.special_account? %>
+                <tr>
+                  <td><%= f.label :allow_sis_import, "SIS Imports:" %></td>
+                  <td><%= f.select :allow_sis_import, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.allow_sis_import == true) %></td>
+                </tr>
+              <% end %>
+            <% end %>
+          <% end %>
+          <% if @account.settings[:global_includes] %>
+            <% f.fields_for :settings do |settings| %>
+              <tr>
+                <td style="padding-top: 15px;"><%= settings.label :global_javascript, "Global Javascript URL:" %></td>
+                <td style="padding-top: 15px;"><%= settings.text_field :global_javascript, :value => @account.settings[:global_javascript] %></td>
+              </tr>
+              <tr>
+                <td><%= settings.label :global_stylesheet, "Global CSS URL:" %></td>
+                <td><%= settings.text_field :global_stylesheet, :value => @account.settings[:global_stylesheet] %></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td style="font-size: 0.8em; padding-bottom: 15px;">
+                  these files will be included on all page loads for your account<br/>
+                  <!-- I'd like to include a link here to whatever documentation we put up -->
+                  <a style="display: none;" href="/docs/global_content.pdf">more information</a>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        <% end %>
+        <tr style="<%= hidden unless RAILS_ENV == 'development' %>">
+          <td colspan="2">
+            <div style="margin-top: 10px;">
+              <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
+              <label for="turnitin">Enable turnitin for this account</label>
+            </div>
+          </td>
+        </tr>
+        <tr class="turnitin_settings" style="display: none;">
+          <td><%= f.label :turnitin_account_id, "Turnitin Account ID:" %></td>
+          <td><%= f.text_field :turnitin_account_id, :style => "width: 150px;", :class => "turnitin_account_settings" %></td>
+        </tr>
+        <tr class="turnitin_settings" style="display: none;">
+          <td><%= f.label :turnitin_shared_secret, "Turnitin Shared Secret:" %></td>
+          <td><%= f.text_field :turnitin_shared_secret, :style => "width: 150px;", :class => "turnitin_account_settings" %></td>
+        </tr>
+        <tr class="turnitin_settings" style="display: none;">
+          <td>&nbsp;</td><td>
+            <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link">confirm Turnitin settings</a>
+          </td>
+        </tr>
+        <tr class="turnitin_settings" style="display: none;">
+          <td><%= f.label :turnitin_comments, "Turnitin Submission Comments:" %></td>
+          <td><span style="font-size: 0.8em;">these comments will be shown to students when submitting a Turnitin-enabled assignment</span><%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %></td>
+        </tr>
+        <tr class="turnitin_settings" style="display: none;">
+          <td><%= f.label :turnitin_pledge, "Turnitin Pledge:" %></td>
+          <td><span style="font-size: 0.8em;">students must check a box acknowledging that they agree with this pledge</span><%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %></td>
+        </tr>
+        <% if @account.root_account_id == nil %>
+          <% f.fields_for :settings do |settings| %>
+            <tr>
+              <td colspan="2">
+                <div style="margin-top: 10px;">
+                  <%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>
+                  <%= settings.label :prevent_course_renaming_by_teachers, "Don't let teachers rename their courses" %>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div style="margin-top: 10px;">
+                  Choose who can create new courses: (Account Administrators can always create courses)
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div style="margin-top: 10px;">
+                  <%= settings.check_box :teachers_can_create_courses, :checked => @account.settings[:teachers_can_create_courses] != false %>
+                  <%= settings.label :teachers_can_create_courses, "Teachers" %>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div style="margin-top: 10px;">
+                  <%= settings.check_box :students_can_create_courses, :checked => @account.settings[:students_can_create_courses] != false %>
+                  <%= settings.label :students_can_create_courses, "Students" %>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div style="margin-top: 10px;">
+                  <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.settings[:no_enrollments_can_create_courses] != false %>
+                  <%= settings.label :no_enrollments_can_create_courses, "Users with no enrollments" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+        <tr>
+          <td colspan="2">
+            <div class="button-container">
+              <button type="submit" class="button">Update Settings</button>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <% end %>
+    <% else %>
+      You don't have permission to edit these settings
+    <% end %>
+  </div>
+  <div id="tab-users">
+    <h2>Account Admins</h2>
+    <ul class="admins_list">
+      <% @account_users.each do |account_user| %>
+        <li>
+          <a href="<%= user_url(account_user.user_id) %>" class="user_name"><%= account_user.user.name %></a>
+          <% if can_do(@context, @current_user, :manage_account_memberships) %>
+            <a href="<%= account_remove_account_user_url(@context.id, account_user.id) %>" class="remove_account_user_link no-hover" title="Remove this admin"><%= image_tag "delete_circle.png" %></a>
+          <% end -%>
+          <span class="membership_type"><%= account_user.readable_type %></span>
+          <span class="email"><%= account_user.user.email %></span>
+        </li>
+      <% end %>
+    </ul>
+    <% if can_do(@context, @current_user, :manage_account_memberships) %>
+      <h2>Add a New Admin</h2>
+      <% form_for :account_user, :url => account_add_account_user_url(@account), :html => {:id => ""} do |f| %>
+        <label for="admin_email">Email Address:</label>
+        <input type="text" id="admin_email" name="admin[email]"/>
+        <label for="admin_membership_type">Type:</label>
+        <select name="admin[membership_type]" id="admin_membership_type">
+        <% @context.account_membership_types.each do |type| %>
+          <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
+        <% end %>
+        </select>
+        <button type="submit" class="button">Add Admin</button>
+      <% end %>
+    <% end %>
+  </div>
+  <% if @available_reports %>
+    <div id="tab-reports">
+      <% @available_reports.each do |report, print_name| 
+         last_run = @last_reports[report]
+      %>
+        <div id="<%= report %>" style="margin-bottom: 10px;">
+          <h3 style="margin-bottom: 3px;"><%= print_name %></h3>
+          Last Run:
+          <% if last_run %>
+              <%= datetime_string(last_run.created_at) %><br/>
+              <a href="/accounts/<%= last_run.account.id %>/files/<%= last_run.attachment.id %>/download">Download last version</a>
+          <% else %>
+          Never
+          <% end %>
+          <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
+            <input type="hidden" name="report_type" value="<%= report %>" />
+            <span class="running_report_message" style="<%= hidden %>">The report is running. You'll receive an email when it is done.</span>
+            <a href="#" id="run_<%= report %>" class="run_report_link">Run this report now</a><br/>
+          </form>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $("#account_settings_tabs").tabs().show();
+  $(".remove_account_user_link").click(function(event) {
+    event.preventDefault();
+    var $item = $(this).parent("li");
+    $item.confirmDelete({
+      message: "Are you sure you want to remove this account admin?",
+      url: $(this).attr('href'),
+      success: function() {
+        $item.slideUp(function() {
+          $(this).remove();
+        });
+      }
+    });
+  });
+  $("#turnitin").change(function() {
+    $("tr.turnitin_settings").showIf($(this).attr('checked'));
+  }).change();
+  $(".turnitin_account_settings").change(function() {
+    $(".confirm_turnitin_settings_link").text("confirm Turnitin settings");
+  });
+  $(".confirm_turnitin_settings_link").click(function(event) {
+    event.preventDefault();
+    var $link = $(this);
+    var url = $link.attr('href');
+    var account = $("#account_settings").getFormData({object_name: 'account'});
+    url = $.replaceTags($.replaceTags(url, 'account_id', account.turnitin_account_id), 'shared_secret', account.turnitin_shared_secret);
+    $link.text("checking Turnitin settings...");
+    $.ajaxJSON(url, 'GET', {}, function(data) {
+      if(data && data.success) {
+        $link.text("Turnitin settings confirmed!");
+      } else {
+        $link.text("invalid Turnitin settings, please check your account id and shared secret from Turnitin")
+      }
+    }, function(data) {
+      $link.text("invalid Turnitin settings, please check your account id and shared secret from Turnitin")
+    });
+  });
+
+    $(".run_report_link").click(function(event) {
+        event.preventDefault();
+        $(this).parent("form").submit();
+    });
+
+    $(".run_report_form").formSubmit({
+        resetForm: true,
+        beforeSubmit: function(data) {
+            $(this).find('.run_report_link').hide();
+            $(this).find('.running_report_message').show();
+            return true;
+        },
+        success: function(data) {
+        },
+        error: function(data) {
+        }
+    });
+
+});
+</script>
+<% end %>
+
+<% content_for :stylesheets do %>
+<style>
+.admins_list {
+  list-style-type: none;
+  padding-left: 10px;
+}
+.admins_list li {
+  width: 300px;
+  padding: 2px 5px;
+  margin-bottom: 5px;
+}
+.admins_list li:hover {
+  background-color: #eee;
+  -moz-border-radius: 3px;
+}
+.admins_list .user_name {
+  font-weight: bold;
+  float: left;
+}
+.admins_list .email {
+  clear: left;
+  display: block;
+  font-size: 0.8em;
+  color: #888;
+  padding-left: 10px;
+}
+.admins_list .membership_type {
+  clear: left;
+  display: block;
+  font-size: 0.8em;
+  padding-left: 10px;
+}
+.admins_list .remove_account_user_link {
+  float: right;
+  opacity: 0.5;
+}
+.admins_list li:hover .remove_account_user_link {
+  opacity: 1.0;
+}
+</style>
+<% end %>

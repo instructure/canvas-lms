@@ -1,0 +1,17 @@
+<% content_for :page_title do %>Invitation to <%= @context.name %><% end %>
+<% @show_left_side = false %>
+
+<% content_for :page_header do %>
+  <h1>Course Invitation</h1>
+<% end %>
+
+<div id="modal-box">
+  <div id="modal-box-inner">
+    <h2>Invitation Received!</h2>
+    You should get an email at <b><%= params[:email] %> in the next few minutes.
+    That email will have a link that you can use
+    to finish the registration process.  Once you've set up your account you'll
+    be able to access content from <b><%= @context.name %></b>.  Welcome to
+    Canvas!
+  </div>
+</div>

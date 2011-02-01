@@ -1,0 +1,28 @@
+<% content_for :page_title do %>Import Wizard<% end %>
+<%= render :partial => 'wizard_secondary_nav', :locals => {:view => 'intro' } %>
+
+<div class="content-imports-wrapper">
+  <h2>Import Wizard</h2>
+  <p>If you're moving to Canvas from another course management system, then chances are
+  there are files, quizzes, assignments and things over there that you're going to want moved
+  over here.  This wizard should make that process pretty easy.
+  </p>
+  <p>There are <%= qti_enabled? ? "three" : "two" %> basic steps to migrating your course: </p>
+  <ul class="content-imports-instructions">
+    <li><a href="<%= context_url(@context, :context_import_files_url) %>">Import Files</a> (if any)</li>
+    <% if qti_enabled? %>
+        <li><a href="<%= context_url(@context, :context_import_quizzes_url) %>">Import Quizzes</a> (if any)</li>
+    <% end %>
+  </ul>
+  <p>You may skip any steps that don't apply.</p>
+  <p>
+    <h4>You can also:</h4> 
+    <div>
+      <% if exports_enabled? %>
+          <a class="button" href="<%= context_url(@context, :context_import_migrate_url) %>"> Migrate content from <b>another system</b> into Canvas</a>
+          or &nbsp;
+      <% end %>
+      <a class="button" href="<%= context_url(@context, :context_import_copy_url) %>"> Copy content from <b>another Canvas course</b></a>
+    </div>
+  </p>
+</div>

@@ -1,0 +1,37 @@
+<% rubric = rubric_summary %>
+<% rubric_association ||= nil; editable ||= false; association_object = nil
+   edit ||= false; rubic ||= nil; assessing ||= false; assessment ||= nil; brief ||= false %>
+<table class="rubric rubric_summary <%= 'free_form' if rubric && rubric.free_form_criterion_comments %>" id="<%= rubric ? "rubric_summary_#{rubric.id}" : "default_rubric_summary" %>" style="<%= 'hidden' unless brief %>">
+<thead>
+  <tr class="rubric_title" style="<%= hidden if brief %>">
+    <th colspan="2">
+      <span class="title"><%= rubric.title rescue "Title" %></span>
+      <span class="id" style="display: none;"><%= rubric.id rescue nbsp %></span>
+    </th>
+  </tr>
+  <tr>
+    <th>Criteria</th>
+    <th>Assessment</th>
+  </tr>
+</thead>
+<tbody> 
+  <% if rubric && rubric.criteria %>
+    <% rubric.criteria_object.each do |criterion| %>
+      <% rating = assessment.ratings.find{|r| r.criterion_id == criterion.id} rescue nil %>
+      <%= render :partial => "shared/rubric_summary_criterion", :object => criterion, :locals => {:assessing => assessing, :assessment_rating => rating, :brief => brief} %>
+    <% end %>
+  <% else %>
+    <%= render :partial => "shared/rubric_summary_criterion", :locals => {:assessing => assessing, :brief => brief} %>
+  <% end %>
+  <tr class="summary" style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
+    <td colspan="2" style="padding-right: 10px; text-align: right;">
+      Total Points: 
+      <span class="rubric_total" style="<%= hidden if brief %>"><%= assessing ? "0" : (rubric.points_possible rescue 5) %></span> out of <span class="points_possible"><%= rubric.points_possible rescue 5 %></span>
+    </td>
+  </tr>
+</tbody>
+</table>
+<div class="button-container" style="<%= hidden if brief %>">
+  <button class="toggle_full_rubric edit button">Edit Assessment</button>
+</div>
+

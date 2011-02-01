@@ -1,0 +1,36 @@
+<assessmentItem identifier="" title="Ordering question"><responseDeclaration identifier="RESPONSE" baseType="identifier" cardinality="ordered"><correctResponse><value>choice_1</value><value>choice_2</value><value>choice_3</value></correctResponse></responseDeclaration><outcomeDeclaration identifier="SCORE" baseType="float" cardinality="single"><defaultValue><value>0</value></defaultValue></outcomeDeclaration><itemBody><![CDATA[<div>Order these</div>]]><orderInteraction responseIdentifier="RESPONSE"><simpleChoice identifier="choice_1">1</simpleChoice><simpleChoice identifier="choice_2">2</simpleChoice><simpleChoice identifier="choice_3">3</simpleChoice></orderInteraction><![CDATA[<div></div>]]></itemBody><modalFeedback outcomeIdentifier="GENERAL_FEEDBACK" identifier="CORRECT_FEEDBACK" showHide="show"><![CDATA[jkl;]]></modalFeedback><modalFeedback outcomeIdentifier="GENERAL_FEEDBACK" identifier="INCORRECT_FEEDBACK" showHide="show"><![CDATA[asdf]]></modalFeedback><FEEDBACK /><outcomeDeclaration identifier="GENERAL_FEEDBACK" baseType="identifier" cardinality="single" /><responseProcessing>
+    <responseCondition>
+        <responseIf>
+            <isNull>
+                <variable identifier="RESPONSE" />
+            </isNull>
+            <setOutcomeValue identifier="SCORE">
+                <baseValue baseType="integer">0</baseValue>
+            </setOutcomeValue>
+        </responseIf>
+        <responseElse>
+            <responseCondition>
+                <responseIf>
+                    <match>
+                        <correct identifier="RESPONSE" />
+                        <variable identifier="RESPONSE" />
+                    </match>
+                    <setOutcomeValue identifier="SCORE">
+                        <baseValue baseType="float">1</baseValue>
+                    </setOutcomeValue>
+                    <setOutcomeValue identifier="GENERAL_FEEDBACK">
+		                <baseValue baseType="identifier">CORRECT_FEEDBACK</baseValue>
+                    </setOutcomeValue>
+                </responseIf>
+                <responseElse>
+                    <setOutcomeValue identifier="SCORE">
+                        <baseValue baseType="float">0</baseValue>
+                    </setOutcomeValue>
+                    <setOutcomeValue identifier="GENERAL_FEEDBACK">
+		                <baseValue baseType="identifier">INCORRECT_FEEDBACK</baseValue>
+                    </setOutcomeValue>
+                </responseElse>
+            </responseCondition>
+        </responseElse>
+    </responseCondition>
+</responseProcessing></assessmentItem>

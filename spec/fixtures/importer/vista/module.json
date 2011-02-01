@@ -1,0 +1,37 @@
+{
+    "migration_id":"1865116190002",
+    "show_table_of_contents":true,
+    "show_toc_as_first_page":false,
+    "show_item":"true",
+    "description":"",
+    "module_id":"1865116190002",
+    "order":"1",
+    "title":"Getting Started",
+    "numbering_type":"1, 1.1, 1.1.1, 2...",
+    "items":[
+        {
+            "indents":0,
+            "linked_resource_title":"Computer Setup",
+            "linked_resource_type":"URL_TYPE",
+            "url":"http://oioi.com",
+            "title":"Computer Setup",
+            "sub_items":[]
+        },
+        {
+            "indents":0,
+            "linked_resource_title":"Blackboard Support",
+            "linked_resource_type":"URL_TYPE",
+            "title":"Blackboard Tools--the \"How to\"",
+            "url":"http://blackboardisntthebest.com",
+            "sub_items":[]
+        },
+        {
+            "indents":0,
+            "linked_resource_title":"Test Assignment",
+            "linked_resource_type":"PROXY_SAFEASSIGN_1",
+            "linked_resource_id":"1865124013002",
+            "title":"Test Assignment",
+            "sub_items":[]
+        }
+    ]
+}

@@ -1,0 +1,45 @@
+.defaultSkin table.mceLayout 
+  border: 1px solid #ddd
+  -moz-border-radius: 5px
+  padding: 6px
+  background-color: transparent
+  tr.mceLast
+    td.mceIframeContainer
+      border: 2px solid #ccc
+  tr.mceFirst 
+    td.mceToolbar
+      border-top: 0
+      background: #ccc url(/images/tinybg.png) repeat-x top left
+      -moz-border-radius-topleft: 5px
+      -moz-border-radius-topright: 5px
+      table.mceToolbar
+        margin-top: 2px
+        margin-bottom: 2px
+        background-color: transparent
+        &.mceToolbarRow1
+          margin-top: 5px
+        tr
+          td
+            background-color: transparent
+            &.mceToolbarStart,&.mceSeparatorLeft
+              -moz-border-radius-topleft: 5px
+              -moz-border-radius-bottomleft: 5px
+            &.mceToolbarEnd,&.mceSeparatorRight
+              -moz-border-radius-topright: 5px
+              -moz-border-radius-bottomright: 5px
+            &.mceSeparatorMiddle
+              background: transparent
+              width: 4px
+            background-image: url(/images/tinybutton.png)
+            padding: 4px 2px
+            a.mceButton
+              border-color: transparent
+              -moz-border-radius: 3px
+              &:hover
+                background-color: #B1D5E9
+              &.mceButtonActive
+                background-color: #ADCDDF
+            td
+              padding: 0
+              a.mceAction,a.mceOpen
+                border-color: #ccc

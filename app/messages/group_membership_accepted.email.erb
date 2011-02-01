@@ -1,0 +1,13 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups/<%= asset.group_id %>
+<% end %>
+<% define_content :subject do %>
+  Group Membership Accepted: <%= asset.group.name %>
+<% end %>
+
+Group Request Accepted: <%= asset.group.name %>
+
+You're request to join the group <%= asset.group.name %> for the <%= asset.group.context.class.to_s.downcase %> <%= asset.group.context.name %> has been accepted.
+
+You can check out the group by clicking the link below:
+<%= content :link %>

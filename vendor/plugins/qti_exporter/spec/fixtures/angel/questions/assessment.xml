@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Unmapped metadata field: cc_profile=cc.multiple_choice.v0p1
+Unmapped metadata field: cc_weighting=1
+Unmapped metadata field: cc_profile=cc.multiple_response.v0p1
+Unmapped metadata field: cc_profile=cc.true_false.v0p1
+	-->
+
+<assessmentTest
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+ identifier="angel2_assessment"
+ title="QM Practice Quiz">
+<testPart identifier="BaseTestPart">
+<assessmentSection identifier="7e65181c-c7d9-4aec-88ff-7529ad7eb56a">
+<assessmentItemRef identifier="ID_622cb516-53e7-44ee-aad1-9998a8395b3b" href="../assessmentItems/ID_622cb516-53e7-44ee-aad1-9998a8395b3b.xml"/>
+<assessmentItemRef identifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62" href="../assessmentItems/f2e9bd5b-8dae-4829-a639-c38e97a96c62.xml"/>
+<assessmentItemRef identifier="ID_9c0075c8-fc10-43d2-834c-ba630f44e21d" href="../assessmentItems/ID_9c0075c8-fc10-43d2-834c-ba630f44e21d.xml"/>
+<assessmentItemRef identifier="ID_4ca73eba-edbb-4cad-87f5-d0aa2284440c" href="../assessmentItems/ID_4ca73eba-edbb-4cad-87f5-d0aa2284440c.xml"/>
+<assessmentItemRef identifier="ID_543c53e4-f001-41a7-af6d-3312572801d3" href="../assessmentItems/ID_543c53e4-f001-41a7-af6d-3312572801d3.xml"/>
+<assessmentItemRef identifier="b00fe68d-2b75-4652-8d06-9e9d38a1fef6" href="../assessmentItems/b00fe68d-2b75-4652-8d06-9e9d38a1fef6.xml"/>
+<assessmentItemRef identifier="ID_0ee472e8-5bc2-4b30-a341-2fa93a50bc54" href="../assessmentItems/ID_0ee472e8-5bc2-4b30-a341-2fa93a50bc54.xml"/>
+<assessmentItemRef identifier="ID_3f9f4eed-4698-4690-9f9d-851b31ce5eb0" href="../assessmentItems/ID_3f9f4eed-4698-4690-9f9d-851b31ce5eb0.xml"/>
+</assessmentSection>
+</testPart>
+</assessmentTest>

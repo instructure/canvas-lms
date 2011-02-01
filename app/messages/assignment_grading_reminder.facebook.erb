@@ -1,0 +1,5 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
+<% end %>
+
+It looks like the assignment <b><a href="<%= content :link %>"><%= asset.assignment.title %></a></b> for <%= asset.assignment.context.name %> hasn't been graded.  It was due <b><%= datetime_string(force_zone(asset.assignment.due_at)) %></b>.

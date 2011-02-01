@@ -1,0 +1,10 @@
+<% wiki_namespace = asset.find_namespace_for_user(user) %>
+<% define_content :link do %>
+   http://<%= HostUrl.context_host(wiki_namespace.context) %>/<%= wiki_namespace.context.class.to_s.downcase.pluralize %>/<%= wiki_namespace.context_id %>/wiki/<%= wiki_namespace.namespace + ":" if !wiki_namespace.default? %><%= asset.url %>
+<% end %>
+
+<% define_content :subject do %>
+  New Wiki Page - <%= asset.title.titleize %>: <%= wiki_namespace.context.name rescue "" %>
+<% end %>
+
+<%= strip_and_truncate(asset.body, :max_length => 200) %> 

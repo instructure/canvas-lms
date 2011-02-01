@@ -1,0 +1,7 @@
+Your grade for <%= asset.assignment.title %>, <%= asset.assignment.context.name %> just changed.
+
+re-graded: <%= force_zone(asset.graded_at).strftime("%b %d at %I:%M") rescue "No Date Set" %><%= force_zone(asset.graded_at).strftime("%p").downcase rescue "" %>
+<% if asset.score  %>score:  <%= asset.score %> out of <%= asset.assignment.points_possible || "N/A" %><% end %>
+<%= "score pending review by the teacher" if asset.pending_review? %>
+
+More info at <%= HostUrl.context_host(asset.assignment.context) %>

@@ -1,0 +1,87 @@
+<% term ||= nil %>
+<tr class="term" id="term_<%= term ? term.id : "blank" %>" style="<%= hidden unless term %>">
+  <td class="header">
+    <div class="show_term">
+      <span class="name"><%= term.name rescue nbsp %></span>
+    </div>
+    <div class="show_term" style="font-size: 0.8em;">
+      <%= pluralize(term.courses.count, "Course") rescue nil %>
+    </div>
+    <% form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
+      <div class="edit_term">
+        <%= f.text_field :name %>
+      </div>
+      <div class="edit_term" style="margin-top: 10px;">
+        <button class="button submit_button" type="submit"><%= term ? "Update Term" : "Add Term" %></button>
+        <button class="button button-secondary cancel_button" type="button">Cancel</button>
+      </div>
+    <% end %>
+  </td>
+  <% types = [StudentEnrollment, TeacherEnrollment, TaEnrollment] %>
+  <td class="permissions">
+    <table>
+      <tr>
+        <td>
+          <strong>Term Runs</strong> from&nbsp;
+        </td>
+        <td>
+          <div class="show_term">
+            <span class="start_at"><%= (date_string(term.start_at, :long) || 'whenever') rescue 'whenever' %></span>
+          </div>
+          <div class="edit_term">
+            <input type="text" name="enrollment_term[start_at]" value="<%= date_string(term.start_at, :long) rescue nil %>" title="Term starts" class="date_field" style="width: 120px;"/>
+          </div>
+        </td>
+        <td>
+          &nbsp;to&nbsp;
+        </td>
+        <td>
+          <div class="show_term">
+            <span class="end_at"><%= (date_string(term.end_at, :long) || 'whenever') rescue 'whenever' %></span>
+          </div>
+          <div class="edit_term">
+            <input type="text" name="enrollment_term[end_at]" value="<%= date_string(term.end_at, :long) rescue nil %>" title="Term ends" class="date_field" style="width: 120px;"/>
+          </div>
+        </td>
+      </tr>
+    <% types.each do |type| %>
+      <% override = term.enrollment_dates_overrides.find_by_context_type_and_context_id_and_enrollment_type(@context.class.to_s, @context.id, type.to_s) if term %>
+      <% override ||= OpenStruct.new %>
+      <% type_string = type.to_s.underscore %>
+      <% readable_type = Enrollment.readable_type(type.to_s) %>
+      <tr>
+        <td>
+          <strong><%= readable_type %>s</strong> can access from&nbsp;
+        </td>
+        <td>
+          <div class="show_term">
+            <span class="<%= type_string %>_start_at"><%= date_string(override.start_at || term.start_at, :long) rescue 'whenever' %></span>
+          </div>
+          <div class="edit_term">
+            <input type="text" name="enrollment_term[overrides][<%= type_string %>][start_at]" value="<%= date_string(override.start_at || term.start_at, :long) rescue nil %>" title="For <%= readable_type.downcase %>s the term starts" class="date_field" style="width: 120px;"/>
+          </div>
+        </td>
+        <td>
+          &nbsp;to&nbsp;
+        </td>
+        <td>
+          <div class="show_term">
+            <span class="<%= type_string %>_end_at"><%= date_string(override.end_at || term.end_at, :long) rescue 'whenever' %></span>
+          </div>
+          <div class="edit_term">
+            <input type="text" name="enrollment_term[overrides][<%= type_string %>][end_at]" value="<%= date_string(override.end_at || term.end_at, :long) rescue nil %>" title="For <%= readable_type.downcase %>s the term ends" class="date_field" style="width: 120px;"/>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </table>
+  </td>
+  <td class="links">
+    <a href="#" class="edit_term_link no-hover"><%= image_tag "edit.png" %></a>
+    <% if term && !term.courses.empty? %>
+      <a href="#" class="cant_delete_term_link no-hover"><%= image_tag "delete_circle_gray.png" %></a>
+    <% elsif term != @context.default_enrollment_term %>
+      <a href="#" class="delete_term_link no-hover"><%= image_tag "delete.png" %></a>
+    <% end %>
+  </td>
+</tr>

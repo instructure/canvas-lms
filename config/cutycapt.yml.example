@@ -1,0 +1,4 @@
+development:
+  path: /usr/bin/cutycapt
+  delay: 3000
+  timeout: 30000

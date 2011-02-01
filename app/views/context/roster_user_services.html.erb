@@ -1,0 +1,138 @@
+<% content_for :page_title do %>Registered Services<% end %>
+<% add_crumb('People', context_url(@context, :context_users_url))
+  @active_tab="people"
+  add_crumb('Registered Services', context_url(@context, :context_user_services_url)) %>
+<% content_for :right_side do %>
+  <div class="rs-margin-all rs-margin-lr">
+    <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_users_url) %>"><%= image_tag "back.png" %> Back to Roster</a>
+  </div>
+  <h2>Service Types</h2>
+  <div class="rs-margin-lr">
+    <ul class="service_types">
+    <% @services_hash.sort_by{|t, s| UserService.sort_position(t) }.each do |service_type, services| %>
+      <li>
+        <%= image_tag "#{service_type}_icon.png", :alt => "" %>
+        <a href="#service_<%= service_type %>"><%= service_type.titleize %></a>
+        <span class="service_count">(<%= services.length %>)</span>
+      </li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
+<% content_for :stylesheets do %>
+<style>
+.service_types {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+.service_types li {
+  line-height: 2.2em;
+}
+.service_types li img {
+  vertical-align: middle;
+}
+.user_list {
+  padding-left: 30px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.user_list li {
+  font-size: 1.1em;
+  line-height: 1.5em;
+}
+.service_count {
+  font-size: 0.8em;
+  color: #888;
+}
+.user_list .current_user {
+  font-weight: bold;
+}
+.service_type {
+  margin-bottom: 0;
+}
+.short_description {
+  padding-left: 30px;
+  font-size: 0.8em;
+  max-width: 500px;
+}
+.service_type img {
+  vertical-align: middle;
+  padding-right: 5px;
+}
+.user_list .skype_status a img {
+  height: 22px;
+}
+</style>
+<% end %>
+<h2>Registered Services</h2>
+<a href="<%= profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
+<p>
+If <%= @context.class.to_s.downcase %> members choose, they can let you see
+which outside services they've linked to their Canvas account.  This can make it easier to
+coordinate group projects and also link up outside of class.
+</p>
+<% if @current_user && @current_user.user_services.empty? %>
+  <p>
+    You haven't linked your user profile to any external services.  You 
+    can link your Canvas account to services like Facebook and Twitter.
+  </p>
+  <p>
+    <a href="<%= profile_path %>#registered_web_services" class="button">Link web services to my account</a>
+  </p>
+<% elsif @current_user && !@current_user.show_user_services %>
+  <p>
+    You haven't enabled your list of registered services.  Enabling this
+    list will let fellow course and group members see which services
+    you have linked to your Canvas account.
+  </p>
+  <p>
+    <input type="checkbox" id="show_user_services" class="show_user_services_checkbox"/><label for="show_user_services">Let fellow course/group members see which services I've linked to my profile</label>
+  </p>
+<% end %>
+
+<% @services_hash.sort_by{|t, s| UserService.sort_position(t) }.each do |service_type, services| %>
+<% service_example = services.first %>
+<a name="service_<%= service_type %>"></a>
+<h3 class="service_type"><%= image_tag "#{service_type}_icon.png", :alt => "" %><%= service_type.titleize %></h3>
+<div class="short_description"><%= UserService.short_description(service_type) %></div>
+<ul class="user_list">
+<% services.once_per(&:user_id).each do |service| %>
+  <li class="<%= 'current_user' if @current_user && service.user_id == @current_user.id %>">
+    <% if service.has_profile_link? %>
+      <a href="<%= service.service_user_link %>">
+        <%= @users_hash[service.user_id].name %>
+      </a>
+    <% else %>
+      <%= @users_hash[service.user_id].name %>
+    <% end %>
+    <% if service.service == 'skype' %>
+      <span class="skype_status">
+        <a href="skype:<%= service.service_user_name %>?call"><img src="http://mystatus.skype.com/bigclassic/<%= service.service_user_name %>" alt="<%= @users_hash[service.user_id].name %>'s status" /></a>
+      </span>
+    <% end %>
+  </li>
+<% end %>
+<% if !@current_user_services[service_type] %>
+  <li class="current_user">
+    <% if UserService.registration_url(service_type) %>
+      <a href="<%= UserService.registration_url(service_type) %>">Sign Up</a>
+      |
+    <% end %>
+    <a href="<%= profile_path %>#register_<%= service_type %>">Link Existing Account</a>
+  </li>
+<% end %>
+</ul>
+<% end %>
+
+<% js_block do %>
+<script type="text/javascript" src="http://download.skype.com/share/skypebuttons/js/skypeCheck.js"></script>
+<script>
+$(document).ready(function() {
+  $(".show_user_services_checkbox").change(function() {
+    $.ajaxJSON($(".profile_url").attr('href'), 'PUT', {'user[show_user_services]': $(this).attr('checked')}, function(data) {
+    }, function(data) {
+    });
+  });
+});
+</script>
+<% end %>

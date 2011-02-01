@@ -1,0 +1,116 @@
+#right-side-wrapper
+  display: none
+
+#right-side
+  width: $right_side_width
+  margin-bottom: 1em
+  padding-bottom: 20px
+  +box-shadow(#E8E8E8, -3px, 3px, 32px)
+  margin-left: 15px
+  background-color: #f3f4f5
+  border-left: 1px solid #ccc
+  border-bottom: 1px solid #ccc
+  +border-bottom-left-radius(5px)
+  color: $right_side_text_color
+  min-height: 20px
+  
+  hr
+    border: dotted #aaa
+    border-width: 1px 0 0
+    margin: 17px 0 20px
+  h2
+    font-size: 1.12em
+    padding: 7px 10px 7px 15px
+    font-weight: normal
+    color: $right_side_header_color
+    background-color: #8a8a8a
+    margin-bottom: 8px
+    +text-shadow(-1px, -1px, rgba(100, 100, 100, 0.4))
+    a
+      color: $right_side_header_color
+.rs-match-list-indent
+  padding-left: 31px
+.rs-margin-lr
+  margin: 0 20px
+.rs-margin-all
+  margin: 0 20px 20px
+  padding-top: 20px
+.rs-margin-top
+  padding-top: 20px
+.rs-margin-bottom
+  margin-bottom: 20px
+.right-side-list
+  +reset-list
+  margin-left: 15px
+  margin-right: 15px
+  margin-bottom: 19px
+  li 
+    a
+      padding: 3px 0 0px 31px
+      display: block
+      background-position: left 7px
+      
+      &:hover, &:focus
+        text-decoration: none
+        b, &.more_link
+          text-decoration: underline
+        em
+          color: #666
+    small // this is for things like "nothing for the next week"
+      padding: 3px 0 0px 31px
+      display: block
+      color: #666
+      font-size: 1em
+    b, em
+      font-weight: normal
+      display: block  
+    em, .more_link
+      font:
+        family: "ff-clifford-eighteen-web-pro-1","ff-clifford-eighteen-web-pro-2",Georgia,"Times New Roman",Times,serif
+        style: italic
+      font-size: 10px
+      line-height: 13px
+    em
+      color: #bcbcbc
+      border-bottom: 1px dotted #aaa
+      padding-bottom: 5px
+    .more_link
+      padding-top: 6px
+  .tooltip 
+    .tooltip_wrap
+      left: -160px
+      width: 160px
+      height: 70px
+      top: 0
+      font-size: 0.9em
+      background-image: none
+    .tooltip_text
+      margin-right: 15px
+      min-height: 30px
+      
+    .tooltip-carat
+      border-bottom: 7px solid transparent
+      border-left: 14px solid #444444
+      border-top: 7px solid transparent
+      display: block
+      margin-top: 12px
+      float: right
+      width: 1px
+      height: 1px
+  &.to-do-list
+    li 
+      position: relative
+      a.item
+        b
+          padding-right: 20px
+      a.disable_item_link
+        +opacity(0.3)
+        padding: 0
+        position: absolute
+        background-image: none
+        right: 0
+        top: 0
+      &:hover
+        a.disable_item_link
+          +opacity(1.0)
+        

@@ -1,0 +1,27 @@
+<% 
+  @active_tab = "courses"
+  add_crumb "Courses", account_courses_path(@account)
+  add_crumb "Search results for &quot;#{@query}&quot;"
+%>
+<% content_for :page_title do %>Course Search results for "<%= h @query %>" <% end %>
+<% content_for :right_side do %>
+  <%= render :partial => 'courses_right_side' %>
+<% end %>
+<h2>Course Search Results for "<%= h @query %>"</h2>
+<%= "No Results Found" if @courses.empty? %>
+<ul class='courses' style="list-style-type: none;">
+  <%= render :partial => "course", :collection => @courses %>
+  <%= render :partial => "course", :object => nil %>
+</ul>
+<% js_block do %>
+<script>
+  $(document).ready(function() {
+    $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
+      $(this).find(".info").addClass('info_hover');
+    });
+    $(".courses .course,.groups .group").bind('blur mouseout', function(event) {
+      $(this).find(".info").removeClass('info_hover');
+    });
+  });
+</script>
+<% end %>

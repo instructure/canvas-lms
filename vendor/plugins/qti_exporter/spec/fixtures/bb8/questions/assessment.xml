@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _152997_1
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Multiple Choice
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 237.0
+Warning: rubric with view="all" replaced by <div> with class="rubric"
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: ignoring assessment or section rubric
+	-->
+
+<assessmentTest
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+ identifier="res00001"
+ title="Blackboard 8 Export Test">
+<testPart identifier="BaseTestPart">
+<assessmentSection identifier="">
+<assessmentItemRef identifier="_153086_1" href="../assessmentItems/_153086_1.xml"/>
+<assessmentItemRef identifier="_152999_1" href="../assessmentItems/_152999_1.xml"/>
+<assessmentItemRef identifier="_153000_1" href="../assessmentItems/_153000_1.xml"/>
+<assessmentItemRef identifier="_153002_1" href="../assessmentItems/_153002_1.xml"/>
+<assessmentItemRef identifier="_153003_1" href="../assessmentItems/_153003_1.xml"/>
+<assessmentItemRef identifier="_153004_1" href="../assessmentItems/_153004_1.xml"/>
+<assessmentItemRef identifier="_153005_1" href="../assessmentItems/_153005_1.xml"/>
+<assessmentItemRef identifier="_153006_1" href="../assessmentItems/_153006_1.xml"/>
+<assessmentItemRef identifier="_153007_1" href="../assessmentItems/_153007_1.xml"/>
+<assessmentItemRef identifier="_153008_1" href="../assessmentItems/_153008_1.xml"/>
+<assessmentItemRef identifier="_153009_1" href="../assessmentItems/_153009_1.xml"/>
+<assessmentItemRef identifier="_153010_1" href="../assessmentItems/_153010_1.xml"/>
+<assessmentItemRef identifier="_153011_1" href="../assessmentItems/_153011_1.xml"/>
+<assessmentItemRef identifier="_153012_1" href="../assessmentItems/_153012_1.xml"/>
+<assessmentItemRef identifier="_153013_1" href="../assessmentItems/_153013_1.xml"/>
+<assessmentItemRef identifier="_153014_1" href="../assessmentItems/_153014_1.xml"/>
+<assessmentItemRef identifier="_153015_1" href="../assessmentItems/_153015_1.xml"/>
+<assessmentItemRef identifier="_153126_1" href="../assessmentItems/_153126_1.xml"/>
+<assessmentItemRef identifier="_153127_1" href="../assessmentItems/_153127_1.xml"/>
+<assessmentItemRef identifier="_153128_1" href="../assessmentItems/_153128_1.xml"/>
+<assessmentItemRef identifier="_153001_1" href="../assessmentItems/_153001_1.xml"/>
+<assessmentItemRef identifier="_153271_1" href="../assessmentItems/_153271_1.xml"/>
+</assessmentSection>
+</testPart>
+</assessmentTest>

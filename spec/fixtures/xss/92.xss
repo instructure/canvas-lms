@@ -1,0 +1,2 @@
+href|google|document|javascript
+<A HREF="javascript:document.location='http://www.google.com/'">XSS</A>

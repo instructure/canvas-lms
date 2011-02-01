@@ -1,0 +1,5 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.submission.assignment.context) %>/<%= asset.submission.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.submission.assignment.context_id %>/assignments/<%= asset.submission.assignment_id %>/submissions/<%= asset.submission.user_id %>
+<% end %>
+
+<b><%= asset.author_name || "Someone" %></b> just made a new comment on the submission for <b><a href="<%= content :link %>"><%= asset.submission.user.short_name %> for <%= asset.submission.assignment.title %></a></b>.

@@ -1,0 +1,47 @@
+[
+    {
+        "is_visible":true,
+        "allow_anonymous_posts":false,
+        "is_gradeable":true,
+        "grade_reference":"3a0acc83-4691-4a0d-988b-95d85ff12c34",
+        "description":"Grade me eh.<br />",
+        "topic_type":"thread",
+        "created_date":1269293549000,
+        "title":"Graded Thread",
+        "grading":
+        {
+            "assignment_group":"_70173_1",
+            "points_possible":"22.0",
+            "grade_type":"numeric",
+            "weight":"0",
+            "description":null,
+            "grade_reference":"3a0acc83-4691-4a0d-988b-95d85ff12c34",
+            "title":"Graded Thread",
+            "due_date":null,
+            "migration_id":"_52448_1"
+        },
+        "migration_id":"_62234_1",
+        "updated_date":1269373393000
+    },
+    {
+        "is_visible":true,
+        "allow_anonymous_posts":false,
+        "description":"What do you think about things?",
+        "topic_type":"thread",
+        "created_date":1268861783000,
+        "title":"Thread in the first forum",
+        "migration_id":"_61866_1",
+        "updated_date":1269020394000
+    },
+    {
+        "is_visible":true,
+        "allow_anonymous_posts":true,
+        "description":"Threads are so much fun.<br />",
+        "topic_type":"thread",
+        "created_date":1269019926000,
+        "title":"second thread in the first forum.",
+        "migration_id":"_62121_1",
+        "updated_date":1269029489000
+    }
+
+]

@@ -1,0 +1,9 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= asset.course.class.to_s.capitalize %> Enrollment
+<% end %>
+
+You've been enrolled in the <%= asset.course.class.to_s.downcase %>, <%= asset.course.name %> as a <%= asset.readable_type %>

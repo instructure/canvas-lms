@@ -1,0 +1,36 @@
+{
+    "question_name":"",
+    "question_text":"The answer is nose.<br />",
+    "incorrect_comments":"wrong",
+    "question_type":"multiple_choice_question",
+    "migration_id":"_153010_1",
+    "correct_comments":"right",
+    "points_possible":10.0,
+    "answers":[
+        {
+            "text":"nose",
+            "comments":"right",
+            "weight":100,
+            "migration_id":"RESPONSE_595202876ccd425a9b4fe9e8e257292d",
+            "id":3450
+        },
+        {
+            "text":"ear",
+            "weight":0,
+            "migration_id":"RESPONSE_29b3b04b609c4a7abbf882e9b89b26ea",
+            "id":3351
+        },
+        {
+            "text":"eye",
+            "weight":0,
+            "migration_id":"aa35aa6b600844e1b42fd493cb0f0da7",
+            "id":2037
+        },
+        {
+            "text":"mouth",
+            "weight":0,
+            "migration_id":"b83b61f6356a410892de7f9c4a99b669",
+            "id":959
+        }
+    ]
+}

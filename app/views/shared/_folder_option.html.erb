@@ -1,0 +1,5 @@
+<% indent ||= 0; folders ||= []; selected_folder_id ||= 0 %>
+<option value="<%= folder_option.id %>" <%= 'selected' if selected_folder_id == folder_option.id %> ><%= raw("&nbsp;" * indent) %><%= "- " if indent > 0 %><%= folder_option.name %></option>
+<% folders.select{|f| f.parent_folder_id == folder_option.id }.each do |folder| %>
+  <%= render :partial => 'shared/folder_option', :object => folder, :locals => {:folders => folders, :indent => indent + 3, :selected_folder_id => selected_folder_id} %>
+<% end %>

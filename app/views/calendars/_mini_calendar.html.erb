@@ -1,0 +1,29 @@
+<% cache(['mini_calendar_render', current.to_s, first_day.to_s].cache_key) do %>
+<div class="mini_month" aria-hidden="true">
+  <div class="mini-cal-header">
+    <a href="#" class="prev_month_link"><%= image_tag "arrow_left.png" %></a>
+    <a href="#" class="next_month_link"><%= image_tag "arrow_right.png" %></a>
+    <span class="mini-cal-month-and-year">
+      <span class="month_name"><%= Date::MONTHNAMES[current.month] %></span>
+      <span class="year_number"><%= current.year %></span>
+    </span>
+  </div>
+  <div style="display: none;">
+    <span class="month_number"><%= current.month %></span>
+  </div>
+  <% today = Date.today %>
+  <table class="mini_calendar" cellspacing="0">
+    <% day = first_day %>
+    <% 6.times do %>
+    <tr class="mini_calendar_week">
+      <% 7.times do %>
+        <td class="mini_calendar_day day <%= day.month == current.month ? 'current_month' : 'other_month' %><%= day == today ? ' today' : '' %> <%= day.strftime("date_%m_%d_%Y") %>">
+          <span class="day_number" title="<%= day.strftime "%m/%d/%Y" %>"><%= day.day %></span>
+          <% day = day.next %>
+        </td>
+      <% end %>
+    </tr>
+    <% end %>
+  </table>
+</div>
+<% end %>

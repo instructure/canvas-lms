@@ -1,0 +1,18 @@
+<% namespace = asset.find_namespace_for_user(user) %>
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(namespace.context) %>/<%= namespace.context.class.to_s.downcase.pluralize %>/<%= namespace.context_id %>/wiki/<%= namespace.namespace + ":" if !namespace.default? %><%= asset.url %>
+  <% end %>
+
+<% define_content :subject do %>
+  Updated Wiki Page: <%= asset.title.titleize %>, <%= asset.find_namespace_for_user(user).context.name rescue "" %>
+<% end %>
+
+A page has been updated on the wiki for <%= namespace.context.name %> that may make your life easier.  
+
+<%= asset.title.titleize %> 
+
+<%= strip_and_truncate(asset.body, :max_length => 200) %> 
+
+
+You can review it here: 
+<%= content :link %>

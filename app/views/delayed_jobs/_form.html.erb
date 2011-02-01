@@ -1,0 +1,40 @@
+<% form_for(@delayed_job, :url => update_delayed_job_path) do |f| %>
+  <%= f.error_messages %>
+  <p>
+    <%= f.label :priority %><br />
+    <%= f.text_field :priority %>
+  </p>
+  <p>
+    <%= f.label :attempts %><br />
+    <%= f.text_field :attempts %>
+  </p>
+  <p>
+    <%= f.label :handler %><br />
+    <%= f.text_area :handler %>
+  </p>
+  <p>
+    <%= f.label :last_error %><br />
+    <%= f.text_area :last_error %>
+  </p>
+  <p>
+    <%= f.label :queue %><br />
+    <%= f.text_field :queue %>
+  </p>
+  <p>
+    <%= f.label :run_at %> - format: <em>2010-04-26 21:26:32 UTC</em><br />
+    <%= f.text_field :run_at %>
+  </p>
+  <p>
+    <%= f.label :locked_at %> - format: <em>2010-04-26 21:26:32 UTC</em><br />
+    <%= f.text_field :locked_at %>
+  </p>
+  <p>
+    <%= f.label :failed_at %> - format: <em>2010-04-26 21:26:32 UTC</em><br />
+    <%= f.text_field :failed_at %>
+  </p>
+  <p>
+    <%= f.label :locked_by %><br />
+    <%= f.text_field :locked_by %>
+  </p>
+  <p><%= f.submit "Submit" %></p>
+<% end %>

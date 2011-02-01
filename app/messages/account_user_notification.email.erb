@@ -1,0 +1,12 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.account) %>/accounts/<%= asset.account_id %>
+<% end %>
+
+<% define_content :subject do %>
+  Account Admin Notification
+<% end %>
+
+You've been added as an <%= asset.readable_type %> to the account <%= asset.account.name %> at <%= HostUrl.context_host(asset.account) %>
+
+Visit the account page here:
+<%= content :link %>

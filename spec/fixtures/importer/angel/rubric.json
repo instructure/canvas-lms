@@ -1,0 +1,176 @@
+{
+  "migration_id":"92492da7-4f98-4554-85ab-06c097cfa0b5_885E7BE9171242918C0573A11C846D1A",
+  "title":"Test Rubric",
+  "points_possible":100.0,
+  "description":"Test Rubric",
+  "data":[
+    {
+      "points":25.0,
+      "migration_id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c",
+      "percentage":25.0,
+      "description":"Criteria 1",
+      "ratings":[
+        {
+          "points":25.0,
+          "migration_id":"ff3064d9-a6fe-4085-94a4-f23e564e4058",
+          "criterion_id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c",
+          "description":"Achievement Level 4",
+          "percentage":100.0,
+          "id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c_ff3064d9-a6fe-4085-94a4-f23e564e4058"
+        },
+        {
+          "points":16.75,
+          "migration_id":"a55348e0-a0ff-47cd-9067-e954ab760f16",
+          "criterion_id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c",
+          "description":"Achievement Level 3",
+          "percentage":67.0,
+          "id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c_a55348e0-a0ff-47cd-9067-e954ab760f16"
+        },
+        {
+          "points":8.25,
+          "migration_id":"dcaa3fb7-08fa-4d0a-b00e-d6247375f179",
+          "criterion_id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c",
+          "description":"Achievement Level 2",
+          "percentage":33.0,
+          "id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c_dcaa3fb7-08fa-4d0a-b00e-d6247375f179"
+        },
+        {
+          "points":0.0,
+          "migration_id":"e824861e-c4e1-48ed-9927-65998e87e35c",
+          "criterion_id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c",
+          "description":"Achievement Level 1",
+          "percentage":0.0,
+          "id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c_e824861e-c4e1-48ed-9927-65998e87e35c"
+        }
+      ],
+      "order":"1",
+      "id":"6e2a179a-4caf-4407-b839-d38ef5f00b0c"
+    },
+    {
+      "points":25.0,
+      "migration_id":"8e6f0290-57b7-4ff6-920c-627df5a8a189",
+      "percentage":25.0,
+      "description":"Criteria 2",
+      "ratings":[
+        {
+          "points":25.0,
+          "migration_id":"ff3064d9-a6fe-4085-94a4-f23e564e4058",
+          "criterion_id":"8e6f0290-57b7-4ff6-920c-627df5a8a189",
+          "description":"Achievement Level 4",
+          "percentage":100.0,
+          "id":"8e6f0290-57b7-4ff6-920c-627df5a8a189_ff3064d9-a6fe-4085-94a4-f23e564e4058"
+        },
+        {
+          "points":16.75,
+          "migration_id":"a55348e0-a0ff-47cd-9067-e954ab760f16",
+          "criterion_id":"8e6f0290-57b7-4ff6-920c-627df5a8a189",
+          "description":"Achievement Level 3",
+          "percentage":67.0,
+          "id":"8e6f0290-57b7-4ff6-920c-627df5a8a189_a55348e0-a0ff-47cd-9067-e954ab760f16"
+        },
+        {
+          "points":8.25,
+          "migration_id":"dcaa3fb7-08fa-4d0a-b00e-d6247375f179",
+          "criterion_id":"8e6f0290-57b7-4ff6-920c-627df5a8a189",
+          "description":"Achievement Level 2",
+          "percentage":33.0,
+          "id":"8e6f0290-57b7-4ff6-920c-627df5a8a189_dcaa3fb7-08fa-4d0a-b00e-d6247375f179"
+        },
+        {
+          "points":0.0,
+          "migration_id":"e824861e-c4e1-48ed-9927-65998e87e35c",
+          "criterion_id":"8e6f0290-57b7-4ff6-920c-627df5a8a189",
+          "description":"Achievement Level 1",
+          "percentage":0.0,
+          "id":"8e6f0290-57b7-4ff6-920c-627df5a8a189_e824861e-c4e1-48ed-9927-65998e87e35c"
+        }
+      ],
+      "order":"2",
+      "id":"8e6f0290-57b7-4ff6-920c-627df5a8a189"
+    },
+    {
+      "points":25.0,
+      "migration_id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3",
+      "percentage":25.0,
+      "description":"Criteria 3",
+      "ratings":[
+        {
+          "points":25.0,
+          "migration_id":"ff3064d9-a6fe-4085-94a4-f23e564e4058",
+          "criterion_id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3",
+          "description":"Achievement Level 4",
+          "percentage":100.0,
+          "id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3_ff3064d9-a6fe-4085-94a4-f23e564e4058"
+        },
+        {
+          "points":16.75,
+          "migration_id":"a55348e0-a0ff-47cd-9067-e954ab760f16",
+          "criterion_id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3",
+          "description":"Achievement Level 3",
+          "percentage":67.0,
+          "id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3_a55348e0-a0ff-47cd-9067-e954ab760f16"
+        },
+        {
+          "points":8.25,
+          "migration_id":"dcaa3fb7-08fa-4d0a-b00e-d6247375f179",
+          "criterion_id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3",
+          "description":"Achievement Level 2",
+          "percentage":33.0,
+          "id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3_dcaa3fb7-08fa-4d0a-b00e-d6247375f179"
+        },
+        {
+          "points":0.0,
+          "migration_id":"e824861e-c4e1-48ed-9927-65998e87e35c",
+          "criterion_id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3",
+          "description":"Achievement Level 1",
+          "percentage":0.0,
+          "id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3_e824861e-c4e1-48ed-9927-65998e87e35c"
+        }
+      ],
+      "order":"3",
+      "id":"c9373694-3f9f-4c9f-b3fa-ed16c27cc5f3"
+    },
+    {
+      "points":25.0,
+      "migration_id":"8fc4c182-7e87-49c4-9506-bc60ab47f564",
+      "percentage":25.0,
+      "description":"Criteria 4 sucks",
+      "ratings":[
+        {
+          "points":25.0,
+          "migration_id":"ff3064d9-a6fe-4085-94a4-f23e564e4058",
+          "criterion_id":"8fc4c182-7e87-49c4-9506-bc60ab47f564",
+          "description":"Achievement Level 4",
+          "percentage":100.0,
+          "id":"8fc4c182-7e87-49c4-9506-bc60ab47f564_ff3064d9-a6fe-4085-94a4-f23e564e4058"
+        },
+        {
+          "points":16.75,
+          "migration_id":"a55348e0-a0ff-47cd-9067-e954ab760f16",
+          "criterion_id":"8fc4c182-7e87-49c4-9506-bc60ab47f564",
+          "description":"Achievement Level 3",
+          "percentage":67.0,
+          "id":"8fc4c182-7e87-49c4-9506-bc60ab47f564_a55348e0-a0ff-47cd-9067-e954ab760f16"
+        },
+        {
+          "points":8.25,
+          "migration_id":"dcaa3fb7-08fa-4d0a-b00e-d6247375f179",
+          "criterion_id":"8fc4c182-7e87-49c4-9506-bc60ab47f564",
+          "description":"Achievement Level 2",
+          "percentage":33.0,
+          "id":"8fc4c182-7e87-49c4-9506-bc60ab47f564_dcaa3fb7-08fa-4d0a-b00e-d6247375f179"
+        },
+        {
+          "points":0.0,
+          "migration_id":"e824861e-c4e1-48ed-9927-65998e87e35c",
+          "criterion_id":"8fc4c182-7e87-49c4-9506-bc60ab47f564",
+          "description":"Achievement Level 1",
+          "percentage":0.0,
+          "id":"8fc4c182-7e87-49c4-9506-bc60ab47f564_e824861e-c4e1-48ed-9927-65998e87e35c"
+        }
+      ],
+      "order":"4",
+      "id":"8fc4c182-7e87-49c4-9506-bc60ab47f564"
+    }
+  ]
+}

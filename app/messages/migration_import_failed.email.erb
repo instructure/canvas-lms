@@ -1,0 +1,11 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>
+<% end %>
+
+<% define_content :subject do %>
+  Content Import Failed: <%= asset.context.name %>
+<% end %>
+      
+There was a problem importing <%= asset.migration_settings[:course_name] %> into <%= asset.context.name %>.  Only some of the content could be successfully imported.  Please notify your system administrator, and give them the following error code: "ContentMigration:<%= asset.id %>:<%= asset.progress %>".
+
+<%= content :link %>

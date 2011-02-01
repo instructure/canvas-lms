@@ -1,0 +1,14 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.discussion_topic_id %>
+<% end %>
+
+<% define_content :subject do %>
+  New Comment for <%= asset.title %>: <%= asset.context.name %>
+<% end %>
+
+<%= asset.user.short_name %> posted a new comment on the thread <%= asset.title %> for <%= asset.context.name %>:
+
+<%= strip_and_truncate(asset.message, :max_length => 200) %> 
+
+Join to the conversation here: 
+<%= content :link %>

@@ -1,0 +1,5 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>
+<% end %>
+
+<%= asset.submissions.graded.map(&:user_id).include?(user.id) ? "Your" : "The" %> assignment, <b><a href="<%= content :link %>"><%= asset.title %></a></b>, has been graded.  

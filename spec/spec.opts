@@ -1,0 +1,6 @@
+--colour
+--format progress
+--format html:tmp/spec_html/index.html
+--loadby mtime
+--reverse
+--pattern *_spec.rb

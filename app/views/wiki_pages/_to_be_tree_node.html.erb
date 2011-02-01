@@ -1,0 +1,13 @@
+<% tree_node = to_be_tree_node || nil %>
+<li id="<%= tree_node ? tree_node.class.to_s.downcase : 'attachment' %>_<%= tree_node ? tree_node.id : 'blank' %>" class="<%= tree_node.mime_class rescue '' %> <%= 'file' unless tree_node && tree_node.is_a?(Folder) %> in_folder_<%= ((tree_node.parent_folder_id rescue tree_node.folder_id) rescue nil) || 0 %>" title="<%= "Click to insert a link to this page" unless tree_node && tree_node.is_a?(Folder) %>">
+  <% if tree_node && tree_node.is_a?(Folder) %>
+    <span class='name'><%= tree_node.name %></span>
+  <% else %>
+    <span rel="<%= context_url(@context, :context_url) %>/files/<%= tree_node ? tree_node.id : "{{ id }}" %>/download?wrap=1" class='name <%= 'scribdable' if tree_node && tree_node.respond_to?("scribdable?") && tree_node.scribdable? %>'><%= tree_node.display_name rescue '' %></span>
+  <% end %>
+  
+  <% if tree_node && tree_node.respond_to?("subcontent") %>
+  <ul>
+  </ul>
+  <% end %>
+</li>

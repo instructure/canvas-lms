@@ -1,0 +1,112 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
+describe EportfolioCategoriesController do
+  def eportfolio_category
+    @category = @portfolio.eportfolio_categories.create(:name => "some name")
+  end
+
+  describe "GET 'index'" do
+    it "should redirect" do
+      eportfolio
+      get 'index', :eportfolio_id => @portfolio.id
+      response.should be_redirect
+    end
+  end
+  
+  describe "GET 'show'" do
+    it "should require authorization" do
+      eportfolio_with_user(:active_all => true)
+      get 'show', :eportfolio_id => @portfolio.id, :id => 1
+      assert_unauthorized
+    end
+    
+    it "should assign variables" do
+      eportfolio_with_user_logged_in(:active_all => true)
+      eportfolio_category
+      get 'show', :eportfolio_id => @portfolio.id, :id => @category.id
+      response.should be_success
+      assigns[:portfolio].should_not be_nil
+      assigns[:portfolio].should eql(@portfolio)
+      assigns[:category].should_not be_nil
+      assigns[:category].should eql(@category)
+    end
+    
+    it "should responsd to named category request" do
+      eportfolio_with_user_logged_in(:active_all => true)
+      eportfolio_category
+      get 'show', :eportfolio_id => @portfolio.id, :category_name => @category.slug
+      response.should be_success
+      assigns[:portfolio].should_not be_nil
+      assigns[:portfolio].should eql(@portfolio)
+      assigns[:category].should_not be_nil
+      assigns[:category].should eql(@category)
+    end
+  end
+  
+  describe "POST 'create'" do
+    it "should require authorization" do
+      eportfolio_with_user
+      post 'create', :eportfolio_id => @portfolio.id, :eportfolio_category => {:name => "some portfolio"}
+      assert_unauthorized
+    end
+    
+    it "should create eportfolio category" do
+      eportfolio_with_user_logged_in
+      post 'create', :eportfolio_id => @portfolio.id, :eportfolio_category => {:name => "some category"}
+      response.should be_redirect
+      assigns[:category].should_not be_nil
+      assigns[:category].name.should eql("some category")
+    end
+  end
+  
+  describe "PUT 'update'" do
+    it "should require authorization" do
+      eportfolio_with_user(:active_all => true)
+      eportfolio_category
+      put 'update', :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => {:name => "new name" }
+      assert_unauthorized
+    end
+    
+    it "should update eportfolio category" do
+      eportfolio_with_user_logged_in(:active_all => true)
+      eportfolio_category
+      put 'update', :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => {:name => "new name" }
+      assigns[:category].should_not be_nil
+      assigns[:category].should eql(@category)
+    end
+  end
+  
+  describe "DELETE 'destroy'" do
+    it "should require authorization" do
+      eportfolio_with_user(:active_all => true)
+      eportfolio_category
+      delete 'destroy', :eportfolio_id => @portfolio.id, :id => @category.id
+      assert_unauthorized
+    end
+    
+    it "should delete eportfolio category" do
+      eportfolio_with_user_logged_in(:active_all => true)
+      eportfolio_category
+      delete 'destroy', :eportfolio_id => @portfolio.id, :id => @category.id
+      assigns[:category].should be_frozen
+    end
+  end
+end

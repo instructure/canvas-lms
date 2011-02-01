@@ -1,0 +1,24 @@
+<% content_for :page_title do %>Invitation to <%= @context.name %><% end %>
+<% @show_left_side = false %>
+
+<% content_for :page_header do %>
+  <h1>Course Invitation</h1>
+<% end %>
+
+<div id="modal-box">
+  <div id="modal-box-inner">
+    <h2>Accept Enrollment Invitation</h2>
+    You've been invited to participate in this course, <b><%= @context.name %></b>.
+    To continue the enrollment process, please provide us with your current
+    email address.
+    <div style="margin-top: 20px;">
+      <% form_tag course_self_enrollment_path(@context, @context.self_enrollment_code), {:method => :get} do %>
+        <label for="enrollment_email">Email Address:</label>
+        <input type="text" name="email" id="enrollment_email"/>
+        <div class="button-container">
+          <button type="submit" class="button">Enroll in Course</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

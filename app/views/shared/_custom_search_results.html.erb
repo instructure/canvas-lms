@@ -1,0 +1,18 @@
+<div style="margin-top: 20px; display: none;">
+  <a href="#" class="custom_search_results_link find">Search for Open Resources Related to this Page</a>
+</div>
+<div id="custom_search_results_dialog" style="display: none;">
+  <div id="cse" style="width: 100%;">Loading</div>
+  <!--link rel="stylesheet" href="http://www.google.com/cse/style/look/greensky.css" type="text/css" /-->
+</div>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript">
+  google.load('search', '1', {language : 'en'});
+  google.setOnLoadCallback(function() {
+    var customSearchControl = new google.search.CustomSearchControl('014949904870326116447:l9dhnd4kuni');
+    customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+    customSearchControl.draw('cse');
+    $("#custom_search_results_dialog").data('searchControl', customSearchControl);
+  }, true);
+</script>
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Multiple Choice
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 20.0
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Warning: rubric with view="all" replaced by <div> with class="rubric"
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: ignoring assessment or section rubric
+	-->
+
+<assessmentTest
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+ identifier="res00080"
+ title="Practice Test 02">
+<testPart identifier="BaseTestPart">
+<assessmentSection identifier="">
+<assessmentSection identifier="">
+<selection select="20">
+<sourcebank_ref>res00013</sourcebank_ref>
+</selection>
+</assessmentSection>
+</assessmentSection>
+</testPart>
+</assessmentTest>

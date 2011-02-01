@@ -1,0 +1,18 @@
+<% skip_ul ||= false; exclude_files ||= false %>
+<% unless skip_ul %><ul><% end %>
+  <% folders ||= [] %>
+  <% nested_content.compact.select{|i| !i.is_a?(Attachment) || !exclude_files}.each do |item| 
+    new_f = folders.to_a.find{|i| i.id == item.id} if folders && item.is_a?(Folder)
+    item = new_f if new_f
+    subcontent = folders.select{|f| f.parent_folder_id == f.id } if exclude_files && !folders.empty?
+    subcontent ||= item.subcontent(:exclude_files => exclude_files) if item.respond_to?(:subcontent)
+  %>
+    <li class="<%= item.is_a?(Attachment) ? "file" : "folder" %> <%= 'folder_locked' if item.is_a?(Folder) && item.currently_locked %> <%= item.mime_class rescue "" %> <%= item.is_a?(Attachment) ? "file" : "folder" %>_<%= item ? item.id : "blank" %>">
+      <span class="id" style="display: none;"><%= item.id %></span>
+      <span class="text name"><%= item.display_name %></span>
+      <% if subcontent %>
+        <%= render :partial => "files/nested_content", :object => subcontent, :locals => {:exclude_files => exclude_files} %>
+      <% end %>
+    </li>
+  <% end %>
+<% unless skip_ul %></ul><% end %>

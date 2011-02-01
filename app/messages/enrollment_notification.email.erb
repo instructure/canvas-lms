@@ -1,0 +1,16 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= asset.course.class.to_s.capitalize %> Enrollment
+<% end %>
+
+You've been enrolled in the <%= asset.course.class.to_s.downcase %>, <%= asset.course.name %> as a <%= asset.readable_type %>
+<% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
+Name: <%= asset.user.name %>
+Email: <%= asset.user.email %>
+<% if email != login %>Username: <%= asset.user.pseudonym.unique_id rescue "none" %><% end %>
+
+Visit the <%= asset.course.class.to_s.downcase %> page here:
+<%= content :link %>

@@ -1,0 +1,8 @@
+You've been enrolled in the <%= asset.course.class.to_s.downcase %> as
+a <%= asset.readable_type %>.
+<% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
+Name: <%= asset.user.name %>
+Email: <%= asset.user.email %>
+<% if email != login %>Username: <%= asset.user.pseudonym.unique_id rescue "none" %><% end %>
+
+More info at <%= HostUrl.context_host(asset.course) %>

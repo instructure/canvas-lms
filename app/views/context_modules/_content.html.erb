@@ -1,0 +1,395 @@
+<% course_home ||= false %>
+<% if course_home %>
+  <h2><%= @context.name %></h2>
+<% end %>
+<div id="no_context_modules_message" style="display:none; clear: both;">
+  <% if can_do(@context.context_modules.new, @current_user, :create) %>
+    <p>Course modules let you organize your assignments, pages, files, etc. into smaller sections
+    or units.  Modules could be centered around a theme, focused on a specific topic, or even just
+    grouped chronologically.</p>
+    <p>You can also sequence modules by defining criteria and prerequisites for each module.
+    Students won't be able to access modules until they have unlocked all their prerequisites.
+    That way you can prevent students from accessing certain content or files until they
+    have, say, gotten at least 75% on a review quiz.</p>
+    <p>To start organizing your course into modules, click the "Add a New Module" button to the
+    right.</p>
+  <% else %>
+    <p>No modules have been defined for this course.</p>
+  <% end %>
+</div>
+<div id="context_modules_sortable_container">
+  <div id="context_modules" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
+    <% editable = can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
+    <% cache([@context, editable, 'all_context_modules']) do %>
+      <% @context.context_modules.active.each do |m| %>
+        <%= render :partial => 'context_modules/context_module', :object => m, :locals => {:editable => editable } %>
+      <% end %>
+    <% end %>
+  </div>  
+</div>
+<%= render :partial => 'context_modules/context_module', :object => nil %>
+<%= render :partial => 'context_modules/module_item', :object => nil %>
+<% if can_do(@context, @current_user, :manage_content) %>
+  <% form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
+    <table class="formtable">
+      <tr>
+        <td>
+          <div class="module_name">
+            Name:
+          </div>
+        </td><td>
+          <div class="module_name">
+            <%= f.text_field :name %>
+          </div>
+        </td>
+      </tr><tr>
+        <td colspan="2">
+          <input type="checkbox" id="unlock_module_at"/>
+          <label for="unlock_module_at">lock module until a given date</label>
+        </td>
+      </tr><tr class="unlock_module_at_details">
+        <td>
+          Unlock At:
+        </td><td>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 125px;" %>
+        </td>
+      </tr><tr>
+        <td colspan="2">
+        <div class="prerequisites_entry">
+          <b>Before students can view this module:</b>
+          <div style="margin: 2px 10px 5px 20px;" class="prerequisites_list">
+            <div class="no_prerequisites_message">No prerequisites defined</div>
+            <div class="criteria_list" style="display: none;">
+            </div>
+            <div id="criterion_blank" class="criterion" style="display: none;">
+              <div style="float: left">
+                <span class="prereq_desc">They must complete</span>
+                <span class="option">
+                </span>
+              </div>
+              <div style="float: right;">
+                <a href="#" class="delete_criterion_link no-hover"><%= image_tag "delete_circle.png" %></a>
+              </div>
+              <div class="clear"></div>
+            </div>
+            <div style="font-size: 0.9em;">
+              <a href="#" class="add_prerequisite_link add-small">Add prerequisite</a>
+            </div>
+          </div>
+        </div>
+        <div class="completion_entry">
+          <b>This module is complete when:</b>
+          <div style="margin: 2px 10px 5px 20px;" class="completion_criteria_list">
+            <div class="no_items_message">You'll need to add items before you can specify how a user will complete this module</div>
+            <div class="no_criteria_message" style="display: none;">No requirements defined</div>
+            <div class="criteria_list" style="display: none;">
+            </div>
+            <div style="font-size: 0.9em;">
+              <a href="#" class="add_completion_criterion_link add-small">Add requirement</a>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+        <td colspan="2">
+          <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
+          <%= f.label :require_sequential_progress, "students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>
+        </td>
+    </tr><tr>
+      <td colspan="2">
+        <div class="button-container" style="margin-top: 10px;">
+          <button type="submit" class="button submit_button">Add Module</button>
+          <button type="button" class="cancel_button button-secondary">Cancel</button>
+        </div>
+        <a href="<%= context_url(@context, :context_context_modules_url) %>" style="display: none;" class="add_context_module_url">&nbsp;</a>
+      </td>
+    </tr>
+  </table>
+  <% end %>
+  <div id="add_module_prerequisite_dialog" style="display: none;">
+    <span class="context_module_id" style="display: none;">&nbsp;</span>
+    <div>
+      Add prerequisite to <span class="module_name">module</span>
+    </div>
+    <div style="text-align: center;" class="prerequisite_module_select">
+    </div>
+    <div class="button-container">
+      <button type="button" class="button submit_button">Add Prerequisite</button>
+      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+    </div>
+  </div>
+  <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true} %>
+  <div id="edit_item_dialog" style="display: none;">
+    <% form_for :content_tag, :url => "", :html => {:id => "edit_item_form", :method => :put, :style => "margin: 20px 10px;"} do |f| %>
+      <table class="formtable">
+        <tr>
+          <td><%= f.label :title, "Title:" %></td>
+          <td><%= f.text_field :title, :style => "width: 150px;" %></td>
+        </tr>
+        <tr class="external_url">
+          <td><%= f.label :url, "URL:" %></td>
+          <td><%= f.text_field :url, :style => "width: 200px;" %></td>
+        </tr>
+        <tr>
+          <td><label for="content_tag_indent_select">Indent:</label></td>
+          <td>
+            <select name="content_tag[indent]" id="content_tag_indent_select">
+              <option value="0">Don't Indent</option>
+              <option value="1">Indent 1 Level</option>
+              <option value="2">Indent 2 Levels</option>
+              <option value="3">Indent 3 Levels</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <button type="submit" class="button">Update</button>
+            <button type="button" class="button button-secondary cancel_button">Cancel</button>
+          </td>
+        </tr>
+      </table>
+    <% end %>
+    <form>
+    <table>
+    </table>
+    </form>
+  </div>
+  <div id="add_prerequisite_dialog" style="display: none;">
+    <h3>Add Prerequisite to <span class="name">&nbsp;</span></h3>
+    <p style="display: none;">Select the type of prerequisite.  Students cannot see a module until all prerequisites
+    are satisfied.
+      <div>
+        <select class="type" style="display: none;">
+          <option value="module">Another Module</option>
+        </select>
+      </div>
+    </p>
+    <p class="module_details">Modules are shown in sequential order, so only modules that are above 
+      <span class="name">&nbsp;</span> can be set as prerequisites.
+      <div>
+        <select class="module_id">
+        </select>
+      </div>
+    </p>
+  </div>
+  <div id="student_progression_dialog" style="display: none;" title="Module Progression By Student">
+    <h2 style="margin-top: 0;">Module Progress by Student</h2>
+    <table class="side_tabs_table" style="width: 100%;">
+      <tr>
+        <td class="left">
+          <div style="display: none;">
+            Sort By: 
+            <a href="#">Name</a> | 
+            <a href="#">Progress</a>
+          </div>
+          <ul class="side_tabs student_list">
+            <li class="student blank" style="display: none;">
+              <a href="#">
+                <span class="name">Student Name</span>
+                <span class="id" style="display: none;">&nbsp;</span>
+              </a>
+              <div class="sub_content current_module"></div>
+            </li>
+          </ul>
+        </td>
+        <td class="right">
+          <div class="side_tabs_content">
+            <div style="text-align: right; padding-right: 5px;">
+              <a href="#" class="refresh refresh_progressions_link">Reload Student's Progress</a>
+            </div>
+            <table class="module_progressions" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th>Module</th>
+                  <th>State</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="module blank" style="display: none;">
+                  <td class="icon">&nbsp;</td>
+                  <td class="details">
+                    <span class="name">&nbsp;</span>
+                    <span class="id" style="display: none;">&nbsp;</span>
+                    <div class="still_need_completing" style="font-size: 0.6em; padding-left: 10px; color: #888; font-weight: normal;">
+                    </div>
+                  </td>
+                  <td class="progress" style="vertical-align: top;">&nbsp;</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div id="module_progression_dialog" style="display: none;">
+    <h2 style="margin-top: 0;">Student Progress for <span class="module_name">&nbsp;</span></h2>
+    <div style="max-height: 200px; overflow: auto;">
+      <div>
+        <div class="completed_list progression_list" style="margin-bottom: 10px;">
+          <h3 style="margin: 0;">Students who have Completed the Module</h3>
+          <ul>
+          </ul>
+        </div>
+        <div class="started_list progression_list" style="margin-bottom: 10px;">
+          <h3 style="margin: 0;">Students who are Working on the Module</h3>
+          <ul>
+          </ul>
+        </div>
+        <div class="unlocked_list progression_list" style="margin-bottom: 10px;">
+          <h3 style="margin: 0;">Students who have Unlocked (but not started) the Module</h3>
+          <ul>
+          </ul>
+          </div>
+        <div class="locked_list progression_list" style="margin-bottom: 10px;">
+          <h3 style="margin: 0;">Students who haven't Unlocked the Module</h3>
+          <ul>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+<div style="display: none;">
+  <a href="<%= context_url(@context, :progressions_context_context_modules_url) %>" class="progression_list_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_context_modules_assignment_info_url) %>" class="assignment_info_url">&nbsp;</a>
+  <select id="module_list">
+    <option value="">[ Select Module ]</option>
+    <% @modules.each do |m| %>
+      <option value="<%= m.id %>" class="context_module_option context_module_<%= m.id %>">the module, <%= m.name %></option>
+    <% end %>
+  </select>
+  <div id="display_criterion_blank" class="criterion" style="display: none; float: left;">
+    <span class="id" style="display: none;">&nbsp;</span>
+    <span class="type" style="display: none;">&nbsp;</span>
+    <span class="name">module</span>
+    <span style="padding-left: 3px;"><a href="#" class="delete_prerequisite_link" title="Remove this prerequisite" style="text-decoration: none;">&#215;</a></span>
+  </div>
+  <div id="completion_criterion_option" class="completion_criterion_option">
+    For
+    <span style="padding: 0 4px;">
+      <select class="id assignment_picker">
+      </select>
+    </span>
+    users must 
+    <span style="padding: 0 4px;">
+      <select class="type assignment_requirement_picker">
+        <option class="any" value="must_view">view the item</option>
+        <option class="assignment wiki_page discussion_topic" value="must_contribute">contribute to the page</option>
+        <option class="assignment quiz" value="must_submit">submit the assignment</option>
+        <option class="assignment quiz" value="min_score">score at least</option>
+      </select>
+    </span>
+    <span class="min_score_box" style="display: none;">
+      <input type="text" class="min_score" style="width: 35px;"/>
+      <span>out of <span class="points_possible">&nbsp;</span></span>
+    </span>
+  </div>
+  <%= image_tag "flagged_question_dim.png", :id => "criterion_image_min_score", :class => "image not_blank", :alt => "minimum score", :title => "Students must get at least a {{ min_score }} on this item before the module is considered complete" %>
+  <%= image_tag "preview_dim.png", :id => "criterion_image_must_view", :class => "image not_blank", :alt => "must view", :title => "Students must view this item before the module is considered complete" %>
+  <%= image_tag "text_entry_dim.png", :id => "criterion_image_must_submit", :class => "image not_blank", :alt => "must submit", :title => "Students must submit this assignment before the module is considered complete" %>
+  <%= image_tag "text_entry_dim.png", :id => "criterion_image_must_contribute", :class => "image not_blank", :alt => "must contribute", :title => "Students must contribute to this item before the module is considered complete" %>
+  <%= image_tag "blank.png", :id => "criterion_image_blank", :class => "image", :alt => "" %>
+  <a href="<%= context_url(@context, :reorder_context_context_modules_url) %>" class="reorder_modules_url">&nbsp;</a>
+</div>
+<div id="current_user_progression_list" class="user_<%= @current_user && @current_user.id %>" style="display: none;">
+  <div class="progression progression_blank">
+    <div class="context_module_id">&nbsp;</div>
+    <div class="workflow_state">&nbsp;</div>
+    <div class="requirements_met">&nbsp;</div>
+    <div class="current_position">&nbsp;</div>
+    <div class="collapsed">&nbsp;</div>
+  </div>
+</div>
+<% if can_do(@context, @current_user, :manage_grades) %>
+<div style="display: none;" id="progression_list">
+  <a href="#" class="progression_list_url">&nbsp;</a>
+  <% cache([@context, @current_user, 'students_visible_to_user'].cache_key) do %>
+    <% @context.students_visible_to(@current_user).scoped(:select => "id, name").each do |student| %>
+      <div class="student student_<%= student.id %>">
+        <div class="id"><%= student.id %></div>
+        <div class="name"><%= student.last_name_first %></div>
+        <div class="current_module">&nbsp;</div>
+        <div class="progressions">
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+  <div class="progression" id="progression_list_blank">
+    <div class="context_module_id">&nbsp;</div>
+    <div class="workflow_state">&nbsp;</div>
+  </div>
+</div>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  var foundExpanded = false;
+  var collapsedModules = <%= raw @collapsed_modules.to_json %>;
+  for(var idx in collapsedModules) {
+    $("#context_module_" + collapsedModules[idx]).addClass('collapsed_module');
+  }
+  var foundModules = [];
+  var $contextModules = $("#context_modules .context_module");
+  if (!$contextModules.length) {
+    $('#no_context_modules_message').show();
+  }
+  $contextModules.each(function() {
+    modules.updateProgressionState($(this));
+  });
+  $contextModules.filter(":visible").each(function() {
+    if($(this).find(".content:visible").length > 0) {
+      foundExpanded = true;
+    } else if(foundExpanded) {
+      foundModules.push($(this));
+    }
+  });
+  $("#context_modules").bind('slow_load', function() {
+    var $module = foundModules.shift();
+    if($module) {
+      $module.find(".expand_module_link:first").triggerHandler('click', true);
+    }
+  });
+});
+</script>
+<% end %>
+<% content_for :keyboard_navigation do %>
+  <ul class="navigation_list" tabindex="-1">
+    <li>
+      <span class="keycode">j</span>
+      <span class="colon">:</span>
+      <span class="description">Next Module/Item</span>
+    </li>
+    <li>
+      <span class="keycode">k</span>
+      <span class="colon">:</span>
+      <span class="description">Previous Module/Item</span>
+    </li>
+    <li>
+      <span class="keycode">e</span>
+      <span class="colon">:</span>
+      <span class="description">Edit Module/Item</span>
+    </li>
+    <li>
+      <span class="keycode">d</span>
+      <span class="colon">:</span>
+      <span class="description">Delete Current Module/Item</span>
+    </li>
+    <li>
+      <span class="keycode">i</span>
+      <span class="colon">:</span>
+      <span class="description">Indent Current Item</span>
+    </li>
+    <li>
+      <span class="keycode">o</span>
+      <span class="colon">:</span>
+      <span class="description">Outdent Current Item</span>
+    </li>
+    <li>
+      <span class="keycode">n</span>
+      <span class="colon">:</span>
+      <span class="description">New Module</span>
+    </li>
+  </ul>
+<% end %>

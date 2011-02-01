@@ -1,0 +1,33 @@
+<assessmentItem identifier="" title="Matching question"><responseDeclaration identifier="RESPONSE" baseType="directedPair" cardinality="multiple"><correctResponse><value>definition_1 term_1</value><value>definition_2 term_2</value><value>definition_3 term_3</value></correctResponse><mapping><mapEntry mapKey="definition_1 term_1" mappedValue="0.333333333333333" /><mapEntry mapKey="definition_2 term_2" mappedValue="0.333333333333333" /><mapEntry mapKey="definition_3 term_3" mappedValue="0.333333333333333" /></mapping></responseDeclaration><outcomeDeclaration identifier="SCORE" baseType="float" cardinality="single"><defaultValue><value>0</value></defaultValue></outcomeDeclaration><itemBody><![CDATA[<div>matching question</div>]]><matchInteraction responseIdentifier="RESPONSE"><simpleMatchSet><simpleAssociableChoice identifier="definition_1" matchMax="1">a</simpleAssociableChoice><simpleAssociableChoice identifier="definition_2" matchMax="1">b</simpleAssociableChoice><simpleAssociableChoice identifier="definition_3" matchMax="1">c</simpleAssociableChoice></simpleMatchSet><simpleMatchSet><simpleAssociableChoice identifier="term_1" matchMax="3">1</simpleAssociableChoice><simpleAssociableChoice identifier="term_2" matchMax="3">2</simpleAssociableChoice><simpleAssociableChoice identifier="term_3" matchMax="3">3</simpleAssociableChoice></simpleMatchSet></matchInteraction><![CDATA[<div></div>]]></itemBody><outcomeDeclaration identifier="FEEDBACK" baseType="identifier" cardinality="multiple" /><outcomeDeclaration identifier="GENERAL_FEEDBACK" baseType="identifier" cardinality="single" /><responseProcessing>
+    <responseCondition>
+        <responseIf>
+            <isNull>
+                <variable identifier="RESPONSE" />
+            </isNull>
+            <setOutcomeValue identifier="SCORE">
+                <baseValue baseType="integer">0</baseValue>
+            </setOutcomeValue>
+        </responseIf>
+        <responseElse>
+            <setOutcomeValue identifier="SCORE">
+                <mapResponse identifier="RESPONSE" />
+            </setOutcomeValue>
+	        <responseCondition>
+	            <responseIf>
+                    <match>
+                        <correct identifier="RESPONSE" />
+                        <variable identifier="RESPONSE" />
+                    </match>
+                    <setOutcomeValue identifier="GENERAL_FEEDBACK">
+			            <baseValue baseType="identifier">CORRECT_FEEDBACK</baseValue>
+                    </setOutcomeValue>
+	            </responseIf>
+	            <responseElse>
+                    <setOutcomeValue identifier="GENERAL_FEEDBACK">
+			            <baseValue baseType="identifier">INCORRECT_FEEDBACK</baseValue>
+                    </setOutcomeValue>
+	            </responseElse>
+	        </responseCondition>
+        </responseElse>
+    </responseCondition>
+</responseProcessing></assessmentItem>

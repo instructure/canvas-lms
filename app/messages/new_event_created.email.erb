@@ -1,0 +1,24 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>
+<% end %>
+
+<% define_content :subject do %>
+  New Event - <%= asset.title %>: <%= asset.context.name %>
+<% end %>
+
+There's a new event scheduled for <%= asset.context.name %> that you should be aware of:
+
+<%= asset.title %> 
+
+<% if (asset.start_at == asset.end_at || !asset.end_at) %>
+<%= force_zone(asset.start_at).strftime("%b %d at %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
+
+<% else %>
+from <%= force_zone(asset.start_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
+
+to <%= force_zone(asset.end_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.end_at).strftime("%p").downcase rescue "" %> 
+
+<% end %>
+
+You can see details here: 
+<%= content :link %>

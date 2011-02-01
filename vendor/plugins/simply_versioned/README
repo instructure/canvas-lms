@@ -1,0 +1,129 @@
+SimplyVersioned
+===============
+
+Release:	0.9.3
+Date:			28-01-2008
+Author:		Matt Mower <self@mattmower.com>
+
+SimplyVersioned is a simple, non-invasive, approach to versioning ActiveRecord models.
+
+SimplyVersioned does not require any structural change to the models to be versioned and requires only one versions table to be created (a migration generator is supplied with the plugin) regardless of the number of models being versioned.
+
+The plugin introduces a 'Version' ActiveRecord model (that reflects changes to model attributes) to which versioned models are polymorphically associated. Version records store the model information as a YAML hash.
+	
+SimplyVersioned meets a simple need for model versioning. If your needs are more complex maybe try Rick Olsen's acts_as_versioned (http://svn.techno-weenie.net/projects/plugins/acts_as_versioned/).
+	
+SimplyVersioned is (so far) actively tested with Rails 2.0.2 and Ruby 1.8.6p111 on MacOSX.
+
+Usage
+=====
+
+1. Install the plugin
+
+  ./script/plugin install http://rubymatt.rubyforge.org/svn/simply_versioned
+
+2. Generate the migration
+
+  ./script/generate simply_versioned_migration
+
+	Note that the migration defaults to storing the version info in a TEXT field. On MySQL this will default to a
+	limit of 64K. If you are versioning particularly large models you will want to modify the migration to include
+	a :limit => n condition to promote the yaml column to a MEDIUMTEXT or (god forbid) a LONGTEXT.
+
+3. Create the versions table
+
+  rake db:migrate
+
+4. Annotate the models you want to version specifying how many versions to keep
+
+	class Thing < ActiveRecord::Base
+	  simply_versioned :keep => 10
+	end
+	
+	If you do not specify a limit then old versions are never automatically deleted. You can
+	manually delete them like this:
+	
+	thing.versions.purge( 10 )
+	
+	which would delete all the but the last ten versions.
+	
+	If you want fine-grained control over when versions are created you can use:
+	
+	class Thing < ActiveRecord::Base
+		simply_versioned :automatic => false
+	end
+	
+	and new versions will no longer be created by default. You will then need to use
+	the with_versioning method to create a version.
+	
+	Lastly you can control which columns will be versioned by specifying an exclude parameter.
+	
+	class Thing < ActiveRecord::Base
+		simply_versioned :exclude => :awkward_column
+	end
+		
+	or	
+	
+	class Thing < ActiveRecord::Base
+		simply_versioned :exclude => [:first_awkward_column,:second_awkward_column,...]
+	end
+	
+	This may be helpful if you run into conflicts with other plugins which try to manage columns.
+
+5. Create versions
+
+	thing = Thing.create!( :foo => bar ) # creates v1
+	thing.foo = baz
+	thing.save! # creates v2
+	
+	If you need to control whether a version is created or not, use #with_versioning. For example:
+	
+	thing.with_versioning( false ) do |t|
+		t.save!
+	end
+	
+	or, using the "magic pen" (http://dablog.rubypal.com/2007/2/18/the-magic-pens-of-ruby thanks hmj):
+	
+	thing.with_versioning( false, &:save! )
+
+6. Find versions
+
+	thing.versions.each do |version| ... end
+	render :partial => 'thing_version', :collection => thing.versions
+	thing.versions.current
+	thing.versions.first
+	thing.versions.get( 3 )
+	
+	To find a version number:
+	
+	thing.version_number
+
+7. Revert to a previous version
+
+	thing.revert_to_version( 5 )
+	
+	If a specific reversion needs to avoid overwriting some column values pass
+	an :except option, e.g.
+	
+	thing.revert_to_version( 1, :except => [:name,:age] )
+	
+	The revert_to_version method also takes an existing Version instance, e.g.
+	
+	version = thing.versions.find( ... )
+	thing.revert_to_version( version )
+
+8. Traverse versions
+
+	thing.versions.current.previous
+	thing.versions.first.next
+
+9. Obtain a copy of a previous versioned model
+
+	thing.versions.first.model # => Instantiated Thing with versioned values
+	
+Thanks to:
+
+	Josh Susser (http://blog.hasmanythrough.com/) for useful suggestions and feedback
+	Rick Olson (http://techno-weenie.net/) for all the many plugins whose code i've read
+	
+Copyright (c) 2007 Matt Mower <self@mattmower.com> and released under the MIT license

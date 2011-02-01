@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Unmapped metadata field: cc_profile=cc.multiple_choice.v0p1
+Unmapped metadata field: cc_weighting=1
+Warning: replacing bad NMTOKEN "543c53e4-f001-41a7-af6d-3312572801d3" with "RESPONSE_543c53e4-f001-41a7-af6d-3312572801d3"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: titles on respconditions no longer supported, ignored "Correct"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="543c53e4-f001-41a7-af6d-3312572801d3"
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<responseDeclaration identifier="RESPONSE_543c53e4-f001-41a7-af6d-3312572801d3" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<div>A peer review team is reviewing a course.  They are considering Standard 1.1.  Reviewer 1 scores the standard &quot;No.&quot;  Reviewer 2 scores the standard &quot;No.&quot; The Master Reviewer scores the standard &quot;Yes.&quot; How many points will the course receive for Standard 1.1?</div>
+<div></div>
+<choiceInteraction responseIdentifier="RESPONSE_543c53e4-f001-41a7-af6d-3312572801d3" shuffle="false" maxChoices="1">
+<simpleChoice identifier="answerChoice1" fixed="true">
+<p>3 points</p></simpleChoice>
+<simpleChoice identifier="answerChoice2" fixed="true">
+<p>2 points</p></simpleChoice>
+<simpleChoice identifier="answerChoice3" fixed="true">
+<p>1 point</p></simpleChoice>
+<simpleChoice identifier="answerChoice4" fixed="true">
+<p>0 points</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="RESPONSE_543c53e4-f001-41a7-af6d-3312572801d3"/><baseValue baseType="identifier">answerChoice1</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="RESPONSE_543c53e4-f001-41a7-af6d-3312572801d3"/><baseValue baseType="identifier">answerChoice2</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect_fb</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="RESPONSE_543c53e4-f001-41a7-af6d-3312572801d3"/><baseValue baseType="identifier">answerChoice3</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect_fb</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="RESPONSE_543c53e4-f001-41a7-af6d-3312572801d3"/><baseValue baseType="identifier">answerChoice4</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct_fb</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect_fb</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct_fb">
+<p>You got it!  Majority rules in QM rubric scoring.  Since two out of the three reviewers scored the standard &quot;No,&quot; no points are awarded for this standard.</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect_fb">
+<p>If you chose one of the incorrect answers, you may have been thinking that the scores were averaged or that the master reviewer's &quot;Yes&quot; score carried more weight than the other reviewers' scores. Majority rules in QM rubric scoring.  Since two out of the three reviewers scored the standard &quot;No,&quot; no points are awarded for this standard.  </p></modalFeedback>
+</assessmentItem>

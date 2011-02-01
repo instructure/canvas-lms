@@ -1,0 +1,505 @@
+<% content_for :stylesheets do %>
+<style>
+.channel_list .channel .default_link {
+  opacity: 0;
+  -moz-opacity: 0;
+  filter:alpha(opacity=0);
+}
+.channel_list.single .hidden_for_single {
+  display: none;
+}
+.channel_list .channel:hover .default_link {
+  display: block;
+  opacity: 0.5;
+}
+.channel_list .channel.unconfirmed .default_link {
+  display: none;
+}
+.channel_list .channel.default .default_link,
+.channel_list .channel.default:hover .default_link {
+  display: block;
+  opacity: 1.0;
+}
+.channel_list .channel.default .delete_channel_link {
+  display: none;
+}
+#right-side table.channel_list tr.channel.unconfirmed > td {
+}
+#right-side table.channel_list tr.channel.unconfirmed > td a {
+  color: #888;
+  font-style: italic;
+}
+</style>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $("#communication_channels").tabs();
+  $("#communication_channels").bind('tabsshow', function(event) {
+    if($(this).css('display') != 'none') {
+      var idx = $(this).data('selected.tabs');
+      if(idx == 0) {
+        $("#register_email_address").find(":text:first").focus().select();
+      } else {
+        $("#register_sms_number").find(":text:first").focus().select();
+      }
+    }
+  });
+  $(".channel_list tr").hover(function() {
+    if($(this).hasClass('unconfirmed')) {
+      var channel_type = "contact";
+      if($(this).closest(".email_channels").length > 0) {
+        channel_type = "email";
+      }
+      $(this).attr('title', 'This ' + channel_type + ' has not been confirmed.  Click the address for more details');
+      $(this).find("a.path").parent().attr('title', 'This ' + channel_type + ' has not been confirmed.  Click for more details');
+    }
+  }, function() {
+    $(this).attr('title', '');
+    $(this).find("a.path").parent().attr('title', $(this).find("a.path").text());
+  });
+  $(".add_email_link,.add_contact_link").click(function(event) {
+    event.preventDefault();
+    var view = "email";
+    $("#communication_channels").show().dialog('close').dialog({
+      title: "Register Communication",
+      width: 430,
+      resizable: false,
+      modal: true,
+      open: function() {
+        $("#communication_channels").triggerHandler('tabsshow');
+      }
+    }).dialog('open');
+    if($(this).hasClass('add_contact_link')) {
+      $("#communication_channels").tabs('select', '#register_sms_number');
+      view = "sms";
+    } else {
+      $("#communication_channels").tabs('select', '#register_email_address');
+    }
+  });
+  $("#register_sms_number .user_selected").bind('change blur keyup focus', function() {
+    var $form = $(this).parents("#register_sms_number");
+    var sms_number = $form.find(".sms_number").val().replace(/[^\d]/g, "");
+    $form.find(".should_be_10_digits").showIf(sms_number && sms_number.length != 10);
+    var email = $form.find(".carrier").val();
+    $form.find(".sms_email").attr('disabled', email != 'other');
+    if(email == "other") { return; }
+    email = email.replace("#", sms_number);
+    $form.find(".sms_email").val(email);
+  });
+
+  $("#register_sms_number,#register_email_address").formSubmit({
+    beforeSubmit: function(data) {
+      var $list = $(".email_channels");
+      var data = $(this).getFormData({object_name: 'pseudonym'});
+      if($(this).attr('id') == "register_sms_number") {
+        $list = $(".other_channels");
+      }
+      var path = $(this).getFormData({object_name: 'pseudonym'}).unique_id;
+      $(this).data('email', path);
+      $list.find(".channel .path").each(function() {
+        if($(this).text() == path) { path = ""; }
+      });
+      $list.removeClass('single');
+      var $channel = null;
+      if(path) {
+        $channel = $list.find(".channel.blank").clone(true).removeClass('blank');
+        $channel.find(".path").attr('title', "Unconfirmed.  Click to confirm");
+        $channel.fillTemplateData({
+          data: {path: path}
+        });
+        $list.find(".channel.blank").before($channel.show());
+      }
+      if(!path) { return false; }
+      $("#communication_channels").dialog('close');
+      $channel.loadingImage({image_size: 'small'});
+      return $channel;
+    }, success: function(data, $channel) {
+      $("#communication_channels").dialog('close');
+      $channel.loadingImage('remove');
+      
+      var channel = data.communication_channel;
+      channel.pseudonym_id = channel.pseudonym && channel.pseudonym.id;
+      channel.channel_id = channel.id;
+      var select_type = "email_select";
+      if($(this).attr('id') == 'register_sms_number') {
+        select_type = "sms_select";
+      }
+      var $select = $("#select_templates ." + select_type);
+      var $option = $(document.createElement('option'));
+      $option.val(channel.id).text(channel.path);
+      $select.find("option:last").before($option);
+      $select.find("option.blank_option").remove();
+      $("." + select_type).each(function() {
+        var val = $(this).val();
+        if(val == "new") {
+          val = channel.id;
+        }
+        $(this).after($select.clone(true).val(val)).remove();
+      });
+      //$(".email_select or .sms_select")
+      $channel.fillTemplateData({
+        data: channel,
+        id: 'channel_' + channel.id,
+        hrefValues: ['user_id', 'pseudonym_id', 'channel_id']
+      });
+      $channel.addClass('pseudonym_' + channel.pseudonym.id);
+      $channel.find(".path").triggerHandler('click');
+    },
+    error: function(data, $channel) {
+      $channel.loadingImage('remove');
+      var errored = false;
+      if(data && data.path) {
+        for(var idx in data.path) {
+          var error = data.path[idx];
+          if(error && error.message.match(/has already been activated for another account/)) {
+            var email = $(this).data('email');
+            $("#claim_email_address_dialog")
+              .find(":text").val(email || "").end()
+              .find(".user_email").text(email);
+            $("#claim_email_address_dialog").dialog('close').dialog({
+              autoOpen: false,
+              width: 400,
+              title: "Email Address Already Taken"
+            }).dialog('open');
+            // var message = error.message + "<br/><a href='#' class='email_address_taken_learn_more' style='font-size: 0.8em;'>learn more</a>";
+            // $channel.parents(".channel_list").errorBox(message);
+            errored = true;
+          }
+        }
+      }
+      if(!errored) {
+        // $channel.parents(".channel_list").formErrors(data); //.errorBox(message); //formErrors(data);
+      }
+      $channel.remove();
+    }
+  });
+  $("a.email_address_taken_learn_more").live('click', function(event) {
+    event.preventDefault();
+    
+  });
+  $("#claim_email_address_dialog .cancel_button").click(function() {
+    $("#claim_email_address_dialog").dialog('close');
+  });
+  $(".channel_list .channel .delete_channel_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".channel").confirmDelete({
+      url: $(this).attr('href'),
+      success: function(data) {
+        var $list = $(this).parents(".channel_list");
+        $(this).remove();
+        $list.toggleClass('single', $list.find(".channel:visible").length <= 1);
+      }
+      
+    });
+  });
+  $("#confirm_communication_channel .cancel_button").click(function(event) {
+    $("#confirm_communication_channel").dialog('close');
+  });
+  $(".email_channels .channel .path,.other_channels .channel .path").click(function(event) {
+    event.preventDefault();
+    var $channel = $(this).parents(".channel");
+    if($channel.hasClass('unconfirmed')) {
+      var type = "email address", type_proper = "Email Address";
+      if($(this).parents(".channel_list").hasClass('other_channels')) {
+        type = "sms number", type_proper = "SMS Number";
+      }
+      var $box = $("#confirm_communication_channel");
+      if($channel.parents(".email_channels").length > 0) {
+        $box = $("#confirm_email_channel");
+      }
+      var data = $channel.getTemplateData({textValues: ['user_id', 'pseudonym_id', 'channel_id']});
+      var path = $(this).text();
+      if(type == "sms number") {
+        path = path.split("@")[0];
+      }
+      data.code = "";
+      $box.fillTemplateData({data: {
+        path: path,
+        path_type: type,
+        user_id: data.user_id,
+        channel_id: data.channel_id
+      }});
+      $box.find(".status_message").css('visibility', 'hidden');
+      var url = $(".re_send_confirmation_url").attr('href');
+      url = $.replaceTags(url, "id", data.channel_id);
+      url = $.replaceTags(url, "pseudonym_id", data.pseudonym_id);
+      url = $.replaceTags(url, "user_id", data.user_id);
+      $box.find(".re_send_confirmation_link").attr('href', url)
+        .text("Re-Send Confirmation");
+      $box.fillFormData(data);
+      $box.show().dialog('close').dialog({
+        autoOpen: false,
+        title: "Confirm " + type_proper,
+        width: 350,
+        open: function() {
+          $(this).find(":text:first").focus().select();
+        }
+      }).dialog('open');
+    }
+  });
+  $("#confirm_communication_channel").formSubmit({
+    formErrors: false,
+    processData: function(data) {
+      var url = $(this).find(".register_channel_link").attr('href');
+      url = $.replaceTags(url, "id", data.channel_id);
+      url = $.replaceTags(url, "code", data.code);
+      $(this).attr('action', url);
+    },
+    beforeSubmit: function(data) {
+      $(this).find(".status_message").text("Confirming...").css('visibility', 'visible');
+    },
+    success: function(data) {
+      $(this).find(".status_message").css('visibility', 'hidden');
+      var pseudonym_id = data.communication_channel.pseudonym_id;
+      $("#channel_" + data.communication_channel.id).removeClass('unconfirmed');
+      $(".channel.pseudonym_" + pseudonym_id).removeClass('unconfirmed');
+      $("#confirm_communication_channel").dialog('close');
+      $.flashMessage("Contact successfully confirmed!");
+    },
+    error: function(data) {
+      $(this).find(".status_message").text("Confirmation failed.  Please try again.");
+    }
+  });
+  $(".channel_list .channel .default_link").click(function(event) {
+    event.preventDefault();
+    var channel_id = $(this).parents(".channel").getTemplateData({textValues: ['channel_id']}).channel_id;
+    var formData = {
+      'default_communication_channel_id': channel_id
+    }
+    $.ajaxJSON($(this).attr('href'), 'PUT', formData, function(data) {
+      var channel_id = data.user.communication_channel.id;
+      $(".channel.default").removeClass('default');
+      $(".channel#channel_" + channel_id).addClass('default');
+      $(".default_email.display_data").text(data.user.pseudonym.unique_id);
+    });
+  });
+  $(".dialog .re_send_confirmation_link").click(function(event) {
+    event.preventDefault();
+    var $link = $(this);
+    $link.text("Re-Sending...");
+    $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
+      $link.text("Done! Message may take a few minutes.");
+    }, function(data) {
+      $link.text("Request failed. Try again.");
+    });
+  });
+  $("#communication_channels .cancel_button").click(function(event) {
+    $("#communication_channels").dialog('close');
+  });
+  $("#confirm_email_channel .cancel_button").click(function() {
+    $("#confirm_email_channel").dialog('close');
+  });
+});
+</script>
+<% end %>
+<h2>Ways to Contact</h2>
+<div class="rs-margin-lr">
+<table class="<%= 'single' if @email_channels.length <= 1 %> summary channel_list email_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
+  <thead>
+    <tr>
+      <th style="padding: 0;">&nbsp;</th>
+      <th>Email Addresses</th>
+      <th style="padding: 0;" class="hidden_for_single">&nbsp;</th>
+    </tr>
+  </thead>
+  <% @email_channels.each do |c| %>
+    <tr class="channel <%= "default" if c.position && c.position <= 1 %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
+      <td style="padding: 0; text-align: center;">
+        <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => "Default email address" %></a>
+      </td>
+      <td><div style="overflow: hidden; position: relative;">&nbsp;
+      <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="<%=h c.path %>">
+        <a href="#" class="path"><%= c.path %></a>
+      </div></div></td>
+      <td style="padding: 0; text-align: center;" class="hidden_for_single">
+        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => "Remove email address" %></a>
+        <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
+        <span class="channel_id" style="display: none;"><%= c.id %></span>
+        <span class="user_id" style="display: none;"><%= c.user_id %></span>
+      </td>
+    </tr>
+  <% end %>
+  <tr class="channel blank unconfirmed" style="display: none;">
+    <td style="padding: 0; text-align: center;">
+      <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => "Default email address" %></a>
+    </td>
+    <td><div style="overflow: hidden; position: relative;">&nbsp;
+    <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="">
+      <a href="#" class="path">&nbsp;</a>
+    </div></div></td>
+    <td style="padding: 0; text-align: center;" class="hidden_for_single">
+      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><%= image_tag "delete.png" %></a>
+      <span class="pseudonym_id" style="display: none;">&nbsp;</span>
+      <span class="channel_id" style="display: none;">&nbsp;</span>
+      <span class="user_id" style="display: none;">&nbsp;</span>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="3" style="text-align: center;">
+      <a href="#" class="add_email_link add">Add Email Address</a>
+    </td>
+  </tr>
+</table>
+<table class="summary channel_list other_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
+  <thead>
+    <tr>
+      <th>Other Contacts</th>
+      <th colspan='2'>Type</th>
+    </tr>
+  </thead>
+  <tbody style="font-size: 0.8em">
+  <% @other_channels.each do |c| %>
+    <tr class="channel <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym_id %>" id="channel_<%= c.id %>">
+      <td><a href="#" class="path"><%= c.path_description %></a></td>
+      <td><%= c.path_type %></td>
+      <td style="padding: 0; text-align: center;">
+        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => "Remove email address", :style => (c.first?) ? "display: none;" : "" %></a>
+        <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
+        <span class="channel_id" style="display: none;"><%= c.id %></span>
+        <span class="user_id" style="display: none;"><%= c.user_id %></span>
+      </td>
+    </tr>
+  <% end %>
+  <tr class="channel blank unconfirmed" style="display: none;">
+    <td><a href="#" class="path">&nbsp;</a></td>
+    <td>sms</td>
+    <td style="padding: 0; text-align: center;">
+      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><%= image_tag "delete.png" %></a>
+      <span class="pseudonym_id" style="display: none;">&nbsp;</span>
+      <span class="channel_id" style="display: none;">&nbsp;</span>
+      <span class="user_id" style="display: none;">&nbsp;</span>
+    </td>
+  </tr>
+  </tbody>
+  <tfoot>
+  <tr>
+    <td colspan="3" style="text-align: center;">
+      <a href="#" class="add_contact_link add"> Add Contact Method</a>
+    </td>
+  </tr>
+  </tfoot>
+</table>
+</div>
+<div id="communication_channels" style="display: none;">
+<ul>
+  <li><a href="#register_email_address">Email</a></li>
+  <li><a href="#register_sms_number">Text (SMS)</a></li>
+</ul>
+<% form_tag communication_channels_url, {:id => "register_email_address"} do %>
+<input type="hidden" name="path_type" value="email"/>
+<table>
+  <tr>
+    <td style="white-space: nowrap"><%= label :pseudonym, :unique_id, "Email Address:" %></td>
+    <td><%= text_field :pseudonym, :unique_id %></td>
+  </tr><tr>
+    <td colspan="2">
+      <input type="checkbox" id="build_pseudonym_for_email" name="build_pseudonym" value="1"/>
+      <label for="build_pseudonym_for_email">I want to log in to Canvas using this email address</label>
+    </td>
+  </tr><tr>
+    <td colspan="2">
+      <button type="submit" class="button">Register Email</button>
+    </td>
+  </tr>
+</table>
+<% end %>
+<% form_tag communication_channels_url, {:id => "register_sms_number"} do %>
+<input type="hidden" name="path_type" value="sms"/>
+<table>
+  <tr>
+    <td style="white-space: nowrap; vertical-align: top;">Cell Number:</td>
+    <td>
+      <input type="text" class="user_selected sms_number"/><br/>
+      <span style="font-size: 0.8em; color: #a44" class="should_be_10_digits">should be 10-digit number</span>
+    </td>
+  </tr><tr>
+    <td>Carrier:</td>
+    <td>
+      <select class="user_selected carrier">
+        <option value="other">[Select Carrier]</option>
+        <option value="#@txt.att.net">AT&amp;T</option>
+        <option value="#@message.alltel.com">Alltel</option>
+        <option value="#@myboostmobile.com">Boost</option>
+        <option value="#@cingularme.com">Cingular</option>
+        <option value="#@mobile.celloneusa.com">CellularOne</option>
+        <option value="#@sms.mycricket.com">Cricket</option>
+        <option value="#@messaging.nextel.com">Nextel</option>
+        <option value="#@messaging.sprintpcs.com">Sprint PCS</option>
+        <option value="#@tmomail.net">T-Mobile</option>
+        <option value="#@vtext.com">Verizon</option>
+        <option value="#@vmobile.com">Virgin Mobile</option>
+        <option value="other">Other Carrier</option>
+      </select>
+    </td>
+  </tr><tr>
+    <td style="white-space: nowrap; vertical-align: top;">SMS Email:</td>
+    <td>
+      <%= text_field :pseudonym, :unique_id, :class => "sms_email" %><br/>
+    </td>
+  </tr><tr>
+    <td colspan="2">
+      <button type="submit" class="button">Register SMS</button>
+    </td>
+</table>
+<% end %>
+</div>
+<div id="confirm_email_channel" style="display: none;" class="dialog">
+  <div style="text-align: center;">We emailed a confirmation link to 
+    <span class="path" style="font-weight: bold;">&nbsp;</span>.  Click the link in that
+    email to finish registering.  Make sure to check your spam box in case
+    it got filtered.
+  </div>
+  <div style="text-align: center; margin: 10px 0; font-weight: bold;">
+    <a href="#" class="re_send_confirmation_link">Re-Send Confirmation</a>
+    <a href="<%= re_send_confirmation_url("{{ user_id }}", "{{ id }}") %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
+  </div>
+  <div class="button-container">
+    <button type="button" class="button cancel_button">Ok, Thanks</button>
+  </div>
+</div>
+<% form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog"} do %>
+  <input type="hidden" name="pseudonym_id" value=""/>
+  <input type="hidden" name="channel_id" value=""/>
+  <input type="hidden" name="user_id" value=""/>
+  <div style="text-align: center;">We sent a four-character confirmation code to <span class="path" style="font-weight: bold;">&nbsp;</span>.
+    Enter the code below to activate this <span class="path_type">&nbsp;</span></div>
+  <div style="text-align: center;">
+    <input type="text" style="width: 100px; font-size: 1.5em;" name="code"/><br/>
+    <!--a href="#" style="font-size: 0.8em;">Re-send code</a-->
+    <span style="display: none;" class="channel_id">&nbsp;</span>
+    <a href="<%= communication_channel_confirm_path("{{ id }}", "{{ code }}") %>" style="display: none;" class="register_channel_link">&nbsp;</a>
+  </div>
+  <div style="margin: 0 0 5px; text-align: center; font-size: 0.8em;">
+    <a href="#" class="re_send_confirmation_link">Re-Send Confirmation</a>
+  </div>
+  <div class="status_message" style="visibility: hidden; text-align: center; color: #444; font-weight: bold">Confirming...</div>
+  <div class="button-container">
+    <button type="submit" class="button">Confirm</button>
+  </div>
+<% end %>
+<div id="claim_email_address_dialog" style="display: none;">
+  <%= image_tag "email_big.png", :style => "float: left; padding-right: 5px; padding-bottom: 3px;" %>
+  The address you entered (<b class="user_email">email</b>) is 
+  currently assigned to another user.  Email addresses can only be 
+  tied to one user at a time.  If you're sure this
+  address belongs to you and you want to claim it, enter it again in the
+  form below:
+  <% form_for :communication_channel, :url => try_merge_communication_channels_url, :html => {:id => ""} do |f| %>
+    <div style="margin: 10px; text-align: center;">
+      <%= f.text_field :path %>
+    </div>
+    <div class="button-container">
+      <button type="submit" class="button">Find Email Address</button>
+      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+    </div>
+  <% end %>
+</div>
+<div style="display: none;" id="select_templates">
+  <%= render :partial => "email_select" %>
+  <%= render :partial => "sms_select" %>
+  <%= render :partial => "facebook_select" %>
+</div>
+<div id="contact_urls">
+  <a href="<%= update_communication_profile_url %>" class="update_communication_url">&nbsp;</a>
+</div>

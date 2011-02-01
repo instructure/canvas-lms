@@ -1,0 +1,20 @@
+<% exception ||= nil %>
+<% if ENV["RAILS_ENV"] != 'production' %>
+  <div id="backtrace" style="width: 90%; margin: 10px auto; display: none;">
+    <% if exception %>
+      <%= h(exception.to_s).gsub(/\n/, "<br/>\n") %><br/><br/>
+      <% exception.backtrace.each do |line| %>
+        <%= h(line) %><br/>
+      <% end %>
+    <% end %>
+  </div>
+  <% js_block do %>
+    <script>
+    $(document).ready(function() {
+      $(document).keycodes("s", function() {
+        $("#backtrace").slideToggle();
+      });
+    });
+    </script>
+  <% end %>
+<% end %>

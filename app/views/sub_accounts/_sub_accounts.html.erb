@@ -1,0 +1,43 @@
+<% account ||= nil; current_depth ||= 0; depth ||= 1; max_sub_accounts ||= 100 %>
+<% keep_going = current_depth < depth %>
+
+<div id="account_<%= account ? account.id : "blank" %>" class="account" style="<%= hidden unless account %>">
+  <div class="header">
+    <div class="show_account">
+      <span class="id" style="display: none;"><%= account ? account.id : nbsp %></span>
+      <a href="<%= account_url(account ? account.id : "{{ id }}") %>" class="name"><%= account.name rescue nbsp %></a>
+      <span class="links">
+        <a href="<%= context_url(@context, :context_sub_account_url, (account ? account.id : "{{ id }}")) %>" class="expand_sub_accounts_link no-hover" title="Show Sub-Accounts" style="<%= hidden if (keep_going && account && account.sub_account_count < max_sub_accounts) || (account && account.sub_account_count == 0) %>"><%= image_tag "expand.png" %></a>
+        <a href="#" class="collapse_sub_accounts_link no-hover" title="Hide Sub-Accounts" style="<%= hidden unless keep_going && account && account.sub_account_count < max_sub_accounts %>"><%= image_tag "collapse.png" %></a>
+        <a href="#" class="add_sub_account_link no-hover" title="Add Sub-Account" style="<%= hidden unless (keep_going && account && account.sub_account_count < max_sub_accounts) || (account && account.sub_account_count == 0) %>"><%= image_tag "add.png" %></a>
+        <a href="#" class="edit_account_link no-hover" title="Edit Account Name"><%= image_tag "edit.png" %></a>
+        <% if account && !account.child_courses.empty? %>
+          <a href="#" class="cant_delete_account_link no-hover" title="Can't Delete this Sub-Account"><%= image_tag "delete_circle_gray.png" %></a>
+        <% elsif account != @context %>
+          <a href="#" class="delete_account_link no-hover" title="Delete Sub-Account"><%= image_tag "delete.png" %></a>
+        <% end %>
+      </span>
+      <div style="<%= hidden unless account && account.course_count > 0 %>" class="courses_count">
+        <%= pluralize(account.course_count, "Course") if account %>
+      </div>
+      <div style="<%= hidden unless account && account.sub_account_count > 0 %>" class="sub_accounts_count">
+        <%= pluralize(account.sub_account_count, "Sub-Account") rescue "" %>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="edit_account">
+      <% form_for (account || Account.new), :url => (account ? context_url(@context, :context_sub_account_url, account.id) : context_url(@context, :context_sub_accounts_url)), :html => {:class => "edit_sub_account_form", :method => (account ? :put : :post)} do |f| %>
+        <%= f.text_field :name, :class => "account_name" %>
+      <% end %>
+    </div>
+  </div>
+  <ul class="sub_accounts">
+    <% if account && keep_going && account.sub_account_count < max_sub_accounts %>
+      <% account.sub_accounts.active.scoped(:order => 'name').each do |sub_account| %>
+        <li class="sub_account">
+          <%= render :partial => "sub_accounts", :locals => {:account => sub_account, :depth => depth, :current_depth => current_depth + 1} %>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+</div>

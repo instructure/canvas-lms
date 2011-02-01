@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _153126_1
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Either/Or
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 10.0
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: minnumber attribute no no longer supported on render_*
+Warning: flow_label is no longer supported in version 2, ignoring
+Warning: removing period from identifier "yes_no.true"
+Warning: charset attribute no longer supported: ignored charset="us-ascii"
+Warning: removing period from identifier "yes_no.false"
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "correct"
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+	-->
+
+<assessmentItem
+        xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+        identifier="_153126_1"
+        title=""
+        adaptive="false"
+        timeDependent="false">
+  <instructureMetadata>
+    <instructureField name="max_score" value="10.0"/>
+    <instructureField name="bb_question_type" value="Either/Or"/>
+  </instructureMetadata>
+  <responseDeclaration identifier="response" cardinality="single"
+                       baseType="identifier"/>
+  <outcomeDeclaration identifier="FEEDBACK" cardinality="multiple"
+                      baseType="identifier"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0.0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <itemBody>
+    <div class="QUESTION_BLOCK">
+      <p class="FORMATTED_TEXT_BLOCK">Either or question with yes/no</p>
+    </div>
+    <div class="RESPONSE_BLOCK">
+      <choiceInteraction responseIdentifier="response" shuffle="false"
+                         maxChoices="1">
+        <simpleChoice identifier="yes_no_true" fixed="true">
+          <p>yes_no.true</p>
+        </simpleChoice>
+        <simpleChoice identifier="yes_no_false" fixed="true">
+          <p>yes_no.false</p>
+        </simpleChoice>
+      </choiceInteraction>
+    </div>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf>
+        <match>
+          <variable identifier="response"/>
+          <baseValue baseType="identifier">yes_no.false</baseValue>
+        </match>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">SCORE.max</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">correct</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+      <responseElseIf>
+        <baseValue baseType="boolean">true</baseValue>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">0.0</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">incorrect</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseElseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <gt>
+          <variable identifier="SCORE"/>
+          <baseValue baseType="float">10.0</baseValue>
+        </gt>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">10.0</baseValue>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="correct">
+    <div class="flow_1">
+      <p class="FORMATTED_TEXT_BLOCK">right answer</p>
+    </div>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="incorrect">
+    <div class="flow_1">
+      <p class="FORMATTED_TEXT_BLOCK">Wrong answer</p>
+    </div>
+  </modalFeedback>
+</assessmentItem>

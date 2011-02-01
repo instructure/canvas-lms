@@ -1,0 +1,130 @@
+<% form_tag(context_url(@context, :context_collaborations_url), {:id => "add_collaboration_form", :target => "_blank", :style => "display: none; margin-top: 10px;"}) do %>
+<h2>Start a New Collaboration</h2>
+<table class="formtable">
+  <tr>
+    <td style="white-space: nowrap">
+      Collaborate Using:
+    </td>
+    <td style="width: 90%;">
+      <select id="collaboration_collaboration_type" name="collaboration[collaboration_type]">
+        <% Collaboration.collaboration_types.each do |collab_type| %>
+          <% if collab_type['type'] == 'google_docs' %>
+            <% if @domain_root_account && feature_and_service_enabled?(:google_docs) %>
+              <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
+            <% end %>
+          <% elsif (Collaboration.collaboration_class(collab_type['type'].titleize.gsub(/\s/, "")).config rescue false) %>
+            <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
+          <% end %>
+        <% end %>
+      </select>
+    </td>
+  </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @google_docs %>">
+    <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
+      <%= image_tag "google_docs_icon.png", :style => "float: left; margin-right: 5px;" %> Google Docs are a great place to collaborate
+      on a group project.  It's like Microsoft Word, but lets you work together with others
+      on the same file without having to email it around.  You'll need a Google account
+      in order to participate in any Google Docs collaborations.
+    </td>
+  </tr><tr id="etherpad_description" style="display: none;" class="collaboration_type">
+    <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
+      <%= image_tag "ether_pad.png", :style => "float: left; margin-right: 5px; margin-top: 5px;" %> EtherPad is a site that lets you quickly set
+      up shared documents.  It's fast enough that you can see what others are typing as they're
+      typing it -- although "pads" aren't protected by a password so anyone that knows about them
+      can edit them.  EtherPad might be better suited than Google Docs for things like taking
+      notes because it's so fast.
+    </td>
+  </tr><tr class="collaborate_data">
+    <td style="white-space: nowrap">
+      Document Name:
+    </td>
+    <td>
+      <%= text_field :collaboration, :title, :style => "width: 300px;" %>
+    </td>
+  </tr><tr class="collaborate_data">
+    <td style="white-space: nowrap; vertical-align: top;">
+      Description:
+    </td>
+    <td>
+      <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
+    </td>
+  </tr>
+    <td colspan="2">
+      <div class="collaborate_data">
+        <div>
+          Collaborate With:
+          <div style="margin-left: 10px; font-size: 0.8em;">
+            <a href="#" class="select_all_link">Select All</a> | 
+            <a href="#" class="deselect_all_link">Deselect All</a>
+          </div>
+          <ul id="collaborator_list">
+            <% @users.find(:all, :order => 'sortable_name').uniq.each do |user| %>
+              <% if user != @current_user %>
+                <li class="collaborator">
+                  <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
+                  <%= label :user, "#{user.id}".to_sym, context_user_name(@context, user, true) %>
+                </li>
+              <% end %>
+            <% end %>
+          </ul>
+        </div>
+        <div class="button-container">
+          <button type="submit" class="button button-default-action">Start Collaborating</button>
+          <button type="button" class="button-secondary cancel_button">Cancel</button>
+        </div>
+      </div>
+      <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none; margin: 20px;">
+        Before you can collaborate on documents, you need to authorize Canvas
+        to access your Google Docs account:
+        <div class="button-container">
+          <a class="button button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>">Authorize Google Docs Access</a>
+          <button type="button" class="button-secondary cancel_button">Cancel</button>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+<% end %>
+<div id="delete_collaboration_dialog" style="display: none;">
+  <%= image_tag "google_docs.png", :style => "float: left;" %>
+  This collaboration is being stored as a Google Doc.  Did you want to delete it just
+  from Canvas, or remove it from Google Docs as well?  
+  <div style="margin-top: 15px;">
+  <button type="button" class="button delete_button delete_document_button">Just Delete<br/>from Canvas</button>
+  <button type="button" class="button delete_button">Also Delete From<br/>Google Docs</button>
+  </div>
+</div>
+<% form_tag(context_url(@context, :context_collaboration_url, "{{ id }}"), {:id => "edit_collaboration_form", :method => :put, :style => "display: none; margin-top: 10px;", :class => 'collaboration communication_message'}) do %>
+  <div class="header">
+    <%= text_field :collaboration, :title, :style => "width: 300px;", :value => "#{@context.name} Collaboration" %>
+  </div>
+  <div class="content">
+  Description:<br/>
+  <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
+  </div>
+  <div class="footer">
+    Collaborate With:
+    <div style="margin-left: 10px; font-size: 0.8em;">
+      <a href="#" class="select_all_link">Select All</a> | 
+      <a href="#" class="deselect_all_link">Deselect All</a>
+    </div>
+    <ul id="collaborator_list">
+      <% @users.find(:all, :order => 'sortable_name').uniq.each do |user| %>
+        <% if user != @current_user %>
+          <li class="collaborator collaborator_<%= user.id %>">
+            <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
+            <%= label :user, "#{user.id}".to_sym, user.last_name_first %>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+  </div>
+  <div class="button-container">
+    <button type="submit" class="button button-default-action">Update Collaboration</button>
+    <button type="button" class="button-secondary cancel_button">Cancel</button>
+  </div>
+<% end %>
+<% js_block do %>
+<script>
+  INST.collaboration_types = <%= raw Collaboration.collaboration_types.to_json %>;
+</script>
+<% end %>

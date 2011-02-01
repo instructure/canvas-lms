@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	-->
+
+<assessmentTest
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+ identifier="neutral"
+ title="neutral">
+<testPart identifier="BaseTestPart">
+<assessmentSection identifier="S1002"
+ title="Main">
+<assessmentItemRef identifier="QUE_1004" href="../assessmentItems/QUE_1004.xml"/>
+<assessmentItemRef identifier="QUE_1015" href="../assessmentItems/QUE_1015.xml"/>
+<assessmentItemRef identifier="QUE_1021" href="../assessmentItems/QUE_1021.xml"/>
+<assessmentItemRef identifier="QUE_1026" href="../assessmentItems/QUE_1026.xml"/>
+<assessmentItemRef identifier="QUE_1036" href="../assessmentItems/QUE_1036.xml"/>
+<assessmentItemRef identifier="QUE_1040" href="../assessmentItems/QUE_1040.xml"/>
+<assessmentItemRef identifier="QUE_1051" href="../assessmentItems/QUE_1051.xml"/>
+<assessmentItemRef identifier="QUE_1061" href="../assessmentItems/QUE_1061.xml"/>
+</assessmentSection>
+</testPart>
+</assessmentTest>

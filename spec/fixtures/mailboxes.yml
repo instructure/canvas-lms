@@ -1,0 +1,717 @@
+
+--- 
+mailboxes_058: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-oPia
+  updated_at: 2009-04-30 23:55:51
+  id: "58"
+  mailboxable_entity_type: Submission
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "4"
+  created_at: 2009-04-30 23:55:51
+mailboxes_047: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-7yoR
+  updated_at: 2009-04-30 23:55:50
+  id: "47"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "10"
+  created_at: 2009-04-30 23:55:50
+mailboxes_036: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-ShDs
+  updated_at: 2009-04-30 23:55:49
+  id: "36"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "49"
+  created_at: 2009-04-30 23:55:49
+mailboxes_025: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-HZEC
+  updated_at: 2009-04-30 23:55:49
+  id: "25"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "38"
+  created_at: 2009-04-30 23:55:49
+mailboxes_014: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-7UoO
+  updated_at: 2009-04-30 23:55:48
+  id: "14"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "14"
+  created_at: 2009-04-30 23:55:48
+mailboxes_003: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-9Wnj
+  updated_at: 2009-04-30 23:55:47
+  id: "3"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "3"
+  created_at: 2009-04-30 23:55:47
+mailboxes_059: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-hQPv
+  updated_at: 2009-04-30 23:55:51
+  id: "59"
+  mailboxable_entity_type: Submission
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "5"
+  created_at: 2009-04-30 23:55:51
+mailboxes_048: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-iacg
+  updated_at: 2009-04-30 23:55:50
+  id: "48"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "11"
+  created_at: 2009-04-30 23:55:50
+mailboxes_037: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-aSgW
+  updated_at: 2009-04-30 23:55:49
+  id: "37"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "50"
+  created_at: 2009-04-30 23:55:49
+mailboxes_026: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-3NFW
+  updated_at: 2009-04-30 23:55:49
+  id: "26"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "39"
+  created_at: 2009-04-30 23:55:49
+mailboxes_015: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-LwYj
+  updated_at: 2009-04-30 23:55:48
+  id: "15"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "15"
+  created_at: 2009-04-30 23:55:48
+mailboxes_004: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-y4IQ
+  updated_at: 2009-04-30 23:55:47
+  id: "4"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "4"
+  created_at: 2009-04-30 23:55:47
+mailboxes_060: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-PgkE
+  updated_at: 2009-04-30 23:55:52
+  id: "60"
+  mailboxable_entity_type: Submission
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "6"
+  created_at: 2009-04-30 23:55:52
+mailboxes_049: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-kzia
+  updated_at: 2009-04-30 23:55:50
+  id: "49"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "12"
+  created_at: 2009-04-30 23:55:50
+mailboxes_038: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-wBoX
+  updated_at: 2009-04-30 23:55:49
+  id: "38"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "1"
+  created_at: 2009-04-30 23:55:49
+mailboxes_027: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-1xhk
+  updated_at: 2009-04-30 23:55:49
+  id: "27"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "40"
+  created_at: 2009-04-30 23:55:49
+mailboxes_016: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-DT7b
+  updated_at: 2009-04-30 23:55:48
+  id: "16"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "16"
+  created_at: 2009-04-30 23:55:48
+mailboxes_005: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-a8h7
+  updated_at: 2009-04-30 23:55:48
+  id: "5"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "5"
+  created_at: 2009-04-30 23:55:48
+mailboxes_061: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-9chL
+  updated_at: 2009-04-30 23:55:52
+  id: "61"
+  mailboxable_entity_type: Submission
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "7"
+  created_at: 2009-04-30 23:55:52
+mailboxes_050: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-MBTV
+  updated_at: 2009-04-30 23:55:50
+  id: "50"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "13"
+  created_at: 2009-04-30 23:55:50
+mailboxes_039: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-U2Zr
+  updated_at: 2009-04-30 23:55:50
+  id: "39"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "2"
+  created_at: 2009-04-30 23:55:50
+mailboxes_028: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-CjyU
+  updated_at: 2009-04-30 23:55:49
+  id: "28"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "41"
+  created_at: 2009-04-30 23:55:49
+mailboxes_017: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-vx7o
+  updated_at: 2009-04-30 23:55:48
+  id: "17"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "17"
+  created_at: 2009-04-30 23:55:48
+mailboxes_006: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-Nqsr
+  updated_at: 2009-04-30 23:55:48
+  id: "6"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "6"
+  created_at: 2009-04-30 23:55:48
+mailboxes_062: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-YFTP
+  updated_at: 2009-04-30 23:55:52
+  id: "62"
+  mailboxable_entity_type: Submission
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "17"
+  created_at: 2009-04-30 23:55:52
+mailboxes_051: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-SlXj
+  updated_at: 2009-04-30 23:55:50
+  id: "51"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "14"
+  created_at: 2009-04-30 23:55:50
+mailboxes_040: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-PKtd
+  updated_at: 2009-04-30 23:55:50
+  id: "40"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "3"
+  created_at: 2009-04-30 23:55:50
+mailboxes_029: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-w7z7
+  updated_at: 2009-04-30 23:55:49
+  id: "29"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "42"
+  created_at: 2009-04-30 23:55:49
+mailboxes_018: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-gbGV
+  updated_at: 2009-04-30 23:55:48
+  id: "18"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "18"
+  created_at: 2009-04-30 23:55:48
+mailboxes_007: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-DPjI
+  updated_at: 2009-04-30 23:55:48
+  id: "7"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "7"
+  created_at: 2009-04-30 23:55:48
+mailboxes_063: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-3dlR
+  updated_at: 2009-04-30 23:55:52
+  id: "63"
+  mailboxable_entity_type: DiscussionTopic
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "1"
+  created_at: 2009-04-30 23:55:52
+mailboxes_052: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-5hxj
+  updated_at: 2009-04-30 23:55:51
+  id: "52"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "15"
+  created_at: 2009-04-30 23:55:51
+mailboxes_041: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-Qa87
+  updated_at: 2009-04-30 23:55:50
+  id: "41"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "4"
+  created_at: 2009-04-30 23:55:50
+mailboxes_030: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-q0Fo
+  updated_at: 2009-04-30 23:55:49
+  id: "30"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "43"
+  created_at: 2009-04-30 23:55:49
+mailboxes_019: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-SdJM
+  updated_at: 2009-04-30 23:55:48
+  id: "19"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "19"
+  created_at: 2009-04-30 23:55:48
+mailboxes_008: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-L7lG
+  updated_at: 2009-04-30 23:55:48
+  id: "8"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "8"
+  created_at: 2009-04-30 23:55:48
+mailboxes_064: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-9637
+  updated_at: 2009-04-30 23:55:53
+  id: "64"
+  mailboxable_entity_type: DiscussionTopic
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "2"
+  created_at: 2009-04-30 23:55:53
+mailboxes_053: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-9bXc
+  updated_at: 2009-04-30 23:55:51
+  id: "53"
+  mailboxable_entity_type: CalendarEvent
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "1"
+  created_at: 2009-04-30 23:55:51
+mailboxes_042: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-8dl2
+  updated_at: 2009-04-30 23:55:50
+  id: "42"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "5"
+  created_at: 2009-04-30 23:55:50
+mailboxes_031: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-JLYg
+  updated_at: 2009-04-30 23:55:49
+  id: "31"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "44"
+  created_at: 2009-04-30 23:55:49
+mailboxes_020: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-1Yk4
+  updated_at: 2009-04-30 23:55:48
+  id: "20"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "20"
+  created_at: 2009-04-30 23:55:48
+mailboxes_009: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-nIt1
+  updated_at: 2009-04-30 23:55:48
+  id: "9"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "9"
+  created_at: 2009-04-30 23:55:48
+mailboxes_065: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-tG4v
+  updated_at: 2009-04-30 23:55:53
+  id: "65"
+  mailboxable_entity_type: Course
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "1"
+  created_at: 2009-04-30 23:55:53
+mailboxes_054: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-HXFZ
+  updated_at: 2009-04-30 23:55:51
+  id: "54"
+  mailboxable_entity_type: CalendarEvent
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "2"
+  created_at: 2009-04-30 23:55:51
+mailboxes_043: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-J45d
+  updated_at: 2009-04-30 23:55:50
+  id: "43"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "6"
+  created_at: 2009-04-30 23:55:50
+mailboxes_032: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-Kh91
+  updated_at: 2009-04-30 23:55:49
+  id: "32"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "45"
+  created_at: 2009-04-30 23:55:49
+mailboxes_021: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-MGTj
+  updated_at: 2009-04-30 23:55:48
+  id: "21"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "21"
+  created_at: 2009-04-30 23:55:48
+mailboxes_010: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-ohOk
+  updated_at: 2009-04-30 23:55:48
+  id: "10"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "10"
+  created_at: 2009-04-30 23:55:48
+mailboxes_055: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-kT6u
+  updated_at: 2009-04-30 23:55:51
+  id: "55"
+  mailboxable_entity_type: CalendarEvent
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "3"
+  created_at: 2009-04-30 23:55:51
+mailboxes_044: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-5umv
+  updated_at: 2009-04-30 23:55:50
+  id: "44"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "7"
+  created_at: 2009-04-30 23:55:50
+mailboxes_033: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-uBvl
+  updated_at: 2009-04-30 23:55:49
+  id: "33"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "46"
+  created_at: 2009-04-30 23:55:49
+mailboxes_022: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-sCDd
+  updated_at: 2009-04-30 23:55:49
+  id: "22"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "22"
+  created_at: 2009-04-30 23:55:49
+mailboxes_011: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-3qlU
+  updated_at: 2009-04-30 23:55:48
+  id: "11"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "11"
+  created_at: 2009-04-30 23:55:48
+mailboxes_056: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-yWoo
+  updated_at: 2009-04-30 23:55:51
+  id: "56"
+  mailboxable_entity_type: Submission
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "2"
+  created_at: 2009-04-30 23:55:51
+mailboxes_045: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-ewM7
+  updated_at: 2009-04-30 23:55:50
+  id: "45"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "8"
+  created_at: 2009-04-30 23:55:50
+mailboxes_034: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-hyRb
+  updated_at: 2009-04-30 23:55:49
+  id: "34"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "47"
+  created_at: 2009-04-30 23:55:49
+mailboxes_023: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-CUJK
+  updated_at: 2009-04-30 23:55:49
+  id: "23"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "36"
+  created_at: 2009-04-30 23:55:49
+mailboxes_012: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-gspu
+  updated_at: 2009-04-30 23:55:48
+  id: "12"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "12"
+  created_at: 2009-04-30 23:55:48
+mailboxes_001: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-loo9
+  updated_at: 2009-04-30 23:55:47
+  id: "1"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "1"
+  created_at: 2009-04-30 23:55:47
+mailboxes_057: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-SOPC
+  updated_at: 2009-04-30 23:55:51
+  id: "57"
+  mailboxable_entity_type: Submission
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "3"
+  created_at: 2009-04-30 23:55:51
+mailboxes_046: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-nN3a
+  updated_at: 2009-04-30 23:55:50
+  id: "46"
+  mailboxable_entity_type: Assignment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "9"
+  created_at: 2009-04-30 23:55:50
+mailboxes_035: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-pqWh
+  updated_at: 2009-04-30 23:55:49
+  id: "35"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "48"
+  created_at: 2009-04-30 23:55:49
+mailboxes_024: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-wPKK
+  updated_at: 2009-04-30 23:55:49
+  id: "24"
+  mailboxable_entity_type: Enrollment
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "37"
+  created_at: 2009-04-30 23:55:49
+mailboxes_013: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-OcRq
+  updated_at: 2009-04-30 23:55:48
+  id: "13"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "13"
+  created_at: 2009-04-30 23:55:48
+mailboxes_002: 
+  name: Announcements
+  purpose: broadcast
+  handle: broadcast-6Tb9
+  updated_at: 2009-04-30 23:55:47
+  id: "2"
+  mailboxable_entity_type: CommunicationChannel
+  content_parser: 
+  workflow_state: active
+  mailboxable_entity_id: "2"
+  created_at: 2009-04-30 23:55:47

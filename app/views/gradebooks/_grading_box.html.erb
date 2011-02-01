@@ -1,0 +1,19 @@
+<% assignment = grading_box 
+  submission ||= nil
+%>
+<% if assignment.grading_type == "points" %>
+  <input type="text" value="<%= submission.grade if submission %>" size="3" class="grading_value grading_box" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %> text-align: center;"/>
+<% elsif assignment.grading_type == "percent" %>
+  <span class="grading_box" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %>">
+    <input type="text" value="<%= submission.grade if submission %>" size="3" class="grading_value" style="text-align: center;"/>
+    <span style="display: none;">%</span>
+  </span>
+<% elsif assignment.grading_type == "letter_grade" %>
+  <input type="text" value="<%= submission.score if submission %>" size="3" class="grading_value grading_box score_value" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %> text-align: center;"/>
+<% elsif assignment.grading_type == "pass_fail" %>
+  <select class="grading_value grading_box pass_fail" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %> text-align: left;">
+    <option value="" style="padding-left: 5px;">---</option>
+    <option value="complete" style="padding-left: 5px;" <%= "selected" if submission && (submission.grade == "pass" || submission.grade == "complete") %>>Complete</option>
+    <option value="incomplete" style="padding-left: 5px;" <%= "selected" if submission && (submission.grade == "fail" || submission.grade == "incomplete") %>>Incomplete</option>
+  </select>
+<% end %>

@@ -1,0 +1,2 @@
+alert|javascript|css|src
+<IFRAME SRC="javascript:alert('XSS');"></IFRAME>

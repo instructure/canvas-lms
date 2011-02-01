@@ -1,0 +1,30 @@
+<% if !course || !course.deleted? %>
+<% teacher_names = course && (course.read_attribute(:teacher_names) || course.teachers.uniq.map(&:name)) %>
+<% student_count = course && (course.read_attribute(:student_count) || course.students.count) %>
+<li class="course" id="course_<%= course ? course.id : "blank" %>" style="<%= hidden unless course %>">
+  <div class="course <%= 'unpublished' if course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) %>">
+    <div class="name">
+      <a href="<%= course_path(course ? course.id : "{{ id }}") %>" class="name"><%= (course && (course.name || course.section)) || nbsp %></a>
+      <%= image_tag "hammer.png", :title => "This course hasn't been published yet", :alt => "Unpublished", :class => "unpublished_icon", :style => (course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) ? "" : "display: none;") %>
+    </div>
+    <% if course %>
+    <div class="details ellipsis">
+      <% if course.course_code != course.name %>
+        <div><%= course.course_code %></div>
+      <% end %>
+      <% teacher_string = teacher_names[0,2].join(',') %>
+      <% teacher_string += ", #{teacher_names[2..-1].length} more" if teacher_names.length > 2 %>
+      <span style="display: inline-block; min-width: 80px;"><%= pluralize(student_count || 0, 'Student') %></span>
+      Teachers: <%= teacher_names.blank? ? 'none' : teacher_string %>
+    </div>
+    <% end %>
+    <div class="info">
+      <span class="links">
+        <%= link_to "Settings", course_details_path(course ? course : "{{ id }}") %> | 
+        <%= link_to "Statistics", course_statistics_path(course ? course : "{{ id }}") %> |
+        <%= link_to "Homepage", course_path(course ? course : "{{ id }}") %>
+      </span>
+    </div>
+  </div>
+</li>
+<% end %>

@@ -1,0 +1,135 @@
+Delivered-To: davidlamontrichards@gmail.com
+Received: by 10.151.74.3 with SMTP id b3cs121232ybl;
+        Tue, 27 Jan 2009 11:36:37 -0800 (PST)
+Received: by 10.114.74.1 with SMTP id w1mr10569730waa.155.1233084996791;
+        Tue, 27 Jan 2009 11:36:36 -0800 (PST)
+Return-Path: <drichards@showcase60.com>
+Received: from outbound-mail-128.bluehost.com (outbound-mail-128.bluehost.com [67.222.38.28])
+        by mx.google.com with SMTP id m26si27999713pof.18.2009.01.27.11.36.34;
+        Tue, 27 Jan 2009 11:36:35 -0800 (PST)
+Received-SPF: pass (google.com: domain of drichards@showcase60.com designates 67.222.38.28 as permitted sender) client-ip=67.222.38.28;
+DomainKey-Status: no signature
+Authentication-Results: mx.google.com; spf=pass (google.com: domain of drichards@showcase60.com designates 67.222.38.28 as permitted sender) smtp.mail=drichards@showcase60.com; domainkeys=neutral (no signature) header.From=drichards@showcase60.com
+Received: (qmail 2325 invoked by uid 0); 27 Jan 2009 19:36:37 -0000
+Received: from unknown (HELO box171.bluehost.com) (69.89.25.171)
+  by outboundproxy4.bluehost.com with SMTP; 27 Jan 2009 19:36:37 -0000
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws; s=default; d=showcase60.com;
+	h=Received:Mime-Version:To:Message-Id:Content-Type:From:Subject:Date:X-Mailer:X-Identified-User;
+	b=YLGi8RhTSby1Nrla1ZdyrxbzFsMOQXTVye7x6lrPfjjF0siRIByIbHc9+auXK6MpUSjyG8b1Cxa1yJ8C44RfKBYRaDYQ2T0rMDA/TyWPwIhSBL4vicPZ3AmAg7Sr8jQc;
+Received: from 69.169.150.185.provo.static.broadweave.net ([69.169.150.185])
+	by box171.bluehost.com with esmtpa (Exim 4.69)
+	(envelope-from <drichards@showcase60.com>)
+	id 1LRtjZ-0006pz-Ji
+	for davidlamontrichards@gmail.com; Tue, 27 Jan 2009 12:36:35 -0700
+Mime-Version: 1.0 (Apple Message framework v753.1)
+To: David Richards <davidlamontrichards@gmail.com>
+Message-Id: <52DD8BF6-B78F-482B-821C-7A8F208E9FA3@showcase60.com>
+Content-Type: multipart/mixed; boundary=Apple-Mail-1--772771931
+From: David Richards <drichards@showcase60.com>
+Subject: Testing my messaging service
+Date: Tue, 27 Jan 2009 12:36:22 -0700
+X-Mailer: Apple Mail (2.753.1)
+X-Identified-User: {1174:box171.bluehost.com:showcas2:showcase60.com} {sentby:smtp auth 69.169.150.185 authed with drichards@showcase60.com}
+
+
+--Apple-Mail-1--772771931
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=US-ASCII;
+	format=flowed
+
+This is a test, with an attachment!!
+
+
+--Apple-Mail-1--772771931
+Content-Transfer-Encoding: base64
+Content-Type: image/jpeg;
+	x-unix-mode=0644;
+	name=me_small.jpg
+Content-Disposition: inline;
+	filename=me_small.jpg
+
+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
+
+--Apple-Mail-1--772771931--

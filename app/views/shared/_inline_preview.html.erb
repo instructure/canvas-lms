@@ -1,0 +1,201 @@
+<% content_for :stylesheets do %>
+<style>
+#content {
+  padding: 0;
+}
+#content_preview {
+  width: 100%;
+  height: 300px;
+  border: 0;
+}
+#file_content {
+  width: 100%;
+}
+#file_content td {
+  padding: 0;
+  vertical-align: top;
+}
+#file_content_header {
+  background: url("/images/canvas/header_bg.png") repeat-x left -28px;
+  border-bottom: 1px solid #aaa;
+  padding: 8px 5px 0px 45px;
+  text-align: center;
+  min-height: 25px;
+}
+#content_holder {
+  width: 100%;
+}
+#file_content_header a {
+  color: #333;
+  font-weight: bold;
+}
+#file_content .context_module .header .completion_status {
+  display: none;
+}
+#file_content .context_module .header  {
+  margin-left: 5px;
+}
+#file_content .context_module {
+  margin-bottom: 0;
+  width: 100%;
+  overflow: hidden;
+}
+#file_content .context_module_item td {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+#file_content .hide_sidebar_link {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+#file_content .modules_holder {
+  background-color: #F2F3F4;
+}
+#modules {
+  overflow: auto;
+  width: 250px;
+  position: relative;
+  border-right: 1px solid #aaa;
+}
+#modules .context_module_item .move_item_link {
+  display: none;
+}
+#modules .context_module_item .title {
+  white-space: nowrap;
+}
+#modules .context_module_item .due_date_display,
+#modules .context_module_item .points_possible_display,
+#modules .context_module_item .links {
+  display: none;
+}
+#modules .context_module_item.context_module_sub_header .title {
+  white-space: inherit;
+}
+#modules .context_module_item .module_item_icons {
+  padding-left: 20px;
+}
+#modules .context_module {
+  border: 0
+}
+#modules .context_module .reorder_module_link {
+  display: none;
+}
+#modules .context_module .links {
+  display: none;
+}
+#modules .context_module .header {
+  background: transparent;
+  border: 0;
+}
+#modules .context_module .footer {
+  display: none;
+}
+#modules .context_module_item .links {
+  display: none;
+}
+#modules .context_module_item.selected .title {
+  font-weight: bold;
+}
+#modules .context_module_item.selected .module_item_icons {
+  background: url(/images/arrow_right.png) no-repeat left 3px;
+}
+#modules .context_module_item .title {
+  white-space: normal;
+}
+#file_display_name {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+</style>
+<% end %>
+
+<div id="file_content_header">
+  <div style="float: left;" id="file_display_name"><%= @attachment ? @attachment.display_name : @tag.title %>
+  </div>
+  <div style="float: right; padding-top:0.5em;">
+    <a href="#" id="frameless_link">Lose the Frames</a>
+  </div>
+  <div id="current_item_id" style="display: none;"><%= @tag.id %></div>
+  <div style="padding-top: 0.5em;">
+    <a href="<%= context_url(@context, :context_url) %>">Course Home</a> | 
+    <a href="<%= context_url(@context, :context_files_url) %>">Files</a>
+    <% if @module %>
+      | <a href="<%= context_url(@context, :context_context_modules_url) %>">Modules</a>
+    <% end %>
+  </div>
+  <div class="clear"></div>
+</div>
+<table id="file_content" cellspacing="0">
+  <tr>
+    <td style="<%= hidden unless @module %>" class="modules_holder">
+      <div id="modules">
+        <%= render :partial => "context_modules/context_module", :object => @module %>
+        <div style="float: right; margin-top: 5px;">
+          <a href="#" class="hide_sidebar_link no-hover" title="Hide Sidebar"><%= image_tag "delete_circle.png" %></a>
+        </div>
+      </div>
+    </td>
+    
+    <td id="content_holder">
+      <% if @attachment %>
+        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= context_url(@context, :context_file_url, @attachment.id) %>/<%= @attachment.full_path %>">
+        </iframe>
+      <% elsif @tag %>
+        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= @tag.url %>">
+        </iframe>
+      <% end %>
+    </td>
+  </tr>
+</table>
+
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(window).resize(function() {
+    var top = $("#file_content").offset().top;
+    var height = $(window).height();
+    $("#content_preview").height(height - top);
+    $("#modules").height(height - top);
+  }).triggerHandler('resize');
+  var maxWidth = 0;
+  $(".context_module_item").each(function() {
+    maxWidth = Math.max(maxWidth, $(this).width());
+  });
+  $(".context_module_item").width(maxWidth);
+  $("#modules .context_module_item.attachment a.title,#modules .context_module_item.external_url a.title").each(function() {
+    $(this).attr('href', $(this).attr('href') + "?already_inline=1");
+  });
+  $("#modules .context_module_item").filter(".attachment,.external_url").find("a.title").each(function() {
+    $(this).attr('target', 'content_preview');
+  }).click(function(event) {
+    event.preventDefault();
+    $("#file_display_name").text($(this).text());
+    var id = $(this).parents(".context_module_item").getTemplateData({textValues: ['id']}).id;
+    location.replace("#tag_" + id);
+  });
+  $(document).fragmentChange(function(event, hash) {
+    if(hash.match(/^#tag_/)) {
+      var id = parseInt(hash.substring(5), 10);
+      if(id && id != $("#current_item_id").text() && $("#context_module_item_" + id + " a.title").length > 0) {
+        $("#current_item_id").text(id);
+        $("#content_preview").attr('src', $("#context_module_item_" + id + " a.title").attr('href'));
+        $("#modules .context_module_item").removeClass('selected');
+        $("#context_module_item_" + id).addClass('selected');
+        $("#context_module_item_" + id + " a.title").click();
+      }
+    }
+  });
+  $("#context_module_item_" + $("#current_item_id").text()).addClass('selected');
+  $("#frameless_link").click(function(event) {
+    event.preventDefault();
+    location.href = $("#content_preview").attr('src');
+  });
+  $(".hide_sidebar_link").click(function(event) {
+    event.preventDefault();
+    $("#modules").parent().hide();
+  });
+  $("body").css('overflow', 'hidden');
+});
+</script>
+<% end %>

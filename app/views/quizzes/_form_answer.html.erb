@@ -1,0 +1,67 @@
+<div class="answer" id="form_answer_template" style="display: none; _width: 100%;">
+  
+  <table style="width: 100%; position: relative; _height: 10px; min-height: 10px;">
+    <tr>
+      <td class="answer_select" style="width: 30px;">
+        <div style="width: 30px;" class="answer_box">
+          <a href="#" class="select_answer_link no-hover" title="Click to set this answer as correct"><%= image_tag "blank_answer.png", :class => "answer_image" %></a><br/>
+          <span class="answer_weight"><input class="float_value" type="text" style="width: 25px;" name="answer_weight"/>%</span>
+        </div>
+      </td><td>
+        <div class="select_answer answer_type">
+          <b>Answer text:</b>
+          <input type="text" style="width: 200px;" name="answer_text"/>
+          <!--textarea style="width: 95%; height: 50px" name="answer_text"></textarea-->
+        </div>
+        <div class="fixed_answer answer_type">
+          <b class="answer_text"></b>
+        </div>
+        <div class="short_answer answer_type">
+          <b class="short_answer_header">Possible Answer:</b>
+          <input type="text" name="answer_text"/>
+        </div>
+        <div class="matching_answer answer_match answer_type">
+          <div class="answer_match_left">
+            <input type="text" style="width: 95%;" name="answer_match_left"/>
+            <!--textarea style="width: 95%; height: 50px" name="answer_match_left"></textarea-->
+          </div>
+          <div class="answer_match_middle">&nbsp;
+          </div>
+          <div class="answer_match_right">
+            <input type="text" style="width: 95%;" name="answer_match_right"/>
+            <!--textarea style="width: 95%; height: 50px" name="answer_match_right"></textarea-->
+          </div>
+          <div class="clear"></div>
+        </div>
+        <div class="numerical_answer answer_type">
+          <select style="font-weight: bold;" class="numerical_answer_type" name="numerical_answer_type">
+            <option value="exact_answer">Exact Answer:</option>
+            <option value="range_answer">Answer in the Range:</option>
+          </select>
+          <span class="exact_answer numerical_answer_text">
+            <input class="float_value" type="text" style="width: 50px;" name="answer_exact"/>
+            with error margin <input class="float_value" type="text" style="width: 70px;" name="answer_error_margin"/>
+          </span>
+          <span class="range_answer numerical_answer_text">
+            between <input class="float_value" type="text" style="width: 50px;" name="answer_range_start"/> and <input class="float_value" type="text" style="width: 50px;" name="answer_range_end"/>
+          </span>
+        </div>
+        <div class="answer_comments empty">
+          <div class="comment_top"></div>
+          <a href="#" class="comment_focus" title="Click to enter comments, if the student chooses this answer">...</a>
+          <span class="comments_header">Comments, if the student chooses this answer:</span>
+          <textarea style="width: 95%;" name="answer_comment" class="comments answer_comment_box"></textarea>
+        </div>
+        <div style="display: none;">
+          <span class="blank_id">&nbsp;</span>
+          <span class="id">&nbsp;</span>
+          <span class="match_id">&nbsp;</span>
+        </div>
+      </td><td style="vertical-align: top; padding-top: 0.5em; text-align: right; width: 20px;">
+        <div style="width: 20px;">
+        <a href="#" class="delete_answer_link no-hover" title="Delete this Answer"><%= image_tag "blank.png", :alt => "Delete" %></a>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

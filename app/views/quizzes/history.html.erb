@@ -1,0 +1,213 @@
+<% user_name = @quiz.survey? && @quiz.anonymous_submissions ? "Student" : context_user_name(@context, @user) %>
+<% content_for :page_title do %><%= user_name %> <%= @quiz.readable_type %> History: <%= @quiz.quiz_title || "#{@quiz.readable_type} #{ @context.name}" %><% end   %>
+
+<% unless params[:headless] %>
+<% content_for :right_side do %>
+  <% if @current_version %>
+    <div class="rs-margin-lr rs-margin-top">
+      <p>Here's the latest <%= @quiz.readable_type.downcase %> results for <%= user_name %>.  You can modify the
+      points for any question and add more comments, then click "Update Scores"
+      at the bottom of the page.</p>
+    </div>
+  <% end %>
+  <% unless params[:headless] %>
+    <h2>
+      <%= @quiz.readable_type %> Submissions
+    </h2>
+    <div class="rs-margin-lr">
+      <ul id="quiz_versions" style="max-height: 250px; overflow: auto;">
+      <% @version_instances.each do |version_instance| %>
+        <li class="quiz_version <%= "selected" if version_instance.version_number == @submission.version_number %>">
+          <a class="no-hover" href="?version=<%= version_instance.version_number %><%= "&user_id=#{@submission.user_id}" if @current_user.id != @submission.user_id %>">
+            <% if version_instance.pending_review? %>
+              <% if can_do(@quiz, @current_user, :grade) %>
+                <%= image_tag "pending_review.png", :title => "This submission needs review" %>
+              <% else %>
+                <%= image_tag "hourglass.png", :title => "This score is pending review, and may change" %>
+              <% end %>
+            <% end %>
+            Attempt <%= version_instance.attempt %>: <%= version_instance.score %>
+          </a>
+        </li>
+      <% end %>
+      </ul>
+      <div style="margin-bottom: 10px;">
+        <% if !@quiz.unlimited_attempts? %>
+          <% if @current_submission.attempts_left <= 0 %>
+            <%= user_name %> has no attempts left
+          <% else %>
+            <%= user_name %> has <%= pluralize(@current_submission.attempts_left, "attempt") %>  left
+          <% end %>
+          <% if can_do(@submission, @current_user, :add_attempts) %>
+            <div>
+              <a class="button" href="<%= context_url(@context, :context_quiz_quiz_submission_add_attempts_url, @quiz.id, @submission.id, :extra_attempts => 1) %>">allow this student an extra attempt</a>
+            </div>
+          <% end %>
+        <% else %>
+          This <%= @quiz.readable_type.downcase %> has unlimited attempts
+        <% end %>
+      </div>
+      <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class='no-hover'><%= image_tag "back.png" %> Back to <%= @quiz.readable_type %></a>
+    </div>
+  <% end %>
+<% end %>
+<% end %>
+
+<h2><%= @quiz.quiz_title || @quiz.readable_type %> Results for <%= user_name %></h2>
+<div id="feel_free_to_toggle_message">
+</div>
+<% if @submission.untaken? %>
+  <%= @quiz.readable_type %> hasn't been taken yet or is currently in progress
+<% else %>
+  <% form_tag context_url(@context, :context_quiz_quiz_submission_url, @quiz.id, @submission.id), {:method => :put, :id => "update_history_form"} do %>
+    <input type="hidden" name="override_scores" value="true"/>
+    <% if params[:headless] %>
+      <input type="hidden" name="headless" value="1"/>
+    <% end %>
+    <input type="hidden" name="submission_version_number" value="<%= @submission.version_number %>"/>
+    <%= render :partial => "quizzes/quiz_submission", :locals => {:editable => can_do(@quiz, @current_user, :grade)} %>
+    <% if can_do(@quiz, @current_user, :grade) %>
+      <div class="button-container">
+        <button type="submit" class="button">Update Scores</button>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+<% js_block do %>
+  <script>
+  $(document).ready(function() {
+    $(":text").focus(function() {
+      $(this).select();
+    });
+    <% if params[:score_updated] %>
+    window.parent && 
+    window.parent.INST && 
+    window.parent.INST.refreshGrades && 
+    $.isFunction(window.parent.INST.refreshGrades &&
+    window.parent.INST.refreshGrades();
+    <% end %>    
+  });
+  </script>
+<% end %>
+<div style="display: none;" id="submission_details">
+  <div class="version_number"><%= @version_number.to_s %></div>
+  <div class="user_id"><%= @submission.user_id %></div>
+</div>
+<% js_block do %>
+  <script>
+  var data = $("#submission_details").getTemplateData({textValues: ['version_number', 'user_id']});
+  var scoringSnapshot = {
+    snapshot: {
+      user_id: parseInt(data.user_id, 10) || null,
+      version_number: data.version_number,
+      last_question_touched: null,
+      question_updates: {},
+      fudge_points: 0
+    },
+    getSnapshot: function() {
+      return scoringSnapshot.snapshot;
+    },
+    jumpToQuestion: function(question_id) {
+      var top = $("#question_" + question_id).offset().top - 10;
+      $("html,body").scrollTo({top: top, left:0});
+    },
+    externallySet: false,
+    setSnapshot: function(data, cancelIfAlreadyExternallySet) {
+      if(data) {
+        if(cancelIfAlreadyExternallySet && scoringSnapshot.externallySet) { return; }
+        scoringSnapshot.externallySet = true;
+        scoringSnapshot.snapshot = data;
+        for(var idx in data.question_updates) {
+          var question = data.question_updates[idx];
+          var $question = $("#question_" + idx);
+          $question.addClass('modified_but_not_saved');
+          $question.find(".user_points :text").val(question.points).end()
+            .find(".question_neutral_comment .question_comment_text textarea").val(question.comments);
+        }
+        if(window.parent && window.parent.INST && window.parent.INST.lastQuestionTouched) {
+          scoringSnapshot.jumpToQuestion(window.parent.INST.lastQuestionTouched);
+        } else if(scoringSnapshot.snapshot.last_question_touched) {
+          scoringSnapshot.jumpToQuestion(scoringSnapshot.snapshot.last_question_touched);
+        }
+      } else if(cancelIfAlreadyExternallySet) {
+        if(window.parent && window.parent.INST && window.parent.INST.lastQuestionTouched) {
+          scoringSnapshot.jumpToQuestion(window.parent.INST.lastQuestionTouched);
+        }
+      }
+      if(scoringSnapshot.externallySet || cancelIfAlreadyExternallySet) {
+        $("#feel_free_to_toggle_message").show();
+      }
+      if(window.parent && window.parent.INST && window.parent.INST.refreshQuizSubmissionSnapshot && $.isFunction(window.parent.INST.refreshQuizSubmissionSnapshot)) {
+        window.parent.INST.refreshQuizSubmissionSnapshot(scoringSnapshot.snapshot);
+      }
+    }
+  }
+  $(document).ready(function() {
+    $(":text").focus(function() {
+      $(this).select();
+    });
+    $(document).fragmentChange(function(event, hash) {
+      if(hash.indexOf("#question") == 0) {
+        var id = hash.substring(10);
+        scoringSnapshot.jumpToQuestion(id);
+      }
+    });
+    if(window.parent && window.parent.INST && window.parent.INST.getQuizSubmissionSnapshot && $.isFunction(window.parent.INST.getQuizSubmissionSnapshot)) {
+      $("#feel_free_to_toggle_message").show();
+      var data = window.parent.INST.getQuizSubmissionSnapshot(scoringSnapshot.snapshot.user_id, scoringSnapshot.snapshot.version_number);
+      if(data) {
+        scoringSnapshot.setSnapshot(data);
+      } else {
+        scoringSnapshot.setSnapshot(null, true);
+      }
+    }
+    $(".question_holder .user_points :text,.question_holder .question_neutral_comment .question_comment_text textarea").change(function() {
+      var $question = $(this).parents(".display_question");
+      var question_id = parseInt($question.attr('id').substring(9), 10) || null;
+      if(question_id) {
+        var data = {};
+        $question.addClass('modified_but_not_saved');
+        data.points = parseFloat($question.find(".user_points :text").val(), 10);
+        data.comments = $question.find(".question_neutral_comment .question_comment_text textarea").val() || "";
+        scoringSnapshot.snapshot.question_updates[question_id] = data;
+        scoringSnapshot.snapshot.last_question_touched = question_id;
+        scoringSnapshot.setSnapshot();
+      }
+      $(document).triggerHandler('score_changed');
+    });
+    $("#fudge_points_entry").change(function() {
+      var points = parseFloat($(this).val(), 10);
+      if(points || points === 0) {
+        scoringSnapshot.snapshot.fudge_points = points;
+        scoringSnapshot.setSnapshot();
+      }
+      $(document).triggerHandler('score_changed');
+    });
+    $(document).bind('score_changed', function() {
+      var $total = $("#after_fudge_points_total");
+      var total = 0;
+      $(".display_question .user_points:visible").each(function() {
+        var points = parseFloat($(this).find(":text:first").val(), 10) || 0;
+        points = Math.round(points * 100.0) / 100.0;
+        total = total + points;
+      });
+      var fudge = (parseFloat($("#fudge_points_entry").val(), 10) || 0);
+      fudge = Math.round(fudge * 100.0) / 100.0;
+      total = total + fudge;
+      $total.text(total || "0");
+    });
+  });
+  </script>
+  <% if params[:score_updated] %>
+  <script>
+  $(document).ready(function() {
+    if(window.parent && window.parent.INST && window.parent.INST.refreshGrades && $.isFunction(window.parent.INST.refreshGrades)) {
+      window.parent.INST.refreshGrades();
+    }
+    if(window.parent && window.parent.INST && window.parent.INST.clearQuizSubmissionSnapshot && $.isFunction(window.parent.INST.clearQuizSubmissionSnapshot)) {
+      window.parent.INST.clearQuizSubmissionSnapshot(scoringSnapshot.snapshot);
+    }
+  });
+  </script>
+  <% end %>
+<% end %>

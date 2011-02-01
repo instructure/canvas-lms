@@ -1,0 +1,6 @@
+alert|script|xss
+<HTML><BODY>
+<?xml:namespace prefix="t" ns="urn:schemas-microsoft-com:time">
+<?import namespace="t" implementation="#default#time2">
+<t:set attributeName="innerHTML" to="XSS&lt;SCRIPT DEFER&gt;alert(&quot;XSS&quot;)&lt;/SCRIPT&gt;">
+</BODY></HTML>

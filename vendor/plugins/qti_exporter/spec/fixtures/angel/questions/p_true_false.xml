@@ -1,0 +1,45 @@
+<assessmentItem identifier="" title="Question for main question bank.">
+  <responseDeclaration identifier="RESPONSE" baseType="identifier" cardinality="single">
+    <correctResponse>
+      <value>ChoiceTrue</value>
+    </correctResponse>
+  </responseDeclaration>
+  <outcomeDeclaration identifier="SCORE" baseType="float" cardinality="single">
+    <defaultValue>
+      <value>0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <itemBody><![CDATA[<div>This is annoying.</div>]]>
+    <choiceInteraction responseIdentifier="RESPONSE" shuffle="false" maxChoices="1">
+      <simpleChoice identifier="ChoiceTrue" fixed="True">True</simpleChoice>
+      <simpleChoice identifier="ChoiceFalse" fixed="True">False</simpleChoice>
+    </choiceInteraction>
+    <![CDATA[<div></div>]]>
+  </itemBody>
+  <outcomeDeclaration identifier="GENERAL_FEEDBACK" baseType="identifier" cardinality="single"/>
+  <responseProcessing>
+
+    <responseCondition>
+      <responseIf>
+        <match>
+          <variable identifier="RESPONSE"/>
+          <correct identifier="RESPONSE"/>
+        </match>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="integer">1</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="GENERAL_FEEDBACK">
+          <baseValue baseType="identifier">CORRECT_FEEDBACK</baseValue>
+        </setOutcomeValue>
+      </responseIf>
+      <responseElse>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="integer">0</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="GENERAL_FEEDBACK">
+          <baseValue baseType="identifier">INCORRECT_FEEDBACK</baseValue>
+        </setOutcomeValue>
+      </responseElse>
+    </responseCondition>
+  </responseProcessing>
+</assessmentItem>

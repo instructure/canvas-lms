@@ -1,0 +1,75 @@
+<% jammit_js :calendar_event %>
+<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
+
+<% calendar_event = full_calendar_event %>
+<div id="full_calendar_event_holder" class="<%= 'editing' if @editing %>">
+  <div class="calendar_event content_underline_links" id="full_calendar_event">
+    <div style="float: right; text-align: right; font-size: 0.8em;">
+      <div class="date_text" style="<%= hidden unless calendar_event && calendar_event.start_at %>">
+        <span class="start_at_date_string" title="<%= date_string(calendar_event.start_at, :long) %>"><%= date_string(calendar_event.start_at, :long) %></span>
+        <span class="non_all_day" style="<%= hidden if calendar_event.try_rescue(:all_day) %>">
+          <span class="from_string" style="<%= hidden if calendar_event.end_at && calendar_event.end_at != calendar_event.start_at %>"> from </span>
+          <span class="at_string" style="<%= hidden unless calendar_event.end_at && calendar_event.end_at != calendar_event.start_at %>"> at </span>
+          <span class="start_at_time_string"><%= time_string(calendar_event.start_at) %></span>
+          <span class="to_string" style="<%= hidden if calendar_event.end_at && calendar_event.end_at != calendar_event.start_at %>"> to </span>
+          <span class="end_at_time_string" style="<%= hidden if calendar_event.end_at && calendar_event.end_at != calendar_event.start_at %>"><%= time_string(calendar_event.end_at) %></span>
+        </span>
+        <div style="display: none;">
+          <span class="all_day"><%= calendar_event.try_rescue(:all_day) || false %></span>
+          <span class="all_day_date"><%= date_string(calendar_event.try_rescue(:all_day_date), :long) %></span>
+        </div>
+      </div>
+    </div>
+    <h2 class="title">
+      <%= calendar_event.try_rescue(:title) %>
+    </h2>
+    
+    <div class="description user_content"><%= calendar_event && calendar_event.description && !calendar_event.description.empty? ? user_content(calendar_event.description, @context.asset_string, calendar_event.asset_string) : 'No Content' %></div>
+    <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
+    <div class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @role_lookups %></div>
+  </div>
+  <% if can_do(calendar_event, @current_user, :update_content) %>
+  <% url = calendar_event.new_record? ? context_url(@context, :context_calendar_events_url) : context_url(@context, :context_calendar_event_url, calendar_event.id) %>
+  <% form_for calendar_event, :url => url, :html => {:method => (calendar_event.new_record? ? 'POST' : 'PUT'), :style => 'display: none;', :id => 'edit_calendar_event_form', :class => (calendar_event.new_record? ? 'new_event' : '')} do |f| %>
+  <table class="formtable full_calendar_event_table" style="width: 100%;">
+    <% if can_do(calendar_event, @current_user, :update) %>
+    <tr>
+      <td><%= f.label :title, "Title:" %></td>
+      <td><%= f.text_field :title, :size => 20 %></td>
+    </tr><tr>
+      <td style="vertical-align: top;">Date:</td>
+      <td>
+        <input type="text" name="start_date" value="<%= date_string(calendar_event.start_at) %>" style="width: 120px;" class="date_field"/>
+      </td>
+    </tr><tr>
+      <td style="vertical-align: top;">From:</td>
+      <td>
+        <div style="float: left;">
+          <input type="text" name="start_time" value="<%= time_string(calendar_event.start_at) unless calendar_event.all_day %>" style="width: 60px;" class="time_field"/>
+        </div>
+        <div style="float: left;">&nbsp;to&nbsp;</div>
+        <div style="float: left;">
+          <input type="text" name="end_time" value="<%= time_string(calendar_event.end_at) unless calendar_event.all_day %>" style="width: 60px;" class="time_field"/>
+        </div>
+      </td>
+    </tr>
+    <% end %>
+    <tr>
+      <td colspan="4">
+        <a href="#" style="font-size: 0.8em; float: right;" class="switch_full_calendar_event_view">Switch Views</a>
+        <div>
+          Event Description:
+        </div>
+        <div><%= f.text_area :description, :style => 'width: 100%;' %></div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <button type="submit" class="button submit_button"><%= calendar_event.new_record? ? 'Create Event' : 'Update Event' %></button>
+        <button type="button" class="button-secondary cancel_button">Cancel</button>
+      </td>
+    </tr>
+  </table>
+  <% end %>
+  <% end %>
+</div>

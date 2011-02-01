@@ -1,0 +1,5 @@
+New announcement: <%= asset.title %>, <%= asset.context.name %>
+
+<%= strip_and_truncate(asset.message, :max_length => 50) %>
+
+More info at <%= HostUrl.context_host(asset.context) %>

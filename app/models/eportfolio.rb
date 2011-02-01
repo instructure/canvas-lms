@@ -1,0 +1,71 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+class Eportfolio < ActiveRecord::Base
+  include Workflow
+  attr_accessible :name, :public, :user
+  
+  has_many :eportfolio_categories, :order => :position, :dependent => :destroy
+  has_many :eportfolio_entries, :dependent => :destroy
+  has_many :attachments, :as => :context
+  belongs_to :user
+  validates_presence_of :user_id
+
+  adheres_to_policy  
+  
+  workflow do
+    state :active
+    state :deleted
+  end
+  
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.deleted_at = Time.now
+    self.save
+  end
+  
+  named_scope :active, :conditions => ['eportfolios.workflow_state != ?', 'deleted']
+
+  before_create :assign_uuid
+  def assign_uuid
+    self.uuid ||= UUIDSingleton.instance.generate
+  end
+  protected :assign_uuid
+
+  set_policy do
+    given {|user| user }
+    set {can :create}
+    
+    given {|user| self.user == user}
+    set {can :read and can :manage and can :update and can :delete}
+    
+    given {|user| self.public }
+    set {can :read }
+    
+    given {|user, session| session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
+    set {can :read }
+  end
+  
+  def setup_defaults
+    cat = self.eportfolio_categories.create(:name => "Home") if self.eportfolio_categories.empty?
+    entry = cat.eportfolio_entries.create(:eportfolio => self, :name => "Welcome", :content => "Nothing entered yet") if cat && cat.eportfolio_entries.empty?
+    cat
+  end
+  def self.serialization_excludes; [:uuid]; end
+end

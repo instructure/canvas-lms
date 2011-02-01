@@ -1,0 +1,9 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>
+<% end %>
+
+<% define_content :subject do %>
+  Assignment Due Date Changed: <%= asset.title %>, <%= asset.context.name %>
+<% end %>
+      
+due: <%= force_zone(asset.due_at).strftime("%b %d at %I:%M") rescue "No Due Date" %><%= force_zone(asset.due_at).strftime("%p").downcase rescue "" %>

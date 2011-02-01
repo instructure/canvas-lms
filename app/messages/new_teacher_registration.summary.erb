@@ -1,0 +1,15 @@
+<% define_content :link do %>http://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
+<% define_content :subject do %>
+  New Teacher Registration
+<% end %>
+
+New Teacher Registration
+  
+<%= asset.name %> just registered as a teacher in Canvas.
+
+School Name:     <%= asset.school_name %>
+School Position: <%= asset.school_position %>
+Phone:           <%= asset.phone %>
+Email:           <%= asset.email %>
+
+<%= content :link %>

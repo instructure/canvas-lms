@@ -1,0 +1,2 @@
+alert|lowsrc|javascript
+<IMG LOWSRC="javascript:alert('XSS')">

@@ -1,0 +1,72 @@
+<%
+   add_crumb(@user.name, user_path(@user) )
+   add_crumb "Faculty Journal"
+   jammit_js :user_notes
+%>
+<% content_for :page_title do %>Faculty Journal
+<% end %>
+
+<% content_for :page_header do %>
+  <h1>Faculty Journal</h1>
+<% end %>
+
+<% content_for :page_subhead do %>
+  <h2><%= @user.name %></h2>
+<% end %>
+
+<% if can_do(@user, @current_user, :create_user_notes) %>
+  <% content_for :right_side do %>
+    <div class="rs-margin-lr rs-margin-top">
+      <a id="new_user_note_button" class="new button button-sidebar-wide" href="#"><%= image_tag "add.png" %>
+        Create a New Entry</a>
+    </div>
+  <% end %>
+<% end %>
+
+<style type="text/css">
+.user_note .header .delete_user_note_link {
+  opacity: 0.3;
+}
+.user_note:hover .header .delete_user_note_link {
+  opacity: 1;
+}
+</style>
+
+<h2>Faculty Journal for <%= @user.name %><span id="proccessing">&nbsp;</span></h2>
+<div id="create_entry" style="display: none; margin-bottom: 10px;">
+  <% form_for(@user_note, :url => user_user_notes_path, :html=>{:id=>'add_entry_form'}) do |f| %>
+    <%= f.error_messages %>
+    <%= f.hidden_field :user_id, :value=>@user.id %>
+    <table class="formtable" style="width: 100%;">
+      <tr>
+        <td style="font-weight: bold">Title:</td>
+        <td><%= f.text_field :title, :class => "title" %></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <%= f.text_area :note, :class => "note", :style => "width: 98%; height: 200px;" %>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="button-container">
+            <button type="submit" class="button send_button">Create Entry
+            </button>
+            <button type="button" class="cancel_button button-secondary">Cancel</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+</div>
+
+<div id="#no_user_notes_message" style="display: none;">There are no journal entries for this student.</div>
+
+<div id="user_note_list" class="user_note_list">
+  <%= render :partial => 'user_note', :collection => @user_notes %>
+  <%= will_paginate(@user_notes, :style=>"margin-bottom: 1em;") %>
+  <% js_block do %>
+    <%= pageless(@user_notes.total_pages, user_user_notes_path) %>
+  <% end %>
+  <%= render :partial => 'user_note', :locals => {:user_note => @user_note}%>
+</div>

@@ -1,0 +1,20 @@
+<img src='http://<%= HostUrl.default_host %>/images/favicon_large.png'/> Canvas is providing the next
+generation of online learning.  We've used other educational tools on the web, and we know
+how painful they can be, so we're here to fix it.
+<div style="text-align: right;">
+  <a href="http://www.instructure.com">Learn More at instructure.com</a>
+</div>
+<div style="margin-top: 10px;">
+<% if @user %>
+  <fb:if-is-app-user>
+    All you can do right now is have notifications from your Canvas account
+    sent automatically over to your Facebook account.  To do that, click the "Settings" tab.
+    <fb:else>
+      You'll need to 
+      <a href="<%= install_url %>">install the application first</a>.
+    </fb:else>
+  </fb:if-is-app-user>
+<% else %>
+  <a href="http://<%= HostUrl.default_host %>">Click Here to sign up at Canvas</a>
+<% end %>
+</div>

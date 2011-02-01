@@ -1,0 +1,17 @@
+<% content_for :page_title do %>Groups<% end %>
+<% add_crumb "Groups" %>
+
+<% content_for :right_side do %>
+<% end %>
+
+<% jammit_css :context_list %>
+
+<h2>Current Groups</h2>
+<%= "No Groups" if @groups.empty? %>
+<ul class="context_list">
+  <% @groups.each do |group| %>
+    <li>
+      <%= link_to group.name, group_path(group) %>
+    </li>
+  <% end %>
+</ul>

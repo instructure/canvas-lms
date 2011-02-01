@@ -1,0 +1,65 @@
+<% @page = page; @portfolio = portfolio; @static_attachments = static_attachments; @submissions_hash = submissions_hash %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title><%= @page.name %> -- <%= @portfolio.name %></title>
+  <link href="eportfolio.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="container">
+  <div id="header">
+    <a href="#skip_navigation" id="skip_navigation_link">Skip Navigation</a>
+    <a href="http://www.instructure.com" title="Created with Canvas"><img class="logo" src="logo.png" alt="logo"/></a>
+    <h1><%= @page.name %></h1>
+    <h2><a href="<%= @page.eportfolio.eportfolio_categories.first.eportfolio_entries.first.full_slug %>.html"><%= @page.eportfolio.name %></a> &#187; <a href="<%= @page.eportfolio_category.eportfolio_entries.first.full_slug %>.html"><%= @page.eportfolio_category.name %></a></h2>
+    <div class="clear"></div>
+  </div>
+  <div class="clear"></div>
+  <div id="nav-level2">
+    <ul>
+    <% @page.eportfolio.eportfolio_categories.each do |category| %>
+      <li class="<%= 'current' if category == @page.eportfolio_category %>"><a href="<%= category.eportfolio_entries.first.full_slug %>.html"><%= category.name %></a></li>
+    <% end %>
+    </ul>
+    <div class="clear"></div>
+  </div>
+  <div id="content">
+    <a name="skip_navigation"></a>
+    <h2><%= @page.name %></h2>
+    <% idx = 1 %>
+    <div id="page_content">
+      <% @page.content_sections.each do |c| %>
+        <%= render :partial => "eportfolios/page_section_static", :object => c, :locals => {:idx => idx, :read_only => true} %>
+        <% idx = idx + 1 %>
+      <% end %>
+    </div>
+    <% if !@page.page_comments.empty? %>
+      <div id="page_comments_holder" style="margin-top: 50px;">
+        <h2>Page Comments</h2>
+        <div id="page_comments" style="padding: 5px 20px;">
+          <%= render :partial => "eportfolios/page_comment", :collection => @page.page_comments, :locals => {:read_only => true} %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div id="sidebar">
+    <div class="section_header">
+      <%= @page.eportfolio_category.name %>
+    </div>
+    <ul id="page_list">
+      <% @page.eportfolio_category.eportfolio_entries.each do |entry| %>
+        <li id="page_<%= entry.id %>" class="page <%= "current" if entry == @page %>">
+          <a class="page_url" href="<%= entry.full_slug %>.html">
+            <span class="name"><%= entry.name %></span>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+
+
+</body>
+</html>

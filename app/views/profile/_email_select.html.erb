@@ -1,0 +1,9 @@
+<select class="email_select contact_select" name="channel_id">
+  <% if @email_channels.empty? %>
+    <option value="">[Select Email]</option>
+  <% end %>
+  <% @email_channels.each do |c| %>
+    <option class="channel_option_<%= c.id %>" value="<%= c.id %>" <%= "selected" if c == email_select %>><%= c.path %></option>
+  <% end %>
+  <option value="new">New Email Address</option>
+</select>

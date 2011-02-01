@@ -1,0 +1,2 @@
+background|alert|javascript
+<TABLE><TD BACKGROUND="javascript:alert('XSS')">

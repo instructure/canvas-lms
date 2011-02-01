@@ -1,0 +1,2 @@
+script|xss|src
+<SCRIPT SRC="http://ha.ckers.org/xss.jpg"></SCRIPT>

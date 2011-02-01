@@ -1,0 +1,9 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>
+<% end %>
+
+<% define_content :subject do %>
+  Late Assignment: <%= asset.group.name %>, <%= asset.assignment.title %>
+<% end %>
+
+The group <%= asset.group.name %> turned in a late submission for <%= asset.assignment.title %> in the course <%= asset.assignment.context.name %>. 

@@ -1,0 +1,71 @@
+@import environment.sass
+#syllabus
+  :width 100%
+  :table-layout fixed
+  :margin-bottom 10px
+  
+  a:hover, a:focus, a:active
+    color = !link_color
+  thead th
+    :text-align left
+    :background-color #444
+    :color #fff
+    :padding 3px 10px
+    :border-bottom 1px solid #bbb
+    
+    a
+      :font-size 0.8em
+      :color #aaa
+      
+  tr.date 
+    td, th
+      :border-bottom 1px solid #bbb
+      :padding 4px 10px
+      :font-size 0.9em
+      :text-align center
+      color: #666
+
+    th.day_date
+      :white-space nowrap
+
+    td.details
+      :font-size 1.1em
+      :line-height 2.0em
+      :padding 2px 10px
+      :color #000
+      :text-align left
+      
+      td
+        border: none
+        background-color: none
+        padding: 0
+        font-size: 1em
+        text-align: left
+        color: inherit
+      .dates
+        color: #999
+        font-size: 10px
+        text-align: right
+    
+
+    table.detail_list
+      :width 100%
+
+      tr.syllabus_assignment
+        .name
+          :font-weight bold
+
+      td.not_last
+        :border-bottom 1px solid #ddd
+
+    &.date_passed 
+      td, th
+        :background-color #f8f8f8
+
+      &.details
+        :color #444
+
+    &.related 
+      td, th
+        :background-color #def
+

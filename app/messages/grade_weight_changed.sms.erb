@@ -1,0 +1,9 @@
+<% course = asset.is_a?(Course) ? asset : asset.context %>
+The grading policy for the course, <%= course.name %> has changed.
+
+Grading is based on <%= course.group_weighting_scheme == 'percent' ? "the weighted total for each assignment group:" : "total points for all assignments" %>
+<% if course.group_weighting_scheme == 'percent' %><% course.assignment_groups.each do |group |%>
+  - <%= group.name %>: <%= group.group_weight %>%
+<% end %><% end %>
+
+More info at <%= HostUrl.context_host(asset) %>

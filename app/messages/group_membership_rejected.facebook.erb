@@ -1,0 +1,4 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
+<% end %>
+Your request to join the group <b><a href="<%= content :link %>"><%= asset.group.name %></a></b> for the <%= asset.group.context.class.to_s.downcase %> <%= asset.group.context.name %> has been rejected.

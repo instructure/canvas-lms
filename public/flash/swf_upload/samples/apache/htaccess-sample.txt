@@ -1,0 +1,18 @@
+# Copy/paste this to your .htaccess file (or rename this file to .htaccess)
+
+# Turns off mod_securty (use at your own risk)
+# You should understand the security consequences before applying this change.
+# Works around the issue with Flash Player submitting an poorly formatted post when uploading files.
+
+# Use for Apache Shared hosts with mod_security on
+# Check your phpinfo() first to see if mod_security is turned on before attempting to turn it off.
+# Warning: Disabling mod_security isn't allowed on some shared hosts. Check your Terms Of Service agreement
+
+#Disable mod_security completely
+#SecFilterEngine Off
+#SecFilterScanPOST Off
+
+
+#Disable mod security only for the upload.php
+SecFilterEngine On
+SecFilterSelective "REQUEST_URI" "/path/to/upload.php" "allow,nolog"

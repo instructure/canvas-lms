@@ -1,0 +1,239 @@
+<% 
+  jammit_js :grade_summary
+  jammit_css :grade_summary 
+  content_for :page_title, "Grades for #{@student.name} - #{@context.name}" 
+%>
+<% content_for :right_side do %>
+  <div class="rs-margin-all">
+    <% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>
+      <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide">Faculty Journal for <%= context_user_name(@context, @user) %></a>
+    <% end %>
+    <div class="student_assignment final_grade" style="font-size: 1.2em;">
+      Total: <span class="grade"></span>%
+    </div>
+    <div class="show_guess_grades" style="display: none; margin-bottom: 10px; font-size: 0.8em;">
+      <button type="button" class="button button-sidebar-wide show_guess_grades_link"><%= image_tag "grading_icon.png" %> Show Saved "What-If" Scores</button>
+    </div>
+    <div class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
+      <b>NOTE</b>: This is NOT your official score.<br/>
+      <a href="#" class="button revert_all_scores_link"><%= image_tag "back.png" %> Revert to Actual Score</a>
+    </div>
+    <div style="margin-top: 10px;">
+      <%= render :partial => "courses/sidebar_weighting", :object => @groups %>
+      <div style="font-size: 0.8em;">
+        <input type="checkbox" id="only_consider_graded_assignments" checked="true"/>
+        <label for="only_consider_graded_assignments">Calculate based only on graded assignments</label>
+      </div>
+    </div>
+    <div style="margin-top: 10px;">
+      Click any score and enter a new value to see how
+      the change will affect your total.
+    </div>
+  </div>
+<% end %>
+<h2>Grades For <%= @student.name %></h2>
+<% if @courses_with_grades.length > 1 %>
+  <div style="margin-left: 10px;">
+  For the course, 
+  <select id="course_url">
+    <% @courses_with_grades.each do |course| %>
+      <option value="<%= context_url(course, :context_grades_url) %>" <%= 'selected' if course == @context %>><%= course.name %></option>
+    <% end %>
+  </select>
+  </div>
+  <% js_block do %>
+    <script>
+      $(document).ready(function() {
+        $("#course_url").change(function() {
+          if(location.href != $(this).val()) {
+            location.href = $(this).val();
+          }
+        });
+      });
+    </script>
+  <% end %>
+<% end %>
+</h2>
+<% editable = @current_user == @student %>
+<table style="width: 100%;" id="grades_summary" class="<%= 'editable' if editable %>">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Due</th>
+      <th>Score</th>
+      <th style="text-align: right; white-space: nowrap;">Out of</th>
+      <th>&nbsp;</th>
+    </tr>
+  </thead>
+<% @assignments.each do |assignment| %>
+  <% submission = @submissions.find {|s| s.assignment_id == assignment.id} %>
+  <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade %> <%= "hard_coded " + assignment.special_class rescue "editable" %>" id="<%= "submission_" + assignment.id.to_s %>">
+    <td class="title">
+      <% if assignment.class.to_s == "Assignment" %>
+        <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @student.id) %>"><%= assignment.title %></a>
+      <% else %>
+        <%= assignment.title %>
+      <% end %>
+      <% if assignment && assignment.assignment_group %>
+        <div class="context"><%= assignment.assignment_group.name %></div>
+      <% end %>
+    </td>
+    <td class="due">
+      <% if (assignment.group_weight rescue false) %>
+        <% if @context.group_weighting_scheme == "percent" %>
+        <% else %>
+          
+        <% end %>
+      <% else %>
+        <%= datetime_string(assignment.due_at, :due_date) rescue "" %>
+      <% end %>
+    </td>
+    <td class="assignment_score" title="<%= "Click to test a different score" unless (!editable || assignment.special_class rescue false) %>">
+      <div style="position: relative; height: 100%;" class="score_holder">
+        <span class="tooltip">
+          <span class="tooltip_wrap right">
+            <span class="tooltip_text score_teaser">
+              <% if (assignment.special_class rescue false) %>
+                Percent
+              <% else %>
+                Click to test a different score
+              <% end %>
+            </span>
+          </span>
+          <span class="grade">
+            <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
+          </span>
+          <% if assignment.grading_type == 'letter_grade' %>
+            <span class="score_value" style="font-size: 0.8em; color: #aaa; <%= hidden unless submission && submission.published_score %>"><%= submission.published_score rescue nbsp %></span>
+          <% end %>
+          <%= "%" if (assignment.special_class rescue false) %>
+        </span>
+        <div style="display: none;">
+          <span class="original_score"><%= submission.published_score rescue "" %></span>
+          <span class="score"><%= submission.published_score rescue "" %></span>
+          <span class="assignment_group_id"><%= assignment.assignment_group_id rescue "" %></span>
+          <span class="assignment_id"><%= assignment.id.to_s %></span>
+          <span class="group_weight"><%= assignment.group_weight rescue "" %></span>
+          <span class="student_entered_score"><%= submission.student_entered_score rescue "" %></span>
+          <span class="rules"><%= assignment.rules rescue "" %></span>
+        </div>
+      </div>
+    </td>
+    <td class="possible points_possible" <%= "colspan='2'" if (assignment.special_class rescue false) %>><%= assignment.points_possible %></td>
+    <% if !(assignment.special_class rescue false) %>
+    <td style="padding-left: 10px; white-space: nowrap;">
+      <a href="#" class="toggle_comments_link tooltip" title="View comments and scoring details" style="<%= 'visibility: hidden;' unless submission && submission.submission_comments && !submission.submission_comments.empty? %>">
+        <span class="tooltip_wrap right">
+          <span class="tooltip_text"><%= pluralize(submission && submission.submission_comments && submission.submission_comments.count, "comment") %></span>
+        </span>
+        <%= image_tag "word_bubble.png" %>
+      </a>
+      <a href="#" class="toggle_comments_link tooltip" title="View Scoring Details" style="<%= 'visibility: hidden;' unless submission && submission.score && assignment.points_possible && assignment.points_possible > 0 %>">
+        <span class="tooltip_wrap right">
+          <span class="tooltip_text">See scoring details</span>
+        </span>
+        <%= image_tag "grading_icon.png", :style => "opacity: 0.5;" %>
+      </a>
+      <a class="tooltip" title="View Rubric Evaluation" href="<%= context_url(assignment.context, :context_assignment_submission_url, assignment.id, submission ? submission.user_id : "{{ user_id }}") %>#rubric" style="<%= 'visibility: hidden;' unless submission && submission.rubric_assessment %>">
+        <span class="tooltip_wrap right">
+          <span class="tooltip_text">See rubric results</span>
+        </span>
+        <%= image_tag "rubric.png" %>
+      </a>
+    </td>
+    <% end %>
+  </tr>
+  <% if !(assignment.special_class rescue false) %>
+    <tr class="comments <%= 'assignment_graded' if submission && submission.grade %>" style="display: none;">
+      <td colspan="5" style="padding-bottom: 20px;">
+        <% if assignment && assignment.points_possible && assignment.points_possible > 0 %>
+        <% high, low, mean = assignment.grade_distribution %>
+        <% title = "" %>
+        <% title += "Mean: #{(mean.round(1) rescue '0')}" %>
+        <% title += "High: #{high}" unless assignment && assignment.hide_max_scores_for_assignments %>
+        <% title += "Low: #{low}" unless assignment && assignment.hide_min_scores_for_assignments %>
+        <% if mean && high && low %>
+        <div class="tooltip" style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= title %>">
+          <span class="tooltip_wrap right" style="z-index: 11; bottom: 35px;">
+            <span class="tooltip_text">
+              <table>
+                <% if submission && submission.score %>
+                <tr>
+                  <td><b>Your Score:</b></td>
+                  <td><b><%= submission.score %></b> out of <%= assignment.points_possible %></td>
+                </tr>
+                <% end %>
+                <tr>
+                  <td>Mean:</td>
+                  <td><%= mean.round(1) %> </td>
+                </tr><tr>
+                  <td>High:</td>
+                  <td><% if assignment && assignment.hide_max_scores_for_assignments %>disabled<% else %><%= high %><% end %></td>
+                </tr><tr>
+                  <td>Low:</td>
+                  <td><% if assignment && assignment.hide_min_scores_for_assignments %>disabled<% else %><%= low %><% end %></td>
+                </tr>
+              </table>
+            </span>
+          </span>
+          &nbsp;
+          <% if assignment && !assignment.hide_min_scores_for_assignments && !assignment.hide_max_scores_for_assignments %>
+            <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
+            <div style="position: absolute; top: 0; left: 0px; width: <%= (low.to_f / assignment.points_possible.to_f * 150.0).round %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
+            <div style="position: absolute; top: 0; left: <%= (high.to_f / assignment.points_possible.to_f * 150.0).round %>px; width: <%= ((assignment.points_possible - high).to_f / assignment.points_possible.to_f * 150.0).round %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden;">&nbsp;</div>
+            <div style="position: absolute; top: 0; left: <%= (low.to_f / assignment.points_possible.to_f * 150.0).round %>px; width: <%= ((mean - low).to_f / assignment.points_possible.to_f * 150.0).round %>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topleft: 3px; -moz-border-radius-bottomleft: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
+            <div style="position: absolute; top: 0; left: <%= (mean.to_f / assignment.points_possible.to_f * 150.0).round %>px; width: <%= ((high - mean).to_f / assignment.points_possible.to_f * 150.0).round %>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topright: 3px; -moz-border-radius-bottomright: 3px; background: #fff;">&nbsp;</div>
+            <% left = [150, (high.to_f / assignment.points_possible.to_f * 150.0).round + 3].max %>
+            <div style="position: absolute; top: 0; left: <%= left %>px; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-left-width: 0;">&nbsp;</div>
+          <% else %>
+            <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
+            <div style="position: absolute; top: 0; left: 0px; width: 150px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
+            <div style="position: absolute; top: 0; left: 150px; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-left-width: 0;">&nbsp;</div>
+          <% end %>
+          <% if submission && submission.score %>
+          <div style="position: absolute; top: 5px; height: 10px; width: 10px; left: <%= (submission.score.to_f / assignment.points_possible.to_f * 150.0).round - 5 %>px; border: 2px solid #248; background-color: #abd; overflow: hidden; -moz-border-radius: 3px;" title="Your Score: <%= submission.score %> out of <%= assignment.points_possible %>">&nbsp;</div>
+          <% end %>
+        </div>
+        <% end %>
+        <% end %>
+        <% if submission && submission.submission_comments %>
+          <% submission.submission_comments.each do |comment| %>
+            <div>
+              <% if comment.media_comment_id && comment.media_comment_type %>
+                <div class="comment_media">
+                  This is a media comment,<br/>
+                  <a href="#" class="play_comment_link media-comment">click here to view</a>
+                  <span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>
+                  <div class="media_comment_content">
+                  </div>
+                </div>
+              <% else %>
+                <span style="white-space: pre-wrap;"><%= comment.comment %></span>
+              <% end %>
+              <div style="text-align: right; font-size: 0.8em; margin-right: 10px; clear: both;">
+                <% comment.attachments.each do |attachment| %>
+                  <div>
+                    <a href="<%= context_url(@context, :context_assignment_submission_url, submission.assignment_id, submission.user_id, :download => attachment.id, :comment_id => comment.id) %>"><%= image_tag "file.png", :style => "height: 12px;" %> Download <%= attachment.display_name %></a>
+                  </div>
+                <% end %>
+              </div>
+              <div style="text-align: right; font-size: 0.8em;">
+                <%= comment.author_name %>, <%= datetime_string(comment.created_at) %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+<% end %>
+</table>
+<% total_weight = 0
+  if @context.group_weighting_scheme == "percent"
+    @groups.each {|g| total_weight = total_weight + g.group_weight}
+  end
+%>
+<div id="total_groups_weight" style="display: none;"><%= total_weight %></div>
+<input type="text" style="width: 40px; display: none;" id="grade_entry"/>
+<a href="#" id="revert_score_template" class="revert_score_link" title="Revert to original score"><%= image_tag "back.png" %></a>
+<a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @student.id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>

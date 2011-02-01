@@ -1,0 +1,38 @@
+<% content_for :page_subhead do %>
+  <h2>
+    Don't delay
+  </h2>
+<% end %>
+
+<% content_for :primary_nav do %>
+  <ul>
+    <li><a href="<%= delayed_jobs_path %>">All Delayed Jobs</a></li>
+    <li><%= link_to 'Freedom!', dashboard_path %></li>
+  </ul>
+<% end %>
+
+
+
+<% content_for :stylesheets do %>
+<style>
+.under_h3 {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+.root_accounts {
+  list-style-type: none;
+  padding-left: 0px;
+  margin-top: 0;
+}
+.root_accounts li.letter {
+  display: block;
+  font-size: 1.2em;
+  visibility: hidden;
+}
+.root_accounts li.account {
+  display: block;
+  padding: 5px 2px 5px 20px;
+  font-size: 1.2em;
+}
+</style>
+<% end %>

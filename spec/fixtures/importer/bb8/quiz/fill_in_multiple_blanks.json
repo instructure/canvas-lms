@@ -1,0 +1,32 @@
+{
+    "question_name":"",
+    "question_text":"I'm just a [poor] boy from a poor [family]<br />",
+    "incorrect_comments":"wrong",
+    "question_type":"fill_in_multiple_blanks_question",
+    "migration_id":"_153004_1",
+    "correct_comments":"right",
+    "points_possible":10.0,
+    "answers":[
+        {
+            "text":"poor",
+            "comments":"",
+            "blank_id":"poor",
+            "weight":100,
+            "id":7067
+        },
+        {
+            "text":"sad",
+            "comments":"",
+            "blank_id":"poor",
+            "weight":100,
+            "id":7028
+        },
+        {
+            "text":"family",
+            "comments":"",
+            "blank_id":"family",
+            "weight":100,
+            "id":8158
+        }
+    ]
+}

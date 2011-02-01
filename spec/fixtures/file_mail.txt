@@ -1,0 +1,25 @@
+Return-Path: <mikel@nowhere.com>
+Date: Sun, 21 Oct 2007 19:38:13 +1000
+From: Mikel Lindsaar <mikel@nowhere.com>
+To: mikel@canvas.instructure.com
+Message-Id: <009601c813c6$19df3510$0437d30a@mikel091a>
+Subject: Testing Email
+Content-Type: multipart/mixed; boundary="salmon"
+
+--salmon
+Content-Type: multipart/alternative; boundary="bacon"
+
+--bacon
+Content-Type: text/plain
+
+Hello Mikel
+--bacon
+Content-Type: text/html
+
+<b>Hello Mikel</b>
+--bacon
+--salmon
+Content-Type: text/plain
+
+this is a bunch of dumb text
+--salmon

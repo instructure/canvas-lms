@@ -1,0 +1,28 @@
+<% term_count =  @root_account.enrollment_terms.active.count %>
+<% if term_count > 1 || @associated_courses_count > 0  %>
+  <% if term_count > 1 %>
+    <h2>Choose Term</h2>
+    <div class="rs-margin-lr rs-margin-bottom">
+      <label for="enrollment_term">Show courses from the term:</label><br />
+      <select id="enrollment_term">
+        <% @root_account.enrollment_terms.active.each do |term| %>
+          <option value="<%= context_url(@account, :context_url, :enrollment_term_id => term.id) %>" <%= 'selected' if term == @term %>><%= term.name %></option>
+        <% end %>
+      </select>
+    </div>
+  <% end %>
+  
+  <% if @associated_courses_count > 0 %>
+    <h2><label for="filter">Find a Course</label></h2>
+    <div class="rs-margin-lr rs-margin-bottom">
+      <% form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :method => :get} do |f| -%>
+        <fieldset class="textfield-inline-with-button">
+          <input id="course_name" type="search" name="course[name]" size=30 value="<%= @query %>" autocomplete="off" />
+          <button class='button small-button'>Go</button>
+        </fieldset>
+      <%- end -%>
+    </div>
+  <% end %>
+<% end %>
+<%= render :partial => 'shared/accounts_right_side_shared' %>
+<%= render :partial => 'add_course_or_user' %>

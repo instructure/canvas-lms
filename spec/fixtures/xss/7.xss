@@ -1,0 +1,2 @@
+src|javascript|alert
+<IMG SRC=JaVaScRiPt:alert('XSS')>

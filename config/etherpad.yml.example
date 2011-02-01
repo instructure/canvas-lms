@@ -1,0 +1,11 @@
+production:
+  domain: typewith.me
+  name: EtherPad
+  
+development:
+  domain: typewith.me
+  name: EtherPad
+     
+test:
+  domain: typewith.me
+  name: EtherPad

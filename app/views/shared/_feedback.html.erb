@@ -1,0 +1,2 @@
+<div id="feedback_user_email" style="display: none;"><%= (session[:user_email] = @current_user.email) rescue (session[:user_email] || "") %></div>
+<div id="feedback_dialog" style="display: none;"></div>

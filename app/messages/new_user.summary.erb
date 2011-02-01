@@ -1,0 +1,6 @@
+<% define_content :link do %>http://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
+<% define_content :subject do %>
+  New User
+<% end %>
+
+A new user, <%= asset.name %>, has just registered for the account <%= asset.account.name %>

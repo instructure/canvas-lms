@@ -1,0 +1,82 @@
+<% 
+  editable ||= can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content)
+  @modules ||= []
+%>
+<% cache(['context_module_render_', (context_module.try_rescue(:cache_key) || @context.asset_string), editable].join('/')) do %>
+
+<div class="context_module <%= 'editable_context_module' if editable %>" id="context_module_<%= context_module ? context_module.id : "blank" %>" style="<%= hidden unless context_module %>">
+  <a name="module_<%= context_module.id if context_module %>"></a>
+  <div class="header">
+    <span class="reorder_module_link" title="Drag to reorder modules" style="cursor: move; <%= 'hidden' unless @modules.length > 1 %>"><%= image_tag "move.png" %></span>
+    <span class="completion_status" style="<%= "visibility: hidden;" if !context_module || (context_module.completion_requirements || []).empty? %>">
+      <%= image_tag "pass.png", :alt => "done", :title => "Module Completed", :class => "complete_icon" %>
+      <%= image_tag "blank.png", :alt => "incomplete", :title => "Module Incomplete", :class => "incomplete_icon" %>
+      <%= image_tag "lock.png", :alt => "locked", :title => "Module Locked", :class => "locked_icon" %>
+    </span>
+    
+    <span class="name"> <%= context_module.try_rescue(:name) || nbsp %></span>
+    <div class="links">
+      <span class="id" style="display: none;"><%= context_module ? context_module.id : nbsp %></span>
+      <span class="unlock_at" style="display: none;"><%= datetime_string(context_module.try_rescue(:unlock_at)) || nbsp %></span>
+      
+      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="edit_module_link edit_link no-hover" title="Edit module settings"><%= image_tag "edit.png" %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="delete_module_link delete_link no-hover" title="Delete this module"><%= image_tag "delete.png" %></a>
+    </div>
+    <div class="clear"></div>
+    <div style="display: none;">
+      <span class="require_sequential_progress"><%= context_module.try_rescue(:require_sequential_progress) || nbsp %></span>
+      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/reorder" class="reorder_items_url" style="display: none;">&nbsp;</a>
+    </div>
+  </div>
+  <div class="content">
+    <div class="items context_module_items <%= 'manageable' if editable %>" style="min-height: 10px;">
+      <% if context_module %>
+        <% new_module = context_module || @context.context_modules.new  %>
+        <% context_module.content_tags.active.each do |tag| %>
+          <%= render :partial => 'context_modules/module_item', :object => tag, :locals => {:completion_criteria => context_module.completion_requirements, :new_module => new_module, :editable => editable} %>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="collapsed">
+    </div>
+  </div>
+  <div class="footer">
+    <div class="show_hide">
+      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="expand_module_link expand-small">Show module contents</a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="collapse_module_link collapse-small">Hide module contents</a>
+    </div>
+    <div class="manage_module">
+      <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items" class="add_module_item_link add-small">Add item to module</a>
+      <a href="#" class="add_prerequisite_link edit-small" style="display: none;">Module Settings</a>
+    </div>
+    <div class="progression_container">
+      <a href="#" class="progression_details_link" title="See Student Progress for this Module" style="display: none;">
+        <span class="progression_started"><span class="progression_started_count">0</span> In Progress, </span><span class="progression_complete"><span class="progression_complete_count">0</span> Complete</span>
+      </a>
+      <span class="progression_state" style="<%= hidden if editable || !context_module || ((context_module.prerequisites || []).empty? && (context_module.completion_requirements || []).empty?) %>">
+        &nbsp;
+      </span>
+      <div class="unlock_details" style="<%= hidden unless context_module && context_module.to_be_unlocked %>">will unlock <span class="unlock_at"><%= datetime_string(context_module.try_rescue(:unlock_at)) || nbsp %></span></div>
+    </div>
+    <div class="clear"></div>
+    <div class="prerequisites_footer" style="<%= hidden unless context_module && context_module.prerequisites && !context_module.prerequisites.empty? %>">
+      <div class="prerequisites_message" style="float: left;">
+        Prerequisites: 
+      </div>
+      <div class="prerequisites">
+      <% if context_module %>
+        <% (context_module.prerequisites || []).each do |pre| %>
+          <div class="criterion <%= pre[:type] %>_criterion" style="float: left;">
+            <span class="id" style="display: none;"><%= pre[:id] %></span>
+            <span class="type" style="display: none;"><%= pre[:type] %></span>
+            <span class="name"><%= pre[:name] || "module" %></span>
+            <span style="padding-left: 3px;"><a href="#" class="delete_prerequisite_link" title="Remove this prerequisite" style="text-decoration: none;">&#215;</a></span>
+          </div>
+        <% end %>
+      <% end %>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+</div>
+<% end %>

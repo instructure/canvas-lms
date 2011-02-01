@@ -1,0 +1,12 @@
+{
+    
+    "question_name":"",
+    "question_text":"File response question. I'm stupid.<br />",
+    "incorrect_comments":"",
+    "unsupported":true,
+    "question_type":"File Upload",
+    "answers":[],
+    "migration_id":"_153003_1",
+    "correct_comments":"",
+    "points_possible":10.0
+}

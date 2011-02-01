@@ -1,0 +1,109 @@
+<% 
+  jammit_css :login
+  @headers = false
+  @body_classes << "modal" if @body_classes
+%>
+
+<% content_for :page_title do %>Register as a Teacher<% end %>
+
+<% content_for :stylesheets do %>
+<style>
+.registration_table td {
+  padding-top: 5px;
+}
+</style>
+<% end %>
+<% js_block do %>
+<script type="text/javascript">
+$(document).ready(function() {
+  $("#register_form :text:first").focus().select();
+  $("#register_form").submit(function(event) {
+    var $form = $(this);
+    
+    // track that they clicked the submit button for the google analytics signup goal funnel tracking.
+    $.trackPageview("/clicked_submit_on_user_registration");
+    
+    var data = $form.getFormData({object_name: 'pseudonym'});
+    success = true;
+    if(!data['user[name]']) {
+      $form.formErrors({
+        'user[name]': "User name is required"
+      });
+      success = false;
+    } else if(!data.unique_id || !data.unique_id.length) {
+      $form.formErrors({
+        unique_id: "Email Address is required"
+      });
+      success = false;
+    } else if(data.unique_id.length < 3 || !data.unique_id.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,10}$/i)) {
+      $form.formErrors({
+        unique_id: "Invalid Email Address"
+      });
+      success = false;
+    } else if(!data['user[school_name]']) {
+      $form.formErrors({
+        'user[school_name]': "School name is required"
+      });
+      success = false;
+    }
+    if(!success) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  });
+});
+</script>
+<% end %>
+<div id="modal-box" class="modal-box-tall">
+  <div style="margin: 24px 17px 0 45px; position: relative;">
+    <h2>Sign up for a free account</h2>
+    <p>You can use Canvas in your class too!   As a teacher, it&#x27;s free!</p>
+    <% form_for @pseudonym, :url => users_path, :html => {:id => "register_form", :method => :post} do |form|  
+        errors = [] 
+        [@user, @pseudonym].each do |obj|
+          obj.errors.full_messages.each do |m| 
+            if !["Pseudonyms is invalid"].include?(m) 
+              errors << m.gsub("Unique", "Login")
+            end
+          end
+        end 
+      js_block do %>
+        <script type="text/javascript">
+          $.flashError('There were problems with the following fields: <%= errors.join(", ") %>');
+        </script>
+      <% end unless errors.empty? %>
+      <input type="hidden" name="new_teacher" value="1"/>
+      <table class="formtable registration_table">
+        <tr>
+          <td><%= label :user, :name, "Name:" %></td>
+          <td><%= text_field :user, :name %></td>
+        </tr><tr>
+          <td><%= form.label :unique_id, "Email:" %></td>
+          <td><%= form.text_field :unique_id, :value => !@pseudonym || @pseudonym.deleted? ? (@pseudonym.deleted_unique_id rescue nil) : @pseudonym.unique_id %></td>
+        </tr><tr>
+          <td><%= label :user, :school_name, "School / organization:" %></td>
+          <td><%= text_field :user, :school_name %></td>
+        </tr><tr>
+          <td><%= label :user, :school_position, "Position at school:" %></td>
+          <td style="vertical-align: top;"><%= text_field :user, :school_position %></td>
+        </tr><tr>
+          <td><%= label :user, :phone, "Phone number:" %></td>
+          <td style="vertical-align: top;"><%= text_field :user, :phone %></td>
+        </tr><tr>
+          <td style="vertical-align: top;"><%= label :user, :referrer, "How did you hear about us?" %></td>
+          <td>
+            <%= text_area :user, :referrer, :style => "width: 217px; height: 50px;" %>
+          </td>
+        <% if @domain_root_account == Account.default %>
+          </tr><tr>
+            <td colspan="2">
+              <%= check_box :user, :subscribe_to_emails, :checked => true %>
+              <%= label :user, :subscribe_to_emails, "I want to receive information, news and tips from Instructure" %>
+            </td>
+        <% end %>
+        </tr>
+      </table>
+      <button style="margin-top:-36px" type="submit" class="button">Register</button>
+      <% end %>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+{
+    "email_teacher_upon_submission":false,
+    "attachment_names":[],
+    "grading":
+    {
+        "points_possible":"20",
+        "grade_type":"numeric",
+        "release_grade_to_student":true,
+        "due_date":"1228521600000",
+        "title":"Discussion Assignment"
+    },
+    "submission_format":"textwithattachments",
+    "show_item":"true",
+    "description":"",
+    "distribution_type":"ALL_STUDENTS",
+    "instructions":"Your score will be posted at the end of the course as described in the assignment description (see Course Schedule and Materials).",
+    "attachment_ids":[],
+    "multiple_instructions":false,
+    "take_backable":false,
+    "instructions_in_html":false,
+    "leeway_date":"1245175200000",
+    "due_date":"1228521600000",
+    "title":"Discussion Assignment",
+    "students_can_publish_submissions":false,
+    "migration_id":"4285383730191",
+    "gradeable":true,
+    "assignment_id":"4285383730191"
+}

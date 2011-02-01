@@ -1,0 +1,39 @@
+<% course_home ||= false %>
+  <% if @just_viewing_one_course %>
+  <div class="rs-margin-lr rs-margin-top">
+    <a href="#" class="show_groups_link button button-sidebar button-sidebar-wide">Group Assignments by Type</a>
+    <a href="#" class="hide_groups_link button button-sidebar button-sidebar-wide" style="display: none;">Just Show the Assignment List</a>
+    <% if @courses.length == 1 && can_do(@courses.first, @current_user, :participate_as_student) %>
+      <a href="<%= context_url(@context, :context_grades_url) %>" class="button button-sidebar-wide"><%= image_tag "grading_icon.png" %> See my grades so far</a>
+    <% end %>
+  </div>
+  <% end %>
+  <%= render :partial => "shared/event_list", 
+             :object  => @upcoming_assignments, 
+             :locals  => {
+               :title         => "Upcoming Assignments", 
+               :display_count => 3, 
+               :period        => "the next week", 
+               :show_context  => true, 
+               :upcoming      => true,
+               :show_more     => false
+             } %>
+  
+  <% unless @just_viewing_one_course %>
+    <% if @courses.length == 1 && can_do(@courses.first, @current_user, :manage_assignments) %>
+      <div>
+        <a href="<%= course_assignments_path(@courses.first) %>" class="button"><%= image_tag "edit.png" %> Manage Assignments</a>
+      </div>
+    <% elsif @courses.length > 1 %>
+      <h2>Show Only Assignments from</h2>
+      <div class="show-only-from rs-margin-lr">
+        <ul class="unstyled_list">
+        <% @courses.each do |course| %>
+          <li>
+            <%= link_to(course.name, course_assignments_path(course), :class => dom_id(course)) %>
+          </li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+  <% end %>

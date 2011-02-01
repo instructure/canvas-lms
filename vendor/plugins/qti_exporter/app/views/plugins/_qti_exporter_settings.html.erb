@@ -1,0 +1,5 @@
+<p>
+  <label>Enabled</label>
+  <input name="settings[enabled]" type="hidden" value="false" />
+  <%= check_box_tag("settings[enabled]", 'true', @settings[:enabled].to_s == 'true') %>
+</p>

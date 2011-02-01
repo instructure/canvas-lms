@@ -1,0 +1,82 @@
+<% add_crumb 'Profile Pictures' %>
+<% content_for :page_title do %>Profile Pictures<% end %>
+<% content_for :stylesheets do %>
+<style>
+.views .selected {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#avatars {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+#avatars tr .avatar_state {
+  width: 50px;
+}
+#avatars tr.approved .avatar_state {
+  background: url(/images/graded.16px.png) no-repeat center center
+}
+#avatars tr.reported .avatar_state {
+  background: url(/images/warning.png) no-repeat center center
+}
+#avatars tr.re_reported .avatar_state {
+  background: url(/images/warning_dim.png) no-repeat center center
+}
+#avatars tr.locked .avatar_state {
+  background: url(/images/lock.png) no-repeat center center
+}
+#avatars td {
+  border-bottom: 1px dotted #ddd;
+  padding: 2px 0;
+}
+#avatars td.link_holder {
+  text-align: right;
+}
+</style>
+<% end %>
+<h2>Profile Pictures</h2>
+<div class="views">
+  <span style="padding-right: 10px; font-weight: bold;">Show: </span>
+  <a href="?avatar_state=submitted" class="<%= 'selected' if @avatar_state == 'submitted' %>">Submitted <%= count_if_any(@avatar_counts[:submitted]) %></a> | 
+  <a href="?avatar_state=reported" class="<%= 'selected' if @avatar_state == 'reported' %>">Reported <%= count_if_any(@avatar_counts[:reported]) %></a> | 
+  <a href="?avatar_state=re_reported" class="<%= 'selected' if @avatar_state == 're_reported' %>">Approved, Re-Reported <%= count_if_any(@avatar_counts[:re_reported]) %></a> | 
+  <a href="?avatar_state=any" class="<%= 'selected' if @avatar_state == 'any' %>">All <%= count_if_any(@avatar_counts[:all]) %></a>
+</div>
+
+<% if @users.empty? %>
+  <h3 style="padding-top: 20px;">No Profile Pics to Show</h3>
+<% end %>
+<table id="avatars">
+<% @users.each do |user| %>
+  <tr class="<%= user.avatar_state %>">
+    <td style="width: 50px;">
+      <div class="avatar"><img src="<%= user.avatar_url(50, @domain_root_account.settings[:avatars]) %>" style="width: 50px;"/></div>
+    </td>
+    <td class="avatar_state">
+    </td>
+    <td>
+      <div class="name"><a href="<%= user_url(user.id) %>"><%= user.name %></a></div>
+      <div class="email"><%= user.email %></div>
+    </td>
+    <td class="link_holder">
+      <div class="links">
+        <a href="#" class="update_avatar_link approve_avatar_link" data-state="approved" style="<%= hidden unless user.avatar_approvable? %>">approve</a>
+        <a href="#" class="update_avatar_link lock_avatar_link" data-state="locked" style="<%= hidden if user.avatar_state == :locked %>">lock</a>
+        <a href="#" class="update_avatar_link unlock_avatar_link" data-state="approved" style="<%= hidden unless user.avatar_state == :locked %>">unlock</a>
+        <a href="#" class="update_avatar_link reject_avatar_link" data-state="none">delete</a>
+        <div style="display: none;">
+          <a href="<%= update_avatar_image_url(user.id) %>" class="user_avatar_url">&nbsp;</a>
+        </div>
+      </div>
+      <div class="progress" style="visibility: hidden;">
+        Saving...
+      </div>
+    </td>
+  </tr>
+<% end %>
+</table>
+
+<%= will_paginate(@users, :style=>"margin-bottom: 1em;") %>
+
+<% jammit_js :manage_avatars %>

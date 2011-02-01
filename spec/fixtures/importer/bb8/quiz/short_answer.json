@@ -1,0 +1,23 @@
+{
+    "question_name":"",
+    "question_text":"The answer is 'purple'.<br />",
+    "incorrect_comments":"wrong",
+    "question_type":"short_answer_question",
+    "migration_id":"_153005_1",
+    "correct_comments":"right",
+    "points_possible":10.0,
+    "answers":[
+        {
+            "text":"purple",
+            "comments":"",
+            "weight":100,
+            "id":8829
+        },
+        {
+            "text":"violet",
+            "comments":"",
+            "weight":100,
+            "id":2196
+        }
+    ]
+}

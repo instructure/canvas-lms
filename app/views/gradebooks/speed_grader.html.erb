@@ -1,0 +1,263 @@
+<% 
+  jammit_js :speed_grader
+  jammit_css :speed_grader
+  @show_left_side = false 
+%>
+<% content_for :page_title do %><%= [@assignment.title, "SpeedGrader", @context.name, ].join(", ") %><% end %>
+<h4 id="speed_grader_loading">
+  loading...
+</h4>
+<div id="gradebook_header" style="display:none;">
+  <% form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
+    <div class="left">
+      <a href="#" class="prev">Previous</a>
+      <div id="combo_box_container"></div>
+      <a href="#" class="next">Next</a>
+      <div id='x_of_x_students'>
+        (<span>???</span> of <%= @assignment.context.students.length %> students)<br />
+        <a href="<%= context_url(@context, :context_gradebook_url) %>#assignment/<%= @assignment.id %>">Gradebook</a> | 
+        <a href="<%= context_url(@context, :context_url) %>">Course Home</a>
+      </div>
+    </div>
+    <div class="right">
+      <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span>Settings</a>
+      <% if Setting.get_cached("show_feedback_link", "false") == "true" %>| <a href="#" id="feedback_link">Feedback</a><% end %>
+      <div>
+        <span id="x_of_x_graded"><span>0</span> / <span><%= @assignment.context.students.length %></span> Graded</span>
+        <span id='average_score_wrapper' style='display:none; padding-left: 10px;'>Avg: <span id='average_score'>0.0</span></span>
+      </div>
+    </div>
+    <div class='center'>
+      <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>"><%= @assignment.title %></a>
+      (<span id="context_title" ><%= @context.short_name %></span>)
+      <% if @assignment.due_at %>
+        <div class="due_at">due <%= datetime_string(@assignment.due_at) %></div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div id="full_width_container" style="display:none;">
+  <div id="left_side" class="full_height">
+    <div id="left_side_inner">
+      <div id='submissions_container'>
+        <div id="this_student_does_not_have_a_submission">
+          <h3>This student does not have a submission for this assignment</h3>
+        </div>
+        <div id="scribd_doc_holder" style="display:none;"></div>
+        <div id="iframe_holder" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+  <div id="right_side" class="full_height">
+    <div class="full_height" id="width_resizer"></div>
+    <div id="rightside_inner" class="full_height">
+
+      <div id="submission_details">
+        <div id="single_submission">
+          <label>Submitted:</label>
+          <span id="single_submission_submitted_at" title="Submitted on time">??/??/?? at ??:??PM</span>
+        </div>
+        <div id="multiple_submissions">
+          <label for="submission_to_view">Submission to view:</label>
+          <select id="submission_to_view">
+            <option value="option1">??/??/?? at ??:??PM </option>
+            <option value="option2" class="late">??/??/?? at ??:??PM LATE (graded: ?+)</option>
+          </select>
+        </div>
+        <div id="submission_late_notice">Note: This Submission Was LATE</div>
+        <div id="submission_not_newest_notice" title='use the dropdown above to change which submission to look at'>Note: This Is Not the Most Recent Submission</div>
+        <div id="submission_files_container">
+          <label>Submitted File<span id="submitted_files_plurality">s</span>: (click to load)</label>
+          <div id="submission_files_list">
+            <div id="submission_file_hidden"  class="submission-file" style='display:none;'>
+              <a class="turnitin_similarity_score" href="#" title="Turnitin similarity score -- more details"><span class="similarity_score">10</span>%</a>
+              <a class="submission-file-download" title="Download this file" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}} ") %>">Download File</a>
+              <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}} ") %>" title="Preview this File">???</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if @assignment.rubric_association %>
+      <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
+      <div id="rubric_full" style="display:none;">
+        <div id="rubric_full_resizer">
+          <div id="rubric_full_resizer_handle"></div>
+        </div>
+        <h2>Grading</h2>
+        <div class="content_box">
+          <div id="rubric_holder">
+            <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true, :rubric_association => @assignment.rubric_association } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+            <div class="button-container">
+              <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
+                <button type="button" class="save_rubric_button button">Save</button>
+              <% end %>
+              <button type="button" class="hide_rubric_link button-secondary">Cancel</button>
+            </div>
+            <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
+            <%= render :partial => "shared/rubric_criterion_dialog" %>
+          </div>
+        </div>
+      </div>
+      <% end %>
+
+      <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) %>
+      <div id="grading">
+        <h2>Assessment</h2>
+        <div>
+          <% if can_do(@context, @current_user, :manage_grades) %>
+          <div id="grade_container"  class="content_box" style="padding-bottom: 0">
+            <label class="bold">Grade
+            <%= render :partial => "grading_box_extended", :object => @assignment %>
+            <% if @assignment.grading_type == "points" %>
+              out of <%= @assignment.points_possible %>
+            <% else %>
+              (<span class="score">&nbsp;</span> / <%= @assignment.points_possible %>)
+            <% end %>
+            </label>
+            <a href="#" class="turnitin_similarity_score" title="Turnitin similarity score -- more details" target="_blank" style="display: none;">
+              <span class="similarity_score"></span>%
+            </a>
+            <a href="#" id="submit_same_score"><br>Use this same grade for the resubmission</a>
+              <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
+          </div>
+          <% end %>
+          <% if @assignment.rubric_association %>
+          <div id="rubric_summary_holder">
+            <div id="rubric_assessments_list_and_edit_button_holder"  class="content_box">
+              <span id="rubric_assessments_list">
+                Show Assessment By:
+                <select id="rubric_assessments_select">
+                    <option value="new" id="new_rubric_assessment_option">[New Assessment]</option>
+                </select>
+              </span>
+            </div>
+            <div id="rubric_summary_container">
+              <%= render :partial => "shared/rubric_summary", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+            </div>
+          </div>
+          <% end %>
+        </div>
+      </div><!-- end #grading -->
+      <% end %>
+
+      <div>
+        <h2>Discussion</h2>
+        <div id="discussion">
+          <div id="comments">
+            <div class="comment" id="comment_blank" style="display: none;">
+              <a href="javascript:void 0;" class="delete_comment_link"><span class="ui-icon ui-icon-close"></span></a>
+              <span class="comment"></span>
+              <a href="#" class="play_comment_link media-comment" style="display:none;">click here to view</a>
+              <span class="media_comment_id" style="display: none;">&nbsp;</span>
+              <div class="media_comment_content" style="display:none"></div>
+              <div class="comment_attachments"></div>
+              <div class="comment_citation">
+                <span class="author_name">&nbsp;</span>,
+                <span class="posted_at">&nbsp;</span>
+              </div>
+            </div>
+            <div class="comment_attachment" id="comment_attachment_blank" style="display: none;">
+              <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{ submitter_id }}", :comment_id => "{{ comment_id }}", :download => "{{ id }}") %>"><span class="display_name">&nbsp;</span></a>
+            </div>
+          </div>
+
+          <form id="add_a_comment">
+            <label>Add a Comment</label>
+            <textarea></textarea>
+            <div>
+              <div id="media_media_recording" style="display: none;">
+                <div class="media_recording"></div>
+              </div>
+              <% if @assignment.group_category %>
+                <div id="group_comment_wrapper">
+                  <input type="checkbox" name="group_comment" id="submission_group_comment" checked/>
+                  <label for="submission_group_comment">Send to the Whole Group</label>
+                </div>
+              <% end %>
+              <div id="comment_attachments"></div>
+              <div class="comment_attachment_input" id="comment_attachment_input_blank" style="display: none;">
+                <input type="file" name="attachments[-1][uploaded_data]" style="font-size: 0.8em;"/>
+                <a href="#">Remove Attachment</a>
+              </div>
+
+
+              <button class="button small-button" type="submit">Submit Comment</button>
+              <ul class="attach_things">
+                <li class="prompt">Attach</li>
+                <li>
+                  <a id="add_attachment" href="#" class="tooltip">
+                    <span class="tooltip_wrap">
+                      <span class="tooltip_text">File Attachment</span>
+                    </span>
+                    <span class="icon"><%= image_tag "file_multiple.png" %></span>
+                  </a>
+                </li>
+                <% if feature_enabled?(:kaltura) %>
+                  <li>
+                    <a class="media_comment_link tooltip" href="#">
+                      <span class="tooltip_wrap">
+                        <span class="tooltip_text">Media Comment</span>
+                      </span>
+                      <span class="icon"><%= image_tag "microphone.png" %></span>
+                    </a>
+                  </li>
+                <% end %>
+                <li style="clear:both;"></li>
+              </ul>
+              <div style="clear:both;"></div>
+            </div>
+          </form>
+        </div><!-- end #discussion -->
+      </div>
+    </div>
+  </div>
+</div>
+<a style="display:none;" id="assignment_submission_url" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submission_id}}") %>"></a>
+<a style="display:none;" id="assignment_submission_turnitin_url" href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
+<form id="settings_form" style="display:none; width:400px;" title="Speedgrader Options">
+  <p>
+    <label for="eg_sort_by">Sort student list</label>
+    <%= select_tag 'eg_sort_by', options_for_select([ 
+      ["by student name (alphabetically) ", "alphabetically"], 
+      ["the date they submitted the assignment", "submitted_at"],
+      ["by submission status (needs grading, not submitted, etc)", "submission_status"]], cookies[:eg_sort_by]) %>
+  </p>
+  <p>
+    <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
+    <label for="hide_student_names">Hide student names in the SpeedGrader</label>
+  </p>
+  <p>
+    <button type="submit" class="button submit_button">Save Settings</button>
+  </p>
+</form>
+<ul id="section-menu" class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open" style="display:none;" role="listbox" aria-activedescendant="section-menu-link">
+  <li role="presentation" class="ui-selectmenu-item">
+    <a href="#" tabindex="-1" role="option" aria-selected="true" id="section-menu-link">
+      <span>Showing: <span id="section_currently_showing">All Sections</span></span>
+    </a>
+    <ul>
+      <li style="border-bottom: 1px dotted #ccc"><a class="selected" style="font-size: 1.1em;" data-section-id="all" href="#">Show all sections</a></li>
+    </ul> 
+  </li>
+</ul>
+
+<% js_block do %>
+  <script type="text/javascript">
+    var hideStudentNames = <%= @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions ? "true" : "false" %>;
+    var visibleRubricAssessments = <%= raw((@assignment.visible_rubric_assessments_for(@current_user) || {}).to_json(:methods => [:assessor_name], :include_root => false)) %>;
+    
+    rubricAssessment.assessor_id = <%= @current_user ? @current_user.id : "null" %>;
+    rubricAssessment.assessment_type = '<%= can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review" %>';
+  </script>
+<% end %>
+<div id="current_context_code" style="display: none;"><%= @context.asset_string %></div>
+
+<% keyboard_navigation([
+  {:key => 'j', :description => 'Next Student'},
+  {:key => 'k', :description => 'Previous Student'},
+  {:key => 'c', :description => 'Leave Comment'},
+  {:key => 'g', :description => 'Change Grade'},
+  {:key => 'r', :description => 'Use Rubric'}
+]) %>

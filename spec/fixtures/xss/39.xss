@@ -1,0 +1,2 @@
+bgsound|alert|javascript|src
+<BGSOUND SRC="javascript:alert('XSS');">

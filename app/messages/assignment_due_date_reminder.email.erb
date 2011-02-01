@@ -1,0 +1,12 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
+<% end %>
+
+<% define_content :subject do %>
+  Due: <%= asset.assignment.title %>, <%= asset.assignment.context.name %>
+<% end %>
+
+This is a reminder that the assignment <%= asset.assignment.title %>, for the course, <%= asset.assignment.context.name %> is due <%= datetime_string(force_zone(asset.assignment.due_at)) %>.
+
+Click here to view the assignment: 
+<%= content :link %>

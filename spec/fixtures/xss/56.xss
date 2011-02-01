@@ -1,0 +1,2 @@
+alert|frameset|frame|javascript|alert
+<FRAMESET><FRAME SRC="javascript:alert('XSS');"></FRAMESET>

@@ -1,0 +1,142 @@
+<% content_for :page_title do %><%= @section.name %><% end %>
+
+<% content_for :right_side do %>
+  <div class="rs-margin-all">
+    <a href="#" class="button button-sidebar-wide edit_section_link"><%= image_tag "edit.png" %> Edit Section</a>
+  </div>
+<% end %>
+
+<% content_for :stylesheets do %>
+<style>
+#course_form .course_form {
+  display: none;
+}
+#course_form.editing .course_form {
+  display: inline;
+}
+#course_form.editing .course_info {
+  display: none;
+}
+#course_form .date_entry {
+  width: 100px;
+}
+ul.user_list {
+  list-style: none;
+  padding-left: 0px;
+  margin-top: 0px;
+  max-width: 400px;
+}
+ul.user_list li.user {
+  padding-left: 10px;
+  color: #444;
+  line-height: 1.5em;
+  -moz-border-radius: 5px;
+}
+ul.user_list li.user:hover {
+  background-color: #eee;
+}
+ul.user_list li.user .email {
+  font-size: 0.8em;
+  margin: -5px 10px 5px;
+}
+ul.user_list li.user .section {
+  font-size: 0.8em;
+  margin: -5px 10px 5px;
+}
+ul.user_list li.user .short_name {
+  font-size: 0.8em;
+  margin: -2px 10px 0px;
+}
+ul.user_list li.user .enrollment_type {
+  font-size: 0.8em;
+  margin: -2px 10px 0px;
+}
+ul.user_list li.user .links {
+  float: right;
+  padding-right: 20px;
+  padding-top: 5px;
+  visibility: hidden;
+}
+ul.user_list li.user .links a {
+  text-decoration: none;
+}
+ul.user_list li.user:hover .links {
+  float: right;
+  padding-right: 20px;
+  visibility: visible;
+}
+ul.user_list li.user.pending {
+  color: #888;
+  font-style: italic;
+}
+h3 .tally { 
+  font-family: arial,sans-serif;
+  font-size: 12px;
+  padding-left: 5px;
+}
+.associated_user {
+  display: none;
+}
+#edit_section_form {
+  margin-bottom: 20px;
+}
+</style>
+<% end %>
+<% form_for @section, :url => context_url(@context, :context_section_url, @section), :html => {:id => "edit_section_form", :style => "display: none;"} do |f| %>
+<table class="formtable">
+  <tr>
+    <td><%= f.label :name, "Section Name" %></td>
+    <td><%= f.text_field :name %></td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <div class="button-container">
+        <button type="submit" class="button submit_button">Update Section</button>
+        <button type="button" class="button cancel_button button-secondary">Cancel</button>
+      </div>
+    </td>
+  </tr>
+</table>
+<% end %>
+<% unless @current_enrollments.empty? %>
+<h2>Current Enrollments</h2>
+<ul class="user_list">
+<% @current_enrollments.each do |enrollment| %>
+  <%= render :partial => "shared/enrollment", :object => enrollment, :locals => {:include_type => true} %>
+<% end %>
+</ul>
+<% end %>
+<% unless @completed_enrollments.empty? %>
+<h2>Completed Enrollments</h2>
+<ul class="user_list">
+<% @completed_enrollments.each do |enrollment| %>
+  <%= render :partial => "shared/enrollment", :object => enrollment, :locals => {:include_type => true} %>
+<% end %>
+</ul>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $("#edit_section_form .cancel_button").click(function() {
+    $("#edit_section_form").hide();
+  });
+  $(".edit_section_link").click(function(event) {
+    event.preventDefault();
+    $("#edit_section_form").toggle();
+    $("#edit_section_form :text:visible:first").focus().select();
+  });
+  $(".unenroll_user_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".user").confirmDelete({
+      message: "Are you sure you want to delete this enrollment permanently?",
+      url: $(this).attr('href'),
+      success: function() {
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
+      }
+    });
+  });
+});
+</script>
+<% end %>

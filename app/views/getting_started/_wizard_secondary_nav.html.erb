@@ -1,0 +1,40 @@
+<% view ||= 'name' 
+  hide_scratch ||= false
+%>
+<ul id="wizard-steps" style='display:none;'>
+  <li class="first <%= "active" if view == 'name' %>"><a href="<%= url_for :action => "name" %>">
+    <span class="title">Step 1</span>
+    <span class="subtitle">Course Name</span>
+    </a>
+  </li>
+  <li class="<%= "active" if view == 'assignments' %>"><a href="<%= url_for :action => "assignments" %>">
+    <span class="title">Step 2</span>
+    <span class="subtitle">Assignments</span>
+    </a>
+  </li>
+  <li class="<%= "active" if view == 'students' %>"><a href="<%= url_for :action => "students" %>">
+    <span class="title">Step 3</span>
+    <span class="subtitle">Students</span>
+    </a>
+  </li>
+  <li class="<%= "active" if view == 'setup' %>"><a href="<%= url_for :action => "setup" %>">
+    <span class="title">Step 4</span>
+    <span class="subtitle">Review &amp; Save</span>
+    </a>
+  </li>
+  <li id="hide-scratch" style="<%= hidden if hide_scratch %>">
+    <%= link_to "Start From Scratch", getting_started_url(:fresh => 1) %>
+    <% if @context && session[:saved_course_uuid] == @context.uuid %>
+      | <%= link_to "Visit Course Page", course_url(@context) %>
+    <% end %>
+  </li>
+</ul>
+  
+
+<% js_block do %>
+  <script type="text/javascript">
+    $(function(){
+      $("#wizard-steps").chevronCrumbs();
+    });
+  </script>
+<% end %>

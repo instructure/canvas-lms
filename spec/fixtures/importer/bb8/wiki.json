@@ -1,0 +1,13 @@
+{
+    "show_item":true,
+    "alternate_migration_id":"_116799_1",
+    "text":"<p>My wiki content because it&#39;s <strong>cool</strong> to have a wiki!</p><p><a href=\"http://instructure.com\">Linkage</a></p><p><a href=\"http://instructure.com\"></a><<img src=\"res00058/canvasPoster__0.jpg\" alt=\"\" width=\"400\" height=\"592\" />&nbsp;</p><p><<img src=\"res00058/formula__0.png\" alt=\"\" width=\"943\" height=\"74\" /> </p>",
+    "end_date":null,
+    "start_date":null,
+    "bb8_type":"x-lobj-teams-group",
+    "created_date":1268855603000,
+    "title":"Wiki page",
+    "migration_id":"res00058",
+    "updated_date":1268855603000,
+    "is_folder":false
+}

@@ -1,0 +1,148 @@
+<% content_for :page_title do %><%= @user.short_name %><% end %>
+
+<% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>
+  <% content_for :right_side do %>
+      <div class="rs-margin-lr rs-margin-top">
+          <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide">Faculty Journal for <%= context_user_name(@context, @user) %></a>
+      </div>
+  <% end %>
+<% end %>
+<div style="margin: .3em">
+  <div style="float: right;">
+    <% if @context_account.is_a?(Account) && @context_account.has_outcomes? %>
+      <div>
+        <a href="<%= context_url(@context_account, :context_user_outcomes_results_url, @user.id) %>" class="">See Outcome Results for <%= @user.short_name %></a>
+      </div>
+    <% end %>
+    <div>
+      <a href="<%= user_sent_messages_url(@user) %>">See Messages sent by <%= @user.short_name %></a>
+    </div>
+  </div>
+  <h2><%= @user.short_name %></h2>
+<% content_for :stylesheets do %>
+<style type="text/css" media="screen">
+  #user-info-fieldsets{
+    margin-bottom: 2em;
+  }
+  #user-info-fieldsets table th{
+    text-align: left;
+    padding-right: 2em;
+  }
+  ul.context_list .subtitle {
+    line-height: 1.0em;
+  }
+</style>
+<% end %>
+
+<% jammit_css :roster_user %>
+<% jammit_css :context_list %>
+
+<div id="user-info-fieldsets">  
+  <%= render :partial => 'users/name' %>
+  <%= render :partial => 'users/logins' %>
+  <fieldset id="courses" class="">
+    <legend>Enrollments</legend>
+    <% num_enrollments = 0 %>
+    <div style="overflow: hidden; font-size: 0.8em;" id="content">
+    <div id="courses_list" style="<%= hidden if @enrollments.empty? %>">
+      <h2>Courses <%= count_if_any(@enrollments.count) %></h2>
+      <div class="courses" style="font-size: 1.2em">
+        <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+          <% @enrollments.each do |enrollment| %>
+            <% num_enrollments += 1 %>
+            <%= render :partial => "enrollment", :object => enrollment %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+    <% if @user.accounts && !@user.accounts.empty? %>
+      <h2>Accounts <%= count_if_any(@user.accounts.count) %></h2>
+      <div class="accounts" style="font-size: 1.2em">
+        <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+          <% @user.accounts.each do |account| %>
+            <% num_enrollments += 1 %>
+            <li>
+              <a href="<%= url_for(account) %>">
+                <span class="name ellipsis"><%= account.name %></span>
+                <span class="subtitle ellipsis"></span>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <% if !@group_memberships.empty? %>
+      <h2>Groups <%= count_if_any(@group_memberships.count) %></h2>
+      <div class="groups" style="font-size: 1.2em">
+        <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
+          <% @group_memberships.each do |membership| %>
+            <% num_enrollments += 1 %>
+            <li>
+              <a href="<%= group_path(membership.group) %>">
+                <span class="name ellipsis"><%= membership.group.name %></span>
+                <span class="subtitle ellipsis"><%= membership.group.context.name rescue "" %></span>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    
+    <% if num_enrollments == 0 %>
+      <div style="font-size: 1.2em;">None yet.</div>
+    <% end %>
+    
+    </div>
+  </fieldset>
+  </div>
+  
+  <% unless !page_views_enabled? || @page_views.total_pages == 0 %>
+    <h3>
+      Page Views
+    </h3>
+  
+    <% if @page_views.total_pages < 5 %>
+      <h2 style="clear:both;">Page views over time</h2>
+      <div id='chart_div' style='width: 960px; height: 240px;'></div>
+    <% end %>
+  
+    <%= render :partial => 'page_views/table' %>
+  <% end %>
+</div>
+
+
+<% jammit_js :user %>
+<% if page_views_enabled? && @page_views.total_pages < 5 %>
+<% js_block do %>
+  <!--Load the GOOGLE AJAX API-->
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+  <script type="text/javascript">
+    var pageViewData = <%= raw(@user.page_view_data.to_json) rescue '{}' %>;
+    google.load('visualization', '1', {'packages':['annotatedtimeline']});
+    google.setOnLoadCallback(function(){
+      var data = new google.visualization.DataTable();
+      data.addColumn('date', 'Date');
+      $.each(pageViewData.labels, function(i){
+        data.addColumn('number', this);
+        data.addColumn('string', 'title'+i);
+        data.addColumn('string', 'text'+i);
+      });
+      
+      var rows = [];
+      
+      $.each(pageViewData.days, function(i) {
+        var date = new Date();
+        date.setTime(this[0]);
+        this[0] = date;
+        rows.push(this);
+      });
+      data.addRows(rows);
+
+      var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
+      chart.draw(data, {displayAnnotations: false});
+      
+    });
+  </script>
+<% end %>
+<% end %>

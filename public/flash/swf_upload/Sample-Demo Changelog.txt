@@ -1,0 +1,22 @@
+ * SWFUpload Demos, January 2009, www.swfupload.org, swfupload.googlecode.com
+
+ * --------- Version 2.2.0 -----------
+ * = Updated for v2.2.0 features and other cosmetic changes
+
+ * --------- Version 2.2.0 Beta 1 ~ 5 -----------
+ * + Added Speed Demo
+ * = Updated Demos for fixed uploadSuccess event
+ * + Applied the fixed Queue Plugin to all the correct demos
+ * + Added External Interface Demo (for testing what will break the EI)
+ * = Fixed FileProgress to re-display if hidden when modified
+ * + Updated all demos for Flash Player 10
+ * + Added new SWFUpload functionality to Features Demo
+ * + Added Overlay demo showing how to do a transparent button overlay
+ * - Dropped v1.0.2 Demo
+ * = Removed Graceful Degradation plugin
+
+ * --------- Version 2.1.0 -----------
+ * + Features Demo uses new destroy function
+ * + Split Core and Demo
+ 
+ */

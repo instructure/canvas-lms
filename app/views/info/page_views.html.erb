@@ -1,0 +1,81 @@
+<% content_for :page_title do %>Page Views<% end %>
+
+<% content_for :page_header do %>
+  <h1>Page Views</h1>
+<% end %>
+
+<% content_for :page_subhead do %>
+  <h2>User views</h2>
+<% end %>
+
+<style>
+.render_time.long {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.render_time.really_long {
+  color: #f00;
+  font-size: 1.2em;
+}
+</style>
+<% js_block do %>
+<script>
+function poll() {
+  poll.delay = poll.delay || 10000;
+//  if(poll.paused) { 
+//    setTimeout(poll, 1000);
+//    return; 
+//  }
+  $(".refresh_link").text("Refreshing...");
+  $.ajaxJSON(location.href, 'GET', {}, function(data) {
+    $(".refresh_link").text("Refresh");
+    var last_id = data[0].page_view.id;
+    for(var i = 0; i < data.length; i++) {
+      var $view = $("#page_view_" + i);
+      var view = data[i].page_view;
+      view.created_at_string = $.parseFromISO(view.created_at).datetime_formatted;
+      $view.fillTemplateData({
+        data: view
+      });
+      $view.find("a").attr('href', view.url);
+      $view.find(".render_time").toggleClass('long', view.render_time > 1.0);
+      $view.find(".render_time").toggleClass('really_long', view.render_time > 2.0);
+      $view.find("a.as_user").attr('href', view.url + "?as_user_id=" + view.user_id);
+    }
+//    if(poll.last_id == last_id && poll.delay < 60000) {
+//      poll.delay = poll.delay + 5000;
+//    } else {
+//      poll.delay = 10000;
+//    }
+//    setTimeout(poll, poll.delay);
+  }, function() {
+    $(".refresh_link").text("Refresh");
+//    setTimeout(poll, 120000);
+  });
+}
+$(document).ready(function() {
+//  setTimeout(poll, 10000);
+  $(".refresh_link").click(function(event) {
+    event.preventDefault();
+    poll();
+//    poll.paused = !poll.paused;
+//    $(this).text(poll.paused ? "Resume" : "Pause");
+  });
+});
+</script>
+<% end %>
+<a href="#" class="refresh_link">Refresh</a>
+<div id="page_views">
+  <% @views.each_index do |idx| %>
+    <% page_view = @views[idx] %>
+    <div class="page_view" id="page_view_<%= idx %>" style="margin: 5px; border-bottom: 1px solid #ccc; padding: 2px 20px;">
+      <a class="url" href="<%= page_view.url %>"><%= page_view.url %></a>
+      <span class="created_at_string" style="float: right;"><%= datetime_string(page_view.created_at) %></span>
+      <div style="font-size: 0.8em; padding-left: 30px;">
+        <span class="user_name"><%= page_view.user_name %></span>
+        <a href="<%= page_view.url %>?as_user_id=<%= page_view.user_id %>" class="as_user" style="padding-left: 15px;">(as user)</a>
+        <span class="render_time <%= 'long' if (page_view.render_time || 0) > 1.0 %> <%= 'really_long' if (page_view.render_time || 0) > 2.0 %>" style="padding-left: 20px;"><%= page_view.render_time %></span>s
+      </div>
+    </div>
+  <% end %>
+</div>

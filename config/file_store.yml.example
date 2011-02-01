@@ -1,0 +1,16 @@
+development:
+  storage: local
+  path: tmp/files
+     
+test:
+  storage: local
+  path: tmp/files
+
+production:
+  storage: local
+  path: tmp/files
+
+## amazon storage example. requires valid amazon_s3.yml
+#
+# production:
+#   storage: s3

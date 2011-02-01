@@ -1,0 +1,204 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+class EportfoliosController < ApplicationController
+  include EportfolioPage
+  before_filter :require_user, :only => [:index, :user_index]
+  
+  def index
+    user_index
+    # @portfolios = Eportfolio.find_all_by_public(true)
+  end
+  
+  def user_index
+    @active_tab = "eportfolios"
+    @context = UserProfile.new(@current_user)
+    @active_tab = "eportfolios"
+    add_crumb(@current_user.short_name, profile_url)
+    add_crumb("ePortfolios")
+    @portfolios = @current_user.eportfolios.active.find(:all, :order => :updated_at)
+    render :action => 'user_index'
+  end
+  
+  def create
+    if authorized_action(Eportfolio.new, @current_user, :create)
+      @portfolio = @current_user.eportfolios.build(params[:eportfolio])
+      respond_to do |format|
+        if @portfolio.save
+          @portfolio.setup_defaults
+          flash[:notice] = "Porfolio successfully created"
+          format.html { redirect_to eportfolio_url(@portfolio) }
+          format.json { render :json => @portfolio.to_json(:permissions => {:user => @current_user, :session => session}) }
+        else
+          format.html { render :action => "new" }
+          format.json { render :json => @portfolio.errors.to_json, :status => :bad_request }
+        end
+      end
+    end
+  end
+  
+  def show
+    @portfolio = Eportfolio.active.find(params[:id])
+    if params[:verifier] == @portfolio.uuid
+      session[:eportfolio_ids] ||= []
+      session[:eportfolio_ids] << @portfolio.id
+    end
+    if authorized_action(@portfolio, @current_user, :read)      
+      @category = @portfolio.eportfolio_categories.first rescue nil
+      @category ||= @portfolio.setup_defaults
+      @page = @category.eportfolio_entries.first
+      @owner_view = @portfolio.user == @current_user && params[:view] != 'preview'
+      if @owner_view
+        @used_submission_ids = []
+        @portfolio.eportfolio_entries.each do |entry|
+          entry.content_sections.each do |s|
+            @used_submission_ids << s[:submission_id].to_i if s[:section_type] == "submission"
+          end
+        end
+      end
+      @show_left_side = true
+      eportfolio_page_attributes
+      render :template => "eportfolios/show"
+    end
+  end
+  
+  def update
+    @portfolio = Eportfolio.find(params[:id])
+    if authorized_action(@portfolio, @current_user, :update)
+      respond_to do |format|
+        if @portfolio.update_attributes(params[:eportfolio])
+          @portfolio.setup_defaults
+          flash[:notice] = "Porfolio successfully updated"
+          format.html { redirect_to eportfolio_url(@portfolio) }
+          format.json { render :json => @portfolio.to_json(:permissions => {:user => @current_user, :session => session}) }
+        else
+          format.html { render :action => "edit" }
+          format.json { render :json => @portfolio.errors.to_json, :status => :bad_request }
+        end
+      end
+    end
+  end
+  
+  def destroy
+    @portfolio = Eportfolio.find(params[:id])
+    if authorized_action(@portfolio, @current_user, :delete)
+      respond_to do |format|
+        if @portfolio.destroy
+          flash[:notice] = "Portfolio successfully deleted"
+          format.html { redirect_to profile_url }
+          format.json { render :json => @portfolio.to_json }
+        else
+          format.html { render :action => "delete" }
+          format.json { render :json => @portfolio.errors.to_json, :status => :bad_request }
+        end
+      end
+    end
+  end
+  
+  def reorder_categories
+    @portfolio = Eportfolio.find(params[:eportfolio_id])
+    if authorized_action(@portfolio, @current_user, :update)
+      order = params[:order].split(",")
+      order.each do |id|
+        category = @portfolio.eportfolio_categories.find_by_id(id)
+        category.move_to_bottom if category
+      end
+      respond_to do |format|
+        format.json { render :json => @portfolio.eportfolio_categories.map{|c| [c.id, c.position]}.to_json, :status => :ok }
+      end
+    end
+  end
+  
+  def reorder_entries
+    @portfolio = Eportfolio.find(params[:eportfolio_id])
+    if authorized_action(@portfolio, @current_user, :update)
+      @category = @portfolio.eportfolio_categories.find(params[:eportfolio_category_id])
+      order = params[:order].split(",")
+      order.each do |id|
+        entry = @category.eportfolio_entries.find_by_id(id)
+        entry.move_to_bottom if entry
+      end
+      respond_to do |format|
+        format.json { render :json => @portfolio.eportfolio_entries.map{|c| [c.id, c.position]}.to_json, :status => :ok }
+      end
+    end
+  end
+  
+  def export
+    @portfolio = Eportfolio.find(params[:eportfolio_id])
+    if authorized_action(@portfolio, @current_user, :update)
+      @attachments = @portfolio.attachments.find_all_by_display_name("eportfolio.zip").select{|a| ['to_be_zipped', 'zipping', 'zipped'].include?(a.workflow_state) }.sort_by{|a| a.created_at }
+      @attachment = @attachments.pop
+      @attachments.each{|a| a.destroy! }
+      if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@portfolio.eportfolio_entries.map{|s| s.updated_at}.compact.max || @attachment.created_at))
+        @attachment.destroy!
+        @attachment = nil
+      end
+      
+      if !@attachment
+        @attachment = @portfolio.attachments.build(:display_name => 'submissions.zip')
+        @attachment.workflow_state = 'to_be_zipped'
+        @attachment.file_state = '0'
+        @attachment.save!
+      end
+      if params[:compile] && @attachment.to_be_zipped?
+        ContentZipper.send_later_if_production(:process_attachment, @attachment)
+        render :json => @attachment.to_json
+      else
+        respond_to do |format|
+          if @attachment.zipped?
+            format.json { render :json => @attachment.to_json(:methods => :readable_size) }
+            if Attachment.s3_storage?
+              format.html { redirect_to @attachment.cacheable_s3_url }
+              format.zip { redirect_to @attachment.cacheable_s3_url }
+            else
+              format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
+              format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
+            end
+          else
+            flash[:notice] = "File zipping still in process..."
+            format.json { render :json => @attachment.to_json }
+            format.html { redirect_to eportfolio_url(@portfolio.id) }
+            format.zip { redirect_to eportfolio_url(@portfolio.id) }
+          end
+        end
+      end
+    end
+  end
+  
+  def public_feed
+    @portfolio = Eportfolio.find(params[:eportfolio_id])
+    respond_to do |format|
+      if @portfolio.public || params[:verifier] == @portfolio.uuid
+        @entries = @portfolio.eportfolio_entries.find(:all, :order => 'eportfolio_entries.created_at DESC')
+        feed = Atom::Feed.new do |f|
+          f.title = "#{@portfolio.name} Feed"
+          f.links << Atom::Link.new(:href => eportfolio_url(@portfolio.id))
+          f.updated = @entries.first.updated_at rescue Time.now
+          f.id = eportfolio_url(@portfolio.id)
+        end
+        @entries.each do |e|
+          feed.entries << e.to_atom(:private => params[:verifier] == @portfolio.uuid)
+        end
+        format.atom { render :text => feed.to_xml }
+      else
+        authorized_action(nil, nil, :bad_permission)
+      end
+    end
+  end
+end

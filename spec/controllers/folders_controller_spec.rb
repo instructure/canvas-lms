@@ -1,0 +1,124 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
+describe FoldersController do
+  def io
+    require 'action_controller'
+    require 'action_controller/test_process.rb'
+    ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/doc.doc'), 'application/msword', true)
+  end
+  
+  def course_folder
+    @folder = @course.folders.create(:name => "some folder")
+  end
+  
+  describe "GET 'show'" do
+    it "should not return hidden files for students" do
+      course_with_student_logged_in(:active_all => true)
+      course_folder
+      file = @folder.active_file_attachments.build(:filename => 'long_unique_filename', :uploaded_data => io)
+      file.context = @course
+      file.save!
+      
+      get 'show', :course_id => @course.id, :id => @folder.id, :format => 'json'
+      json = JSON.parse(response.body)
+      json['files'].count.should eql(1)
+      
+      file.hidden = true
+      file.save!
+      get 'show', :course_id => @course.id, :id => @folder.id, :format => 'json'
+      json = JSON.parse(response.body)
+      json['files'].count.should eql(0)
+    end
+  end
+  
+  describe "PUT 'update'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      course_folder
+      put 'update', :course_id => @course.id, :id => @folder.id
+      assert_unauthorized
+    end
+    
+    it "should update folder" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_folder
+      put 'update', :course_id => @course.id, :id => @folder.id, :folder => {:name => "new name"}
+      response.should be_redirect
+      assigns[:folder].should_not be_nil
+      assigns[:folder].should eql(@folder)
+      assigns[:folder].name.should eql("new name")
+    end
+  end
+  
+  describe "POST 'create'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      post 'create', :course_id => @course.id, :folder => {:name => "folder"}
+      assert_unauthorized
+    end
+    
+    it "should create folder" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create', :course_id => @course.id, :folder => {:name => "new name"}
+      response.should be_redirect
+      assigns[:folder].should_not be_nil
+      assigns[:folder].name.should eql("new name")
+    end
+    
+    it "should force new folders to be sub_folders" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create', :course_id => @course.id, :folder => {:name => "new name"}
+      response.should be_redirect
+      assigns[:folder].should_not be_nil
+      assigns[:folder].name.should eql("new name")
+      assigns[:folder].parent_folder_id.should_not be_nil
+      # assigns[:folder].parent_folder.name.should eql("unfiled")
+    end
+    
+    it "should create sub_folder" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_folder
+      post 'create', :course_id => @course.id, :folder => {:name => "new folder", :parent_folder_id => @folder.id}
+      response.should be_redirect
+    end
+  end
+  
+  describe "DELETE 'destroy'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      course_folder
+      delete 'destroy', :course_id => @course.id, :id => @folder.id
+      assert_unauthorized
+    end
+    
+    it "should delete folder" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_folder
+      delete 'destroy', :course_id => @course.id, :id => @folder.id
+      response.should be_redirect
+      assigns[:folder].should_not be_frozen
+      assigns[:folder].should be_deleted
+      @course.reload
+      @course.folders.should be_include(@folder)
+      @course.folders.active.should_not be_include(@folder)
+    end
+  end
+end

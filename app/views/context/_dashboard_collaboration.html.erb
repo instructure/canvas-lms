@@ -1,0 +1,35 @@
+<% collab = dashboard_collaboration; show_context ||= false %>
+<div style="<%= hidden unless collab %>" class="communication_message message_<%= collab.try_rescue(:context_code) || "no_context" %> <%= 'show_context_communication_message' if show_context %>">
+  <div class="header">
+    <div class="header_title">
+      <%= image_tag "#{collab.try_rescue(:style_class) || 'collaboration'}_icon.ico", :alt => collab.try_rescue(:collaboration_type), :title => collab.try_rescue(:service_name), :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
+      <a href="<%= context_prefix(collab.try_rescue(:context_code)) %>/collaborations/<%= collab.try_rescue(:id) || "{{ id }}" %>" class="title subject"><%= collab.try_rescue(:title) %></a>
+      <div class="sub_title">
+        <span class="context_code group_<%= collab.try_rescue(:context_code) %>"><%= cached_context_short_name(collab.try_rescue(:context_code)) %></span>
+        <a href="<%= context_prefix(collab.try_rescue(:context_code)) %>/users/<%= collab.try_rescue(:user_id) || "{{ user_id }}" %>" class="user_name"><%= context_user_name(collab.try_rescue(:context_code), collab.try_rescue(:user_id)) || nbsp %></a>
+      </div>
+    </div>
+    <div class="post_date time_ago_date"><%= datetime_string(collab.try_rescue(:created_at)) || nbsp %></div>
+    <div class="clear"></div>
+  </div>
+  <div class="content">
+    <div class="course_id" style="display: none;"><%= collab.context_id if collab && collab.context_type == "Course" %></div>
+    <div class="course_role" style="display: none;"><%= @role_lookups["#{collab.try_rescue(:context_code)}"] if @role_lookups %></div>
+    <div class="message user_content">
+      <%= user_content(collab.try_rescue(:description), collab.try_rescue(:context_code), collab.try_rescue(:asset_string)) || nbsp %>
+    </div>
+    <div class="links">
+      <div style="float: left; display: none;">Last viewed <span class="time_ago_date"><%= datetime_string(collab.try_rescue(:updated_at)) %></span></div>
+      <div style="float: right;"><a href="#" class="show_collaborators_link show_users_link"><%= pluralize(collab.try_rescue(:users).try_rescue(:length) || 1, "Collaborator") %></a></div>
+      <div class="clear"></div>
+    </div>
+    <ul style="display: none;" class="collaborators_list users_list">
+      <% (collab.try_rescue(:users) || []).each do |user| %>
+        <li class="collaborator">
+          <a href="<%= context_prefix(collab.try_rescue(:context_code)) %>/users/<%= user.id %>" class="user_name"><%= context_user_name(collab.try_rescue(:context_code), user) %></a><br/>
+        </li>
+      <% end %>
+    </ul>      
+    <div class="clear"></div>
+  </div>
+</div>

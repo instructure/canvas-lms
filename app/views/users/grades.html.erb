@@ -1,0 +1,132 @@
+<% add_crumb(@current_user.short_name, context_url(@current_user, :context_url))
+   add_crumb("Grades", grades_path) %>
+
+<% content_for :page_title do %>
+  Grades - <%= @current_user.name %>
+<% end %>
+
+<% if false %>
+<% #TODO: implement previous courses  %>
+<% content_for :right_side do %>
+    <div class="rs-margin-lr rs-margin-top">
+        <a href="#" class="previous_courses_link"><%= image_tag "history.png" %> Show Previous Courses</a>
+    </div>
+<% end %>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(".previous_courses_link").click(function(event) {
+    event.preventDefault();
+    $("#previous_courses").show();
+    $("html,body").scrollTo($("#previous_courses"));
+  });
+});
+</script>
+<% end %>
+<style>
+.course_details { 
+  border-collapse: collapse;
+  min-width: 400px;
+  margin-left: 20px;
+  border-spacing: 0;
+}
+.course_details th {
+  text-align: left;
+}
+.course_details tr:hover td {
+  background-color: #eee;
+}
+.course_details td {
+  border-bottom: 1px solid #ccc;
+}
+.course_details .course {
+  font-size: 1.2em;
+  padding: 6px 50px 6px 5px;
+  vertical-align: top;
+}
+.course_details .percent {
+  text-align: right;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding-right: 5px;
+}
+</style>
+<% unless @student_enrollments.empty? %>
+<h2>Courses I'm Taking</h2>
+<table class="course_details">
+<% @student_enrollments.each do |enrollment| %>
+  <tr>
+    <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= @course_names[enrollment.course_id] %></a></td>
+    <td class="percent">
+      <% if enrollment.computed_current_score && enrollment.is_a?(StudentEnrollment) %>
+        <%= enrollment.computed_current_score %>%
+      <% else %>
+        <span style="font-weight: normal; font-size: 0.9em;">no grade</span>
+      <% end %>
+    </td>
+    <td style="display: none;"><a href="#" title="Send a Message to the Teacher" class="no-hover"><%= image_tag "email.png" %></a></td>
+  </tr>
+<% end %>
+</table>
+<% end %>
+<% unless @observed_enrollments.empty? %>
+<h2 style="margin-top: 20px;">Linked Student Accounts</h2>
+<table class="course_details">
+<% @observed_enrollments.each do |enrollment| %>
+  <tr>
+    <td class="course"><a href="<%= course_grades_path(enrollment.course_id) %>"><%= context_user_name(nil, enrollment.user_id) %>, <%= @course_names[enrollment.course_id] %></a></td>
+    <td class="percent">
+      <% if enrollment.computed_current_score && enrollment.is_a?(StudentEnrollment) %>
+        <%= enrollment.computed_current_score %>%
+      <% else %>
+        <span style="font-weight: normal; font-size: 0.9em;">no grade</span>
+      <% end %>
+    </td>
+    <td style="display: none;"><a href="#" title="Send a Message to the Teacher" class="no-hover"><%= image_tag "email.png" %></a></td>
+  </tr>
+<% end %>
+</table>
+<% end %>
+<% unless @teacher_enrollments.empty? %>
+<h2 style="margin-top: 20px;">Courses I'm Teaching</h2>
+<table class="course_details">
+<% @teacher_enrollments.each do |enrollment| %>
+  <tr>
+    <td class="course" style="vertical-align: middle;"><a href="<%= course_gradebook_path(enrollment.course_id) %>"><%= @course_names[enrollment.course_id] %></a></td>
+    <td class="percent">
+      <% if @course_grade_summaries[enrollment.course_id] && @course_grade_summaries[enrollment.course_id][:score] %>
+        <%= @course_grade_summaries[enrollment.course_id][:score] %>%
+        <div style="font-size: 0.6em; font-weight: normal;">average for<br/><%= pluralize(@course_grade_summaries[enrollment.course_id][:students], "student") %></div>
+      <% else %>
+        <span style="font-weight: normal; font-size: 0.9em;">no grades</span>
+      <% end %>
+    </td>
+    <td style="display: none;"><a href="#" title="Send a Message to the Teacher" class="no-hover"><%= image_tag "email.png" %></a></td>
+  </tr>
+<% end %>
+</table>
+<% end %>
+<% unless @prior_enrollments.empty? %>
+<div style="margin-top: 20px; display: none;" id="previous_courses">
+<h2>Previous Courses</h2>
+<table class="summary" style="margin-left: 20px; min-width: 350px;">
+  <thead><tr>
+    <th>Course</th>
+    <th>Percent</th>
+  </tr></thead>
+  <% @prior_enrollments.each do |enrollment| %>
+    <tr>
+      <td><%= @course_names[enrollment.course_id] %></td>
+      <td>
+        <% if enrollment.computed_current_score %>
+          <%= enrollment.computed_current_score %>%
+        <% else %>
+          --
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+</div>
+<% end %>

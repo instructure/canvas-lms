@@ -1,0 +1,137 @@
+@import environment.sass
+.context_message
+  background-color: transparent
+  .show_message_body
+    display: none
+  &.read
+    background-color: transparent
+    .show_message_body
+      text-align: right
+      font-size: 0.8em
+      display: block
+      a
+        color: #888
+    .post_date,.sub_title,.sub_title a
+      color: #aaa
+    .header_icon,.header_title .title
+      cursor: pointer
+    .content
+      max-height: 1.2em
+      overflow: hidden
+      cursor: pointer
+    .header .header_title .title
+      font-weight: normal
+    .mark_as_read_link
+      display: none
+  &.read_open
+    .content
+      max-height: 500px
+      overflow: auto
+      cursor: auto
+    
+.context_message .recipients_list_holder
+  margin-left: 40px
+.context_message .recipients_list 
+  padding: 0
+  margin: 3px 15px
+  font-size: 0.8em
+  list-style-type: none
+.shown_context_message .communication_message
+  border-bottom: 1px solid #aaa
+  padding-bottom: 20px
+  margin-bottom: 40px
+  padding-top: 10px
+  border-top: 1px solid #aaa
+
+.recipient 
+  .email, .short_name
+    margin-left: 10px
+    font-size: 0.7em
+.recipients_dialog .select_recipients_link.selected
+  font-weight: bold
+.send_message_form
+  border-bottom: 1px solid #ddd
+  padding-bottom: 10px
+  .recipients
+    .recipient,.no_recipients
+      float: left
+    .recipient
+      border: 1px solid #ccc
+      background-color: #E1ECF6
+      +border-radius(3px)
+      padding: 1px 2px
+      margin: 1px 2px
+      a
+        text-decoration: none
+        font-size: 1.2em
+        line-height: 0.8em
+  .context_message
+    border: 1px solid #ccc
+    +border-radius(3px)
+    margin-left: 0
+    margin-right: 0
+    width: 98%
+    padding-left: 2px
+    padding-right: 2px
+    
+#message_list
+  .inbox_item
+    display: none
+  &.show_context_message .context_message,
+  &.show_submission_comment .submission_comment,
+  &.show_discussion_entry .discussion_entry
+    display: block
+.inbox_item
+  .content
+    padding-top: 0
+    .inner_content
+      cursor: pointer
+  .header
+    .delete_inbox_item_link,.reply_inbox_item_link
+      opacity: 0.2
+    padding-bottom: 0
+    .inbox_item_link .user_name
+      font-weight: normal
+    .unread_icons
+      display: inline
+    .read_icons
+      display: none
+    .header_icon
+      width: 20px
+      height: 20px
+      &.discussion_header_icon,
+      &.submission_header_icon
+        display: none
+  &:hover
+    .header 
+      .delete_inbox_item_link,.reply_inbox_item_link
+        +opacity(1.0)
+  &.read
+    a.title.inbox_item_link
+      color: #666
+    .content
+      color: #888
+    .post_date,.sub_title,.sub_title a
+      color: #aaa
+    .header .header_title .title
+      font-weight: normal
+    .unread_icons
+      display: none
+    .read_icons
+      display: inline
+    
+  &.discussion_entry
+    .header_icon
+      &.email_header_icon,
+      &.submission_header_icon
+        display: none
+      &.discussion_header_icon
+        display: inline
+  &.submission_comment
+    .header_icon
+      &.email_header_icon,
+      &.discussion_header_icon
+        display: none
+      &.submission_header_icon
+        display: inline
+  

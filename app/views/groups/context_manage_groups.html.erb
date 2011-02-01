@@ -1,0 +1,214 @@
+<% content_for :page_title do %>Course Groups: <%= @context.name %><% end %>
+<% content_for :right_side do %>
+  <div class="rs-margin-lr rs-margin-top">
+    <a href="#" class="add_category_link button button-sidebar-wide"><%= image_tag "add.png" %> Make a New Set of Groups</a>
+    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> View <%= @context.class.to_s %> Roster</a>
+  </div>
+  <h2 id="category_header" style="margin-top: 10px;<%= hidden if !@categories || @categories.empty? %>">Group Pages</h2>
+  <div class="rs-margin-lr">
+    <%= render :partial => 'secondary_category', :collection => @categories %>
+    <%= render :partial => 'secondary_category', :object => nil %>
+  </div>
+<% end %>
+<% content_for :stylesheets do %>
+<style>
+#group_tabs .group_category {
+  position: relative;
+  height: 300px;
+}
+#group_tabs .left_side {
+  position: relative;
+  overflow: auto;
+  height: 200px;
+  margin-right: 5px;
+}
+#group_tabs .right_side {
+  position: relative;
+  overflow: auto;
+  height: 200px;
+  margin-left: 5px;
+}
+#group_tabs .group_category > .group {
+  width: 45%;
+  float: left;
+  clear: left;
+}
+
+#group_tabs .group_category .group {
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+#group_tabs .group_category .group .load-more {
+  background: #DDD;
+}
+
+#group_tabs .group_category .group .inner-wrapper {
+  padding: 5px;
+}
+
+#group_tabs .group_category .category_header {
+  margin-bottom: 5px; 
+  text-align: left; 
+  -moz-border-radius: 5px;
+  padding: 5px;
+}
+#group_tabs .group_category .category_header .category_name {
+  font-weight: bold;
+}
+#group_tabs .group_category .category_header .links {
+  float: right;
+  clear: right;
+}
+#group_tabs .group_category .group h3 {
+  
+}
+#group_tabs .group_category .group.editing .links,
+#group_tabs .group_category .group.editing .name {
+  display: none;
+}
+#group_tabs .group_category .right_side {
+  float: right;
+  width: 45%;
+}
+#group_tabs h3 {
+  margin-bottom: 0.4em;
+}
+#group_tabs .group_category .group_blank {
+  width: auto;
+}
+#group_tabs .group_category .group_blank .links a {
+  display: none;
+}
+#group_tabs .group_category .group_blank .links a.blank_link {
+  display: inline;
+}
+#group_tabs .group_category .group .group_user_count {
+  font-size: 0.8em; 
+  margin-left: 10px; 
+  line-height: 1.0em;
+  padding-bottom: 2px;
+  float: right;
+  clear: right;
+}
+#group_tabs .group_category .group.editing .group_user_count {
+  display: none;
+}
+#group_tabs .group_category .group .links {
+  float: right;
+  clear: right;
+  visibility: hidden;
+}
+#group_tabs .group_category .group.group-hover .links {
+  visibility: visible;
+}
+#group_tabs .group_category .group.group-hover.editing .links {
+  visibility: hidden;
+}
+#group_tabs .group_category .group .student_list {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 15px;
+  max-height: 300px;
+  overflow: auto;
+  clear: both;
+}
+#group_tabs .group_category .group.hover {
+  border: 2px dashed #aaa;
+  min-height: 30px;
+}
+a.load_members_link, .loading_members {
+  text-align: center;
+  width: 100%;
+  display: block;
+  clear: both;
+}
+.student {
+  background-color: #fff;
+  list-style-type: none;
+  cursor: move;
+  padding: 1px 3px;
+}
+.student:hover, .student.dragging {
+  background-color: #eee;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+</style>
+<% end %>
+
+<% jammit_js :manage_groups %>
+
+<% if @context.is_a?(Course) && @context.students.empty? %>
+  <div style="text-align: center;" id="no_students_message">
+    No students have been added for this course
+    <div style="margin: 20px; font-size: 1.2em;">
+      <a href="<%= context_url(@context, :context_details_url) %>#add_students" style="padding-left: 20px;">Add Students to the Course</a>
+    </div>
+  </div>
+<% else %>
+  <div style="display: none;" id="manage_group_urls">
+    <a href="<%= group_add_user_url("{{ id }}") %>" class="add_user_url">&nbsp;</a>
+    <a href="<%= group_remove_user_url("{{ id }}") %>" class="remove_user_url">&nbsp;</a>
+    <a href="<%= group_members_url("{{ id }}") %>" class="list_users_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_group_unassigned_members_url) %>" class="list_unassigned_users_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_groups_url) %>" class="add_group_url" %>&nbsp;</a>
+  </div>
+  
+  <div id="tabs_loading_wrapper" style="display: none;">
+    <div style="text-align: left; <%= hidden unless @categories.empty? %>" id="no_groups_message">
+      <% if @context.is_a?(Account) %>
+        <h2>Account-level Student Groups</h2>
+        <p>Account-level student groups are a good way to group students without being
+        tied to a specific course. Every student group gets their own calendar, discussion 
+        board and collaboration tools so they can organize themselves and work together
+        more effectively.</p>
+      <% else %>
+        <h2>Student Groups</h2>
+        <p>Student groups are a useful way to organize students for things like group projects or 
+        papers.  Every student group gets their own calendar, discussion board and collaboration
+        tools so they can organize themselves and work together more effectively.</p>
+  
+        <p>You can randomly assign students to groups of a specific size, or manually
+        create and organize the groups.  Once your groups are created, you can set assignments
+        to be "group submission" assignments, which means each group will have one submission for
+        all users of that group.</p>
+      <% end %>
+  
+      <p>To get started, click the "Make a New Set of Groups" link to the right.</p>
+    </div>
+    <div id="group_tabs" style="<%= hidden if @categories.empty? %>;">
+      <ul id="category_list">
+        <% @categories.each do |category| %>
+          <li class="category"><a href="#<%= category.unpack('H*') %>"><%= category %></a></li>
+        <% end %>
+      </ul>
+      <%= render :partial => "category", :collection => @categories %>
+    </div>
+  </div>
+
+  <ul style="display: none;">
+    <li class="student user_template" title="Click and drag to move student to another group.">
+      <span class="name"></span>
+      <span class="user_id" style="display: none"></span>
+    </li>
+  </ul>
+
+  <% form_for [@context, Group.new], :html => {:id => "edit_group_form", :style => "display: none;"} do |f| %>
+    <%= f.text_field :name, :style => "width: 95%;" %>
+    <div style="font-size: 0.8em; margin: 4px 10px; float: left; display: none;">
+      <%= f.text_field :max_membership, :style => "width: 25px;" %> users or less
+    </div>
+    <div class="button-container">
+      <button type="submit" class="button small-button">Update</button>
+      <button type="button" class="button-secondary cancel_button">Cancel</button>
+    </div>
+    <div class="clear"></div>
+  <% end %>
+  <div style="display: none;">
+    <%= render :partial => "category", :object => nil %>
+  </div>
+  <%= render :partial => "groups/add_group_category" %>
+<% end %>

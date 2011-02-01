@@ -1,0 +1,13 @@
+<% define_content :link do %>
+  http://<%= HostUrl.default_host %>/communication_channels/<%= asset.id %>/merge/<%= asset.confirmation_code %>
+<% end %>
+
+
+<% define_content :subject do %>
+  Claim Email: Canvas
+<% end %>
+
+Someone is requesting the use of this email address, <%= asset.path %>, for their account at <%=  (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>.  Right now this address is being used by <%= asset.user.name %> (id: <%= asset.user_id %>).
+
+If you would like to assign this email address to a different user, please visit the following url:
+<%= content :link %>

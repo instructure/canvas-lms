@@ -1,0 +1,14 @@
+<% group = group_detailed || nil %>
+<li class="group">
+  <span class="name"><%= group.name %></span>
+  <a class="link" href="<%= context_url(@context, :context_group_url, group.id, :join => 1) %>">
+    <% if group.auto_accept?(@current_user) %>
+      join this group
+    <% else %>
+      ask to join this group
+    <% end %>
+  </a>
+  <div class="members">
+    <%= pluralize(group.participating_users.length, 'Member') %>
+  </div>
+</li>

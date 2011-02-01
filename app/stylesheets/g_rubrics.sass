@@ -1,0 +1,202 @@
+table.rubric
+  :margin-top 20px
+  :border-collapse collapse
+  //for some reason, chrome puts a scrollbar on the table in the extended gradebook if it is 100%
+  :width 99.9%
+  :page-break-inside avoid
+
+  thead th
+    :background-color #ccc
+  td, th
+    :border 1px solid #aaa
+    :padding 2px 5px
+
+  tr.criterion td.criterion_description
+    // :max-width 150px
+
+    .container 
+      :position relative
+      :font-size 0.9em
+
+    .links
+      :display none
+      :position absolute
+      :bottom 0
+      :right 0
+      
+    .learning_outcome_flag,.threshold
+      display: none
+    
+    .long_description_holder  
+      font-size: 0.8em
+      display: block
+      &.empty
+        display: none
+    &hover .links
+      :display block
+
+    &.editinghover .links 
+      :display none
+  tr.criterion.learning_outcome_criterion 
+    td.criterion_description
+      .learning_outcome_flag
+        display: inline
+      .threshold
+        font-size: 0.8em
+        display: block
+        white-space: nowrap
+    td
+      .links
+        display: none
+        visibility: hidden
+      &.points_form
+        .editing
+          display: none
+        .displaying
+          display: block
+        .ignoring
+          display: none
+  tr.criterion.learning_outcome_criterion.ignore_criterion_for_scoring
+    .points_form
+      .editing
+        display: none
+      .displaying
+        display: none
+      .ignoring
+        display: block
+
+  table.ratings
+    :border-collapse collapse
+    :width 100%
+    :margin-left -1px
+    td 
+      :border 1px solid #aaa
+      :padding 2px 5px
+      :border-bottom-width 0
+      :border-right-width 0
+      :border-top-width 0
+      :font-size 0.8em
+      :vertical-align top
+      :padding 2px 8px
+
+      .container 
+        :padding 5px 0
+
+      .container 
+        :position relative
+
+      .links 
+        :display none
+        :position absolute
+        :bottom 0
+        :right 0
+
+      &.edge_rating .delete_rating_link
+        :display none
+
+  .editing
+    :display none
+  .ignoring
+    :display none
+    
+  .assessing
+    :display none
+    
+  td.criterion_description.completed 
+    :background-color #ddd
+  td.rating.selected 
+    :background-color #cfa
+  td.points_form
+    .criterion_comments
+      display: none
+    .displaying
+      .criterion_comments
+        display: inline
+        &.empty
+          display: none
+    
+  &.assessing
+    .points_form .editing
+      :display block
+      .criterion_comments
+        display: inline
+        &.empty
+          opacity: 0.3
+          &:hover 
+            opacity: 0.8
+    .points_form .displaying
+      :display none
+      .criterion_comments
+        display: inline
+        &.empty
+          display: none
+    
+    span.assessing
+      :display inline
+    div.assessing
+      :display block
+    div.not_assessing
+      :display none
+    
+    td.rating:hover 
+      :background-color #ad9
+      :cursor pointer
+    tr.criterion.learning_outcome_criterion 
+      td.points_form .editing
+        :display block
+      td.points_form .displaying
+        :display none
+    
+  &.editing 
+    .editing
+      :display block
+      
+    td.editing, th.editing
+      :display table-cell
+
+    .displaying
+      :display none
+
+    tr.criterion td.criterion_description
+      .long_description_holder  
+        font-size: 0.8em
+        font-weight: bold
+        &.empty
+          font-weight: normal
+          display: block
+    tr.criterion td.criterion_description:hover .links
+      :display block
+
+    table.ratings 
+      td.add_right 
+        :border-right-color #000
+        :background url(/images/add_right.png) no-repeat center right
+
+      td.add_left 
+        :border-left-color #000
+        :background url(/images/add_left.png) no-repeat center left
+
+      td.add_column 
+        :cursor pointer
+
+      td:hover .links
+        :display block
+
+.rubric_summary
+  margin-top: 0 !important
+  .rating_holder
+    margin-bottom: 3px
+  .rating
+    color: #777
+    font-style: italic
+    text-align: left
+  .rating_comments_dialog_link
+    font-size: 0.8em
+    max-height: 2.7em
+    cursor: pointer
+    overflow: hidden
+  .x_out_of_x
+    float: right
+  &.free_form
+    .rating.description 
+      display: none

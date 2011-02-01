@@ -1,0 +1,23 @@
+<% form_tag({:url => search_url}, { :id => 'search_query' }) do %>
+<table class="formtable">
+  <tr><td>
+    Search the content here.
+  </td></tr><tr><td style="text-align: right;">
+    <%= text_field :search, :query, :style => "width: 100%" %>
+  </td></tr><tr><td style="text-align: right;">
+    <%= select_tag(
+      :models, 
+      options_for_select(
+        %w(Announcement Assignment CalendarEvent DiscussionEntry WikiPage), 
+        "Assignment"), 
+      :multiple => true, :style => "width: 100%" 
+    ) %>
+  </td></tr><tr><td style="text-align: right;">
+    <%= submit_tag "Search" %>
+  </td></td>
+</table>
+<% end %>
+
+<% for result in @result %>
+  <p><%= result.title rescue result.message %> (<%= result.class.to_s %>)</p>
+<% end %>

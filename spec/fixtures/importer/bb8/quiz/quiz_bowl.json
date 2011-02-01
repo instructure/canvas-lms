@@ -1,0 +1,11 @@
+{
+    "question_name":"",
+    "question_text":"Yellow",
+    "incorrect_comments":"",
+    "unsupported":true,
+    "question_type":"Quiz Bowl",
+    "answers":[],
+    "migration_id":"_153013_1",
+    "correct_comments":"",
+    "points_possible":10.0
+}

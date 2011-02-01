@@ -1,0 +1,256 @@
+<% cache(['wiki_sidebar_render_', @context.cache_key, can_do(@context, @current_user, :manage_content).to_s, can_do(@context, @current_user, :manage_files).to_s].cache_key.to_s) do %>
+<% load_wiki_sidebar %>
+<div id="editor_tabs" style="display: none;">
+
+  <h4 style="font-size: 1.3em; font-weight: bold; padding-left: 10px; margin-bottom: 0.3em; color: #666;">Insert Content into the Page</h4>
+  <ul>
+    <li><a href="#editor_tabs_1">Links</a></li>
+    <li><a href="#editor_tabs_2">Files</a></li>
+    <li><a href="#editor_tabs_3">Images</a></li>
+  </ul>
+  <div id="editor_tabs_1">
+    Link to other content in the <%= @context.class.to_s.downcase %>.  Click any page
+    to insert a link to that page.
+    <div id="pages_accordion">
+      <% if @context.respond_to?(:wiki) %>
+      <a href="<%= context_url(@context, :context_wiki_page_url, '{{ page_url }}') %>" id="wiki_sidebar_wiki_url" style="display: none;">&nbsp;</a>
+      <div>
+        <h5 class="header"><a href="#">Wiki Pages</a></h5>
+        <div>
+            <ul class="wiki_pages page_list">
+              <% (@wiki_sidebar_data[:default_wiki_wiki_pages].select{|p| p.active? }.sort_by{|p| p.title || "" } rescue []).each do |wiki_page|  %>
+                <% if !wiki_page.hide_from_students || can_do(@context, @current_user, :manage_content) %>
+                  <li title="Click to insert a link to this page"><%= link_to wiki_page.title.titleize, context_url(@context, :context_wiki_page_url, wiki_page.url) rescue "" %></li>
+                <% end %>
+              <% end %>
+            </ul>
+            <%= link_to "Link to a New Page", context_url(@context, :new_context_wiki_page_url), :id => 'new_page_link', :class => "add" %>
+            <form id="new_page_drop_down" style="display:none; margin-left: 15px; margin-top: 5px;">
+              <label for="new_page_name">What would you like to call the new page?</label><br />
+              <input type="text" name="new_page_name" id="new_page_name">
+              <input type="hidden" name="new_page_url_prefix" value="<%= context_url(@context, :context_wiki_pages_url) %>" id="new_page_url_prefix" />
+              <button id="new_page_submit" class="button small-button" type="submit">Insert Link</button>
+            </form>
+        </div>
+      </div>
+      <% end %>
+      <% if @context.respond_to?(:assignments) %>
+      <div>
+        <h5 class="header"><a href="#">Assignments</a></h5>
+         <div>
+            <ul class="wiki_pages page_list">
+              <li title="Click to insert a link to this assignment"><%= link_to "Assignment List", context_url(@context, :context_assignments_url) %></li>
+              <% for assignment in @wiki_sidebar_data[:active_assignments].select{|a| !a.new_record?} %>
+                <li title="Click to insert a link to this assignment"><%= link_to assignment.title, context_url(@context, :context_assignment_url, assignment) %></li>
+              <% end %>
+            </ul>
+         </div>
+      </div>
+      <% end %>
+      <% if @context.respond_to?(:quizzes) %>
+      <div>
+        <h5 class="header"><a href="#">Quizzes</a></h5>
+         <div>
+            <ul class="wiki_pages page_list">
+              <li title="Click to insert a link to this assignment"><%= link_to "Quiz List", context_url(@context, :context_quizzes_url) %></li>
+              <% for quiz in @wiki_sidebar_data[:active_quizzes].select{|a| !a.new_record?} %>
+                <li title="Click to insert a link to this assignment"><%= link_to quiz.title, context_url(@context, :context_quiz_url, quiz) %></li>
+              <% end %>
+            </ul>
+         </div>
+      </div>
+      <% end %>
+      <% if @context.respond_to?(:announcements) %>
+      <div>
+        <h5 class="header"><a href="#">Announcements</a></h5>
+         <div>
+            <ul class="wiki_pages page_list">
+              <li title="Click to insert a link to this announcement"><%= link_to "Announcements List", context_url(@context, :context_announcements_url) %></li>
+              <% for announcement in @wiki_sidebar_data[:active_discussion_topics].select{|d| d.is_a?(Announcement) } %>
+                <li title="Click to insert a link to this announcement"><%= link_to announcement.title, context_url(@context, :context_announcement_url, announcement) %></li>
+              <% end %>
+            </ul>
+         </div>
+      </div>
+      <% end %>
+
+      <% if @context.respond_to?(:discussion_topics) %>
+      <div>
+        <h5 class="header"><a href="#">Discussions</a></h5>
+         <div>
+            <ul class="wiki_pages page_list">
+              <li title="Click to insert a link to this topic"><%= link_to "Discussion Index", context_url(@context, :context_discussion_topics_url) %></li>
+              <% for discussion_topic in @wiki_sidebar_data[:active_discussion_topics] %>
+                <li title="Click to insert a link to this topic"><%= link_to discussion_topic.title, context_url(@context, :context_discussion_topic_url, discussion_topic) %></li>
+              <% end %>
+            </ul>
+         </div>
+      </div>
+      <% end %>
+      
+      <div>
+        <h5 class="header"><a href="#"><%= @context.class.to_s %> Navigation</a></h5>
+         <div>
+            <ul class="wiki_pages page_list">
+              <% if @context.respond_to?(:assignments) %>
+                <li title="Click to insert a link to the assignments page"><%= link_to "Assignment List", context_url(@context, :context_assignments_url) %></li>
+              <% end %>
+              <% if @context.respond_to?(:wiki) %>
+                <li title="Click to insert a link to the wiki"><%= link_to "Wiki Home", context_url(@context, :context_wiki_pages_url) %></li>
+              <% end %>
+              <% if @context.respond_to?(:discussion_topics) %>
+                <li title="Click to insert a link to the discussions page"><%= link_to "Discussions Index", context_url(@context, :context_discussion_topics_url) %></li>
+              <% end %>
+              <% if @context.respond_to?(:assignments) %>
+                <li title="Click to insert a link to the syllabus"><%= link_to "#{@context.class.to_s} Syllabus", context_url(@context, :syllabus_context_assignments_url) %></li>
+              <% end %>
+              <% if @context.respond_to?(:announcements) %>
+                <li title="Click to insert a link to the announcements page"><%= link_to "Announcement List", context_url(@context, :context_announcements_url) %></li>
+              <% end %>
+              <% if @context.respond_to?(:attachments) %>
+                <li title="Click to insert a link to the files page"><%= link_to "Files Index", context_url(@context, :context_files_url) %></li>
+              <% end %>
+              <% collaborations_url = context_url(@context, :context_collaborations_url) rescue nil %>
+              <% if collaborations_url %>
+                <li title="Click to insert a link to the collaborations page"><%= link_to "Collaborations", collaborations_url %></li>
+              <% end %>
+              <% if @context.is_a?(Course) %>
+                <li title="Click to insert a link to the grades page"><%= link_to "Grades", context_url(@context, :context_grades_url) %></li>
+              <% end %>
+              <% if @context.respond_to?(:users) %>
+                <li title="Click to insert a link to the people page"><%= link_to "People", context_url(@context, :context_users_url) %></li>
+              <% end %>
+            </ul>
+         </div>
+      </div>
+    </div>
+
+  </div>
+  <div id="editor_tabs_2">
+    Click any file to insert a download link for that file.
+    <a href="<%= context_url(@context, :list_context_files_url) %>" class="files_list_url" style="display: none;">&nbsp;</a>
+    <div id="wiki_sidebar_file_uploads" class="uploading_file_list" style="display: none;">
+      <div class="uploading">
+        Uploading <span class="filename">file</span>...
+        <div>
+          <%= image_tag "ajax-loader-bar.gif", :alt => "Loading..." %>
+        </div>
+      </div>
+      <div class="remaining">
+        <span class="files_remaining">0</span> more to upload
+      </div>
+    </div>
+    <div class="file_list_holder <%= 'file_drop' if can_do(@context, @current_user, :manage_files) %>">
+      <div class="dragging_message">Drop Files Here to upload</div>
+      <div class="file_list" style="max-height: 300px; overflow: auto;">
+        <ul id="tree1_temp">
+          <li class="loading">Loading Files...</li>
+        </ul>
+        <ul id="tree1">
+        </ul>
+      </div>
+    </div>
+    <ul style="display: none;" class="tree_node_template">
+      <%= render :partial => "wiki_pages/to_be_tree_node", :object => nil %>
+      <%= render :partial => "wiki_pages/to_be_tree_node", :object => Folder.new %>
+    </ul>
+    <% if can_do(@context, @current_user, :manage_files) %>
+      <div><a href="#" class="upload_new_file_link add" style="padding-top:2px;">Upload a new file</a></div>
+      <% form_for :attachment, :url => context_url(@context, :context_files_url), :html => {:id => "sidebar_upload_file_form", :style => "display: none;", :multipart => true} do |f| %>
+        <input type="hidden" name="return_to" value="<%= request.url %>"/>
+        <%= f.file_field :uploaded_data, :class => "file_name" %>
+        <% if !@wiki_sidebar_data[:root_folders].empty? %>
+        <div style="margin-left: 10px;">
+          <div>limit 50MB per file</div>
+          <label for="attachment_folder_id">Folder</label> 
+          <select name="attachment[folder_id]" id="attachment_folder_id" class="attachment_folder_id">
+            <% @wiki_sidebar_data[:root_folders].each do |folder| %>
+              <option value="<%= folder.id %>"><%= folder.name %></option>
+            <% end %>
+          </select>
+        </div>
+        <% end %>
+        <div class="uploading" style="display: none; text-align: center;">
+          <%= image_tag "ajax-loader-bar.gif", :alt => "Loading..." %>
+        </div>
+        <div class="button-container">
+          <button class="button " type="submit">Upload</button>
+        </div>
+        <a href="<%= context_url(@context, :context_files_url, :format => :text) %>" class="json_upload_url" style="display: none;">&nbsp;</a>
+        <a href="<%= context_url(@context, :context_file_download_url, "{{ id }}", :wrap => 1) %>" class="file_url" style="display: none;">&nbsp;</a>
+      <% end %>
+    <% end %>
+  </div>
+  <div id="editor_tabs_3">
+    Click any image to embed the image in the page.
+    <% if can_do(@context, @current_user, :manage_files) %>
+      <div><a href="#" class="upload_new_image_link add" style="padding-top:2px;">Upload a new image</a></div>
+    <% end %>
+    <div>
+      <a href="#" class="find_new_image_link find">Find images on flickr creative commons</a>
+    </div>
+    <% if can_do(@context, @current_user, :manage_files) %>
+      <% form_for :attachment, :url => context_url(@context, :context_files_url), :html => {:id => "sidebar_upload_image_form", :style => "display: none;", :multipart => true} do |f| %>
+        <input type="hidden" name="return_to" value="<%= request.url %>"/>
+        <%= f.file_field :uploaded_data, :class => "file_name" %>
+        <div class="uploading" style="display: none; text-align: center;">
+          <%= image_tag "ajax-loader-bar.gif", :alt => "Loading..." %>
+        </div>
+        <div style="margin-left: 10px;">
+          <div>limit 50MB per file</div>
+          <label for="image_folder_id">Folder</label> 
+          <select name="attachment[folder_id]" id="image_folder_id">
+            <% @wiki_sidebar_data[:root_folders].each do |folder| %>
+              <option value="<%= folder.id %>"><%= folder.name %></option>
+            <% end %>
+          </select>
+        </div>
+        <div class="button-container">
+          <button class="button " type="submit">Upload</button>
+        </div>
+        <a href="<%= context_url(@context, :context_files_url, :format => :text) %>" class="json_upload_url" style="display: none;">&nbsp;</a>
+        <a href="<%= context_url(@context, :context_file_preview_url, "{{ id }}") %>" class="file_url" style="display: none;">&nbsp;</a>
+      <% end %>
+    <% end %>
+    <div id="wiki_sidebar_image_uploads" class="uploading_file_list uploading_image_list" style="display: none;">
+      <div class="uploading">
+        Uploading <span class="filename">file</span>...
+        <div>
+          <%= image_tag "ajax-loader-bar.gif", :alt => "Loading..." %>
+        </div>
+      </div>
+      <div class="remaining">
+        <span class="files_remaining">0</span> more to upload
+      </div>
+    </div>
+    <div class="image_list_holder <%= 'file_drop' if can_do(@context, @current_user, :manage_files) %>">
+      <div class="dragging_message">Drop Images Here to upload</div>
+      <div class="image_list" style="max-height: 300px; overflow: auto;">
+        <div class="loading">Loading Images...</div>
+        <div style="text-align: center" class="img_link default_image" title="Click to embed image">
+          <div class="img_holder">
+            <img class="img" alt="blank" src="/images/blank.png">
+          </div>
+          <div class="display_name">Logo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display: none;">
+    <a href="<%= services_path(:service_type => "BookmarkService") %>" class="bookmark_services_url">&nbsp;</a>
+    <a href="<%= bookmark_search_path(:service_type => "{{ service_type }}", :q => "{{ query }}") %>" class="bookmark_search_url">&nbsp;</a>
+    <a href="<%= image_search_path(:service_type => "{{ service_type }}", :q => "{{ query }}") %>" class="image_search_url">&nbsp;</a>
+    <div id="wiki_sidebar_select_folder_dialog">
+      Select a destination folder for these <span class="file_count">&nbsp;</span> files:
+      <div style="margin: 20px;">
+        <select class="folder_id">
+        </select>
+      </div>
+      <div class="button-container">
+        <button type="button" class="button select_button">Upload Files to Folder</button>
+        <button type="button" class="button cancel_button button-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

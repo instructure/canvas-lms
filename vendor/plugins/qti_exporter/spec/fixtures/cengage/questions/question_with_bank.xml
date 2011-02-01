@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Pool
+Converting proprietary Blackboard metadata field bbmd_questiontype = Fill in the Blank
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 0.0
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: charset attribute no longer supported: ignored charset="us-ascii"
+Warning: prompt style on render_fib no longer supported, converted to style class
+Warning: minimum response no longer supported, ignoring minnumber="0"
+Warning: maxchars on render_fib no longer strictly enforced.
+Warning: converting rows x columns to expectedLength only
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: titles on respconditions no longer supported, ignored "52EDEA91394611DCC7E1C1CB0268B66D"
+Warning: replacing bad NMTOKEN "52EDEA91394611DCC7E1C1CB0268B66D" with "FEEDBACK_52EDEA91394611DCC7E1C1CB0268B66D"
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Warning: solution material is being replaced by div with class="solution"
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier=""
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="question_bank_iden" value="res00013" />
+<instructureField name="max_score" value="0.0" />
+<instructureField name="question_bank" value="Practice Test Chapter 2" />
+<instructureField name="quiz_type" value="Fill in the Blank" />
+</instructureMetadata>
+<responseDeclaration identifier="response" cardinality="single" baseType="string"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+<defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
+<itemBody>
+<div class="QUESTION_BLOCK">
+<p class="FORMATTED_TEXT_BLOCK">&lt;div style=&quot;font-size:12pt;
+                      font-family:'Times New Roman'; color:#000000;&quot;&gt;
+                      The answer is _____.&lt;/div&gt;</p>
+<p class="FILE_BLOCK"></p>
+<p class="LINK_BLOCK"></p></div>
+<div class="RESPONSE_BLOCK">
+<extendedTextInteraction responseIdentifier="response" class="Box" expectedLength="127"/></div>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><stringMatch  caseSensitive="false" substring="false"><variable identifier="response"/><baseValue baseType="string">join</baseValue></stringMatch>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_52EDEA91394611DCC7E1C1CB0268B66D</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0.0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK"></p>
+<p class="FILE_BLOCK"></p>
+<p class="LINK_BLOCK"></p></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK"></p>
+<p class="FILE_BLOCK"></p>
+<p class="LINK_BLOCK"></p></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_52EDEA91394611DCC7E1C1CB0268B66D">
+<div class="solution">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK"></p>
+<p class="FILE_BLOCK"></p>
+<p class="LINK_BLOCK"></p></div></div></modalFeedback>
+</assessmentItem>

@@ -1,0 +1,11 @@
+{
+    "question_name":"",
+    "question_text":"Who likes to use Blackboard?<br />",
+    "incorrect_comments":"",
+    "question_type":"essay_question",
+    "answers":[],
+    "example_solution":"Nobody.",
+    "migration_id":"_153002_1",
+    "correct_comments":"",
+    "points_possible":23.0
+}

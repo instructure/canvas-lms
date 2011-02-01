@@ -1,0 +1,59 @@
+<% js_block do %>
+<script>
+var INST = INST || {};
+INST.downloadSubmissions = function(url) {
+  var cancelled = false;
+  $("#download_submissions_dialog").dialog('close').dialog({
+    autoOpen: false,
+    title: "Download Assignment Submissions",
+    close: function() {
+      cancelled = true;
+    }
+  }).dialog('open');
+  $("#download_submissions_dialog .progress").progressbar({value: 0});
+  var checkForChange = function() {
+    if(cancelled || $("#download_submissions_dialog:visible").length == 0) { return; }
+    $("#download_submissions_dialog .status_loader").css('visibility', 'visible');
+    var lastProgress = null;
+    $.ajaxJSON(url, 'GET', {}, function(data) {
+      if(data && data.attachment) {
+        var attachment = data.attachment;
+        if(attachment.workflow_state == 'zipped') { 
+          $("#download_submissions_dialog .progress").progressbar('value', 100);
+          $("#download_submissions_dialog .status").html("Finished!  Redirecting to File...<br/><a href='" + url + "'><b>Click here to download " + attachment.readable_size + "</b></a>")
+          $("#download_submissions_dialog .status_loader").css('visibility', 'hidden');
+          location.href = url;
+          return;
+        } else {
+          var progress = parseInt(attachment.file_state, 10);
+          if(isNaN(progress)) { progress = 0; }
+          progress += 5
+          $("#download_submissions_dialog .progress").progressbar('value', progress);
+          $("#download_submissions_dialog .status").text(progress >= 95 ? "Creating zip file..." : "Gathering Files (" + progress + "%)...")
+          if(progress <= 5 || progress == lastProgress) {
+            $.ajaxJSON(url + "&compile=1", 'GET', {}, function() {}, function() {});
+          }
+          lastProgress = progress;
+        }
+      }
+      $("#download_submissions_dialog .status_loader").css('visibility', 'hidden');
+      setTimeout(checkForChange, 3000);
+    }, function(data) {
+      $("#download_submissions_dialog .status_loader").css('visibility', 'hidden');
+      setTimeout(checkForChange, 1000);
+    });
+  }
+  checkForChange();
+}
+</script>
+<% end %>
+<div id="download_submissions_dialog" style="display: none;">
+  <%= image_tag "download.png" %> <b>Your student submissions are being gathered</b> and compressed
+  into a zip file.  This may take some time, depending on the size and number of submission
+  files.
+  <div class="progress" style="margin: 10px 5px;">
+  </div>
+  <div class="status_box" style="text-align: center;">
+    <%= image_tag "ajax-loader-small.gif", :style => "visibility: hidden;", :class => "status_loader" %>&nbsp;<span class="status">Gathering Files...</span>
+  </div>
+</div>

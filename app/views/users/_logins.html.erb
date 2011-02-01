@@ -1,0 +1,101 @@
+  <% jammit_css :user_logins %>
+  <% jammit_js :user_logins %>
+  <% 
+    can_only_select_current_account_which_is_passwordable = !can_do(Account.site_admin, @current_user, :manage_user_logins) && @domain_root_account && @domain_root_account.settings && @domain_root_account.settings[:admins_can_change_passwords] 
+  %>
+  <fieldset id="login_information">
+    <legend>Login Information</legend>
+    <table>
+      <% pseudonyms = @user.pseudonyms.active.scoped(:include => :account) + [nil] %>
+      <% pseudonyms.each do |pseudonym| %>
+        <% can_change_pseudonym_password = (pseudonym && pseudonym.account && pseudonym.account.settings && pseudonym.account.settings[:admins_can_change_passwords]) %>
+        <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
+          <th scope='row'>
+            <b class='unique_id'><%= pseudonym && pseudonym.unique_id %></b>
+          </th>
+          <td class='account'>
+            <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account_id : "{{ account_id }}"), :class => 'account_name') %>
+          </td>
+          <td class='details'>
+            <% if pseudonym %>
+              <table>
+                <tr>
+                  <th>Last request:</th>
+                  <td><%= datetime_string(pseudonym.last_request_at) || "never" %></td>
+                </tr>
+                <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 %>">
+                  <th>Current login:</th>
+                  <td><%= datetime_string(pseudonym.current_login_at) || "never" %></td>
+                </tr>
+                <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 %>">
+                  <th>Current login IP:</th>
+                  <td><%= pseudonym.current_login_ip || "none" %></td>
+                </tr>
+                <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 %>">
+                  <th>Last login:</th>
+                  <td><%= datetime_string(pseudonym.last_login_at) || "never" %></td>
+                </tr>
+                <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 %>">
+                  <th>Last login IP:</th>
+                  <td><%= pseudonym.last_login_ip || "none" %></td>
+                </tr>
+              </table>
+              <% if pseudonyms.length > 1 %>
+                <a href="#" class="login_details_link">more...</a>
+              <% end %>
+            <% end %>
+          </td>
+          <% if !pseudonym || can_do(pseudonym.account, @current_user, :manage_user_logins) %>
+            <td class='links <%= 'passwordable' if (!pseudonym && can_only_select_current_account_which_is_passwordable) || can_change_pseudonym_password %>'>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link"><%= image_tag "edit.png" %></a>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden unless pseudonyms.length > 2 %>"><%= image_tag "delete.png" %></a>
+            </td>
+          <% else %>
+            <td>&nbsp;</td>
+          <% end %>
+        </tr>
+      <% end %>
+      <% if can_do(@user, @current_user, :manage_logins) && can_do(@domain_root_account, @current_user, :manage_user_logins) %>
+        <tr class="add_holder">
+          <td colspan="4" style="font-size: 0.8em;">
+            <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" class="add_pseudonym_link">Add Login</a>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </fieldset>
+  <% form_for :pseudonym, :url => user_pseudonyms_url(@user.id), :html => {:id => 'edit_pseudonym_form', :style => 'display: none;'} do |f| %>
+    <table class="formtable" style="margin-top: 20px;">
+      <tr>
+        <td><%= f.label :unique_id, "Login:" %></td>
+        <td><%= f.text_field :unique_id, :style => "width: 150px;" %></td>
+      </tr>
+      <% if can_do(Account.site_admin, @current_user, :manage_user_logins) %>
+        <tr class="account_id">
+            <td><%= f.label :account_id, "Account:" %></td>
+            <td>
+              <% accounts = Account.root_accounts.map{|a| [a.name, a.id] }.sort_by(&:first) %>
+              <%= f.select :account_id, accounts, {:selected => @domain_root_account.id}, :class => "account_id_select" %>
+              <span class="default_account_name" style="display: none;"><%= @domain_root_account.name %></span>
+              <span id="passwordable_account_ids" style="display: none;"><%= Account.root_accounts.select{|a| a.settings && a.settings[:admins_can_change_passwords]}.map(&:id).join(',') %></span>
+            </td>
+        </tr>
+      <% end %>
+      <tr class="password">
+        <td><%= f.label :password, "Password:" %></td>
+        <td><%= f.password_field :password, :style => "width: 150px;" %></td>
+      </tr>
+      <tr class="password">
+        <td>&nbsp;</td>
+        <td><%= f.password_field :password_confirmation, :style => "width: 150px;" %></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="button-container">
+            <button type="submit" class="button submit_button">Update Login</button>
+            <button type="button" class="button button-secondary cancel_button">Cancel</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  <% end %>

@@ -1,0 +1,11 @@
+<% define_content :link do %>http://<%= HostUrl.default_host %>/courses/<%= asset.id %><% end %>
+
+New Course for <%= asset.root_account.name %>
+  
+A new course <b><%= asset.name %></b> has been added for the account <b><%= asset.root_account.name %></b>.
+<% if !asset.teachers.empty? %>
+Teachers:
+<% asset.teachers.each do |teacher| %>
+  - <a href="http://<%= HostUrl.default_host %>/users/<%= teacher.id %>"><b><%= teacher.name %> (<%= teacher.email %>)</b></a>
+<% end %><% end %>
+

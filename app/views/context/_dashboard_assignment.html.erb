@@ -1,0 +1,38 @@
+<% assignment = dashboard_assignment; submissions = assignment.try_rescue(:submissions) || []; context_code = assignment.try_rescue(:context_code) %>
+<% show_context ||= false %>
+<div style="<%= hidden unless assignment %>" class="communication_message message_<%= context_code || 'blank' %> <%= 'show_context_communication_message' if show_context %>">
+  <div class="header">
+    <div class="post_date time_ago_date"><%= datetime_string(assignment.try_rescue(:created_at)) || nbsp %></div>
+    <%= image_tag "grading_icon.png", :class => "header_icon", :alt => "submission", :title => "Assignment Submission", :style => "padding: 7px 2px 2px 2px;" %>
+    <a href="<%= context_prefix(context_code) %>/assignments/<%= assignment ? assignment.id : "{{ id }}" %>" class="title subject"><%= assignment.try_rescue(:title) || "Assignment" %> Submissions</a>
+    <div class="sub_title">
+      <span class="points_possible" style="<%= hidden unless assignment && assignment.points_possible %>">points possible: <%= assignment.try_rescue(:points_possible) %></span>
+      <span class="context_code group_<%= context_code %>"><%= cached_context_short_name(context_code) %></span>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="content">
+    <div class="message user_content"><%= user_content(submission_comment.try_rescue(:formatted_body, 250), context_code, submission_comment.try_rescue(:asset_string)) || nbsp %>
+      <% if submission_comment && submission_comment.media_comment_id %>
+        <a href="#" class="instructure_inline_media_comment no-underline"><span class="media_comment_id" style="display: none;"><%= submission_comment.media_comment_id %></span>&nbsp;</a>
+      <% end %>
+    </div>
+    <div class="subcontent">
+      <% if submissions.length > 3 %>
+      <% end %>
+      <% submissions.each do |submission| %>
+        <div class="" style="<%= hidden if submissions.length > 3 %>">
+          <a href="<%= context_prefix(context_code) %>/assignments/<%= assignment ? assignment.id : "{{ id }}" %>/submissions/<%= submission.user_id %>"><%= context_user_short_name(context_code, submission.user_id) %></a>
+        </div>
+      <% end %>
+      <div class="communication_sub_message reply_message lonely_behavior_message">
+        <div class="content behavior_content">
+          <div class="less_important">
+            <a href="<%= context_prefix(context_code) %>/gradebook/speed_grader?assignment_id=<%= assignment ? assignment.id : "{{ id }}" %>">See All Submissions</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+</div>

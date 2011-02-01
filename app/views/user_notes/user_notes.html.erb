@@ -1,0 +1,32 @@
+<% add_crumb "Faculty Journal" %>
+<% @active_tab = "faculty-journal" %>
+<% content_for :page_title do %>Faculty Journal<% end %>
+
+<% content_for :page_header do %>
+    <h1>Faculty Journal</h1>
+<% end %>
+
+<p>Last Faculty Journal entries for students currently enrolled in <%= @is_course ? 'this' : 'a' %> course.</p>
+
+<%= will_paginate(@users, :style=>"margin-bottom: 1em;") %>
+
+<table id="syllabus">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Last Faculty Journal Entry</th>
+      <th>Current Courses</th>
+    </tr>
+  </thead>
+  <% @users.each do |user| %>
+    <tr class="date">
+      <td class="details"><a href="<%= user_user_notes_path(user)%>"><%= user.last_name_first %></a></td>
+      <td style="text-align:left;"><%= datetime_string(user.try_rescue(:last_user_note)) || "Never" %></td>
+      <td class="courses" style="text-align:left;">
+        <% user.courses.each_with_index do |course, i| %><%= ", " if i > 0 %><a href="<%= course_user_notes_path(course) %>"><%= course.short_name %></a><% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<%= will_paginate(@users, :style=>"margin-top: 1em;") %>

@@ -1,0 +1,23 @@
+<% assignment = grading_box_extended 
+  submission ||= nil
+%>
+<% if assignment.grading_type == "points" %>
+  <input type="text" style="width: 35px;"/>
+<% elsif assignment.grading_type == "percent" %>
+  <input type="text" style="width: 35px;"/> %
+<% elsif false %>
+  <select>
+    <option value="">---</option>
+    <% assignment.grading_scheme.to_a.sort_by{|s| s[1]}.reverse.each do |grade| %>
+      <option value="<%= grade[0] %>"> <%= grade[0] %> </option>
+    <% end %>
+  </select>
+<% elsif assignment.grading_type == "letter_grade" %>
+  <input type="text" style="width: 35px;"/>
+<% elsif assignment.grading_type == "pass_fail" %>
+  <select>
+    <option value="">---</option>
+    <option value="complete">Complete</option>
+    <option value="incomplete">Incomplete</option>
+  </select>
+<% end %>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qtimetadata vocabulary is ignored
+Unmapped metadata field: questiontype=Essay
+Converting proprietary WebCT metadata field wct_questiontype = WCT_Paragraph
+Unmapped metadata field: answerboxheight=5
+Unmapped metadata field: answerboxwidth=60
+Unmapped metadata field: wct_authorwebctglid=2
+Unmapped metadata field: wct_questioncategory=Export Test
+Unmapped metadata field: wct_usedbyassessment=Blackboard Vista Export Test
+Unmapped metadata field: wct_authorfullname=Instructure LMS
+Warning: charset attribute no longer supported: ignored charset="US-ASCII"
+Unknown text type: ignored mattext with texttype="TEXT/PLAIN" treated as text/plain
+Warning: prompt style on render_fib no longer supported, converted to style class
+Warning: minimum response no longer supported, ignoring minnumber="1"
+Warning: encoding attribute of render_fib not supported, ignored "UTF-8"
+Warning: maxchars on render_fib no longer strictly enforced.
+Warning: ignoring rows x columns on render_fib in favour of maxchars
+Unknown text type: ignored mattext with texttype="TEXT/HTML" treated as text/plain
+Warning: solution material is being replaced by div with class="solution"
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="4609842537341"
+ title="Essay Question"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="bb_question_type" value="WCT_Paragraph" />
+</instructureMetadata>
+<responseDeclaration identifier="PARA" cardinality="single" baseType="string"/>
+<itemBody>
+<p>Who likes to use Blackboard?<br/>
+</p>
+<extendedTextInteraction responseIdentifier="PARA" class="Box" expectedLength="99999999" maxStrings="1"/>
+</itemBody>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="CORRECT_ANSWER">
+<div class="solution">
+<p>Nobody.</p></div></modalFeedback>
+</assessmentItem>

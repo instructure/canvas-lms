@@ -1,0 +1,9 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>
+<% end %>
+
+Your assignment, <b><a href="<%= content :link %>"><%= asset.assignment.title %></a></b>, has been graded.  
+
+graded: <%= force_zone(asset.graded_at).strftime("%b %d at %I:%M") rescue "No Date Set" %><%= force_zone(asset.graded_at).strftime("%p").downcase rescue "" %>
+<% if asset.score  %>score: <%= asset.score %> out of <%= asset.assignment.points_possible || "N/A" %><% end %>
+<%= "score pending review by the teacher" if asset.pending_review? %>

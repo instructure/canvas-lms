@@ -1,0 +1,190 @@
+<% content_for :page_title do %>Announcements<% end %>
+
+<% content_for :auto_discovery do %>
+  <% if @context_enrollment %>
+    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context_enrollment.feed_code, :atom), {:title => "#{@context.class.to_s} Announcements Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context_enrollment.feed_code, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
+  <% elsif can_do(@context, @current_user, :manage) %>
+    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context.feed_code, :atom), {:title => "#{@context.class.to_s} Announcements Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context.feed_code, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
+  <% elsif @context.available? && @context.respond_to?(:is_public) && @context.is_public %>
+    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context.asset_string, :atom), {:title => "#{@context.class.to_s} Announcements Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context.asset_string, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
+  <% end %>
+<% end %>
+
+<% content_for :right_side do %>
+  <div id="sidebar_content">
+    <div class="rs-margin-lr rs-margin-top">
+    <% if can_do(@context.announcements.new, @current_user, :create) %>
+      <p>
+        <a href="#" class="add_topic_link button button-sidebar-wide"><%= image_tag "add.png" %> Create Announcement</a>
+      </p>
+    <% end %>
+    <p>
+      <% if @context_enrollment %>
+        <a class='atom' href="<%= feeds_announcements_format_path(@context_enrollment.feed_code, :atom) %>"> Announcements Feed</a><br/>
+      <% elsif @context.available? %>
+        <a class='atom' href="<%= feeds_announcements_format_path(@context.feed_code, :atom) %>"> Announcements Feed</a><br/>
+      <% end %>
+      <!--a href="#"><%= image_tag "custom_feed.png" %> Add to Custom Feed</a-->
+    </p>
+    <% if can_do(@context.announcements.new, @current_user, :create) %>
+      <p>
+        <a href="#" class="add_external_feed_link add-feed"> Add External Feed</a>
+        <div id="external_feeds" style="<%= hidden if @context.external_feeds.for('announcements').empty? %>">
+          <h3 style="margin-bottom: 0;">External Feeds</h3>
+          <ul class="unstyled_list external_feed_list">
+            <% @context.external_feeds.for('announcements').each do |feed| %>
+              <%= render :partial => 'external_feed', :object => feed %>
+            <% end %>
+            <%= render :partial => 'external_feed', :object => nil %>
+          </ul>
+        </div>
+        <% form_for :external_feed, :url => context_url(@context, :context_announcements_external_feeds_url), :html => {:id => "add_external_feed_form", :style => "display: none;"} do |f| %>
+          <div style="font-size: 17px; font-weight:bold;">Add a New Feed</div>
+          <p style="font-size: 0.8em;">
+            You can automatically add posts from an RSS or Atom feed as announcements for this
+            <%= @context.class.to_s.downcase %>.  Just paste the feed URL below and any new entries
+            will be added.
+          </p>
+          <%= f.label :url, "URL: " %><%= f.text_field :url, :style => "width: 233px;" %><br/>
+          <div>
+            <label for="external_feed_verbosity">Content to post:</label>
+            <select id="external_feed_verbosity" name="external_feed[verbosity]">
+              <option value="full">Full article</option>
+              <option value="truncate">Truncated</option>
+              <option value="link_only">Link only</option>
+            </select>
+          </div>
+          <input type="checkbox" name="external_feed[add_header_match]" value="1" id="external_feed_add_header_match"/>
+          <label style="font-size: 0.8em;" for="external_feed_add_header_match">Only add posts with a specific phrase in the title</label>
+          <div style="display: none;" id="external_feed_header">
+            Phrase to look for:<%= f.text_field :header_match, :style => "width: 150px;" %>
+          </div>
+          <div class="button-container">
+            <button type="submit" class="button">Add Feed</button>
+            <button class="cancel_button button-secondary" type="button">Cancel</button>
+          </div>
+        <% end %>
+      <p>
+    <% end %>
+    </div>
+  </div>
+  <%= render :partial => "shared/wiki_sidebar" %>
+<% end %>
+
+<% content_for :stylesheets do %>
+<style>
+.external_feed_list .feed {
+  font-size: 0.8em;
+}
+.external_feed_list .feed .delete_feed_link {
+  float: right;
+}
+.external_feed_list .feed .match,
+.external_feed_list .feed .posts  {
+  padding-left: 20px;
+}
+.external_feed_list .feed .header_match {
+  font-weight: bold;
+}
+</style>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $("#external_feed_add_header_match").change(function() {
+    $("#external_feed_header")[ $(this).attr('checked') ? 'slideDown' : 'slideUp']();
+  }).triggerHandler('change');
+  $(".add_external_feed_link").click(function(event) {
+    event.preventDefault();
+    $("#add_external_feed_form").slideToggle();
+  });
+  $("#add_external_feed_form").formSubmit({
+    object_name: 'external_feed',
+    processData: function(data) {
+      if(!data.add_header_match) {
+        data['external_feed[header_match]'] = '';
+      }
+      return data;
+    },
+    beforeSubmit: function(data) {
+      $(this).loadingImage();
+    },
+    success: function(data) {
+      $(this).loadingImage('remove');
+      var feed = data.external_feed;
+      var $feed = $("#feed_blank").clone(true).removeAttr('id');
+      feed.display_name = feed.url;
+      $feed.fillTemplateData({
+        data: feed,
+        id: 'feed_' + feed.id,
+        hrefValues: ['id', 'url']
+      });
+      $feed.find(".display_name").attr('title', feed.url);
+      
+      $feed.find(".match").showIf(feed.header_match);
+      $("#external_feeds").show();
+      $(".external_feed_list").append($feed.slideDown());
+      $(this).slideUp(function() {
+        $(this).find(":text").val("").find("#external_feed_add_header_match").attr('checked', false).change();
+      });
+    },
+    error: function(data) {
+      $(this).loadingImage('remove');
+    }
+  });
+  $(".delete_feed_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".feed").confirmDelete({
+      url: $(this).attr('href'),
+      message: "Stop adding posts from this feed?",
+      success: function(data) {
+        $(this).slideUp(function() {
+          $(this).remove();
+          if($(".external_feed_list .feed:visible").length == 0) {
+            $("#external_feeds").slideUp();
+          }
+        });
+      }
+    });
+  });
+  $("#add_external_feed_form .cancel_button").click(function() {
+    $("#add_external_feed_form").slideUp();
+  });
+});
+</script>
+<% end %>
+<h2>Announcements</h2>
+
+<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
+<% jammit_js :topics %>
+
+<%= render :partial => "shared/topics", :object => @announcements, :locals => { :topic_type => "announcement" } %>
+<%= will_paginate(@announcements) %>
+<% js_block do %>
+  <script type="text/javascript">
+    $(function(){
+      $('#topic_list').pageless({
+        totalPages: <%= @announcements.total_pages %>,
+        url: "<%= context_url(@context, :context_announcements_url, :format => :json) %>",
+        loaderMsg: "Loading more results",
+        scrape: function(data) {
+          if(typeof(data) == 'string') {
+            try {
+              data = JSON.parse(data);
+            } catch(e) {
+              data = [];
+            }
+          }
+          for(var idx in data) {
+            var $topic = topics.updateTopic(null, data[idx]);
+          }
+          $("#topic_list").append($("#pageless-loader"));
+          return "";
+        }
+      });
+    });
+  </script>
+<% end %>

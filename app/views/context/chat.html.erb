@@ -1,0 +1,11 @@
+<% content_for :page_title do %><%= @context.class.to_s %> Chat: <%= @context.name %><% end %>
+
+<div style="height: 600px; width: 800px; margin: 0 auto;">
+  <div id="client"></div> 
+</div>
+<% js_block do %>
+<script> 
+var tinychat = { room: "inst<%= Digest::MD5.hexdigest(@context.asset_string) %>", nick: "<%= @current_user.short_name.gsub(/[^\w]+/, "_").sub(/\A_/, '').sub(/_\z/, '') rescue "user" %>", colorbk: "0xffffff", oper: "none", owner: "none", change: "none", join: "auto", api: "none", key: "<%= Tinychat.config['api_key'] %>"};
+</script> 
+<script src="http://tinychat.com/js/embed.js"></script> 
+<% end %>

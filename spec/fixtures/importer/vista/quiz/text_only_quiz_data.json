@@ -1,0 +1,24 @@
+{
+    "migration_id":"URN:X-WEBCT-VISTA_V2:790EA1350A10681DE0440003BA07D9B4",
+    "title":"Import Quiz",
+    "quiz_type":null,
+    "points_possible":2,
+    "allowed_attempts":3,
+    "question_count":1,
+    "shuffle_answers":false,
+    "show_correct_answers":false,
+    "which_attempt_to_keep":"keep_latest",
+    "questions":[
+        {
+            "question_text":"Section Label",
+            "question_type":"text_only_question"
+        },
+        {
+            "migration_id":"4393906433391",
+            "points_possible":2,
+            "question_type":"question_reference"
+        }
+    ],
+    "show_score":true,
+    "time_limit":60
+}

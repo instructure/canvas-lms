@@ -1,0 +1,83 @@
+{
+  "title":"Test Rubric",
+  "migration_id":"4469882249231",
+  "points_possible":"45",
+  "description":"",
+  "data":[
+    {
+      "points":15.0,
+      "description":"Spelling",
+      "ratings":[
+        {
+          "description":"Exceptional - fff",
+          "points":15.0,
+          "criterion_id":"4469882250231",
+          "id":"4469882262231"
+        },
+        {
+          "description":"Meet Expectations - asdf",
+          "points":10.0,
+          "criterion_id":"4469882250231",
+          "id":"4469882263231"
+        },
+        {
+          "description":"Need Improvement - rubric entry text",
+          "points":5.0,
+          "criterion_id":"4469882250231",
+          "id":"4469882264231"
+        }
+      ],
+      "id":"4469882250231"
+    },
+    {
+      "points":15.0,
+      "description":"Grammar",
+      "ratings":[
+        {
+          "description":"Exceptional",
+          "points":15.0,
+          "criterion_id":"4469882251231",
+          "id":"4469882259231"
+        },
+        {
+          "description":"Meet Expectations",
+          "points":10.0,
+          "criterion_id":"4469882251231",
+          "id":"4469882260231"
+        },
+        {
+          "description":"Need Improvement - you smell",
+          "points":5.0,
+          "criterion_id":"4469882251231",
+          "id":"4469882261231"
+        }
+      ],
+      "id":"4469882251231"
+    },
+    {
+      "points":15.0,
+      "description":"Style",
+      "ratings":[
+        {
+          "description":"Exceptional",
+          "points":15.0,
+          "criterion_id":"4469882252231",
+          "id":"4469882256231"
+        },
+        {
+          "description":"Meet Expectations",
+          "points":10.0,
+          "criterion_id":"4469882252231",
+          "id":"4469882257231"
+        },
+        {
+          "description":"Need Improvement",
+          "points":5.0,
+          "criterion_id":"4469882252231",
+          "id":"4469882258231"
+        }
+      ],
+      "id":"4469882252231"
+    }
+  ]
+}

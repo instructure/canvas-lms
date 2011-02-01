@@ -1,0 +1,49 @@
+<% content_for :page_title do %>Gradebook - <%= @context.name %><% end %>
+<% content_for :auto_discovery do %>
+  <% if @context_enrollment %>
+    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => "Course Gradebook Atom Feed"}) %>
+  <% end %>
+<% end %>
+
+<%= render :partial => "gradebook" %>
+
+<% content_for :keyboard_navigation do %>
+  <ul class="navigation_list" tabindex="-1">
+    <li>
+      <span class="keycode">right</span>
+      <span class="colon">:</span>
+      <span class="description">Next Assignment</span>
+    </li>
+    <li>
+      <span class="keycode">left</span>
+      <span class="colon">:</span>
+      <span class="description">Previous Assignment</span>
+    </li>
+    <li>
+      <span class="keycode">down</span>
+      <span class="colon">:</span>
+      <span class="description">Next Student</span>
+    </li>
+    <li>
+      <span class="keycode">right</span>
+      <span class="colon">:</span>
+      <span class="description">Previous Student</span>
+    </li>
+    <li>
+      <span class="keycode">enter</span>
+      <span class="colon">:</span>
+      <span class="description">Edit Cell</span>
+    </li>
+    <li>
+      <span class="keycode">i</span>
+      <span class="colon">:</span>
+      <span class="description">More Information for Current Cell</span>
+    </li>
+    <li>
+      <span class="keycode">r</span>
+      <span class="colon">:</span>
+      <span class="description">Refresh Gradebook</span>
+    </li>
+  </ul>
+<% end %>
+

@@ -1,0 +1,99 @@
+<% content_for :page_title do %>Access Report<% end %>
+<% add_crumb('People', context_url(@context, :context_users_url))
+  add_crumb(@user.name, context_url(@context, :context_user_url, @user))
+  @active_tab="people"
+  add_crumb("Access Report") %>
+<% content_for :right_side do %>
+  <div class="rs-margin-all rs-margin-lr">
+    <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>"><%= image_tag "back.png" %> Back to User Page</a>
+  </div>
+<% end %>
+<h2><%= @user.name %> Access Report</h2>
+<% content_for :stylesheets do %>
+<style>
+#usage_report table {
+  border-collapse: collapse;
+}
+#usage_report th {
+  padding: 2px 5px;
+  border-bottom: 1px dotted #888;
+  
+}
+#usage_report td {
+  padding: 8px 5px;
+  border-bottom: 1px dotted #ccc;
+}
+#usage_report .view_score {
+  text-align: right;
+  padding-right: 20px;
+}
+#usage_report .participate_score {
+  text-align: right;
+  padding-right: 20px;
+}
+#usage_report .last_viewed {
+  white-space: nowrap;
+  font-size: 0.8em;
+}
+</style>
+<% end %>
+<div id="usage_report">
+<table>
+  <thead>
+    <tr>
+      <th>Content</th>
+      <th style="text-align: right;">Times Viewed</th>
+      <th style="text-align: right;">Times Participated</th>
+      <th>Last Viewed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @accesses.each do |access| %>
+      <tr class="access">
+        <td class="readable_name"><%= access.readable_name %></td>
+        <td class="view_score"><%= access.view_score %></td>
+        <td class="participate_score"><%= access.participate_score %></td>
+        <td class="last_viewed time_ago_date"><%= datetime_string(access.updated_at) %></td>
+      </tr>
+    <% end %>
+    <tr class="access blank" style="display: none;">
+      <td class="display_name">&nbsp;</td>
+      <td class="view_score">&nbsp;</td>
+      <td class="participate_score">&nbsp;</td>
+      <td class="last_viewed time_ago_date">&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<%= will_paginate(@accesses) %>
+<% js_block do %>
+  <script type="text/javascript">
+    $(function(){
+      var url = "<%= context_url(@context, :context_user_usage_url, @user, :format => :json) %>";
+      $('#usage_report').pageless({
+        totalPages: <%= @accesses.total_pages %>,
+        url: url,
+        loaderMsg: "Loading more results",
+        scrape: function(data) {
+            if(typeof(data) == 'string') {
+              try {
+                data = JSON.parse(data);
+              } catch(e) {
+                data = [];
+              }
+            }
+            for(var idx in data) {
+              var $access = $("#usage_report .access.blank:first").clone(true).removeClass('blank');
+              var access = data[idx].asset_user_access;
+              access.readable_name = access.readable_name || access.display_name || access.asset_code;
+              access.last_viewed = $.parseFromISO(access.updated_at).datetime_formatted;
+              $access.fillTemplateData({data: access});
+              $("#usage_report table tbody").append($access.show());
+            }
+          return "";
+        }
+      });
+    });
+  </script>
+<% end %>
+

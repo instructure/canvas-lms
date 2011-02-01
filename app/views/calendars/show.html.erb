@@ -1,0 +1,71 @@
+<% content_for :page_title do %>Calendar - <%= @context.name %><% end %>
+<% add_crumb "My Calendar", calendar_url %>
+
+<% content_for :auto_discovery do %>
+  <% if @context_enrollment %>
+    <%= auto_discovery_link_tag(:atom, feeds_calendar_format_url(@context_enrollment.feed_code, :atom), {:title => "Course Calendar Atom Feed"}) %>
+  <% elsif @context.available? %>
+    <%= auto_discovery_link_tag(:atom, feeds_calendar_format_url(@context.feed_code, :atom), {:title => "Course Calendar Atom Feed"}) %>
+  <% end %>
+<% end %>
+
+<%= render :partial => "calendar", :object => @events, :locals => { :first_day => @first_day, :last_day => @last_day, :current => @current } %>
+
+<% content_for :wizard_box do %>
+  <%= render :partial => "calendars/wizard_box" %>
+<% end %>
+
+<% content_for :keyboard_navigation do %>
+  <ul class="navigation_list" tabindex="-1">
+    <li>
+      <span class="keycode">j</span>
+      <span class="colon">:</span>
+      <span class="description">Next Calendar Day/Event</span>
+    </li>
+    <li>
+      <span class="keycode">k</span>
+      <span class="colon">:</span>
+      <span class="description">Previous Calendar Day/Event</span>
+    </li>
+    <li>
+      <span class="keycode">e</span>
+      <span class="colon">:</span>
+      <span class="description">Edit Current Event</span>
+    </li>
+    <li>
+      <span class="keycode">d</span>
+      <span class="colon">:</span>
+      <span class="description">Delete Current Event</span>
+    </li>
+    <li>
+      <span class="keycode">n</span>
+      <span class="colon">:</span>
+      <span class="description">New Event for Current Day</span>
+    </li>
+    <li>
+      <span class="keycode">r</span>
+      <span class="colon">:</span>
+      <span class="description">Refresh Calendar</span>
+    </li>
+    <li>
+      <span class="keycode">ctrl+right</span>
+      <span class="colon">:</span>
+      <span class="description">Next Calendar Day</span>
+    </li>
+    <li>
+      <span class="keycode">ctrl+left</span>
+      <span class="colon">:</span>
+      <span class="description">Previous Calendar Day</span>
+    </li>
+    <li>
+      <span class="keycode">ctrl+down</span>
+      <span class="colon">:</span>
+      <span class="description">Next Week</span>
+    </li>
+    <li>
+      <span class="keycode">ctrl+up</span>
+      <span class="colon">:</span>
+      <span class="description">Previous Week</span>
+    </li>
+  </ul>
+<% end %>

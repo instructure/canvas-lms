@@ -1,0 +1,25 @@
+<% folders ||= nil %>
+<% if !tree_node || (!tree_node.is_a?(Folder) && !tree_node.deleted?) || tree_node.visible? || can_do(@context, @current_user, :manage) %>
+<% if tree_node && tree_node.is_a?(Folder) && folders
+      tree_node = folders.to_a.find{|f| f.id == tree_node.id} || tree_node
+   end %>
+<li id="<%= tree_node ? tree_node.class.to_s.downcase : 'attachment' %>_<%= tree_node ? tree_node.id : 'blank' %>" class="<%= tree_node.mime_class rescue '' %>" title="<%= "Click to insert a link to this page" unless tree_node && tree_node.is_a?(Folder) %>">
+  <% if tree_node && tree_node.is_a?(Folder) %>
+    <span class='name'><%= tree_node.name %></span>
+  <% else %>
+    <span rel="<%= context_url(@context, :context_file_download_url, (tree_node ? tree_node.id : "{{ id }}")) %>" class='name <%= 'scribdable' if tree_node && tree_node.respond_to?("scribdable?") && tree_node.scribdable? %>'><%= tree_node.display_name rescue '' %></span>
+  <% end %>
+  <% if tree_node && tree_node.respond_to?("subcontent") %>
+  <ul>
+    <% subcontent = []
+       if folders && files 
+          subcontent = folders.select{|f| f.parent_folder_id == tree_node.id} + files.select{|f| f.folder_id == tree_node.id}
+       else
+          subcontent = tree_node.subcontent
+       end
+    %>
+    <%= render :partial => "wiki_pages/tree_node", :collection => subcontent %>
+  </ul>
+  <% end %>
+</li>
+<% end %>

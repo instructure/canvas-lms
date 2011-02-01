@@ -1,0 +1,98 @@
+{
+  "assessment_questions":
+  {
+    "assessment_questions":
+            [
+              {
+                "incorrect_comments":"",
+                "general_comments":"Is that a rocket ship?",
+                "question_bank_name":"Group1",
+                "question_text":"I wish I could insult competitors here, why not?",
+                "question_type":"essay_question",
+                "answers":[],
+                "question_name":"Something",
+                "migration_id":"1",
+                "points_possible":2
+              },
+              {
+                "incorrect_comments":"",
+                "general_comments":"Is that a rocket ship?",
+                "question_text":"I wish I could insult competitors here, why can't I?",
+                "question_type":"essay_question",
+                "answers":[],
+                "question_name":"What",
+                "migration_id":"2",
+                "points_possible":2
+              },
+              {
+                "incorrect_comments":"",
+                "general_comments":"Is that a rocket ship?",
+                "question_text":"Why is it good to do something?",
+                "question_type":"essay_question",
+                "answers":[],
+                "question_name":"Is",
+                "migration_id":"3",
+                "points_possible":2
+              },
+              {
+                "incorrect_comments":"",
+                "general_comments":"Is that a rocket ship?",
+                "question_text":"Meta?",
+                "question_type":"essay_question",
+                "answers":[],
+                "question_name":"Going On?",
+                "migration_id":"4",
+                "points_possible":2
+              }
+            ]
+  },
+  "assessments":
+  {
+    "assessments":
+            [
+              {
+                "migration_id":"q1",
+                "title":"Assmnt1",
+                "quiz_type":"assignment",
+                "due_date":"1247497200000",
+                "grading":
+                {
+                  "points_possible":2,
+                  "grade_type":"numeric",
+                  "due_date":"1247497200000",
+                  "title":"You smell"
+                },
+                "allowed_attempts":3,
+                "question_count":1,
+                "shuffle_answers":false,
+                "show_correct_answers":false,
+                "which_attempt_to_keep":"keep_latest",
+                "points_possible":2,
+                "questions":[
+                  {
+                    "migration_id":"1",
+                    "points_possible":2,
+                    "question_type":"question_reference"
+                  },
+                  {
+                    "migration_id":"2",
+                    "points_possible":2,
+                    "question_type":"question_reference"
+                  },
+                  {
+                    "question_points":5,
+                    "question_type":"question_group",
+                    "pick_count":2,
+                    "questions":[
+                      {
+                        "migration_id":"3",
+                        "points_possible":2,
+                        "question_type":"question_reference"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+  }
+}

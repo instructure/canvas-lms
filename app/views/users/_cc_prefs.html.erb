@@ -1,0 +1,28 @@
+<% if message_count < 3 && @current_pseudonym && @current_pseudonym.login_count < 10 && @current_user && !@current_user.used_feature?(:cc_prefs) %>
+  <div class="communication_message dashboard_notification">
+    <div class="header">
+      <div class="header_title">
+        <%= image_tag "information.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
+        <a href="<%= communication_profile_path %>" class="title subject">Configure Communication Preferences</a>
+        <div class="sub_title">
+          <span class="context_code">Information</span>
+        </div>
+      </div>
+      <div style="clear: left;"></div>
+    </div>
+    <div class="content">
+      <div class="message user_content">
+        Now that you're registered with Canvas, you might want to configure what
+        notifications you'll receive as your courses progress.
+        Canvas is flexible enough to let you choose how and for what
+        events you'd like to be notified.
+        When things happen in your courses you can choose to be emailed
+        or texted to your cell immediately, daily or weekly.
+      </div>
+      <div class="button-container">
+        <a href="<%= communication_profile_path %>" class="button">Configure Communication Preferences</a>
+      </div>
+      <div class="clear"></div>
+    </div>
+  </div>
+<% end %>

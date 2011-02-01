@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Unmapped metadata field: cc_profile=cc.true_false.v0p1
+Unmapped metadata field: cc_weighting=1
+Warning: replacing bad NMTOKEN "0ee472e8-5bc2-4b30-a341-2fa93a50bc54" with "RESPONSE_0ee472e8-5bc2-4b30-a341-2fa93a50bc54"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "Correct"
+Warning: case-insensitive comparison of identifiers not supported in version 2
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="0ee472e8-5bc2-4b30-a341-2fa93a50bc54"
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<responseDeclaration identifier="RESPONSE_0ee472e8-5bc2-4b30-a341-2fa93a50bc54" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<div>If a course meets expectations, it is recognized on the QM website and permitted to display the QM logo.</div>
+<div></div>
+<choiceInteraction responseIdentifier="RESPONSE_0ee472e8-5bc2-4b30-a341-2fa93a50bc54" shuffle="false" maxChoices="1">
+<simpleChoice identifier="true" fixed="true">
+<p>True</p></simpleChoice>
+<simpleChoice identifier="false" fixed="true">
+<p>False</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="RESPONSE_0ee472e8-5bc2-4b30-a341-2fa93a50bc54"/><baseValue baseType="identifier">true</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="RESPONSE_0ee472e8-5bc2-4b30-a341-2fa93a50bc54"/><baseValue baseType="identifier">false</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+</assessmentItem>

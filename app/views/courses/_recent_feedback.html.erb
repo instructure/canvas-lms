@@ -1,0 +1,71 @@
+<% 
+  show_context ||= false
+  comment = nil
+  grade = nil
+   score = nil
+
+  cache(['recent_feedback_render', recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do 
+    context = recent_feedback.context
+    assignment = recent_feedback.assignment
+    url = context_url(context, :context_assignment_submission_url, :assignment_id => recent_feedback.assignment_id, :id=>@current_user.id)
+    icon_data = recent_feedback.submitted_or_graded? ? [recent_feedback.readable_state, 'icon-grading'] : ['not submitted', "icon-grading-gray"]
+    icon_explanation, icon_class = *icon_data
+    grade = recent_feedback.readable_grade if recent_feedback.grade and icon_explanation == 'graded'
+    score = recent_feedback.score
+    comment = recent_feedback.last_teacher_comment
+    comment_text = comment.comment if comment
+  %>
+<li style="<%= hidden if is_hidden %>" class="event">
+  <a class="<%= icon_class %> tooltip" href="<%= url %>">
+    <span class="tooltip_wrap">
+      <span class='tooltip-carat'></span>
+      <span class="tooltip_text">
+        <% if recent_feedback.submitted_or_graded? %>
+          <span style="display: block;"><%= icon_explanation.capitalize %>: 
+            <% if icon_explanation == 'graded' %>
+              <span style="font-size: 0.8em;"><%= datetime_string(recent_feedback.graded_at) %></span>
+            <% else %>
+              <span style="font-size: 0.8em;"><%= datetime_string(recent_feedback.submitted_at) %></span>
+            <% end %>
+          </span>
+          <% unless icon_explanation == 'graded' %>
+            <span style="display: block; font-style: italic;">not graded</span>
+          <% end %>
+        <% else %>
+          <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
+          <span style="display: block;">Due: <span style="font-size: 0.8em;"><%= datetime_string(assignment.due_at) %></span></span>
+        <% end %>
+        <% if assignment.points_possible %>
+          <span style="display: block;"><%= 'Score: ' if grade %><strong><%= score if grade %></strong> <span style="font-size: 0.8em;">out of <%= assignment.points_possible %></span></span>
+        <% end %>
+        <span style="display: block;">Comments: <%= recent_feedback.submission_comments.length %></span>
+        <% if show_context %>
+          <span style="display: block; font-size: 0.8em;"><%= context.short_name %></span>
+        <% end %>
+      </span>
+    </span>
+    <div style="border-bottom: 1px dotted #aaa;">
+      <% if comment && comment.media_comment? %>
+        <img src="http://cdn.kaltura.com/p/156652/thumbnail/entry_id/<%= comment.media_comment_id %>/width/50/height/35/bgcolor/F3F4F5/type/2/vid_sec/5" style="float: right; padding-left: 3px;" alt=""/>
+      <% end %>
+      <b class="ellipsis"><%= recent_feedback.assignment.title %></b>
+      <% if comment_text or grade %>
+        <em class="ellipsis" style="color: #808080; border: 0;">
+          <% if grade %>
+            <strong><%= grade %></strong>
+            <%= " - " if comment_text && (!comment || !comment.media_comment?) %>
+          <% end %>
+          <% if comment_text %>
+            <span class="<%= 'hidden-readable' if comment && comment.media_comment? %>">
+            &ldquo;<%= comment_text %>&rdquo;
+            </span>
+          <% end %>
+        </em>
+      <% end %>
+    </div>
+    <div class="clear"></div>
+  </a>
+  <div class="clear"></div>
+</li>
+
+<% end %>

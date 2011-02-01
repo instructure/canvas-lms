@@ -1,0 +1,12 @@
+<h2>Settings: <%=h @plugin.name %></h2>
+
+<div id="settings">
+  <% form_tag(plugins_update_path(@plugin.id)) do %>
+      <div class="box tabular">
+        <%= render :partial => @plugin.settings_partial, :locals => {:settings => @plugin.settings} %>
+      </div>
+      <%= submit_tag "Apply" %>
+  <% end %>
+</div>
+
+<p><%=link_to("Return to plugins list", plugins_path)%></p>

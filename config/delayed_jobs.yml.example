@@ -1,0 +1,13 @@
+production:
+  workers:
+  - queue: canvas_queue
+    workers: 2
+    max_priority: 10
+  - queue: canvas_queue
+    workers: 4
+  - periodic: config/periodic_jobs.rb
+
+default:
+  workers:
+  - queue: canvas_queue
+  - periodic: config/periodic_jobs.rb

@@ -1,0 +1,37 @@
+{
+    "question_name":"",
+    "question_text":"The answers are house and garage.<br />",
+    "incorrect_comments":"wrong",
+    "question_type":"multiple_answers_question",
+    "migration_id":"_153009_1",
+    "correct_comments":"right",
+    "points_possible":10.0,
+    "answers":[
+        {
+            "text":"house",
+            "comments":"right",
+            "weight":100,
+            "migration_id":"RESPONSE_21c52601c6b545b39aab43c56749c2eb",
+            "id":5455
+        },
+        {
+            "text":"garage",
+            "comments":"right",
+            "weight":100,
+            "migration_id":"RESPONSE_2095979784cd45c9bcec8d303225ae16",
+            "id":3727
+        },
+        {
+            "text":"barn",
+            "weight":0,
+            "migration_id":"RESPONSE_08f1bd768b044f47881067ab7fcabac6",
+            "id":8144
+        },
+        {
+            "text":"pond",
+            "weight":0,
+            "migration_id":"dc9f2f878ce64fddbe762721e26fa11c",
+            "id":8699
+        }
+    ]
+}

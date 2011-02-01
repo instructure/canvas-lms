@@ -1,0 +1,6 @@
+<div id="Services" class="method_details_list">
+<h2>Actions</h2>
+<% @meths.each_with_index do |meth, i| %>
+  <%= yieldall :object => meth, :index => i %>
+<% end %>
+</div>

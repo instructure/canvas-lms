@@ -1,0 +1,55 @@
+<% content_for :page_title do %><%= @context.name %>: Assignments<% end %>
+<% jammit_js :assignments %>
+
+<% content_for :right_side do %>
+  <div class="rs-margin-all">
+    <a href="#" class="wizard_popup_link <%= 'auto_open' if params[:wizard] %> help"> How Do I...?</a>
+    <%= render :partial => 'assignments/assignments_right_side' %>
+  </div>
+<% end %>
+
+<%= render :partial => 'assignments/assignments_content' %>
+
+<% content_for :wizard_box do %>
+  <%= render :partial => "assignments/wizard_box" %>
+<% end %>
+
+<% content_for :keyboard_navigation do %>
+  <ul class="navigation_list" tabindex="-1">
+    <li>
+      <span class="keycode">j</span>
+      <span class="colon">:</span>
+      <span class="description">Next Assignment/Group</span>
+    </li>
+    <li>
+      <span class="keycode">k</span>
+      <span class="colon">:</span>
+      <span class="description">Previous Assignment/Group</span>
+    </li>
+    <li>
+      <span class="keycode">e</span>
+      <span class="colon">:</span>
+      <span class="description">Edit Current Assignment/Group</span>
+    </li>
+    <li>
+      <span class="keycode">d</span>
+      <span class="colon">:</span>
+      <span class="description">Delete Current Assignment/Group</span>
+    </li>
+    <li>
+      <span class="keycode">a</span>
+      <span class="colon">:</span>
+      <span class="description">Add Assignment to Current Group</span>
+    </li>
+    <li>
+      <span class="keycode">f</span>
+      <span class="colon">:</span>
+      <span class="description">Full Preview/Edit Assignment</span>
+    </li>
+  </ul>
+<% end %>
+
+<% if @context.try_rescue(:module_based?) && !can_do(@context, @current_user, :manage_content) %>
+  <a href="<%= context_url(@context, :context_locks_url) %>" id="assignment_locks_url" style="display: none;">&nbsp;</a>
+  <%= image_tag "lock.png", :style => "display: none;", :id => "assignment_lock_icon", :title => "This assignment is currently locked.  Visit the assignment details page for more information.", :alt => "locked" %>
+<% end %>

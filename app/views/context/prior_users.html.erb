@@ -1,0 +1,40 @@
+<% 
+  add_crumb("People", context_url(@context, :context_users_url))
+  add_crumb("Prior Users")
+  @active_tab="people"
+%>
+<% content_for :page_title do %>Prior Users<% end %>
+
+<% content_for :right_side do %>
+  <div class="rs-margin-lr rs-margin-top">
+    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> Back to People</a>
+  </div>
+<% end %>
+
+<% jammit_css :prior_users %>
+<h2>Prior Users</h2>
+<table id="users">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @prior_memberships.each do |enrollment| %>
+      <tr>
+        <td class="name">
+          <%= link_to(enrollment.user.last_name_first, context_url(@context, :context_user_url, enrollment.user_id)) %>
+          <div class="email">
+            <%= enrollment.user.email %>
+          </div>
+        </td>
+        <td class="type">
+          <%= enrollment.readable_type %>
+        </td>
+        <td class="score"><%= link_to(enrollment.computed_final_score || '--', context_url(@context, :context_student_grades_url, enrollment.user_id)) if enrollment.student? %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,352 @@
+<%
+  jammit_css :quizzes
+  jammit_js :quizzes_bundle
+  content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : 'New Quiz' )
+%>
+<% content_for :right_side do %>
+  <div style="position: relative;">
+    <div id="quiz_content_links" style="display: none;">
+      <div class="options_header">
+        <h2>
+          <a class='quiz_options_link' href='#'>Quiz Options</a>
+          Link to Content
+          <div class="clear"></div>
+        </h2>
+      </div>
+      <%= render :partial => "shared/wiki_sidebar" %>
+    </div>
+    <% form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form"} do %>
+      <input type="hidden" name="activate" value="true"/>
+      <div id="quiz_options_holder">
+        <div class="options_header">
+          <h2>
+            <a class='link_to_content_link' href='#'>Link to Content</a>
+            Quiz Options
+            <div class="clear"></div>
+          </h2>
+        </div>
+        <div id="unpublished_changes_message" class="rs-margin-lr rs-margin-bottom" style="<%= hidden unless @quiz.available? && @quiz.unpublished_changes? %>; font-size: 0.9em;">
+          <%= image_tag "warning.png" %> You have made unpublished changes to this quiz.  These changes will not appear for students until you publish or re-publish the quiz.
+        </div>
+        <div id="quiz_options" class="rs-margin-lr">
+          <table class="stylized-table" style="margin-bottom: 0;">
+            <tr>
+              <td><label for="quiz_assignment_id">This is a: </label></td>
+              <td><select name="quiz[quiz_type]" id="quiz_assignment_id">
+                <option value="practice_quiz">Practice Quiz</option>
+                <option value="assignment" <%= 'selected' if @quiz.quiz_type == 'assignment' %> >Graded Quiz</option>
+                <option value="graded_survey" <%= 'selected' if @quiz.quiz_type == 'graded_survey' %> >Graded Survey</option>
+                <option value="survey" <%= 'selected' if @quiz.quiz_type == 'survey' %> >Ungraded Survey</option>
+              </select></td>
+            </tr>
+            <tr id="quiz_assignment_group" style="<%= hidden if @quiz.quiz_type != 'assignment' && @quiz.quiz_type != 'graded_survey' %>">
+              <td><label for="quiz_assignment_group_id">Group:</label></td>
+              <td><select name="quiz[assignment_group_id]" id="quiz_assignment_group_id" style="width: 100%;">
+                <% current_group_id = @quiz.assignment && @quiz.assignment.assignment_group_id || @quiz.assignment_group_id %>
+                <% @context.assignment_groups.active.each do |g| %>
+                  <option value="<%= g.id %>" <%= 'selected' if g.id == current_group_id%>><%= g.name %></option>
+                <% end %>
+              </select>
+              </td>
+            </tr>
+            <tr id="quiz_title">
+              <td class="nobr"><%= label :quiz, :title, "Quiz Name: " %></td>
+              <td>
+                <div style="margin-right: 1px;">
+                  <%= text_field :quiz, :title, :style => "width: 100%;" %>
+                </div>
+              </td>
+            </tr>
+            <tr id="quiz_points_possible" style="<%= hidden unless @quiz.quiz_type == 'graded_survey' %>">
+              <td><%= label :quiz, :points_possible, "Score: " %></td>
+              <td>
+                <%= text_field :quiz, :points_possible, :style => "width: 50px;" %> pts
+                <div style="font-size: 0.8em;">
+                  students will automatically receive full credit once they take the survey
+                </div>
+              </td>
+            </tr>
+            <tr class="quiz_survey_setting" style="<%= hidden unless @quiz.survey? %>">
+              <td colspan="2">
+                <%= check_box :quiz, :anonymous_submissions %>
+                <%= label :quiz, :anonymous_submissions, "Keep Submissions Anonymous" %>
+              </td>
+            </tr>
+          </table>
+          <span class="title" style="display: none;"><%= !@quiz.title || @quiz.title.empty? ? nbsp : @quiz.title %></span>
+          <span class="assignment_id" style="display: none;"><%= @assignment ? @assignment.id : nbsp %></span>
+        </div>
+        <div class="rs-margin-lr">
+          <table class="stylized-table" cellspacing="0">
+            <tr>
+              <td colspan="2">
+                <%= check_box :quiz, :shuffle_answers %>
+                <%= label :quiz, :shuffle_answers, "Shuffle Answers" %>  
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <input type="checkbox" <%= "checked" if @quiz.time_limit %> name="time_limit" id="time_limit_option"/><label for="time_limit_option"> Time Limit:</label> 
+                <%= text_field :quiz, :time_limit, :style => "width: 30px;" %>
+                <%= label :quiz, :time_limit, "minutes" %>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <input type="hidden" name="quiz[hide_results][never]" value="0"/>
+                <input type="checkbox" name="quiz[hide_results][never]" value="1" id="never_hide_results" <%= 'checked' if @quiz.hide_results != 'always' %> />
+                <label for="never_hide_results">Let Students See their Quiz Results</label>
+                <div style="padding-left: 20px;" class="show_quiz_results_options">
+                  <div id="hide_results_only_after_last_holder">
+                    <input type="hidden" name="quiz[hide_results][last_attempt]" value="0"/>
+                    <input type="checkbox" name="quiz[hide_results][last_attempt]" value="1" id="hide_results_only_after_last" <%= 'checked' if @quiz.hide_results == 'until_after_last_attempt' %> />
+                    <label for="hide_results_only_after_last">Only After their Last Attempt</label>
+                  </div>
+                  <div>
+                    <%= check_box :quiz, :show_correct_answers %>
+                    <%= label :quiz, :show_correct_answers, "Show the Correct Answers" %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %> name="multiple_attempts" value="1" id="multiple_attempts_option"/><label for="multiple_attempts_option"> Allow Multiple Attempts</label>
+                <div id="multiple_attempts_suboptions" style="padding-left: 20px;">
+                  <div>
+                    <label for="keep_score_select">Keep
+                    <select id="keep_score_select" name="quiz[scoring_policy]">
+                      <option value="keep_highest">Highest</option>
+                      <option value="keep_latest">Latest</option>
+                    </select>
+                    Quiz Score</label>
+                  </div>
+                  <div>
+                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 0 %> name="limit_attempts" id="limit_attempts_option"/><label for="limit_attempts_option"> Limit to</label> 
+                    <%= text_field :quiz, :allowed_attempts, :style => "width: 20px;", :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts) %>
+                    <%= label :quiz, :allowed_attempts, "attempts" %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <input type="checkbox" <%= 'checked' if @quiz.access_code && !@quiz.access_code.empty? %> name="require_access_code" id="require_access_code"/><label for="require_access_code">Require an access code for this quiz</label>
+              </td>
+            </tr>
+            <tr id="access_code_suboptions" style="display: none;">
+              <td>
+                <label class="nobr" style="padding-left: 20px;" for="quiz_access_code">Access Code:</label>
+              </td>
+              <td>
+                <input style="width:100%;" type="text" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>"/>
+              </td>
+            </tr>
+            <tr>
+              <td class="nobr">Due Date:</td>
+              <td style="width: 200px;">
+                <div style="margin-right: 1px;">
+                  <%= text_field :quiz, :due_at, :style => "width: 100%; margin-right: -24px;", :class => "datetime_field", :value => datetime_string(@quiz.due_at) %>
+                </div>
+              </td>
+            </tr>
+            <tr>          
+              <td class="nobr">Locked Until:</td>
+              <td style="width: 200px;">
+                <div style="margin-right: 1px;">
+                  <%= text_field :quiz, :unlock_at, :style => "width: 100%; margin-right: -24px;", :class => "datetime_field", :value => datetime_string(@quiz.unlock_at) %>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="nobr">Locked After:</td>
+              <td style="width: 200px;">
+                <div style="margin-right: 1px;">
+                  <%= text_field :quiz, :lock_at, :style => "width: 100%; margin-right: -24px;", :class => "datetime_field", :value => datetime_string(@quiz.lock_at) %>
+                </div>
+              </td>
+            </tr>
+          </table>
+          <div style="font-size: 1.1em;" id="quiz_display_points_possible">
+            <span style="font-weight: bold; font-size: 1.2em;" class="points_possible"><%= @quiz.points_possible %></span> Points Possible
+          </div>
+        </div>
+      </div>
+      <div class="button-container rs-margin-lr">
+        <div>
+            <a href="<%= context_url(@context, :context_quiz_take_url, @quiz, :preview => 1) %>">Preview the Quiz</a>
+        </div>
+        <button type="submit" class="save_quiz_button button">Save Settings</button>
+        <button type="submit" class="publish_quiz_button button button-default"><%= "Re-" if @quiz.available? %>Publish Quiz</button>
+        <div style="display: none;">
+        <button type="submit" class="save_quiz_button button" style="height: 50px;">Save Quiz<div style="font-size: 0.7em;">but don't Publish</div></button>
+        <button type="submit" class="publish_quiz_button button button-default" style="height: 50px; float: right;"><%= "Re-" if @quiz.available? %>Publish Quiz</button>
+        <div style="text-align: right; margin-right: 30px;">
+          <a href="#" class="whats_the_difference_link help">What's the difference?</a>
+          <div id="whats_the_difference_dialog">
+            When you publish a quiz, all your changes are visible to students.  If you've made
+            changes 
+          </div>
+        </div>
+        </div>
+        <% if request.path_parameters['action'] == "new" %>
+          <div style="text-align: left;">
+            <a href="#" class="start_over_link button-secondary">Start Over</a>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <div class="rs-margin-lr rs-margin-top">
+    <% if @quiz.available? %>
+      <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="no-hover back">Return to Quiz Page</a><br/>
+    <% end %>
+    <a href="#" class="add_question_link add">Add a New Question</a><br/>
+    <!--a class="add" href="#">Add an Existing Question</a><br/-->
+  </div>
+<% end %>
+<% js_block do %>
+<script>
+var quizAssignmentId = "<%= @assignment ? @assignment.id : "" %>";
+$(document).ready(function() {
+  $(".delete_quiz_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".quiz").confirmDelete({
+      message: "Are you sure you want to delete this quiz?",
+      url: $(this).attr('href')
+    });
+  });
+});
+</script>
+<% end %>
+<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
+
+<h2><%= @quiz && !@quiz.new_record? ? "Edit Quiz" : "Create a New Quiz" %></h2>
+<div style="display: none;" id="quiz_urls">
+  <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="update_quiz_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_question_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_quiz_reorder_url, @quiz.id) %>" class="reorder_questions_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_group_url">&nbsp;</a>
+</div>
+<%= render :partial => "quiz_preview" %>
+<% if @has_student_submissions %>
+<div style="margin-bottom: 5px;">
+  <%= image_tag "warning.png" %> Students have either already taken or started taking this quiz, 
+  so be careful about editing it.  If you change any quiz questions in a significant way, you may
+  want to consider re-grading students who took the old version of the quiz.
+</div>
+<% end %>
+<div style="margin-bottom: 25px;">
+  Quiz Instructions:
+  <a style="float: right; font-size: 0.8em; cursor: pointer;" href="#" class="toggle_description_views_link">Switch Views</a>
+  <textarea style="display: block; width: 100%; margin: 0px auto; height: 125px;" id="quiz_description"><%= @quiz.description %></textarea>
+</div>
+<div style="margin-bottom: 5px;">
+  <input type="checkbox" id="show_question_details"/><label for="show_question_details"> Show Question Details</label>
+</div>
+<div id="questions" class="question_editing brief">
+  <% @quiz.root_entries.each do |question| %>
+    <% if question[:entry_type] == "quiz_group" %>
+      <%= render :partial => "quizzes/question_group", :object => question %>
+    <% else %>
+      <%= render :partial => "quizzes/display_question", :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question.id}"} %>
+    <% end %>
+  <% end %>
+</div>
+<%= render :partial => "quizzes/display_question", :object => nil, :locals => {:editing => true } %>
+<%= render :partial => "quizzes/display_answer", :object => nil %>
+<%= render :partial => "quizzes/form_answer", :object => nil %>
+<%= render :partial => "quizzes/form_question", :object => nil %>
+<%= render :partial => "quizzes/question_group", :object => nil %>
+<%= render :partial => "quizzes/find_question_from_bank" %>
+<div style="text-align: center;" class="add_question question_editing">
+  <a href="#" class="add_question_link add">New Question</a>
+  <a href="#" class="add_question_group_link add" style="margin-left: 20px; margin-right: 20px;">New Question Group</a>
+  <% if feature_enabled?(:question_banks) %>
+    <a href="#" class="find_question_link find">Find Questions</a>
+  <% end %>
+</div>
+<div class="question_generated" style="display: none;">
+  <div class="question_generated_description"></div>
+  <textarea style="width: 600px; height: 400px;" id="copy_paste_box"></textarea>
+</div>
+<div id="help_with_equations_dialog" style="display: none;">
+  <div id="equations_dialog_tabs">
+    <ul>
+      <li><a href="#intro">Intro</a></li>
+      <li><a href="#variables">Variables</a></li>
+      <li><a href="#functions">Functions</a></li>
+    </ul>
+    <div id="intro">
+      <p>
+      Calculated questions are based on a set of one or more formulas computed 
+      in order.  You can define intermediate variables in these formulas, but the
+      numerical result of the last formula is what is used to generate the
+      correct answer.  For example:
+      </p>
+      <table>
+        <tr>
+          <td><pre>7+3*5</pre></td>
+          <td><pre style="font-weight: bold;"> = 22</pre></td>
+        </tr><tr>
+          <td><pre>value = 5*(6+7)</pre></td>
+          <td><pre style="font-weight: bold;"> = 65</pre></td>
+        </tr><tr>
+          <td><pre>value + 6</pre></td>
+          <td><pre style="font-weight: bold;"> = 71</pre></td>
+        </tr>
+      </table>
+      <p>For this set of formulas, the final answer is 71.  However,
+      there are no predefined variables, so all students would have the
+      same question with the same answer. See the "variables" tab for more
+      information on variables.</p>
+    </div>
+    <div id="variables">
+      <p>You can also define variables in you question text using brackets 
+      ("What is [a] + [b]?").  For every variable, you'll see an "Example Value"
+      based on the variable settings.  This is so you can check your math and
+      make sure your formulas work.
+      </p>
+      <p>For example, if your question was "What is [a] + 5?" then you'd
+      be asked to define the variable "a".  If the example value for "a" 
+      were 5.2, you could write:
+      <table>
+        <tr>
+          <td><pre>a + 5</pre></td>
+          <td><pre style="font-weight: bold;"> = 10.2</pre></td>
+        </tr>
+      </table>
+      <p>With this formula you can generate any number of solution sets, with a 
+      different value of "a" in each set.  One student might see the question,
+      "What is 5.2 + 5?" and another might see "What is 9 + 5?".</p>
+    </div>
+    <div id="functions">
+      <p>In addition to variables, there are also a collection of helper functions
+      you can use to generate useful values.  For example:
+      </p>
+      <table>
+        <tr>
+          <td><pre>abs(-2)</pre></td>
+          <td><pre style="font-weight: bold;"> = 2</pre></td>
+        </tr><tr>
+          <td><pre>ln(1)</pre></td>
+          <td><pre style="font-weight: bold;"> = 0</pre></td>
+        </tr><tr>
+          <td><pre>round(5.253)</pre></td>
+          <td><pre style="font-weight: bold;"> = 5</pre></td>
+        </tr>
+      </table>
+      <p>To see an exaplanation of a given helper function, select it from the list
+      below:
+      </p>
+      <p>
+        <select id="calc_helper_methods">
+        </select>
+        <div id="calc_helper_method_description">
+        </div>
+        <div id="calc_helper_method_examples" style="margin: 5px 20px;">
+        </div>
+      </p>
+    </div>
+  </div>
+</div>

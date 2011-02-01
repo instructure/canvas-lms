@@ -1,0 +1,44 @@
+<div class="section <%= "read_only" if (page_section && (page_section["attachment_id"] || page_section["submission_id"])) %>" id="page_section_<%= idx %>">
+  <a href="#" class="move_link no-hover" title="Drag to rearrange sections"><%= image_tag "move.png" %></a>
+  <div class="section_type_name">
+    <% if !page_section || page_section["section_type"] == "rich_text" %>
+      Rich Text Content
+    <% elsif page_section["section_type"] == "html" %>
+      HTML/Embedded Content
+    <% elsif page_section["section_type"] == "submission" %>
+      Course Submission
+    <% elsif page_section["section_type"] == "upload" %>
+      Image/File Upload
+    <% end %>
+  </div>
+  <div class="links">
+    <a href="#" class="delete_page_section_link no-hover" title="Delete this section"><%= image_tag "delete.png" %></a>
+  </div>
+  <div class="section_content">
+    <% if page_section %>
+      <% if !page_section["section_type"] || page_section["section_type"] == "rich_text" || page_section["section_type"] == "html" %>
+        <%= raw(page_section["content"] || "Nothing Entered Yet") %>
+      <% elsif page_section["section_type"] == "upload" %>
+        <div style="text-align: center;" class="upload">
+          <% attachment = @attachments.find{|a| a.uuid == page_section["attachment_id"]} %>
+          <% if attachment && attachment.content_type.match(/\Aimage/) %>
+            <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>" class="no-hover"><%= image_tag eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %></a>
+          <% elsif attachment %>
+            <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>">Click here to Download <span class="filename"><%= attachment.display_name %></span></a>
+          <% end %>
+        </div>
+      <% elsif page_section["section_type"] == "submission" %>
+        <% submission = @portfolio.user.submissions.find_by_id(page_section["submission_id"]) %>
+        <% if submission %>
+          <iframe class="submission_preview" src="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>" style="border: 1px solid #aaa; width: 100%; height: 300px; display: block; margin-left: auto; margin-right: auto;">
+          </iframe>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+  <div style="display: none;">
+    <span class="section_type"><%= (page_section["section_type"] || "rich_text") rescue "rich_text" %></span>
+    <span class="attachment_id"><%= (page_section["attachment_id"] || nbsp) rescue nbsp %></span>
+    <span class="submission_id"><%= (page_section["submission_id"] || nbsp) rescue nbsp %></span>
+  </div>
+</div>

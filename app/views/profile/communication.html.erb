@@ -1,0 +1,230 @@
+<% 
+  add_crumb(@user.short_name, profile_path )
+  add_crumb("Communication Preferences", communication_profile_path )
+%>
+<% content_for :page_title do %>Communication Preferences<% end %>
+
+<% content_for :right_side do %>
+  <%= render :partial => "ways_to_contact" %>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(".notification_preferences .frequency").click(function(event) {
+    event.preventDefault();
+    if(!$(this).hasClass('selected')) {    
+      $(this).parents("tr").find(".frequency").removeClass('selected').removeClass('selected_pending');
+      $(this).addClass('selected_pending');
+    }
+  });
+  $(".notification_preferences .add_notification_link").click(function(event) {
+    event.preventDefault();
+    var $prev = $(this).parents("tr").prev();
+    var $next = $prev.clone(true);
+    $next.find(".delete_preference_link").show();
+    $next.find(".frequency.selected").removeClass('selected').addClass('selected_pending');
+    $prev.after($next);
+    var $prev = $next.prev(".preference");
+    while($prev.length > 0) {
+      $prev.find(".delete_preference_link").show();
+      $prev = $prev.prev(".preference");
+    }
+    $next.find(".contact_type_select").change();
+//    $next.addClass('event_pending').find(":input").attr('disabled', true);
+  });
+  $(".delete_preference_link").bind('click', function(event, skipAnimate) {
+    event.preventDefault();
+    var $first = $(this).parents(".preference");
+    while($first.prev(".preference").length > 0) {
+      $first = $first.prev(".preference");
+    }
+    var cnt = 1;
+    var $last = $first;
+    while($last.next(".preference").length > 0) {
+      $last = $last.next(".preference");
+      cnt++;
+    }
+    var speed = skipAnimate ? 0 : 'normal';
+    $(this).parents(".preference").fadeOut(speed, function() {
+      if(cnt < 3) {
+        $first.find(".delete_preference_link").hide();
+        while($first.next(".preference").length > 0) {
+          $first = $first.next(".preference");
+          $first.find(".delete_preference_link").hide();
+        }
+      }
+      $(this).remove();
+    });
+  });
+  $(".sms_select").change(function(event) {
+    if($(this).val() == "new") {
+      $(".add_contact_link").click();
+    }
+  });
+  $(".email_select").change(function(event) {
+    if($(this).val() == "new") {
+      $(".add_email_link").click();
+    }
+  });
+  $(".contact_type_select").change(function(event) {
+    var $preference = $(this).parents("tr.preference");
+    var val = $(this).val();
+    if($preference.find(".contact_select").hasClass(val)) { return; }
+    var $new_select = $("#select_templates ." + val).clone(true);
+    $new_select[0].selectedIndex = 0;
+    $preference.find(".contact_select").after($new_select).remove();
+    $preference.find(".at").showIf(val == 'email_select' || val == 'sms_select');
+  }).each(function() { $(this).change(); });
+  $(".save_preferences_button").click(function(event) {
+    event.preventDefault();
+    var $button = $(this);
+    //$("html,body").scrollTo({top: $(".notification_preferences").offset().top});
+    $(".notification_preferences").loadingImage();
+    var data = {};
+    $(".notification_preferences tr.preference").each(function() {
+      var params = $(this).getTemplateData({textValues: ['category_slug', 'channel_id']});
+      var frequency = 'immediately';
+      params.channel_id = $(this).getFormData().channel_id;
+      var $frequency = $(this).find(".frequency.selected,.frequency.selected_pending");
+      if($frequency.hasClass('never')) {
+        frequency = 'never';
+      } else if($frequency.hasClass('daily')) {
+        frequency = 'daily';
+      } else if($frequency.hasClass('weekly')) {
+        frequency = 'weekly';
+      }
+      if(params.category_slug && params.channel_id) {
+        data["category_" + params.category_slug + "[channel_" + params.channel_id + "]"] = frequency;
+      }
+    });
+    var url = $("#contact_urls .update_communication_url").filter(":last").attr('href');
+    $button.text("Saving Preferences...").attr('disabled', true);
+    $.ajaxJSON(url, 'POST', data, function(data) {
+      $button.text("Saved Preferences!").attr('disabled', false);
+      setTimeout(function() {
+        $button.text("Save Preferences");
+      }, 2500);
+      $.flashMessage('Communication Preferences updated');
+      $(".notification_preferences").loadingImage('remove');
+      $("tr.preference .frequency.selected_pending").removeClass('selected_pending').addClass('selected');
+      //location.reload();
+      var found = {};
+      $("tr.preference").each(function() {
+        var slug = $(this).getTemplateData({textValues: ['category_slug']}).category_slug;
+        if(found[slug]) {
+          $(this).find(".delete_preference_link").triggerHandler('click', true);
+        }
+        found[slug] = true;
+      });
+      found = {}
+      for(var idx in data) {
+        var policy = data[idx].notification_policy;
+        if(found[policy.notification_id]) {
+          $(".add_notification_" + policy.notification_id).click();
+        }
+        found[policy.notification_id] = true;
+        var $preference = $(".preference_" + policy.notification_id + ":last");
+        var type = "email_select";
+        if($(".channel_option_" + policy.communication_channel_id).parents("select").hasClass('sms_select')) {
+          type = "sms_select";
+        } else if($(".channel_option_" + policy.communication_channel_id).parents("select").hasClass('facebook_select')) {
+          type = "facebook_select";
+        }
+        $preference.find(".contact_type_select").val(type).change();
+        $preference.find(".contact_select").val(policy.communication_channel_id);
+        $preference.find(".frequency." + policy.frequency).click();
+      }
+      $("tr.preference .frequency.selected_pending").removeClass('selected_pending').addClass('selected');
+    }, function(data) {
+      $button.text("Problem Saving Preferences").attr('disabled', false);
+      $(".notification_preferences").loadingImage('remove');
+      $.flashError('Oops! Something broke.  Try saving again');
+    });
+  });
+  $(".sms_select, .email_select").change(function() {
+    if($(this).parents("tr.preference").length > 0) {
+      $(this).parents("tr.preference td.frequency.selected").removeClass('selected').addClass('selected_pending');
+    }
+  });
+});
+</script>
+<% end %>
+<% content_for :stylesheets do %>
+<style>
+.notification_preferences {
+  border-collapse: collapse;
+  width: 100%;
+}
+.notification_preferences .notification_type {
+  font-size: 1.2em;
+}
+.notification_preferences .frequency_header,
+.notification_preferences .frequency {
+  font-size: 0.8em;
+  width: 40px;
+  text-align: center;
+}
+.notification_preferences .frequency  div {
+  border: 1px solid #aaa;
+  width: 40px;
+  margin: 1px;
+  height: 22px;
+  cursor: pointer;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  background: no-repeat center center;
+}
+.notification_preferences .frequency  div:hover {
+  opacity: 0.7;
+  -moz-opacity: 0.7;
+  background: url(/images/pass.png) #ffffa8 no-repeat center center;
+}
+.notification_preferences .frequency.selected_pending  div,
+.notification_preferences .frequency.selected div {
+  opacity: 1;
+  -moz-opacity: 1;
+  background: url(/images/pass.png) #fe8 no-repeat center center;
+}
+.notification_preferences .frequency.selected div {
+  background-color: #afa;
+}
+.notification_preferences .contact_type_select {
+  /*font-weight:bold;*/
+}
+.notification_preferences .contact_select {
+  opacity:0.8;
+}
+.notification_preferences tr.preference:hover .contact_select, 
+.notification_preferences .contact_select:active, 
+.notification_preferences .contact_select:focus  {
+  opacity:1;
+}
+.notification_preferences td {
+  padding:0;
+}
+/*.contact_type_select, .contact_select {
+  border: 1px solid #fff;
+}
+.contact_type_select:hover, .contact_select:hover {
+  border: 1px solid #ccc;
+}*/
+</style>
+<% end %>
+
+<table class="notification_preferences" cellspacing="0">
+  <tr>
+    <td colspan="2"><h2>Notification Preferences</h2></td>
+    <td class="frequency_header">Right Away</td>
+    <td class="frequency_header">Daily</td>
+    <td class="frequency_header">Weekly</td>
+    <td class="frequency_header">Never</td>
+    <td>&nbsp;</td>
+  </tr>
+  <% @notification_categories.each do |n| %>
+    <%= render :partial => "notification_preference", :object => n, :locals => {:list => @policies.select{|p| p.notification_id == n.id} } %>
+  <% end %>
+</table>
+<p class="button-container">
+  <button type="button" class="save_preferences_button button">Save Preferences</button>
+</p>
+

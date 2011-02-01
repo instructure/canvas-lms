@@ -1,0 +1,49 @@
+<% inbox_item ||= nil %>
+<% message_read = inbox_item && inbox_item.read? %>
+<div class="<%= 'read' if message_read %> <%= inbox_item.try_rescue(:item_asset_string) %> communication_message inbox_item <%= inbox_item.try_rescue(:asset_type).try_rescue(:underscore) %>" style="<%= hidden unless inbox_item %>" id="inbox_item_<%= inbox_item ? inbox_item.id : "blank" %>">
+  <div class="header">
+    <div class="post_date">
+      <span class="time_ago_date created_at" style="padding-right: 45px;"><%= datetime_string(inbox_item.try_rescue(:created_at)) || nbsp %></span>
+      <% if !inbox_item || inbox_item.asset_type == 'ContextMessage' %>
+        <a href="#" class="reply_inbox_item_link no-hover" title="Reply to this Message"><%= image_tag "reply.png" %></a>
+      <% end %>
+      <a href="<%= inbox_item_path(inbox_item ? inbox_item.id : "{{ id }}") %>" class="delete_inbox_item_link no-hover" title="Remove this Message"><%= image_tag "delete_circle.png" %></a>
+    </div>
+    <div class="header_title">
+      <span class="unread_icons">
+        <%= image_tag "email_big.png", :class => "header_icon email_header_icon unread_icon", :alt => "email", :title => "Email Message" %>
+        <%= image_tag "discussion_topic.png", :class => "header_icon discussion_header_icon unread_icon", :alt => "topic", :title => "Discussion Message" %>
+        <%= image_tag "grading_icon.png", :class => "header_icon submission_header_icon unread_icon", :alt => "email", :title => "Grading Message", :style => "width: 16px; height: 16px; padding: 2px;" %>
+      </span>
+      <span class="read_icons">
+        <%= image_tag "email_big-gray.png", :class => "header_icon email_header_icon read_icon", :alt => "email", :title => "Email Message - read" %>
+        <%= image_tag "discussion_topic-gray.png", :class => "header_icon discussion_header_icon read_icon", :alt => "email", :title => "Discussion Message - read" %>
+        <%= image_tag "grading_icon-gray.png", :class => "header_icon submission_header_icon read_icon", :alt => "email", :title => "Grading Message - read", :style => "width: 16px; height: 16px; padding: 2px;" %>
+      </span>
+      <a href="<%= inbox_item_path(inbox_item ? inbox_item.id : "{{ id }}") %>" class="inbox_item_url" style="display: none;">&nbsp;</a>
+      <a href="#" class="title inbox_item_link">
+        <span class="subject"><%= inbox_item.try_rescue(:subject) || "No Title" %></span>
+      </a>
+      <div class="sub_title">
+        <a class="context_name" style="display: inline;" href="<%= context_prefix(inbox_item.try_rescue(:context_code)) %>">
+          <%= inbox_item.try_rescue(:context_short_name) %>
+        </a>
+        <a href="/<%= inbox_item.try_rescue(:context_type_plural) || "{{ context_type_pluralized }}" %>/<%= inbox_item.try_rescue(:context_id) || "{{ context_id }}" %>/users/<%= inbox_item.try_rescue(:sender_id) || "{{ sender_id }}" %>" class="user_name sender_name"><%= context_user_name('user', inbox_item.try_rescue(:sender_id)) %></a>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div style="display: none;">
+    <span class="asset_type"><%= inbox_item.try_rescue(:asset_type).try_rescue(:underscore) || nbsp %></span>
+  </div>
+  <div class="content">
+    <div class="inner_content">
+    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar(inbox_item.try_rescue(:sender_id), inbox_item.try_rescue(:context_code)) %></div>
+    <div style="float: right; display: none;">
+      <a href="<%= inbox_item_path(inbox_item ? inbox_item.id : "{{ id }}") %>" class="button small-button delete_inbox_item_link">Remove</a>
+    </div>
+    <div class="body_teaser"><%= inbox_item.try_rescue(:body_teaser) || nbsp %></div>
+    <div class="clear"></div>
+    </div>
+  </div>
+</div>

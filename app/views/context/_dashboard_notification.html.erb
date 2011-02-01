@@ -1,0 +1,24 @@
+<% message = dashboard_notification; show_context ||= false %>
+<div style="<%= hidden unless message %>" class="communication_message message_<%= message.try_rescue(:context_code) %> <%= 'show_context_communication_message' if show_context %> dashboard_notification">
+  <div class="header">
+    <div class="header_title">
+      <%= image_tag "#{slugify(message.try_rescue(:notification_category)) || 'notification'}_icon.png", :alt => 'notification', :title => message.try_rescue(:notification_name), :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
+      <a href="<%= message.try_rescue(:url).try_rescue(:sub, /\Ahttp:\/\/[^\/]*/, "") %>" class="title subject"><%= message.try_rescue(:subject) %></a>
+      <div class="sub_title">
+        <span class="context_code group_<%= message.try_rescue(:context_code) %>"><%= cached_context_short_name(message.try_rescue(:context_code)) %></span>
+      </div>
+    </div>
+    <div class="post_date time_ago_date"><%= datetime_string(message.try_rescue(:created_at)) || nbsp %></div>
+    <% if false %>
+    <div class="under_links"><a href="<%= context_url(message.asset_context, :context_notification_url, message.id) %>" class="delete_message_link">clear message</a></div>
+    <% end %>
+    <div style="display: none;" class="notification_name"><%= message.try_rescue(:notification_name) || nbsp %></div>
+    <div style="clear: left;"></div>
+  </div>
+  <div class="content">
+    <div class="message user_content" style="white-space: pre-wrap;"><%= message.try_rescue(:body) || nbsp %></div>
+    <div class="course_id" style="display: none;"><%= message.asset_context_id if message && message.asset_context_type == 'Course' %></div>
+    <div class="course_role" style="display: none;"><%= @role_lookups["#{message.try_rescue(:context_code)}"] if message && @role_lookups %></div>
+    <div class="clear"></div>
+  </div>
+</div>

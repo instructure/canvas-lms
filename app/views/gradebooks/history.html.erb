@@ -1,0 +1,73 @@
+<% content_for :page_title do %>Gradebook History - <%= @context.name %><% end %>
+
+<% content_for :auto_discovery do %>
+  <% if @context_enrollment %>
+    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => "Course Gradebook Atom Feed"}) %>
+  <% end %>
+<% end %>
+
+<a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
+<ul id="gradebook-history">
+<% @days.each do |day| %>
+  <li>
+    <h3><%= day.date.try_rescue(:strftime, "%B %d, %Y") %></h3>
+    <ul>
+    <% day.graders.each do |grader| %>
+      <li clas="grader">
+        <h4><%= grader.name %></h4>
+        <ul>
+        <% grader.assignments.each do |assignment| %>
+          <li class='gradebook-history-assignment'>
+            <div class="assignment_header">
+              <span class="changes ui-state-highlight ui-corner-all"><%= pluralize assignment.submission_count, "change" %></span>
+              <a href="<%= context_url(@context, :context_assignment_url, assignment.assignment_id) %>" class="assignment-header"><%= assignment.name %></a>
+              <span class="ui-icon ui-icon-circle-arrow-s"></span>
+              <br class="clear" />
+            </div>
+            <div class="assignment_details" style="display:none;">
+              <table cellspacing="0" class='ui-widget ui-widget-content ui-corner-all zebra-stripes'>
+                <thead class='ui-widget-header'>
+                  <tr>
+                    <th>Student</th>
+                    <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Before&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                    <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;After&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                    <th>Current</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% assignment.submissions.each_with_index do |submission, i| %>
+                  <tr class='<%= i.even? ? "even" : "odd" %> <%= raw({
+                    :assignment_id =>  submission.assignment_id,
+                    :user_id => submission.user_id,
+                    }.to_json) %>'>
+                    <th scope="row"><%= submission.student_name %></th>
+                    <td>
+                      <a href="#" class="ui-corner-all revert-grade-link" >
+                        <span class="ui-icon ui-icon-arrowrefresh-1-w"></span>
+                        <span title="<%= submission.previous_graded_at %> by <%= submission.previous_grader %>" class='ui-corner-all grade'><%= display_grade(submission.previous_grade) %></span>
+                        <span class="revert">Revert to this grade</span>
+                      </a>
+                    </td>
+                    <td>
+                      <a href="#" class="ui-corner-all revert-grade-link" >
+                        <span class="ui-icon ui-icon-arrowrefresh-1-w"></span>
+                        <span title="<%= submission.new_graded_at %> by <%= submission.new_grader %>" class='ui-corner-all grade'><%= display_grade(submission.new_grade) %></span>
+                        <span class="revert">Revert to this grade</span>
+                      </a>
+                    </td>
+                    <td><span title="<%= submission.current_graded_at %> by <%= submission.current_grader %>" class="current_grade assignment_<%= submission.assignment_id %>_user_<%= submission.user_id  %>_current_grade"><%= display_grade(submission.current_grade) %></span></td>
+                  </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </li>
+        <% end %>
+        </ul>
+      </li>
+    <% end %>
+    </ul>
+  </li>
+<% end %>
+</ul>
+<% jammit_js :gradebook_history %>

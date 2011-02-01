@@ -1,0 +1,45 @@
+<% show_section ||= false %>
+<% include_type ||= false; show_information_link ||= false %>
+<% enrollments = enrollment[1] if enrollment.is_a?(Array) %>
+<% enrollment = enrollment[1][0] if enrollment.is_a?(Array) %>
+<li id="enrollment_<%= enrollment.try_rescue(:id) || "blank" %>" class="user <%= "pending" if enrollment.try_rescue(:pending?) %> <%= enrollment.class.to_s.underscore %> user_<%= enrollment.try_rescue(:user_id) %>" 
+<% if enrollment.try_rescue(:user) %>
+  title="<%= enrollment.user.name %>: <%= enrollment.user.email %>"
+<% end %>>
+  <span class="links" style="<%= hidden if enrollment && (enrollment.user == @current_user || (@current_enrollment && @current_enrollment.type != 'TeacherEnrollment')) %>">
+    <% if show_information_link %>
+    <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
+    <% end %>
+    <% if enrollment && enrollment.defined_by_sis? %>
+      <a href="<%= context_url(@context, :context_unenroll_url, (enrollment.try_rescue(:id) || "{{ id }}" ) ) %>" class="unenroll_user_link cant_unenroll no-hover" title="Can't Remove User from Course"><%= image_tag "delete_circle_gray.png" %></a>
+    <% else %>
+      <a href="<%= context_url(@context, :context_unenroll_url, (enrollment.try_rescue(:id) || "{{ id }}" ) ) %>" class="unenroll_user_link no-hover" title="Remove User from Course"><%= image_tag "delete_circle.png" %></a>
+    <% end %>
+    <a href="<%= re_send_confirmation_url( enrollment.try_rescue(:user_id) || "{{ user_id }}", enrollment.try_rescue(:user).try_rescue(:communication_channel).try_rescue(:id) || "{{ communication_channel_id }}", :enrollment_id => enrollment.try_rescue(:id) || "{{ id }}" ) rescue "#" %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
+  </span>
+  <a href="<%= context_url(@context, :context_user_url, enrollment.try_rescue(:user_id) || "{{ user_id }}") %>" class="name"><%= enrollment.try_rescue(:user).try_rescue(:last_name_first) %></a>
+  <div class="short_name"><%= enrollment.try_rescue(:user).try_rescue(:short_name) %></div>
+  <% if include_type || (enrollment && enrollment.limit_priveleges_to_course_section) %>
+    <div class="enrollment_type">enrolled as a <%= enrollment.try_rescue(:readable_type) %><%= " with section-only access" if enrollment && enrollment.limit_priveleges_to_course_section %></div>
+  <% end %>
+  <div class="email"><%= enrollment.try_rescue(:user).try_rescue(:email) %></div>
+  <div class="associated_user associated" style="<%= hidden unless enrollment.try_rescue(:associated_user_id) %>">
+    linked to:
+    <span class="associated_user_name associate_user_link"><%= context_user_name(@context, enrollment.try_rescue(:associated_user_id)) %></span>
+  </div>
+  <div class="associated_user unassociated" style="<%= hidden if enrollment && enrollment.try_rescue(:associated_user_id) %>">
+    <a href="#" class="associate_user_link">link to a student</a>
+  </div>
+  <% if show_section && enrollments %>
+    <% enrollments.each do |enrollment| %>
+      <% if enrollment && enrollment.course_section %>
+        <div class="section"><%= enrollment.course_section.display_name %></div>
+      <% end %>
+    <% end %>
+  <% end %>
+  <span class="invitation_sent_at" style="display: none;"><%= datetime_string(enrollment.try_rescue(:updated_at)) || nbsp %></span>
+  <span class="associated_user_id" style="display: none;"><%= enrollment.try_rescue(:association_user_id) %></span>
+  <span class="id" style="display: none;"><%= enrollment.try_rescue(:id) %></span>
+  <span class="user_id" style="display: none;"><%= enrollment.try_rescue(:user_id) %></span>
+  <span class="clear"></span>
+</li>

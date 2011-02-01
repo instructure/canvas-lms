@@ -1,0 +1,206 @@
+<% content_for :page_title do %>Web Conferences: <%= @context.name %><% end %>
+
+<% content_for :right_side do %>
+  <% if can_do(@context.web_conferences.new, @current_user, :create) %>
+    <div class="rs-margin-lr rs-margin-top"><a href="#" class="add_conference_link button button-sidebar-wide"><%= image_tag "add.png" %> Make a New Conference</a></div>
+  <% end %>
+<% end %>
+<div id="no_conferences_message" style="<%= hidden unless @conferences.empty? %>">
+  <h2>Web Conferences</h2>
+  <% if can_do(@context.web_conferences.new, @current_user, :create) %>
+    <% if @context.is_a?(Course) %>
+      <p>Web conferences let you communicate remotely with class members.  Teachers can present
+      lectures using their webcam and microphone, demonstrate how to use computer 
+      tools by broadcasting their computer screen, or even just have remote office hours.
+      </p>
+      <p>To start a conference now, click the "Make a New Conference" link.</p>
+    <% else %>
+      <p>Web conferences let you communicate remotely with group members.  You can organize
+      meetings or study sessions without having to meet in person using webcams, microphones,
+      sharing your computer screen, or using digital whiteboards.
+      </p>
+      <p>To start a conference now, click the "Make a New Conference" link.</p>
+    <% end %>
+  <% else %>
+    <p>Web conferences are a way to meet remotely with <%= @context.class.to_s.downcase %> members
+    for things like study sessions, virtual office hours, etc.  Web conferencing tools let
+    you share video and audio using your computer's webcam, and also offer additional tools
+    like screen sharing and digital whiteboards.</p>
+    <% if can_do(@context.web_conferences.new, @current_user, :create) %>
+      <p>You can start your own web conference and invite the entire <%= @context.class.to_s.downcase %>,
+      or just select members.  Click "Make a New Conference" to get started.</p>
+    <% end %>
+  <% end %>
+</div>
+
+<% form_for :web_conference, :url => context_url(@context, :context_conferences_url), :html => {:id => "add_conference_form", :style => "display: none;", :class => "communication_message"} do |f| %>
+  <div class="header">
+    <span class="title">Start a New Conference</span>
+  </div>
+  <div class="content">
+    <table class="formtable" style="width: 100%;">
+      <tr>
+        <td class="nobr" style="width: 5px;"><%= f.label :title, "Name:", :value => "#{@context.name} Conference" %></td>
+        <td><%= f.text_field :title, :style => "width: 200px;", :value => "#{@context.name} Conference" %></td>
+      </tr><tr style="<%= hidden unless WebConference.conference_types.length > 1 %>">
+        <td class="nobr" style="width: 5px;"><%= f.label :conference_type, "Type:" %></td>
+        <td><%= f.select :conference_type, WebConference.conference_types.map{|c| [c['name'], c['name']] } %></td>
+      </tr><tr>
+        <td class="nobr" style="width: 5px;"><%= f.label :duration, "Duration:" %></td>
+        <td><%= f.text_field :duration, :style => "width: 25px;", :value => "60" %> minutes</td>
+      </tr><tr>
+        <td colspan="2">
+          <%= f.label :description, "Description:" %><br/>
+          <%= f.text_area :description, :style => "display: block; margin: 0 auto; width: 90%; height: 50px;" %>
+        </td>
+      </tr><tr>
+        <td style="vertical-align: top;">Members:</td>
+        <td>
+          <div>
+            <%= check_box :user, :all, :checked => true, :class => "all_users_checkbox" %>
+            <%= label :user, :all, "Invite All Course Members" %> 
+            <ul id="members_list" style="display: none;">
+              <% @users.find(:all, :order => 'sortable_name').uniq.each do |user| %>
+                <% if user != @current_user %>
+                  <li class="member user_<%= user.id %>">
+                    <%= check_box :user, "#{user.id}".to_sym, :value => user.id %>
+                    <%= label :user, "#{user.id}".to_sym, user.last_name_first %>
+                  </li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        </td>
+      </tr><tr>
+        <td class="button-container" colspan="2">
+          <button type="submit" class="button">Create Conference</button>
+          <button type="button" class="cancel_button button-secondary">Cancel</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+<% end %>
+
+<div style="display: none;">
+  <a href="<%= context_url(@context, :context_conferences_url) %>" class="add_conference_url">&nbsp;</a>
+</div>
+<div id="conferences">
+<% @conferences.each do |conference| %>
+  <% if can_do(conference, @current_user, :read) %>
+    <%= render :partial => "shared/conference", :object => conference %>
+  <% end %>
+<% end %>
+</div>
+<%= render :partial => "shared/conference", :object => nil %>
+
+<% js_block do %>
+  <script>
+  $(document).ready(function() {
+    $("#add_conference_form .cancel_button").click(function() {
+      if($("#add_conference_form").prev(".conference").length > 0) {
+        $("#add_conference_form").hide();
+      } else {
+        $("#add_conference_form").slideUp();
+      }
+      $("#add_conference_form").prev(".conference").show();
+    });
+    $("#add_conference_form :text").keycodes('esc', function() {
+      $("#add_conference_form").find(".cancel_button").click();
+    });
+    $("#add_conference_form").formSubmit({
+      object_name: 'web_conference',
+      beforeSubmit: function(data) {
+        var $conference = $(this).prev(".conference");
+        if($conference.length == 0) {
+          $conference = $("#conference_blank").clone(true);
+          $("#conferences").prepend($conference.show());
+        }
+        $("#add_conference_form").hide();
+        $conference.loadingImage();
+        $conference.fillTemplateData({
+          data: data
+        });
+        $conference.find(".join_conference_link").hide();
+        return $conference;
+      },
+      success: function(data, $conference) {
+        $("#no_conferences_message").slideUp();
+        $conference.loadingImage('remove');
+        $conference.fillTemplateData({
+          data: data.web_conference,
+          hrefValues: ['id']
+        });
+        if(data.web_conference && data.web_conference.permissions) {
+          $conference.find(".edit_conference_link").showIf(data.web_conference.permissions.update);
+          $conference.find(".delete_conference_link").showIf(data.web_conference.permissions['delete']);
+          if(data.web_conference.permissions.initiate || data.web_conference.permissions.join) {
+            $conference.find(".join_conference_link").show();
+          }
+        }
+      }
+    });
+    $(".edit_conference_link, .add_conference_link").click(function(event) {
+      event.preventDefault();
+      var edit = $(this).hasClass('edit_conference_link');
+      var $conference = $(this).parents(".conference")
+      if(!edit) {
+        $conference = $("#conference_blank");
+      }
+      var $form = $("#add_conference_form");
+      var data = $conference.getTemplateData({
+        textValues: ['title', 'duration', 'description', 'user_ids']
+      });
+      if(edit) {
+        $form.find("h3").text("Edit Conference Details");
+        $form.attr('method', 'PUT').attr('action', $(this).attr('href'));
+        $conference.after($form);
+        $form.find("#members_list").show().find(":checkbox").attr('checked', false).end().end()
+          .find(".all_users_checkbox").attr('checked', false);
+        var ids = (data.user_ids || "").split(",");
+        for(var idx in ids) {
+          var id = ids[idx];
+          $form.find("#members_list .member.user_" + id).find(":checkbox").attr('checked', true);
+        }
+      } else {
+        $form.find("h3").text("Start a New Conference");
+        $form.attr('method', 'POST').attr('action', $(".add_conference_url").attr('href'));
+        $form.find("all_users_checkbox").attr('checked', true).end()
+          .find("#members_list").hide().attr('checked', true).find(":checkbox").attr('checked', false);
+        $("#conferences").before($form);
+      }
+      $form.fillFormData(data, {object_name: 'web_conference'});
+      $conference.hide();
+      if(edit) {
+        $form.show();
+        $form.find(":input:visible:first").focus().select();
+      } else {
+        $form.slideDown(function() {
+          $(this).find(":input:visible:first").focus().select();
+        });
+      }
+    });
+    $(".delete_conference_link").click(function(event) {
+      event.preventDefault();
+      $(this).parents(".conference").confirmDelete({
+        url: $(this).attr('href'),
+        message: "Are you sure you want to delete this conference?",
+        success: function() {
+          if($("#conferences .conference:visible").length <= 1) {
+            $("#no_conferences_message").slideDown();
+          }
+          $(this).slideUp(function() {
+            $(this).remove();
+          });
+        }
+      });
+    });
+    $(".all_users_checkbox").change(function() {
+      if(!$(this).attr('checked')) {
+        $("#members_list").slideDown();
+      } else {
+        $("#members_list").slideUp();
+      }
+    }).change();
+  });
+  </script>
+<% end %>

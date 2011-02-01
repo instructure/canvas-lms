@@ -1,0 +1,35 @@
+<% content_for :page_title do %>Claim <%= @communication_channel.proper_type %><% end %>
+
+<% content_for :stylesheets do %>
+<style>
+ul.claim_list {
+  margin-top: 20px;
+  padding-left: 40px;
+  line-height: 1.7em;
+  font-size: 1.2em;
+  color: #444;
+}
+</style>
+<% end %>
+<div style="width: 600px; margin-left: auto; margin-right: auto; margin-top: 20px;">
+  <h2>Claim <%= @communication_channel.proper_type %></h2>
+  <% if @enrollment %>
+    The enrollment invitation for <%= @enrollment.course.name %> was for the <%= @communication_channel.proper_type.downcase %>
+    <div style="padding: 5px 20px; font-weight: bold; font-size: 1.1em;"><%= @communication_channel.path %></div>
+    which is not yet associated with a Canvas user.  You can log in to claim the <%= @communication_channel.proper_type.downcase %>
+    or create a new user.
+  <% else %>
+    To finish registering the  <%= @communication_channel.proper_type.downcase %>
+    <div style="padding: 5px 20px; font-weight: bold; font-size: 1.1em;"><%= @communication_channel.path %></div>
+    click one of the options below:
+  <% end %>
+  <ul class="claim_list">
+    <li><a href="<%= registration_confirmation_url(@pseudonym.id, @communication_channel.confirmation_code) %>">Finish Setting me up as <%= @communication_channel.path %></a></li>
+    <% if @current_user %>
+      <li style="font-size: 0.8em;"><a href="<%= claim_pseudonym_url(@pseudonym.id, @communication_channel.confirmation_code, :claim => "1") %>">Add this <%= @communication_channel.proper_type.downcase %> to my existing Account, <b><%= @current_user.name %></b></a></li>
+      <li style="font-size: 0.8em;"><a href="<%= login_url(:re_login => '1') %>">Log In as Another User</a></li>
+    <% else %>
+      <li style="font-size: 0.8em;"><a href="<%= login_url %>">I already registered with a different <%= @communication_channel.proper_type.downcase %></a></li>
+    <% end %>
+  </ul>
+</div>

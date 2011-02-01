@@ -1,0 +1,76 @@
+= Stringex
+
+Some [hopefully] useful extensions to Ruby's String class. It is made up of three libraries: ActsAsUrl, Unidecoder, and StringExtensions.
+
+== ActsAsUrl
+
+This library is designed to create URI-friendly representations of an attribute, for use in generating urls from your attributes. Basic usage is just calling the method:
+
+  acts_as_url :title
+
+which will populate the <tt>url</tt> attribute on the object with the converted contents of the <tt>title</tt> attribute. This behavior can be customized by adding the following options to the arguments of the <tt>acts_as_url</tt> method:
+
+<tt>:url_attribute</tt>:: The name of the attribute to use for storing the generated url string.
+                          Default is <tt>:url</tt>
+<tt>:scope</tt>:: The name of model attribute to scope unique urls to. There is no default here.
+<tt>:only_when_blank</tt>:: If true, the url generation will only happen when <tt>:url_attribute</tt> is 
+                            blank. Default is false (meaning url generation will happen always)
+<tt>:sync_url</tt>:: If set to true, the url field will be updated when changes are made to the
+                     attribute it is based on. Default is false.
+                     
+In order to use the generated url attribute, you will probably want to override <tt>to_param</tt> like so, in your Model:
+
+  def to_param
+    url # or whatever you set :url_attribute to
+  end
+  
+Routing called via named routes like <tt>foo_path(@foo)</tt> will automatically use the url. In your controllers you will need to call <tt>Foo.find_by_url(params[:id])</tt> instead of the regular find. Don't look for <tt>params[:url]</tt> unless you set it explicitly in the routing, <tt>to_param</tt> will generate <tt>params[:id]</tt>.
+
+Unlike other permalink solutions, ActsAsUrl doesn't rely on Iconv (which is inconsistent across platforms and doesn't provide great transliteration as is) but instead uses a transliteration scheme (see the code for Unidecoder) which produces much better results for Unicode characters. It also mixes in some custom helpers to translate common characters into a more URI-friendly format rather than just dump them completely. Examples:
+
+   # A simple prelude
+   "simple English".to_url => "simple-english" 
+   "it's nothing at all".to_url => "its-nothing-at-all" 
+   "rock & roll".to_url => "rock-and-roll" 
+
+   # Let's show off
+   "$12 worth of Ruby power".to_url => "12-dollars-worth-of-ruby-power" 
+   "10% off if you act now".to_url => "10-percent-off-if-you-act-now" 
+
+   # You don't even wanna trust Iconv for this next part
+   "kick it en Français".to_url => "kick-it-en-francais" 
+   "rock it Español style".to_url => "rock-it-espanol-style" 
+   "tell your readers 你好".to_url => "tell-your-readers-ni-hao"
+   
+Compare those results with the ones produced on my Intel Mac by a leading permalink plugin:
+
+  "simple English" # => "simple-english" 
+  "it's nothing at all" # => "it-s-nothing-at-all"
+  "rock & roll" # => "rock-roll" 
+
+  "$12 worth of Ruby power" # => "12-worth-of-ruby-power" 
+  "10% off if you act now" # => "10-off-if-you-act-now" 
+
+  "kick it en Français" # => "kick-it-en-francais" 
+  "rock it Español style" # => "rock-it-espan-ol-style" 
+  "tell your readers 你好" # => "tell-your-readers"
+
+Not so great, actually.
+
+Note: No offense is intended to the author[s] of whatever plugins might produce such results. It's not your faults Iconv sucks.
+
+== Unidecoder
+
+This library converts Unicode [and accented Ascii] characters to their plain-text Ascii equivalents. This is a port of Perl's Unidecode and provides eminently superior and more reliable results than Iconv. (Seriously, Iconv... A plague on both your houses! [sic])
+
+You probably won't ever need to run Unidecoder by itself. StringExtensions adds String#to_ascii which wraps all of Unidecoder's functionality. For anyone interested, details of the implementation can be read about in the original implementation of Text::Unidecode[http://interglacial.com/~sburke/tpj/as_html/tpj22.html]. Extensive examples can be found in the tests. 
+
+== StringExtensions
+
+A collection of extensions on Ruby's String class. Please see the documentation for string_extensions module for more information. There's not much to explain about them really.
+
+== Thanks & Acknowledgements
+
+If it's not obvious, some of the code for ActsAsUrl is based on Rick Olsen's permalink_fu[http://svn.techno-weenie.net/projects/plugins/permalink_fu/] plugin. Unidecoder is a Ruby port of Sean Burke's Text::Unidecode[http://interglacial.com/~sburke/tpj/as_html/tpj22.html] module for Perl. And, finally, the bulk of strip_html_tags[link:classes/LuckySneaks/StringExtensions.html#M000005] in StringExtensions was stolen from Tobias Lütke's Regex in Typo[http://typosphere.org/].
+
+copyright (c) 2008 Lucky Sneaks, released under the MIT license

@@ -1,0 +1,73 @@
+<% content_for :page_title do %>Attendance for <%= @user.name %><% end %>
+
+<% content_for :right_side do %>
+  <div class='rs-margin-all'>
+    <% if can_do(@enrollment, @current_user, :read_grades) %>
+      <a class="button button-sidebar button-sidebar-wide" href="<%= context_url(@context, :context_student_grades_url, @user.id) %>"><%= image_tag "grading_icon.png" %> Grades for <%= context_user_name(@context, @user) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :send_messages) %>
+      <a class="button button-sidebar button-sidebar-wide" href="<%= inbox_url %>#<%= CGI::escape("reply{\"context_code\":\"#{@context.asset_string}\",\"recipients\":\"#{@user.id}\"}") %>"><%= image_tag "email.png" %> Message <%= context_user_name(@context, @user) %></a>
+    <% end %>
+  </div>
+<% end %>
+<% if @assignments.empty? %>
+  <div style="margin-left: 20px;">
+    <h2>Attendance</h2>
+    No attendance assignments have been created.
+  </div>
+<% else %>
+  <h2>Attendance for <%= @user.name %></h2>
+  <table id="student_attendance">
+    <thead>
+      <tr>
+        <th style="padding-right: 50px;">
+          Assignnment
+        </th>
+        <th style="text-align: center;">
+          Mark
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @assignments.each do |assignment| %>
+    <tr>
+      <td id="assignment_<%= assignment.id %>" class="assignment">
+        <span href="<%= context_url(@context, :context_assignment_url, assignment.id) %>">
+          <%= assignment.title %>
+        </span>
+        <div class="sub_title">
+          <%= datetime_string(assignment.due_at) %>
+        </div>
+      </td>
+      <% submission = @submissions.detect{|s| s.assignment_id == assignment.id} %>
+      <td class="submission">
+        <a href="<%= context_url(@context, :context_assignment_submission_url, assignment.id, @user.id) %>" class="no-hover">
+        <% if submission && (submission.grade == "pass" || submission.grade == "complete") %>
+          <%= image_tag "graded.png", :alt => "present", :title => "Marked as Present, click for more details" %>
+        <% elsif submission && (submission.grade == "fail" || submission.grade == "incomplete") %>
+          <%= image_tag "not_graded.png", :alt => "absent", :title => "Marked as Absent, click for more details" %>
+        <% else %>
+          <span title="Click for More Details"> - </span>
+        <% end %>
+        </a>
+      </td>
+    </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <% js_block do %>
+  <script>
+    $(document).ready(function() {
+      $(document).fragmentChange(function(event, hash) {
+        $("#student_attendance tr.highlighted").removeClass('highlighted');
+        if(hash.indexOf("#assignment_") == 0) {
+          var $tr = $("#" + hash.substring(1)).parents("tr");
+          $tr.addClass('highlighted');
+          $("html,body").scrollTo($tr);
+        }
+      });
+    });
+  </script>
+  <% end %>
+  <% jammit_css :attendance %>
+<% end %>

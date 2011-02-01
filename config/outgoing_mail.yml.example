@@ -1,0 +1,27 @@
+development:
+  address: "smtp.example.com"
+  port: "25"
+  user_name: "user"
+  password: "password"
+  authentication: "plain" # plain, login, or cram_md5
+  domain: "example.com"
+  outgoing_address: "canvas@example.com"
+
+test:
+  address: "smtp.example.com"
+  port: "25"
+  user_name: "user"
+  password: "password"
+  authentication: "plain" # plain, login, or cram_md5
+  domain: "example.com"
+  outgoing_address: "canvas@example.com"
+
+production:
+  address: "smtp.example.com"
+  port: "25"
+  user_name: "user"
+  password: "password"
+  authentication: "plain" # plain, login, or cram_md5
+  domain: "example.com"
+  outgoing_address: "canvas@example.com"
+

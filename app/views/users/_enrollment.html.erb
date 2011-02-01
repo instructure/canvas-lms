@@ -1,0 +1,18 @@
+<li class="<%= 'unpublished' if enrollment.course.created? || enrollment.course.claimed? %> <%= enrollment.workflow_state %>">
+  <a href="<%= course_path(enrollment.course_id) %>" style="float: left;">
+    <span class="name ellipsis" title="<%= enrollment.long_name %>">
+      <%= enrollment.long_name %>
+      <% if enrollment.course.created? || enrollment.course.claimed? %>
+        <%= image_tag "hammer.png", :title => "This course hasn't been published yet", :alt => "Unpublished", :class => "unpublished_icon" %>
+      <% end %>
+    </span>
+    <span class="subtitle ellipsis">
+      <%= enrollment.workflow_state.titleize %>, 
+      Enrolled as <%= enrollment.readable_type %>
+    </span>
+  </a>
+  <span style="float: right; margin-right: 5px; margin-top: 3px;">
+    <a href="#" rel="<%= course_unenroll_url(enrollment.course_id, enrollment.id) %>" class="unenroll_link"><%= image_tag "delete_circle.png" %></a>
+  </span>
+  <span class="clear"></span>
+</li>

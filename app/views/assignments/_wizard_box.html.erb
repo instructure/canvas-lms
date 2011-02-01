@@ -1,0 +1,125 @@
+  <div class="wizard_options">
+  <h3>I would like to:</h3>
+  <ul class="wizard_options_list">
+    <li class="option create_assignment_option add_step">
+      <a href="#">Create a New Assignment</a>
+      <div class="details" style="display: none;">
+        Assignments are always organized into groups, so to add an assignment you first
+        need to know what group you want to add it to.  Select the group and click 
+        "Add Assignment to" or Click the <%= image_tag "add.png" %> icon to start
+        a new assignment for a group.
+        <div style="text-align: center; margin-top: 5px; font-size: 1.5em;">
+          <a href="#" class="highlight_add_assignment_icon">Show Me Where</a>
+        </div>        
+        <div style="display: none;" class="no_groups_message">
+          Oops.  You need to add an assignment group first.  Click "Create an
+          Assignment Group" to see how.
+        </div>
+      </div>
+    </li>
+    <li class="option edit_assignment_option" style="display: none;">
+      <a href="#" class="wizard_edit_assignment_details"></a>
+      <div class="details" style="display: none;">
+        Great!  Now fill in your details.  You can enter a title for your assignment,
+        a due date and the number of points possible.  If you want to do more than that
+        you can, but only after the assignment has been created.
+      </div>
+    </li>
+    <li class="option review_assignment_option" style="display: none;">
+      <a href="#" class="wizard_edit_assignment_details"></a>
+      <div class="details" style="display: none;">
+        Done!  The assignment is now added to the group!  If you hover your mouse over the
+        assignment, you'll see a bunch of options.  Here's what they mean:
+        <ul style="list-style-type: none;">
+          <li><%= image_tag "move.png" %>: Move the assignment to another group</li>
+          <li><%= image_tag "preview.png" %>: Preview the assignment and edit it in full</li>
+          <li><%= image_tag "edit.png" %>: Edit the basic options again</li>
+          <li><%= image_tag "delete.png" %>: Delete the assignment</li>
+        </ul>
+      </div>
+    </li>
+    <li class="option add_step">
+      <a href="#">Create an Assignment Group</a>
+      <div class="details" style="display: none;">
+        Assignment groups are used to organize assignments.  You provide a name for each
+        group.  If you choose to weight the final grade based on groups 
+        (<a href="#" class="highlight_weight_groups"><b>where?</b></a>)
+        then
+        you can also set a percentage score for each group.  Click "Add Assignment Group"
+        to create a group.
+        <div style="text-align: center; margin-top: 5px; font-size: 1.5em;">
+          <a href="#" class="highlight_add_assignment_group_icon">Show Me Where</a>
+        </div>        
+      </div>
+    </li>
+    <li class="option edit_step" style="line-height: 1.1em;">
+      <a href="#">Edit Assignments in Detail</a>
+      <div style="font-size: 0.6em; padding-left: 10px;">(allow uploads, edit description, etc.)</div>
+      <div class="details" style="display: none;">
+        There's a lot more that goes into an assignment than due dates and points.  If you
+        want to type up a description of the assignment, allow file uploads, change the
+        grading type or a bunch of other things, click the assignment's name
+        or click the <%= image_tag "edit.png" %> icon and then "more options".
+      </div>
+    </li>
+    <li class="option quiz_step">
+      <a href="#">Create/Import a Quiz</a>
+      <div class="details" style="display: none;">
+        Quizzes are special types of assignments.  You can create or import quizzes by 
+        clicking the "Quizzes" link on the left sidebar.
+      </div>
+    </li>
+    <li class="option introduction" style="display: none;">
+      <a href="#" class="wizard_introduction"></a>
+      <div class="details" style="display: none;">
+        This page is for setting up your course at a high level.  You can add assignments,
+        group them and then weight those groups.  The idea is to get yourself organized
+        first, dive into the specifics second.  Even still, there's a lot you can do
+        from here.
+      </div>
+    </li>
+  </ul>
+  </div>
+  <div class="wizard_details">
+    <div>
+      <div class="header"></div>
+    </div>
+  </div>
+  <div class="clear"></div>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(document).bind('add_assignment', function() {
+    if($("#wizard_box .option.create_assignment_option.selected").length > 0) {
+      $("#wizard_box .edit_assignment_option").click();
+    }
+  }).bind('assignment_update', function() {
+    if($("#wizard_box .option.edit_assignment_option.selected").length > 0) {
+      $("#wizard_box .review_assignment_option").click();
+    }
+  });
+  $(".highlight_add_assignment_icon").hover(function() {
+    $link = $(".assignment_group:visible:first").find(".add_assignment_link");
+    if($link.length == 0) {
+      $(".no_groups_message").show();
+    }
+    $("html,body").scrollTo($link);
+    $link.indicate();
+  }, function() {
+    $(".no_groups_message").hide();
+  });
+  $(".highlight_add_assignment_group_icon").hover(function() {
+    var $link = $(".add_group_link:visible:first");
+    $("html,body").scrollTo($link);
+    $link.indicate();
+  }, function() {
+  });
+  $(".highlight_weight_groups").hover(function() {
+    var $item = $("#class_weighting_box");
+    $("html,body").scrollTo($item);
+    $item.indicate();
+  }, function() {});
+});
+</script>
+<% end %>
+ 

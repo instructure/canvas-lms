@@ -1,0 +1,80 @@
+<div id="find_question_dialog" style="display: none;">
+  <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
+  <a href="/{{ context_type_plural }}/{{ context_id }}/question_banks/{{ question_bank_id }}/questions" class="question_bank_questions_url" style="display: none;">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_questions_url" style="display: none;">&nbsp;</a>
+  <h2 style="margin-top: 0; float: left;">Find Quiz Questions to Add</h2>
+  <div style="float: right; padding-right: 5px; line-height: 2.5em;">
+    <a href="<%= context_url(@context, :context_question_banks_url) %>">Manage <%= @context.class.to_s %> Question Banks</a>
+  </div>
+  <div class="clear"></div>
+  <div class="message" style="display: none;"></div>
+  <table class="side_tabs_table" style="width: 100%;">
+    <tr>
+      <td class="left">
+        <ul class="side_tabs bank_list">
+          <li class="bank blank" style="display: none;">
+            <a href="#">
+              <span class="title">Bank Name</span>
+              <span class="id" style="display: none;">&nbsp;</span>
+            </a>
+            <div class="sub_content">
+              <span class="cached_context_short_name">&nbsp;</span>, <span class="assessment_question_count">&nbsp;</span> questions
+            </div>
+          </li>
+        </ul>
+      </td>
+      <td class="right">
+        <div class="side_tabs_content">
+          <div class="question_message"></div>
+          <div class="question_list_holder" style="display: none;">
+            <a href="#" class="select_all_link">Select All</a> | 
+            <a href="#" class="clear_all_link">Clear All</a>
+            <ul class="question_list unstyled_list">
+              <li class="found_question blank" style="display: none;">
+                <input type="checkbox"/>
+                <label class="question_name"></label>
+                <div class="already_added_message">this question is already on the quiz</div>
+                <div class="question_text"></div>
+              </li>
+            </ul>
+            <a href="#" class="page_link">more questions</a>
+            <div class="button-container quiz_group_select_holder">
+              <label for="quiz_group_select">Add questions to the quiz group:</label>
+              <select class="quiz_group_select" id="quiz_group_select">
+                <option value="none">[ No Group ]</option>
+                <option class="bottom" value="new">[ New Group ]</option>
+              </select>
+            </div>
+            <div class="button-container" style="margin-bottom: 5px;">
+              <button type="button" class="button submit_button">Add Questions</button>
+              <button type="button" class="button button-secondary cancel_button">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="add_question_group_dialog" style="display: none;" title="Add a New Question Group">
+  <h2>Add a New Question Group</h2>
+  <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_question_group_url" style="display: none;">&nbsp;</a>
+  <table class="formtable">
+    <tr>
+      <td><label for="found_question_group_name">Group Name:</label></td>
+      <td><input id="found_question_group_name" type="text" name="quiz_group[name]" /></td>
+    </tr><tr>
+      <td><label for="found_question_group_pick">Pick:</label></td>
+      <td><input id="found_question_group_pick" type="text" style="width: 50px;" name="quiz_group[pick_count]" /> questions<br/><span style="font-size: 0.8em;">(<span class="questions_count">&nbsp;</span> selected so far)</span></td>
+    </tr><tr>
+      <td><label for="found_question_group_points">Points:</label></td>
+      <td><input id="found_question_group_points" type="text" style="width: 50px;" class="float_value" name="quiz_group[question_points]" /> per question</td>
+    </tr><tr>
+      <td colspan="2">
+        <div class="button-container">
+          <button type="button" class="button submit_button">Create Group</button>
+          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

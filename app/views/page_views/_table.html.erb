@@ -1,0 +1,50 @@
+<div id="Pageviews">
+  <table cellspacing="0" class="ui-widget ui-widget-content ui-corner-all zebra-stripes" style="width: 100%;">
+    <thead class='ui-widget-header'>
+      <tr>
+        <th>URL</th>
+        <th>Date</th>
+        <th>Participated</th>
+        <th>Time</th>
+        <th>
+          <div style="float:right; margin-right: 4px">
+            <%= link_to("csv", user_page_views_path(@user, :format => :csv), :class => 'xls' ) %>, <%= link_to("xml", user_page_views_path(@user, :format => :xml), :class => 'code' ) %>
+          </div>
+          User Agent
+        </th>
+      </tr>
+    </thead>
+    <tbody id="page_view_results">
+      <%= render :partial => 'page_views/page_view', :collection => @page_views %>
+    </tbody>
+  </table>
+</div>
+<%= will_paginate(@page_views) %>
+<% js_block do %>
+  <script type="text/javascript">
+    $(function(){
+      $('#page_view_results').pageless({
+        totalPages: <%= @page_views.total_pages %>,
+        url: "<%= user_page_views_path(@user) %>",
+        loaderMsg: "Loading more results",
+        complete: function() {
+          $(document).triggerHandler('page_views_added');
+        }
+      });
+      $(document).bind('page_views_added', function() {
+        $(".user_agent").live('click', function() {
+          if($(this).attr('title')) {
+            var title = $(this).attr('title');
+            $(this).attr('title', $(this).text());
+            $(this).text(title);
+          } 
+        });
+        $(".user_agent:not(.classified)").each(function() {
+          var userAgent = $(this).text();
+          var browser = $.parseUserAgentString(userAgent);
+          $(this).text(browser).attr('title', userAgent).addClass('classified');
+        });
+      }).triggerHandler('page_views_added');
+    });
+  </script>
+<% end %>

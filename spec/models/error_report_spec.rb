@@ -1,0 +1,51 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
+describe ErrorReport do
+  it "should send emails if configured" do
+    account_model
+    @account.settings = {'error_reporting' => {
+      'action' => 'email',
+      'email' => 'nobody@nowhere.com'
+    }}
+    @account.save
+    report = ErrorReport.new
+    report.account = @account
+    report.message = "test"
+    report.subject = "subject"
+    report.save!
+    report.send_to_external
+    m = Message.last
+    m.should_not be_nil
+    m.to.should eql("nobody@nowhere.com")
+  end
+  
+  it "should not send emails if not configured" do
+    account_model
+    report = ErrorReport.new
+    report.account = @account
+    report.message = "test"
+    report.subject = "subject"
+    report.save!
+    report.send_to_external
+    m = Message.last
+    (!!(m && m.to == "nobody@nowhere.com")).should eql(false)
+  end
+end

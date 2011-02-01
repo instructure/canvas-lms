@@ -1,0 +1,53 @@
+{
+    "question_name":"",
+    "question_text":"Match these.<br />",
+    "incorrect_comments":"wrong",
+    "question_type":"matching_question",
+    "migration_id":"_153008_1",
+    "correct_comments":"right",
+    "points_possible":10.0,
+    "answers":[
+        {
+            "text":"left 1",
+            "comments":"",
+            "match_id":8298,
+            "id":6705
+        },
+        {
+            "text":"left 2",
+            "comments":"",
+            "match_id":2186,
+            "id":6522
+        },
+        {
+            "text":"left 3",
+            "comments":"",
+            "match_id":2320,
+            "id":9820
+        },
+        {
+            "text":"left 4",
+            "comments":"",
+            "match_id":3067,
+            "id":9788
+        }
+    ],
+    "matches":[
+        {
+            "text":"right 1",
+            "match_id":8298
+        },
+        {
+            "text":"right 2",
+            "match_id":2186
+        },
+        {
+            "text":"right 3",
+            "match_id":2320
+        },
+        {
+            "text":"right 4",
+            "match_id":3067
+        }
+    ]
+}

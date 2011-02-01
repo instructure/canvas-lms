@@ -1,0 +1,25 @@
+{
+    "group_id":"_1398_1",
+    "allow_anonymous_posts":false,
+    "category_description":"",
+    "is_gradeable":false,
+    "show_item":true,
+    "alternate_migration_id":"_4653_1",
+    "topics":[
+        {
+            "is_visible":true,
+            "allow_anonymous_posts":false,
+            "description":"Yes, a thread.",
+            "topic_type":"thread",
+            "created_date":1268856338000,
+            "title":"Thread in group discussion board.",
+            "migration_id":"_61828_1",
+            "updated_date":1269028588000
+        }
+    ],
+    "bb8_type":"x-bb-discussionboard",
+    "created_date":1268855411000,
+    "category_name":"Group 1",
+    "migration_id":"res00031",
+    "updated_date":1268855411000
+}

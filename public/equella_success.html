@@ -1,0 +1,24 @@
+<html>
+<body>
+<h2 id="dialog_message" style="color: #666; font-size: 24px;">Retrieving Content...</h2>
+<script>
+var parentWindow = window.parent;
+while(parentWindow && !parentWindow.equella) {
+  if(parentWindow.parent == parentWindow) {
+    parentWindow = null;
+  } else {
+    parentWindow = parentWindow.parent;
+  }
+}
+var message = document.getElementById('dialog_message') || {};
+if(parentWindow && parentWindow.equella && parentWindow.equella.ready) {
+  parentWindow.equella.cancel();
+  setTimeout(function() {
+    message.innerHTML = "Success!  This popup should close on its own...";
+  }, 1000);
+} else {
+  message.innerHTML = "Cannot find the parent window, you'll need to close this popup manually.";
+}
+</script>
+</body>
+</html>

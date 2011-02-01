@@ -1,0 +1,6 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/messages/<%= asset.id %>/reply
+<% end %>
+<%= asset.user.name rescue 'Unknown User' %> just sent you a message from the Canvas <%= asset.context.class.to_s %>, <%= asset.context.name %>:
+<br/>
+<b><a href="<%= content :link %>"><%= asset.subject %></a></b>

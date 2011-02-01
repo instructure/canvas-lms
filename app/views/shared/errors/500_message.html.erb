@@ -1,0 +1,18 @@
+<%
+  self.instance_variables.each do |name|
+    if name.match(/\A@content_for/)
+      instance_variable_set(name, nil)
+    end
+  end
+  exception ||= nil
+%>
+<% content_for :page_title, :clear_first => true do %>Page Error<% end %>
+
+<%= render :partial => "shared/errors/backtrace", :locals => {:exception => exception} %>
+<div style="width: 400px; margin-left: auto; margin-right: auto; margin-top: 50px;">
+  <h2>Page Error</h2>
+  <p>Well, it looks like something broke unexpectedly.  Sorry you had to see that.  If you have
+  a second, please let us know what you were doing when the error happened.</p>
+  <a href="#" style="font-size: 1.2em;" class="submit_error_link discussion-topic">Click here to tell us what happened</a>
+  <%= render :partial => "shared/errors/error_form", :locals => {:status => status} %>
+</div>

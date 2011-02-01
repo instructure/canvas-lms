@@ -1,0 +1,1 @@
+<%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true, :rubric_association => @assignment.rubric_association } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>

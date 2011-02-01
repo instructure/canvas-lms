@@ -1,0 +1,14 @@
+<% content_for :stylesheets do %>
+<style>
+
+</style>
+<% end %>
+<% js_block do %>
+<%= javascript_include_tag "media_comments.js" %>
+<script>
+$(document).ready(function() {
+  $.mediaComment.init();
+});
+</script>
+<% end %>
+

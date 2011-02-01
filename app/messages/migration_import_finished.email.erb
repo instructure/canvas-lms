@@ -1,0 +1,11 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>
+<% end %>
+
+<% define_content :subject do %>
+  Course Import Finished: <%= asset.context.name %>
+<% end %>
+      
+Importing <%= asset.migration_settings[:course_name] %> into <%= asset.context.name %> has finished.  Everything you selected should now be imported into your course.
+
+<%= content :link %>

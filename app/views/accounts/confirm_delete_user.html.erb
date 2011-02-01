@@ -1,0 +1,15 @@
+<% content_for :page_title do %>Confirm Delete<% end %>
+<% add_crumb("Confirm Delete") %>
+
+<h2>Confirm Delete <%= @user.name %> from <%= @account.name %></h2>
+
+<% form_for :user, :url => account_user_url(@context, @user), :html => {:method => :delete} do |f| %>
+  Are you sure you want to delete this user from the account <%= @account.name %>?  
+  This will remove the user's data (including grades) from all
+  courses and groups.  This process cannot be undone.
+
+  <div class="button-container">
+    <button type="submit" class="button">Delete <%= @user.name %></button>
+    <a href="<%= account_url(@context) %>" class="button button-secondary">Cancel</a>
+  </div>
+<% end %>

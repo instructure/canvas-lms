@@ -1,0 +1,25 @@
+test:
+  adapter: sqlite3
+  encoding: utf8
+  database: db/canvas_test.sqlite3
+  pool: 5
+  timeout: 5000
+  queue:
+    adapter: sqlite3
+    encoding: utf8
+    database: db/canvas_queue_test.sqlite3
+    timeout: 5000
+    pool: 5
+
+development:
+  adapter: sqlite3
+  encoding: utf8
+  database: db/canvas_development.sqlite3
+  timeout: 5000
+  pool: 5
+  queue:
+    adapter: sqlite3
+    encoding: utf8
+    database: db/canvas_queue_development.sqlite3
+    timeout: 5000
+    pool: 5

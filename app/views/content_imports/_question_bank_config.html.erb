@@ -1,0 +1,25 @@
+<label for="question_bank_select">If not specified in the export, questions will go in this question bank </label>
+<select name="migration_settings[question_bank_name]" id="question_bank_select">
+<% question_banks_select_list.each do |qb| %>
+    <option value="<%= qb %>"><%= qb %></option>
+<% end %>
+<option value="new_question_bank">[ New Question Bank ]</option>
+</select>
+
+<div id="new_question_bank" style="<%= hidden %>">
+<label for="new_question_bank_name">New question bank name </label>
+<input type="text" name="new_question_bank_name" id="new_question_bank_name"/>
+</div>
+
+
+<% js_block do %>
+<script>
+$("#question_bank_select").change(function() {
+  if($(this).val() == 'new_question_bank') {
+    $('#new_question_bank').show();
+  } else {
+    $('#new_question_bank').hide();
+  }
+});
+</script>
+<% end %>

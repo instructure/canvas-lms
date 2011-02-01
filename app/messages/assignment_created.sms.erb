@@ -1,0 +1,6 @@
+New Assignment for <%= asset.context.name %>:
+<%= asset.title %>
+
+due: <%= force_zone(asset.due_at).strftime("%b %d at %I:%M") rescue "No Due Date" %><%= force_zone(asset.due_at).strftime("%p").downcase rescue "" %> 
+
+More info at <%= HostUrl.context_host(asset.context) %>

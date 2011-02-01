@@ -1,0 +1,37 @@
+<div class="communication_message context_message" style="<%= hidden unless context_message %>" id="context_message_<%= context_message ? context_message.id : "blank" %>">
+  <div class="header">
+    <div class="link_box">
+      <span class="links">
+        <span class="author_id" style="display: none;"><%= context_message.user_id rescue nbsp %></span>
+        <!--a href="#" class="add_entry_link"><%= image_tag "reply.png", :alt => "Re-Send", :title => "Re-Send" %></a-->
+        <a href="#" class="reply_link no-hover"><%= image_tag "reply.png", :alt => "Reply", :title => "Reply to Sender" %></a>
+      </span>
+    </div>
+    <div class="post_date"><%= datetime_string(context_message.created_at) rescue nbsp %></div>
+    <%= image_tag "email_big.png", :class => "topic_icon", :alt => "announcement", :title => "Announcement" %>
+    <span class="title"><%= context_message.subject rescue "No Title" %></span>
+    <a href="<%= context_url(@context, :context_user_url, context_message ? context_message.user_id : '{{ user_id }}') %>" class="user_name"> <%= context_user_name(@context, context_message.user) %></a>
+    <div class="clear"></div>
+  </div>
+  <div class="content">
+    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((context_message.user_id rescue nil), @context.asset_string) %></div>
+    <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
+    <div class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @role_lookups %></div>
+    <div class="message user_content"><%= user_content(context_message.body, @context.asset_string, context_message.asset_string) rescue nbsp %></div>
+    <div class="clear"></div>
+  </div>
+  <div style="margin: 5px;">
+    <a href="#" class="show_recipients_link"><span class="users_count"><%= context_message.recipients.length rescue "0" %></span> Recipients</a>
+    <ul style="display: none;" class="recipients_list">
+      <% context_message.recipient_users.each do |user| %>
+        <li class="recipient">
+          <a href="<%= context_url(@context, :context_user_url, user.id) %>" class="user_name"><%= context_user_name(@context, user) %></a><br/>
+          <span class="id" style="display: none;"><%= user.id %></span>
+        </li>
+      <% end %>
+    </ul>
+    <li class="recipient recipient_blank" style="display: none;">
+      <a href="<%= context_url(@context, :context_user_url, '{{ user_id }}') %>" class="user_name">&nbsp;</a><br/>
+    </li>
+  </div>
+</div>

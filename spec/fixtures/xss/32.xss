@@ -1,0 +1,2 @@
+alert|onclick|javascript
+<a href="#" onclick="javascript:alert('asdf');">click</a>

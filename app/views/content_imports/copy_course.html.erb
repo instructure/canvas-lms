@@ -1,0 +1,348 @@
+<% @body_classes << "content-imports" %>
+<% content_for :page_title do %>Copy From Another Course<% end %>
+
+<% content_for :stylesheets do %>
+<style>
+.root_asset_list {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-left: 30px;
+}
+.root_asset_list > li {
+  margin-bottom: 10px;
+}
+.root_asset_list h4 {
+  margin: 0;
+}
+.asset_list {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-left: 30px;
+}
+#copy_context_form h3 {
+  color: #444;
+}
+</style>
+<% end %>
+<% if @copy_context %>
+  <% add_crumb "Copy From #{@copy_context.name}", "#{context_url(@context, :context_import_copy_url)}&import_id=#{@copy_context.id}" %>
+  <% form_tag context_url(@context, :context_import_copy_url), :id => "copy_context_form" do %>
+    <%= hidden_field :copy, :course_id, :value => @copy_context.id %>
+    <h2>Copy Content From <%= @copy_context.name %></h2>
+    <p>Select the content you'd like copied into this course.  We'll try to auto-correct any mismatched
+    due dates and calendar event dates as best we can.</p>
+    <h3 style="margin-bottom: 10px;"><%= check_box :copy, :everything, :class => "copy_everything" %> <%= label :copy, :everything, image_tag('checked.png', :style => 'width: 16px;') + " Copy Everything from #{@copy_context.name}" %></h3>
+    <% if @copy_context.assignment_groups.active.length > 0 %>
+      <h3><%= check_box :copy, :all_assignments, :class => "copy_all", :checked => true %><%= label :copy, :all_assignments, image_tag('assignment.png') + " Assignments for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list root_asset_list">
+        <% @copy_context.assignment_groups.active.each do |group| %>
+          <li>
+            <h4><%= check_box :copy, group.asset_string.to_sym, :class => "copy_all" %><%= label :copy, group.asset_string.to_sym, group.name %></h4>
+            <ul class="unstyled_list asset_list">
+              <% group.assignments.active.each do |assignment| %>
+                <li>
+                  <%= check_box :copy, assignment.asset_string.to_sym %>
+                  <%= label :copy, assignment.asset_string.to_sym, assignment.title %>
+                </li>
+              <% end %>
+            </ul>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if @copy_context.context_modules.active.length > 0 %>
+      <h3><%= check_box :copy, :all_modules, :class => "copy_all", :checked => true %><%= label :copy, :all_modules,image_tag('ball.png') + " Modules for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list root_asset_list">
+        <% @copy_context.context_modules.active.each do |mod| %>
+          <li>
+            <%= check_box :copy, mod.asset_string.to_sym %>
+            <%= label :copy, mod.asset_string.to_sym, mod.name %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if @copy_context.quizzes.active.length > 0 %>
+      <h3><%= check_box :copy, :all_quizzes, :class => "copy_all", :checked => true %><%= label :copy, :all_quizzes, image_tag('quiz.png') + " Quizzes for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list root_asset_list">
+        <% @copy_context.quizzes.active.each do |quiz| %>
+          <li>
+            <%= check_box :copy, quiz.asset_string.to_sym %>
+            <%= label :copy, quiz.asset_string.to_sym, quiz.title %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if @copy_context.folders.active.length > 0 && @copy_context.attachments.active.length > 0 %>
+      <h3><%= check_box :copy, :all_files, :class => "copy_all", :checked => true %><%= label :copy, :all_files, image_tag('download.png') + " Files for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list root_asset_list">
+        <% @copy_context.folders.active.sort_by{|f| f.full_name}.each do |folder| %>
+          <% if folder.attachments.length > 0 %>
+            <li>
+              <h4><%= check_box :copy, folder.asset_string.to_sym, :class => "copy_all" %><%= label :copy, folder.asset_string.to_sym, folder.full_name %></h4>
+              <ul class="unstyled_list asset_list">
+                <% folder.attachments.each do |file| %>
+                  <li><%= check_box :copy, file.asset_string.to_sym %><%= label :copy, file.asset_string.to_sym, file.display_name %></li>
+                <% end %>
+              </ul>
+            </li>
+          <% end %>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if @copy_context.wiki.wiki_pages.active.length > 0 %>
+      <h3><%= check_box :copy, :all_wiki_pages, :class => "copy_all", :checked => true %><%= label :copy, :all_wiki_pages, image_tag('course_content_icon.png') + " Wiki Pages for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list asset_list">
+        <% @copy_context.wiki.wiki_pages.active.each do |page| %>
+          <li><%= check_box :copy, page.asset_string.to_sym %><%= label :copy, page.asset_string.to_sym, page.title %></li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if @copy_context.discussion_topics.active.length > 0 %>
+      <h3><%= check_box :copy, :all_topics, :class => "copy_all" %><%= label :copy, :all_topics, image_tag('word_bubble.png') + " Discussions for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list asset_list">
+        <% @copy_context.discussion_topics.active.each do |topic| %>
+          <li><%= check_box :copy, topic.asset_string.to_sym, :class => 'skip_on_everything' %><%= label :copy, topic.asset_string.to_sym, topic.title %>
+            <div style="font-size: 0.8em; padding-left: 25px;">
+              <%= check_box :copy, "#{topic.asset_string}_entries".to_sym, :class => "secondary_checkbox skip" %><%= label :copy, "#{topic.asset_string}_entries".to_sym, "include entries from the old course" %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if @copy_context.calendar_events.active.length > 0 %>
+      <h3><%= check_box :copy, :all_calendar_events, :class => "copy_all", :checked => true %><%= label :copy, :all_calendar_events, image_tag('due_date_icon.png') + " Events for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list asset_list">
+        <% @copy_context.calendar_events.active.each do |event| %>
+          <li><%= check_box :copy, event.asset_string.to_sym %><%= label :copy, event.asset_string.to_sym, event.title %> - <span style="font-size: 0.8em;"><%= datetime_string(event.start_at) %></span></li>
+        <% end %>
+      </ul>
+    <% end %>
+    <div style="margin-top: 20px;">
+      <h3><%= check_box :copy, :shift_dates, :class => "shift_dates_checkbox" %><%= label :copy, :shift_dates, "Adjust events and due dates" %></h3>
+      <div style="display: none; margin-left: 50px;" class="shift_dates_settings">
+        <div>
+          <div style="margin-bottom: 5px;"><strong><%= @copy_context.name %></strong> dates range</div>
+          <div style="float: left; margin-left: 10px;">from&nbsp;</div>
+          <div style="float: left;"><%= text_field :copy, :old_start_date, :value => date_string(@copy_context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <div style="float: left;">&nbsp;to&nbsp;</div>
+          <div style="float: left;"><%= text_field :copy, :old_end_date, :value => date_string(@copy_context.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <div class="clear"></div>
+        </div>
+        <div>
+          <div style="margin-bottom: 5px margin-top: 10px;"><strong>This Course</strong> dates range</div>
+          <div style="float: left; margin-left: 10px;">from&nbsp;</div>
+          <div style="float: left;"><%= text_field :copy, :new_start_date, :value => date_string(@context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <div style="float: left;">&nbsp;to&nbsp;</div>
+          <div style="float: left;"><%= text_field :copy, :new_end_date, :value => date_string(@context.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <div class="clear"></div>
+        </div>
+        <div style="margin-top: 15px;">
+          You can also explicitly define day substitutions to adjust for changing class schedules
+          (i.e. move everything that was on Mondays to now happen on Tuesdays)
+          <div class="substitutions" style="margin-top: 10px;"></div>
+          <div style="display: none;">
+            <div class="substitution substitution_blank">
+              Move everything on <span class="old_select">&nbsp;</span> to happen on <span class="new_select">&nbsp;</span>
+              <a href="#" class="delete_substitution_link no-hover"><%= image_tag "delete_circle.png" %></a>
+            </div>
+            <select class="weekday_select weekday_select_blank">
+              <% Date::DAYNAMES.each_with_index do |name, idx| %>
+                <option value="<%= idx %>"><%= name %>s</option>
+              <% end %>
+            </select>
+          </div>
+          <div>
+            <a href="#" class="add_substitution_link add">Define a day substitution</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="progress_bar_holder" style="display: none; margin-top: 10px;">
+      <div class="copy_progress"></div>
+    </div>
+    <div class="button-container" style="margin-top: 20px;">
+      <button class="button big-button submit_button" type="submit">Import Course Content</button>
+    </div>
+  <% end %>
+<% else %>
+  <% add_crumb "Copy From Another Course",  context_url(@context, :context_import_copy_url) %>
+  <div>
+    <h2>Copy From another Course</h2>
+    <p>
+      To copy content from another course to this one, you'll first need to select the
+      course you want to copy from.  Then you can specify what exactly you want copied over.
+    </p>
+    <% if @current_user.courses.length < 2 %>
+      <p>You don't have access to any additional courses.</p>
+    <% else %>
+      <% form_tag context_url(@context, :context_import_copy_url), :method => :get do %>
+        <table class="formtable">
+          <tr>
+            <td><label for="course_autocomplete_id_lookup">Search for Course: </label></td>
+            <td>
+              <a href="<%= context_url(@current_user, :context_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
+              <input type="hidden" name="copy[course_id]" id="course_autocomplete_id"/>
+              <input type="text" id="course_autocomplete_id_lookup" style="width: 250px;"/>
+            </td>
+          </tr><tr style="<%= hidden unless @possible_courses.length < 500 %>">
+            <td><label for="copy_from_course">Or Select from the List:</label></td>
+            <td>
+              <% if @possible_courses.length < 500 %>
+              <select style="font-size: 1.2em; width: 250px;" id="copy_from_course">
+                <option value="none">[Select Course]</option>
+                <% @possible_courses.sort_by{|c| c.name || "zzzz"}.each do |course| %>
+                  <option value="<%= course.id %>"><%= course.name %></option>
+                <% end %>
+              </select>
+              <% end %>
+            </td>
+          </tr><tr>
+            <td colspan="2">
+              <div id="course_autocomplete_name_holder" style="display: none; margin-top: 20px;">
+                Selected Course: 
+                <span id="course_autocomplete_name" style="font-weight: bold;">&nbsp;</span>
+                <div class="button-container">
+                  <button type="submit" class="button">Copy From this Course</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+<div id="copy_entries_dialog" style="display: none;">
+  <h2>Copy Discussion Replies?</h2>
+  In addition to copying discussions, would you like to also
+  copy all student replies to topic posts?
+  <div class="button-container" style="margin-top: 15px;">
+    <button type="button" class="button">Just Copy Topics</button>
+    <button type="button" class="button include">Copy Topics and Replies</button>
+  </div>
+</div>
+<% js_block do %>
+<script type="text/javascript">
+$(document).ready(function() {
+  var $frame = $("<iframe id='copy_course_target' name='copy_course_target' src='about:blank'/>");
+  $("body").append($frame.hide());
+  $("#copy_context_form").attr('target', 'copy_course_target');
+  $(".copy_progress").progressbar();
+  $("#copy_context_form").submit(function() {
+    $("#copy_context_form .submit_button").text("Copying... this will take a few minutes").attr('disabled', true);
+    $(".progress_bar_holder").show();
+    var checkup = function() {
+      var url = location.href;
+      $.ajaxJSON(url, 'GET', {}, function(data) {
+        var course_import = data.course_import;
+        if(course_import) { 
+          $(".copy_progress").progressbar('option', 'value', course_import.progress);
+        }
+        if(course_import && course_import.workflow_state == 'completed') {
+          location.href = location.href + "&import_id=" + course_import.id;
+        } else if(course_import && course_import.workflow_state == 'failed') {
+          var message = "Course Import failed with the following error: \"import_" + course_import.id + "\"";
+          $.flashError(message);
+          $(".progress_bar_holder").after("<b>" + message + "</b>");
+        } else {
+          setTimeout(checkup, 1500);
+        }
+      }, function() {
+        setTimeout(checkup, 3000);
+      });
+    };
+    setTimeout(checkup, 5000);
+    return true;
+  });
+  $("#copy_entries_dialog button").click(function() {
+    var $checkbox = $("#copy_all_topics");
+    var include_secondaries = $(this).hasClass('include');
+    if(include_secondaries) {
+      $checkbox.parent().next("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $checkbox.attr('checked')).each(function() { $(this).triggerHandler('change', true); });
+    } else {
+      $checkbox.parent().next("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $checkbox.attr('checked'));
+    }
+    $("#copy_entries_dialog").dialog('close');
+  });
+  $("#copy_context_form :checkbox").bind('change', function(event, force_secondaries) {
+    if(!$(this).attr('checked')) {
+      force_secondaries = true;
+    } 
+    if($(this).hasClass('copy_all')) {
+      if($(this).is('#copy_all_topics') && $(this).attr('checked')) {
+        $("#copy_entries_dialog").dialog('close').dialog({
+          autoOpen: false,
+          title: 'Copy Discussion Replies?',
+          width: 370
+        }).dialog('open');
+      } else {
+        $(this).parent().next("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $(this).attr('checked')).each(function() { $(this).triggerHandler('change'); });
+      }
+    } else if($(this).hasClass('copy_everything')) {
+      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.skip_on_everything)").attr('checked', $(this).attr('checked')).filter(":not(.copy_all)").each(function() { $(this).triggerHandler('change'); });
+      $("#copy_all_topics").attr('checked', $(this).attr('checked')).triggerHandler('change');
+    } else {
+      $(this).parent().find(":checkbox.secondary_checkbox" + (force_secondaries ? '' : ':not(.skip)')).attr('checked', $(this).attr('checked'));
+      if($(this).hasClass('secondary_checkbox') && $(this).attr('checked')) {
+        $(this).parents("li").children(":checkbox").attr('checked', true);
+      }
+      if(!$(this).attr('checked')) {
+        $(this).parents("ul").each(function() {
+          $(this).prev("h2,h3,h4").find(":checkbox").attr('checked', false);
+        });
+      }
+    }
+  })
+  $(".shift_dates_checkbox").change(function() {
+    $(".shift_dates_settings").showIf($(this).attr('checked'));
+  }).change();
+  $(".add_substitution_link").click(function(event) {
+    event.preventDefault();
+    var $sub = $(".substitution_blank").clone(true).removeClass('substitution_blank');
+    $(".substitutions").append($sub.hide());
+    var $select = $(".weekday_select_blank").clone(true).removeClass('weekday_select_blank');
+    $sub.find(".old_select").empty().append($select.clone(true));
+    $sub.find(".new_select").empty().append($select);
+    $sub.find(".old_select").children("select").change();
+    $sub.slideDown();
+  });
+  $(".weekday_select").change(function() {
+    if($(this).parents(".old_select").length > 0) {
+      var $select = $(this).parents(".substitution").find(".new_select").children("select");
+      $select.attr('name', 'copy[day_substitutions][' + $(this).val() + ']');
+    }
+  });
+  $(".delete_substitution_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".substitution").slideUp(function() {
+      $(this).remove();
+    });
+  });
+  $("#copy_context_form .copy_all").each(function() { $(this).triggerHandler('change'); });
+  $(".date_field").date_field();
+  $("#copy_from_course").change(function() {
+    var select = $("#copy_from_course")[0];
+    var idx = select.selectedIndex;
+    var name = select.options[idx].innerHTML;
+    var id = select.options[idx].value;
+    if(id != "none") {
+      $("#course_autocomplete_name_holder").show();
+      $("#course_autocomplete_name").text(name);
+      $("#course_autocomplete_id").val(id);
+      $("#course_autocomplete_id_lookup").val("");
+    }
+  }).change();
+  if($("#course_autocomplete_id_lookup:visible").length > 0) {
+    $("#course_autocomplete_id_lookup").autocomplete({
+      serviceUrl: $("#course_autocomplete_url").attr('href'),
+      onSelect: function(value, data){
+        $("#course_autocomplete_name_holder").show();
+        $("#course_autocomplete_name").text(value);
+        $("#course_autocomplete_id").val(data.course.id);
+        $("#copy_from_course").val("none");
+      }
+    });
+  }
+});
+</script>
+<% end %>

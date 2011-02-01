@@ -1,0 +1,2 @@
+alert|background|javascript
+<img style="width: 200px; border: 1px; background-image: url(javascript:alert('asdf'))"/>

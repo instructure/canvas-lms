@@ -1,0 +1,106 @@
+	.embed_content {
+		padding: 0;
+	}
+	.embed_content > table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	.embed_content > table td {
+		vertical-align: top;
+	}
+	.embed_content > table td > .content {
+		overflow: auto;
+	}
+	.embed_content > table td.search .search_title {
+		font-size: 0.8em;
+	}
+	.embed_content > table td.search .search_results {
+		position: relative;
+	}
+	.embed_content > table td.search .search_result {
+		width: 40%;
+		float: left;
+		margin: 3px;
+    padding: 3px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+	}
+	.embed_content > table td.search .search_result.search_result_assignment {
+    padding-left: 22px;
+    background: url(/images/binder.png) no-repeat 3px 3px;
+	}
+	.embed_content > table td.search .search_result.search_result_discussion_topic,
+	.embed_content > table td.search .search_result.search_result_discussion_entry,
+	.embed_content > table td.search .search_result.search_result_announcement
+  {
+    padding-left: 22px;
+    background: url(/images/word_bubble.png) no-repeat 3px 3px;
+	}
+	.embed_content > table td.search .search_result.search_result_calendar_event {
+    padding-left: 22px;
+    background: url(/images/history.png) no-repeat 3px 3px;
+  }
+	.embed_content > table td.search .search_result.search_result_wiki_page {
+    padding-left: 22px;
+    background: url(/images/file.png) no-repeat 3px 3px;
+  }
+	.embed_content > table td.search .search_result:hover {
+    background-color: #DADADA;
+    -moz-border-radius: 3px;
+  }
+  
+	.embed_content > table td.search .search_result .title {
+    white-space: nowrap;
+    font-weight: bold;
+  }
+	.embed_content > table td.search .search_result .links {
+		text-align: right;
+		font-size: 1.0em;
+    font-weight: bold;
+    opacity: 0.5;
+    margin-right: 10px;
+	}
+	.embed_content > table td.search .search_result:hover .links {
+    opacity: 1.0;
+  }
+	.embed_content > table td.search .search_result .teaser {
+    max-height: 40px;
+    overflow: hidden;
+    font-size: 0.8em;
+    margin-left: 10px;
+    color: #888;
+  }
+	.embed_content > table td.search .search_result:hover .teaser {
+    color: #444;
+  }
+  .embed_content > table td.search .search_result .image_preview {
+    overflow: hidden;
+  }
+	.embed_content .content_options {
+		margin: 0;
+		padding: 5px;
+	}
+	.embed_content .content_options li {
+		cursor: pointer;
+		white-space: nowrap;
+		padding: 2px 20px;
+		list-style-type: none;
+	}
+	.embed_content .content_options li:hover {
+		background: #ddd;
+	}
+	.embed_content .content_options li.selected {
+		background: #bbb;
+	}
+	.embed_content .content_options li .search_title,
+	.embed_content .content_options li .models {
+		display: none;
+	}
+	.embed_content .content_options ul {
+		display: none;
+		padding-left: 20px;
+	}
+	.embed_content .content_options ul.opened {
+		display: block;
+	}

@@ -1,0 +1,70 @@
+      <table class="merge_results">
+        <thead>
+          <tr class="result">
+            <th>User</th>
+            <td><%= user.name %></td>
+            <td><%= other_user.name %></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="result">
+            <th>Action</th>
+            <td>will be deleted</td>
+            <td>will be kept</td>
+          </tr>
+          <tr class="result">
+            <th>Emails</th>
+            <td>no emails</td>
+            <td>
+                <% emails = (user.communication_channels.unretired.email + other_user.communication_channels.unretired.email).map(&:path).uniq.sort %>
+                <% if emails.empty? %>
+                  no emails
+                <% else %>
+                  <ul class="unstyled_list">
+                    <% emails.each do |email| %>
+                      <li><%= email %></li>
+                    <% end %>
+                  </ul>
+                <% end %>
+            </td>
+          </tr>
+          <tr class="result">
+            <th>Logins</th>
+            <td>no logins</td>
+            <td>
+              <% pseudonyms = (user.pseudonyms.active + other_user.pseudonyms.active).sort_by(&:unique_id) %>
+              <% if pseudonyms.empty? %>
+                no logins
+              <% else %>
+                <table>
+                  <% pseudonyms.each do |pseudonym| %>
+                    <tr>
+                      <td><%= pseudonym.unique_id %></td>
+                      <td><%= pseudonym.account.name %></td>
+                    </tr>
+                  <% end %>
+                </table>
+              <% end %>
+            </td>
+          </tr>
+          <tr class="result">
+            <th>Enrollments</th>
+            <td>no enrollments</td>
+            <td>
+              <% enrollments = (user.current_enrollments + other_user.current_enrollments).sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] } %>
+              <% if enrollments.empty? %>
+                no enrollments
+              <% else %>
+                <table>
+                  <% enrollments.each do |enrollment| %>
+                    <tr>
+                      <td><%= enrollment.course.name %></td>
+                      <td><%= enrollment.readable_type %></td>
+                    </tr>
+                  <% end %>
+                </table>
+              <% end %>
+            </td>
+          </tr>
+        </tbody>
+      </table>

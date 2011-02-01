@@ -1,0 +1,2 @@
+alert|javascript|rel
+<div rel="javascript:alert('asdf');"></div>

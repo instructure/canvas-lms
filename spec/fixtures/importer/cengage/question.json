@@ -1,0 +1,20 @@
+{
+  "question_text":"The answer is _____.",
+  "answers":
+          [
+            {
+              "text":"join",
+              "comments":"",
+              "id":5719,
+              "weight":100
+            }
+          ],
+  "question_bank_name":"Practice Test Chapter 2",
+  "correct_comments":"",
+  "question_type":"short_answer_question",
+  "question_bank_id":"res00013",
+  "incorrect_comments":"",
+  "migration_id":"",
+  "question_name":"",
+  "points_possible":0
+}

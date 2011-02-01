@@ -1,0 +1,20 @@
+{
+    "question_name":"",
+    "question_text":"What is 10 - 6?<br />",
+    "incorrect_comments":"Left",
+    "question_type":"numerical_question",
+    "answers":[
+        {
+            "exact":4.0,
+            "end":4.0,
+            "start":4.0,
+            "comments":"",
+            "weight":100,
+            "numerical_answer_type":"range_answer",
+            "id":4262
+        }
+    ],
+    "migration_id":"_153000_1",
+    "correct_comments":"Right.",
+    "points_possible":10.0
+}

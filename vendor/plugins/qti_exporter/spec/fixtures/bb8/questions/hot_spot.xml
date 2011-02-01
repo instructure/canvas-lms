@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _153006_1
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Hot Spot
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 10.0
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: minnumber attribute no no longer supported on render_*
+Warning: couldn't find an image inside a graphic interaction
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "d4dc758afcba4bfaa74357fd2fdd6211"
+Warning: rectangle conversion assumes pixel-centred coordinates, watch out for off-by-one errors
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="_153006_1"
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="max_score" value="10.0" />
+<instructureField name="bb_question_type" value="Hot Spot" />
+</instructureMetadata>
+<responseDeclaration identifier="response" cardinality="single" baseType="point"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+<defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
+<itemBody>
+<div class="QUESTION_BLOCK">
+<p class="FORMATTED_TEXT_BLOCK">Where are the nuts?&lt;br /&gt;</p></div>
+<div class="RESPONSE_BLOCK">
+<p class="FILE_BLOCK"></p></div>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><inside shape="rect" coords="331 530 928 1158"><variable identifier="response"/></inside>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0.0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">10.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">10.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK">right</p></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK">wrong</p></div></modalFeedback>
+</assessmentItem>

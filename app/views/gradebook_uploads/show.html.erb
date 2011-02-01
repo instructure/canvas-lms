@@ -1,0 +1,99 @@
+<% content_for :page_title do %>Gradebook - <%= @context.name %><% end %>
+
+<% content_for :auto_discovery do %>
+  <% if @context_enrollment %>
+    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => "Course Gradebook Atom Feed"}) %>
+  <% end %>
+<% end %>
+
+<% 
+  jammit_css :gradebook_uploads
+  jammit_js :gradebook_uploads 
+%>
+
+<form id="gradebook_importer_resolution_section" style="display:none;">
+  <h3>There was some stuff I couldn't figure out with the data that you uploaded:</h3>
+  <div class="student_section" style="display:none;">
+    <h4>You uploaded rows for the following students, I couldn't decide which student in your class they are.  please tell me which student they are.</h4>
+    <table cellspacing="0" class="ui-widget ui-widget-content">
+      <thead>
+        <tr>
+          <th class="ui-widget-header">Student in question</th>
+          <th class="ui-widget-header">This person is really</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="student_resolution_template" style="display:none">
+          <th class='name'>Some Guy</th>
+          <td>
+            <select name="student_-iterator-">
+              <option value="">-- Choose --</option>
+              <option value="ignore" class="ignore">Not in my class, Ignore this row.</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="assignment_section" style="display:none">
+    <h4>You uploaded some assignments that don't appear to be in your gradebook before now.  Please tell me if it is a new assignment, or if it represents an existing assignment.</h4>
+    <table cellspacing="0" class="ui-widget ui-widget-content">
+      <thead>
+        <tr>
+          <th class="ui-widget-header">Assignment in question</th>
+          <th class="ui-widget-header">This Assignment is</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="assignment_resolution_template" style="display:none;">
+          <th class='title'>Equity Indices Quiz</th>
+          <td>
+            <select name="assignment_-iterator-">
+              <option value="">-- Choose --</option>
+              <option value="new" class="new">A new assignment</option>
+              <option value="ignore" class="ignore">Bogus, ignore it</option>
+            </select>
+            <span class="points_possible_section">
+              <label> Points Possible </label><input type="text" class="points_possible" />
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="button-container">
+    <button type="submit" class="button">Continue &rarr;</button>
+  </div>
+</form>
+
+<div id="no_changes_detected" style="display:none;">
+  <h2>There were no changes detected in the gradebook you uploaded.</h2>
+  <p>
+    <%= link_to("Go back to Gradebook", context_url(@context, :context_gradebook_url) ) %>
+  </p>
+  
+</div>
+
+<% form_tag({}, {:method => "put", :id => "gradebook_grid_form", :style => "display:none;"}) do %>
+  <div id="gradebook_grid"></div>
+  <input type="hidden" name="json_data_to_submit" value="" />
+  <div class="button-container" style="padding-left:7px;">
+    <button type="submit" class="button">Save Changes</button>
+    <%= link_to "Cancel", :back , :class => "button button-secondary" %>
+    <span id="assignments_without_changes_alert" style="display:none; margin-left: 50px;">Note: You uploaded some assignments that had no grade changes detected. They have been hidden.</span>
+  </div>
+<% end -%>
+<style>
+  /*keep this here because jquery.rule needs it to stick in dynamic styles for the slick.grid to keep all of the columns the same width*/
+</style>
+
+<% js_block do %>
+  <script type="text/javascript">
+    var originalGradebook = <%= raw @context.gradebook_json %>;
+    var uploadedGradebook = <%= raw @uploaded_gradebook.to_json %>
+
+    $(function(){
+      GradebookUploader.handleThingsNeedingToBeResolved();
+    });
+  </script>
+<% end %>

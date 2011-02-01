@@ -1,0 +1,2 @@
+background|url|javascript|url
+<DIV STYLE="background-image: url(javascript:alert('XSS'))">

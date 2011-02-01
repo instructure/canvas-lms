@@ -1,0 +1,9 @@
+<li class="student user_<%= student ? student.id : "blank" %>" title="Click and Drag to move student to another group">
+  <span class="name"><%= student.last_name_first rescue "" %></span>
+  <div style="display: none;" class="data">
+    <% student && @memberships.select{|m| m.user_id == student.id}.each do |membership| %>
+      <span class="<%= membership.group.category.underscore.gsub(" ", "_") %>_group_id"><%= membership.group_id || nbsp %></span>
+    <% end %>
+    <span class="user_id"><%= student ? student.id : nbsp %></span>
+  </div>
+</li>

@@ -1,0 +1,152 @@
+@import environment.sass
+
+#course_form .course_form 
+  display: none
+
+#course_form.editing 
+  .course_form 
+    display: inline
+  .course_info, .edit_course_link, .move_course_link
+    display: none
+
+
+#course_form .date_entry 
+  width: 100px
+
+ul.user_list 
+  list-style: none
+  padding-left: 0px
+  margin-top: 0px
+  margin-bottom: 20px
+  max-height: 300px
+  overflow: auto
+
+ul.user_list li.user 
+  padding-left: 10px
+  color: #444
+  line-height: 1.0em
+  -moz-border-radius: 5px
+  padding: 3px 0 3px 3px
+  margin-bottom: 2px
+
+ul.user_list li.user:hover 
+  background-color: #eee
+
+ul.user_list li.user .email 
+  font-size: 0.8em
+  margin-left: 10px
+  
+ul.user_list li.user .associated_user
+  display: none
+  font-size: 0.8em
+  margin-left: 10px
+ul.user_list li.user.observer_enrollment .associated_user
+  display: block
+
+ul.user_list li.user .section 
+  font-size: 0.8em
+  margin-left: 10px
+
+ul.user_list li.user .short_name 
+  font-size: 0.8em
+  margin-left: 10px
+  margin-top: 2px
+
+ul.user_list li.user .enrollment_type 
+  font-size: 0.8em
+  margin: -2px 10px 0px
+
+ul.user_list li.user .links 
+  float: right
+  padding-right: 20px
+  padding-top: 5px
+  visibility: hidden
+
+ul.user_list li.user .links a 
+  text-decoration: none
+
+ul.user_list li.user:hover .links 
+  float: right
+  padding-right: 20px
+  visibility: visible
+
+ul.user_list li.user.pending 
+  color: #888
+  font-style: italic
+
+h3 .tally  
+  font-family: arial,sans-serif
+  font-size: 12px
+  padding-left: 5px
+
+#sections 
+  +reset-list
+  max-width: 500px
+  list-style-type: none
+
+#sections .section 
+  padding: 3px 2px
+
+#sections .section .delete_section_link, 
+#sections .section .edit_section_link, 
+#sections .section .cant_delete_section_link
+
+  float: right
+
+#sections .section .section_link 
+  +opacity(0.3)
+
+#sections .section:hover 
+  background-color: #eee
+
+#sections .section:hover .section_link 
+  +opacity(1)
+
+#sections .section .users_count 
+  font-size: 0.8em
+  padding-left: 5px
+
+#edit_section_form 
+  float: left
+
+.nav_list
+  +reset-list
+  border-top: 1px solid $section_tabs_border_top_color
+  width: 400px
+  margin: 20px 0
+  li.enabled
+    &:hover
+      span
+        display: block
+
+  li.navitem
+    color: $section_tabs_color
+    cursor: pointer
+    display: block
+    font-size: 14px
+    padding: 4px 0 4px 25px
+    border: solid $section_tabs_border_bottom_color
+    border-width: 0 1px 1px
+    &:hover, &:focus
+      background-color: $section_tabs_hover_background_color
+      z-index: 0
+      position: static
+      text-decoration: none
+      .disabled_message
+        display: none
+    .disabled_message
+      display: none
+
+#nav_disabled_list
+  border-top: 0
+  li.disabled
+    padding: 4px 0 4px 0px
+    border-bottom: 1px solid $section_tabs_border_top_color
+  li.navitem
+    color: $section_tabs_to_be_hidden_color
+    .disabled_message
+      display: block
+      font-size: 0.8em
+      padding-left: 10px
+      line-height: 0.7em
+      font-style: italic

@@ -1,0 +1,27 @@
+{
+    "show_item":true,
+    "alternate_migration_id":"_116776_1",
+    "text":"Do whatever it is you need to do.",
+    "end_date":1269544200000,
+    "start_date":1268853000000,
+    "bb8_type":"x-bb-assignment",
+    "created_date":1268853335000,
+    "title":"First assignment",
+    "attachments":[],
+    "migration_id":"res00034",
+    "updated_date":1268853335000,
+    "is_folder":false,
+    "due_date":1274090400000,
+    "grading":
+    {
+        "assignment_group_migration_id":"_70170_1",
+        "points_possible":"10.0",
+        "grade_type":"numeric",
+        "weight":"0",
+        "description":null,
+        "grade_reference":"",
+        "title":"First assignment",
+        "due_date":1274090400000,
+        "migration_id":"_52298_1"
+    }
+}

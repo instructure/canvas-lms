@@ -1,0 +1,9 @@
+A new course, <%= asset.name %>, has been added for the account <%= asset.root_account.name %>
+<% if !asset.teachers.empty? %>
+Teachers:
+<% asset.teachers.each do |teacher| %>
+  - <%= teacher.name %> (<%= teacher.email %>)
+    
+<% end %><% end %>
+
+More info at <%= HostUrl.default_host %>

@@ -1,0 +1,66 @@
+<% form_id = @account_config.saml_authentication? ? 'auth_form' : 'saml_form' %>
+<% active = @account_config.saml_authentication? ? 'class="active"' : '' %>
+<div id="saml_div" <%= active %>>
+<% form_for @account_config, :url => context_url(@account, :context_account_authorization_config_url, @account.id), :html => {:id => form_id, :class=>"auth_type saml_form"} do |f| %>
+    <input type="hidden" name="account_authorization_config[auth_type]" value="<%= @account_config.auth_type || 'saml' %>"/>
+    <table class="formtable" style="margin-left: 20px;">
+      <tr>
+        <td><%= f.label :auth_type, "Type:" %></td>
+        <td>
+          <span class="auth_form">
+            <%= @account_config.auth_type || 'SAML' %>
+          </span>
+          <span class="auth_info"><%= @account_config.auth_type || 'SAML' %></span>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.label :log_in_url, "Log On URL:" %></td>
+        <td class="nobr">
+          <%= f.text_field :log_in_url, :class => "auth_form", :style => "width: 450px;" %>
+          <span class="auth_info log_in_url"><%= @account_config.log_in_url %></span>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.label :log_out_url, "Log Out URL:" %></td>
+        <td class="nobr">
+          <%= f.text_field :log_out_url, :class => "auth_form", :style => "width: 450px;" %>
+          <span class="auth_info log_out_url"><%= @account_config.log_out_url %></span>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.label :change_password_url, "Change Password Link:" %></td>
+        <td class="nobr">
+          <%= f.text_field :change_password_url, :class => "auth_form", :style => "width: 450px;" %>
+          <span class="auth_info change_password_url"><%= @account_config.change_password_url %></span>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.label :certificate_fingerprint, "Certificate Fingerprint:" %></td>
+        <td class="nobr">
+          <%= f.text_field :certificate_fingerprint, :class => "auth_form", :style => "width: 450px;" %>
+          <span class="auth_info certificate_fingerprint"><%= @account_config.certificate_fingerprint %></span>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.label :identifier_format, "Identifier Format:" %></td>
+        <td class="nobr">
+          <%= f.select :identifier_format, @saml_identifiers, {}, {:class => "auth_form"} %>
+          <span class="auth_info identifier_format"><%= @account_config.identifier_format %></span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          <span class="auth_form">
+            <button type="submit" class="button">Save Authentication Settings</button>
+            <button type="button" class="cancel_button button-secondary">Cancel</button>
+          </span>
+        </td>
+      </tr>
+      <% if @account_config.saml_authentication? %>
+      <tr>
+        <td colspan="2"><%= link_to("Click here to see the service provider identity XML for instructure.", :saml_meta_data) %></td>
+      </tr>
+      <% end %>
+    </table>
+<% end %>
+</div>

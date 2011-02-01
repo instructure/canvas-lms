@@ -1,0 +1,154 @@
+# Account
+Everything is keyed off of root accounts.  Accounts can be configured in 
+a number of ways, but most configurations are only available on the 
+root account (things like authentication, SIS, js/css embeds).  Courses, 
+sub-accounts, logins, etc. will be scoped to the root account.
+
+# Users
+Users are global, and can span across root accounts (although in most cases they
+won't).  Visitors don't log in as users, though, they log in as pseudonyms.
+Pseudonyms are tied to a specific root account.  Visitors log in
+using a Pseudonym and password, which is then used to retrieve the actual 
+user data.  Pseudonyms can either store a hash of the user's password,
+or if configured on the root account they can authenticate through another
+service like LDAP or SAML.
+
+# Communication Preferences
+Users can receive notifications for different types of events (if an assignment
+is graded, if a new announcement is made, etc.).  They can specify where and how
+often they would like those messages sent.  A user has multiple
+CommunicationChannels, each of which are a route for messaging.  They can register
+email, sms, or facebook communication channels and then have certain types of
+notifications send out immediately, daily, weekly or never to those channels.
+Each notification type is a Notification record, and a user specifies 
+NotificationPolicy records that state where and how often to send each 
+type of notification.  Some notification types also show up on the user's 
+dashboard activity stream (see StreamItems).
+
+To send a notification to a user we trigger custom events using the
+vendor/plugins/broadcast_policy plugin.  In an ActiveRecord model you call
+set_broadcast_policy to do this.  BroadcastPolicy retrieves a list of recipients
+and creates a DelayedNotification record to be handled in the background.  The
+DelayedNotification is then used to build a list of Message records, one per
+user per specified channel.
+
+# StreamItems
+When we want to send a message to one or more users' dashboards, we create
+a StreamItem, which is a cached version of the needed data to render the 
+item.  This way we can populate the dashboard of a user with only one
+database lookup.  For every affected user we create a StreamItemInstance
+that ties the StreamItem to the user.  To see how items show up in streams
+check out lib/send_to_stream.rb.
+
+# Inbox
+The inbox is not really an inbox (better name anyone?).  It's a place where
+you can see messages that are probably directed to you.  So if someone sends
+a direct message to you through the inbox tool, or if someone replies to
+a topic you started, or if someone replies to your reply in a topic, or if
+someone comments on one of your homework submissions, or if you're a teacher
+and a student comments on their submission in a course you're teaching, then
+the message will show up in your inbox.  To see how items show up in the
+inbox check out lib/send_to_inbox.rb
+
+# Assignments
+Assignments probably isn't the best term for it, because it's more than 
+just assignments.  This is anything that a teacher wants to show up in their
+gradebook, so that's assignments, attendance, tests, papers, etc.  Every assignment
+can have a points possible, allow for submitting online, and can be associated 
+with a forum, quiz, etc.
+
+Assignments are organized into groups. Every AssignmentGroup can have a weight
+assigned (so a teacher could say "Papers are worth 50% of the final grade,
+Tests worth 30%, Homework worth 20%"), and have custom grading rules (i.e. 
+"Drop the lowest 2 scores").  A teacher can also just do straight points-based
+grading if they want.
+
+The gradebook shows all assignments and students in a grid, and by default
+calculates final grades based only on assignments that have actually been graded.
+This gives a better feel for a student's progress throughout the semester, 
+instead of just once all the grades have been entered.  Students also have access
+to just their own grades with the same calculations.  Students can enter
+"what-if" grades and see how future grades will affect their final grade.
+
+# Files
+Every course, group, and individual user gets a place to hold files.  They
+can organize them into folders, lock and unlock files for student access, 
+import batches of files as a single zip, etc.  The default is a simple
+javascript uploader, but if flash is enabled then a multi-file uploader
+is overlaid and used instead.  If you have edit priveleges, you can drag a 
+folder to another context and copy its contents without having to re-upload
+all the files.  Files (Attachment is the name of the model) are namespaced
+by the root account, and if a user uploads a file that matches some other file
+in the same root account we don't store two copies, we just keep a pointer.
+This makes it harder for us if we want to delete old files, but keeps storage
+down.
+
+# Wiki
+Every course and group gets a wiki.  They can set edit priveleges to only
+teachers, or students as well.  There's no wiki words, instead there's a
+WYSIWYG editor and a sidebar with all the links you could possibly want.  In
+fact, every editable page inside of Instructure gets the same sidebar, so it's
+easy to link from an assignment page to a forum, a file, a wiki page, etc.
+Wiki pages are accessed by name, and created on demand (/courses/5/wiki/new_page
+would be created if it didn't exist and you went to it).
+
+# Quizzes
+Teachers can build online quizzes for students to take.  They can be graded
+or ungraded.  There are a few quiz question types, including multiple choice,
+true-false, fill-in-the-blank, missing word, short answer, numerical answer,
+and short essay.  A teacher builds a set of questions, assigns each question 
+points, and students can then take the quiz.  Questions answers are keyed randomly
+to prevent cheating, and all grading is done server-side.
+
+Quizzes can also include question groups.  This is easiest to explain with an
+example.  A teacher could create a group with fifty questions, and then say
+every student should be given a random selection of five of those fifty questions,
+worth five points each.
+
+Quiz questions are also stored as AssessmentQuestion records.  This is so they
+can be organized into question banks and reused on future quizzes.  QuestionBanks
+can be bookmarked by a teacher, which means they'll be able to add questions
+from that bank to any course they manage.
+
+# Calendar
+The calendar view shows assignment due dates and calendar events overlaid on
+a monthly calendar.  A user can see all their courses, groups, and personal
+events overlaid on the same calendar a la Google Calendar.  Those with edit
+priveleges can drag and drop, rename events, etc.  A user can subscribe to their
+calendars using an external tool via the ical feed link on their calendar
+page.
+
+Currently there are no repeating events in the calendar, and no way to import
+an ical feed into the Instructure calendar.
+
+# Forums
+Every course and group has a discussion forum.  Topics include replies, 
+and every reply can have a set of sub-replies, but that's as deep as it 
+goes, no sub-sub-replies.  Sub-replies are called 'Side Comments'.
+
+Announcements also show up in the forum view for discussion.  Teachers can
+lock topics so they can't be posted to.  They can also rearrange the order
+of topics if they like.
+
+# Modules
+Courses can have modules, which are just collections of different types
+of content.  A module could have some files, some wiki pages, some
+assignments, etc.  Teachers can specify criteria for completing modules,
+and then specify prerequisites for modules.  This lets a teacher block
+access to some content in the course until the user has, say, gotten a 
+minimum score or viewed a page.
+
+# Access Control
+Account managers can set fine-grained permissions on a per-role basis.  Right 
+now the roles they can specify permissions for are Teacher, Student, Ta, Observer
+and Designer.
+
+Access controls are inherited up the chain.  If a teacher doesn't define
+permissions, they are inherited from the department, then the college, then
+the school.  Anywhere along the chain an admin can "lock" a permission, which
+says, "I don't want anyone down the chain to override my decision for 
+this policy".
+
+Account managers can also create different types of account users.  They can 
+define as many custom account roles as they like (i.e. sys admins,
+tech support, etc.) and define what permissions those role types have.

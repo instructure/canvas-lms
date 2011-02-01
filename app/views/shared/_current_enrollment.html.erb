@@ -1,0 +1,33 @@
+<li class="<%= 'unpublished' if current_enrollment.course.created? || current_enrollment.course.claimed? %> <%= current_enrollment.workflow_state %>">
+  <% if current_enrollment.workflow_state == "invited" %>
+  <div class="reminder">
+    <h2><a href="<%= course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid) %>"><%= current_enrollment.long_name %></a></h2>
+    <div class="body">
+      You've been invited to join <%= current_enrollment.long_name %> as a<%= "n" if current_enrollment.readable_type == 'Observer' %> 
+      <b><%= current_enrollment.readable_type %></b>
+      for the user account <b><%= current_enrollment.user.email %></b>.  
+      <% if !@domain_root_account || @domain_root_account.allow_invitation_previews? %>
+      Feel free to <a href="<%= course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid) %>">wander around</a> and see what it's
+      like.  
+      <% end %>
+      When you're ready, you can either accept or reject the invitation.
+      <div class="button-container button-container-right-aligned">
+        <% form_tag course_enrollment_invitation_path(current_enrollment.course_id) do %>
+          <button type="submit" name="accept" class="button positive button-default">Accept Invitation</button>
+          <button type="submit" name="reject" class="button reject_button">Reject Invitation</button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <% else %>
+  <a href="<%= course_path(current_enrollment.course_id) %>">
+    <span class="name ellipsis" title="<%= current_enrollment.long_name %>">
+      <%= current_enrollment.long_name %>
+      <% if current_enrollment.course.created? || current_enrollment.course.claimed? %>
+        <%= image_tag "hammer.png", :title => "This course hasn't been published yet", :alt => "Unpublished", :class => "unpublished_icon" %>
+      <% end %>
+    </span>
+    <span class="subtitle ellipsis">Enrolled as <%= current_enrollment.readable_type %></span> 
+  </a>  
+  <% end %>
+</li>

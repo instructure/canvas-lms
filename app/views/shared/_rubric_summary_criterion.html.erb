@@ -1,0 +1,22 @@
+<% criterion = rubric_summary_criterion || nil; assessing ||= false; brief ||= false; assessment_rating ||= nil %>
+<% @empty_rating ||= [OpenObject.new(:id => "blank", :description => "Full Marks", :points => 5), OpenObject.new(:id => "blank_2", :description => "No Marks", :points => 0)] %>
+<tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> criterion_<%= criterion ? criterion.id : "blank" %>">
+  <td class="criterion_description"><%= criterion ? truncate_text(criterion.description, :max_length => 50) : "Description of criterion" %></td>
+  <td>
+      <div class="ratings">
+      <% ratings = criterion ? criterion.ratings : @empty_rating %>
+      <% ratings.each_index do |idx| %>
+        <% rating = ratings[idx]; rating.edge = (idx == 0 || idx == ratings.length - 1) %>
+        <div class="rating_holder"><span id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %>"><%= rating.description %></span></div>
+      <% end %>
+      </div>
+      <div class="rating description" style="<%= hidden unless criterion %>"><%= assessment_rating ? assessment_rating.description : "" %></div>
+      <div class="rating_comments_dialog_link" title="Click to see full comments" style="margin-top: 5px;">
+        <% comments = assessment_rating.comments if assessment_rating && assessment_rating.comments_enabled %>
+        <div class="rating rating_custom"><%= comments || "" %></div>
+      </div>
+      <span class="nobr x_out_of_x">
+        <span class="criterion_points" style="<%= hidden if brief %>"><%= assessing ? (assessment_rating ? assessment_rating.points : "") : (criterion ? criterion.points : 5) %></span>/<span class="criterion_points_possible"><%= criterion ? criterion.points : 5 %></span> pts
+      </span>
+  </td>
+</tr>

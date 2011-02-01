@@ -1,0 +1,35 @@
+{
+    "incorrect_comments":"",
+    "question_text":"Coenzymes",
+    "question_type":"multiple_choice_question",
+    "answers":[
+        {
+            "weight":0,
+            "text":"are two enzymes hooked together",
+            "id":4902,
+            "migration_id":"MC0"
+        },
+        {
+            "weight":100,
+            "text":"work in unison with proteins",
+            "id":5049,
+            "migration_id":"MC1"
+        },
+        {
+            "weight":0,
+            "text":"are poor catalysts",
+            "id":8182,
+            "migration_id":"MC2"
+        },
+        {
+            "weight":0,
+            "text":"do not work well with other enzymes",
+            "id":221,
+            "migration_id":"MC3"
+        }
+    ],
+    "question_name":"Coenzymes",
+    "correct_comments":"",
+    "migration_id":"URN-X-WEBCT-VISTA_V2-790EA1350D71681DE0440003BA07D9B4",
+    "points_possible":1
+}

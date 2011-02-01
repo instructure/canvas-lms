@@ -1,0 +1,202 @@
+<% content_for :page_title do %><%= @messages_view_header %><% end %>
+
+<% content_for :right_side do %>
+  <div class="rs-margin-lr rs-margin-all">
+    <% if !@message_contexts.empty? %>
+      <a href="#" class="button button-sidebar new_message_link button-sidebar-wide"><%= image_tag "email.png" %> Write a Message</a>
+    <% end %>
+    <% if @current_user && @current_user.unread_inbox_items_count && @current_user.unread_inbox_items_count > 0 %>
+      <% form_tag mark_inbox_as_read_path, {:method => :delete, :id => "mark_inbox_as_read_form"} do %>
+        <button class="button button-sidebar-wide" type="submit"><%= image_tag "pass.png" %> <span class="msg">Mark All Messages as Read</span></button>
+      <% end %>
+    <% end %>
+  </div>
+  <h2>Show Message Types</h2>
+  <div class="rs-margin-lr">
+    <a href="<%= user_path(@current_user) %>" class="update_user_url" style="display: none;">&nbsp;</a>
+    Select which message types you'd like to show up in your inbox:
+    <ul class="unstyled_list" id="visible_message_types">
+      <% [['ContextMessage', 'Private Messages'], ['SubmissionComment', 'Submission Comments'], ['DiscussionEntry', 'Discussion Replies']].each do |type, desc| %>
+        <li><input type="checkbox" value="<%= type.underscore %>" id="show_<%= type.underscore %>" <%= 'checked' if @current_user.show_in_inbox?(type) %> /><label for="show_<%= type.underscore %>"><%= desc %></label></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<h2 id="messages_view" style="float: left;"><%= @messages_view_header %></h2>
+<% if @messages_view == :action_items %>
+  <div style="float: left; padding-top: 0.5em; margin-left: 15px;">
+    <a href="<%= inbox_path(:view => 'inbox') %>" style="display: none;">Received Messages</a>
+    <a href="<%= inbox_path(:view => 'sentbox') %>">Sent Messages</a>
+  </div>
+<% elsif @messages_view == :inbox %>
+  <div style="float: left; padding-top: 0.5em; margin-left: 15px;">
+    <a href="<%= inbox_path(:view => 'sentbox') %>">Sent Messages</a>
+  </div>
+<% else %>
+  <div style="float: left; padding-top: 0.5em; margin-left: 15px;">
+    <a href="<%= inbox_path %>">Inbox</a>
+    <a href="<%= inbox_path(:view => (@messages_view == :inbox ? 'sentbox' : nil)) %>" style="display: none;"><%= @messages_view == :inbox ? "Sent Messages" : "Received Messages" %></a>
+  </div>
+<% end %>
+<div class="clear"></div>
+<div id="send_message" style="display: none; margin-bottom: 10px;">
+  <h3>New Message for 
+    <select id="current_message_context">
+    <% @message_contexts.each do |context| %>
+      <option value="<%= context.asset_string %>"><%= context.name %></option>
+    <% end %>
+    </select>
+  </h3>
+  <% @message_contexts.each do |context| %>
+    <% form_for :context_message, :url => context_url(context, :context_roster_messages_url), :html => {:id => "#{context.asset_string}_recipients", :class => 'send_message_form', :style => 'display: none;', :multipart => true} do |f| %>
+    <%= f.hidden_field :recipients, :class => "recipient_ids" %>
+    <%= f.hidden_field :root_context_message_id, :class => "root_context_message_id" %>
+    <a href="<%= context_url(context, :context_message_recipients_url) %>" style="display: none;" class="recipients_url">&nbsp;</a>
+    <table class="formtable" style="width: 100%;">
+      <tr>
+        <td style="vertical-align: top; font-weight: bold;">
+          Recipients:
+        </td>
+        <td colspan="2" class="recipients" style="font-size: 0.8em; text-align: left; vertical-align: top; width: 80%">
+          <div style="max-height: 75px; overflow: auto;" class="recipients_scroll">
+            <button type="button" class="button small-button nobr select_recipients" style="float: left;">Select Recipients</button>
+            <div class="no_recipients">No Recipients</div>
+            <div class="recipient blank" style="display: none;">
+              <span class="name">user name</span>
+              <a href="#" class="delete_recipient_link">&#215;</a>
+              <span class="id" style="display: none;">&nbsp;</span>
+            </div>
+          </div>
+          <div class="clear"></div>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold">Subject:</td>
+        <td><%= f.text_field :subject, :class => "subject" %></td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td colspan="3">
+          <%= f.text_area :body, :style => "width: 98%; height: 200px;" %>
+          <div style="display: none;">
+            <i style="font-size: 0.8em;">Keep in mind this message will be sent out as an
+            email to the selected recipients, and we can't promise it won't be read by unregistered
+            users if they share email accounts.</i>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <% if can_do(context.announcements.new, @current_user, :create) %>
+            <input type="checkbox" id="<%= context.asset_string %>_also_announcement" name="also_announcement" class="also_announcement" value="1"/>
+            <label for="<%= context.asset_string %>_also_announcement">Also post as an announcement</label>
+          <% end %>
+        </td>
+        <td style="width: 250px;">
+          <a class="add-small add_attachment_link" href="#">Add Attachment</a>
+          <div class="context_message_attachment blank" style="display: none;">
+            <input type="file" name="" class="file_input"/>
+            <a href="#" class="remove_attachment_link"><%= image_tag "delete_circle.png" %></a>
+          </div>
+        </td>
+      </tr>
+        <% if context.respond_to?(:enable_user_notes) && context.enable_user_notes && can_do(context, @current_user, :create_user_notes) %>
+          <tr>
+            <td colspan="2">
+              <input type="checkbox" id="add_as_user_note" class="add_as_user_note" name="add_as_user_note" value="1" disabled/>
+              <label for="add_as_user_note">Add as a Faculty Journal entry</label>
+            </td>
+          </tr>
+        <% end %>
+      <tr>
+        <td colspan="3">
+          <%= f.hidden_field :recipients, :class => 'recipient_ids' %>
+          <div class="button-container">
+            <button type="submit" class="button send_button">Send Message</button>
+            <button type="button" class="cancel_button button-secondary">Cancel</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <% end %>
+  <% end %>
+</div>
+<% if @messages_view == :action_items %>
+  <%= render :partial => "inbox_items" %>
+<% else %>
+  <%= render :partial => "context_message_inbox" %>
+<% end %>
+
+<% jammit_js :context_messages %>
+<div id="possible_recipients" style="display: none;">
+  <% @contexts.each do |context| %>
+    <% (context.try_rescue(:users) || []).each do |user| %>
+      <div class="for_<%= context.asset_string %> user_name_<%= user.id %>"><%= context_user_name(context, user) %></div>
+    <% end %>
+  <% end %>
+</div>
+<% if @included_message %>
+<div style="display: none;" id="included_message_for_reply">
+  <%= render :partial => 'context/context_message', :object => @included_message %>
+</div>
+<% end %>
+<div id="recipients_dialogs" style="display: none;">
+<% @message_contexts.each do |context| %>
+  <div id="<%= context.asset_string %>_recipients_dialog" class="recipients_dialog" title="Recipients for <%=h context.name %>">
+    <div class="left_side" style="float: left; width: 35%; height: 300px; overflow: auto;">
+      <% if context.is_a?(Course) %>
+      <div>
+        <h3 style="margin-top: 0; margin-bottom: 0;">Possible Recipients</h3>
+        <ul class="unstyled_list" style="margin-left: 10px; margin-bottom: 15px;">
+          <li class="message_group">
+            <a href="#" class="message_all_students_link select_recipients_link email">Select All Students
+            </a>
+          </li>
+          <li class="message_group">
+            <a href="#" class="message_all_teachers_link select_recipients_link email">Select Teachers
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="message_groups" style="display: none;">
+        <h3 style="margin-bottom: 0;">Select a Group</h3>
+        <ul class="unstyled_list category blank" style="margin-left: 10px; margin-bottom: 15px; display: none;">
+          <li class="message_group blank" style="display: none;">
+            <a href="#" class="message_group_link email select_recipients_link"><span class="group_name"></span>
+              <div class="group_recipient blank" style="display: none;">
+                <span class="user_id" style="display: none;">&nbsp;</span>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <% end %>
+    </div>
+    <div class="right_side" style="float: left; width: 60%; height: 300px; overflow: auto; padding-left: 10px;">
+      
+      <h3 style="margin-top: 0; float: left;">Recipients</h3>
+      <a href="#" class="clear_recipients_link" style="float: right; margin-right: 5px;">clear all</a>
+      <div class="clear"></div>
+      <div style="margin-left: 10px;">
+      <ul class="unstyled_list recipients">
+        <li class="recipient blank" style="display: none;">
+          <input type="checkbox" id=""/>
+          <label for="" class="name">&nbsp;</label>
+        </li>
+      </ul>
+      </div>
+    </div>
+    <div class="clear"></div>
+    <div class="button-container">
+      <button type="button" class="button select_button">Add Recipients</button>
+      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+    </div>
+  </div>
+<% end %>
+</div>
+<div id="context_message_recipient_not_available_dialog" title='<span class="ui-icon ui-icon-alert" style="float: left; margin-right: 0.3em; "></span> Alert:' style="display:none;">
+  Some of the original intended recipients are no longer available. <br />
+  This may be because they are no longer an active member of the course or group. 
+  They might have been deleted or un-enrolled.     
+</div>

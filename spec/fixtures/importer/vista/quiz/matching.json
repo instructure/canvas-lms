@@ -1,0 +1,53 @@
+{
+    "incorrect_comments":"Humans and other mammals have two occipital condyles as do modern amphibians. Modern reptiles have one.",
+    "matches":[
+        {
+            "text":"two",
+            "id":3338
+        },
+        {
+            "text":"four",
+            "id":2830
+        },
+        {
+            "text":"three",
+            "id":9417
+        },
+        {
+            "text":"one",
+            "id":2290
+        }
+    ],
+    "question_text":"How many occipital condyles do each of the following have?",
+    "question_type":"matching_question",
+    "answers":[
+        {
+            "text":"Man",
+            "match_id":3338,
+            "comments":"",
+            "id":9065
+        },
+        {
+            "text":"Mammals other than man",
+            "match_id":3338,
+            "comments":"",
+            "id":9270
+        },
+        {
+            "text":"Modern reptiles",
+            "match_id":2290,
+            "comments":"",
+            "id":4974
+        },
+        {
+            "text":"Modern amphibians",
+            "match_id":3338,
+            "comments":"",
+            "id":6682
+        }
+    ],
+    "question_name":"Occipital condyles",
+    "correct_comments":"Humans and other mammals have two occipital condyles as do modern amphibians. Modern reptiles have one.",
+    "migration_id":"URN-X-WEBCT-VISTA_V2-790EA1350E85681DE0440003BA07D9B4",
+    "points_possible":1
+}

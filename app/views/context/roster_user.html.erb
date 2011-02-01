@@ -1,0 +1,218 @@
+<% 
+  add_crumb("People", context_url(@context, :context_users_url))
+  add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
+  @active_tab="people"
+%>
+<% content_for :page_title do %><%= context_user_name(@context, @user) %>, <%= @context.name %><% end %>
+
+<% content_for :right_side do %>
+  <h2><%= context_user_name(@context, @user) %></h2>
+  <div class="rs-margin-rl">
+    <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
+      <a class="button button-sidebar button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><%= image_tag "grading_icon.png" %> Grades for <%= context_user_name(@context, @user) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :send_messages) %>
+      <a class="button button-sidebar-wide" href="<%= inbox_path %>#<%= CGI::escape("reply{\"context_code\":\"#{@context.asset_string}\",\"recipients\":\"#{@user.id}\"}") %>"><%= image_tag "email.png" %> Message <%= context_user_name(@context, @user) %></a>
+    <% end %>
+    <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
+      <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide">Faculty Journal for <%= context_user_name(@context, @user) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_students) %>
+      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>" class="button button-sidebar-wide"><%= image_tag "link.png" %> Access Report for <%= context_user_name(@context, @user) %></a>
+    <% end %>
+    <% if @context.is_a?(Course) && @context.has_outcomes? && can_do(@context, @current_user, :manage) %>
+      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>" class="button button-sidebar-wide"><%= image_tag "learning_outcome.png" %> Outcomes for <%= @user.short_name %></a>
+    <% end %>
+    <% if can_do(@domain_root_account, @current_user, :manage) %>
+      <a href="<%= user_path(@user.id) %>" class="button button-sidebar-wide"><%= image_tag "information.png" %> User Account Details</a>
+    <% end %>
+  </div>
+  <a href="<%= profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
+  <h2><%= @user.short_name %>'s Services</h2>
+  <div class="rs-margin-lr">
+    <% if can_do(@membership, @current_user, :read_services) && !@membership.user.user_services.empty? %>
+      <p>
+      <% @membership.user.user_services.each do |service| %>
+        <a href="<%= service.service_user_link %>" title="<%= service.service.titleize rescue 'Unknown' %>" class="no-hover"><%= image_tag "#{service.service}_icon.png" %></a>
+      <% end %>
+      </p>
+    <% else %>
+      <% if !@membership.user.user_services.empty?  %>
+        <p>
+        <%= @user.short_name %>'s registered services are not visible to you at this time.
+        </p>
+      <% else %>
+        <p>
+        <%= @user.short_name %> hasn't linked any external services to their account yet.
+        </p>
+      <% end %>
+    <% end %>
+    <% if @current_user && @current_user == @user && @current_user.user_services.empty? %>
+      <p>
+        You haven't linked your user profile to any external services.  You 
+        can link your Canvas account to services like Facebook and Twitter.
+        This will make it easier for fellow course and group members to
+        link up with you outside of class.
+      </p>
+      <p>
+        <a href="<%= profile_path %>#registered_web_services" class="button">Link web services to my account</a>
+      </p>
+    <% elsif @current_user && @current_user == @user && !@current_user.show_user_services %>
+      <p>
+        You haven't enabled your list of registered services.  Enabling this
+        list will let fellow course and group members more easily link
+        up with you outside of class.
+      </p>
+      <p>
+        <input type="checkbox" id="show_user_services" class="show_user_services_checkbox"/><label for="show_user_services">Let fellow course/group members see which services I've linked to my profile</label>
+      </p>
+    <% end %>
+  </div>
+<% end %>
+
+<% jammit_css :roster_user %>
+
+<h2><%= @user.short_name %>'s Details</h2>
+<% if can_do(@context, @current_user, :manage_students) %>
+<h2>User Details</h2>
+<%= render :partial => 'users/name' %>
+<a href="#" class="more_user_information_link">more user details...</a>
+<div class="more_user_information" style="display: none;">
+  <% if @context.is_a?(Course) %>
+    <fieldset>
+      <legend>Membership(s)</legend>
+      <table>  
+        <% @enrollments.each do |enrollment| %>
+          <tr class="enrollment">
+            <td style="vertical-align: top; padding: 5px 50px 5px 5px;">
+              <b><a href="<%= context_url(@context, :context_section_url, enrollment.course_section_id) rescue "#" %>"><%= enrollment.try_rescue(:course_section).try_rescue(:display_name) || enrollment.short_name %></a></b>
+              <div style="font-size: 0.8em; padding-left: 20px;">Enrolled as a <%= enrollment.readable_type %></div>
+              <div style="font-size: 0.8em; padding-left: 20px;">created <%= datetime_string(enrollment.created_at) %></div>
+              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? %>" class="completed_at_holder">completed <span class="completed_at"><%= datetime_string(enrollment.completed_at) %></div>
+            </td>
+            <% if !enrollment.admin? || (can_do(@context, @current_user, :manage_admin_users) && enrollment.user_id != @current_user.id) %>
+              <td style="vertical-align: top; padding: 5px; font-size: 0.8em;">
+                <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
+                  <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>">Conclude this Enrollment</a>
+                </div>
+                <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.completed? %>">
+                  <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>">Restore this Enrollment</a>
+                </div>
+                <div><% if enrollment.defined_by_sis? %>
+                  <a href="#" title="This enrollment was defined by the university, and can't be deleted">Can't Delete</a>
+                <% else %>
+                  <a class="delete_enrollment_link" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>">Delete this Enrollment</a>
+                <% end %>
+                </div>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+        <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+          <tr>
+            <td style="border-top: 1px solid #eee; padding-top: 5px; vertical-align: top; font-weight: bold;">Privileges:</td>
+            <td style="border-top: 1px solid #eee; padding-top: 5px;">
+              <div class="elevate_enrollment_link_holder" style="<%= hidden if @enrollments.any?{|e| !e.limit_priveleges_to_course_section } %>">
+                this user can only view students in their assigned course section(s)
+                <div style="margin-left: 10px; font-size: 0.8em;">
+                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="elevate_enrollment_link">let this user see all course users</a>
+                </div>
+              </div>
+              <div class="restrict_enrollment_link_holder" style="<%= hidden unless @enrollments.any?{|e| !e.limit_priveleges_to_course_section } %>">
+                this user can view students in any course section
+                <div style="margin-left: 10px; font-size: 0.8em;">
+                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="restrict_enrollment_link">limit this user to only see fellow section users</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </fieldset>
+  <% end %>
+  <%= render :partial => 'users/logins' %>
+</div>
+<div style="margin-bottom: 10px;">&nbsp;</div>
+<% elsif service_enabled?(:avatars) %>
+  <div style="margin-bottom: 20px;">
+    <span class="avatar_image"><img src="<%= @user.avatar_url(50, @domain_root_account && @domain_root_account.settings[:avatars], "http://#{request.host_with_port}/images/dotted_pic.png") %>"/></span>
+    <% if can_do(@user, @current_user, :remove_avatar) %>
+      <a href="#" class="remove_avatar_picture_link">Remove avatar picture</a>
+    <% else %>
+      <a href="#" class="report_avatar_picture_link">Report inappropriate picture</a>
+    <% end %>
+  </div>
+<% end %>
+
+<h2>Recent Messages</h2>
+<%= "No Messages" if @messages.empty? %>
+<% @messages[0,10].each do |message| %>
+  <% if message.is_a?(DiscussionEntry) %>
+    <%= render :partial => 'discussion_topics/entry', :object => message, :locals => {:out_of_context => true, :show_context => true} %>
+  <% elsif message.is_a?(ContextMessage) %>
+    <%= render :partial => 'context/context_message', :object => message %>
+  <% end %>
+<% end %>
+
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(".show_user_services_checkbox").change(function() {
+    $.ajaxJSON($(".profile_url").attr('href'), 'PUT', {'user[show_user_services]': $(this).attr('checked')}, function(data) {
+    }, function(data) {
+    });
+  });
+  $(".unconclude_enrollment_link").click(function(event) {
+    event.preventDefault();
+    var $enrollment = $(this).parents(".enrollment");
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
+      $enrollment.find(".conclude_enrollment_link_holder").slideDown();
+      $enrollment.find(".unconclude_enrollment_link_holder").slideUp();
+      $enrollment.find(".completed_at_holder").slideUp();
+    });
+  });
+  $(".conclude_enrollment_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".enrollment").confirmDelete({
+      message: "Are you sure you want to conclude this student's enrollment?",
+      url: $(this).attr('href'),
+      success: function(data) {
+        $(this).undim();
+        $(this).find(".conclude_enrollment_link_holder").slideUp();
+        $(this).find(".unconclude_enrollment_link_holder").slideDown();
+        // $(this).find(".completed_at").text("just now");
+        // $(this).find(".completed_at_holder").slideDown();
+      }
+    });
+  });
+  $(".elevate_enrollment_link,.restrict_enrollment_link").click(function(event) {
+    var limit = $(this).hasClass('restrict_enrollment_link') ? "1" : "0";
+    var $user = $(this).parents(".tr");
+    $user.loadingImage();
+    $.ajaxJSON($(this).attr('href'), 'POST', {limit: limit}, function(data) {
+      $user.loadingImage('remove');
+      $(".elevate_enrollment_link_holder,.restrict_enrollment_link_holder").slideToggle();
+    }, function(data) {
+      $.flashError("Enrollment privilege change failed, please try again");
+      $user.loadingImage('remove');
+    });
+    event.preventDefault();
+  });
+  $(".delete_enrollment_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".enrollment").confirmDelete({
+      message: "Are you sure you want to delete this student's enrollment?",
+      url: $(this).attr('href'),
+      success: function(data) {
+        $(this).closest('.enrollment').hide();
+      }
+    });
+  });
+  $(".more_user_information_link").click(function(event) {
+    event.preventDefault();
+    $(".more_user_information").slideDown();
+    $(this).hide();
+  });
+});
+</script>
+<% end %>

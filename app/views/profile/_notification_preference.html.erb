@@ -1,0 +1,65 @@
+<% list ||= [] 
+  if list.empty?
+    list << NotificationPolicy.new(:frequency => "never", :communication_channel => @user.communication_channel)
+  end
+  found = {}
+  list = list.select do |policy|
+    if !found[[policy.communication_channel_id, policy.frequency]]
+      true
+    else
+      false
+    end
+  end
+  list.compact!
+%>
+  <tr>
+    <td colspan="7" class="notification_type">
+      <%= notification_preference.category_description %>
+      <% if notification_preference.category == 'Message' %>
+        <div style="font-weight: normal; font-size: 0.8em;">
+          You must have at least one "right away" notification for email messages.
+        </div>
+      <% elsif notification_preference.category == 'Course Content' %>
+        <div style="font-weight: normal; font-size: 0.8em;">
+          Will notify you of changes to any wiki or assignment pages (could be a lot of notifications)
+        </div>
+      <% end %>
+    </td>
+  </tr>
+  <% list.each do |preference| %>
+  <tr class="preference preference_<%= notification_preference.id %>">
+    <td colspan="2" style="padding-left: 10px;">
+      <select class="contact_type_select">
+        <option value="email_select" <%= "selected" if preference.communication_channel.path_type == "email" %>>Email Me</option>
+        <option value="sms_select" <%= "selected" if preference.communication_channel.path_type == "sms" %>>Text my Cell</option>
+        <% if !@current_user.user_services.for_service('facebook').empty? %>
+          <option value="facebook_select" <%= 'selected' if preference.communication_channel.path_type == 'facebook' %>>Notify me on Facebook</option>
+        <% end %>
+      </select>
+      <span style="white-space: nowrap;"><span class="at" style="<%= hidden unless preference.communication_channel.path_type == 'email' || preference.communication_channel.path_type == 'sms' %>">at </span>
+        <% if preference.communication_channel.path_type == "email" %>
+          <%= render :partial => "email_select", :object => preference.communication_channel %>
+        <% elsif preference.communication_channel.path_type == "sms" %>
+          <%= render :partial => "sms_select", :object => preference.communication_channel %>
+        <% elsif preference.communication_channel.path_type == 'facebook' %>
+          <%= render :partial => "facebook_select", :object => preference.communication_channel %>
+        <% end %>
+      </div>
+      <div style="display: none;">
+        <div class="category_slug"><%= notification_preference.category_slug %></div>
+      </div>
+    </td>
+    <td class="frequency <%= "selected" if !preference.frequency || preference.frequency == "immediately" %> immediately" title="Notify me right away"><div>&nbsp;</div></td>
+    <td class="frequency <%= "selected" if preference.frequency == "daily" %> daily" title="Send notifications for the day in one message"><div>&nbsp;</div></td>
+    <td class="frequency <%= "selected" if preference.frequency == "weekly" %> weekly" title="Send notifications for the week in one message"><div>&nbsp;</div></td>
+    <td class="frequency <%= "selected" if preference.frequency == "never" %> never" title="Don't send me anything"><div>&nbsp;</div></td>
+    <td style="padding-left: 2px;">
+      <a href="#" class="delete_preference_link no-hover" style="opacity: 0.6; <%= hidden unless list.length > 1 %>"><%= image_tag "delete_circle.png" %></a>
+    </td>
+  </tr>
+  <% end %>
+  <tr>
+    <td colspan="7" style="text-align: right; font-size: 0.8em;">
+      <a href="#" class="add-small add_notification_link add_notification_<%= notification_preference.id %>"> And Also...</a>
+    </td>
+  </tr>

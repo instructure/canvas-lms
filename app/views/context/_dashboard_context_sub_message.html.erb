@@ -1,0 +1,35 @@
+<% comment = dashboard_context_sub_message || nil; hide_comment ||= false; context_code = comment.try_rescue(:context_code) || message.try_rescue(:context_code) %>
+<div id="dashboard_context_sub_message_<%= comment ? comment.id : "blank" %>" style="<%= hidden unless comment %>" class="communication_sub_message <%= 'toggled_communication_sub_message' if hide_comment %> <%= 'blank' unless comment %>">
+  <div class="header">
+    <div class="header_title">
+      <a title="Author's name" href="<%= context_prefix(context_code) %>/users/<%= comment ? comment.user_id : @current_user.id %>" class="user_name"><%= context_user_name(context_code, comment ? comment.user_id : @current_user) %></a>
+    </div>
+    <div class="post_date time_ago_date"><%= datetime_string(comment.try_rescue(:created_at)) || nbsp %></div>
+    <div class="clear"></div>
+  </div>
+  <div class="content">
+    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((comment.try_rescue(:user_id)), context_code, 30) %></div>
+    <div class="course_id" style="display: none;"><%= comment.try_rescue(:context_id) if comment.try_rescue(:context_type) == 'Course' %></div>
+    <div class="course_role" style="display: none;"><%= @role_lookups[context_code] if @role_lookups %></div>
+    <div class="message user_content" style="<%= hidden unless comment %>"><%= user_content(comment.try_rescue(:formatted_body), comment.try_rescue(:context_code), comment.try_rescue(:asset_string)) || nbsp %></div>
+    <% if !comment %>
+     <% form_for :context_message, :url => "#{context_prefix(context_code)}/messages", :html => {:class => "add_sub_message_form context_message_form"} do |f| %>
+        <input type="hidden" name="from_dashboard" value="1"/>
+        <%= f.hidden_field :recipients, :value => message && (message.user_id == @current_user.id ? message.recipient_users.map(&:id).join(',') : message.user_id) %>
+        <%= f.hidden_field :root_context_message_id, :value => message.try_rescue(:id) %>
+        <%= f.hidden_field :subject, :value => "Re: #{message.try_rescue(:subject).try_rescue(:sub, /\ARe:\s*/, '')}" %>
+        To: <%= message && (message.user_id == @current_user.id ? message.recipient_users.map{|u| context_user_name(context_code, u)} : [context_user_name(context_code, message.user_id)]).join(', ') %>
+        <%= f.text_area :body, :style => "height: 50px;" %>
+        <div style="float: right;">
+          <a href="<%= inbox_path(:include_contexts => context_code) %>#reply" class="more_options_reply_link">more options</a>
+        </div>
+        <div class="button-container" style="padding-bottom: 5px;">
+          <button type="submit" class="button small-button submit_button">Post Message</button>
+          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+        </div>
+      <% end %>
+    <% end %>
+    <div class="clear"></div>
+  </div>
+  <div class="clear"></div>
+</div>

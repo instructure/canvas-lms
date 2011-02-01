@@ -1,0 +1,91 @@
+<% content_for :page_title do %>Outcomes for <%= @user.name %><% end %>
+  
+<% content_for :right_side do %>
+  <div class="rs-margin-all">
+    <% chain = (@context.account_chain rescue [@domain_root_account]).select{|a| can_do(a, @current_user, :manage) }; %>
+    <% if !chain.empty? %>
+      See <%= @user.short_name %>'s results for:
+      <ul>
+      <% chain.each do |account| %>
+        <li><a href="<%= context_url(account, :context_user_outcomes_results_url, @user.id) %>"><%= account.name %></a></li>
+      <% end %>
+      </ul>
+    <% end %>
+  </div>
+<% end %>
+
+<% content_for :stylesheets do %>
+<style>
+#outcomes th {
+  background-color: #444;
+  color: #eee;
+  padding: 5px 5px;
+  font-size: 1.2em;
+  text-align: center;
+}
+#outcomes th.outcome {
+  text-align: left;
+}
+#outcomes td {
+  padding: 2px 5px;
+  text-align: center;
+}
+#outcomes .short_description {
+  text-align: left;
+  min-width: 150px;
+}
+#outcomes .attempts .sub_attempt {
+  font-size: 0.8em;
+}
+#outcomes .latest_score {
+  white-space: nowrap;
+}
+#outcomes .out_of {
+  font-size: 0.8em;
+}
+#outcomes .latest_score.mastery {
+  background-color: #efe;
+}
+#outcomes .latest_score {
+  background-color: #fee;
+}
+</style>
+<% end %>
+
+<table id="outcomes">
+<thead>
+  <tr>
+    <th class="outcome">Outcome</th>
+    <th>Attempts</th>
+    <th>Latest Score</th>
+    <th>Avg Percent</th>
+</thead>
+<tbody>
+  <% @outcomes.each do |outcome| %>
+    <tr>
+      <td class="short_description"><%= outcome.short_description %></td>
+      <% results = @results_for_outcome[outcome.id] || [] %>
+      <td class="attempts">
+        <%= pluralize(results.map{|r| [1, r.attempt || 0].max }.sum, "attempt") %>
+        <div class="sub_attempt">
+          from <%= pluralize(results.length, "artifact") %>
+        </div>
+      </td>
+      <td class="latest_score <%= 'mastery' if results[-1] && results[-1].mastery %>" title="<%= (results[-1] && results[-1].mastery) ? "Mastery on latest attempt" : "No Mastery on latest attempt" %>">
+        <% if results.empty? %>
+           - 
+        <% else %>
+          <%= results[-1].score %><span class="out_of"><% if results[-1].possible %> out of <%= results[-1].possible%><% end %></span>
+        <% end %>
+      </td>
+      <td class="avg_percent">
+        <% if results.empty? %>
+           - 
+        <% else %>
+          <%= results.map(&:percent).sum.to_f * 100.0 / results.length.to_f %>%
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

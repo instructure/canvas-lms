@@ -1,0 +1,3 @@
+xml|datasrc|datafld|dataformatas
+<XML SRC="xsstest.xml" ID=I></XML>
+<SPAN DATASRC=#I DATAFLD=C DATAFORMATAS=HTML></SPAN>

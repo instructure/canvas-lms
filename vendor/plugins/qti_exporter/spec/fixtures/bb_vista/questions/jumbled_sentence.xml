@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qtimetadata vocabulary is ignored
+Unmapped metadata field: questiontype=
+Converting proprietary WebCT metadata field wct_questiontype = WCT_JumbledSentence
+Unmapped metadata field: wct_authorwebctglid=2
+Unmapped metadata field: wct_questioncategory=Export Test
+Unmapped metadata field: wct_usedbyassessment=Blackboard Vista Export Test
+Unmapped metadata field: wct_authorfullname=Instructure LMS
+Warning: charset attribute no longer supported: ignored charset="US-ASCII"
+Unknown text type: ignored mattext with texttype="TEXT/PLAIN" treated as text/plain
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="4609842882341"
+ title="Jumbled Sentence"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="bb_question_type" value="WCT_JumbledSentence" />
+</instructureMetadata>
+<responseDeclaration identifier="JUMBLED01" cardinality="ordered" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p></p>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><and><match><index n="1"><variable identifier="JUMBLED01"/></index><baseValue baseType="identifier">JA03</baseValue></match><match><index n="2"><variable identifier="JUMBLED01"/></index><baseValue baseType="identifier">JA01</baseValue></match><match><index n="3"><variable identifier="JUMBLED01"/></index><baseValue baseType="identifier">JA02</baseValue></match></and>
+<setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></sum></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+</assessmentItem>

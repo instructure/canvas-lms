@@ -1,0 +1,38 @@
+<% content_for :page_title do %>Import Files<% end %>
+
+<% unless params[:return_to] %>
+  <%= render :partial => 'content_imports/wizard_secondary_nav', :locals => {:view => 'files' } %>
+<% end %>
+
+<div class="content-imports-wrapper">
+  <h2>Import Files</h2>
+  <p>You can upload a zipped collection of files into your course and we'll extract
+  them all out for you.  This is an easy way to move files from another system
+  into Canvas.
+  </p>
+  <% unless params[:return_to] %>
+  <div class="content-imports-instructions">
+    <a href="#" class="help zip_from_webct_link">How do I get a .zip file from WebCT?</a>
+    <ul id="zip_from_webct" class="ui-state-highlight" style="display: none;">
+      <li>Log in to WebCT and go to the File Manager</li>
+      <li>Select all the files you want to export</li>
+      <li>Click the zip option to archive the files</li>
+      <li>Save the file to your local computer</li>
+    </ul>
+  </div>
+  <% end %>
+  <%= render :partial => 'shared/zip_file_import_form' %>
+</div>
+<% js_block do %>
+<script type="text/javascript">
+  $(function(){
+    $(".zip_from_webct_link").click(function(event) {
+      event.preventDefault();
+      $("#zip_from_webct").slideToggle();
+    });
+    $("#zip_file_import_form .cancel_button")
+      .attr("href", "<%= qti_or_content_link %>")
+      .text("<%= params[:return_to] ? "Cancel" : "Skip this Step" %>");
+  });
+</script>
+<% end %>

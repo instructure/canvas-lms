@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Unmapped metadata field: cc_profile=cc.multiple_response.v0p1
+Unmapped metadata field: cc_weighting=1
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "Correct"
+Warning: case-insensitive comparison of identifiers not supported in version 2
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62"
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<responseDeclaration identifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<div>The QM peer review team must be composed of which of the following (select all that apply)?</div>
+<div></div>
+<choiceInteraction responseIdentifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62" shuffle="false" maxChoices="1">
+<simpleChoice identifier="answerChoice1" fixed="true">
+<p>A subject matter expert</p></simpleChoice>
+<simpleChoice identifier="answerChoice2" fixed="true">
+<p>An external reviewer</p></simpleChoice>
+<simpleChoice identifier="answerChoice3" fixed="true">
+<p>An instructional designer</p></simpleChoice>
+<simpleChoice identifier="answerChoice4" fixed="true">
+<p>A student </p></simpleChoice>
+<simpleChoice identifier="answerChoice5" fixed="true">
+<p>A master reviewer</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><and><member><baseValue baseType="identifier">answerChoice1</baseValue><variable identifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62"/></member><member><baseValue baseType="identifier">answerChoice2</baseValue><variable identifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62"/></member><not><member><baseValue baseType="identifier">answerChoice3</baseValue><variable identifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62"/></member></not><not><member><baseValue baseType="identifier">answerChoice4</baseValue><variable identifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62"/></member></not><member><baseValue baseType="identifier">answerChoice5</baseValue><variable identifier="f2e9bd5b-8dae-4829-a639-c38e97a96c62"/></member></and>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct_fb">
+<p>Correct!  The QM peer review team must include a subject matter expert, an external reviewer, and a master reviewer.</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect_fb">
+<p>The QM peer review team must include a subject matter expert, an external reviewer, and a master reviewer.  While an instructional designer may be involved in preparing the course for review or may happen to be one of the reviewers, QM does not require that an instructional designer be part of the review team.  Likewise, while the peer reviewers examine the course from the perspective of a student, students do not review the course in a QM review.</p></modalFeedback>
+</assessmentItem>

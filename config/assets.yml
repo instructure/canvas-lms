@@ -1,0 +1,238 @@
+javascript_compressor: closure
+embed_assets: off
+gzip_assets: off
+
+javascripts:
+  common:
+    - public/javascripts/firebugx.js
+    - public/javascripts/datejs_to_iso_string_patch.js
+    - public/javascripts/date.js
+    - public/javascripts/jquery-1.4.js
+    - public/javascripts/jquery.ba-hashchange.js
+    - public/javascripts/jquery-ui-1.8.js
+    - public/javascripts/jquery.ba-throttle-debounce.js
+    - public/javascripts/jquery.fancyplaceholder.js
+    - public/javascripts/jquery.autocomplete.js
+    - public/javascripts/jquery.google-analytics.js
+    - public/javascripts/jquery.pageless.js
+    - public/javascripts/jquery.inst_tree.js
+    - public/javascripts/jquery.store.js
+    - public/javascripts/jquery.scrollTo.js
+    - public/javascripts/scribd.view.js
+    - public/javascripts/swfobject/swfobject.js
+    - public/javascripts/reminders.js
+    - public/javascripts/instructure_helper.js
+    - public/javascripts/media_comments.js
+    - public/javascripts/tinymce.editor_box.js
+    - public/javascripts/instructure.js
+    - public/javascripts/ajax_errors.js
+    - public/javascripts/page_views.js
+    - public/javascripts/feedback.js
+    - public/javascripts/license_help.js
+    - public/javascripts/wiki_sidebar.js
+  speed_grader:
+    - public/javascripts/jquery.elastic.js
+    - public/javascripts/ui.selectmenu.js
+    - public/javascripts/jquery.getScrollbarWidth.js
+    - public/javascripts/rubric_assessment.js
+    - public/javascripts/speed_grader.js
+  file_inline:
+    - public/javascripts/file_inline.js
+  site_admin:
+    - public/javascripts/site_admin.js
+  graphael:
+    - public/javascripts/raphael.js
+    - public/javascripts/g.raphael/g.raphael.js
+    - public/javascripts/g.raphael/g.pie.js
+    - public/javascripts/g.raphael/g.bar.js
+    - public/javascripts/g.raphael/g.dot.js
+    - public/javascripts/g.raphael/g.line.js
+  gradebook_uploads:
+    - public/javascripts/underscore.js
+    - public/javascripts/jquery.template.js
+    - public/javascripts/jquery.getScrollbarWidth.js
+    - public/javascripts/slickgrid-googlecode/slick.editors.js
+    - public/javascripts/slickgrid-googlecode/slick.grid.js
+    - public/javascripts/slickgrid-googlecode/slick.globaleditorlock.js
+    - public/javascripts/gradebook_uploads.js
+  gradebook_history:
+    - public/javascripts/jquery.metadata.js 
+    - public/javascripts/gradebook-history.js
+  profile:
+    - public/javascripts/profile.js
+  topics:
+    - public/javascripts/topics.js
+  topic:
+    - public/javascripts/topic.js
+    - public/javascripts/edit_rubric.js
+  account_statistics:
+    - public/javascripts/account_statistics.js
+  assignments:
+    - public/javascripts/assignments.js
+  edit_rubric:
+    - public/javascripts/edit_rubric.js
+  syllabus:
+    - public/javascripts/calendar_move.js
+    - public/javascripts/syllabus.js
+  calendar_event:
+    - public/javascripts/calendar_event.js
+  calendar:
+    - public/javascripts/calendar.js
+    - public/javascripts/calendar_move.js
+  collaborations:
+    - public/javascripts/collaborations.js
+  context_messages:
+    - public/javascripts/context_messages.js
+  context_modules:
+    - public/javascripts/context_modules.js
+  course_details:
+    - public/javascripts/jquery.cookie.js
+    - public/javascripts/email_lists.js
+    - public/javascripts/course_details.js
+  course:
+    - public/javascripts/course.js
+  wiki:
+    - public/javascripts/wiki.js
+  eportfolio:
+    - public/javascripts/eportfolio.js
+  full_files:
+    - public/javascripts/full_files.js
+    - public/javascripts/swfupload.js
+  files_index:
+    - public/javascripts/swfupload.js
+    - public/javascripts/files.js
+  email_lists:
+    - public/javascripts/email_lists.js
+  datagrid:
+    - public/javascripts/datagrid.js
+  gradebooks:
+    - public/javascripts/gradebooks.js
+    - public/javascripts/message_students.js
+  attendance:
+    - public/javascripts/datagrid.js
+    - public/javascripts/attendance.js
+  grade_summary:
+    - public/javascripts/grade_summary.js
+  groups:
+    - public/javascripts/groups.js
+  learning_outcomes:
+    - public/javascripts/learning_outcomes.js
+  learning_outcome:
+    - public/javascripts/learning_outcome.js
+  quizzes_bundle:
+    - public/javascripts/quizzes.js
+    - public/javascripts/supercalc.js
+    - public/javascripts/calcCmd.js
+  quizzes_index:
+    - public/javascripts/quiz_index.js
+    - public/javascripts/content_locks.js
+  quiz_show:
+    - public/javascripts/quiz_show.js
+    - public/javascripts/message_students.js
+  question_banks:
+    - public/javascripts/question_banks.js
+  sub_accounts:
+    - public/javascripts/sub_accounts.js
+  aligned_outcomes:
+    - public/javascripts/aligned_outcomes.js    
+  full_assignment:
+    - public/javascripts/full_assignment.js
+  select_content_dialog:
+    - public/javascripts/select_content_dialog.js
+  rubric_assessment:
+    - public/javascripts/rubric_assessment.js
+  dashboard:
+    - public/javascripts/dashboard.js
+  prerequisites_lookup:
+    - public/javascripts/prerequisites_lookup.js
+  sis_import:
+    - public/javascripts/sis_import.js
+  user_notes:
+    - public/javascripts/user_notes.js
+  user_logins:
+    - public/javascripts/user_logins.js
+  user_name:
+    - public/javascripts/user_name.js
+  user:
+    - public/javascripts/user.js
+  manage_groups:
+    - public/javascripts/manage_groups.js
+  manage_avatars:
+    - public/javascripts/manage_avatars.js
+  ie7:
+    - public/javascripts/json2.js
+  content_migration:
+    - public/javascripts/content_migration.js
+
+stylesheets:
+  common:
+    - public/stylesheets/compiled/g_reset.css
+    - public/stylesheets/compiled/g_base.css
+    - public/stylesheets/static/jquery-ui-theme.css
+    - public/stylesheets/static/jquery.autocomplete.css
+    - public/stylesheets/compiled/g_instructure.css
+    - public/stylesheets/compiled/g_util_misc.css
+    - public/stylesheets/compiled/g_util_fancy_links.css
+    - public/stylesheets/compiled/g_util_buttons.css
+    - public/stylesheets/compiled/g_util_inst_tree.css
+    - public/stylesheets/compiled/g_util_chevron_crumbs.css
+    - public/stylesheets/compiled/g_assignments.css
+    - public/stylesheets/compiled/g_content_imports.css
+    - public/stylesheets/compiled/g_gradebook_history.css
+    - public/stylesheets/compiled/g_context_messages.css
+    - public/stylesheets/compiled/g_groups.css
+    - public/stylesheets/compiled/g_media_comments.css
+    - public/stylesheets/compiled/g_context_modules.css
+    - public/stylesheets/compiled/g_collaborations.css
+    - public/stylesheets/compiled/g_files.css
+    - public/stylesheets/compiled/g_wiki.css
+    - public/stylesheets/compiled/g_conference.css
+    - public/stylesheets/compiled/g_forum.css
+    - public/stylesheets/compiled/g_rubrics.css
+    - public/stylesheets/compiled/g_wiki_sidebar.css
+    - public/stylesheets/compiled/g_syllabus.css
+    - public/stylesheets/compiled/g_mini_calendar.css
+    - public/stylesheets/compiled/print.css
+  speed_grader:
+    - public/stylesheets/static/ui.selectmenu.css
+    - public/stylesheets/compiled/speed_grader.css
+  gradebook_uploads:
+    - public/stylesheets/static/slick.grid.css
+    - public/stylesheets/compiled/gradebook_uploads.css
+  calendar:
+    - public/stylesheets/static/calendar.css
+  course_details:
+    - public/stylesheets/compiled/course_details.css
+  full_files:
+    - public/stylesheets/compiled/full_files.css
+  datagrid:
+    - public/stylesheets/compiled/datagrid.css
+  gradebooks:
+    - public/stylesheets/compiled/gradebooks.css
+    - public/stylesheets/compiled/message_students.css
+  attendance:
+    - public/stylesheets/compiled/attendance.css
+  quizzes:
+    - public/stylesheets/compiled/quizzes.css
+    - public/stylesheets/compiled/message_students.css
+  full_assignment:
+    - public/stylesheets/compiled/full_assignment.css
+    - public/stylesheets/static/embed_content.css
+  login:
+    - public/stylesheets/compiled/login.css
+  roster_user:
+    - public/stylesheets/compiled/roster_user.css
+  learning_outcomes:
+    - public/stylesheets/compiled/learning_outcomes.css
+  grade_summary:
+    - public/stylesheets/compiled/grade_summary.css
+  context_list:
+    - public/stylesheets/compiled/context_list.css
+  prior_users:
+    - public/stylesheets/compiled/prior_users.css
+  statistics:
+    - public/stylesheets/compiled/statistics.css
+  sub_accounts:
+    - public/stylesheets/compiled/sub_accounts.css
+  user_logins:
+    - public/stylesheets/compiled/user_logins.css

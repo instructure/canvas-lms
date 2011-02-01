@@ -1,0 +1,54 @@
+<div class="learning_outcome outcome_item <%= 'out_of_context' if outcome && (outcome.context_id != @context.id || outcome.context_type != @context.class.to_s) %>" id="outcome_<%= outcome ? outcome.id : "blank" %>" style="<%= hidden unless outcome %>">
+  <div class="header">
+    <a href="#" class="reorder_link no-hover"><%= image_tag "move.png" %></a>
+    <% if can_do(@context, @current_user, :manage_outcomes) %>
+      <a href="<%= context_url(@context, :context_outcome_url, outcome ? outcome.id : "{{ id }}") %>" class="short_description"><%= outcome.try_rescue(:short_description) || nbsp %></a>
+    <% else %>
+      <span class="short_description"><%= outcome.try_rescue(:short_description) || nbsp %></span>
+    <% end %>
+    <div class="links">
+      <% if !outcome || (outcome.context_code == @context.asset_string && can_do(outcome, @current_user, :update)) %>
+      <a href="<%= context_url(@context, :context_outcome_url, outcome ? outcome.id : "{{ id }}") %>" class="edit_outcome_link no-hover"><%= image_tag "edit.png" %></a>
+      <% end %>
+      <% if !outcome || can_do(outcome, @current_user, :delete) || can_do(@context, @current_user, :manage_outcomes) %>
+        <a href="<%= context_url(@context, :context_outcome_url, outcome ? outcome.id : "{{ id }}") %>" class="delete_outcome_link remove_outcome_link no-hover" title="Remove this outcome" style="<%= hidden unless outcome && outcome.context_code != @context.asset_string %>"><%= image_tag "delete_circle.png" %></a>
+        <a href="<%= context_url(@context, :context_outcome_url, outcome ? outcome.id : "{{ id }}") %>" class="delete_outcome_link really_delete_outcome_link no-hover" title="Delete this outcome" style="<%= hidden if outcome && outcome.context_code != @context.asset_string %>"><%= image_tag "delete.png" %></a>
+      <% end %>
+    </div>
+    <div class="clear"></div>
+    <div style="display: none;">
+      <div class="asset_string"><%= outcome && outcome.asset_string %></div>
+      <div class="id"><%= outcome && outcome.id %></div>
+    </div>
+  </div>
+  <div class="body">
+    <a href="#" class="show_details_link">show details</a>
+    <a href="#" class="hide_details_link">hide details</a>
+    <div class="user_content description">&nbsp;</div>
+    <textarea style="display: none;" class="description"></textarea>
+    <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
+    <div class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @role_lookups %></div>
+    <div class="aligned_artifacts">
+      <span class="artifacts_count_for_tied_context">&nbsp;</span> artifacts
+    </div>
+    <table class="rubric_criterion">
+      <tr class="criterion_title">
+        <td style="vertical-align: top;" colspan="2">
+          Criterion Ratings:
+        </td>
+      <tr/>
+      <tr class="add_holder">
+        <td>
+          Threshold:
+          <span class="nobr"><span class="mastery_points">&nbsp;</span> / <span class="points_possible">&nbsp;</span></span>
+        </td>
+      </tr>
+      <tr style="display: none;" class="rating blank">
+        <td colspan="2">
+          <span class="description"></span>
+          <span style="float: right;"><span class="points">&nbsp;</span> pts</span>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

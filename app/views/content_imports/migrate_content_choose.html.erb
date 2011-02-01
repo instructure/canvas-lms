@@ -1,0 +1,523 @@
+<% add_crumb "Migrate From Another System",  context_url(@context, :context_import_migrate_url) %>
+<% content_for :page_title do %>Migrate From another System<% end %>
+<% content_for :stylesheets do %>
+<style>
+.root_asset_list {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-left: 30px;
+}
+.root_asset_list > li {
+  margin-bottom: 10px;
+}
+.root_asset_list h4 {
+  margin: 0;
+}
+.asset_list {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-left: 30px;
+}
+#copy_context_form h3 {
+  color: #444;
+}
+</style>
+<% end %>
+
+<div>
+  <div id="copy_context_form_loading">
+    <h2>Migrate From another System</h2>
+    <p>
+      We're working with a select set of schools to provide a simpler, more 
+      automated migration process from other learning management systems.  If 
+      your school shows up on the list, all you need to do is provide us with your
+      login and password.  We'll extract the content from your course, and you can
+      then specify which parts you'd like to have added to your new course.
+    </p>
+    <div style="font-size: 1.5em;">
+      Loading list of migrated resources...
+      <br>
+      <%= image_tag 'ajax-loader-bar.gif' %>
+    </div>
+  </div>
+  <% form_tag context_url(@context, :context_import_migrate_execute_url, @content_migration.id), :id => "copy_context_form", :style => "width: 600px; margin: 10px auto; display: none;" do %>
+    <%= hidden_field :copy, :content_migration_id, :value => @content_migration.id %>
+    <div style="display: none;" class="content_migration_id"><%= @content_migration.id %></div>
+    <h2>Copy From <span class="course_name">...</span></h2>
+    <p>Select the content you'd like copied into this course.  At the bottom you 
+    can also choose to adjust all dates for migrated items in case you've moved
+    on to a new semester.</p>
+    <h3 style="margin-bottom: 10px;"><%= check_box :copy, :everything, :class => "copy_everything" %> <%= label :copy, :everything, image_tag('checked.png', :style => 'width: 16px;') + " Copy Everything" %></h3>
+    <div id="copy_assignments_list">
+      <h3><%= check_box :copy, :all_assignments, :class => "copy_all", :checked => true %><%= label :copy, :all_assignments, image_tag('assignment.png') + " Assignments" %></h3>
+      <ul class="unstyled_list root_asset_list">
+          <li class="assignment" style="display: none;">
+            <input type="checkbox" value="1" name="copy[assignments][id]" id="copy_assignments_id"/>
+            <label for="copy_assignments_id" class="assignment_title">...</label>
+          </li>
+      </ul>
+    </div>
+    <div id="copy_quizzes_list">
+      <h3><%= check_box :copy, :all_quizzes, :class => "copy_all", :checked => true %><%= label :copy, :all_quizzes, image_tag('quiz.png') + " Quizzes" %></h3>
+      <ul class="unstyled_list root_asset_list quizzes_list">
+        <li class="quiz" style="display: none;">
+          <input type="checkbox" value="1" name="copy[quizzes][id]" id="copy_quizzes_id"/>
+          <label for="copy_quizzes_id">...</label>
+        </li>
+      </ul>
+      <ul>
+        <li class="assessment_questions" style="display: none;">
+          <input type="checkbox" value="1" name="copy[assessment_questions]" id="copy_assessment_questions"/>
+          <label for="copy_assessment_questions">Copy All Question Banks</label>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_files_list">
+      <h3><%= check_box :copy, :all_files, :class => "copy_all", :checked => true %><%= label :copy, :all_files, image_tag('download.png') + " Files" %></h3>
+      <ul class="unstyled_list root_asset_list folder" style="display: none;">
+        <li>
+          <h4>
+            <input type="checkbox" value="1" name="copy[folders][id]" id="copy_folders_id"/ class="copy_all">
+            <label for="copy_folders_id">...</label>
+          </h4>
+          <ul class="unstyled_list asset_list">
+            <li class="file">
+              <input type="checkbox" value="1" name="copy[files][id]" id="copy_files_id"/>
+              <label for="copy_files_id">...</label>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <input type="checkbox" value="1" name="copy[files][id]" id="copy_files_id" style="display: none;"/>
+    </div>
+    <div id="copy_modules_list">
+      <h3><%= check_box :copy, :all_modules, :class => "copy_all", :checked => true %><%= label :copy, :all_modules, image_tag('ball.png') + " Learning Modules" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="module" style="display: none;">
+          <input type="checkbox" value="1" name="copy[modules][id]" id="copy_modules_id"/>
+          <label for="copy_modules_id">...</label>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_outline_folders_list">
+      <h3><%= check_box :copy, :all_outline_folders, :class => "copy_all" %><%= label :copy, :all_outline_folders, image_tag('folder_closed.png') + " Content Folders" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="outline_folder" style="display: none;">
+          <input type="checkbox" value="1" name="copy[outline_folders][id]" id="copy_outline_folders_id"/>
+          <label for="copy_outline_folders_id">...</label>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_topics_list">
+      <h3><%= check_box :copy, :all_topics, :class => "copy_all" %><%= label :copy, :all_topics, image_tag('word_bubble.png') + " Discussions" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="topic" style="display: none;">
+          <input type="checkbox" value="1" name="copy[topics][id]" id="copy_topics_id"/>
+          <label for="copy_topics_id">...</label>
+          <div style="font-size: 0.8em; padding-left: 25px;">
+            <input type="checkbox" value="1" name="copy[topic_entries][id]" id="copy_topic_entries_id" class="secondary_checkbox"/>
+            <label for="">also import posts in this topic</label>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_announcements_list">
+      <h3><%= check_box :copy, :all_announcements, :class => "copy_all" %><%= label :copy, :all_announcements, image_tag('announcement_icon.png') + " Announcements" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="announcement" style="display: none;">
+          <input type="checkbox" value="1" name="copy[announcements][id]" id="copy_announcements_id"/>
+          <label for="copy_announcements_id">...</label>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_events_list">
+      <h3><%= check_box :copy, :all_calendar_events, :class => "copy_all" %><%= label :copy, :all_calendar_events, image_tag('due_date_icon.png') + " 5Events" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="event" style="display: none;">
+          <input type="checkbox" value="1" name="copy[events][id]" id="copy_events_id"/>
+          <label for="copy_events_id">...</label>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_rubrics_list">
+      <h3><%= check_box :copy, :all_rubrics, :class => "copy_all" %><%= label :copy, :all_rubrics, image_tag('rubric.png') + " Rubrics" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="rubric" style="display: none;">
+          <input type="checkbox" value="1" name="copy[rubrics][id]" id="copy_rubrics_id"/>
+          <label for="copy_rubrics_id">...</label>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_groups_list">
+      <h3><%= check_box :copy, :all_groups, :class => "copy_all" %><%= label :copy, :all_groups, image_tag('ball.png') + " Groups" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="group" style="display: none;">
+          <input type="checkbox" value="1" name="copy[groups][id]" id="copy_groups_id"/>
+          <label for="copy_groups_id">...</label>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_assignment_groups_list">
+      <h3><%= check_box :copy, :all_assignment_groups, :class => "copy_all" %><%= label :copy, :all_assignment_groups, image_tag('ball.png') + " Assignment Groups" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="assignment_group" style="display: none;">
+          <input type="checkbox" value="1" name="copy[assignment_groups][id]" id="copy_assignment_groups_id"/>
+          <label for="copy_assignment_groups_id">...</label>
+        </li>
+      </ul>
+    </div>
+    <div id="copy_wikis_list">
+      <h3><%= check_box :copy, :all_wikis, :class => "copy_all" %><%= label :copy, :all_wikis, image_tag('ball.png') + " Wikis" %></h3>
+      <ul class="unstyled_list asset_list">
+        <li class="wiki" style="display: none;">
+          <input type="checkbox" value="1" name="copy[wikis][id]" id="copy_wikis_id"/>
+          <label for="copy_wikis_id">...</label>
+        </li>
+      </ul>
+    </div>
+    <div style="margin-top: 20px;">
+      <h3><%= check_box :copy, :shift_dates, :class => "shift_dates_checkbox" %><%= label :copy, :shift_dates, "Adjust events and due dates" %></h3>
+      <div style="display: none; margin-left: 50px;" class="shift_dates_settings">
+        <div>
+          <div style="margin-bottom: 5px;"><strong class="course_name">...</strong> dates range</div>
+          <div style="float: left; margin-left: 10px;">from&nbsp;</div>
+          <div style="float: left;"><%= text_field :copy, :old_start_date, :value => "", :class => "date_field", :style => "width: 120px;" %></div>
+          <div style="float: left;">&nbsp;to&nbsp;</div>
+          <div style="float: left;"><%= text_field :copy, :old_end_date, :value => "", :class => "date_field", :style => "width: 120px;" %></div>
+          <div class="clear"></div>
+        </div>
+        <div>
+          <div style="margin-bottom: 5px margin-top: 10px;"><strong>This Course</strong> dates range</div>
+          <div style="float: left; margin-left: 10px;">from&nbsp;</div>
+          <div style="float: left;"><%= text_field :copy, :new_start_date, :value => date_string(@context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <div style="float: left;">&nbsp;to&nbsp;</div>
+          <div style="float: left;"><%= text_field :copy, :new_end_date, :value => date_string(@context.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <div class="clear"></div>
+        </div>
+        <div style="margin-top: 15px;">
+          You can also explicitly define day substitutions to adjust for changing class schedules
+          (i.e. move everything that was on Mondays to now happen on Tuesdays)
+          <div class="substitutions" style="margin-top: 10px;"></div>
+          <div style="display: none;">
+            <div class="substitution substitution_blank">
+              Move everything on <span class="old_select">&nbsp;</span> to happen on <span class="new_select">&nbsp;</span>
+              <a href="#" class="delete_substitution_link no-hover"><%= image_tag "delete_circle.png" %></a>
+            </div>
+            <select class="weekday_select weekday_select_blank">
+              <% Date::DAYNAMES.each_with_index do |name, idx| %>
+                <option value="<%= idx %>"><%= name %>s</option>
+              <% end %>
+            </select>
+          </div>
+          <div>
+            <a href="#" class="add_substitution_link add">Define a day substitution</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="progress_bar_holder" style="display: none; margin-top: 10px;">
+      <div class="copy_progress"></div>
+      <div class="progress_message">The import process has started!  This can take a few hours for large courses, so feel free to leave this page.  We'll send you an email when the import process is completed.</div>
+    </div>
+    <div class="button-container" style="margin-top: 20px;">
+      <button class="button big-button submit_button" type="submit">Import Course Content</button>
+    </div>
+  <% end %>
+  <div id="course_importing" style="display: none;">
+    <p><b>Thank you!</b>  We'll import the selected content from
+    <span class="course_name"></span>, and send you an email when the process is
+    complete.  The process normally finished within one hour.
+    </p>
+    <p>
+      <a href="<%= context_url(@context, :context_url) %>" class="course_url back">Back to Course Page</a>
+    </p>
+  </div>
+</div>
+
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(".date_field").date_field();
+  var pendingPopulates = 0;
+  var populateItem = function($item, id, name, param_name) {
+    pendingPopulates += 1;
+    setTimeout(function() {
+      var full_param_name = param_name + "[" + id + "]";
+      $item.find(":checkbox:first")
+        .attr('name', full_param_name)
+        .attr('id', full_param_name.replace(/[\[\]]+/g, "_"));
+      if(name != null) {
+        $item.find("label:first")
+          .text(name);
+      }
+      $item.find("label:first")
+        .attr('for', full_param_name.replace(/[\[\]]+/g, "_"));
+      $item.show();
+      pendingPopulates -= 1;
+      if (pendingPopulates <= 0) {
+        $("#copy_context_form_loading").hide();
+        $("#copy_context_form").show();
+      }
+    });
+  };
+  $.ajaxJSON(location.href, 'GET', {}, function(data) {
+    if(data.start_timestamp){
+      var date = $.parseFromISO(new Date(parseInt(data.start_timestamp, 10)).toISOString()).date_formatted;
+      $('#copy_old_start_date').val(date);
+    }
+    if(data.end_timestamp){
+      var date = $.parseFromISO(new Date(parseInt(data.end_timestamp, 10)).toISOString()).date_formatted;
+      $('#copy_old_end_date').val(date);
+    }
+    $("#copy_quizzes_list").showIf(data.assessments && data.assessments.length > 0);
+    if(data.assessments && data.assessments) {
+      for(var idx in data.assessments) {
+        var quiz = data.assessments[idx];
+        var $quiz = $("#copy_quizzes_list .quiz:first").clone(true);
+        populateItem($quiz, quiz.assessment_id || quiz.migration_id, quiz.assessment_title || quiz.quiz_name, 'copy[quizzes]');
+        $("#copy_quizzes_list ul.quizzes_list").append($quiz);
+      }
+    }
+    $("#copy_assignments_list").showIf(data.assignments && data.assignments.length > 0);
+    if(data.assignments) {
+      for(var idx in data.assignments) {
+        var assignment = data.assignments[idx];
+        var $assignment = $("#copy_assignments_list .assignment:first").clone(true);
+        populateItem($assignment, assignment.migration_id, assignment.title, 'copy[assignments]');
+        $("#copy_assignments_list ul").append($assignment);
+      }
+    }
+    $("#copy_announcements_list").showIf(data.announcements && data.announcements.length > 0);
+    if(data.announcements) {
+      for(var idx in data.announcements) {
+        var announcement = data.announcements[idx];
+        var $announcement = $("#copy_announcements_list .announcement:first").clone(true);
+        populateItem($announcement, announcement.migration_id, announcement.title, 'copy[announcements]');
+        $("#copy_announcements_list ul").append($announcement);
+      }
+    }
+    $("#copy_events_list").showIf(data.calendar_events && data.calendar_events.length > 0);
+    if(data.calendar_events) {
+      for(var idx in data.calendar_events) {
+        var event = data.calendar_events[idx];
+        var $event = $("#copy_events_list .event:first").clone(true);
+        populateItem($event, event.migration_id, event.title, 'copy[calendar_events]');
+        $("#copy_events_list ul").append($event);
+      }
+    }
+    $("#copy_modules_list").showIf(data.modules && data.modules.length > 0);
+    if(data.modules) {
+      for(var idx in data.modules) {
+        var module = data.modules[idx];
+        var $module = $("#copy_modules_list .module:first").clone(true);
+        populateItem($module, module.migration_id, module.title, 'copy[modules]');
+        $("#copy_modules_list ul").append($module);
+      }
+    }
+    $("#copy_rubrics_list").showIf(data.rubrics && data.rubrics.length > 0);
+    if(data.rubrics) {
+      for(var idx in data.rubrics) {
+        var rubric = data.rubrics[idx];
+        var $rubric = $("#copy_rubrics_list .rubric:first").clone(true);
+        populateItem($rubric, rubric.migration_id, rubric.title, 'copy[rubrics]');
+        $("#copy_rubrics_list ul").append($rubric);
+      }
+    }
+    $("#copy_groups_list").showIf(data.groups && data.groups.length > 0);
+    if(data.groups) {
+      for(var idx in data.groups) {
+        var group = data.groups[idx];
+        var $group = $("#copy_groups_list .group:first").clone(true);
+        populateItem($group, group.migration_id, group.title, 'copy[groups]');
+        $("#copy_groups_list ul").append($group);
+      }
+    }
+    $("#copy_assignment_groups_list").showIf(data.assignment_groups && data.assignment_groups.length > 0);
+    if(data.assignment_groups) {
+      for(var idx in data.assignment_groups) {
+        var assignment_group = data.assignment_groups[idx];
+        var $assignment_group = $("#copy_assignment_groups_list .assignment_group:first").clone(true);
+        populateItem($assignment_group, assignment_group.migration_id, assignment_group.title, 'copy[assignment_groups]');
+        $("#copy_assignment_groups_list ul").append($assignment_group);
+      }
+    }
+    $("#copy_wikis_list").showIf(data.wikis && data.wikis.length > 0);
+    if(data.wikis) {
+      for(var idx in data.wikis) {
+        var wiki = data.wikis[idx];
+        var $wiki = $("#copy_wikis_list .wiki:first").clone(true);
+        populateItem($wiki, wiki.migration_id, wiki.title, 'copy[wikis]');
+        $("#copy_wikis_list ul").append($wiki);
+      }
+    }
+    var topic_count = 0;
+    $("#copy_topics_list").showIf(data.discussion_topics && data.discussion_topics.length > 0);
+    if(data.discussion_topics) {
+      for(var idx in data.discussion_topics) {
+        var topic = data.discussion_topics[idx];
+        topic.entry_count = 0; //entryCount(topic);
+        var $topic = $("#copy_topics_list .topic:first").clone(true);
+        populateItem($topic, topic.migration_id, topic.title, 'copy[topics]');
+        //$topic.find(".sub_entry_count").text(topic.migration_id);
+        populateItem($topic.children("div"), topic.topic_id, null, 'copy[topic_entries]');
+        $("#copy_topics_list ul").append($topic);
+      }
+    }
+    var outline_count = 0;
+    if(data.course_outline) {
+      var checkItem = function(obj, root) {
+        if(obj && obj.migration_id) {
+          outline_count++;
+          var $outline = $("#copy_outline_folders_list .outline_folder:first").clone(true);
+          if(root) {
+            obj.title = "Home Page";
+          }
+          populateItem($outline, obj.migration_id, obj.title, 'copy[outline_folders]');
+          $("#copy_outline_folders_list ul").append($outline);
+        }
+        for(var idx in obj.contents) {
+          checkItem(obj.contents[idx]);
+        }
+      };
+      checkItem(data.course_outline, true);
+    }
+    $("#copy_outline_folders_list").showIf(outline_count > 0);
+    var file_count = 0;
+    if(data.file_map) {
+      var folders = {};
+      var folderNames = [];
+      for(var idx in data.file_map) {
+        var file = data.file_map[idx];
+        if(!file.is_folder) {
+          var folder = file.path_name.split('/');
+          var filename = folder.pop();
+          folder = folder.join('/') || "";
+          if(!folders[folder]) {
+            var $folder = $("#copy_files_list .folder:first").clone(true);
+            $folder.find("ul").empty();
+            populateItem($folder, file.migration_id, folder || "/", 'copy[folders]');
+            folderNames.push(folder);
+            folders[folder] = $folder;
+          }
+          var $file = $("#copy_files_list .file:first").clone(true);
+          populateItem($file, file.migration_id, filename, 'copy[files]');
+          folders[folder].find("ul").append($file);
+          file_count++;
+        }
+      }
+      folderNames = folderNames.sort();
+      for(var idx in folderNames) {
+        $("#copy_files_list").append(folders[folderNames[idx]]);
+      }
+    }
+    $("#copy_files_list").showIf(file_count > 0);
+    $("#copy_context_form .course_name").text(data.name);
+    $("#copy_everything").attr('checked', true).change();
+  });
+  $("#copy_context_form :checkbox").change(function() {
+    if($(this).hasClass('copy_all')) {
+      $(this).parent().nextAll("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $(this).attr('checked')).each(function() { $(this).triggerHandler('change'); });
+    } else if($(this).hasClass('copy_everything')) {
+      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything)").attr('checked', $(this).attr('checked')).filter(":not(.copy_all)").each(function() { $(this).triggerHandler('change'); });
+    } else {
+      $(this).parent().find(":checkbox.secondary_checkbox").attr('checked', $(this).attr('checked'));
+      if(!$(this).attr('checked')) {
+        $(this).parents("ul").each(function() {
+          $(this).prev("h2,h3,h4").find(":checkbox").attr('checked', false);
+        });
+      }
+    }
+  });
+  $(".shift_dates_checkbox").change(function() {
+    $(".shift_dates_settings").showIf($(this).attr('checked'));
+  }).change();
+  $(".add_substitution_link").click(function(event) {
+    event.preventDefault();
+    var $sub = $(".substitution_blank").clone(true).removeClass('substitution_blank');
+    $(".substitutions").append($sub.hide());
+    var $select = $(".weekday_select_blank").clone(true).removeClass('weekday_select_blank');
+    $sub.find(".old_select").empty().append($select.clone(true));
+    $sub.find(".new_select").empty().append($select);
+    $sub.find(".old_select").children("select").change();
+    $sub.slideDown();
+  });
+  $(".weekday_select").change(function() {
+    if($(this).parents(".old_select").length > 0) {
+      var $select = $(this).parents(".substitution").find(".new_select").children("select");
+      $select.attr('name', 'copy[day_substitutions][' + $(this).val() + ']');
+    }
+  });
+  $(".delete_substitution_link").click(function(event) {
+    event.preventDefault();
+    $(this).parents(".substitution").slideUp(function() {
+      $(this).remove();
+    });
+  });
+  
+  var $frame = $("<iframe id='copy_course_target' name='copy_course_target' src='about:blank'/>");
+  $("body").append($frame.hide());
+  $("#copy_context_form").attr('target', 'copy_course_target');
+  $(".copy_progress").progressbar();
+  $("#copy_context_form").submit(function() {
+    setTimeout(function() {
+      $("#copy_context_form").find(":checkbox,:text,select").attr('disabled', true);
+    }, 1000);
+    $("#copy_context_form .submit_button").text("Importing... this could take a while").attr('disabled', true);
+    $(".progress_bar_holder").slideDown();
+    var state = "nothing";
+    var fakeTickCount = 0;
+    var tick = function() {
+      if(state == "nothing") {
+        fakeTickCount++;
+        var progress = ($(".copy_progress").progressbar('option', 'value') || 0) + 0.25;
+        if(fakeTickCount < 10) {        
+          $(".copy_progress").progressbar('option', 'value', progress);
+        }
+        setTimeout(tick, 2000);
+      } else {
+        state = "nothing";
+        fakeTickCount = 0;
+        setTimeout(tick, 10000);
+      }
+    };
+    var checkup = function() {
+      var url = $("#copy_context_form").attr('action'); //location.href;
+      var lastProgress = null;
+      var waitTime = 1500;
+      $.ajaxJSON(url, 'GET', {}, function(data) {
+        state = "updating";
+        var course_import = data.content_migration;
+        var progress = 0;
+        if(course_import) {
+          progress = Math.max($(".copy_progress").progressbar('option', 'value') || 0, course_import.progress);
+          $(".copy_progress").progressbar('option', 'value', progress);
+        }
+        if(course_import && course_import.progress >= 100) {
+          $.flashMessage("Import Complete!  Returning to the Course Page...");
+          location.href = $(".course_url").attr('href');
+        } else if(course_import && course_import.workflow_state == 'failed') {
+          var code = "ContentMigration:" + $(".content_migration_id:first").text() + ":" + course_import.progress;
+          var message = "There was an error during your migration import.  Please notify your system administrator and give them the following code: \"" + code + "\"";
+          $.flashError(message);
+          $(".progress_message").html(message); //after("<div>" + message + "</div>")
+        } else {
+          if(progress == lastProgress) {
+            waitTime = Math.max(waitTime + 500, 30000);
+          } else {
+            waitTime = 1500;
+          }
+          lastProgress = progress;
+          setTimeout(checkup, 1500);
+        }
+      }, function() {
+        setTimeout(checkup, 3000);
+      });
+    };
+    setTimeout(checkup, 2000);
+    setTimeout(tick, 1000);
+    return true;
+  });
+
+});
+</script>
+<% end %>

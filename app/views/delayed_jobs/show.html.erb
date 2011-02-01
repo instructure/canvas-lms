@@ -1,0 +1,58 @@
+<% content_for :page_title do %>Delayed Job<% end %>
+
+<% content_for :page_header do %>
+  <h1>Delayed Job</h1>
+<% end %>
+
+<%= render :partial => "nav" %>
+
+<p>
+  <strong>Id:</strong>
+  <%=h @delayed_job.id %>
+</p>
+<p>
+  <strong>Priority:</strong>
+  <%=h @delayed_job.priority %>
+</p>
+<p>
+  <strong>Attempts:</strong>
+  <%=h @delayed_job.attempts %>
+</p>
+<p>
+  <strong>Handler:</strong>
+  <pre>
+  <%=h @delayed_job.handler %>
+  </pre>
+</p>
+<p>
+  <strong>Last Error:</strong>
+  <pre>
+  <%=h @delayed_job.last_error %>
+  </pre>
+</p>
+<p>
+  <strong>Queue:</strong>
+  <%=h @delayed_job.queue %>
+</p>
+<p>
+  <strong>Run At:</strong>
+  <%=h @delayed_job.run_at %>
+</p>
+<p>
+  <strong>Locked At:</strong>
+  <%=h @delayed_job.locked_at %>
+</p>
+<p>
+  <strong>Failed At:</strong>
+  <%=h @delayed_job.failed_at %>
+</p>
+<p>
+  <strong>Locked By:</strong>
+  <%=h @delayed_job.locked_by %>
+</p>
+
+<p>
+  <%= link_to "Edit", edit_delayed_job_path(@delayed_job) %> |
+  <%= link_to 'Delete', delayed_job_path(@delayed_job), :confirm => 'Are you sure?', :method => :delete %> | 
+  <%= link_to "View All", delayed_jobs_path %>
+</p>

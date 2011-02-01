@@ -1,0 +1,145 @@
+#grades_summary 
+  border-collapse: collapse
+  border-bottom: 1px solid #eee
+
+#grades_summary th 
+  font-size: 1.0em
+  padding: 4px 5px 2px
+  font-weight: bold
+  background-color: #444
+  color: #fff
+  text-align: left
+
+#grades_summary tr td 
+  padding: 5px 5px
+  text-align: left
+  border-top: 1px solid #ccc
+  background-color: #fff
+
+#grades_summary tr.comments td 
+  border-width: 0
+  font-size: 0.8em
+  padding-left: 30px
+
+#grades_summary tr.editable:hover td 
+  background-color: #cdf
+
+#grades_summary tr.editable.student_assignment.dropped:hover td.points_possible 
+  background-image: url(/images/earmark_hover.png)
+
+#grades_summary tr.student_assignment.dropped td 
+  color: #ccc
+  border-top-color: #eee
+
+#grades_summary tr.student_assignment.dropped td.points_possible 
+  background-image: url(/images/earmark.png)
+  background-repeat: no-repeat
+  background-position: top left
+
+#grades_summary tr.student_assignment.dropped td a 
+  color: #aaa
+
+#grades_summary td.assignment_score 
+  cursor: pointer
+  text-align: center
+  white-space: nowrap
+
+#grades_summary td.assignment_score:hover .grade 
+  font-weight: bold
+
+#grades_summary td.assignment_score .grade.changed 
+  color: #800
+  font-weight: bold
+
+#grades_summary td.possible 
+  text-align: right
+  padding-right: 15px
+
+#grades_summary td.title 
+  font-size: 1.1em
+  padding-left: 20px
+
+#grades_summary td.title .context 
+  visibility: hidden 
+  font-size: 0.8em 
+  color: #999 
+  padding-left: 10px
+  line-height: 0.5em
+
+#grades_summary td.title .context.context_hover 
+  visibility: visible
+
+#grades_summary td.due 
+  font-size: 0.8em
+  white-space: nowrap
+
+#grades_summary tr.assignment_graded td 
+  background-color: #eee
+
+#grades_summary tr.final_grade td 
+  background-color: #666
+  color: #eee
+  font-size: 1.5em
+  font-weight: bold
+
+#grades_summary tr.group_total td 
+  background-color: #ccc
+  border-top-width: 0
+  font-weight: bold
+
+#grades_summary tr.group_total td.possible 
+  font-weight: normal
+  font-size: 0.8em
+
+.revert_score_link 
+  position: absolute 
+  top: 2px 
+  left: 0px 
+  opacity: 0.5
+  display: none
+
+.revert_score_link:hover 
+  opacity: 1.0
+
+
+#grades_summary .tooltip
+  :position relative
+  :z-index 10
+  :outline none
+  &:hover
+    :text-decoration none
+    .tooltip_wrap, .tooltip_text
+      :visibility visible
+  &:active
+    :outline none
+    :text-decoration none
+    .tooltip_wrap, .tooltip_text
+      :visibility visible    
+  .tooltip_wrap, .tooltip_text
+    :display block
+    :visibility hidden
+  .tooltip_wrap
+    :background url("/images/tooltip_carat.png") no-repeat left bottom
+    :bottom 15px
+    :padding-bottom 3px
+    :position absolute
+    // ie puts the tooltips too low.
+    .ie & 
+      :bottom 25px
+  .tooltip_text
+    :background-color #444
+    :background-position left bottom
+    :color #fff
+    :left 0px
+    :max-width 250px
+    :padding 2px 7px 2px
+    :white-space nowrap
+    table tr td
+      :background-color transparent
+      :font-size 1.0em
+      :padding 0 2px
+      :border-width 0px
+  .right
+    :right 0px
+    :background-position right bottom
+

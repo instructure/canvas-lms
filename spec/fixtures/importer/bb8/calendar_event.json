@@ -1,0 +1,14 @@
+{
+    "alternate_migration_id":"_933_1",
+    "description":"no repeating events? That's weird.",
+    "recurring_enabled":false,
+    "end_date":1276809600000,
+    "start_date":1276806000000,
+    "end_timestamp":1276809600000,
+    "bb8_type":"x-bb-calendar",
+    "created_date":null,
+    "title":"Event",
+    "migration_id":"res00023",
+    "start_timestamp":1276806000000,
+    "updated_date":1268857291000
+}

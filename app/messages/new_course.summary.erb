@@ -1,0 +1,13 @@
+<% define_content :link do %>http://<%= HostUrl.default_host %>/courses/<%= asset.id %><% end %>
+<% define_content :subject do %>
+  New Course
+<% end %>
+
+A new course, <%= asset.name %>, has been added for the account <%= asset.root_account.name %>
+<% if !asset.teachers.empty? %>
+Teachers:
+<% asset.teachers.each do |teacher| %>
+  - <%= teacher.name %> (<%= teacher.email %>)
+    http://<%= HostUrl.default_host %>/users/<%= teacher.id %>
+    
+<% end %><% end %>

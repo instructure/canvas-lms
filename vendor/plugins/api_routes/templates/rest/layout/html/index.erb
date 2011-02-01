@@ -1,0 +1,25 @@
+<div id="listing">
+  <h1 class="noborder title"><%= options[:title] %></h1>
+  
+  <% if @files && @files.size > 0 %>
+    <h2>Files A-Z</h2>
+    <ul id="files">
+    <% n = 1 %>
+    <% @files.each_with_index do |file, i| %>
+      <li class="r<%= n %>"><%= link_file(file, File.basename(file).gsub(/\.[^.]+$/, '')) %></li>
+      <% n = n == 2 ? 1 : 2 %>
+    <% end %>
+    </ul>
+  <% end %>
+  <div class="clear"></div>
+
+  <h2>Resources</h2>
+  <ul>
+  <% options[:resources].sort_by { |r,c| r.downcase }.each do |resource, controllers| %>
+    <li>
+      <a href="<%= url_for("#{resource.downcase}.html") %>"><%= resource %> API</a>
+    </li>
+  <% end %>
+  </ul>
+
+</div>

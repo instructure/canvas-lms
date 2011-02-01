@@ -1,0 +1,35 @@
+<% submission = submission_score; student_score ||= false %>
+<% if !submission %>
+  -
+<% else %>
+  <% grade = nil; score = nil
+    @submission_score_lookup ||= {
+      'online_url' => 'link.png',
+      'online_text_entry' => 'text_entry.png',
+      'discussion_topic' => 'text_entry.png',
+      'online_upload' => 'file.png',
+      'online_quiz' => 'quiz.png'
+    }
+    if submission
+      grade = student_score ? submission.published_grade : submission.grade
+      score = student_score ? submission.published_score : submission.score
+    end
+  %>
+  <% if submission && grade %>
+    <% if submission.assignment.grading_type == "pass_fail" %>
+      <% if score && score > 0 %>
+        <%= image_tag "pass.png", :alt => "Complete", :class => "graded_icon" %>
+      <% else %>
+        <%= image_tag "fail.png", :alt => "Incomplete", :class => "graded_icon" %>
+      <% end %>
+    <% elsif submission.assignment.grading_type == "percent" %>
+      <%= grade %>
+    <% elsif grade.to_f == score %>
+      <%= grade %>
+    <% end %>
+  <% elsif submission && submission.submission_type %>
+    <%= @submission_score_lookup[submission.submission_type] ? image_tag(@submission_score_lookup[submission.submission_type], :class => "submission_icon") : ' - ' %>
+  <% else %>
+    -
+  <% end %>
+<% end %>

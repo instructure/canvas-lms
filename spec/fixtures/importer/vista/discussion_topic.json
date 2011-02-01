@@ -1,0 +1,36 @@
+[
+  {
+      "posts":[],
+      "authors_are_anonymous":false,
+      "is_visible":true,
+      "is_gradeable":false,
+      "description":"my description",
+      "students_can_post_or_reply":"BOTH",
+      "is_peer_rateable":false,
+      "goals":[],
+      "topic_is_locked_to_students":false,
+      "topic_type":"thread",
+      "posts_are_editable":false,
+      "title":"Week 2 Discussion",
+      "migration_id":"4285383842191",
+      "topic_id":"4285383842191",
+      "description_in_html":false
+  },
+  {
+      "posts":[],
+      "authors_are_anonymous":false,
+      "is_visible":true,
+      "is_gradeable":false,
+      "description":"another description",
+      "students_can_post_or_reply":"BOTH",
+      "is_peer_rateable":false,
+      "goals":[],
+      "topic_is_locked_to_students":false,
+      "topic_type":"thread",
+      "posts_are_editable":true,
+      "title":"Week 4 Discussion",
+      "migration_id":"4285383837191",
+      "topic_id":"4285383837191",
+      "description_in_html":false
+  }
+]

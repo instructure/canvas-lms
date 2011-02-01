@@ -1,0 +1,43 @@
+<div id="add_assignment" style="display: none;">
+  <% form_for :assignment, :url => context_url(@context, :controller => :assignments, :action => :create), :html => { :style => "display: none; padding: 2px;", :id => "add_assignment_form" } do |form| %>
+    <%= form.hidden_field :assignment_group_id %>
+    <input type="hidden" name="assignment_group_id"/>
+    <div style="float: left;">
+      <div style="float: left;">
+        <%= form.text_field :title, :title => 'Assignment Name', :style => 'width: 120px;' %>
+        <div style="padding-left: 20px; font-size: 0.8em; margin-top: 1px;">
+          type: <select name="assignment[submission_types]" style="font-size: 0.8em;" class="assignment_submission_types">
+            <option value="" class="current_submission_types">Assignment</option>
+            <option value="online_quiz">Quiz</option>
+            <option value="discussion_topic">Discussion</option>
+            <% if feature_enabled?(:attendance) %>
+              <option value="attendance">Attendance</option>
+            <% end %>
+            <option value="not_graded">Not Graded</option>
+          </select>
+        </div>
+      </div><div style="float: left;">      
+        <span style="font-size: 0.8em; padding-left: 10px;">due:</span>
+        <%= form.text_field :due_at, :style => "width: 130px;", :class => "datetime_field" %>
+      </div><div style="float: left;">
+      <span class="points nobr">
+        <span style="font-size: 0.8em; padding-left: 10px;">points: </span>
+        <%= form.text_field :points_possible, :size => '2', :title => 'pts' %>
+        <br/><a href="#" class="more_options_link" style="font-size: 0.8em; padding-left: 10px;">more options</a>
+      </span>
+      <span class="no_points nobr" title="This assignment is a quiz, so points possible comes from the questions and can't be set manually.">
+        quiz pts
+      </span>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="button-container-right-aligned">
+      <button type="submit" class="button small-button">Update</button>
+      <button type="button" class="button-secondary cancel_button" style="margin-right:0 !important;"><%= image_tag("cancel.png") %></button>
+      <br/>
+      <a href="#" style="font-size: 0.8em; display: none;">Full Edit</a>
+    </div>
+    <div class="clear"></div>
+  <% end %>
+  <a href="<%= context_url(@context, :controller => :assignments, :action => :create) %>" class="assignments_url">&nbsp;</a>
+</div>

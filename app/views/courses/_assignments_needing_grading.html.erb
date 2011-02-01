@@ -1,0 +1,62 @@
+<% 
+# I am assuming that any new submission or grading will touch the course (or the user) so that will make this cache work, 
+# if not we need to cache smarter. -RS
+cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do 
+  
+ max_to_show = 16
+ if @current_user && [
+    @current_user.assignments_needing_submitting(:contexts => contexts, :limit => max_to_show), 
+    @current_user.assignments_needing_grading(:contexts => contexts, :limit => max_to_show), 
+    (@assessments_needing_completing || []) 
+  ].any?{ |set| set.length > 0} %>
+  <h2>To Do</h2>
+  <% cnt = 0 %>
+  <ul class="right-side-list to-do-list">
+    <% @current_user.assignments_needing_grading(:contexts => contexts, :limit => max_to_show).each do |assignment| %>
+      <% cnt += 1 %>
+      <% if cnt <= 15 %>
+        <li style="<%= hidden if cnt > 5 %>">
+          <a class="item icon-grading-gray" href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>">
+            <b>Grade <%= assignment.title %></b>
+            <em><%= assignment.need_graded_count %> need<%= 's' if assignment.need_graded_count == 1 %> grading</em>
+          </a>
+          <a class='disable_item_link grading' title="Ignore this assignment" href="<%= dashboard_ignore_item_url(assignment.asset_string, 'grading') %>"><%= image_tag "earmark_hover.png", :alt => 'ignore' %></a>
+        </li>
+      <% end %>
+    <% end %>
+    <% @current_user.assignments_needing_submitting(:contexts => contexts, :limit => max_to_show).each do |assignment| %>
+      <% cnt += 1 %>
+      <% if cnt <= 15 %>
+        <li style="<%= hidden if cnt > 5 %>">
+          <a class="item icon-grading-gray" href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit">
+            <b><%= assignment.submission_action_string %> <%= assignment.title %></b>
+            <em>Due <%= datetime_string(assignment.due_at) %></em>
+          </a>
+          <a class='disable_item_link submitting' title="Ignore this assignment"  href="<%= dashboard_ignore_item_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => 'ignore' %></a>
+        </li>
+      <% end %>
+    <% end %>
+    <% (@assessments_needing_completing || []).each do |a| %>
+      <% cnt += 1 %>
+      <% if cnt <= 15 %>
+        <li style="<%= hidden if cnt > 5 %>">
+          <a class='item icon-clock' href="<%= context_url(a.submission.assignment.context_id, :context_assignment_submission_url, a.submission.assignment_id, a.submission.user_id) %>">
+            <b>Review <%= a.submission.assignment.title %></b>
+            <em>For <%= a.user.try_rescue(:name) || "Unknown User" %></em>
+          </a>
+        </li>
+      <% end %>
+    <% end %>
+    <% if cnt > 5 %>
+      <li>
+        <a href="#" class="more_link"><%= [10, cnt - 5].min %> more...</a>
+      </li>
+    <% end %>
+    <% if cnt > 15 %>
+      <li style="display: none;">
+        <a href="#" class="even_more_link">see all...</a>
+      </li>
+    <% end %>
+  </ul>
+  <% end %>
+<% end %>

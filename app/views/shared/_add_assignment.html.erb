@@ -1,0 +1,119 @@
+<% cache([@context, 'add_assignment']) do %>
+  <div id="add_assignment_inline" class="add_assignment_inline" style="padding: 0; display: none; position: relative;">
+    <% form_for :assignment, :url => (context_url(@context, :context_assignments_url) rescue "."), :html => {:id => "add_assignment_inline_form", :style => "padding: 10px;"} do |f| %>
+    <table class="formtable">
+      <tr>
+        <td><%= f.label :title, "Name:" %></td>
+        <td><%= f.text_field :title, :style => "width:150px;" %></td>
+      </tr>
+      <tr>
+        <td><%= f.label :assignment_group_id, "Group:" %></td>
+        <td>
+          <select name="assignment[assignment_group_id]">
+            <% cnt = 0 %>
+            <% @context.assignment_groups.each do |group| %>
+              <% cnt += 1 %>
+              <option value="<%= group.id %>"><%= group.name %></option>
+            <% end %>
+            <% if cnt == 0 %>
+              <option value="">Assignments</option>
+            <% end %>
+          </select>
+        </td>
+      </tr><tr>
+        <td><%= f.label :points_possible, "Points:" %></td>
+        <td><%= f.text_field :points_possible, :style => "width: 50px;" %></td>
+      </tr><tr>
+        <td style="vertical-align: top;"><%= f.label :due_at, "Due:" %></td>
+        <td><%= f.text_field :due_at, :style => "width: 100px;", :class => "datetime_field" %></td>
+      </tr><tr>
+        <td colspan="2">
+          <button type="submit" class="button">Add Assignment</button>
+          <button type="button" class="button-secondary cancel_button">Cancel</button>
+        </td>
+      </tr>
+    </table>
+    <% end %>
+  </div>
+<% end %>
+<% js_block do %>
+  <script>
+    $(document).ready(function() {
+      $(".add_assignment_inline:not(:first)").remove();
+    });
+    function attachAddAssignment($select, url, selector, default_name) {
+      var $group = $select;
+      url = url || $("#add_assignment_inline_form").attr('action');
+      $group.change(function(event) {
+        var $group = $(this);
+        if($(this).val() == "new") {
+          $("#add_assignment_inline").dialog('close');
+          $("#add_assignment_inline").show().dialog({
+            title: "Add Assignment",
+            width: 300,
+            height: "auto",
+            autoSize: true,
+            modal: true,
+            autoOpen: false,
+            overlay: {
+              backgroundColor: "#000",
+              opacity: 0.5
+            },
+            open: function() {
+              if(default_name && $.isFunction(default_name)) {
+                var name = default_name.call($group);
+                $("#add_assignment_inline_form :text:first").val(name);
+              }
+              $("#add_assignment_inline_form :text:first").focus().select();
+              $("#add_assignment_inline_form").find(".weight_assignment_groups").showIf($group.hasClass('weight'));
+              $("#add_assignment_inline_form").data('group_select', $group)
+                .data('group_selector', selector || "")
+                .attr('action', url);
+            },
+            close: function() {
+              if($group.val() == "new") {
+                $group[0].selectedIndex = 0;
+              }
+            }
+          }).dialog('open');
+        }
+      });
+      if($group.val() == "new") {
+        $group[0].selectedIndex = 0;
+    //    $group.val($("#full_assignment .group_id").text());
+      }
+    }
+    $(document).ready(function() {
+      $("#add_assignment_inline_form .datetime_field").datetime_field();
+      $("#add_assignment_inline_form").formSubmit({
+        beforeSubmit: function(data) {
+          $("#add_assignment_inline").loadingImage();
+        },
+        success: function(data) {
+          $("#add_assignment_inline").loadingImage('remove');
+          var assignment = data.assignment;
+          var $group = $("#add_assignment_inline_form").data('group_select');
+          var selector = $("#add_assignment_inline_form").data('group_selector');
+          var $groups = $group;
+          if(selector) {
+            $groups = $groups.add(selector);
+          }
+          $groups.each(function() {
+            var $option = $(document.createElement('option'));
+            $option.val(assignment.id).text(assignment.title);
+            if($(this).children("#assignment_group_optgroup_" + assignment.assignment_group_id).length > 0) {
+              $(this).children("#assignment_group_optgroup_" + assignment.assignment_group_id).append($option);
+            } else {
+              $(this).children("option:last").before($option);
+            }
+          });
+          $group.val(assignment.id).change();
+          $("#add_assignment_inline").dialog('close');
+        }
+      });
+      $("#add_assignment_inline .cancel_button").click(function(event) {
+        $("#add_assignment_inline").dialog('close');
+      });
+    });
+  </script>
+<% end %>

@@ -1,0 +1,764 @@
+fieldset.question, fieldset.display_question
+  padding: 0
+
+#sort_questions
+  :max-height 250px
+  :overflow auto
+  :margin 0px 0px 20px
+  :padding-left 30px
+  :line-height 1.5em
+  li
+    :cursor pointer
+#questions.assessment_results
+  clear: both
+  .question
+    .header
+      :float right
+      :margin-right 20px
+      :font-size 1.0em
+    .answers
+      .answer
+        &.correct_answer
+          :background none
+          .answer_text
+            :font-weight normal
+        &.selected_answer
+          :background url(/images/incorrect_answer.png) no-repeat 3px 5px
+        &.selected_answer.correct_answer
+          :background url(/images/correct_answer.png) no-repeat 3px 5px
+        &.selected_answer.unspecified_answer
+          :background url(/images/neutral_answer.png) no-repeat 3px 5px
+        &.hide_right_arrow,&.selected_answer.hide_right_arrow
+          :background-image none
+    &.hover
+      .answers
+        .answer.selected_answer.correct_answer
+          :background url(/images/correct_answer.png) no-repeat 3px 5px
+        .answer.selected_answer.unspecified_answer
+          :background url(/images/neutral_answer.png) no-repeat 3px 5px
+        .answer.correct_answer
+          :background url(/images/partial_answer.png) no-repeat 3px 5px
+        .answer.hide_right_arrow,.answer.selected_answer.hide_right_arrow
+          :background-image none
+    &.correct
+      :border-color #4a4
+    &.incorrect
+      :border-color #faa
+  .text_box_answer
+    color: #ab3636
+  .correct_text_box_answer
+    color: #44AA44
+#questions.assessment_results.survey_results
+  .question
+    .answers
+      .answer
+        &.selected_answer
+          :background url(/images/correct_answer.png) no-repeat 3px 5px
+        &.selected_answer.correct_answer
+          :background url(/images/correct_answer.png) no-repeat 3px 5px
+    &.hover
+      .answers
+        .answer.selected_answer.correct_answer
+          :background-image none
+        .answer.correct_answer
+          :background-image none
+        .answer.hide_right_arrow,.answer.selected_answer.hide_right_arrow
+          :background-image none
+    &.correct
+      :border-color inherit
+    &.incorrect
+      :border-color inherit
+    .user_points,.question_points_holder
+      display: none
+
+#questions.assessing,#questions.assessment_results
+  .question_holder
+    .question
+      &.related
+        :border-width 2px
+      .header
+        :float right
+        :margin-right 10px
+        :font-size 0.9em
+      .move
+        :display none
+      
+#questions.brief 
+  .question_holder .display_question
+    :font-size 0.9em
+    .answer, .question_comment
+      :display none
+    .calculated_question_answers
+      :display none
+  .multiple_answer_sets_holder
+    :display none
+  .add_question_group_link
+    :display inline
+  .after_answers
+    :display none
+
+#questions
+  .add_question_group_link
+    :display none
+  .group_placeholder
+    :border-right 1px solid #aaa
+    :border-left 1px solid #aaa
+  .group_top
+    :border 1px solid #aaa
+    :border-bottom-width 1px
+    :-moz-border-radius-topright 5px
+    :-moz-border-radius-topleft 5px
+    :padding 5px 10px
+    :background-color #eee
+    &.ui-sortable-placeholder
+      :border-bottom-width 1px
+      :border-style dashed
+      :-moz-border-radius 5px
+      :border-color #444
+      :margin-bottom 20px
+    .group_edit
+      :display none
+    .links
+      :opacity 0.5
+    .move
+      :width 20px
+      :height 20px
+      .move_icon
+        :display none
+    .group_display.hidden
+      :display none
+    &.hover
+      .move .move_icon
+        :display inline
+        :cursor move
+      .links 
+        :opacity 1.0
+    &.editing
+      .links
+        :opacity 1.0
+      .group_edit
+        :display inline
+      .group_display
+        :display none
+      .move
+        :display none
+    &.dragging
+      :border-bottom-width 1px
+      :padding-bottom 5px
+      :-moz-border-radius 5px
+  .group_bottom
+    :border 1px solid #aaa
+    :border-top-width 0
+    :margin-bottom 30px
+    :-moz-border-radius-bottomright 5px
+    :-moz-border-radius-bottomleft 5px
+  .question_holder.ui-sortable-placeholder
+    .question_placeholder
+      :display block
+      :border 1px dashed #444
+      :-moz-border-radius 5px
+  .assessment_question_bank, .question_holder.group
+    :border-left 1px solid #aaa
+    :border-right 1px solid #aaa
+    :border-top 0
+    :padding-left 20px
+    :padding-right 20px
+    :padding-top 1.0em
+    :-moz-border-radius 0
+  .question_holder.group
+    :padding-bottom 10px
+    .question
+      :margin-bottom 0
+      .question_points_holder
+        :display none
+
+.question_holder 
+  :position relative
+  > .question
+    .question_comment.empty
+      :display none
+    .answer_comment_holder.empty
+      :display none
+    .answer_comment,.question_comment_text
+      white-space: pre-wrap
+
+.question
+  :border 1px solid #888
+  :margin-bottom 30px
+  :margin-top 0.7em
+  :-moz-border-radius 5px
+  :background-color #fff
+  :position relative
+  :min-height 50px
+  :_height 10px
+  
+  &.modified_but_not_saved
+    border-width: 3px
+  .move
+    :float left
+    :margin-top -0.8em
+    :_margin-top 0
+    :margin-left 20px
+    :width 16px
+    :height 16px
+    :padding 2px
+ 
+    .move_icon
+      :display none
+      :cursor move
+  .header
+    :font-size 1.2em 
+    :font-weight bold
+    :float left
+    :background-color #fff
+    :margin-left 10px
+    :margin-top -0.7em
+    :_margin-top 0px
+    :padding 0px 3px
+
+
+  .text
+    :clear left
+    :padding 5px 20px
+    
+    .question_text
+      .answer_select
+        :border 2px solid #888
+      .text_after_answers
+        display: block
+        margin-top: 10px
+      .text_before_answers
+        display: block
+        margin-bottom: 10px
+    .variable_definitions
+      width: 100%
+    .calculated_question_answers_header
+      font-weight: bold
+    .formulas_list div
+      margin-bottom: 2px
+    .calculated_question_answers_content
+      margin-left: 20px
+      margin-bottom: 5px
+      max-width: 400px
+      overflow: auto
+      table
+        border-collapse: collapse
+      th
+        text-align: left
+        font-weight: normal
+        padding-left: 5px
+        padding-right: 5px
+      td
+        border-top: 1px solid #ccc
+        text-align: left
+    .equation_combinations_holder
+      max-height: 100px
+      overflow: auto
+    .equation_combinations
+      width: 100%
+    .answers
+      .answer
+        :padding 5px 30px
+        
+        // .answer_text
+
+        .answer_list
+          :margin 5px
+          :padding-left 0
+          :font-weight bold
+
+        .answer_percent
+          :padding-left 20px
+          :font-size 0.8em
+          
+        .answer_comment_holder
+          :-moz-border-radius 5px
+          :border 2px solid #faa
+          :margin-left 20px
+          :padding 3px 5px
+          :margin-top 5px
+          :font-size 0.8em
+          :position relative
+          :float left
+          :width auto
+          :min-width 50px
+          
+          .answer_comment
+            :background-image none
+          
+          .comment_top
+            :position absolute
+            :display block
+            :top -8px
+            :left 10px
+            :width 19px
+            :height 8px
+            :background-repeat no-repeat
+            :background-image url(/images/comment_top.png)
+
+        &.unspecified_answer
+          .answer_comment_holder
+            :border-color #abd
+            .comment_top 
+              :background-image url(/images/comment_top_neutral.png)
+        &.correct_answer
+          :background url(/images/correct_answer.png) no-repeat 3px 5px
+          
+          .answer_text
+            :font-weight bold
+            
+          .answer_comment_holder
+            :border-color #4a4
+            
+            .comment_top 
+              :background-image url(/images/comment_top_correct.png)
+
+        &.partial_answer
+          :background url(/images/partial_answer.png) no-repeat 3px 5px
+          
+          .answer_text
+            :font-weight bold
+        
+        &.negative_answer
+          :background url(/images/negative_answer.png) no-repeat 3px 5px
+          
+          .answer_text
+            :font-weight bold
+          
+          .answer_percent
+            color: #a00
+            
+        .answer_percent
+          :display none
+
+  .question_comment
+    :position relative
+    :float left
+    :width auto
+    :min-width 50px
+    :border 2px solid #faa
+    :-moz-border-radius 5px
+    :padding 3px 5px
+    :margin 5px 20px
+    .comment_top
+      :position absolute
+      :display block
+      :top -8px
+      :left 10px
+      :width 19px
+      :height 8px
+      :background-image url(/images/comment_top.png)
+      :background-repeat no-repeat
+    &.question_neutral_comment
+      :border-color #abd
+      .comment_top
+        :background-image url(/images/comment_top_neutral.png)
+    &.question_correct_comment
+      :border-color #4a4
+      .comment_top
+        :background-image url(/images/comment_top_correct.png)
+  .links
+    :float right
+    :top 2px
+    :right 2px
+    :visibility hidden
+  .user_points
+    :float right
+    :margin-right 5px
+    :font-size 1.1em
+    :font-weight bold
+    :background-color #fff
+    .points_possible
+      :font-size 0.8em
+      :font-weight normal
+  .flag_question
+    :float left
+    :margin-top -0.8em
+    :margin-left 20px
+    :width 20px
+    :height 20px
+    :padding 2px
+    :cursor pointer
+    .flag_icon
+      :display none
+  &.marked,&.marked:hover
+    .flag_question
+      :background-color #fff
+      .flag_icon
+        :display inline
+        :opacity 1.0
+  &.hover
+    .move
+      :background-color #fff
+      .move_icon
+        :display inline
+    .links
+      :visibility visible
+    .flag_question
+      :background-color #fff
+      .flag_icon
+        :opacity 0.5
+        :display inline
+
+.answer
+  .answer_select
+    :vertical-align top
+    :padding-top 0.5em
+    
+    .answer_weight
+      :display none
+
+  .answer_match
+    :padding 0 0 10px 0
+
+    .answer_match_left 
+      :float left
+      :width 45%
+      :overflow auto
+
+    .answer_match_middle
+      :float left
+      :width 10%
+      :background url(/images/matching_arrow.png) no-repeat center center
+            
+    .answer_match_right
+      :float left
+      :width 45%
+      :overflow auto
+
+.form_answers
+  .answer
+    .answer_match
+      :padding-bottom 0
+      :padding-top 10px
+
+.question_form .question .answer .answer_select .select_answer
+  :display none
+
+.question
+  .answer
+    .answer_select .select_answer_link
+      :display none
+.question.selectable
+  .answer
+    .answer_select .select_answer
+      :display block
+    .answer_select .select_answer:focus .answer_box
+      :background-image url(/images/partial_answer.png)
+    .select_answer_link
+      :display inline
+    .answer_select .answer_box
+      :background-repeat no-repeat
+      :cursor pointer
+      &.hover .answer_box
+        :background-image url(/images/correct_answer.png)
+        
+    &.hover
+      .answer_select .answer_box
+        :background-image url(/images/partial_answer.png)
+    &.correct_answer .answer_select .answer_box
+      :background-image url(/images/correct_answer.png)
+    &.partial_answer .answer_select .answer_box
+      :background-image url(/images/partial_answer.png)
+    &.negative_answer .answer_select .answer_box
+      :background-image url(/images/negative_answer.png)
+.survey_quiz .question
+  .text
+    .answers
+      .answer
+        &.correct_answer
+          :background-image none
+          .answer_text
+            :font-weight normal
+
+        &.partial_answer
+          :background-image none
+          .answer_text
+            :font-weight normal
+        
+        &.negative_answer
+          :background-image none
+  &.selectable
+    .answer
+      .answer_select
+        visibility: hidden
+      .answer_select .select_answer:focus .answer_box
+        :background-image none
+      .answer_select .answer_box
+        &.hover .answer_box
+          :background-image none
+          
+      &.hover
+        .answer_select .answer_box
+          :background-image none
+      &.correct_answer .answer_select .answer_box
+        :background-image none
+ 
+.question
+  textarea  
+    :border 1px solid #ccc
+    :padding 2px
+    :margin 2px
+
+.survey_quiz 
+  form.question_form
+    .form_answers
+      .answer_comments
+        display: none
+    .question_comment
+      display: none
+    .question_comment.question_neutral_comment
+      display: block
+    .question.selectable
+      .answer.correct_answer
+        :color inherit
+  
+form.question_form
+  .multi_answer_sets
+    display: none
+  .fill_in_multiple_blanks_question,.multiple_dropdowns_question
+    .multi_answer_sets
+      display: block
+    .multi_answer_sets_subheader
+      font-size: 0.8em
+  .explanation
+    font-size: 0.8em
+    margin-bottom: 5px
+  .form_answers
+    .answer
+      :border 1px solid #fff
+      :-moz-border-radius 5px
+    .answer.hover
+      :border 1px solid #ddd
+    .answer .delete_answer_link
+      :display block
+    .answer.hover .delete_answer_link
+      :background url(/images/delete_circle.png) no-repeat center center
+    .answer .delete_answer_link:focus
+      :background url(/images/delete_circle.png) no-repeat center center
+    .answer_comments
+      :-moz-border-radius 5px
+      :border 2px solid #faa
+      :font-size 0.8em
+      :margin-left 30px
+      :padding 10px 5px
+      :margin-top 5px
+      :position relative
+      .comment_focus
+        :display none
+      .comment_top
+        :position absolute
+        :top -8px
+        :left 10px
+        :width 19px
+        :height 8px
+        :background-repeat no-repeat
+        :background-image url(/images/comment_top.png)
+      .answer_comment_box
+        :height 2.5em
+      &.empty
+        :width 50px
+        :padding 0
+        :opacity 0.5
+        .comment_focus
+          :display block
+          :text-align center
+          :font-size 1.2em
+        .comments_header,textarea
+          :display none
+    .answer.correct_answer
+      .answer_comments
+        :border-color #4a4
+        .comment_top 
+          :background-image url(/images/comment_top_correct.png)
+  .question_comment
+    :font-size 0.8em
+    :position relative
+    :float left
+    :width 40%
+    :min-width 50px
+    :border 2px solid #faa
+    :-moz-border-radius 5px
+    :padding 3px 5px
+    :margin 5px 10px
+    .comment_focus
+      :display none
+    .comment_top
+      :position absolute
+      :display block
+      :top -8px
+      :left 10px
+      :width 19px
+      :height 8px
+      :background-repeat no-repeat
+      :background-image url(/images/comment_top.png)
+    &.question_correct_comment
+      :border-color #4a4
+      :color #080
+      .comment_top
+        :background-image url(/images/comment_top_correct.png)
+    &.empty
+      :width 50px
+      :opacity 0.5
+      .comment_focus
+        :display block
+        :text-align center
+        :font-size 1.2em
+      .details
+        :display none
+      textarea
+        :display none
+  .question.selectable
+    .answer.correct_answer
+      :color #080
+
+ul#question_list
+  li
+    &.answered
+      :opacity 0.5
+    &.marked
+      :opacity 1.0
+      :font-weight bold
+      :list-style-image url(/images/flagged_question.png)
+    &.correct
+      :color #080
+      a
+        :color #080
+    &.incorrect
+      :color #800
+      a
+        :color #800
+.quiz_score
+  .score_value
+    :font-size 1.2em
+    :font-weight bold
+    :color #444
+table#quiz_details 
+  :margin-top 10px
+  h3
+    :font-weight bold
+    :font-size 0.9em
+  ul.student_list
+    :max-height 300px
+    :overflow auto
+    :margin-top 5px     
+
+ul#quiz_versions
+  :margin-top 5px
+
+  .quiz_version
+    &.selected
+      :font-weight bold
+      
+#quiz_options_form
+  td
+    vertical-align: top
+#quiz_options_form,#quiz_content_links
+.options_header
+  font-weight: bold
+  font-size: 1.2em
+  a 
+    margin-right: 10px
+    margin-top: 0.35em
+    float: right
+    font-size: 0.8em
+      
+.equation_answers
+  display: none
+.equation_header
+  display: none
+  margin-bottom: 0
+  .equation_subheader
+    margin-left: 0
+    font-size: 0.8em
+.calculated_question
+  .equation_answers
+    display: block
+  .form_answers
+    display: none
+  .add_answer
+    display: none
+  .variables 
+    margin-bottom: 10px
+    th
+      font-size: 0.8em
+  .equation_content > table
+    width: 100%
+    th
+      vertical-align: top
+      text-align: left
+
+  .word_problem
+    width: 100%
+
+  .formulas 
+    .formula_row.last_row
+      font-weight: bold
+    .formula_row.last_row .status
+      font-size: 1.2em
+    .last_row_details
+      font-size: 0.8em
+    .formula_row .formula
+      cursor: move
+    .formula_row .status
+      cursor: pointer
+    .decimal_places
+      font-size: 0.8em
+  .combinations td, .combinations th
+    text-align: left
+    width: 10%
+  .combinations th
+    padding-right: 5px
+    padding-left: 5px
+  .combinations td.final_answer, .combinations th.final_answer
+    width: 1%
+  .combinations td.final_answer
+    white-space: nowrap
+  .combinations
+    border-collapse: collapse
+    td
+      border-top: 1px solid #ccc
+      padding: 1px 3px
+  .combinations_holder
+    overflow: auto
+    max-height: 100px
+  .equation_header
+    display: block
+  .equation_answers
+    .equation_header
+      font-size: 1.1em
+      font-weight: bold
+      margin-bottom: 5px
+      display: block
+      .equation_subheader
+        font-size: 0.7em
+        font-weight: normal
+        margin-left: 20px
+    .equation_content
+      margin-left: 20px
+      margin-bottom: 15px
+#equations_dialog_tabs pre
+  margin: 3px 1px
+#find_question_dialog
+  .page_link
+    display: block
+    font-weight: bold
+    margin: 5px 0
+  .found_question
+    margin-bottom: 5px
+    .question_text
+      margin: 2px 10px 2px 25px
+      font-size: 0.8em
+    .question_name
+      font-weight: bold
+    .already_added_message
+      display: none
+    &.already_added
+      .question_name, .question_text
+        color: #888
+      .already_added_message
+        display: block
+        font-size: 0.8em
+        color: #888
+        font-style: italic
+        margin-left: 25px        

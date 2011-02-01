@@ -1,0 +1,13 @@
+<meta name="Content-Type" content="text/html; charset=<%= charset %>" />
+<title><%= @page_title %></title>
+<link rel="stylesheet" href="<%= url_for("css/style.css") %>" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="<%= url_for("css/common.css") %>" type="text/css" media="screen" charset="utf-8" />
+<% if @extra_css %>
+  <link rel="stylesheet" href="<%= url_for @extra_css %>" type="text/css" media="screen" charset="utf-8" />
+<% end %>
+<script type="text/javascript" charset="utf-8">
+  relpath = '<%= url_for('') %>';
+  if (relpath != '') relpath += '/';
+</script>
+<script type="text/javascript" charset="utf-8" src="<%= url_for("js/jquery.js") %>"></script>
+<script type="text/javascript" charset="utf-8" src="<%= url_for("js/app.js") %>"></script>

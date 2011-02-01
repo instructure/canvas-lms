@@ -1,0 +1,594 @@
+<% 
+  content_for :page_title, "Files - #{@context && @context.name}"
+  jammit_css :full_files
+  jammit_js :full_files 
+  showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]
+%>
+<div id="file_uploads" style="display: none;">
+  <div id="file_uploads_session_id" style="display: none;"><%= request.session_options[:id] %></div>
+  <div class="file_upload" id="file_upload_blank" style="display: none;">
+    <div style="float: left;">
+    <span class="status"></span> <span class="file_name"></span>
+    </div>
+    <a href="#" class="cancel_upload_link no-hover" ><%= image_tag "delete_circle.png" %></a>
+    <div class="clear"></div>
+    <div class="progress_bar"></div>
+  </div>
+</div>
+<% if @too_many_contexts %>
+  <div style="padding-bottom: 10px;">
+    <%= image_tag "warning.png" %> There were too many courses/groups to show all at once.  Below are the first 15 results.
+  </div>
+<% end %>
+<div style="margin: 0; width: auto;" class="files_holder">
+  <div id="files_structure" style="position: relative;">
+    <div id="file_uploads_progress" style="display: none; position: absolute; right: 5px; background-color: #eee; z-index: 2; border: 1px solid #aaa; border-top-width: 0; padding: 2px 5px;">
+      <a href="#" id="file_uploads_dialog_link">Uploading 5 Files...</a>
+    </div>
+    <ul id="files_structure_list">
+      <li id="swfupload_holder">
+        <div id="blech"></div>
+      </li>
+      <% @file_structures.each do |context, structure| %>
+        <% root_folder = structure[:folders].select{|f| f.root_folder? && f.context_id == context.id && f.context_type == context.class.base_ar_class.to_s }.first %>
+        <li class="context folder folder_<%= root_folder.id %> <%= context.asset_string %>" style="display: none;">
+          <span class="text name"><%= context.name %></span>
+          <span class="text id" style="display: none;"><%= root_folder.id %></span>
+          <ul>
+            <%= render :partial => 'files/nested_content', :object => structure[:folders].select{|f| f.parent_folder_id == root_folder.id }, :locals => {:folders => structure[:folders], :skip_ul => true, :exclude_files => true} %>
+            <% if !context.is_a?(User) && (!structure[:collaborations].empty? || can_do((context.collaborations.new rescue nil), @current_user, :create)) %>
+            <li class="collaborations">
+              <span class="text name">collaborations</span>
+              <ul>
+              <% structure[:collaborations].select{|c| c.context == context}.each do |collaboration| %>
+                <li class="collaboration <%= collaboration.collaboration_type %> collaboration_<%= collaboration.id %>">
+                  <span class="text name"><%= collaboration.title %></span>
+                  <span class="text id" style="display: none;"><%= collaboration.id %></span>
+                </li>
+              <% end %>
+              </ul>
+            </li>
+            <% end %>
+            <% if !structure[:groups].empty? %>
+              <% structure[:groups].map{|g| g.category}.uniq.each do |category| %>
+                <li class="groups">
+                  <span class="text name"><%= category %></span>
+                  <ul>
+                  <% structure[:groups].select{|g| g.category == category }.each do |group| %>
+                    <% group_root_folder = Folder.root_folders(group).first %>
+                    <li class="group context folder folder_<%= group_root_folder.id %> <%= group.asset_string %>">
+                      <span class="text name"><%= group.name %></span>
+                      <span class="text id" style="display: none;"><%= group_root_folder.id %></span>
+                      <%= render :partial => 'files/nested_content', :object => group_root_folder.subcontent, :locals => {:folders => structure[:folders]} %>
+                    </li>
+                  <% end %>
+                  </ul>
+                </li>
+              <% end %>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+      <li class="file file_blank" style="display: none;">
+        <span class="id" style="display: none;">&nbsp;</span>
+        <span class="text name">&nbsp;</span>
+      </li>
+      <li class="folder_blank" style="display: none;">
+        <span class="id" style="display: none;">&nbsp;</span>
+        <span class="text name">&nbsp;</span>
+        <ul>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <ul id="files_content" class="files_content">
+  </ul>
+</div>
+<% unless showing_all_contexts %>
+  <div style="float: left; font-size: 0.8em; margin-right: 1.0em;">
+    Storage Used: <span id="quota_used"><%= number_to_human_size(@quota_used) %></span> out of <span id="quota"><%= number_to_human_size(@quota) %></span>
+  </div>
+<% end %>
+<div style="float: right; font-size: 0.8em; margin-right: 1.0em;">
+  <% if showing_all_contexts %>
+    <a href="<%= dashboard_files_url %>">just show my personal files</a>
+  <% else %>
+    <a href="<%= dashboard_files_url(:show_all_contexts => 1) %>">see files for all your courses/groups</a>
+  <% end %>
+</div>
+<div class="clear"></div>
+<ul style="display: none;" id="content_templates">
+  <li id="drag_n_drop_panel" class="drag_panel">
+    <div class="header">
+      <%= image_tag "file_upload.png" %> Drop files here to add them to this folder.
+      <div style="font-size: 0.8em;">
+        You can also drop zip files and choose to extract their contents into this folder.
+      </div>
+    </div>
+    <div class="clear"></div>
+  </li>
+  <li id="folder_panel" class="content_panel">
+    <div class="header">
+      <span class="name">&nbsp;</span>
+      <span class="content">&nbsp;</span>
+      <div class="breadcrumb">
+      </div>
+    </div>
+    <div class="links">
+      <a href="#" class="rename_item_link no-hover folder_url" title="Rename this Folder"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_item_link no-hover folder_url" title="Delete this Folder"><%= image_tag "delete.png" %></a>
+      <div class="sub_links">
+        <!-- replace "Add File" with "Add Files" flash button if possible -->
+        <span id="file_uploads_link">&nbsp;</span>
+        <a href="#" class="add_file_link" id="add_file_link">Add File</a> | 
+        <a href="#" class="add_folder_link">Add Folder</a>
+        <span class="download_zip" style="padding-left: 5px;">
+          <a href="#" class="download_zip_link no-hover" title="Download files in this folder as a zip"><%= image_tag "inst_tree/file_types/page_white_zip.png" %></a>
+        </span>
+        <span class="upload_zip" style="padding-left: 5px;">
+          <a href="#" class="upload_zip_link no-hover" title="Import a zip file"><%= image_tag "file_upload.png" %></a>
+        </span>
+        <span class="edit_link" style="padding-left: 5px;">
+          <a href="#" class="lock_item_link no-hover folder_url" title="Lock this Folder"><%= image_tag "lock.png" %></a>
+          <a href="#" class="unlock_item_link no-hover folder_url" style="display: none;" title="Unlock this Folder"><%= image_tag "unlock.png" %></a>
+        </span>
+      </div>
+    </div>
+    <div class="clear"></div>
+    <div class="details">
+      <div class="currently_locked_box">
+        <%= image_tag "lock.png" %> This folder is locked and cannot be viewed by students.
+        <span class="lock_until"><br/>It is locked until <span class="unlock_at_string" style="font-weight: bold;">&nbsp;</span>.</span>
+        <span class="lock_after"><br/>It will be locked after <span class="lock_at_string" style="font-weight: bold;">&nbsp;</span>.</span>
+        <%= image_tag "mime_types/locked.png", :class => 'locked', :style => "display: none;", :title => "Locked", :alt => "locked" %>
+      </div>
+    </div>
+  </li>
+  <li class="folder_item folder">
+    <div class="header">
+      <%= image_tag "blank.png", :class => "item_icon" %>
+      <a href="#" class="name">&nbsp;</a>
+    </div>
+    <div class="links">
+      <span class="edit_link">
+        <a href="#" class="lock_item_link no-hover folder_url" title="Lock this Folder"><%= image_tag "lock.png" %></a>
+        <a href="#" class="unlock_item_link no-hover folder_url" style="display: none;" title="Unlock this Folder"><%= image_tag "unlock.png" %></a>
+      </span>
+      <a href="#" class="sort_icon" title="Drag to reorder"><%= image_tag "move-ns.png" %></a>
+      <a href="#" class="rename_item_link no-hover"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_item_link no-hover"><%= image_tag "delete.png" %></a>
+    </div>
+    <div class="clear"></div>
+  </li>
+  <li class="folder_item file">
+    <div class="header">
+      <%= image_tag "blank.png", :class => "item_icon" %>
+      <a href="#" class="name download_url">&nbsp;</a>
+      <div class="sub_header">
+        <span class="readable_size">&nbsp;</span>
+        <a href="#" class="preview_item_link">preview</a>
+        <span class="edit_item_content_link_holder" style="padding-left: 10px;">
+          <a href="#" class="edit_item_content_link">edit content</a>
+        </span>
+      </div>
+    </div>
+    <div class="links">
+      <span class="edit_link">
+        <a href="#" class="lock_item_link no-hover attachment_url" title="Lock this File"><%= image_tag "lock.png" %></a>
+        <a href="#" class="unlock_item_link no-hover attachment_url" style="display: none;" title="Unlock this File"><%= image_tag "unlock.png" %></a>
+      </span>
+      <a href="#" class="sort_icon" title="Drag to reorder"><%= image_tag "move-ns.png" %></a>
+      <a href="#" class="rename_item_link no-hover attachment_url" title="Rename this File"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_item_link no-hover attachment_url" title="Delete this File"><%= image_tag "delete.png" %></a>
+    </div>
+    <div class="clear"></div>
+  </li>
+  <li class="folder_item collaboration">
+    <div class="header">
+      <%= image_tag "blank.png", :class => "item_icon" %><a href="#" class="name collaboration_url" target="_blank">&nbsp;</a>
+    </div>
+    <div class="links">
+      <a href="#" class="edit_collaboration_link no-hover collaboration_url" title="Edit this Collaboration"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_item_link no-hover collaboration_url" title="Delete this File"><%= image_tag "delete.png" %></a>
+    </div>
+    <div class="clear"></div>
+  </li>
+  <li id="file_panel" class="content_panel">
+    <div class="header">
+      <a href="#" class="display_name download_item_link">&nbsp;</a> 
+      <span class="display_name cant_download">&nbsp;</span>
+      <span class="readable_size">&nbsp;</span>
+      <div class="breadcrumb">
+      </div>
+    </div>
+    <div class="links">
+      <span class="edit_link">
+        <a href="#" class="lock_item_link no-hover attachment_url" title="Lock this File"><%= image_tag "lock.png" %></a>
+        <a href="#" class="unlock_item_link no-hover attachment_url" style="display: none;" title="Unlock this File"><%= image_tag "unlock.png" %></a>
+      </span>
+      <a href="#" class="rename_item_link no-hover attachment_url" title="Rename this File"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_item_link no-hover attachment_url" title="Delete this File"><%= image_tag "delete.png" %></a>
+      <div class="sub_links">
+        <a href="#" class="download download_item_link">Download this File</a>
+      </div>
+    </div>
+    <div class="clear"></div>
+    <div class="details">
+      <span class="cant_download" style="font-weight: bold;">This file isn't unlocked yet, so it can't be downloaded.</span>      
+      <div class="currently_locked_box">
+        <%= image_tag "lock.png" %> This file is locked and cannot be downloaded by students.
+        <span class="lock_until"><br/>It is locked until <span class="unlock_at_string" style="font-weight: bold;">&nbsp;</span>.</span>
+        <span class="lock_after"><br/>It will be locked after <span class="lock_at_string" style="font-weight: bold;">&nbsp;</span>.</span>
+        <%= image_tag "mime_types/locked.png", :class => 'locked', :style => "display: none;", :title => "Locked", :alt => "locked" %>
+      </div>
+    </div>
+  </li>
+  <li class="file_scribd_preview">
+  </li>
+  <li class="file_image_preview" style="text-align: center; margin-top: 10px;">
+    <a href="#" class="no-hover"><img src="" alt="preview" title=""/></a>
+  </li>
+  <li class="file_media_preview" style="text-align: center; margin-top: 10px; font-size: 1.2em;">
+    <div class="media_preview">
+    </div>
+    <a href="#">download the file (<span class="readable_size">&nbsp;</span>)</a>
+  </li>
+  <li class="file_no_preview" style="text-align: center; margin-top: 10px; font-size: 1.2em;">
+    No Preview Available<br/>
+    <a href="#">download the file (<span class="readable_size">&nbsp;</span>)</a>
+  </li>
+  <li id="collaborations_panel" class="content_panel">
+    <div class="header">
+      Collaborations for <span class="name">&nbsp;</span>
+      <div class="breadcrumb">
+      </div>
+    </div>
+    <div class="links">
+      <a href="#" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_collaboration_link no-hover"><%= image_tag "delete.png" %></a>
+      <div class="sub_links">
+        <a href="#" class="add_collaboration_link">New Collaboration</a>
+        <span class="view_collaborations">
+          | <a href="#" class="collaborations_link">ALL Collaborations</a>
+        </span>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </li>
+  <li id="collaboration_panel" class="content_panel">
+    <div class="header">
+      <span class="name">&nbsp;</span>
+      <div class="breadcrumb">
+      </div>
+    </div>
+    <div class="links">
+      <a href="#" class="edit_collaboration_link no-hover attachment_url" title="Rename this File"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_collaboration_link no-hover attachment_url" title="Delete this File"><%= image_tag "delete.png" %></a>
+      <div class="sub_links">
+        <a href="#" class="view_item_link">View this Collaboration</a>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </li>
+  <li id="collaboration_sub_panel" class="content_panel with_subcontent">
+    <div class="subcontent">
+      <div style="font-size: 1.2em; margin-bottom: 20px;"><a href="#" class="view_item_link file_big">Click here to view <span class="name">&nbsp;</span></a></div>
+      <div class="google_docs_icon collaboration_icon"><%= image_tag "google_docs.png", :title => "This document was created using Google Docs." %><span class="description">&nbsp;</span></div>
+      <div class="etherpad_icon collaboration_icon"><%= image_tag "ether_pad.png", :title => "This document was created using EtherPad." %><span class="description">&nbsp;</span></div>
+      <div style="margin-top: 10px; font-size: 0.8em;">
+        <div>Last Viewed: <span class="updated_at"></span></div>
+        <div><span class="collaborator_count"></span> Collaborators</div>
+        <ul class="collaborators unstyled_list" style="margin-top: 10px; margin-left: 20px; line-height: 1.5em; font-size: 1.2em;">
+          <li>Bob Jones</li>
+          <li>Fred Ferkels</li>
+        </ul>
+      </div>
+    </div>
+  </li>
+  <li id="groups_panel" class="content_panel">
+    <div class="header">
+      <a href="#" class="name category_name groups_link">&nbsp;</a> for <span class="name context_name">&nbsp;</span>
+      <div class="breadcrumb">
+      </div>
+    </div>
+    <div class="links">
+      <a href="#" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_collaboration_link no-hover"><%= image_tag "delete.png" %></a>
+      <div class="sub_links">
+        <a href="#" class="groups_link">See all groups for <span class="context_name">&nbsp;</span></a>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </li>
+  <li class="folder_item file add_item" id="add_file_form">
+    <% form_for :attachment, :url => "#", :html => {:class => "add_file_form add_form"} do |f| %>
+      <%= f.hidden_field :folder_id %>
+      <div class="header">
+        <%= image_tag "blank.png", :class => "item_icon" %>
+        <%= f.file_field :uploaded_data, :title => "File to Upload" %>
+      </div>
+      <div class="clear"></div>
+      <div class="loading_message" style="display: none;">
+        <%= image_tag "ajax-loader-bar.gif" %>
+      </div>
+      <div class="button-container">
+        <button type="submit" class="button small-button">Add File</button>
+        <button type="button" class="button button-secondary cancel_button">Cancel</button>
+      </div>
+    <% end %>
+  </li>
+  <li class="folder_item folder add_item" id="add_folder_form">
+    <% form_for :folder, :url => "#", :html => {:class => "add_folder_form add_form header"} do |f| %>
+      <%= f.hidden_field :parent_folder_id %>
+      <%= image_tag "blank.png", :class => "item_icon" %>
+      <span class="name" style="display: none;">&nbsp;</span>
+      <%= f.text_field :name, :title => "Folder Name" %>
+    <% end %>
+    <div class="clear"></div>
+  </li>
+</ul>
+<div style="display: none;" id="file_context_links">
+  <input type="text" id="rename_entry_field" style="width: 200px;"/>
+  <%= image_tag "ajax-loader.gif", :class => "preview_loading_image" %>
+  <% contexts = @file_structures.map{|s| s[0]} %>
+  <% contexts += @file_structures.map{|s| s[1][:groups]}.flatten %>
+  <% contexts.each do |context| %>
+    <% root_url = context_url(context, :context_url) rescue '' %>
+    <a href="<%= root_url %>/files" class="<%= context.asset_string %>_attachments_url">&nbsp;</a>
+    <a href="<%= root_url %>/folders" class="<%= context.asset_string %>_folders_url">&nbsp;</a>
+    <a href="<%= root_url %>/files/reorder" class="<%= context.asset_string %>_reorder_attachments_url">&nbsp;</a>
+    <a href="<%= root_url %>/collaborations" class="<%= context.asset_string %>_collaborations_url">&nbsp;</a>
+    <a href="<%= root_url %>/collaborations/{{ id }}" class="<%= context.asset_string %>_collaboration_url">&nbsp;</a>
+    <a href="<%= root_url %>/groups" class="<%= context.asset_string %>_groups_url">&nbsp;</a>
+    <a href="<%= root_url %>/files/{{ id }}" class="<%= context.asset_string %>_attachment_url">&nbsp;</a>
+    <a href="<%= root_url %>/folders/{{ id }}" class="<%= context.asset_string %>_folder_url">&nbsp;</a>
+    <a href="<%= root_url %>/files/{{ id }}/download?wrap=1" class="<%= context.asset_string %>_download_attachment_url">&nbsp;</a>
+    <a href="<%= root_url %>/files/{{ id }}/preview" class="<%= context.asset_string %>_preview_attachment_url">&nbsp;</a>
+    <a href="<%= root_url %>/zip_file_imports" class="<%= context.asset_string %>_zip_import_url">&nbsp;</a>
+    <a href="<%= context_url(context, :import_status_context_zip_file_imports_url, :format => :json) %>" class="<%= context.asset_string %>_zip_import_status_url" style="display: none;">&nbsp;</a>
+    <a href="<%= context_url(context, :context_file_inline_view_url, "{{ id }}") rescue '#' %>" class="<%= context.asset_string %>_inline_view_attachment_url">&nbsp;</a>
+    <a href="<%= context_url(context, :context_import_files_url) rescue '#' %>" class="<%= context.asset_string %>_import_url">&nbsp;</a>
+    <% if can_do(context, @current_user, :read_roster) %>
+    <ul class="<%= context.asset_string %>_user_list unstyled_list">
+      <% context.users.uniq.each do |user| %>
+        <li class="collaborator collaborator_<%= user.id %>">
+          <%= check_box :user, "#{user.id}".to_sym, :value => user.id, :class => "#{context.asset_string}_user_#{user.id}" %>
+          <label for="<%= context.asset_string %>_user_<%= user.id %>"><%= context_user_name(context, user) %></label>
+          <span class="user_id" style="display: none;"><%= user.id %></span>
+        </li>
+      <% end %>
+    </ul>
+    <% end %>
+  <% end %>
+</div>
+<div id="edit_content_dialog" style="display: none;" title="Edit File Contents">
+  <h2>Edit <span class="display_name">&nbsp;</span></h2>
+  <div class="loading_message">
+  </div>
+  <div class="content">
+    <textarea id="edit_content_textarea" style="width: 550px; height: 270px"></textarea>
+    <div class="button-container">
+      <button type="button" class="button save_button">Update File</button>
+      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+    </div>
+  </div>
+</div>
+<div style="display: none;" id="form_templates">
+  <%= image_tag "blank.png", :id => "content_blank_icon" %>
+  <%= image_tag "lock_for_file_folder.png", :id => "content_locked_icon" %>
+<div id="edit_collaboration_dialog">
+  <% form_for :collaboration, :url => "", :html => {:id => "edit_collaboration_form"} do |f| %>
+  <table class="formtable">
+    <tr class="add_collaboration">
+      <td style="white-space: nowrap;"><label for="collaboration_collaboration_type">Collaborate Using:</label></td>
+      <td><select id="collaboration_collaboration_type" name="collaboration[collaboration_type]">
+        <% Collaboration.collaboration_types.each do |collab_type| %>
+          <% if collab_type['type'] == 'google_docs' %>
+            <% if @domain_root_account && feature_and_service_enabled?(:google_docs) %>
+              <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
+            <% end %>
+          <% elsif (Collaboration.collaboration_class(collab_type['type'].titleize.gsub(/\s/, "")).config rescue false) %>
+            <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
+          <% end %>
+        <% end %>
+      </select></td>
+    </tr><tr id="google_docs_description" class="collaboration_description add_collaboration">
+      <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
+        <%= image_tag "google_docs_icon.png", :style => "float: left; margin-right: 5px;" %> Google Docs are a great place to collaborate
+        on a group project.  It's like Microsoft Word, but lets you work together with others
+        on the same file without having to email it around.  You'll need a Google account
+        in order to participate in any Google Docs collaborations.
+      </td>
+    </tr><tr id="etherpad_description" class="collaboration_description add_collaboration">
+      <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
+        <%= image_tag "ether_pad.png", :style => "float: left; margin-right: 5px; margin-top: 5px;" %> EtherPad is a site that lets you quickly set
+        up shared documents.  It's fast enough that you can see what others are typing as they're
+        typing it -- although "pads" aren't protected by a password so anyone that knows about them
+        can edit them.  EtherPad might be better suited than Google Docs for things like taking
+        notes because it's so fast.
+      </td>
+    </tr><tr>
+      <td style="white-space: nowrap;"><%= f.label :title, "Document Name:" %></td>
+      <td><%= f.text_field :title, :style => "width: 300px;" %></td>
+    </tr><tr>
+      <td><%= f.label :description, "Description:" %></td>
+      <td><%= f.text_area :description, :style => "width: 300px; height: 50px;" %></td>
+    </tr><tr>
+      <td colspan="2">
+        <div class="collaborate_data">
+          <div>
+            Collaborate With:
+            <div style="margin-left: 10px; font-size: 0.8em;">
+              <a href="#" class="select_all_link">Select All</a> | 
+              <a href="#" class="deselect_all_link">Deselect All</a>
+            </div>
+            <div class="collaborator_list" style="max-height: 100px; overflow: auto;">
+            </div>
+          </div>
+          <div class="button-container">
+            <button type="submit" class="button button-default-action submit_button">Add Collaboration</button>
+            <button type="button" class="button-secondary cancel_button">Cancel</button>
+          </div>
+        </div>
+        <% if @current_user && !@current_user.user_services.map(&:service).include?("google_docs") %>
+        <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none; margin: 20px;">
+          Before you can collaborate on documents, you need to authorize Canvas
+          to access your Google Docs account:
+          <div class="button-container">
+            <a class="button button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>">Authorize Google Docs Access</a>
+            <button type="button" class="button-secondary cancel_button">Cancel</button>
+          </div>
+        </div>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+  <% end %>
+</div>
+<div id="lock_item_dialog" style="display: none;">
+  <% form_for :attachment, :url => "", :html => {:id => "lock_attachment_form", :method => :put} do |f| %>
+    <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
+    <h3 style="margin: 0;">Lock <span class="name">&nbsp;</span></h3>
+    When a file is locked, only teachers and TA's can access it.
+    <div class="clear"></div>
+    <table style="margin-top: 10px;">
+      <tr>
+        <td style="vertical-align: top;">
+          <%= f.check_box :just_hide %> 
+        </td><td colspan="2" style="padding-bottom: 10px; 10px; font-size: 0.8em;">
+          <%= f.label :just_hide, "Let students download or view the file if I link to it, just don't show it in the file listings for students" %>
+        </td>
+      </tr>
+      <tr class="full_lock">
+        <td style="padding-bottom: 10px;">
+          <%= f.check_box :locked, :class => 'lock_checkbox' %> 
+        </td><td colspan="2" style="padding-bottom: 10px;">
+          <%= f.label :locked, "Lock until I manually unlock it" %>
+        </td>
+      </tr><tr class="lock_range full_lock">
+        <td>&nbsp;</td>
+        <td style="vertical-align: top; padding-left: 5px; white-space: nowrap;">Lock Until:</td>
+        <td>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;" %>
+        </td>
+      </tr><tr class="lock_range full_lock">
+        <td>&nbsp;</td>
+        <td style="vertical-align: top; padding-left: 5px; white-space: nowrap;">Lock After:</td>
+        <td>
+          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;" %>
+        </td>
+      </tr><tr>
+        <td colspan="3">
+          <button type="submit" class="button">Lock this File</button>
+          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+  <% form_for :folder, :url => "", :html => {:id => "lock_folder_form", :method => :put} do |f| %>
+    <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
+    <h3 style="margin: 0;">Lock <span class="name">&nbsp;</span></h3>
+    When a folder is locked, only teachers and TA's can access it.
+    <div class="clear"></div>
+    <table style="margin-top: 10px;">
+      <tr>
+        <td style="vertical-align: top;">
+          <%= f.check_box :just_hide %> 
+        </td><td colspan="2" style="padding-bottom: 10px; font-size: 0.8em;">
+          <%= f.label :just_hide, "Let students download or view files in this folder if I link to them, just don't show it in the file listings for students" %>
+        </td>
+      </tr>
+      <tr class="full_lock">
+        <td style="padding-bottom: 10px;">
+          <%= f.check_box :locked, :class => 'lock_checkbox' %> 
+        </td><td colspan="2" style="padding-bottom: 10px;">
+          <%= f.label :locked, "Lock until I manually unlock it" %>
+        </td>
+      </tr><tr class="lock_range full_lock">
+        <td>&nbsp;</td>
+        <td style="vertical-align: top; padding-left: 5px; white-space: nowrap;">Lock Until:</td>
+        <td>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;" %>
+        </td>
+      </tr><tr class="lock_range full_lock">
+        <td>&nbsp;</td>
+        <td style="vertical-align: top; padding-left: 5px; white-space: nowrap;">Lock After:</td>
+        <td>
+          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;" %>
+        </td>
+      </tr><tr>
+        <td colspan="3">
+          <button type="submit" class="button">Lock this Folder</button>
+          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+</div>
+</div>
+<% js_block do %>
+<script>
+<% @file_structures.each{|c, s| s.delete(:folders) } %>
+var fileStructureData = <%= raw @file_structures.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:read_contents,:manage_grades,:read_roster,:download]}, :methods => [:readable_size,:mime_class,:currently_locked,:collaborator_ids]) %>;
+
+
+var INST = INST || {};
+INST.downloadFolderFiles = function(url) {
+  var cancelled = false;
+  $("#download_folder_files_dialog .status_box .status").text("Gathering data...");
+  $("#download_folder_files_dialog").dialog('close').dialog({
+    autoOpen: false,
+    title: "Download Folder Contents",
+    close: function() {
+      cancelled = true;
+    }
+  }).dialog('open');
+  $("#download_folder_files_dialog .progress").progressbar({value: 0});
+  var checkForChange = function() {
+    if(cancelled || $("#download_folder_files_dialog:visible").length == 0) { return; }
+    $("#download_folder_files_dialog .status_loader").css('visibility', 'visible');
+    var lastProgress = null;
+    $.ajaxJSON(url, 'GET', {}, function(data) {
+      if(data && data.attachment) {
+        var attachment = data.attachment;
+        if(attachment.workflow_state == 'zipped') { 
+          $("#download_folder_files_dialog .progress").progressbar('value', 100);
+          $("#download_folder_files_dialog .status").html("Finished!  Redirecting to File...<br/><a href='" + url + "'><b>Click here to download " + attachment.readable_size + "</b></a>")
+          $("#download_folder_files_dialog .status_loader").css('visibility', 'hidden');
+          location.href = url;
+          return;
+        } else {
+          var progress = parseInt(attachment.file_state, 10);
+          if(isNaN(progress)) { progress = 0; }
+          progress += 5
+          $("#download_folder_files_dialog .progress").progressbar('value', progress);
+          $("#download_folder_files_dialog .status").text(progress >= 95 ? "Creating zip file..." : "Gathering Files (" + progress + "%)...")
+          if(progress <= 5 || progress == lastProgress) {
+            $.ajaxJSON(url + "?compile=1", 'GET', {}, function() {}, function() {});
+          }
+          lastProgress = progress;
+        }
+      }
+      $("#download_folder_files_dialog .status_loader").css('visibility', 'hidden');
+      setTimeout(checkForChange, 3000);
+    }, function(data) {
+      $("#download_folder_files_dialog .status_loader").css('visibility', 'hidden');
+      setTimeout(checkForChange, 1000);
+    });
+  }
+  checkForChange();
+}
+</script>
+<% end %>
+<div id="download_folder_files_dialog" style="display: none;">
+  <%= image_tag "download.png" %> <b>The contents of this folder are being gathered</b> and compressed
+  into a zip file.  This may take some time, depending on the size and number of files.
+  <div class="progress" style="margin: 10px 5px;">
+  </div>
+  <div class="status_box" style="text-align: center;">
+    <%= image_tag "ajax-loader-small.gif", :style => "visibility: hidden;", :class => "status_loader" %>&nbsp;<span class="status">Gathering Files...</span>
+  </div>
+</div>
+<% unless showing_all_contexts %>
+  <a href="<%= context_url(@context.is_a?(UserProfile) ? @context.user : @context, :quota_context_files_url) %>" class="quota_url" style="display: none;">&nbsp;</a>
+<% end %>

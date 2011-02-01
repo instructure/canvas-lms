@@ -1,0 +1,53 @@
+<% 
+   group = question_group || nil 
+   if group && hash_get(group, :assessment_question_bank_id)
+     question_bank = @context.assessment_question_banks.active.find(hash_get(group, :assessment_question_bank_id))
+   end
+%>
+<div class="group_top <%= 'question_bank_top' if question_bank %>" style="<%= "display: none;" unless group %>" id="group_top_<%= hash_get(group, :id, 'template') %>">
+  <% form_for :quiz_group, :url => context_url(@context, :context_quiz_quiz_groups_url, @quiz.id), :html => {:class => "quiz_group_form"} do |f| %>
+  <div style="float: left;" class="move">
+    <%= image_tag "move.png", :class => "move_icon" %>
+  </div>
+  <div style="float: left;">
+    <span class="group_display name" style="font-weight: bold; padding-right: 20px;"><%= hash_get(group, :name, "Group") %></span>
+    <input name="quiz_group[name]" type="text" value="Group Name" class="group_edit" value="<%= hash_get(group, :name, "Group") %>"/>
+    Pick 
+    <span class="group_display pick_count"><%= hash_get(group, :pick_count, 1) %></span>
+    <input name="quiz_group[pick_count]" type="text" style="width: 20px;" class="group_edit" value="<%= hash_get(group, :pick_count, 1) %>"/> 
+    questions, 
+    <span class="group_display question_points"><%= hash_get(group, :question_points, 1) %></span>
+    <input name="quiz_group[question_points]" type="text" style="width: 20px;" class="group_edit" value="<%= hash_get(group, :question_points, 1) %>"/> 
+    pts per question
+  </div>
+  <div style="float: right;" class="links">
+  <% if question_bank %>
+      <% # Question group pointing to question bank controls to come in the next episode %>
+  <% else %>
+      <a href="#" class="collapse_link group_display no-hover" title="Collapse Group"><%= image_tag "collapse.png" %></a>
+      <a href="#" class="expand_link group_display hidden no-hover" title="Expand Group"><%= image_tag "expand.png" %></a>
+      <a href="#" class="add_question_link group_display no-hover" title="Add Question to this Group"><%= image_tag "add.png" %></a>
+    <% end %>
+    <a href="#" class="edit_group_link group_display no-hover" title="Edit Group Details"><%= image_tag "edit.png" %></a>
+    <a href="#" class="delete_group_link group_display no-hover" title="Delete Group"><%= image_tag "delete.png" %></a>
+  </div>
+  <div class="clear"></div>
+  <div class="button-container">
+    <button type="submit" class="group_edit submit_button button small-button">Update</button>
+    <button type="button" class="group_edit cancel_button button-secondary"/>Cancel</button>
+  </div>
+  <div style="display: none;">
+    <a href="<%= context_url(@context, :context_quiz_quiz_group_url, @quiz.id, hash_get(group, :id, "{{ id }}")) %>" class="update_group_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_quiz_quiz_group_reorder_url, @quiz.id, hash_get(group, :id, "{{ id }}")) %>" class="reorder_group_questions_url">&nbsp;</a>
+  </div>
+  <% end %>
+</div>
+<% if question_bank %>
+  <div class="assessment_question_bank" style="">Questions will be pulled from the bank: <%= question_bank.title %></div>
+<% end %>
+<% hash_get(group, :questions, []).each do |question| %>
+  <%= render :partial => "quizzes/display_question", :object => question, :locals => {:in_group => true} %>
+<% end %>
+<div class="group_bottom" style="<%= "display: none;" unless group %>" id="<%= "group_bottom_template" unless group %>">
+  &nbsp;
+</div>

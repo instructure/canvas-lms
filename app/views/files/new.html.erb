@@ -1,0 +1,6 @@
+<h1>Upload a File</h1>
+<% form_for(:attachment, :url => { :action => "create", :format => "json" }, :html => { :multipart => true }) do |f| %>
+  <%= render :partial => 'fields', :locals => {:f => f} %>
+  <%= f.submit "Create" %>
+<% end %>
+

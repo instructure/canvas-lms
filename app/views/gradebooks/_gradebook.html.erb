@@ -1,0 +1,467 @@
+<% content_for :stylesheets do %>
+<style type="text/css" media="screen">
+  #content {
+    position: relative;
+    padding: 0;
+  }
+</style>
+<% end %>
+<% if !@students || @students.empty? %>
+  <div id="no_students_message" style="padding: 10px 30px; font-size: 1.2em;">
+    <div>No Students are enrolled in the course.</div>
+    <a href="<%= context_url(@context, :context_details_url) %>#add_students" class="button"><%= image_tag "add.png" %> Add Students to the Course</a>
+  </div>
+<% end %>
+<% if !@just_assignments || @just_assignments.empty? %>
+  <div id="no_assignments_message" style="padding: 10px 30px; font-size: 1.2em">
+    <p>No Assignments created yet for this course.</p>
+    <a href="<%= context_url(@context, :context_assignments_url) %>" style="padding-left: 20px;">Add Assignments to the Course</a>
+  </div>
+<% else %>
+  <% 
+    jammit_css :gradebooks, :datagrid
+    jammit_js :datagrid, :gradebooks
+    @show_left_side = false 
+  %>
+  <div style="display: none;"><input type="checkbox" id="hide_students_option"/><label for="hide_students_option"> Hide Student Names</label></div>
+  <div class="clear"></div>
+  <% form_tag context_url(@context, :update_submission_context_gradebook_url), { :id => "update_submission_form", :style => "display: none;" } do %>
+  <% end %>
+
+  <div id="loading_gradebook_message" style="margin-top: 10px; margin-left: 10px;">
+    <h3 id="loading_gradebook_status">Loading Gradebook...</h3>
+    <div id="loading_gradebook_progressbar" style="width: 250px;">
+    </div>
+    <a href="<%= context_url(@context, :context_gradebook_url) %>" class="gradebook_url" style="display: none;">&nbsp;</a>
+  </div>
+  <div id="datagrid_topleft" class="datagrid">
+    <div class="content">
+    </div>
+  </div>
+  <div id="datagrid_top" class="datagrid">
+    <div class="content">
+    </div>
+  </div>
+  <div class="clear"></div>
+  <div id="datagrid_left" class="datagrid">
+    <div class="content">
+    </div>
+  </div>
+  <div id="datagrid_data" class="datagrid">
+    <div class="content">
+    </div>
+    <div id="datagrid_filler">&nbsp;
+    </div>
+  </div>
+  <%= render :partial => 'assignments', :hide_dropdowns => (!@students || @students.empty?) %>
+  
+  <div style="float: left; padding: 10px; display: none;" id="groups_data">
+  <table style="width: auto; min-width: 200px;">
+    <% tally = 0 %>
+    <tr>
+      <td colspan="2">
+        <input type="checkbox" <%= "checked" if @context.group_weighting_scheme == 'percent' %> id="class_weighting_policy" name="class_weighting_policy"/>
+        <label for="class_weighting_policy">Weight final grade based on groups</label>
+        <a href="<%= context_url(@context, :context_url) %>" class="weighting_policy_url" style="display: none;">&nbsp;</a>
+      </td>
+    </tr>
+    <% @groups.each do |group| %>
+    <tr class="group" id="group_<%= group.id %>">
+      <td><%= group.name %></td>
+      <td>
+        <input type="text" style="width: 50px;" value="<%= group.group_weight || 0 %>" name="group_weight" class="group_weight"/>%
+        <div style="display: none;">
+          <span class="assignment_group_id"><%= group.id %></span>
+          <div class="rules"><%= group.rules %></div>
+          <a href="<%= context_url(@context, :context_assignment_group_url, group.id) %>" class="assignment_group_url">&nbsp;</a>
+        </div>
+      </td>
+      <% tally = tally + (group.group_weight || 0) %>
+    </tr>
+    <% end %>
+    <tr>
+      <td><b>Total</b></td>
+      <td><b><span class="total_weight"><%= tally %></span>%</b></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: left;">
+        <a href="<%= context_url(@context, :context_assignments_url) %>" target="_new" class="edit">Manage Assignment Groups</a>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <button type="button" class="button normalize_button">Make it Total 100%</button>
+        <button type="button" class="cancel_button button-secondary">Done</button>
+      </td>
+    </tr>
+  </table>
+  </div>
+  <% form_for :assignment, :url => ".", :html => {:id => "default_grade_form", :style => "position: relative; display: none;"} do |f| %>
+    <input type="hidden" name="assignment_id" class="assignment_id"/>
+    <div>Give all currently visible students the same grade for
+      <span class="assignment_title" style="font-weight: bold;">&nbsp;</span>
+      by entering and submitting a grade value below:
+    </div>
+    <div style="text-align: center; margin: 10px 10px 0;" class="grading_box_holder">
+      <input type="text" name="default_grade" style="width: 100px;"/>
+    </div>
+    <div style="margin-bottom: 10px; font-size: 0.8em; text-align: center;">
+      <span class="out_of">out of</span> <span class="points_possible">&nbsp;</span>
+    </div>
+    <div style="text-align: left;">
+      <input type="checkbox" name="overwrite_existing_grades" id="submission_overwrite_existing_grades"/>
+      <label for="submission_overwrite_existing_grades">Overwrite already-entered grades</label>
+    </div>
+    <div class="button-container">
+      <button type="submit" class="button">Set Grade</button>
+      <button type="button" class="cancel_button button-secondary">Cancel</button>
+    </div>
+    <a href="<%= context_url(@context, :context_assignment_url, "{{ id }}") %>" style="display: none;" class="default_grade_url">&nbsp;</a>
+  <% end %>
+  <% form_tag ".", {:id => "re_upload_submissions_form", :multipart => true, :style => "display: none;"} do %>
+    <a href="<%= context_url(@context, :context_gradebook_submissions_upload_url, "{{ assignment_id }}") %>" class="re_upload_submissions_url" style="display: none;">&nbsp;</a>
+    <p style="font-size: 0.8em;">If you made changes to the student submission files you downloaded 
+    before, just zip them back up and upload the zip with the form below.  
+    Students will see the modified files in their comments for the submission.
+    </p>
+    <p style="font-size: 0.8em;">
+      <i>Make sure you don't change the names of the submission files so we can recognize them</i>.
+    </p>
+    <input type="file" name="submissions_zip"/>
+    <div class="button-container">
+      <button type="submit" class="button">Upload Files</button>
+    </div>
+  <% end %>
+  <form action="<%= context_url(@context, :update_submission_context_gradebook_url) %>" id="curve_grade_dialog" style="display: none;">
+    <input type="hidden" name="_method" value="POST"/>
+    <input type="hidden" name="assignment_id" class="assignment_id" value="10"/>
+    <div style="font-size: 0.8em;">
+      Enter an average grade for the curve for <span class="assignment_title" style="font-weight: bold;">the assignment</span>.
+      The chart shows a best attempt at curving the
+      grades based on current student scores.
+    </div>
+    <div style="min-height: 100px;">
+    <table cellpadding="0" cellspacing="0" style="margin: 2px auto;">
+      <tr id="results_list">
+      </tr>
+      <tr id="results_values">
+      </tr>
+    </table>
+    </div>
+    <div style="text-align: center;">
+      Average Score: 
+      <input type="text" value="16" name="middle_score" id="middle_score" style="width: 25px;"/>
+      <span class="out_of">out of</span> <span class="points_possible">20</span>
+    </div>
+    <div style="margin-top: 10px;">
+      <input type="checkbox" name="assign_blanks" id="assign_blanks"/>
+      <label for="assign_blanks" style="font-size: 0.8em;">Assign zero's to unsubmitted students</label>
+    </div>
+    <div class="button-container">
+      <button type="submit" class="button">Curve Grades</button>
+      <button type="button" class="cancel_button button-secondary">Cancel</button>
+    </div>
+  </form>
+  <div style="display: none;" id="gradebook_urls">
+    <%= image_tag "forward.png", :id => "submission_view_image", :alt => "View", :title => "View" %>
+    <%= image_tag "pass.png", :id => "submission_entry_pass_image", :alt => "Pass", :title => "Pass", :class => "graded_icon" %>
+    <%= image_tag "pass.png", :id => "submission_entry_complete_image", :alt => "Complete", :title => "Complete", :class => "graded_icon" %>
+    <%= image_tag "fail.png", :id => "submission_entry_fail_image", :alt => "Fail", :title => "Fail", :class => "graded_icon" %>
+    <%= image_tag "fail.png", :id => "submission_entry_incomplete_image", :alt => "Incomplete", :title => "Incomplete", :class => "graded_icon" %>
+    <%= image_tag "link.png", :id => "submission_online_url_image", :alt => "url", :title => "URL Submission", :class => "submission_icon" %>
+    <%= image_tag "word_bubble.png", :id => "submission_discussion_topic_image", :alt => "discussion_topic", :title => "Discussion Submission", :class => "submission_icon" %>
+    <%= image_tag "file.png", :id => "submission_online_upload_image", :alt => "upload", :title => "File Upload Submission", :class => "submission_icon" %>
+    <%= image_tag "text_entry.png", :id => "submission_online_text_entry_image", :alt => "text", :title => "Text Entry Submission", :class => "submission_icon" %>
+    <%= image_tag "pending_review.png", :id => "submission_pending_review_image", :alt => "quiz", :title => "This quiz needs review", :class => "submission_icon" %>
+    <%= image_tag "media_comment.gif", :id => "submission_media_comment_image", :alt => "media comment", :title => "Media Comment Submission", :class => "submission_icon" %>
+    <%= image_tag "quiz.png", :id => "submission_quiz_image", :alt => "quiz", :title => "Quiz Submission", :class => "submission_icon" %>
+    <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}", :download => "{{ attachment_id }}") %>" class="view_online_upload_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}") %>" class="view_online_text_entry_url view_online_submission_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_quiz_history_url, "{{ quiz_id }}", :user_id => "{{user_id}}") %>" class="view_quiz_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}") %>?zip=1" class="download_assignment_submissions_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_gradebook_url) %>.csv" class="gradebook_csv_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_gradebook_url) %>/history" class="gradebook_history_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, "{{ assignment_id }}", "{{ user_id }}", "{{ asset_string }}") %>" class="turnitin_report_url">&nbsp;</a>
+    <%= image_tag 'pending_review.png', 
+          :style => "position: absolute; top: 3px; right: 2px; cursor: pointer;", 
+          :title => "This submission needs review",
+          :class => "pending_review" %>
+    <%= image_tag 'turnitin_no_score.png', 
+          :style => "position: absolute; top: 3px; right: 2px; cursor: pointer;", 
+          :title => "This submission has a turnitin similarity score",
+          :alt => "turnitin score",
+          :class => "turnitin" %>
+    <%= image_tag 'word_bubble.png', 
+          :style => "position: absolute; top: 3px; right: 2px; cursor: pointer;", 
+          :title => "New message for this submission",
+          :class => "new_message" %>
+  </div>
+<% js_block do %>
+  <script type="text/javascript">
+  lastGradebookUpdate = "<%= ActiveSupport::TimeWithZone.new(Time.now, Time.zone).strftime("%Y-%m-%dT%H:%M:%S") %>";
+  var ignoreUngradedSubmissions = true;
+  setTimeout(function() {
+    $(document).ready(function() {
+      $("#embed_code input[type='button']").click(function() {
+        $("#embed_code textarea:first").focus().select();
+      });
+      $(document).delegate('#gradebook_options', 'click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var show = $("#hide_students_option").attr('checked');
+        var hide_show = "Show";
+        var options = {
+          '<span class="ui-icon ui-icon-person">&nbsp;</span> Show Student Names': function() {
+            $("#hide_students_option").attr('checked', false).change();
+          }
+        }
+        if(!show) {
+          hide_show = "Hide";
+          options = {
+            '<span class="ui-icon ui-icon-person">&nbsp;</span> Hide Student Names': function() {
+              $("#hide_students_option").attr('checked', true).change();
+            }
+          }
+        }
+        if(!ignoreUngradedSubmissions) {
+          options['<span class="ui-icon ui-icon-check">&nbsp;</span> Ignore Ungraded Assignments'] = function() {
+            ignoreUngradedSubmissions = true;
+            gradebook.updateAllStudentGrades();
+          }
+        } else {
+          options['<span class="ui-icon ui-icon-check">&nbsp;</span> Include Ungraded Assignments'] = function() {
+            ignoreUngradedSubmissions = false;
+            gradebook.updateAllStudentGrades();
+          }
+        }
+        options['<span class="ui-icon ui-icon-carat-2-e-w">&nbsp;</span> Sort Columns By...'] = function() {
+          $(".sort_gradebook").each(function() {
+            $(this).attr('disabled', false).text($(this).attr('title'));
+          });
+          $("#sort_columns_dialog").dialog('close').dialog({
+            autoOpen: false,
+            width: 400,
+            height: 300
+          }).dialog('open');
+        };
+        options['<span class="ui-icon ui-icon-carat-2-n-s">&nbsp;</span> Sort Rows By...'] = function() {
+          $(".sort_gradebook").each(function() {
+            $(this).attr('disabled', false).text($(this).attr('title'));
+          });
+          $("#sort_rows_dialog").dialog('close').dialog({
+            autoOpen: false,
+            width: 400,
+            height: 300
+          }).dialog('open');
+        };
+        options['<span class="ui-icon ui-icon-pencil">&nbsp;</span> Set Group Weights'] = function() {
+          $("#groups_data").dialog('close').dialog({
+            title: "Assignment Groups",
+            autoOpen: false
+          }).dialog('open').show();
+        };
+        options['<span class="ui-icon ui-icon-clock">&nbsp;</span> View Grading History'] = function() {
+          location.href = $(".gradebook_history_url").attr('href');
+        };
+        options['<span class="ui-icon ui-icon-disk">&nbsp;</span> Download Scores (.csv)'] = function() {
+          location.href = $(".gradebook_csv_url").attr('href');
+        };
+        options['<span class="ui-icon ui-icon-clock">&nbsp;</span> Upload Scores (from .csv) '] = function() {
+          $("#upload_modal").dialog({
+            bgiframe: true,
+            autoOpen: false,
+            modal: true,
+            width: 410,
+            resizable: false,
+            buttons: {
+              'Upload Data': function() {
+                $(this).submit();
+              }
+            }
+          }).dialog('open');
+        };
+        $(this).dropdownList({
+          options: options
+        });
+      });
+      $(".sort_gradebook").click(function(event) {
+        event.preventDefault();
+        var $button = $(this);
+        if($button.hasClass('by_grade') && !gradebook.finalGradesReady) {
+          $button.attr('disabled', true).text("Computing Grades...");
+          setTimeout(function() {
+            if($button.filter(":visible").length > 0) {
+              $button.click();
+            }
+          }, 1000);
+          return;
+        }
+        $button.attr('disabled', false);
+        $button.text($button.attr('title'));
+        if($button.hasClass('sort_rows')) {
+          sortStudentRows(function(student) {
+            if($button.hasClass('by_secondary_identifier')) {
+              return [student.secondary_identifier, student.display_name, student.course_section];
+            } else if($button.hasClass('by_section')) {
+              return [student.course_section, student.display_name, student.secondary_identifier];
+            } else if($button.hasClass('by_grade_desc')) { 
+              return [Math.round((1000 - student.grade) * 10.0), student.display_name, student.secondary_identifier, student.course_section];
+            } else if($button.hasClass('by_grade_asc')) {
+              return [10000 + Math.round(student.grade * 10.0), student.display_name, student.secondary_identifier, student.course_section];
+            } else {
+              return [student.display_name, student.secondary_identifier, student.course_section];
+            }
+          });
+        } else {
+          sortAssignmentColumns(function(assignment) {
+            var list = [assignment.special_sort, assignment.date_sortable || "1050-12-12T99:99", assignment.title];
+            if($button.hasClass('by_group')) {
+              list.unshift(parseInt(assignment.groupData[assignment.group_id || assignment.id.toString().substring(6)], 10));
+            }
+            return list;
+          });
+        }
+        $("#sort_rows_dialog").dialog('close');
+        $("#sort_columns_dialog").dialog('close');
+      });
+      sortStudentRows
+    });
+  }, 1000);
+  // only update entries that have changed since the last gradebook update!
+  // compare to all updates, replace value with the highest update (keep it all server-time based)
+  </script>
+<% end %>
+
+  <div id="loading_submission_details_dialog" style="display: none;">
+    <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}") %>" class="submission_details_url" style="display: none;">&nbsp;</a>
+    <div style="margin: 20px 10px; text-align: center; font-size: 1.5em; ">
+    Loading Submission Details...
+    </div>
+  </div>
+  <div id="submission_information" style="display: none;">
+    <div style="display: none;">
+      <span class="id">&nbsp;</span>
+      <span class="assignment_id">&nbsp;</span>
+      <span class="student_id">&nbsp;</span>
+    </div>
+    <div style="float: left;" class="submitted_at_box">Submitted: <span class="submitted_at_string">submitted_at</span><span class="late_box"> (late)</span></div>
+    <div style="text-align: right; display: none;" class="submission_details">
+    </div>
+    <div style="padding: 5px 0px;">
+      <b>Comments for student:</b>
+      <div class="submission_comments" style="margin-left: 10px; _height: 100px; max-height: 100px; overflow: auto;">
+        <div class="no_comments">No Comments</div>
+      </div>
+      <div class="submission_comment" id="submission_comment_blank" style="display: none;">
+        <div class="comment" style="margin-left: 15px;">&nbsp;
+        </div>
+        <div class="attachments" style="text-align: right; font-size: 0.8em; margin-right: 10px;"></div>
+        <div style="font-size: 0.8em; text-align: right; color: #888;">
+          <span class="author_name">&nbsp;</span>,
+          <span class="posted_at">&nbsp;</span>
+        </div>
+      </div>
+    </div>
+    <div class="add_comment" style="text-align: center; font-size: 0.8em; padding-bottom: 10px;">
+      <div style="text-align: left;">Send a Comment to the Student:</div>
+      <textarea class="comment_text" style="width: 95%; margin: 0px auto; height: 80px; display: none; font-size: 1.2em;"></textarea>
+      <div class="comment_attachments" style="width: 80%; text-align: right; margin: 0 auto;"></div>
+      <div style="text-align: right; margin-right: 10px;"><a href="#" class="attach_comment_file_link">Attach File</a></div>
+      <div class="comment_attachment" style="display: none;">
+        <input type="file" name="attachments[-1][uploaded_data]"/>
+        <a href="#" class="delete_comment_attachment_link no-hover"><%= image_tag "delete_circle.png" %></a>
+      </div>
+      <div class="group_comment"><input type="checkbox" name="group_comment" value="1" id="group_comment_checkbox"/><label for="group_comment_checkbox">Send Comment to the Whole Group</label></div>
+    </div>
+    <div style="text-align: right;" class="submission_grade">
+      <span style="font-weight: bold;">Grade:</span> <span class="grade_entry">&nbsp;</span>
+      <span style="font-size: 0.8em;" class="out_of"> out of </span>
+      <span class="points_possible">N/A</span>
+    </div>
+    <div class="button-container">
+      <button type="button" class="button update_button">Update</button>
+      <button type="button" class="button-secondary cancel_button">Cancel</button>
+    </div>
+  </div>
+  <div id="assignment_details_dialog" style="display: none;">
+    Grade statistics for <b><a class="assignment_link title" href="#" target="_blank">&nbsp;</a></b>
+    <div class="distribution">
+      <div class="bar_left"></div>
+      <div class="none_left"></div>
+      <div class="some_left"></div>
+      <div class="some_right"></div>
+      <div class="none_right"></div>
+      <div class="bar_right"></div>
+    </div>
+    <table style="margin: 5px 20px 10px; font-size: 1.2em;">
+      <tr>
+        <td style="padding: 2px 5px;">Average Score:</td>
+        <td class="average" style="padding: 2px 5px; font-size: 1.1em; font-weight: bold;">&nbsp;</td>
+      </tr><tr>
+        <td style="padding: 2px 5px;">High Score:</td>
+        <td class="max" style="padding: 2px 5px; font-size: 1.1em; font-weight: bold;">&nbsp;</td>
+      </tr><tr>
+        <td style="padding: 2px 5px;">Low Score:</td>
+        <td class="min" style="padding: 2px 5px; font-size: 1.1em; font-weight: bold;">&nbsp;</td>
+      </tr><tr>
+        <td style="padding: 2px 5px;">Total Submitted:</td>
+        <td style="padding: 2px 5px; font-size: 1.1em; font-weight: bold;"><span class="cnt">&nbsp; submissions</span></td>
+      </tr>
+    </table>
+  </div>
+  <div style="display: none;">
+    <div id="submission_comment_attachment_blank">
+      <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}", :download => "{{ id }}", :comment_id => "{{ comment_id }}") %>" class="file">Download <span class="display_name">&nbsp;</span></a>
+    </div>http://localhost:3000/courses/5/gradebook#
+  </div>
+  <%= image_tag 'word_bubble.png', :title => "Submission Comments", :id => "information_link", :style => "position: absolute; top: 2px; right: 1px; display: none; cursor: pointer;"  %>
+
+<% end %>
+<%= render :partial => 'submissions/submission_download' %>
+<div style="display:none;">
+  <%= render :partial => 'gradebook_uploads/form' %>
+  <div id="gradebook_entry_template">
+    <div class="table_entry assignment_ASSIGNMENT_ID student_USER_ID" id="submission_USER_ID_ASSIGNMENT_ID" style="position: relative; text-align: center; vertical-align: middle; min-height: 20px;">
+      <span tabindex="0" class="grade HARD_CODED_CLASS" style="text-align: center; cursor: pointer;">
+        <a href="#" class="no-hover no-underline"> - </a>
+      </span>
+      <span class="score">&nbsp;</span>
+      <span class="pct"></span>
+      <span class="letter_grade" style="display: none;"></span>
+      <%= image_tag "pending_review.png",
+        :style => "position: absolute; top: 3px; right: 2px; cursor: pointer; display: none;",
+        :title => "This submission needs review",
+        :class => "pending_review" %>
+      <div style="display: none;"></div>
+    </div>
+  </div>
+  <div id="sort_columns_dialog" title="Sort Gradebook Columns">
+    <h2>Sort Gradebook Columns:</h2>
+    <div style="margin-bottom: 5px;">
+      <button type="button" class="button sort_gradebook sort_columns by_due_date" title="By Due Date" style="width: 300px;">By Due Date</button>
+    </div>
+    <div style="margin-bottom: 5px;">
+      <button type="button" class="button sort_gradebook sort_columns by_group" title="By Assignment Group" style="width: 300px;">By Assignment Group</button>
+    </div>
+  </div>
+  <div id="sort_rows_dialog" title="Sort Gradebook Rows">
+    <h2>Sort Gradebook Rows:</h2>
+    <div style="margin-bottom: 5px;">
+      <button type="button" class="button sort_gradebook sort_rows by_display_name" title="By Student Name" style="width: 300px;">By Student Name</button>
+    </div>
+    <div style="margin-bottom: 5px;">
+      <button type="button" class="button sort_gradebook sort_rows by_secondary_identifier" title="By Email/ID" style="width: 300px;">By Email/ID</button>
+    </div>
+    <div style="margin-bottom: 5px;">
+      <button type="button" class="button sort_gradebook sort_rows by_section" title="By Section Name" style="width: 300px;">By Section Name</button>
+    </div>
+    <div style="margin-bottom: 5px;">
+      <button type="button" class="button sort_gradebook sort_rows by_grade by_grade_desc" title="By Total (Highest First)" style="width: 300px;">By Total (Highest First)</button>
+    </div>
+    <div style="margin-bottom: 5px;">
+      <button type="button" class="button sort_gradebook sort_rows by_grade by_grade_asc" title="By Total (Lowest First)" style="width: 300px;">By Total (Lowest First)</button>
+    </div>
+  </div>
+  <%= render :partial => "shared/message_students" %>
+</div>
+

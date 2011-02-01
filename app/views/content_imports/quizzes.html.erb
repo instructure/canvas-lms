@@ -1,0 +1,96 @@
+<% content_for :page_title do %>Import Quizzes<% end %>
+<%= render :partial => 'wizard_secondary_nav', :locals => {:view => 'quizzes' } %>
+
+<div>
+  <h2>Import Quizzes</h2>
+  <p>Canvas can import quizzes in the IMS QTI format.  Most systems allow you to export your
+  quizzes in this format. You can also use popular quiz tools like Respondus to create and export IMS QTI.
+  Upload the file below and you'll receive an email when the importing is complete.
+  </p>
+  <div class="content-imports-instructions">
+    <a href="#" class="help quiz_from_respondus_link">How do I save a quiz using Respondus?</a>
+    <ul id="quiz_from_respondus" style="display: none;" class="ui-state-highlight">
+      <li>Open Respondus and select the system you're currently using</li>
+      <li>Click the "Retrieval & Reports" tab, then "Retrieve Questions" on the left</li>
+      <li>Select or setup your current system's configuration</li>
+      <li>Click the "Retrieve" button</li>
+      <li>Click back on the "Start" tab</li>
+      <li>Change "Current Personality" to "IMS QTI 1.1+"</li>
+      <li>Click the "Preview & Publish" tab, then "Save QTI XML File"</li>
+      <li>Select "Points as decimal numbers" and "QTI xml zip file" for the settings</li>
+      <li>Click "Save As" and save the zipped file to your local computer</li>
+    </ul>
+  </div>
+  <div id="uploading_please_wait_dialog" title="Uploading, Please Wait." style="display:none;">
+    <div id="uploading_progressbar"></div>
+    <p>Uploading and processing your zip file, if it is large it may take a while.</p>
+  </div>
+  <% form_tag context_url(@context, :context_import_migrate_url), :method => :post, :id => "qti_file_import_form", :multipart => true do %>
+      <input type="hidden" name="migration_settings[migration_type]" value="qti_exporter"/>
+      <input type="hidden" name="export_file_enabled" value="1"/>
+    <div>
+      <input type="file" id="export_file_input" name="export_file"  class="export_file_input"/>
+      <br/><span class="error zip_error ui-state-error" style="display:none; font-size: 16px">You must choose a .zip file to upload</span>
+    </div>
+
+    <div class="qti_settings" style="padding-left:10px;">
+      <%= render :partial=>'question_bank_config' %>
+    </div>
+    <div style="margin-top: 10px;">
+      <button type="submit" class="submit_button button big-button">Import Quiz</button>
+      <a href="<%= context_url(@context, :context_url) %>" class="button"><%= image_tag "check.png" %> I'm Done Importing, back to the Course.</a>
+    </div>
+  <% end %>
+  <div style="<%= hidden if @quizzes.empty? %> margin-top: 30px;">
+    <h2>Current Quizzes</h2>
+    <% @quizzes.each do |quiz| %>
+    <div style="margin-left: 10px;">
+      <a style="font-size: 1.2em;" href="<%= context_url(@context, :context_quiz_url, quiz.id) %>"><%= quiz.title || "Unnamed Quiz" %></a>
+      <span style="padding-left: 20px;"><%= pluralize(quiz.question_count , "Question") %></span>
+    </div>
+    <% end %>
+  </div>
+  <div id="file_uploaded" style="display: none;">
+    <p><b>Thank you!</b>  We'll start importing your QTI data and send you an email when it's complete. The process normally finishes within 10 minutes.</p>
+    <p>
+      <a class="button big-button" href="<%= context_url(@context, :context_import_quizzes_url) %>">Import another QTI file</a>
+      <a href="<%= context_url(@context, :context_url) %>" class="button"><%= image_tag "check.png" %> I'm Done Importing, back to the Course.</a>
+    </p>
+  </div>
+</div>
+
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $("#export_file_input").change(function() {
+    if($(this).val().match(/\.zip$/i)) {
+      $("#qti_file_import_form .submit_button").text("Import Quiz").attr('disabled', false);
+      $('.zip_error').hide();
+    } else {
+      $("#qti_file_import_form .submit_button").text("Please Choose a .zip file").attr('disabled', true);
+        $('.zip_error').show();
+    }
+  });
+
+  $(".quiz_from_respondus_link").click(function(event) {
+    event.preventDefault();
+    $("#quiz_from_respondus").slideToggle();
+  });
+
+  $("#qti_file_import_form").formSubmit({
+    fileUpload: true,
+    beforeSubmit: function(data) {
+      $(this).find(".submit_button").attr('disabled', true).text("Uploading QTI File...");
+    },
+    success: function(data) {
+      $(this).slideUp();
+      $("#file_uploaded").slideDown();
+    },
+    error: function(data) {
+      $(this).formErrors(data);
+    }
+  });
+
+});
+</script>
+<% end %>

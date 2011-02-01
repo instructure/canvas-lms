@@ -1,0 +1,37 @@
+<div id="message_students_dialog" style="display: none;">
+  <% form_for :context_message, :url => context_url(@context, :context_roster_messages_url), :html => {:id => "message_assignment_recipients"} do |f| %>
+    <%= f.hidden_field :recipients, :class => "recipient_ids" %>
+    <%= f.hidden_field :protect_recipients, :value => true %>
+    <h2>Message students who...</h2>
+    <div style="margin-bottom: 15px; margin-top: -1.4em;">
+      for <span class="asset_title">&nbsp;</span>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <select class="message_types">
+      </select>
+      <span class="cutoff_holder">
+        <input type="text" class="cutoff_score" style="width: 35px;"/>
+        <span class="out_of"> out of <span class="points_possible">&nbsp;</span></span>
+      </span>
+    </div>
+    <ul class="student_list">
+      <li class="student blank" style="display: none;"><span class="name">&nbsp;</span><span class="score">&nbsp;</span></li>
+    </ul>
+    <div class="clear"></div>
+    <table class="formtable" style="width: 100%;">
+      <tr>
+        <td style="font-weight: bold; width: 5px;"><%= f.label :subject, "Subject:" %></td>
+        <td><%= f.text_field :subject, :class => "subject" %></td>
+      </tr><tr>
+        <td style="font-weight: bold;" colspan="2">
+          <%= f.label :body, "Message:" %>
+          <%= f.text_area :body, :style => "width: 90%; height: 100px;" %>
+        </td>
+      </tr>
+    </table>
+    <div class="button-container">
+      <button type="submit" class="button send_button">Send Message</button>
+      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+    </div>
+  <% end %>
+</div>

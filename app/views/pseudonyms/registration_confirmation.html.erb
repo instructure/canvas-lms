@@ -1,0 +1,93 @@
+<% 
+  jammit_css :login
+  @headers = false
+  @body_classes << "modal" 
+  content_for :page_title, "Register #{@communication_channel.path}"
+%>
+
+<div id='modal-box'>
+  <div style="margin: 40px 10px 0">
+    <h2>Welcome aboard!</h2>
+    <h4 style="margin-bottom: 0.2em">Email address: <%= @communication_channel.path %> confirmed.</h4>
+    <p>In order to finish signing you up<% if @course %> for the course <b><%= @course.name %></b><% end %>, we'll need a few more pieces of information.  Please
+    fill out the form below:</p>
+    <%= (error_messages_for :object => [@user, @pseudonym], :header_message => nil).gsub("Unique", "Login") %>
+    <% form_for :pseudonym, :url => registration_confirmation_url(@pseudonym.id, @communication_channel.confirmation_code), :html => {:id => "registration_confirmation_form"} do |form| %>
+    <input type="hidden" name="register" value="1"/>
+    <table class="formtable">
+      <tr>
+        <td><%= label :user, :name, "Full Name:" %></td>
+        <td>
+          <%= text_field :user, :name, :value => (@user.name == @user.email ? "" : @user.name) %>
+          <div style="font-size: 0.8em;">Teachers will use this name for grading.</div>
+        </td>
+      </tr><tr>
+        <td><%= label :user, :short_name, "Short Name:" %></td>
+        <td>
+          <%= text_field :user, :short_name, :value => params[:short_name] || (@user.short_name && !@user.short_name.blank? && @user.short_name) || @user.name %>
+          <div style="font-size: 0.8em;">People will see this name in discussions, messages and comments.</div>
+        </td>
+      </tr><tr>
+        <td><%= label :user, :time_zone, "Time Zone:" %></td>
+        <td><%= time_zone_select :user, :time_zone, ActiveSupport::TimeZone.us_zones, :default => ((@domain_root_account && @domain_root_account.default_time_zone) || "Mountain Time (US & Canada)"), :value => @user.time_zone %></td>
+      </tr><tr>
+        <td><%= form.label :password, "Password:" %></td>
+        <td><%= form.password_field :password %></td>
+      </tr><tr>
+        <td><%= form.label :password_confirmation, "Confirm Password:"%></td>
+        <td><%= form.password_field :password_confirmation %></td>
+      </tr>
+      <% if @domain_root_account == Account.default %>
+        <tr>
+          <td colspan="2">
+            <%= check_box :user, :subscribe_to_emails, :checked => true %>
+            <%= label :user, :subscribe_to_emails, "I want to receive information, news and tips from Instructure" %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+    <button style="margin-top:-36px" type="submit" class="button">Register</button>
+    <% end %>
+  </div>
+</div>
+
+
+<% js_block do %>
+<script type="text/javascript">
+$(document).ready(function() {
+  $("#registration_confirmation_form :text:first").focus().select();
+  $("#registration_confirmation_form").submit(function(event) {
+    var data = $(this).getFormData();
+    success = true;
+    if(!data['user[name]']) {
+      $(this).formErrors({
+        'user[name]': "User name is required"
+      });
+      success = false;
+    } else if(!data['user[short_name]']) {
+      $(this).formErrors({
+        unique_id: "Short name is required"
+      });
+      success = false;
+    } else if(!data["pseudonym[password]"] || !data["pseudonym[password]"].length) {
+      $(this).formErrors({
+        "pseudonym[password]": "Password required"
+      });
+      success = false;
+    } else if(data["pseudonym[password]"].length < 6) {
+      $(this).formErrors({
+        "pseudonym[password]": "Password too short"
+      });
+      success = false;
+    } else if(data["pseudonym[password]"] != data["pseudonym[password_confirmation]"]) {
+      $(this).formErrors({
+        "pseudonym[password_confirmation]": "Passwords don't match"
+      });
+      success = false;
+    
+    }
+    return success;
+  });
+});
+</script>
+<% end %>

@@ -1,0 +1,11 @@
+<% course = asset.is_a?(Course) ? asset : asset.context %>
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset) %>/<%= course.class.to_s.downcase.pluralize %>/<%= course.id %>/assignments
+<% end %>
+
+The grading policy for <b><a href="<%= content :link %>"><%= course.name %></a></b> has changed.  
+
+Grading is based on <%= course.group_weighting_scheme == 'percent' ? "the weighted total for each assignment group:" : "total points for all assignments" %>
+<% if course.group_weighting_scheme == 'percent' %><% course.assignment_groups.each do |group |%>
+  - <%= group.name %>: <%= group.group_weight %>%
+<% end %><% end %>

@@ -1,0 +1,49 @@
+<% context ||= @context %>
+<div id="find_outcome_criterion_dialog" style="display: none;" class="find_outcome">
+  <div class="loading_message" style="margin: 10px; text-align: center;">
+  </div>
+  <table style="border-collapse: collapse;" class="outcomes_holder side_tabs_table" style="display: none;">
+    <tr>
+      <td class="left">
+        <ul class="outcomes_selects unstyled_list side_tabs" style="max-height: 350px; width: 200px;">
+          <li class="outcomes_select blank" style="display: none;">
+            <a href="#">
+              <span class="title">Some standard</span>
+              <span class="id" style="display: none;">&nbsp;</span>
+            </a>
+            <div class="display_name" style="font-size: 0.8em;">Full name, smaller text</div>
+          </li>
+        </ul>
+      </td>
+      <td class="right">
+        <div class="side_tabs_content outcomes_list" style="max-height: 350px;">
+            <div class="outcome blank" style="display: none; cursor: pointer;" title="Select and Add Criterion">
+              <div class="button-container" style="margin-bottom: 0.5em;">
+                <button type="button" class="button select_outcome_link">Add Outcome</button>
+                <div>
+                  <input type="checkbox" class="criterion_for_scoring" checked /><label>use this criterion for scoring</label>
+                </div>
+              </div>
+            <div class="learning_outcome_id" style="display: none;"></div>
+            <div class="header short_description" style="font-weight: bold; font-size: 1.2em;"></div>
+            <div class="body description" style="margin: 10px 0; font-size: 0.8em;"></div>
+            <div>Criterion Ratings:</div>
+            <table>
+              <tr>
+                <td class="rating blank" style="display: none; padding: 2px 5px;">
+                  <div class="description"></div>
+                  <div class="long_description" style="font-size: 0.8em;"></div>
+                  <div><span class="points"></span> pts</div>
+                </td>
+              </tr>
+            </table>
+            <div style="font-size: 0.8em; margin-bottom: 10px;">
+              threshold: <span class="mastery_points">&nbsp;</span> pts
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <a href="<%= context_url(context, :list_context_outcomes_url) %>" style="display: none;" class="outcomes_list_url">&nbsp;</a>
+</div>

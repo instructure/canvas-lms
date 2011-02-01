@@ -1,0 +1,82 @@
+<% q = quiz_summary || nil 
+  submission = nil
+  submission = @submissions_hash[q.id] if q
+  unpublished ||= false
+  start = Time.now
+%>
+<li class="quiz <%= 'unpublished' if unpublished %>" id="summary_quiz_<%= q ? q.id : "blank" %>">
+  <div class="title">
+    <div style="float: right; font-size: 0.6em; font-weight: normal;">
+      <% if can_do(q, @current_user, :update) %>
+        <div>
+          <a href="<%= context_url(@context, :edit_context_quiz_url, q) %>" title="Edit <%= q.readable_type %>" class="edit_quiz_link no-hover"><%= image_tag "edit.png" %></a>
+          <a href="<%= context_url(@context, :context_quiz_url, q) %>" title="Delete <%= q.readable_type %>" class="delete_quiz_link no-hover"><%= image_tag "delete.png" %></a>
+        </div>
+      <% end %>
+    </div>
+    <a href="<%= context_url(@context, :context_quiz_url, q) %>" class="quiz_title"><%= q.quiz_title || q.readable_type %></a>
+    <% if q && q.assignment_id %>
+      <span style="font-size: 0.8em; font-weight: normal;">(<%= pluralize(q.assignment.points_possible, "pt") if q.assignment.points_possible %>)</span>
+    <% end %>
+    <div class="clear"></div>
+  </div>
+  <div class="description user_content">
+    <% if q.available? %>
+      <div style="float: right; margin: 0 0 0 20px;">
+        <div style="border-bottom: 1px solid #ccc;">
+          <% if submission %>
+            Latest Submission:
+          <% else %>
+            <%= q.readable_type %> Details:
+          <% end %>
+        </div>
+        <% if q.quiz_type == 'survey' %>
+          <% if submission && submission.completed? %>
+            <%= datetime_string(submission.finished_at) %><br/>
+          <% elsif submission %>
+            <%= datetime_string(submission.started_at) %><br/>
+            <a href="<%= context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id) %>">Resume <%= q.readable_type %></a>
+          <% else %>
+            <%= q.question_count %> Questions
+          <% end %>
+        <% else %>
+          <% if submission && submission.completed? %>
+            <%= datetime_string(submission.finished_at) %><br/>
+            <%= submission.score %> out of <%= q.points_possible %>
+          <% elsif submission %>
+            <%= datetime_string(submission.started_at) %><br/>
+            <a href="<%= context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id) %>">Resume Quiz</a>
+          <% else %>
+            <%= q.points_possible || "No" %> Points<br/>
+            <%= q.question_count %> Questions
+          <% end %>
+        <% end %>
+      </div>
+      <% if q.due_at %>
+        Due: <%= datetime_string(q.due_at) %><br/>
+      <% end %>
+      <% if q.time_limit %>
+        Time Limit: <%= time_ago_in_words(Time.now - q.time_limit.minutes) %><br/>
+      <% end %>
+      <% if q.allowed_attempts && q.allowed_attempts != 1 %>
+        <% if q.allowed_attempts > 0 %>
+          Allowed Attempts: <%= q.allowed_attempts %><br/>
+          <% if submission %>
+            Attempts Left: <%= q.allowed_attempts - submission.attempt %><br/>
+          <% end %>
+        <% else %>
+          Unlimited Attempts<br/>
+          <% if submission %>
+            Attempts So Far: <%= submission.attempt %><br/>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <%= pluralize(q.unpublished_question_count, "Question") %>
+    <% end %>
+    <div class="user_content" style="margin-top: 5px;">
+      <%= user_content(truncate_html(q.description || "No Details", :num_words => 50), @context.asset_string, q.asset_string) %>
+    </div>
+    <div class="clear"></div>
+  </div>
+</li>

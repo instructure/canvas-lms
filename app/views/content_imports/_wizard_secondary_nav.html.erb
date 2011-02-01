@@ -1,0 +1,28 @@
+<% @body_classes << "content-imports" %>
+<% view ||= 'intro' %>
+<ul id="import-steps">
+  <li class="first <%= "active" if view == 'intro' %>"><a href="<%= context_url(@context, :context_imports_url) %>">
+    <span class="title">Step 1</span>
+    <span class="subtitle">Intro</span>
+    </a>
+  </li>
+  <li class="wizard_step <%= "active" if view == 'files' %>"><a href="<%= context_url(@context, :context_import_files_url) %>">
+    <span class="title">Step 2</span>
+    <span class="subtitle">Import Files</span>
+    </a>
+  </li>
+  <% if qti_enabled? %>
+      <li class="wizard_step <%= "active" if view == 'quizzes' %>"><a href="<%= context_url(@context, :context_import_quizzes_url) %>">
+        <span class="title">Step 3</span>
+        <span class="subtitle">Import Quizzes</span>
+        </a>
+      </li>
+  <% end %>
+</ul>
+<% js_block do %>
+  <script type="text/javascript">
+    $(function(){
+      $("#import-steps").chevronCrumbs();
+    });
+  </script>
+<% end %>

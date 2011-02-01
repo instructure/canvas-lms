@@ -1,0 +1,5 @@
+Confirm Canvas registration w/ code:
+
+<%= asset.confirmation_code %>
+
+for <%= asset.user.name %> by visiting <%= HostUrl.context_host(((asset.pseudonym || asset.user.pseudonym).account rescue nil)) %>.

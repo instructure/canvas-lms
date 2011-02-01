@@ -1,0 +1,140 @@
+  <div class="wizard_options">
+  <h3>I would like to:</h3>
+  <ul class="wizard_options_list">
+    <li class="option create_calendar_event_option add_step">
+      <a href="#">Create a New Event</a>
+      <div class="details" style="display: none;">
+        To start creating a calendar event, just click the day on the calendar
+        where you want the event.
+      </div>
+    </li>
+    <li class="option edit_calendar_event_option" style="display: none;">
+      <a href="#" class="wizard_edit_calendar_event_details"></a>
+      <div class="details" style="display: none;">
+        Great!  Now just enter a name for the event (<a href="#" class="highlight_calendar_event_title"><b>where?</b></a>).  You can specify a start and
+        end time for the event if you like.  Or just a start time.  Or no time at all.
+        Click "Submit" to finish.
+      </div>
+    </li>
+    <li class="option review_calendar_event_option" style="display: none;">
+      <a href="#" class="wizard_review_calendar_event_details"></a>
+      <div class="details" style="display: none;">
+        Done!  The event is now created!  You can click it to see the details, edit
+        and delete the event, or drag and drop it to a new day to change its date.
+      </div>
+    </li>
+    <% if @contexts.any?{|c| c.respond_to?(:assignments) && can_do(c.assignments.new, @current_user, :create)} %>
+      <li class="option create_assignment_option add_step">
+        <a href="#">Create a New Assignment</a>
+        <div class="details" style="display: none;">
+          Just like with a calendar event, click the date you want to add the assignment
+          to.  Or you can create an assignment without a due date by clicking in the
+          "Undated Events" box (<a href="#" class="highlight_undated_events"><b>where?</b></a>).
+        </div>
+      </li>
+      <li class="option tab_assignment_option" style="display: none;">
+        <a href="#" class="wizard_tab_assignment_details"></a>
+        <div class="details" style="display: none;">
+          Sweet.  Now click the "Assignment" tab in the dialog to create an assignment
+          instead of a calendar event.
+          <div style="text-align: center; margin-top: 5px; font-size: 1.5em;">
+            <a href="#" class="highlight_assignment_tab">Show Me Where</a>
+          </div>        
+        </div>
+      </li>
+      <li class="option edit_assignment_option" style="display: none;">
+        <a href="#" class="wizard_edit_assignment_details"></a>
+        <div class="details" style="display: none;">
+          Now just enter a name for the assignment (<a href="#" class="highlight_assignment_title"><b>where?</b></a>) and the assignment
+          group it belongs to.  You can specify a due date if you want, too.
+          Click "Submit" to finish.
+        </div>
+      </li>
+      <li class="option review_assignment_option" style="display: none;">
+        <a href="#" class="wizard_review_assignment_details"></a>
+        <div class="details" style="display: none;">
+          Done!  The assignment is now created!  You can click it to see the details, edit
+          and delete the event, or drag and drop it to a new day to change its date.
+        </div>
+      </li>
+    <% end %>
+    <li class="option edit_step">
+      <a href="#">Change the Date of an Event/Assignment</a>
+      <div class="details" style="display: none;">
+        That one's easy.  Just drag the event to a new date and let go.  Or you can
+        click the event and then click "Edit" to get a little more specific.
+      </div>
+    </li>
+    <li class="option delete_calendar_event_option delete_step">
+      <a href="#">Delete an Event/Assignment</a>
+      <div class="details" style="display: none;">
+        Click the event or assignment on the calendar you want to delete.
+      </div>
+    </li>
+    <li class="option confirm_delete_calendar_event_option" style="display: none;">
+      <a href="#" class="wizard_confirm_delete_calendar_event_details"></a>
+      <div class="details" style="display: none;">
+        Now click "Delete" (<a href="#" class="highlight_delete_event"><b>where?</b></a>) and your event will be deleted.
+      </div>
+    </li>
+    <li class="option review_delete_calendar_event_option" style="display: none;">
+      <a href="#" class="wizard_review_delete_calendar_event_details"></a>
+      <div class="details" style="display: none;">
+        Done and done.  That was some serious deletion skills you had just there.
+      </div>
+    </li>
+  </ul>
+  </div>
+  <div class="wizard_details">
+    <div>
+      <div class="header"></div>
+    </div>
+  </div>
+  <div class="clear"></div>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(document).bind('edit_event_dialog', function() {
+    if($("#wizard_box .option.create_calendar_event_option.selected").length > 0) {
+      $("#wizard_box .edit_calendar_event_option").click();
+    } else if($("#wizard_box .option.create_assignment_option.selected").length > 0) {
+      $("#wizard_box .tab_assignment_option").click();
+    }
+  }).bind('event_dialog', function() {
+    if($("#wizard_box .option.delete_calendar_event_option.selected").length > 0) {
+      $("#wizard_box .confirm_delete_calendar_event_option").click();
+    }
+  }).bind('event_tag_select', function(event, index) {
+    if(index == 1 && $("#wizard_box .option.tab_assignment_option.selected").length > 0) {
+      $("#wizard_box .edit_assignment_option").click();
+    };
+  }).bind('add_event', function(event, $object) {
+    if($("#wizard_box .option.edit_calendar_event_option.selected").length > 0) {
+      $("#wizard_box .review_calendar_event_option").click();
+    } else if($("#wizard_box .option.edit_assignment_option.selected").length > 0) {
+      $("#wizard_box .review_assignment_option").click();
+    }
+  }).bind('delete_event', function() {
+    if($("#wizard_box .option.confirm_delete_calendar_event_option.selected").length > 0) {
+      $("#wizard_box .review_delete_calendar_event_option").click();
+    }
+  });
+  $(".highlight_calendar_event_title").hover(function() {
+    $("#edit_calendar_event_form input[name='calendar_event[title]']").indicate();
+  }, function() {});
+  $(".highlight_undated_events").hover(function() {
+    $(".calendar_undated").indicate();
+  }, function() {});
+  $(".highlight_assignment_tab").hover(function() {
+    $(".edit_assignment_option").indicate();
+  }, function() {});
+  $(".highlight_assignment_title").hover(function() {
+    $("#edit_assignment_form input[name='assignment[title]']").indicate();
+  }, function() {});
+  $(".highlight_delete_event").hover(function() {
+    $("#event_details .delete_event_link").indicate();
+  }, function() {});
+});
+</script>
+<% end %>
+ 

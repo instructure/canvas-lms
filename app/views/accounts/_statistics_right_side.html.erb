@@ -1,0 +1,12 @@
+<% if page_views_enabled? -%>
+<% view ||= 'statistics' %>
+<h2>Reports</h2>
+<div class="rs-margin-all">
+  <% unless view == 'statistics' %>
+    <a href="<%= context_url(@context, :context_statistics_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> General Statistics</a>
+  <% end %>
+  <% if view != 'page_views' && !@context.root_account_id %>
+    <a href="<%= context_url(@context, :context_statistics_page_views_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> Page Views</a>
+  <% end %>
+</div>
+<% end -%>

@@ -1,0 +1,72 @@
+<% add_crumb "SIS Import" %>
+<% @active_tab = "sis-import" %>
+<% content_for :page_title do %>SIS Import<% end %>
+
+<% content_for :page_header do %>
+    <h1>SIS Import</h1>
+<% end %>
+
+<div>
+  <h2>SIS Import</h2>
+
+  <div class="sis_messages" style="<%= hidden %>">
+    <div class="ui-state-error error_message"></div>
+    <%= link_to "Try import again", account_sis_import_path %>
+  </div>
+  
+  <div class="form" style="<%= hidden if @current_batch && @current_batch.importing? %>">
+    <% form_tag account_sis_import_submit_path(@account.id), :multipart => true, :id => "sis_importer" do %>
+      <p class="instruction">Select the zip file that you want imported.</p>
+      <div style="float: left;">
+          <input type="file" name="attachment" style="font-size: 1.2em;"/><br/>
+          <label for="import_type">Import type</label>
+          <select id="import_type" name="import_type">
+            <option value="instructure_csv_zip">Instructure formatted CSV zip</option>
+          </select>
+  
+          <div id="batch_check" style="<%= hidden %>">
+            <input type="checkbox" name="batch" value="1" id="batch_update"/>
+            <label for="batch_update">This is a full batch update</label>
+          </div>
+        </div>
+        <div style="float: left; margin-left: 5px;">
+          <button type="submit" class="submit_button button big-button">Process Data</button>
+        </div>
+        <div class="clear"></div>
+    <% end %>
+  </div>
+  
+  <div class="progress_bar_holder" style="<%= hidden unless @current_batch && @current_batch.importing? %> margin-top: 10px;">
+      <div class="copy_progress"></div>
+      <div class="progress_message">The import process has started! This can take awhile if there is a lot to import. You can leave the page and come back.</div>
+  </div>
+
+  <div id="import_log_holder" style="<%= hidden %>">
+    <h3>Import Progress Log</h3>
+    <div id="import_log"></div>
+  </div>
+  
+  <% if show_last_batch %>
+    <div class="last_batch" style="margin-top: 20px;">
+      <h3>Last Batch</h3>
+      <p>Started: <%= datetime_string(@last_batch.created_at) %><br/>
+        <% if @last_batch.workflow_state == 'imported' %>
+          All SIS data was successfully imported.
+          <%= print_counts @last_batch %>
+        <% elsif @last_batch.workflow_state == 'imported_with_messages' %>
+          The SIS data was imported but with these messages:    
+          <%= print_messages(@last_batch) %>
+          <%= print_counts @last_batch %>
+        <% elsif @last_batch.workflow_state == 'failed' %>
+          There was an error importing your SIS data. No records were imported. 
+        <% elsif @last_batch.workflow_state == 'failed_with_messages' %>
+          No SIS records were imported. The import failed with these messages:
+          <%= print_messages(@last_batch) %>
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+
+</div>
+
+<% jammit_js :sis_import %>

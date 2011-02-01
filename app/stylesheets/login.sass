@@ -1,0 +1,104 @@
+@import environment.sass
+$modal_box_width = 647px
+
+body.modal
+  #footer
+    display: block !important
+    width: $modal_box_width + 20px
+    margin: 20px auto
+
+  #main
+    background-color: transparent
+    border: 0 none
+    margin: 0
+    padding: 0
+    
+  #modal-box
+    background: url(/images/login-bg.jpg) no-repeat
+    width: $modal_box_width
+    height: 358px
+    padding: 20px
+    color: #5c5c5c
+    margin: 75px auto 0
+    position: relative
+    color: #4B4B4B
+    &.modal-box-tall
+      margin-top: 50px
+    a
+      color: inherit !important
+      text-decoration: underline
+    
+    button.button
+      float: right
+      padding: 10px 24px
+      margin-right: 7px
+    
+    input.text
+      background: url(/images/login-input-bg.png) no-repeat
+      border: 0 none
+      font-size: 13px
+      padding: 19px 9px 18px 22px
+      width: 204px
+      color: #303030
+      margin: 0 6px 6px 0
+  
+#login_form
+  margin: 200px auto 0
+  width: 487px
+#forgot_password_form
+  margin: 200px auto 0
+  width: 435px
+  button.button
+    margin: 7px
+  
+span.field-with-fancyplaceholder
+  display: block
+  display: inline-block
+  position: relative
+  vertical-align: top
+
+  label
+    display: none
+    &.placeholder
+      display: inline
+      color: #999
+      cursor: text
+      pointer-events: none
+
+      span
+        position: absolute
+        z-index: 2
+        -webkit-user-select: none
+        padding: 19px 22px 18px 24px
+
+    &.focus
+      color: #ccc
+      
+  // gets rid of yello autofill bg for safari but doesnt work in chrome :(
+  input:-webkit-autofill
+    background-color: transparent !important
+
+  input
+    outline: none
+    &.invalid
+      background: #ffffc5
+      color: #F30
+
+    &.editing
+      color: #000
+      background: none repeat scroll 0 0 transparent
+      overflow: hidden
+      
+#register_link
+  position: absolute
+  display: block
+  background: url(/images/use_canvas_free_callout.png) no-repeat
+  padding-left: 229px
+  width: 319px - 226px
+  height: 41px
+  right: -1px
+  top: 94px
+  font-size: 11px
+  font-weight: bold
+  line-height: 27px
+  

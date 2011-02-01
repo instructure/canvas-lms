@@ -1,0 +1,24 @@
+{
+    "question_name":"",
+    "question_text":"I am wearing a black hat.<br />",
+    "incorrect_comments":"nope",
+    "question_type":"true_false_question",
+    "migration_id":"_153015_1",
+    "correct_comments":"yep",
+    "points_possible":10.0,
+    "answers":[
+        {
+            "text":"true",
+            "comments":"yep",
+            "weight":100,
+            "migration_id":"true",
+            "id":2156
+        },
+        {
+            "text":"false",
+            "weight":0,
+            "migration_id":"false",
+            "id":276
+        }
+    ]
+}

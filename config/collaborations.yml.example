@@ -1,0 +1,17 @@
+production:
+- name: Google Docs
+  type: google_docs
+- name: EtherPad
+  type: etherpad
+  
+development:
+- name: Google Docs
+  type: google_docs
+- name: EtherPad
+  type: etherpad
+     
+test:
+- name: Google Docs
+  type: google_docs
+- name: EtherPad
+  type: etherpad

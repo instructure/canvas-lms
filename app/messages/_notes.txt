@@ -1,0 +1,7 @@
+Since messages are parsed in a different thread than the request, they don't 
+know the time_zone of the user by default.  If you want to display formatted
+versions of a date or time, you could call force_zone from within the template
+code (i.e. force_zone(asset.due_at).strftime("")) or whatever.
+
+I don't think it's the ideal way at all, but it's all I could get to work, so
+that's what's there for now.

@@ -1,0 +1,68 @@
+<% content_for :stylesheets do %>
+<style>
+#deleted_items_list {
+  max-width: 600px;
+}
+#deleted_items_list li {
+  padding: 5px;
+}
+#deleted_items_list li:hover {
+  background-color: #eee;
+  -moz-border-radius: 5px;
+}
+#deleted_items_list li .links {
+  float: right;
+}
+#deleted_items_list li .name {
+  font-weight: bold;
+  font-side: 1.1em;
+}
+#deleted_items_list li .type {
+  margin-left: 20px;
+  font-style: italic;
+}
+#deleted_items_list li .details {
+  font-size: 0.8em;
+  margin: 5px 20px;
+}
+#deleted_items_list li .dates {
+  font-size: 0.8em;
+  margin: 5px 30px;
+  font-style: italic;
+}
+#deleted_items_list li .dates td {
+  padding-right: 5px;
+}
+
+</style>
+<% end %>
+
+<h2>Restore Deleted Items</h2>
+Keep in mind that some items may have lost some of their associated data when they
+were deleted.  Make sure you confirm the results of any restores you perform.
+<ul id="deleted_items_list" class="unstyled_list">
+<%= render :partial => 'deleted_item', :collection => @deleted_items %>
+</ul>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(".restore_link").click(function(event) {
+    event.preventDefault();
+    var $link = $(this);
+    var $item = $link.parents(".item");
+    var result = confirm("Are you sure you want to restore \"" + $.trim($item.find(".name").text()) + "\"?");
+    if(result) {
+      $link.text("restoring...");
+      $item.dim();
+      $.ajaxJSON($link.attr('href'), "POST", {}, function() {
+        $item.slideUp(function() {
+          $item.remove();
+        });
+      }, function() {
+        $link.text("restore failed");
+      });
+    } 
+  });
+});
+</script>
+<% end %>

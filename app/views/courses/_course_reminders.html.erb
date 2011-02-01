@@ -1,0 +1,91 @@
+<% if @context.created? %>
+  <div class="reminder">
+  <% if @context_just_saved %>
+    <h2>Course Created and Saved</h2>
+    <div class="body">
+      <p>Done and done!  Your course, <%= @context.name %> is now officially created.  It's only visible
+      to you right now, but feel free to wander about, edit pages and get things just how
+      you like them. To make it all official you'll need to register or log in.  
+      If you need to leave and come back before then, just save 
+      <%= link_to "this link", course_path(@context, :verification => @context.uuid), :title => "Copy or bookmark this link" %> 
+      to get back here later.
+      </p><p>
+      Please <b><%= link_to "log in", login_path %></b> or <b><%= link_to "register", register_path %></b> to claim this course.
+      </p>
+    </div>
+  <% else %>
+    <h2>This course hasn't been claimed</h2>
+    <div class="body">
+      <p>Yep, it's a floater, and it'll get deleted if it's not claimed within a week.  In the mean time,
+      feel free to wander about.  You can see what the course would actually be like if it were activated.
+      Copy <%= link_to "this link", course_path(@context, :verification => @context.uuid), :title => "Copy or bookmark this link" %> to get back here later.
+      </p><p>
+      Please <b><%= link_to "log in", login_path %></b> or <b><%= link_to "register", register_path %></b> to claim this course.
+      </p>
+    </div>
+  <% end %>
+  </div>
+<% elsif @context.claimed? %>
+  <% if @current_user %>
+    <div class="reminder">
+    <% if @context_just_saved %>
+      <h2>Course Created and Saved</h2>
+      <div class="body">
+        <p>
+          Done and done!  Your course, <%= @context.name %> is now officially created.  It's only visible
+          to you right now, but feel free to wander about, edit pages and get things just how
+          you like them. Then when you're ready you can publish the course.  Publishing will
+          send out invitations to all your students and give them access to the course
+          content.
+          <ul class="unstyled_list wide_spacing" style="margin: 5px 20px;">
+            <li><a href="<%= context_url(@context, :context_details_url) %>#add_students" class="add">Add Students to the Course</a></li>
+            <li><a href="<%= context_url(@context, :context_details_url) %>#add_tas" class="add">Add TAs to the Course</a></li>
+          </ul>
+          <% form_for @context, :url => course_url(@context), :html => {:method => :put} do |f| %>
+            <input type="hidden" name="course[event]" value="offer"/>
+            <div class="button-container">
+              <button type="submit" class="button">Publish Course</button>
+            </div>
+          <% end %>
+        </p>
+      </div>
+    <% else %>
+      <h2>This course hasn't been published</h2>
+      <div class="body">
+        <p>
+          Not yet anyway.  Right now only registered teachers can see and use it.
+          When you publish the course, your students will be sent an invitation
+          and will be authorized to access the course.  In the mean time, you
+          can edit anything, add new students or TA's... do whatever you need to
+          get it "just so" before you publish.
+          <ul class="unstyled_list wide_spacing" style="margin: 5px 20px;">
+            <li><a href="<%= context_url(@context, :context_details_url) %>#add_students" class="add">Add Students to the Course</a></li>
+            <li><a href="<%= context_url(@context, :context_details_url) %>#add_tas" class="add">Add TAs to the Course</a></li>
+          </ul>
+          <% form_for @context, :url => course_url(@context), :html => {:method => :put} do |f| %>
+            <input type="hidden" name="course[event]" value="offer"/>
+            <div class="button-container">
+              <button type="submit" class="button">Publish Course</button>
+            </div>
+          <% end %>
+        </p>
+      </div>
+    <% end %>
+    </div>
+  <% elsif @pending_teacher %>
+    <div class="reminder">
+      <h2>Waiting for Registration Confirmation</h2>
+      <div class="body">
+        <p>
+          This course is claimed and ready, but you'll need to finish the registration
+          process before you can publish the course.  You should have received an 
+          email from Canvas with a link to finish the process.  Be sure to check
+          your spam box.
+        </p>
+        <div style="text-align: center; font-size: 1.2em;">
+          <b><a href="<%= re_send_confirmation_url(@pending_teacher.id, @pending_teacher.communication_channel.id) %>" class="re_send_confirmation_link">Re-Send the Confirmation Email</a></b>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,3 @@
+test:
+  host: "localhost"
+  port: 4444

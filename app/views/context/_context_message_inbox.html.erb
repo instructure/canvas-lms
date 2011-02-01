@@ -1,0 +1,38 @@
+<div id="message_list" class="communication_messages_list">
+  <div class="no_messages" style="<%= hidden unless @messages.empty? %>">
+    Sorry, no messages yet.
+  </div>
+  <% @messages.each do |message| %>
+    <%= render :partial => 'context/context_message', :object => message, :locals => {:show_mark_as_read => true} %>
+  <% end %>
+  <% @all_message_contexts.each do |context| %>
+    <%= render :partial => 'context/context_message', :object => nil, :locals => {:context => context, :show_mark_as_read => true} %>
+  <% end %>
+  <%= will_paginate(@messages) %>
+</div>
+<% js_block do %>
+  <script type="text/javascript">
+    $(function(){
+      url = "<%= inbox_url(:format => :json) %>";
+      $('#message_list').pageless({
+        totalPages: <%= @messages.total_pages %>,
+        url: url,
+        params: { 'view': $.queryParam("view") },
+        loaderMsg: "Loading more results",
+        scrape: function(data) {
+            if(typeof(data) == 'string') {
+              try {
+                data = JSON.parse(data);
+              } catch(e) {
+                data = [];
+              }
+            }
+            for(var idx in data) {
+              var $message = messages.updateMessage(null, data[idx]);
+            }
+          return "";
+        }
+      });
+    });
+  </script>
+<% end %>

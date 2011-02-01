@@ -1,0 +1,17 @@
+{
+    "category_name":"Uncategorized",
+    "goals":[
+        {
+            "goal_name":"Goal",
+            "goal_description":"lame",
+            "migration_id":"4444809619231",
+            "goal_id":"4444809619231"
+        },
+        {
+            "goal_name":"goal 2",
+            "goal_description":"more lame",
+            "migration_id":"4444878820231",
+            "goal_id":"4444878820231"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.submission.assignment.context) %>/<%= asset.submission.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.submission.assignment.context_id %>/assignments/<%= asset.submission.assignment_id %>/submissions/<%= asset.submission.user_id %>
+<% end %>
+
+<% define_content :subject do %>
+  Submission Comment: <%= asset.submission.user.short_name %>, <%= asset.submission.assignment.title %>, <%= asset.submission.assignment.context.name %>
+<% end %>
+
+<%= asset.author_name || "Someone" %> just made a new comment on the submission for <%= asset.submission.user.short_name %>
+for <%= asset.submission.assignment.title %>.  

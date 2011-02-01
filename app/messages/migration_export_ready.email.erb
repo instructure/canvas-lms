@@ -1,0 +1,12 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/imports/migrate/<%= asset.id %>  
+<% end %>
+
+<% define_content :subject do %>
+  Course Extraction Ready: <%= asset.migration_settings[:course_name] %>
+<% end %>
+
+The extraction process for the course, <%= asset.migration_settings[:course_name] || asset.context.name %>, has completed.  The content is now ready to be imported into your course.
+
+To finish importing content into <%= asset.context.name %> you'll need to click the following link:
+<%= content :link %>

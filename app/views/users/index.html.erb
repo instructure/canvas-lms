@@ -1,0 +1,38 @@
+<% add_crumb "Users" %>
+<% @active_tab = "users" %>
+<% content_for :page_title do %>
+  <% if @query %>
+    User Search results for <%= h((params[:user][:name] rescue '')) %>
+  <% else %>
+    All Users
+  <% end %>
+<% end %>
+
+<% content_for :right_side do %>
+  <div class="rs-margin-lr rs-margin-top" style="padding-bottom: 20px;">
+    <a href="<%= context_url(@context, :context_groups_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png", :alt => '' %> View Student Groups</a>
+    <a href="<%= context_url(@context, :context_avatars_url) %>" class="button button-sidebar-wide"><%= image_tag "image_icon.gif", :alt => '' %> Manage Profile Pictures</a>
+  </div>
+
+  <%= render :partial => 'shared/accounts_right_side_shared' %>
+  <%= render :partial => 'accounts/add_course_or_user', :locals => {:hide_add_course => true} %>
+<% end %>
+
+<% if @query %>
+  <h2>Search results for "<%= params[:user][:name] rescue '' %>"</h2>
+  <%= "No Results Found" if @users.empty? %>
+<% else %>
+  <h2>All Users</h2>
+<% end %>
+
+<%= will_paginate(@users, :style=>"margin-bottom: 1em;") %>
+
+<ul class="users">
+  <% @users.each do |user| %>
+    <% content_tag_for(:li, user) do %>
+      <%= link_to (user.last_name_first_or_unnamed, context_url(@context, :context_user_url, user)) %>
+    <% end %>
+  <% end %>
+</ul>
+
+<%= will_paginate(@users, :style=>"margin-top: 1em;") %>

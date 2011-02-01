@@ -1,0 +1,2 @@
+xss|style|htc
+<XSS STYLE="behavior: url(xss.htc);">

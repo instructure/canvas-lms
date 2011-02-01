@@ -1,0 +1,8 @@
+<% namespace = asset.find_namespace_for_user(user) %>
+<% define_content :link do %>
+  <% namespace = asset.find_namespace_for_user(user) %>http://<%= HostUrl.context_host(namespace.context) %>/<%= namespace.context.class.to_s.downcase.pluralize %>/<%= namespace.context_id %>/wiki/<%= namespace.namespace + ":" if !namespace.default? %><%= asset.url %>
+<% end %>
+
+A new page has been added to the wiki for <%= namespace.context.name %> that may make your life easier.  
+
+<b><a href="<%= content :link %>"><%= asset.title.titleize %></a></b>

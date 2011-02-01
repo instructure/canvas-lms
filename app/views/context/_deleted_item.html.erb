@@ -1,0 +1,36 @@
+<% item = deleted_item %>
+<li class="item">
+  <div class="links">
+    <a class="restore_link button" href="<%= context_url(@context, :context_undelete_item_url, item.asset_string) %>">restore</a>
+  </div>
+  <div class="name">
+    <% if item.is_a?(Enrollment) %>
+      <%= item.short_name %> - <%= item.user.name %>
+    <% elsif item.respond_to?(:name) %>
+      <%= item.name %>
+    <% elsif item.respond_to?(:title) %>
+      <%= item.title %>
+    <% else %>
+      <%= item.class.to_s %>:<%= item.id %>
+    <% end %>
+  </div>
+  <div class="type">
+    <%= item.class.to_s %>
+  </div>
+  <div class="details">
+    <% if item.respond_to?(:description) %>
+      <%= strip_and_truncate(item.description, :max_length => 200) %>
+    <% elsif item.respond_to?(:message) %>
+      <%= strip_and_truncate(item.message, :max_length => 200) %>
+    <% end %>
+  </div>
+  <table class="dates">
+    <tr>
+      <td>created</td>
+      <td><%= datetime_string(item.created_at) %></td>
+    </tr><tr>
+      <td>last updated</td>
+      <td><%= datetime_string(item.updated_at) %></td>
+    </tr>
+  </table>
+</li>

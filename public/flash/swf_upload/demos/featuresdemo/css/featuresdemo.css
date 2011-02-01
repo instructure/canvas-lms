@@ -1,0 +1,220 @@
+label { 
+	display: inline; 
+	width: auto; 
+	text-align:left;  
+}
+
+
+
+table.layout {
+	width: 948px;
+	border-collapse: collapse;
+}
+
+table.layout td {
+	padding: 0 10px 0 0;
+}
+table.layout td td{ padding: 0;}
+
+input.textbox {
+	margin: 4px 3px;
+	padding: 1px;
+	border: solid 1px #A7A6AA;
+
+	font-size: .8em;
+	line-height: 15px;
+	height: 15px;
+}
+
+table.btn {
+	border: 0;
+	margin: 2px 0px;
+	border-collapse: collapse;
+	height: 22px;
+	empty-cells: show;
+	padding: 0;
+}
+td.btn-left {
+	width: 2px;
+	padding: 0;
+
+	background-color: Transparent;
+	background-image: url(../images/btn_states.gif);
+	background-repeat: no-repeat;
+	background-position: left 0px;
+}
+td.btn-right {
+	width: 2px;
+	padding: 0;
+
+	background-color: Transparent;
+	background-image: url(../images/btn_states.gif);
+	background-repeat: no-repeat;
+	background-position: left -22px;
+}
+td.btn-center {
+	padding: 0;
+	background-color: Transparent;
+}
+td.btn-center button {
+	border: none 0px;
+	width: auto;
+	height: 22px;
+	margin: 0px 0px;
+	padding: 0px 5px;
+	font-size: 10px;
+	font-weight: 700;
+	overflow: hidden;
+	white-space: nowrap;
+
+	background-color: Transparent;
+	background-image: url(../images/btn_states.gif);
+	background-repeat: repeat-x;
+	background-position: left -44px;
+}
+td.btn-center button:hover {
+	background-position: left -66px;
+}
+td.btn-center button:active {
+	background-position: left -88px;
+}
+
+button.action  {
+	width: 266px !important;
+}
+
+select {
+	font-family: monospace;
+	border: solid 1px #C3C3C3;
+	margin: 2px 0px;
+	padding: 0;
+}
+
+#divDynamicSettingForm div,
+#fsStaticSettings div {
+	position: relative;
+	clear: both;
+	margin: 2px 0px;
+}
+#divDynamicSettingForm label,
+#fsStaticSettings label {
+	display: block;
+	font-size: .8em;
+	width: 150px;
+	overflow: hidden;
+	height: 25px;
+	line-height: 25px;
+}
+#divDynamicSettingForm input,
+#fsStaticSettings input {
+	width: 121px;
+	height: 15px;
+	margin: 4px 0px;
+	padding: 1px;
+	border: solid 1px #A7A6AA;
+}
+#divDynamicSettingForm div.checkbox label,
+#fsStaticSettings div.checkbox label {
+	display: inline;
+	float: none;
+	width: auto;
+	overflow: hidden;
+	height: 25px;
+}
+#divDynamicSettingForm div.checkbox input,
+#fsStaticSettings div.checkbox input {
+	width: auto;
+	height: auto;
+	margin: auto;
+	padding: auto;
+	border: 0;
+}
+
+
+#btnRemoveFileParam,
+#btnRemoveFileQueryParam,
+#btnRemoveCookie,
+#btnRemoveParam,
+#btnRemoveQueryParam,
+#btnAddFileParam,
+#btnAddFileQueryParam,
+#btnAddCookie,
+#btnAddParam,
+#btnAddQueryParam
+{
+	position: absolute;
+
+	border: 0;
+	margin: 5px 0px;
+	padding: 0;
+	width: 16px;
+	height: 16px;
+
+	background-color: Transparent;
+	background-position: center;
+}
+#btnAddFileParam,
+#btnAddFileQueryParam,
+#btnAddCookie,
+#btnAddParam,
+#btnAddQueryParam
+{
+	background-image: url(../images/add.png);
+}
+#btnRemoveFileParam,
+#btnRemoveFileQueryParam,
+#btnRemoveCookie,
+#btnRemoveParam,
+#btnRemoveQueryParam
+{
+	background-image: url(../images/delete.png);
+}
+
+#selCookies,
+#selParams,
+#selQueryParams
+{
+	width: 235px;
+}
+
+#txtAddCookieName,
+#txtUploadTarget,
+#txtControlID
+{
+	width: 232px;
+}
+#txtAddParamName,
+#txtAddParamValue,
+#txtAddQueryParamName,
+#txtAddQueryParamValue
+{
+	width: 111px;
+}
+
+#txtFlashHTML
+{
+	width: 270px;
+	height: 60px;
+	font-size: .75em;
+}
+
+#selEventsQueue,
+#selEventsFile,
+#selEventsError
+{
+	width: 300px;
+}
+
+#SWFUpload_Console {
+	font-family: monospace;
+	width: 900px;
+	height: 400px;
+	background-color: #F0F0F0;
+	border: solid 1px #C0C0C0;
+}
+
+#divServerData {
+	width: 900px;
+	height: 400px;
+	overflow: scroll;
+}

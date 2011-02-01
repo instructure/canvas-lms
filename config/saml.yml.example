@@ -1,0 +1,14 @@
+production:
+  entity_id: "http://www.your-domain.com/saml2"
+  tech_contact_name: "Administrator"
+  tech_contact_email: "info@your-domain.com"
+  
+development:
+  entity_id: "http://www.your-domain.com/saml2"
+  tech_contact_name: "Administrator"
+  tech_contact_email: "info@your-domain.com"
+     
+test:
+  entity_id: "http://www.your-domain.com/saml2"
+  tech_contact_name: "Administrator"
+  tech_contact_email: "info@your-domain.com"

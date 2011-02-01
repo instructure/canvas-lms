@@ -1,0 +1,5 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/conferences
+<% end %>
+
+You've been invited to participate in a web conference, <b><a href="<%= content :link %>"><%= asset.title %></a></b> for <b><%= asset.context.name %></b>.

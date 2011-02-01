@@ -1,0 +1,453 @@
+<%
+  jammit_js :rubric_assessment
+  content_for :page_title, "#{@assignment.title}: #{@submission.user.name}"
+  add_crumb("Assignments", context_url(@context, :context_assignments_url))
+  add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
+  add_crumb(@user.try_rescue(:short_name)) 
+  @active_tab = "assignments"
+%>
+<% content_for :stylesheets do %>
+  <style>
+    .rubric {
+      max-width: 600px;
+    }
+  </style>
+<% end %>
+<% js_block do %>
+  <script>
+  $("#content").addClass('padless');
+  var fileIndex = 1;
+  var submissionLoaded = function(data) {
+    if(data.submission) {
+      var d = [];
+      d.push(data);
+      data = d;
+    }
+    for(var jdx in data) {
+      var submission = data[jdx].submission;
+      var comments = submission.submission_comments;
+      if(submission.user_id != <%= @submission.user_id %>) { continue; }
+      //$(".comments .comment_list").empty();
+      for(var idx in comments) {
+        var comment = comments[idx].submission_comment;
+        if($("#submission_comment_" + comment.id).length > 0) { continue; }
+        var $comment = $("#comment_blank").clone(true).removeAttr('id');
+        comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
+        if(comment.anonymous) {
+          comment.author_name = "Anonymous";
+        }
+        $comment.fillTemplateData({
+          data: comment,
+          id: 'submission_comment_' + comment.id
+        });
+        if(comment.media_comment_id) {
+          $media_comment_link = $("#comment_media_blank").clone(true).removeAttr('id');
+          $media_comment_link.fillTemplateData({
+            data: comment
+          });
+          $comment.find(".comment").empty().append($media_comment_link.show());
+        } else {
+          for(var jdx in comment.attachments) {
+            var attachment = comment.attachments[jdx].attachment;
+            var $attachment = $("#comment_attachment_blank").clone(true).removeAttr('id');
+            attachment.comment_id = comment.id;
+            $attachment.fillTemplateData({
+              data: attachment,
+              hrefValues: ['comment_id', 'id']
+            });
+            $comment.find(".comment_attachments").append($attachment.show());
+          }
+        }
+        $(".comments .comment_list").append($comment.show()).scrollTop(10000);
+      }
+      $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
+      if(submission) {
+        $(".grading_value").val(submission.grade);
+        if($(".grading_value").hasClass('score_value')) {
+          $(".grading_value").val(submission.score);
+        }
+        $(".submission_details").fillTemplateData({
+          data: submission
+        });
+        $(".grading_comment").val(""); //submission.comment);
+        $("#add_comment_form .comment_attachments").empty();
+      }
+    }
+    $(".submission_header").loadingImage('remove');
+  }
+  $(document).ready(function() {
+    $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
+    $(window).bind('resize', function() {
+//      $(document).css('overflow', 'hidden');
+//      $("body").css('overflow', 'hidden');
+      var $frame = $("#preview_frame");
+      var top = $frame.offset().top;
+      var height = $(window).height() - top;
+      $frame.height(height);
+      $("#rubric_holder").css('maxHeight', height - 50).css('overflow', 'auto').css('zIndex', 5);
+      $(".comments").height(height);
+    }).triggerHandler('resize');
+    $(".comments_link").click(function(event) {
+      event.preventDefault();
+      $(".comments").slideToggle(function() {
+        $(".comments .media_comment_content").empty();
+        $(".comments textarea:visible").focus().select();
+      });
+    });
+    $(".save_comment_button").click(function(event) {
+      $(document).triggerHandler('grading_change');
+    });
+    $(".cancel_comment_button").click(function(event) {
+      $(".grading_comment").val("");
+      $(".comments_link").click();
+    });
+    $(".grading_value").change(function(event) {
+      $(document).triggerHandler('grading_change');
+    });
+    $(document).bind('grading_change', function(event) {
+//    $(".grading_value,.grading_comment").bind('change', function(event) {
+      $(".submission_header").loadingImage();
+      var url = $(".update_submission_url").attr('href');
+      var method = $(".update_submission_url").attr('title');
+      var formData = {
+        'submission[assignment_id]': "<%= @assignment.id %>",
+        'submission[user_id]': "<%= @submission.user_id %>",
+        'submission[group_comment]': ($("#submission_group_comment").attr('checked') ? "1" : "0")
+      };
+      if($(".grading_value:visible").length > 0) {
+        formData['submission[grade]'] = $(".grading_value").val();
+      }
+      if($("#media_media_recording:visible").length > 0) {
+        var comment_id = $("#media_media_recording").data('comment_id');
+        var comment_type = $("#media_media_recording").data('comment_type');
+        formData['submission[media_comment_type]'] = comment_type || 'video';
+        formData['submission[media_comment_id]'] = comment_id;
+      } else {
+        if($(".grading_comment").val() && $(".grading_comment").val != "") {
+          formData['submission[comment]'] = $(".grading_comment").val();
+        }
+        if(!formData['submission[comment]'] && $("#add_comment_form input[type='file']").length > 0) {
+          formData['submission[comment]'] = formData['submission[comment]'] || "See attached files";
+        }
+      }
+      if(!formData['submission[comment]'] && !formData['submission[grade]'] && !formData['submission[media_comment_id]']) {
+        return;
+      }
+      if($("#add_comment_form input[type='file']").length > 0) {
+        $.ajaxJSONFiles(url + ".text", method, formData, $("#add_comment_form input[type='file']"), submissionLoaded);
+      } else {
+        $.ajaxJSON(url, method, formData, submissionLoaded);
+      }
+    });
+    $(".attach_comment_file_link").click(function(event) {
+      event.preventDefault();
+      var $attachment = $("#comment_attachment_input_blank").clone(true).removeAttr('id');
+      $attachment.find("input").attr('name', 'attachments[' + (fileIndex++) + '][uploaded_data]');
+      $("#add_comment_form .comment_attachments").append($attachment.slideDown());
+    });
+    $(".delete_comment_attachment_link").click(function(event) {
+      event.preventDefault();
+      $(this).parents(".comment_attachment_input").slideUp(function() {
+        $(this).remove();
+      });
+    });
+    $(".save_rubric_button").click(function() {
+      var $rubric = $(this).parents("#rubric_holder").find(".rubric");
+      var data = rubricAssessment.assessmentData($rubric);
+      var url = $(".update_rubric_assessment_url").attr('href');
+      var method = "POST";
+      $rubric.loadingImage();
+      $.ajaxJSON(url, method, data, function(data) {
+        $rubric.loadingImage('remove');
+        var assessment = data;
+        var found = false;
+        if(assessment.rubric_association) {
+          rubricAssessment.updateRubricAssociation($rubric, data.rubric_association);
+          delete assessment.rubric_association;
+        }
+        for(var idx in rubricAssessments) {
+          var a = rubricAssessments[idx].rubric_assessment;
+          if(a && assessment && assessment.id == a.id) {
+            rubricAssessments[idx].rubric_assessment = assessment;
+            found = true;
+          }
+        }
+        if(!found) {
+          rubricAssessments.push(data);
+          var $option = $(document.createElement('option'));
+          $option.val(assessment.id).text(assessment.assessor_name).attr('id', 'rubric_assessment_option_' + assessment.id);
+          $("#rubric_assessments_select").prepend($option).val(assessment.id);
+        }
+        $("#rubric_assessment_option_" + assessment.id).text(assessment.assessor_name);
+        $("#new_rubric_assessment_option").remove();
+        $("#rubric_assessments_list").show();
+        rubricAssessment.populateRubric($rubric, assessment);
+      });
+    });
+    $("#rubric_holder .rubric").css('width', 'auto').css('marginTop', 0);
+    $(".hide_rubric_link").click(function(event) {
+      event.preventDefault();
+      $("#rubric_holder").fadeOut();
+    });
+    $(".assess_submission_link").click(function(event) {
+      event.preventDefault();
+      $("#rubric_assessments_select").change();
+      $("#rubric_holder").fadeIn();
+    });
+    $("#rubric_assessments_select").change(function() {
+      var id = $(this).val();
+      var found = null;
+      for(var idx in rubricAssessments) {
+        var assessment = rubricAssessments[idx].rubric_assessment;
+        if(assessment.id == id) {
+          found = assessment;
+        }
+      }
+      rubricAssessment.populateRubric($("#rubric_holder .rubric"), found);
+      var current_user = (!found || found.assessor_id == rubricAssessment.assessor_id);
+      $("#rubric_holder .rubric").toggleClass('assessing', current_user && rubricAssessment.assessor_id != rubricAssessment.assessment_user_id);
+      $("#rubric_holder .save_rubric_button").showIf(current_user);
+    }).change();
+    $(".media_comment_link").click(function(event) {
+      event.preventDefault();
+      $("#add_comment_form").hide();
+      $("#media_media_recording").show();
+      $("#media_media_recording").find(".media_recording").mediaComment('create', 'audio', function(id, type) {
+        $("#media_media_recording").data('comment_id', id).data('comment_type', type);
+        $(document).triggerHandler('grading_change');
+        $("#add_comment_form").show();
+        $("#media_media_recording").hide();
+        $(this).empty();
+      }, function() {
+        $("#add_comment_form").show();
+        $("#media_media_recording").hide();
+      });
+    });
+    $("#media_recorder_container a").live('click', function(event) {
+      $("#add_comment_form").show();
+      $("#media_media_recording").hide();
+    });
+    $(".play_comment_link").live('click', function(event) {
+      event.preventDefault();
+      var comment_id = $(this).parents(".comment_media").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
+      if(comment_id) {
+        $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'audio');
+      }
+    });
+  });
+  $(document).fragmentChange(function(event, hash) {
+    if(hash == '#rubric') {
+      $(".assess_submission_link:visible:first").click();
+    } else if(hash.match(/^#comment/)) {
+      var params = null;
+      try {
+        params = JSON.parse(hash.substring(8));
+      } catch(e) { }
+      if(params && params.comment) {
+        $(".grading_comment").val(params.comment);
+      }
+      $(".grading_comment").focus().select();
+    }
+  });
+  INST.refreshGrades = function() {
+    var url = $(".submission_data_url").attr('href');
+    setTimeout(function() {
+      $.ajaxJSON(url, 'GET', {}, submissionLoaded);
+    }, 500);
+  };
+  </script>
+<% end %>
+  <div style="padding: 0px 20px 3px;" class="submission_details">
+    <div style="float: right;">
+      <% if can_do(@submission, @current_user, :read_grade) %>
+        Grade: 
+          <% if can_do(@assignment, @current_user, :grade) %>
+            <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
+          <% elsif can_do(@submission, @current_user, :read_grade) %>
+            <span class="published_grade"><%= @submission.published_grade %></span>
+          <% end %>
+          <br/>
+        <% if can_do(@assignment, @current_user, :grade) %>
+          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.published_score %></span> 
+        <% elsif can_do(@submission, @current_user, :read_grade) %>
+          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.score %></span> 
+        <% end %>
+        out of <%= @submission.assignment.points_possible %><br/>
+        
+        <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) %>
+          <% if turnitin_score = @submission.turnitin_data[@submission.asset_string] && turnitin_score[:similarity_score] %>
+            <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
+          <% end %>
+        <% end %>
+      <% end %>
+      <% if @rubric_association && (can_do(@submission, @current_user, :read_grade) || can_do(@rubric_association, @current_user, :assess)) %>
+        <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;">Show Rubric</a>
+      <% end %>
+    </div>
+    <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? "Peer Review" : "Submission Details" %></h2>
+    <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= context_user_name(@context, @submission.user) %></span>
+    <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em; <%= 'color: #800; font-weight: bold;' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">submitted <%= datetime_string(@submission.submitted_at) %><%= ' (late)' if @submission.late? %></span>
+    <% if can_do(@context, @current_user, :grade) %>
+      <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;">SpeedGrader</a>
+    <% end %>
+    <% if can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
+      <span style="padding-left: 10px;"><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="add" >Re-Submit Assignment</a></span>
+    <% end %>
+    <% if @assessment_request %>
+      <div class="assessment_request_completed_message" style="<%= hidden unless @assessment_request.completed? %>">
+        You have finished the required steps for this peer review.
+      </div>
+      <div class="assessment_request_incomplete_message" style="<%= hidden if @assessment_request.completed? %>">
+        <strong>This peer review is not finished yet.</strong>  For it to be considered 
+        finished, you need to leave at least one 
+        comment<% if @assessment_request && @assessment_request.rubric_association %>
+          and fill out the rubric form to the right<% end %>.
+      </div>
+    <div>
+    </div>
+    <% end %>
+    <div class="clear"></div>
+  </div>
+  
+  <% if @assignment.rubric_association %>
+    <% @visible_rubric_assessments ||= [] %>
+  <div id="rubric_holder" style="position: absolute; right: 0px; padding: 5px; background-color: #fff; border: 1px solid #aaa; border-right-width: 0; display: none;">
+    <button type="button" class="button-secondary hide_rubric_link" style="float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
+    <div id="rubric_assessments_list" style="text-align: right; margin-bottom: 5px; <%= hidden if @visible_rubric_assessments.empty? %>">
+      Show Assessment By:
+      <select id="rubric_assessments_select">
+        <% @visible_rubric_assessments.each do |assessment| %>
+          <option id="rubric_assessment_option_<%= assessment.id %>" value="<%= assessment.id %>"><%= assessment.assessor_name %></option>
+        <% end %>
+        <% if can_do(@assignment.rubric_association, @current_user, :assess) && @submission.user != @current_user %>
+        <% unless @visible_rubric_assessments.map{|a| a.assessor_id}.include?(@current_user.id) %>
+          <option value="new" id="new_rubric_assessment_option">[New Assessment]</option>
+        <% end %>
+        <% end %>
+      </select>
+    </div>
+    <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => @submission.user != @current_user } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+    <%= render :partial => "shared/rubric_criterion_dialog" %>
+    <div class="button-container">
+      <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
+        <button type="button" class="save_rubric_button button small-button">Save Comment</button>
+      <% end %>
+    </div>
+    <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
+  </div>
+  <% end %>
+  
+  <div style="display: none;">
+    <% if can_do(@context, @current_user, :manage_grades) %>
+      <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_url">&nbsp;</a>
+    <% else %>
+      <a style="display: none;" title="PUT" href="<%= context_url(@context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id) %>" class="update_submission_url">&nbsp;</a>
+    <% end %>
+    <a style="display: none;" href="<%= context_url(@context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id) %>" class="submission_data_url">&nbsp;</a>
+  </div>
+  <div style="border-top: 2px solid #ccc;">
+    <div style="float: left; width: 75%;">
+      <iframe id="preview_frame" src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :preview => 1, :rand => rand(999999)) %>" frameborder="0" style="border: 0; width: 100%; height: 300px;"></iframe>
+    </div>
+    <div style="float: left; width: 25%;">
+      <div style="background-color: #fff;">
+        <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless @submission.submission_comments.empty? %>">Comments <% unless @submission.submission_comments.empty? %>(<%= @submission.submission_comments.length %>)<% end %></a>
+        <div class="comments" style="border-left: 2px solid #ccc; height: 300px; overflow: auto; background-color: #f0f0f0;">
+          <button type="button" class="button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
+          <div class="comment_list" style="padding: 10px; clear:right;">
+            <% unless can_do(@submission, @current_user, :read_grade) %>
+              <i>You do not have full access to this submission, so you will only see comments written by you.</i><br/><br/>
+            <% end %>
+            <% @submission.submission_comments.each do |comment| %>
+              <% if can_do(comment, @current_user, :read) %>
+              <div class="comment" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
+                <div class="comment" style="color: #444;">
+                  <% if comment.media_comment_id && comment.media_comment_type %>
+                    <div class="comment_media">
+                      This is a media comment,<br/>
+                      <a href="#" class="play_comment_link media-comment">click here to view</a>.
+                      <span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>
+                      <div class="media_comment_content">
+                      </div>
+                    </div>
+                  <% else %>
+                    <span style="white-space: pre-wrap;"><%= comment.comment %></span>
+                  <% end %>
+                </div>
+                <div class="comment_attachments" style="text-align: right; margin-right: 10px;">
+                  <% comment.attachments.each do |attachment| %>
+                    <div class="comment_attachment">
+                      <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %>"><%= attachment.display_name %></a>
+                    </div>
+                  <% end %>
+                </div>
+                <div style="text-align: right; font-size: 0.8em; color: #888;">
+                  <span class="author_name"><%= comment.author_name %></span>,
+                  <span class="posted_at"><%= datetime_string(comment.created_at) %></span>
+                </div>
+              </div>
+              <% end %>
+            <% end %>
+          </div>
+          <div class="comment_media" id="comment_media_blank" style="display: none; white-space: normal;">
+            This is a media comment,
+            <a href="#" class="play_comment_link media-comment">click here to view</a>.
+            <span class="media_comment_id" style="display: none;">&nbsp;</span>
+            <div class="media_comment_content">
+            </div>
+          </div>
+          <div class="comment_attachment" id="comment_attachment_blank" style="display: none;">
+            <a class="comment_attachment_link" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :comment_id => "{{ comment_id }}", :download => "{{ id }}") %>"><span class="display_name">&nbsp;</span></a>
+          </div>
+          <div class="comment" id="comment_blank" style="display: none; margin-bottom: 10px;">
+            <span class="comment" style="color: #444; white-space: pre-wrap;"></span>
+            <div class="comment_attachments" style="text-align: right; margin-right: 10px;"></div>
+            <div style="text-align: right; font-size: 0.8em; color: #888;">
+              <span class="author_name">&nbsp;</span>,
+              <span class="posted_at">&nbsp;</span>
+            </div>
+          </div>
+          <div class="comment_attachment_input nobr" id="comment_attachment_input_blank" style="display: none;">
+            <input type="file" name="attachments[-1][uploaded_data]"/>
+            <a href="#" class="delete_comment_attachment_link no-hover"><%= image_tag "delete_circle.png" %></a>
+          </div>
+          <div id="media_media_recording" style="display: none;">
+            <div class="media_recording">
+            </div>
+          </div>
+          <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
+            Add a Comment:
+            <span style="font-size: 0.9em;"><br/>Teachers and submitter will be notified of all comments</span>
+            <textarea style="width: 95%;" class="grading_comment"></textarea>
+            <div class="comment_attachments">
+            </div>
+            <div style="text-align: right;">
+              <% if feature_enabled?(:kaltura) %>
+                <a href="#" style="float: left;" class="media_comment_link media-comment">Media Comment</a>
+              <% end %>
+              <a href="#" style="float: right;" class="attach_comment_file_link">Attach File</a>
+              <div class="clear"></div>
+            </div>
+            <% if @assignment.group_category && can_do(@submission, @current_user, :make_group_comment) %>
+              <br/>
+              <input type="checkbox" name="group_comment" id="submission_group_comment" checked/>
+              <label for="submission_group_comment">Send Comment to the Whole Group</label>
+            <% end %>
+            <div class="button-container">
+              <button type="button" class="button save_comment_button">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<% js_block do %>
+<script>
+var rubricAssessments = <%= raw @visible_rubric_assessments.to_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) %>;
+rubricAssessment.assessment_user_id = <%= @submission.user_id %>;
+rubricAssessment.assessor_id = <%= @current_user ? @current_user.id : "null" %>;
+rubricAssessment.assessment_type = '<%= can_do(@submission, @current_user, :grade) ? "grading" : "peer_review" %>';
+//rubricAssessment.populateRubric($("#rubric_holder"), rubricAssessments.rubric_assessment);
+</script>
+<% end %>

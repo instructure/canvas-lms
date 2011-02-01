@@ -1,0 +1,35 @@
+Delivered-To: davidlamontrichards@gmail.com
+Received: by 10.151.74.3 with SMTP id b3cs126306ybl;
+        Tue, 27 Jan 2009 12:56:27 -0800 (PST)
+Received: by 10.215.13.1 with SMTP id q1mr2845674qai.200.1233089786871;
+        Tue, 27 Jan 2009 12:56:26 -0800 (PST)
+Return-Path: <drichards@showcase60.com>
+Received: from outbound-mail-301.bluehost.com (outbound-mail-301.bluehost.com [67.222.53.8])
+        by mx.google.com with SMTP id 9si12068225qyk.92.2009.01.27.12.56.19;
+        Tue, 27 Jan 2009 12:56:20 -0800 (PST)
+Received-SPF: pass (google.com: domain of drichards@showcase60.com designates 67.222.53.8 as permitted sender) client-ip=67.222.53.8;
+DomainKey-Status: no signature
+Authentication-Results: mx.google.com; spf=pass (google.com: domain of drichards@showcase60.com designates 67.222.53.8 as permitted sender) smtp.mail=drichards@showcase60.com; domainkeys=neutral (no signature) header.From=drichards@showcase60.com
+Received: (qmail 11241 invoked by uid 0); 27 Jan 2009 20:52:33 -0000
+Received: from unknown (HELO box171.bluehost.com) (69.89.25.171)
+  by outboundproxy6.bluehost.com with SMTP; 27 Jan 2009 20:52:33 -0000
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws; s=default; d=showcase60.com;
+	h=Received:Mime-Version:Content-Transfer-Encoding:Message-Id:Content-Type:To:From:Subject:Date:X-Mailer:X-Identified-User;
+	b=j7+FFf+cjf1DTI2FIn9J52A3P2XMw6RZBAvOaHWdqt5fL2UQXBvv8h1MciQiT1pfdEBL8WiBV/gcCUcXL8ZcCTQib6f5GFqfZ16cMO7N9rSdccFMqC0idaHtsNLQDwEl;
+Received: from 69.169.150.185.provo.static.broadweave.net ([69.169.150.185])
+	by box171.bluehost.com with esmtpa (Exim 4.69)
+	(envelope-from <drichards@showcase60.com>)
+	id 1LRuyr-00036E-Rl
+	for davidlamontrichards@gmail.com; Tue, 27 Jan 2009 13:56:22 -0700
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Transfer-Encoding: 7bit
+Message-Id: <01BF054D-0086-4653-BA97-70B8038FD641@showcase60.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+To: David Richards <davidlamontrichards@gmail.com>
+From: David Richards <drichards@showcase60.com>
+Subject: Mail without Attachment
+Date: Tue, 27 Jan 2009 13:56:15 -0700
+X-Mailer: Apple Mail (2.753.1)
+X-Identified-User: {1174:box171.bluehost.com:showcas2:showcase60.com} {sentby:smtp auth 69.169.150.185 authed with drichards@showcase60.com}
+
+And this is a message without an attachment.

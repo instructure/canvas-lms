@@ -1,0 +1,8 @@
+<% define_content :link do %>http://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
+<% define_content :subject do %>
+  New Teacher Registration
+<% end %>
+
+New Teacher Registration
+  
+<a href="<%= content :link %>"><b><%= asset.name %></b></a> just registered as a teacher at <%= (HostUrl.context_host(asset.latest_pseudonym.account) rescue nil) || HostUrl.default_host %>.

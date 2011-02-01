@@ -1,0 +1,53 @@
+<% @active_tab = "syllabus" %>
+<% course_home ||= false %>
+<% if !course_home %>
+  <div style="float: right;"><a href="#" class="jump_to_today_link">Jump to Today</a></div>
+  <h2>Course Syllabus</h2>
+<% else %>
+  <h2><%= @context.name %></h2>
+  <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link">Jump to Today</a></div>
+<% end %>
+<div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
+  <%= user_content(@context.syllabus_body, @context.asset_string, @context.asset_string) %>
+</div>
+<div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
+  <p>The syllabus page shows a table-oriented view of the course schedule, and the basics of
+  course grading.  You can add any other comments, notes, or thoughts you have about the course
+  structure, course policies or anything else.</p>
+  <p>
+    To add some comments, click the "Edit Syllabus Description" link to the right.
+    <!--a href="#" class="edit_syllabus_link"><%= image_tag "edit.png" %> Edit Syllabus Description</a-->
+  </p>
+</div>
+<% form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
+  <a href="#" class="toggle_views_link" style="float: right;">Switch Views</a>
+  <%= f.label :syllabus_body, "Syllabus Description:" %>
+  <div class="clear"></div>
+  <%= f.text_area :syllabus_body, :style => "width: 100%; height: 300px;", :id => "course_syllabus_body" %>
+  <div class='button-container'>
+    <button type="submit" class='button'>Update Syllabus</button>
+    <button type="button" class="button-secondary cancel_button">Cancel</button>
+  </div>
+<% end %>
+<table id="syllabus">
+  <thead>
+    <tr>
+      <th scope="col" style="width: 10%;">Date</th>
+      <th scope="col" style="width: 10%;">Day</th>
+      <th scope="col" style="width: 80%;">
+      <div style="float: right;"></div>
+      Details
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% today = Date.today
+      @dates.each do |d| %>
+      <% events = @events.select{|e| e.start_at != nil && e.start_at.to_date == d}.sort_by{ |e| e.start_at} %>
+      <%= render :partial => "assignments/syllabus_row", :object => events, :locals => {:date => d, :date_passed => (d < today)} %>
+    <% end %>
+    <% if @undated_events && !@undated_events.empty? %>
+      <%= render :partial => "assignments/syllabus_row", :object => @undated_events %>
+    <% end %>
+  </tbody>
+</table>

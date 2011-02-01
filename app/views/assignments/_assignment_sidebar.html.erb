@@ -1,0 +1,59 @@
+<div id="sidebar_content">
+  <%= render :partial => "assignment_locked" if @assignment.locked_for?(@current_user) %>
+  
+  <% unless @assignment.new_record? %>
+    <% if can_do(@assignment, @current_user, :update) && @assignment.needs_publishing? %>
+      <h2>Unpublished</h2>
+      <div class="rs-margin-lr">
+      <%= image_tag "warning.png" %> You should publish assignments that you are finished grading so students can consider their grades "official."
+      <% form_for :assignment, :url => context_url(@context, :context_assignment_url, @assignment.id), :html => {:method => :put, :id => "publish_assignment_form", :style => "margin-bottom: 10px;"} do |f| %>
+        <input type="hidden" name="publish" value="1"/>
+        <button type="submit" class="button button-sidebar-wide">Publish this Assignment</button>
+      <% end %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="rs-margin-lr rs-margin-top">
+    <% if can_do(@assignment, @current_user, :update_content) %>
+      <a href="#" class="edit_full_assignment_link button button-sidebar button-sidebar-wide"><%= image_tag "edit.png" %> Edit Assignment</a>
+    <% end %>
+    <% if LearningOutcome.non_rubric_outcomes? && can_do(@context, @current_user, :manage_outcomes) && @context && @context.has_outcomes %>
+      <a href="#" class="align_outcomes_link button button-sidebar button-sidebar-wide"><%= image_tag "ball.png" %> Align Outcomes</a>
+    <% end %>
+  </div>
+  
+  <% unless @assignment.new_record? %>
+    <% if can_do(@assignment, @current_user, :update) %>
+    <div class="rs-margin-lr">
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link button button-sidebar button-sidebar-wide" style="<%= hidden if @assignment.rubric_association %>"><%= image_tag "rubric.png" %> Add Rubric</a>
+    </div>
+    <% end %>
+    
+    <% if can_do(@assignment, @current_user, :grade) %>
+      <div class="rs-margin-lr" style="margin-left: 10px; margin-bottom: 10px; <%= hidden unless @assignment.expects_submission? %>">
+        Students can submit this assignment as <span class="readable_submission_types"><%= @assignment.readable_submission_types %></span>
+      </div>
+      <%= render :partial => "grade_assignment" if can_do(@assignment, @current_user, :grade) %>
+    <% else %>
+      <div class="rs-margin-lr" style="<%= hidden unless @assignment.expects_submission? %>">
+        This assignment can be submitted as <span class="readable_submission_types"><%= @assignment.readable_submission_types %></span>.
+        <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
+          The permitted file upload types are: <%= @assignment.allowed_extensions.join(", ") %>.
+        <% end -%>
+      </div>
+    <% end %>
+    
+    
+    <% if @current_user_submission %>
+      <%= render :partial => "submission_sidebar" %>
+    <% elsif @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
+      <div class="rs-margin-lr">
+        <a href="#" class="submit_assignment_link button-sidebar-wide button <%= 'late' if @current_user_submission && @current_user_submission.late? %>"><%= image_tag "add.png" %> Submit Assignment</a><br/>
+      </div>
+    <% elsif can_do(@assignment.context, @current_user, :participate_as_student) %>
+      
+    <% end %>
+  <% end %>
+  <span id="assignment_due_at_span" style="display: none;"><%= @assignment.try_rescue(:due_at).try_rescue(:strftime, "%Y-%m-%dT%H:%M:%SZ") %></span>
+</div>

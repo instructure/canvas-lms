@@ -1,0 +1,13 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.context) %>/accounts/<%= asset.account_id %>/files/<%= asset.attachment_id %>/download
+<% end %>
+  
+<% define_content :subject do %>
+  Report Generated
+<% end %>
+
+<%= asset.message %>
+
+
+Click here to download the report: 
+<%= content :link %>

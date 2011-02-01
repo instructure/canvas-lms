@@ -1,0 +1,37 @@
+{
+    "migration_id":"URN:X-WEBCT-VISTA_V2:790EA1350A10681DE0440003BA07D9B4",
+    "title":"Quiz list quiz 1",
+    "quiz_type":"survey",
+    "points_possible":10,
+    "allowed_attempts":3,
+    "question_count":1,
+    "shuffle_answers":false,
+    "show_correct_answers":false,
+    "which_attempt_to_keep":"keep_latest",
+    "questions":[
+        {
+            "question_points":5,
+            "question_type":"question_group",
+            "pick_count":2,
+            "questions":[
+                {
+                    "migration_id":"4393906433391",
+                    "points_possible":2,
+                    "question_type":"question_reference"
+                },
+                {
+                    "migration_id":"URN-X-WEBCT-VISTA_V2-790EA1350E85681DE0440003BA07D9B4",
+                    "points_possible":2,
+                    "question_type":"question_reference"
+                },
+                {
+                    "migration_id":"URN-X-WEBCT-VISTA_V2-790EA1350E1A681DE0440003BA07D9B4",
+                    "points_possible":3,
+                    "question_type":"question_reference"
+                }
+            ]
+        }
+    ],
+    "show_score":true,
+    "time_limit":60
+}

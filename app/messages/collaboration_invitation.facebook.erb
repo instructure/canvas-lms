@@ -1,0 +1,8 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations
+<% end %>
+
+You've been invited to collaborate on a document, <b><a href="<%= content :link %>"><%= asset.collaboration.title %></a></b> for 
+<%= asset.collaboration.context.name %>.  The document was created 
+<% if asset.collaboration.user %> by <%= asset.collaboration.user.short_name %><% end %>
+in <%= asset.collaboration.service_name %>.

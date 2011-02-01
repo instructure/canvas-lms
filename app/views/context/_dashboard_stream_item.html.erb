@@ -1,0 +1,16 @@
+<% item = dashboard_stream_item %>
+<% if item.type == 'Submission' %>
+  <%= render :partial => 'context/dashboard_submission', :object => item %>
+<% elsif item.type == 'Assignment' %>
+  <!--%= render :partial => 'context/assignment', :object => item %-->
+<% elsif item.type == 'Collaboration' %>
+  <%= render :partial => 'context/dashboard_collaboration', :object => item %>
+<% elsif item.type == 'WebConference' %>
+  <%= render :partial => 'context/dashboard_conference', :object => item %>
+<% elsif item.type == 'ContextMessage' %>
+  <%= render :partial => 'context/dashboard_context_message', :object => item %>
+<% elsif item.type == 'Message' %>
+  <%= render :partial => 'context/dashboard_notification', :object => item %>
+<% elsif item.type == 'DiscussionTopic' || item.type == 'Announcement' %>
+  <%= render :partial => 'context/dashboard_topic', :object => item %>
+<% end %>

@@ -1,0 +1,318 @@
+<% page_name = @context.is_a?(User) ? "My Files" : "#{@context.class.to_s} Files" %>
+<% content_for :auto_discovery do %>
+  <% if @context_enrollment %>
+    <%= auto_discovery_link_tag(:atom, feeds_files_format_url(@context_enrollment.feed_code, :atom), {:title => "Files Atom Feed"}) %>
+  <% elsif @context.available? %>
+    <%= auto_discovery_link_tag(:atom, feeds_files_format_url(@context.feed_code, :atom), {:title => "Files Atom Feed"}) %>
+  <% end %>
+<% end %>
+
+<% content_for :right_side do %>
+  <div class="rs-margin-lr rs-margin-top" id="selection_details">
+    <div class="current_folder" style="font-size: 1.2em; font-weight: bold; border-bottom: 1px solid #888; color: #444;"><%= @current_folder.name %></div>
+    <div class="current_folder_details" style="font-size: 0.8em; padding-bottom: 10px; color: #000;">
+      <!--span class="current_folder_description">This folder is cool.</span-->
+      <div style="color: #444; padding-left: 20px;">
+        <span class="current_file_count"><%= @current_attachments.length %></span> files 
+        <span class="current_folder_count"><%= "and " + pluralize(@current_folder.active_sub_folders.length, 'sub-folder') if @current_folder.active_sub_folders.length > 0 %></span> 
+        in this folder
+        </div>
+     </div>
+    <div id="tag_details" class="details" style="display: none;">
+      <a href="#" class="delete delete_link delete_tag_link">Delete this Tag</a><br/>
+      <a href="#" class="edit edit_link edit_tag_link">Rename this Tag</a>s<br/>
+    </div>
+    <div id="folder_details" class="details" style="display: none;">
+      <div class="current_folder">
+        <span class="current_folder_name header">&nbsp;</span>
+      </div>
+      <div class="current_folder_preview preview">
+        <%= image_tag "mime_types/locked.png", :class => 'locked', :title => "Locked", :alt => "locked" %>
+        <% if can_do(@context.attachments.new, @current_user, :update) %>
+          <br/>Students will not be able to access files inside of this folder while it is locked.
+        <% else %>
+          <br/>This folder is locked and cannot be accessed.
+        <% end %>
+        <span class="lock_until"><br/>It is locked until <span class="unlock_at" style="font-weight: bold;">&nbsp;</span>.</span>
+        <span class="lock_after"><br/>It will be locked after <span class="lock_at" style="font-weight: bold;">&nbsp;</span>.</span>
+      </div>
+      <div class="links">
+        <div><span class="cant_read" style="display: none; font-weight: bold;">This folder is currently locked</span></div>
+        <a href="#" class="delete delete_link delete_item_link">Delete this Folder</a><br/>
+        <a href="#" class="edit edit_link edit_item_link">Rename this Folder</a><br/>
+        <span class="edit_link">
+          <div><a href="#" class="lock lock_item_link">Lock this Folder</a></div>
+          <div><a href="#" class="unlock unlock_item_link">Unlock this Folder</a></div>
+        </span>
+      </div>
+    </div>
+    <div id="file_details" class="details" style="display: none;">
+      <div class="current_file">
+        <a href="#" class="download_item_link"><span class="current_file_name header">&nbsp;</span></a>
+        <span class="current_file_name header cant_download" style="display: none;">&nbsp;</span> 
+        <span style="font-size: 0.8em; white-space: nowrap">(<span class="current_file_size">&nbsp;</span>)</span>
+      </div>
+      <div class="current_file_preview preview">
+        <a href="#" class="download_item_link no-hover"><%= image_tag "ajax-loader.gif", :class => 'image_preview', :style => "max-width: 200px; max-height: 100px;", :alt => "Loading..." %></a>
+        <%= image_tag "mime_types/locked.png", :class => 'locked', :style => "display: none;", :title => "Locked", :alt => "locked" %>
+      </div>
+      <div class="currently_locked" style="display: none;">
+        <% if can_do(@context.attachments.new, @current_user, :update) %>
+          <%= image_tag "lock.png" %> Students will not be able to download this file while it is locked.
+        <% else %>
+          <%= image_tag "lock.png" %> This file is locked and cannot be downloaded.
+        <% end %>
+        <span class="lock_until"><br/>It is locked until <span class="unlock_at" style="font-weight: bold;">&nbsp;</span>.</span>
+        <span class="lock_after"><br/>It will be locked after <span class="lock_at" style="font-weight: bold;">&nbsp;</span>.</span>
+      </div>
+      <div class="links">
+        <div><a href="#" class="download download_item_link">Download this File</a></div>
+        <div><span class="cant_download" style="display: none; font-weight: bold;">This file isn't unlocked yet, so it can't be downloaded.<br/><br/></span></div>
+        <div><a href="#" class="edit edit_link edit_item_link">Rename this File</a></div>
+        <span class="edit_link">
+          <div><a href="#" class="lock lock_item_link">Lock this File</a></div>
+          <div><a href="#" class="unlock unlock_item_link">Unlock this File</a></div>
+        </span>
+        <div><a href="#" class="delete delete_link delete_item_link">Delete this File</a></div>
+      </div>
+    </div>
+    <div id="files_details" class="details" style="display: none;">
+      <div class="links">
+        <a href="#" class="delete_link delete_files_link">Delete these Files</a><br/>
+        Tags: ... Edit<br/>
+      </div>
+    </div>
+
+    <div style="padding: 10px 0px;">
+      <% if can_do(@context.attachments.new, @current_user, :create) %>
+        <a href="#" class="add_file_link add-file"> Add File</a><br/>
+      <% end %>
+      <% if can_do(@context.folders.new, @current_user, :create) %>
+        <a href="#" class="add_folder_link folder-closed"> Add Folder</a>
+      <% end %>
+      <% if can_do(@context.attachments.new, @current_user, :create) %>
+        <a href="<%= context_url(@context, :context_files_url, :format => :json) %>" id="file_uploads_url" style="display: none;">&nbsp;</a>
+        <div id="file_uploads_session_id" style="display: none;"><%= request.session_options[:id] %></div>
+        <div id="multi_file_uploads_link">
+          <span id="file_upload">
+          </span>
+        </div>
+        <div style="margin-left: 30px; font-size: 0.8em;">limit 50MB per file</div>
+      <% else %>
+        <div id="multi_file_uploads_link" style="display: none;">
+          <span id="file_upload">
+          </span>
+        </div>
+      <% end %>
+    </div>
+    <div style="text-align: center; display: none;" id="file_uploads_spinner">
+      <%= image_tag "ajax-loader-bar.gif" %>
+    </div>
+    <div id="file_uploads">
+      <div class="file_upload" id="file_upload_blank" style="display: none;">
+        <div style="float: left;">
+        <span class="status"></span> <span class="file_name"></span>
+        </div>
+        <a href="#" class="cancel_upload_link no-hover" ><%= image_tag "delete_circle.png" %></a>
+        <div class="clear"></div>
+        <div class="progress_bar"></div>
+      </div>
+    </div>
+  </div>
+  <% if can_do(@context.attachments.new, @current_user, :create) %>
+  <div class="rs-margin-lr" class="quota_details">
+    Used: <span class="quota_used"><%= number_to_human_size(@quota_used) %></span> out of <span class="quota"><%= number_to_human_size(@quota) %></span>
+  </div>
+  <% end %>
+<% end %>
+<% content_for :stylesheets do %>
+<style type="text/css">
+.ui-accordion-content {
+  padding: 0;
+}
+</style>
+<% end %>
+
+<% jammit_js :files_index %>
+<% js_block do %>
+  <script type="text/javascript">
+    var folderObjectList = <%= raw @folders.to_json(:methods => [:id, :currently_locked], :permissions => {:user => @current_user, :session => session}) %>;
+    var currentFolder = "<%= @current_folder.full_name %>";
+  </script>
+<% end %>
+<div style="font-size: 0.8em;">
+<% if @context.is_a?(User) %>
+  <div class="ui-state-highlight ui-corner-all" style="padding: 2px 5px;"><%= image_tag "warning.png" %> This section is for your personal files.  Adding a file here will <b>not</b> submit it for a course assignment.  You'll need to visit the course assignment page to submit the assignment.</div>
+<% elsif @context.is_a?(Group) && @context.context.is_a?(Course) %>
+  <div class="ui-state-highlight ui-corner-all" style="padding: 2px 5px;"><%= image_tag "warning.png" %> These files are only visible to members of your group, and are not submitted for course assignments.  You'll need to visit the course assignment page to submit the assignment.</div>
+<% end %>
+</div>
+<table style="width: 100%;" id="file_browser">
+  <tr>
+    <td style="border: 0px solid #000; min-width: 200px; padding: 0;">
+      <div style="overflow: none;">
+      <div id="view_options" style="height: 340px;">
+        <div>
+          <div class="header"><a href="#" class="nobr"><%= @context.class.to_s %> Folders</a></div>
+          <div style="overflow: auto; padding: 0;">
+            <div id="folders" class="content">
+              <ul class="folder_list">
+                <% @root_folders.each do |f| %>
+                  <%= render :partial => "folder", :object => f, :locals => {:selected => f == @current_folder} %>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div><!--div>
+          <div class="header"><a href="#"><%= @context.class.to_s %> Tags</a></div>
+          <div style="overflow: auto; padding: 0;">
+            <div id="tags">
+              <div style="padding-left: 20px;">Not implemented</div>
+            </div>
+          </div>
+        </div-->
+      </div>
+      </div>
+    </td><td style="width: 100%; border: 1px solid #888; -moz-border-radius: 5px; vertical-align: top; padding: 0;">
+      <ul id="folder_content" style="max-height: 350px; overflow: auto;">
+        <% @current_sub_folders.each do |f| %>
+          <%= render :partial => "content_folder", :object => f %>
+        <% end %>
+        <% @current_attachments.each do |a| %>
+          <%= render :partial => "content_file", :object => a %>
+        <% end %>
+        <li class="no_content_message" style="<%= "display: none;" if (@current_sub_folders.length + @current_attachments.length) > 0 %>">
+        <div class="message">Nothing in this folder...</div>
+        <div style="font-size: 0.8em; text-align: right;">
+          <% if can_do(@context.folders.new, @current_user, :create) %>
+            <a href="#" class="add_file_link">Add File</a> | <a href="#" class="add_folder_link">Add Folder</a>
+          <% end %>
+        </div>
+        </li>
+        <li class="locked_content_message" style="<%= hidden unless @current_folder.locked? %>">
+          <div class="message"><%= image_tag "lock_small.png" %> This folder is currently locked.</div>
+        </li>
+      </ul>
+    </td>
+  </tr>
+</table>
+<% form_for :folder, :url => context_url(@context, :controller => :folders, :action => :create), :html => {:id => "edit_folder_form", :style => "display: none;"} do |f| %>
+<div style="float:left;">
+  <%= f.hidden_field :parent_folder_id %>
+  <%= f.text_field :name, :style => "font-size: 0.9em; font-weight: bold, 225px;" %>
+  
+</div>
+<div class="button-container-right-aligned" style="font-size:12px; float:right; margin-top:3px;">
+  <button type="submit" class="button small-button submit_button">Add</button>
+  <button type="button" class="button-secondary cancel_button" style="margin-right:0 !important;"><%= image_tag("cancel.png") %></button>
+</div>
+<div class="clear"></div>
+<% end %>
+<% form_for :attachment, :url => context_url(@context, :action => :create), :html => { :id => "edit_file_form", :style => "display: none;", :multipart => true } do |f| %>
+  <%= f.hidden_field :folder_id, :value => @current_folder.id %>
+  <div style="text-align: right;">
+    <div style="text-align: left;">
+      <span class="file_display_option">
+        <span class="file_display_name">File Name</span>
+        <a href="#" class="change_file_name_link" style="padding-left: 5px; font-size: 0.6em; padding-right: 20px;">Rename</a>
+      </span>
+    </div>
+    <%= f.text_field :display_name, :style => "font-size: 0.9em; font-weight: bold; width: 225px; display: none; float: left;", :class => "file_name" %>
+    <div class="upload" style="display: none; padding-bottom: 5px; font-size: 0.7em; float: left; width: 225px;">
+      <div class="clear"></div>
+      <%= f.file_field :uploaded_data, :class => "file_upload", :style => "width: 300px;" %>
+    </div>
+    <div class="button-container-right-aligned" style="font-size:12px; float:right; margin-top:3px;">
+      <button type="submit" class="button small-button submit_button">Add</button>
+      <button type="button" class="button-secondary cancel_button" style="margin-right:0 !important;"><%= image_tag("cancel.png") %></button>
+    </div>
+  </div>
+  <div class="clear"></div>
+  <a href="#" class="show_upload_link" style="font-size: 0.5em; font-weight: none; padding-left: 10px; display: none;">Replace File</a>
+  <div style="text-align: center; font-size: 0.8em; display: none;" class="uploading_message">
+    <span class="message">Uploading...</span>
+    <%= image_tag "ajax-loader-bar.gif" %>
+  </div>
+<% end %>
+<ul style="display: none;" id="templates">
+  <%= render :partial => "folder", :object => nil %>
+  <%= render :partial => "content_folder", :object => nil %>
+  <%= render :partial => "content_file", :object => nil %>
+  <li>
+  <%= link_to nbsp, context_url(@context, :controller => :files, :action => :index, :folder_id => ""), {:class => "list_folder_url"} %>
+  <a href="<%= context_url(@context, :reorder_context_files_url) %>" class="reorder_attachments_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_files_url) %>" class="new_attachment_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :action => :create, :format => :text) %>" class="json_upload_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :controller => :folders, :action => :create) %>" class="new_folder_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :quota_context_files_url) %>" class="quota_url">&nbsp;</a>
+  <%= image_tag "ajax-loader-ccc.gif", :class => "preview_loading_image" %>
+  </li>
+</ul>
+<div id="lock_item_dialog" style="display: none;">
+  <% form_for :attachment, :url => "", :html => {:id => "lock_attachment_form", :method => :put} do |f| %>
+    <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
+    <h3 style="margin: 0;">Lock <span class="name">&nbsp;</span></h3>
+    When a file is locked, only teachers and TA's can access it.
+    <div class="clear"></div>
+    <table style="margin-top: 10px;">
+      <tr>
+        <td style="padding-bottom: 10px;">
+          <%= f.check_box :locked, :class => 'lock_checkbox' %> 
+        </td><td colspan="2" style="padding-bottom: 10px;">
+          <%= f.label :locked, "Lock until I manually unlock it" %>
+        </td>
+      </tr><tr class="lock_range">
+        <td>&nbsp;</td>
+        <td style="vertical-align: top; padding-left: 5px; white-space: nowrap;">Lock Until:</td>
+        <td>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;" %>
+        </td>
+      </tr><tr class="lock_range">
+        <td>&nbsp;</td>
+        <td style="vertical-align: top; padding-left: 5px; white-space: nowrap;">Lock After:</td>
+        <td>
+          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;" %>
+        </td>
+      </tr><tr>
+        <td colspan="3">
+          <button type="submit" class="button">Lock this File</button>
+          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+  <% form_for :folder, :url => "", :html => {:id => "lock_folder_form", :method => :put} do |f| %>
+    <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
+    <h3 style="margin: 0;">Lock <span class="name">&nbsp;</span></h3>
+    When a folder is locked, only teachers and TA's can access it.
+    <div class="clear"></div>
+    <table style="margin-top: 10px;">
+      <tr>
+        <td style="padding-bottom: 10px;">
+          <%= f.check_box :locked, :class => 'lock_checkbox' %> 
+        </td><td colspan="2" style="padding-bottom: 10px;">
+          <%= f.label :locked, "Lock until I manually unlock it" %>
+        </td>
+      </tr><tr class="lock_range">
+        <td>&nbsp;</td>
+        <td style="vertical-align: top; padding-left: 5px; white-space: nowrap;">Lock Until:</td>
+        <td>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;" %>
+        </td>
+      </tr><tr class="lock_range">
+        <td>&nbsp;</td>
+        <td style="vertical-align: top; padding-left: 5px; white-space: nowrap;">Lock After:</td>
+        <td>
+          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;" %>
+        </td>
+      </tr><tr>
+        <td colspan="3">
+          <button type="submit" class="button">Lock this Folder</button>
+          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+</div>
+<div id="preview_item_dialog" style="display: none;">
+</div>

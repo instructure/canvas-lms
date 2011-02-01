@@ -1,0 +1,226 @@
+<% content_for :page_title do %><%= @quiz.title %>: Statistics<% end %>
+<% content_for :stylesheets do %>
+<style>
+#statistics { 
+  width: 100%;
+  border-collapse: collapse;
+}
+#statistics table {
+  border-collapse: collapse;
+}
+#statistics td {
+  vertical-align: top;
+}
+#statistics table.results td {
+  text-align: center;
+  font-size: 0.7em;
+  padding: 2px 5px;
+}
+tr.group td {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+tr.question td.question_name, tr.group td.group_name {
+  min-width: 30%;
+  padding-left: 10px;
+}
+tr.question.group_row td.question_name {
+  padding-left: 30px;
+}
+tr.question td.question_name .question_name {
+  font-weight: bold;
+}
+tr.question td.question_name .question_text {
+  font-size: 0.8em;
+}
+tr.question td.question_name .question_details {
+  font-size: 0.8em;
+  padding-left: 10px;
+}
+#statistics .response {
+  min-width: 50px;
+}
+#statistics .response_bar {
+  margin: 100px 5px 0; 
+  width: auto; 
+  border: 1px solid #999; 
+  background: #bbb;
+  height: 0px;
+}
+#statistics .correct_answer {
+  font-weight: bold;
+}
+#statistics .correct_answer .response_bar {
+  border-color: #5CA93D;
+  background: #8EC778;
+}
+#statistics tr.spacer td {
+  border-top: 1px solid #ddd;
+}
+#statistics tr.group {
+  border-top: 1px solid #ddd;
+}
+#statistics tr.group_bottom {
+  border-top: 1px solid #ddd;
+}
+#statistics tr.group_row td {
+  background: #f6f6f6;
+}
+#statistics tr.spacer.group_row td {
+  border-top: 0px solid #ddd;
+}
+#statistics_summary {
+  border-collapse: collapse;
+}
+#statistics_summary th {
+  text-align: left;
+  font-size: 1.2em;
+}
+#statistics_summary td {
+  border-top: 1px solid #aaa;
+  padding: 2px 5px;
+}
+#statistics .answer {
+  cursor: pointer;
+}
+#statistics .essay_answers {
+  max-height: 150px;
+  overflow: auto;
+}
+#statistics .essay_answer {
+  padding: 5px;
+  border-bottom: 1px dotted #ccc;
+  max-height: 2.7em;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+}
+#statistics .essay_answer.expanded {
+  max-height: 100px;
+  cursor: inherit;
+  overflow: auto;
+}
+</style>
+<% end %>
+<% content_for :right_side do %>
+  <div class="rs-margin-all">
+    <table id="statistics_summary">
+      <thead>
+      <tr>
+        <th colspan="2"><%= pluralize(@statistics[:submission_count], "student") %> <%= @statistics[:submission_count] == 1 ? 'has' : 'have' %> taken this <%= @quiz.readable_type.downcase %></th>
+      </tr>
+      </thead>
+      <tr>
+        <td>Average Time:</td>
+        <td><%= time_ago_in_words(Time.now + @statistics[:submission_duration_average]) %></td>
+      </tr>
+    <% if @quiz.quiz_type != 'survey' && @quiz.quiz_type != 'graded_survey' %>
+      <tr>
+        <td>Average Correct:</td>
+        <td><%= #rails monkey patches the float class to let you round with precision so 23.round(2).to_s is "23" and (1.23456).round(2).to_s is "1.23"  
+                # see rails/active_support/lib/core_ext/float/rounding.rb 
+                @statistics[:submission_correct_count_average].to_f.round(2) %></td>
+      </tr><tr>
+        <td>Average Incorrect:</td>
+        <td><%= @statistics[:submission_incorrect_count_average].to_f.round(2) %></td>
+      </tr><tr>
+        <td>Mean Score:</td>
+        <td><%= @statistics[:submission_score_average].to_f.round(2) %></td>
+      </tr><tr>
+        <td>Standard Deviation:</td>  
+        <td><%= @statistics[:submission_score_stdev].to_f.round(2) %></td>
+      </tr>
+    <% end %>
+    </table>
+  </div>
+<% end %>
+<h2><%= @quiz.title %> Statistics</h2> 
+<table id="statistics">
+<% @statistics[:questions].each do |question_type, data| %>
+  <% if question_type == 'group' %>
+    <tr class="group group_row">
+      <td colspan="3" class="group_name"><%= data[:name] %></td>
+    </tr>
+    <% data[:questions].each do |question_type, question| %>
+      <%= render :partial => 'question_statistic', :object => question, :locals => {:in_group => true, :ignore_correct_answers => @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey'} %>
+    <% end %>
+    <tr class="group_bottom">
+      <td colspan="3">&nbsp;</td>
+    </tr>
+  <% else %>
+    <%= render :partial => 'question_statistic', :object => data, :locals => {:ignore_correct_answers => @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey'} %>
+  <% end %>
+<% end %>
+</table>
+<div id="submitted_users" style="display: none;">
+  <% @submitted_users.each_with_index do |user, idx| %>
+    <div class="user user_<%= user.id %>">
+      <% if @quiz.survey? && @quiz.anonymous_submissions %>
+        Student <%= idx + 1 %>
+      <% else %>
+        <%= context_user_name(@context, user) %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+<div id="submitted_users_dialog" style="display: none;">
+  <h2>For <span class="question_name" style="font-style: italic;">&nbsp;</span></h2>
+  <div>The following users selected the answer, <span class="answer_text" style="font-style: italic;">&nbsp;</span>:</div>
+  <ul class="users">
+    <li class="user blank" style="display: none;">
+      <a href="#" class="name user">&nbsp;</a>
+      <span class="name uncounted">&nbsp;</span>
+    </li>
+  </ul>
+</div>
+
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $.scrollSidebar();
+  $(".essay_answer").live('click', function(event) {
+    event.preventDefault();
+    $(this).addClass('expanded');
+  });
+  $(".answer").live('click', function(event) {
+    var ids = $(this).getTemplateData({textValues: ['user_ids']}).user_ids;
+    if(ids) {
+      var uncounted = 0;
+      var $dialog = $("#submitted_users_dialog");
+      $dialog.find(".user:not(.blank)").remove();
+      var names = [];
+      var answer_text = $(this).find(".answer_text").text();
+      var question_name = $(this).parents("tr").find("td .question_name").text();
+      ids = ids.split(",");
+      for(var idx in ids) {
+        var id = ids[idx];
+        var name = $("#submitted_users .user.user_" + id).text();
+        if(name) {
+          var $name = $dialog.find(".user.blank:first").clone(true).removeClass('blank');
+          $name.fillTemplateData({data: {name: name}});
+          $dialog.find(".users").append($name.show());
+        } else {
+          uncounted++;
+        }
+      }
+      if(uncounted > 0) {
+        var $name = $dialog.find(".user.blank:first").clone(true).removeClass('blank');
+        $name.fillTemplateData({data: {name: uncounted + " other submissions"}});
+        $name.addClass('uncounted');
+        $dialog.find(".users").append($name.show());
+      }
+      $dialog.fillTemplateData({data: {
+        answer_text: answer_text,
+        question_name: question_name
+      }});
+      $dialog.dialog('close').dialog({
+        autoOpen: false,
+        title: "Submitted Users for " + question_name,
+        width: 500,
+        height: 300
+      }).dialog('open');
+    }
+  });
+});
+</script>
+<% end %>

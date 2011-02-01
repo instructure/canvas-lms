@@ -1,0 +1,100 @@
+<% content_for :page_title do %>Rubrics<% end %>
+<% add_crumb "Rubrics" %>
+<% content_for :right_side do %>
+  <div class="rs-margin-all">
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="button button-sidebar-wide add_rubric_link"><%= image_tag "add.png" %> Add Rubric</a>
+  </div>
+<% end %>
+
+<% jammit_js :edit_rubric %>
+<% content_for :stylesheets do %>
+<style>
+#rubrics .find_rubric_link {
+  display: none;
+}
+#rubrics ul {
+  list-style-type: none;
+  padding-left: 0px;
+}
+#rubrics ul li {
+  padding: 3px 5px;
+  margin-bottom: 5px;
+}
+#rubrics ul li .title {
+  font-size: 1.2em;
+  font-weight: bold;
+  float: left;
+}
+#rubrics ul li .links {
+  float: right;
+  opacity: 0.5;
+}
+#rubrics ul li .details {
+  clear: left;
+  display: block;
+  font-size: 0.7em;
+  margin-left: 20px;
+}
+#rubrics ul li:hover {
+  background-color: #eee;
+  -moz-border-radius: 5px;
+}
+#rubrics ul li:hover .links {
+  opacity: 1.0;
+}
+</style>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $("#rubrics ul .delete_rubric_link").click(function(event) {
+    event.preventDefault();
+    var $rubric = $(this).parents("li");
+    $rubric.confirmDelete({
+      url: $(this).attr('href'),
+      message: "Are you sure you want to delete this rubric?  Anywhere currently using the rubric will still have access to it, but no one else will be able to use it.",
+      success: function() {
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
+      }
+    });
+  });
+});
+</script>
+<% end %>
+<h2><%= @context.class.to_s %> Rubrics</h2>
+<a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
+<div id="rubrics" class="raw_listing">
+  <ul>
+  <% @rubric_associations.each do |association| %>
+    <% rubric = association.rubric %>
+    <li>
+      <a href="<%= context_url(@context, :context_rubric_url, association.rubric_id) %>" class="title"><%= rubric.title %></a>
+      <span class="links">
+        <% if can_do(rubric, @current_user, :update) %>
+          <a href="<%= context_url(@context, :context_rubric_url, association.rubric_id) %>#edit" class="no-hover"><%= image_tag "edit.png" %></a>
+        <% end %>
+        <% if can_do(association, @current_user, :delete) %>
+          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover" title="Delete Rubric"><%= image_tag "delete.png" %></a>
+        <% end %>
+      </span>
+      <span class="details">
+        <%= rubric.criteria.length %> <%= rubric.criteria.length == 1 ? 'criterion' : 'criteria' %><br/>
+        <%= pluralize(rubric.points_possible, "point") %> possible
+      </span>
+    </li>
+  <% end %>
+  </ul>
+  <div style="display: none;" id="rubric_parameters">
+    <input type="hidden" name="rubric_association[association_type]" value="<%= @context.class.to_s %>"/>
+    <input type="hidden" name="rubric_association[association_id]" value="<%= @context.id %>"/>
+    <input type="hidden" name="rubric_association[purpose]" value="bookmark"/>
+  </div>
+  <span class="current_user_id" style="display: none;"><%= @current_user.id %></span>
+  <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_association_url" style="display: none;">&nbsp;</a>
+</div>
+<%= render :partial => "shared/find_outcome" %>
+<%= render :partial => "shared/rubric", :object => nil, :locals => {:for_context => true} %>
+<%= render :partial => "shared/rubric_forms" %>
+<%= render :partial => "shared/rubric_criterion_dialog" %>

@@ -1,0 +1,14 @@
+<% p = asset.is_a?(Pseudonym) ? asset : (asset.pseudonym || asset.user.pseudonym) %>
+<% cc = asset.is_a?(CommunicationChannel) ? asset : (p.communication_channel || p.user.communication_channel) %>
+<% define_content :link do %>
+  http://<%= HostUrl.context_host((p.account rescue nil)) %>/pseudonyms/<%= p.id %>/register/<%= cc.confirmation_code %>
+<% end %>
+
+<% define_content :subject do %>
+  Confirm Registration: Canvas
+<% end %>
+
+Thank you for registering with Canvas!  This email is confirmation that the user <%= asset.user.short_name %> is registering for a new account at <%= (HostUrl.context_host(p.account) rescue nil) || HostUrl.default_host %>.
+
+To finish the registration process, please visit the following url: 
+<%= content :link %>

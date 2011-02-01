@@ -1,0 +1,9 @@
+<% define_content :link do %>http://<%= HostUrl.default_host %><% end %>
+<% define_content :subject do %>
+  New Account User
+<% end %>
+
+New Account Admin for <%= asset.account.name %>
+  
+A new admin, <%= asset.user.name %>, has been added for the account <%= asset.account.name %>
+<%= content :link %>

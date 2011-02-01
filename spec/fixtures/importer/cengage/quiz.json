@@ -1,0 +1,27 @@
+{
+  "grading":
+  {
+    "grade_type":"numeric",
+    "title":"Practice Test 02",
+    "due_date":null,
+    "migration_id":"res00080",
+    "weight":null,
+    "points_possible":"237.0"
+  },
+  "quiz_type":"assignment",
+  "question_count":0,
+  "title":"Practice Test 02",
+  "quiz_name":"Practice Test 02",
+  "migration_id":"res00080",
+  "points_possible":"237.0",
+  "questions":[
+    {
+      "pick_count":20,
+      "question_bank_migration_id":"res00013",
+      "question_points":1,
+      "question_type":"question_group",
+      "migration_id":77574,
+      "questions":[]
+    }
+  ]
+}

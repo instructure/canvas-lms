@@ -1,0 +1,4 @@
+<% enrollment = pending_enrollment %>
+<li><a href="<%= course_url(enrollment.course, :invitation => enrollment.uuid) %>" title="Invited as <%= enrollment.readable_type %>, click to see the Course" class="<%= enrollment.type.to_s.underscore %>">
+  <%= enrollment.course.name %> as a <%= enrollment.readable_type %>
+</a></li>

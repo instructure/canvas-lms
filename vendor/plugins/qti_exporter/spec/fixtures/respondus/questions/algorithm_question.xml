@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: failed to make well-formed XML out of embedded text/html (<class 'xmlutils.XMLException'>: expected: AttValue)
+Warning: offending text/html will be left undecoded
+Warning: case-insensitive comparison of identifiers not supported in version 2
+	-->
+
+<assessmentItem
+        xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+        identifier="QUE_1061"
+        title="Algorithm Question"
+        adaptive="false"
+        timeDependent="false">
+    <responseDeclaration identifier="QUE_1062_RL" cardinality="single" baseType="identifier"/>
+    <outcomeDeclaration identifier="QUE_SCORE" cardinality="single" baseType="integer">
+        <defaultValue>
+            <value>0</value>
+        </defaultValue>
+    </outcomeDeclaration>
+    <itemBody>
+        <p>
+            &lt;!--$rSp_js_alg_08_704a54e03efa494aac6756ffd87be288
+            &quot;alg08704a54e03efa494aac6756ffd87be288.swf&quot;
+            &quot;625&quot;
+            &quot;485&quot;
+            --&gt;
+
+            &lt;script language=&quot;JavaScript&quot;&gt;
+            var alg_08_704a54e03efa494aac6756ffd87be288 = new Date();
+            function launch_alg_08_704a54e03efa494aac6756ffd87be288()
+            {
+            var iv = alg_08_704a54e03efa494aac6756ffd87be288.getTime();
+            var url = &quot;?v=&quot; + iv;
+            newwin = window.open(&quot;&quot;,&quot;Respondus&quot;,&quot;scrollbars=0,resizable=yes,width=640,height=500&quot;);
+            newwin.resizeBy(0,0);
+            var htmlString =
+            &quot;&lt;HTML&gt;&lt;TITLE&gt;Respondus Algorithmic Question&lt;/TITLE&gt; \n&quot;+
+            &quot;&lt;BODY marginheight=0 marginwidth=0 topmargin=0 rightmargin=0 leftmargin=0 bottommargin=0
+            BGCOLOR=#000000&gt;&quot;+
+            &quot;&lt;OBJECT classid=\&quot;clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\&quot; codebase=\&quot;http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0\&quot;
+            WIDTH=\&quot;625\&quot; HEIGHT=\&quot;485\&quot; id=\&quot;alg08704a54e03efa494aac6756ffd87be288\&quot;
+            ALIGN=\&quot;\&quot;&gt; &quot; +
+            &quot;&lt;PARAM NAME=movie VALUE=\&quot;alg08704a54e03efa494aac6756ffd87be288.swf&quot; + url + &quot;\&quot;&gt;&quot;
+            +
+            &quot;&lt;PARAM NAME=quality VALUE=high&gt; &quot; +
+            &quot;&lt;PARAM NAME=devicefont VALUE=true&gt; &quot; +
+            &quot;&lt;PARAM NAME=bgcolor VALUE=#000000&gt; &quot; +
+            &quot;&lt;EMBED sr&quot; + &quot;c=\&quot;alg08704a54e03efa494aac6756ffd87be288.swf&quot; + url + &quot;\&quot;
+            &quot; +
+            &quot;quality=\&quot;high\&quot; devicefont=\&quot;true\&quot; bgcolor=\&quot;#000000\&quot; WIDTH=\&quot;625\&quot;
+            HEIGHT=\&quot;485\&quot; &quot; +
+            &quot;NAME=\&quot;alg08704a54e03efa494aac6756ffd87be288\&quot; ALIGN=\&quot;\&quot; TYPE=\&quot;application/x-shockwave-flash\&quot;
+            PLUGINSPAGE=\&quot;http://www.macromedia.com/go/getflashplayer\&quot;&gt; &quot; +
+            &quot;&lt;/EMBED&gt; &lt;/OBJECT&gt; &quot; +
+            &quot;&lt;/BODY&gt;&lt;/HTML&gt;&quot;;
+            newwin.document.open();
+            newwin.document.write(htmlString);
+            newwin.document.close();
+            }
+            &lt;/script&gt;
+
+            &lt;a href=&quot;javascript:launch_alg_08_704a54e03efa494aac6756ffd87be288()&quot;&gt;Click here to view the
+            question&lt;/a&gt; Determine the correct answer and submit it within the pop-up window. You will then be
+            told which answer choice to select below.
+        </p>
+        <choiceInteraction responseIdentifier="QUE_1062_RL" shuffle="false" maxChoices="1">
+            <simpleChoice identifier="QUE_1063_A1" fixed="true">
+                <p>Answer A</p>
+            </simpleChoice>
+            <simpleChoice identifier="QUE_1064_A2" fixed="true">
+                <p>Answer B</p>
+            </simpleChoice>
+            <simpleChoice identifier="QUE_1065_A3" fixed="true">
+                <p>Answer C</p>
+            </simpleChoice>
+            <simpleChoice identifier="QUE_1066_A4" fixed="true">
+                <p>Answer D</p>
+            </simpleChoice>
+            <simpleChoice identifier="QUE_1067_A5" fixed="true">
+                <p>Answer E</p>
+            </simpleChoice>
+        </choiceInteraction>
+    </itemBody>
+    <responseProcessing>
+        <responseCondition>
+            <responseIf>
+                <match>
+                    <variable identifier="QUE_1062_RL"/>
+                    <baseValue baseType="identifier">QUE_1063_A1</baseValue>
+                </match>
+                <setOutcomeValue identifier="QUE_SCORE">
+                    <sum>
+                        <variable identifier="QUE_SCORE"/>
+                        <baseValue baseType="integer">0</baseValue>
+                    </sum>
+                </setOutcomeValue>
+            </responseIf>
+            <responseElseIf>
+                <match>
+                    <variable identifier="QUE_1062_RL"/>
+                    <baseValue baseType="identifier">QUE_1064_A2</baseValue>
+                </match>
+                <setOutcomeValue identifier="QUE_SCORE">
+                    <sum>
+                        <variable identifier="QUE_SCORE"/>
+                        <baseValue baseType="integer">0</baseValue>
+                    </sum>
+                </setOutcomeValue>
+            </responseElseIf>
+            <responseElseIf>
+                <match>
+                    <variable identifier="QUE_1062_RL"/>
+                    <baseValue baseType="identifier">QUE_1065_A3</baseValue>
+                </match>
+                <setOutcomeValue identifier="QUE_SCORE">
+                    <sum>
+                        <variable identifier="QUE_SCORE"/>
+                        <baseValue baseType="integer">0</baseValue>
+                    </sum>
+                </setOutcomeValue>
+            </responseElseIf>
+            <responseElseIf>
+                <match>
+                    <variable identifier="QUE_1062_RL"/>
+                    <baseValue baseType="identifier">QUE_1066_A4</baseValue>
+                </match>
+                <setOutcomeValue identifier="QUE_SCORE">
+                    <baseValue baseType="integer">1</baseValue>
+                </setOutcomeValue>
+            </responseElseIf>
+            <responseElseIf>
+                <match>
+                    <variable identifier="QUE_1062_RL"/>
+                    <baseValue baseType="identifier">QUE_1067_A5</baseValue>
+                </match>
+                <setOutcomeValue identifier="QUE_SCORE">
+                    <sum>
+                        <variable identifier="QUE_SCORE"/>
+                        <baseValue baseType="integer">0</baseValue>
+                    </sum>
+                </setOutcomeValue>
+            </responseElseIf>
+        </responseCondition>
+    </responseProcessing>
+</assessmentItem>

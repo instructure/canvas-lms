@@ -1,0 +1,13 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
+<% end %>
+
+<% define_content :subject do %>
+  Unpublished Assignment: <%= asset.assignment.title %>, <%= asset.assignment.context.name %>
+<% end %>
+
+
+The assignment, <%= asset.assignment.title %>, for the course, <%= asset.assignment.context.name %> appears to have been graded, but not published.  Publishing assignments notifies students that their grades have been entered and finalized.
+
+Click here to view the assignment: 
+<%= content :link %>

@@ -1,0 +1,322 @@
+<%- 
+  @body_classes ||= []
+  @body_class_no_headers = @headers == false
+  @body_classes << "no-headers" if @body_class_no_headers
+  unless (@body_classes.include? "no-headers") || (@show_left_side == false)
+    left_side = yield :left_side
+    left_side_custom = yield :left_side_custom
+    @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length)) 
+  end
+  right_side = yield :right_side 
+  wizard = yield :wizard_box
+  top_nav = yield :top_nav
+  keyboard_navigation = yield :keyboard_navigation
+  @body_classes << "with-left-side" if @show_left_side
+  #we dont want to render a right side unless there is actually content in it.
+  @body_classes << "with-right-side" if right_side and not right_side.strip.empty? 
+  @body_classes << "padless-content" if @padless
+  @body_classes << "context-#{@context.asset_string}" if @context
+-%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <title><%= yield :page_title || "Add a page title here." %></title>
+  
+  <%= yield :auto_discovery %>
+  <%= include_stylesheets :common, :media => "all" %>
+  <% if @eportfolio_view === true %>
+    <%= stylesheet_link_tag "compiled/instructure_eportfolio.css" %>
+  <% end %>
+  <%= include_stylesheets(*jammit_css_bundles) unless jammit_css_bundles.empty?  %>
+  <!--[if lte IE 8]>
+    <%= javascript_include_tag "html5.js" %>
+  <![endif]-->
+  <!--[if lte IE 7]>
+    <%= include_javascripts :ie7 %>
+  <![endif]-->
+  <%= yield :stylesheets %>
+  <% if @domain_root_account && @domain_root_account.settings[:global_stylesheet] %>
+    <link href="<%= @domain_root_account.settings[:global_stylesheet] %>" media="all" rel="stylesheet" type="text/css" />
+  <% end %>
+</head>
+<body class="<%= (@body_classes << @active_tab).uniq.join(" ") %>">
+  <!--[if lte IE 6]>
+    <style type="text/css" media="screen">
+      * { display:none; }
+      body, html, #block-ie6, #block-ie6 * { display: block !important;}
+    </style>
+    <div id="block-ie6">
+      <h1>Internet Explorer version 6 is so outdated it is not supported on this website.</h1>
+      <p>
+        May we suggest some better, more modern browsers? <a href="http://getfirefox.com">download firefox here</a> or <a href="http://www.google.com/chrome">get Google Chrome here</a>.
+      </p>
+    </div>
+  <![endif]-->
+  <noscript>
+    <div id="noscript">
+      <h1>You need to have javascript enabled in order to access this site.</h1>
+      <p>
+        Perhaps you could try a different browser. You can get the latest version of firefox <a href="http://getfirefox.com">here.</a><br />
+        Or, here are the <a href="http://www.enable-javascript.com" target="_blank"> instructions how to enable JavaScript in your web browser</a>.
+      </p>
+    </div>
+  </noscript>
+  <% unless @body_class_no_headers %>
+  <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
+    <a href="#content" id="skip_navigation_link">Skip To Content</a>
+    <a id="header-logo" href="<%= root_url %>">My Dashboard</a> 
+    <b id="header-logo-secondary"></b>  
+    <div id="topbar"> 
+      <%= (identity = yield :identity) ? identity : render(:partial => 'shared/identity') %>
+    </div>
+    <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
+    <% if @current_user %>
+    <ul role="navigation" id="menu">
+      <%- cache([@current_user, 'home-menu']) do -%>
+      <li class="menu-item">
+        <%# if any of these have anything in them, then we should show a dropdown on the 'home' menu item  %>
+        <%- if [ @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid_course_id]),
+                @current_user.accounts,
+                @current_user.cached_current_group_memberships,
+                @current_user.enrollments.ended ].any?{ |e| e.respond_to?(:count) && e.count > 0 }  -%>
+        <a href="<%= dashboard_path %>" class="menu-item-title">
+          Courses <%= "& Groups" unless @current_user.cached_current_group_memberships.empty? -%>
+          <span class="menu-item-title-icon"></span></a>
+        <div class="menu-item-drop">
+          <table cellspacing="0">
+            <tr>
+              <% 
+                max_to_show = 8 # Need to keep this low for users with limited screen real estate
+                coalesced_enrollments = []
+                @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid_course_id]).each do |e|
+                  coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] } if !e.course
+                  existing_enrollment_info = coalesced_enrollments.find { |en|
+                    # coalesce together enrollments for the same course and the same state
+                    !e.course.nil? && en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
+                  }
+                  if existing_enrollment_info
+                    existing_enrollment_info[:types] << e.readable_type
+                    existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || [999,999, 999], [e.rank_sortable, e.state_sortable, 0 - e.id]].min
+                  else
+                    coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
+                  end
+                end
+                coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
+                [
+                  [coalesced_enrollments, "shared/menu_enrollment", "My Courses", courses_path],
+                  [@current_user.cached_current_group_memberships, "shared/menu_group_membership", "Current Groups", groups_path],
+                  [@current_user.accounts, "shared/menu_account", "Managed Accounts", accounts_path]
+                ].each do |triple| %>
+              <%= render(:partial => "shared/menu_section", :locals => { 
+                           :collection => triple.first[0,max_to_show],
+                           :partial => triple[1],
+                           :collection_size => triple.first.length,
+                           :max_to_show => max_to_show,
+                           :more_link_for_over_max => triple[3],
+                           :title => triple[2] }) %>
+              <% end %>
+            </tr>
+          </table>
+          <% unless @current_user.enrollments.ended.empty? %>
+            <div class="menu-item-drop-padded">
+              <%= link_to 'See All Enrollments &raquo;', courses_path, :class => "menu-item-drop-float-right" %>
+              <!-- <div style="<%= hidden if !@domain_root_account || @domain_root_account.require_authorization_code %>">
+                You can also <a href="<%= getting_started_teacherless_path %>">use Canvas to track grades for your other classes</a>
+              </div> -->
+            </div>
+          <% end %>
+        </div>
+        <%- else #there is nothing inside the home menu, so dont show it as a drop-down -%>
+        <a href="<%= dashboard_path %>" class="menu-item-no-drop">Home</a>
+        <%- end -%>
+      </li>
+      <%- end -%>
+      <li class="menu-item">
+      <% 
+      # this will cache the assignments menu for 3 minutes.  the way it is right now it does 3 really expensive queries every page load.
+      # to do this better we would either figure a better way to find needing_submitting, needing_grading, and recently_graded
+      # or use delayed_job and memcache together to compute and cache it outside of the scope of a request
+      # so by just caching this stupidly for 3 minutes, if there is a new thing that should show up in the last 3 minutes, it wont show up.
+      cache([@current_user, 'assignments_menu'], :expires_in => 3.minutes) do %>
+        <%# if there is anything inside the assignments drop down %>
+      <%-
+        max_to_show = 8
+        assignment_sets = {
+          :needing_submitting => "To Turn In",
+          :needing_grading    => "Needing Grading",
+          :recently_graded    => "Recently Graded"
+        }
+        total_shown = 0
+        if assignment_sets.any?{ |k, v| @current_user.send("assignments_#{k}", :limit => max_to_show).length > 0 }  
+      -%>
+        <a href="/assignments" class="menu-item-title">Assignments<span class="menu-item-title-icon"></span></a>
+        <div class="menu-item-drop">
+          <table cellspacing="0">
+            <tr>
+              <% assignment_sets.each do |k,v| 
+                  if (set = @current_user.send("assignments_#{k}", :limit => max_to_show)).length 
+                    set = set[0,(max_to_show - total_shown)]
+                    total_shown += set.length
+                   %><%= render(:partial => "shared/menu_section", :locals => { 
+                                :max_to_show => max_to_show,
+                                :more_link_for_over_max => assignments_path,
+                                :collection => set,
+                                :collection_size => total_shown >= max_to_show ? @current_user.send("assignments_#{k}_total_count"): set.length,
+                                :partial => "shared/menu_assignment",
+                                :title => v })  %>
+                  <%
+                  end
+                end 
+              %>
+            </tr>
+          </table>
+        </div>
+        <%- else #there is not anything to show in the assignments drop down  -%>
+        <a href="/assignments" class="menu-item-no-drop">Assignments</a>
+        <%- end -%>
+      <% end %>
+      </li>
+      <li class="menu-item">
+        <%= link_to("Grades", :grades, :class=>"menu-item-no-drop") %>
+      </li>
+      <li class="menu-item">
+        <a href="<%= calendar_path %>" class="menu-item-no-drop">Calendar</a>
+      </li>      
+    </ul>
+    <% end %>
+  </div>
+
+  <% end  #unless no-headers %>
+  <div id="instructure_ajax_error_box">
+    <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link">Close</a></div>
+    <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;"></iframe>
+  </div>
+<%= render :partial => 'shared/flash_notices' %>
+
+
+
+<div id="wrapper-container">
+  <div id="wrapper">
+    <% if @show_left_side %>
+    <div id="left-side">
+      <% if left_side %>
+        <%= left_side %>
+      <% else %>
+        <% if @context.try(:short_name) %>
+        <h1 id="section-tabs-header"><%= @context.short_name %></h1>
+          <% if @context && @context.respond_to?(:context)  %>
+        <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
+          <% end %>
+        <% end %>
+        <%= section_tabs %>
+      <% end %>
+      <% if left_side_custom %>
+      <div class="left-side-inner">
+       <%= left_side_custom %>
+      </div>
+      <% end %>
+    </div>
+    <% end %>
+    <div id="main">
+      <div id="right-side-wrapper">
+        <aside id="right-side" role="complementary">
+          <%= right_side %>
+        </aside>
+      </div>
+      <div id="not_right_side">
+        <%= render_crumbs %>
+        <div id="content" role="main">
+          <%= yield %>
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo" id="footer">
+      <a href="http://www.instructure.com"><%= image_tag 'footer-logo.png', :alt => "Powered By Instructure" %></a>
+      <% @started_bottom_link_list = false %>
+      <% if Setting.get_cached("show_opensource_linkback", "false") == "true" %>
+        <% @started_bottom_link_list = true %>
+        <a href="http://instructure.com">Open Source LMS</a>      
+      <% end %>
+      <% if url = ((@domain_root_account && @domain_root_account.settings[:support_url]) || (Account.default && Account.default.settings[:support_url])) %>
+        <% if @started_bottom_link_list %>|<% end %><% @started_bottom_link_list = true %>
+        <%= link_to("Support", url) %>
+      <% end %>
+      <%= render :partial => 'shared/legalese' %>
+      <%  if @headers == false && Setting.get_cached("show_feedback_link", "false") == "true" %>
+        <% if @started_bottom_link_list %>|<% end %><% @started_bottom_link_list = true %>
+        <a href="#" id="feedback_link">Feedback</a> 
+      <% end %>
+      <% if @domain_root_account && @domain_root_account.settings[:facebook_url] %>
+        <% if @started_bottom_link_list %>|<% end %><% @started_bottom_link_list = true %>
+        <a href="<%= @domain_root_account.settings[:facebook_url] %>">Facebook</a>
+      <% end %>
+      <% if @domain_root_account && @domain_root_account.settings[:twitter_url] %>
+        <% if @started_bottom_link_list %>|<% end %><% @started_bottom_link_list = true %>
+        <a href="<%= @domain_root_account.settings[:twitter_url] %>">Twitter</a>
+      <% end %>
+    </footer>
+  </div>
+</div>
+
+<%= render :partial => 'shared/feedback' %>
+
+
+<% if wizard %>
+  <div id="wizard_spacer_box"></div>
+  <div id="wizard_box" role="dialog">
+    <div class="shadow shadow_1"></div>
+    <div class="shadow shadow_3"></div>
+    <div class="shadow shadow_5"></div>
+    <div class="wizard_content">
+      <div class="links">
+        <a href="#" class="close_wizard_link close-link">close</a>
+      </div>
+      <%= wizard %>
+    </div>
+  </div>
+<% end %>
+<% if keyboard_navigation %>
+  <div id="keyboard_navigation">
+    <%= keyboard_navigation %>
+  </div>
+<% end %>
+  <div style="display:none;"><!-- Everything inside of this should always stay hidden -->
+    <div id="ajax_authenticity_token"><%= form_authenticity_token %></div>
+    <div id="time_zone_offset"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).utc_offset / -60 %></div>
+    <% if @context && session && temp_type = session["role_#{@context.asset_string}"] %>
+      <span id="switched_role_type" class="<%= @context.asset_string %>"><%= Enrollment.readable_type(temp_type) %></span>
+    <% end %>
+    <% if @page_view %>
+      <a href="<%= page_view_path(@page_view.id || @page_view.temporary_id) %>" id="page_view_update_path">&nbsp;</a>
+      <div id="page_view_id"><%= @page_view.id || @page_view.temporary_id %></div>
+    <% end %>
+    <div id="domain_root_account_id"><%= @domain_root_account.id %></div>
+    <% if equella_enabled? %>
+      <a id="equella_endpoint_url" href="<%= @equella_settings.endpoint %>">&nbsp;</a>
+      <a id="equella_callback_url" href="<%= external_content_success_url('equella') %>">&nbsp;</a>
+      <a id="equella_cancel_url" href="<%= external_content_cancel_url('equella') %>">&nbsp;</a>
+      <a id="equella_action" href="<%= @equella_settings.default_action %>">&nbsp;</a>
+      <% if @equella_settings.teaser %>
+        <div id="equella_teaser"><%= @equella_settings.teaser %></div>
+      <% end %>
+    <% end %>
+  </div>
+<% cache('global_dialogs_render') do %>
+  <%= render :partial => "shared/global_dialogs" %>
+<% end %>
+
+<script>
+  var INST = <%= raw(inst_env.to_json) %>;
+</script>
+
+<%= include_javascripts :common %>
+
+<%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
+<%= render_js_blocks %>
+<% if @domain_root_account && @domain_root_account.settings[:global_includes] && @domain_root_account.settings[:global_javascript] %>
+  <script src="<%= @domain_root_account.settings[:global_javascript] %>"></script>
+<% end %>
+</body>
+</html>

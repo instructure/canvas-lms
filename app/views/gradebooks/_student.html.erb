@@ -1,0 +1,7 @@
+<a class="display_name nobr" href="<%= context_url(@context, :context_url) %>/grades/<%= student.id %>"><%= student.name ? student.last_name_first : "New Student" %></a>
+<span class="hidden_name nobr" style="display: none;">Student</span>
+<% e = @context.course_sections.active.count > 1 && @enrollments_hash && @enrollments_hash[student.id] && @enrollments_hash[student.id].course_section && @enrollments_hash[student.id] %>
+<div class="secondary_identifier <%= 'with_section' if e %>" title="<%= student.secondary_identifier %>"><%= student.secondary_identifier %></div>
+<% if e %>
+  <div class="course_section" title="<%= e.course_section.display_name %>"><%= e.course_section.display_name %></div>
+<% end %>

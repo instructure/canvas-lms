@@ -1,0 +1,45 @@
+0.9.3	- 28-01-2008
+
+Fixed #version_number to versioned instances as a shortcut
+
+0.9.2 - 28-01-2008
+
+Fixed :exclude => :column now equivalent to :exclude => [:column]
+
+0.9.1 - 24-01-2008
+
+Improved implementation of revert_to_version with further tests.
+Provided clean aliases for methods in VersionProxy.
+
+0.9 - 24-01-2008
+
+Added an :exclude option (default: [])
+
+0.8 - 08-01-2008
+
+Added an :automatic option (default: true)
+
+0.7 - 04-01-2008
+
+The without_versioning method becomes with_versioning( exp )
+
+0.6 - 01-01-2008
+
+The default is now to keep all versions, specify :keep if you want to set a limit.
+Dropped the updated_at column from revisions as unnecessary.
+
+0.5 - 30-12-2007
+
+The revert_to_version call now takes an :except => [:name,:and,:so,:on] list of attributes whose value will not be reverted. The defautl is [:created_at,:updated_at].
+
+0.4 - 30-12-2007
+
+Changed some method names to reduce possibility of conflicts. Added more tests. Changed some method implementations w.r.t. empty versions to try and tease out a bug in production.
+
+0.3 - 30-12-2007
+
+Added versioning_enabled? and without_versioning( &block ) to allow save without a version being generated.
+
+0.2 - 30-12-2007
+
+Added a test & some documentation, shaved a yak or two

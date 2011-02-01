@@ -1,0 +1,52 @@
+<div id="section_pages">
+  <h2>
+    <%= @category.name %>
+    <% if can_do(@portfolio, @current_user, :manage) %>
+    <div style="float: right; margin-right: 10px; font-size: 0.8em;">
+      <a href="#" class="manage_pages_link" style="font-style: italic;" title="Add, remove or rearrange pages for this section">Organize/Manage Pages</a>
+      <!--input type="button" value="Manage Pages" title="Add, remove, or rearrange pages for this section" class="manage_pages_link"/-->
+    </div>
+    <% end %>
+  </h2>
+  <div class="rs-margin-lr">
+    <div class="editing_box" style="font-size: 0.8em;">
+      Click any page name to rename it, or click and drag to reorder.
+    </div>
+    <div class="displaying_box" style="font-size: 0.8em;">
+      Pages for this section
+    </div>
+    <ul id="page_list">
+      <% @category.eportfolio_entries.each do |e| %>
+        <li id="page_<%= e.id %>" class="page <%= "current" if e == @page %>">
+          <a href="#" class="edit_page_link">
+            <%= image_tag "edit.png", :class => "editing_image", :title => "Rename Page" %>
+          </a>
+          <a class="page_url no-hover" href="<%= eportfolio_named_category_entry_path(@portfolio,@category.slug, e.slug) %>">
+            <span class="name"><%= e.name %></span>
+          </a>
+          <a class="rename_page_url" href="<%= eportfolio_entry_path(@portfolio, e.id) %>" style="display: none;">&nbsp;</a>
+          &nbsp;<a href="#" class="remove_page_link" title="Delete this Page">&#215;</a>
+        </li>
+      <% end %>
+      <li id="page_blank" class="page unsaved" style="display: none;">
+        <a href="#" class="edit_page_link">
+          <%= image_tag "edit.png", :class => "editing_image", :title => "Rename Page" %>
+        </a>
+        <a class="page_url no-hover" href="<%= eportfolio_named_category_entry_path(@portfolio, @category.slug, "{{ slug }}") %>">
+          <span class="name">Page Name</span>
+        </a>
+        &nbsp;<a href="#" class="remove_page_link">&#215;</a>
+        <a class="rename_page_url" href="<%= eportfolio_entry_path(@portfolio, "{{ id }}") %>" style="display: none;">&nbsp;</a>
+      </li>
+    </ul>
+    <a href="#" class="add_page_link add"> Add Another Page</a>
+    <div class="editing_box button-container">
+      <button type="button" class="done_editing_button button">Done Editing</button>
+    </div>
+    <a href="<%= eportfolio_entries_path(@portfolio) %>" class="add_page_url" style="display: none;">&nbsp;</a>
+    <a href="<%= eportfolio_reorder_entries_url(@portfolio.id, @category.id) %>" class="reorder_pages_url">&nbsp;</a>
+  </div>
+</div>
+<span id="page_name_holder" style="display: none;">
+<input type="text" id="page_name"/>
+</span>

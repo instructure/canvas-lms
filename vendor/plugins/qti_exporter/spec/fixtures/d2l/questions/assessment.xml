@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: rubric with view="all" replaced by <div> with class="rubric"
+Warning: ignoring assessment or section rubric
+	-->
+
+<assessmentTest
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+ identifier="d2l_true_false"
+ title="01 Early Bird Storybook Week 2">
+<testPart identifier="BaseTestPart">
+<assessmentSection identifier="CONTAINER_SECTION">
+<assessmentItemRef identifier="d2l_true_false" href="../assessmentItems/d2l_true_false.xml"/>
+</assessmentSection>
+</testPart>
+</assessmentTest>

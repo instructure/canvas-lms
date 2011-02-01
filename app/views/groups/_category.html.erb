@@ -1,0 +1,97 @@
+<div id="<%= category ? category.unpack('H*') : "category_template" %>" class="group_category">
+  <div class="category_header">
+    <div class="links">
+      <a href="#" class="add_group_link no-hover" title="Add Another Group"><%= image_tag "add.png" %></a>
+      <% if category != Group.student_organized_category %>
+        <a href="<%= context_url(@context, :delete_category_context_groups_url, :category_name => category || "{{ category_name }}") %>" class="delete_category_link no-hover" title="Remove This Set of Groups"><%= image_tag "delete.png" %></a>
+      <% end %>
+    </div>
+    <h3 class="category_name"><%= category %></h3>
+    <div class="clear"></div>
+    <div style="margin-left: 20px;">
+      <div style="float: right;">
+      <a href="#" class="expand_groups_link">Expand All</a> | 
+      <a href="#" class="collapse_groups_link">Collapse All</a>
+      </div>
+      <span class="group_count"></span>
+      <span style="color: #888;"> &nbsp; &nbsp; drag students to assign to groups</span>
+      <% if category == Group.student_organized_category %>
+        <div style="color: #444;"><%= image_tag "warning.png" %> These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments.</div>
+      <% end %>
+    </div>
+  </div>
+  <div class="right_side">
+    <div class="group group_blank">
+      <div class="inner-wrapper">
+        <div class="group_user_count" style="display: none">
+          <span class="user_count">0</span> <span class="user_count_label">students</span>
+          <span class="user_count_hidden" style="display: none">0</span>
+        </div>
+        <div class="links">
+          <span class="expand_collapse_links">
+          <a href="#" class="expand_group_link blank_link no-hover" style="display: none;"><%= image_tag "expand.png" %></a>
+          <a href="#" class="collapse_group_link blank_link no-hover"><%= image_tag "collapse.png" %></a>
+          </span>
+          <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="edit_group_link no-hover"><%= image_tag "edit.png" %></a>
+          <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="delete_group_link no-hover"><%= image_tag "delete.png" %></a>
+        </div>
+        <h3 style="display: none;" class="group_name"><a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" target="_blank" class="name">Name</a></h3>
+        <% if category == Group.student_organized_category %>
+          <h3 class="name blank_name">Everyone</h3>
+        <% else %>
+          <h3 class="name blank_name">Unassigned</h3>
+        <% end %>
+        <% unless @context.is_a?(Account) || category == Group.student_organized_category %>
+          <a href="#" class="assign_students_link no-hover" title="Distribute Unassigned Students Equally Among Groups">randomly assign students</a>
+        <% end %>
+        <div style="display: none;">
+          <span class="category_name">&nbsp;</span>
+          <span class="max_membership">&nbsp;</span>
+          <span class="group_id">&nbsp;</span>
+        </div>
+        <ul class="student_list">
+        </ul>
+      </div>
+      <div class="load-more">
+        <a href="#" class="load_members_link no-hover">Load more</a>
+        <div class="loading_members" style="display: none;">Loading...</div>
+      </div>
+    </div>
+  </div>
+  <div class="left_side">
+  <% @groups.select{|g| g.category == category}.each do |group| %>
+    <div class="group" id="group_<%= group.id %>">
+      <div class="inner-wrapper">
+        <div class="group_user_count">
+          <span class="user_count"><%= group.members_count_cached %></span> <span class="user_count_label">students</span>
+          <span class="user_count_hidden" style="display: none"><%= group.members_count_cached %></span>
+        </div>
+        <div class="links">
+          <span class="expand_collapse_links">
+          <a href="#" class="expand_group_link no-hover" style="display: none;"><%= image_tag "expand.png" %></a>
+          <a href="#" class="collapse_group_link no-hover"><%= image_tag "collapse.png" %></a>
+          </span>
+          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" class="edit_group_link no-hover"><%= image_tag "edit.png" %></a>
+          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" class="delete_group_link no-hover"><%= image_tag "delete.png" %></a>
+        </div>
+        <h3 class="name">
+          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" target="_blank"><%= group.name %></a>
+        </h3>
+        <div style="display: none;">
+          <span class="category_name"><%= category || nbsp %></span>
+          <span class="max_membership"><%= (group.max_membership || nbsp) rescue nbsp %></span>
+          <span class="group_id"><%= group ? group.id : nbsp %></span>
+        </div>
+        <ul class="student_list">
+        </ul>
+      </div>
+      <div class="load-more">
+        <a href="#" class="load_members_link no-hover" style="<%= 'display: none;' if group.members_count_cached == 0 %>">Load full student list</a>
+        <div class="loading_members" style="display: none;">Loading...</div>
+      </div>
+    </div>
+  <% end %>
+    <div class="clear clearer"></div>
+  </div>
+  <div class="clear"></div>
+</div>

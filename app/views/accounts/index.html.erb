@@ -1,0 +1,17 @@
+<% content_for :page_title do %>Accounts<% end %>
+<% add_crumb "Accounts" %>
+
+<% content_for :right_side do %>
+<% end %>
+
+<% jammit_css :context_list %>
+
+<h2>Accounts I Manage</h2>
+<%= "No Accounts" if @accounts.empty? %>
+<ul class="context_list">
+  <% @accounts.each do |account| %>
+    <li>
+      <%= link_to account.name, url_for(account) %>
+    </li>
+  <% end %>
+</ul>

@@ -1,0 +1,11 @@
+<% membership = group; context = membership.is_a?(Enrollment) ? membership.course : membership.group %>
+<div>
+  <div style="position: relative; overflow: hidden; white-space: nowrap;" class="group_reference group_<%= "#{context.class.to_s.downcase}_#{context.id}" %>">
+    &nbsp;
+    <div style="position: absolute; top: 2px; left: 2px;">
+    <input type="checkbox" class="group_reference_checkbox" title="Show/Hide in the Recent Activity list" checked id="group_<%= "#{context.class.to_s.downcase}_#{context.id}" %>"/>
+    <a href="<%= context_url(context, :context_url) %>"><%= context.name %></a>
+    </div>
+  </div>
+  <div class="clear"></div>
+</div>

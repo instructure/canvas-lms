@@ -1,0 +1,11 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>?invitation=<%= asset.uuid %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= asset.course.class.to_s.capitalize %> Invitation
+<% end %>
+
+You've been invited to participate in a class at <%=  (HostUrl.context_host((asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>.  The class is
+called <%= asset.course.name %>, and you've been invited to
+participate as a <%= asset.readable_type %>.

@@ -1,0 +1,49 @@
+    <table class="summary" style="margin-left: auto; margin-right: auto; margin-top: 10px; font-size: 1.1em;">
+      <thead>
+      <tr>
+        <th>Questions</th>
+        <th>Limits</th>
+        <th style="<%= hidden if @quiz.quiz_type == 'survey' %>">Points</th>
+        <th>Availability</th>
+      </tr>
+      </thead>
+      <tr>
+        <td style="padding: 5px 10px; white-space: nowrap;">
+          <%= @question_count || "No" %> <%= (@question_count == 1) ? "Question" : "Questions" %>
+        </td>
+        <td style="padding: 5px 10px; white-space: nowrap;">
+          <% if @quiz.time_limit %>
+            <%= @quiz.time_limit %> Minutes
+          <% else %>
+            No Time Limit
+          <% end %>
+          <div>
+            <% if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %>
+              <% if @quiz.allowed_attempts > 0 %>
+                Allowed Attempts: <%= @quiz.allowed_attempts %><br/>
+              <% else %>
+                Unlimited Attempts<br/>
+              <% end %>
+            <% end %>
+          </div>
+        </td>
+        <td style="padding: 5px 10px; white-space: nowrap; <%= hidden if @quiz.quiz_type == 'survey' %>">
+          <%= @quiz.points_possible || 0 %> pts possible
+        </td>
+        <td>
+          <% if @quiz.lock_at || @quiz.unlock_at %>
+            <% if @quiz.lock_at && @quiz.unlock_at %>
+              <%= datetime_string(@quiz.unlock_at) %> through<br/>
+              <%= datetime_string(@quiz.lock_at) %>
+              <div style="font-size: 0.8em;"><%= time_ago_in_words(Time.now + (@quiz.lock_at - @quiz.unlock_at)) rescue "" %></div>
+            <% elsif @quiz.lock_at %>
+              until <%= datetime_string(@quiz.lock_at) %>
+            <% else %>
+              after <%= datetime_string(@quiz.unlock_at) %>
+            <% end %>
+          <% else %>
+            Always available
+          <% end %>
+        </td>
+      </tr>
+    </table>

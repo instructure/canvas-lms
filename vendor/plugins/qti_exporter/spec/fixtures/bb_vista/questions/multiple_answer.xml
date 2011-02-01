@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qtimetadata vocabulary is ignored
+Unmapped metadata field: questiontype=Multiple-choice
+Unmapped metadata field: wct_questiontype=WCT_MultipleChoice
+Unmapped metadata field: layouthorizontal=false
+Unmapped metadata field: wct_question_labelledletter=No
+Unmapped metadata field: wct_authorwebctglid=2
+Unmapped metadata field: wct_questioncategory=Export Test
+Unmapped metadata field: wct_usedbyassessment=Blackboard Vista Export Test
+Unmapped metadata field: wct_authorfullname=Instructure LMS
+Warning: charset attribute no longer supported: ignored charset="US-ASCII"
+Unknown text type: ignored mattext with texttype="TEXT/PLAIN" treated as text/plain
+Warning: flow_label is no longer supported in version 2, ignoring
+Unknown text type: ignored mattext with texttype="TEXT/HTML" treated as text/plain
+Warning: scoremodel not supported, ignoring "SumofScores"
+Warning: titles on respconditions no longer supported, ignored "genFeedback"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+	-->
+
+<assessmentItem
+        xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+        identifier="4609865392341"
+        title="Multiple Answer"
+        adaptive="false"
+        timeDependent="false">
+  <responseDeclaration identifier="RESP_MC" cardinality="multiple"
+                       baseType="identifier"/>
+  <outcomeDeclaration identifier="FEEDBACK" cardinality="multiple"
+                      baseType="identifier"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0.0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <itemBody>
+    <p>The answers are house and garage.
+      <br/>
+    </p>
+    <choiceInteraction responseIdentifier="RESP_MC" shuffle="false"
+                       maxChoices="1">
+      <simpleChoice identifier="MC0" fixed="false">
+        <p>house
+          <br/>
+        </p>
+      </simpleChoice>
+      <simpleChoice identifier="MC1" fixed="false">
+        <p>garage
+          <br/>
+        </p>
+      </simpleChoice>
+      <simpleChoice identifier="MC2" fixed="false">
+        <p>barn
+          <br/>
+        </p>
+      </simpleChoice>
+      <simpleChoice identifier="MC3" fixed="false">
+        <p>pond
+          <br/>
+        </p>
+      </simpleChoice>
+    </choiceInteraction>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf>
+        <member>
+          <baseValue baseType="identifier">MC0</baseValue>
+          <variable identifier="RESP_MC"/>
+        </member>
+        <setOutcomeValue identifier="SCORE">
+          <sum>
+            <variable identifier="SCORE"/>
+            <baseValue baseType="float">50.0</baseValue>
+          </sum>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">wct_mc_answer_fb0</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <member>
+          <baseValue baseType="identifier">MC1</baseValue>
+          <variable identifier="RESP_MC"/>
+        </member>
+        <setOutcomeValue identifier="SCORE">
+          <sum>
+            <variable identifier="SCORE"/>
+            <baseValue baseType="float">50.0</baseValue>
+          </sum>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">wct_mc_answer_fb1</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <member>
+          <baseValue baseType="identifier">MC2</baseValue>
+          <variable identifier="RESP_MC"/>
+        </member>
+        <setOutcomeValue identifier="SCORE">
+          <sum>
+            <variable identifier="SCORE"/>
+            <baseValue baseType="float">0.0</baseValue>
+          </sum>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">wct_mc_answer_fb2</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <member>
+          <baseValue baseType="identifier">MC3</baseValue>
+          <variable identifier="RESP_MC"/>
+        </member>
+        <setOutcomeValue identifier="SCORE">
+          <sum>
+            <variable identifier="SCORE"/>
+            <baseValue baseType="float">0.0</baseValue>
+          </sum>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">wct_mc_answer_fb3</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <baseValue baseType="boolean">true</baseValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">wct_general_feedback_ref_1
+            </baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="wct_mc_answer_fb0">
+    <p>house: right</p>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="wct_mc_answer_fb1">
+    <p>garage: right</p>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="wct_mc_answer_fb2">
+    <p>barn: wrong</p>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="wct_mc_answer_fb3">
+    <p>pond: wrong</p>
+  </modalFeedback>
+</assessmentItem>

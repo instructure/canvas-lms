@@ -1,0 +1,5 @@
+<% indent ||= 0 %>
+<option value="<%= account.id %>" <%= "selected" if @context && @context.account_id == account.id %>><%= raw("&nbsp;" * indent) %><%= account.name %></option>
+<% account.sub_accounts.active.each do |a| %>
+  <%= render :partial => "shared/account_options", :locals => {:account => a, :indent => indent + 2} %>
+<% end %>

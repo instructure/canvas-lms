@@ -1,0 +1,34 @@
+{
+    "migration_id":"res00046",
+    "url":"",
+    "description":"This is a learning unit. I don't know what that is",
+    "show_item":true,
+    "alternate_migration_id":"_116785_1",
+    "end_date":1274124600000,
+    "start_date":1268854200000,
+    "bb8_type":"x-bb-lesson",
+    "created_date":1268854390000,
+    "title":"A learning Unit",
+    "updated_date":1269536208000,
+    "is_folder":true,
+    "items":[
+        {
+            "linked_resource_title":"First assignment",
+            "type":"linked_resource",
+            "linked_resource_type":"ASSIGNMENT_TYPE",
+            "linked_resource_id":"res00034"
+        },
+        {
+            "linked_resource_title":"Chat",
+            "type":"internal_link",
+            "linked_resource_type":"UNSUPPORTED_TYPE",
+            "linked_resource_id":"collaboration"
+        },
+        {
+            "linked_resource_title":"Timp",
+            "type":"linked_resource",
+            "linked_resource_type":"FILE_TYPE",
+            "linked_resource_id":"_99066_1"
+        }
+    ]
+}

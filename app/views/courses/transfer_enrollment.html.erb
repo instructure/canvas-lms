@@ -1,0 +1,24 @@
+<% content_for :page_title do %>Invitation to <%= @context.name %><% end %>
+
+<div style="margin: 10px auto; width: 600px;">
+  <h2>Accept Enrollment Invitation</h2>
+  The enrollment invitation you're accepting was extended to the user 
+  <%= @pending_enrollment.user.name %> (id: <%= @pending_enrollment.user_id %>, <%= @pending_enrollment.user.email %>),
+  but you're currently logged in as 
+  <%= @current_user.name %> (id: <%= @current_user.id %>, <%= @current_user.email %>).
+  You can:
+  <ul class="claim_list">
+    <% if @pending_enrollment.user.pseudonyms.all?{|p| p.never_logged_in? } && @pending_enrollment.user.communication_channel %>
+      <li>
+        <%= link_to "Those are both me.  Combine them into one account.", communication_channel_merge_path(@pending_enrollment.user.communication_channel, @pending_enrollment.user.communication_channel.confirmation_code, 'communication_channel[event]' => 'merge_users'), :method => :post %>
+      </li>
+    <% end %>
+    <li>
+      <%= link_to "Enroll as #{@current_user.name} (id: #{@current_user.id}, #{@current_user.email})", course_enrollment_invitation_path(@context, :accept => 1, :transfer_enrollment => 1), :method => :post %>
+    </li>
+    <li>
+      <%= link_to "Logout so I can log in as #{@pending_enrollment.user.name} (id: #{@pending_enrollment.user_id}, #{@pending_enrollment.user.email}", logout_path, :method => :delete, :class => "logout" %>
+    </li>
+  </ul>
+  
+</div>

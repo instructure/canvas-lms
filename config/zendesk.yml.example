@@ -1,0 +1,13 @@
+development:
+  username: put_your_zendesk_username_here
+  password: put_your_zendesk_password_here
+  site: http://support.put_your_zendesk_support_site_here.com
+  auth_token: put_auth_token_from_zendes_website_here
+  enabled: false
+
+production:
+  username: put_your_zendesk_username_here
+  password: put_your_zendesk_password_here
+  site: http://support.put_your_zendesk_support_site_here.com
+  auth_token: put_auth_token_from_zendes_website_here
+  enabled: true

@@ -1,0 +1,58 @@
+<% allow_take ||= false %>
+<% if @quiz.available? || (params[:preview] && @submission) %>
+  <div>
+    <div style="border-bottom: 1px solid #888; font-size: 1.1em; font-weight: bold;">
+      <% if @quiz.allowed_attempts == 1 %>
+        Submission Details:
+      <% else %>
+        Last Attempt Details:
+      <% end %>
+    </div>
+    <div>
+    <table class="summary" style="font-size: 1.1em;">
+      <tr>
+        <th>Time:</th>
+        <td><%= time_ago_in_words(Time.now - (@submission.finished_at - @submission.started_at)) %></td>
+      </tr>
+      <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+        <th>Current Score:</th>
+        <td><%= render :partial => "submission_score", :object => @submission %> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %></td>
+      </tr>
+      <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
+        <th>Kept Score:</th>
+        <td><%= @submission.kept_score %> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %></td>
+      </tr>
+    </table>
+    </div>
+  </div>
+    <% if @submission && params[:preview] %>
+      <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :preview => 1) %>">Preview the <%= @quiz.readable_type %> Again</a><br/>
+    <% elsif !@quiz.single_attempt? || can_do(@quiz, @current_user, :update) %>
+      <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
+        <% if @submission.attempt > 1 || (@submission.attempt == 1 && can_do(@quiz, @current_user, :update)) %>
+          <%= pluralize(@submission.attempt, "Attempt") %> so far<br/>
+          <a href="<%= context_url(@context, :context_quiz_history_url, @quiz) %>" class="history"> View Previous Attempts</a>
+          <br/>
+        <% end %>
+        <% if @quiz.unlimited_attempts? %>
+          Unlimited Attempts<br/>
+        <% elsif !can_do(@quiz, @current_user, :update) %>
+          <% if @submission.attempts_left <= 0 %>
+            No More Attempts available<br/>
+          <% elsif can_do(@quiz, @current_user, :submit) %>
+            <%= @submission.attempts_left %> More Attempts available<br/>
+          <% end %>
+        <% end %>
+      </div>
+      <% if allow_take && can_do(@quiz, @current_user, :submit) %>
+        <div style="margin-top: 10px; font-size: 1.2em;">
+        <% if (!@locked && (@quiz.unlimited_attempts? || @submission.attempts_left > 0)) || can_do(@quiz, @current_user, :update) %>
+          <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>">Take the <%= @quiz.readable_type %> Again</a><br/>
+          <span style="font-size: 0.7em; padding-left: 20px;">
+            (Will keep the <%= @quiz.scoring_policy == "keep_highest" ? "highest" : "latest" %> of all your scores)
+          </span>
+        <% end %>
+        </div>
+      <% end %>
+    <% end %>
+<% end %>

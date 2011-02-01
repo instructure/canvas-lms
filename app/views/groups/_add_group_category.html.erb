@@ -1,0 +1,89 @@
+<% js_block do %>
+<script>
+function addGroupCategory(callback) {
+  $("#add_category_form").dialog('close').dialog({
+    autoOpen: false,
+    width: "auto",
+    title: 'Add Set of Groups',
+    modal: true,
+    overlay: {
+      backgroundColor: "#000",
+      opacity: 0.7
+    }      
+  }).dialog('open');
+  var callbacks = $("#add_category_form").data('callbacks') || [];
+  callbacks.push(callback);
+  $("#add_category_form").data('callbacks', callbacks);
+}
+$(document).ready(function() {
+  $("#add_category_form .cancel_button").click(function() {
+    $("#add_category_form").dialog('close');
+  });
+  $("#add_category_form").formSubmit({
+    property_validations: {
+      'category[name]': function(val, data) {
+        var found = false;
+        $("#category_list .category").each(function() {
+          if($(this).text().toLowerCase() == val.toLowerCase()) {
+            found = true;
+            return false;
+          }
+        });
+        if(found) {
+          return "\"" + val + "\" is already in use"
+        }
+      }
+    },
+    beforeSubmit: function(data) {
+      $(this).loadingImage();
+      $(this).data('category_name', data['category[name]']);
+    },
+    success: function(data) {
+      $(this).loadingImage('remove');
+      var callbacks = $(this).data('callbacks') || [];
+      for(var idx in callbacks) {
+        var callback = callbacks[idx];
+        if(callback && $.isFunction(callback)) {
+          callback.call(this, data);
+        }
+      }
+      $(this).data('callbacks', [])
+      $(this).dialog('close');
+    }
+  });
+});
+</script>
+<% end %>
+<% form_tag context_url(@context, :create_category_context_groups_url), {:id => "add_category_form", :style => "display: none;"} do %>
+  <table>
+    <tr>
+      <td>Name for Groups:</td>
+      <td><input type="text" name="category[name]" value="Project Groups"/></td>
+    </tr>
+    <% if @context.is_a?(Account) %>
+      <input type="hidden" name="category[split_groups]" value="0">
+    <% else %>
+      <tr>
+        <td style="vertical-align: top;">Group Structure:</td>
+        <td>
+          <input type="radio" name="category[split_groups]" id="category_split_groups" value="1"/>
+          <label for="category_split_groups">
+            Split students into 
+          </label>
+          <input type="text" name="category[group_count]" style="width: 25px;"/> equal groups<br/>
+          <div style="display: none;">
+          <input type="checkbox" name="category[limit_groups]" value="1"/>
+          Maximum of <input type="text" name="category[max_membership]" style="width: 25px;"/> students per group
+          </div>
+          <input type="radio" name="category[split_groups]" id="category_no_groups" value="0" checked="true"/>
+          <label for="category_no_groups">I'll create groups manually</label>
+        </td>
+      </tr>
+    <% end %>
+    <tr>
+      <td colspan="2" class="button-container-right-aligned">
+        <button type="submit" class="button">Create Groups</button>
+      </td>
+    </tr>
+  </table>
+<% end %>

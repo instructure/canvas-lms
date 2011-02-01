@@ -1,0 +1,103 @@
+<% entry_exists = entry && entry ? true : false
+  out_of_context ||= false
+  entry_context ||= entry && entry.context ? entry.context : @context
+  entry_id = entry ? entry.id : "{{ id }}"
+  user_id = entry.try_rescue(:user_id) || "{{ user_id }}"
+  topic ||= nil
+  discussion_topic_id = entry.try_rescue(:discussion_topic_id) || (topic && topic.id) || "{{ discussion_topic_id }}"
+  skip_sub_entries ||= false
+ %>
+<% cache([
+    'entry_message_render', 
+    (entry.try_rescue(:cache_key) || (entry_context.try_rescue(:asset_string) || 'blank')), 
+    out_of_context, 
+    skip_sub_entries,
+    @topic_agglomerated,
+    Time.zone.utc_offset
+  ].join('/')) do %>
+<div class="discussion_entry communication_message" style="<%= entry_exists ? "" : "display: none;" %>" id="entry_<%= entry_exists ? entry.id : "blank" %>">
+  <div class="header">
+    <% if entry && entry.new_record? && entry.new_record_header %>
+      <%= entry.new_record_header %>
+    <% else %>
+      <div class="header_title">
+        <% if out_of_context %>
+          <span style="font-size: 0.8em; padding-left: 20px;">from
+            <a href="<%= context_url(entry_context, :context_discussion_topic_url, entry ? entry.discussion_topic_id : '{{ topic_id }}') %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
+          </span>
+        <% else %>
+          <% if @topic_agglomerated && entry %>
+            <a href="<%= context_url(entry_context, :context_discussion_topic_url, entry ? entry.discussion_topic_id : '{{ topic_id }}') %>" style="font-weight: bold;"><%= entry.context.name %></a>
+          <% end %>
+          <a title="Author's name" href="<%= context_url(entry_context, :context_user_url, user_id) %>" class="user_name"><%= context_user_name(@context, entry && entry.user_id) %></a>
+        <% end %>
+      </div>
+      <div class="teaser_message"></div>
+      <% unless out_of_context %>
+      <div class="link_box">
+        <span class="links">
+          <% if !@topic_agglomerated && (!entry || !entry.new_record?) %>
+            <a href="<%= context_url(entry_context, :new_context_discussion_entry_url) %>" class="add_entry_link disabled_link atr-reply">Reply to this Message</a>
+            <a href="<%= context_url(entry_context, :edit_context_discussion_entry_url, entry_id) %>" class="edit_entry_link disabled_link atr-edit">Edit this Message</a>
+            <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry_id) %>" class="delete_entry_link disabled_link atr-delete">Delete this Message</a>
+          <% end %>
+        </span>
+      </div>
+      <% end %>
+      <div class="post_date time_ago_date"><%= entry.try_rescue(:created_at).try_rescue(:strftime, "%b %d at %I:%M%p") || "Date Created" %></div>
+      <div class="clear"></div>
+    <% end %>
+  </div>
+  <div class="content">
+    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), entry_context.asset_string) %></div>
+    <div class="course_id" style="display: none;"><%= entry_context.id if entry_context && entry_context.is_a?(Course) %></div>
+    <div class="course_role" style="display: none;"><%= @role_lookups[entry_context.asset_string] if entry_context && @role_lookups %></div>
+    <div class="message user_content"><%= user_content(entry.try_rescue(:message), entry_context.asset_string, entry.try_rescue(:asset_string)) || nbsp %></div>
+    <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>
+    <div class="link_box">
+      <div class="attachment_data" style="<%= hidden unless entry && entry.attachment %>; float: left;">
+        Attached File: <a href="<%= context_url(entry_context, :context_file_download_url, entry && entry.attachment ? entry.attachment_id : "{{ attachment_id }}") %>" class="attachment_name"><%= entry.try_rescue(:attachment).try_rescue(:display_name) || nbsp %></a>
+        <a href="<%= context_url(entry_context, :context_file_download_url, "{{ attachment_id }}") %>" class="entry_attachment_url" style="display: none;">&nbsp;</a>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="subcontent" style="<%= hidden if entry && entry.new_record? %>">
+      <% entries ||= []; @grouped_entries ||= {} %>
+      <% if entry && !skip_sub_entries %>
+        <% entries = @grouped_entries[entry.id] %>
+        <% entries ||= [] #entry.discussion_subentries.active %>
+        <% if entries.length > 3 %>
+          <div class="communication_sub_message">
+            <div class="content behavior_content">
+              <a href="#" class="show_sub_messages_link">Show <%= pluralize(entries.length - 2, "More Entry") %></a>
+            </div>
+          </div>
+        <% end %>
+        <% entries.each_with_index do |entry, idx| %>
+          <%= render :partial => "discussion_topics/sub_entry", :object => entry, :locals => {:hide_entry => entries.length > 3 && idx < entries.length - 2 && !@context.try_rescue(:show_all_discussion_entries)} %>
+        <% end %>
+      <% end %>
+      <% if entry && entry.editor_id && entry.editor_id != entry.user_id %>
+        <div style="font-size: 0.8em;">
+          This comment was edited by <%= link_to(context_user_name(entry_context, entry.editor_id), context_url(entry_context, :context_user_url, entry.editor_id)) %>.
+        </div>
+      <% end %>
+      <div class="communication_sub_message reply_message <%= 'lonely_behavior_message' if entries.empty? %>" style="display: none;">
+        <div class="content behavior_content">
+          <a href="#" class="add_entry_link textarea">Make a Side Comment...</a>
+        </div>
+      </div>
+      <%= render :partial => 'discussion_topics/sub_entry', :object => nil, :locals => {:parent_entry => entry || topic} %>
+    </div>
+  </div>
+  <div style="display: none;">
+    <% if !@topic_agglomerated && (!entry || !entry.new_record?) %>
+    <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry_id) %>" class="edit_entry_url">&nbsp;</a>
+    <% end %>
+    <span class="parent_id"><%= entry.parent_id rescue nbsp %></span>
+    <span class="id"><%= entry ? entry.id : nbsp %></span>
+  </div>
+</div>
+<div class="discussion_subtopic entry_list" id="replies_entry_<%= entry_exists ? entry.id : "blank" %>" style="display: none;">
+</div>
+<% end %>

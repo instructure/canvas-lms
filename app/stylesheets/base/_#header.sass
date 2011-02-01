@@ -1,0 +1,231 @@
+#skip_navigation_link
+  position: absolute
+  left: -10000px
+  top: auto
+  width: 1px
+  height: 1px
+  overflow: hidden
+  color: #fff
+  background-color: #DC3F3F
+  border: 1px dashed #fff
+  font-size: 12px
+  padding: 1px
+  &:focus
+    left: 0
+    width: auto
+    height: auto
+    z-index: 1
+// the #header.no-user #header-logo part here is so that it overrides the byuh logo
+#header-logo, #header.no-user #header-logo 
+  background: url("/images/canvas/header_canvas_logo.png") no-repeat
+  width: 135px
+  height: 26px
+  left: 16px
+  bottom: 21px
+  position: absolute
+  text-indent: -9999px
+  outline: none
+#header-logo-secondary
+  display: none
+  background: url("/images/canvas/header_canvas_logo.png") no-repeat
+  width: 135px
+  height: 26px
+  right: 26px
+  bottom: 6px
+  position: absolute
+
+#header
+  position: relative
+  z-index: 11 /* IE7 needs this o so the menu-item-drops get stuck above #main */
+  padding-top: 26px
+  background: url("/images/canvas/header_bg.png") 0 0 repeat-x 
+  &.no-user
+    background-position: 0 -25px
+    min-height: 20px
+    #header-logo
+      top: 11px
+      left: 6px
+    #header-logo-secondary
+      display: none
+    
+#topbar
+  position: absolute
+  top: 0
+  right: 0
+  width: 100%
+  overflow: hidden
+  
+#identity
+  +reset-list
+  float: right
+  font-size: 12px
+  margin-right: 22px
+  margin-bottom: 4px /*make room for the drop shadow*/
+  padding: 1px 11px
+  +box-shadow(rgba(0,0,0, 0.2), 2px, 2px, 4px)
+  background-color: $identity_background_color
+  
+  
+  li
+    float: left
+    border-left: 1px solid darken($identity_background_color, 5%)
+    line-height: 1em
+    margin: 5px 8px 5px 0
+    padding-left: 8px
+    &.first, &.feedback
+      border-left: none
+  .no-left-border
+    border-left: none
+  .user_name
+    border-left: none
+    margin-right: 15px
+    a
+      color: #444 !important
+      text-decoration: none !important
+      
+  a
+    color: $identity_link_color
+    
+  .inbox a
+    text-decoration: none
+    &:hover, &:active
+      span
+        text-decoration: underline
+    
+    .unread-messages-count
+      +border-radius(8px)
+      background-color: $identity_link_color
+      color: $identity_background_color
+      padding: 1px 6px
+  #feedback_link
+    color: #fff !important
+    background-color: orange
+    +border-radius(5px)
+    padding: 1px 2px
+    border: 1px solid #E79900
+
+#menu
+  +pie-clearfix
+  +reset-list
+  color: black
+  padding-top: 3px
+  margin-left = !left_side_width
+.menu-item
+  display: block
+  float: left
+  position: relative
+  .menu-item-title, .menu-item-no-drop
+    border: 1px solid transparent
+    border-bottom: 0 none
+    color: $menu_text_color
+    display: block
+    padding: 6px 17px 5px
+    text-decoration: none
+    position: relative
+    z-index: 100
+    height: 29px
+    font-size: 17px
+  
+  .menu-item-no-drop:hover
+    text-decoration: underline
+  .menu-item-title
+    background: url("/images/canvas/menu_arrow.png") no-repeat  right 17px
+    padding-right: 27px
+  &.hover
+    .menu-item-title
+      border-top-color = !menu_border_color
+      border-left-color = !menu_border_color
+      border-right-color = !menu_border_color 
+      background-color: $menu_background_color
+      
+    .menu-item-drop
+      // bring it back on screen so you can see it
+      left: 0
+
+  .menu-item-drop
+    border = "1px solid" !menu_border_color
+    +linear-gradient(color-stops($menu_background_color, $menu_background_color_bottom))
+    +box-shadow(rgba(0, 0, 0, 0.25), 7px, 7px, 9px)
+    background:
+      color: $menu_background_color
+      repeat: repeat-x
+      position: top left
+    padding: 6px 0
+    top: 40px
+    z-index: 99
+    font-size: 13px
+    // hide off screen, dont do display:none, so screenreaders can see it
+    overflow: hidden
+    position: absolute
+    left: -99999999px
+    
+    .menu-item-drop-padded
+      padding:
+        top: 6px
+        left: 12px
+        right: 12px
+        
+    .menu-item-drop-float-right
+      font:
+        family: "ff-clifford-eighteen-web-pro-1","ff-clifford-eighteen-web-pro-2",Georgia,"Times New Roman",Times,serif
+        style: italic
+      float: right
+      white-space: nowrap
+      
+    
+    .menu-item-drop-column
+      padding: 0 12px
+      border-left: 1px dotted #ccc
+      min-width: 270px
+      width: 270px
+      vertical-align: top
+      h2
+        font-size: 1.2em
+        margin-top: 0
+      &:first-child /* :first-child works in IE 7+ but not :last-child */
+        border-left: none
+      .menu-item-drop-column-list
+        +reset-list
+        width: 270px
+        li
+          border-top: 1px dashed #ccc
+          &:hover
+            // do this instead of a specific bg color because the drop-down has a gradient, so it would look wierd with a color, 
+            // but this just makes any li a little darker than it normally would so it works with the gradient
+            background-image: url('/images/4_percent_opacity.png')
+            .name
+              color: darken($menu_link_color, 12%)
+          a
+            display: block
+            font-size: 15px
+            line-height: 19px
+            padding-top: 2px
+            text-decoration: none
+            color: $menu_link_color
+    li
+      font-size: 15px
+      line-height: .9em
+      .secondary-right, .subtitle
+        font:
+          family: "ff-clifford-eighteen-web-pro-1","ff-clifford-eighteen-web-pro-2",Georgia,"Times New Roman",Times,serif
+          style: italic
+        color: #888
+      .subtitle
+        display: block
+        color: #bcbcbc
+        font-size: 9px
+      &:hover 
+        .secondary-right, .subtitle
+          color: #555
+      .name-right-wrapper
+        width: 100%
+        display: block
+        overflow: hidden
+      .secondary-right
+        float: right
+        white-space: nowrap
+        font-size: 11px
+      .name
+        display: block
+          
+

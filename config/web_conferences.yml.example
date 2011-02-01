@@ -1,0 +1,14 @@
+production:
+- name: DimDim
+  type: dim_dim
+  domain: dimdim.com
+  
+development:
+- name: DimDim
+  type: dim_dim
+  domain: dimdim.com
+     
+test:
+- name: DimDim
+  type: dim_dim
+  domain: dimdim.com

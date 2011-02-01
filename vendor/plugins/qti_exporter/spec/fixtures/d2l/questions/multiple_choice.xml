@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: flow_label is no longer supported in version 2, ignoring
+Warning: titles on respconditions no longer supported, ignored "Response Condition 1"
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: reference to undeclared outcome, auto-declaring "SCORE" as type float
+Warning: titles on respconditions no longer supported, ignored "Response Condition 2"
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="d2l_multiple_choice"
+ title=""
+ label="QUES_32399_53455"
+ adaptive="false"
+ timeDependent="false">
+<responseDeclaration identifier="QUES_32399_53455_LID" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>&lt;!--BBQ-001--&gt;Akkadian is a Semitic language, related to Hebrew and Arabic.</p>
+<choiceInteraction responseIdentifier="QUES_32399_53455_LID" shuffle="false" maxChoices="1">
+<simpleChoice identifier="QUES_32399_53455_A1013651" fixed="true">
+<p>True</p></simpleChoice>
+<simpleChoice identifier="QUES_32399_53455_A1013652" fixed="true">
+<p>False</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="QUES_32399_53455_LID"/><baseValue baseType="identifier">QUES_32399_53455_A1013651</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.000000000</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">QUES_32399_53455_IF1013651</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="QUES_32399_53455_LID"/><baseValue baseType="identifier">QUES_32399_53455_A1013652</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0.000000000</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">QUES_32399_53455_IF1013652</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUES_32399_53455_IF1013651">
+<p>Good work</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUES_32399_53455_IF1013652">
+<p>That's not correct</p></modalFeedback>
+</assessmentItem>

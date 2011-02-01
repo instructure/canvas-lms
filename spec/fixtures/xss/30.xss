@@ -1,0 +1,2 @@
+alert|javascript|rel
+<iframe rel=javascript:alert('asdf')/>

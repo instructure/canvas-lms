@@ -1,0 +1,18 @@
+{
+    "quiz_name":"Blackboard 8 Export Test",
+    "quiz_type":"assignment",
+    "migration_id":"res00001",
+    "title":"Blackboard 8 Export Test",
+    "points_possible":"20",
+    "question_count":2,
+    "questions":[
+        {
+            "question_type":"question_reference",
+            "migration_id":"_153086_1"
+        },
+        {
+            "question_type":"question_reference",
+            "migration_id":"_152999_1"
+        }
+    ]
+}

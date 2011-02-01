@@ -1,0 +1,115 @@
+<% content_for :page_title do %><%= @assignment.title %>: <%= context_user_name(@context, @submission.user) %><% end %>
+
+<% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
+  <div style="width: 600px; margin: 10px auto;">
+    <p>The submissions for this assignment are posts in the assignment's discussion.
+    Below are the discussion posts for <%= context_user_name(@context, @submission.user) %>, or you can 
+    <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1) %>"><b>view the full discussion</b></a>
+    </p>
+    <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
+    <% if @assignment.group_category %>
+      <% @entries = @assignment.discussion_topic.child_topics.map{|t| t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at} %>
+    <% end %>
+    <% @entries.each do |entry| %>
+      <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true} %>
+    <% end %>
+    <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
+      <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward">Show the Entire Discussion</a>
+    </div>
+  </div>
+<% elsif @submission.submission_type == "online_url" %>
+  <div style="text-align: center; width: 500px; margin: 10px auto; font-size: 0.8em;">
+    <% image = @submission.attachment if @submission.processed? %>
+    This submission was a URL to an external page.  
+    <% if image %>  
+      We've included a snapshot of what the page looked like when it was submitted.  Or you
+      can click to view the original submission.
+    <% else %>
+      Keep in mind that this page may
+      have changed since the submission originally occurred.
+    <% end %>
+    <div style="font-size: 1.4em; margin: 10px;">
+      <a href="<%= @submission.url %>" class="not_external">View the Original Submission for <%= context_user_name(@context, @submission.user) %></a>
+    </div>
+    <div style="font-size: 1.4em; margin: 10px;">
+      <a href="<%= @submission.url %>" class="not_external"><%= @submission.url %></a>
+    </div>
+  </div>
+  <div style="text-align: center;">
+  <% if @submission.processed %>
+    <img src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => image.id) %>" alt="URL Preview"/>
+  <% end %>
+  </div>
+<% elsif @submission.submission_type == "online_text_entry" %>
+  <% js_block do %>
+  <script>
+  $(document).ready(function() {
+    $(".data_view").change(function() {
+      if($(this).val() == "paper") {
+        $("#submission_preview").removeClass('plain_text').addClass('paper');
+      } else {
+        $("#submission_preview").removeClass('paper').addClass('plain_text');
+      }
+    }).change();
+  });
+  </script>
+  <% end %>
+  <div style="text-align: right; margin-right: 20px;">
+    <select class="data_view">
+      <option value="paper">Paper View</option>
+      <option value="plain_text">Plain Text View</option>
+    </select>
+  </div>
+  <div id="submission_preview" class="paper user_content">
+    <%= user_content(@submission.body, @context.asset_string, @submission.asset_string) %>
+  </div>
+<% elsif @submission.submission_type == "online_upload" %>
+  <div style="width: 600px; margin: 5px auto;">
+    File Uploads for <%= @submission.user.name %>:<br/>
+    <% @submission.attachments.each do |attachment| %>
+      <div style="font-size: 1.2em; margin-top: 10px;">
+        <a style="font-size: 1em;" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %> <%= 'instructure_scribd_file' if attachment.scribdable? %>"><%= attachment.display_name %></a>
+        <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) %>
+          <% if (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
+            <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
+          <% end %>
+        <% end %>
+        
+      </div>
+      <span style="padding-left: 20px;"><%= number_to_human_size(attachment.size) %></span>
+    <% end %>
+  </div>
+<% elsif @submission.submission_type == "online_quiz" %>
+  <% content_for :stylesheets do %>
+    <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version) %>"/>
+  <% end %>
+  <div style="text-align: center;">
+    This submission was a quiz submission.  Redirecting to quiz page.
+  </div>
+<% elsif @submission.submission_type == 'media_recording' && @submission.media_comment_id %>
+  This submission is a media recording.
+  <a href="#" class="play_media_recording_link">Click here to view</a>
+  <div style="width: 400px; margin: 10px auto;" id="media_recording_box">
+    <div class="box_content">
+    </div>
+  </div>
+  <div class="media_comment_id" style="display: none;"><%= @submission.media_comment_id %></div>
+
+  <% js_block do %>
+    <script>
+      $(document).ready(function() {
+        $(".play_media_recording_link").click(function(event) {
+          event.preventDefault();
+          var id = $(".media_comment_id:first").text();
+          $("#media_recording_box .box_content").mediaComment('show_inline', id);
+          $(this).remove();
+        });
+        $(".play_media_recording_link").mediaCommentThumbnail();
+      });
+    </script>
+  <% end %>
+<% else %>
+  <div style="margin: 20px auto; width: 200px; height: 50px; font-size: 1.5em;  font-weight: bold;">
+    No Submission
+  </div>
+<% end %>

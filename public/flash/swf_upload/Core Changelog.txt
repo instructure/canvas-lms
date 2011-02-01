@@ -1,0 +1,283 @@
+ * SWFUpload Core, January 2009, www.swfupload.org, swfupload.googlecode.com
+
+ * --------- Version 2.2.0.1-----------
+ * - Removed requeueUpload due to bugs/poor testing
+ * = Fixed namespace conflict that broke stopUpload
+ 
+ * --------- Version 2.2.0-----------
+ * + Added button_placeholder setting that accepts a DOM element.
+ * + Added ability to requeue any file (including some improvement to internal queue state tracking)
+ * + UploadErrors caused by a missing upload_url now causes the file to be requeued automatically
+ * + Added preserve_relative_urls setting
+ * + SWFUpload now converts relative URLs to absolute URLs to avoid issues with Flash Player interpreting it differently on some clients
+ * + Added assume_success_timeout setting which allows uploadSuccess to be called after a timeout if, for some reason Flash ignores the server's response
+ *   An additional parameter has been added to the uploadSuccess event to indicate whether a response was received or success was assumed.
+ 
+ * --------- Version 2.2.0 Beta 2 ~ 5-----------
+ * = Fixed a Queue Limit bug
+ * + Improved internal event handling code so uploadSuccess fires even when not content is returned from the server (*woot*, except for Macs)
+ * = Fixed issues in Destroy
+ * = Fixed issues with Queue Plugin
+ * + Added periodic checks of the ExternalInterface
+ * + Improved IE memory leak prevention code
+ * + Added Speed Plugin
+ * = Updated Queue Plugin for better multi-plugin compatibility
+
+ * --------- Version 2.2.0 Beta 1-----------
+ * + Added Flash Player 10 Support
+ *   = Added setting for defining a button image
+ *   = Added setting for defining button text
+ *   = Added setting for defining button width, height and padding
+ *   = Added setting for defining what element the Flash Movie should replace
+ *   = Added setting for defining flash wmode
+ *   = Added setting for defining the mouse cursor
+ * + Added prevent_swf_caching setting as a work-around for issues in Avant Browser (and other IE based browser)
+ * + Added setting for accepting HTTP Status codes other than 200 as successful
+ * + Added parameter to cancelUpload that allows the uploadError event for cancelled uploads to be supressed
+ * + Added pro-active memory leak fix for IE and fixed problems with the destroy function (credits to steffen for patches and testing)
+ * + Replaced callFlash with CallFunction (using the internal function that Flash uses). Based on code from MooTools.
+ * = Fixed bug in the Queue plugin that breaks startUpload when passing a file id.
+ * + Updated Queue plugin to stop the queue if false is returned from the uploadStart handler.
+ * = Fixed small issues in SWFObject plugin
+ * = Fixed issue with ExternalInterface string escaping
+ * - Dropped Graceful Degradation Plugin
+ * - Dropped v1.0.2 Plugin
+ * - Dropped Flash Player 8 support
+
+ * --------- Version 2.1.0 -----------
+ * = Fixed GET values so they are escaped properly
+ * + Added destroy function
+ * = Added exception handling around browse() calls
+ * = Minor code cleanup
+ * + Split Core and Demos
+ 
+ * --------- Version 2.1.0 Beta 2-----------
+ * = Fixed bug in XHTML fix where it wasn't split correctly by Flash
+ * = Fixed file params "undefined" in debug output
+ * + Added requeue_on_error settings so HTTP/IO/Security errors requeue the file instead of discarding it.
+       This will affect the queue plugin (if an error is occurring the file will be reuploaded and reuploaded).
+ * = Fixed HTTP/IO error behavior.  We'll see how this goes Flash 9 is supposed to call HTTPError followed by an IO error but I suspect they come out of orde sometimes.
+ * = Fixed invalid characters in file param names.  Worked around flash bug by escaping the names. Should be transparent to devs.
+ * = Fixed missing upload URL logic so it fires consistently
+ * = Fixed file params not being sent when useQueryString is true
+ * + Added SWFObject plugin and demo.
+ * + Added CookieBug demo to demonstrate what they bug really is all about.
+ * + Added VB.Net version of the Application Demo
+ 
+ 
+ * --------- Version 2.1.0 Beta 1-----------
+ * + Added allowScriptAccess="always" to the embed/object elements so the SWF can be served from different domains.
+ * = Fixed a type-o in the debug output that prevented the instance id (movieName) from displaying. - Thx Joel
+ * + Rewrote SWFUpload.js for better code reuse based on sample code from batiste.bieler (thanks!!!)
+ * + Added queueComplete event to the Queue Plugin
+ * + Added Simple Upload demo
+ * = JSLinted all the JavaScript code
+ * + Added use_query_string setting (and setUseQueryString function) that forces post_param and file_param values to be sent on the query_string instead of the post (for Flash 9 version)
+ * = Fixed file.type and date properties so a default value is provided (rather than null) when no value is provided by flash.
+ * = Fixed misc bugs in the demos
+ * = Fixed ExternalInterface calls being made available for Flash 9 versions <9.0.28 which aren't supported
+ * + Fixed use of & producing invalid XHTML in the <object> and <embed> tags.
+ * - Removed the use of the embed tag (using the <object> sample from the Flash Satay method)
+ * = Updated plugins to work with code rewrite changes.
+ * = Extracted FileProgress object in to its own file.
+ * + Added addPostParam and removePostParam functions
+
+ * --------- Version 2.0.2 -----------
+ * = Fixed a bug where post params could not be added to the current file (because it is removed from the queue when it becomes current)
+ * = Fixed a conversion error when converting kilobytes to bytes in the file size check
+ * = Fixed a problem in the documentation that said the file_size_limit was bytes when it is actually kilobytes
+ * + Added formatting to the documentation, a table of contents, and details for each setting .
+ * + Added units for file_size_limit setting. The setting understands B, KB, MB, GB. Default is KB.
+ * + Added a check for the ExternalInterface functions in flashReady so SWFUpload will not fire the loaded event if those are not available.
+  
+ * --------- Version 2.0.1 -----------
+ * = Fixed a bug where zero-byte files would stop file the queuing process.
+ * = Finished updating Features Demo
+ * + Added GetFileByIndex(i) that gets a JavaScript File Object.  The index never changes. Finished files continue to be available.
+ *    The JavaScript GetFile function will accept a file_id or an index.
+ * + Added CheckFileSize constants to replace the magic numbers
+ * + Added some code in an attempt to fix "Script is running slowly" error messages
+ * = Better cleanup of FileReference objects
+ 
+ * --------- Version 2.0 -----------
+ * + Re-created SWFUpload in Actionscript v2 for Flash 8 compatibility. Flash 8 loses POST and Server Data features.  The two versions are otherwise fully compatible.
+ *    Flash 8 uses URL to pass post_params/file_params.
+ * = Changed uploadStart event so it's part of the setTimeout/eventQueue workaround. This allows Flash functions to be called from uploadStart.
+ * = Renamed uploadComplete to uploadSuccess and fileComplete to uploadComplete.  All started uploads call uploadComplete (even if cancelled or stopped).
+ * = Changed startUpload validation failure behavior. Rather than cancelling the upload the file is now requeued. Devs can cancel
+ *    or do whatever the need to in uploadError to handle the problem.
+ * = Fixed fileQueueLimit/fileUploadLimit logic so it works correctly.
+ * = Moved the upload request building to a later point so that the post params and file params can be updated in uploadStart.
+ * - Removed the last of the UI stuff (ui_container, degraded_container).
+ * + Started development on Plug-ins. Graceful Degradation, v1.0.2, Cookies, Queue Handling
+ * = Fixed missing file_status field in FileItem.
+ * + Added modificationDate to FileItem (file object)
+ * + Added setStats function that lets you change the file upload count, etc.  This will give more power over the queue limits. Not well tested.
+ * = Renamed compeleted_uploads to successful_uploads in getStats object
+ * + Added in_progress to getStats object
+
+ * --------- Revision 7.0 beta 3 -----------
+ * + Added an "event queue".  Events are added to an array and executeEvent is called on a setTimeout. This prevents out of order issues that occur
+ *    in the Safari browser.
+ * + Added a check for the UPLOAD_COMPLETE_DATA event constant which only became available in Flash Player 9.0.28.  This 
+ *    fixes the Flash Version detection (Flash Object Detection) which was accepting Flash Player 9 versions before 9.0.28.
+ * - Removed old code block that was missed when moving from a Flash Timer to the JavaScript timeout (caused certain cancel events to be called twice)
+ * = Change ShowUI to the swfUploadLoaded event which will hopefully make it more clear that this is an overrideable event
+ * = Changed flashReady to behave like the other events (uses setTimeout and the Event Queue).
+ 
+ * --------- Revision 7.0 beta 2 -----------
+ * = Changed ERROR_CODE_FILE_NOT_FOUND to ERROR_CODE_FILE_ID_NOT_FOUND
+ * + Grouped the error code constants in objects for queue errors and upload errors.
+ * + Added an UPLOAD_STOPPED error code.
+ * = Changed Event calling method (using Timer) in Flash.  Timer is no longer called
+ *    instead setTimeout is called in JavaScript.  This includes a change to the
+ *    JavaSCript design so the Event methods are not directly overridden but stored
+ *    internally and called if defined (with a setTimeout).  This is an effort
+ *    be more compatible with the current Flash Player on Linux
+ * = Changed the parameter order for the fileQueueError and uploadError events so the fileObj is first, like other events.
+ * + Added an empty JavaScript object (customSettings) where users can store settings associated with the instance.
+ * + Worked around an escaping bug in the ExternalInterface library by escaping all backslashes in out-going strings.
+ * = Updated all the demos.
+ 
+ * --------- Revision 7.0 beta 1 -----------
+ * = Redesigned the Event Chain
+ * - Removed much of the queue concepts
+ * - Removed the fileValidation events. This can be done in the new uploadStart event
+ * - Removed beginUploadOnQueue feature. This can be done in the new dialogComplete event.
+ * - Removed use_server_data. This is now always on.
+ * + Added functions for retrieving queue stats (number of files uploaded, queued, errors, etc)
+ * + Added a file status property to the FileObject. This indicates, uploaded, error, waiting.
+ * + Added a single file browser (user cannot select multiple files)
+ * + Fixed bug (hopefully) caused if Flash call to JavaScript and in the callback JavaSCript calls to Flash
+ *    This only place this does not apply is to uploadStart.  If you call in to Flash from uploadStart use a setTimeout to do it.
+
+ * --------- Revision 6.2 -----------
+ * + Added API calls for changing all the changeable settings dynamically
+ * = Fixed a bug in FileComplete event handler (in the SWF) that caused an error in Debug Players
+ *     and prevent the event from being called
+ * + Added a setting (use_server_data_event) to indicate whether FileComplete or ServerData should be called.
+ *     The SWFUpload architecture requires that only one file upload success event can be called.
+ * = Updated all the Demos, especially the Features Demo and the Forms Demo
+
+
+ * --------- Revision 6 -----------
+ * - Removed the call to setUploadSettings in flashReady.  This was a left over call that is unnecessary.
+ * + Finished the parsing of post params during the init stage. This ommision was hidden by the call to setUploadSettings.
+ * - Removed the flash_target_id setting.  The Flash file should only ever be added to the body tag.
+ * + Fixed (hopefully for good) another SWF race condition.  IE executes the SWF very very early.  The this.movieElement value should never be referenced.
+ *     The movie Element should always be retrieved using this.getMovieElement().
+ 
+ * --------- Revision 6 -----------
+ * + Ported to ActionScript 3.  Revision 6 requires Flash Player 9.
+ * = Fixed bug caused when cancelling single files. Would break any function that searched for a file_id.
+ * - Removed the automatic cookie sending setting. Devs should just pass the value they want to send in the post_params
+ * - Removed the query params settings (global and file specific).  All params should be sent in the post_params
+ * + Added post_params which adds post values to the file upload post.
+ * + Added validate_files setting flag which causes the fileValidation event to be called before each file is uploaded.
+ * + Added fileValidation event. Return false if validation fails and true if validation is successful.
+ * + Added server_data parameter to the fileComplete event which returns any text that the upload script returns.
+ * = Updated all demos to work with Revision 6
+ * + Added in-code file extension validation.  Before a file is queued the extension is checked against the valid extensions.
+ *     Files the have invalid extensions cause the error event to be raised.
+ * + Added 'file_post_name' setting that allows the post variable name containing the file data to be named something other than 'Filedata'
+ * = Fixed a race condition in loadFlash where a cached flash movie would execute before this.movieElement could be assigned and loading would fail.
+
+ * --------- Revision 5.2 -----------
+ * = A little more code cleaning and variable renaming
+ * + Changed from an array queue to a FIFO queue. This eliminates the "current_index" and
+ *    should reduce some memory usage.
+ * + Added out of order file uploading.  Call StartUpload(/file_id/).
+ * + Added custom query_string parameters in addition to the cookies
+ * + Added the ability to modify the URL, cookies, params and send to flash
+ * + Added per file query_string params
+ * + Added files queued limit.  Sometimes you may want the user to only queue one file at a time (or something)
+ * + Fixed limits so a zero(0) value means unlimited.
+ 
+ * --------- Revision 5 -------------
+ * = More code cleaning.  Ported SWF to FlashDevelop. (Since my Flash Studio trial expired)
+ *    The port to FlashDevelop is a big deal.  It significantly changes the code structure
+ *    and could introduce bugs.  Also there have been reported issues with the FlashDevelop
+ *    version from swfupload.mammon.se: Doesn't start when reloading in IE.  Doesn't start
+ *    in Firefox if the SWF file is visible because of a page scroll.
+ *    + I fixed the Firefox issue by removing the wmode attribute from the embed object.
+ *    + I cannot reproduce the IE issue on my local machine (although I can reproduce it at swfupload.mammon.se)
+ * + Event Handlers are now attached to the SWFUpload javascript object.  The SWF file
+ *    now calls the handlers in the context of the SWFUpload object which means the "this"
+ *    object inside the handler refers to the proper SWFUpload instance.
+ * + Tested and Fixed upload target cookie attachment
+ * = Cleaned up / renamed everything for clarity and consistancy
+ * + File queuing is now subject to the upload limit.  If the user attempts to queue more files
+ *    than allowed an error is returned and the files are not queued.
+ * + Fixed misc bugs and text encodings.
+ * + Added more debug info for the SWF file.
+ * + SWF file now obeys the debug setting.
+ * + Added SetUploadTargetURL function that allows you to "dynamically" change the upload target
+ * + Added error code for zero byte file uploads which always return an IO error. The files are now rejected
+ *    instead of being uploaded.
+ 
+ * --------- Revision 4 -------------
+ * = Cleaned up code.  Added comments. Reorganized. Added more try..catches. Removed old unused methods.
+ * - Removed the 'create_ui' setting.  The UI is now completely up to the developer.
+ * + Added upload_backend_cookies setting. Can set a string, or array of cookie names. These values will be
+ *    passed as part of the upload_backend url
+ *
+ * = Changed QueueComplete event to only fire if at least one file has been successfully uploaded.
+ * + Added "Stop Upload" feature.
+ * = Revised the FLA file to clean things up, better handle errors, etc.
+ * = Fixed a bug where cancelling the first upload would cause the remaining uploads to fire before calling
+ *    "startUpload". This change is in the FLA.
+ *
+ * + Fixed a bug in the upload.swf that prevented further file processing after an error is returned.
+ * + Added uploadLimit variable.  Only complete uploads are counted. Once the limit is reached the flash
+ *      movie will not upload any more files. (The ability to select or queue many files is not affected
+ *      by the upload limit)
+ * + Added cancelQueue and cancelUpload methods.
+ * + Added ID property to the FileObj in the upload.swf
+ * + Added Upload and Queue settings
+ * + Added methods for generating the flash HTML and inserting it into the DOM.
+ * - Removed SWFObject
+ * + Updated the upload.swf and added the "flashReady" event.  This will only call back
+ *        for Flash 8 and above.  With this we don't need a flash version detect script.
+ *        The script initializes the Flash then waits for the Callback to init the UI.
+ * + Added seperate ui_target, degraded_target, create_ui settings. This allows fine control
+ *      over what parts of the GUI the script displays and hides
+ *
+ * + Changed from a Static Class to an Instance (changed code/class structure)
+ * + Added "flash_version" setting.  When set to zero the version check is skipped
+ * + Added Debug Console.  The Instance class can't do document.write.
+ * = De-obfuscated SWFObject a bit
+ * - Removed standalone mode.
+ * + Added "ui_target" setting. When non-blank the link is added.
+ * + Added "flash_target" setting.  When blank the flash is appended to the <body> tag
+ *        = This fixes ASP.Net not allowing the flash to be added to the Form
+ * + Added error checking to the callSWF method
+ *
+
+
+ * -------- -------- -------- -------- -------- -------- -------- --------
+ * SWFUpload 0.7: Flash upload dialog - http://profandesign.se/swfupload/
+ * SWFUpload is (c) 2006 Lars Huring, Olov Nilzén and Mammon Media and is released under the MIT License:
+ * http://www.opensource.org/licenses/mit-license.php
+ * -------- -------- -------- -------- -------- -------- -------- --------
+
+ * SWFUpload 0.7: Flash upload dialog - http://profandesign.se/swfupload/
+ *
+ * VERSION HISTORY
+ * 0.5 - First release
+ *
+ * 0.6 - 2006-11-24
+ * - Got rid of flash overlay
+ * - SWF size reduced to 840b
+ * - CSS-only styling of button
+ * - Add upload to links etc.
+ *
+ * 0.7 - 2006-11-27
+ * - Added filesize param and check in SWF
+ *
+ * 0.7.1 - 2006-12-01
+ * - Added link_mode param for standalone links
+ * if set to "standalone", createElement("a") won't run.
+ * - Added link_text param if css isn't needed.
+ * - Renamed cssClass to css_class for consistency
+ *
+ */

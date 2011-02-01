@@ -1,0 +1,126 @@
+<% if @assignments.empty? %>
+  <h2>Assignments</h2>
+  No Assignments created for this course.
+<% else %>
+  <% if @just_viewing_one_course %>
+  <div id="groups_for_student" style="display: none;">
+    <h2>Course Assignments</h2>
+    <%= render :partial => "shared/assignment_group", 
+               :collection => @groups, 
+               :locals => { 
+                 :skip_assignments => true,
+                 :multiple_groups  => @groups.length > 1
+               } %>
+  </div>
+  <% end %>
+  <div id="assignments_for_student">
+    <% [ { :label => "Overdue", :variable => @overdue_assignments},
+         { :label => "Ungraded", :variable => @ungraded_assignments},
+         { :label => "Upcoming", :variable => @future_assignments},
+         { :label => "Past", :variable => @past_assignments}
+       ].each do |group| %>
+    <div style="margin-bottom: 25px; <%= hidden if !group[:variable] || group[:variable].empty? %>" class="assignment_list <%= 'show_context' unless @just_viewing_one_course %>">
+      <h2><%= group[:label] %> Assignments</h2>
+      <%= render :partial    => "shared/assignment", 
+                 :collection => group[:variable], 
+                 :locals     => {
+                   :submissions_hash => @submissions_hash, 
+                   :assignment_count => group[:variable].length
+                 } %>
+    </div>
+    <% end %>
+  </div>
+<% end %>
+<% if @just_viewing_one_course %>
+<div id="group_weighting_scheme" style="display: none;"><%= @context.group_weighting_scheme %></div>
+<% end %>
+<% js_block do %>
+<script>
+var submissionsHash = <%= raw @submissions_hash.to_json %>;
+var managedAssignments = null;
+$(document).ready(function() {
+  if(managedAssignments) {
+    for(var idx in managedAssignments) {
+      var assignment = managedAssignments[idx].assignment;
+      var $assignment = $(".assignment_" + assignment.id);
+      $assignment.fillTemplateData({data: {
+        submitted_count: assignment.submitted_count || "0",
+        graded_count: assignment.graded_count || "0"
+      }});
+      if(assignment.submitted_count || assignment.graded_count) {
+        $assignment.find(".submitted").showIf(!!assignment.submitted_count);
+        $assignment.find(".graded").showIf(!!assignment.graded_count);
+        $assignment.find(".submitted_graded_comma").showIf(assignment.submitted_count && assignment.graded_count);
+        $assignment.find(".submitted_details").showIf(!!(assignment.submitted_count || assignment.graded_count));
+      }
+    }
+  }
+  if(submissionsHash) {
+    for(var idx in submissionsHash) {
+      var submission = submissionsHash[idx].submission;
+      var $assignment = $(".assignment_" + idx);
+      if(submission && (submission.score || submission.score === 0)) {
+        $assignment.addClass('group_assignment_graded');
+        $assignment.find(".grade").show();
+      } else {
+        $assignment.removeClass('group_assignment_graded');
+        $assignment.find(".grade").hide();
+      }
+      if(submission && submission.submission_type && !submission.score) {
+        $assignment.addClass('group_assignment_ungraded');
+        var cnt = parseInt($assignment.find(".ungraded_count").text(), 10) || 0;
+        cnt++;
+        $assignment.find(".ungraded_count").text(cnt);
+      }
+      $assignment.fillTemplateData({
+        data: submission,
+        hrefValues: ['assignment_id', 'user_id']
+      });
+      $assignment.find(".submission_comment_link").showIf(submission && submission.submission_comments_count);
+      $assignment.find(".rubric_assessment_link").showIf(submission && submission.has_rubric_assessment);
+      var data = $assignment.filter(":first").getTemplateData({textValues: ['due_date_string', 'due_time_string']});
+      var due = Date.parse(data.due_date_string + " " + data.due_time_string);
+      var now = new Date();
+      if(submission && submission.submitted_at) {
+        $assignment.addClass('group_assignment_submitted');
+      }
+      if(due && (!submission || !submission.submitted_at) && due < now) {
+        $assignment.addClass('group_assignment_overdue');
+      }
+    }
+  }
+  
+  $("#groups_for_student .assignment_group") //.find(".more_info_link").show().end()
+    .find(".more_info").hide().end()
+    .find(".more_info_brief").showIf($("#group_weighting_scheme").text() == "percent").append(" of final grade");
+  $(".show_groups_link,.hide_groups_link").click(function(event) {
+    event.preventDefault();
+    if($(this).hasClass('show_groups_link') && !$("#groups_for_student").hasClass('populated')) {
+      $("#assignments_for_student .group_assignment").each(function() {
+        var $assignment = $(this).clone(true);
+        var group_id = $assignment.find(".assignment_group_id").text();
+        var $group = $("#groups_for_student .group_" + group_id);
+        $group.find(".assignment_list").append($assignment);
+      });
+      $("#groups_for_student").addClass('populated');
+    }
+    $("#groups_for_student").showIf($(this).hasClass('show_groups_link'));
+    $("#assignments_for_student").showIf($(this).hasClass('hide_groups_link'));
+    $(".show_groups_link").showIf($(this).hasClass('hide_groups_link'));
+    $(".hide_groups_link").showIf($(this).hasClass('show_groups_link'));
+  });
+  $(".group_assignment").hover(function() {
+    if($(this).hasClass('group_assignment_overdue')) {
+      $(this).attr('title', "This assignment is overdue");
+    } else if($(this).hasClass('group_assignment_ungraded')) {
+      var ungraded_count = $(this).getTemplateData({textValues: ['ungraded_count']}).ungraded_count;
+      $(this).attr('title', ungraded_count + " submissions for this assignment still need grading");
+    } else if($(this).hasClass('group_assignment_graded')) {
+      $(this).attr('title', "This assignment has been graded");
+    }
+  }, function() {
+    $(this).attr('title', '');
+  });
+});
+</script>
+<% end %>

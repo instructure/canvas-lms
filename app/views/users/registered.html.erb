@@ -1,0 +1,114 @@
+<% 
+  jammit_css :login
+  @headers = false
+  @body_classes << "modal" if @body_classes
+  content_for :page_title, "Registration Complete"
+%>
+<% js_block do %>
+<script type="text/javascript">
+$(document).ready(function() {
+  var runAjax = true;
+  $(".re_send_confirmation_link").click(function(event) {
+    event.preventDefault();
+    
+    //we dont really want them to just keep clicking resend a bunch of times, 
+    // if it doesnt work then its ok so they can try to see if they can get it to work.
+    if (runAjax) {
+      var $link = $(this);
+      $link.text("Re-Sending...");
+      $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
+        $link.text("Done! Message may take a few minutes.");
+        runAjax = false;
+      }, function(data) {
+        $link.text("Request failed. Try again.");
+      }); 
+    }
+  });
+
+  var videoWidth = Math.max(Math.min($(window).width() - 120, ($(window).height() * 1390/900 - 120)), 800),
+      videoHeight = videoWidth * 900/1390,
+      params = { allowScriptAccess: "always" },
+      atts = { id: "youtube_player" };
+
+  swfobject.embedSWF("http://www.youtube.com/v/AVIcN531GRA?version=3&rel=0&enablejsapi=1&disablekb=1&fs=1&hd=1&showsearch=0&iv_load_policy=3&feature=player_embedded", "youtube_player", videoWidth, videoHeight, "8", null, null, params, atts);
+  
+  // $("#video").width(videoWidth).height(videoHeight);
+  $("#play_overview_video_link").click(function(){
+    $("#video_wrapper").dialog({
+      width: videoWidth,
+      title: "Overview Video of Canvas"
+    });
+    return false;
+  });
+    
+  
+});
+
+function onYouTubePlayerReady(playerid){
+  var player = document.getElementById("youtube_player");
+  player.setPlaybackQuality('hd720');
+  player.playVideo();
+}
+</script>
+<!-- Google Code for New Teacher Signup Conversion Page -->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1016624328;
+var google_conversion_language = "en";
+var google_conversion_format = "3";
+var google_conversion_color = "ffffff";
+var google_conversion_label = "WYEpCIj-0QEQyOnh5AM";
+var google_conversion_value = 0;
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js"></script>
+
+<% end %>
+<div id="modal-box">
+  <div style="margin: 55px 17px 0 45px; position: relative;">
+    <h2>You're almost there...</h2>
+    <% if @user.workflow_state == 'pending_approval' %>
+      <%= render :partial => 'users/pending_approval' %>
+    <% else %>
+      <p>We sent an email to <%= @email_address %>. <b style="font-size: 1.1em;"> Click the link in the email to
+        finish registering</b>. If you don&#x27;t see it,
+        <a href="<%= re_send_confirmation_path(@cc.user_id, @cc.id) %>" class="re_send_confirmation_link">click
+        to re-send the email</a>, and make sure to check your spam box.</p>
+    <% end %>
+    <div style="margin-top:2em">
+      <a href="#" id="play_overview_video_link"><%= image_tag("play_button.png", :alt => "Play overview video") %></a>
+      <h3>While you&#x27;re waiting...</h3>
+      <p>
+        We invite you to watch this brief overview of Canvas.  You may also <a href="http://www.instructure.com/images/case_study_byuh.pdf" title="download PDF" class="not_external">read about how Canvas is helping</a> to bring students in 27 countries closer to lecture halls, instructors and classmates. 
+      </p> 
+    </div>
+  </div>
+</div>
+<div id="video_wrapper" style="padding:0; overflow: hidden; display:none;">
+  <div id="youtube_player">
+    You need Flash player 8+ and JavaScript enabled to view this video.
+  </div>
+</div>
+<% content_for :stylesheets do %>
+  <style type="text/css" media="screen">
+    #play_overview_video_link{
+      display: block;
+      float: left;
+      margin-right: 1em;
+      background: url("/images/overview_video_thumbnail.png") no-repeat;
+      width: 211px;
+      height: 134px;
+      border: 1px solid #999;
+    }
+    #play_overview_video_link img{
+      opacity: 0.6;
+      filter:alpha(opacity=60);
+    }
+    #play_overview_video_link:hover img, #play_overview_video_link:focus img{
+      opacity: 0.9;
+      -moz-opacity: 0.9;
+      filter:alpha(opacity=90);
+    }
+    
+  </style>
+<% end %>
