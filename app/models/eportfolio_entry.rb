@@ -50,7 +50,13 @@ class EportfolioEntry < ActiveRecord::Base
   protected :update_portfolio
   
   def content_sections
-    self.content || []
+    (self.content || []).map do |section|
+      if section.is_a?(Hash)
+        section.with_indifferent_access
+      else
+        section
+      end
+    end
   end
   
   def submission_ids
