@@ -235,4 +235,90 @@ describe FilesController do
       # assigns[:attachment].should be_frozen
     end
   end
+  
+  describe "POST 'create_pending'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      post 'create_pending', {:attachment => {:context_code => @course.asset_string}}
+      assert_unauthorized
+    end
+    
+    it "should create file placeholder (in local mode)" do
+      class Attachment
+        class <<self
+          alias :old_s3_storage? :s3_storage?
+          alias :old_local_storage? :local_storage?
+        end
+        def self.s3_storage?; false; end
+        def self.local_storage?; true; end
+      end
+      begin
+        Attachment.local_storage?.should eql(true)
+        Attachment.s3_storage?.should eql(false)
+        course_with_teacher_logged_in(:active_all => true)
+        post 'create_pending', {:attachment => {
+          :context_code => @course.asset_string,
+          :filename => "bob.txt"
+        }}
+        response.should be_success
+        assigns[:attachment].should_not be_nil
+        assigns[:attachment].id.should_not be_nil
+        json = JSON.parse(response.body) rescue nil
+        json.should_not be_nil
+        json['id'].should eql(assigns[:attachment].id)
+        json['upload_url'].should_not be_nil
+        json['upload_params'].should_not be_nil
+        json['upload_params'].should_not be_empty
+        json['remote_url'].should eql(false)
+      ensure
+        class Attachment
+          class <<self
+            alias :s3_storage? :old_s3_storage?
+            alias :local_storage? :old_local_storage?
+          end
+        end
+      end
+    end
+    
+    it "should create file placeholder (in s3 mode)" do
+      class Attachment
+        class <<self
+          alias :old_s3_storage? :s3_storage?
+          alias :old_local_storage? :local_storage?
+        end
+        def self.s3_storage?; true; end
+        def self.local_storage?; false; end
+      end
+      begin
+        Attachment.s3_storage?.should eql(true)
+        Attachment.local_storage?.should eql(false)
+        course_with_teacher_logged_in(:active_all => true)
+        post 'create_pending', {:attachment => {
+          :context_code => @course.asset_string,
+          :filename => "bob.txt"
+        }}
+        response.should be_success
+        assigns[:attachment].should_not be_nil
+        assigns[:attachment].id.should_not be_nil
+        json = JSON.parse(response.body) rescue nil
+        json.should_not be_nil
+        json['id'].should eql(assigns[:attachment].id)
+        json['upload_url'].should_not be_nil
+        json['upload_params'].should_not be_nil
+        json['upload_params'].should_not be_empty
+        json['remote_url'].should eql(true)
+      ensure
+        class Attachment
+          class <<self
+            alias :s3_storage? :old_s3_storage?
+            alias :local_storage? :old_local_storage?
+          end
+        end
+      end
+    end
+  end
+  
+  describe "POST 's3_success'" do
+  end
+  
 end

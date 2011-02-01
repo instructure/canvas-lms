@@ -111,6 +111,7 @@ class SubmissionsController < ApplicationController
       attachment_ids.each do |id|
         params[:submission][:attachments] << @current_user.attachments.active.find_by_id(id) if @current_user
         params[:submission][:attachments] << @group.attachments.active.find_by_id(id) if @group
+        params[:submission][:attachments].compact!
       end
       if params[:attachments] && params[:submission][:submission_type] == 'online_upload'
 

@@ -16,8 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+CONTENT_LENGTH_RANGE = 50*1024*1024
+S3_EXPIRATION_TIME = 30.minutes
+
 class FilesController < ApplicationController
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show, :image_thumbnail]
+  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show, :image_thumbnail,:create_pending,:s3_success]
   before_filter :check_file_access_flags, :only => :show_relative
 
   before_filter { |c| c.active_tab = "files" }
@@ -353,6 +356,163 @@ class FilesController < ApplicationController
     if authorized_action(@attachment, @current_user, :create)
     end
   end
+  
+  def create_pending
+    @context = Context.find_by_asset_string(params[:attachment][:context_code])
+    @attachment = Attachment.new
+    @attachment.context = @context
+    permission_object = @attachment
+    permission = :create
+    
+    # Using workflow_state we can keep track of the files that have been built
+    # but we don't know that there's an s3 component for yet (it's still being
+    # uploaded)
+    workflow_state = 'unattached'
+    # There are multiple reasons why we could be building a file. The default
+    # is to upload it to a context.  In the other cases we need to check the
+    # permission related to the purpose to make sure the file isn't being
+    # uploaded just to disappear later
+    if @context.is_a?(Assignment) && params[:intent] == 'comment'
+      permission_object = @context
+      permission = :attach_submission_comment_files
+    elsif @context.is_a?(Assignment) && params[:intent] == 'submit'
+      permission_object = @context
+      permission = (@context.submission_types || "").match(/online_file_upload/) ? :submit : :nothing
+    elsif @context.respond_to?(:is_a_context) && params[:intent] == 'attach_discussion_file'
+      permission_object = @context.discussion_topics.new
+      permission = :attach
+    elsif @context.respond_to?(:is_a_context) && params[:intent] == 'message'
+      permission_object = @context
+      permission = :send_messages
+      workflow_state = 'unattached_temporary'
+    elsif @context.respond_to?(:is_a_context) && params[:intent] && params[:intent] != 'upload'
+      # In other cases (like unzipping a file, extracting a QTI, etc.
+      # we don't actually want the uploaded file to show up in the context's
+      # file listings.  If you set its workflow_state to unattached_temporary
+      # then it will never be activated.
+      workflow_state = 'unattached_temporary'
+    end
+    
+    if authorized_action(permission_object, @current_user, permission)
+      if @context.respond_to?(:is_a_context) && params[:intent] == 'upload'
+        get_quota
+        return if quota_exceeded(named_context_url(@context, :context_files_url))
+      end
+      @attachment.filename = params[:attachment][:filename]
+      @attachment.file_state = 'deleted'
+      @attachment.workflow_state = workflow_state
+      if @context.respond_to?(:folders)
+        @folder = @context.folders.active.find_by_id(params[:attachment][:folder_id])
+        @folder ||= Folder.unfiled_folder(@context)
+        @attachment.folder_id = @folder.id
+      end
+      @attachment.content_type = Attachment.mimetype(@attachment.filename)
+      @attachment.save!
+
+      if Attachment.s3_storage?
+        # Build the data that will be needed for the user to upload to s3
+        # without us being the middle-man
+        full_filename = @attachment.full_filename.gsub(/\+/, " ")
+        policy = {
+          'expiration' => S3_EXPIRATION_TIME.from_now.utc.iso8601,
+          'conditions' => [
+            {'bucket' => @attachment.bucket_name},
+            {'key' => full_filename},
+            {'acl' => 'private'},
+            ['starts-with', '$Filename', ''],
+            ['starts-with', '$folder', ''],
+            ['content-length-range', 1, CONTENT_LENGTH_RANGE]
+          ]
+        }
+        if params[:s3_no_redirect]
+          policy['conditions'] << {'success_action_status' => '201'}
+        else
+          policy['conditions'] << {'success_action_redirect' => s3_success_url(@attachment.id, :uuid => @attachment.uuid)}
+        end
+        if @attachment.content_type && @attachment.content_type != "unknown/unknown"
+          policy['conditions'] << {'content-type' => @attachment.content_type}
+        end
+        policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
+        signature = Base64.encode64(
+          OpenSSL::HMAC.digest(
+            OpenSSL::Digest::Digest.new('sha1'), AWS::S3::Base.connection.secret_access_key, policy_encoded
+          )
+        ).gsub(/\n/, '')
+        res = {
+          :id => @attachment.id,
+          :upload_url => "http://#{@attachment.bucket_name}.s3.amazonaws.com/",
+          :proxied_upload_url => nil,
+          :file_param => 'file',
+          :remote_url => true,
+          :success_url => s3_success_url(@attachment.id, :uuid => @attachment.uuid),
+          :upload_params => {
+            'AWSAccessKeyId' => AWS::S3::Base.connection.access_key_id,
+            'key' => full_filename,
+            'Policy' => policy_encoded,
+            'Filename' => '',
+            'folder' => '',
+            'acl' => 'private',
+            'Signature' => signature
+          }
+        }
+        if params[:s3_no_redirect]
+          res[:upload_params]['success_action_status'] = '201'
+        else
+          res[:upload_params]['success_action_redirect'] = s3_success_url(@attachment.id, :uuid => @attachment.uuid)
+        end
+        if @attachment.content_type && @attachment.content_type != "unknown/unknown"
+          res[:upload_params]['Content-Type'] = @attachment.content_type
+        end
+        render :json => res.to_json
+
+      elsif Attachment.local_storage?
+        render :json => {
+          :id => @attachment.id,
+          :upload_url => named_context_url(@context, :context_files_url, :format => :text) + "?" + { ActionController::Base.session_options[:key] => request.session_options[:id] }.to_query,
+          :remote_url => false,
+          :file_param => 'attachment[uploaded_data]', #uploadify ignores this and uses 'file'
+          :upload_params => {
+            'attachment[folder_id]' => params[:attachment][:folder_id] || '',
+            'folder' => '',
+            'Filename' => '',
+            'attachment[unattached_attachment_id]' => @attachment.id,
+            'authenticity_token' => form_authenticity_token
+          }
+        }.to_json
+      else
+        raise "Unknown storage system configured"
+      end
+    end
+  end
+  
+  def s3_success
+    @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
+    details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
+    if @attachment && details
+      unless @attachment.workflow_state == 'unattached_temporary'
+        @attachment.workflow_state = nil
+        @attachment.file_state = 'available'
+      end
+      @attachment.md5 = (details['etag'] || "").gsub(/\"/, '')
+      @attachment.content_type = details['content-type']
+      @attachment.size = details['content-length']
+      
+      if @attachment.md5 && !@attachment.md5.empty? && ns = @attachment.infer_namespace
+        if existing_attachment = Attachment.find_all_by_md5_and_namespace(@attachment.md5, ns).detect{|a| a.id != @attachment.id && !a.root_attachment_id && a.content_type == @attachment.content_type }
+          AWS::S3::S3Object.delete(@attachment.full_filename, @attachment.bucket_name) rescue nil
+          @attachment.root_attachment = existing_attachment
+          @attachment.write_attribute(:filename, nil)
+          @attachment.clear_cached_urls
+        end
+      end
+      
+      @attachment.save!
+      @attachment.submit_to_scribd!
+      render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session})
+    else
+      render_for_text ""
+    end
+  end
 
   # POST /files
   # POST /files.xml
@@ -360,15 +520,19 @@ class FilesController < ApplicationController
     @folder = @context.folders.active.find_by_id(params[:attachment].delete(:folder_id))
     @folder ||= Folder.unfiled_folder(@context)
     params[:attachment][:uploaded_data] ||= params[:attachment_uploaded_data]
+    params[:attachment][:uploaded_data] ||= params[:file] 
     params[:attachment][:user] = @current_user
     params[:attachment].delete :context_id
     params[:attachment].delete :context_type
-    @attachment = @context.attachments.new #(params[:attachment])
+    @attachment = @context.attachments.find_by_id_and_workflow_state(params[:attachment].delete(:unattached_attachment_id), 'unattached')
+    @attachment ||= @context.attachments.new #(params[:attachment])
     if authorized_action(@attachment, @current_user, :create)
       get_quota
       return if quota_exceeded(named_context_url(@context, :context_files_url))
       respond_to do |format|
-        @attachment.folder_id = @folder.id
+        @attachment.folder_id ||= @folder.id
+        @attachment.workflow_state = nil
+        @attachment.file_state = 'available'
         success = nil
         if params[:attachment] && params[:attachment][:source_attachment_id]
           a = Attachment.find(params[:attachment].delete(:source_attachment_id))
@@ -380,7 +544,12 @@ class FilesController < ApplicationController
             success = @attachment.save
           end
         end
-        success = @attachment.update_attributes(params[:attachment]) if params[:attachment][:uploaded_data]
+        if params[:attachment][:uploaded_data]
+          success = @attachment.update_attributes(params[:attachment])
+          @attachment.errors.add_to_base("Upload failed, server error, please try again.") unless success
+        else
+          @attachment.errors.add_to_base("Upload failed, expected form field missing")
+        end
         unless (@attachment.cacheable_s3_url rescue nil)
           success = false
           if (params[:attachment][:uploaded_data].size == 0 rescue false)

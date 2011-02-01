@@ -628,7 +628,7 @@ class Assignment < ActiveRecord::Base
       self.cached_context_grants_right?(user, session, :participate_as_student) &&
       !self.locked_for?(user)
     }
-    set { can :submit }
+    set { can :submit and can :attach_submission_comment_files }
     
     given { |user, session| !self.locked_for?(user) && 
       (self.context.allow_student_assignment_edits rescue false) && 
@@ -637,10 +637,10 @@ class Assignment < ActiveRecord::Base
     set { can :update_content }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#self.context.admins.find_by_id(user) }
-    set { can :update and can :update_content and can :grade and can :delete and can :create and can :read }
+    set { can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#self.context.admins.find_by_id(user) }
-    set { can :update and can :update_content and can :delete and can :create and can :read }
+    set { can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files }
   end
 
   def self.search(query)
