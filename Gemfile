@@ -1,5 +1,4 @@
-source :gemcutter
-source 'http://gems.github.com'
+source :rubygems
 
 gem 'rails',          '2.3.9'
 gem 'authlogic',      '2.1.3'
