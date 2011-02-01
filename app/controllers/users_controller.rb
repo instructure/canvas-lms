@@ -326,15 +326,17 @@ class UsersController < ApplicationController
         @pseudonym.save_without_session_maintenance
         @pseudonym.assert_communication_channel(true)
         @user.reload
+        
         if @user.registration_approval_required? && params[:new_teacher]
           @user.workflow_state = 'pending_approval'
           @user.save
-          @user.send_later_if_production(:new_teacher_registration, request.remote_ip) if params[:new_teacher]
         else
           @user.workflow_state = 'pre_registered'
           @user.save
           @pseudonym.send_confirmation!
         end
+        
+        @user.new_teacher_registration(request.remote_ip) if params[:new_teacher]
         
         data = OpenObject.new(:user => @user, :pseudonym => @pseudonym, :channel => @pseudonym.communication_channel)
         respond_to do |format|
