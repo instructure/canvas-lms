@@ -99,6 +99,8 @@ class Account < ActiveRecord::Base
   add_setting :students_can_create_courses, :boolean => true, :root_only => true
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true
   add_setting :support_url, :root_only => true
+  add_setting :equella_endpoint
+  add_setting :equella_teaser
   
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -145,11 +147,15 @@ class Account < ActiveRecord::Base
   end
   
   def equella_settings
-    if self.respond_to?(:equella_endpoint) && self.equella_endpoint
+    endpoint = self.settings[:equella_endpoint] || self.equella_endpoint
+    if !endpoint.blank?
       OpenObject.new({
-        :endpoint => self.equella_endpoint,
-        :default_action => 'selectOrAdd'
+        :endpoint => endpoint,
+        :default_action => self.settings[:equella_action] || 'selectOrAdd',
+        :teaser => self.settings[:equella_teaser]
       })
+    else
+      nil
     end
   end
   

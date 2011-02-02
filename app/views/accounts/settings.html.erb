@@ -80,12 +80,29 @@
               </tr>
             <% end %>
           <% end %>
+          <% f.fields_for :settings do |settings| %>
+            <tr>
+              <td colspan="2">
+                <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
+                <label for="enable_equella">Enable Equella for this Account</label>
+              </td>
+            </tr><tr class="equella_row" style="display: none;">
+              <td style="vertical-align: top;"><%= settings.label :equella_endpoint, "Equella Endpoint:" %></td>
+              <td>
+                <%= settings.text_field :equella_endpoint, :value => @account.settings[:equella_endpoint] %>
+                <div style="font-size: 0.8em;">This is the URL to your equella service.  It will probably look something like "http://oer.equella.com/signon.do".</div>
+              </td>
+            </tr><tr class="equella_row" style="display: none;">
+              <td><%= settings.label :equella_teaser, "Equella Comments:" %></td>
+              <td><%= settings.text_area :equella_teaser, :style => "width: 250px; height: 75px;", :value => @account.settings[:equella_teaser] %></td>
+            </tr>
+          <% end %>
         <% end %>
         <tr style="<%= hidden unless RAILS_ENV == 'development' %>">
           <td colspan="2">
             <div style="margin-top: 10px;">
               <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
-              <label for="turnitin">Enable turnitin for this account</label>
+              <label for="turnitin">Enable Turnitin for this account</label>
             </div>
           </td>
         </tr>
@@ -260,24 +277,30 @@ $(document).ready(function() {
       $link.text("invalid Turnitin settings, please check your account id and shared secret from Turnitin")
     });
   });
+  $("#enable_equella").change(function() {
+    $("tr.equella_row").showIf($(this).attr('checked'));
+    if(!$(this).attr('checked')) {
+      $("tr.equella_row").find("input,textarea").each(function() { $(this).val(""); });
+    }
+  }).change();
 
-    $(".run_report_link").click(function(event) {
-        event.preventDefault();
-        $(this).parent("form").submit();
-    });
+  $(".run_report_link").click(function(event) {
+      event.preventDefault();
+      $(this).parent("form").submit();
+  });
 
-    $(".run_report_form").formSubmit({
-        resetForm: true,
-        beforeSubmit: function(data) {
-            $(this).find('.run_report_link').hide();
-            $(this).find('.running_report_message').show();
-            return true;
-        },
-        success: function(data) {
-        },
-        error: function(data) {
-        }
-    });
+  $(".run_report_form").formSubmit({
+      resetForm: true,
+      beforeSubmit: function(data) {
+          $(this).find('.run_report_link').hide();
+          $(this).find('.running_report_message').show();
+          return true;
+      },
+      success: function(data) {
+      },
+      error: function(data) {
+      }
+  });
 
 });
 </script>

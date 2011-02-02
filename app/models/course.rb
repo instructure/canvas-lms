@@ -1739,6 +1739,15 @@ class Course < ActiveRecord::Base
     (root_account || account).enable_user_notes rescue false
   end
   
+  def equella_settings
+    account = self.account
+    while account
+      settings = account.equella_settings
+      return settings if settings
+      account = account.parent_account
+    end
+  end
+  
   # This will move the course to be in the specified account.
   # All enrollments, sections, and other objects attached to the course will also be updated.
   def move_to_account(new_root_account, new_sub_account=nil) 

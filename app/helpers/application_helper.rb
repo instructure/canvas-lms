@@ -321,13 +321,8 @@ module ApplicationHelper
   end
   
   def equella_enabled?
-    @equella_settings ||= @context.equella_settings rescue nil
-    @equella_settings ||= @domain_root_account.equella_settings rescue nil
-    if @domain_root_account == Account.default && params[:uen_demo]
-      @equella_settings = OpenObject.new(:endpoint => "http://eq.uen.org/emedia/signon.do", :default_action => "selectOrAdd", :teaser => "#{image_tag 'equella_icon.png'} Equella is a shared content tool which makes it easy to reuse content across courses and even institutions.  <a href='http://eq.uen.org'>The UEN eMedia repository</a> is a collection of open-licensed content made available by the Utah Education Network.")
-    elsif @domain_root_account == Account.default
-      @equella_settings = OpenObject.new(:endpoint => "http://oer.equella.com/signon.do", :default_action => "selectOrAdd", :teaser => "#{image_tag 'equella_icon.png'} Equella is a shared content tool which makes it easy to reuse content across courses and even institutions.  <a href='http://oer.equella.com'>This OER repository</a> is a collection of open-licensed content made available by major universities and consortiums.  Feel free to include any of this content in your course materials.")
-    end
+    @equella_settings ||= @context.equella_settings if @context.respond_to?(:equella_settings)
+    @equella_settings ||= @domain_root_account.equella_settings
     !!@equella_settings
   end
 
