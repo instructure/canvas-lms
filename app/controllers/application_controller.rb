@@ -500,8 +500,17 @@ class ApplicationController < ActionController::Base
   # Asset accesses are used for generating usage statistics.  This is how
   # we say, "the user just downloaded this file" or "the user just
   # viewed this wiki page".  We can then after-the-fact build statistics
-  # and reports from these accesses. Note that this is a no-op for now.
+  # and reports from these accesses.  This is currently being used
+  # to generate access reports per student per course.
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
+    return unless @current_user && @context && asset
+    @accessed_asset = {
+      :code => asset.is_a?(String) ? asset : asset.asset_string,
+      :group_code => asset_group.is_a?(String) ? asset_group : (asset_group.asset_string rescue 'unknown'),
+      :category => asset_category,
+      :membership_type => membership_type || (@context_membership && @context_membership.class.to_s rescue nil),
+      :level => level
+    }
   end
   
   def log_page_view
