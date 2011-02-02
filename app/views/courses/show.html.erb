@@ -13,7 +13,7 @@
   <div id="course_show_secondary">
     <% if can_do(@context, @current_user, :manage_content) %>
       <div class="rs-margin-lr rs-margin-top rs-margin-bottom">
-        <a href="#" class="button button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>" style="<%= hidden if @context.created? || @context.claimed? %>"><%= image_tag "help.png" %> Course Setup Checklist</a>
+        <a href="#" class="button button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>"><%= image_tag "help.png" %> Course Setup Checklist</a>
         <a class="button button-sidebar-wide" href="<%= context_url(@context, :controller => :announcements) %>#new"><%= image_tag "add.png" %> New Announcement</a>
       </div>
     <% end %>
