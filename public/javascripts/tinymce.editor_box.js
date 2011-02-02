@@ -90,6 +90,7 @@
       }).triggerHandler('resize');
     }
     var $dom = $("#" + id);
+    $dom.data('enable_bookmarking', enableBookmarking);
     var width = $("#" + id).width();
     if(width == 0) {
       width = $("#" + id).closest(":visible").width();

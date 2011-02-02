@@ -38,9 +38,11 @@
         }
       }, 100);
       ed.addCommand('instructureLinks', function() {
-        var bookmark = ed.selection && ed.selection.getBookmark();
         var $editor = $("#" + ed.id);
-        $editor.data('last_bookmark', bookmark);
+        if ($editor.data('enable_bookmarking')) {
+          var bookmark = ed.selection && ed.selection.getBookmark();
+          $editor.data('last_bookmark', bookmark);
+        }
         var $box = $("#instructure_link_prompt");
         var priorClasses = '';
         $box.removeClass('for_inline_content')
