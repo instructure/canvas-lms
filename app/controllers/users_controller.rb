@@ -335,8 +335,7 @@ class UsersController < ApplicationController
           @user.save
           @pseudonym.send_confirmation!
         end
-        
-        @user.new_teacher_registration(request.remote_ip) if params[:new_teacher]
+        @user.new_teacher_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip})) if params[:new_teacher]
         
         data = OpenObject.new(:user => @user, :pseudonym => @pseudonym, :channel => @pseudonym.communication_channel)
         respond_to do |format|
@@ -640,4 +639,5 @@ class UsersController < ApplicationController
     end
   end
   protected :require_open_registration
+  
 end

@@ -19,8 +19,8 @@
 class User < ActiveRecord::Base
   include Context
 
-  attr_accessible :name, :short_name, :time_zone, :subscribe_to_emails, :school_name, :school_position, :phone, :referrer, :show_user_services, :gender, :visible_inbox_types, :avatar_image
-  attr_accessor :original_id, :referrer
+  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image
+  attr_accessor :original_id
   
   before_save :infer_defaults
   serialize :preferences
@@ -274,7 +274,7 @@ class User < ActiveRecord::Base
   
   # These two methods can be overridden by a plugin if you want to have an approval process for new teachers
   def registration_approval_required?; false; end
-  def new_teacher_registration(remote_ip = nil); end
+  def new_teacher_registration(form_params = {}); end
   
   set_broadcast_policy do |p|
     p.dispatch :new_teacher_registration
