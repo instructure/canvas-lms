@@ -99,8 +99,6 @@ class Account < ActiveRecord::Base
   add_setting :students_can_create_courses, :boolean => true, :root_only => true
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true
   add_setting :support_url, :root_only => true
-  add_setting :facebook_url, :root_only => true
-  add_setting :twitter_url, :root_only => true
   
   def settings=(hash)
     if hash.is_a?(Hash)
