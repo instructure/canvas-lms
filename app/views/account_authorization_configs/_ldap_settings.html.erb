@@ -1,6 +1,6 @@
 <% form_id = @account_config.ldap_authentication? ? 'auth_form' : 'ldap_form' %>
 <% active = @account_config.ldap_authentication? ? 'class="active"' : '' %>
-<div id="ldap_div" <%= active %>>
+<div id="ldap_div" <%= raw active %>>
 <% form_for @account_config, :url => context_url(@account, :context_account_authorization_config_url, @account.id), :html => {:id => form_id, :class=>"auth_type ldap_form"} do |f| %>
     <input type="hidden" name="account_authorization_config[auth_type]" value="<%= @account_config.auth_type || 'ldap' %>"/>
     <table class="formtable" style="margin-left: 20px;">
