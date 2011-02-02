@@ -43,6 +43,9 @@
         <% end -%>
       </div>
     <% end %>
+    <div class="rs-margin-lr" style="<%= hidden unless @assignment.turnitin_enabled %>" id="turnitin_enabled">
+      Turnitin has been enabled for this assignment.
+    </div>
     
     
     <% if @current_user_submission %>

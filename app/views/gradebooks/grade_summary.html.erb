@@ -65,6 +65,7 @@
       <th>&nbsp;</th>
     </tr>
   </thead>
+<% turnitin_enabled = @context.turnitin_enabled? && @assignments.any?(&:turnitin_enabled) %>
 <% @assignments.each do |assignment| %>
   <% submission = @submissions.find {|s| s.assignment_id == assignment.id} %>
   <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade %> <%= "hard_coded " + assignment.special_class rescue "editable" %>" id="<%= "submission_" + assignment.id.to_s %>">
@@ -140,6 +141,24 @@
         </span>
         <%= image_tag "rubric.png" %>
       </a>
+      <% if turnitin_enabled %>
+        <% 
+          turntitin = nil 
+          if submission && (submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades))
+            if submission.submission_type == 'online_text_entry'
+              turnitin = submission.turnitin_data && submission.turnitin_data[submission.asset_string]
+            elsif submission.submission_type == 'online_upload'
+              turnitin = submission.attachments.map{|a| submission.turnitin_data && submission.turnitin_data[a.asset_string] }.compact.first
+            end
+          end
+        %>
+        <a class="tooltip" title="Turnitin Score" href="#" style="<%= 'visibility: hidden;' if !turnitin %>">
+          <%= image_tag "turnitin_#{turnitin && turnitin[:state]}_score.png" %>
+          <span class="tooltip_wrap right">
+            <span class="tooltip_text">See Turnitin results</span>
+          </span>
+        </a>
+      <% end %>
     </td>
     <% end %>
   </tr>

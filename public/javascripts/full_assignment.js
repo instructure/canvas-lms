@@ -224,6 +224,7 @@ jQuery(function($){
       
       $assignment.find(".quiz_content").showIf(assignment.submission_types == "online_quiz" && assignment.quiz);
       $assignment.find(".discussion_topic_content").showIf(assignment.submission_types == "discussion_topic" && assignment.discussion_topic);
+      $("#turnitin_enabled").showIf(assignment.turnitin_enabled);
       $(".readable_submission_types").text(assignment.readable_submission_types || "").showIf(assignment.readable_submission_types);
       if(assignment.quiz) {
         $.extend(assignment, {

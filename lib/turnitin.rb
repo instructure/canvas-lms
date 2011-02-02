@@ -25,8 +25,8 @@ module Turnitin
       @endpoint = "/api.asp"
       raise "Account ID required" unless account_id
       raise "Shared secret required" unless shared_secret
-      @account_id = account_id #|| "60338" || "59166"
-      @shared_secret = shared_secret #|| "instruct"
+      @account_id = account_id
+      @shared_secret = shared_secret
       @testing = testing
       @functions = {
         :create_user              => '1', # instructor or student
@@ -59,7 +59,12 @@ module Turnitin
     
     def email(item)
       # emails @example.com are, guaranteed by RFCs, to be like /dev/null :)
-      "#{item.asset_string}@null.instructure.example.com"
+      null_email = "#{item.asset_string}@null.instructure.example.com"
+      if item.is_a?(User)
+        item.email || null_email
+      else
+        null_email
+      end
     end
     
     def testSettings
@@ -75,22 +80,22 @@ module Turnitin
     
     def createStudent(user)
       res = sendRequest(:create_user, 2, :user => user, :utp => '1')
-      res.find("userid")[0].content rescue nil
+      res.css("userid")[0].content rescue nil
     end
     
     def createTeacher(user)
       res = sendRequest(:create_user, 2, :user => user, :utp => '2')
-      res.find("userid")[0].content rescue nil
+      res.css("userid")[0].content rescue nil
     end
     
     def createCourse(course)
       res = sendRequest(:create_course, 2, :utp => '2', :course => course, :user => course, :utp => '2')
-      res.find("classid")[0].content rescue nil
+      res.css("classid")[0].content rescue nil
     end
     
     def enrollStudent(course, student)
       res = sendRequest(:enroll_student, 2, :user => student, :course => course, :utp => '1', :tem => email(course))
-      res.find("userid")[0].content rescue nil
+      res.css("userid")[0].content rescue nil
     end
     
     def createAssignment(assignment)
@@ -108,7 +113,7 @@ module Turnitin
         :late_accept_flag => '1',
         :post => true
       )
-      res.find("assignmentid")[0].content rescue nil
+      res.css("assignmentid")[0].content rescue nil
     end
     
     def submitPaper(submission)
@@ -132,8 +137,7 @@ module Turnitin
             res = sendRequest(:submit_paper, '2', :post => true, :utp => '1', :ptl => a.display_name, :pdata => file, :ptype => "2", :user => student, :course => course, :assignment => assignment, :tem => email(course))
             file.close
           end
-          puts res.to_s
-          object_id = res.find("objectID")[0].content rescue nil
+          object_id = res.css("objectID")[0].content rescue nil
           if object_id
             submission.turnitin_data[a.asset_string] = {:object_id => object_id}
             submission.turnitin_data_changed!
@@ -143,7 +147,7 @@ module Turnitin
         end
       elsif submission.submission_type == 'online_text_entry'
         res = sendRequest(:submit_paper, '2', :post => true, :utp => '1', :ptl => assignment.title, :pdata => submission.plaintext_body, :ptype => "1", :user => student, :course => course, :assignment => assignment, :tem => email(course))
-        object_id = res.find("objectID")[0].content rescue nil
+        object_id = res.css("objectID")[0].content rescue nil
         if object_id
           submission.turnitin_data[submission.asset_string] = {:object_id => object_id}
           submission.turnitin_data_changed!
@@ -166,10 +170,10 @@ module Turnitin
       res = sendRequest(:generate_report, 2, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment) if object_id
       data = {}
       if res
-        data[:similarity_score] = res.find("originalityscore")[0].content rescue nil
-        data[:web_overlap] = res.find("web_overlap")[0].content rescue nil
-        data[:publication_overlap] = res.find("publication_overlap")[0].content rescue nil
-        data[:student_overlap] = res.find("student_paper_overlap")[0].content rescue nil
+        data[:similarity_score] = res.css("originalityscore")[0].content rescue nil
+        data[:web_overlap] = res.css("web_overlap")[0].content rescue nil
+        data[:publication_overlap] = res.css("publication_overlap")[0].content rescue nil
+        data[:student_overlap] = res.css("student_paper_overlap")[0].content rescue nil
       end
       data
     end
@@ -257,6 +261,7 @@ module Turnitin
         params[:md5] = md5
         mp = Multipart::MultipartPost.new
         query, headers = mp.prepare_query(params)
+        puts query if @testing
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true
         res = http.start{|con|
@@ -265,7 +270,8 @@ module Turnitin
           begin
             res = con.request(req, query)
           rescue => e
-            puts "POSTING Failed #{e}... #{Time.now}"
+            Rails.logger.error("Turnitin API error for account_id #{@account_id}: POSTING FAILED")
+            Rails.logger.error(params.to_json)
           end
         }
       else
@@ -274,7 +280,7 @@ module Turnitin
           next if value.nil?
           requestParams += "&#{URI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
         end
-        puts requestParams
+        puts requestParams if @testing
         if params[:fcmd] == '1'
           return "https://#{@host}#{@endpoint}?#{requestParams}"
         else
@@ -289,8 +295,12 @@ module Turnitin
         puts res.body
         nil
       else
-        doc = LibXML::XML::Parser.string(res.body).parse rescue nil
-        puts doc
+        doc = Nokogiri(res.body) rescue nil
+        if doc && doc.css('rcode') && doc.css('rcode')[0].content.to_i >= 100
+          Rails.logger.error("Turnitin API error for account_id #{@account_id}: error #{doc.css('rcode')[0].content}")
+          Rails.logger.error(params.to_json)
+          Rails.logger.error(res.body)
+        end
         doc
       end
     end
