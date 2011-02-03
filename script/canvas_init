@@ -9,6 +9,8 @@
 # Short-Description:	Start/stop Canvas background jobs
 ### END INIT INFO
 
+set -e
+
 # drop privs if necessary
 if [ "$(id -u)" == "0" ]; then
   exec su $(stat -c %U $(dirname $(readlink -f $0))/../config/environment.rb) -- $0 $@
@@ -19,6 +21,9 @@ fi
 cd $(dirname $(readlink -f $0))/..
 
 # set up config
+if [ -e "config/GEM_HOME" ]; then
+  export GEM_HOME=$(cat config/GEM_HOME)
+fi
 #export GEM_HOME=/path/to/gem/home
 export RAILS_ENV=production
 
