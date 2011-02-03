@@ -19,6 +19,7 @@ config/delayed_jobs.yml
 config/domain.txt
 config/domain.yml
 config/etherpad.yml
+config/external_migration.yml
 config/facebooker.yml
 config/file_store.yml
 config/GEM_HOME

@@ -81,14 +81,28 @@ class Canvas::Migrator
     rescue => e
       message = "Error unzipping archive file: #{e.message}"
       add_error "qti", message, nil, e
+    ensure
+      delete_archive
     end
 
     false
   end
 
   def delete_unzipped_archive
-    if File.exists?(@unzipped_file_path)
-      FileUtils::rm_rf(@unzipped_file_path)
+    delete_file(@unzipped_file_path)
+  end
+
+  def delete_archive
+    delete_file(@archive_file_path)
+  end
+  
+  def delete_file(file)
+    if File.exists?(file)
+      begin
+        FileUtils::rm_rf(file)
+      rescue
+        Rails.logger.warn "Couldn't delete #{file} for content_migration #{@settings[:content_migration_id]}"
+      end
     end
   end
 

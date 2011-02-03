@@ -190,12 +190,27 @@ class ContentMigration < ActiveRecord::Base
     logger.error message
     self.save
     raise e
+  ensure
+    clear_migration_data
   end
   handle_asynchronously :import_content, :priority => Delayed::LOW_PRIORITY
   
   named_scope :for_context, lambda{|context|
     {:conditions => {:context_id => context.id, :context_type => context.class.to_s} }
   }
+  
+  def clear_migration_data
+    config = Setting.from_config('external_migration')
+    if !config || !config[:keep_after_complete]
+      if File.exists?(migration_settings[:export_folder_path])
+        begin
+          FileUtils::rm_rf(migration_settings[:export_folder_path])
+        rescue
+          Rails.logger.warn "Couldn't delete export folder for content_migration #{self.id}"
+        end
+      end
+    end
+  end
 
   def fast_update_progress(val)
     self.progress = val

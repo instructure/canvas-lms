@@ -27,6 +27,11 @@ module Canvas::MigrationWorker
     att.context = content_migration
     att.uploaded_data = uploaded_data
     att.save
+    begin
+      uploaded_data.unlink
+    rescue
+      Rails.logger.warn "Couldn't unlink overview for content_migration #{content_migration.id}"
+    end
     content_migration.overview_attachment = att
     content_migration.save
     att
