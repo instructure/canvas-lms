@@ -28,10 +28,62 @@ module TextHelper
     txt += "</div></div>"
     txt
   end
-  
+
+  # http://daringfireball.net/2010/07/improved_regex_for_matching_urls
+  # released to the public domain
+  AUTO_LINKIFY_PLACEHOLDER = "LINK-PLACEHOLDER"
+  AUTO_LINKIFY_REGEX = %r{
+    \b
+    (                                            # Capture 1: entire matched URL
+      (?:
+        https?://                                # http or https protocol
+        |                                        # or
+        www\d{0,3}[.]                            # "www.", "www1.", "www2." … "www999."
+        |                                        # or
+        [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
+      )
+      (?:                                        # One or more:
+        [^\s()<>]+                               # Run of non-space, non-()<>
+        |                                        # or
+        \(([^\s()<>]+|(\([^\s()<>]+\)))*\)       # balanced parens, up to 2 levels
+      )+
+      (?:                                        # End with:
+        \(([^\s()<>]+|(\([^\s()<>]+\)))*\)       # balanced parens, up to 2 levels
+        |                                        # or
+        [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # not a space or one of these punct chars
+      )
+    ) | (
+      #{AUTO_LINKIFY_PLACEHOLDER}
+    )
+  }xi
+
   # Converts a plaintext message to html, with newlinification, quotification, and linkification
   def format_message(message, url=nil, notification_id=nil)
+    # insert placeholders for the links we're going to generate, before we go and escape all the html
+    links = []
+    placeholder_blocks = []
+    message = message.gsub(AUTO_LINKIFY_REGEX) do |match|
+      placeholder_blocks << if match == AUTO_LINKIFY_PLACEHOLDER
+        AUTO_LINKIFY_PLACEHOLDER
+      else
+        s = $1
+        link = s
+        link = "http://#{link}" if link[0,3] == 'www'
+        link = add_notification_to_link(link, notification_id) if notification_id
+        links << link
+        "<a href='#{link}'>#{s}</a>"
+      end
+      AUTO_LINKIFY_PLACEHOLDER
+    end
+
+    # now escape any html
     message = TextHelper.escape_html(message)
+
+    # now put the links back in
+    message = message.gsub(AUTO_LINKIFY_PLACEHOLDER) do |match|
+      placeholder_blocks.shift
+    end
+
     message = message.gsub(/\r?\n/, "<br/>\r\n")
     processed_lines = []
     quote_block = []
@@ -46,13 +98,6 @@ module TextHelper
     end
     processed_lines << quote_clump(quote_block) if !quote_block.empty?
     message = processed_lines.join("\n")
-    links = []
-    message = message.gsub(/((http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?)/ix) do |s|
-      link = s
-      link = add_notification_to_link(link, notification_id) if notification_id
-      links << link
-      "<a href='#{link}'>#{s}</a>";
-    end
     if url
       url = add_notification_to_link(url, notification_id) if notification_id
       links.unshift url
