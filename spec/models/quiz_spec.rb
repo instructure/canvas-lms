@@ -22,7 +22,17 @@ describe Quiz do
   before(:each) do
     course
   end
-  
+
+  it "should infer the times if none given" do
+    q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :due_at => "Sep 3 2008 12:00am", :quiz_type => 'assignment', :workflow_state => 'available')
+    q.due_at.should == Time.parse("Sep 3 2008 12:00am UTC")
+    q.assignment.due_at.should == Time.parse("Sep 3 2008 12:00am UTC")
+    q.infer_times
+    q.save!
+    q.due_at.should == Time.parse("Sep 3 2008 11:59pm UTC")
+    q.assignment.due_at.should == Time.parse("Sep 3 2008 11:59pm UTC")
+  end
+
   it "should initialize with default settings" do
     q = @course.quizzes.create!(:title => "new quiz")
     q.shuffle_answers.should eql(false)

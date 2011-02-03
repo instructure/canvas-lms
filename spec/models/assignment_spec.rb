@@ -82,12 +82,45 @@ describe Assignment do
     assignment_model
     @a.should be_respond_to(:versions)
   end
-  
+
+  describe "infer_due_at" do
+    it "should set to all_day" do
+      assignment_model(:due_at => "Sep 3 2008 12:00am")
+      @assignment.all_day.should eql(false)
+      @assignment.infer_due_at
+      @assignment.save!
+      @assignment.all_day.should eql(true)
+      @assignment.due_at.strftime("%H:%M").should eql("23:59")
+      @assignment.all_day_date.should eql(Date.parse("Sep 3 2008"))
+    end
+
+    it "should not set to all_day without infer_due_at call" do
+      assignment_model(:due_at => "Sep 3 2008 12:00am")
+      @assignment.all_day.should eql(false)
+      @assignment.due_at.strftime("%H:%M").should eql("00:00")
+      @assignment.all_day_date.should eql(Date.parse("Sep 3 2008"))
+    end
+  end
+
+  it "should treat 11:59pm as an all_day" do
+    assignment_model(:due_at => "Sep 4 2008 11:59pm")
+    @assignment.all_day.should eql(true)
+    @assignment.due_at.strftime("%H:%M").should eql("23:59")
+    @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
+  end
+
+  it "should not be set to all_day if a time is specified" do
+    assignment_model(:due_at => "Sep 4 2008 11:58pm")
+    @assignment.all_day.should eql(false)
+    @assignment.due_at.strftime("%H:%M").should eql("23:58")
+    @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
+  end
+
   context "peer reviews" do
     it "should assign peer reviews" do
       setup_assignment
       assignment_model
-      
+
       @submissions = []
       # log = Logger.new(STDOUT)
       # n = Time.now
@@ -127,39 +160,7 @@ describe Assignment do
       res = @a.assign_peer_reviews
       res.length.should eql(@submissions.length * 2)
     end
-    
-    it "should set to all_day" do
-      assignment_model(:due_at => "Sep 3 2008 12:00am")
-      @assignment.all_day.should eql(true)
-      @assignment.due_at.strftime("%H:%M").should eql("23:59")
-      @assignment.all_day_date.should eql(Date.parse("Sep 3 2008"))
-    end
-    
-    it "should update to all_day" do
-      assignment_model(:due_at => "Sep 3 2008 12:05am")
-      @assignment.all_day.should eql(false)
-      
-      @assignment.due_at = "Sep 4 2008 12:00am"
-      @assignment.save
-      @assignment.all_day.should eql(true)
-      @assignment.due_at.strftime("%H:%M").should eql("23:59")
-      @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
-    end
-    
-    it "should treat 11:59pm as an all_day" do
-      assignment_model(:due_at => "Sep 4 2008 11:59pm")
-      @assignment.all_day.should eql(true)
-      @assignment.due_at.strftime("%H:%M").should eql("23:59")
-      @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
-    end
-    
-    it "should not be set to all_day if a time is specified" do
-      assignment_model(:due_at => "Sep 4 2008 11:58pm")
-      @assignment.all_day.should eql(false)
-      @assignment.due_at.strftime("%H:%M").should eql("23:58")
-      @assignment.all_day_date.should eql(Date.parse("Sep 4 2008"))
-    end
-    
+
     it "should assign late peer reviews" do
       setup_assignment
       assignment_model
@@ -492,7 +493,7 @@ describe Assignment do
     
     it ".to_ics should return string dates for all_day events" do
       Account.default.update_attribute(:default_time_zone, 'UTC')
-      assignment_model(:due_at => "Sep 3 2008")
+      assignment_model(:due_at => "Sep 3 2008 11:59pm")
       @assignment.all_day.should eql(true)
       res = @assignment.to_ics
       res.match(/DTSTART;VALUE=DATE:20080903/).should_not be_nil

@@ -275,6 +275,7 @@ class QuizzesController < ApplicationController
       end
       @quiz = @context.quizzes.build(params[:quiz])
       @quiz.content_being_saved_by(@current_user)
+      @quiz.infer_times
       @quiz.save
       if params[:activate]
         @quiz.generate_quiz_data

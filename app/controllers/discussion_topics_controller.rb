@@ -136,6 +136,8 @@ class DiscussionTopicsController < ApplicationController
     @assignment.title = params[:discussion_topic][:title]
     @assignment.points_possible = assignment[:points_possible] || @assignment.points_possible
     @assignment.due_at = assignment[:due_at] || @assignment.due_at
+    # if no due_at was given, set it to 11:59 pm in the creator's time zone
+    @assignment.infer_due_at
     @assignment.saved_by = :discussion_topic
     @assignment.save
     params[:discussion_topic][:assignment] = @assignment

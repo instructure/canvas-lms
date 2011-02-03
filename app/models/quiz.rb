@@ -48,15 +48,19 @@ class Quiz < ActiveRecord::Base
   serialize :quiz_data
   
   simply_versioned
-  
+
+  def infer_times
+    # set the time to 11:59 pm in the creator's time zone, if none given
+    self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
+    self.lock_at += ((60 * 60 * 24) - 60) if self.lock_at && self.lock_at.hour == 0 && self.lock_at.min == 0
+  end
+
   def set_defaults
     self.shuffle_answers = false if self.shuffle_answers == nil
     self.show_correct_answers = true if self.show_correct_answers == nil
     self.allowed_attempts = 1 if self.allowed_attempts == nil
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= [[self.lock_at, self.due_at].compact.min, self.unlock_at].compact.max
-    self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
-    self.lock_at += ((60 * 60 * 24) - 60) if self.lock_at && self.lock_at.hour == 0 && self.lock_at.min == 0
     if !self.available? && self.quiz_type != 'survey' && self.quiz_type != 'graded_survey'
       self.points_possible = self.current_points_possible
     end

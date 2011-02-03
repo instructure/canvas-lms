@@ -231,6 +231,8 @@ class AssignmentsController < ApplicationController
     @assignment.workflow_state = "available"
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
+    # if no due_at was given, set it to 11:59 pm in the creator's time zone
+    @assignment.infer_due_at
     if authorized_action(@assignment, @current_user, :create)
       respond_to do |format|
         if @assignment.save

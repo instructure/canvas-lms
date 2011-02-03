@@ -83,7 +83,7 @@ class Assignment < ActiveRecord::Base
 
   before_create :infer_state_from_course  
 
-  before_save   :infer_due_at,  
+  before_save   :set_old_assignment_group_id,
                 :deliver_messages_if_publishing, 
                 :infer_grading_type, 
                 :process_if_quiz,
@@ -466,14 +466,16 @@ class Assignment < ActiveRecord::Base
     score
   end
 
-  def infer_due_at
+  def set_old_assignment_group_id
     @old_assignment_group_id = self.assignment_group_id_was
-    
+  end
+  protected :set_old_assignment_group_id
+
+  def infer_due_at
     # set to 11:59pm if it's 12:00am
     self.due_at += ((60 * 60 * 24) - 60) if self.due_at && self.due_at.hour == 0 && self.due_at.min == 0
   end
-  protected :infer_due_at
-  
+
   def to_atom(opts={})
     extend ApplicationHelper
     Atom::Entry.new do |entry|
