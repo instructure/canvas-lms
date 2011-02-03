@@ -140,9 +140,10 @@ class EportfoliosController < ApplicationController
   end
   
   def export
+    zip_filename = "eportfolio.zip"
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
-      @attachments = @portfolio.attachments.find_all_by_display_name("eportfolio.zip").select{|a| ['to_be_zipped', 'zipping', 'zipped'].include?(a.workflow_state) }.sort_by{|a| a.created_at }
+      @attachments = @portfolio.attachments.find_all_by_display_name(zip_filename).select{|a| ['to_be_zipped', 'zipping', 'zipped'].include?(a.workflow_state) }.sort_by{|a| a.created_at }
       @attachment = @attachments.pop
       @attachments.each{|a| a.destroy! }
       if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@portfolio.eportfolio_entries.map{|s| s.updated_at}.compact.max || @attachment.created_at))
@@ -151,13 +152,13 @@ class EportfoliosController < ApplicationController
       end
       
       if !@attachment
-        @attachment = @portfolio.attachments.build(:display_name => 'submissions.zip')
+        @attachment = @portfolio.attachments.build(:display_name => zip_filename)
         @attachment.workflow_state = 'to_be_zipped'
         @attachment.file_state = '0'
         @attachment.save!
       end
       if params[:compile] && @attachment.to_be_zipped?
-        ContentZipper.send_later_if_production(:process_attachment, @attachment)
+        ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY }, @attachment)
         render :json => @attachment.to_json
       else
         respond_to do |format|

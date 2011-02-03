@@ -69,7 +69,7 @@ class FoldersController < ApplicationController
         @attachment.file_state = '0'
         @attachment.context = @folder
         @attachment.save!
-        ContentZipper.send_later_if_production(:process_attachment, @attachment, @current_user)
+        ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY }, @attachment, @current_user)
         render :json => @attachment.to_json
       else
         respond_to do |format|

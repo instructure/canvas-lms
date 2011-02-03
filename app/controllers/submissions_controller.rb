@@ -266,7 +266,7 @@ class SubmissionsController < ApplicationController
       @attachment.save!
     end
     if params[:compile] && @attachment.to_be_zipped?
-      ContentZipper.send_later_if_production(:process_attachment, @attachment)
+      ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY }, @attachment)
       render :json => @attachment.to_json
     else
       respond_to do |format|

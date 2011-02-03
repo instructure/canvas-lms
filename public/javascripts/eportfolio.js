@@ -810,7 +810,11 @@
       var url = $(this).attr('href');
       var errorCount = 0;
       var check = function(first) {
-        $.ajaxJSON(url + "?compile=1", 'GET', {}, function(data) {
+        req_url = url;
+        if (first) {
+          req_url = url + "?compile=1";
+        }
+        $.ajaxJSON(req_url, 'GET', {}, function(data) {
           if(data.attachment && data.attachment.file_state && data.attachment.file_state == "available") {
             $("#export_progress").progressbar('option', 'value', 100);
             location.href = url + ".zip";
@@ -831,7 +835,7 @@
           }
         });
       };
-      check();
+      check(true);
     });
     $(".download_eportfolio_link").click(function(event) {
       $("#downloading_eportfolio_dialog").dialog('close').dialog({
