@@ -411,6 +411,7 @@ describe SubmissionsApiController, :type => :controller do
     course_with_teacher_logged_in(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    submit_homework(@assignment, student)
 
     json = api_call(:put,
           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
@@ -468,6 +469,98 @@ describe SubmissionsApiController, :type => :controller do
     comment = @submission.submission_comments.first
     comment.should be_present
     comment.comment.should == "Why U no submit"
+  end
+
+  it "should allow clearing out the current grade with a blank grade" do
+    student = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    @course.enroll_student(student).accept!
+    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    @assignment.grade_student(student, { :grade => '10' })
+    Submission.count.should == 1
+    @submission = Submission.first
+    @submission.grade.should == '10'
+    @submission.score.should == 10
+    @submission.workflow_state.should == 'graded'
+
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+          { :submission => { :posted_grade => '' } })
+    Submission.count.should == 1
+    @submission = Submission.first
+    @submission.grade.should be_nil
+    @submission.score.should be_nil
+  end
+
+  it "should allow repeated changes to a submission to accumulate" do
+    student = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    @course.enroll_student(student).accept!
+    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    submit_homework(@assignment, student)
+
+    # post a comment
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => "This works" } })
+    Submission.count.should == 1
+    @submission = Submission.first
+
+    # grade the submission
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+          { :submission => { :posted_grade => '10' } })
+    Submission.count.should == 1
+    @submission = Submission.first
+
+    # post another comment
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => "10/12 ain't bad" } })
+    Submission.count.should == 1
+    @submission = Submission.first
+
+    json['grade'].should == '10'
+    @submission.grade.should == '10'
+    @submission.score.should == 10
+    json['body'].should == 'test!'
+    @submission.body.should == 'test!'
+    json['submission_comments'].size.should == 2
+    json['submission_comments'].first['comment'].should == "This works"
+    json['submission_comments'].last['comment'].should == "10/12 ain't bad"
+    @submission.user_id.should == student.id
+
+    # post another grade
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment.id.to_s, :id => student.id.to_s },
+          { :submission => { :posted_grade => '12' } })
+    Submission.count.should == 1
+    @submission = Submission.first
+
+    json['grade'].should == '12'
+    @submission.grade.should == '12'
+    @submission.score.should == 12
+    json['body'].should == 'test!'
+    @submission.body.should == 'test!'
+    json['submission_comments'].size.should == 2
+    json['submission_comments'].first['comment'].should == "This works"
+    json['submission_comments'].last['comment'].should == "10/12 ain't bad"
+    @submission.user_id.should == student.id
   end
 
 end

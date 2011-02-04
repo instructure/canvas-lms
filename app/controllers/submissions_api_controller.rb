@@ -119,7 +119,11 @@ class SubmissionsApiController < ApplicationController
       if params[:submission].is_a?(Hash)
         submission[:grade] = params[:submission].delete(:posted_grade)
       end
-      @submission = @assignment.grade_student(@user, submission).first
+      if submission[:grade]
+        @submission = @assignment.grade_student(@user, submission).first
+      else
+        @submission = @assignment.find_or_create_submission(@user)
+      end
 
       assessment = params[:rubric_assessment]
       if assessment.is_a?(Hash) && @assignment.rubric_association
