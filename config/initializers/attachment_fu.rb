@@ -1,7 +1,3 @@
-# The following code is a work-around for the Flash 8 bug that prevents our multiple file uploader
-# from sending the _session_id.  Here, we hack the Session#initialize method and force the session_id
-# to load from the query string via the request uri. (Tested on Lighttpd, Mongrel, Apache)
-
 Technoweenie::AttachmentFu::InstanceMethods.module_eval do
   require 'rack'
   
@@ -57,6 +53,7 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
         if existing_attachment = Attachment.find_all_by_md5_and_namespace(self.md5, ns).detect{|a| (self.new_record? || a.id != self.id) && !a.root_attachment_id && a.content_type == self.content_type }
           self.temp_path = nil if respond_to?(:temp_path=)
           self.temp_data = nil if respond_to?(:temp_data=)
+          write_attribute(:filename, nil) if respond_to?(:filename=)
           self.root_attachment = existing_attachment
         end
       end
