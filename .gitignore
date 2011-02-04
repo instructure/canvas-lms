@@ -30,6 +30,7 @@ config/outgoing_mail.yml
 config/saml.yml
 config/scribd.yml
 config/security.yml
+config/selenium.yml
 config/tinychat.yml
 config/twitter.yml
 config/web_conferences.yml
