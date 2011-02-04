@@ -98,8 +98,6 @@ namespace :db do
   
   desc "Find or create the notifications"
   task :load_notifications => :load_environment do 
-    domain = HostUrl.default_host
-  
     create_notification 'Announcement', 'Announcement', 0,
       'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/announcements', %{
       New Announcement
@@ -448,7 +446,7 @@ namespace :db do
       <%= main_link %>
     }, %{
       You were invited to collaborate on a document, <%= asset.collaboration.title %> for
-      <%= asset.collaboration.context.name %>.  Visit } + domain + %{ for more details.
+      <%= asset.collaboration.context.name %>.  Visit <%= HostUrl.default_host %> for more details.
     }
     
     create_notification 'WebConference', 'Invitation', 0, 
@@ -464,7 +462,7 @@ namespace :db do
       <%= main_link %>
     }, %{
       You were invited to join a web conference, <%= asset.title %> for
-      <%= asset.context.name %>.  Visit } + domain + %{ for more details.
+      <%= asset.context.name %>.  Visit <%= HostUrl.default_host %> for more details.
     }
     
     create_notification 'CommunicationChannel', 'Registration', 0,
@@ -499,21 +497,21 @@ namespace :db do
       
       Confirm SMS: Instructure
       
-      This address is being registered at } + domain + %{ for the user, <%= asset.user.name %>.  Enter the code:
+      This address is being registered at <%= HostUrl.default_host %> for the user, <%= asset.user.name %>.  Enter the code:
       
       <%= asset.confirmation_code %>
       
-      at } + domain + %{ to confirm this account.
+      at <%= HostUrl.default_host %> to confirm this account.
     }, %{
       Confirm SMS Communication Channel
       
       Confirm SMS: Instructure
       
-      This address is being registered at } + domain + %{ for the user, <%= asset.user.name %>.  Enter the code:
+      This address is being registered at <%= HostUrl.default_host %> for the user, <%= asset.user.name %>.  Enter the code:
       
       <%= asset.confirmation_code %>
       
-      at } + domain + %{ to confirm this account.
+      at <%= HostUrl.default_host %> to confirm this account.
     }
     
     create_notification 'Pseudonym', 'Registration', 0,
@@ -534,7 +532,7 @@ namespace :db do
       
       Confirm Registration: Instructure
       
-      Thank you for registering with Instructure!  This email is confirmation that the user, <%= asset.user.name %> is registering for a new account at } + domain + %{.
+      Thank you for registering with Instructure!  This email is confirmation that the user, <%= asset.user.name %> is registering for a new account at <%= HostUrl.default_host %>.
       
       To finish the registration process, please visit the following url: 
       <%= main_link %>
@@ -548,7 +546,7 @@ namespace :db do
       
       Forgot Password: Instructure
       
-      You requested a confirmation of your password for this address at } + domain + %{.
+      You requested a confirmation of your password for this address at <%= HostUrl.default_host %>.
       
       To set a new password, please click the following link:
       <%= main_link %>
@@ -635,7 +633,7 @@ namespace :db do
       <%= main_link %>
     }, %{
       You've been invited to the <%= asset.context.class.to_s.downcase %> as
-      a <%= asset.readable_type %>.  Visit } + domain + %{ for more details.
+      a <%= asset.readable_type %>.  Visit <%= HostUrl.default_host %> for more details.
     }
     
     create_notification 'Enrollment', 'Registration', 0,
@@ -644,7 +642,7 @@ namespace :db do
       
       <%= asset.context.class.to_s.capitalize %> Invitation
       
-      You've been invited to participate in a class at } + domain + %{.  The class is
+      You've been invited to participate in a class at <%= HostUrl.default_host %>.  The class is
       called <%= asset.context.name %>, and you've been invited to
       participate as a <%= asset.readable_type %>.
       
@@ -652,7 +650,7 @@ namespace :db do
       <%= main_link %>
     }, %{
       You've been invited to the <%= asset.context.class.to_s.downcase %> as
-      a <%= asset.readable_type %>.  Visit } + domain + %{ for more details.
+      a <%= asset.readable_type %>.  Visit <%= HostUrl.default_host %> for more details.
     }
 
     create_notification 'Enrollment', 'Registration', 0,
@@ -667,7 +665,7 @@ namespace :db do
       <%= main_link %>
     }, %{
       You've been enrolled in the <%= asset.context.class.to_s.downcase %> as
-      a <%= asset.readable_type %>.  Visit } + domain + %{ for more details.
+      a <%= asset.readable_type %>.  Visit <%= HostUrl.default_host %> for more details.
     }
     
     create_notification 'Enrollment', 'Membership Update', 0,
@@ -1019,7 +1017,7 @@ namespace :db do
       Instructure.
 
       To change the way you get mail from this group, visit your profile page at
-      } + domain + %{.
+      <%= HostUrl.default_host %>.
 
       ==============================================================================
     }
