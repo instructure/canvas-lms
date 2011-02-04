@@ -78,7 +78,7 @@ class ExternalFeed < ActiveRecord::Base
   
   def add_entry(item, feed, feed_type)
     if feed_type == :rss
-      uuid = (item.guid && item.guid.content.to_s) || Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
+      uuid = (item.respond_to?(:guid) && item.guid && item.guid.content.to_s) || Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
       entry = self.external_feed_entries.find_by_uuid(uuid)
       entry ||= self.external_feed_entries.find_by_url(item.link)
       description = entry && entry.message
@@ -94,9 +94,10 @@ class ExternalFeed < ActiveRecord::Base
         )
         return entry
       end
+      date = (item.respond_to?(:date) && item.date) || Date.today
       return nil if self.header_match && !item.title.match(Regexp.new(self.header_match, true))
       return nil if self.body_match && !item.description.match(Regexp.new(self.body_match, true))
-      return nil if (item.date && self.created_at > item.date rescue false)
+      return nil if (date && self.created_at > date rescue false)
       description = "<a href='#{item.link}'>Original article</a><br/><br/>"
       description += format_description(item.description || item.title)
       entry = self.external_feed_entries.create(
@@ -104,7 +105,7 @@ class ExternalFeed < ActiveRecord::Base
         :message => description,
         :source_name => feed.channel.title,
         :source_url => feed.channel.link,
-        :posted_at => Time.parse(item.date.to_s),
+        :posted_at => Time.parse(date.to_s),
         :user => self.user,
         :url => item.link,
         :uuid => uuid
