@@ -176,7 +176,7 @@ class SubmissionsController < ApplicationController
     @submission = @assignment.submissions.find_by_user_id(params[:submission_id])
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
-      url = @submission.turnitin_report_url(@asset_string) rescue nil
+      url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
       if url
         redirect_to url
       else

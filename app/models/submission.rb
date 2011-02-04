@@ -177,10 +177,14 @@ class Submission < ActiveRecord::Base
     data
   end
   
-  def turnitin_report_url(asset_string)
+  def turnitin_report_url(asset_string, user)
     if self.turnitin_data && self.turnitin_data[asset_string] && self.turnitin_data[asset_string][:similarity_score]
       turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
-      turnitin.submissionReportUrl(self, asset_string)
+      if self.grants_right?(user, nil, :grade)
+        turnitin.submissionReportUrl(self, asset_string)
+      elsif self.current_submission_graded?
+        turnitin.submissionStudentReportUrl(self, asset_string)
+      end
     else
       nil
     end

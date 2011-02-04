@@ -186,12 +186,20 @@ module Turnitin
       sendRequest(:generate_report, 1, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment)
     end
     
+    def submissionStudentReportUrl(submission, asset_string)
+      user = submission.user
+      assignment = submission.assignment
+      course = assignment.context
+      object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
+      sendRequest(:generate_report, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
+    end
+    
     def submissionPreviewUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:show_paper, 1, :oid => object_id, :user => user, :course => course, :assignment => assignment, :utp => '1', :tem => email(course))
+      sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
     end
     
     def submissionDownloadUrl(submission, asset_string)
@@ -199,7 +207,7 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:show_paper, 2, :oid => object_id, :user => user, :course => course, :assignment => assignment, :utp => '1', :tem => email(course))
+      sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
     end
     
     def listSubmissions(assignment)

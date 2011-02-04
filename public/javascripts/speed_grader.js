@@ -794,7 +794,7 @@ var jsonData, visibleRubricAssessments;
         .css('display', (turnitin && turnitin.similarity_score != null) ? '' : 'none')
         .attr('href', turnitin_url)
         .attr('class', 'turnitin_similarity_score ' + ((turnitin && turnitin.state) || 'no') + '_score')
-        .find(".similarity_score").text((turnitin && turnitin.similarity_score) "--");
+        .find(".similarity_score").text((turnitin && turnitin.similarity_score) || "--");
       
       //handle the files
       $submission_files_list.html("");
