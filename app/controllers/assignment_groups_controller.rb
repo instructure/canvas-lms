@@ -68,7 +68,7 @@ class AssignmentGroupsController < ApplicationController
             hash = group.as_json(:include_root => false,
                                  :only => %w(id name position))
             if include_assignments
-              hash['assignments'] = group.assignments.map { |a| assignment_json(a) }
+              hash['assignments'] = group.assignments.active.map { |a| assignment_json(a) }
             end
             hash
           end

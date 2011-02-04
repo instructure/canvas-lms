@@ -151,4 +151,26 @@ describe AssignmentGroupsController, :type => :controller do
       },
     ]
   end
+
+  it "should exclude deleted assignments" do
+    course_with_teacher_logged_in(:active_all => true)
+    group1 = @course.assignment_groups.create!(:name => 'group1')
+    group1.update_attribute(:position, 10)
+
+    a1 = @course.assignments.create!(:title => "test1", :assignment_group => group1, :points_possible => 10)
+    a2 = @course.assignments.create!(:title => "test2", :assignment_group => group1, :points_possible => 12)
+    a2.reload
+    a2.destroy
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
+          { :controller => 'assignment_groups', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :include => ['assignments'] })
+
+    group = json.first
+    group.should be_present
+    group['assignments'].size.should == 1
+    group['assignments'].first['name'].should == 'test1'
+  end
 end

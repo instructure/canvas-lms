@@ -253,8 +253,6 @@ describe SubmissionsApiController, :type => :controller do
     Submission.count.should == 1
     @submission = Submission.first
 
-    # Haven't completely defined the submission json format yet, all fields are
-    # being returned right now.
     json['grade'].should == 'B'
     json['score'].should == 12.9
   end
@@ -450,4 +448,26 @@ describe SubmissionsApiController, :type => :controller do
     comment['media_comment']['url'].should == "http://test.host/courses/#{@course.id}/media_download?entryId=1234&redirect=1&type=mp4"
     comment['media_comment']["content-type"].should == "audio/mp4"
   end
+
+  it "should allow commenting on an uncreated submission" do
+    student = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+
+    json = api_call(:put,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :id => student.id.to_s },
+          { :comment => { :text_comment => "Why U no submit" } })
+
+    Submission.count.should == 1
+    @submission = Submission.first
+
+    comment = @submission.submission_comments.first
+    comment.should be_present
+    comment.comment.should == "Why U no submit"
+  end
+
 end

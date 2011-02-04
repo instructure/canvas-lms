@@ -19,86 +19,104 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe AssignmentsApiController, :type => :controller do
-  it "should sort the returned list of assignments" do
-    # the API returns the assignments sorted by
-    # [assignment_groups.position, assignments.position]
-    course_with_teacher_logged_in(:active_all => true)
-    group1 = @course.assignment_groups.create!(:name => 'group1')
-    group1.update_attribute(:position, 10)
-    group2 = @course.assignment_groups.create!(:name => 'group2')
-    group2.update_attribute(:position, 7)
-    group3 = @course.assignment_groups.create!(:name => 'group3')
-    group3.update_attribute(:position, 12)
+  context "index" do
 
-    @course.assignments.create!(:title => 'assignment1', :assignment_group => group2).update_attribute(:position, 2)
-    @course.assignments.create!(:title => 'assignment2', :assignment_group => group2).update_attribute(:position, 1)
-    @course.assignments.create!(:title => 'assignment3', :assignment_group => group1).update_attribute(:position, 1)
-    @course.assignments.create!(:title => 'assignment4', :assignment_group => group3).update_attribute(:position, 3)
-    @course.assignments.create!(:title => 'assignment5', :assignment_group => group1).update_attribute(:position, 2)
-    @course.assignments.create!(:title => 'assignment6', :assignment_group => group2).update_attribute(:position, 3)
-    @course.assignments.create!(:title => 'assignment7', :assignment_group => group3).update_attribute(:position, 2)
-    @course.assignments.create!(:title => 'assignment8', :assignment_group => group3).update_attribute(:position, 1)
+    it "should sort the returned list of assignments" do
+      # the API returns the assignments sorted by
+      # [assignment_groups.position, assignments.position]
+      course_with_teacher_logged_in(:active_all => true)
+      group1 = @course.assignment_groups.create!(:name => 'group1')
+      group1.update_attribute(:position, 10)
+      group2 = @course.assignment_groups.create!(:name => 'group2')
+      group2.update_attribute(:position, 7)
+      group3 = @course.assignment_groups.create!(:name => 'group3')
+      group3.update_attribute(:position, 12)
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/assignments.json",
-          { :controller => 'assignments_api', :action => 'index',
-            :format => 'json', :course_id => @course.id.to_s })
+      @course.assignments.create!(:title => 'assignment1', :assignment_group => group2).update_attribute(:position, 2)
+      @course.assignments.create!(:title => 'assignment2', :assignment_group => group2).update_attribute(:position, 1)
+      @course.assignments.create!(:title => 'assignment3', :assignment_group => group1).update_attribute(:position, 1)
+      @course.assignments.create!(:title => 'assignment4', :assignment_group => group3).update_attribute(:position, 3)
+      @course.assignments.create!(:title => 'assignment5', :assignment_group => group1).update_attribute(:position, 2)
+      @course.assignments.create!(:title => 'assignment6', :assignment_group => group2).update_attribute(:position, 3)
+      @course.assignments.create!(:title => 'assignment7', :assignment_group => group3).update_attribute(:position, 2)
+      @course.assignments.create!(:title => 'assignment8', :assignment_group => group3).update_attribute(:position, 1)
 
-    order = json.map { |a| a['name'] }
-    order.should == %w(assignment2 assignment1 assignment6 assignment3 assignment5 assignment8 assignment7 assignment4)
-  end
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/assignments.json",
+            { :controller => 'assignments_api', :action => 'index',
+              :format => 'json', :course_id => @course.id.to_s })
 
-  it "should return the assignments list with API-formatted Rubric data" do
-    # the API changes the structure of the data quite a bit, to hide
-    # implementation details and ease API use.
-    course_with_teacher_logged_in(:active_all => true)
-    @group = @course.assignment_groups.create!({:name => "some group"})
-    @assignment = @course.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
-    @assignment.update_attribute(:submission_types, "online_upload,online_text_entry,online_url,media_recording")
+      order = json.map { |a| a['name'] }
+      order.should == %w(assignment2 assignment1 assignment6 assignment3 assignment5 assignment8 assignment7 assignment4)
+    end
 
-    @rubric = rubric_model(:user => @user, :context => @course,
-                                     :data => larger_rubric_data,
-                          :free_form_criterion_comments => true)
+    it "should return the assignments list with API-formatted Rubric data" do
+      # the API changes the structure of the data quite a bit, to hide
+      # implementation details and ease API use.
+      course_with_teacher_logged_in(:active_all => true)
+      @group = @course.assignment_groups.create!({:name => "some group"})
+      @assignment = @course.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
+      @assignment.update_attribute(:submission_types, "online_upload,online_text_entry,online_url,media_recording")
 
-    @assignment.create_rubric_association(:rubric => @rubric, :purpose => 'grading', :use_for_grading => true)
+      @rubric = rubric_model(:user => @user, :context => @course,
+                                       :data => larger_rubric_data,
+                            :free_form_criterion_comments => true)
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/assignments.json",
-          { :controller => 'assignments_api', :action => 'index',
-            :format => 'json', :course_id => @course.id.to_s })
+      @assignment.create_rubric_association(:rubric => @rubric, :purpose => 'grading', :use_for_grading => true)
 
-    json.should == [
-      {
-        'id' => @assignment.id,
-        'name' => 'some assignment',
-        'position' => 1,
-        'points_possible' => 12,
-        'grading_type' => 'points',
-        'use_rubric_for_grading' => true,
-        'free_form_criterion_comments' => true,
-        'submission_types' => [
-          "online_upload",
-          "online_text_entry",
-          "online_url",
-          "media_recording"
-        ],
-        'rubric' => [
-          {'id' => 'crit1', 'points' => 10, 'description' => 'Crit1',
-            'ratings' => [
-              {'id' => 'rat1', 'points' => 10, 'description' => 'A'},
-              {'id' => 'rat2', 'points' => 7, 'description' => 'B'},
-              {'id' => 'rat3', 'points' => 0, 'description' => 'F'},
-            ],
-          },
-          {'id' => 'crit2', 'points' => 2, 'description' => 'Crit2',
-            'ratings' => [
-              {'id' => 'rat1', 'points' => 2, 'description' => 'Pass'},
-              {'id' => 'rat2', 'points' => 0, 'description' => 'Fail'},
-            ],
-          },
-        ],
-      },
-    ]
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/assignments.json",
+            { :controller => 'assignments_api', :action => 'index',
+              :format => 'json', :course_id => @course.id.to_s })
+
+      json.should == [
+        {
+          'id' => @assignment.id,
+          'name' => 'some assignment',
+          'position' => 1,
+          'points_possible' => 12,
+          'grading_type' => 'points',
+          'use_rubric_for_grading' => true,
+          'free_form_criterion_comments' => true,
+          'submission_types' => [
+            "online_upload",
+            "online_text_entry",
+            "online_url",
+            "media_recording"
+          ],
+          'rubric' => [
+            {'id' => 'crit1', 'points' => 10, 'description' => 'Crit1',
+              'ratings' => [
+                {'id' => 'rat1', 'points' => 10, 'description' => 'A'},
+                {'id' => 'rat2', 'points' => 7, 'description' => 'B'},
+                {'id' => 'rat3', 'points' => 0, 'description' => 'F'},
+              ],
+            },
+            {'id' => 'crit2', 'points' => 2, 'description' => 'Crit2',
+              'ratings' => [
+                {'id' => 'rat1', 'points' => 2, 'description' => 'Pass'},
+                {'id' => 'rat2', 'points' => 0, 'description' => 'Fail'},
+              ],
+            },
+          ],
+        },
+      ]
+    end
+
+    it "should exclude deleted assignments in the list return" do
+      course_with_teacher_logged_in(:active_all => true)
+      @context = @course
+      @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model})
+      @assignment.reload
+      @assignment.destroy
+
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/assignments.json",
+            { :controller => 'assignments_api', :action => 'index',
+              :format => 'json', :course_id => @course.id.to_s })
+
+      json.size.should == 0
+    end
   end
 
   it "should allow creating an assignment via the API" do
