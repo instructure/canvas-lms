@@ -148,7 +148,7 @@ $(document).ready(function() {
   $(".collaborate_data").find(".select_all_link,.deselect_all_link").click(function(event) {
     event.preventDefault();
     var checked = $(this).hasClass('select_all_link');
-    $(this).parents(".collaborate_data").find(".collaborator_list :checkbox").each(function() {
+    $("#collaborator_list :checkbox").each(function() {
       $(this).attr('checked', checked);
     });
   });
