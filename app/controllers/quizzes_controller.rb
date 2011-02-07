@@ -162,6 +162,7 @@ class QuizzesController < ApplicationController
         render :action => 'invalid_ip'
       else
         log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
+        flash[:notice] = "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz." if @submission.less_than_allotted_time?
         render :action => "take_quiz"
       end
     else

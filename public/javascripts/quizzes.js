@@ -865,6 +865,11 @@ var quiz = {};
         $text.val('1');
       }
     }).triggerHandler('change');
+    $quiz_options_form.find("#time_limit_option").change(function() {
+      if(!$(this).attr('checked')) {
+        $("#quiz_time_limit").val("");
+      }
+    }).triggerHandler('change');
     $("#limit_attempts_option").change(function() {
       var $item = $("#quiz_allowed_attempts");
       if($(this).attr('checked')) {

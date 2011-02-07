@@ -23,6 +23,11 @@
     <span style="font-size: 0.8em; padding-left: 10px;">
       <a href="#" class="hide_time_link">Hide</a>
     </span>
+    <% if @submission.end_at %>
+      <div style="font-size: 0.8em;">
+        Attempt due: <%= datetime_string(@submission.end_at) %>
+      </div>
+    <% end %>
     <div class="clear"></div>
   </div>
   <div class="time_running" style="font-size: 1.2em; padding-left: 20px; color: #444;"></div>
@@ -49,6 +54,7 @@ Started: <%= datetime_string(@submission.started_at) %>
   <span class="started_at"><%= @submission.started_at.iso8601 %></span>
   <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).iso8601 %></span>
   <span class="end_at"><%= @submission.end_at && @submission.end_at.iso8601 %></span>
+  <span class="time_limit"><%= @quiz.time_limit || nbsp %></span>
   <span class="utc_offset"><%= Time.now.utc_offset %></span>
 </div>
 <%= render :partial => "display_question", :collection => @submission.questions_as_object, :locals => {:assessing => true } %>

@@ -104,7 +104,7 @@ class QuizSubmission < ActiveRecord::Base
   def needs_grading?(strict=false)
     if strict && self.untaken? && self.overdue?(true)
       true
-    elsif self.untaken? && self.end_at && !self.extendable?
+    elsif self.untaken? && self.end_at && self.end_at < Time.now && !self.extendable?
       true
     elsif self.completed? && self.submission_data && self.submission_data.is_a?(Hash)
       true
@@ -188,6 +188,10 @@ class QuizSubmission < ActiveRecord::Base
       s.submission_type = "online_quiz"
       s.save!
     end
+  end
+  
+  def less_than_allotted_time?
+    self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes
   end
   
   def completed?

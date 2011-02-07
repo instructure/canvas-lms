@@ -24,7 +24,6 @@ $(document).mousedown(function(event) {
 });
 $(document).ready(function() {
   $.scrollSidebar();
-  var current_user_id = $("#identity .user_id").text() || "none";
   $("#questions").delegate('.group_top,.question,.answer_select', 'mouseover', function(event) {
     $(this).addClass('hover');
   }).delegate('.group_top,.question,.answer_select', 'mouseout', function(event) {
@@ -170,6 +169,7 @@ $(document).ready(function() {
   }, 2000);
   setInterval(quizSubmission.updateTime, 200);
   setInterval(function() {
+    var current_user_id = $("#identity .user_id").text() || "none";
     $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
     }, function() {
       ajaxErrorFlash("Connection to " + location.host + " was lost.  Please make sure you're connected to the Internet before continuing.", request);
@@ -177,123 +177,144 @@ $(document).ready(function() {
   }, 30000);
   setTimeout(function() { quizSubmission.updateSubmission(true) }, 15000);
 });
-var quizSubmission = {
-  referenceDate: null,
-  referenceOffset: 0,
-  countDown: null,
-  isDeadline: true,
-  fiveMinuteDeadline: false,
-  oneMinuteDeadline: false,
-  submitting: false,
-  dialogged: false,
-  contentBoxCounter: 0,
-  lastSubmissionUpdate: new Date(),
-  currentlyBackingUp: false,
-  started_at: $(".started_at"),
-  end_at: $(".end_at"),
-  updateSubmission: function(repeat) {
-    if(quizSubmission.submitting && !repeat) { return; }
-    var now = new Date();
-    if((now - quizSubmission.lastSubmissionUpdate) < 1000) { return }
-    if(quizSubmission.currentlyBackingUp) { return; }
-    quizSubmission.currentlyBackingUp = true;
-    quizSubmission.lastSubmissionUpdate = new Date();
-    var data = $("#submit_quiz_form").getFormData();
-    $(".question_holder .question.marked").each(function() {
-      data[$(this).attr('id') + "_marked"] = "1";
-    });
-    $.ajaxJSON($(".backup_quiz_submission_url").attr('href'), 'PUT', data, function(data) {
-      quizSubmission.currentlyBackingUp = false;
-      if(repeat) {
-        setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
-      }
-      if(data && data.end_at) {
-        quizSubmission.end_at.text(data.end_at);
+var quizSubmission = (function() {
+  var timeMod = 0;
+  return {
+    referenceDate: null,
+    referenceOffset: 0,
+    countDown: null,
+    isDeadline: true,
+    fiveMinuteDeadline: false,
+    oneMinuteDeadline: false,
+    submitting: false,
+    dialogged: false,
+    contentBoxCounter: 0,
+    lastSubmissionUpdate: new Date(),
+    currentlyBackingUp: false,
+    started_at: $(".started_at"),
+    end_at: $(".end_at"),
+    time_limit: parseInt($(".time_limit").text(), 10) || null,
+    updateSubmission: function(repeat) {
+      if(quizSubmission.submitting && !repeat) { return; }
+      var now = new Date();
+      if((now - quizSubmission.lastSubmissionUpdate) < 1000) { return }
+      if(quizSubmission.currentlyBackingUp) { return; }
+      quizSubmission.currentlyBackingUp = true;
+      quizSubmission.lastSubmissionUpdate = new Date();
+      var data = $("#submit_quiz_form").getFormData();
+      $(".question_holder .question.marked").each(function() {
+        data[$(this).attr('id') + "_marked"] = "1";
+      });
+      $.ajaxJSON($(".backup_quiz_submission_url").attr('href'), 'PUT', data, function(data) {
+        quizSubmission.currentlyBackingUp = false;
+        if(repeat) {
+          setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
+        }
+        if(data && data.end_at) {
+          quizSubmission.end_at.text(data.end_at);
+          quizSubmission.referenceDate = null;
+          if(data.end_at > quizSubmission.end_at.text()) {
+            $.flashMessage('You have been given extra time on this attempt');
+          }
+        }
+      }, function() {
+        var current_user_id = $("#identity .user_id").text() || "none";
+        quizSubmission.currentlyBackingUp = false;
+        $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
+        }, function() {
+          ajaxErrorFlash("Connection to " + location.host + " was lost.  Please make sure you're connected to the Internet before continuing.", request);
+        }, {skipDefaultError: true});
+        
+        if(repeat) {
+          setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
+        }
+      }, {timeout: 5000, skipDefaultError: true});
+    },
+    updateTime: function() {
+      var now = new Date();
+      var end_at = quizSubmission.time_limit ? quizSubmission.end_at.text() : null;
+      timeMod = (timeMod + 1) % 120;
+      if(timeMod == 0 && !end_at && !quizSubmission.twelveHourDeadline) {
         quizSubmission.referenceDate = null;
-        if(data.end_at > quizSubmission.end_at.text()) {
-          $.flashMessage('You have been given extra time on this attempt');
+        var end = Date.parse(quizSubmission.end_at.text());
+        var now = new Date();
+        if(!quizSubmission.time_limit && (end - now) < 43200000) {
+          end_at = quizSubmission.end_at.text();
         }
       }
-    }, function() {
-      quizSubmission.currentlyBackingUp = false;
-      $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
-      }, function() {
-        ajaxErrorFlash("Connection to " + location.host + " was lost.  Please make sure you're connected to the Internet before continuing.", request);
-      }, {skipDefaultError: true});
-      
-      if(repeat) {
-        setTimeout(function() {quizSubmission.updateSubmission(true) }, 30000);
+      if(!quizSubmission.referenceDate) {
+        $.extend(quizSubmission, timing.setReferenceDate(quizSubmission.started_at.text(), end_at, now));
       }
-    }, {timeout: 5000, skipDefaultError: true});
-  },
-  updateTime: function() {
-    var now = new Date();
-    if(!quizSubmission.referenceDate) {
-      $.extend(quizSubmission, timing.setReferenceDate(quizSubmission.started_at.text(), quizSubmission.end_at.text(), now));
-    }
-    if(quizSubmission.countDown) {
-      var diff = quizSubmission.countDown.getTime() - now.getTime() - quizSubmission.clientServerDiff;
-      if(diff <= 0) {
-        diff = 0;
+      if(quizSubmission.countDown) {
+        var diff = quizSubmission.countDown.getTime() - now.getTime() - quizSubmission.clientServerDiff;
+        if(diff <= 0) {
+          diff = 0;
+        }
+        var d = new Date(diff);
+        $(".countdown_seconds").text(d.getUTCSeconds());
+        if(diff <= 0 && !quizSubmission.submitting) {
+          quizSubmission.submitting = true;
+          $("#submit_quiz_form").submit();
+        }
       }
-      var d = new Date(diff);
-      $(".countdown_seconds").text(d.getUTCSeconds());
-      if(diff <= 0 && !quizSubmission.submitting) {
-        quizSubmission.submitting = true;
-        $("#submit_quiz_form").submit();
-      }
-    }
-    var diff = quizSubmission.referenceDate.getTime() - now.getTime() - quizSubmission.clientServerDiff;
-    if(quizSubmission.isDeadline) {
-      if(diff < 1000) {
-        diff = 0;
-      }
-      if(diff < 1000 && !quizSubmission.dialogged) {
-        quizSubmission.dialogged = true;
-        quizSubmission.countDown = new Date(now.getTime() + 10000);
-        $("#times_up_dialog").show().dialog({
-          title: "Time's Up!",
-          width: "auto",
-          height: "auto",
-          modal: true,
-          overlay: {
-            backgroundColor: "#000",
-            opacity: 0.7
-          },
-          close: function() {
-            if(!quizSubmission.submitting) {
-              quizSubmission.submitting = true;
-              $("#submit_quiz_form").submit();
+      var diff = quizSubmission.referenceDate.getTime() - now.getTime() - quizSubmission.clientServerDiff;
+      if(quizSubmission.isDeadline) {
+        if(diff < 1000) {
+          diff = 0;
+        }
+        if(diff < 1000 && !quizSubmission.dialogged) {
+          quizSubmission.dialogged = true;
+          quizSubmission.countDown = new Date(now.getTime() + 10000);
+          $("#times_up_dialog").show().dialog({
+            title: "Time's Up!",
+            width: "auto",
+            height: "auto",
+            modal: true,
+            overlay: {
+              backgroundColor: "#000",
+              opacity: 0.7
+            },
+            close: function() {
+              if(!quizSubmission.submitting) {
+                quizSubmission.submitting = true;
+                $("#submit_quiz_form").submit();
+              }
             }
-          }
-        });
-      } else if(diff > 30000 && diff < 60000 && !quizSubmission.oneMinuteDeadline) {
-        quizSubmission.oneMinuteDeadline = true;
-        $.flashMessage("One Minute Left");
-      } else if(diff > 250000 && diff < 300000 && !quizSubmission.fiveMinuteDeadline) {
-        quizSubmission.fiveMinuteDeadline = true;
-        $.flashMessage("Five Minutes Left");
+          });
+        } else if(diff >    30000 && diff <    60000 && !quizSubmission.oneMinuteDeadline) {
+          quizSubmission.oneMinuteDeadline = true;
+          $.flashMessage("One Minute Left");
+        } else if(diff >   250000 && diff <   300000 && !quizSubmission.fiveMinuteDeadline) {
+          quizSubmission.fiveMinuteDeadline = true;
+          $.flashMessage("Five Minutes Left");
+        } else if(diff >  1800000 && diff <  1770000 && !quizSubmission.thirtyMinuteDeadline) {
+          quizSubmission.thirtyMinuteDeadline = true;
+          $.flashMessage("Thirty Minutes Left");
+        } else if(diff > 43200000 && diff < 43170000 && !quizSubmission.twelveHourDeadline) {
+          quizSubmission.twelveHourDeadline = true;
+          $.flashMessage("Twelve Hours Left");
+        } 
       }
+      quizSubmission.updateTimeString(diff);
+    },
+    updateTimeString: function(diff) {
+      var date = new Date(Math.abs(diff));
+      var yr = date.getUTCFullYear() - 1970;
+      var mon = date.getUTCMonth();
+      var day = date.getUTCDate() - 1;
+      var hr = date.getUTCHours();
+      var min = date.getUTCMinutes();
+      var sec = date.getUTCSeconds();
+      var times = [];
+      if(yr) { times.push(yr + (yr == 1 ? " Year" : " Years")); }
+      if(mon) { times.push(mon + (mon == 1 ? " Month" : " Months")); }
+      if(day) { times.push(day + (day == 1 ? " Day" : " Days")); }
+      if(hr) { times.push(hr + (hr == 1 ? " Hour" : " Hours")); }
+      if(true || min) { times.push(min + (min == 1 ? " Minute" : " Minutes")); }
+      if(true || sec) { times.push(sec + (sec == 1 ? " Second" : " Seconds")); }
+      $(".time_running,.time_remaining").text(times.join(", "));
     }
-    quizSubmission.updateTimeString(diff);
-  },
-  updateTimeString: function(diff) {
-    var date = new Date(Math.abs(diff));
-    var yr = date.getUTCFullYear() - 1970;
-    var mon = date.getUTCMonth();
-    var day = date.getUTCDate() - 1;
-    var hr = date.getUTCHours();
-    var min = date.getUTCMinutes();
-    var sec = date.getUTCSeconds();
-    var times = [];
-    if(yr) { times.push(yr + (yr == 1 ? " Year" : " Years")); }
-    if(mon) { times.push(mon + (mon == 1 ? " Month" : " Months")); }
-    if(day) { times.push(day + (day == 1 ? " Day" : " Days")); }
-    if(hr) { times.push(hr + (hr == 1 ? " Hour" : " Hours")); }
-    if(true || min) { times.push(min + (min == 1 ? " Minute" : " Minutes")); }
-    if(true || sec) { times.push(sec + (sec == 1 ? " Second" : " Seconds")); }
-    $(".time_running,.time_remaining").text(times.join(", "));
-  }
-};
+  };
+})();
 function updateTime() {
 }

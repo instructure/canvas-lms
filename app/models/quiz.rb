@@ -458,6 +458,10 @@ class Quiz < ActiveRecord::Base
     submission.started_at = Time.now
     submission.end_at = nil
     submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
+    # Admins can take the full quiz whenever they want
+    unless user && self.grants_right?(user, nil, :grade)
+      submission.end_at = self.due_at if self.due_at && Time.now < self.due_at && (!submission.end_at || self.due_at < submission.end_at)
+    end
     submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
     submission.finished_at = nil
     submission.submission_data = nil
