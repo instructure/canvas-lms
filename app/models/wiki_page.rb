@@ -363,7 +363,15 @@ class WikiPage < ActiveRecord::Base
     item ||= find_by_wiki_id_and_id(context.wiki.id, hash[:id]) #find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
     item ||= find_by_wiki_id_and_migration_id(context.wiki.id, hash[:migration_id]) #context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
     item ||= context.wiki.wiki_pages.new
-    item = context.wiki.wiki_page if ['folder', 'FOLDER_TYPE'].member?(hash[:type]) && hash[:root_folder]
+    if hash[:root_folder] && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
+      front_page = context.wiki.wiki_page
+      if front_page.id
+        hash[:root_folder] = false
+      else
+        # If there is no id there isn't a front page yet
+        item = front_page
+      end
+    end
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     (hash[:contents] || []).each do |sub_item|
