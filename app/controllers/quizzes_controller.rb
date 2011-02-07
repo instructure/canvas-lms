@@ -176,6 +176,20 @@ class QuizzesController < ApplicationController
   end
   protected :take_quiz
   
+  def publish
+    if authorized_action(@context, @current_user, :manage_assignments)
+      @quizzes = @context.quizzes.active.find_all_by_id(params[:quizzes]).compact.select{|q| !q.available? }
+      @quizzes.each do |quiz|
+        quiz.generate_quiz_data
+        quiz.published_at = Time.now
+        quiz.workflow_state = 'available'
+        quiz.save
+      end
+      flash[:notice] = "#{@quizzes.length} quizzes successfully published!"
+      redirect_to named_context_url(@context, :context_quizzes_url)
+    end
+  end
+  
   def reorder
     if authorized_action(@quiz, @current_user, :update)
       items = []

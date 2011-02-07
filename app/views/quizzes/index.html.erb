@@ -9,6 +9,9 @@
       <% if can_do(@context, @current_user, :manage_assignments) && feature_enabled?(:question_banks) %>
         <a href="<%= context_url(@context, :context_question_banks_url) %>" class="button button-sidebar-wide"><%= image_tag "edit.png" %> Manage Question Banks</a>
       <% end %>
+      <% if can_do(@context, @current_user, :manage_assignments) && @unpublished_quizzes.length > 1 %>
+        <a href="#" class="button button-sidebar-wide publish_multiple_quizzes_link">Publish Multiple Quizzes</a>
+      <% end %>
     </div>
   <% end %>
 <% end %>
@@ -40,9 +43,25 @@ ul.quiz_list li.quiz div.description {
 <% end %>
 <% if can_do(@context, @current_user, :manage_assignments) && @unpublished_quizzes && !@unpublished_quizzes.empty? %>
   <h2>Unpublished Quizzes</h2>
-  <ul class="quiz_list">
+  <ul class="quiz_list" id="unpublished_quizzes">
     <%= render :partial => "quiz_summary", :collection => @unpublished_quizzes, :locals => {:unpublished => true} %>
   </ul>
+  <div id="publish_multiple_quizzes_dialog" style="display: none;">
+    <% form_tag context_url(@context, :context_quizzes_publish_url), :id => "publish_quizzes_form" do %>
+      <h3>Publish Multiple Quizzes</h3>
+      Select the quizzes you would like to publish at this time:
+      <ul class="quiz_list unstyled_list">
+        <li class="quiz_item blank" style="display: none;">
+          <input type="checkbox" value="1" name="quizzes[]" class="id"/>
+          <label class="title">&nbsp;</label>
+        </li>
+      </ul>
+      <div class="button-container">
+        <button type="submit" class="button submit_button">Publish Quizzes</button>
+        <button type="button" class="button button-secondary cancel_button">Cancel</button>
+      </div>
+    <% end %>
+  </div>
 <% end %>
 <% if @assignment_quizzes.empty? && @open_quizzes.empty? %>
   <h2>Course Quizzes</h2>

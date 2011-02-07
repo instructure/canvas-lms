@@ -15,6 +15,7 @@
       <% end %>
     </div>
     <a href="<%= context_url(@context, :context_quiz_url, q) %>" class="quiz_title"><%= q.quiz_title || q.readable_type %></a>
+    <span class="quiz_id" style="display: none;"><%= (q && q.id) || nbsp %></span>
     <% if q && q.assignment_id %>
       <span style="font-size: 0.8em; font-weight: normal;">(<%= pluralize(q.assignment.points_possible, "pt") if q.assignment.points_possible %>)</span>
     <% end %>

@@ -27,6 +27,30 @@ $(document).ready(function() {
       }
     });
   });
+  $(".publish_multiple_quizzes_link").click(function(event) {
+    event.preventDefault();
+    var $dialog = $("#publish_multiple_quizzes_dialog");
+    var $template = $dialog.find(".quiz_item.blank:first").clone(true);
+    var $list = $dialog.find(".quiz_list").find(".quiz_item:not(.blank)").remove().end();
+    $("#unpublished_quizzes .quiz").each(function() {
+      var $quiz_item = $template.clone(true);
+      var data = $(this).getTemplateData({textValues: ['quiz_id', 'quiz_title']});
+      $quiz_item.find(".id").val(data.quiz_id).attr('id', 'quiz_checkbox_' + data.quiz_id).end()
+        .find(".title").text(data.quiz_title || 'Unnamed Quiz').attr('for', 'quiz_checkbox_' + data.quiz_id);
+      $list.append($quiz_item.show());
+    });
+    $dialog.find("button").attr('disabled', false);
+    $dialog.dialog('close').dialog({
+      autoOpen: false,
+      width: 400
+    }).dialog('open');
+  });
+  $("#publish_quizzes_form").submit(function() {
+    $(this).find("button").attr('disabled', true).filter('.submit_button').text('Publishing Quizzes...');
+  });
+  $("#publish_multiple_quizzes_dialog .cancel_button").click(function() {
+    $("#publish_multiple_quizzes_dialog").dialog('close');
+  });
   if($("#quiz_locks_url").length > 0) {
     var data = {};
     var assets = [];

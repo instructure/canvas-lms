@@ -165,6 +165,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :assessment_questions do |question|
       question.move_question 'move', :controller => 'assessment_questions', :action => 'move'
     end
+    course.quizzes_publish 'quizzes/publish', :controller => 'quizzes', :action => 'publish'
     course.resources :quizzes do |quiz|
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
       quiz.history "history", :controller => "quizzes", :action => "history"
