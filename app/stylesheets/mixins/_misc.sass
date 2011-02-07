@@ -28,3 +28,11 @@
   li
     margin: 0
     padding: 0
+
+// provides cross-browser vertical background gradients, will work on everything we support including ie7&8  
+=vertical-gradiant($topColor, $bottomColor)
+  background-image: -moz-linear-gradient(top, $topColor, $bottomColor)
+  background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, 		$topColor), color-stop(1, 		$bottomColor))
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$topColor}', EndColorStr='#{$bottomColor}')"
+	
+	
