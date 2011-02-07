@@ -46,7 +46,7 @@
           data[name + '[section_type]'] = "submission";
           data[name + '[submission_id]'] = $(this).getTemplateData({textValues: ['submission_id']}).submission_id;
         } else if(section_type == "upload") {
-          data[name + '[section_type]'] = "upload";
+          data[name + '[section_type]'] = "attachment";
           data[name + '[attachment_id]'] = $(this).getTemplateData({textValues: ['attachment_id']}).attachment_id;
         }
       }
@@ -236,10 +236,16 @@
       helper: 'clone',
       axis: 'y',
       start: function(event, ui) {
-        $(ui.item).find("textarea").editorBox('destroy');
+        var $item = $(ui.item);
+        if($item.getTemplateData({textValues: ['section_type']}).section_type == 'rich_text') {
+          $item.find("textarea").editorBox('destroy');
+        }
       },
       stop: function(event, ui) {
-        $(ui.item).find("textarea").editorBox();
+        var $item = $(ui.item);
+        if($item.getTemplateData({textValues: ['section_type']}).section_type == 'rich_text') {
+          $item.find("textarea").editorBox();
+        }
       }
     });
     $("#page_content").delegate('.cancel_content_button', 'click', function(event) {
