@@ -569,7 +569,8 @@ class Attachment < ActiveRecord::Base
       "video/x-msvideo" => "video",
       "video/x-sgi-movie" => "video",
       "video/3gpp" => "video",
-      "video/mp4" => "video"
+      "video/mp4" => "video",
+      "application/x-shockwave-flash" => "flash"
     }[content_type] || "file"
   end
   
