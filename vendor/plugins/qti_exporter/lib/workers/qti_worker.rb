@@ -23,8 +23,11 @@ module Canvas
           file = File.new(overview_file_path)
           Canvas::MigrationWorker::upload_overview_file(file, cm)
         end
+        if export_folder_path
+          Canvas::MigrationWorker::upload_exported_data(export_folder_path, cm)
+          Canvas::MigrationWorker::clear_exported_data(export_folder_path)
+        end
 
-        cm.migration_settings[:export_folder_path] = export_folder_path
         cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}
         cm.save
         cm.import_content

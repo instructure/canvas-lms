@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
+require 'tmpdir'
 module Canvas::MigratorHelper
   include Canvas::Migration
 
@@ -24,16 +24,6 @@ module Canvas::MigratorHelper
   OVERVIEW_JSON = "overview.json"
   
   attr_reader :overview
-
-  # The base directory where all the course data will be download to
-  # The final path for a course will be:
-  # BASE_DOWNLOAD_PATH + blackboard user name + course name
-  if ENV['RAILS_ENV'] and ENV['RAILS_ENV'] == "production"
-    #production path
-    BASE_DOWNLOAD_PATH = "/var/web/migration_tool/data/"
-  else
-    BASE_DOWNLOAD_PATH = "exports/"
-  end
 
   def self.unzip_command(zip_file, dest_dir)
     "unzip -qo #{zip_file.gsub(/ /, "\\ ")} -d #{dest_dir.gsub(/ /, "\\ ")} 2>&1"
@@ -54,6 +44,33 @@ module Canvas::MigratorHelper
     end
 
     error
+  end
+  
+  def find_export_dir
+    if @settings[:content_migration_id] && @settings[:user_id]
+      slug = "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
+    else
+      slug = "export_#{rand(10000)}"
+    end
+
+    path = create_export_dir(slug)
+    i = 1
+    while File.exists?(path) && File.directory?(path)
+      i += 1
+      path = create_export_dir("#{slug}_attempt_#{i}")
+    end
+
+    path
+  end
+
+  def create_export_dir(slug)
+    config = Setting.from_config('external_migration')
+    if config && config[:data_folder]
+      folder = config[:data_folder]
+    else
+      folder = Dir.tmpdir
+    end
+    File.join(folder, slug)
   end
 
   def make_export_dir

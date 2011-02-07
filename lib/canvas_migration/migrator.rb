@@ -44,27 +44,6 @@ class Canvas::Migrator
     raise "Migrator.export should have been overwritten by a sub-class"
   end
 
-  def find_export_dir
-    if @settings[:content_migration_id] && @settings[:user_id]
-      slug = "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}"
-    else
-      slug = "export_#{rand(10000)}"
-    end
-
-    path = create_export_dir(slug)
-    i = 1
-    while File.exists?(path) && File.directory?(path)
-      i += 1
-      path = create_export_dir("#{slug}_attempt_#{i}")
-    end
-
-    path
-  end
-
-  def create_export_dir(slug)
-    File.join(BASE_DOWNLOAD_PATH, @settings[:migration_type], @settings[:course_name].to_s, slug)
-  end
-
   def unzip_archive
     begin
       command = Canvas::MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
@@ -113,7 +92,12 @@ class Canvas::Migrator
   protected
   
   def download_archive
-    temp_file = Tempfile.new("migration")
+    config = Setting.from_config('external_migration')
+    if config && config[:data_folder]
+      temp_file = Tempfile.new("migration", config[:data_folder])
+    else
+      temp_file = Tempfile.new("migration")
+    end
     if @settings[:export_archive_path]
       temp_file.write File.read(@settings[:export_archive_path])
     elsif @settings[:course_archive_download_url] and @settings[:course_archive_download_url] != ""

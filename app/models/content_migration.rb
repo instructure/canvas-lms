@@ -24,6 +24,7 @@ class ContentMigration < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
   belongs_to :overview_attachment, :class_name => 'Attachment'
+  belongs_to :exported_attachment, :class_name => 'Attachment'
   has_a_broadcast_policy
   serialize :migration_settings
   before_save :infer_defaults
@@ -178,20 +179,36 @@ class ContentMigration < ActiveRecord::Base
   def import_content
     self.workflow_state = :importing
     self.save
-    file = File.open(File.join(migration_settings[:export_folder_path], 'course_export.json'))
-    data = JSON.parse(file.read)
-    data = data.with_indifferent_access if data.is_a? Hash
-    migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
-    self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
-  rescue => e
-    self.workflow_state = :failed
-    message = "#{e.to_s}: #{e.backtrace.join("\n")}"
-    migration_settings[:last_error] = message
-    logger.error message
-    self.save
-    raise e
-  ensure
-    clear_migration_data
+    
+    begin
+      @exported_data_zip = download_exported_data
+      @zip_file = Zip::ZipFile.open(@exported_data_zip.path)
+      data = JSON.parse(@zip_file.read('course_export.json'))
+      data = data.with_indifferent_access if data.is_a? Hash
+      
+      if @zip_file.find_entry('all_files.zip')
+        # the file importer needs an actual file to process
+        all_files_path = create_all_files_path(@exported_data_zip.path)
+        @zip_file.extract('all_files.zip', all_files_path)
+        data['all_files_export']['file_path'] = all_files_path
+      else
+        data['all_files_export']['file_path'] = nil if data['all_files_export']
+      end
+      
+      @zip_file.close
+      
+      migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
+      self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
+    rescue => e
+      self.workflow_state = :failed
+      message = "#{e.to_s}: #{e.backtrace.join("\n")}"
+      migration_settings[:last_error] = message
+      logger.error message
+      self.save
+      raise e
+    ensure
+      clear_migration_data
+    end
   end
   handle_asynchronously :import_content, :priority => Delayed::LOW_PRIORITY
   
@@ -199,16 +216,44 @@ class ContentMigration < ActiveRecord::Base
     {:conditions => {:context_id => context.id, :context_type => context.class.to_s} }
   }
   
-  def clear_migration_data
+  def download_exported_data
+    raise "No exported data to import" unless self.exported_attachment
     config = Setting.from_config('external_migration')
-    if !config || !config[:keep_after_complete]
-      if File.exists?(migration_settings[:export_folder_path])
-        begin
-          FileUtils::rm_rf(migration_settings[:export_folder_path])
-        rescue
-          Rails.logger.warn "Couldn't delete export folder for content_migration #{self.id}"
-        end
+    if config && config[:data_folder]
+      @exported_data_zip = Tempfile.new("migration_#{self.id}_", config[:data_folder])
+    else
+      @exported_data_zip = Tempfile.new("migration_#{self.id}_")
+    end
+    
+    if Attachment.local_storage?
+      @exported_data_zip.write File.read(self.exported_attachment.full_filename)
+    elsif Attachment.s3_storage?
+      att = self.exported_attachment
+      require 'aws/s3'
+      AWS::S3::S3Object.stream(att.full_filename, att.bucket_name) do |chunk|
+        @exported_data_zip.write chunk
       end
+    end
+    
+    @exported_data_zip.close
+    @exported_data_zip
+  end
+  
+  def create_all_files_path(temp_path)
+    "#{temp_path}_all_files.zip"
+  end
+  
+  def clear_migration_data
+    begin
+      @zip_file.close if @zip_file
+      @zip_file = nil
+      if @exported_data_zip
+        all_files_path = create_all_files_path(@exported_data_zip.path)
+        FileUtils::rm_rf(all_files_path) if File.exists?(all_files_path)
+        @exported_data_zip.unlink
+      end
+    rescue
+      Rails.logger.warn "Couldn't delete files for content_migration #{self.id}"
     end
   end
 

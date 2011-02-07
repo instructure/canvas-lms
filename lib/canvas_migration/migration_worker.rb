@@ -36,4 +36,45 @@ module Canvas::MigrationWorker
     content_migration.save
     att
   end
+
+  def self.upload_exported_data(folder, content_migration)
+    file_name = "exported_data_cm_#{content_migration.id}.zip"
+    zip_file = File.join(folder, file_name)
+    att = nil
+    
+    begin
+      Zip::ZipFile.open(zip_file, 'w') do |zipfile|
+        Dir["#{folder}/**/**"].each do |file|
+          next if File.basename(file) == file_name
+          file_path = file.sub(folder+'/', '')
+          zipfile.add(file_path, file)
+        end
+      end
+
+      upload_file = ActionController::TestUploadedFile.new(zip_file, "application/zip")
+      att = Attachment.new
+      att.context = content_migration
+      att.uploaded_data = upload_file
+      att.save
+      upload_file.unlink
+      content_migration.exported_attachment = att
+      content_migration.save
+    rescue => e
+      content_migration.migration_settings[:last_error] = "#{e.to_s}: #{e.backtrace.join("\n")}"
+      Rails.logger.warn "Error while uploading exported data for content_migration #{content_migration.id} - #{e.to_s}"
+    end
+
+    att
+  end
+  
+  def self.clear_exported_data(folder)
+    begin
+      config = Setting.from_config('external_migration')
+      if !config || !config[:keep_after_complete]
+        FileUtils::rm_rf(folder) if File.exists?(folder)
+      end
+    rescue
+      Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"
+    end
+  end
 end
