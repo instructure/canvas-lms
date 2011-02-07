@@ -72,6 +72,7 @@ class Account < ActiveRecord::Base
   before_save :ensure_defaults
   before_save :set_update_account_associations_if_changed
   after_save :update_account_associations_if_changed
+  after_create :default_enrollment_term
   
   serialize :settings, Hash
 
@@ -474,7 +475,9 @@ class Account < ActiveRecord::Base
   end
   
   def default_enrollment_term
-    self.enrollment_terms.active.find_or_create_by_name("Default Term")
+    unless self.root_account_id
+      self.enrollment_terms.active.find_or_create_by_name("Default Term")
+    end
   end
   
   def add_admin(args)

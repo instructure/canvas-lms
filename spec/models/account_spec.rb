@@ -109,5 +109,15 @@ describe Account do
       a.turnitin_shared_secret.should eql("2t87aot72gho8a37gh4g[awg'waegawe-,v-3o7fya23oya2o3")
     end
   end
-  
+
+  it "should make a default enrollment term if necessary" do
+    a = Account.create!(:name => "nada")
+    a.enrollment_terms.size.should == 1
+    a.enrollment_terms.first.name.should == "Default Term"
+
+    # don't create a new default term for sub-accounts
+    a2 = a.all_accounts.create!(:name => "sub")
+    a2.enrollment_terms.size.should == 0
+  end
+
 end
