@@ -121,7 +121,7 @@
           </table>
           <% unless @current_user.enrollments.ended.empty? %>
             <div class="menu-item-drop-padded">
-              <%= link_to 'See All Enrollments &raquo;', courses_path, :class => "menu-item-drop-float-right" %>
+              <%= link_to raw('See All Enrollments &raquo;'), courses_path, :class => "menu-item-drop-float-right" %>
               <!-- <div style="<%= hidden if !@domain_root_account || @domain_root_account.require_authorization_code %>">
                 You can also <a href="<%= getting_started_teacherless_path %>">use Canvas to track grades for your other classes</a>
               </div> -->

@@ -7,7 +7,7 @@
       <% if collection_size > 0 && collection.size == 0 %>
         <li><%= link_to("#{collection_size} more", more_link_for_over_max, :class => "menu-item-drop-float-right" ) %></li>
       <% elsif max_to_show && (collection_size || collection.size) > max_to_show %>
-        <li><%= link_to("&hellip; and #{(collection_size || collection.size) - max_to_show} more", more_link_for_over_max, :class => "menu-item-drop-float-right" ) %></li>
+        <li><%= link_to(raw("&hellip; and #{(collection_size || collection.size) - max_to_show} more"), more_link_for_over_max, :class => "menu-item-drop-float-right" ) %></li>
       <% end %>
     </ul>
   </td>
