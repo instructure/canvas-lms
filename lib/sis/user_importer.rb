@@ -73,7 +73,7 @@ module SIS
         end
 
         if row['status']=~ /active/i
-          user.workflow_state = 'active'
+          user.workflow_state = 'registered'
         elsif  row['status']=~ /deleted/i
           user.workflow_state = 'deleted'
           enrolls = user.enrollments.find_all_by_root_account_id(@root_account.id).map(&:id)
