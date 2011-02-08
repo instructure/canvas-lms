@@ -179,6 +179,7 @@ stylesheets:
     - public/stylesheets/compiled/g_util_buttons.css
     - public/stylesheets/compiled/g_util_inst_tree.css
     - public/stylesheets/compiled/g_util_chevron_crumbs.css
+    - public/stylesheets/compiled/g_util_ui_listview.css
     - public/stylesheets/compiled/g_assignments.css
     - public/stylesheets/compiled/g_content_imports.css
     - public/stylesheets/compiled/g_gradebook_history.css

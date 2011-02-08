@@ -64,21 +64,37 @@
     <%= user_content(@submission.body, @context.asset_string, @submission.asset_string) %>
   </div>
 <% elsif @submission.submission_type == "online_upload" %>
-  <div style="width: 600px; margin: 5px auto;">
-    File Uploads for <%= @submission.user.name %>:<br/>
-    <% @submission.attachments.each do |attachment| %>
-      <div style="font-size: 1.2em; margin-top: 10px;">
-        <a style="font-size: 1em;" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %> <%= 'instructure_scribd_file' if attachment.scribdable? %>"><%= attachment.display_name %></a>
-        <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) %>
-          <% if (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
-            <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
+  <div class="centered-block">
+    <div class="centered-block-wrap">
+      <div class="centered-block-inner">
+        <ul class="ui-listview" style="margin-top: 30px">
+    			<li class="ui-listview-header">File Uploads for <b><%= @submission.user.name %></b></li>
+    			<% @submission.attachments.each do |attachment| %>
+      			<li>
+      			  <div class="ui-listview-text ui-listview-right">
+      			    <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
+                  <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
+                <% end %>
+        			  <span><%= number_to_human_size(attachment.size) %></span>
+      			  </div>
+      			  <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %> <%= 'instructure_scribd_file' if attachment.scribdable? %>">
+      			    <%= attachment.display_name %>
+      			  </a>
+      			</li>
           <% end %>
-        <% end %>
-        
+    		</ul>
       </div>
-      <span style="padding-left: 20px;"><%= number_to_human_size(attachment.size) %></span>
-    <% end %>
+    </div>
   </div>
+  <% js_block do %>
+    <script>
+      $("a.flash").click(function() {
+        swfobject.embedSWF($(this).attr('href'), "main", "100%", "100%", "9.0.0", false, null, { wmode: "opaque" }, null);
+        return false;
+       });
+    </script>
+  <% end %>
+  
 <% elsif @submission.submission_type == "online_quiz" %>
   <% content_for :stylesheets do %>
     <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version) %>"/>
