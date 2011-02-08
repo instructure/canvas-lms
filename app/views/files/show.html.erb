@@ -13,7 +13,22 @@
     <% end %>
   </div>
 <% else %>
-  <% if @attachment.inline_content? %>
+  <% if @attachment.content_type == "application/x-shockwave-flash" %>
+    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="100%" height="500">
+      <param name="movie" value="<%= safe_domain_file_url(@attachment) %>" />
+      <param name="wmode" value="transparent" />
+      <param name="allowscriptaccess" value="never" />
+      <!--[if !IE]>-->
+      <object type="application/x-shockwave-flash" data="<%= safe_domain_file_url(@attachment) %>" width="100%" height="500">
+        <param name="wmode" value="transparent" />
+        <param name="allowscriptaccess" value="never" />
+        <!--<![endif]-->
+        <!--[if !IE]>-->
+      </object>
+      <!--<![endif]-->
+    </object>
+    <a style="display:block;" href="<%= safe_domain_file_url(@attachment) %>">Download <%= @attachment.display_name %></a>
+  <% elsif @attachment.inline_content? %>
     <% jammit_js :file_inline %>
     <iframe id="file_content" src="<%= safe_domain_file_url(@attachment) %>" style="width: 100%; height: 400px;"></iframe>
   <% elsif @attachment.content_type && @attachment.content_type.match(/\Aimage\//) %>
@@ -26,25 +41,25 @@
     </span> (<%= @attachment.readable_size %>)
     <% if @attachment.scribdable? && @attachment.scribd_doc %>
       <div id="scribd_preview" data-doc-id="<%= @attachment.scribd_doc.doc_id %>" data-access-key="<%= @attachment.scribd_doc.access_key %>"></div>
+      <% js_block do %>
+        <script>
+          $(function() {
+            $('#scribd_preview').ifExists(function($preview){
+              var sd = scribd.Document.getDoc( $preview.data('doc-id'), $preview.data('access-key') );
+              $.each({
+                  'jsapi_version': 1,
+                  'disable_related_docs': true,
+                  'height' : '400px'
+                }, function(key, value){
+                  sd.addParam(key, value);
+              });
+              sd.write('scribd_preview');
+            });
+          });
+        </script>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @attachment} %>
-<% js_block do %>
-<script>
-$(document).ready(function() {
-  var $preview = $("#scribd_preview");
-  if($preview.length) {
-    var sd = scribd.Document.getDoc( $preview.attr('data-doc-id'), $preview.attr('data-access-key'));
-    $.each({
-        'jsapi_version': 1,
-        'disable_related_docs': true,
-        'height' : '400px'
-      }, function(key, value){
-        sd.addParam(key, value);
-    });
-    sd.write($preview.attr('id'));
-  }
-});
-</script>
-<% end %>
+
