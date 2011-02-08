@@ -479,13 +479,16 @@ class RoleOverride < ActiveRecord::Base
   def self.css_class_for(context, permission, enrollment_type)
     generated_permission = self.permission_for(context, permission, enrollment_type)
     
-    css = ""
+    css = []
     if generated_permission[:readonly]
-      css += "six-checkbox-disabled-#{generated_permission[:enabled] ? 'checked' : 'unchecked' }"
+      css << "six-checkbox-disabled-#{generated_permission[:enabled] ? 'checked' : 'unchecked' }"
     else
-      css += "six-checkbox#{generated_permission[:explicit] ? '' : '-default' }-#{generated_permission[:enabled] ? 'checked' : 'unchecked' }"
+      if generated_permission[:explicit]
+        css << "six-checkbox-default-#{generated_permission[:prior_default] ? 'checked' : 'unchecked'}"
+      end
+      css << "six-checkbox#{generated_permission[:explicit] ? '' : '-default' }-#{generated_permission[:enabled] ? 'checked' : 'unchecked' }"
     end
-    css
+    css.join(' ')
   end
   
   def self.readonly_for(context, permission, enrollment_type)
@@ -550,16 +553,17 @@ class RoleOverride < ActiveRecord::Base
     overrides = @@role_override_chain[permissionless_key]
     unless overrides
       contexts = []
-      while context
-        contexts << context
-        if context.respond_to?(:course)
-          context = context.course
-        elsif context.respond_to?(:account)
-          context = context.account
-        elsif context.respond_to?(:parent_account)
-          context = context.parent_account
+      context_walk = context
+      while context_walk
+        contexts << context_walk
+        if context_walk.respond_to?(:course)
+          context_walk = context_walk.course
+        elsif context_walk.respond_to?(:account)
+          context_walk = context_walk.account
+        elsif context_walk.respond_to?(:parent_account)
+          context_walk = context_walk.parent_account
         else
-          context = nil
+          context_walk = nil
         end
       end
       context_codes = contexts.reverse.map(&:asset_string)
@@ -579,6 +583,16 @@ class RoleOverride < ActiveRecord::Base
       
         if !generated_permission[:locked] && context_override = override
           unless context_override.enabled.nil?
+            if context_override.context == context
+              # if the explicit override is for the target context, the prior default
+              # is the parent context's value
+              generated_permission[:prior_default] = generated_permission[:enabled]
+            else
+              # otherwise, the prior default is the same as the new override,
+              # since changing it in the target context will create a new
+              # override
+              generated_permission[:prior_default] = context_override.enabled?
+            end
             generated_permission.merge!({
               :enabled => context_override.enabled?,
               :explicit => !context_override.enabled.nil?
