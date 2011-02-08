@@ -21,8 +21,8 @@ class Group < ActiveRecord::Base
   include Workflow
 
   attr_accessible :name, :context, :max_membership, :category, :join_level, :default_view
-  has_many :group_memberships, :dependent => :destroy
-  has_many :users, :through => :group_memberships
+  has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
+  has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
   has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
   has_many :invited_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'invited']
