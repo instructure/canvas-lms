@@ -872,6 +872,7 @@ class Quiz < ActiveRecord::Base
         case question[:question_type]
           when "question_reference"
             if aq = question_data[question[:migration_id]]
+              aq[:points_possible] = question[:points_possible] if question[:points_possible]
               QuizQuestion.import_from_migration(aq, context, item)
             else
               #TODO: no assessment question was imported for this question...
