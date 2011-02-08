@@ -44,6 +44,11 @@ Spec::Runner.configure do |config|
 
   config.include Webrat::Matchers, :type => :views 
 
+  config.before :each do
+    Time.zone = 'UTC'
+    Account.default.update_attribute(:default_time_zone, 'UTC')
+  end
+
   def course(opts={})
     @course = Course.create!
     @course.offer! if opts[:active_course] || opts[:active_all]

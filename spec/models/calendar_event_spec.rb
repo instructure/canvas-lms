@@ -20,11 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CalendarEvent do
 
-  before(:each) do
-    Time.zone = "UTC"
-    Account.default.update_attribute(:default_time_zone, 'UTC')
-  end
-  
   it "should sanitize description" do
     course_model
     @c = CalendarEvent.new

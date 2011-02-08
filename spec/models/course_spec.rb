@@ -169,8 +169,6 @@ describe Course, "merge_into" do
   end
   
   it "should update due dates for date changes" do
-    Time.zone = "UTC"
-    Account.default.update_attribute(:default_time_zone, 'UTC')
     new_start = Date.parse("Jun 1 2000")
     new_end = Date.parse("Sep 1 2000")
     @c = Course.create!(:name => "some course", :start_at => new_start, :conclude_at => new_end)
