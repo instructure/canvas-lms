@@ -194,7 +194,7 @@
             <option value="new">[ New Group Set ]</option>
           </select><br/>
           <%= f.check_box :grade_group_students_individually %>
-          <%= f.label :grade_group_students_individually, "Assign grades to each student individually<br/><span style='font-size: 0.8em;'>(normally all students receive the same grade on group assignments)</span>" %>
+          <%= f.label :grade_group_students_individually, raw("Assign grades to each student individually<br/><span style='font-size: 0.8em;'>(normally all students receive the same grade on group assignments)</span>") %>
         </div>
       </td>
     </tr><tr>
