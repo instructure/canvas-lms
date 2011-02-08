@@ -379,6 +379,14 @@ var modules = (function() {
         });
         $.ajaxJSON(url, 'POST', {order: items.join(",")}, function(data) {
           $module.find(".content").loadingImage('remove');
+          if(data && data.context_module && data.context_module.content_tags) {
+            for(var idx in data.context_module.content_tags) {
+              var tag = data.context_module.content_tags[idx].content_tag;
+              $module.find("#context_module_item_" + tag.id).fillTemplateData({
+                data: {position: tag.position}
+              });
+            }
+          }
         }, function(data) {
           $module.find(".content").loadingImage('remove');
           $module.find(".content").errorBox('Reorder failed, please try again.');
