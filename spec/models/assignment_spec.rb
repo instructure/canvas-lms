@@ -355,6 +355,34 @@ describe Assignment do
       @assignment2.messages_sent.should_not be_include("Assignment Graded")
     end
     
+    it "should update grades when assignment changes" do
+      setup_assignment_without_submission
+      @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
+      @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
+      @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
+
+      @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'C').first
+      @sub.grade.should eql('C')
+      @sub.score.should eql(15.2)
+      
+      @assignment.points_possible = 30
+      @assignment.save!
+      @sub.reload
+      @sub.score.should eql(15.2)
+      @sub.grade.should eql('F')
+    end
+    
+    it "should accept lowercase letter grades" do
+      setup_assignment_without_submission
+      @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
+      @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
+      @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
+
+      @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'c').first
+      @sub.grade.should eql('C')
+      @sub.score.should eql(15.2)
+    end
+    
     it "should not fire off assignment graded notification on second publish" do
       setup_unpublished_assignment_with_students
       @assignment.publish!

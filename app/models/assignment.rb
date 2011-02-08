@@ -87,7 +87,8 @@ class Assignment < ActiveRecord::Base
                 :deliver_messages_if_publishing, 
                 :infer_grading_type, 
                 :process_if_quiz,
-                :default_values
+                :default_values,
+                :update_grades_if_details_changed
   
   after_save    :generate_reminders_if_changed,
                 :touch_assignment_group,
@@ -122,6 +123,23 @@ class Assignment < ActiveRecord::Base
   
   def touch_assignment_group
     AssignmentGroup.update_all({:updated_at => Time.now}, {:id => self.assignment_group_id}) if self.assignment_group_id
+    true
+  end
+  
+  def update_student_grades(old_points_possible, old_grading_type)
+    submissions.graded.each do |submission|
+      submission.grade = score_to_grade(submission.score)
+      submission.save
+    end
+  end
+  
+  # if a teacher changes the settings for an assignment and students have
+  # already been graded, then we need to update the "grade" column to
+  # reflect the changes
+  def update_grades_if_details_changed
+    if !new_record? && (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) && !submissions.graded.empty?
+      send_later_if_production(:update_student_grades, points_possible_was, grading_type_was)
+    end
     true
   end
   
@@ -432,8 +450,14 @@ class Assignment < ActiveRecord::Base
       0.0
     else
       # try to treat it as a letter grade
-      if grading_scheme && percentage = grading_scheme[grade]
-        (points_possible * percentage * 100.0).round / 100.0
+      if grading_scheme 
+        percentage = grading_scheme[grade]
+        percentage ||= grading_scheme.detect{|g, percent| g.downcase == grade.downcase }.try(:last)
+        if percentage
+          (points_possible * percentage * 100.0).round / 100.0
+        else
+          nil
+        end
       else
         nil
       end
