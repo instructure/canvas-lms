@@ -137,6 +137,7 @@ class Account < ActiveRecord::Base
   
   def set_update_account_associations_if_changed
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
+    self.root_account_id ||= self.parent_account_id
     self.parent_account_id ||= self.root_account_id
     Account.invalidate_cache(self.id) if self.id
     @should_update_account_associations = self.parent_account_id_changed? || self.root_account_id_changed?
