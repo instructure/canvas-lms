@@ -48,6 +48,7 @@ end
 
 group :development do
   gem 'ruby-debug',   '0.10.4'
+  gem 'bluecloth' # for generating api docs
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from
