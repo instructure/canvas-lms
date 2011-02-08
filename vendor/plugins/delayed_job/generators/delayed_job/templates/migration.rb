@@ -25,11 +25,14 @@ class CreateDelayedJobs < ActiveRecord::Migration
       # Who is working on this object (if locked)
       table.string   :locked_by
 
+      table.string   :tag
+
       table.timestamps
     end
 
     add_index :delayed_jobs, [:priority, :run_at], :name => 'delayed_jobs_priority'
     add_index :delayed_jobs, [:queue], :name => 'delayed_jobs_queue'
+    add_index :delayed_jobs, [:tag]
   end
 
   def self.down

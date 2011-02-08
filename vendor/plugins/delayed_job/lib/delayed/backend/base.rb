@@ -52,6 +52,7 @@ module Delayed
 
       def payload_object=(object)
         self['handler'] = object.to_yaml
+        self['tag'] = object.tag if object.respond_to?(:tag)
       end
       
       # Moved into its own method so that new_relic can trace it.

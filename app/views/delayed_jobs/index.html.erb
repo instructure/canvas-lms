@@ -33,6 +33,7 @@
     <th>Healthy Jobs</th>
     <th>Failed Jobs</th>
     <th>On Hold</th>
+    <th>Popular Jobs</th>
   </tr>
   <tr>
     <td>
@@ -54,6 +55,13 @@
     <td>
       <ul>
         <li>Total: <%= @counts[:hold_total] %></li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <% @tags.each do |name, count| %>
+          <li><%= name %>: <%= count %></li>
+        <% end %>
       </ul>
     </td>
   </tr>

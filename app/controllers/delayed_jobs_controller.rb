@@ -19,6 +19,7 @@
 class DelayedJobsController < ApplicationController
   before_filter :require_site_admin
   ON_HOLD_COUNT = 50
+  POPULAR_TAG_COUNTS = 5
   
   def index
     total_count = Delayed::Job.count
@@ -38,6 +39,8 @@ class DelayedJobsController < ApplicationController
     @counts[:hold_total] = Delayed::Job.count(:all, :conditions => "attempts = #{ON_HOLD_COUNT}")
     
     @counts[:total_jobs] = total_count
+
+    @tags = Delayed::Job.count(:group => 'tag', :limit => POPULAR_TAG_COUNTS, :order => 'count(tag) desc', :select => 'tag')
   end
   
   def show

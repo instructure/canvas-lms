@@ -18,6 +18,8 @@ end
 module Delayed
   class PerformableMethod < Struct.new(:object, :method, :args)
     STRING_FORMAT = /^LOAD\;([A-Z][\w\:]+)(?:\;(\w+))?$/
+
+    attr_accessor :tag
     
     class LoadError < StandardError
     end
@@ -28,6 +30,12 @@ module Delayed
       self.object = dump(object)
       self.args   = args.map { |a| dump(a) }
       self.method = method.to_sym
+
+      if object.is_a?(Module)
+        self.tag = "#{object.name}.#{method}"
+      else
+        self.tag = "#{object.class}##{method}"
+      end
     end
     
     def display_name
