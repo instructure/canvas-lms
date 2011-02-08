@@ -279,7 +279,7 @@ class ContentTag < ActiveRecord::Base
   
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={})
-    return nil if ( !(self.content && self.content.respond_to?(:clone_for)) && self.content_type != 'ExternalUrl')
+    return nil if ( !(self.content && self.content.respond_to?(:clone_for)) && self.content_type != 'ExternalUrl' && self.content_type != 'ContextModuleSubHeader')
     options[:migrate] = true if options[:migrate] == nil
     if !self.cloned_item && !self.new_record?
       self.cloned_item ||= ClonedItem.create(:original_item => self)
