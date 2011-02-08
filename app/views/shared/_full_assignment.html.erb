@@ -8,6 +8,7 @@
   if !assignment_exists
     assignment = @context.assignments.new
   end
+  is_discussion_topic = !!(assignment && assignment.submission_types == "discussion_topic" && assignment.discussion_topic)
 %>
 <% js_block do %>
 <script type="text/javascript">
@@ -56,10 +57,10 @@
         <a class="assignment_quiz_url" href="<%= context_url(@context, :context_quiz_url, "{{ quiz_id }}") %>" style="display: none;">&nbsp;</a>
       </div>
     </div>
-    <div class="discussion_topic_content reminder-content" style="<%= hidden unless assignment && assignment.submission_types == "discussion_topic" && assignment.discussion_topic %>">
+    <div class="discussion_topic_content reminder-content" style="<%= hidden unless is_discussion_topic %>">
       <div class="body">
-        This assignment is linked to the discussion, <span class="discussion_topic_title"><%= assignment.submission_types == 'discussion_topic' && assignment.discussion_topic.title rescue nbsp %></span>. Grading will be based on posts in the topic.<br/>
-        <a class="assignment_topic_link content-link" href="<%= context_url(@context, :context_discussion_topic_url, ((assignment && assignment.submission_types == 'discussion_topic' && assignment.discussion_topic) ? assignment.discussion_topic.id : "{{ discussion_topic_id }}")) %>" style="font-weight: bold;">Click here to go to the discussion</a>
+        This assignment is linked to the discussion, <span class="discussion_topic_title"><%= is_discussion_topic && assignment.discussion_topic.title rescue nbsp %></span>. Grading will be based on posts in the topic.<br/>
+        <a class="assignment_topic_link content-link" href="<%= context_url(@context, :context_discussion_topic_url, (is_discussion_topic ? assignment.discussion_topic.id : "{{ discussion_topic_id }}")) %>" style="font-weight: bold;">Click here to go to the discussion</a>
         <a class="assignment_topic_url" href="<%= context_url(@context, :context_discussion_topic_url, "{{ discussion_topic_id }}") %>" style="display: none;">&nbsp;</a>
       </div>
     </div>
@@ -97,9 +98,9 @@
     <% if can_do(assignment, @current_user, :update) %>
     <tr>
       <td style="width: 10%;">
-        <div style="margin-bottom: 10px;">Type:</div>
+        <div style="margin-bottom: 10px; <%= hidden if is_discussion_topic %>">Type:</div>
       </td><td style="width: 40%;">
-          <select class="assignment_type" name="assignment_type">
+          <select class="assignment_type" name="assignment_type" style="<%= hidden if is_discussion_topic %>">
             <option value="assignment" <%= "selected" if (assignment.submission_types != 'online_quiz' && assignment.submission_types != 'attendance' && assignment.submission_types != 'not_graded' rescue true) %>>Assignment</option>
             <option value="discussion_topic" <%= "selected" if (assignment.submission_types == 'discussion_topic' rescue false) %>>Discussion</option>
             <option value="quiz" <%= "selected" if (assignment.submission_types == 'online_quiz' rescue false) %>>Quiz</option>
@@ -130,10 +131,10 @@
         <%= f.select :assignment_group_id, (@assignment_groups.map {|g| [g.name, g.id]} << ["[ New Group ]", "new"]), :class => "#{(@context.weight_assignment_groups rescue false) ? 'weight' : ''}" %>
       </td>
     </tr><tr class="assignment_content">
-      <td style="width: 10%;"><%= f.label :points_possible, "Score:", :style => "width: 50px;" %></td>
+      <td style="width: 10%;"><%= f.label :points_possible, "Points:", :style => "width: 50px;" %></td>
       <td style="width: 40%;">
         <!-- javascript check on change, if score is 0 then show text, "No score.  Any points set in the gradebook will be extra credit for this assignment's type" -->
-        <%= f.text_field :points_possible, :size => 5, :class => "points_possible" %>
+        <%= f.text_field :points_possible, :style => "width: 140px;", :class => "points_possible" %>
       </td>
       <td style="width: 25%;" class="nobr more_assignment_values">
         <%= f.label :grading_type, "Grading By:" %>
