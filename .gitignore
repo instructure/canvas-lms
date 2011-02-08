@@ -58,7 +58,6 @@ instructure_content
 exports/*
 .sass-cache
 .bundle
-vendor/cache/*mswin*.gem
 public/*.gz
 public/*/*.gz
 public/*/*/*.gz

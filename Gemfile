@@ -51,6 +51,19 @@ group :development do
   gem 'ruby-debug',   '0.10.4'
 end
 
+# The closure-compiler gem has an undocumented
+# gem dependency on windows with ruby < 1.9.  I'm
+# working to get this fixed in the gem itself, but
+# in the mean time this needs to be here to make
+# things work on windows.
+WINDOWS  = RUBY_PLATFORM.match(/(win|w)32$/)
+ONE_NINE = RUBY_VERSION >= "1.9"
+if WINDOWS
+  if !ONE_NINE
+    gem 'win32-open3',  '0.3.2'
+  end
+end
+
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from
 # plugins.
 Dir[File.join(File.dirname(__FILE__),'vendor/plugins/*/Gemfile')].each do |g|
