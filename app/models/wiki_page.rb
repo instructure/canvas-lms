@@ -374,7 +374,7 @@ class WikiPage < ActiveRecord::Base
     end
     return if hash[:type] && ['folder', 'FOLDER_TYPE'].member?(hash[:type]) && hash[:linked_resource_id]
     allow_save = true
-    if hash[:type] == 'linked_resource'
+    if hash[:type] == 'linked_resource' || hash[:type] == "URL_TYPE"
       allow_save = false
     elsif ['folder', 'FOLDER_TYPE'].member? hash[:type]
       item.title = hash[:title] unless hash[:root_folder]
@@ -418,7 +418,11 @@ class WikiPage < ActiveRecord::Base
             obj = context.discussion_topics.find_by_migration_id(sub_item[:linked_resource_id])
             contents += "  <li><a href='/courses/#{context.id}/discussion_topics/#{obj.id}'>#{obj.title}</a></li>\n" if obj
           when 'URL_TYPE'
-            contents += "  <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
+            if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
+              contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
+            else
+              contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
+            end
           end
         end
       end
@@ -452,6 +456,7 @@ class WikiPage < ActiveRecord::Base
       item.title = hash[:title]
       item.body = ImportedHtmlConverter.convert(hash[:text] || "", context)
     else
+      allow_save = false
     end
     # item.title = hash[:title_in_gradebook] || hash[:name] || hash[:title]
     # if hash[:instructions_in_html] == false

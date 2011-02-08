@@ -88,7 +88,7 @@ describe Course do
     page.should_not be_nil
     page.migration_id.should eql("1865116206002")
     page.body.should_not be_nil
-    page.body.scan(/<li>/).length.should eql(3)
+    page.body.scan(/<li>/).length.should eql(4)
     page.body.should match(/Orientation/)
     page.body.should match(/Orientation Quiz/)
     re = Regexp.new("\\/courses\\/#{course.id}\\/file_contents\\/course%20files\\/Pictures\\/banner_kandinsky.jpg")
