@@ -36,7 +36,7 @@ $(document).ready(function() {
       var $services = $("#content_tag_services").empty();
       $.getUserServices('BookmarkService', function(data) {
         for(var idx in data) {
-          service = data[idx].bookmark_service;
+          service = data[idx].user_service;
           $service = $("<a href='#' class='bookmark_service no-hover'/>");
           $service.addClass(service.service);
           $service.data('service', service);
