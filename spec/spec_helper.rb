@@ -34,6 +34,13 @@ ALL_MODELS = Dir.glob(File.expand_path(File.dirname(__FILE__) + '/../app/models'
 # cleaning up after themselves
 ALL_MODELS.each &:delete_all
 
+# rspec aliases :describe to :context in a way that it's pretty much defined
+# globally on every object. :context is already heavily used in our application,
+# so we remove rspec's definition.
+module Spec::DSL::Main
+  remove_method :context
+end
+
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
