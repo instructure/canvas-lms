@@ -207,33 +207,17 @@ class StreamItem < ActiveRecord::Base
   end
 
   def self.generate_or_update(object)
-    # TODO: for now, we may end up finding multiple StreamItems for the same
-    # asset_string, since we've grandfathered in the ones from before the join
-    # table was created.
-    # Once enough time has passed that we've destroyed all of these legacy
-    # StreamItems, we can safely assume that there's only one StreamItem per
-    # asset_string and simplify this logic. Maybe even make a unique index.
     item = nil
-    items = []
     # we can't coalesce messages that weren't ever saved to the DB
     unless object.asset_string == 'message_'
-      items = StreamItem.for_item_asset_string(object.asset_string).all(:order => 'id asc')
+      item = StreamItem.find_by_item_asset_string(object.asset_string)
     end
-    if items.empty?
+    if item
+      item.regenerate!(object)
+    else
       item = self.new
       item.generate_data(object)
       item.save
-    else
-      # Fix these guys opportunistically -- delete all the previous copies of
-      # the StreamItem for this asset_string, and update all the existing
-      # StreamItemInstances to point to the lone surviving StreamItem.
-      item = items.pop
-      unless items.empty?
-        item_ids = items.map(&:id)
-        ActiveRecord::Base.execute_with_sanitize(["UPDATE stream_item_instances SET stream_item_id = ? WHERE stream_item_id in (?)", item.id, item_ids])
-        items.each(&:destroy)
-      end
-      item.regenerate!(object)
     end
     item
   end
