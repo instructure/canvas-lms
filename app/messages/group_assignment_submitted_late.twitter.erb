@@ -1,0 +1,4 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>
+<% end %>
+Canvas Alert - Late Group Submission: <%= asset.group.name %>, <%= asset.assignment.title %>

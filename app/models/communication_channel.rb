@@ -111,8 +111,12 @@ class CommunicationChannel < ActiveRecord::Base
   
   def path_description
     if self.path_type == 'facebook'
-      res = self.user.user_services.for_service('facebook').first.service_user_name + " (facebook)" rescue nil
+      res = self.user.user_services.for_service('facebook').first.service_user_name rescue nil
       res ||= 'Facebook Account'
+      res
+    elsif self.path_type == 'twitter'
+      res = self.user.user_services.for_service('twitter').first.service_user_name rescue nil
+      res ||= 'Twitter Account'
       res
     else
       self.path
@@ -319,7 +323,7 @@ class CommunicationChannel < ActiveRecord::Base
   # This is setup as a default in the database, but this overcomes misspellings.
   def assert_path_type
     pt = self.path_type
-    self.path_type = 'email' unless pt == 'email' or pt == 'sms' or pt == 'chat' or pt == 'facebook'
+    self.path_type = 'email' unless pt == 'email' or pt == 'sms' or pt == 'chat' or pt == 'facebook' or pt == 'twitter'
   end
   protected :assert_path_type
     

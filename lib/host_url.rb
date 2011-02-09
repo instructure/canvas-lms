@@ -44,7 +44,11 @@ class HostUrl
       Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res || !Rails.env.production?
       res ||= @@file_host = default_host
     end
-
+    
+    def short_host(context)
+      context_host(context)
+    end
+    
     def outgoing_email_address(preferred_user="notifications")
       @outgoing_email_address.presence || "#{preferred_user}@#{outgoing_email_domain}"
     end

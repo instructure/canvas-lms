@@ -30,6 +30,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :files do |file|
     file.download 'download', :controller => 'files', :action => 'show', :download => '1'
   end
+  map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
 
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404. I'm not sure we ever actually want

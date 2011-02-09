@@ -19,6 +19,7 @@
 class Message < ActiveRecord::Base
   include Workflow
   include SendToStream
+  include Twitter
 
   has_many :attachments, :as => :context
   belongs_to :notification
@@ -407,6 +408,14 @@ class Message < ActiveRecord::Base
   
     def deliver_via_chat
       # record_delivered
+    end
+    
+    def deliver_via_twitter
+      @twitter_service = self.user.user_services.find_by_service('twitter')
+      url = "http://#{HostUrl.short_host(self.asset_context)}/mr/#{self.id}"
+      body = self.body[0, 139 - url.length]
+      twitter_self_dm(@twitter_service, "#{body} #{url}") if @twitter_service
+      complete_dispatch
     end
     
     def deliver_via_facebook

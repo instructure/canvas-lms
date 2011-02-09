@@ -1,0 +1,4 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.rubric_association.context) %>/<%= asset.rubric_association.context.class.to_s.downcase.pluralize %>/<%= asset.rubric_association.context_id %>/rubrics/<%= asset.rubric_association.rubric_id %>
+<% end %>
+Canvas Alert - Reminder: assess <%= asset.rubric_association.title %>, <%= asset.rubric_association.context.name %>

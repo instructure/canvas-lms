@@ -30,6 +30,15 @@ class InfoController < ApplicationController
     end
   end
   
+  def message_redirect
+    m = Message.find_by_id(params[:id])
+    if m && m.url
+      redirect_to m.url
+    else
+      redirect_to "http://#{HostUrl.default_host}/"
+    end
+  end
+  
   def avatar_image_url
     cancel_cache_buster
     url = Rails.cache.fetch(['avatar_img', params[:user_id]].cache_key, :expires_in => 30.minutes) do
