@@ -16,8 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'open_object'
+require 'set'
+
 class StreamItem < ActiveRecord::Base
-  require 'open_object'
   serialize :data
 
   has_many :stream_item_instances, :dependent => :delete_all
@@ -257,8 +259,8 @@ class StreamItem < ActiveRecord::Base
 
     # Then delete any old instances from these users' streams.
     # This won't actually delete StreamItems out of the table, it just deletes
-    # the join table entries. We're going to periodically clear out old
-    # StreamItems anyway.
+    # the join table entries.
+    # Old stream items are deleted in a periodic job.
     conn = ActiveRecord::Base.connection
     StreamItemInstance.delete_all(
           ["user_id in (?) AND stream_item_id = ? AND id < ?",
@@ -285,6 +287,34 @@ class StreamItem < ActiveRecord::Base
     object = object.submission if object.is_a?(SubmissionComment)
     object = object.root_context_message || object if object.is_a?(ContextMessage)
     object
+  end
+
+  # delete old stream items and the corresponding instances before a given date
+  # returns the number of destroyed stream items
+  def self.destroy_stream_items(before_date, touch_users = true)
+    user_ids = Set.new
+    count = 0
+
+    query = { :conditions => ['updated_at < ?', before_date] }
+    if touch_users
+      query[:include] = 'stream_item_instances'
+    end
+
+    self.find_each(query) do |item|
+      count += 1
+      if touch_users
+        user_ids.add(item.stream_item_instances.map { |i| i.user_id })
+      end
+      # this will destroy the associated stream_item_instances as well
+      item.destroy
+    end
+
+    unless user_ids.empty?
+      # touch all the users to invalidate the cache
+      User.update_all({:updated_at => Time.now}, {:id => user_ids.to_a})
+    end
+
+    count
   end
 
   named_scope :for_user, lambda {|user|
