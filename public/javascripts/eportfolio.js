@@ -304,7 +304,7 @@
             var id = data.id;
             var uuid = $("#file_uuid_" + id).text();
             var name = data.name;
-            $section.find(".attachment_id").text(uuid);
+            $section.find(".attachment_id").text(id);
             var url = $(".eportfolio_download_url").attr('href');
             url = $.replaceTags(url, 'uuid', uuid);
             if($file.hasClass('image')) {
@@ -334,7 +334,7 @@
       success: function(data) {
         var $section = $(this).data('section');
         var attachment = data.attachment;
-        $section.find(".attachment_id").text(attachment.uuid);
+        $section.find(".attachment_id").text(attachment.id);
         var url = $(".eportfolio_download_url").attr('href');
         url = $.replaceTags(url, 'uuid', attachment.uuid);
         if(attachment.content_type.indexOf("image") != -1) {

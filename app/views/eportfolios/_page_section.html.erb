@@ -7,7 +7,7 @@
       HTML/Embedded Content
     <% elsif page_section["section_type"] == "submission" %>
       Course Submission
-    <% elsif page_section["section_type"] == "upload" %>
+    <% elsif page_section["section_type"] == "attachment" %>
       Image/File Upload
     <% end %>
   </div>
@@ -18,9 +18,9 @@
     <% if page_section %>
       <% if !page_section["section_type"] || page_section["section_type"] == "rich_text" || page_section["section_type"] == "html" %>
         <%= raw(page_section["content"] || "Nothing Entered Yet") %>
-      <% elsif page_section["section_type"] == "upload" %>
-        <div style="text-align: center;" class="upload">
-          <% attachment = @attachments.find{|a| a.uuid == page_section["attachment_id"]} %>
+      <% elsif page_section["section_type"] == "attachment" %>
+        <div style="text-align: center;" class="attachment">
+          <% attachment = @portfolio.user.attachments.find(page_section["attachment_id"]) %>
           <% if attachment && attachment.content_type.match(/\Aimage/) %>
             <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>" class="no-hover"><%= image_tag eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %></a>
           <% elsif attachment %>
