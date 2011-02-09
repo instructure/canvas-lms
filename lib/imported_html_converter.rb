@@ -40,7 +40,7 @@ class ImportedHtmlConverter
             end
           elsif relative_url?(node[attr])
             root_folder_name ||= Folder.root_folders(context).first.name
-            node[attr] = URI::escape("/#{context.class.to_s.underscore.pluralize}/#{context.id}/file_contents/#{root_folder_name}/#{node[attr]}")
+            node[attr] = URI::escape("/#{context.class.to_s.underscore.pluralize}/#{context.id}/file_contents/#{root_folder_name}/") + node[attr]
           end
         end
       end
