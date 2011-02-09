@@ -453,6 +453,7 @@ class ApplicationController < ActionController::Base
   
   def clear_cached_contexts
     ActiveRecord::Base.clear_cached_contexts
+    RoleOverride.clear_cached_contexts
   end
   
   def set_page_view

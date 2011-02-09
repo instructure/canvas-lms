@@ -520,6 +520,7 @@ class RoleOverride < ActiveRecord::Base
   
   def self.clear_cached_contexts
     @@role_override_chain = {}
+    @cached_permissions = {}
   end
   
   def self.permission_for(context, permission, enrollment_type=nil)

@@ -45,4 +45,44 @@ describe "security" do
       cookie.should_not eql(new_cookie)
     end
   end
+
+  describe "permissions" do
+    it "should flush the role_override caches on permission changes" do
+      course_with_teacher_logged_in
+
+      get "/courses/#{@course.to_param}/users"
+      assert_response :success
+
+      RoleOverride.create!(:context => @course,
+                           :permission => 'read_roster',
+                           :enrollment_type => 'TeacherEnrollment',
+                           :enabled => false)
+
+      # if this second get doesn't fail with a permission denied error, we've
+      # still got the permissions cached and haven't seen the change
+      get "/courses/#{@course.to_param}/users"
+      assert_response 401
+    end
+
+    # if we end up moving the permissions cache to memcache, this test won't be
+    # valid anymore and we need some more extensive tests for actual cache
+    # invalidation. right now, though, this is the only really valid way to
+    # test that we're actually flushing on every request.
+    it "should flush the role_override caches on every request" do
+      course_with_teacher_logged_in
+
+      get "/courses/#{@course.to_param}/users"
+      assert_response :success
+
+      RoleOverride.send(:instance_variable_get, '@cached_permissions').should_not be_empty
+      RoleOverride.send(:class_variable_get, '@@role_override_chain').should_not be_empty
+
+      get "/"
+      assert_response 302
+
+      # verify the cache is emptied on every request
+      RoleOverride.send(:instance_variable_get, '@cached_permissions').should be_empty
+      RoleOverride.send(:class_variable_get, '@@role_override_chain').should be_empty
+    end
+  end
 end
