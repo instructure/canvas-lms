@@ -151,6 +151,10 @@ class DiscussionTopicsController < ApplicationController
     assignment = params[:discussion_topic].delete(:assignment)
     generate_assignment(assignment) if assignment && assignment[:set_assignment]
 
+    unless @context.grants_right?(@current_user, session, :moderate_forum)
+      params[:discussion_topic].delete :podcast_enabled
+      params[:discussion_topic].delete :podcast_has_student_posts
+    end
     if params[:discussion_topic].delete(:is_announcement) == "1" && @context.announcements.new.grants_right?(@current_user, session, :create)
       @topic = @context.announcements.build(params[:discussion_topic])
     else
@@ -203,6 +207,10 @@ class DiscussionTopicsController < ApplicationController
       if params[:discussion_topic][:lock]
         @topic.workflow_state = (params[:discussion_topic][:lock] == '1') ? 'locked' : 'active'
         params[:discussion_topic].delete :lock
+      end
+      unless @context.grants_right?(@current_user, session, :moderate_forum)
+        params[:discussion_topic].delete :podcast_enabled
+        params[:discussion_topic].delete :podcast_has_student_posts
       end
       delay_posting = params[:discussion_topic].delete :delay_posting
       delayed_post_at = params[:discussion_topic].delete :delayed_post_at
@@ -269,5 +277,8 @@ class DiscussionTopicsController < ApplicationController
     respond_to do |format|
       format.atom { render :text => feed.to_xml }
     end    
+  end
+  
+  def public_topic_feed
   end
 end

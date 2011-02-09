@@ -23,7 +23,7 @@ class DiscussionTopic < ActiveRecord::Base
   include HasContentTags
   include CopyAuthorizedLinks
   
-  attr_accessible :title, :message, :user, :delayed_post_at, :assignment, :plaintext_message
+  attr_accessible :title, :message, :user, :delayed_post_at, :assignment, :plaintext_message, :podcast_enabled, :podcast_has_student_posts
 
   attr_readonly :context_id, :context_type, :user_id
   adheres_to_policy
@@ -518,18 +518,18 @@ class DiscussionTopic < ActiveRecord::Base
     item
   end
   
-  def self.podcast_elements(announcements, context)
+  def self.podcast_elements(messages, context)
     attachment_ids = []
     media_object_ids = []
-    announcements_hash = {}
-    announcements.each do |announcement|
-      txt = (announcement.message || "")
+    messages_hash = {}
+    messages.each do |message|
+      txt = (message.message || "")
       attachment_matches = txt.scan(/\/#{context.class.to_s.pluralize.underscore}\/#{context.id}\/files\/(\d+)\/download/)
       attachment_ids += (attachment_matches || []).map{|m| m[0] }
       media_object_matches = txt.scan(/media_comment_([0-9a-z_]+)/)
       media_object_ids += (media_object_matches || []).map{|m| m[0] }
       (attachment_ids + media_object_ids).each do |id|
-        announcements_hash[id] ||= announcement
+        messages_hash[id] ||= message
       end
     end
     media_object_ids = media_object_ids.uniq.compact
@@ -537,7 +537,7 @@ class DiscussionTopic < ActiveRecord::Base
     attachments = context.attachments.active.find_all_by_id(attachment_ids).compact
     attachments = attachments.select{|a| a.content_type && a.content_type.match(/(video|audio)/) }
     attachments.each do |attachment|
-      attachment.podcast_associated_announcement = announcements_hash[attachment.id]
+      attachment.podcast_associated_asset = messages_hash[attachment.id]
     end
     media_objects = MediaObject.find_all_by_media_id(media_object_ids)
     media_objects += media_object_ids.map{|id| MediaObject.new(:media_id => id) }
@@ -545,7 +545,7 @@ class DiscussionTopic < ActiveRecord::Base
     media_objects = media_objects.map do |media_object|
       if media_object.new_record?
         media_object.context = context
-        media_object.user_id = announcements_hash[media_object.media_id].user_id rescue nil
+        media_object.user_id = messages_hash[media_object.media_id].user_id rescue nil
         media_object.root_account_id = context.root_account_id rescue nil
         media_object.save
       elsif media_object.deleted? || media_object.context != context
@@ -554,7 +554,7 @@ class DiscussionTopic < ActiveRecord::Base
       if !media_object.podcast_format_details
         media_object = nil
       end
-      media_object.podcast_associated_announcement = announcements_hash[media_object.media_id]
+      media_object.podcast_associated_asset = messages_hash[media_object.media_id] if media_object
       media_object
     end
     to_podcast(attachments + media_objects.compact)
@@ -563,15 +563,21 @@ class DiscussionTopic < ActiveRecord::Base
   def self.to_podcast(elements, opts={})
     require 'rss/2.0'
     elements.map do |elem|
-      announcement = elem.podcast_associated_announcement rescue nil
-      next unless announcement
+      asset = elem.podcast_associated_asset
+      next unless asset
       item = RSS::Rss::Channel::Item.new
-      item.title = (announcement.title rescue "") + ": " + elem.name
-      link = "http://#{HostUrl.context_host(announcement.context)}/#{announcement.context_url_prefix}/announcements/#{announcement.id}"
+      item.title = (asset.title rescue "") + ": " + elem.name
+      link = nil
+      if asset.is_a?(DiscussionTopic)
+        link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.id}"
+      elsif asset.is_a?(DiscussionEntry)
+        link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.discussion_topic_id}"
+      end
+      
       item.link = link
       item.guid = RSS::Rss::Channel::Item::Guid.new
       item.pubDate = elem.updated_at.utc
-      item.description = announcement ? announcement.message : elem.name
+      item.description = asset ? asset.message : elem.name
       item.enclosure
       if elem.is_a?(Attachment)
         item.guid.content = link + "/#{elem.uuid}"

@@ -122,21 +122,55 @@ class DiscussionEntriesController < ApplicationController
   
   def public_feed
     return unless get_feed_context
-    topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
-    feed = Atom::Feed.new do |f|
-      f.title = "#{topic.title}: #{@context.name} Discussion Feed"
-      f.links << Atom::Link.new(:href => named_context_url(@context, :context_discussion_topic_url, topic.id))
-      f.updated = Time.now
-      f.id = named_context_url(@context, :context_discussion_topic_url, topic.id)
+    @topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
+    if !@topic.podcast_enabled && request.format == :rss
+      @problem = "Podcasts have not been enabled for this topic."
+      @template_format = 'html'
+      @template.template_format = 'html'
+      render :text => @template.render(:file => "shared/unauthorized_feed", :layout => "layouts/application"), :status => :bad_request # :template => "shared/unauthorized_feed", :status => :bad_request
+      return
     end
-    @entries = []
-    @entries.concat topic.discussion_entries
-    @entries = @entries.sort_by{|e| e.updated_at}
-    @entries.each do |entry|
-      feed.entries << entry.to_atom
-    end
-    respond_to do |format|
-      format.atom { render :text => feed.to_xml }
+    if authorized_action(@topic, @current_user, :read)
+      @all_discussion_entries = @topic.discussion_entries.active
+      @discussion_entries = @all_discussion_entries
+      if request.format == :rss && !@topic.podcast_has_student_posts
+        @admins = @context.admins
+        @discussion_entries = @discussion_entries.find_all_by_user_id(@admins.map(&:id))
+      end
+      if @topic.locked_for?(@current_user) && !@topic.grants_right?(@current_user, nil, :update)
+        @discussion_entries = []
+      end
+      respond_to do |format|
+        format.atom {
+          feed = Atom::Feed.new do |f|
+            f.title = "#{@topic.title} Posts Feed"
+            f.links << Atom::Link.new(:href => named_context_url(@context, :context_discussion_topic_url, @topic.id))
+            f.updated = Time.now
+            f.id = named_context_url(@context, :context_discussion_topic_url, @topic.id)
+          end
+          feed.entries << @topic.to_atom
+          @discussion_entries.sort_by{|e| e.updated_at}.each do |e|
+            feed.entries << e.to_atom
+          end
+          render :text => feed.to_xml 
+        }
+        format.rss {
+          @entries = [@topic] + @discussion_entries
+          require 'rss/2.0'
+          rss = RSS::Rss.new("2.0")
+          channel = RSS::Rss::Channel.new
+          channel.title = "#{@topic.title} Posts Podcast Feed"
+          channel.description = "Any media files linked from or embedded within entries in the topic \"#{@topic.title}\" will appear in this feed."
+          channel.link = named_context_url(@context, :context_discussion_topic_url, @topic.id)
+          channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
+          elements = Announcement.podcast_elements(@entries, @context)
+          elements.each do |item|
+            channel.items << item
+          end
+          rss.channel = channel
+          render :text => rss.to_s
+        }
+      end
     end
   end
 end

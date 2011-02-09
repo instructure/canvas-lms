@@ -3,13 +3,13 @@
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
     <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context_enrollment.feed_code, :atom), {:title => "#{@context.class.to_s} Announcements Atom Feed"}) %>
-    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context_enrollment.feed_code, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
+    <%= auto_discovery_link_tag(:rss, feeds_announcements_format_path(@context_enrollment.feed_code, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
   <% elsif can_do(@context, @current_user, :manage) %>
     <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context.feed_code, :atom), {:title => "#{@context.class.to_s} Announcements Atom Feed"}) %>
-    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context.feed_code, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
+    <%= auto_discovery_link_tag(:rss, feeds_announcements_format_path(@context.feed_code, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
   <% elsif @context.available? && @context.respond_to?(:is_public) && @context.is_public %>
     <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context.asset_string, :atom), {:title => "#{@context.class.to_s} Announcements Atom Feed"}) %>
-    <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(@context.asset_string, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
+    <%= auto_discovery_link_tag(:rss, feeds_announcements_format_path(@context.asset_string, :rss), {:title => "#{@context.class.to_s} Announcements Podcast Feed"}) %>
   <% end %>
 <% end %>
 

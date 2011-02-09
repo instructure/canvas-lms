@@ -51,6 +51,8 @@ var topics = {};
     }
     $topic_sortable.text(topic.title);
     $("#topics_reorder_list").sortable('refresh');
+    $topic.toggleClass('has_podcast', !!topic.podcast_enabled);
+    $("#podcast_link_holder").showIf(topic.podcast_enabled);
     $topic.toggleClass('announcement', !!data.announcement);
     topic.user_name = topic.user_name ? topic.user_name : "";
     delete topic['user'];
@@ -102,7 +104,7 @@ var topics = {};
       $form.addClass('add_topic_form_new').attr('id', 'add_topic_form_' + id)
         .find(".topic_content").addClass('topic_content_new').attr('id', 'topic_content_' + id);
       var data = $topic.getTemplateData({
-        textValues: ['title', 'is_announcement', 'delayed_post_at', 'assignment[id]', 'attachment_name', 'assignment[points_possible]', 'assignment[assignment_group_id]', 'assignment[due_at]'],
+        textValues: ['title', 'is_announcement', 'delayed_post_at', 'assignment[id]', 'attachment_name', 'assignment[points_possible]', 'assignment[assignment_group_id]', 'assignment[due_at]', 'podcast_enabled', 'podcast_has_student_posts'],
         htmlValues: ['message']
       });
       data.message = $topic.find(".content .message_html").val();
@@ -250,6 +252,10 @@ var topics = {};
     }).change();
     $("#add_topic_form .is_announcement").change(function() {
       $(this).parents("form").find(".assignment_options").showIf(!$(this).attr('checked'));
+      $(this).parents("form").find(".podcast_options").showIf(!$(this).attr('checked'));
+    });
+    $("#add_topic_form .podcast_enabled_checkbox").change(function() {
+      $(this).parents("form").find(".podcast_sub_options").showIf($(this).attr('checked'));
     });
     $("#add_topic_form .add_attachment_link").click(function(event) {
       event.preventDefault();

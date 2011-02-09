@@ -25,6 +25,18 @@ describe DiscussionEntriesController do
   def topic_entry
     @entry = @topic.discussion_entries.create(:message => "some message", :user => @user)
   end
+  def topic_with_media_reply
+    course_with_student(:active_all => true)
+    course_topic
+    @topic.update_attribute(:podcast_enabled, true)
+    @mo1 = @course.media_objects.build(:media_id => 'asdf', :title => 'asdf')
+    @mo1.data = {:extensions => {:mp4 => {
+      :size => 100, 
+      :extension => 'mp4'
+    }}}
+    @mo1.save!
+    @entry = @topic.discussion_entries.create!(:user => @user, :message => " media_comment_asdf ")
+  end
 
   describe "GET 'show'" do
     it "should require authorization" do
@@ -193,6 +205,80 @@ describe DiscussionEntriesController do
       @topic.reload
       @topic.discussion_entries.should_not be_empty
       @topic.discussion_entries.active.should be_empty
+    end
+  end
+  
+  describe "GET 'public_feed.rss'" do
+    it "should require authorization" do
+      course_with_student(:active_all => true)
+      course_topic
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code + "x"
+      assigns[:problem].should eql("The verification code does not match any currently enrolled user.")
+      response.should
+    end
+    
+    it "should require the podcast to be enabled" do
+      course_with_student(:active_all => true)
+      course_topic
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      assigns[:problem].should eql("Podcasts have not been enabled for this topic.")
+      response.should
+    end
+    
+    it "should return a valid RSS feed" do
+      course_with_student(:active_all => true)
+      course_topic
+      @topic.update_attribute(:podcast_enabled, true)
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      assigns[:entries].should_not be_nil
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss.should_not be_nil
+      rss.channel.title.should eql("some topic Posts Podcast Feed")
+      rss.items.length.should eql(0)
+    end
+    
+    it "should include student entries if enabled" do
+      topic_with_media_reply
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      assigns[:entries].should_not be_nil
+      assigns[:entries].should_not be_empty
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss.should_not be_nil
+      rss.channel.title.should eql("some topic Posts Podcast Feed")
+      rss.items.length.should eql(1)
+      assigns[:discussion_entries].should_not be_empty
+      assigns[:discussion_entries][0].should eql(@entry)
+    end
+    
+    it "should not include student entries if locked" do
+      topic_with_media_reply
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      @topic.update_attribute(:delayed_post_at, 2.days.from_now)
+      @topic.locked_for?(@user).should_not eql(nil)
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      assigns[:entries].should_not be_nil
+      assigns[:entries].should_not be_empty
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss.should_not be_nil
+      rss.channel.title.should eql("some topic Posts Podcast Feed")
+      rss.items.length.should eql(0)
+      assigns[:discussion_entries].should be_empty
+      assigns[:all_discussion_entries].should_not be_empty
+    end
+    
+    it "should not include student entries if disabled" do
+      topic_with_media_reply
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      assigns[:entries].should_not be_nil
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss.should_not be_nil
+      rss.channel.title.should eql("some topic Posts Podcast Feed")
+      rss.items.length.should eql(0)
     end
   end
 end

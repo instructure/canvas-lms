@@ -753,6 +753,8 @@ ul.group_list
         :font-size 0.8em
         :padding-right 5px
         :padding-left 0
+      .podcast
+        display: none
         
       .user_name
         :white-space nowrap
@@ -857,6 +859,12 @@ ul.group_list
     .user_content
       p:last-child
         margin-bottom: 0
+  &.has_podcast
+    .header
+      .podcast
+        display: block
+        float: right
+        +opacity(.7)
 .communication_message_hover
   div.header
     .link_box

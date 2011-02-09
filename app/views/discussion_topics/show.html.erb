@@ -3,8 +3,14 @@
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
     <%= auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), {:title => "Discussion Atom Feed"}) %>
+    <% if @topic.podcast_enabled %>
+      <%= auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), {:title => "Discussion Podcast Feed"}) %>
+    <% end %>
   <% elsif @context.available? %>
     <%= auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), {:title => "Discussion Atom Feed"}) %>
+    <% if @topic.podcast_enabled %>
+      <%= auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => "Discussion Podcast Feed"}) %>
+    <% end %>
   <% end %>
 <% end %>
 
@@ -30,38 +36,49 @@
     <% else %>
       <div class="rs-margin-all">
         <div id="sidebar_content">
-        <p>
-          <b><span class="message_count"><%= @entries.length %></span> <span class="message_count_text"><%= @entries.length == 1 ? 'post' : 'posts' %></span></b>
-          <% if @entries.length > 0 && !@topic_agglomerated %>
-            <span style="font-size: 0.8em; padding-left: 10px;">( <span class="total_message_count"><%= @topic.discussion_entries.active.length %></span> including subtopics )</span>
-          <% end %>
-        </p>
-        <p>
-          <% if @topic_agglomerated %>
-            This view shows all the messages from all this topic's group topics.  If you want to 
-            comment or edit posts, you'll have to visit each topic individually.
-            <ul class="unstyled_list" style="line-height: 1.8em; margin: 5px 20px 10px;">
-            <% @groups.select{|g| can_do(g, @current_user, :read) }.each do |group| %>
-              <li class="unstyled_list">
-                <% cnt = (@topics || []).find{|t| t.context == group}.discussion_entries.count rescue 0 %>
-                <b><a href="<%= context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group.name %></a></b> - <%= pluralize(cnt, 'Post') %>
-              </li>
+          <p>
+            <b><span class="message_count"><%= @entries.length %></span> <span class="message_count_text"><%= @entries.length == 1 ? 'post' : 'posts' %></span></b>
+            <% if @entries.length > 0 && !@topic_agglomerated %>
+              <span style="font-size: 0.8em; padding-left: 10px;">( <span class="total_message_count"><%= @topic.discussion_entries.active.length %></span> including subtopics )</span>
             <% end %>
-            </ul>
-          <% else %>
-          <% end %>
-        </p>
-        <p>
-          <% if can_do(@topic, @current_user, :update) %>
-            <a href="#" class="edit_topic_link button button-sidebar-wide"><%= image_tag "edit.png", :alt => "" %> Edit Topic</a>
-          <% end %>
-          <% if can_do(@topic, @current_user, :reply) && !params[:combined] %>
-            <a href="#" class="add_entry_link button button-sidebar-wide"><%= image_tag "add.png", :alt => "" %> Add New Entry</a>
-          <% end %>
-          <% if can_do(@topic, @current_user, :delete) && !params[:combined] %>
-            <a href="#" class="delete_topic_link button button-sidebar-wide"><%= image_tag "delete.png", :alt => "" %> Delete Topic</a>
-          <% end %>
-        </p>
+          </p>
+          <p>
+            <% if @topic_agglomerated %>
+              This view shows all the messages from all this topic's group topics.  If you want to 
+              comment or edit posts, you'll have to visit each topic individually.
+              <ul class="unstyled_list" style="line-height: 1.8em; margin: 5px 20px 10px;">
+              <% @groups.select{|g| can_do(g, @current_user, :read) }.each do |group| %>
+                <li class="unstyled_list">
+                  <% cnt = (@topics || []).find{|t| t.context == group}.discussion_entries.count rescue 0 %>
+                  <b><a href="<%= context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group.name %></a></b> - <%= pluralize(cnt, 'Post') %>
+                </li>
+              <% end %>
+              </ul>
+            <% else %>
+            <% end %>
+          </p>
+          <p>
+            <% if can_do(@topic, @current_user, :update) %>
+              <a href="#" class="edit_topic_link button button-sidebar-wide"><%= image_tag "edit.png", :alt => "" %> Edit Topic</a>
+            <% end %>
+            <% if can_do(@topic, @current_user, :reply) && !params[:combined] %>
+              <a href="#" class="add_entry_link button button-sidebar-wide"><%= image_tag "add.png", :alt => "" %> Add New Entry</a>
+            <% end %>
+            <% if can_do(@topic, @current_user, :delete) && !params[:combined] %>
+              <a href="#" class="delete_topic_link button button-sidebar-wide"><%= image_tag "delete.png", :alt => "" %> Delete Topic</a>
+            <% end %>
+          </p>
+          <div id="podcast_link_holder" style="<%= hidden unless @topic.podcast_enabled %>">
+            <% if @context_enrollment %>
+              <p>
+                <a class="feed" href="<%= feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss) %>">Topic Podcast Feed</a>
+              </p>
+            <% elsif @context.available? %>
+              <p>
+                <a class="feed" href="<%= feeds_topic_format_path(@topic.id, @context.feed_code, :rss) %>">Topic Podcast Feed</a>
+              </p>
+            <% end %>
+          </div>
         </div>
       </div>
       <%= render :partial => "shared/wiki_sidebar" %>

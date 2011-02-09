@@ -219,10 +219,13 @@ class DiscussionEntry < ActiveRecord::Base
   named_scope :after, lambda{|date|
     {:conditions => ['created_at > ?', date] }
   }
+  named_scope :include_subentries, lambda{
+    {:include => discussion_subentries}
+  }
 
   def to_atom(opts={})
     Atom::Entry.new do |entry|
-      entry.title     = "Entry#{", " + self.discussion_topic.context.name if opts[:include_context]}: #{self.discussion_topic.title}"
+      entry.title     = "#{"Re: " if parent_id != 0}#{self.discussion_topic.title}#{", " + self.discussion_topic.context.name if opts[:include_context]}"
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/discussion_entries/#{self.feed_code}"

@@ -48,7 +48,7 @@ class Attachment < ActiveRecord::Base
   after_save :touch_context
   after_create :build_media_object
   
-  attr_accessor :podcast_associated_announcement
+  attr_accessor :podcast_associated_asset
 
   # this is a magic method that gets run by attachment-fu after it is done sending to s3,
   # that is the moment that we also want to submit it to scribd.

@@ -14,7 +14,7 @@
   end %>
 <div class="clear"></div>
 <% if !topic || can_do(topic, @current_user, :read) %>
-<div class="<%= topic_type %> topic communication_message" style="<%= topic ? "" : "display: none;" %>" id="topic_<%= topic ? topic.id : "blank" %>">
+<div class="<%= topic_type %> topic communication_message <%= 'has_podcast' if topic && topic.podcast_enabled %>" style="<%= topic ? "" : "display: none;" %>" id="topic_<%= topic ? topic.id : "blank" %>">
   <div class="header">
     <div class="header_title">
       <%= image_tag "announcement.png", :class => "header_icon topic_icon announcement_icon", :alt => "announcement", :title => "Announcement", :style => brief ? "width: 20px;" : "" %>
@@ -49,6 +49,11 @@
         <a style="<%= "display: none;" if !can_do(topic, @current_user, :delete) %>" href="<%= context_url(topic_context, :controller => :discussion_topics, :action => :destroy, :id => topic_id) %>" class="delete_topic_link no-hover"><%= image_tag "delete.png", :alt => "Delete", :title => "Delete " + topic_desc %></a>
       </span>
     </div>
+    <% end %>
+    <% if !single_topic %>
+      <div class="podcast">
+        <a href="<%= context_url(topic_context, :controller => :discussion_topics, :action => :show, :id => topic_id) %>"><%= image_tag "atom.png", :title => 'This topic has a podcast feed.', :alt => 'Has a podcast' %></a>
+      </div>
     <% end %>
     <div class="post_date"><%= post_date %></div>
     <div class="clear"></div>
@@ -106,6 +111,8 @@
     <div style="display: none;">
       <a href="<%= context_url(topic_context, :controller => :discussion_topics, :action => :update, :id => topic_id) %>" class="edit_topic_url">&nbsp;</a>
       <span class="is_announcement"><%= (is_announcement || (topic && topic.is_announcement)) ? "1" : "0" %></span>
+      <span class="podcast_enabled"><%= (topic && topic.podcast_enabled) ? "1" : "0" %></span>
+      <span class="podcast_has_student_posts"><%= (topic && topic.podcast_has_student_posts) ? "1" : "0" %></span>
     </div>
   </div>
 </div>

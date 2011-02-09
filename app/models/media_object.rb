@@ -27,6 +27,8 @@ class MediaObject < ActiveRecord::Base
   after_save :update_title_on_kaltura_later
   serialize :data
   
+  attr_accessor :podcast_associated_asset
+
   def infer_defaults
     self.user_type = "admin" if self.user && self.cached_context_grants_right?(self.user, nil, :manage_content)
     self.user_type ||= "student"

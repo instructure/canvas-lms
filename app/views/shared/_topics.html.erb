@@ -91,6 +91,16 @@ var shortName = "<%= short_name %>";
       <%= text_field :discussion_topic, :delayed_post_at, :style => "width: 100px;", :class => 'datetime_field delayed_post_at_value' %>
     </div>
     <div class="clear"></div>
+    <% if can_do(@context, @current_user, :moderate_forum) %>
+      <div class="podcast_options">
+        <%= f.check_box :podcast_enabled, :class => 'podcast_enabled_checkbox' %>
+        <%= f.label :podcast_enabled, "Enable Podcast Feed for this Topic" %>
+        <div class="podcast_sub_options" style="display: none; margin-left: 30px;">
+          <%= f.check_box :podcast_has_student_posts %>
+          <%= f.label :podcast_has_student_post, "Include Student Comments in the Feed" %>
+        </div>
+      </div>
+    <% end %>
     <% if @context.respond_to?(:assignments) %>
       <% f.fields_for(:assignment) do |a| -%>
       <div class="assignment_options">
