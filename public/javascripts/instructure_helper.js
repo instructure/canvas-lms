@@ -2690,13 +2690,14 @@
   $.parseUserAgentString = function(userAgent) {
     userAgent = (userAgent || "").toLowerCase();
     var data = {
-      version: (userAgent.match( /.+(?:me|ox|it|ra|ie)[\/: ]([\d.]+)/ ) || [0,null])[1],
+      version: (userAgent.match( /.+(?:me|ox|it|ra|ie|er)[\/: ]([\d.]+)/ ) || [0,null])[1],
       chrome: /chrome/.test( userAgent ),
       safari: /webkit/.test( userAgent ),
       opera: /opera/.test( userAgent ),
       msie: /msie/.test( userAgent ) && !(/opera/.test( userAgent )),
       firefox: /firefox/.test( userAgent),
-      mozilla: /mozilla/.test( userAgent ) && !(/(compatible|webkit)/.test( userAgent ))
+      mozilla: /mozilla/.test( userAgent ) && !(/(compatible|webkit)/.test( userAgent )),
+      speedgrader: /speedgrader/.test( userAgent )
     };
     var browser = "Unrecognized Browser";
     if(data.chrome) {
@@ -2711,6 +2712,8 @@
       browser = "Firefox";
     } else if(data.mozilla) {
       browser = "Mozilla";
+    } else if(data.speedgrader) {
+      browser = "SpeedGrader for iPad";
     }
     if(browser != "Unrecognized Browser" && data.version) {
       data.version = data.version.split(/\./).slice(0,2).join(".");
