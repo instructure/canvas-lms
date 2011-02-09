@@ -85,4 +85,24 @@ describe "security" do
       RoleOverride.send(:class_variable_get, '@@role_override_chain').should be_empty
     end
   end
+
+  it "should make both session-related cookies httponly" do
+    u = user_with_pseudonym :active_user => true,
+                            :username => "nobody@example.com",
+                            :password => "asdfasdf"
+    u.save!
+
+    https!
+
+    post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+      "pseudonym_session[password]" => "asdfasdf",
+      "pseudonym_session[remember_me]" => "1",
+      "redirect_to_ssl" => "1"
+    assert_response 302
+    response['Set-Cookie'].each do |cookie|
+      if cookie =~ /\Apseudonym_credentials=/ || cookie =~ /\A_normandy_session=/
+        cookie.should match(/; *HttpOnly/)
+      end
+    end
+  end
 end
