@@ -619,9 +619,9 @@ class ApplicationController < ActionController::Base
       ErrorLogging.log_error(:default, {
         "message" => "rendered error page failed unexpectedly",
         "method" => (request.method rescue "none"),
-        'referrer' => request.referrer, 
-        'format' => request.format,
-        'xhr' => request.xhr?,
+        'referrer' => (request.referrer rescue 'none'),
+        'format' => (request.format rescue 'none'),
+        'xhr' => (request.xhr? rescue false),
         'user_id' => (@current_user ? @current_user.id : ''),
         "error_id" => (@error ? @error.id : ""),
         "backtrace" => (e.backtrace.join("<br/>\n") rescue "none"),
