@@ -24,6 +24,7 @@ class AccountsController < ApplicationController
   end
   
   def show
+    return redirect_to account_settings_url(@account) if @account.site_admin?
     if authorized_action(@account, @current_user, :manage)
       load_course_right_side
       @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show)

@@ -437,7 +437,7 @@ class Account < ActiveRecord::Base
       given {|user, session| self.parent_account && self.parent_account.grants_right?(user, session, permission) }
       set { can permission }
 
-      given {|user, session| self != Account.site_admin && Account.site_admin_user?(user) }
+      given {|user, session| !site_admin? && Account.site_admin_user?(user) }
       set { can permission }
     end
 
@@ -450,7 +450,7 @@ class Account < ActiveRecord::Base
     given { |user| self.parent_account && self.parent_account.grants_right?(user, nil, :manage) }
     set { can :read and can :read_roster and can :manage and can :update and can :delete }
     
-    given { |user| self != Account.site_admin && Account.site_admin_user?(user) }
+    given { |user| !site_admin? && Account.site_admin_user?(user) }
     set { can :read and can :read_roster and can :manage and can :update and can :delete }
   end
 
@@ -591,6 +591,10 @@ class Account < ActiveRecord::Base
   def special_account?
     self == Account.site_admin || self == Account.default
   end
+  
+  def site_admin?
+    self == Account.site_admin
+  end
 
   def display_name
     self.name
@@ -694,19 +698,25 @@ class Account < ActiveRecord::Base
   TAB_SIS_IMPORT = 11
   
   def tabs_available(user=nil, opts={})
-    tabs = [
-      { :id => TAB_COURSES, :label => "Courses", :href => :account_path },
-      { :id => TAB_USERS, :label => "Users", :href => :account_users_path },
-      { :id => TAB_STATISTICS, :label => "Statistics", :href => :statistics_account_path },
-      { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
-      { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path },
-      { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path },
-      { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path },
-    ]
-    tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
-    tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id
-    tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil?
-    tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.allow_sis_import
+    if site_admin?
+      tabs = [
+        { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
+      ]
+    else
+      tabs = [
+        { :id => TAB_COURSES, :label => "Courses", :href => :account_path },
+        { :id => TAB_USERS, :label => "Users", :href => :account_users_path },
+        { :id => TAB_STATISTICS, :label => "Statistics", :href => :statistics_account_path },
+        { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
+        { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path },
+        { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path },
+        { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path },
+      ]
+      tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
+      tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id
+      tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil?
+      tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.allow_sis_import
+    end
     tabs << { :id => TAB_SETTINGS, :label => "Settings", :href => :account_settings_path }
     tabs
   end

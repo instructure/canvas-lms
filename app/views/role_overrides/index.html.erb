@@ -95,10 +95,12 @@
     If you would like to prevent anyone from overriding this in their own course, click the lock (<%= image_tag "locked_small.png", :class => 'lock locked' %>) icon.
   </div>
   <div style="text-align: right;">
-    <% if @managing_account_roles %>
-      <a href="<%= context_url(@context, :context_role_overrides_url) %>">Manage Course-Level Roles</a>
-    <% else %>
-      <a href="<%= context_url(@context, :context_role_overrides_url, :account_roles => 1) %>">Manage Account-Level Roles</a>
+    <% if !@context.site_admin? %>
+      <% if @managing_account_roles %>
+        <a href="<%= context_url(@context, :context_role_overrides_url) %>">Manage Course-Level Roles</a>
+      <% else %>
+        <a href="<%= context_url(@context, :context_role_overrides_url, :account_roles => 1) %>">Manage Account-Level Roles</a>
+      <% end %>
     <% end %>
   </div>
   <% if @managing_account_roles %>
