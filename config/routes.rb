@@ -593,7 +593,7 @@ ActionController::Routing::Routes.draw do |map|
   ApiRouteSet.new(map, "/api/v1") do |api|
     api.resources :courses,
                   :only => %w(index) do |course|
-      course.students 'students.:format',
+      course.api_students 'students.:format',
         :controller => 'courses', :action => 'students',
         :conditions => { :method => :get }
       course.resources :assignments,
