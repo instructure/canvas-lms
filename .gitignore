@@ -11,6 +11,7 @@ tmp/*
 db/*.sqlite3
 db/*.sqlite3-journal
 db/*.sqlite
+db/demo
 config/amazon_s3.yml
 config/cutycapt.yml
 config/collaborations.yml
