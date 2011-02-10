@@ -1,5 +1,6 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
 <p>
-  <label>Enabled</label>
-  <input name="settings[enabled]" type="hidden" value="false" />
-  <%= check_box_tag("settings[enabled]", 'true', @settings[:enabled].to_s == 'true') %>
+  <%= f.check_box :enabled, {}, 'true', 'false' %>
+  <%= f.label :enabled, "Enabled" %>
 </p>
+<% end %>

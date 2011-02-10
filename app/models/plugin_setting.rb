@@ -27,9 +27,22 @@
 #  updated_at :datetime
 #
 class PluginSetting < ActiveRecord::Base
-  validates_uniqueness_of :name
+  validates_uniqueness_of :name, :if => :validate_uniqueness_of_name?
+  before_save :validate_posted_settings
   serialize :settings
+  attr_accessor :posted_settings
+  
+  def validate_uniqueness_of_name?
+    true
+  end
 
+  def validate_posted_settings
+    if @posted_settings
+      plugin = Canvas::Plugin.find(name.to_s)
+      plugin.validate_settings(self, @posted_settings)
+    end
+  end
+  
   def self.settings_for_plugin(name, plugin=nil)
     if settings = PluginSetting.find_by_name(name.to_s)
       settings = settings.settings

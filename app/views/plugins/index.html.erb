@@ -18,7 +18,7 @@
         <td><%= content_tag('span', link_to(h(plugin.website), plugin.website), :class => 'url') unless plugin.website.blank? %></td>
         <td class="author"><%= plugin.author_website.blank? ? h(plugin.author) : link_to(h(plugin.author), plugin.author_website) %></td>
         <td class="version"><%= h plugin.version %></td>
-        <td class="configure"><%= link_to("Configure", plugins_show_path(plugin.id)) if plugin.has_settings_partial? %></td>
+        <td class="configure"><%= link_to("Configure", plugin_path(plugin.id)) if plugin.has_settings_partial? %></td>
       </tr>
     <% end %>
   </table>

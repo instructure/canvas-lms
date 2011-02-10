@@ -506,9 +506,7 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.dashboard_ignore_channel 'dashboard/ignore_path', :controller => "users", :action => "ignore_channel", :conditions => {:method => :post}
 
-  map.plugins 'plugins', :controller => 'plugins', :action => 'index'
-  map.plugins_show 'plugins/:id', :controller => 'plugins', :action => 'show', :method => 'get'
-  map.plugins_update 'plugins/:id/update', :controller => 'plugins', :action => 'update', :method => 'post'
+  map.resources :plugins, :only => [:index, :show, :update]
 
   # The getting_started pages are a short wizard used to help
   # a teacher start a new course from scratch.

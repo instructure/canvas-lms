@@ -38,7 +38,7 @@ class PluginsController < ApplicationController
   end
   
   def show
-    if @plugin = Canvas::Plugin.find(params[:id])
+    if find_plugin_setting
       @settings = @plugin.settings
     else
       flash[:notice] = "The plugin #{params[:id]} doesn't exist."
@@ -47,26 +47,33 @@ class PluginsController < ApplicationController
   end
 
   def update
-    if plugin = Canvas::Plugin.find(params[:id])
-      plugin.settings.merge! params[:settings]
-
-      plugin_setting = PluginSetting.find_by_name(plugin.id)
-      plugin_setting ||= PluginSetting.new(:name => plugin.id)
-      plugin_setting.settings = plugin.settings
-
-      if plugin_setting.save!
+    if find_plugin_setting
+      @plugin_setting.posted_settings = params[:settings]
+      if @plugin_setting.save
         flash[:notice] = "Plugin settings successfully updated."
+        redirect_to plugin_path(@plugin.id)
       else
-        flash[:notice] = "There was an error saving the plugin settings."
+        @settings = @plugin.settings
+        flash[:error] = "There was an error saving the plugin settings."
+        render :action => 'show'
       end
-      redirect_to plugins_path
     else
-      flash[:notice] = "The plugin #{params[:id]} doesn't exist."
+      flash[:error] = "The plugin #{params[:id]} doesn't exist."
       redirect_to plugins_path
     end
   end
 
   protected
+  
+  def find_plugin_setting
+    if @plugin = Canvas::Plugin.find(params[:id])
+      @plugin_setting = PluginSetting.find_by_name(@plugin.id)
+      @plugin_setting ||= PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
+      true
+    else
+      false
+    end
+  end
 
   def require_setting_site_admin
     require_site_admin_with_permission(:manage_site_settings)
