@@ -43,12 +43,12 @@ group :test do
   gem 'webrat',       '0.7.2'
   gem 'rcov',         '0.9.9'
   gem 'yard',         '0.6.3'
+  gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'selenium-client', '1.2.18'
 end
 
 group :development do
   gem 'ruby-debug',   '0.10.4'
-  gem 'bluecloth' # for generating api docs
 end
 
 # Non-standard Canvas extension to Bundler behavior -- load the Gemfiles from
