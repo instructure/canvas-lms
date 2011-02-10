@@ -85,6 +85,10 @@ module Canvas
     end
 
     def self.find(id)
+      @registered_plugins[id.to_s] || nil
+    end
+
+    def self.find!(id)
       raise(NoPluginError) if id.nil?
       @registered_plugins[id.to_s] || raise(NoPluginError)
     end

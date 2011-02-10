@@ -38,30 +38,32 @@ class PluginsController < ApplicationController
   end
   
   def show
-    @plugin = Canvas::Plugin.find(params[:id])
-    @settings = @plugin.settings
-  rescue Canvas::NoPluginError
-    flash[:notice] = "The plugin #{params[:id]} doesn't exist."
-    redirect_to plugins_path
+    if @plugin = Canvas::Plugin.find(params[:id])
+      @settings = @plugin.settings
+    else
+      flash[:notice] = "The plugin #{params[:id]} doesn't exist."
+      redirect_to plugins_path
+    end
   end
 
   def update
-    plugin = Canvas::Plugin.find(params[:id])
-    plugin.settings.merge! params[:settings]
-    
-    plugin_setting = PluginSetting.find_by_name(plugin.id)
-    plugin_setting ||= PluginSetting.new(:name => plugin.id)
-    plugin_setting.settings = plugin.settings
-  
-    if plugin_setting.save!
-      flash[:notice] = "Plugin settings successfully updated."
+    if plugin = Canvas::Plugin.find(params[:id])
+      plugin.settings.merge! params[:settings]
+
+      plugin_setting = PluginSetting.find_by_name(plugin.id)
+      plugin_setting ||= PluginSetting.new(:name => plugin.id)
+      plugin_setting.settings = plugin.settings
+
+      if plugin_setting.save!
+        flash[:notice] = "Plugin settings successfully updated."
+      else
+        flash[:notice] = "There was an error saving the plugin settings."
+      end
+      redirect_to plugins_path
     else
-      flash[:notice] = "There was an error saving the plugin settings."
+      flash[:notice] = "The plugin #{params[:id]} doesn't exist."
+      redirect_to plugins_path
     end
-    redirect_to plugins_path
-  rescue Canvas::NoPluginError
-    flash[:notice] = "The plugin #{params[:id]} doesn't exist."
-    redirect_to plugins_path
   end
 
   protected
