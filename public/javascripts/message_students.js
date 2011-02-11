@@ -99,7 +99,10 @@
       var idx = parseInt($(this).val(), 10) || 0;
       var option = currentSettings.options[idx];
       var students_hash = $message_students_dialog.data('students_hash'),
-          cutoff = parseFloat($message_students_dialog.find(".cutoff_score").val(), 10) || null;
+          cutoff = parseFloat($message_students_dialog.find(".cutoff_score").val(), 10);
+      if (!cutoff && cutoff !== 0) {
+        cutoff = null;
+      }
       var student_ids = null;
       var students_list = [];
       for(var idx in students_hash) { students_list.push(students_hash[idx]); }

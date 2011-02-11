@@ -375,9 +375,9 @@
                   if(selected == "Haven't submitted yet") {
                     return !student.submitted_at && !student.graded_at;
                   } else if(selected == "Scored less than") {
-                    return student.score != null && student.score != "" && cutoff != null && student.score < cutoff;
+                    return student.score != null && student.score !== "" && cutoff != null && student.score < cutoff;
                   } else if(selected == "Scored more than") {
-                    return student.score != null && student.score != "" && cutoff != null && student.score > cutoff;
+                    return student.score != null && student.score !== "" && cutoff != null && student.score > cutoff;
                   }
                 });
                 return $.map(students, function(student) { return student.user_data.id });
