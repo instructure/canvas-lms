@@ -20,7 +20,7 @@ class ContentImportsController < ApplicationController
   before_filter :require_context
   add_crumb("Content Imports") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
   before_filter { |c| c.active_tab = "home" }
-  ssl_required :migrate_content
+  ssl_required :migrate_content, :quizzes
   
   def intro
     if authorized_action(@context, @current_user, :update)
