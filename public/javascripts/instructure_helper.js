@@ -178,7 +178,6 @@
       }
       if(error && !options.preventDegradeToFormSubmit) {
         if(INST && INST.environment == 'development') {
-          console.log(error);
           $.flashError('formSubmit error, trying to gracefully degrade. See console for details');
         }
         return;
@@ -409,9 +408,6 @@
     var xhr = new XMLHttpRequest();
     if(xhr.upload) {
       xhr.upload.addEventListener('progress', function(event) {
-        if(event && event.lengthComputable) {
-          console.log(event.loaded + " out of " + event.total);
-        }
         if(options.progress && $.isFunction(options.progress)) {
           options.progress.call(this, event); 
         }
@@ -1865,28 +1861,21 @@
       }
     }
     var uploadFile = function(parameters, file) {
-      console.log("uploading file");
       $.ajaxJSON("/files/pending", 'POST', parameters, function(data) {
         try {
         if(data && data.upload_url) {
           var post_params = data.upload_params;
           var old_name = $(file).attr('name');
           $(file).attr('name', data.file_param);
-          console.log("got upload url: " + data.upload_url);
-          console.log(post_params);
           $.ajaxJSONFiles(data.upload_url, 'POST', post_params, $(file), function(data) {
-            console.log("upload success");
             attachments.push(data);
             $(file).attr('name', old_name);
             next.call($this);
           }, function(data) {
-            console.log("upload failure");
-            console.log(data);
             $(file).attr('name', old_name);
             (options.upload_error || options.error).call($this, data);
           }, {onlyGivenParameters: data.remote_url});
         } else {
-          console.log("did not receive upload url, failing");
           (options.upload_error || options.error).call($this, data);
         }
         } catch(e) {
@@ -1895,14 +1884,12 @@
           ex;
         }
       }, function() { 
-        console.log("failed to post pending file information");
         return (options.upload_error || options.error).apply(this, arguments);
       })
     }
     var next = function() {
       var item = list.shift();
       if(item) {
-        console.log("uploading next file");
         uploadFile.call($this, {
           'attachment[folder_id]': options.folder_id,
           'attachment[intent]': options.intent,
@@ -1910,7 +1897,6 @@
           'attachment[context_code]': options.context_code
         }, item);
       } else {
-        console.log("no items left");
         ready.call($this);
       }
     }
@@ -1953,10 +1939,8 @@
   // Wrapper for default $.ajax behavior.  On error will call
   // the default error method if no error method is provided.
   $.ajaxJSON = function(url, submit_type, data, success, error, options) {
-    console.log("making ajaxJSON call");
     data = data || {};
     if(!url && error) {
-      console.log("url required");
       error(null, null, "URL required for requests", null);
       return;
     }
@@ -1994,7 +1978,6 @@
       dataType: "json",
       type: submit_type,
       success: function(data) {
-        console.log("ajaxJSON success");
         data = data || {};
         var page_view_id = null;
         if(xhr && xhr.getResponseHeader && (page_view_id = xhr.getResponseHeader("X-Canvas-Page-View-Id"))) {
@@ -2014,7 +1997,6 @@
         }
       },
       error: function() {
-        console.log("ajaxJSON failure");
         ajaxError.apply(this, arguments);
       },
       data: data
@@ -2319,7 +2301,6 @@
         text += " " + time;
       }
       picker.input.val(text).change();
-      console.log(dateText);
     };
     if(!$.fn.datepicker.timepicker_initialized) {
       $(document).delegate('.ui-datepicker-ok', 'click', function(event) {

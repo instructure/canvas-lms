@@ -2171,7 +2171,6 @@ var fileUpload = {
   swfQueuedAndPendingFiles: [],
   swfFiles: [],
   swfFileQueue: function(event, id, file) { //onSelect
-    console.log("queued: " + id);
     file.id = id;
     var $file = fileUpload.initFile(file);
     $file.data('folder', files.currentItemData());
@@ -2188,9 +2187,7 @@ var fileUpload = {
     $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {
       file.upload_url = data.proxied_upload_url || data.upload_url;
       data.upload_params.Signature = encodeURIComponent(data.upload_params.Signature);
-      console.log("signature: " + data.upload_params.Signature);
       file.upload_params = data.upload_params;
-      console.log("data for: " + file.id);
       $file.data('success_url', data.success_url);
       if(!$file.hasClass('done')) {
         fileUpload.swfQueuedAndPendingFiles.push(file);
@@ -2207,8 +2204,6 @@ var fileUpload = {
     if(file || fileUpload.swfQueuedAndPendingFiles.length > 0) {
       file = file || fileUpload.swfQueuedAndPendingFiles.shift();
       if(file) {
-        console.log("going to start: " + file.id + " to: " + file.upload_url);
-        console.log(file.upload_params);
         $("#file_swf").uploadifySettings('script', file.upload_url);
         $("#file_swf").uploadifySettings('scriptData', file.upload_params);
         $("#file_swf").uploadifyUpload(file.id);
@@ -2234,7 +2229,6 @@ var fileUpload = {
   swfFileError: function(event, id, file, error, cancelable) { // onError
     cancelable = typeof(cancelable) != 'undefined' ? cancelable : true;
     file.id = id;
-    console.log(error.type + " error: " + file.id + "  " + error.info);
     var $file = fileUpload.initFile(file);
     setTimeout(function() {
       $file.addClass('error_cancelled');
@@ -2252,8 +2246,6 @@ var fileUpload = {
   swfFileOpen: function(event, id, file) { // onOpen
     file.id = id;
     var $file = fileUpload.initFile(file);
-    console.log("starting: " + file.id + " to: " + file.upload_url);
-    console.log(file.upload_params);
     if(file.upload_url) $("#file_swf").uploadifySettings('script', file.upload_url);
     if(file.upload_params) $("#file_swf").uploadifySettings('scriptData', file.upload_params);
     fileUpload.swfQueuedAndPendingFiles = $.grep(fileUpload.swfQueuedAndPendingFiles, function(f) { return f.id != file.id; });
@@ -2298,13 +2290,10 @@ var fileUpload = {
     }, 5000);
     if(response) {
       try {
-        console.log("parsing: " + response);
         var data = JSON.parse(response);
         if("errors" in data && !jQuery.isEmptyObject(data["errors"])) {
           fileUpload.swfFileError(event, id, file, {type: "server", info: JSON.stringify(data["errors"])}, false);
         } else {
-          console.log("success!");
-          console.log(response);
           data.swf = true;
           setTimeout(function() {
             files.updateFile(context_string, data);
@@ -2314,10 +2303,8 @@ var fileUpload = {
         fileUpload.swfFileError(event, id, file, {type: "JS", info: e.toString()}, false);
       }
     } else {
-      console.log("no response");
       $file.find(".status").text("File may have uploaded, but the server failed to respond.  Reload the page to confirm. ");
     }
-    console.log("getting next...");
     fileUpload.swfUploadNext();
   },
   swfQueueComplete: function(event, data) { // onAllComplete
