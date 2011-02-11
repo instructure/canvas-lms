@@ -581,6 +581,10 @@ var quiz = {};
         var val = Math.round(parseFloat($input.val()) * 100.0) / 100.0;
         if(isNaN(val)) { val = 0.0; }
         $input.val(val);
+      } else if(type == "float_long") {
+        var val = Math.round(parseFloat($input.val()) * 10000.0) / 10000.0;
+        if(isNaN(val)) { val = 0.0; }
+        $input.val(val);
       }
     },
     defaultQuestionData: {
@@ -1818,12 +1822,8 @@ var quiz = {};
       if(event.keyCode > 57 && event.keyCode < 91) {
         event.preventDefault();
       }
-    }).delegate('input.float_value', 'change', function(event) {
-      quiz.parseInput($(this), "float");
-    }).delegate('input.float_value', 'blur', function(event) {
-      quiz.parseInput($(this), "float");
-    }).delegate('input.float_value', 'focus', function(event) {
-      quiz.parseInput($(this), "float");
+    }).delegate('input.float_value', 'change blur focus', function(event) {
+      quiz.parseInput($(this), $(this).hasClass('long') ? 'float_long' : 'float');
     });
     $(".question_form textarea, .question_form :text, .answer textarea, .answer :text").focus(function(event) {
       $(this).select();

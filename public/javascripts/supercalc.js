@@ -45,7 +45,7 @@ $.fn.superCalc = function(options, more_options) {
     options = options || {};
     options.c1 = true;
     var $entryBox = $(this);
-    var $table = $("<table class='formulas'><thead><tr><th>Formula</th><th>Result</th><th>&nbsp;</th></tr></thead><tfoot><tr><td colspan='3' class='last_row_details' style='display: none;'>the last formula row will be used to compute the final answer</td></tr><tr><td></td><td class='decimal_places'><select class='round'><option>0</option><option>1</option><option>2</option><option>3</option></select> Decimal Places</td></tr></tfoot><tbody></tbody></table>");
+    var $table = $("<table class='formulas'><thead><tr><th>Formula</th><th>Result</th><th>&nbsp;</th></tr></thead><tfoot><tr><td colspan='3' class='last_row_details' style='display: none;'>the last formula row will be used to compute the final answer</td></tr><tr><td></td><td class='decimal_places'><select class='round'><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select> Decimal Places</td></tr></tfoot><tbody></tbody></table>");
     $(this).data('table', $table);
     $entryBox.before($table);
     $table.find("tfoot tr:last td:first").append($entryBox);
