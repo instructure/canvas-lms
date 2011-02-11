@@ -216,6 +216,9 @@ class WebConference < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :create_conferences) }
     set { can :create }
     
+    given { |user, session| user && user.id == self.user_id && self.cached_context_grants_right?(user, session, :create_conferences) }
+    set { can :initiate }
+    
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_content) }
     set { can :read and can :join and can :initiate and can :create and can :delete and can :update }
   end
