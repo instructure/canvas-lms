@@ -30,6 +30,47 @@ describe GradebooksController do
     end
 
   end
+  
+  describe "GET 'grade_summary'" do
+    it "should redirect teacher to gradebook" do
+      course_with_teacher_logged_in(:active_all => true)
+      get 'grade_summary', :course_id => @course.id
+      response.should be_redirect
+      response.should redirect_to(:action => 'show')
+    end
+    
+    it "should render for current user" do
+      course_with_student_logged_in(:active_all => true)
+      get 'grade_summary', :course_id => @course.id
+      response.should render_template('grade_summary')
+      get 'grade_summary', :course_id => @course.id, :id => @user.id
+      response.should render_template('grade_summary')
+    end
+    
+    it "should not allow access for wrong user" do
+      course_with_student(:active_all => true)
+      @student = @user
+      user(:active_all => true)
+      user_session(@user)
+      get 'grade_summary', :course_id => @course.id
+      assert_unauthorized
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      assert_unauthorized
+    end
+    
+    it" should allow access for a linked observer" do
+      course_with_student(:active_all => true)
+      @student = @user
+      user(:active_all => true)
+      user_session(@user)
+      @oe = @course.enroll_user(@user, 'ObserverEnrollment')
+      @oe.accept
+      @oe.update_attribute(:associated_user_id, @student.id)
+      @user.reload
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      response.should render_template('grade_summary')
+    end
+  end
 
   describe "GET 'show'" do
     before(:each) do

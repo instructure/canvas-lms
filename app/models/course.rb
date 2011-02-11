@@ -660,13 +660,16 @@ class Course < ActiveRecord::Base
     
     given { |user| self.available? && user &&  user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
     set { can :read and can :participate_as_student and can :read_grades and can :read_groups }
-    
+
     given { |user| self.completed? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
     set { can :read and can :read_groups }
     
     given { |user| (self.available? || self.completed?) && user &&  user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? } }
     set { can :read }
     
+    given { |user| (self.available? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? && e.associated_user_id} }
+    set { can :read_grades }
+     
     given { |user, session| self.available? && self.teacherless? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } && (!session || !session["role_course_#{self.id}"]) }
     set { can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p } }
     
@@ -1711,7 +1714,9 @@ class Course < ActiveRecord::Base
       
       # remove some tabs for logged-out users or non-students
       tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } unless self.grants_right?(user, nil, :participate_as_student)
-      tabs.delete_if {|t| [TAB_GRADES].include?(t[:id]) } unless self.grants_right?(user, nil, :read_grades)
+      if !self.grants_right?(user, nil, :read_grades)
+        tabs.delete_if {|t| [TAB_GRADES].include?(t[:id]) } 
+      end
       
       # remove hidden tabs from students
       tabs.delete_if {|t| t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused]) }

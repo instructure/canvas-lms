@@ -52,10 +52,6 @@ class UsersController < ApplicationController
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
       @current_enrollments = @user.current_enrollments
-      if @current_enrollments.length == 1
-        redirect_to course_grades_url(@current_enrollments.first.course_id)
-        return
-      end
       
       @student_enrollments = @current_enrollments.select{|e| e.is_a?(StudentEnrollment) }
       
@@ -65,6 +61,11 @@ class UsersController < ApplicationController
         @observed_enrollments << StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)
       end
       @observed_enrollments = @observed_enrollments.uniq.compact
+      
+      if @current_enrollments.length + @observed_enrollments.length == 1
+        redirect_to course_grades_url(@current_enrollments.first.course_id)
+        return
+      end
       
       @teacher_enrollments = @current_enrollments.select{|e| e.admin? }
       @prior_enrollments = @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
