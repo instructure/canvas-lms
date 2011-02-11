@@ -19,7 +19,7 @@
 <div class="question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>">
   <div style="display: block; height: 1px; overflow: hidden;">&nbsp;</div>
   <a name="question_<%= hash_get(question, :id, "blank") %>"></a>
-  <fieldset class="display_question question <%= "marked" if assessing && @stored_params && @stored_params.send("question_#{hash_get(question, :id)}_marked") %> <%= "correct" if user_answer && hash_get(user_answer, :correct) == true %> <%= "incorrect" if user_answer && hash_get(user_answer, :correct) == false %>" id="question_<%= hash_get(question, :id, "new") %>">
+  <fieldset class="display_question question <%= "marked" if assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"] %> <%= "correct" if user_answer && hash_get(user_answer, :correct) == true %> <%= "incorrect" if user_answer && hash_get(user_answer, :correct) == false %>" id="question_<%= hash_get(question, :id, "new") %>">
     <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
     <% if assessing %>
       <div class="flag_question">
@@ -63,7 +63,7 @@
           <select class="answer_select question_input" name="question_<%= hash_get(question, :id, "blank") %>">
             <option value="">[ Choose ]</option>
             <% hash_get(question, :answers, []).each do |answer| %>
-              <option value="<%= hash_get(answer, :id) %>" <%= "selected" if user_answer && hash_get(user_answer, :answer_id) == hash_get(answer, :id) || (@stored_params && @stored_params.send("question_#{hash_get(question, :id)}").to_s == hash_get(answer, :id).to_s) %>><%= hash_get(answer, :text) %></option>
+              <option value="<%= hash_get(answer, :id) %>" <%= "selected" if user_answer && hash_get(user_answer, :answer_id) == hash_get(answer, :id) || (@stored_params && @stored_params["question_#{hash_get(question, :id)}"].to_s == hash_get(answer, :id).to_s) %>><%= hash_get(answer, :text) %></option>
             <% end %>
           </select>
           <span class="text_after_answers"><%= user_content(hash_get(question, :text_after_answers), @context.asset_string, asset_string) %></span>

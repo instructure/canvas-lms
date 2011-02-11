@@ -96,7 +96,7 @@ class QuizQuestion < ActiveRecord::Base
     self.attributes.delete_if{|k,v| [:id, :quiz_id, :quiz_group_id, :question_data].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
-    data = self.question_data
+    data = self.question_data || {}
     if options[:old_context] && options[:new_context]
       data = QuizQuestion.migrate_question_hash(data, options)
     end

@@ -16,7 +16,7 @@
     <span class="score_value"><%= render :partial => "submission_score", :object => @submission, :locals => {:quiz => @quiz, :context => @context} %></span> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %>
   </div>
 <% else %>
-<% @stored_params ||= OpenObject.new
+<% @stored_params ||= {}
     editable ||= false
     submission_data = @submission.data
     submission_data_hash = {}

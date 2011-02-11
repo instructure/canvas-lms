@@ -8,7 +8,7 @@
   <h3 style="margin: 0px;">Questions</h3>
   <ul id="question_list" style="max-height: 200px; overflow: auto;">
     <% @submission.questions_as_object.compact.each do |q| %>
-      <li id="list_question_<%= q[:id] %>" class="list_question <%= "marked" if @stored_params.send("question_#{q[:id]}_marked") %>">
+      <li id="list_question_<%= q[:id] %>" class="list_question <%= "marked" if @stored_params["question_#{q[:id]}_marked"] %>">
         <a class="jump_to_question_link" href="#question_<%= q[:id] %>"><%= q[:question_name] %></a>
       </li>
     <% end %>

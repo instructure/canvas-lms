@@ -72,7 +72,7 @@ class QuizSubmission < ActiveRecord::Base
   def temporary_data
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
     raise "Cannot view temporary data for completed quiz" if self.submission_data && !self.submission_data.is_a?(Hash)
-    res = self.submission_data || {}
+    res = (self.submission_data || {}).with_indifferent_access
     res
   end
   

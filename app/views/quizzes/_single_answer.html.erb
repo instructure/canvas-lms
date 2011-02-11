@@ -1,9 +1,9 @@
 <div style="margin-left: 30px;">
 <% if question_type.entry_type == "text_box" %>
-  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= h(@stored_params.send("question_#{hash_get(question, :id)}")) %>" class="question_input"/>
+  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= h(@stored_params["question_#{hash_get(question, :id)}"]) %>" class="question_input"/>
 <% elsif question_type.entry_type == "numerical_text_box" %>
-  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= h(@stored_params.send("question_#{hash_get(question, :id)}")) %>" class="question_input numerical_question_input"/>
+  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= h(@stored_params["question_#{hash_get(question, :id)}"]) %>" class="question_input numerical_question_input"/>
 <% elsif question_type.entry_type == "textarea" %>
-  <textarea name="question_<%= hash_get(question, :id) %>" class="question_input" style="width: 90%;"><%= h(@stored_params.send("question_#{hash_get(question, :id)}")) %></textarea>
+  <textarea name="question_<%= hash_get(question, :id) %>" class="question_input" style="width: 90%;"><%= h(@stored_params["question_#{hash_get(question, :id)}"]) %></textarea>
 <% end %>
 </div>

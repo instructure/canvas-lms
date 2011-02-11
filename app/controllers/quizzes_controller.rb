@@ -112,7 +112,7 @@ class QuizzesController < ApplicationController
       end
       managed_quiz_data if @quiz.grants_right?(@current_user, session, :grade)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && @submission.untaken?
-      @stored_params ||= OpenObject.new
+      @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
       take_quiz if params[:take] && !@locked
     end
