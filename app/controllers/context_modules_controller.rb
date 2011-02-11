@@ -228,7 +228,8 @@ class ContextModulesController < ApplicationController
         item = items[idx]
         item.update_attributes(:position => idx, :context_module_id => @module.id)
       end
-      ContextModule.update_all({:updated_at => Time.now}, {:id => affected_module_ids});
+      ContextModule.update_all({:updated_at => Time.now}, {:id => affected_module_ids})
+      @context.touch
       @module.reload
       respond_to do |format|
         format.json { render :json => @module.to_json(:include => :content_tags, :permissions => {:user => @current_user, :session => session}) }
