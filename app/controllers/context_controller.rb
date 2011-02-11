@@ -359,22 +359,26 @@ class ContextController < ApplicationController
   
   def recipients
     get_context
-    if authorized_action(@context, @current_user, :read_roster)
-      @groups = @context.groups.active.find(:all, :include => :users)
-      @users = @context.users
-      @visible_students = @context.students_visible_to(@current_user)
-      if @context.visibility_limited_to_course_sections?(@current_user)
-        @bad_students = @context.students - @visible_students
-        @users -= @bad_students
-      end
-      res = {:users => @users.sort_by{|u| u.sortable_name }.uniq,
-        :groups => @groups,
-        :teachers => @context.teachers,
-        :students => @visible_students
-        }
-      res[:group_members] = {}
-      @groups.each do |group|
-        res[:group_members][group.id] = group.users
+    if authorized_action(@context, @current_user, :send_messages)
+      @users = @context.users.sort_by{|u| u.sortable_name }.uniq
+      res = {:users => @context.teachers, :teachers => @context.teachers}
+      if @context.grants_right?(@current_user, session, :read_roster)
+        @visible_students = @context.students_visible_to(@current_user)
+        if @context.visibility_limited_to_course_sections?(@current_user)
+          @bad_students = @context.students - @visible_students
+          @users -= @bad_students
+        end
+        @groups = @context.groups.active.scoped(:include => {:group_memberships => :user})
+        res = {:users => @users.sort_by{|u| u.sortable_name }.uniq,
+          :groups => @groups,
+          :teachers => @context.teachers.scoped(:select => 'id').map(&:id),
+          :students => @visible_students.map(&:id),
+          :observers => @context.observers.scoped(:select => 'id').map(&:id)
+          }
+        res[:group_members] = {}
+        @groups.each do |group|
+          res[:group_members][group.id] = group.group_memberships.active.map(&:user_id)
+        end
       end
       render :json => res.to_json
     end

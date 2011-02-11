@@ -57,6 +57,12 @@ $(document).ready(function() {
     }
   });
   $(".context_message.read").find(".header_icon,.title").attr('title', 'Click to Expand Message');
+  $(".recipients_dialog .select_all_recipients_link").click(function(event) {
+    event.preventDefault();
+    var $dialog = $(this).parents(".recipients_dialog");
+    $dialog.find(".right_side :checkbox").attr('checked', true);
+    $dialog.find(".left_side .select_recipients_link").addClass('selected');
+  });
   $(".recipients_dialog .clear_recipients_link").click(function(event) {
     event.preventDefault();
     var $dialog = $(this).parents(".recipients_dialog");
@@ -173,23 +179,33 @@ $(document).ready(function() {
         var groups = data.groups;
         var categories = {};
         student_ids = {};
+        $dialog.find(".message_groups").showIf(data.groups && data.groups.length > 0);
         for(var idx in data.groups) {
           var group = (groups[idx].group || groups[idx].course_assigned_group);
           categories[group.category] = categories[group.category] || [];
           categories[group.category].push(group);
         }
+        $dialog.find(".message_all_teachers_link").parents(".message_group").showIf(data.students && data.students.length);
         for(var idx in data.teachers) {
-          var user = data.teachers[idx].user;
+          var user_id = data.teachers[idx];
           var $user = $dialog.find(".group_recipient.blank:first").clone(true).removeClass('blank');
-          $user.find(".user_id").text(user.id);
+          $user.find(".user_id").text(user_id);
           $dialog.find(".message_all_teachers_link").append($user);
         }
+        $dialog.find(".message_all_students_link").parents(".message_group").showIf(data.students && data.students.length);
         for(var idx in data.students) {
-          var user = data.students[idx].user;
+          var user_id = data.students[idx];
           var $user = $dialog.find(".group_recipient.blank:first").clone(true).removeClass('blank');
-          student_ids[user.id] = true;
-          $user.find(".user_id").text(user.id);
+          student_ids[user_id] = true;
+          $user.find(".user_id").text(user_id);
           $dialog.find(".message_all_students_link").append($user);
+        }
+        $dialog.find(".message_all_observers_link").parents(".message_group").showIf(data.observers && data.observers.length);
+        for(var idx in data.observers) {
+          var user_id = data.observers[idx];
+          var $user = $dialog.find(".group_recipient.blank:first").clone(true).removeClass('blank');
+          $user.find(".user_id").text(user_id);
+          $dialog.find(".message_all_observers_link").append($user);
         }
         for(var category in categories) {
           var groups = categories[category];
@@ -199,9 +215,9 @@ $(document).ready(function() {
             var $group = $category.find(".message_group.blank").clone(true).removeClass('blank');
             $group.find(".group_name").text(group.name);
             for(var jdx in data.group_members[group.id]) {
-              var user = data.group_members[group.id][jdx].user;
+              var user_id = data.group_members[group.id][jdx];
               var $user = $group.find(".group_recipient.blank").clone(true).removeClass('blank');
-              $user.find(".user_id").text(user.id);
+              $user.find(".user_id").text(user_id);
               $group.find(".message_group_link").append($user);
             }
             $category.append($group.show());
