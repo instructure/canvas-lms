@@ -17,7 +17,7 @@
   %>
   <% if submission && grade %>
     <% if submission.assignment.grading_type == "pass_fail" %>
-      <% if score && score > 0 %>
+      <% if score && score > 0 || grade == "complete" %>
         <%= image_tag "pass.png", :alt => "Complete", :class => "graded_icon" %>
       <% else %>
         <%= image_tag "fail.png", :alt => "Incomplete", :class => "graded_icon" %>
