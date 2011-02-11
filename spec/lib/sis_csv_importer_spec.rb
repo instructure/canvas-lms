@@ -314,7 +314,8 @@ describe SIS::SisCsv do
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,active",
-        "user_3,user4,User,Tres,user3@example.com,active"
+        "user_3,user4,User,Tres,user3@example.com,active",
+        "user_5,user5,User,Quatro,user5@example.com,active"
       )
       process_csv_data(
         "section_id,course_id,name,status,start_date,end_date",
@@ -322,15 +323,18 @@ describe SIS::SisCsv do
       )
       # the enrollments
       process_csv_data(
-        "course_id,user_id,role,section_name,status",
-        "test_1,user_1,teacher,S001,active",
-        "test_1,user_2,student,S001,active",
-        "test_1,user_3,ta,S001,active"
+        "course_id,user_id,role,section_name,status,associated_user_id",
+        "test_1,user_1,teacher,S001,active,",
+        "test_1,user_2,student,S001,active,",
+        "test_1,user_3,ta,S001,active,",
+        "test_1,user_5,observer,S001,active,user_2"
       )
       course = @account.courses.find_by_sis_source_id("test_1")
       course.teachers.first.name.should == "User Uno"
       course.students.first.name.should == "User Dos"
       course.tas.first.name.should == "User Tres"
+      course.observers.first.name.should == "User Quatro"
+      course.observer_enrollments.first.associated_user_id.should == course.students.first.id
     end
   end
 

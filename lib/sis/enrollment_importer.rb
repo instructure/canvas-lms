@@ -27,7 +27,7 @@ module SIS
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         add_error(csv, "No course_id given for an enrollment") if row['course_id'].blank?
         add_error(csv, "No user_id given for an enrollment") if row['user_id'].blank?
-        add_error(csv, "Improper role \"#{row['role']}\" for an enrollment") unless row['role'] =~ /\Astudent|\Ateacher|\Ata/i
+        add_error(csv, "Improper role \"#{row['role']}\" for an enrollment") unless row['role'] =~ /\Astudent|\Ateacher|\Ata|\Aobserver/i
         add_error(csv, "Improper status \"#{row['status']}\" for an enrollment") unless row['status'] =~ /\Aactive|\Adeleted|\Acompleted/i
       end
     end
@@ -72,6 +72,13 @@ module SIS
           enrollment.type = 'StudentEnrollment'
         elsif row['role'] =~ /\Ata\z|assistant/i
           enrollment.type = 'TaEnrollment'
+        elsif row['role'] =~ /\Aobserver\z/i
+          enrollment.type = 'ObserverEnrollment'
+          if row['associated_user_id']
+            pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, row['associated_user_id'])
+            associated_enrollment = pseudo && course.student_enrollments.find_by_user_id(pseudo.user_id)
+            enrollment.associated_user_id = associated_enrollment && associated_enrollment.user_id
+          end
         end
 
         if row['status']=~ /active/i
