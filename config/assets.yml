@@ -97,11 +97,7 @@ javascripts:
     - public/javascripts/eportfolio.js
   full_files:
     - public/javascripts/full_files.js
-    - public/javascripts/swfupload.js
     - public/flash/uploadify/jquery.uploadify.v2.1.0.js
-  files_index:
-    - public/javascripts/swfupload.js
-    - public/javascripts/files.js
   email_lists:
     - public/javascripts/email_lists.js
   datagrid:
