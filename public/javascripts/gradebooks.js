@@ -373,7 +373,7 @@
                 students = $.grep(students, function($student, idx) {
                   var student = $student.user_data;
                   if(selected == "Haven't submitted yet") {
-                    return !student.submitted_at && !student.graded_at;
+                    return !student.submitted_at;
                   } else if(selected == "Scored less than") {
                     return student.score != null && student.score !== "" && cutoff != null && student.score < cutoff;
                   } else if(selected == "Scored more than") {
