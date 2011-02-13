@@ -2500,8 +2500,8 @@ I18n.scoped('instructure', function(I18n) {
     options = $.extend({}, options);
     this.each(function() {
       var $field = $(this);
-      // if($field.hasClass('datetime_field_enabled')) { return; }
-      // $field.addClass('datetime_field_enabled');
+      if($field.hasClass('datetime_field_enabled')) { return; }
+      $field.addClass('datetime_field_enabled');
       if(!options.timeOnly) {
         $field.datepicker({
           timePicker: (!options.dateOnly),
@@ -2513,7 +2513,6 @@ I18n.scoped('instructure', function(I18n) {
         });
       }
       var $after = $(this);
-      $field.addClass('datetime_field_enabled');
       if($field.next(".ui-datepicker-trigger").length > 0) { $after = $field.next(); }
       var $div = $(document.createElement('div')).addClass('datetime_suggest');
       $after.after($div);
