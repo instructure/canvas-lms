@@ -56,7 +56,7 @@ $(document).ready(function() {
       }
     });
   }
-  $(".list_question").hover(function(event) {
+  $(".list_question").live('mouseover', function(event) {
     if($(this).hasClass('marked')) {
       $(this).attr('title', "You marked this question to come back to later");
     } else if($(this).hasClass('answered')) {
@@ -65,29 +65,26 @@ $(document).ready(function() {
       $(this).attr('title', "Haven't Answered yet");
     }
     $("#" + $(this).attr('id').substring(5)).addClass('related');
-  }, function(event) {
+  }).live('mouseout', function(event) {
     $("#questions .question_holder .question").removeClass('related');
   });
-  $(".jump_to_question_link").click(function(event) {
+  $(".jump_to_question_link").live('click', function(event) {
     event.preventDefault();
     var $obj = $($(this).attr('href'));
     $("html,body").scrollTo({object: $obj});
     $obj.find(":input:first").focus().select();
   });
-  $("#questions").find(":checkbox,:radio,label").bind('change mouseup', function(event) {
+  $("#questions").delegate(":checkbox,:radio,label", 'change mouseup', function(event) {
     if(lastAnswerSelected == $(this).parents(".answer")[0]) {
       $(this).parents(".answer").find(":checkbox,:radio").blur();
       quizSubmission.updateSubmission();
     }
-//      $(this).parents(".answer").find("label").focus();
-//      $(document).focus();
-  });
-  $("#questions").find(":text,textarea").bind('change blur', function(event, update) {
+  }).delegate(":text,textarea", 'change blur', function(event, update) {
     if(update !== false) {
       quizSubmission.updateSubmission();
     }
   });
-  $(".numerical_question_input").bind('keypress', function(event) {
+  $(".numerical_question_input").live('keypress', function(event) {
     var string = String.fromCharCode(event.charCode || event.keyCode);
     if(event.charCode == 0 || string == "-" || string == "." || string == "0" || parseInt(string, 10)) {
       $(this).triggerHandler('focus');
@@ -96,12 +93,12 @@ $(document).ready(function() {
       event.preventDefault();
       event.stopPropagation();
     }
-  }).bind('change blur', function() {
+  }).live('change blur', function() {
     var val = parseFloat($(this).val());
     if(isNaN(val)) { val = ""; }
     $(this).val(val);
   });
-  $(".flag_question").click(function() {
+  $(".flag_question").live('click', function() {
     $(this).parents(".question").toggleClass('marked');
     $("#list_" + $(this).parents(".question").attr('id')).toggleClass('marked');
   });
@@ -110,7 +107,7 @@ $(document).ready(function() {
       $(this).triggerHandler('change', false);
     });
   }, 2500);
-  $(".question_input").change(function() {
+  $(".question_input").live('change', function() {
     var tagName = $(this)[0].tagName.toUpperCase();
     var val = "";
     if(tagName == "TEXTAREA") {
@@ -140,11 +137,13 @@ $(document).ready(function() {
       $(this).text("Hide");
     }
   });
-  $("#question_list .list_question").each(function() {
-    if($(this).find(".jump_to_question_link").text() == "Spacer") {
-      $(this).remove();
-    }
-  });
+  setTimeout(function() {
+    $("#question_list .list_question").each(function() {
+      if($(this).find(".jump_to_question_link").text() == "Spacer") {
+        $(this).remove();
+      }
+    });
+  }, 1000);
   $("#submit_quiz_form").submit(function(event) {
     unanswered = $("#question_list .list_question:not(.answered)").length;
     if(unanswered && !quizSubmission.submitting) {

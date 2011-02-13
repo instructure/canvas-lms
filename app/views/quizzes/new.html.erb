@@ -254,7 +254,7 @@ $(document).ready(function() {
   <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_group_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_filters_url, @quiz.id) %>" class="filters_url">&nbsp;</a>
 </div>
-<%= render :partial => "quiz_preview" %>
+
 <% if @has_student_submissions %>
 <div style="margin-bottom: 5px;">
   <%= image_tag "warning.png" %> Students have either already taken or started taking this quiz, 
@@ -275,10 +275,11 @@ $(document).ready(function() {
     <% if question[:entry_type] == "quiz_group" %>
       <%= render :partial => "quizzes/question_group", :object => question %>
     <% else %>
-      <%= render :partial => "quizzes/display_question", :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question.id}"} %>
+      <%= render :partial => (@quiz.quiz_questions.count > 25 ? "quizzes/question_teaser" : "quizzes/display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
     <% end %>
   <% end %>
 </div>
+<%= render :partial => "quizzes/question_teaser", :object => nil, :locals => {:editing => true } %>
 <%= render :partial => "quizzes/display_question", :object => nil, :locals => {:editing => true } %>
 <%= render :partial => "quizzes/display_answer", :object => nil %>
 <%= render :partial => "quizzes/form_answer", :object => nil %>

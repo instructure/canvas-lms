@@ -1,0 +1,23 @@
+<% data = question_teaser %>
+<div class="question_holder question_teaser" id="question_teaser_<%= question_teaser ? question_teaser[:id] : "blank" %>" style="<%= hidden unless question_teaser %>">
+  <div class="display_question question">
+    <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
+    <div class="header">
+      <a href="#" class="question_name question_teaser_link" title="Click to show full question details"><%= hash_get(data, :question_name) %></a>
+    </div>
+    <div class="links">
+      <a href="#" class="edit_teaser_link no-hover" title="Edit this Question"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_question_link no-hover" title="Delete this Question"><%= image_tag "delete.png" %></a>
+      <a href="<%= context_url(@context, :context_quiz_quiz_question_url, @quiz.id, question_teaser ? question_teaser[:id] : "{{ id }}") %>" class="update_question_url">&nbsp;</a>
+    </div>
+    <div class="text">
+      <div class="teaser question_text user_content">
+        <%= user_content(hash_get(data, :question_text), @context.asset_string, "quiz_question_#{hash_get(data, :id)}") %>
+      </div>
+    </div>
+    <div class="bottom_links">
+      <span class="id" style="display: none;"><%= question_teaser && question_teaser[:id] %></span>
+    </div>
+    <div class="clear"></div>
+  </div>
+</div>

@@ -174,7 +174,7 @@ ActionController::Routing::Routes.draw do |map|
       quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put} do |submission|
       end
       quiz.extensions 'extensions/:user_id', :controller => 'quiz_submissions', :action => 'extensions', :conditions => {:method => :post}
-      quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy)
+      quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy show)
       quiz.resources :quiz_groups, :as => "groups", :only => %w(create update destroy) do |group|
         group.reorder "reorder", :controller => "quiz_groups", :action => "reorder"
       end

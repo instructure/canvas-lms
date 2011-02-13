@@ -1548,10 +1548,20 @@ var quiz = {};
       $.ajaxJSON(url, 'POST', params, function(question_results) {
         $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text("Add Selected Questions");
         $findQuestionDialog.find(".selected_side_tab").removeClass('selected_side_tab');
-        for(idx in question_results) {
-          var question = question_results[idx].quiz_question;
-          quiz.addExistingQuestion(question);
+        var counter = 0;
+        function nextQuestion() { 
+          counter++;
+          var question = question_results.shift();
+          if(question) {
+            quiz.addExistingQuestion(question.quiz_question);
+            if(counter > 5) {
+              setTimeout(nextQuestion, 500);
+            } else {
+              nextQuestion();
+            }
+          }
         }
+        setTimoeut(nextQuestion, 100);
         $findQuestionDialog.dialog('close');
       }, function(data) {
         $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text("Adding Questions Failed, please try again");
@@ -1829,6 +1839,41 @@ var quiz = {};
     $(".question_form textarea, .question_form :text, .answer textarea, .answer :text").focus(function(event) {
       $(this).select();
   });
+  $("#questions").delegate('.question_teaser_link', 'click', function(event) {
+    event.preventDefault();
+    var $teaser = $(this).parents(".question_teaser");
+    var question_data = $teaser.data('question');
+    if(!question_data) {
+      $teaser.find(".teaser.question_text").text("Loading Question...");
+      $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, function(question) {
+        showQuestion(question.quiz_question);
+      }, function() {
+        $teaser.find(".teaser.question_text").text("Loading Question Failed...");
+      });
+    } else {
+      showQuestion(question_data);
+    }
+    function showQuestion(question_data) {
+      var $question = $("#question_template").clone().removeAttr('id');
+      var question = question_data;
+      var questionData = $.extend({}, question, question.question_data);
+      $teaser.after($question);
+      $teaser.remove();
+      $question.show();
+      $question.find(".question_points").text(questionData.points_possible);
+      quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
+      if($teaser.hasClass('to_edit')) {
+        $question.find(".edit_question_link").click();
+      }
+    }
+  }).delegate('.teaser.question_text', 'click', function(event) {
+    event.preventDefault();
+    $(this).parents(".question_teaser").find(".question_teaser_link").click();
+  }).delegate('.edit_teaser_link', 'click', function(event) {
+    event.preventDefault();
+    $(this).parents(".question_teaser").addClass('to_edit');
+    $(this).parents(".question_teaser").find(".question_teaser_link").click();
+  });
     $(".keep_editing_link").click(function(event) {
       event.preventDefault();
       $(".question_generated,.question_preview").hide()
@@ -1952,7 +1997,7 @@ var quiz = {};
             var id = $obj.find(".assessment_question_id").text();
             list.push(id);
           } else if($obj.hasClass('question_holder')) {
-            var id = 'question_' + $obj.find(".question").attr('id').substring(9);
+            var id = 'question_' + ($obj.find(".question").attr('id').substring(9) || $obj.find(".question .id").text());
             list.push(id);
           } else {
             var id = 'group_' + $obj.attr('id').substring(10);

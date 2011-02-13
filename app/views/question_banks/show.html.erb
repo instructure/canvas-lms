@@ -131,27 +131,6 @@ $(document).ready(function() {
     }, function(data) {
     });
   }
-  $("#questions").delegate('.question_teaser_link', 'click', function(event) {
-    event.preventDefault();
-    var $teaser = $(this).parents(".question_teaser");
-    if($teaser.data('question')) {
-      var question_data = $teaser.data('question');
-      var $question = $("#question_template").clone().removeAttr('id');
-      var question = question_data;
-      var questionData = $.extend({}, question, question.question_data);
-      quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
-      $teaser.after($question);
-      $teaser.remove();
-      $question.show();
-      if($teaser.hasClass('to_edit')) {
-        $question.find(".edit_question_link").click();
-      }
-    }
-  }).delegate('.edit_teaser_link', 'click', function(event) {
-    event.preventDefault();
-    $(this).parents(".question_teaser").addClass('to_edit');
-    $(this).parents(".question_teaser").find(".question_teaser_link").click();
-  });
   $(".more_questions_link").click(function(event) {
     event.preventDefault();
     if($(this).hasClass('loading')) { return; }
