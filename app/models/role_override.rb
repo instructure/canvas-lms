@@ -454,6 +454,12 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :manage_alerts => {
+        :label => "Manage account user alerts",
+        :account_only => :true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+      },
 
       :site_admin => {
         :label => "Use the Site Admin section and admin all other accounts",

@@ -366,6 +366,7 @@ ActionController::Routing::Routes.draw do |map|
     account.confirm_delete_user 'users/:user_id/delete', :controller => 'accounts', :action => 'confirm_delete_user'
     account.delete_user 'users/:user_id', :controller => 'accounts', :action => 'remove_user', :conditions => {:method => :delete}
     account.resources :users
+    account.resources :account_notifications, :only => [:create, :destroy]
     account.resources :announcements
     account.resources :assignments
     account.resources :submissions
@@ -497,6 +498,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    dashboard.close_notification 'account_notifications/:id', :controller => 'users', :action => 'close_notification', :conditions => {:method => :delete}
     dashboard.resources :notifications, :only => [:index, :destroy, :update]
     dashboard.eportfolios "eportfolios", :controller => "eportfolios", :action => "user_index"
     dashboard.grades "grades", :controller => "users", :action => "grades"

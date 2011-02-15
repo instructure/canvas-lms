@@ -2,6 +2,7 @@
 <h2>Recent Activity</h2>
 <div class="clear"></div>
 <div id="topic_list" class="recent_messages_list <%= 'recent_messages_show_context' if show_context %>">
+  <%= render :partial => 'users/account_notification', :collection => @account_notifications %>
   <%= render :partial => 'users/cc_prefs', :locals => {:message_count => recent_messages.length} %>
   <div id="no_topics_message" style="<%= recent_messages && recent_messages.length > 0 ? 'display: none;' : '' %>">
     <div class="communication_message dashboard_notification">

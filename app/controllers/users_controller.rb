@@ -22,7 +22,7 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   ssl_required :create, :new
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :mark_avatar_image]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image]
   before_filter :require_open_registration, :only => [:new, :create]
   
   def oauth
@@ -168,6 +168,7 @@ class UsersController < ApplicationController
     if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
+    @account_notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @is_default_account = @current_user.pseudonyms.active.map(&:account_id).include?(Account.default.id)
     render :action => "user_dashboard"
   end
@@ -195,6 +196,11 @@ class UsersController < ApplicationController
   
   def ignore_item
     @current_user.ignore_item!(params[:asset_string], params[:purpose], params[:permanent] == '1')
+    render :json => @current_user.to_json
+  end
+  
+  def close_notification
+    @current_user.close_notification(params[:id])
     render :json => @current_user.to_json
   end
   

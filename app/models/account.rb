@@ -68,6 +68,7 @@ class Account < ActiveRecord::Base
   has_many :associated_learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome
   has_many :page_views
   has_many :error_reports
+  has_many :account_notifications
 
   before_save :ensure_defaults
   before_save :set_update_account_associations_if_changed

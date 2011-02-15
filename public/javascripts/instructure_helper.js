@@ -952,6 +952,7 @@
 
     if (options.object_name) {
       options.required = $._addObjectName(options.required, options.object_name);
+      options.date_fields = $._addObjectName(options.date_fields, options.object_name);
       options.dates = $._addObjectName(options.dates, options.object_name);
       options.times = $._addObjectName(options.times, options.object_name);
       options.numbers = $._addObjectName(options.numbers, options.object_name);
@@ -964,6 +965,17 @@
             errors[name] = []; 
           }
           errors[name].push("This field is required");
+        }
+      });
+    }
+    if(options.date_fields) {
+      $.each(options.date_fields, function(i, name) {
+        var $item = $form.find("input[name='" + name + "']").filter(".datetime_field_enabled");
+        if($item.length && $item.parent().children(".datetime_suggest").hasClass('invalid_datetime')) {
+          if (!errors[name]) { 
+            errors[name] = []; 
+          }
+          errors[name].push("Invalid date/time value");
         }
       });
     }
@@ -1093,6 +1105,9 @@
       var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":first");
       if(!$obj || $obj.length === 0 || name == "general") {
         $obj = $form;
+      }
+      if($obj[0].tagName == 'TEXTAREA' && $obj.next('.mceEditor').length) {
+        $obj = $obj.next().find(".mceIframeContainer");
       }
       hasErrors = true;
       var offset = $obj.errorBox(msg).offset();

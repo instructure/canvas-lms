@@ -953,6 +953,13 @@ class User < ActiveRecord::Base
     read_attribute(:preferences) || write_attribute(:preferences, {})
   end
   
+  def close_notification(id)
+    preferences[:closed_notifications] ||= []
+    preferences[:closed_notifications] << id.to_i
+    preferences[:closed_notifications].uniq!
+    save
+  end
+  
   def ignore_item!(asset_string, purpose, permanent=nil)
     permanent ||= false
     asset_string = asset_string.gsub(/![0-9a-z_]/, '')

@@ -1,0 +1,76 @@
+@import environment.sass
+
+.admins_list  
+  list-style-type: none
+  padding-left: 10px
+
+.admins_list li  
+  width: 300px
+  padding: 2px 5px
+  margin-bottom: 5px
+
+.admins_list li:hover  
+  background-color: #eee
+  +border-radius(3px)
+
+.admins_list .user_name  
+  font-weight: bold
+  float: left
+
+.admins_list .email  
+  clear: left
+  display: block
+  font-size: 0.8em
+  color: #888
+  padding-left: 10px
+
+.admins_list .membership_type  
+  clear: left
+  display: block
+  font-size: 0.8em
+  padding-left: 10px
+
+.admins_list .remove_account_user_link  
+  float: right
+  opacity: 0.5
+
+.admins_list li:hover .remove_account_user_link  
+  opacity: 1.0
+
+#account_notification_icon
+  option
+    padding: 3px 0 3px 25px
+    background: url(/images/warning.png) no-repeat 5px center
+    &.calendar
+      background-image: url(/images/calendar_icon.png)
+    &.people
+      background-image: url(/images/group.png)
+    &.help
+      background-image: url(/images/help.png)
+    &.file
+      background-image: url(/images/file.png)
+.alerts_list
+  padding-left: 20px
+  li
+    padding: 5px 10px
+    margin-bottom: 5px
+    .subject
+      font-size: 1.1em
+      font-weight: bold
+      float: left
+      img
+        padding-right: 5px
+    .delete_notification_link
+      float: right
+      +opacity(0.5)
+    .dates
+      font-size: 0.8em
+      border-bottom: 1px dotted #ccc
+      margin-bottom: 5px
+    .message
+      font-size: 0.8em
+    &:hover
+      background: #eee
+      +border-radius(5px)
+      .delete_notification_link
+        +opacity(1.0)

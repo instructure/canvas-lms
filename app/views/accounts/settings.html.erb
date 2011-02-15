@@ -6,12 +6,17 @@
 <%
   @active_tab = "settings"
   add_crumb "Settings"
+  jammit_css :account_settings
 %>
+<% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
 
 <div id="account_settings_tabs" style="display:none;">
   <ul>
     <li><a href="#tab-settings">Settings</a></li>
     <li><a href="#tab-users" id="tab-users-link">Admins</a></li>
+    <% if !@account.parent_account %>
+      <li><a href="#tab-alerts" id="tab-alerts-link">Alerts</a></li>
+    <% end %>
     <% if @available_reports %>
       <li><a href="#tab-reports" id="tab-reports-link">Reports</a></li>
     <% end %>
@@ -256,6 +261,78 @@
       <% end %>
     <% end %>
   </div>
+  <% if !@account.parent_account %>
+    <div id="tab-alerts">
+      <h2>User Alerts</h2>
+      Alerts are a way for you to post sticky messages on the dashboard
+      of all users in your account.  They will appear on each user's
+      dashboard for the given time period or until the user clicks the
+      "close" link to ignore the alert. <strong>These alerts should be 
+      used sparingly.</strong>
+      <ul class="alerts_list unstyled_list">
+        <% @account_notifications.each do |notification| %>
+          <li>
+            <div class="subject">
+              <%= image_tag("#{notification.icon}.png") %><%= notification.subject %>
+            </div>
+            <% if can_do(@account, @current_user, :manage_alerts) %>
+              <a href="#" rel="<%= context_url(@account, :context_account_notification_url, notification) %>" class="delete_notification_link" title="Delete this Alert"><%= image_tag "delete_circle.png" %></a>
+            <% end %>
+            <div class="clear"></div>
+            <div class="dates">
+              <span style="padding-right: 10px;">
+                from <%= datetime_string(notification.start_at) %> to
+                <%= datetime_string(notification.end_at) %>
+              </span>
+              <%= link_to(context_user_name(@account, notification.user_id), user_path(notification.user_id)) %>
+            </div>
+            <div class="message user_content">
+              <%= user_content(notification.message, @account.asset_string, notification.asset_string) %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+      <% if can_do(@account, @current_user, :manage_alerts) %>
+        <a href="#" class="button add_notification_link"><%= image_tag "add.png" %> Add a New Alert</a>
+        <% form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none; margin-top: 10px;'} do |f| %>
+          <table class="formtable">
+            <tr>
+              <td><%= f.label :subject, "Subject:" %></td>
+              <td><%= f.text_field :subject %></td>
+            </tr><tr>
+              <td>
+                <label for="account_notification_icon">Icon:</label>
+              </td>
+              <td>
+                <select id="account_notification_icon" name="account_notification[icon]">
+                  <option value="warning" class="warning">warning</option>
+                  <option value="calendar_icon" class="calendar">calendar</option>
+                  <option value="group" class="people">people</option>
+                  <option value="help" class="help">help</option>
+                  <option value="file" class="file">file</option>
+                </select>
+              </td>
+            </tr><tr>
+              <td><%= f.label :start_at, "Starts:" %></td>
+              <td><%= f.text_field :start_at, :class => 'datetime_field', :style => 'width: 120px;' %></td>
+            </tr><tr>
+              <td><%= f.label :end_at, "Ends:" %></td>
+              <td><%= f.text_field :end_at, :class => 'datetime_field', :style => 'width: 120px;' %></td>
+            </tr><tr>
+              <td><%= f.label :message, "Message:" %></td>
+              <td><%= f.text_area :message, :class => 'alert_message', :style => "width: 400px; height: 100px;" %></td>
+            </tr><tr>
+              <td colspan="2">
+                <div class="button-container">
+                  <button type="submit" class="button">Add Alert</button>
+                </div>
+              </td>
+            </tr>
+          </table>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
   <% if @available_reports %>
     <div id="tab-reports">
       <% @available_reports.each do |report, print_name| 
@@ -291,6 +368,39 @@ $(document).ready(function() {
       var name = $.trim($(this).parents(".ip_filter").find(".name").val().replace(/\[|\]/g, '_'));
       if(name) {
         $(this).attr('name', 'account[ip_filters][' + name + ']');
+      }
+    });
+  });
+  $(".datetime_field").datetime_field();
+  $(".add_notification_link").click(function(event) {
+    event.preventDefault();
+    $("#add_notification_form").slideToggle(function() {
+      $("#add_notification_form textarea:not(.enabled)").addClass('enabled').editorBox();
+    });
+  });
+  $("#add_notification_form").submit(function(event) {
+    $(this).find(".datetime_field").each(function() {
+      $(this).val(Date.parse($(this).val()));
+    });
+    var result = $(this).validateForm({
+      object_name: 'account_notification',
+      required: ['start_at', 'end_at', 'subject', 'message'],
+      date_fields: ['start_at', 'end_at']
+    });
+    if(!result) {
+      return false;
+    }
+  });
+  $(".delete_notification_link").click(function(event) {
+    event.preventDefault();
+    var $link = $(this);
+    $link.parents("li").confirmDelete({
+      url: $link.attr('rel'),
+      message: "Are you sure you want to delete this alert?",
+      success: function() {
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
       }
     });
   });
@@ -378,46 +488,4 @@ $(document).ready(function() {
 
 });
 </script>
-<% end %>
-
-<% content_for :stylesheets do %>
-<style>
-.admins_list {
-  list-style-type: none;
-  padding-left: 10px;
-}
-.admins_list li {
-  width: 300px;
-  padding: 2px 5px;
-  margin-bottom: 5px;
-}
-.admins_list li:hover {
-  background-color: #eee;
-  -moz-border-radius: 3px;
-}
-.admins_list .user_name {
-  font-weight: bold;
-  float: left;
-}
-.admins_list .email {
-  clear: left;
-  display: block;
-  font-size: 0.8em;
-  color: #888;
-  padding-left: 10px;
-}
-.admins_list .membership_type {
-  clear: left;
-  display: block;
-  font-size: 0.8em;
-  padding-left: 10px;
-}
-.admins_list .remove_account_user_link {
-  float: right;
-  opacity: 0.5;
-}
-.admins_list li:hover .remove_account_user_link {
-  opacity: 1.0;
-}
-</style>
 <% end %>

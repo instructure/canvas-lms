@@ -354,6 +354,19 @@ $(document).ready(function() {
     $(this).parents(".communication_message").find(".message_short").hide().end()
       .find(".message").show();
   });
+  $(".communication_message .close_notification_link").live('click', function(event) {
+    event.preventDefault();
+    var $message = $(this).parents(".communication_message");
+    $message.confirmDelete({
+      url: $(this).attr('rel'),
+      noMessage: true,
+      success: function() {
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
+      }
+    });
+  });
   $(".communication_message .add_entry_link").click(function(event) {
     event.preventDefault();
     var $message = $(this).parents(".communication_message");
