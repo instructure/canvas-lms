@@ -437,6 +437,9 @@ class Course < ActiveRecord::Base
     if self.completed?
       enrollments = self.enrollments.scoped(:select => "id, user_id, course_id", :conditions=>"workflow_state IN ('active', 'invited')")
       Enrollment.update_all({:workflow_state => 'completed'}, {:id => enrollments.map(&:id)})
+    elsif self.deleted?
+      enrollments = self.enrollments.scoped(:select => "id, user_id, course_id", :conditions=>"workflow_state != 'deleted'")
+      Enrollment.update_all({:workflow_state => 'deleted'}, {:id => enrollments.map(&:id)})
     end
     enrollments = self.enrollments.scoped(:select => "id, user_id, course_id")
     Enrollment.update_all({:updated_at => Time.now}, {:id => enrollments.map(&:id)})
