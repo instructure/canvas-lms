@@ -228,14 +228,14 @@ $(document).ready(function() {
     beforeSubmit: function(data) {
       $("#edit_bank_form h2").text(data.title);
       $(this).loadingImage();
-      return $bank;
     },
-    success: function(data, $bank) {
+    success: function(data) {
       $(this).loadingImage('remove');
       var bank = data.assessment_question_bank;
+      $("#edit_bank_form .bank_name_box").blur();
       $("#edit_bank_form h2").text(bank.title);
     },
-    error: function(data, $bank) {
+    error: function(data) {
       $(this).loadingImage('remove');
       $(".edit_bank_link").click();
       $("#edit_bank_form").formErrors(data);
