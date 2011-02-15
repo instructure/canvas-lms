@@ -157,9 +157,9 @@ module ApplicationHelper
   # context_url(@context, :controller => :assignments, :action => :show)
   def context_url(context, *opts)
     @context_url_lookup ||= {}
-    lookup = [context ? context.id : nil, *opts]
+    context_name = (context ? context.class.base_ar_class : context.class).name.underscore
+    lookup = [context ? context.id : nil, context_name, *opts]
     return @context_url_lookup[lookup] if @context_url_lookup[lookup]
-    context_name = context.class.base_ar_class.name.underscore
     res = nil
     if opts.length > 1 || (opts[0].is_a? String) || (opts[0].is_a? Symbol)
       name = opts.shift.to_s
