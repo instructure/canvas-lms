@@ -2,6 +2,7 @@ $:.unshift(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
 require 'spec'
+gem 'activerecord', '2.3.11'
 require 'active_record'
 require 'delayed_job'
 
@@ -23,6 +24,7 @@ ActiveRecord::Schema.define do
     table.datetime :locked_at
     table.string   :locked_by
     table.datetime :failed_at
+    table.string   :tag
     table.timestamps
   end
 
