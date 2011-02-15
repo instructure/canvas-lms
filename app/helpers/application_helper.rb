@@ -392,4 +392,20 @@ module ApplicationHelper
   def nbsp
     raw("&nbsp;")
   end
+
+  # translate a URL intended for an iframe into an alternative URL, if one is
+  # avavailable. Right now the only supported translation is for youtube
+  # videos. Youtube video pages can no longer be embedded, but we can translate
+  # the URL into the player iframe data.
+  def iframe(src, html_options = {})
+    uri = URI.parse(src) rescue nil
+    if uri
+      query = Rack::Utils.parse_query(uri.query)
+      if uri.host == 'www.youtube.com' && uri.path == '/watch' && query['v'].present?
+        src = "http://www.youtube.com/embed/#{query['v']}"
+        html_options.merge!({:title => 'Youtube video player', :width => 640, :height => 480, :frameborder => 0, :allowfullscreen => 'allowfullscreen'})
+      end
+    end
+    content_tag('iframe', '', { :src => src }.merge(html_options))
+  end
 end

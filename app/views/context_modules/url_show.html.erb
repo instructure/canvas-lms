@@ -3,7 +3,7 @@
 <% add_crumb @tag.title %>
 
 <% jammit_js :file_inline %>
-<iframe id="file_content" src="<%= @tag.url %>" style="width: 100%; height: 400px;"></iframe>
+<%= iframe(@tag.url, :id => 'file_content', :width => '100%', :height => '400') %>
 <div>
   <a href="<%= @tag.url %>">Original Link</a>
 </div>
