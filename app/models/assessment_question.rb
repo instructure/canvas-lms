@@ -384,6 +384,7 @@ class AssessmentQuestion < ActiveRecord::Base
     bank_map = {}
     assessments = data['assessments'] ? data['assessments']['assessments'] : []
     assessments.each do |assmnt|
+      next unless assmnt['questions']
       assmnt['questions'].each do |q|
         if q["question_type"] == "question_reference"
           bank_map[q['migration_id']] = assmnt['title'] if q['migration_id']
