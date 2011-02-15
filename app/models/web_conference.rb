@@ -62,6 +62,7 @@ class WebConference < ActiveRecord::Base
     return unless user
     p = self.web_conference_participants.find_or_initialize_by_web_conference_id_and_user_id(self.id, user.id)
     p.participation_type = type unless type == 'attendee' && p.participation_type == 'initiator'
+    # Once anyone starts attending the conference, mark it as started.
     if type == 'attendee'
       self.started_at ||= Time.now
       self.save
@@ -111,7 +112,7 @@ class WebConference < ActiveRecord::Base
     self.title ||= "#{self.context.name} Web Conference"
     self.start_at ||= self.started_at
     self.end_at ||= self.ended_at
-    self.end_at ||= self.start_at + (self.duration * 60) rescue nil
+    self.end_at ||= self.start_at + self.duration.minutes if self.start_at && self.duration
     if self.started_at && self.ended_at && self.ended_at < self.started_at
       self.ended_at = self.started_at
     end
@@ -130,7 +131,7 @@ class WebConference < ActiveRecord::Base
   end
   
   def restartable?
-    Time.now <= self.started_at + duration_in_seconds
+    self.end_at && Time.now <= self.end_at
   end
   
   def duration_in_seconds
@@ -145,19 +146,42 @@ class WebConference < ActiveRecord::Base
     raise "not implemented"
   end
   
+  def restart
+    self.start_at ||= Time.now
+    self.end_at ||= self.start_at + self.duration_in_seconds
+    self.started_at ||= self.start_at
+    self.ended_at = nil
+    self.save
+  end
+  
   def active?(force_check=false)
     if !force_check
       return true if self.start_at && self.end_at && Time.now > self.start_at && Time.now < self.end_at
       return true if self.ended_at && Time.now < self.ended_at
-      return false if self.ended_at && Time.now > self.ended_at #> duration_in_seconds
+      return false if self.ended_at && Time.now > self.ended_at
       return @conference_active if @conference_active
     end
     @conference_active = (conference_status == :active)
+    # If somehow the end_at didn't get set, set the end date
+    # based on the start time and duration
     if @conference_active && !self.end_at
-      self.ended_at = Time.now + 300
+      self.start_at ||= Time.now
+      self.end_at = [self.start_at, Time.now].compact.min + self.duration_in_seconds
       self.save
-    else
-      self.ended_at = [self.ended_at || Time.now, [Time.now, (self.started_at || Time.now) + duration_in_seconds].min].max
+    # If the conference is still active but it's been more than fifteen minutes
+    # since it was supposed to end, just go ahead and end it
+    elsif @conference_active && self.end_at && self.end_at < 15.minutes.ago && !self.ended_at
+      self.ended_at = Time.now
+      self.start_at ||= self.started_at
+      self.end_at ||= self.ended_at
+      @conference_active = false
+      self.save
+    # If the conference is no longer in use and its end_at has passed,
+    # consider it ended
+    elsif @conference_active == false && self.started_at && self.end_at && self.end_at < Time.now && !self.ended_at
+      self.ended_at = Time.now
+      self.start_at ||= self.started_at
+      self.end_at ||= self.ended_at
       self.save
     end
     @conference_active
