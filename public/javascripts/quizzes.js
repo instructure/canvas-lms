@@ -977,12 +977,13 @@ var quiz = {};
           delete data['activate'];
         }
         data['quiz[description]'] = $("#quiz_description").editorBox('get_code'); //val();
+        var attempts = 1;
         if(data.multiple_attempts) {
           attempts = parseInt(data.allowed_attempts, 10);
           if(isNaN(attempts) || !data.limit_attempts) { attempts = -1; }
-          data.allowed_attempts = attempts;
-          data['quiz[allowed_attempts]'] = attempts;
         }
+        data.allowed_attempts = attempts;
+        data['quiz[allowed_attempts]'] = attempts;
         return data;
       },
       beforeSubmit: function(data) {
