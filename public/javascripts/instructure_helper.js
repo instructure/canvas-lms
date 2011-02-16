@@ -397,7 +397,7 @@
             $.ajaxJSON.unhandledXHRs.push(request);
           }
         }
-      });
+      }, options.binary === false);
     });
   };
   
@@ -455,6 +455,9 @@
     if(not_binary) {
       xhr.send();
     } else {
+      if(!xhr.sendAsBinary) {
+        console.log('xhr.sendAsBinary not supported');
+      }
       xhr.sendAsBinary(body);
     }
   };

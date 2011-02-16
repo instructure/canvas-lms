@@ -1684,6 +1684,7 @@ var files = {};
       $.ajaxFileUpload({
         url: $dialog.data('update_url'),
         method: 'PUT',
+        binary: false,
         data: {
           'attachment[uploaded_data]': {
             fake_file: true, 
