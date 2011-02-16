@@ -52,7 +52,7 @@
                 <td><%= settings.label :global_includes, "External CSS/JS:" %></td>
                 <td><%= settings.select :global_includes, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.settings[:global_includes] == true) %></td>
               </tr>
-              <% unless @account.special_account? %>
+              <% unless @account.site_admin? %>
                 <tr>
                   <td><%= f.label :allow_sis_import, "SIS Imports:" %></td>
                   <td><%= f.select :allow_sis_import, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.allow_sis_import == true) %></td>

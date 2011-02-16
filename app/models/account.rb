@@ -607,10 +607,6 @@ class Account < ActiveRecord::Base
     return @special_accounts[special_account_type] = account
   end
 
-  def special_account?
-    self == Account.site_admin || self == Account.default
-  end
-  
   def site_admin?
     self == Account.site_admin
   end
