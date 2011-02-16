@@ -319,7 +319,8 @@ class ApplicationController < ActionController::Base
       a.submissions.having_submission.ungraded.count > 0
     }
     @assignment_groups = @groups
-    @past_assignments = @assignments.select{ |a| !a.due_at || a.due_at < Time.now }
+    @past_assignments = @assignments.select{ |a| a.due_at && a.due_at < Time.now }
+    @undated_assignments = @assignments.select{ |a| !a.due_at }
     @past_assignments.each do |assignment|
       submission = @submissions_hash[assignment.id]
       if assignment.overdue? && 
@@ -346,7 +347,7 @@ class ApplicationController < ActionController::Base
       @ungraded_assignments = @ungraded_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
     end
     
-    [@assignments, @upcoming_assignments, @past_assignments, @overdue_assignments, @ungraded_assignments].map(&:sort!)
+    [@assignments, @upcoming_assignments, @past_assignments, @overdue_assignments, @ungraded_assignments, @undated_assignments].map(&:sort!)
   end
   
   # Calculates the file storage quota for @context
