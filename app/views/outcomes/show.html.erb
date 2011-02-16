@@ -40,9 +40,7 @@
   <div id="outcome_results_total_pages"><%= @results.total_pages %></div>
   <a href="<%= context_url(@context, :context_outcome_results_url, @outcome.id) %>" style="display: none;" class="outcome_results_url">&nbsp;</a>
   <ul>
-  <% if @context.is_a?(Course) %>
   <%= render :partial => "outcome_result" %>
-  <% end %>
   <%= render :partial => "outcome_alignment" %>
   </ul>
 </div>

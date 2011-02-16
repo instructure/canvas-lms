@@ -92,10 +92,6 @@ class LearningOutcome < ActiveRecord::Base
     end
   end
   
-  def artifacts_for(context)
-    content_tags.active.for_context(context).not_rubric
-  end
-  
   def rubric_criterion=(hash)
     criterion = {}
     if hash[:enable] != '1'
@@ -131,7 +127,15 @@ class LearningOutcome < ActiveRecord::Base
   end
   
   def artifacts_count_for_tied_context
-    self.artifacts_for(@tied_context).count rescue 0
+    codes = [@tied_context]
+    if @tied_context.is_a?(Account)
+      if @tied_context == context
+        codes = "all"
+      else
+        codes = @tied_context.all_courses.scoped({:select => [:id]}).map(&:asset_string)
+      end
+    end
+    self.learning_outcome_results.for_context_codes(codes).count
   end
   
   def self.non_rubric_outcomes?
