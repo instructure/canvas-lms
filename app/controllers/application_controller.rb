@@ -89,6 +89,12 @@ class ApplicationController < ActionController::Base
     self.send name, *opts
   end
   
+  def user_url(*opts)
+    opts[0] == @current_user && !current_user_is_site_admin? && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
+      profile_url :
+      super
+  end
+
   def tab_enabled?(id)
     if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :include_hidden_unused => true).any?{|t| t[:id] == id }
       flash[:notice] = "That page has been disabled for this #{@context.class.to_s.downcase}"
