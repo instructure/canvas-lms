@@ -671,7 +671,7 @@ class ContextModule < ActiveRecord::Base
     existing_item.migration_id = hash[:migration_id]
     hash[:indents] = [hash[:indents] || 0, level].max
     if hash[:linked_resource_type] =~ /wiki_type/i
-      wiki = self.context.wiki_pages.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+      wiki = self.context.wiki.wiki_pages.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if wiki
         item = self.add_item({
           :title => hash[:title],
