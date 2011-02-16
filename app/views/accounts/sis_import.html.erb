@@ -16,23 +16,24 @@
   
   <div class="form" style="<%= hidden if @current_batch && @current_batch.importing? %>">
     <% form_tag account_sis_import_submit_path(@account.id), :multipart => true, :id => "sis_importer" do %>
-      <p class="instruction">Select the zip file that you want imported.</p>
+      <p class="instruction">Select the zip file that you want imported.<br/>
+      For a description of how to generate these zip files, <a href="/resources/CanvasSISImport.pdf">please see this documentation</a>.</p>
       <div style="float: left;">
-          <input type="file" name="attachment" style="font-size: 1.2em;"/><br/>
-          <label for="import_type">Import type</label>
-          <select id="import_type" name="import_type">
-            <option value="instructure_csv_zip">Instructure formatted CSV zip</option>
-          </select>
+        <input type="file" name="attachment" style="font-size: 1.2em;"/><br/>
+        <label for="import_type">Import type</label>
+        <select id="import_type" name="import_type">
+          <option value="instructure_csv_zip">Instructure formatted CSV zip</option>
+        </select>
   
-          <div id="batch_check" style="<%= hidden %>">
-            <input type="checkbox" name="batch" value="1" id="batch_update"/>
-            <label for="batch_update">This is a full batch update</label>
-          </div>
+        <div id="batch_check" style="<%= hidden %>">
+          <input type="checkbox" name="batch" value="1" id="batch_update"/>
+          <label for="batch_update">This is a full batch update</label>
         </div>
-        <div style="float: left; margin-left: 5px;">
-          <button type="submit" class="submit_button button big-button">Process Data</button>
-        </div>
-        <div class="clear"></div>
+      </div>
+      <div style="float: left; margin-left: 5px;">
+        <button type="submit" class="submit_button button big-button">Process Data</button>
+      </div>
+      <div class="clear"></div>
     <% end %>
   </div>
   
