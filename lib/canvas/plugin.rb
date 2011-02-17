@@ -82,12 +82,12 @@ module Canvas
     # The validator receives the model so that it can
     # add any errors that it would like.
     def validate_settings(plugin_setting, settings)
-      if meta[:validator] 
+      if validator
         validator_module = Canvas::Plugins::Validators.const_defined?(validator) && Canvas::Plugins::Validators.const_get(validator)
         if validator_module && validator_module.respond_to?(:validate)
           res = validator_module.validate(settings, plugin_setting)
           if res.is_a?(Hash)
-            plugin_setting.settings = self.settings.with_indifferent_access.merge(res)
+            plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(res || {})
           else
             false
           end
@@ -96,7 +96,7 @@ module Canvas
           false
         end
       else
-        plugin_setting.settings = self.settings.with_indifferent_access.merge(settings)
+        plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(settings || {})
       end
     end
 

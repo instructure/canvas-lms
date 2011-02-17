@@ -58,6 +58,11 @@ Rails::Initializer.run do |config|
   config.autoload_paths += %W( #{RAILS_ROOT}/app/middleware )
   
   config.middleware.use("RequestContextGenerator")
+  config.to_prepare do
+    require_dependency 'canvas/plugins/default_plugins'
+    require_dependency 'canvas/plugins/validators/kaltura_validator'
+  end
+
 end
 
 # Extend any base classes, even gem classes

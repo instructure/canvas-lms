@@ -46,8 +46,7 @@ module Kaltura
     end
     
     def self.config
-      return @config if defined?(@config)
-      @config ||= (YAML.load_file(RAILS_ROOT + "/config/kaltura.yml")[RAILS_ENV] rescue nil)
+      Canvas::Plugin.find(:kaltura).try(:settings)
     end
     
     def startSession(type = SessionType::USER, userId = nil)
@@ -213,3 +212,4 @@ module Kaltura
     end
   end
 end
+
