@@ -196,142 +196,6 @@
           :title => "New message for this submission",
           :class => "new_message" %>
   </div>
-<% js_block do %>
-  <script type="text/javascript">
-  lastGradebookUpdate = "<%= ActiveSupport::TimeWithZone.new(Time.now, Time.zone).strftime("%Y-%m-%dT%H:%M:%S") %>";
-  var ignoreUngradedSubmissions = true;
-  setTimeout(function() {
-    $(document).ready(function() {
-      $("#embed_code input[type='button']").click(function() {
-        $("#embed_code textarea:first").focus().select();
-      });
-      $(document).delegate('#gradebook_options', 'click', function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        var show = $("#hide_students_option").attr('checked');
-        var hide_show = "Show";
-        var options = {
-          '<span class="ui-icon ui-icon-person">&nbsp;</span> Show Student Names': function() {
-            $("#hide_students_option").attr('checked', false).change();
-          }
-        }
-        if(!show) {
-          hide_show = "Hide";
-          options = {
-            '<span class="ui-icon ui-icon-person">&nbsp;</span> Hide Student Names': function() {
-              $("#hide_students_option").attr('checked', true).change();
-            }
-          }
-        }
-        if(!ignoreUngradedSubmissions) {
-          options['<span class="ui-icon ui-icon-check">&nbsp;</span> Ignore Ungraded Assignments'] = function() {
-            ignoreUngradedSubmissions = true;
-            gradebook.updateAllStudentGrades();
-          }
-        } else {
-          options['<span class="ui-icon ui-icon-check">&nbsp;</span> Include Ungraded Assignments'] = function() {
-            ignoreUngradedSubmissions = false;
-            gradebook.updateAllStudentGrades();
-          }
-        }
-        options['<span class="ui-icon ui-icon-carat-2-e-w">&nbsp;</span> Sort Columns By...'] = function() {
-          $(".sort_gradebook").each(function() {
-            $(this).attr('disabled', false).text($(this).attr('title'));
-          });
-          $("#sort_columns_dialog").dialog('close').dialog({
-            autoOpen: false,
-            width: 400,
-            height: 300
-          }).dialog('open');
-        };
-        options['<span class="ui-icon ui-icon-carat-2-n-s">&nbsp;</span> Sort Rows By...'] = function() {
-          $(".sort_gradebook").each(function() {
-            $(this).attr('disabled', false).text($(this).attr('title'));
-          });
-          $("#sort_rows_dialog").dialog('close').dialog({
-            autoOpen: false,
-            width: 400,
-            height: 300
-          }).dialog('open');
-        };
-        options['<span class="ui-icon ui-icon-pencil">&nbsp;</span> Set Group Weights'] = function() {
-          $("#groups_data").dialog('close').dialog({
-            title: "Assignment Groups",
-            autoOpen: false
-          }).dialog('open').show();
-        };
-        options['<span class="ui-icon ui-icon-clock">&nbsp;</span> View Grading History'] = function() {
-          location.href = $(".gradebook_history_url").attr('href');
-        };
-        options['<span class="ui-icon ui-icon-disk">&nbsp;</span> Download Scores (.csv)'] = function() {
-          location.href = $(".gradebook_csv_url").attr('href');
-        };
-        options['<span class="ui-icon ui-icon-clock">&nbsp;</span> Upload Scores (from .csv) '] = function() {
-          $("#upload_modal").dialog({
-            bgiframe: true,
-            autoOpen: false,
-            modal: true,
-            width: 410,
-            resizable: false,
-            buttons: {
-              'Upload Data': function() {
-                $(this).submit();
-              }
-            }
-          }).dialog('open');
-        };
-        $(this).dropdownList({
-          options: options
-        });
-      });
-      $(".sort_gradebook").click(function(event) {
-        event.preventDefault();
-        var $button = $(this);
-        if($button.hasClass('by_grade') && !gradebook.finalGradesReady) {
-          $button.attr('disabled', true).text("Computing Grades...");
-          setTimeout(function() {
-            if($button.filter(":visible").length > 0) {
-              $button.click();
-            }
-          }, 1000);
-          return;
-        }
-        $button.attr('disabled', false);
-        $button.text($button.attr('title'));
-        if($button.hasClass('sort_rows')) {
-          sortStudentRows(function(student) {
-            if($button.hasClass('by_secondary_identifier')) {
-              return [student.secondary_identifier, student.display_name, student.course_section];
-            } else if($button.hasClass('by_section')) {
-              return [student.course_section, student.display_name, student.secondary_identifier];
-            } else if($button.hasClass('by_grade_desc')) { 
-              return [Math.round((1000 - student.grade) * 10.0), student.display_name, student.secondary_identifier, student.course_section];
-            } else if($button.hasClass('by_grade_asc')) {
-              return [10000 + Math.round(student.grade * 10.0), student.display_name, student.secondary_identifier, student.course_section];
-            } else {
-              return [student.display_name, student.secondary_identifier, student.course_section];
-            }
-          });
-        } else {
-          sortAssignmentColumns(function(assignment) {
-            var list = [assignment.special_sort, assignment.date_sortable || "1050-12-12T99:99", assignment.title];
-            if($button.hasClass('by_group')) {
-              list.unshift(parseInt(assignment.groupData[assignment.group_id || assignment.id.toString().substring(6)], 10));
-            }
-            return list;
-          });
-        }
-        $("#sort_rows_dialog").dialog('close');
-        $("#sort_columns_dialog").dialog('close');
-      });
-      sortStudentRows
-    });
-  }, 1000);
-  // only update entries that have changed since the last gradebook update!
-  // compare to all updates, replace value with the highest update (keep it all server-time based)
-  </script>
-<% end %>
-
   <div id="loading_submission_details_dialog" style="display: none;">
     <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}") %>" class="submission_details_url" style="display: none;">&nbsp;</a>
     <div style="margin: 20px 10px; text-align: center; font-size: 1.5em; ">
@@ -412,7 +276,7 @@
   <div style="display: none;">
     <div id="submission_comment_attachment_blank">
       <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}", :download => "{{ id }}", :comment_id => "{{ comment_id }}") %>" class="file">Download <span class="display_name">&nbsp;</span></a>
-    </div>http://localhost:3000/courses/5/gradebook#
+    </div>
   </div>
   <%= image_tag 'word_bubble.png', :title => "Submission Comments", :id => "information_link", :style => "position: absolute; top: 2px; right: 1px; display: none; cursor: pointer;"  %>
 
@@ -444,6 +308,12 @@
       <button type="button" class="button sort_gradebook sort_columns by_group" title="By Assignment Group" style="width: 300px;">By Assignment Group</button>
     </div>
   </div>
+  <div id="section_to_show_dialog" title="Choose A Section To Show">
+    <label for="section-to-show">Section to show</label>
+    <select id="section-to-show">
+      <option value="all">All</option>
+    </select>
+  </div>
   <div id="sort_rows_dialog" title="Sort Gradebook Rows">
     <h2>Sort Gradebook Rows:</h2>
     <div style="margin-bottom: 5px;">
@@ -465,3 +335,6 @@
   <%= render :partial => "shared/message_students" %>
 </div>
 
+<script>
+  var lastGradebookUpdate = "<%= ActiveSupport::TimeWithZone.new(Time.now, Time.zone).strftime("%Y-%m-%dT%H:%M:%S") %>";
+</script>

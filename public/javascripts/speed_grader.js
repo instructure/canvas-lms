@@ -107,7 +107,7 @@ var jsonData, visibleRubricAssessments;
     
     // handle showing students only in a certain section.
     // the sectionToShow will be remembered for a given user in a given browser across all assignments in this course 
-    sectionToShow = Number($.store.userGet("eg_show_only_section"+jsonData.context_id));
+    sectionToShow = Number($.store.userGet("grading_show_only_section"+jsonData.context_id));
     if (sectionToShow) {
       var tempArray  = $.grep(jsonData.studentsWithSubmissions, function(student, i){
         return $.inArray(sectionToShow, student.section_ids) != -1;
@@ -227,7 +227,7 @@ var jsonData, visibleRubricAssessments;
         .hide()
         .menu()
         .delegate('a', 'click mousedown', function(){
-          $.store[$(this).data('section-id') == 'all' ? 'userRemove' : 'userSet']("eg_show_only_section"+jsonData.context_id, $(this).data('section-id'));
+          $.store[$(this).data('section-id') == 'all' ? 'userRemove' : 'userSet']("grading_show_only_section"+jsonData.context_id, $(this).data('section-id'));
           window.location.reload();
         });
         

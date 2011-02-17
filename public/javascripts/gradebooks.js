@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(){
+var gradebook = (function(){
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
       $assignment_details_dialog = $("#assignment_details_dialog"),
@@ -26,9 +26,33 @@
       $message_students_dialog = $("#message_students_dialog"),
       $information_link = $("#information_link"),
       $total_tooltip = $("#total_tooltip"),
-      content_offset = $("#content").offset();
+      content_offset = $("#content").offset(),
+      ignoreUngradedSubmissions = true;
+      
+  var possibleSections = {},
+      $courseSections = $(".outer_student_name .course_section").each(function(){
+        possibleSections[$(this).data('course_section_id')] = $(this).attr('title'); 
+      }),
+      contextId = $("#current_context_code").text().split("_")[1],
+      sectionToShow = $.store.userGet("grading_show_only_section" + contextId);
   
-  window.gradebook = {
+  if (sectionToShow) {
+    var atLeastOnePersonExistsInThisSection = false;
+    $courseSections.add('.gradebook_table .course_section').each(function() {
+      if ($(this).data('course_section_id') != sectionToShow){
+        $(this).closest('tr').remove();
+      } else {
+        atLeastOnePersonExistsInThisSection = true;
+      }
+    });
+    if (!atLeastOnePersonExistsInThisSection) {
+      alert("Could not find any students in that section, falling back to showing all sections.");
+      $.store.userRemove("grading_show_only_section"+contextId);
+      window.location.reload();
+    }
+  }
+  
+  var gradebook = {
     hoverCount: -1,
     fileIndex: 1,
     assignmentIndexes: {},
@@ -81,7 +105,7 @@
         .attr('role', 'grid')
         .prepend(function(){
           var topRowHtml = $("#datagrid_top .assignment_title").map(function(){
-            return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).text() + "</div>"
+            return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).text() + "</div>";
           }).get().join("");
           return "<div class='hidden-readable' role='row'><div role='columnheader' tabindex='-1'>Student Name</div>" + topRowHtml +"</div>";
         })
@@ -101,8 +125,8 @@
         }
       });
     }
-
   };
+  
   $(document).ready(function() {
     gradebook.pointCalculations = !$("#class_weighting_policy").attr('checked');
     var init = function() {
@@ -333,7 +357,7 @@
               .find(".assignment_link").attr('href', data.url);
           };
           options['<span class="ui-icon ui-icon-newwin">&nbsp;</span> SpeedGrader'] = function() {
-            window.open(extendedGradebookURL);
+            window.location.href = extendedGradebookURL;
           };
           options['<span class="ui-icon ui-icon-mail-closed">&nbsp;</span> Message Students Who...'] = function() {
             var data = objectData($td),
@@ -380,7 +404,7 @@
                     return student.score != null && student.score !== "" && cutoff != null && student.score > cutoff;
                   }
                 });
-                return $.map(students, function(student) { return student.user_data.id });
+                return $.map(students, function(student) { return student.user_data.id; });
               }
             });
           };
@@ -910,9 +934,144 @@
         $curve_grade_dialog.dialog('close');
       });
     }, 1500);
+    
+    $('#gradebook_options').live('click', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+          
+      var options = {
+        '<span class="ui-icon ui-icon-carat-2-e-w" /> Sort Columns By...' : function() {
+          $(".sort_gradebook").each(function() {
+            $(this).attr('disabled', false).text($(this).attr('title'));
+          });
+          $("#sort_columns_dialog").dialog('close').dialog({
+            autoOpen: false,
+            width: 400,
+            height: 300
+          }).dialog('open');
+        },
+        '<span class="ui-icon ui-icon-carat-2-n-s" /> Sort Rows By...' : function() {
+          $(".sort_gradebook").each(function() {
+            $(this).attr('disabled', false).text($(this).attr('title'));
+          });
+          $("#sort_rows_dialog").dialog('close').dialog({
+            autoOpen: false,
+            width: 400,
+            height: 300
+          }).dialog('open');
+        },
+        '<span class="ui-icon ui-icon-pencil" /> Set Group Weights' : function() {
+          $("#groups_data").dialog('close').dialog({
+            title: "Assignment Groups",
+            autoOpen: false
+          }).dialog('open').show();
+        },
+        '<span class="ui-icon ui-icon-clock" /> View Grading History' : function() {
+          window.location.href = $(".gradebook_history_url").attr('href');
+        },
+        '<span class="ui-icon ui-icon-disk" /> Download Scores (.csv)' : function() {
+          window.location.href = $(".gradebook_csv_url").attr('href');
+        },
+        '<span class="ui-icon ui-icon-clock" /> Upload Scores (from .csv) ' : function() {
+          $("#upload_modal").dialog({
+            bgiframe: true,
+            autoOpen: false,
+            modal: true,
+            width: 410,
+            resizable: false,
+            buttons: {
+              'Upload Data': function() {
+                $(this).submit();
+              }
+            }
+          }).dialog('open');
+        }
+      };
+      
+      var show = $("#hide_students_option").attr('checked');
+      options['<span class="ui-icon ui-icon-person" /> ' + (show ? 'Show' : 'Hide') + ' Student Names'] = function() {
+        $("#hide_students_option").attr('checked', !show).change();
+      };
+      
+      options['<span class="ui-icon ui-icon-check" /> ' + (ignoreUngradedSubmissions ? 'Include' : 'Ignore') + ' Ungraded Assignments'] = function() {
+        ignoreUngradedSubmissions = !ignoreUngradedSubmissions;
+        gradebook.updateAllStudentGrades(); 
+      };
+      
+      
+      
+      if ($.size(possibleSections) > 1) {  
+        var sectionToShowLabel = sectionToShow ? 
+                                    ('Showing Section: ' + possibleSections[sectionToShow]) : 
+                                    'Showing All Sections';
+        options['<span class="ui-icon ui-icon-search" />' + sectionToShowLabel] = function() {
+          var $dialog = $("#section_to_show_dialog").dialog({
+                modal: true,
+                resizable: false,
+                buttons: {
+                  'Change Section': function() {
+                    var val = $("#section_to_show_dialog select").val();
+                    $.store[val == "all" ? 'userRemove' : 'userSet']("grading_show_only_section"+contextId, val);
+                    window.location.reload();
+                  }
+                }
+              });
+          var $select = $dialog.find('select');
+          $select.find('[value != all]').remove();
+          for (var key in possibleSections) {
+            $select.append('<option value="' + key + '" ' + (sectionToShow == key ? 'selected' : '') + ' >' + possibleSections[key] + '</option>'); 
+          }
+        };
+      }
+      
+      $(this).dropdownList({
+        options: options
+      });
+    });
+    
+    $(".sort_gradebook").click(function(event) {
+      event.preventDefault();
+      var $button = $(this);
+      if($button.hasClass('by_grade') && !gradebook.finalGradesReady) {
+        $button.attr('disabled', true).text("Computing Grades...");
+        setTimeout(function() {
+          if($button.filter(":visible").length > 0) {
+            $button.click();
+          }
+        }, 1000);
+        return;
+      }
+      $button.attr('disabled', false);
+      $button.text($button.attr('title'));
+      if($button.hasClass('sort_rows')) {
+        sortStudentRows(function(student) {
+          if($button.hasClass('by_secondary_identifier')) {
+            return [student.secondary_identifier, student.display_name, student.course_section];
+          } else if($button.hasClass('by_section')) {
+            return [student.course_section, student.display_name, student.secondary_identifier];
+          } else if($button.hasClass('by_grade_desc')) { 
+            return [Math.round((1000 - student.grade) * 10.0), student.display_name, student.secondary_identifier, student.course_section];
+          } else if($button.hasClass('by_grade_asc')) {
+            return [10000 + Math.round(student.grade * 10.0), student.display_name, student.secondary_identifier, student.course_section];
+          } else {
+            return [student.display_name, student.secondary_identifier, student.course_section];
+          }
+        });
+      } else {
+        sortAssignmentColumns(function(assignment) {
+          var list = [assignment.special_sort, assignment.date_sortable || "1050-12-12T99:99", assignment.title];
+          if($button.hasClass('by_group')) {
+            list.unshift(parseInt(assignment.groupData[assignment.group_id || assignment.id.toString().substring(6)], 10));
+          }
+          return list;
+        });
+      }
+      $("#sort_rows_dialog").dialog('close');
+      $("#sort_columns_dialog").dialog('close');
+    });
 
   });
-
+    
 
   function objectData($td) {
     var id = $td.data('object_id');
@@ -955,6 +1114,7 @@
     }
     return data;
   }
+
   function submitDataEntry(data, fromDialog) {
     var formData = $update_submission_form.getFormData();
     var $div = $("#submission_" + data.student_id + "_" + data.assignment_id);
@@ -995,6 +1155,7 @@
       $.ajaxJSON($update_submission_form.attr('action'), 'POST', formData, formSuccess, formError);
     }
   }
+
   function updateSubmission(submission) {
     if(!submission) { return; }
     var $submission = null;
@@ -1084,6 +1245,7 @@
       $submission_grade.empty().append(emptySubmissionText(submission));
     }
   }
+
   function emptySubmissionText(submission) {
     var result = $("#submission_" + submission.submission_type + "_image").clone().attr('id', '');
     if(result.length === 0) {
@@ -1091,6 +1253,7 @@
     }
     return result;
   }
+
   function updateDataEntry($box, forceUpdate) {
     var $input = $box;
     var $parent = $input.parents(".table_entry");
@@ -1128,6 +1291,7 @@
     }
     $parent.find(".grade").show().empty().append(val);
   }
+
   function toggleColumn($obj, show) {
     var assignment_id = objectData($obj).assignment_id;
     var $list = $(".assignment_" + assignment_id);
@@ -1137,6 +1301,7 @@
       $list.hide().parent().addClass('hidden_column');
     }
   }
+
   function populateSubmissionInformation($submission, submission) {
     var $td = $submission,
         assignment = object_data["assignment_" + submission.assignment_id].assignment,
@@ -1304,6 +1469,7 @@
       autoOpen: false
     }).dialog('open').dialog('option', 'title', title);
   }
+
   function submissionInformation($submission) {
     var $td = $submission;
     var submission = objectData($td);
@@ -1328,6 +1494,7 @@
       });
     }
   }
+
   var studentsToUpdate = [];
   gradebook.finalGradesReady = true;
   var studentsToInitialize = {};
@@ -1387,6 +1554,7 @@
       $assignment.data('assignment_object', assignment);
     });
   }
+
   function moveAssignmentColumn(assignment_id, movement, relative_assignment_id) {
     if(movement == "first") {
       movement = "before";
@@ -1409,6 +1577,7 @@
       }
     }
   }
+
   window.sortStudentRows = function(callback) {
     var $students = $(".outer_student_name");
     var students = [];
@@ -1443,6 +1612,7 @@
     });
     datagrid.reorderRows(new_order);
   };
+
   window.reverseRows = function() {
     var new_order = [0];
     for(var idx = datagrid.rows.length - 1; idx > 0; idx--) {
@@ -1450,6 +1620,7 @@
     }
     datagrid.reorderRows(new_order);
   };
+
   window.sortAssignmentColumns = function(callback) {
     var $assignments = $(".outer_assignment_name");
     var assignments = [];
@@ -1486,6 +1657,7 @@
     });
     datagrid.reorderColumns(new_order);
   }
+
   function updateGroupTotal(updateGrades) {
     var total = 0.0;
     var weighted = $("#class_weighting_policy").attr('checked');
@@ -1515,6 +1687,7 @@
       gradebook.updateAllStudentGrades();
     }
   }
+
   function setGroupData(groups, $group) {
     if(!$group) { return; }
     if($group && $group.length === 0) { return; }
@@ -1563,6 +1736,7 @@
     groups[data.assignment_group_id] = groupData;
     return groupData;
   }
+
   function updateStudentGrades(student_id) {
     var $submissions = $(".table_entry.student_" + student_id);
     if($submissions.length === 0) { return; }
@@ -1708,25 +1882,30 @@
       .find(".score").hide().end()
       .find(".pct").text(' %').show();
   }
+
   $(document).ready(function(){
     $(document).bind('update_student_grades', function(event, student_id) {
       updateStudentGrades(student_id);
     });
   });
+
   $.fn.gradebookLoading = function(action) {
     this.find(".refresh_grades_link").find(".static").showIf(action).end()
       .find(".animated").showIf(!action);
   };
+
   function updateGrades(refresh) {
+    var url = window.location.protocol + "//" + 
+              window.location.host + 
+              window.location.pathname + 
+              "?updated=" + lastGradebookUpdate;
+    
     $("#datagrid_topleft").gradebookLoading();
-    var url = "http://" + location.host + location.pathname + "?updated=" + lastGradebookUpdate;
-    var options = {};
-    $.ajaxJSON(url, 'GET', {}, function(data) {
+    $.ajaxJSON(url, 'GET', {}, function(submissions) {
       if(refresh) {
         setTimeout(function() { updateGrades(true); }, 120000);
       }
       $("#datagrid_topleft").gradebookLoading('remove');
-      var submissions = data;
       var newGradebookUpdate = lastGradebookUpdate;
       for(idx in submissions) {
         var submission = submissions[idx].submission;
@@ -1744,6 +1923,8 @@
         setTimeout(function() { updateGrades(true); }, 240000);
       }
       $("#datagrid_topleft").gradebookLoading('remove');
-    }, options);
+    });
   }
+
+  return gradebook;
 })();
