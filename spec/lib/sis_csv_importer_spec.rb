@@ -290,7 +290,7 @@ describe SIS::SisCsv do
       before_count = Enrollment.count
       importer = process_csv_data(
         "course_id,user_id,role,section_id,status",
-        ",U001,student,1B,active",
+        ",U001,student,,active",
         "C001,,student,1B,active",
         "C001,U001,cheater,1B,active",
         "C001,U001,student,1B,semi-active"
@@ -298,12 +298,37 @@ describe SIS::SisCsv do
       Enrollment.count.should == before_count
 
       errors = importer.errors.map { |r| r.last }
-      errors.should == ["No course_id given for an enrollment", 
-                        "No user_id given for an enrollment", 
-                        "Improper role \"cheater\" for an enrollment", 
+      errors.should == ["No course_id or section_id given for an enrollment",
+                        "No user_id given for an enrollment",
+                        "Improper role \"cheater\" for an enrollment",
                         "Improper status \"semi-active\" for an enrollment"]
     end
-    
+
+    it 'should warn about inconsistent data' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active",
+        "C002,TC 102,Test Course 102,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "1B,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "U001,user1,User,Uno,user@example.com,active"
+      )
+      importer = process_csv_data(
+        "course_id,user_id,role,section_id,status",
+        "NONEXISTENT,U001,student,1B,active",
+        "C001,U001,student,NONEXISTENT,active",
+        "C002,U001,student,1B,active")
+      warnings = importer.warnings.map { |r| r.last }
+      warnings.should == ["An enrollment referenced a non-existent course NONEXISTENT",
+                          "An enrollment referenced a non-existent section NONEXISTENT",
+                          "An enrollment listed a section and a course that are unrelated"]
+    end
+
     it "should enroll users" do
       #create course, users, and sections
       process_csv_data(
@@ -315,7 +340,8 @@ describe SIS::SisCsv do
         "user_1,user1,User,Uno,user@example.com,active",
         "user_2,user2,User,Dos,user2@example.com,active",
         "user_3,user4,User,Tres,user3@example.com,active",
-        "user_5,user5,User,Quatro,user5@example.com,active"
+        "user_5,user5,User,Quatro,user5@example.com,active",
+        "user_6,user6,User,Cinco,user6@example.com,active"
       )
       process_csv_data(
         "section_id,course_id,name,status,start_date,end_date",
@@ -323,11 +349,12 @@ describe SIS::SisCsv do
       )
       # the enrollments
       process_csv_data(
-        "course_id,user_id,role,section_name,status,associated_user_id",
-        "test_1,user_1,teacher,S001,active,",
-        "test_1,user_2,student,S001,active,",
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,user_1,teacher,,active,",
+        ",user_2,student,S001,active,",
         "test_1,user_3,ta,S001,active,",
-        "test_1,user_5,observer,S001,active,user_2"
+        "test_1,user_5,observer,S001,active,user_2",
+        "test_1,user_6,designer,S001,active,"
       )
       course = @account.courses.find_by_sis_source_id("test_1")
       course.teachers.first.name.should == "User Uno"
@@ -335,7 +362,10 @@ describe SIS::SisCsv do
       course.tas.first.name.should == "User Tres"
       course.observers.first.name.should == "User Quatro"
       course.observer_enrollments.first.associated_user_id.should == course.students.first.id
+      course.designers.first.name.should == "User Cinco"
     end
+
+
   end
 
   context 'account importing' do

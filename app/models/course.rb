@@ -45,6 +45,8 @@ class Course < ActiveRecord::Base
   has_many :teacher_enrollments, :class_name => 'TeacherEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :tas, :through => :ta_enrollments, :source => :user
   has_many :ta_enrollments, :class_name => 'TaEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
+  has_many :designers, :through => :designer_enrollments, :source => :user
+  has_many :designer_enrollments, :class_name => 'DesignerEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :observers, :through => :observer_enrollments, :source => :user
   has_many :observer_enrollments, :class_name => 'ObserverEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :admins, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment'"
