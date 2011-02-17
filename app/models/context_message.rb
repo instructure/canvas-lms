@@ -99,7 +99,14 @@ class ContextMessage < ActiveRecord::Base
   def read(user)
     self.viewed_user_ids ||= [self.user_id]
     self.viewed_user_ids << user.id if user
-    self.save
+    transaction do
+      if user && (item = user.inbox_items.find_by_asset_id_and_asset_type(self.id, "ContextMessage"))
+        item.mark_as_read(false)
+      end
+      self.save!
+    end
+  rescue
+    false
   end
   
   def read?(user)

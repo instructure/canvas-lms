@@ -30,6 +30,7 @@ class ContextController < ApplicationController
       root_id = params[:context_message].delete(:root_context_message_id)
       unless root_id.blank?
         params[:context_message][:root_context_message] = @context.context_messages.find(root_id)
+        params[:context_message][:root_context_message].read(params[:context_message][:user])
       end
       @message = @context.context_messages.build(params[:context_message])
       @message.recipients = recipients
