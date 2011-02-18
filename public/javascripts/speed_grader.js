@@ -1135,6 +1135,7 @@ var jsonData, visibleRubricAssessments;
           EG.setOrUpdateSubmission(this.submission);
         });
         EG.refreshSubmissionsToView();
+        $submission_to_view.change();
         EG.showGrade();
       });
     },
