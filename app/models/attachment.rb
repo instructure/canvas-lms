@@ -606,7 +606,10 @@ class Attachment < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :read) } #students.include? user }
     set { can :read }
     
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) && !self.locked_for?(user) } #students.include? user }
+    given { |user, session| 
+      self.cached_context_grants_right?(user, session, :read) && 
+      (self.cached_context_grants_right?(user, session, :manage_files) || !self.locked_for?(user))
+    }
     set { can :download }
     
     given { |user, session| self.context_type == 'Submission' && self.context.grant_rights?(user, session, :comment) }
@@ -621,7 +624,8 @@ class Attachment < ActiveRecord::Base
     
     given { |user, session| 
         u = session && User.find_by_id(session['file_access_user_id'])
-        u && self.cached_context_grants_right?(u, session, :read) && !self.locked_for?(u) &&
+        u && self.cached_context_grants_right?(u, session, :read) && 
+        (self.cached_context_grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     set { can :download }

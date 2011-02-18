@@ -1,15 +1,11 @@
 <% content_for :page_title do %><%= @attachment.display_name %>: <%= @context.name %><% end %>
 <% add_crumb @attachment.display_name, context_url(@context, :context_file_url, @attachment) %>
-<% if @attachment.locked_for?(@current_user) %>
+<% if !can_do(@context, @current_user, :manage_files) && (locked = @attachment.locked_for?(@current_user)) %>
   <div style="margin: 10px 50px;">
     <% if @attachment.folder && @attachment.folder.locked? %>
       The folder "<%= @attachment.folder.name %>," which includes this file, has been locked.
-    <% elsif @attachment.lock_at && Time.now > lock_at %>
-      This file has been locked since <%= datetime_string(@attachment.lock_at) %>
-    <% elsif @attachment.unlock_at && Time.now < @attachment.unlock_at %>
-      This file is set to be unlocked <%= datetime_string(@attachment.unlock_at) %>
     <% else %>
-      This file has not been unlocked yet.
+      <%= locked.is_a?(Hash) ? lock_explanation(locked, 'file', @context) : "This file has not been unlocked yet." %>
     <% end %>
   </div>
 <% else %>
