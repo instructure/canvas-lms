@@ -957,6 +957,7 @@ class User < ActiveRecord::Base
     preferences[:closed_notifications] ||= []
     preferences[:closed_notifications] << id.to_i
     preferences[:closed_notifications].uniq!
+    updated_at = Time.now
     save
   end
   

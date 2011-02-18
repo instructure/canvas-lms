@@ -4,6 +4,7 @@ class AccountNotification < ActiveRecord::Base
 
   validates_presence_of :start_at
   before_save :infer_defaults
+  after_save :touch_account
   belongs_to :account
   belongs_to :user
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false
@@ -12,6 +13,10 @@ class AccountNotification < ActiveRecord::Base
   def infer_defaults
     end_at ||= start_at + 2.weeks
     end_at = [end_at, start_at].max
+  end
+  
+  def touch_account
+    Account.update_all({:updated_at => Time.now}, {:id => self.account_id}) if self.account_id
   end
   
   named_scope :for_account, lambda{|account|
