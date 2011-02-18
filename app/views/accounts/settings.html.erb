@@ -378,10 +378,14 @@ $(document).ready(function() {
       $("#add_notification_form textarea:not(.enabled)").addClass('enabled').editorBox();
     });
   });
+  $("#add_notification_form .datetime_field").bind('blur change', function() {
+    var date = Date.parse($(this).val());
+    if(date) {
+      date = date.toString($.datetime.defaultFormat);
+    }
+    $(this).val(date);
+  });
   $("#add_notification_form").submit(function(event) {
-    $(this).find(".datetime_field").each(function() {
-      $(this).val(Date.parse($(this).val()));
-    });
     var result = $(this).validateForm({
       object_name: 'account_notification',
       required: ['start_at', 'end_at', 'subject', 'message'],
