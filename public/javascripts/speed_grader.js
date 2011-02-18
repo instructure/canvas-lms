@@ -116,6 +116,8 @@ var jsonData, visibleRubricAssessments;
         jsonData.studentsWithSubmissions = tempArray;
       } else {
         alert("Could not find any students in that section, falling back to showing all sections.");
+        $.store.userRemove("grading_show_only_section"+jsonData.context_id);
+        window.location.reload();
       }
     }
     
@@ -230,11 +232,13 @@ var jsonData, visibleRubricAssessments;
           $.store[$(this).data('section-id') == 'all' ? 'userRemove' : 'userSet']("grading_show_only_section"+jsonData.context_id, $(this).data('section-id'));
           window.location.reload();
         });
-        
+      
       if (sectionToShow) {
-        $("#section_currently_showing").text($.map(jsonData.context.active_course_sections, function(section){
-                                                    if (section.id == sectionToShow) { return section.name; }
-                                                  }).join(', '));
+        var text = $.map(jsonData.context.active_course_sections, function(section){
+                      if (section.id == sectionToShow) { return section.name; }
+                   }).join(', ');
+        
+        $("#section_currently_showing").text(text);
         $menu.find('ul li a')
           .removeClass('selected')
           .filter('[data-section-id='+ sectionToShow +']')
