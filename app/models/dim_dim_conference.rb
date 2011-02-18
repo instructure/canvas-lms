@@ -27,7 +27,7 @@ class DimDimConference < WebConference
     require 'uri'
     active = nil
     begin
-      url = URI.parse("http://#{config['domain']}/dimdim/IsMeetingKeyInUse.action?key=#{self.conference_key}&roomName=#{self.conference_key}")
+      url = URI.parse("http://#{config[:domain]}/dimdim/IsMeetingKeyInUse.action?key=#{self.conference_key}&roomName=#{self.conference_key}")
       req = Net::HTTP::Get.new(url.path + '?' + url.query)
       res = Net::HTTP.start(url.host, url.port) {|http|
         http.request(req)
@@ -46,11 +46,11 @@ class DimDimConference < WebConference
   end
 
   def admin_join_url(user, return_to="http://www.instructure.com")
-    "http://#{config['domain']}/dimdim/html/envcheck/connect.action?action=host&email=#{CGI::escape(user.email)}&confKey=#{self.conference_key}&attendeePwd=#{self.attendee_key}&presenterPwd=#{self.presenter_key}&displayName=#{CGI::escape(user.name)}&meetingRoomName=#{self.conference_key}&confName=#{CGI::escape(self.title)}&presenterAV=av&collabUrl=#{CGI::escape("http://#{HostUrl.context_host(self.context)}/dimdim_welcome.html")}&returnUrl=#{CGI::escape(return_to)}"
+    "http://#{config[:domain]}/dimdim/html/envcheck/connect.action?action=host&email=#{CGI::escape(user.email)}&confKey=#{self.conference_key}&attendeePwd=#{self.attendee_key}&presenterPwd=#{self.presenter_key}&displayName=#{CGI::escape(user.name)}&meetingRoomName=#{self.conference_key}&confName=#{CGI::escape(self.title)}&presenterAV=av&collabUrl=#{CGI::escape("http://#{HostUrl.context_host(self.context)}/dimdim_welcome.html")}&returnUrl=#{CGI::escape(return_to)}"
   end
   
   def participant_join_url(user, return_to="http://www.instructure.com")
-    "http://#{config['domain']}/dimdim/html/envcheck/connect.action?action=join&email=#{CGI::escape(user.email)}&confKey=#{self.conference_key}&attendeePwd=#{self.attendee_key}&displayName=#{CGI::escape(user.name)}&meetingRoomName=#{self.conference_key}"
+    "http://#{config[:domain]}/dimdim/html/envcheck/connect.action?action=join&email=#{CGI::escape(user.email)}&confKey=#{self.conference_key}&attendeePwd=#{self.attendee_key}&displayName=#{CGI::escape(user.name)}&meetingRoomName=#{self.conference_key}"
   end
   
 end

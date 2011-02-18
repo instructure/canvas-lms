@@ -60,7 +60,6 @@ Rails::Initializer.run do |config|
   config.middleware.use("RequestContextGenerator")
   config.to_prepare do
     require_dependency 'canvas/plugins/default_plugins'
-    require_dependency 'canvas/plugins/validators/kaltura_validator'
   end
 
 end

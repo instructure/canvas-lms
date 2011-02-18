@@ -40,11 +40,11 @@
   <div class="content">
     <table class="formtable" style="width: 100%;">
       <tr>
-        <td class="nobr" style="width: 5px;"><%= f.label :title, "Name:", :value => "#{@context.name} Conference" %></td>
+        <td class="nobr" style="width: 5px;"><%= f.label :title, "Name:" %></td>
         <td><%= f.text_field :title, :style => "width: 200px;", :value => "#{@context.name} Conference" %></td>
       </tr><tr style="<%= hidden unless WebConference.conference_types.length > 1 %>">
         <td class="nobr" style="width: 5px;"><%= f.label :conference_type, "Type:" %></td>
-        <td><%= f.select :conference_type, WebConference.conference_types.map{|c| [c['name'], c['name']] } %></td>
+        <td><%= f.select :conference_type, WebConference.conference_types.map{|c| [c[:conference_type], c[:conference_type]] } %></td>
       </tr><tr>
         <td class="nobr" style="width: 5px;"><%= f.label :duration, "Duration:" %></td>
         <td><%= f.text_field :duration, :style => "width: 25px;", :value => "60" %> minutes</td>
@@ -112,8 +112,10 @@
       beforeSubmit: function(data) {
         var $conference = $(this).prev(".conference");
         if($conference.length == 0) {
-          $conference = $("#conference_blank").clone(true);
+          $conference = $("#conference_blank").clone(true).attr('id', '');
           $("#conferences").prepend($conference.show());
+        } else {
+          $conference.show();
         }
         $("#add_conference_form").hide();
         $conference.loadingImage();
@@ -137,22 +139,36 @@
             $conference.find(".join_conference_link").show();
           }
         }
+      },
+      error: function(data, $conference) {
+        $conference.loadingImage('remove');
+        $conference.remove();
+        $(this).show();
       }
     });
     $(".edit_conference_link, .add_conference_link").click(function(event) {
       event.preventDefault();
+      var $form = $("#add_conference_form");
+      if ($form.is(":visible")) {
+        if (confirm('It looks like you are already editing another conference. Do you wish to continue? Any unsaved changes will be lost.')) {
+          $form.prev(".conference").show();
+        } else {
+          return;
+        }
+      }
       var edit = $(this).hasClass('edit_conference_link');
       var $conference = $(this).parents(".conference")
       if(!edit) {
         $conference = $("#conference_blank");
       }
-      var $form = $("#add_conference_form");
       var data = $conference.getTemplateData({
-        textValues: ['title', 'duration', 'description', 'user_ids']
+        textValues: ['title', 'duration', 'description', 'user_ids', 'conference_type']
       });
       if(edit) {
-        $form.find("h3").text("Edit Conference Details");
+        $form.find("span.title").text("Edit Conference Details");
+        $form.find("button[type=submit]").text("Update Conference");
         $form.attr('method', 'PUT').attr('action', $(this).attr('href'));
+        $form.find('select').attr("disabled", true);
         $conference.after($form);
         $form.find("#members_list").show().find(":checkbox").attr('checked', false).end().end()
           .find(".all_users_checkbox").attr('checked', false);
@@ -162,10 +178,12 @@
           $form.find("#members_list .member.user_" + id).find(":checkbox").attr('checked', true);
         }
       } else {
-        $form.find("h3").text("Start a New Conference");
+        $form.find("span.title").text("Start a New Conference");
+        $form.find("button[type=submit]").text("Create Conference");
         $form.attr('method', 'POST').attr('action', $(".add_conference_url").attr('href'));
-        $form.find("all_users_checkbox").attr('checked', true).end()
-          .find("#members_list").hide().attr('checked', true).find(":checkbox").attr('checked', false);
+        $form.find('select').attr("disabled", false);
+        $form.find(".all_users_checkbox").attr('checked', true).end()
+          .find("#members_list").hide().find(":checkbox").attr('checked', false);
         $("#conferences").before($form);
       }
       $form.fillFormData(data, {object_name: 'web_conference'});

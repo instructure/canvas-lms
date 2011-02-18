@@ -42,17 +42,7 @@ class ConferencesController < ApplicationController
     if authorized_action(@context.web_conferences.new, @current_user, :create)
       @conference = @context.web_conferences.build(params[:web_conference])
       @conference.user = @current_user
-      @conference.duration += 30 if @conference.duration
-      members = [@current_user]
-      if params[:user] && params[:user][:all] != '1'
-        ids = []
-        params[:user].each do |id, val|
-          ids << id.to_i if val == '1'
-        end
-        members += @context.users.find_all_by_id(ids).to_a
-      else
-        members += @context.users.to_a
-      end
+      members = get_new_members
       respond_to do |format|
         if @conference.save
           @conference.add_initiator(@current_user)
@@ -74,8 +64,13 @@ class ConferencesController < ApplicationController
     get_conference
     if authorized_action(@conference, @current_user, :update)
       @conference.user ||= @current_user
+      members = get_new_members
       respond_to do |format|
-        if @conference.update_attributes(params[:web_conference])
+        if @conference.update_attributes(params[:web_conference].delete_if{|k,v| k.to_sym == :conference_type})
+          # TODO: ability to dis-invite people
+          members.uniq.each do |u|
+            @conference.add_invitee(u)
+          end
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json { render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session}) }
         else
@@ -100,7 +95,12 @@ class ConferencesController < ApplicationController
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
         log_asset_access(@conference, "conferences", "conferences", 'participate')
         @conference.touch
-        redirect_to @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, :include_host => true))
+        if url = @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, :include_host => true))
+          redirect_to url
+        else
+          flash[:error] = "There was an error joining the conference"
+          redirect_to named_context_url(@context, :context_url)
+        end
       else
         flash[:notice] = "That conference is not currently active"
         redirect_to named_context_url(@context, :context_url)
@@ -128,7 +128,21 @@ class ConferencesController < ApplicationController
       redirect_to named_context_url(@context, :context_url)
     end
   end
-  
+
+  def get_new_members
+    members = [@current_user]
+    if params[:user] && params[:user][:all] != '1'
+      ids = []
+      params[:user].each do |id, val|
+        ids << id.to_i if val == '1'
+      end
+      members += @context.users.find_all_by_id(ids).to_a
+    else
+      members += @context.users.to_a
+    end
+    members - @conference.invitees
+  end
+
   def get_conference
     @conference = @context.web_conferences.find(params[:conference_id] || params[:id])
   end

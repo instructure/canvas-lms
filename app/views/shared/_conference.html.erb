@@ -26,6 +26,7 @@
       <% end %>
       <div style="display: none;" class="duration"><%= conference.duration.to_i rescue "60" %></div>
       <div style="display: none;" class="user_ids"><%= Array(conference.user_ids).join(",") rescue nbsp %></div>
+      <div style="display: none;" class="conference_type"><%= conference && conference.conference_type %></div>
     </div>
     <div class="description">
       <%= conference.description rescue "" %>

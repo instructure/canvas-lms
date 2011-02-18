@@ -20,19 +20,41 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WebConference do
   before(:all) do
-    WebConference.instance_variable_set('@configs', [{
-      'type' => 'dim_dim',
-      'name' => 'dimdim',
-      'domain' => 'dimdim.instructure.com'
-    }])
+    WebConference.instance_eval do
+      def plugins
+        [OpenObject.new(:id => "dim_dim", :settings => {:domain => "dimdim.instructure.com"}),
+         OpenObject.new(:id => "broken_plugin", :settings => {:foo => :bar})]
+      end
+    end
   end
+  after(:all) do
+    WebConference.instance_eval do
+      def plugins; Canvas::Plugin.all_for_tag(:web_conferencing); end
+    end
+  end
+
+  context "broken_plugin" do
+    it "should return false on valid_config? if no matching config" do
+      WebConference.new.valid_config?.should be_false
+      conf = WebConference.new
+      conf.conference_type = 'bad_type'
+      conf.valid_config?.should be_false
+    end
+
+    it "should return false on valid_config? if plugin subclass is broken/missing" do
+      conf = WebConference.new
+      conf.conference_type = "broken_plugin"
+      conf.valid_config?.should be_false
+    end
+  end
+
   context "dim_dim" do
     it "should correctly retrieve a config hash" do
       conference = DimDimConference.new
       config = conference.config
       config.should_not be_nil
-      config['type'].should eql('dim_dim')
-      config['name'].should eql('dimdim')
+      config[:conference_type].should eql('DimDim')
+      config[:class_name].should eql('DimDimConference')
     end
     
     it "should correctly generate join urls" do
@@ -47,14 +69,7 @@ describe WebConference do
     
     it "should confirm valid config" do
       DimDimConference.new.valid_config?.should be_true
-      DimDimConference.new(:conference_type => "dimdim").valid_config?.should be_true
-    end
-    
-    it "should return false on valid_config? if no matching config" do
-      WebConference.new.valid_config?.should be_false
-      conf = DimDimConference.new
-      conf.write_attribute(:conference_type, 'bad_type')
-      conf.valid_config?.should be_false
+      DimDimConference.new(:conference_type => "DimDim").valid_config?.should be_true
     end
   end
   
