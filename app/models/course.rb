@@ -1266,6 +1266,14 @@ class Course < ActiveRecord::Base
     @to_migrate_links = []
     added_items = []
     delete_placeholder = nil
+    
+    if bool_res(options[:course_settings])
+      #Copy the course settings too
+      course.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
+        self.send("#{attr}=", course.send(attr))
+      end
+      self.save
+    end
     if self.assignment_groups.length == 1 && self.assignment_groups.first.name == "Assignments" && self.assignment_groups.first.assignments.empty?
       delete_placeholder = self.assignment_groups.first
       self.group_weighting_scheme = course.group_weighting_scheme
@@ -1461,7 +1469,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.clonable_attributes
-    [:name, :group_weighting_scheme, :start_at, :conclude_at, 
+    [:name, :course_code, :group_weighting_scheme, :start_at, :conclude_at, 
     :grading_standard_id, :is_public, :publish_grades_immediately, 
     :allow_student_wiki_edits, :allow_student_assignment_edits, 
     :hashtag, :show_public_context_messages, :syllabus_body, 
