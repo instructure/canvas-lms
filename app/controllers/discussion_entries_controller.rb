@@ -137,6 +137,9 @@ class DiscussionEntriesController < ApplicationController
         @admins = @context.admins
         @discussion_entries = @discussion_entries.find_all_by_user_id(@admins.map(&:id))
       end
+      if @topic.require_initial_post && (!@current_user || !@all_discussion_entries.find_by_user_id(@current_user.id))
+        @discussion_entries = []
+      end
       if @topic.locked_for?(@current_user) && !@topic.grants_right?(@current_user, nil, :update)
         @discussion_entries = []
       end

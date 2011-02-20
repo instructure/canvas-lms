@@ -384,6 +384,9 @@ var wikiSidebar;
           .find(".delete_entry_link").toggleClass("disabled_link", !entry.permissions['delete']);
         $entry.find(".content").loadingImage('remove');
         $entry.find(".user_content").removeClass('enhanced');
+        if($("#initial_post_required").length) {
+          location.reload();
+        }
         $(document).triggerHandler('user_content_change');
       }, error: function(data, $entry) {
         $entry.find(".content").loadingImage('remove');

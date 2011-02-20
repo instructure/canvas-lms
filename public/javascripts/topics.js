@@ -104,7 +104,7 @@ var topics = {};
       $form.addClass('add_topic_form_new').attr('id', 'add_topic_form_' + id)
         .find(".topic_content").addClass('topic_content_new').attr('id', 'topic_content_' + id);
       var data = $topic.getTemplateData({
-        textValues: ['title', 'is_announcement', 'delayed_post_at', 'assignment[id]', 'attachment_name', 'assignment[points_possible]', 'assignment[assignment_group_id]', 'assignment[due_at]', 'podcast_enabled', 'podcast_has_student_posts'],
+        textValues: ['title', 'is_announcement', 'delayed_post_at', 'assignment[id]', 'attachment_name', 'assignment[points_possible]', 'assignment[assignment_group_id]', 'assignment[due_at]', 'podcast_enabled', 'podcast_has_student_posts', 'require_initial_post'],
         htmlValues: ['message']
       });
       data.message = $topic.find(".content .message_html").val();
@@ -127,7 +127,9 @@ var topics = {};
         .find(".no_attachment").showIf(!data.attachment_name).end()
         .find(".current_attachment").showIf(data.attachment_name).end()
         .find(".upload_attachment").hide().end()
-        .find(".attachment_name").text(data.attachment_name);
+        .find(".attachment_name").text(data.attachment_name || "").end()
+        .find(".more_options_link").show().end()
+        .find(".more_options_holder").hide();
       $form.find(".datetime_field").datetime_field();
       $form.find(".announcement_option").showIf($topic.attr('id') == "topic_new");
       if($topic.attr('id') == "topic_new") {
@@ -243,43 +245,48 @@ var topics = {};
       $("#reorder_topics_dialog").dialog('close');
     });
     $("#add_topic_form .topic_title").formSuggestion();
-    $("#add_topic_form .delay_posting").change(function() {
+    $("#add_topic_form")
+    .find(".delay_posting").change(function() {
       $(this).parents("form").find(".delay_posting_option").showIf($(this).attr('checked'));
-    }).change();
-    $("#add_topic_form .set_assignment").change(function() {
+    }).change().end()
+    .find(".set_assignment").change(function() {
       $(this).parents("form").find(".set_assignment_option").showIf($(this).attr('checked'));
       $(this).parents("form").find(".announcement_option").showIf(!$(this).attr('checked') && $(this).parents("form").attr('id').match(/_new$/));
-    }).change();
-    $("#add_topic_form .is_announcement").change(function() {
+    }).change().end()
+    .find(".is_announcement").change(function() {
       $(this).parents("form").find(".assignment_options").showIf(!$(this).attr('checked'));
       $(this).parents("form").find(".podcast_options").showIf(!$(this).attr('checked'));
-    });
-    $("#add_topic_form .podcast_enabled_checkbox").change(function() {
+    }).end()
+    .find(".podcast_enabled_checkbox").change(function() {
       $(this).parents("form").find(".podcast_sub_options").showIf($(this).attr('checked'));
-    });
-    $("#add_topic_form .add_attachment_link").click(function(event) {
+    }).end()
+    .find(".more_options_link").click(function(event) {
+      event.preventDefault();
+      $(this).hide().parents("form").find(".more_options_holder").show();
+    }).end()
+    .find(".add_attachment_link").click(function(event) {
       event.preventDefault();
       var $form = $(this).parents("form");
       $form.find(".no_attachment").slideUp().addClass('current');
       $form.find(".current_attachment").hide().removeClass('current');
       $form.find(".upload_attachment").slideDown();
-    });
-    $("#add_topic_form .delete_attachment_link").click(function(event) {
+    }).end()
+    .find(".delete_attachment_link").click(function(event) {
       event.preventDefault();
       var $form = $(this).parents("form");
       $form.find(".current_attachment").slideUp().removeClass('current');
       $form.find(".no_attachment").slideDown().addClass('current');
       $form.find(".upload_attachment").hide();
       $form.find(".discussion_remove_attachment").val("1");
-    });
-    $("#add_topic_form .replace_attachment_link").click(function(event) {
+    }).end()
+    .find(".replace_attachment_link").click(function(event) {
       event.preventDefault();
       var $form = $(this).parents("form");
       $form.find(".upload_attachment").slideDown();
       $form.find(".no_attachment").hide().removeClass('current');
       $form.find(".current_attachment").slideUp().addClass('current');
-    });
-    $("#add_topic_form .cancel_attachment_link").click(function(event) {
+    }).end()
+    .find(".cancel_attachment_link").click(function(event) {
       event.preventDefault();
       var $form = $(this).parents("form");
       $form.find(".no_attachment.current").slideDown();

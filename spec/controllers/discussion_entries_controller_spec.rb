@@ -270,6 +270,42 @@ describe DiscussionEntriesController do
       assigns[:all_discussion_entries].should_not be_empty
     end
     
+    it "should not include student entries if initial post is required but missing" do
+      topic_with_media_reply
+      @user = user_model
+      @enrollment = @course.enroll_student(@user)
+      @enrollment.accept!
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      @topic.update_attribute(:require_initial_post, true)
+      @topic.locked_for?(@user).should_not eql(nil)
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      assigns[:entries].should_not be_nil
+      assigns[:entries].should_not be_empty
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss.should_not be_nil
+      rss.channel.title.should eql("some topic Posts Podcast Feed")
+      rss.items.length.should eql(0)
+      assigns[:discussion_entries].should be_empty
+      assigns[:all_discussion_entries].should_not be_empty
+    end
+
+    it "should include student entries if initial post is required and given" do
+      topic_with_media_reply
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      @topic.update_attribute(:require_initial_post, true)
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      assigns[:entries].should_not be_nil
+      assigns[:entries].should_not be_empty
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss.should_not be_nil
+      rss.channel.title.should eql("some topic Posts Podcast Feed")
+      rss.items.length.should eql(1)
+      assigns[:discussion_entries].should_not be_empty
+      assigns[:discussion_entries][0].should eql(@entry)
+    end
+
     it "should not include student entries if disabled" do
       topic_with_media_reply
       get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code

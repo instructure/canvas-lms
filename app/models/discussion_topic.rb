@@ -23,7 +23,9 @@ class DiscussionTopic < ActiveRecord::Base
   include HasContentTags
   include CopyAuthorizedLinks
   
-  attr_accessible :title, :message, :user, :delayed_post_at, :assignment, :plaintext_message, :podcast_enabled, :podcast_has_student_posts
+  attr_accessible :title, :message, :user, :delayed_post_at, :assignment, 
+    :plaintext_message, :podcast_enabled, :podcast_has_student_posts, 
+    :require_initial_post
 
   attr_readonly :context_id, :context_type, :user_id
   adheres_to_policy
