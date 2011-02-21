@@ -62,7 +62,7 @@ class FacebookController < ApplicationController
         session[:facebook_user_authorized] = true
         session[:facebook_user_id] = @facebook_user_id
         @facebook_session.user.populate(:name)[:name] rescue nil
-        session[:facebook_user_name] = @facebook_session.user.name
+        session[:facebook_user_name] = @facebook_session.user.name rescue nil
         flash[:notice] = "Facebook Canvas App successfully installed! You still need to authorize its use within Canvas."
         redirect_to "http://apps.facebook.com/#{Facebooker.facebooker_config['canvas_page_name']}"
       end
