@@ -1234,7 +1234,7 @@ class User < ActiveRecord::Base
     submissions = []
     submissions += self.submissions.after(opts[:fallback_start_at]).for_context_codes(context_codes).find(
       :all, 
-      :conditions => 'submissions.score IS NOT NULL',
+      :conditions => 'submissions.score IS NOT NULL AND assignments.workflow_state != "deleted"',
       :include => [:assignment, :user, :submission_comments],
       :order => 'submissions.created_at DESC',
       :limit => opts[:limit]
@@ -1243,8 +1243,8 @@ class User < ActiveRecord::Base
     submissions += Submission.for_context_codes(context_codes).find(
       :all,
       :select => "submissions.*, MAX(submission_comments.created_at) as last_updated_at_from_db",
-      :joins => {:submission_comments => :submission_comment_participants},
-      :conditions => ["(submission_comments.created_at > ?) AND (`submission_comment_participants`.user_id = ?) AND (`submission_comments`.author_id != ?)", opts[:fallback_start_at], self.id, self.id ],
+      :joins => [:assignment, {:submission_comments => :submission_comment_participants}],
+      :conditions => ["(submission_comments.created_at > ?) AND (`submission_comment_participants`.user_id = ?) AND (`submission_comments`.author_id != ?) AND assignments.workflow_state != 'deleted'", opts[:fallback_start_at], self.id, self.id ],
       :order => 'submissions.created_at DESC',
       :group => 'submissions.id',
       :limit => opts[:limit]
