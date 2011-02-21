@@ -20,9 +20,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title><%= yield :page_title || "Add a page title here." %></title>
+  <noscript> <meta http-equiv=refresh content="0; URL=/javascript-is-required.html" /> </noscript> 
+  <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
   
   <%= yield :auto_discovery %>
   <%= include_stylesheets :common, :media => "all" %>
@@ -30,39 +32,14 @@
     <%= stylesheet_link_tag "compiled/instructure_eportfolio.css" %>
   <% end %>
   <%= include_stylesheets(*jammit_css_bundles) unless jammit_css_bundles.empty?  %>
-  <!--[if lte IE 8]>
-    <%= javascript_include_tag "html5.js" %>
-  <![endif]-->
-  <!--[if lte IE 7]>
-    <%= include_javascripts :ie7 %>
-  <![endif]-->
+  <!--[if lte IE 8]> <%= javascript_include_tag "html5.js" %> <![endif]-->
+  <!--[if lte IE 7]> <%= include_javascripts :ie7 %> <![endif]-->
   <%= yield :stylesheets %>
   <% if @domain_root_account && @domain_root_account.settings[:global_stylesheet] %>
     <link href="<%= @domain_root_account.settings[:global_stylesheet] %>" media="all" rel="stylesheet" type="text/css" />
   <% end %>
 </head>
 <body class="<%= (@body_classes << @active_tab).uniq.join(" ") %>">
-  <!--[if lte IE 6]>
-    <style type="text/css" media="screen">
-      * { display:none; }
-      body, html, #block-ie6, #block-ie6 * { display: block !important;}
-    </style>
-    <div id="block-ie6">
-      <h1>Internet Explorer version 6 is so outdated it is not supported on this website.</h1>
-      <p>
-        May we suggest some better, more modern browsers? <a href="http://getfirefox.com">download firefox here</a> or <a href="http://www.google.com/chrome">get Google Chrome here</a>.
-      </p>
-    </div>
-  <![endif]-->
-  <noscript>
-    <div id="noscript">
-      <h1>You need to have javascript enabled in order to access this site.</h1>
-      <p>
-        Perhaps you could try a different browser. You can get the latest version of firefox <a href="http://getfirefox.com">here.</a><br />
-        Or, here are the <a href="http://www.enable-javascript.com" target="_blank"> instructions how to enable JavaScript in your web browser</a>.
-      </p>
-    </div>
-  </noscript>
   <% unless @body_class_no_headers %>
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
     <a href="#content" id="skip_navigation_link">Skip To Content</a>
