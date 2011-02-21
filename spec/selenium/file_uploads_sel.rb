@@ -136,7 +136,7 @@ end
 describe "file uploads Windows-Firefox-Local-Tests" do
   it_should_behave_like "file uploads selenium tests"
   before(:all) {
-    @selenium_driver = setup_selenium "Windows-Firefox"
+    @selenium_driver = setup_selenium
     Setting.set("file_storage_test_override", "local")
   }
 end
@@ -144,7 +144,7 @@ end
 describe "file uploads Windows-Firefox-S3-Tests" do
   it_should_behave_like "file uploads selenium tests"
   prepend_before(:all) {
-    @selenium_driver = setup_selenium "Windows-Firefox"
+    @selenium_driver = setup_selenium
     Setting.set("file_storage_test_override", "s3")
   }
 end

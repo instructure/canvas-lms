@@ -19,51 +19,36 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'selenium/client'
 require "socket"
+require File.expand_path(File.dirname(__FILE__) + '/server')
 
-SELENIUM_CONFIG = Setting.from_config("selenium") || {
-    :host => "localhost", :port => 4444 }
+SELENIUM_CONFIG = Setting.from_config("selenium") || {}
 SERVER_IP = UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
-SERVER_PORT = 3002
-MAX_SERVER_START_TIME = 30
+SERVER_PORT = SELENIUM_CONFIG[:app_port] || 3002
 
 module SeleniumTestsHelperMethods
-  def setup_selenium(selenium_env)
+  def setup_selenium
     Selenium::Client::Driver.new \
-      :host => SELENIUM_CONFIG[:host],
-      :port => SELENIUM_CONFIG[:port],
-      :browser => selenium_env,
+      :host => SELENIUM_CONFIG[:host] || "localhost",
+      :port => SELENIUM_CONFIG[:port] || 4444,
+      :browser => SELENIUM_CONFIG[:browser] || "Windows-Firefox",
       :url => "http://#{SERVER_IP}:#{SERVER_PORT}/",
       :timeout_in_second => 60
   end
-  
+
   def self.start_webrick_server
-    domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
-    domain_conf = YAML.load_file(domain_conf_path)
-    old_domain = domain_conf[RAILS_ENV]["domain"]
-    domain_conf[RAILS_ENV]["domain"] = "#{SERVER_IP}:#{SERVER_PORT}"
-    File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-    server_pid = fork do
-      exec(File.expand_path(File.dirname(__FILE__) +
-          "/../../script/server -p #{SERVER_PORT} -e #{RAILS_ENV}"))
-    end
-    for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
-      break if s
-      sleep 1
-    end
-    raise "Failed starting script/server" unless s
-    s.close
-    closed = false
-    shutdown = lambda do
-      unless closed
-        Process.kill 'KILL', server_pid
-        Process.wait server_pid
-        domain_conf[RAILS_ENV]["domain"] = old_domain
-        File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-        closed = true
+    server = SpecFriendlyWEBrickServer
+    app = Rack::Builder.new do
+      use Rails::Rack::Debugger
+      map '/' do
+
+        use Rails::Rack::Static
+        run ActionController::Dispatcher.new
       end
+    end.to_app
+    server.run(app, :Port => SERVER_PORT, :AccessLog => [])
+    shutdown = lambda do
+      server.shutdown
     end
-    at_exit { shutdown.call }
     return shutdown
   end
 end

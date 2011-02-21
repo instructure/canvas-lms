@@ -1,3 +1,5 @@
 test:
   host: "localhost"
   port: 4444
+  app_port: 3002
+  browser: "firefox"
