@@ -9,7 +9,7 @@
   'outdent' => image_tag('outdent_thin.png'),
   'edit' => image_tag('edit.png'),
   'delete' => image_tag('delete_circle.png'),
-  'other' => image_tag("blank.png", :class => "image")
+  'other' => image_tag("blank.png", :class => "image", :alt => '')
 }
  %>
 <% criterion = completion_criteria && completion_criteria.find{|c| c[:id] == tag.id} %>
@@ -22,7 +22,7 @@
         <%= image_tag "blank.png", :alt => "done", :title => "Module Item Completed", :class => "complete_item_icon" %>
         <%= image_tag "blank.png", :alt => "incomplete", :title => "Module Item Incomplete", :class => "incomplete_item_icon" %>
       </span>
-      <span class="type_icon" title="<%= module_item.content_type if module_item %>"><%= image_tag "blank.png", :style => "height: 20px;" %></span>
+      <span class="type_icon" title="<%= module_item.content_type if module_item %>"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
       <span class="criterion <%= 'defined' if criterion %>">
         <span class="min_score" style="display: none;"><%= (criterion && criterion[:min_score]) || nbsp %></span>
         <span class="criterion_type" style="display: none;"><%= (criterion && criterion[:type]) || nbsp %></span>

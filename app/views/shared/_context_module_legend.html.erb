@@ -16,7 +16,7 @@
         <% tag = module_item || nil; progression ||= nil %>
         <div id="context_module_item_<%= tag ? tag.id : "blank" %>" class="context_module_item <%= module_item.content_type.underscore %>_module_item">
           <span class="type_icon">
-            <%= image_tag "blank.png", :style => "height: 20px;" %>
+            <%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %>
           </span>
           <% criterion = context_module.completion_requirements.find{|c| c[:id] == tag.id} rescue nil %>
           <span class="criterion <%= 'defined' if criterion %> <%= 'completed' if module_item && progression && progression.finished_item?(module_item) %>" style="<%= hidden unless progression && progression.started? %>">
@@ -33,7 +33,7 @@
                 <%= image_tag "text_entry_dim.png", :class => "image", :alt => "must submit", :title => "Students must submit this assignment before the module is considered complete" %>
               <% end %>
             <% else %>
-              <%= image_tag "blank.png" %>
+              <%= image_tag "blank.png", :alt => '' %>
             <% end %>
           </span>
           <a class="title" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag.title rescue nbsp %></a>

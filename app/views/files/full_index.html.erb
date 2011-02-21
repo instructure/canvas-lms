@@ -146,7 +146,7 @@
   </li>
   <li class="folder_item folder">
     <div class="header">
-      <%= image_tag "blank.png", :class => "item_icon" %>
+      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <a href="#" class="name">&nbsp;</a>
     </div>
     <div class="links">
@@ -162,7 +162,7 @@
   </li>
   <li class="folder_item file">
     <div class="header">
-      <%= image_tag "blank.png", :class => "item_icon" %>
+      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <a href="#" class="name download_url">&nbsp;</a>
       <div class="sub_header">
         <span class="readable_size">&nbsp;</span>
@@ -185,7 +185,7 @@
   </li>
   <li class="folder_item collaboration">
     <div class="header">
-      <%= image_tag "blank.png", :class => "item_icon" %><a href="#" class="name collaboration_url" target="_blank">&nbsp;</a>
+      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %><a href="#" class="name collaboration_url" target="_blank">&nbsp;</a>
     </div>
     <div class="links">
       <a href="#" class="edit_collaboration_link no-hover collaboration_url" title="Edit this Collaboration"><%= image_tag "edit.png" %></a>
@@ -304,7 +304,7 @@
     <% form_for :attachment, :url => "#", :html => {:class => "add_file_form add_form"} do |f| %>
       <%= f.hidden_field :folder_id %>
       <div class="header">
-        <%= image_tag "blank.png", :class => "item_icon" %>
+        <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
         <%= f.file_field :uploaded_data, :title => "File to Upload" %>
       </div>
       <div class="clear"></div>
@@ -320,7 +320,7 @@
   <li class="folder_item folder add_item" id="add_folder_form">
     <% form_for :folder, :url => "#", :html => {:class => "add_folder_form add_form header"} do |f| %>
       <%= f.hidden_field :parent_folder_id %>
-      <%= image_tag "blank.png", :class => "item_icon" %>
+      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <span class="name" style="display: none;">&nbsp;</span>
       <%= f.text_field :name, :title => "Folder Name" %>
     <% end %>
@@ -374,7 +374,7 @@
   </div>
 </div>
 <div style="display: none;" id="form_templates">
-  <%= image_tag "blank.png", :id => "content_blank_icon" %>
+  <%= image_tag "blank.png", :alt => '', :id => "content_blank_icon" %>
   <%= image_tag "lock_for_file_folder.png", :id => "content_locked_icon" %>
 <div id="edit_collaboration_dialog">
   <% form_for :collaboration, :url => "", :html => {:id => "edit_collaboration_form"} do |f| %>

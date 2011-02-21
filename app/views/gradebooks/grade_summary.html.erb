@@ -159,7 +159,7 @@
           end
         %>
         <a class="tooltip" title="Turnitin Score" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank">
-          <%= image_tag(turnitin ? "turnitin_#{turnitin && turnitin[:state]}_score.png" : "blank.png") %>
+          <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png") : image_tag("blank.png", :alt => '') %>
           <span class="tooltip_wrap right">
             <span class="tooltip_text">See Turnitin results</span>
           </span>
