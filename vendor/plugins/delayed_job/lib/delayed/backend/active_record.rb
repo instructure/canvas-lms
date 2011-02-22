@@ -8,13 +8,6 @@ class ActiveRecord::Base
       super
     end
   end
-  
-  def dump_for_delayed_job
-    if id.nil?
-      raise("Can't serialize unsaved ActiveRecord object for delayed job: #{self.inspect}")
-    end
-    "#{self.class};#{id}"
-  end
 end
 
 module Delayed

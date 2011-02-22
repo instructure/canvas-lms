@@ -8,18 +8,18 @@ end
 
 describe Delayed::PerformableMethod do
   
-  it "should NOT FREAKING ignore ActiveRecord::RecordNotFound errors because they are NOT ALWAYS permanent" do
+  it "should not ignore ActiveRecord::RecordNotFound errors because they are not always permanent" do
     story = Story.create :text => 'Once upon...'
     p = Delayed::PerformableMethod.new(story, :tell, [])
     story.destroy
-    lambda { p.perform }.should raise_error
+    lambda { YAML.load(p.to_yaml) }.should raise_error
   end
   
-  it "should store the object as string if its an active record" do
+  it "should store the object using native YAML even if its an active record" do
     story = Story.create :text => 'Once upon...'
     p = Delayed::PerformableMethod.new(story, :tell, [])
     p.class.should   == Delayed::PerformableMethod
-    p.object.should  == "LOAD;Story;#{story.id}"
+    p.object.should  == story
     p.method.should  == :tell
     p.args.should    == []
     p.perform.should == 'Once upon...'
@@ -30,13 +30,13 @@ describe Delayed::PerformableMethod do
     lambda { p.send(:load, p.object) }.should_not raise_error
   end
   
-  it "should store arguments as string if they are active record objects" do
+  it "should store arguments as native YAML if they are active record objects" do
     story = Story.create :text => 'Once upon...'
     reader = StoryReader.new
     p = Delayed::PerformableMethod.new(reader, :read, [story])
     p.class.should   == Delayed::PerformableMethod
     p.method.should  == :read
-    p.args.should    == ["LOAD;Story;#{story.id}"]
+    p.args.should    == [story]
     p.perform.should == 'Epilog: Once upon...'
   end                 
   
