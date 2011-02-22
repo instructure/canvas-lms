@@ -771,7 +771,7 @@
                 $found.val(options.data[item]);
               } else {
                 try {
-                  var str = options.data[item].toString().replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+                  var str = options.data[item].toString().replace(/\&/g, "&amp;").replace(/\"/g, "&quot;").replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
                   $found.html(str);
                 } catch(e) { }
               }
