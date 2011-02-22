@@ -54,6 +54,7 @@ module SendToStream
     end
     
     def create_stream_items
+      return if stream_item_inactive?
       block = self.class.send_to_stream_block
       stream_recipients = Array(self.instance_eval(&block)) if block
       generate_stream_items(stream_recipients) if stream_recipients
@@ -105,15 +106,19 @@ module SendToStream
     def stream_item_recipient_ids
       @stream_item_recipient_ids
     end
- 
+
+    def stream_item_inactive?
+      (self.respond_to?(:workflow_state) && self.workflow_state == 'deleted') || (self.respond_to?(:deleted?) && self.deleted?)
+    end
+
     def clear_stream_items_on_destroy
-      clear_stream_items if (self.respond_to?(:workflow_state) && self.workflow_state == 'deleted') || (self.respond_to?(:deleted? ) && self.deleted?)
+      clear_stream_items if stream_item_inactive?
     end
     
     def clear_stream_items
       # We need to pass the asset_string, not the asset itself, since we're about to delete the asset
       StreamItem.send_later_if_production(:delete_all_for, StreamItem.root_object(self).asset_string, self.asset_string)
-    end    
+    end
   end
  
   def self.included(klass)
