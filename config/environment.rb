@@ -89,9 +89,3 @@ ActionController::Dispatcher.middleware.use FlashSessionCookieMiddleware, '_norm
 ActiveSupport::XmlMini.backend = 'LibXML'
 
 class NotImplemented < StandardError; end
-
-HostUrl.configure_email(if File.exist?(RAILS_ROOT + "/config/outgoing_mail.yml")
-    YAML.load_file(RAILS_ROOT + "/config/outgoing_mail.yml")[RAILS_ENV]
-  else
-    {:domain => "unknowndomain.example.com"}
-  end)

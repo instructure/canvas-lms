@@ -7,14 +7,13 @@ development:
   domain: "example.com"
   outgoing_address: "canvas@example.com"
 
+# or to use sendmail --
+#
+# development:
+#   delivery_method: "sendmail"
+
 test:
-  address: "smtp.example.com"
-  port: "25"
-  user_name: "user"
-  password: "password"
-  authentication: "plain" # plain, login, or cram_md5
-  domain: "example.com"
-  outgoing_address: "canvas@example.com"
+  delivery_method: "test"
 
 production:
   address: "smtp.example.com"
