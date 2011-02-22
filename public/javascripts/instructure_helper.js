@@ -720,7 +720,9 @@
     }
     return r;
   }
-  
+  $.htmlEscape = function(str) {
+    return $('<div/>').text(str).html();
+  }
   
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
   //  data: data used to fill template.
@@ -771,8 +773,8 @@
                 $found.val(options.data[item]);
               } else {
                 try {
-                  var str = options.data[item].toString().replace(/\&/g, "&amp;").replace(/\"/g, "&quot;").replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
-                  $found.html(str);
+                  var str = options.data[item].toString();
+                  $found.html($.htmlEscape(str));
                 } catch(e) { }
               }
             }
@@ -811,6 +813,7 @@
     }
     return this;
   };
+  
   $.fn.fillTemplateData.defaults = {htmlValues: null, hrefValues: null};
   // Reverse version of fillTemplateData.  Lets you pull out the string versions of values held in divs, spans, etc.
   // Based on the usage of class names within an object to specify an object's sub-parts.

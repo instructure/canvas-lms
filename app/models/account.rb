@@ -186,7 +186,7 @@ class Account < ActiveRecord::Base
   end
   
   def sub_accounts_as_options(indent=0)
-    res = [[("&nbsp;&nbsp;" * indent) + self.name, self.id]]
+    res = [[("&nbsp;&nbsp;" * indent).html_safe + self.name, self.id]]
     self.sub_accounts.each do |account|
       res += account.sub_accounts_as_options(indent + 1)
     end

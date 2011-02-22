@@ -164,6 +164,7 @@
                 if(name.length + level + 1 > 38) {
                   name = name.substring(0, 35) + "...";
                 }
+                name = $.htmlEscape(name);
                 for(var idx = 0; idx < level; idx++) {
                   name = "&nbsp;&nbsp;" + name;
                 }

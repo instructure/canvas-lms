@@ -57,7 +57,7 @@ $(document).ready(function() {
         $dialog.find(".feedback-course-select")
           .html(function(){
             return $.map(courses, function(course){
-              return '<option value="' + course.id + '">' + course.name + '</option>';
+              return '<option value="' + course.id + '">' + $.htmlEscape(course.name) + '</option>';
             }).join('');
           })
           .showIf(courses.length > 0);

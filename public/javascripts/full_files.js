@@ -441,7 +441,7 @@ var files = {};
         $(ui.helper).find(".header .sub_header").text("move to " + droppable.name);
         if(draggable && droppable && draggable.context_string != droppable.context_string) {
           $(ui.helper).addClass('copy_drag');
-          $(ui.helper).find(".header .sub_header").html("<strong>copy</strong> to " + droppable.name);
+          $(ui.helper).find(".header .sub_header").html("<strong>copy</strong> to " + $.htmlEscape(droppable.name));
         }
       },
       out: function(event, ui) {
@@ -524,7 +524,7 @@ var files = {};
         if(!$context_folder || $context_folder.length === 0) {
           $context_folder = $files_structure.find(".folder_blank").clone(true).removeClass('folder_blank');
         }
-        $context_folder.children(".name").html(context_name);
+        $context_folder.children(".name").text(context_name);
         $context_folder.children(".id").text(root_folder.id);
         $context_folder.addClass('context folder folder_' + root_folder.id + ' ' + context_string);
         $context_folder.find("li").addClass('to_be_removed');

@@ -23,13 +23,13 @@ $(document).ready(function() {
       var data = $(this).data('lock_reason');
       var type = data.type || "content";
       var $reason = $("<div/>");
-      $reason.html("This " + type + " is locked.  No other reason has been provided.");
+      $reason.text("This " + type + " is locked.  No other reason has been provided.");
       if(data.lock_at) {
-        $reason.html("This " + type + " was locked " + $.parseFromISO(data.lock_at).datetime_formatted);
+        $reason.text("This " + type + " was locked " + $.parseFromISO(data.lock_at).datetime_formatted);
       } else if(data.unlock_at) {
-        $reason.html("This " + type + " is locked until " + $.parseFromISO(data.unlock_at).datetime_formatted);
+        $reason.text("This " + type + " is locked until " + $.parseFromISO(data.unlock_at).datetime_formatted);
       } else if(data.context_module) {
-        $reason.html("This " + type + " is part of the module <b>" + data.context_module.name + "</b> and hasn't been unlocked yet.");
+        $reason.html("This " + type + " is part of the module <b>" + $.htmlEscape(data.context_module.name) + "</b> and hasn't been unlocked yet.");
         if($("#context_modules_url").length > 0) {
           $reason.append("<br/>");
           var $link = $("<a/>");

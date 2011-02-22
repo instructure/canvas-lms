@@ -590,7 +590,7 @@ var rubricEditing = {
             var $name = $dialog.find(".outcomes_select.blank:first").clone(true).removeClass('blank');
             outcome.title = outcome.short_description;
             var $text = $("<div/>");
-            $text.html(outcome.short_description);
+            $text.text(outcome.short_description);
             outcome.title = $.truncateText($.trim($text.text()), 35);
             outcome.display_name = outcome.cached_context_short_name || "";
             $name.fillTemplateData({data: outcome});

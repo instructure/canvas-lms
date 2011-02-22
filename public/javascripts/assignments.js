@@ -546,9 +546,9 @@
           if(rule_type == "drop_lowest") {
             rules += "Drop the Lowest " + value + " Scores<br/>";
           } else if(rule_type == "drop_highest") {
-            rules += "Drop the Highest " + value + " Scores<br/>";					
+            rules += "Drop the Highest " + value + " Scores<br/>";
           } else if(rule_type == "never_drop") {
-            var title = $("#assignment_" + value).find(".title").text();
+            var title = $("#assignment_" + value).find(".title").html();
             rules += "Never Drop " + title + "<br/>";
           }
         }

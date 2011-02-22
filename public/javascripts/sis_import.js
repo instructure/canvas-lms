@@ -32,7 +32,7 @@ $(document).ready(function(event) {
       output += "<li>Errors that prevent importing\n<ul>";
       for(var i in batch.processing_errors) {
         var message = batch.processing_errors[i];
-        output += "<li>" + message[0] + " - " + message[1] + "</li>";
+        output += "<li>" + $.htmlEscape(message[0]) + " - " + $.htmlEscape(message[1]) + "</li>";
       }
       output += "</ul>\n</li>";
     }
@@ -40,7 +40,7 @@ $(document).ready(function(event) {
       output += "<li>Warnings\n<ul>";
       for(var i in batch.processing_warnings) {
         var message = batch.processing_warnings[i];
-        output += "<li>" + message[0] + " - " + message[1] + "</li>";
+        output += "<li>" + $.htmlEscape(message[0]) + " - " + $.htmlEscape(message[1]) + "</li>";
       }
       output += "</ul>\n</li>";
     }
@@ -162,7 +162,7 @@ $(document).ready(function(event) {
        startPoll();
      } else {
        //show error message
-       $(".sis_messages .error_message").html(data.error_message);
+       $(".sis_messages .error_message").text(data.error_message);
        $(".sis_messages").show();
        if(data.batch_in_progress){
          startPoll();
