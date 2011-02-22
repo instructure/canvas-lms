@@ -65,7 +65,7 @@ $(document).ready(function(event) {
   }
 
   function startPoll() {
-    $("#sis_importer").html("Processing<div style='font-size: 0.6eml'>this may take a bit...</div>")
+    $("#sis_importer").html("Processing<div style='font-size: 0.6em;'>this may take a bit...</div>")
        .attr('disabled', true);
     $(".instruction").hide();
     $(".progress_bar_holder").slideDown();
