@@ -140,12 +140,12 @@ class Message < ActiveRecord::Base
       { :conditions => {:workflow_state => state.to_s } } 
     end
   }
-    
+
   workflow do
     state :created do
       event :stage, :transitions_to => :staged do
         self.dispatch_at = Time.now.utc + self.delay_for
-        if self.to != 'dashboard'
+        if self.to != 'dashboard' && !@stage_without_dispatch
           MessageDispatcher.dispatch(self)
         end
       end
@@ -198,6 +198,12 @@ class Message < ActiveRecord::Base
       end
     end
 
+  end
+
+  # skip dispatching the message during the stage transition, useful when batch
+  # dispatching.
+  def stage_without_dispatch!
+    @stage_without_dispatch = true
   end
   
   # Sets a few defaults and gets it on its way to be dispatched.  

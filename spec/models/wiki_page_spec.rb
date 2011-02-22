@@ -45,7 +45,7 @@ describe WikiPage do
     p.messages_sent.should_not be_empty
     p.messages_sent["Updated Wiki Page"].should_not be_nil
     p.messages_sent["Updated Wiki Page"].should_not be_empty
-    p.messages_sent["Updated Wiki Page"].map(&:user).should be_include(@user) #[0].user.should eql(@user)
+    p.messages_sent["Updated Wiki Page"].map(&:user).should be_include(@user)
   end
   
   context "atom" do

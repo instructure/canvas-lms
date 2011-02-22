@@ -23,9 +23,36 @@ class MessageDispatcher < Delayed::PerformableMethod
                          :run_at => message.dispatch_at)
   end
 
+  def self.batch_dispatch(messages)
+    return if messages.empty?
+
+    if messages.size == 1
+      self.dispatch(messages.first)
+      return
+    end
+
+    dispatch_at = messages.first.dispatch_at
+
+    Delayed::Job.enqueue(self.new(self, :deliver_batch, [messages]),
+                         :run_at => messages.first.dispatch_at)
+  end
+
   # Called by delayed_job when a job fails to reschedule it.
   def reschedule_at(now, num_attempts)
     live_object.dispatch_at
+  end
+
+  protected
+
+  def self.deliver_batch(messages)
+    messages.each do |message|
+      begin
+        message.deliver
+      rescue
+        # this delivery failed, we'll have to make an individual job to retry
+        self.dispatch(message)
+      end
+    end
   end
 
 end
