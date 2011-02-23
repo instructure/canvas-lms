@@ -112,6 +112,12 @@ class ApplicationController < ActionController::Base
   #   render
   # end
   def authorized_action(object, *opts)
+    can_do = is_authorized_action?(object, *opts)
+    render_unauthorized_action(object) unless can_do
+    can_do
+  end
+  
+  def is_authorized_action?(object, *opts)
     user = opts.shift
     action_session = nil
     action_session ||= session
@@ -128,31 +134,32 @@ class ApplicationController < ActionController::Base
     rescue => e
       logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}"
     end
-    unless can_do
-      object ||= User.new
-      object.errors.add_to_base("You are not authorized to perform this action")
-      respond_to do |format|
-        if !request.xhr?
-          flash[:notice] = "You are not authorized to perform this action"
-        end
-        @show_left_side = false
-        clear_crumbs
-        params = request.path_parameters
-        params[:format] = nil
-        @headers = !!@current_user if @headers != false
-        @files_domain = @account_domain && @account_domain.host_type == 'files'
-        format.html { 
-          store_location if request.get?
-          render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
-        }
-        format.zip { redirect_to(url_for(params)) }
-        format.xml { render :xml => object.errors.to_xml, :status => :unauthorized }
-        format.json { render :json => object.errors.to_json, :status => :unauthorized }
-      end
-      response.headers["Pragma"] = "no-cache"
-      response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
-    end
     can_do
+  end
+  
+  def render_unauthorized_action(object=nil)
+    object ||= User.new
+    object.errors.add_to_base("You are not authorized to perform this action")
+    respond_to do |format|
+      if !request.xhr?
+        flash[:notice] = "You are not authorized to perform this action"
+      end
+      @show_left_side = false
+      clear_crumbs
+      params = request.path_parameters
+      params[:format] = nil
+      @headers = !!@current_user if @headers != false
+      @files_domain = @account_domain && @account_domain.host_type == 'files'
+      format.html { 
+        store_location if request.get?
+        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
+      }
+      format.zip { redirect_to(url_for(params)) }
+      format.xml { render :xml => object.errors.to_xml, :status => :unauthorized }
+      format.json { render :json => object.errors.to_json, :status => :unauthorized }
+    end
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
   
   # To be used as a before_filter, requires controller or controller actions

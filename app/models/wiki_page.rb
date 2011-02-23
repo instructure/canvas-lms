@@ -186,10 +186,10 @@ class WikiPage < ActiveRecord::Base
   end
   
   set_policy do
-    given {|user, session| self.current_namespace(user).grants_right?(user, session, :read) }
+    given {|user, session| self.current_namespace(user).grants_right?(user, session, :read) && can_read_page?(user) }
     set { can :read }
     
-    given {|user, session| self.current_namespace(user).grants_right?(user, session, :contribute) }
+    given {|user, session| self.current_namespace(user).grants_right?(user, session, :contribute) && can_read_page?(user) }
     set { can :read }
 
     given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
@@ -206,15 +206,21 @@ class WikiPage < ActiveRecord::Base
     
   end
   
+  def can_read_page?(user)
+    namespace = self.current_namespace(user)
+    context = namespace.context
+    !hide_from_students || (context.respond_to?(:admins) && context.admins.include?(user))
+  end
+  
   def editing_role?(user)
     namespace = self.current_namespace(user)
     context = namespace.context
     context_roles = context.default_wiki_editing_roles rescue nil
     roles = (self.editing_roles || context_roles || default_roles).split(",")
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
-    return true if roles.include?('students') && context.respond_to?(:students) && context.students.include?(user)
-    return true if roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
-    return true if roles.include?('public')
+    return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.students.include?(user)
+    return true if !hide_from_students && roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
+    return true if !hide_from_students && roles.include?('public')
     false
   end
   
