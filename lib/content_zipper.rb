@@ -95,7 +95,7 @@ class ContentZipper
           if submission.submission_type == "online_upload"
             submission.attachments.each do |attachment|
               @logger.debug("  found attachment: #{attachment.display_name}")
-              fn = filename + "_" + attachment.id.to_s + attachment.extension
+              fn = filename + "_" + attachment.id.to_s + "_" + attachment.display_name
               if add_attachment_to_zip(attachment, zipfile, fn)
                 files << fn
               end
