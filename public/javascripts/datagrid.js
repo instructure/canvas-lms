@@ -18,6 +18,7 @@
 
 var datagrid = {};
 (function() {
+
   datagrid = {
     columns: [],
     rows: [],
@@ -39,21 +40,21 @@ var datagrid = {};
       var columnTally = 0;
       // Measure table columns
       $columns.each(function(i) {
-        var $col = $(this);
-        datagrid.columns[i] = $col;
-        $col.metrics = {};
-        $col.metrics.width = Math.min($col.width(), maxWidth) + 5;
-        $col.metrics.outerWidth = Math.min($col.outerWidth(), maxWidth) + 5;
-        columnTally += $col.metrics.width;
+        var $col = datagrid.columns[i] = $(this);
+        $col.metrics = {
+          width: Math.min($col.width(), maxWidth),
+          outerWidth: Math.min($col.outerWidth(), (maxWidth+1))
+        };
+        columnTally += $col.metrics.outerWidth;
       });
       // Measure table rows
       var rowTally = 0;
       $rows.each(function(i) {
-        var $row = $(this);
-        datagrid.rows[i] = $row;
-        $row.metrics = {};
-        $row.metrics.outerHeight = $row.find("td:first").outerHeight();
-        $row.metrics.height = $row.find("td:first").height();
+        var $row = datagrid.rows[i] = $(this);
+        $row.metrics = {
+          outerHeight: $row.find("td:first").outerHeight(),
+          height: $row.find("td:first").height()
+        };
         rowTally += $row.metrics.height;
       });
       if(tick && $.isFunction(tick)) { tick(); }
@@ -82,7 +83,7 @@ var datagrid = {};
 
       // Initialize top row (column headers)
       $row = datagrid._createRow(0);
-      $row.width(columnTally - datagrid.columns[0].metrics.width + datagrid.columns.length);
+      $row.width(columnTally - datagrid.columns[0].metrics.outerWidth);
       $table.find("tr:first").children("td:not(:first)").each(function(i) {
         $row.append(datagrid._createCell(0, i + 1, $(this)));
       });
@@ -115,7 +116,7 @@ var datagrid = {};
         datagrid.divs.left.children(".content:first").append($row);
         
         $row = datagrid._createRow(i + 1);
-        $row.width(columnTally - datagrid.columns[0].metrics.width + datagrid.columns.length - 1);
+        $row.width(columnTally - datagrid.columns[0].metrics.outerWidth);
         $(this).children("td:not(:first)").each(function(j) {
           populatedWidth = populatedWidth + datagrid.columns[j + 1].metrics.width;
         });
@@ -150,6 +151,37 @@ var datagrid = {};
             if(callback && $.isFunction(callback)) {
               callback();
             }
+            
+            // stupid hack to handle if you have zoomed in on the page in firefox.
+            if (INST.browser.ff) {
+              var $datagrid_top= $('#datagrid_top'),
+                  $topRow = $datagrid_top.find('.row'),
+                  $all_rows = $topRow.add('#datagrid_data .row');
+                  
+              function fixForDifferentZoomLevelInFirefox(){
+                var existingDatagridTopWidth = $datagrid_top.width();
+                
+                // make styles so the .row can be as wide as it needs to fit all the .cell's in it without wrapping
+                $datagrid_top.width(99999999);
+                $topRow.css({'position': 'relative', 'width' : ''});
+                var topWidth = $topRow.width() +1;
+                
+                //reset styles back to what they were was
+                $datagrid_top.width(existingDatagridTopWidth);
+                $topRow.css('position', ''); 
+                
+                $all_rows.width(topWidth); 
+              }
+              fixForDifferentZoomLevelInFirefox();
+              
+              // changing the zoom level in firefox will trigger the resize event on the window.
+              // so listen to it and re-run the fix when it is fired
+              var firefoxZoomHackTimout;
+              $(window).resize(function(){
+                clearTimeout(firefoxZoomHackTimout);
+                firefoxZoomHackTimout = setTimeout(fixForDifferentZoomLevelInFirefox, 100);
+              });
+            } //end of stupid firefox zoomlevel hack
           }
         } catch(e) {
           INST.log_error({
@@ -534,22 +566,22 @@ var datagrid = {};
     sizeToWindow: function() {
       $("html,body").css('overflow', 'hidden');
       var $holder = $("#content,#wide_content");
-      if($holder.length === 0 || $holder.width() < 100) {
+      if (!$holder.length || $holder.width() < 100) {
         $holder = $(window);
       }
-      var spacer = 1;
-      if($("body").hasClass('ff') || $("body").hasClass('webkit')) {
-        spacer = 1;
-      }
-      var windowHeight = $(window).height() - spacer - datagrid.divs.top.offset().top;
-      var windowWidth = $holder.width() - spacer;
-      datagrid.divs.left.height(windowHeight - datagrid.rows[0].metrics.height - datagrid.borderSize + 1);
-      datagrid.divs.data.height(windowHeight - datagrid.rows[0].metrics.height - datagrid.borderSize + 1);
-      datagrid.divs.top.width(windowWidth - datagrid.columns[0].metrics.width - datagrid.borderSize + 1);
-      datagrid.divs.data.width(windowWidth - datagrid.columns[0].metrics.width - datagrid.borderSize + 1);
+      var spacer = INST.browser.ff ? 1 : 0,
+          windowHeight = $(window).height() - spacer - datagrid.divs.top.offset().top,
+          windowWidth = $holder.width() - spacer,
+          newWidth = Math.floor(windowWidth - datagrid.columns[0].metrics.outerWidth),
+          newHeight = Math.floor(windowHeight - datagrid.rows[0].metrics.height - datagrid.borderSize);
+
+      datagrid.divs.top.width(newWidth);
+      datagrid.divs.data.width(newWidth);
+      datagrid.divs.left.height(newHeight);
+      datagrid.divs.data.height(newHeight);
       datagrid.divs.data.metrics = {
-        width: windowWidth - datagrid.columns[0].metrics.width - datagrid.borderSize + 1,
-        height: windowHeight - datagrid.rows[0].metrics.height - datagrid.borderSize + 1
+        width: newWidth,
+        height: newHeight
       }
     },
     _selectFirstCell: function() {
