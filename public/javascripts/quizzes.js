@@ -361,7 +361,7 @@ var quiz = {};
         var code = "";
         for(var cdx in split) {
           if(split[cdx]) {
-            code = code + "<li>" + split[cdx] + "</li>";
+            code = code + "<li>" + $.htmlEscape(split[cdx]) + "</li>";
           }
         }
         if(code) {
@@ -632,20 +632,12 @@ var quiz = {};
     $question.show();
     return $question;
   }
-  var $helper_div = $("<div/>");
-  function fixAmpersands(val, already_escaped) {
-    if(val && !already_escaped) {
-      return $helper_div.text(val).html();
-    } else {
-      return val;
-    }
-  }
   function makeDisplayAnswer(data, escaped) {
     data.answer_weight = data.weight || data.answer_weight;
-    data.answer_comment = fixAmpersands(data.comments || data.answer_comment, escaped);
-    data.answer_text = fixAmpersands(data.text || data.answer_text, escaped);
-    data.answer_match_left = fixAmpersands(data.left || data.answer_match_left, escaped);
-    data.answer_match_right = fixAmpersands(data.right || data.answer_match_right, escaped);
+    data.answer_comment = data.comments || data.answer_comment;
+    data.answer_text = data.text || data.answer_text;
+    data.answer_match_left = data.left || data.answer_match_left;
+    data.answer_match_right = data.right || data.answer_match_right;
     data.answer_exact = data.exact || data.answer_exact;
     data.answer_error_margin = data.answer_error_margin || data.margin;
     data.answer_range_start = data.start || data.answer_range_start;
@@ -662,12 +654,8 @@ var quiz = {};
     delete answer['answer_type'];
     answer.answer_weight = parseFloat(answer.answer_weight);
     if(isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
-    var unescaped = $helper_div.html(answer.answer_text).text();
-    $answer.fillFormData({answer_text: unescaped});
-    $answer.fillTemplateData({
-      data: answer,
-      htmlValues: ['answer_text', 'answer_comment', 'answer_match_left', 'answer_match_right']
-    });
+    $answer.fillFormData({answer_text: answer.answer_text});
+    $answer.fillTemplateData({data: answer});
     if(!answer.answer_comment || answer.answer_comment == "" || answer.answer_comment == "Answer comments") {
       $answer.find(".answer_comment_holder").hide();
     }
@@ -702,8 +690,8 @@ var quiz = {};
     $list.each(function(i) {
       var $question = $(this);
       var questionData = $question.getTemplateData({
-        textValues: ['question_name', 'question_points', 'question_type', 'answer_selection_type', 'assessment_question_id', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'text_before_answers', 'text_after_answers', 'matching_answer_incorrect_matches', 'equation_combinations', 'equation_formulas'],
-        htmlValues: ['question_text']
+        textValues: ['question_name', 'question_points', 'question_type', 'answer_selection_type', 'assessment_question_id', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'matching_answer_incorrect_matches', 'equation_combinations', 'equation_formulas'],
+        htmlValues: ['question_text', 'text_before_answers', 'text_after_answers']
       });
       questionData = $.extend(questionData, $question.find(".original_question_text").getFormData());
       questionData.assessment_question_bank_id = $(".question_bank_id").text() || "";
@@ -729,8 +717,7 @@ var quiz = {};
         $question.find(".answer").each(function() {
           var $answer = $(this);
           var answerData = $answer.getTemplateData({
-            textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id'],
-            htmlValues: ['answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment']
+            textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment']
           });
           var answer = $.extend({}, quiz.defaultAnswerData, answerData);
           if(only_add_for_blank_ids && answer.blank_id && !blank_ids_hash[answer.blank_id]) {

@@ -358,7 +358,7 @@ class Quiz < ActiveRecord::Base
       variables.each do |variable|
         variable_id = AssessmentQuestion.variable_id(variable)
         variable_answers = q[:answers].select{|a| a[:blank_id] == variable }
-        options = variable_answers.map{|a| "<option value='#{a[:id]}'>#{a[:text]}</option>" }
+        options = variable_answers.map{|a| "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>" }
         select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>[ Select ]</option>#{options}</select>"
         re = Regexp.new("\\[#{variable}\\]")
         text = text.sub(re, select)

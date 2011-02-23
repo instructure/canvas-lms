@@ -147,20 +147,15 @@ class AssessmentQuestion < ActiveRecord::Base
     self.save
   end
   
-  def self.sanitize_and_trim(html, type, max=16.kilobytes, escape=false)
-    if html && html.length > max
-      raise "The text for #{type} is too long, max length is #{max}"
-    end
-    html = CGI::escapeHTML(html || "") if escape
-    html = Sanitize.clean(html || "", Instructure::SanitizeField::SANITIZE)
+  def self.sanitize(html)
+    Sanitize.clean(html || "", Instructure::SanitizeField::SANITIZE)
   end
   
-  def self.escape_and_trim(html, type, max=16.kilobytes)
+  def self.check_length(html, type, max=16.kilobytes)
     if html && html.length > max
       raise "The text for #{type} is too long, max length is #{max}"
     end
-    html = CGI::unescapeHTML(html || "")
-    html = CGI::escapeHTML(html)
+    html
   end
   
   def self.parse_question(qdata, assessment_question=nil)
@@ -168,13 +163,13 @@ class AssessmentQuestion < ActiveRecord::Base
     qdata = qdata.with_indifferent_access
     previous_data = assessment_question.question_data rescue {}
     question[:points_possible] = (qdata[:points_possible] || previous_data[:points_possible] || 0.0).to_f
-    question[:correct_comments] = sanitize_and_trim(qdata[:correct_comments] || previous_data[:correct_comments] || "", 'correct comments', 5.kilobyte, true)
-    question[:incorrect_comments] = sanitize_and_trim(qdata[:incorrect_comments] || previous_data[:incorrect_comments] || "", 'incorrect comments', 5.kilobyte, true)
-    question[:neutral_comments] = sanitize_and_trim(qdata[:neutral_comments], 'neutral comments', 5.kilobyte, true)
+    question[:correct_comments] = check_length(qdata[:correct_comments] || previous_data[:correct_comments] || "", 'correct comments', 5.kilobyte)
+    question[:incorrect_comments] = check_length(qdata[:incorrect_comments] || previous_data[:incorrect_comments] || "", 'incorrect comments', 5.kilobyte)
+    question[:neutral_comments] = check_length(qdata[:neutral_comments], 'neutral comments', 5.kilobyte)
     question[:question_type] = qdata[:question_type] || previous_data[:question_type] || "text_only_question"
     question[:question_name] = qdata[:question_name] || qdata[:name] || previous_data[:question_name] || "Question"
     question[:question_name] = "Question" if question[:question_name].blank?
-    question[:question_text] = sanitize_and_trim(qdata[:question_text] || previous_data[:question_text] || "Question text", 'question text')
+    question[:question_text] = sanitize(check_length(qdata[:question_text] || previous_data[:question_text] || "Question text", 'question text'))
     min_size = 1.kilobyte
     question[:answers] = []
     reset_local_ids
@@ -184,7 +179,7 @@ class AssessmentQuestion < ActiveRecord::Base
       found_correct = false
       answers.each do |key, answer|
         found_correct = true if answer[:answer_weight].to_i == 100
-        a = {:text => escape_and_trim(answer[:answer_text], 'answer text', min_size), :comments => escape_and_trim(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
+        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
         question[:answers] << a
       end
       question[:answers][0][:weight] = 100 unless found_correct
@@ -196,10 +191,10 @@ class AssessmentQuestion < ActiveRecord::Base
       false_id = nil
       answers.each do |key, answer|
         if key != answers[0][0]
-          false_comments = escape_and_trim(answer[:answer_comments], 'answer comments', min_size)
+          false_comments = check_length(answer[:answer_comments], 'answer comments', min_size)
           false_id = unique_local_id(answer[:id].to_i)
         else
-          true_comments = escape_and_trim(answer[:answer_comments], 'answer comments', min_size)
+          true_comments = check_length(answer[:answer_comments], 'answer comments', min_size)
           true_id = unique_local_id(answer[:id].to_i)
         end
         if key != answers[0][0] && answer[:answer_weight].to_i == 100
@@ -212,22 +207,22 @@ class AssessmentQuestion < ActiveRecord::Base
       question[:answers] << f
     elsif question[:question_type] == "short_answer_question"
       answers.each do |key, answer|
-        a = {:text => escape_and_trim(scrub(answer[:answer_text]), 'answer text', min_size), :comments => escape_and_trim(answer[:answer_comments], 'answer comments', min_size), :weight => 100, :id => unique_local_id(answer[:id].to_i)}
+        a = {:text => check_length(scrub(answer[:answer_text]), 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => 100, :id => unique_local_id(answer[:id].to_i)}
         question[:answers] << a
       end
     elsif question[:question_type] == "essay_question"
-      question[:comments] = escape_and_trim((qdata[:answers][0][:answer_comments] rescue ""), 'essay comments', 5.kilobyte)
+      question[:comments] = check_length((qdata[:answers][0][:answer_comments] rescue ""), 'essay comments', 5.kilobyte)
     elsif question[:question_type] == "matching_question"
       answers.each do |key, answer|
-        a = {:text => escape_and_trim(answer[:answer_match_left], 'answer match', min_size), :left => escape_and_trim(answer[:answer_match_left], 'answer match', min_size), :right => escape_and_trim(answer[:answer_match_right], 'answer match', min_size), :comments => escape_and_trim(answer[:answer_comments], 'answer comments', min_size)}
+        a = {:text => check_length(answer[:answer_match_left], 'answer match', min_size), :left => check_length(answer[:answer_match_left], 'answer match', min_size), :right => check_length(answer[:answer_match_right], 'answer match', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size)}
         a[:match_id] = unique_local_id(answer[:match_id].to_i)
         a[:id] = unique_local_id(answer[:id].to_i)
         question[:answers] << a
         question[:matches] ||= []
-        question[:matches] << {:match_id => a[:match_id], :text => escape_and_trim(answer[:answer_match_right], 'answer match', min_size) }
+        question[:matches] << {:match_id => a[:match_id], :text => check_length(answer[:answer_match_right], 'answer match', min_size) }
       end
       (qdata[:matching_answer_incorrect_matches] || "").split("\n").each do |other|
-        m = {:text => escape_and_trim(other[0..255], 'distractor', min_size) }
+        m = {:text => check_length(other[0..255], 'distractor', min_size) }
         m[:match_id] = previous_data[:answers].detect{|a| a[:text] == m[:text] }[:id] rescue nil
         m[:match_id] = unique_local_id(m[:match_id])
         question[:matches] << m
@@ -236,21 +231,21 @@ class AssessmentQuestion < ActiveRecord::Base
       found_correct = false
       answers.each do |key, answer|
         found_correct = true if answer[:answer_weight].to_i == 100
-        a = {:text => escape_and_trim(answer[:answer_text], 'answer text', min_size), :comments => escape_and_trim(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
+        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
         question[:answers] << a
       end
       question[:answers][0][:weight] = 100 unless found_correct
-      question[:text_after_answers] = sanitize_and_trim(qdata[:text_after_answers] || previous_data[:text_after_answers] || "", 'text after answers', 16.kilobytes)
+      question[:text_after_answers] = sanitize(check_length(qdata[:text_after_answers] || previous_data[:text_after_answers] || "", 'text after answers', 16.kilobytes))
     elsif question[:question_type] == "multiple_dropdowns_question"
       variables = {}
       answers.each_with_index do |arr, idx| 
         key, answer = arr
-        answers[idx][1][:blank_id] = escape_and_trim(answers[idx][1][:blank_id], 'blank id', min_size)
+        answers[idx][1][:blank_id] = check_length(answers[idx][1][:blank_id], 'blank id', min_size)
       end
       answers.each do |key, answer| 
         variables[answer[:blank_id]] ||= false
         variables[answer[:blank_id]] = true if answer[:answer_weight].to_i == 100
-        a = {:text => escape_and_trim(answer[:answer_text], 'answer text', min_size), :comments => escape_and_trim(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :blank_id => answer[:blank_id], :id => unique_local_id(answer[:id].to_i)}
+        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :blank_id => answer[:blank_id], :id => unique_local_id(answer[:id].to_i)}
         question[:answers] << a
       end
       variables.each do |variable, found_correct|
@@ -265,12 +260,12 @@ class AssessmentQuestion < ActiveRecord::Base
       end
     elsif question[:question_type] == "fill_in_multiple_blanks_question"
       answers.each do |key, answer|
-        a = {:text => escape_and_trim(scrub(answer[:answer_text]), 'answer text', min_size), :comments => escape_and_trim(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :blank_id => escape_and_trim(answer[:blank_id], 'blank id', min_size), :id => unique_local_id(answer[:id].to_i)}
+        a = {:text => check_length(scrub(answer[:answer_text]), 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :blank_id => check_length(answer[:blank_id], 'blank id', min_size), :id => unique_local_id(answer[:id].to_i)}
         question[:answers] << a
       end
     elsif question[:question_type] == "numerical_question"
       answers.each do |key, answer|
-        a = {:text => escape_and_trim(answer[:answer_text], 'answer text', min_size), :comments => escape_and_trim(answer[:answer_comments], 'answer comments', min_size), :weight => 100, :id => unique_local_id(answer[:id].to_i)}
+        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => 100, :id => unique_local_id(answer[:id].to_i)}
         a[:numerical_answer_type] = answer[:numerical_answer_type]
         if answer[:numerical_answer_type] == "exact_answer"
           a[:exact] = answer[:answer_exact].to_f
@@ -286,13 +281,13 @@ class AssessmentQuestion < ActiveRecord::Base
       question[:formulas] = []
       qdata[:formulas].each do |key, formula|
         question[:formulas] << {
-          :formula => escape_and_trim(formula[0..1024], 'formula', min_size)
+          :formula => check_length(formula[0..1024], 'formula', min_size)
         }
       end
       question[:variables] = []
       qdata[:variables].sort_by{|k, v| k[9..-1].to_i}.each do |key, variable|
         question[:variables] << {
-          :name => escape_and_trim(variable[:name][0..1024], 'variable', min_size),
+          :name => check_length(variable[:name][0..1024], 'variable', min_size),
           :min => variable[:min].to_f,
           :max => variable[:max].to_f,
           :scale => variable[:scale].to_i
@@ -305,7 +300,7 @@ class AssessmentQuestion < ActiveRecord::Base
         obj[:answer] = answer[:answer_text].to_f
         answer[:variables].sort_by{|k, v| k[9..-1].to_i}.each do |key2, variable|
           obj[:variables] << {
-            :name => escape_and_trim(variable[:name], 'variable', min_size),
+            :name => check_length(variable[:name], 'variable', min_size),
             :value => variable[:value].to_f
           }
         end
@@ -315,7 +310,7 @@ class AssessmentQuestion < ActiveRecord::Base
       found_correct = false
       answers.each do |key, answer|
         found_correct = true if answer[:answer_weight].to_i == 100
-        a = {:text => escape_and_trim(answer[:answer_text], 'answer text', min_size), :comments => escape_and_trim(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
+        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
         question[:answers] << a
       end
       question[:answers][0][:weight] = 100 unless found_correct

@@ -26,6 +26,7 @@ class QuizSubmission < ActiveRecord::Base
   belongs_to :user
   belongs_to :submission, :touch => true
   before_save :update_kept_score
+  before_save :sanitize_responses
   after_save :update_assignment_submission
   
   serialize :quiz_data
@@ -67,6 +68,23 @@ class QuizSubmission < ActiveRecord::Base
     
     given {|user, session| self.quiz.grants_right?(user, session, :manage) }
     set { can :add_attempts }
+  end
+  
+  def sanitize_responses
+    questions && questions.select {|q| q['question_type'] == 'essay_question' }.each do |q|
+      question_id = q['id']
+      if submission_data.is_a?(Array)
+        if submission = submission_data.find {|s| s[:question_id] == question_id }
+          submission[:text] = Sanitize.clean(submission[:text] || "", Instructure::SanitizeField::SANITIZE)
+        end
+      elsif submission_data.is_a?(Hash)
+        question_key = "question_#{question_id}"
+        if submission_data[question_key]
+          submission_data[question_key] = Sanitize.clean(submission_data[question_key] || "", Instructure::SanitizeField::SANITIZE)
+        end
+      end
+    end
+    true
   end
   
   def temporary_data
