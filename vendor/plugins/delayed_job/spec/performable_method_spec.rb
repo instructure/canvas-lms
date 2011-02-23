@@ -38,8 +38,5 @@ describe Delayed::PerformableMethod do
     p.method.should  == :read
     p.args.should    == [story]
     p.perform.should == 'Epilog: Once upon...'
-  end                 
-  
-  
-  
+  end
 end

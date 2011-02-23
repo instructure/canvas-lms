@@ -18,6 +18,9 @@ class ActiveRecord::Base
   yaml_as "tag:ruby.yaml.org,2002:ActiveRecord"
 
   def to_yaml(opts = {})
+    if id.nil?
+      raise("Can't serialize unsaved ActiveRecord object for delayed job: #{self.inspect}")
+    end
     YAML.quick_emit(self.object_id, opts) do |out|
       out.scalar(taguri, id.to_s)
     end
