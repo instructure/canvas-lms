@@ -1,0 +1,13 @@
+<% counts = sis_batch_counts.data[:counts] %>
+<ul>
+  <li>Imported Items
+    <ul>
+      <li>Accounts: <%= counts[:accounts] %></li>
+      <li>Terms: <%= counts[:terms] %></li>
+      <li>Courses: <%= counts[:courses] %></li>
+      <li>Sections: <%= counts[:sections] %></li>
+      <li>Users: <%= counts[:users] %></li>
+      <li>Enrollments: <%= counts[:enrollments] %></li>
+    </ul>
+  </li>
+</ul>
