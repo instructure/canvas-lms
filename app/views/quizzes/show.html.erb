@@ -158,17 +158,22 @@
             <% end %>
           </ul>
         </td><td style="vertical-align: top; padding-left: 20px;">
-          <h3>Students who haven't taken the <%= @quiz.readable_type.downcase %></h3>
-          <ul class="student_list">
-            <% if @unsubmitted_students.empty? && !@submitted_students.empty? %>
-              <li>All Students have taken the <%= @quiz.readable_type.downcase %></li>
-            <% end %>
-            <% @unsubmitted_students.each do |s| %>
-              <li class="student" data-id="<%= s.id %>">
-                <span class="name"><%= s.name %></span>
-              </li>
-            <% end %>
-          </ul>
+          <% if @quiz.survey? && @quiz.anonymous_submissions %>
+            <h3><%= pluralize(@unsubmitted_students.length, "student") %>
+                haven't taken the <%= @quiz.readable_type.downcase %></h3>
+          <% else %>
+            <h3>Students who haven't taken the <%= @quiz.readable_type.downcase %></h3>
+            <ul class="student_list">
+              <% if @unsubmitted_students.empty? && !@submitted_students.empty? %>
+                <li>All Students have taken the <%= @quiz.readable_type.downcase %></li>
+              <% end %>
+              <% @unsubmitted_students.each do |s| %>
+                <li class="student" data-id="<%= s.id %>">
+                  <span class="name"><%= s.name %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
         </td>
       </tr>
     </table>

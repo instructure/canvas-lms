@@ -224,7 +224,7 @@
       ["the date they submitted the assignment", "submitted_at"],
       ["by submission status (needs grading, not submitted, etc)", "submission_status"]], cookies[:eg_sort_by]) %>
   </p>
-  <p>
+  <p<% if @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions %> style="display: none;"<% end %>>
     <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
     <label for="hide_student_names">Hide student names in the SpeedGrader</label>
   </p>
@@ -245,7 +245,7 @@
 
 <% js_block do %>
   <script type="text/javascript">
-    var hideStudentNames = <%= @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions ? "true" : "false" %>;
+    anonymousAssignment = <%= @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions ? "true" : "false" %>;
     var visibleRubricAssessments = <%= raw((@assignment.visible_rubric_assessments_for(@current_user) || {}).to_json(:methods => [:assessor_name], :include_root => false)) %>;
     
     rubricAssessment.assessor_id = <%= @current_user ? @current_user.id : "null" %>;

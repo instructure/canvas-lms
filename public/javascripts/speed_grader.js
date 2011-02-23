@@ -17,6 +17,7 @@
  */
 
 var jsonData, visibleRubricAssessments;
+var anonymousAssignment = false;
 (function($, INST, scribd, rubricAssessment) {
   
   // fire off the request to get the jsonData,
@@ -178,7 +179,7 @@ var jsonData, visibleRubricAssessments;
   function initDropdown(){
     var hideStudentNames;
     
-    if ($.store.userGet("eg_hide_student_names") == "true") {
+    if ($.store.userGet("eg_hide_student_names") == "true" || anonymousAssignment) {
       hideStudentNames = true;
     }
     $("#hide_student_names").attr('checked', hideStudentNames);
