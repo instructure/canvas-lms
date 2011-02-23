@@ -27,8 +27,8 @@
     <div class="clear"></div>
   </div>
   <div class="content">
-    <div class="inner_content formatted_note">
-      <%= user_note.try_rescue(:formatted_note) || nbsp %>
+    <div class="inner_content user_content formatted_note">
+      <%= user_content(user_note.try_rescue(:formatted_note) || nbsp, user_note.try(:user).try(:asset_string), nil) %>
     </div>
   </div>
 </div>

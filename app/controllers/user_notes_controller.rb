@@ -59,6 +59,11 @@ class UserNotesController < ApplicationController
 
   def create
     params[:user_note][:user] = User.find(params[:user_note].delete(:user_id))
+    # We want notes to be an html field, but we're only using a plaintext box for now. That's why we're
+    # doing the trip to html now, instead of on the way out. This should be removed once the user notes
+    # entry form is replaced with the rich text editor.
+    self.extend TextHelper
+    params[:user_note][:note] = format_message(params[:user_note][:note]).first
     @user_note = UserNote.new(params[:user_note])
     @user_note.creator = @current_user
     
