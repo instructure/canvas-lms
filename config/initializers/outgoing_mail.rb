@@ -13,8 +13,10 @@ config = {
   config[key] = config[key].to_sym if config.has_key?(key)
 end
 
-HostUrl.outgoing_email_address = config[:outgoing_address]
-HostUrl.outgoing_email_domain = config[:domain]
+Rails.configuration.to_prepare do
+  HostUrl.outgoing_email_address = config[:outgoing_address]
+  HostUrl.outgoing_email_domain = config[:domain]
+end
 
 # delivery_method can be :smtp, :sendmail or :test
 ActionMailer::Base.delivery_method = config[:delivery_method]
