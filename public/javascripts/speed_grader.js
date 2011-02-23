@@ -183,7 +183,7 @@ var jsonData, visibleRubricAssessments;
     }
     $("#hide_student_names").attr('checked', hideStudentNames);
     var options = $.map(jsonData.studentsWithSubmissions, function(s, idx){
-      var name = s.name,
+      var name = $.htmlEscape(s.name),
           className = classNameBasedOnStudent(s);
 
       if(hideStudentNames) {
@@ -199,7 +199,7 @@ var jsonData, visibleRubricAssessments;
         style:'dropdown',
         format: function(text){
           var parts = text.split(" ---- ");
-          return '<span class="ui-selectmenu-item-header">' + parts[0] + '</span><span class="ui-selectmenu-item-footer">' + parts[1] + '</span>';
+          return '<span class="ui-selectmenu-item-header">' + $.htmlEscape(parts[0]) + '</span><span class="ui-selectmenu-item-footer">' + parts[1] + '</span>';
         },
         icons: [
           {find: '.graded'},
