@@ -1024,7 +1024,7 @@ var jsonData, visibleRubricAssessments;
 
           // if(comment.anonymous) { comment.author_name = "Anonymous"; }
           var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
-          $comment.find('span.comment').html(comment.comment.replace(/\n/g, "<br />"));
+          $comment.find('span.comment').html($.htmlEscape(comment.comment).replace(/\n/g, "<br />"));
           // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
           // what this is saying is: if I am able to grade this assignment (I am administrator in the course) or if I wrote this comment...
           var commentIsDeleteableByMe = rubricAssessment.assessment_type === "grading" || 
