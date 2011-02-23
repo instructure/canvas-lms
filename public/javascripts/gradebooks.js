@@ -498,7 +498,7 @@ var gradebook = (function(){
           datagrid.toggleColumn(datagrid.position($cell).column);
         };
         if($td.hasClass('group_total')) {
-          var type = $td.find(".assignment_title").text();
+          var type = $td.find(".assignment_title").html();
           options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> Hide All ' + type] = function() {
             var check_id = objectData($td).assignment_group_id;
             $(".outer_assignment_name").each(function() {
