@@ -264,7 +264,6 @@ class Message < ActiveRecord::Base
       self.extend TextHelper
       b = binding
       
-      message = TextHelper.unescape_html(message)
       self.body = ERB.new(message, nil, "%<>", "@output").result(b).strip
       if path_type == 'email'
         message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
@@ -272,7 +271,6 @@ class Message < ActiveRecord::Base
         self.body = self.body + "\n\n\n\n\n\n________________________________________\n" + comm_message if comm_message
       end
       self.subject = @message_content_subject || "Canvas Alert"
-      self.subject = TextHelper.unescape_html(self.subject)
       self.url = @message_content_link || nil
       self.body
     else
@@ -281,8 +279,6 @@ class Message < ActiveRecord::Base
       main_link = ERB.new(self.notification.main_link || "", nil, "%<>").result(b)
       b = binding
       self.subject = ERB.new(self.subject, nil, "%<>").result(b)
-      self.subject = TextHelper.unescape_html(self.subject)
-      self.body = TextHelper.unescape_html(self.body)
       self.body = ERB.new(self.body, nil, "%<>").result(b)
       self.transmission_errors = "couldn't find #{path}"
     end
