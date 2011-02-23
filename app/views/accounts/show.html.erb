@@ -55,12 +55,17 @@ $(document).ready(function() {
     }
   });
   if($("#new_course").length > 0) {
+    var reEscape = new RegExp('(\\' + ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'].join('|\\') + ')', 'g');
     var $newCourseForm = $("#new_course"),
       $courseName = $("#course_name"),
       autoComplete = $courseName.autocomplete({
         minChars: 4,
         deferRequestBy: 150, //miliseconds
         serviceUrl: $newCourseForm[0].action + ".json",
+        fnFormatResult: function fnFormatResult(value, data, currentValue) {
+          var pattern = '(' + currentValue.replace(reEscape, '\\$1') + ')';
+          return $.htmlEscape(value).replace(new RegExp(pattern, 'gi'), '<strong>$1<\/strong>');
+        },
         onSelect: function(value, data){
           window.location = $newCourseForm[0].action + "/" + data
         <% if @associated_courses_count < @maximum_courses_im_gonna_show %>
