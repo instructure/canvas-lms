@@ -30,6 +30,16 @@ class SisBatch < ActiveRecord::Base
   def self.max_attempts
     5
   end
+  
+  def self.valid_import_types
+    @valid_import_types ||= {
+        "instructure_csv_zip" => {
+            :name => "Instructure formatted CSV zip",
+            :callback => lambda {|batch| batch.process_instructure_csv_zip},
+            :default => true
+          }
+      }
+  end
 
   workflow do
     state :created
@@ -46,13 +56,13 @@ class SisBatch < ActiveRecord::Base
       self.progress = 0
       self.save
 
-      case self.data[:import_type]
-        when 'instructure_csv_zip'
-          process_instructure_csv_zip
-        else
-          self.data[:error_message] = "Unrecognized import type"
-          self.workflow_state = :failed
-          self.save
+      import_scheme = SisBatch.valid_import_types[self.data[:import_type]]
+      if import_scheme.nil?
+        self.data[:error_message] = "Unrecognized import type"
+        self.workflow_state = :failed
+        self.save
+      else
+        import_scheme[:callback].call(self)
       end
     end
   rescue => e
@@ -76,17 +86,17 @@ class SisBatch < ActiveRecord::Base
     self.workflow_state == 'importing' || self.workflow_state == 'created'
   end
 
-  private
-  
-  def messages?
-    (self.processing_errors && self.processing_errors.length > 0) || (self.processing_warnings && self.processing_warnings.length > 0)
-  end
-
   def process_instructure_csv_zip
     require 'sis'
     download_zip
     importer = SIS::SisCsv.process(self.account, :files => [ @temp_file.path ], :batch => self)
     finish importer.finished
+  end
+
+  private
+  
+  def messages?
+    (self.processing_errors && self.processing_errors.length > 0) || (self.processing_warnings && self.processing_warnings.length > 0)
   end
 
   def add_extension(ext)
