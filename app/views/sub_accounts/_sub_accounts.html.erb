@@ -11,8 +11,8 @@
         <a href="#" class="collapse_sub_accounts_link no-hover" title="Hide Sub-Accounts" style="<%= hidden unless keep_going && account && account.sub_account_count < max_sub_accounts %>"><%= image_tag "collapse.png" %></a>
         <a href="#" class="add_sub_account_link no-hover" title="Add Sub-Account" style="<%= hidden unless (keep_going && account && account.sub_account_count < max_sub_accounts) || (account && account.sub_account_count == 0) %>"><%= image_tag "add.png" %></a>
         <a href="#" class="edit_account_link no-hover" title="Edit Account Name"><%= image_tag "edit.png" %></a>
-        <% if account && !account.child_courses.empty? %>
-          <a href="#" class="cant_delete_account_link no-hover" title="Can't Delete this Sub-Account"><%= image_tag "delete_circle_gray.png" %></a>
+        <% if account && !account.course_count.zero? %>
+          <a href="#" class="cant_delete_account_link no-hover" title="You can't delete a sub-account that has courses in it"><%= image_tag "delete_circle_gray.png", :alt => "" %></a>
         <% elsif account != @context %>
           <a href="#" class="delete_account_link no-hover" title="Delete Sub-Account"><%= image_tag "delete.png" %></a>
         <% end %>
