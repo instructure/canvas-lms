@@ -569,7 +569,7 @@ var messages = {
       data: message,
       id: 'context_message_' + message.id,
       hrefValues: ['user_id', 'recipient_id', 'id'],
-      htmlValues: ['formatted_body', 'subject']
+      htmlValues: ['formatted_body']
     });
     for(var idx in message.attachments) {
       var attachment = message.attachments[idx].attachment;
