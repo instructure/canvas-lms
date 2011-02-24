@@ -429,8 +429,6 @@ class Account < ActiveRecord::Base
     @self_and_all_sub_accounts ||= ActiveRecord::Base.connection.send(:select, "SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id] #(self.all_accounts + [self]).map &:id
   end
   
-  # validates_uniqueness_of :name
-  
   def abstract_courses
     if self.is_a?(Department)
       self.department_abstract_courses

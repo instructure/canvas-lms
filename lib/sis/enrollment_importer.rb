@@ -28,7 +28,7 @@ module SIS
         add_error(csv, "No course_id or section_id given for an enrollment") if row['course_id'].blank? && row['section_id'].blank?
         add_error(csv, "No user_id given for an enrollment") if row['user_id'].blank?
         add_error(csv, "Improper role \"#{row['role']}\" for an enrollment") unless row['role'] =~ /\Astudent|\Ateacher|\Ata|\Aobserver|\Adesigner/i
-        add_error(csv, "Improper status \"#{row['status']}\" for an enrollment") unless row['status'] =~ /\Aactive|\Adeleted|\Acompleted/i
+        add_error(csv, "Improper status \"#{row['status']}\" for an enrollment") unless row['status'] =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
       end
     end
 
@@ -100,6 +100,12 @@ module SIS
           enrollment.type = 'DesignerEnrollment'
         end
 
+        # special-case status that bases the enrollment state
+        # off of availability dates instead of explicitly setting it.
+        if row['status']=~ /active_if_available/i
+          row['status'] = course.enrollment_state_based_on_date(enrollment)
+        end  
+        
         if row['status']=~ /active/i
           if user.workflow_state != 'deleted'
             enrollment.workflow_state = 'active'
@@ -111,6 +117,8 @@ module SIS
           enrollment.workflow_state = 'deleted'
         elsif  row['status']=~ /completed/i
           enrollment.workflow_state = 'completed'
+        elsif  row['status']=~ /inactive/i
+          enrollment.workflow_state = 'inactive'
         end
 
         enrollment.save_without_broadcasting

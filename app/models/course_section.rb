@@ -18,6 +18,8 @@
 
 class CourseSection < ActiveRecord::Base
   include Workflow
+  include EnrollmentDateRestrictions
+  
   attr_protected :sis_source_id, :sis_batch_id, :course_id, :abstract_course_id,
       :root_account_id, :enrollment_term_id, :sis_cross_listed_section_id, :sis_cross_listed_section_sis_batch_id
   belongs_to :course

@@ -324,6 +324,16 @@ class CoursesController < ApplicationController
       params[:invitation] = pending_enrollment.uuid
       enrollment = pending_enrollment
     end
+    if enrollment && enrollment.inactive?
+      start_at, end_at = @context.enrollment_dates_for(enrollment)
+      if start_at && start_at > Time.now
+        flash[:notice] = "You do not have permission to access the course, #{@context.name}, until #{start_at.to_date.to_s}"
+      else
+        flash[:notice] = "Your membership in the course, #{@context.name}, is not yet activated"
+      end
+      redirect_to dashboard_url
+      return true
+    end
     if params[:invitation] && enrollment
       if enrollment.rejected?
         enrollment.workflow_state = 'active'

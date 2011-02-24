@@ -19,6 +19,7 @@
 class Enrollment < ActiveRecord::Base
   
   include Workflow
+  include EnrollmentDateRestrictions
   
   belongs_to :course, :touch => true
   belongs_to :course_section
@@ -229,13 +230,23 @@ class Enrollment < ActiveRecord::Base
     end
   end
   
+  def accept!
+    res = accept
+    raise "can't accept" unless res
+    res
+  end
+  
+  def accept
+    return false unless invited?
+    ids = nil
+    ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
+    Message.delete_all({:id => ids}) if ids && !ids.empty?
+    update_attribute(:workflow_state, course.enrollment_state_based_on_date(self))
+    true
+  end
+  
   workflow do
     state :invited do
-      event :accept, :transitions_to => :active do
-        ids = nil
-        ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
-        Message.delete_all({:id => ids}) if ids && !ids.empty?
-      end
       event :reject, :transitions_to => :rejected
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
@@ -249,6 +260,10 @@ class Enrollment < ActiveRecord::Base
       event :reject, :transitions_to => :rejected
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
+    end
+    
+    state :inactive do
+      event :activate, :transitions_to => :active
     end
     
     state :deleted
@@ -290,7 +305,7 @@ class Enrollment < ActiveRecord::Base
   end
   
   def active_or_pending?
-    self.active? || self.pending?
+    self.active? || self.inactive? || self.pending?
   end
   
   def email

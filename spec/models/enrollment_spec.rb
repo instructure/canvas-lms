@@ -94,6 +94,15 @@ describe Enrollment do
     e.readable_type.should eql('Student')
   end
   
+  it "should not allow read permission on a course if inactive" do
+    course_with_student(:active_all => true)
+    @enrollment.start_at = 2.days.ago
+    @enrollment.end_at = 2.days.from_now
+    @enrollment.workflow_state = 'inactive'
+    @enrollment.save!
+    @course.grants_right?(@enrollment.user, nil, :read).should eql(false)
+  end
+  
   context "typed_enrollment" do
     it "should allow StudentEnrollment" do
       Enrollment.typed_enrollment('StudentEnrollment').should eql(StudentEnrollment)
@@ -228,6 +237,166 @@ describe Enrollment do
     
     it "should allow the user itself to read its own grades" do
       @enrollment.grants_rights?(@user, nil, :read_grades).should be_true
+    end
+  end
+  
+  context "accept" do
+    it "should accept into the right state based on availability dates on enrollment" do
+      course_with_student(:active_all => true)
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 2.days.from_now
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.state.should eql(:active)
+
+      @enrollment.start_at = 4.days.ago
+      @enrollment.end_at = 2.days.ago
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.state.should eql(:completed)
+      
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.state.should eql(:inactive)
+    end
+    
+    it "should accept into the right state based on availability dates on course_section" do
+      course_with_student(:active_all => true)
+      @section = @course.course_sections.first
+      @section.should_not be_nil
+      @enrollment.course_section = @section
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @section.start_at = 2.days.ago
+      @section.end_at = 2.days.from_now
+      @section.restrict_enrollments_to_section_dates = true
+      @section.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.state.should eql(:active)
+
+      @section.start_at = 4.days.ago
+      @section.end_at = 2.days.ago
+      @section.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:completed)
+      
+      @section.start_at = 2.days.from_now
+      @section.end_at = 4.days.from_now
+      @section.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:inactive)
+    end
+    
+    it "should accept into the right state based on availability dates on course" do
+      course_with_student(:active_all => true)
+      @course.start_at = 2.days.ago
+      @course.conclude_at = 2.days.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:active)
+      
+      @course.start_at = 4.days.ago
+      @course.conclude_at = 2.days.ago
+      @course.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:completed)
+      
+      @course.start_at = 2.days.from_now
+      @course.conclude_at = 4.days.from_now
+      @course.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:inactive)
+    end
+    
+    it "should accept into the right state based on availability dates on enrollment_term" do
+      course_with_student(:active_all => true)
+      @term = @course.enrollment_term
+      @term.should_not be_nil
+      @term.start_at = 2.days.ago
+      @term.end_at = 2.days.from_now
+      @term.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:active)
+    
+      @term.start_at = 4.days.ago
+      @term.end_at = 2.days.ago
+      @term.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:completed)
+
+      @term.start_at = 2.days.from_now
+      @term.end_at = 4.days.from_now
+      @term.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:inactive)
+    end
+    
+    it "should accept into the right state based on availability dates on enrollment_dates_override" do
+      course_with_student(:active_all => true)
+      @term = @course.enrollment_term
+      @term.should_not be_nil
+      @term.save!
+      @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term_id => @term.id)
+      @override.start_at = 2.days.ago
+      @override.end_at = 2.days.from_now
+      @override.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:active)
+      
+      @override.start_at = 4.days.ago
+      @override.end_at = 2.days.ago
+      @override.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:completed)
+      
+      @override.start_at = 2.days.from_now
+      @override.end_at = 4.days.from_now
+      @override.save!
+      @enrollment.workflow_state = 'invited'
+      @enrollment.save!
+      @enrollment.state.should eql(:invited)
+      @enrollment.accept
+      @enrollment.reload.state.should eql(:inactive)
     end
   end
   

@@ -187,6 +187,20 @@
           <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at) || "No Date Set" %></span>
         </td>
       </tr><tr>
+        <td></td>
+        <td>
+          <div class="course_form">
+            <%= f.check_box :restrict_enrollments_to_course_dates %>
+            <%= f.label :restrict_enrollments_to_course_dates, "Users can only access the course between these dates" %>
+            <div style="font-size: 0.8em; padding-left: 25px;">
+              This will override any term availability settings.
+            </div>
+          </div>
+          <div class="course_info restrict_dates" style="font-size: 0.8em;">
+            <%= @context.restrict_enrollments_to_course_dates ? "Users can only access the course between these dates" : "These dates will not affect course availability" %>
+          </div>
+        </td>
+      </tr><tr>
         <td style="width: 10%;"><%= f.label :storage_quota, "File Storage:" %></td>
         <td>
           <span class="course_form">

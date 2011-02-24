@@ -22,8 +22,9 @@ class Course < ActiveRecord::Base
   
   include Context
   include Workflow
+  include EnrollmentDateRestrictions
 
-  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :abstract_course, :root_account, :storage_quota
+  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :abstract_course, :root_account, :storage_quota, :restrict_enrollments_to_course_dates
 
   serialize :tab_configuration
   belongs_to :root_account, :class_name => 'Account'
@@ -33,12 +34,12 @@ class Course < ActiveRecord::Base
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
-  has_many :current_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'rejected', 'completed', 'deleted'], :include => :user
+  has_many :current_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'rejected', 'completed', 'deleted', 'inactive'], :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
   has_many :students, :through => :student_enrollments, :source => :user, :order => :sortable_name
   has_many :all_students, :through => :all_student_enrollments, :source => :user, :order => :sortable_name
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'StudentEnrollment' and enrollments.workflow_state = 'active'"
-  has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected'], :include => :user #, :conditions => "type = 'StudentEnrollment'"
+  has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected', 'inactive'], :include => :user #, :conditions => "type = 'StudentEnrollment'"
   has_many :all_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :detailed_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => {:user => {:pseudonym => :communication_channel}}
   has_many :teachers, :through => :teacher_enrollments, :source => :user
@@ -724,6 +725,40 @@ class Course < ActiveRecord::Base
   def self.find_all_by_context_code(codes)
     ids = codes.map{|c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }.compact
     Course.find(:all, :conditions => {:id => ids}, :include => :current_enrollments)
+  end
+  
+  def enrollment_dates_for(enrollment)
+    if enrollment.start_at && enrollment.end_at
+      [enrollment.start_at, enrollment.end_at]
+    elsif (section = enrollment.course_section_id && course_sections.find_by_id(enrollment.course_section_id)) && 
+          section && section.restrict_enrollments_to_section_dates && !enrollment.admin?
+      [section.start_at, section.end_at]
+    elsif self.restrict_enrollments_to_course_dates && !enrollment.admin?
+      [start_at, end_at]
+    elsif enrollment_term
+      enrollment_term.enrollment_dates_for(enrollment)
+    else
+      [nil, nil]
+    end
+  end
+  
+  def enrollment_state_based_on_date(enrollment)
+    start_at, end_at = enrollment_dates_for(enrollment)
+    if start_at && start_at >= Time.now
+      'inactive'
+    elsif end_at && end_at <= Time.now
+      'completed'
+    else
+      'active'
+    end
+  end
+  
+  def end_at
+    conclude_at
+  end
+  
+  def end_at_changed?
+    conclude_at_changed?
   end
   
   def state_sortable

@@ -17,6 +17,8 @@
 #
 
 class EnrollmentDatesOverride < ActiveRecord::Base
+  include EnrollmentDateRestrictions
+  
   belongs_to :context, :polymorphic => true
   belongs_to :enrollment_term
 end

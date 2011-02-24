@@ -64,7 +64,8 @@ Spec::Runner.configure do |config|
       u = User.create!
       u.register!
       e = @course.enroll_teacher(u)
-      e.accept
+      e.workflow_state = 'active'
+      e.save!
     end
     @course
   end
@@ -91,7 +92,10 @@ Spec::Runner.configure do |config|
     course(opts)
     @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
-    @enrollment.accept! if opts[:active_enrollment] || opts[:active_all]
+    if opts[:active_enrollment] || opts[:active_all]
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+    end
     @course.reload
     @enrollment
   end

@@ -235,6 +235,7 @@ $(document).ready(function() {
       course.conclude_at = $.parseFromISO(course.conclude_at).datetime_formatted;
       course.is_public = course.is_public ? 'Public' : 'Private';
       course.indexed = course.indexed ? "Included in public course index" : "";
+      course.restrict_dates = course.restrict_enrollments_to_course_dates ? "Users can only access the course between these dates" : "These dates will not affect course availability";
       $("#course_form .public_options").showIf(course.is_public);
       $("#course_form .self_enrollment_message").css('display', course.self_enrollment ? '' : 'none');
       $("#course_form").fillTemplateData({data: course});
