@@ -36,11 +36,12 @@ module SeleniumTestsHelperMethods
   end
 
   def self.start_webrick_server
+    HostUrl.default_host = "#{SERVER_IP}:#{SERVER_PORT}"
+    HostUrl.file_host = "#{SERVER_IP}:#{SERVER_PORT}"
     server = SpecFriendlyWEBrickServer
     app = Rack::Builder.new do
       use Rails::Rack::Debugger
       map '/' do
-
         use Rails::Rack::Static
         run ActionController::Dispatcher.new
       end
@@ -48,7 +49,10 @@ module SeleniumTestsHelperMethods
     server.run(app, :Port => SERVER_PORT, :AccessLog => [])
     shutdown = lambda do
       server.shutdown
+      HostUrl.default_host = nil
+      HostUrl.file_host = nil
     end
+    at_exit { shutdown.call }
     return shutdown
   end
 end

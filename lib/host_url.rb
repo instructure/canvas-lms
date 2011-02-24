@@ -44,11 +44,18 @@ class HostUrl
         res = @@file_host = @@domain_config[:files_domain] if @@domain_config && @@domain_config.has_key?(:files_domain)
         Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res
       end
-      res ||= default_host
+      res ||= @@file_host = default_host
     end
 
     def outgoing_email_address(preferred_user="notifications")
       @outgoing_email_address.presence || "#{preferred_user}@#{outgoing_email_domain}"
+    end
+    
+    def file_host=(val)
+      @@file_host = val
+    end
+    def default_host=(val)
+      @@default_host = val
     end
   end
 end
