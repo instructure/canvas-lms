@@ -348,7 +348,7 @@ class Quiz < ActiveRecord::Base
       variables.each do |variable|
         variable_id = AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub(re, "<input class='question_input' type='text' style='width: 120px;' name='question_#{q.id}_#{variable_id}'/>")
+        text = text.sub(re, "<input class='question_input' type='text' style='width: 120px;' name='question_#{q[:id]}_#{variable_id}'/>")
       end
       q[:original_question_text] = q[:question_text]
       q[:question_text] = text
