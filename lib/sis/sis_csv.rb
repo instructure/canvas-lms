@@ -44,6 +44,9 @@ module SIS
       @total_rows = 1
       @current_row = 0
       
+      @progress_multiplier = opts[:progress_multiplier] || 1
+      @progress_offset = opts[:progress_offset] || 0
+      
       @errors = []
       @warnings = []
       
@@ -151,7 +154,7 @@ module SIS
       @current_row += 1
       return unless @batch
 
-      @batch.fast_update_progress((@current_row.to_f/@total_rows) * 100) if @current_row % 10 == 0
+      @batch.fast_update_progress( (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100) if @current_row % 10 == 0
 
       if @current_row.to_i % @pause_every == 0
         sleep(@pause_duration)
