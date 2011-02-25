@@ -54,6 +54,7 @@
         if($box.length == 0) {
           var $box = $(document.createElement('div'));
           $.getUserServices("BookmarkService", function(data) {
+            var $editor = $box.data('editor');
             var $services = $("<div style='text-align: left; margin-left: 20px;'/>");
             var service, $service;
             for(var idx in data) {
@@ -96,6 +97,7 @@
             $box.find(".auto_show").showIf(!$(this).attr('checked') && $box.hasClass('for_inline_content_can_auto_show'));
           });
           $box.find("#instructure_link_prompt_form").submit(function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             event.stopPropagation();
             var text = $(this).find(".prompt").val();
@@ -120,12 +122,14 @@
             updateLinks(true);
           });
           $box.find(".actions").delegate('.embed_image_link', 'click', function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             $editor.editorBox('insert_code', "<img src='" + $(event.target).closest('img').attr('src') + "'/>");
             $box.dialog('close');
           });
           // http://img.youtube.com/vi/BOegH4uYe-c/3.jpg
           $box.find(".actions").delegate('.embed_youtube_link', 'click', function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             $editor.editorBox('create_link', $(event.target).closest('img').attr('alt'));
             $box.dialog('close');
@@ -207,6 +211,7 @@
           $box.attr('id', 'instructure_link_prompt');
           $("body").append($box);
         }
+        $box.data('editor', $editor);
         $box.data('original_data', null);
         var e = ed.selection.getNode();
         while(e.nodeName != 'A' && e.nodeName != 'BODY' && e.parentNode) {

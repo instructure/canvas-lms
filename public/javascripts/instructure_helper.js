@@ -2709,7 +2709,7 @@
     }
     var width = this.width();
     var height = this.height();
-    var zIndex = this.zIndex();
+    var zIndex = (options.container || this).zIndex();
     $indicator = $(document.createElement('div'));
     $indicator.css({
       width: width + 6,
@@ -2745,7 +2745,7 @@
       });
     }
     if(options && options.scroll) {
-      $("html,body").scrollTo($indicator);
+      $("html,body").scrollToVisible($indicator);
     }
   };
   

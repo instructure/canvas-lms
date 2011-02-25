@@ -18,7 +18,6 @@
 (function() {
   tinymce.create('tinymce.plugins.InstructureRecord', {
     init : function(ed, url) {
-      var $editor = $("#" + ed.id);
       ed.addCommand('instructureRecord', function() {
         var $editor = $("#" + ed.id);
         $.mediaComment('create', 'any', function(id, mediaType) {
@@ -32,11 +31,6 @@
         cmd: 'instructureRecord',
         image: url + '/img/record.gif'
       });
-      // ed.onInit.add(function() {
-      var updateLinks = function(limit) {
-      }
-      ed.onChange.add(function() {updateLinks();});
-      ed.onSetContent.add(function() {updateLinks(true);});
     },
 
     getInfo : function() {

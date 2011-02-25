@@ -47,6 +47,7 @@
                       "<div class='actions'><input type='submit' style='float: right' value='Insert Equation'/></div>" +
                       "</form>");
           $box.find("#instructure_equation_prompt_form").submit(function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             event.stopPropagation();
             var text = $(this).find(".prompt").val();
@@ -87,6 +88,7 @@
           $box.attr('id', 'instructure_equation_prompt');
           $("body").append($box);
         }
+        $box.data('editor', $editor);
         $box.find("#instructure_equation_prompt_form .prompt").val(equation)
           .triggerHandler('data_update');
         $box.dialog('close').dialog({
