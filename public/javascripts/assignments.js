@@ -104,7 +104,7 @@
     }
     $form.fillFormData(data, { object_name: "assignment" });
     $form.find(":text:first").focus().select();
-    $("html,body").scrollTo($assignment);
+    $("html,body").scrollToVisible($assignment);
   }
   function hideGroupForm() {
     var $form = $("#add_group_form");
@@ -250,7 +250,7 @@
     $assignment.find(".links,.move").css('display', '');
     $assignment.toggleClass('group_assignment_editable', assignment.permissions && assignment.permissions.update);
     addAssignmentToGroup($assignment.parents(".assignment_group"), $assignment);
-    $("html,body").scrollTo($assignment);
+    $("html,body").scrollToVisible($assignment);
   }
   function addAssignmentToGroup($group, $assignment) {
     var data = $assignment.getTemplateData({textValues: ['timestamp', 'title', 'position']}),
@@ -776,7 +776,7 @@
         addAssignmentToGroup($assignment.parents(".assignment_group"), $assignment);
         $assignment.find(".links").hide();
         $assignment.loadingImage({image_size: 'small', paddingTop: 5});
-        $("html,body").scrollTo($assignment);
+        $("html,body").scrollToVisible($assignment);
         
         var isNew = false;
         if($assignment.attr('id') == "assignment_new") {
@@ -797,6 +797,7 @@
       var $assignment = $(this).parents(".group_assignment");
       var $group = $assignment.parents(".assignment_group");
       hideAssignmentForm();
+      $(".no_assignments_message").showIf($(".group_assignment:visible").length == 0);
     });
     $(".delete_assignment_link").click(function(event) {
       event.preventDefault();
@@ -808,6 +809,7 @@
         success: function() {
           $assignment.slideUp(function() {
             $assignment.remove();
+            $(".no_assignments_message").showIf($(".group_assignment:visible").length == 0);
             if($group.find(".group_assignment").length === 0) {
               $group.find(".padding").show();
             }
