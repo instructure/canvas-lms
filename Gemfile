@@ -44,7 +44,7 @@ group :test do
   gem 'rcov',         '0.9.9'
   gem 'yard',         '0.6.3'
   gem 'bluecloth',    '2.0.10' # for generating api docs
-  gem 'selenium-client', '1.2.18'
+  gem 'selenium-webdriver', '0.1.3'
 end
 
 group :development do

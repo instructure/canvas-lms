@@ -14,62 +14,56 @@ shared_examples_for "file uploads selenium tests" do
   end
 
   it "should upload a file on the discussions page" do
-    # set up basic objects
+    # set up basic user with enrollment
+    username = "nobody@example.com"
+    password = "asdfasdf"
     u = user_with_pseudonym :active_user => true,
-                            :username => "nobody@example.com",
-                            :password => "asdfasdf"
+                            :username => username,
+                            :password => password
     u.save!
     e = course_with_teacher :active_course => true,
                             :user => u,
                             :active_enrollment => true
     e.save!
+    login_as( username, password )
 
-    # log out (just in case) and log in
-    page.open "/logout"
-    page.type "pseudonym_session_unique_id", "nobody@example.com"
-    page.type "pseudonym_session_password", "asdfasdf"
-    page.click "//button[@type='submit']"
-    page.wait_for_page_to_load "30000"
-
-    # go to our new course's discussion page
-    page.open "/courses/#{e.course_id}/discussion_topics"
-    
-    # start a new topic and prepare for new file
-    page.click "link=Start a New Topic"
-    page.click "//div[@id='editor_tabs']/ul/li[2]/a"
-    !60.times{ break if (page.is_text_present("course files") rescue false); sleep 1 }
-    page.is_text_present("course files").should be_true
-    page.is_text_present("No Files").should be_true
-    
+    first_time = true    
     # try with three files. the first two are identical, so our md5-based single-instance-storing on s3 should not break.
     ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |filename|
+      # go to our new course's discussion page
+      get "/courses/#{e.course_id}/discussion_topics"
+
+      # start a new topic and prepare for new file
+      driver.execute_script <<-JS
+        $('.add_topic_link:first').click();
+        $('#editor_tabs ul li:eq(1) a').click();
+      JS
+      
+      keep_trying { driver.find_element(:css, '#tree1 .folder') }
+      driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
+      no_files = driver.execute_script("return $('#tree1 .leaf:contains(\"No Files\")')[0]")
+      if first_time
+        no_files.should_not be_nil
+      else
+        no_files.should be_nil
+      end
+      first_time = false
+
       # upload the file
-      page.click "link=Upload a new file"
-      page.type "attachment_uploaded_data", "C:\\testfiles\\#{filename}"
-      page.click "//form[@id='sidebar_upload_file_form']//button"
-      !60.times{ break if (page.is_text_present(filename) rescue false); sleep 1 }
-      page.is_text_present(filename).should be_true
+      driver.find_element(:css, '.upload_new_file_link').click
+      driver.find_element(:id, 'attachment_uploaded_data').send_keys("C:\\testfiles\\#{filename}")
+      driver.find_element(:css, '#sidebar_upload_file_form button').click
+      keep_trying { driver.execute_script("return $('#tree1 .leaf:contains(#{filename})').length") > 0 }
       
       # let's go check out if the file is in the files controller
-      page.click "link=Files"
-      page.wait_for_element "link=#{filename}"
+      get "/courses/#{e.course_id}/files"
+      keep_trying { driver.execute_script("return $('a:contains(#{filename})')[0]") }
       
       # check out the file content, make sure it's good
-      page.open "/courses/#{e.course_id}/files/#{Attachment.last.id}/download?wrap=1"
-      page.wait_for_element "//iframe[@id='file_content']"
-      page.select_frame "//iframe[@id='file_content']"
-      !60.times{ break if (page.is_text_present(TEST_FILE_UUIDS[filename]) rescue false); sleep 1 }
-      page.is_text_present(TEST_FILE_UUIDS[filename]).should be_true
-      page.select_frame "relative=top"
-      
-      # make sure the discussion page has files now.
-      page.open "/courses/#{e.course_id}/discussion_topics"
-      page.wait_for_element "link=Start a New Topic"
-      page.click "link=Start a New Topic"
-      page.click "//div[@id='editor_tabs']/ul/li[2]/a"
-      !60.times{ break if (page.is_text_present("course files") rescue false); sleep 1 }
-      page.is_text_present("course files").should be_true
-      page.is_text_present("No Files").should be_false
+      get "/courses/#{e.course_id}/files/#{Attachment.last.id}/download?wrap=1"
+      driver.switch_to.frame('file_content')
+      driver.page_source.should match TEST_FILE_UUIDS[filename]
+      driver.switch_to.default_content
     end
   end
 
@@ -88,46 +82,30 @@ shared_examples_for "file uploads selenium tests" do
     c.enroll_student(s).accept!
     c.reload
     
-    a = Assignment.new(:submission_types => "online_upload", :context => c)
-    a.save!
-
-    # log out (just in case) and log in
-    page.open "/logout"
-    page.type "pseudonym_session_unique_id", "student@example.com"
-    page.type "pseudonym_session_password", "asdfasdf"
-    page.click "//button[@type='submit']"
-    page.wait_for_page_to_load "30000"
+    a = c.assignments.create!(:submission_types => "online_upload")
     
-    # go to our new assignment page
-    page.open "/courses/#{c.id}/assignments/#{a.id}"
-    sleep 5
+    login_as( "student@example.com", "asdfasdf" )
+    
     # and attempt some assignment submissions
-    first = true
-
     ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |filename|
-      if first
-        page.click "link=Submit Assignment"
-        first = false
-      else
-        page.click "link=Re-Submit Assignment"
-      end
-      sleep 8
-      !60.times{ break if (page.is_element_present("attachments[0][uploaded_data]") rescue false); sleep 1 }
-      page.type "attachments[0][uploaded_data]", "C:\\testfiles\\#{filename}"
-      page.click "//form[@id='submit_online_upload_form']//button[@id='submit_file_button']"
-      page.wait_for_page_to_load "30000"
-      sleep 5
-      page.click "link=Submission Details"
-      page.wait_for_page_to_load "30000"
-      sleep 5
-      !60.times{ break if (page.is_element_present("//iframe[@id='preview_frame']") rescue false); sleep 1 }
-      page.select_frame "//iframe[@id='preview_frame']"
-      !60.times{ break if (page.is_element_present("link=#{filename}") rescue false); sleep 1 }
-      page.click "link=#{filename}"
-      sleep 5
-      !60.times{ break if (page.is_text_present(TEST_FILE_UUIDS[filename]) rescue false); sleep 1 }
-      page.is_text_present(TEST_FILE_UUIDS[filename]).should be_true
-      page.select_frame "relative=top"
+      # go to our new assignment page
+      get "/courses/#{c.id}/assignments/#{a.id}"
+
+      driver.execute_script("$('.submit_assignment_link').click();")
+      keep_trying { driver.execute_script("return $('div#submit_assignment')[0].style.display") != "none" }
+      driver.find_element(:name, 'attachments[0][uploaded_data]').send_keys("C:\\testfiles\\#{filename}")
+      driver.find_element(:css, '#submit_online_upload_form #submit_file_button').click
+      keep_trying { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
+      link = driver.find_element(:css, "div.details a.forward")
+      link.text.should eql("Submission Details")
+
+      link.click
+      keep_trying { driver.page_source =~ /Submission Details<\/h2>/ }
+      wait_for_dom_ready
+      driver.switch_to.frame('preview_frame')
+      driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click
+      keep_trying { driver.page_source =~ /#{Regexp.quote(TEST_FILE_UUIDS[filename])}/ }
+      driver.switch_to.default_content
     end
   end
 
@@ -136,15 +114,16 @@ end
 describe "file uploads Windows-Firefox-Local-Tests" do
   it_should_behave_like "file uploads selenium tests"
   before(:all) {
-    @selenium_driver = setup_selenium
     Setting.set("file_storage_test_override", "local")
   }
 end
 
-describe "file uploads Windows-Firefox-S3-Tests" do
-  it_should_behave_like "file uploads selenium tests"
-  prepend_before(:all) {
-    @selenium_driver = setup_selenium
-    Setting.set("file_storage_test_override", "s3")
-  }
-end
+## TODO: currently broken, we need to have the webrick server completely restart
+##       after file_storage_test_override is set so attachment.rb loads
+##       correctly
+#describe "file uploads Windows-Firefox-S3-Tests" do
+#  it_should_behave_like "file uploads selenium tests"
+#  prepend_before(:all) {
+#    Setting.set("file_storage_test_override", "s3")
+#  }
+#end

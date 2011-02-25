@@ -17,27 +17,39 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require 'selenium/client'
+require "selenium-webdriver"
 require "socket"
 require File.expand_path(File.dirname(__FILE__) + '/server')
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
 SERVER_IP = UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
 SERVER_PORT = SELENIUM_CONFIG[:app_port] || 3002
+APP_HOST = "#{SERVER_IP}:#{SERVER_PORT}"
+SECONDS_UNTIL_COUNTDOWN = 5
+SECONDS_UNTIL_GIVING_UP = 60
 
 module SeleniumTestsHelperMethods
   def setup_selenium
-    Selenium::Client::Driver.new \
-      :host => SELENIUM_CONFIG[:host] || "localhost",
-      :port => SELENIUM_CONFIG[:port] || 4444,
-      :browser => SELENIUM_CONFIG[:browser] || "Windows-Firefox",
-      :url => "http://#{SERVER_IP}:#{SERVER_PORT}/",
-      :timeout_in_second => 60
+    if SELENIUM_CONFIG.empty?
+      driver = Selenium::WebDriver.for :firefox
+    else
+      driver = Selenium::WebDriver.for(
+        :remote, 
+        :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub', 
+        :desired_capabilities => :firefox
+      )
+    end
+    driver.get(app_host)
+    driver
+  end
+  
+  def app_host
+    "http://#{APP_HOST}"
   end
 
   def self.start_webrick_server
-    HostUrl.default_host = "#{SERVER_IP}:#{SERVER_PORT}"
-    HostUrl.file_host = "#{SERVER_IP}:#{SERVER_PORT}"
+    HostUrl.default_host = APP_HOST
+    HostUrl.file_host = APP_HOST
     server = SpecFriendlyWEBrickServer
     app = Rack::Builder.new do
       use Rails::Rack::Debugger
@@ -62,45 +74,68 @@ shared_examples_for "all selenium tests" do
   include SeleniumTestsHelperMethods
 
   attr_reader :selenium_driver
-  alias_method :page, :selenium_driver
+  alias_method :driver, :selenium_driver
+  
+  def login_as(username, password)
+    # log out (just in case)
+    driver.navigate.to(app_host + '/logout')
+    
+    driver.find_element(:css, '#pseudonym_session_unique_id').send_keys username
+    password_element = driver.find_element(:css, '#pseudonym_session_password')
+    password_element.send_keys(password)
+    password_element.submit
+  end
+  
+  def wait_for_dom_ready
+    driver.execute_script <<-JS
+      window.seleniumDOMIsReady = false; 
+      $(function(){ 
+        window.setTimeout(function(){
+          //by doing a setTimeout, we ensure that the execution of all js completes. then we run selenium.
+          window.seleniumDOMIsReady = true; 
+        }, 1);
+      });
+    JS
+    dom_is_ready = false
+    until (dom_is_ready) do
+      dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
+      sleep 1 
+    end
+  end
+  
+  def keep_trying
+    60.times do |i|
+      puts "trying #{SECONDS_UNTIL_GIVING_UP - i}" if i > SECONDS_UNTIL_COUNTDOWN
+      if i < SECONDS_UNTIL_GIVING_UP - 2
+        break if (yield rescue false)
+      elsif i == SECONDS_UNTIL_GIVING_UP - 1
+        yield
+      else
+        raise
+      end
+      sleep 1
+    end
+  end
+    
+  def get(link)
+    driver.get(app_host + link)
+    wait_for_dom_ready
+  end
 
   self.use_transactional_fixtures = false
-
-  before(:each) do
-    @selenium_driver.start_new_browser_session
-  end
   
   append_after(:each) do
-    @selenium_driver.close_current_browser_session
     ALL_MODELS.each &:delete_all
-  end
-  
-  prepend_after(:each) do
-    begin 
-      if selenium_driver.session_started?
-        selenium_driver.set_context "Ending example '#{self.description}'"
-      end
-    rescue Exception => e
-      STDERR.puts "Problem while capturing system state" + e
-    end
-  end
-
-  append_before(:each) do
-    begin 
-      if selenium_driver && selenium_driver.session_started?
-        selenium_driver.set_context "Starting example '#{self.description}'"
-      end
-    rescue Exception => e
-      STDERR.puts "Problem while setting context on example start" + e
-    end
   end
   
   append_before(:all) do
     @webserver_shutdown = SeleniumTestsHelperMethods.start_webrick_server
+     @selenium_driver = setup_selenium
   end
 
   append_after(:all) do
     @webserver_shutdown.call
+    @selenium_driver.quit
   end
  
 end
