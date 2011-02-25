@@ -40,81 +40,15 @@
       this.bind('media_comment_created', function(event, data) {
         callback.call(this, data.id, data.mediaType);
       });
-      if(location.href.match(/kaltura_test/)) {
-        $.mediaComment.init(mediaType, {
-          modal: modal,
-          close: function() {
-            if(cancel_callback && $.isFunction(cancel_callback)) {
-              cancel_callback.call($comment);
-            }
-          },
-          defaultTitle: defaultTitle
-        });
-      } else { 
-        var $dialog = $("#media_comment_create_dialog");
-        if($dialog.length === 0) {
-          $dialog = $("<div id='media_comment_create_dialog'/>");
-          $("body").append($dialog);
-        }
-        $dialog.dialog('close').dialog({
-          autoOpen: false,
-          title: "Add Media Comment",
-          width: 570,
-          height: 370,
-          draggable: true,
-          modal: !!arg4,
-          close: function() {
-            if(cancel_callback && $.isFunction(cancel_callback)) {
-              cancel_callback.call($comment);
-            }
+      $.mediaComment.init(mediaType, {
+        modal: modal,
+        close: function() {
+          if(cancel_callback && $.isFunction(cancel_callback)) {
+            cancel_callback.call($comment);
           }
-        }).dialog('open');
-        $dialog.empty();
-        $dialog.append("<div id='media_comment_create' style='font-size: 1.5em;'>Loading...</div>");
-        var commentReady = function() {
-          var params = {
-            allowScriptAccess: 'always',
-            allowNetworking: 'all',
-            wmode: 'opaque'
-          }
-          var flashVars = {
-            partnerId: INST.kalturaSettings.partner_id,
-            subpId: INST.kalturaSettings.subpartner_id,
-            uid: INST.kaltura_user_id || 'ANONYMOUS',
-            ks: INST.kaltura_session_id,
-            kshowId: -1,
-            afterAddEntry: 'mediaCommentCallback',
-            singleContribution: 'true',
-            enableTagging: 'false',
-            showCloseButton: 'false',
-            partnerData: $.mediaComment.partnerData(),
-            partner_data: $.mediaComment.partnerData(),
-            wmode: 'opaque'
-          }
-          $("#media_comment_create").html(flashRequiredMessage)
-          swfobject.embedSWF("http://" + INST.kalturaSettings.domain + "/kcw/ui_conf_id/" + INST.kalturaSettings.kcw_ui_conf, "media_comment_create", "540", "300", "9.0.0", false, flashVars, params);
-          if($("#cant_record_dialog .links").length > 0) {
-            var $links = $("#cant_record_dialog .links").clone(true);
-            $dialog.append($links.show());
-          }
-        };
-        if(INST && INST.kaltura_session_id) {
-          commentReady();
-        } else {
-          $.ajaxJSON('/dashboard/comment_session', 'GET', {}, function(data) {
-            INST = INST || {};
-            INST.kaltura_session_id = data.ks;
-            INST.kaltura_user_id = data.uid;
-            commentReady();
-          }, function(data) {
-            if(data.logged_in == false) {
-              $dialog.text("You must be logged in to record media.");
-            } else {
-              $dialog.text("Media Comment Application failed to load.  Please try again.");
-            }
-          });
-        }
-      }
+        },
+        defaultTitle: defaultTitle
+      });
     } else if(command == 'show_inline') {
       var $div = $("<span/>");
       if(mediaType != 'video' && mediaType != 'audio') {
@@ -237,7 +171,11 @@
       }
       id = id || $.trim($(this).parent().find(".media_comment_id:first").text());
       if(id) {
-        var url = "http://" + INST.kalturaSettings.resource_domain + "/p/" + INST.kalturaSettings.partner_id + "/thumbnail/entry_id/";
+        var url = "http://" + INST.kalturaSettings.resource_domain;
+        if(location.protocol === 'https:') {
+          url = "https://" + (INST.kalturaSettings.secure_resource_domain || INST.kalturaSettings.domain);
+        }
+        url = url + "/p/" + INST.kalturaSettings.partner_id + "/thumbnail/entry_id/";
         url = url + id;
         url = url + "/width/" + dimensions.width + "/height/" + dimensions.height + "/bgcolor/000000/type/2/vid_sec/5";
         var $img = $("<img/>");
@@ -401,7 +339,14 @@
       $("#media_upload_title").val(file.title);
       $("#media_upload_display_title").text(file.title);
       $("#media_upload_file_size").text($.fileSize(file.bytesTotal));
-      $("#media_upload_title").focus().select();
+      // Currently there is a known problem with the 
+      // KUpload widget, where unless you submit the uploaded
+      // file as part of the select callback, the flash widget
+      // has some sort of access control problem.  When this is
+      // fixed we can uncomment this line and remove the one
+      // after it.
+      // $("#media_upload_title").focus().select();
+      $("#media_upload_submit").click();
     },
     singleUploadCompleteHandler: function(type, entries) {
       $("#media_upload_progress").progressbar('option', 'value', 100);
@@ -445,8 +390,8 @@
       $dialog.dialog('close').dialog({
         autoOpen: false,
         title: "Record/Upload Media Comment",
-        width: 460,
-        height: 385,
+        width: 530,
+        height: 440,
         modal: (opts.modal == false ? false : true)
       }).dialog('open');
       $dialog.dialog('option', 'close', function() {
@@ -485,8 +430,8 @@
         ks:ks,
         partnerData: $.mediaComment.partnerData(),
         partner_data: $.mediaComment.partnerData(),
-        themeUrl:"/media_test/skin.swf",
-        localeUrl:"/media_test/locale.xml",
+        themeUrl:"/media_record/skin.swf",
+        localeUrl:"/media_record/locale.xml",
         entryName:temporaryName,
         thumbOffset:"1",
         licenseType:"CC-0.1",
@@ -506,18 +451,16 @@
         "wmode": "opaque"
       }
       $("#audio_record").html("Flash required for recording audio.")
-      swfobject.embedSWF("/media_test/KRecordAudio.swf", "audio_record", "320", "240", "9.0.0", false, flashVars, params);
+      swfobject.embedSWF("/media_record/KRecordAudio.swf", "audio_record", "400", "300", "9.0.0", false, flashVars, params);
 
       var params = $.extend({}, params, {name: 'KRecordVideo'})
       $("#video_record").html("Flash required for recording video.")
-      swfobject.embedSWF("/media_test/KRecordVideo.swf", "video_record", "320", "240", "9.0.0", false, flashVars, params);
+      swfobject.embedSWF("/media_record/KRecordVideo.swf", "video_record", "400", "300", "9.0.0", false, flashVars, params);
 
       var flashVars = {
-        host:"http://" + INST.kalturaSettings.domain,
+        host:location.protocol + "//" + INST.kalturaSettings.domain,
         partnerId:INST.kalturaSettings.partner_id,
         subPId:INST.kalturaSettings.subpartner_id,
-        partnerData: $.mediaComment.partnerData(),
-        partner_data: $.mediaComment.partnerData(),
         uid:$dialog.data('uid') || "ANONYMOUS",
         entryId: "-1",
         ks:ks,
@@ -541,13 +484,13 @@
       $("#audio_upload").html("Flash required for uploading audio.");
       var width = "180";
       var height = "50";
-      swfobject.embedSWF("/media_test/KUpload.swf", "audio_upload", width, height, "9.0.0", false, flashVars, params)
+      swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "audio_upload", width, height, "9.0.0", false, flashVars, params)
       
       flashVars = $.extend({}, flashVars, {jsDelegate: '$.mediaComment.video_delegate'});
       $("#video_upload").html("Flash required for uploading video.");
       var width = "180";
       var height = "50";
-      swfobject.embedSWF("/media_test/KUpload.swf", "video_upload", width, height, "9.0.0", false, flashVars, params)
+      swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "video_upload", width, height, "9.0.0", false, flashVars, params)
       
       
       var $audio_record_holder, $audio_record, $audio_record_meter;
@@ -586,7 +529,7 @@
           audio_level = Math.max(audio_level, current_audio_level);
           if(audio_level > -1 && !$audio_record_holder.hasClass('with_volume')) {
             $audio_record_meter.css('display', 'none');
-            $("#audio_record_holder").addClass('with_volume').animate({'width': 340}, function() {
+            $("#audio_record_holder").addClass('with_volume').animate({'width': 420}, function() {
               $audio_record_meter.css('display', '');
             });
           }
@@ -603,7 +546,7 @@
           video_level = Math.max(video_level, current_video_level);
           if(video_level > -1 && !$video_record_holder.hasClass('with_volume')) {
             $video_record_meter.css('display', 'none');
-            $("#video_record_holder").addClass('with_volume').animate({'width': 340}, function() {
+            $("#video_record_holder").addClass('with_volume').animate({'width': 420}, function() {
               $video_record_meter.css('display', '');
             });
           }
@@ -769,7 +712,6 @@ function addEntryComplete(entries) {
       if(entry.entryType == 1 && $("#audio_record_option").hasClass('selected_option')) {
         entry.entryType = 5;
       }
-      console.log([entry.entryId, entry.entryType, entry.entryName, userTitle]);
       $.mediaComment.entryAdded(entry.entryId, entry.entryType, entry.entryName, userTitle);
       $("#media_comment_dialog").dialog('close');
     }
