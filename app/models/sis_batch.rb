@@ -93,19 +93,6 @@ class SisBatch < ActiveRecord::Base
     finish importer.finished
   end
 
-  private
-  
-  def messages?
-    (self.processing_errors && self.processing_errors.length > 0) || (self.processing_warnings && self.processing_warnings.length > 0)
-  end
-
-  def add_extension(ext)
-    @temp_file.close
-    new_path = @temp_file.path + ext
-      File.rename(@temp_file.path, new_path)
-      @temp_file = File.new(new_path)
-  end
-  
   def download_zip
     @temp_file = Tempfile.new("sis_data")
     if self.data[:file_path]
@@ -139,4 +126,17 @@ class SisBatch < ActiveRecord::Base
     end
     self.save
   end
+  private
+  
+  def messages?
+    (self.processing_errors && self.processing_errors.length > 0) || (self.processing_warnings && self.processing_warnings.length > 0)
+  end
+
+  def add_extension(ext)
+    @temp_file.close
+    new_path = @temp_file.path + ext
+      File.rename(@temp_file.path, new_path)
+      @temp_file = File.new(new_path)
+  end
+  
 end
