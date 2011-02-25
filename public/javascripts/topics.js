@@ -316,7 +316,11 @@ var topics = {};
         formData.message = $(this).find(".topic_content_new").editorBox('get_code');
         formData['discussion_topic[message]'] = formData.message;
         if(!formData.message) {
-          $(this).errorBox('Please enter a message');
+          if($(this).find(".topic_content").is(":visible")) {
+            $(this).find(".topic_content").errorBox('Please enter a message');
+          } else {
+            $(this).find(".topic_content").next().find(".mceIframeContainer").errorBox('Please enter a message');
+          }
           return false;
         }
         if(data.delay_posting == '1') {
