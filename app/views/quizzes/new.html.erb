@@ -122,7 +122,7 @@
                     Quiz Score</label>
                   </div>
                   <div>
-                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 0 %> name="limit_attempts" id="limit_attempts_option"/><label for="limit_attempts_option"> Limit to</label> 
+                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 1 %> name="limit_attempts" id="limit_attempts_option"/><label for="limit_attempts_option"> Limit to</label> 
                     <%= text_field :quiz, :allowed_attempts, :style => "width: 20px;", :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts) %>
                     <%= label :quiz, :allowed_attempts, "attempts" %>
                   </div>
