@@ -61,7 +61,7 @@ class QuizzesController < ApplicationController
   def statistics
     if authorized_action(@quiz, @current_user, :manage)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-      add_crumb("History", named_context_url(@context, :context_quiz_statistics_url, @quiz))
+      add_crumb("Statistics", named_context_url(@context, :context_quiz_statistics_url, @quiz))
       @statistics = @quiz.statistics
       @submitted_users = User.find_all_by_id(@quiz.quiz_submissions.select{|s| !s.settings_only? }.map(&:user_id)).compact.uniq.sort_by(&:last_name_first)
     end
@@ -276,7 +276,7 @@ class QuizzesController < ApplicationController
         return
       end
       if authorized_action(@submission, @current_user, :read)
-        add_crumb("History", named_context_url(@context, :context_quiz_history_url, @quiz))
+        add_crumb((!@submission.user || @submission.user == @current_user ? "History" : @submission.user.name))
         @headers = !params[:headless]
         @current_submission = @submission
         @version_instances = @submission.submitted_versions.sort_by{|v| v.version_number }
