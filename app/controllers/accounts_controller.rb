@@ -17,6 +17,7 @@
 #
 
 class AccountsController < ApplicationController
+  before_filter :require_user, :only => [:index]
   before_filter :get_context
   
   def index
