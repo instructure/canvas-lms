@@ -30,7 +30,7 @@
         <td style="padding: 5px 10px; white-space: nowrap; <%= hidden if @quiz.quiz_type == 'survey' %>">
           <%= @quiz.points_possible || 0 %> pts possible
         </td>
-        <td>
+        <td style="padding: 5px 10px;">
           <% if @quiz.lock_at || @quiz.unlock_at %>
             <% if @quiz.lock_at && @quiz.unlock_at %>
               <%= datetime_string(@quiz.unlock_at) %> through<br/>
