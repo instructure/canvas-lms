@@ -43,5 +43,5 @@ var timing = {
       result.referenceOffset = (offsetDiff * 1000) + (myOffset * 60000);
     }
     return result;
-  },
+  }
 };
