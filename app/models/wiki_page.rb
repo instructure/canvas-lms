@@ -170,13 +170,13 @@ class WikiPage < ActiveRecord::Base
   end
   
   def context_module_tag_for(context, user)
-    return nil unless user
     @tags ||= {}
+    user_id = user ? user.id : 0
     # for wiki_pages, context_module_association_id should be the wiki_namespace_id to use
     if context
-      @tags[user.id] ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s) #module_association_id(current_namespace(user).id)
-    else
-      @tags[user.id] ||= self.context_module_tags.find_by_context_module_association_id(current_namespace(user).id)
+      @tags[user_id] ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s) #module_association_id(current_namespace(user).id)
+    elsif user
+      @tags[user_id] ||= self.context_module_tags.find_by_context_module_association_id(current_namespace(user).id)
     end
   end
   
