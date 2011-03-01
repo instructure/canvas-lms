@@ -1148,6 +1148,7 @@ class Assignment < ActiveRecord::Base
         AND (
           (score IS NULL AND submissions.workflow_state != 'graded')
           OR submissions.workflow_state = 'submitted'
+          OR submissions.workflow_state = 'pending_review'
         )
         AND submission_type IS NOT NULL)"
           {:select => 'assignments.id, title, points_possible, due_at, context_id, context_type, submission_types, ' +
