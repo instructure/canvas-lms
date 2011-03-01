@@ -244,45 +244,48 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  # This is used by both /calendar and /assignments.
-  # Retrieves a list of all contexts associated with
-  # the given context.  If the context is a user then 
-  # it will include all the user's current contexts.
-  # Assigns it to the variable @context
-  def get_all_pertinent_contexts(include_groups=false)
-    unless @already_ran_get_all_pertinent_contexts
-      @already_ran_get_all_pertinent_contexts = true
-      @contexts = [@context].compact
-      @included_contexts = []
-      if params[:only_contexts]
-        params[:only_contexts].split(",").each do |include_context|
-          context = Context.find_by_asset_string(include_context)
-          @included_contexts << context if context
-          @contexts << context if context
-        end
-      else
-        if (@context && @context.is_a?( User))
-          @contexts.concat @context.courses
-          @contexts.concat @context.groups if include_groups
-        end
-        if params[:include_contexts]
-          params[:include_contexts].split(",").each do |include_context|
-            context = Context.find_by_asset_string(include_context)
-            @included_contexts << context if context
-            @contexts << context if context
-          end
-        end
+  # This is used by a number of actions to retrieve a list of all contexts
+  # associated with the given context.  If the context is a user then it will
+  # include all the user's current contexts.
+  # Assigns it to the variable @contexts
+  def get_all_pertinent_contexts(include_groups = false)
+    return if @already_ran_get_all_pertinent_contexts
+    @already_ran_get_all_pertinent_contexts = true
+
+    raise(ArgumentError, "Need a starting context") if @context.nil?
+
+    @contexts = [@context]
+    only_contexts = ActiveRecord::Base.parse_asset_string_list(params[:only_contexts])
+    if @context && @context.is_a?(User)
+      # we already know the user can read these courses and groups, so skip
+      # the grants_right? check to avoid querying for the various memberships
+      # again.
+      courses = @context.courses.active
+      groups = include_groups ? @context.groups.active : []
+      if only_contexts.present?
+        # find only those courses and groups passed in the only_contexts
+        # parameter, but still scoped by user so we know they have rights to
+        # view them.
+        courses = courses.find_all_by_id(only_contexts.select { |c| c.first == "Course" }.map(&:last))
+        groups = groups.find_all_by_id(only_contexts.select { |c| c.first == "Group" }.map(&:last)) if include_groups
       end
-      @contexts = @contexts.uniq.select{|c| c == @current_user || c.grants_rights?(@current_user, nil, nil)[:read] }
-      Course.require_assignment_groups(@contexts)
-      @original_context = @context
-      @context = ((@contexts & @included_contexts).first rescue @context) if @included_contexts && !@included_contexts.empty?
-      @context ||= @contexts.first
-      @context_enrollment = @context.membership_for_user(@current_user) rescue nil
-      @context_membership = @context_enrollment
+      @contexts.concat courses
+      @contexts.concat groups
     end
+    if params[:include_contexts]
+      params[:include_contexts].split(",").each do |include_context|
+        # don't load it again if we've already got it
+        next if @contexts.any? { |c| c.asset_string == include_context }
+        context = Context.find_by_asset_string(include_context)
+        @contexts << context if context && context.grants_right?(@current_user, nil, :read)
+      end
+    end
+    @contexts = @contexts.uniq
+    Course.require_assignment_groups(@contexts)
+    @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)
+    @context_membership = @context_enrollment
   end
-  
+
   # Retrieves all assignments for all contexts held in the @contexts variable.
   # Also retrieves submissions and sorts the assignments based on
   # their due dates and submission status for the given user.

@@ -20,6 +20,13 @@ class CalendarsController < ApplicationController
 
   def show
     get_context
+    if @context != @current_user
+      # we used to have calendar pages under contexts, like
+      # /courses/X/calendar, but these all redirect to /calendar now.
+      # we shouldn't have any of these URLs anymore, but let's leave in this
+      # fail-safe in case somebody has a bookmark or something.
+      return redirect_to(calendar_url_for([@context]))
+    end
     get_all_pertinent_contexts(true) # passing true has it return groups too.
     build_calendar_dates
     
@@ -28,23 +35,11 @@ class CalendarsController < ApplicationController
         @events = []
         @undated_events = []
         @show_left_side = false
-        # what is this doing?
-        if @contexts.empty? || (@original_context && @original_context != @current_user) #authorized_action(@context, @current_user, :read)
-          if @context == @current_user
-            redirect_to dashboard_url
-            return
-          else
-            @included_contexts << @original_context
-            redirect_to calendar_url_for(@included_contexts.uniq)
-            return
-          end
-        else
-          @calendar_event = @contexts[0].calendar_events.new
-          @contexts.each do |context|
-            log_asset_access("dashboard_calendar:#{context.asset_string}", "calendar", 'other')
-          end
+        @calendar_event = @contexts[0].calendar_events.new
+        @contexts.each do |context|
+          log_asset_access("dashboard_calendar:#{context.asset_string}", "calendar", 'other')
         end
-        render :action => "show" 
+        render :action => "show"
       end
       # this  unless @dont_render_again stuff is ugly but I wanted to send back a 304 but it started giving me "Double Render errors"
       format.json do

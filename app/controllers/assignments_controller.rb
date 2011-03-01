@@ -23,28 +23,30 @@ class AssignmentsController < ApplicationController
   before_filter { |c| c.active_tab = "assignments" }
   
   def index
-    get_all_pertinent_contexts
-    get_sorted_assignments
-    add_crumb("Assignments", (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
-    @context= (@just_viewing_one_course ? @context : @current_user)
-    return if @just_viewing_one_course && !tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+    if @context == @current_user || authorized_action(@context, @current_user, :read)
+      get_all_pertinent_contexts
+      get_sorted_assignments
+      add_crumb("Assignments", (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
+      @context= (@just_viewing_one_course ? @context : @current_user)
+      return if @just_viewing_one_course && !tab_enabled?(@context.class::TAB_ASSIGNMENTS)
 
-    respond_to do |format|
-      if @contexts.empty?
-        if @context
-          format.html { redirect_to @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
+      respond_to do |format|
+        if @contexts.empty?
+          if @context
+            format.html { redirect_to @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
+          else
+            format.html { redirect_to root_url }
+          end
+        elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
+          format.html
         else
-          format.html { redirect_to root_url }
+          @current_user_submissions ||= @current_user && @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => {:assignment_id => @upcoming_assignments.map(&:id)}) 
+          format.html { render :action => "student_index" }
         end
-      elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
-        format.html
-      else
-        @current_user_submissions ||= @current_user && @current_user.submissions.scoped(:select => 'id, assignment_id, score, workflow_state', :conditions => {:assignment_id => @upcoming_assignments.map(&:id)}) 
-        format.html { render :action => "student_index" }
+        format.xml  { render :xml => @assignments.to_xml }
+        # TODO: eager load the rubric associations
+        format.json { render :json => @assignments.to_json(:include => [ :rubric_association, :rubric ]) }
       end
-      format.xml  { render :xml => @assignments.to_xml }
-      # TODO: eager load the rubric associations
-      format.json { render :json => @assignments.to_json(:include => [ :rubric_association, :rubric ]) }
     end
   end
   

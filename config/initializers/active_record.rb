@@ -29,7 +29,16 @@ class ActiveRecord::Base
     id = code.pop
     code.join("_").classify.constantize.find(id) rescue nil
   end
-  
+
+  # takes an asset string list, like "course_5,user_7" and turns it into an
+  # array of [class_name, id] like [ ["Course", 5], ["User", 7] ]
+  def self.parse_asset_string_list(asset_string_list)
+    asset_string_list.to_s.split(",").map do |str|
+      code = str.split("_", 2)
+      [code.first.classify, code.last.to_i]
+    end
+  end
+
   def self.initialize_by_asset_string(string, asset_types)
     code = string.split("_")
     id = code.pop

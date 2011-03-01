@@ -29,7 +29,7 @@ describe CalendarsController do
       course_with_student(:active_all => true)
       course_event
       get 'show', :course_id => @course.id
-      assigns[:contexts].should be_empty
+      assigns[:contexts].should be_blank
       response.should be_redirect
     end
     
