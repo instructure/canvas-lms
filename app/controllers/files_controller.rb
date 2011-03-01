@@ -69,34 +69,30 @@ class FilesController < ApplicationController
   protected :retrieve_folders
   
   def index
-    return full_index if !params[:old_style] && request.format != :json
-    add_crumb("Files", named_context_url(@context, :context_files_url))
-    if authorized_action(@context.attachments.new, @current_user, :read)
-      @current_folder = Folder.find_folder(@context, params[:folder_id])
-      get_quota
-      retrieve_folders if !request.xhr? || !@current_folder
-      if !@current_folder || authorized_action(@current_folder, @current_user, :read)
-        @current_sub_folders = @current_folder.active_sub_folders
-        if @context.grants_right?(@current_user, session, :manage_files)
-          @current_attachments = @current_folder.active_file_attachments
-        else
-          @current_attachments = @current_folder.visible_file_attachments
-          @root_folders = @root_folders.select{|f| f.visible? } rescue []
-          @folders = @folders.select{|f| f.visible? } rescue []
-          @current_folder = @root_folders[0] if !@current_folder.visible?
-        end
-        @current_attachments = @current_attachments.scoped(:include => [:thumbnail, :media_object])
-        log_asset_access("files:#{@context.asset_string}", "files", 'other')
-        respond_to do |format|
-          format.html
-          format.xml  { render :xml => @current_attachments.to_xml }
+    if request.format == :json
+      if authorized_action(@context.attachments.new, @current_user, :read)
+        @current_folder = Folder.find_folder(@context, params[:folder_id])
+        get_quota
+        retrieve_folders if !@current_folder
+        if !@current_folder || authorized_action(@current_folder, @current_user, :read)
           if params[:folder_id]
-            format.json { render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked], :permissions => {:user => @current_user, :session => session}) }
+            if @context.grants_right?(@current_user, session, :manage_files)
+              @current_attachments = @current_folder.active_file_attachments
+            else
+              @current_attachments = @current_folder.visible_file_attachments
+              @root_folders = @root_folders.select{|f| f.visible? } rescue []
+              @folders = @folders.select{|f| f.visible? } rescue []
+              @current_folder = @root_folders[0] if !@current_folder.visible?
+            end
+            @current_attachments = @current_attachments.scoped(:include => [:thumbnail, :media_object])
+            render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked], :permissions => {:user => @current_user, :session => session})
           else
-            format.json { render :json => @context.file_structure_for(@current_user).to_json(:permissions => {:user => @current_user}, :methods => [:readable_size, :mime_class, :currently_locked, :collaborator_ids]) }
-           end
+            render :json => @context.file_structure_for(@current_user).to_json(:permissions => {:user => @current_user}, :methods => [:readable_size, :mime_class, :currently_locked, :collaborator_ids])
+          end
         end
       end
+    else
+      full_index
     end
   end
   
@@ -129,20 +125,14 @@ class FilesController < ApplicationController
       return
     end
     return unless tab_enabled?(@context.class::TAB_FILES)
-    @file_structures = []
-    @contexts.each do |context|
-      Folder.root_folders(context)
-      context.users rescue nil
-      @file_structures << [context, context.file_structure_for(@current_user)]
-    end
     @context = UserProfile.new(@context) if @context == @current_user
+    log_asset_access("files:#{@context.asset_string}", "files", 'other') if @context
     respond_to do |format|
-      if @contexts.empty? #authorized_action(@context, @current_user, :read)
+      if @contexts.empty?
         format.html { redirect_to !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
       else
         format.html { render :action => 'full_index' }
       end
-      format.xml  { render :xml => @file_structures.to_xml }
       format.json { render :json => @file_structures.to_json }
     end
   end
@@ -212,7 +202,6 @@ class FilesController < ApplicationController
               format.html { render :action => 'show' }
             end
             @attachment.scribd_doc = nil unless @attachment.grants_right?(@current_user, session, :download)
-            format.xml  { render :xml => @attachment.to_xml }
             format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
           end
         end
@@ -232,7 +221,6 @@ class FilesController < ApplicationController
             format.html # show.rhtml
           end
           @attachment.scribd_doc = nil unless @attachment.grants_right?(@current_user, session, :download)
-          format.xml  { render :xml => @attachment.to_xml }
           format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
         end
       end
@@ -565,12 +553,10 @@ class FilesController < ApplicationController
           @attachment.move_to_bottom
           flash[:notice] = 'File was successfully uploaded.'
           format.html { return_to(params[:return_to], named_context_url(@context, :context_files_url)) }
-          format.xml  { head :created, :location => named_context_url(@context, :context_files_url) }
           format.json { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}) }
           format.text { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "new" }
-          format.xml  { render :xml => @attachment.errors.to_xml }
           format.json { render :json => @attachment.errors.to_json }
           format.text { render :json => @attachment.errors.to_json }
         end
@@ -604,11 +590,9 @@ class FilesController < ApplicationController
           @attachment.move_to_bottom if @folder_id_changed
           flash[:notice] = 'File was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.xml  { head :ok }
           format.json { render :json => @attachment.to_json(:methods => [:readable_size, :mime_class, :currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
           format.html { render :action => "edit" }
-          format.xml  { render :xml => @attachment.errors.to_xml }
           format.json { render :json => @attachment.errors.to_json, :status => :bad_request }
         end
       end
@@ -632,7 +616,6 @@ class FilesController < ApplicationController
       @attachment.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_files_url) }# show.rhtml
-        format.xml  { render :xml => @attachment.to_xml }
         format.json { render :json => @attachment.to_json }
       end
     end

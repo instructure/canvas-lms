@@ -61,6 +61,7 @@ class User < ActiveRecord::Base
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :folders, :as => 'context', :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :calendar_events, :as => 'context', :dependent => :destroy
   has_many :eportfolios, :dependent => :destroy
@@ -1070,25 +1071,18 @@ class User < ActiveRecord::Base
   def self.file_structure_for(context, user)
     res = {
       :contexts => [context],
-      :groups => [],
       :collaborations => [],
       :folders => [],
       :folders_with_subcontent => [],
       :files => []
     }
-    visible_groups = []
-    if context.respond_to?(:groups) && !context.is_a?(User) && context.grants_right?(user, nil, :manage)
-      visible_groups = context.groups.active.select{|g| g.grants_right?(user, nil, :read) }
-    end
-    res[:contexts] += visible_groups
-    res[:groups] += visible_groups
     context_codes = res[:contexts].map{|c| c.asset_string }
     if !context.is_a?(User) && user
       res[:collaborations] = user.collaborations.active.find(:all, :include => [:user, :users]).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
       res[:collaborations] = res[:collaborations].sort_by{|c| c.created_at}.reverse
     end
     res[:contexts].each do |context|
-      res[:folders] += context.active_folders_detailed
+      res[:folders] += context.active_folders_with_sub_folders
     end
     res[:folders] = res[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
     res

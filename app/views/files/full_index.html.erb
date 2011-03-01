@@ -29,43 +29,12 @@
       <li id="swfupload_holder">
         <div id="file_swf"></div>
       </li>
-      <% @file_structures.each do |context, structure| %>
-        <% root_folder = structure[:folders].select{|f| f.root_folder? && f.context_id == context.id && f.context_type == context.class.base_ar_class.to_s }.first %>
+      <% @contexts.each do |context| %>
+        <% root_folder = Folder.root_folders(context).first %>
         <li class="context folder folder_<%= root_folder.id %> <%= context.asset_string %>" style="display: none;">
           <span class="text name"><%= context.name %></span>
           <span class="text id" style="display: none;"><%= root_folder.id %></span>
           <ul>
-            <%= render :partial => 'files/nested_content', :object => structure[:folders].select{|f| f.parent_folder_id == root_folder.id }, :locals => {:folders => structure[:folders], :skip_ul => true, :exclude_files => true} %>
-            <% if !context.is_a?(User) && (!structure[:collaborations].empty? || can_do((context.collaborations.new rescue nil), @current_user, :create)) %>
-            <li class="collaborations">
-              <span class="text name">collaborations</span>
-              <ul>
-              <% structure[:collaborations].select{|c| c.context == context}.each do |collaboration| %>
-                <li class="collaboration <%= collaboration.collaboration_type %> collaboration_<%= collaboration.id %>">
-                  <span class="text name"><%= collaboration.title %></span>
-                  <span class="text id" style="display: none;"><%= collaboration.id %></span>
-                </li>
-              <% end %>
-              </ul>
-            </li>
-            <% end %>
-            <% if !structure[:groups].empty? %>
-              <% structure[:groups].map{|g| g.category}.uniq.each do |category| %>
-                <li class="groups">
-                  <span class="text name"><%= category %></span>
-                  <ul>
-                  <% structure[:groups].select{|g| g.category == category }.each do |group| %>
-                    <% group_root_folder = Folder.root_folders(group).first %>
-                    <li class="group context folder folder_<%= group_root_folder.id %> <%= group.asset_string %>">
-                      <span class="text name"><%= group.name %></span>
-                      <span class="text id" style="display: none;"><%= group_root_folder.id %></span>
-                      <%= render :partial => 'files/nested_content', :object => group_root_folder.subcontent, :locals => {:folders => structure[:folders]} %>
-                    </li>
-                  <% end %>
-                  </ul>
-                </li>
-              <% end %>
-            <% end %>
           </ul>
         </li>
       <% end %>
@@ -330,9 +299,7 @@
 <div style="display: none;" id="file_context_links">
   <input type="text" id="rename_entry_field" style="width: 200px;"/>
   <%= image_tag "ajax-loader.gif", :class => "preview_loading_image" %>
-  <% contexts = @file_structures.map{|s| s[0]} %>
-  <% contexts += @file_structures.map{|s| s[1][:groups]}.flatten %>
-  <% contexts.each do |context| %>
+  <% @contexts.each do |context| %>
     <% root_url = context_url(context, :context_url) rescue '' %>
     <a href="<%= root_url %>/files" class="<%= context.asset_string %>_attachments_url">&nbsp;</a>
     <a href="<%= root_url %>/folders" class="<%= context.asset_string %>_folders_url">&nbsp;</a>
@@ -528,9 +495,7 @@
 </div>
 <% js_block do %>
 <script>
-<% @file_structures.each{|c, s| s.delete(:folders) } %>
-var fileStructureData = <%= raw @file_structures.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:read_contents,:manage_grades,:read_roster,:download]}, :methods => [:readable_size,:mime_class,:currently_locked,:collaborator_ids]) %>;
-
+var contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
 
 var INST = INST || {};
 INST.downloadFolderFiles = function(url) {

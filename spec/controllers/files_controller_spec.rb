@@ -80,8 +80,8 @@ describe FilesController do
       course_with_teacher_logged_in(:active_all => true)
       get 'index', :course_id => @course.id
       response.should be_success
-      assigns[:file_structures].should_not be_nil
-      assigns[:file_structures][0][0].should eql(@course)
+      assigns[:contexts].should_not be_nil
+      assigns[:contexts][0].should eql(@course)
     end
     
     it "should select a default folder" do
@@ -98,10 +98,10 @@ describe FilesController do
       a1 = folder_file
       get 'index', :course_id => @course.id, :format => 'json'
       response.should be_success
-      assigns[:current_folder].should eql(f1)
-      assigns[:current_attachments].should_not be_nil
-      assigns[:current_attachments].should_not be_empty
-      assigns[:current_attachments][0].should eql(a1)
+      data = JSON.parse(response.body) rescue nil
+      data.should_not be_nil
+      data['contexts'].length.should eql(1)
+      data['contexts'][0]['course']['id'].should eql(@course.id)
       
       f2 = course_folder
       a2 = folder_file

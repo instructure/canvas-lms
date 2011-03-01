@@ -17,6 +17,7 @@
  */
 
 var files = {};
+var fileStructureData = [];
 (function() {
   var $files_content = $("#files_content"),
     $swfupload_holder = $("#swfupload_holder"),
@@ -34,6 +35,20 @@ var files = {};
       $files_structure_list = $("#files_structure_list");
       $files_content.prepend($swfupload_holder);
       files.clearDataCache.cacheIndex = 0;
+      for(var idx in contexts) {
+        var obj = {
+          context: contexts[idx],
+          context_name: contexts[idx].name,
+          context_string: contexts[idx].asset_string
+        };
+        if(contexts[idx].asset_string) {
+          var context_type = contexts[idx].asset_string.replace(/_\d+$/, '');
+          obj[context_type] = contexts[idx];
+        }
+        fileStructureData.push([
+          obj, {}
+        ]);
+      }
       for(var idx in fileStructureData) {
         if(fileStructureData[idx]) {
           var context = fileStructureData[idx][0];
