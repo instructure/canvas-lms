@@ -252,7 +252,7 @@ class Group < ActiveRecord::Base
   private :ensure_defaults
   
   set_policy do
-    given { |user| user && self.participating_users.include?(user) }
+    given { |user| user && self.participating_group_memberships.find_by_user_id(user.id) }
     set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and
       can :manage_files and can :moderate_forum and
       can :post_to_forum and
@@ -273,7 +273,7 @@ class Group < ActiveRecord::Base
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     set { can :read and can :read_roster }
   end
-  
+
   def file_structure_for(user)
     User.file_structure_for(self, user)
   end
