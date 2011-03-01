@@ -190,7 +190,7 @@ class CalendarEvent < ActiveRecord::Base
     return cal.to_ical
   end
   def self.search(query)
-    find(:all, :conditions => ['title LIKE ? or description LIKE ?', "%#{query}%", "%#{query}%"])
+    find(:all, :conditions => wildcard('title', 'description', query))
   end
   
   attr_accessor :clone_updated

@@ -644,7 +644,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.search(query)
-    find(:all, :conditions => ['title LIKE ? or description LIKE ?', "%#{query}%", "%#{query}%"])
+    find(:all, :conditions => wildcard('title', 'description', query))
   end
   
   def grade_distribution
@@ -1348,7 +1348,7 @@ class Assignment < ActiveRecord::Base
     cases = []
     max = migration.context.assignments.map(&:position).compact.max || 0
     migration.context.assignments
-    assignments.each_with_index{|m, idx| cases << " WHEN migration_id=#{m['assignment_id']} THEN #{max + idx + 1} " if m['assignment_id'] }
+    assignments.each_with_index{|m, idx| cases << " WHEN migration_id=#{conn.quote(m['assignment_id'])} THEN #{max + idx + 1} " if m['assignment_id'] }
     unless cases.empty?
       conn.execute("UPDATE assignments SET position=CASE #{cases.join(' ')} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map{|id| conn.quote(id)}.join(',')})")
     end

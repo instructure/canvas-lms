@@ -285,8 +285,8 @@ class ContentTag < ActiveRecord::Base
       self.cloned_item ||= ClonedItem.create(:original_item => self)
       self.save! 
     end
-    existing = ContentTag.active.find_by_context_type_and_context_id_and_id(self.id)
-    existing ||= ContentTag.active.find_by_context_type_and_context_id_and_cloned_item_id(self.cloned_item_id)
+    existing = ContentTag.active.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, self.id)
+    existing ||= ContentTag.active.find_by_context_type_and_context_id_and_cloned_item_id(context.class.to_s, context.id, self.cloned_item_id)
     return existing if existing && !options[:overwrite]
     dup ||= ContentTag.new
     dup = existing if existing && options[:overwrite]

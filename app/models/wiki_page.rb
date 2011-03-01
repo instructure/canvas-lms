@@ -57,7 +57,7 @@ class WikiPage < ActiveRecord::Base
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
     base_url = self.send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !self.only_when_blank
-    conditions = ["#{url_attribute} LIKE ?", base_url+'%']
+    conditions = [wildcard("#{url_attribute}", base_url, :type => :right)]
     unless new_record?
       conditions.first << " and id != ?"
       conditions << id
@@ -506,7 +506,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def self.search(query)
-    find(:all, :conditions => ['title LIKE ? or body LIKE ?', "%#{query}%", "%#{query}%"])
+    find(:all, :conditions => wildcard('title', 'body', query))
   end
   
 end

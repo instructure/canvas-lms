@@ -252,10 +252,8 @@ class Course < ActiveRecord::Base
   # Account.first.courses.most_active(10).first.page_views_count  #=> "466" 
   named_scope :most_active, lambda { |limit|
     {
-      :select => '`courses`.*, COUNT(*) AS page_views_count',
-      :joins => [:page_views],
+      :select => "courses.*, (SELECT COUNT(*) FROM page_views WHERE context_id = courses.id AND context_type = 'Course') AS page_views_count",
       :order => "page_views_count DESC",
-      :group => '`courses`.id',
       :limit => limit
     }
   }
@@ -278,7 +276,7 @@ class Course < ActiveRecord::Base
     {:limit => limit }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => ["courses.name LIKE ?", "%#{name}%"] }
+    { :conditions => wildcard('courses.name', name) }
   }
   named_scope :needs_account, lambda{|account, limit|
     {:conditions => {:account_id => nil, :root_account_id => account.id}, :limit => limit }
@@ -293,7 +291,7 @@ class Course < ActiveRecord::Base
     {
       :joins => {:teacher_enrollments => {}, :course_account_associations => :account_users},
       :conditions => ["enrollments.user_id = ? OR account_users.user_id = ?", user_id, user_id],
-      :select => "DISTINCT(courses.id), courses.name"
+      :select => "DISTINCT courses.id, courses.name"
     }
   }
   named_scope :not_deleted, {:conditions => ['workflow_state != ?', 'deleted']}

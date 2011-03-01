@@ -428,8 +428,8 @@ describe Assignment do
       @assignment.messages_sent.should_not be_include("Assignment Graded")
       @assignment.updated_submissions.should_not be_nil
       @assignment.updated_submissions.should_not be_empty
-      @assignment.updated_submissions.first.messages_sent.should be_empty
-      @assignment.updated_submissions.last.messages_sent.should be_include("Submission Grade Changed")
+      @assignment.updated_submissions.sort_by(&:id).first.messages_sent.should be_empty
+      @assignment.updated_submissions.sort_by(&:id).last.messages_sent.should be_include("Submission Grade Changed")
     end
   end
   

@@ -797,10 +797,6 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def self.search(query)
-    find(:all, :conditions => ['filename LIKE ?', "%#{query}%"])
-  end
-
   # Import stuff
   attr_accessor :comparison, :prior, :focus
   

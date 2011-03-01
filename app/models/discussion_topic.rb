@@ -164,7 +164,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def self.search(query)
-    find(:all, :conditions => ['title LIKE ? or message LIKE ?', "%#{query}%", "%#{query}%"])
+    find(:all, :conditions => wildcard('title', 'message', query))
   end
   
   named_scope :recent, lambda{
