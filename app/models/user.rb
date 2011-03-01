@@ -1349,9 +1349,16 @@ class User < ActiveRecord::Base
   def cached_contexts
     @cached_contexts ||= begin
       context_groups = []
-      self.courses.scoped({:include => :active_groups}).each{|c| context_groups += c.active_groups.select{|g| g.grants_right?(self, nil, :manage)} }
-      # @contexts = @courses + @groups + @context_groups
-      self.courses + self.groups.active + context_groups
+      # according to the set_policy block in group.rb, user u can manage group
+      # g if either:
+      # (a) g.context.grants_right?(u, :manage_groups)
+      # (b) g.participating_users.include(u)
+      # this is a very performance sensitive method, so we're bypassing the
+      # normal policy checking and somewhat duplicating auth logic here. which
+      # is a shame. it'd be really nice to add support to our policy framework
+      # for understanding how to load associations based on policies.
+      self.courses.all(:include => :active_groups).select { |c| c.grants_right?(self, :manage_groups) }.each { |c| context_groups += c.active_groups }
+      self.courses + (self.groups.active + context_groups).uniq
     end
   end
   
