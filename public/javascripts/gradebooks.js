@@ -453,23 +453,6 @@ var gradebook = (function(){
                 .dialog('open').dialog('option', 'title', "Curve Grade for " + title);
             };
           }
-          if(!$td.hasClass('published')) {
-            options['<span class="ui-icon ui-icon-comment">&nbsp;</span> Publish Grades'] = function() {
-              var url = $td.find(".assignment_link").attr('href');
-              var sendData = {publish: true};
-              $.ajaxJSON(url, 'PUT', sendData, function(data) {
-                $td.removeClass('unpublished').addClass('published');
-              });
-            };
-          } else {
-            options['<span class="ui-icon ui-icon-minus">&nbsp;</span> Unpublish Grades'] = function() {
-              var url = $td.find(".assignment_link").attr('href');
-              var sendData = {unpublish: true};
-              $.ajaxJSON(url, 'PUT', sendData, function(data) {
-                $td.addClass('unpublished').removeClass('published');
-              });
-            };
-          }
           var data = objectData($td);
           if(data.submission_types && data.submission_types.match(/(online_upload|online_text_entry|online_url)/)) {
             options['<span class="ui-icon ui-icon-disk">&nbsp;</span> Download Submissions'] = function() {
