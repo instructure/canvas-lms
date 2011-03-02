@@ -350,7 +350,7 @@ class QuizSubmission < ActiveRecord::Base
     res = []
     tally = 0
     self.workflow_state = "complete"
-    self.fudge_points = params[:fudge_points].to_i if params[:fudge_points] && params[:fudge_points] != ""
+    self.fudge_points = params[:fudge_points].to_f if params[:fudge_points] && params[:fudge_points] != ""
     tally += self.fudge_points if self.fudge_points
     data.each do |answer|
       unless answer.respond_to?(:with_indifferent_access)
