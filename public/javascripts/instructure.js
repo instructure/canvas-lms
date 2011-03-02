@@ -217,11 +217,12 @@ $(document).ready(function() {
   });
 
   function enhanceUserContent() {
+    var $content = $("#content");
     $(".user_content:not(.enhanced):visible").addClass('unenhanced');
     $(".user_content.unenhanced:visible")
       .each(function() {
         var $this = $(this);
-        $this.find("img").css('maxWidth', $this.width());
+        $this.find("img").css('maxWidth', Math.min($content.width(), $this.width()));
         $this.data('unenhanced_content_html', $this.html());
       })
       .find("a:not(.not_external, .external):external").each(function(){
