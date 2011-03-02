@@ -249,7 +249,7 @@
     $assignment.find(".description").val(assignment.description);
     $assignment.find(".links,.move").css('display', '');
     $assignment.toggleClass('group_assignment_editable', assignment.permissions && assignment.permissions.update);
-    addAssignmentToGroup($assignment.parents(".assignment_group"), $assignment);
+    addAssignmentToGroup($("#group_" + assignment.assignment_group_id), $assignment);
     $("html,body").scrollToVisible($assignment);
   }
   function addAssignmentToGroup($group, $assignment) {
@@ -600,31 +600,90 @@
       var $group = $(this).parents(".assignment_group");
       editGroup($group);
     });
+    $("#delete_assignments_dialog").delegate(".delete_button", 'click', function() {
+      var $dialog = $("#delete_assignments_dialog");
+      group_id = $dialog.data('group_id');
+      $old_group = $("#group_" + group_id);
+      var params = {};
+      var formData = $dialog.getFormData();
+      if(formData.action == 'move') {
+        if(formData.group_id) {
+          params.move_assignments_to = formData.group_id;
+          var $new_group = $("#group_" + formData.group_id);
+        } else {
+          return;
+        }
+      }
+      $dialog.find("button").attr('disabled', true).filter(".delete_button").text("Deleting Group...");
+      var url = $old_group.find(".delete_group_link").attr('href');
+      $.ajaxJSON(url, 'DELETE', params, function(data) {
+        deleteGroup($old_group);
+        if(data.new_assignment_group && data.new_assignment_group.active_assignments) {
+          for(var idx in data.new_assignment_group.active_assignments) {
+            var assignment = data.new_assignment_group.active_assignments[idx];
+            $assignment = $("#assignment_" + assignment.id);
+            updateAssignment($assignment, {assignment: assignment});
+          }
+        }
+        $dialog.find("button").attr('disabled', false).filter(".delete_button").text("Delete Group");
+        $dialog.dialog('close');
+      }, function() {
+        $dialog.find("button").attr('disabled', false).filter(".delete_button").text("Delete Failed");
+      });
+    }).delegate('.cancel_button', 'click', function() {
+      $("#delete_assignments_dialog").dialog('close');
+    });
     $(".delete_group_link").click(function(event) {
       event.preventDefault();
       var $group = $(this).parents(".assignment_group");
-      var id = $group.getTemplateData({textValues: ['assignment_group_id']}).assignment_group_id;
+      var assignment_count = $group.find(".group_assignment:visible").length;
+      if(assignment_count > 0) {
+        var data = $group.find(".header").getTemplateData({textValues: ['assignment_group_id', 'name']});
+        data.assignment_count = assignment_count + " " + (assignment_count == 1 ? 'assignment' : $.pluralize("assignment"));
+        var $dialog = $("#delete_assignments_dialog");
+        $dialog.fillTemplateData({data: data});
+        $dialog.find("button").attr('disabled', false).filter(".delete_button").text("Delete Group");
+        $dialog.find(".group_select option:not(.blank)").remove();
+        $(".assignment_group:visible").each(function() {
+          if($(this)[0] != $group[0]) {
+            var group_data = $(this).getTemplateData({textValues: ['assignment_group_id', 'name']});
+            var $option = $("<option/>").val(group_data.assignment_group_id || '').text(group_data.name);
+            $dialog.find(".group_select").append($option);
+          }
+        });
+        $dialog.find(".group_select")[0].selectedIndex = 0;
+        $dialog.find("#assignment_group_delete").attr('checked', true);
+        $dialog.dialog('close').dialog({
+          autoOpen: false,
+          width: 500,
+        }).dialog('open').data('group_id', data.assignment_group_id);
+        return;
+      }
       $group.confirmDelete({
         message: "Are you sure you want to delete this group?",
         url: $(this).attr('href'),
         success: function() {
-          hideGroupForm();
-          $group.slideUp('normal', function() {
-            $(this).remove();
-            updateGroupsSelect();
-            $("#group_weight_" + id).remove();
-            $("#group_weight .group_weight:visible:first .weight").triggerHandler('change', false);
-          });
-          if($("#groups .assignment_group").length <= 1) {
-            $("#groups .assignment_group .delete_group_link").hide();
-          }
-          if(assignmentGroupCount && updateAssignmentCounts) {
-            assignmentGroupCount--;
-            updateAssignmentCounts();
-          }
+          deleteGroup($group);
         }
       });
     });
+    function deleteGroup($group) {
+      var id = $group.find(".header").getTemplateData({textValues: ['assignment_group_id']}).assignment_group_id;
+      hideGroupForm();
+      $group.slideUp('normal', function() {
+        $(this).remove();
+        updateGroupsSelect();
+        $("#group_weight_" + id).remove();
+        $("#group_weight .group_weight:visible:first .weight").triggerHandler('change', false);
+      });
+      if($("#groups .assignment_group").length <= 1) {
+        $("#groups .assignment_group .delete_group_link").hide();
+      }
+      if(assignmentGroupCount && updateAssignmentCounts) {
+        assignmentGroupCount--;
+        updateAssignmentCounts();
+      }
+    }
     $("#add_group_form .cancel_button").click(function() {
       var $group = $(this).parents(".assignment_group");
       hideGroupForm();

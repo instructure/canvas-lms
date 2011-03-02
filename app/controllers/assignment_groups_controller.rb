@@ -167,12 +167,21 @@ class AssignmentGroupsController < ApplicationController
   def destroy
     @assignment_group = AssignmentGroup.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :delete)
+      if params[:move_assignments_to]
+        @new_group = @context.assignment_groups.active.find(params[:move_assignments_to])
+        order = @new_group.assignments.active.map(&:id)
+        ids_to_change = @assignment_group.assignments.active.map(&:id)
+        order += ids_to_change
+        Assignment.update_all({:assignment_group_id => @new_group.id, :updated_at => Time.now}, {:id => ids_to_change})
+        Assignment.find_by_id(order).update_order(order)
+        @new_group.touch
+        @assignment_group.reload
+      end
       @assignment_group.destroy
 
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url)) }
-        format.xml  { head :ok }
-        format.json { render :json => @assignment_group.to_json }
+        format.json { render :json => {:assignment_group => @assignment_group, :new_assignment_group => @new_group}.to_json(:include_root => false, :include => :active_assignments) }
       end
     end
   end
