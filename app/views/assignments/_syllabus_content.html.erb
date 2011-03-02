@@ -16,7 +16,6 @@
   structure, course policies or anything else.</p>
   <p>
     To add some comments, click the "Edit Syllabus Description" link to the right.
-    <!--a href="#" class="edit_syllabus_link"><%= image_tag "edit.png" %> Edit Syllabus Description</a-->
   </p>
 </div>
 <% form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
@@ -43,11 +42,11 @@
   <tbody>
     <% today = Date.today
       @dates.each do |d| %>
-      <% events = @events.select{|e| e.start_at != nil && e.start_at.to_date == d}.sort_by{ |e| e.start_at} %>
+      <% events = @events.select{|e| e.start_at != nil && e.start_at.to_date == d}.sort_by{ |e| [e.start_at, e.title] } %>
       <%= render :partial => "assignments/syllabus_row", :object => events, :locals => {:date => d, :date_passed => (d < today)} %>
     <% end %>
     <% if @undated_events && !@undated_events.empty? %>
-      <%= render :partial => "assignments/syllabus_row", :object => @undated_events %>
+      <%= render :partial => "assignments/syllabus_row", :object => @undated_events.sort_by{|e| e.title } %>
     <% end %>
   </tbody>
 </table>
