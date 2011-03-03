@@ -655,7 +655,7 @@
         $dialog.find("#assignment_group_delete").attr('checked', true);
         $dialog.dialog('close').dialog({
           autoOpen: false,
-          width: 500,
+          width: 500
         }).dialog('open').data('group_id', data.assignment_group_id);
         return;
       }
