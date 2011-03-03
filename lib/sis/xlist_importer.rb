@@ -61,8 +61,34 @@ module SIS
           next
         end
         
-        add_error(csv, "TODO: xlist-importing not actually implemented. whoops.")
+        if row['status'] =~ /\Aactive\z/i
+          next if section.course.id == course.id
+          
+          section.account ||= section.course.account
+          section.save
+          begin
+            section.move_to_course course
+          rescue => e
+            add_warning(csv, "An active cross-listing failed: #{e}")
+            next
+          end
+  
+        elsif row['status'] =~ /\Adeleted\z/i
+          next if course && section.course != course 
+          
+          section.account = nil
+          section.save
+          begin
+            section.move_to_course section.last_course
+          rescue => e
+            add_warning(csv, "A deleted cross-listing failed: #{e}")
+            next
+          end
 
+        else
+          add_error(csv, "Improper status #{row['status']} for a cross-listing")
+        end
+        
         @sis.counts[:xlists] += 1
       end
     end

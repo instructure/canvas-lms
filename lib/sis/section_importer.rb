@@ -61,6 +61,8 @@ module SIS
         section ||= course.course_sections.new
         section.root_account_id = @root_account.id
         
+        section.account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
+        
         # only update the name on new records, and ones that haven't been changed since the last sis import
         if section.new_record? || (section.sis_name && section.sis_name == section.name)
           section.name = section.sis_name = row['name']
