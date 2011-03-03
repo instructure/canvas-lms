@@ -285,7 +285,7 @@
 <div style="display:none;">
   <%= render :partial => 'gradebook_uploads/form' %>
   <div id="gradebook_entry_template">
-    <div class="table_entry assignment_ASSIGNMENT_ID student_USER_ID" id="submission_USER_ID_ASSIGNMENT_ID" style="position: relative; text-align: center; vertical-align: middle; min-height: 20px;">
+    <div class="table_entry assignment_ASSIGNMENT_ID student_USER_ID" id="submission_USER_ID_ASSIGNMENT_ID" style="position: relative; text-align: center; vertical-align: middle; min-height: 20px; visibility: hidden;">
       <span tabindex="0" class="grade HARD_CODED_CLASS" style="text-align: center; cursor: pointer;">
         <a href="#" class="no-hover no-underline"> - </a>
       </span>
@@ -325,11 +325,13 @@
     <div style="margin-bottom: 5px;">
       <button type="button" class="button sort_gradebook sort_rows by_section" title="By Section Name" style="width: 300px;">By Section Name</button>
     </div>
-    <div style="margin-bottom: 5px;">
-      <button type="button" class="button sort_gradebook sort_rows by_grade by_grade_desc" title="By Total (Highest First)" style="width: 300px;">By Total (Highest First)</button>
-    </div>
-    <div style="margin-bottom: 5px;">
-      <button type="button" class="button sort_gradebook sort_rows by_grade by_grade_asc" title="By Total (Lowest First)" style="width: 300px;">By Total (Lowest First)</button>
+    <div class="grade_sorts" style="display: none;">
+      <div style="margin-bottom: 5px;">
+        <button type="button" class="button sort_gradebook sort_rows by_grade by_grade_desc" title="By Total (Highest First)" style="width: 300px;">By Total (Highest First)</button>
+      </div>
+      <div style="margin-bottom: 5px;">
+        <button type="button" class="button sort_gradebook sort_rows by_grade by_grade_asc" title="By Total (Lowest First)" style="width: 300px;">By Total (Lowest First)</button>
+      </div>
     </div>
   </div>
   <%= render :partial => "shared/message_students" %>
