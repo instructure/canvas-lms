@@ -35,11 +35,12 @@ module SIS
       @section_csvs = []
       @course_csvs = []
       @enrollment_csvs = []
+      @xlist_csvs = []
       
       @files = opts[:files] || []
       @batch = opts[:batch]
       @logger = opts[:logger]
-      @counts = {:accounts=>0,:terms=>0,:courses=>0,:sections=>0,:users=>0,:enrollments=>0}
+      @counts = {:accounts=>0,:terms=>0,:courses=>0,:sections=>0,:users=>0,:enrollments=>0,:xlists=>0}
       
       @total_rows = 1
       @current_row = 0
@@ -84,19 +85,29 @@ module SIS
       end
       
       @verify = {}
+      
       course_importer = CourseImporter.new(self)
       @course_csvs.each {|csv| course_importer.verify(csv, @verify) }
+      
       user_importer = UserImporter.new(self)
       @user_csvs.each {|csv| user_importer.verify(csv, @verify) }
       @verify[:user_rows] = nil
+      
       enrollment_importer = EnrollmentImporter.new(self)
       @enrollment_csvs.each {|csv| enrollment_importer.verify(csv, @verify) }
+      
       account_importer = AccountImporter.new(self)
       @account_csvs.each {|csv| account_importer.verify(csv, @verify) }
+      
       term_importer = TermImporter.new(self)
       @term_csvs.each {|csv| term_importer.verify(csv, @verify) }
+      
       section_importer = SectionImporter.new(self)
       @section_csvs.each {|csv| section_importer.verify(csv, @verify) }
+
+      xlist_importer = CrossListImporter.new(self)
+      @xlist_csvs.each {|csv| xlist_importer.verify(csv, @verify) }
+
       @verify = nil
       return unless @errors.empty?
 
@@ -106,6 +117,7 @@ module SIS
       @course_csvs.each {|csv| course_importer.process(csv) }
       @section_csvs.each {|csv| section_importer.process(csv) }
       @enrollment_csvs.each {|csv| enrollment_importer.process(csv) }
+      @xlist_csvs.each {|csv| xlist_importer.process(csv) }
       
       @finished = true
     rescue => e
@@ -200,6 +212,8 @@ module SIS
             @term_csvs << csv
           elsif SectionImporter.is_section_csv?(row)
             @section_csvs << csv
+          elsif CrossListImporter.is_xlist_csv?(row)
+            @xlist_csvs << csv
           else
             add_error(csv, "Couldn't find Canvas CSV import headers")
           end
