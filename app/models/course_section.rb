@@ -28,6 +28,7 @@ class CourseSection < ActiveRecord::Base
   belongs_to :sis_cross_listed_section
   belongs_to :abstract_course
   belongs_to :enrollment_term
+  belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :course_account_associations
   
