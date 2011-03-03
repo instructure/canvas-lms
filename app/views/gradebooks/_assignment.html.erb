@@ -1,6 +1,6 @@
 <% hide_dropdowns ||= false %>
 <div class="title display_name nobr" style="text-align: center;" title="<%= assignment.title %>">
-<% if (assignment.special_class rescue false) %>
+<% if assignment.special_class %>
   <span class="assignment_link assignment_title"><%= assignment.title %></span>
   <a href="#" class="assignment_link assignment_options" style="<%= hidden if hide_dropdowns %>">
     <%= image_tag 'blank.png', :class => "assignment_dropdown" %>
@@ -17,13 +17,13 @@
 <div style="font-size: 0.8em; text-align: center;">
   <div class="nobr">
     <span class="before_points_possible">
-    <% if (assignment.special_class != "group_total" rescue true) %>
+    <% if assignment.special_class != "group_total" %>
       out of
     <% end %>
     </span>
     <span class="points_possible"><%= (assignment.points_possible || nbsp) rescue nbsp %></span>
     <span class="after_points_possible">
-    <% if (assignment.special_class == "group_total" rescue false) && assignment.points_possible %>
+    <% if assignment.special_class == "group_total" && assignment.points_possible %>
      of grade
     <% end %>
     </span>

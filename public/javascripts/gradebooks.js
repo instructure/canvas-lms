@@ -27,8 +27,9 @@ var gradebook = (function(){
       $information_link = $("#information_link"),
       $total_tooltip = $("#total_tooltip"),
       content_offset = $("#content").offset(),
+      context_code = $("#gradebook_full_content").data('context_code'),
       ignoreUngradedSubmissions = true;
-      
+  $("body").append($total_tooltip);
   var possibleSections = {},
       $courseSections = $(".outer_student_name .course_section").each(function(){
         possibleSections[$(this).data('course_section_id')] = $(this).attr('title'); 
@@ -69,8 +70,8 @@ var gradebook = (function(){
           $total_tooltip.show().find(".text").text($obj.attr('data-tip'));
           var height = $total_tooltip.outerHeight();
           $total_tooltip.css({
-            left: position.left - content_offset.left + 2,
-            top: position.top - content_offset.top - height - 3
+            left: position.left - 2,
+            top: position.top - height - 3
           });
         } else {
           $total_tooltip.hide();
@@ -135,12 +136,22 @@ var gradebook = (function(){
         $("#gradebook_table").bind('entry_over', function(event, grid) {
           if(grid.trueEvent) {
             gradebook.showInfoLink(grid.cell);
+            function showTooltip(tip, skinny) {
+              var position = grid.cell.offset();
+              $total_tooltip.show().find(".text").html(tip);
+              var height = $total_tooltip.outerHeight();
+              $total_tooltip.css({
+                left: position.left - (skinny ? 15 : 2),
+                top: position.top - height - 3
+              });
+            }
             if(grid.cell.hasClass('late')) {
-              grid.cell.attr('title', 'This submission was submitted late');
+              showTooltip('This submission was submitted late');
             } else if(grid.cell.hasClass('dropped')) {
-              grid.cell.attr('title', 'This submission is dropped for grading purposes');
-            } else {
-              grid.cell.attr('title', '');
+              showTooltip('This submission is dropped for grading purposes');
+            } else if(datagrid.columns[grid.cell.column].hidden) {
+              var name = objectData(datagrid.cells['0,' + grid.cell.column]).title;
+              showTooltip(name + "<br/><span style='font-size: 0.9em;'>Click to expand</span>", true)
             }
           } else if(event && event.originalEvent && event.originalEvent.type && !event.originalEvent.type.match(/mouse/)) {
             grid.cell.find(".grade").focus().css('outline', 0);
@@ -489,7 +500,7 @@ var gradebook = (function(){
               var group_id = assignment.assignment_group_id;
               if(check_id && (check_id == "group-" + group_id || check_id == group_id)) {
                 var column = datagrid.position($("#assignment_" + assignment.id).parents(".cell")).column;
-                datagrid.toggleColumn(column, false, true);
+                datagrid.toggleColumn(column, false, {skipSizeGrid: true});
                 datagrid.sizeGrid();
               }
             });
@@ -642,8 +653,34 @@ var gradebook = (function(){
           object_data.grid = true;
           $(document).fragmentChange(fragmentCallback);
           $(document).fragmentChange();
+          var columns = $.grep(($.store.userGet('hidden_columns_' + context_code) || '').split(/,/), function(e) { return e; });
+          var columns_to_hide = [];
+          
+          $("#" + columns.join(',#')).parent().each(function() {
+            columns_to_hide.push(this);
+          });
+          if($.store.userGet('show_attendance_' + context_code) != 'true') {
+            $(".cell.assignment_name.attendance").each(function() {
+              columns_to_hide.push(this);
+            });
+          }
+          function nextColumn(i) {
+            var column = columns_to_hide.shift();
+            if(column) {
+              datagrid.toggleColumn(datagrid.position($(column)).column, false, {callback: false, skipSizeGrid: true});
+              if(i > 5) {
+                setTimeout(function() { nextColumn(0); }, 500);
+              } else {
+                nextColumn(i + 1);
+              }
+            } else {
+              datagrid.sizeGrid();
+            }
+          }
+          setTimeout(function() { nextColumn(0); }, 50);
+          var clump_size = INST.browser.ie ? 25 : 100;
           function moreSubmissions() {
-            for(var idx = 0; idx < 25; idx++) {
+            for(var idx = 0; idx < clump_size; idx++) {
               var item = gradebook.queuedSubmissions && gradebook.queuedSubmissions.shift();
               if(item) {
                 updateSubmission(item);
@@ -660,6 +697,16 @@ var gradebook = (function(){
         },
         tick: function() {
           $loading_gradebook_progressbar.progressbar('option', 'value', $loading_gradebook_progressbar.progressbar('option', 'value') + (25 / students_count));
+        },
+        toggle: function(column, show) {
+          var $cell = datagrid.cells[0 + ',' + column];
+          var id = $cell.children('.assignment_header').attr('id');
+          var columns = $.grep(($.store.userGet('hidden_columns_' + context_code) || '').split(/,/), function(e) { return e && (!show || e != id); });
+          if(!show) {
+            columns.push(id);
+          }
+          columns = $.uniq(columns);
+          $.store.userSet('hidden_columns_' + context_code, columns.join(','));
         }
       });
     };
@@ -975,6 +1022,29 @@ var gradebook = (function(){
       options['<span class="ui-icon ui-icon-person" /> ' + (show ? 'Show' : 'Hide') + ' Student Names'] = function() {
         $("#hide_students_option").attr('checked', !show).change();
       };
+      var show = $.store.userGet('show_attendance_' + context_code) == 'true';
+      options['<span class="ui-icon ui-icon-contact" /> ' + (show ? 'Hide' : 'Show') + ' Attendance Columns'] = function() {
+        $.store.userSet('show_attendance_' + context_code, show ? 'false' : 'true');
+        var columns_to_toggle = [];
+        $(".cell.assignment_name.attendance").each(function() {
+          columns_to_toggle.push(this);
+        });
+        function nextColumn(i) {
+          var column = columns_to_toggle.shift();
+          if(column) {
+            datagrid.toggleColumn(datagrid.position($(column)).column, !show, {skipSizeGrid: true});
+            if(i > 5) {
+              setTimeout(function() { nextColumn(0); }, 500);
+            } else {
+              nextColumn(i + 1);
+            }
+          } else {
+            datagrid.sizeGrid();
+          }
+        }
+        setTimeout(function() { nextColumn(0); }, 50);
+      };
+
       
       options['<span class="ui-icon ui-icon-check" /> ' + (ignoreUngradedSubmissions ? 'Include' : 'Ignore') + ' Ungraded Assignments'] = function() {
         ignoreUngradedSubmissions = !ignoreUngradedSubmissions;

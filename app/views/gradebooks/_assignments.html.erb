@@ -1,5 +1,5 @@
 <% @renders = {}; hide_dropdowns ||= false %>
-<table style="border-spacing: 0px; border-collapse: collapse; border: 0; margin: 0;" id="gradebook_full_content" class="hidden-readable"><tr>
+<table style="border-spacing: 0px; border-collapse: collapse; border: 0; margin: 0;" id="gradebook_full_content" class="hidden-readable" data-context_code="<%= @context.asset_string %>"><tr>
   <td><div id="topleft_content">
     <table cellspacing="0" class="gradebook_table" style="height: 100%; width: 100%;">
       <tr>
@@ -17,7 +17,7 @@
       <tr>
         <td style="display: none;"></td>
         <% for assignment in @assignments %>
-          <td class="outer_assignment_name assignment_name <%= assignment.try_rescue(:special_class) %> <%= "unpublished" if should_be_published?(@students, assignment, @submissions) %> <%= "published" if (!assignment || assignment.published?) %>" style="cursor: pointer;">
+          <td class="outer_assignment_name assignment_name <%= assignment.special_class %> <%= "unpublished" if should_be_published?(@students, assignment, @submissions) %> <%= "published" if (!assignment || assignment.published?) %> <%= 'attendance' if assignment.attendance? %>" style="cursor: pointer;">
             <div id="outer_assignment_<%= assignment.id %>" class="assignment_<%= assignment.id %> student_header">
               <%= @renders[assignment.asset_string] ||= render(:partial => 'assignment', :object => assignment, :locals => { :course => @context, :hide_dropdowns => hide_dropdowns }) %>
             </div>
@@ -53,7 +53,7 @@
           <div class="clear"></div>
         </div></td>
         <% for assignment in @assignments %>
-          <td class="assignment_name <%= assignment.try_rescue(:special_class) %>">
+          <td class="assignment_name <%= assignment.special_class %> <%= 'attendance' if assignment.attendance? %>">
             <div id="assignment_<%= assignment.id %>" class="assignment_header assignment_<%= assignment.id %> skip">
               <%= @renders[assignment.asset_string] ||= render(:partial => 'assignment', :object => assignment, :locals => { :course => @context, :hide_dropdowns => hide_dropdowns }) %>
             </div>
@@ -74,7 +74,7 @@
         </td>
         <% @assignments.each_with_index do |assignment, idx| 
         %>
-          <td class="student_assignment  <%= assignment.special_class if assignment.respond_to?(:special_class) %>">
+          <td class="student_assignment  <%= assignment.special_class %>">
             -
           </td>
         <% end %>
@@ -92,7 +92,7 @@
   </div>
   <div class="message"></div>
 </div>
-<div id="total_tooltip" style="display: none;">
+<div id="total_tooltip" style="display: none; z-index: 11;">
   <span class="text"></span>
   <div class="tooltip_tail"></div>
 </div>

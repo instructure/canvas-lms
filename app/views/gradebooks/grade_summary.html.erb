@@ -68,7 +68,7 @@
 <% turnitin_enabled = @context.turnitin_enabled? && @assignments.any?(&:turnitin_enabled) %>
 <% @assignments.each do |assignment| %>
   <% submission = @submissions.find {|s| s.assignment_id == assignment.id} %>
-  <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade %> <%= "hard_coded " + assignment.special_class rescue "editable" %>" id="<%= "submission_" + assignment.id.to_s %>">
+  <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade %> <%= "hard_coded " + (assignment.special_class || "editable") %>" id="<%= "submission_" + assignment.id.to_s %>">
     <td class="title">
       <% if assignment.class.to_s == "Assignment" %>
         <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @student.id) %>"><%= assignment.title %></a>
@@ -89,12 +89,12 @@
         <%= datetime_string(assignment.due_at, :due_date) rescue "" %>
       <% end %>
     </td>
-    <td class="assignment_score" title="<%= "Click to test a different score" unless (!editable || assignment.special_class rescue false) %>">
+    <td class="assignment_score" title="<%= "Click to test a different score" unless (!editable || assignment.special_class) %>">
       <div style="position: relative; height: 100%;" class="score_holder">
         <span class="tooltip">
           <span class="tooltip_wrap right">
             <span class="tooltip_text score_teaser">
-              <% if (assignment.special_class rescue false) %>
+              <% if assignment.special_class %>
                 Percent
               <% else %>
                 Click to test a different score
@@ -107,7 +107,7 @@
           <% if assignment.grading_type == 'letter_grade' %>
             <span class="score_value" style="font-size: 0.8em; color: #aaa; <%= hidden unless submission && submission.published_score %>"><%= submission.published_score rescue nbsp %></span>
           <% end %>
-          <%= "%" if (assignment.special_class rescue false) %>
+          <%= "%" if assignment.special_class %>
         </span>
         <div style="display: none;">
           <span class="original_score"><%= submission.published_score rescue "" %></span>
@@ -120,8 +120,8 @@
         </div>
       </div>
     </td>
-    <td class="possible points_possible" <%= "colspan='2'" if (assignment.special_class rescue false) %>><%= assignment.points_possible %></td>
-    <% if !(assignment.special_class rescue false) %>
+    <td class="possible points_possible" <%= "colspan='2'" if assignment.special_class %>><%= assignment.points_possible %></td>
+    <% if !assignment.special_class %>
     <td style="padding-left: 10px; white-space: nowrap;">
       <a href="#" class="toggle_comments_link tooltip" title="View comments and scoring details" style="<%= 'visibility: hidden;' unless submission && submission.submission_comments && !submission.submission_comments.empty? %>">
         <span class="tooltip_wrap right">
@@ -168,7 +168,7 @@
     </td>
     <% end %>
   </tr>
-  <% if !(assignment.special_class rescue false) %>
+  <% if !assignment.special_class %>
     <tr class="comments <%= 'assignment_graded' if submission && submission.grade %>" style="display: none;">
       <td colspan="5" style="padding-bottom: 20px;">
         <% if assignment && assignment.points_possible && assignment.points_possible > 0 %>

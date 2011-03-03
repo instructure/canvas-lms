@@ -35,6 +35,7 @@ var datagrid = {};
         datagrid.scrollCallback = options.scroll;
       }
       datagrid.table = $table;
+      datagrid.toggleCallback = options.toggle;
       var $columns = $table.find("tr:first td");
       var $rows = $table.find("tr");
       var columnTally = 0;
@@ -510,11 +511,14 @@ var datagrid = {};
       }
       return $row;
     },
-    toggleColumn: function(col, forceShow, skipSizeGrid) {
+    toggleColumn: function(col, forceShow, options) {
       var showing = !datagrid.columns[col].hidden;
       var show = !!datagrid.columns[col].hidden;
       if(forceShow) { show = true; }
       else if(forceShow === false) { show = false; }
+      if((!options || options.callback !== false) && $.isFunction(datagrid.toggleCallback)) {
+        datagrid.toggleCallback(col, !!show);
+      }
       if(showing == show) { return; }
       for(var i = 0; i < datagrid.rows.length; i++) {
         datagrid.cells[i + ',' + col]
@@ -522,9 +526,10 @@ var datagrid = {};
           .children().showIf(show).toggleClass('hidden_column', !show);
       }
       datagrid.columns[col].hidden = !show;
-      if(!skipSizeGrid) {
+      if(!options || !options.skipSizeGrid) {
         datagrid.sizeGrid();
       }
+      return show;
     },
     sizeGrid: function() {
       var width = 0;
@@ -532,7 +537,7 @@ var datagrid = {};
         width += (datagrid.columns[i].hidden ? 10 : datagrid.columns[i].metrics.width);
       }
       datagrid.divs.filler.width(width - datagrid.columns[0].metrics.width);
-      for(var i = 1; i < datagrid.rows.length; i++) {
+      for(var i = 0; i < datagrid.rows.length; i++) {
         datagrid.cells[i + ',' + 1].parent(".row").width(width + datagrid.columns.length + 3);
       }
     },

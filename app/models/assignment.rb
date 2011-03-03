@@ -174,6 +174,10 @@ class Assignment < ActiveRecord::Base
   end
   protected :default_values
   
+  def attendance?
+    submission_types == 'attendance'
+  end
+  
   def due_date
     self.all_day ? self.all_day_date : self.due_at
   end
@@ -1433,6 +1437,8 @@ class Assignment < ActiveRecord::Base
   def submissions_needing_grading
     self.submissions.select{|s| !s.graded? }
   end
+  
+  def special_class; nil; end
   
   def submission_action_string
     if self.submission_types == "online_quiz"
