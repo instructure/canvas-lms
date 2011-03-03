@@ -512,7 +512,7 @@ class CoursesController < ApplicationController
         if @context.grants_right?(@current_user, session, :manage_groups)
           @contexts += @context.groups
         else
-          @contexts += @user_groups
+          @contexts += @user_groups if @user_groups
         end
         @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
       end
