@@ -27,6 +27,7 @@ SERVER_PORT = SELENIUM_CONFIG[:app_port] || 3002
 APP_HOST = "#{SERVER_IP}:#{SERVER_PORT}"
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 60
+MAX_SERVER_START_TIME = 30
 
 module SeleniumTestsHelperMethods
   def setup_selenium
@@ -47,7 +48,7 @@ module SeleniumTestsHelperMethods
     "http://#{APP_HOST}"
   end
 
-  def self.start_webrick_server
+  def self.start_in_process_webrick_server
     HostUrl.default_host = APP_HOST
     HostUrl.file_host = APP_HOST
     server = SpecFriendlyWEBrickServer
@@ -63,6 +64,41 @@ module SeleniumTestsHelperMethods
       server.shutdown
       HostUrl.default_host = nil
       HostUrl.file_host = nil
+    end
+    at_exit { shutdown.call }
+    return shutdown
+  end
+  
+  def self.start_forked_webrick_server
+    domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
+    domain_conf = YAML.load_file(domain_conf_path)
+    old_domain = domain_conf[Rails.env]["domain"]
+    domain_conf[Rails.env]["domain"] = APP_HOST
+    File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
+    HostUrl.default_host = APP_HOST
+    HostUrl.file_host = APP_HOST
+    server_pid = fork do
+      exec(File.expand_path(File.dirname(__FILE__) +
+          "/../../script/server -p #{SERVER_PORT} -e #{Rails.env}"))
+    end
+    for i in 0..MAX_SERVER_START_TIME
+      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
+      break if s
+      sleep 1
+    end
+    raise "Failed starting script/server" unless s
+    s.close
+    closed = false
+    shutdown = lambda do
+      unless closed
+        Process.kill 'KILL', server_pid
+        Process.wait server_pid
+        domain_conf[Rails.env]["domain"] = old_domain
+        File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
+        HostUrl.default_host = nil
+        HostUrl.file_host = nil
+        closed = true
+      end
     end
     at_exit { shutdown.call }
     return shutdown
@@ -129,8 +165,7 @@ shared_examples_for "all selenium tests" do
   end
   
   append_before(:all) do
-    @webserver_shutdown = SeleniumTestsHelperMethods.start_webrick_server
-     @selenium_driver = setup_selenium
+    @selenium_driver = setup_selenium
   end
 
   append_after(:all) do
@@ -140,3 +175,16 @@ shared_examples_for "all selenium tests" do
  
 end
 
+shared_examples_for "in-process server selenium tests" do
+  it_should_behave_like "all selenium tests"
+  prepend_before(:all) do
+    @webserver_shutdown = SeleniumTestsHelperMethods.start_in_process_webrick_server
+  end
+end
+
+shared_examples_for "forked server selenium tests" do
+  it_should_behave_like "all selenium tests"
+  prepend_before(:all) do
+    @webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
+  end
+end

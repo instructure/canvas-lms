@@ -7,7 +7,7 @@ TEST_FILE_UUIDS = { "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
                     "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779" }
 
 shared_examples_for "file uploads selenium tests" do
-  it_should_behave_like "all selenium tests"
+  it_should_behave_like "forked server selenium tests"
   
   append_after(:all) do
     Setting.remove("file_storage_test_override")
@@ -113,17 +113,14 @@ end
 
 describe "file uploads Windows-Firefox-Local-Tests" do
   it_should_behave_like "file uploads selenium tests"
-  before(:all) {
+  prepend_before(:all) {
     Setting.set("file_storage_test_override", "local")
   }
 end
 
-## TODO: currently broken, we need to have the webrick server completely restart
-##       after file_storage_test_override is set so attachment.rb loads
-##       correctly
-#describe "file uploads Windows-Firefox-S3-Tests" do
-#  it_should_behave_like "file uploads selenium tests"
-#  prepend_before(:all) {
-#    Setting.set("file_storage_test_override", "s3")
-#  }
-#end
+describe "file uploads Windows-Firefox-S3-Tests" do
+  it_should_behave_like "file uploads selenium tests"
+  prepend_before(:all) {
+    Setting.set("file_storage_test_override", "s3")
+  }
+end
