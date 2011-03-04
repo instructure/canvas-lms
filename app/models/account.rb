@@ -539,7 +539,7 @@ class Account < ActiveRecord::Base
   end
 
   def email_pseudonyms
-    false #true
+    false
   end
   
    def password_authentication?
@@ -618,7 +618,7 @@ class Account < ActiveRecord::Base
   # Updates account associations for all the courses and users associated with this account
   def update_account_associations
     all_user_ids = []
-    self.associated_courses.compact.each do |course|
+    self.associated_courses.compact.uniq.each do |course|
       # Don't update the user associations yet, we'll do that afterwards so we only do it once per user
       course.update_account_associations(false)
       all_user_ids += course.user_ids
@@ -661,7 +661,7 @@ class Account < ActiveRecord::Base
   end
   
   def course_count
-    self.child_courses.not_deleted.count
+    self.child_courses.not_deleted.uniq.count
   end
   memoize :course_count
   

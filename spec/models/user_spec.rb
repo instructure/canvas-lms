@@ -73,7 +73,7 @@ describe User do
     @user.associated_accounts.first.should eql(account2)
   end
   
-  it "should update account associations when a course account moves in the heirachy" do
+  it "should update account associations when a course account moves in the hierachy" do
     account1 = account_model
     
     @enrollment = course_with_student(:account => account1)

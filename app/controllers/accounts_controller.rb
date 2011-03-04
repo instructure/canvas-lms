@@ -169,7 +169,7 @@ class AccountsController < ApplicationController
     @maximum_courses_im_gonna_show = 100
     @term = @root_account.enrollment_terms.active.find(params[:enrollment_term_id]) rescue nil
     @term ||= @root_account.enrollment_terms.active[-1]
-    @associated_courses_count = @account.associated_courses.active.for_term(@term).count
+    @associated_courses_count = @account.associated_courses.active.for_term(@term).uniq.count
   end
   protected :load_course_right_side
   

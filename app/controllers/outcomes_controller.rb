@@ -97,9 +97,6 @@ class OutcomesController < ApplicationController
   def list
     if authorized_action(@context, @current_user, :manage_outcomes)
       @account_contexts = @context.associated_accounts rescue []
-      codes = @account_contexts.map(&:asset_string)
-      order = {}
-      codes.each_with_index{|c, idx| order[c] = idx }
       @current_outcomes = @context.learning_outcomes
       @outcomes = []
       ([@context] + @account_contexts).uniq.each do |context|
@@ -117,7 +114,7 @@ class OutcomesController < ApplicationController
   # who named this method, anyway?  spaz.
   def add_outcome
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @account_contexts = @context.associated_accounts rescue []
+      @account_contexts = @context.associated_accounts.uniq rescue []
       codes = @account_contexts.map(&:asset_string)
       @outcome = LearningOutcome.for_context_codes(codes).find(params[:learning_outcome_id])
       @group = @context.learning_outcome_groups.find(params[:learning_outcome_group_id])

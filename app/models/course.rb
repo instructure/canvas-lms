@@ -209,9 +209,10 @@ class Course < ActiveRecord::Base
     associations_hash = {}
     to_delete = {}
     self.course_account_associations.each do |association|
-      if !associations_hash[association.account_id]
-        associations_hash[association.account_id] = association
-        to_delete[association.account_id] = association
+      key = [association.account_id, association.course_section_id]
+      if !associations_hash[key]
+        associations_hash[key] = association
+        to_delete[key] = association
       else
         association.destroy
       end
@@ -222,23 +223,24 @@ class Course < ActiveRecord::Base
     # Courses are tied to accounts directly and through cross-listed sections.
     initial_entities = [self] + self.course_sections.active.find(:all, :include => { :abstract_course => :department })
     initial_entities.each do |entity|
-      accounts = if entity.is_a?(Course) && entity.account
+      accounts = if entity.account
                    entity.account.account_chain
                  elsif entity.abstract_course && entity.abstract_course.department
                    entity.abstract_course.department.account_chain
                  else
                    [ ]
                  end
+      section = (entity.is_a?(Course) ? entity.default_section : entity)
       accounts.each_with_index do |account, idx|
-        section = (entity.is_a?(Course) ? entity.default_section : entity)
-        if associations_hash[account.id]
-          unless associations_hash[account.id].depth == idx && associations_hash[account.id].course_section_id == section.id
-            associations_hash[account.id].update_attributes(:depth => idx, :course_section_id => section.id)
+        key = [account.id, section.id]
+        if associations_hash[key]
+          unless associations_hash[key].depth == idx
+            associations_hash[key].update_attributes(:depth => idx)
             did_an_update = true
           end
-          to_delete.delete(account.id)
+          to_delete.delete(key)
         else
-          self.course_account_associations.create(:account_id => account.id, :depth => idx, :course_section_id => section.id)
+          associations_hash[key] = self.course_account_associations.create(:account_id => account.id, :depth => idx, :course_section_id => section.id)
           did_an_update = true
         end
       end
