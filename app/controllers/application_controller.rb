@@ -688,23 +688,23 @@ class ApplicationController < ActionController::Base
     session[:course_uuid] = nil
   end
 
-  class InvalidDeveloperAPIKey < ActionController::ActionControllerError #:nodoc:
+  class InvalidDeveloperAPIKey < ActionController::InvalidAuthenticityToken #:nodoc:
   end
+  rescue_responses['ApplicationController::InvalidDeveloperAPIKey'] = rescue_responses['ActionController::InvalidAuthenticityToken']
 
-  alias_method :original_verify_authenticity_token, :verify_authenticity_token
   # Had to overwrite this method so we can say you don't need to have an
   # authenticity_token if the request is coming from an api request.
   # we also check for the session token not being set at all here, to catch
   # those who have cookies disabled.
   def verify_authenticity_token
     params[request_forgery_protection_token] = params[request_forgery_protection_token].gsub(" ", "+") rescue nil
-    if params[:api_key] && request.path.match(/\A\/api\//)
+    if params[:api_key] && api_request?
       @developer_key = DeveloperKey.find_by_api_key(params[:api_key])
-      @developer_key || raise(ApplicationController::InvalidDeveloperAPIKey)
+      @developer_key || raise(InvalidDeveloperAPIKey)
     elsif protect_against_forgery? &&
           request.method != :get &&
           verifiable_request_format?
-      if session[:_csrf_token].nil? && session.empty? && !request.xhr?
+      if session[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
         # the session should have the token stored by now, but doesn't? sounds
         # like the user doesn't have cookies enabled.
         redirect_to(login_url(:needs_cookies => '1'))
@@ -713,6 +713,10 @@ class ApplicationController < ActionController::Base
         raise(ActionController::InvalidAuthenticityToken) unless form_authenticity_token == form_authenticity_param
       end
     end
+  end
+
+  def api_request?
+    !!request.path.match(/\A\/api\//)
   end
 
   def session_loaded?

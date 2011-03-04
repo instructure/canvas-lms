@@ -105,4 +105,51 @@ describe "security" do
       end
     end
   end
+
+  class Basic
+    extend ActionController::HttpAuthentication::Basic
+  end
+
+  describe "API" do
+    it "should require a developer key for /api non-GETs" do
+      AssignmentsApiController.allow_forgery_protection = true
+
+      # well, unless they have an authenticity token
+      course_with_teacher(:active_all => true)
+      user_with_pseudonym(:user => @user,
+                          :username => "nobody@example.com",
+                          :password => "asdfasdf")
+
+      post "/api/v1/courses/#{@course.id}/assignments",
+      {},
+        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      assert_response 422
+
+      post "/api/v1/courses/#{@course.id}/assignments",
+      {:api_key => "MYKEY"},
+        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      assert_response 422
+
+      key = DeveloperKey.create(:api_key => "MYKEY")
+      post "/api/v1/courses/#{@course.id}/assignments",
+        {:api_key => "MYKEY", :assignment => { :name => 'new assignment' } },
+        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      assert_response 201
+    end
+
+    # this might change eventually
+    it "should allow GET for /api even without a key" do
+      AssignmentsApiController.allow_forgery_protection = true
+
+      # well, unless they have an authenticity token
+      course_with_teacher(:active_all => true)
+      user_with_pseudonym(:user => @user,
+                          :username => "nobody@example.com",
+                          :password => "asdfasdf")
+      get "/api/v1/courses/#{@course.id}/assignments",
+      {},
+        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      assert_response 200
+    end
+  end
 end

@@ -77,15 +77,16 @@ Spec::Runner.configure do |config|
   end
 
   def user_with_pseudonym(opts={})
-    user(opts)
+    user(opts) unless opts[:user]
+    user = opts[:user] || @user
     username = opts[:username] || "nobody@example.com"
     password = opts[:password] || "asdfasdf"
-    @pseudonym = @user.pseudonyms.create!(:unique_id => username, :path => username, :password => password, :password_confirmation => password)
+    @pseudonym = user.pseudonyms.create!(:unique_id => username, :path => username, :password => password, :password_confirmation => password)
     @cc = @pseudonym.communication_channel
     @cc.should_not be_nil
     @cc.should_not be_new_record
-    @user.communication_channels << @cc
-    @user
+    user.communication_channels << @cc
+    user
   end
 
   def course_with_student(opts={})
