@@ -130,7 +130,7 @@ class RubricAssociation < ActiveRecord::Base
   end
   
   def update_values
-    self.bookmarked = true if self.purpose == 'bookmark'
+    self.bookmarked = true if self.purpose == 'bookmark' || self.bookmarked.nil?
     self.context_code ||= "#{self.context_type.underscore}_#{self.context_id}" rescue nil
     self.title ||= (self.association.title rescue self.association.name) rescue nil
   end
