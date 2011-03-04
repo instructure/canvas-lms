@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.instructure.com/xsd/cccv0p1"
+           xmlns="http://www.instructure.com/xsd/cccv0p1"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+  <xs:element name="course">
+    <xs:complexType>
+      <xs:all minOccurs="0">
+        <xs:element name="title" type="xs:string"/>
+        <xs:element name="course_code" type="xs:string"/>
+        <xs:element name="start_at" type="xs:dateTime"/>
+        <xs:element name="conclude_at" type="xs:dateTime"/>
+        <xs:element name="is_public" type="xs:boolean"/>
+        <xs:element name="indexed" type="xs:boolean"/>
+        <xs:element name="publish_grades_immediately" type="xs:boolean"/>
+        <xs:element name="allow_student_wiki_edits" type="xs:boolean"/>
+        <xs:element name="allow_student_assignment_edits" type="xs:boolean"/>
+        <xs:element name="hashtag" type="xs:string"/>
+        <xs:element name="show_public_context_messages" type="xs:boolean"/>
+        <xs:element name="allow_student_forum_attachments" type="xs:boolean"/>
+        <xs:element name="default_wiki_editing_roles" type="xs:string"/>
+        <xs:element name="allow_student_organized_groups" type="xs:boolean"/>
+        <xs:element name="show_all_discussion_entries" type="xs:boolean"/>
+        <xs:element name="open_enrollment" type="xs:boolean"/>
+        <xs:element name="storage_quota" type="xs:integer"/>
+        <xs:element name="allow_wiki_comments" type="xs:boolean"/>
+        <xs:element name="self_enrollment" type="xs:boolean"/>
+        <xs:element name="syllabus_body" type="xs:string"/>
+        <xs:element name="turnitin_comments" type="xs:string"/>
+        <xs:element name="default_view">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="feed"/>
+              <xs:enumeration value="wiki"/>
+              <xs:enumeration value="modules"/>
+              <xs:enumeration value="assignments"/>
+              <xs:enumeration value="syllabus"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="license">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="private"/>
+              <xs:enumeration value="public_domain"/>
+              <xs:enumeration value="cc_by_nc_nd"/>
+              <xs:enumeration value="cc_by_nc_sa"/>
+              <xs:enumeration value="cc_by_nc"/>
+              <xs:enumeration value="cc_by_nd"/>
+              <xs:enumeration value="cc_by_sa"/>
+              <xs:enumeration value="cc_by"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="group_weighting_scheme">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="percent"/>
+              <xs:enumeration value="equal"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:all>
+      <xs:attribute name="identifier" type="xs:ID" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
