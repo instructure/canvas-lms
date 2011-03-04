@@ -17,6 +17,8 @@
 #
 
 # @API Assignment Groups
+#
+# API for accessing Assignment Group and Assignment information.
 class AssignmentGroupsController < ApplicationController
   before_filter :require_user_for_context
 
@@ -34,21 +36,26 @@ class AssignmentGroupsController < ApplicationController
   #   groups for this context.
   #
   # @example_response
+  #   ?include[]=assignments
+  #
   #   [
   #     {
   #       "position": 7,
   #       "name": "group2",
-  #       "id": 1
+  #       "id": 1,
+  #       "assignments": [...]
   #     },
   #     {
   #       "position": 10,
   #       "name": "group1",
-  #       "id": 2
+  #       "id": 2,
+  #       "assignments": [...]
   #     },
   #     {
   #       "position": 12,
   #       "name": "group3",
-  #       "id": 3
+  #       "id": 3,
+  #       "assignments": [...]
   #     }
   #   ]
   def index

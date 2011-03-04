@@ -1,0 +1,12 @@
+<nav>
+  <h2 class='first'>Basics</h2>
+  <a>Request/Response</a>
+  <a>Auth</a>
+  <h2>Resources</h2>
+  <% options[:resources].each_with_index do |(resource, controllers), i| %>
+    <% link = url_for("#{topicize resource}.html")
+       klass = []
+       klass << "current" if resource == options[:object] %>
+    <a class="<%= klass.join(' ') %>" href="<%= link %>"><%= resource %></a>
+  <% end %>
+</nav>

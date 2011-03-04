@@ -1,0 +1,3 @@
+<h3>
+  <%= @route.conditions[:method].to_s.upcase %> <%= @route.segments.inject("") { |str,s| str << s.to_s }.sub(/\(\.:format\)\?/, '').sub(/\/$/, '') %>.json
+</h3>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%= erb(:headers) %>
+  </head>
+  <body>
+    <div id="header">
+      <%= erb(:header) %>
+    </div>
+
+    <div id="sidebar">
+      <%= erb(:sidebar) %>
+    </div>
+
+    <div id="content"><%= yieldall %></div>
+
+    <%= erb(:footer) %>
+  </body>
+</html>
