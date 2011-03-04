@@ -2202,6 +2202,9 @@ var fileUpload = {
     fileUpload.updateUploadCount();
     $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {
       file.upload_url = data.proxied_upload_url || data.upload_url;
+      // It seems that the swf uploader is unencoding some of these params, so we need
+      // to encode them now.
+      data.upload_params.key = encodeURIComponent(data.upload_params.key);
       data.upload_params.Signature = encodeURIComponent(data.upload_params.Signature);
       file.upload_params = data.upload_params;
       $file.data('success_url', data.success_url);
