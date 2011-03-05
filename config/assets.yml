@@ -65,6 +65,7 @@ javascripts:
   topic:
     - public/javascripts/topic.js
     - public/javascripts/edit_rubric.js
+    - public/javascripts/rubric_assessment.js
   account_statistics:
     - public/javascripts/account_statistics.js
   assignments:

@@ -244,7 +244,8 @@ var wikiSidebar;
     };
 
     $(".show_rubric_link").click(function(event) {
-      var $dialog = $("#rubric_dialog");
+      event.preventDefault();
+      var $dialog = $("#rubrics.rubric_dialog");
       $dialog.dialog('close').dialog({
         title: "Assignment Rubric Details",
         width: 600,
@@ -252,6 +253,18 @@ var wikiSidebar;
         resizable: true,
         autoOpen: false
       }).dialog('open');
+    });
+    $(".add_topic_rubric_link").click(function(event) {
+      event.preventDefault();
+      var $dialog = $("#rubrics.rubric_dialog");
+      $dialog.dialog('close').dialog({
+        title: "Assignment Rubric Details",
+        width: 600,
+        modal: false,
+        resizable: true,
+        autoOpen: false
+      }).dialog('open');
+      $(".add_rubric_link").click();
     });
     $("#add_entry_form .add_attachment_link").click(function(event) {
       event.preventDefault();

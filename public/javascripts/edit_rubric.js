@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var limitToOneRubric;
 $(document).ready(function() {
+  var limitToOneRubric = true;
   var $rubric_dialog = $("#rubric_dialog"),
       $rubric_long_description_dialog = $("#rubric_long_description_dialog");
   
@@ -106,7 +106,7 @@ $(document).ready(function() {
       message: message,
       success: function() {
         $(this).fadeOut(function() {
-          $(".add_rubric_link").slideDown();
+          $(".add_rubric_link").show();
           if(callback && $.isFunction(callback)) {
             callback();
           }
@@ -852,7 +852,7 @@ var rubricEditing = {
       if($rubric.attr('id') != 'rubric_new') {
         $rubric.prev(".rubric").show();
       } else {
-        $(".add_rubric_link").slideDown();
+        $(".add_rubric_link").show();
       }
       $rubric.remove();
     } else {

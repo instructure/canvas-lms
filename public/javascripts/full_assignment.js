@@ -621,7 +621,13 @@ jQuery(function($){
     }
   }).change();
   setTimeout(function() {
-    if($("#full_assignment_holder").hasClass('editing')) {
+    if(location.hash == '#add_rubric') {
+      $(".add_rubric_link:visible:first").click();
+    } else if(location.hash == '#edit_rubric') {
+      var $link = $(".edit_rubric_link:visible:first");
+      $("html,body").scrollTo($link.closest(".rubric"));
+      $link.click();
+    } else if($("#full_assignment_holder").hasClass('editing')) {
       $(".edit_full_assignment_link:first").click();
       $("#full_assignment_holder .more_options_link:first").click();
     }
