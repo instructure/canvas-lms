@@ -226,8 +226,10 @@
     <% if @quiz.available? %>
       <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="no-hover back">Return to Quiz Page</a><br/>
     <% end %>
+    <% if @assignment %>
+    <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link rubric" style="<%= hidden unless @assignment %>">Show Assignment Rubric</a>
+    <% end %>
     <a href="#" class="add_question_link add">Add a New Question</a><br/>
-    <!--a class="add" href="#">Add an Existing Question</a><br/-->
   </div>
 <% end %>
 <% js_block do %>
@@ -262,6 +264,7 @@ $(document).ready(function() {
   want to consider re-grading students who took the old version of the quiz.
 </div>
 <% end %>
+
 <div style="margin-bottom: 25px;">
   Quiz Instructions:
   <a style="float: right; font-size: 0.8em; cursor: pointer;" href="#" class="toggle_description_views_link">Switch Views</a>

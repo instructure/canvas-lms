@@ -104,10 +104,12 @@
           <input type="checkbox" id="rubric_custom_rating" class="rubric_custom_rating" <%= 'checked' if rubric && rubric.free_form_criterion_comments %>/>
           <label for="rubric_custom_rating">I'll write free-form comments when assessing students</label>
         </div>
-        <div class="rubric_grading" style="<%= hidden unless @assignment %>">
-          <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" <%= 'checked' if rubric_association && rubric_association.use_for_grading %>/>
-          <label for="grading_rubric">Use this rubric for assignment grading</label>
-        </div>
+        <% if !@assignment || @assignment.submission_types != 'online_quiz' %>
+          <div class="rubric_grading" style="<%= hidden unless @assignment %>">
+            <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" <%= 'checked' if rubric_association && rubric_association.use_for_grading %>/>
+            <label for="grading_rubric">Use this rubric for assignment grading</label>
+          </div>
+        <% end %>
         <div class="totalling_rubric" style="<%= hidden unless @assignment %>">
           <input type="checkbox" id="totalling_rubric" class="totalling_rubric_checkbox" <%= 'checked' if rubric_association && rubric_association.hide_score_total %>/>
           <label for="totalling_rubric">Hide score total for assessment results</label>

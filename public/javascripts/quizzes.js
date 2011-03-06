@@ -1008,6 +1008,7 @@ var quiz = {};
             $group.append($option);
           }
         }
+        $(".show_rubric_link").showIf(data.quiz.assignment);
         $("#quiz_assignment_id").val(data.quiz.quiz_type || "practice_quiz").change(); //data.quiz.assignment.id).change();
         if($(this).data('submit_type') == 'save_and_publish') {
           location.href = $(this).attr('action');

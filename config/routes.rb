@@ -116,6 +116,7 @@ ActionController::Routing::Routes.draw do |map|
       assignment.resources :submissions do |submission|
         submission.turnitin_report 'turnitin/:asset_string', :controller => 'submissions', :action => 'turnitin_report'
       end
+      assignment.rubric "rubric", :controller => 'assignments', :action => 'rubric'
       assignment.resource :rubric_association, :as => :rubric do |association|
         association.resources :rubric_assessments, :as => 'assessments'
       end

@@ -106,6 +106,13 @@ class AssignmentsController < ApplicationController
     end
   end
   
+  def rubric
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+    if authorized_action(@assignment, @current_user, :read)
+      render :partial => 'shared/assignment_rubric_dialog'
+    end
+  end
+  
   def assign_peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)

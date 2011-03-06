@@ -83,8 +83,8 @@
             <a target="_blank" class="button button-sidebar button-sidebar-wide" href="<%= context_url(@topic.assignment.context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment_id) %>"><%= image_tag "grading_icon.png" %> Speed Grader</a>
           <% end %>
         <% end %>
-        <% if @assignment && @assignment.rubric_association && @assignment.rubric_association.rubric || can_do(@topic.assignment, @current_user, :update) %>
-          <a href="#" class="show_rubric_link button button-sidebar-wide"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
+        <% if can_do(@topic.assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
+          <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
         <% end %>
       </div>
     <% end %>
@@ -180,32 +180,6 @@
   </div>
 <% end %>
 <% if @headers == false || @locked %>
-  </div>
-<% end %>
-
-<% if @assignment %>
-  <div id="rubrics" class="rubric_dialog" style="display: none;">
-    <% if @assignment.rubric_association && @assignment.rubric_association.rubric %>
-      <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric, :locals => {:association => @assignment, :rubric_association => @assignment.rubric_association, :editable => can_do(@assignment, @current_user, :update), :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => true} %>
-    <% end %>
-    <div style="display: none;" id="rubric_parameters">
-      <input type="hidden" name="rubric_association[association_type]" value="Assignment"/>
-      <input type="hidden" name="rubric_association[association_id]" value="<%= @assignment.id %>"/>
-      <input type="hidden" name="rubric_association[purpose]" value="grading"/>
-    </div>
-    <% if can_do(@assignment, @current_user, :update) %>
-      <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.rubric_association && @assignment.rubric_association.rubric} %>
-    <% end %>
-    <%= render :partial => "shared/rubric_criterion_dialog" %>
-    <%= render :partial => "shared/find_outcome" %>
-    <%= render :partial => "shared/rubric", :object => nil, :locals => {:association => @assignment, :editable => can_do(@assignment, @current_user, :update), :has_assessments => false, :edit_view => true, :read_only => !can_do(@assignment, @current_user, :update)} %>
-    <% if can_do(@assignment, @current_user, :update) %>
-      <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-        <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.rubric_association %>">Assign Rubric</a>
-      </div>
-      <%= render :partial => "shared/rubric_forms" %>
-    <% end %>
-    <a href="#" class="button add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.rubric_association %>"><%= image_tag "rubric.png" %> Add Rubric</a>
   </div>
 <% end %>
 

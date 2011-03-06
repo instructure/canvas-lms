@@ -98,7 +98,8 @@ class QuizzesController < ApplicationController
       @locked = @locked_reason && !@quiz.grants_right?(@current_user, session, :update)
 
       @quiz.context_module_action(@current_user, :read) if !@locked
-      
+
+      @assignment = @quiz.assignment
       @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id, :order => 'created_at') rescue nil
       if !@current_user || (params[:preview] && @quiz.grants_right?(@current_user, session, :update))
         user_code = temporary_user_code

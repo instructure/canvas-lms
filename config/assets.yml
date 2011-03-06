@@ -64,8 +64,6 @@ javascripts:
     - public/javascripts/topics.js
   topic:
     - public/javascripts/topic.js
-    - public/javascripts/edit_rubric.js
-    - public/javascripts/rubric_assessment.js
   account_statistics:
     - public/javascripts/account_statistics.js
   assignments:
@@ -121,11 +119,13 @@ javascripts:
     - public/javascripts/quizzes.js
     - public/javascripts/supercalc.js
     - public/javascripts/calcCmd.js
+    - public/javascripts/quiz_rubric.js
   quizzes_index:
     - public/javascripts/quiz_index.js
     - public/javascripts/content_locks.js
   quiz_show:
     - public/javascripts/quiz_show.js
+    - public/javascripts/quiz_rubric.js
     - public/javascripts/message_students.js
   take_quiz:
     - public/javascripts/quiz_timing.js

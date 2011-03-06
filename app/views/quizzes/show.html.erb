@@ -45,6 +45,9 @@
             <% end %>
           <% end %>
         <% end %>
+        <% if can_do(@assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
+          <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide" style="<%= hidden unless @assignment %>"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
+        <% end %>
         <% if can_do(@quiz, @current_user, :grade) && @quiz.available? %>
           <% submitted_student_ids = @submitted_students.map{|s| s.id} %>
           <a href="#" class="button quiz_details_link button-sidebar-wide">
@@ -75,7 +78,7 @@
         <% elsif @submission && @submission.untaken? %>
           <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
             You're in the middle of taking this <%= @quiz.readable_type.downcase %>.<br/>
-            <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>">Resume <%= @quiz.readable_type %></a>
+            <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" class="button">Resume <%= @quiz.readable_type %></a>
           </div>
         <% end %>
         <% if @quiz.for_assignment? %>
