@@ -727,7 +727,7 @@ var quiz = {};
         });
       } else {
         question.formulas = [];
-        $question.find(".formulas_holder .formulas_list").each(function() {
+        $question.find(".formulas_holder .formulas_list > div").each(function() {
           question.formulas.push($.trim($(this).text()));
         });
         question.variables = [];
