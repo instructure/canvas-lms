@@ -234,7 +234,8 @@ class Assignment < ActiveRecord::Base
   
   def update_quiz_or_discussion_topic
     if self.submission_types == "online_quiz" && @saved_by != :quiz
-      quiz = Quiz.find_by_assignment_id(self.id) || self.context.quizzes.build(:assignment_id => self.id)
+      quiz = Quiz.find_by_assignment_id(self.id) || self.context.quizzes.build
+      quiz.assignment_id = self.id
       quiz.title = self.title
       quiz.description = self.description
       quiz.due_at = self.due_at
@@ -242,6 +243,7 @@ class Assignment < ActiveRecord::Base
       quiz.lock_at = self.lock_at
       quiz.points_possible = self.points_possible
       quiz.assignment_group_id = self.assignment_group_id
+      quiz.workflow_state = 'created' if quiz.deleted?
       quiz.saved_by = :assignment
       quiz.save
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
@@ -251,6 +253,7 @@ class Assignment < ActiveRecord::Base
       topic.message = self.description
       topic.saved_by = :assignment
       topic.updated_at = Time.now
+      topic.workflow_state = 'active' if topic.deleted?
       topic.save
     end
   end

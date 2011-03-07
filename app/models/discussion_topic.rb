@@ -114,7 +114,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.context_module_tag.confirm_valid_module_requirements
     end
     if @old_assignment_id
-      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :context_id => self.context_id, :context_type => self.context_type})
+      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic'})
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
       ContentTag.delete_for(Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     elsif self.assignment && @saved_by != :assignment
@@ -288,10 +288,10 @@ class DiscussionTopic < ActiveRecord::Base
   def unlink_from(type)
     @saved_by = type
     if self.discussion_entries.empty?
-      self.assignment_id = nil
-      self.destroy 
+      self.assignment = nil
+      self.destroy
     else
-      self.assignment_id = nil
+      self.assignment = nil
       self.save
     end
     self.child_topics.each{|t| t.unlink_from(:assignment) }

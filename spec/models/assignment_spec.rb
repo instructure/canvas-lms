@@ -589,6 +589,65 @@ describe Assignment do
       @a.quiz.should be_nil
     end
     
+    it "should not delete the assignment when unlinked from a quiz" do
+      assignment_model(:submission_types => "online_quiz")
+      @a.reload
+      @a.submission_types.should eql('online_quiz')
+      @quiz = @a.quiz
+      @quiz.should_not be_nil
+      @quiz.state.should eql(:created)
+      @quiz.assignment_id.should eql(@a.id)
+      @a.submission_types = 'on_paper'
+      @a.save!
+      @quiz = Quiz.find(@quiz.id)
+      @quiz.assignment_id.should eql(nil)
+      @quiz.state.should eql(:deleted)
+      @a.reload
+      @a.quiz.should be_nil
+      @a.state.should eql(:published)
+    end
+    
+    it "should not delete the quiz if non-empty when unlinked" do
+      assignment_model(:submission_types => "online_quiz")
+      @a.reload
+      @a.submission_types.should eql('online_quiz')
+      @quiz = @a.quiz
+      @quiz.should_not be_nil
+      @quiz.assignment_id.should eql(@a.id)
+      @quiz.quiz_questions.create!()
+      @quiz.generate_quiz_data
+      @quiz.save!
+      @a.quiz.reload
+      @quiz.root_entries.should_not be_empty
+      @a.submission_types = 'on_paper'
+      @a.save!
+      @a.reload
+      @a.quiz.should be_nil
+      @a.state.should eql(:published)
+      @quiz = Quiz.find(@quiz.id)
+      @quiz.assignment_id.should eql(nil)
+      @quiz.state.should eql(:created)
+    end
+    
+    it "should grab the original quiz if unlinked and relinked" do
+      assignment_model(:submission_types => "online_quiz")
+      @a.reload
+      @a.submission_types.should eql('online_quiz')
+      @quiz = @a.quiz
+      @quiz.should_not be_nil
+      @quiz.assignment_id.should eql(@a.id)
+      @a.quiz.reload
+      @a.submission_types = 'on_paper'
+      @a.save!
+      @a.submission_types = 'online_quiz'
+      @a.save!
+      @a.reload
+      @a.quiz.should eql(@quiz)
+      @a.state.should eql(:published)
+      @quiz.reload
+      @quiz.state.should eql(:created)
+    end
+
     it "should create a discussion_topic if none exists and specified" do
       assignment_model(:submission_types => "discussion_topic")
       @a.submission_types.should eql('discussion_topic')
@@ -610,6 +669,60 @@ describe Assignment do
       @a.save!
       @a.reload
       @a.discussion_topic.should be_nil
+    end
+    
+    it "should not delete the assignment when unlinked from a topic" do
+      assignment_model(:submission_types => "discussion_topic")
+      @a.submission_types.should eql('discussion_topic')
+      @topic = @a.discussion_topic
+      @topic.should_not be_nil
+      @topic.state.should eql(:active)
+      @topic.assignment_id.should eql(@a.id)
+      @a.submission_types = 'on_paper'
+      @a.save!
+      @topic = DiscussionTopic.find(@topic.id)
+      @topic.assignment_id.should eql(nil)
+      @topic.state.should eql(:deleted)
+      @a.reload
+      @a.discussion_topic.should be_nil
+      @a.state.should eql(:published)
+    end
+    
+    it "should not delete the topic if non-empty when unlinked" do
+      assignment_model(:submission_types => "discussion_topic")
+      @a.submission_types.should eql('discussion_topic')
+      @topic = @a.discussion_topic
+      @topic.should_not be_nil
+      @topic.assignment_id.should eql(@a.id)
+      @topic.discussion_entries.create!(:user => @user, :message => "testing")
+      @a.discussion_topic.reload
+      @a.submission_types = 'on_paper'
+      @a.save!
+      @a.reload
+      @a.discussion_topic.should be_nil
+      @a.state.should eql(:published)
+      @topic = DiscussionTopic.find(@topic.id)
+      @topic.assignment_id.should eql(nil)
+      @topic.state.should eql(:active)
+    end
+    
+    it "should grab the original topic if unlinked and relinked" do
+      assignment_model(:submission_types => "discussion_topic")
+      @a.submission_types.should eql('discussion_topic')
+      @topic = @a.discussion_topic
+      @topic.should_not be_nil
+      @topic.assignment_id.should eql(@a.id)
+      @topic.discussion_entries.create!(:user => @user, :message => "testing")
+      @a.discussion_topic.reload
+      @a.submission_types = 'on_paper'
+      @a.save!
+      @a.submission_types = 'discussion_topic'
+      @a.save!
+      @a.reload
+      @a.discussion_topic.should eql(@topic)
+      @a.state.should eql(:published)
+      @topic.reload
+      @topic.state.should eql(:active)
     end
   end
 

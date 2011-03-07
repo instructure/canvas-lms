@@ -166,10 +166,10 @@ class Quiz < ActiveRecord::Base
   def unlink_from(type)
     @saved_by = type
     if self.root_entries.empty? && !self.available?
-      self.assignment_id = nil
+      self.assignment = nil
       self.destroy 
     else
-      self.assignment_id = nil
+      self.assignment = nil
       self.save
     end
   end
@@ -197,7 +197,7 @@ class Quiz < ActiveRecord::Base
       self.context_module_tag.confirm_valid_module_requirements
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
-      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => [@old_assignment_id, self.last_assignment_id].compact})
+      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
       ContentTag.delete_for(Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     end
