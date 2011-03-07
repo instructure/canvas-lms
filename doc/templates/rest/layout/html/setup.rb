@@ -47,7 +47,8 @@ def index
 end
 
 def diskfile
-  "<div id='filecontents'>" +
+  options[:no_highlight] = true
+  content = "<div id='filecontents'>" +
   case (File.extname(@file)[1..-1] || '').downcase
   when 'htm', 'html'
     @contents
@@ -61,6 +62,8 @@ def diskfile
     htmlify(@contents, diskfile_shebang_or_default)
   end +
   "</div>"
+  options.delete(:no_highlight)
+  content
 end
 
 def diskfile_shebang_or_default

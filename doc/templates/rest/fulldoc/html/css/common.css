@@ -83,7 +83,7 @@ h2 {
 }
 
 .method_details h3 {
-  font-size: 1.1em;
+  font-size: 14px;
   font-weight: normal;
   font-family: Monaco, Consolas, Courier, monospace;
   padding: 6px 10px;
@@ -91,6 +91,13 @@ h2 {
   background: #e5e8ff;
   border: 1px solid #d8d8e5;
   border-radius: 3px;
+}
+
+h3 .defined-in {
+  float:right;
+  font-size:10px;
+  padding-top:3px;
+  opacity:0.7;
 }
 
 .method_details h4 {
@@ -103,5 +110,8 @@ h2 {
   border-top: 1px solid #ccc;
   text-align: center;
   padding: 7px 0;
+  color: #999;
+}
+#footer a {
   color: #999;
 }
