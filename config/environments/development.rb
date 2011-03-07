@@ -20,10 +20,6 @@ config.action_mailer.raise_delivery_errors = true
 # they hit.
 Canvas.protected_attribute_error = :raise
 
-SslRequirement.ssl_host = "localhost:3000"
-SslRequirement.standard_host = "localhost:3000"
-SslRequirement.disable_ssl_check = true
-
 # eval <env>-local.rb if it exists
 (File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-local.rb").tap { |localfile|
   eval(File.new(localfile).read) if FileTest.exists?(localfile)

@@ -15,8 +15,6 @@ config.action_view.cache_template_loading            = true
 # Disable delivery errors, bad email addresses will be ignored
 # config.action_mailer.raise_delivery_errors = false
 
-# SslRequirement.disable_ssl_check = true
-
 # eval <env>-local.rb if it exists
 (File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-local.rb").tap { |localfile|
   eval(File.new(localfile).read) if FileTest.exists?(localfile)

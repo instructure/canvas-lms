@@ -30,7 +30,6 @@ class ApplicationController < ActionController::Base
   include AuthenticationMethods
   protect_from_forgery
   before_filter :load_account, :load_user
-  include SslRequirement
   before_filter :set_time_zone
   before_filter :clear_cached_contexts
   before_filter :set_page_view

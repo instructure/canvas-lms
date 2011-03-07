@@ -24,7 +24,7 @@ module ActionController
     # Add a secure option to the rewrite method.
     def rewrite_with_secure_option(options = {})
       secure = options.delete(:secure)
-      if !secure.nil? && !SslRequirement.disable_ssl_check?
+      if !secure.nil?
         if secure == true || secure == 1 || secure.to_s.downcase == "true"
           options.merge!({
             :only_path => false,

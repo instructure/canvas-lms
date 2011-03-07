@@ -19,8 +19,6 @@
 class PseudonymsController < ApplicationController
   before_filter :require_user, :only => [:create, :show, :edit, :update]
   protect_from_forgery :except => [:registration_confirmation, :change_password, :forgot_password]
-  ssl_allowed :forgot_password
-  ssl_required :change_password, :confirm_change_password, :registration_confirmation
   
   def forgot_password
     email = params[:pseudonym_session][:unique_id_forgot] if params[:pseudonym_session]
