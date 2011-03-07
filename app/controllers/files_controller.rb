@@ -22,6 +22,7 @@ S3_EXPIRATION_TIME = 30.minutes
 class FilesController < ApplicationController
   before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show, :image_thumbnail,:create_pending,:s3_success]
   before_filter :check_file_access_flags, :only => :show_relative
+  prepend_around_filter :load_pseudonym_from_policy, :only => :create
 
   before_filter { |c| c.active_tab = "files" }
 
@@ -398,78 +399,74 @@ class FilesController < ApplicationController
       @attachment.save!
 
       if Attachment.s3_storage?
-        # Build the data that will be needed for the user to upload to s3
-        # without us being the middle-man
-        full_filename = @attachment.full_filename.gsub(/\+/, " ")
-        policy = {
-          'expiration' => S3_EXPIRATION_TIME.from_now.utc.iso8601,
-          'conditions' => [
-            {'bucket' => @attachment.bucket_name},
-            {'key' => full_filename},
-            {'acl' => 'private'},
-            ['starts-with', '$Filename', ''],
-            ['starts-with', '$folder', ''],
-            ['content-length-range', 1, CONTENT_LENGTH_RANGE]
-          ]
-        }
-        if params[:s3_no_redirect]
-          policy['conditions'] << {'success_action_status' => '201'}
-        else
-          policy['conditions'] << {'success_action_redirect' => s3_success_url(@attachment.id, :uuid => @attachment.uuid)}
-        end
-        if @attachment.content_type && @attachment.content_type != "unknown/unknown"
-          policy['conditions'] << {'content-type' => @attachment.content_type}
-        end
-        policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
-        signature = Base64.encode64(
-          OpenSSL::HMAC.digest(
-            OpenSSL::Digest::Digest.new('sha1'), AWS::S3::Base.connection.secret_access_key, policy_encoded
-          )
-        ).gsub(/\n/, '')
         res = {
-          :id => @attachment.id,
           :upload_url => "http://#{@attachment.bucket_name}.s3.amazonaws.com/",
-          :proxied_upload_url => nil,
-          :file_param => 'file',
           :remote_url => true,
+          :file_param => 'file',
           :success_url => s3_success_url(@attachment.id, :uuid => @attachment.uuid),
           :upload_params => {
-            'AWSAccessKeyId' => AWS::S3::Base.connection.access_key_id,
-            'key' => full_filename,
-            'Policy' => policy_encoded,
-            'Filename' => '',
-            'folder' => '',
-            'acl' => 'private',
-            'Signature' => signature
+            'AWSAccessKeyId' => AWS::S3::Base.connection.access_key_id
           }
         }
-        if params[:s3_no_redirect]
-          res[:upload_params]['success_action_status'] = '201'
-        else
-          res[:upload_params]['success_action_redirect'] = s3_success_url(@attachment.id, :uuid => @attachment.uuid)
-        end
-        if @attachment.content_type && @attachment.content_type != "unknown/unknown"
-          res[:upload_params]['Content-Type'] = @attachment.content_type
-        end
-        render :json => res.to_json
-
       elsif Attachment.local_storage?
-        render :json => {
-          :id => @attachment.id,
-          :upload_url => named_context_url(@context, :context_files_url, :format => :text) + "?" + { ActionController::Base.session_options[:key] => request.session_options[:id] }.to_query,
+        res = {
+          :upload_url => named_context_url(@context, :context_files_url, :format => :text),
           :remote_url => false,
-          :file_param => 'attachment[uploaded_data]', #uploadify ignores this and uses 'file'
+          :file_param => 'attachment[uploaded_data]', #uploadify ignores this and uses 'file',
           :upload_params => {
             'attachment[folder_id]' => params[:attachment][:folder_id] || '',
-            'folder' => '',
-            'Filename' => '',
-            'attachment[unattached_attachment_id]' => @attachment.id,
-            'authenticity_token' => form_authenticity_token
+            'attachment[unattached_attachment_id]' => @attachment.id
           }
-        }.to_json
+        }
       else
         raise "Unknown storage system configured"
       end
+
+      # Build the data that will be needed for the user to upload to s3
+      # without us being the middle-man
+      full_filename = @attachment.full_filename.gsub(/\+/, " ")
+      policy = {
+        'expiration' => S3_EXPIRATION_TIME.from_now.utc.iso8601,
+        'conditions' => [
+          {'bucket' => @attachment.bucket_name},
+          {'key' => full_filename},
+          {'acl' => 'private'},
+          ['starts-with', '$Filename', ''],
+          ['starts-with', '$folder', ''],
+          ['content-length-range', 1, CONTENT_LENGTH_RANGE]
+        ]
+      }
+      extras = []
+      if params[:no_redirect]
+        extras << {'success_action_status' => '201'}
+      elsif res[:success_url]
+        extras << {'success_action_redirect' => res[:success_url]}
+      end
+      if @attachment.content_type && @attachment.content_type != "unknown/unknown"
+        extras << {'content-type' => @attachment.content_type}
+      end
+      policy['conditions'] += extras
+      # flash won't send the session cookie, so for local uploads we put the user id in the signed
+      # policy so we can mock up the session for FilesController#create
+      policy['conditions'] << {'pseudonym_id' => @current_pseudonym.id} if Attachment.local_storage?
+
+      policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
+      signature = Base64.encode64(
+        OpenSSL::HMAC.digest(
+          OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded
+        )
+      ).gsub(/\n/, '')
+
+      res[:id] = @attachment.id
+      res[:upload_params].merge!({
+        'key' => full_filename,
+        'acl' => 'private',
+        'Policy' => policy_encoded,
+        'Signature' => signature,
+      })
+      extras.map(&:to_a).each{ |extra| res[:upload_params][extra.first.first] = extra.first.last }
+
+      render :json => res.to_json
     end
   end
   
@@ -553,7 +550,6 @@ class FilesController < ApplicationController
         end
         if success
           @attachment.move_to_bottom
-          flash[:notice] = 'File was successfully uploaded.'
           format.html { return_to(params[:return_to], named_context_url(@context, :context_files_url)) }
           format.json { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}) }
           format.text { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}) }

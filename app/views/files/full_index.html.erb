@@ -5,7 +5,6 @@
   showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]
 %>
 <div id="file_uploads" style="display: none;">
-  <div id="file_uploads_session_id" style="display: none;"><%= request.session_options[:id] %></div>
   <div class="file_upload" id="file_upload_blank" style="display: none;">
     <div style="float: left;">
     <span class="status"></span> <span class="file_name"></span>

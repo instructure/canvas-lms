@@ -82,8 +82,6 @@ Canvas::Security.encryption_key
 
 require 'kaltura/kaltura_client_v3'
 
-ActionController::Dispatcher.middleware.use FlashSessionCookieMiddleware, '_normandy_session'
-
 # tell Rails to use the native XML parser instead of REXML
 ActiveSupport::XmlMini.backend = 'LibXML'
 

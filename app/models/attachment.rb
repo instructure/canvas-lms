@@ -346,7 +346,11 @@ class Attachment < ActiveRecord::Base
     raise "Unknown storage type!" if rv && file_store_config['storage'] != 'local'
     rv
   end
-  
+
+  def self.shared_secret
+    self.s3_storage? ? AWS::S3::Base.connection.secret_access_key : "local_storage" + Canvas::Security.encryption_key
+  end
+
   def downloadable?
     !!(self.authenticated_s3_url rescue false)
   end

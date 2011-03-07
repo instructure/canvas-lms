@@ -2197,7 +2197,7 @@ var fileUpload = {
       'attachment[folder_id]': folder.id,
       'attachment[filename]': file.name,
       'attachment[context_code]': folder.context_string,
-      's3_no_redirect': true
+      'no_redirect': true
     };
     fileUpload.updateUploadCount();
     $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {
