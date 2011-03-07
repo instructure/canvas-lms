@@ -19,7 +19,7 @@
   </div>
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((submission_comment.try_rescue(:author_id)), context_code) %></div>
-    <div class="message user_content"><%= user_content(submission_comment.try_rescue(:formatted_body), context_code, submission_comment.try_rescue(:asset_string) || dashboard_submission.try_rescue(:asset_string)) || nbsp %>
+    <div class="message user_content"><%= raw(submission_comment.try_rescue(:formatted_body) || nbsp) %>
       <% if submission_comment && submission_comment.media_comment_id %>
         <a href="#" class="instructure_inline_media_comment no-underline"><span class="media_comment_id" style="display: none;"><%= submission_comment.media_comment_id %></span>&nbsp;</a>
       <% end %>

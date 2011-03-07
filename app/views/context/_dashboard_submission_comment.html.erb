@@ -10,7 +10,7 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((comment.try_rescue(:author_id)), context_code) %></div>
     <div class="message user_content" style="<%= hidden unless comment %>">
-      <%= user_content(comment.try_rescue(:formatted_body), context_code, comment.try_rescue(:asset_string)) || nbsp %>
+      <%= raw(comment.try_rescue(:formatted_body) || nbsp) %>
       <% if comment && comment.media_comment_id %>
         <a href="#" class="instructure_inline_media_comment no-underline"><span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>&nbsp;</a>
       <% end %>
