@@ -1,6 +1,5 @@
-require 'canvas/plugin'
-require File.dirname(__FILE__) + '/lib/qti_exporter'
 Rails.configuration.to_prepare do
+  require_dependency 'qti_exporter'
   python_converter_found = Qti.migration_executable ? true : false
 
   Canvas::Plugin.register :qti_exporter, nil, {
