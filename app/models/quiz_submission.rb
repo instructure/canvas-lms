@@ -28,7 +28,7 @@ class QuizSubmission < ActiveRecord::Base
   before_save :update_kept_score
   before_save :sanitize_responses
   after_save :update_assignment_submission
-  
+ 
   serialize :quiz_data
   serialize :submission_data
 
@@ -87,6 +87,34 @@ class QuizSubmission < ActiveRecord::Base
     true
   end
   
+  def track_outcomes(attempt)
+    question_ids = (self.quiz_data || []).map{|q| q[:assessment_question_id] }.compact.uniq
+    questions = AssessmentQuestion.find_all_by_id(question_ids).compact
+    bank_ids = questions.map(&:assessment_question_bank_id).uniq
+    tagged_bank_ids = (bank_ids.empty? ? [] : ContentTag.outcome_tags_for_banks(bank_ids).scoped(:select => 'content_id')).map(&:content_id).uniq
+    if !tagged_bank_ids.empty?
+      question_ids = questions.select{|q| tagged_bank_ids.include?(q.assessment_question_bank_id) }
+      send_later_if_production(:update_outcomes_for_assessment_questions, question_ids, self.id, attempt) unless question_ids.empty?
+    end
+  end
+  
+  def update_outcomes_for_assessment_questions(question_ids, submission_id, attempt)
+    return if question_ids.empty?
+    submission = QuizSubmission.find(submission_id)
+    versioned_submission = submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect{|s| s.attempt == attempt }
+    questions = AssessmentQuestion.find_all_by_id(question_ids).compact
+    bank_ids = questions.map(&:assessment_question_bank_id).uniq
+    return if bank_ids.empty?
+    tags = ContentTag.outcome_tags_for_banks(bank_ids)
+    questions.each do |question|
+      question_tags = tags.select{|t| t.content_id == question.assessment_question_bank_id }
+      question_tags.each do |tag|
+        debugger unless versioned_submission
+        tag.create_outcome_result(self.user, self.quiz, versioned_submission, {:assessment_question => question})
+      end
+    end
+  end
+  
   def temporary_data
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
     raise "Cannot view temporary data for completed quiz" if self.submission_data && !self.submission_data.is_a?(Hash)
@@ -97,7 +125,7 @@ class QuizSubmission < ActiveRecord::Base
   def data
     raise "Cannot view data for uncompleted quiz" unless self.completed?
     raise "Cannot view data for uncompleted quiz" if self.submission_data && !self.submission_data.is_a?(Array)
-    res = self.submission_data || "[]"
+    res = self.submission_data || []
     res
   end
   
@@ -227,6 +255,7 @@ class QuizSubmission < ActiveRecord::Base
   
   protected :update_assignment_submission
   
+  # Returned in order oldest to newest
   def submitted_versions
     found_attempts = {}
     res = []
@@ -280,6 +309,7 @@ class QuizSubmission < ActiveRecord::Base
     self.with_versioning(true) do |s|
       s.save
     end
+    track_outcomes(self.attempt)
     true
   end
   
@@ -300,6 +330,7 @@ class QuizSubmission < ActiveRecord::Base
         self.score = submission.score
         self.save
       end
+      track_outcomes(self.attempt) if self.attempt
     end
   end
   
@@ -315,7 +346,8 @@ class QuizSubmission < ActiveRecord::Base
     version_data["fudge_points"] = self.fudge_points
     version_data["workflow_state"] = self.workflow_state
     version.yaml = version_data.to_yaml
-    version.save
+    res = version.save
+    res
   end
   
   def context_module_action
@@ -382,6 +414,8 @@ class QuizSubmission < ActiveRecord::Base
         s.save
       end
     end
+    track_outcomes(version.model.attempt)
+    
     true
   end
   

@@ -112,4 +112,90 @@ describe QuizSubmission do
     
     s.score.should eql(5.0)
   end
+  
+  describe "learning outcomes" do
+    it "should create learning outcome results when aligned to assessment questions" do
+      course_with_student(:active_all => true)
+      @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
+      @q1 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
+      @q2 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
+      @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
+      @bank = @q1.assessment_question.assessment_question_bank
+      @bank.outcomes = {@outcome.id => 0.7}
+      @bank.save!
+      @bank.learning_outcome_tags.length.should eql(1)
+      @q2.assessment_question.assessment_question_bank.should eql(@bank)
+      answer_1 = @q1.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+      answer_2 = @q2.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+      @quiz.generate_quiz_data(:persist => true)
+      @sub = @quiz.generate_submission(@user)
+      @sub.submission_data = {}
+      question_1 = @q1.question_data[:id]
+      question_2 = @q2.question_data[:id]
+      @sub.submission_data["question_#{question_1}"] = answer_1
+      @sub.submission_data["question_#{question_2}"] = answer_2 + 1
+      @sub.grade_submission
+      @sub.score.should eql(1.0)
+      @outcome.reload
+      @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
+      @results.length.should eql(2)
+      @results = @results.sort_by(&:associated_asset_id)
+      @results.first.associated_asset.should eql(@q1.assessment_question)
+      @results.first.mastery.should eql(true)
+      @results.last.associated_asset.should eql(@q2.assessment_question)
+      @results.last.mastery.should eql(false)
+    end
+    
+    it "should update learning outcome results when aligned to assessment questions" do
+      course_with_student(:active_all => true)
+      @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
+      @q1 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
+      @q2 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'}}})
+      @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
+      @bank = @q1.assessment_question.assessment_question_bank
+      @bank.outcomes = {@outcome.id => 0.7}
+      @bank.save!
+      @bank.learning_outcome_tags.length.should eql(1)
+      @q2.assessment_question.assessment_question_bank.should eql(@bank)
+      answer_1 = @q1.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+      answer_2 = @q2.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+      @quiz.generate_quiz_data(:persist => true)
+      @sub = @quiz.generate_submission(@user)
+      @sub.submission_data = {}
+      question_1 = @q1.question_data[:id]
+      question_2 = @q2.question_data[:id]
+      @sub.submission_data["question_#{question_1}"] = answer_1
+      @sub.submission_data["question_#{question_2}"] = answer_2 + 1
+      @sub.grade_submission
+      @sub.score.should eql(1.0)
+      @outcome.reload
+      @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
+      @results.length.should eql(2)
+      @results = @results.sort_by(&:associated_asset_id)
+      @results.first.associated_asset.should eql(@q1.assessment_question)
+      @results.first.mastery.should eql(true)
+      @results.last.associated_asset.should eql(@q2.assessment_question)
+      @results.last.mastery.should eql(false)
+      
+      @sub = @quiz.generate_submission(@user)
+      @sub.attempt.should eql(2)
+      @sub.submission_data = {}
+      question_1 = @q1.question_data[:id]
+      question_2 = @q2.question_data[:id]
+      @sub.submission_data["question_#{question_1}"] = answer_1 + 1
+      @sub.submission_data["question_#{question_2}"] = answer_2
+      @sub.grade_submission
+      @sub.score.should eql(1.0)
+      @outcome.reload
+      @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
+      @results.length.should eql(2)
+      @results = @results.sort_by(&:associated_asset_id)
+      @results.first.associated_asset.should eql(@q1.assessment_question)
+      @results.first.mastery.should eql(false)
+      @results.first.original_mastery.should eql(true)
+      @results.last.associated_asset.should eql(@q2.assessment_question)
+      @results.last.mastery.should eql(true)
+      @results.last.original_mastery.should eql(false)
+    end
+  end
 end

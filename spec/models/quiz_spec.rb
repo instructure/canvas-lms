@@ -334,7 +334,7 @@ describe Quiz do
     s.quiz_data.should_not be_nil
     s.quiz_version.should eql(q.version_number)
     s.finished_at.should be_nil
-    s.submission_data.should be_nil
+    s.submission_data.should eql({})
     
   end
   

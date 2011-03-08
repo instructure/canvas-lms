@@ -215,18 +215,42 @@ class ContentTag < ActiveRecord::Base
     raise "Outcome association required" unless association
     raise "Cannot evaluate a rubric alignment for a non-rubric artifact" if self.rubric_association_id && !artifact.is_a?(RubricAssessment)
     raise "Cannot evaluate a non-rubric alignment for a rubric artifact" if !self.rubric_association_id && artifact.is_a?(RubricAssessment)
+    assessment_question = opts[:assessment_question]
+    raise "Assessment question required for quiz outcomes" if association.is_a?(Quiz) && !opts[:assessment_question]
     association_type = association.class.to_s
     result = nil
     attempts = 0
     begin
-      result = LearningOutcomeResult.find_or_create_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
+      if association.is_a?(Quiz)
+        result = LearningOutcomeResult.find_or_create_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id_and_associated_asset_type_and_associated_asset_id(self.learning_outcome_id, user.id, association.id, association_type, self.id, 'AssessmentQuestion', assessment_question.id)
+      else
+        result = LearningOutcomeResult.find_or_create_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
+      end
     rescue => e
       attempts += 1
       retry if attempts < 3
     end
     result.context = self.context
-    result.artifact = artifact
+    if artifact
+      result.artifact_id = artifact.id
+      result.artifact_type = artifact.class.to_s
+    end
     case association
+    when Quiz
+      question_index = nil
+      cached_question = artifact.quiz_data.detect{|q| q[:assessment_question_id] == assessment_question.id }
+      cached_answer = artifact.submission_data.detect{|q| q[:question_id] == cached_question[:id] }
+      raise "Could not find valid question" unless cached_question
+      raise "Could not find valid answer" unless cached_answer
+      
+      result.score = cached_answer[:points]
+      result.context = association.context || result.context
+      result.possible = cached_question['points_possible']
+      if self.mastery_score && result.score && result.possible
+        result.mastery = (result.score / result.possible) > self.mastery_score 
+      end
+      result.attempt = artifact.attempt
+      result.title = "#{user.name}, #{association.title}: #{cached_question[:name]}"
     when Assignment
       if self.rubric_association_id && artifact.is_a?(RubricAssessment)
         association = self.rubric_association
@@ -264,7 +288,7 @@ class ContentTag < ActiveRecord::Base
       result.mastery = !!artifact[:mastery] rescue nil
     end
     result.assessed_at = Time.now
-    result.save
+    result.save_to_version(result.attempt)
     result 
   end
   
@@ -322,5 +346,9 @@ class ContentTag < ActiveRecord::Base
   }
   named_scope :include_outcome, lambda{
     { :include => :learning_outcome }
+  }
+  named_scope :outcome_tags_for_banks, lambda{|bank_ids|
+    raise "bank_ids required" if bank_ids.blank?
+    { :conditions => ["content_tags.tag_type = ? AND content_tags.workflow_state != ? AND content_tags.content_type = ? AND content_tags.content_id IN (#{bank_ids.join(',')})", 'learning_outcome', 'deleted', 'AssessmentQuestionBank'] }
   }
 end

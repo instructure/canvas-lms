@@ -465,7 +465,7 @@ class Quiz < ActiveRecord::Base
     end
     submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
     submission.finished_at = nil
-    submission.submission_data = nil
+    submission.submission_data = {}
     submission.workflow_state = 'preview' if preview
     submission.save
     submission

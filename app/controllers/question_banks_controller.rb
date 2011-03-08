@@ -65,6 +65,7 @@ class QuestionBanksController < ApplicationController
     @bank = @context.assessment_question_banks.find(params[:id])
     add_crumb(@bank.title)
     if authorized_action(@bank, @current_user, :read)
+      @outcome_tags = @bank.learning_outcome_tags.sort_by{|t| t.learning_outcome.short_description.downcase }
       @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => 1)
     end
   end
@@ -122,7 +123,8 @@ class QuestionBanksController < ApplicationController
     @bank = @context.assessment_question_banks.find(params[:id])
     if authorized_action(@bank, @current_user, :update)
       if @bank.update_attributes(params[:assessment_question_bank])
-        render :json => @bank.to_json
+        @bank.reload
+        render :json => @bank.to_json(:include => {:learning_outcome_tags => {:include => :learning_outcome}})
       else
         render :json => @bank.errors.to_json, :status => :bad_request
       end

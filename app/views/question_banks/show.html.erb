@@ -1,5 +1,5 @@
 <%
-  jammit_js :quizzes_bundle
+  jammit_js :quizzes_bundle, :question_bank
   jammit_css :quizzes
   content_for :page_title, @bank.title
 %>
@@ -18,6 +18,27 @@
       <button class="button button-sidebar-wide disabled" disabled="true"><%= image_tag "bookmark.png" %> Already Bookmarked</button>
     <% end %>
   </div>
+  <h2 id="aligned_outcomes">Aligned Outcomes</h2>
+  <div class="rs-margin-lr rs-margin-bottom">
+    <ul class="unstyled_list" id="aligned_outcomes_list">
+      <% @outcome_tags.each do |tag| %>
+        <li class="outcome" data-id="<%= tag.learning_outcome_id %>">
+          <span class="short_description"><%= tag.learning_outcome.short_description %></span>
+          <a href="#" class="delete_outcome_link no-hover"><%= image_tag "delete_circle.png" %></a>
+          <span class="clear"></span>
+          <span class="content">mastery at <span class="mastery_threshold"><%= (tag.mastery_score || 0) * 100.0 %></span>%</span>
+        </li>
+      <% end %>
+      <li class="blank outcome" style="display: none;">
+        <span class="short_description">&nbsp;</span>
+        <a href="#" class="delete_outcome_link no-hover"><%= image_tag "delete_circle.png" %></a>
+        <span class="clear"></span>
+        <span class="content">mastery at <span class="mastery_threshold">&nbsp;</span>%</span>
+      </li>
+    </ul>
+    <a href="#" class="button button-sidebar-wide add_outcome_link"><%= image_tag "ball.png" %> <span class="add_outcome_text">Align Outcome</span></a>
+  </div>
+  <%= render :partial => 'shared/find_outcome', :locals => {:purpose => 'question_bank'}  %>
 <% end %>
 
 <% form_for @bank, :url => context_url(@context, :context_question_bank_url), :html => {:id => "edit_bank_form", :method => :put} do |f| %>

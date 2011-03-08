@@ -1,4 +1,4 @@
-<% context ||= @context %>
+<% context ||= @context; purpose ||= 'rubric' %>
 <div id="find_outcome_criterion_dialog" style="display: none;" class="find_outcome">
   <div class="loading_message" style="margin: 10px; text-align: center;">
   </div>
@@ -20,26 +20,37 @@
             <div class="outcome blank" style="display: none; cursor: pointer;" title="Select and Add Criterion">
               <div class="button-container" style="margin-bottom: 0.5em;">
                 <button type="button" class="button select_outcome_link">Add Outcome</button>
-                <div>
-                  <input type="checkbox" class="criterion_for_scoring" checked /><label>use this criterion for scoring</label>
-                </div>
+                <% if purpose == 'rubric' %>
+                  <div>
+                    <input type="checkbox" class="criterion_for_scoring" checked /><label>use this criterion for scoring</label>
+                  </div>
+                <% elsif purpose == 'question_bank' %>
+                  <div>
+                    <label for="outcome_question_bank_mastery" class="mastery_level_text">
+                      set mastery for any score at or above: 
+                    </label>
+                    <input type="text" class="mastery_level" id="outcome_question_bank_mastery" title="percent above which to set mastery" style="width: 40px;"/>%
+                  </div>
+                <% end %>
               </div>
             <div class="learning_outcome_id" style="display: none;"></div>
             <div class="header short_description" style="font-weight: bold; font-size: 1.2em;"></div>
             <div class="body description" style="margin: 10px 0; font-size: 0.8em;"></div>
-            <div>Criterion Ratings:</div>
-            <table>
-              <tr>
-                <td class="rating blank" style="display: none; padding: 2px 5px;">
-                  <div class="description"></div>
-                  <div class="long_description" style="font-size: 0.8em;"></div>
-                  <div><span class="points"></span> pts</div>
-                </td>
-              </tr>
-            </table>
-            <div style="font-size: 0.8em; margin-bottom: 10px;">
-              threshold: <span class="mastery_points">&nbsp;</span> pts
-            </div>
+            <% if purpose == 'rubric' %>
+              <div>Criterion Ratings:</div>
+              <table>
+                <tr>
+                  <td class="rating blank" style="display: none; padding: 2px 5px;">
+                    <div class="description"></div>
+                    <div class="long_description" style="font-size: 0.8em;"></div>
+                    <div><span class="points"></span> pts</div>
+                  </td>
+                </tr>
+              </table>
+              <div style="font-size: 0.8em; margin-bottom: 10px;">
+                threshold: <span class="mastery_points">&nbsp;</span> pts
+              </div>
+            <% end %>
           </div>
         </div>
       </td>

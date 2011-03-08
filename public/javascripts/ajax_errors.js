@@ -104,6 +104,7 @@ $(document).ready(function() {
       }
       $.flashError(message);
     };
+    window.ajaxErrorFlash = ajaxErrorFlash;
     var data = $.ajaxJSON.findRequest(request);
     data = data || {};
     if(data.data) {

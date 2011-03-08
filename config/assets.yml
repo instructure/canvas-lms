@@ -76,6 +76,7 @@ javascripts:
     - public/javascripts/assignments.js
   edit_rubric:
     - public/javascripts/edit_rubric.js
+    - public/javascripts/find_outcome.js
   syllabus:
     - public/javascripts/calendar_move.js
     - public/javascripts/syllabus.js
@@ -134,6 +135,9 @@ javascripts:
     - public/javascripts/quiz_show.js
     - public/javascripts/quiz_rubric.js
     - public/javascripts/message_students.js
+  question_bank:
+    - public/javascripts/question_bank.js
+    - public/javascripts/find_outcome.js
   take_quiz:
     - public/javascripts/quiz_timing.js
     - public/javascripts/take_quiz.js

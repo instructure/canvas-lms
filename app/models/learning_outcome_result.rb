@@ -22,6 +22,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :content_tag
   belongs_to :association, :polymorphic => true
   belongs_to :artifact, :polymorphic => true
+  belongs_to :associated_asset, :polymorphic => true
   belongs_to :context, :polymorphic => true
   simply_versioned
   before_save :infer_defaults
@@ -50,6 +51,29 @@ class LearningOutcomeResult < ActiveRecord::Base
     !(self.changes.keys - [
       "updated_at",
     ]).empty?
+  end
+  
+  def save_to_version(attempt)
+    current_version = self.versions.current.model
+    if current_version.attempt && attempt < current_version.attempt
+      versions = self.versions.sort_by(&:created_at).reverse.select{|v| v.model.attempt == attempt}
+      if !versions.empty?
+        versions.each do |version|
+          version_data = YAML::load(version.yaml)
+          version_data["score"] = self.score
+          version_data["mastery"] = self.mastery
+          version_data["possible"] = self.possible
+          version_data["attempt"] = self.attempt
+          version_data["title"] = self.title
+          version.yaml = version_data.to_yaml
+          version.save
+        end
+      else
+        save
+      end
+    else
+      save
+    end
   end
   
   named_scope :for_context_codes, lambda{|codes| 

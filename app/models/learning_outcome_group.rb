@@ -41,27 +41,31 @@ class LearningOutcomeGroup < ActiveRecord::Base
     state :deleted
   end
   
-  def sorted_content
+  def sorted_content(outcome_ids=[])
     tags = self.content_tags.active
     positions = {}
     tags.each{|t| positions[t.content_asset_string] = t.position }
-    objects = LearningOutcome.active.find_all_by_id(tags.select{|t| t.content_type == 'LearningOutcome'}.map(&:content_id)).compact
+    ids_to_find = tags.select{|t| t.content_type == 'LearningOutcome'}.map(&:content_id)
+    ids_to_find = (ids_to_find & outcome_ids) unless outcome_ids.empty?
+    objects = LearningOutcome.active.find_all_by_id(ids_to_find).compact
     objects += LearningOutcomeGroup.active.find_all_by_id(tags.select{|t| t.content_type == 'LearningOutcomeGroup'}.map(&:content_id)).compact
     if self.learning_outcome_group_id == nil
       all_tags = all_tags_for_context
       codes = all_tags.map(&:content_asset_string).uniq
-      objects += LearningOutcome.active.find_all_by_context_id_and_context_type(self.context_id, self.context_type).select{|o| !codes.include?(o.asset_string) }
+      all_objects = LearningOutcome.active.find_all_by_id_and_context_id_and_context_type(outcome_ids, self.context_id, self.context_type).select{|o| !codes.include?(o.asset_string) } unless outcome_ids.empty?
+      all_objects ||= LearningOutcome.active.find_all_by_context_id_and_context_type(self.context_id, self.context_type).select{|o| !codes.include?(o.asset_string) }
+      objects += all_objects
     end
     sorted_objects = objects.uniq.sort_by{|o| positions[o.asset_string] || 999 }
   end
   
-  def sorted_all_outcomes
+  def sorted_all_outcomes(ids=[])
     res = []
-    self.sorted_content.each do |obj|
+    self.sorted_content(ids).each do |obj|
       if obj.is_a?(LearningOutcome)
         res << obj
       else
-        res += obj.sorted_all_outcomes
+        res += obj.sorted_all_outcomes(ids)
       end
     end
     res.uniq.compact

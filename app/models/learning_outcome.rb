@@ -138,6 +138,18 @@ class LearningOutcome < ActiveRecord::Base
     self.learning_outcome_results.for_context_codes(codes).count
   end
   
+  def self.available_in_context(context, ids=[])
+    account_contexts = context.associated_accounts rescue []
+    codes = account_contexts.map(&:asset_string)
+    order = {}
+    codes.each_with_index{|c, idx| order[c] = idx }
+    outcomes = []
+    ([context] + account_contexts).uniq.each do |context|
+      outcomes += LearningOutcomeGroup.default_for(context).try(:sorted_all_outcomes, ids) || []
+    end
+    outcomes.uniq
+  end
+  
   def self.non_rubric_outcomes?
     false
   end

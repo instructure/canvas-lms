@@ -18,10 +18,11 @@
 
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :title, :user
+  attr_accessible :context, :title, :user, :outcomes
   belongs_to :context, :polymorphic => true
   has_many :assessment_questions, :order => 'position, created_at'
   has_many :assessment_question_bank_users
+  has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_many :quiz_groups
   before_save :infer_defaults
   DEFAULT_IMPORTED_TITLE = 'Imported Questions'
@@ -80,6 +81,31 @@ class AssessmentQuestionBank < ActiveRecord::Base
     ids = ActiveRecord::Base.connection.select_all("SELECT id FROM assessment_questions WHERE workflow_state != 'deleted' AND assessment_question_bank_id = #{self.id}")
     ids = ids.sort_by{rand}[0...count].map{|i|i['id']}
     AssessmentQuestion.find_all_by_id(ids)
+  end
+  
+  def outcomes=(hash)
+    raise "Can't set outcomes on unsaved bank" if new_record?
+    hash = {} if hash.blank?
+    ids = []
+    hash.each do |key, val|
+      ids.push(key) if !key.blank? && key.to_i != 0
+    end
+    ids.uniq!
+    tags = self.learning_outcome_tags
+    tag_outcome_ids = tags.map(&:learning_outcome_id).compact.uniq
+    outcomes = LearningOutcome.available_in_context(self.context, tag_outcome_ids)
+    missing_ids = ids.select{|id| !tag_outcome_ids.include?(id) }
+    tags.each do |tag|
+      if hash[tag.learning_outcome_id.to_s]
+        tag.update_attribute(:mastery_score, hash[tag.learning_outcome_id.to_s].to_f)
+      end
+    end
+    tags_to_delete = tags.select{|t| !ids.include?(t.learning_outcome_id) }
+    missing_ids.each do |id|
+      self.learning_outcome_tags.create!(:learning_outcome_id => id.to_i, :context => self.context, :tag_type => 'learning_outcome', :mastery_score => hash[id].to_f)
+    end
+    tags_to_delete.each{|t| t.destroy }
+    true
   end
   
   named_scope :active, lambda {

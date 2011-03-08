@@ -98,11 +98,7 @@ class OutcomesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_outcomes)
       @account_contexts = @context.associated_accounts rescue []
       @current_outcomes = @context.learning_outcomes
-      @outcomes = []
-      ([@context] + @account_contexts).uniq.each do |context|
-        @outcomes += LearningOutcomeGroup.default_for(context).sorted_all_outcomes rescue []
-      end
-      @outcomes = @outcomes.uniq
+      @outcomes = LearningOutcome.available_in_context(@context)
       if params[:unused]
         @outcomes -= @current_outcomes
       end
@@ -170,8 +166,19 @@ class OutcomesController < ApplicationController
         elsif @result.artifact.is_a?(RubricAssessment) && @result.artifact.artifact && @result.artifact.artifact.is_a?(Submission)
           @submission = @result.artifact.artifact
           redirect_to named_context_url(@result.context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id)
+        elsif @result.artifact.is_a?(QuizSubmission) && @result.associated_asset
+          @submission = @result.artifact
+          @question = @result.associated_asset
+          if @submission.attempt <= @result.attempt
+            @submission_version = @submission
+          else
+            @submission_version = @submission.submitted_versions.detect{|s| s.attempt >= @result.attempt }
+          end
+          question = @submission.quiz_data.detect{|q| q['assessment_question_id'] == @question.data[:id] }
+          question_id = (question && question['id']) || @question.data[:id]
+          redirect_to named_context_url(@result.context, :context_quiz_history_url, @submission.quiz_id, :quiz_submission_id => @submission.id, :version => @submission_version.version_number, :anchor => "question_#{question_id}")
         else
-          flash[:error] = "Unrecognized artifact type: #{@result.artifact_type rescue 'nil'}"
+          flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || 'nil'}"
           redirect_to named_context_url(@context, :context_outcome_url, @outcome.id)
         end
       end
