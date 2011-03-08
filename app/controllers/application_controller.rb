@@ -40,6 +40,8 @@ class ApplicationController < ActionController::Base
   before_filter :fix_xhr_requests
   before_filter :init_body_classes_and_active_tab
 
+  ssl_required_if(:api_request?)
+
   protected
   
   def init_body_classes_and_active_tab

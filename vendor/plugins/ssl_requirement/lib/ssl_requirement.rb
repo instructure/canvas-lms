@@ -61,11 +61,25 @@ module SslRequirement
     def ssl_allowed(*actions)
       write_inheritable_array(:ssl_allowed_actions, actions)
     end
+
+    # added by Instructure to support our API usage in the short-term, until
+    # the app is all-SSL and we remove this plugin completely.
+    # if any method returns !!true, this overrides the required/allowed list of
+    # actions.
+    def ssl_required_if(method_name)
+      write_inheritable_array(:ssl_required_if, [method_name])
+    end
   end
   
   protected
     # Returns true if the current action is supposed to run as SSL
     def ssl_required?
+      methods = (self.class.read_inheritable_attribute(:ssl_required_if) || [])
+
+      if methods && methods.any? { |m| self.send(m) }
+        return true
+      end
+
       required = (self.class.read_inheritable_attribute(:ssl_required_actions) || [])
       except  = self.class.read_inheritable_attribute(:ssl_required_except_actions)
  
