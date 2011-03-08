@@ -3,7 +3,7 @@
   <div class="header">
     <div class="header_title">
       <%= image_tag "#{slugify(message.try_rescue(:notification_category)) || 'notification'}_icon.png", :alt => 'notification', :title => message.try_rescue(:notification_name), :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
-      <a href="<%= message.try_rescue(:url).try_rescue(:sub, /\Ahttp:\/\/[^\/]*/, "") %>" class="title subject"><%= message.try_rescue(:subject) %></a>
+      <a href="<%= message.try_rescue(:url).try_rescue(:sub, /\A(https?:)?\/\/[^\/]*/, "") %>" class="title subject"><%= message.try_rescue(:subject) %></a>
       <div class="sub_title">
         <span class="context_code group_<%= message.try_rescue(:context_code) %>"><%= cached_context_short_name(message.try_rescue(:context_code)) %></span>
       </div>

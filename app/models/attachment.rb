@@ -359,7 +359,7 @@ class Attachment < ActiveRecord::Base
     )
     def authenticated_s3_url(*args)
       return root_attachment.authenticated_s3_url(*args) if root_attachment
-      "http://#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
+      "//#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
     end
     
     alias_method :attachment_fu_filename=, :filename=

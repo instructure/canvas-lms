@@ -813,7 +813,7 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
   
   def safe_domain_file_url(attachment, host=nil)
-    res = "http://#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
+    res = "//#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
     ts, sig = @current_user && @current_user.access_verifier
     res += named_context_url(@context, :context_file_url, attachment.id)
     res += '/' + URI.escape(attachment.full_display_path)

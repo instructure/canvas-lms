@@ -428,7 +428,7 @@ class FilesController < ApplicationController
         ).gsub(/\n/, '')
         res = {
           :id => @attachment.id,
-          :upload_url => "http://#{@attachment.bucket_name}.s3.amazonaws.com/",
+          :upload_url => "#{request.ssl? ? "https" : "http"}://#{@attachment.bucket_name}.s3.amazonaws.com/",
           :proxied_upload_url => nil,
           :file_param => 'file',
           :remote_url => true,

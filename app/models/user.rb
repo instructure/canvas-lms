@@ -802,7 +802,7 @@ class User < ActiveRecord::Base
   
   def gravatar_url(size=50, fallback=nil)
     fallback ||= "http://#{HostUrl.default_host}/images/no_pic.gif"
-    "http://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
+    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
   end
   
   def avatar_image=(val)

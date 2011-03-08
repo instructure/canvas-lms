@@ -92,7 +92,7 @@
             wmode: 'opaque'
           }
           $("#media_comment_create").html(flashRequiredMessage)
-          swfobject.embedSWF("http://" + INST.kalturaSettings.domain + "/kcw/ui_conf_id/" + INST.kalturaSettings.kcw_ui_conf, "media_comment_create", "540", "300", "9.0.0", false, flashVars, params);
+          swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kcw/ui_conf_id/" + INST.kalturaSettings.kcw_ui_conf, "media_comment_create", "540", "300", "9.0.0", false, flashVars, params);
           if($("#cant_record_dialog .links").length > 0) {
             var $links = $("#cant_record_dialog .links").clone(true);
             $dialog.append($links.show());
@@ -140,7 +140,7 @@
           bgcolor: "#000000",
           wmode: 'opaque'
         };
-        var url = "http://" + INST.kalturaSettings.domain + "/kwidget/wid/_" + INST.kalturaSettings.partner_id + "/uiconf_id/" + INST.kalturaSettings.player_ui_conf + "/entry_id/" + id;
+        var url = "//" + INST.kalturaSettings.domain + "/kwidget/wid/_" + INST.kalturaSettings.partner_id + "/uiconf_id/" + INST.kalturaSettings.player_ui_conf + "/entry_id/" + id;
         var width = Math.min($holder.closest("div,p,table").width() || 550, 550);
         var height = width / 550 * 448;
         if(mediaType == 'audio') {
@@ -174,7 +174,7 @@
         allowFullScreen: true,
         bgcolor: "#000000"
       };
-      var url = "http://" + INST.kalturaSettings.domain + "/index.php/kwidget/wid/_" + INST.kalturaSettings.partner_id + "/uiconf_id/" + INST.kalturaSettings.player_ui_conf + "/entry_id/" + id;
+      var url = "//" + INST.kalturaSettings.domain + "/index.php/kwidget/wid/_" + INST.kalturaSettings.partner_id + "/uiconf_id/" + INST.kalturaSettings.player_ui_conf + "/entry_id/" + id;
       var $dialog = $("#media_comment_player_dialog");
       if($dialog.length === 0) {
         $dialog = $("<div id='media_comment_player_dialog'/>");
@@ -513,7 +513,7 @@
       swfobject.embedSWF("/media_test/KRecordVideo.swf", "video_record", "320", "240", "9.0.0", false, flashVars, params);
 
       var flashVars = {
-        host:"http://" + INST.kalturaSettings.domain,
+        host:"//" + INST.kalturaSettings.domain,
         partnerId:INST.kalturaSettings.partner_id,
         subPId:INST.kalturaSettings.subpartner_id,
         partnerData: $.mediaComment.partnerData(),

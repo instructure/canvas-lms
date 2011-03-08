@@ -70,7 +70,7 @@ $(document).ready(function() {
             <a href="<%= login_path %>" style="font-size: 1.3em;" class="button">Log in at <%= @domain_root_account.display_name rescue "your institution" %></a>
         </div>
     <% else %>
-        <% form_for :pseudonym_session, :url => login_path(:secure => true), :html => {:id => "login_form"} do |f| %>
+        <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form"} do |f| %>
           <%= link_to "Click to register",  Setting.get_cached("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account && @domain_root_account.settings[:open_registration] %>
           <h2 class="ui-helper-hidden-accessible">Login</h2>
           <% login_inner_dialog = yield :login_inner_dialog %>
