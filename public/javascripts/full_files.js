@@ -1456,10 +1456,10 @@ var fileStructureData = [];
               if(!data || !data.permissions || !data.permissions.download) {
                 // get rid of the download link, add a "this file is currently locked (details)"
                 $panel.addClass('panel_locked');
-              } else if(data && data.scribd_doc && data && data.permissions.download) {
-                // show a scribd preview
+              } else if (data && data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
+                // show an inline preview
                 $preview = $("#content_templates .file_scribd_preview").clone(true);
-                $preview.append("<div id='scribd_preview'/>");
+                $preview.append("<div id='doc_preview_holder'/>");
               } else {
                 // show a few more details about the file, preview if possible
                 if(data && data.content_type.match(/image/)) {
@@ -1487,19 +1487,14 @@ var fileStructureData = [];
               if($preview) {
                 $preview.addClass('file_preview');
                 $files_content.append($preview);
-                if(data.scribd_doc && data.permissions && data.permissions.download) {
-                  var sd = scribd.Document.getDoc( data.scribd_doc.attributes.doc_id, data.scribd_doc.attributes.access_key );
-
-                  $.each({
-                      'jsapi_version': 1,
-                      'disable_related_docs': true,
-                      'auto_size' : false,
-                      'height' : '100%'
-                    }, function(key, value){
-                      sd.addParam(key, value);
+                if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
+                  $('#doc_preview_holder').loadDocPreview({
+                    mimeType: data.content_type,
+                    attachment_id: data.id,
+                    height: '100%',
+                    scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id, 
+                    scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key,
                   });
-
-                  sd.write( 'scribd_preview' );
                   files.viewFile(data.context_string, data.id);
                 }
               }

@@ -80,9 +80,16 @@ $(document).ready(function() {
       }
     });
   });
-  $("#turnitin").change(function() {
-    $("tr.turnitin_settings").showIf($(this).attr('checked'));
+
+  $("#turnitin, #account_settings_global_includes, #enable_equella").change(function() {
+    var $myFieldset = $('#'+ $(this).attr('id') + '_settings'),
+        iAmChecked = $(this).attr('checked');
+    $myFieldset.showIf(iAmChecked);
+    if (!iAmChecked) {
+      $myFieldset.find("input,textarea").val("");
+    }
   }).change();
+
   $(".turnitin_account_settings").change(function() {
     $(".confirm_turnitin_settings_link").text("confirm Turnitin settings");
   });
@@ -103,12 +110,6 @@ $(document).ready(function() {
       $link.text("invalid Turnitin settings, please check your account id and shared secret from Turnitin")
     });
   });
-  $("#enable_equella").change(function() {
-    $("tr.equella_row").showIf($(this).attr('checked'));
-    if(!$(this).attr('checked')) {
-      $("tr.equella_row").find("input,textarea").each(function() { $(this).val(""); });
-    }
-  }).change();
 
   $(".run_report_link").click(function(event) {
       event.preventDefault();
@@ -127,5 +128,22 @@ $(document).ready(function() {
       error: function(data) {
       }
   });
-
+  
+  $('.service_help_dialog').each(function(index) {
+    var $dialog = $(this),
+        serviceName = $dialog.attr('id').replace('_help_dialog', '');
+    
+    $dialog.dialog({
+      autoOpen: false,
+      width: 560
+    });
+    
+    $('<a class="help" href="#">&nbsp;</a>')
+      .click(function(event){
+        event.preventDefault();
+        $dialog.dialog('open');
+      })
+      .appendTo('label[for="account_services_' + serviceName + '"]');    
+  });
+  
 });

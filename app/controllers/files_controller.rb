@@ -163,6 +163,24 @@ class FilesController < ApplicationController
     show
   end
   
+  # this is used for the google docs preview of a document
+  def public_url
+    respond_to do |format|
+      format.json do
+        @attachment = Attachment.find(params[:id])
+        # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a 
+        # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the 
+        # submission.
+        if params[:submission_id] && (@submission = Submission.find(params[:submission_id]))
+          @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
+        end        
+        if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
+          render :json  => { :public_url => @attachment.authenticated_s3_url }
+        end
+      end
+    end
+  end
+  
   def show
     params[:id] ||= params[:file_id]
     @attachment = @context.attachments.find(params[:id])
@@ -222,16 +240,22 @@ class FilesController < ApplicationController
         format.html { render :action => 'show' }
       end
       if request.format == :json
-        attachment.context_module_action(@current_user, :read) if @current_user && attachment.scribd_doc
-        log_asset_access(@attachment, "files", "files")
+        options = {:permissions => {:user => @current_user}}
+        if @attachment.grants_right?(@current_user, session, :download)
+          # Right now we assume if they ask for json data on the attachment
+          # which includes the scribd doc data, then that means they have 
+          # viewed or are about to view the file in some form.
+          attachment.context_module_action(@current_user, :read) if @current_user && (
+            (feature_enabled?(:scribd) && attachment.scribd_doc) || 
+            (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url)
+          )
+          options[:methods] = :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
+          log_asset_access(@attachment, "files", "files")
+        else
+          @attachment.scribd_doc = nil
+        end
       end
-      format.json {
-        attachment.scribd_doc = nil unless attachment.grants_right?(@current_user, session, :download)
-        # Right now we assume if they ask for json data on the attachment
-        # which includes the scribd doc data, then that means they have 
-        # viewed or are about to view the file in some form.
-        render :json => attachment.to_json(:permissions => {:user => @current_user}) 
-      }
+      format.json { render :json => @attachment.to_json(options) }
     end
   end
   protected :render_attachment

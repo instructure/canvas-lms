@@ -77,8 +77,11 @@
                 <% end %>
         			  <span><%= number_to_human_size(attachment.size) %></span>
       			  </div>
-      			  <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %> <%= 'instructure_scribd_file' if attachment.scribdable? %>">
+      			  <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
       			    <%= attachment.display_name %>
+      			    <% if attachment.scribdable? %>
+      			      <span style="padding: 0 3px;" title="Preview the document" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-scribd_doc_id="<%= attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= attachment.scribd_doc.try(:access_key) %>" ><%= image_tag('preview.png') %></span>
+      			    <% end %>
       			  </a>
       			</li>
           <% end %>
@@ -88,10 +91,29 @@
   </div>
   <% js_block do %>
     <script>
-      $("a.flash").click(function() {
-        swfobject.embedSWF($(this).attr('href'), "main", "100%", "100%", "9.0.0", false, null, { wmode: "opaque" }, null);
-        return false;
-       });
+      $(document).ready(function(){
+
+        $("a.flash").click(function() {
+          swfobject.embedSWF($(this).attr('href'), "main", "100%", "100%", "9.0.0", false, null, { wmode: "opaque" }, null);
+          return false;
+        });
+
+        if ($.filePreviewsEnabled()) {
+          $('.modal_preview_link').live('click', function() {
+            $('<div style="padding:0; overflow:hidden;">') //overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
+              .dialog({
+                title: "Preview of " + $(this).closest('a').text(),
+                width: document.width * .95,
+                height: document.height * .95
+              })
+              .loadDocPreview($.extend({ 
+                height: '100%'
+              }, $(this).data()));
+            return false;
+          });
+        }
+
+      });
     </script>
   <% end %>
   

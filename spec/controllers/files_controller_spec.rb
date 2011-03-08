@@ -210,10 +210,16 @@ describe FilesController do
       @module.evaluate_for(@user, true, true).state.should eql(:completed)
     end
     
-    it "should not mark files as viewed for module progressions if the file data is requested and it doesn't include the scribd_doc data" do
+    it "should not mark files as viewed for module progressions if the file data is requested and it doesn't include the scribd_doc data (meaning it got viewed in scribd inline) and google docs preview is disabled" do
       file_in_a_module
       @file.scribd_doc = nil
       @file.save!
+      
+      # turn off google docs previews for this acccount so we can isolate testing just scribd.
+      account = @module.context.account
+      account.disable_service(:google_docs_previews)
+      account.save!
+      
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)

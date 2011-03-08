@@ -36,25 +36,34 @@
     <span style="font-size: 1.2em;">
       <%= link_to "Download #{@attachment.filename}", download_url %>
     </span> (<%= @attachment.readable_size %>)
-    <% if @attachment.scribdable? && @attachment.scribd_doc %>
-      <div id="scribd_preview" data-doc-id="<%= @attachment.scribd_doc.doc_id %>" data-access-key="<%= @attachment.scribd_doc.access_key %>"></div>
-      <a href="<%= context_url(@context, :context_file_inline_view_url, @attachment.id) %>" style="display: none;" class="inline_view_attachment_url">&nbsp;</a>
+    <% if @attachment.scribdable? %>
+      <div id="doc_preview" data-attachment_view_inline_ping_url="<%= context_url(@context, :context_file_inline_view_url, @attachment.id) %>" data-scribd_doc_id="<%= @attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= @attachment.scribd_doc.try(:access_key) %>" data-public_url="<%= @attachment.authenticated_s3_url %>"></div>
       <% js_block do %>
         <script>
           $(function() {
-            $('#scribd_preview').ifExists(function($preview){
-              var url = $(".inline_view_attachment_url").attr('href');
-              var sd = scribd.Document.getDoc( $preview.data('doc-id'), $preview.data('access-key') );
-              $.each({
-                  'jsapi_version': 1,
-                  'disable_related_docs': true,
-                  'height' : '400px'
-                }, function(key, value){
-                  sd.addParam(key, value);
-              });
-              sd.write('scribd_preview');
-              $.ajaxJSON(url, 'POST', {}, function() { }, function() { });
+            var $doc_preview = $('#doc_preview'),
+                $wrapper_container = $('#wrapper-container'),
+                $main = $('#main'),
+                $not_right_side = $('#not_right_side');
+                
+            $doc_preview.loadDocPreview({
+              height: '100%',
+              scribdParams: {
+                auto_size: true
+              }
             });
+            
+            function fillWindowWithDocPreview(){
+              $doc_preview.height(0);
+              var spaceLeftForPreview = $(window).height() 
+                                        - ($wrapper_container.offset().top + $wrapper_container.height())
+                                        + ($main.height() - $not_right_side.height());
+                                       
+              $doc_preview.height( Math.max(400, spaceLeftForPreview) );
+            }
+            fillWindowWithDocPreview();
+            $(window).resize(fillWindowWithDocPreview);
+            
           });
         </script>
       <% end %>

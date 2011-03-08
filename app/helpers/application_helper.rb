@@ -374,19 +374,21 @@ module ApplicationHelper
   end
   
   def inst_env
-    global_inst_object = { 
-      :environment            =>  Rails.env,
-      :logPageViews           => !@body_class_no_headers,
-      :allowMediaComments     => !!( Kaltura::ClientV3.config && @context && @context.respond_to?(:allow_media_comments?) && @context.allow_media_comments? ),
+    global_inst_object = { :environment =>  Rails.env }
+    {
+      :allowMediaComments     => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
+      :kalturaSettings        => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf'),
       :equellaEnabled         => !!equella_enabled?,
-      :filePreviewsEnabled    => !!feature_enabled?(:scribd),
       :googleAnalyticsAccount => Setting.get_cached('google_analytics_key', nil),
       :http_status            => @status,
-      :error_id               => @error && @error.id
-    }
-    global_inst_object[:errorURL] = ErrorLogging.javascript_error_url
-    if Kaltura::ClientV3.config 
-      global_inst_object[:kalturaSettings] = Kaltura::ClientV3.config.slice('domain', 'resource_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf')
+      :error_id               => @error && @error.id,
+      :disableGooglePreviews  => !service_enabled?(:google_docs_previews), 
+      :disableScribdPreviews  => !feature_enabled?(:scribd),
+      :logPageViews           => !@body_class_no_headers,
+      :errorURL               => ErrorLogging.javascript_error_url
+    }.each do |key,value|
+      # dont worry about keys that are nil or false because in javascript: if (INST.featureThatIsUndefined ) { //won't happen }
+      global_inst_object[key] = value if value
     end
     global_inst_object
   end

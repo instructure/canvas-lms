@@ -27,7 +27,7 @@ describe Account do
   
   context "equella_settings" do
     it "should respond to :equella_settings" do
-      Account.new.should be_respond_to(:equella_settings)
+      Account.new.should respond_to(:equella_settings)
       Account.new.equella_settings.should be_nil
     end
     
@@ -46,27 +46,71 @@ describe Account do
   # end
   
   context "services" do
+    before(:each) do
+      @a = Account.new
+    end
     it "should be able to specify a list of enabled services" do
-      a = Account.new
-      a.allowed_services = 'facebook,twitter'
-      a.service_enabled?(:facebook).should be_true
-      a.service_enabled?(:twitter).should be_true
-      a.service_enabled?(:diigo).should be_false
-      a.service_enabled?(:avatars).should be_false
+      @a.allowed_services = 'facebook,twitter'
+      @a.service_enabled?(:facebook).should be_true
+      @a.service_enabled?(:twitter).should be_true
+      @a.service_enabled?(:diigo).should be_false
+      @a.service_enabled?(:avatars).should be_false
     end
     
     it "should not enable services off by default" do
-      a = Account.new
-      a.service_enabled?(:facebook).should be_true
-      a.service_enabled?(:avatars).should be_false
+      @a.service_enabled?(:facebook).should be_true
+      @a.service_enabled?(:avatars).should be_false
     end
     
     it "should add and remove services from the defaults" do
-      a = Account.new
-      a.allowed_services = '+avatars,-facebook'
-      a.service_enabled?(:avatars).should be_true
-      a.service_enabled?(:twitter).should be_true
-      a.service_enabled?(:facebook).should be_false
+      @a.allowed_services = '+avatars,-facebook'
+      @a.service_enabled?(:avatars).should be_true
+      @a.service_enabled?(:twitter).should be_true
+      @a.service_enabled?(:facebook).should be_false
+    end
+    
+    it "should allow settings services" do
+      lambda {@a.enable_service(:completly_bogs)}.should raise_error
+      
+      @a.disable_service(:twitter)
+      @a.service_enabled?(:twitter).should be_false
+      
+      @a.enable_service(:twitter)
+      @a.service_enabled?(:twitter).should be_true
+    end
+    
+    it "should use + and - by default when setting service availabilty" do
+      @a.enable_service(:twitter)
+      @a.service_enabled?(:twitter).should be_true
+      @a.allowed_services.should be_nil
+      
+      @a.disable_service(:twitter)
+      @a.allowed_services.should match('\-twitter')
+      
+      @a.disable_service(:avatars)
+      @a.service_enabled?(:avatars).should be_false
+      @a.allowed_services.should_not match('avatars')
+      
+      @a.enable_service(:avatars)
+      @a.service_enabled?(:avatars).should be_true
+      @a.allowed_services.should match('\+avatars')
+    end
+
+    it "should be able to set service availibity for previously hard-coded values" do
+      @a.allowed_services = 'avatars,facebook'
+      
+      @a.enable_service(:twitter)
+      @a.service_enabled?(:twitter).should be_true
+      @a.allowed_services.should match(/twitter/)
+      @a.allowed_services.should_not match(/[+-]/)
+      
+      @a.disable_service(:facebook)
+      @a.allowed_services.should_not match(/facebook/)
+      @a.allowed_services.should_not match(/[+-]/)
+      
+      @a.disable_service(:avatars)
+      @a.disable_service(:twitter)
+      @a.allowed_services.should be_nil
     end
   end
   

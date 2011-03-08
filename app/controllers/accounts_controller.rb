@@ -38,12 +38,18 @@ class AccountsController < ApplicationController
       respond_to do |format|
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
+        if params[:account][:services]
+          params[:account][:services].slice(*Account.services_exposed_to_ui_hash.keys).each do |key, value|
+            @account.set_service_availability(key, value == '1')
+          end
+          params[:account].delete :services
+        end
         if current_user_is_site_admin?
           @account.enable_user_notes = enable_user_notes if enable_user_notes
           @account.allow_sis_import = allow_sis_import if allow_sis_import
-          if params[:account] && params[:account][:settings]
-            @account.settings[:admins_can_change_passwords] = params[:account][:settings][:admins_can_change_passwords] == 'true' if params[:account][:settings][:admins_can_change_passwords]
-            @account.settings[:global_includes] = params[:account][:settings][:global_includes] == 'true' if params[:account][:settings][:global_includes]
+          if params[:account][:settings]
+            @account.settings[:admins_can_change_passwords] = !!params[:account][:settings][:admins_can_change_passwords]
+            @account.settings[:global_includes] = !!params[:account][:settings][:global_includes]
           end
         end
         if @account.update_attributes(params[:account])

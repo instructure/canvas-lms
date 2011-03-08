@@ -557,6 +557,7 @@ ActionController::Routing::Routes.draw do |map|
   map.calendar 'calendar', :controller => 'calendars', :action => 'show', :conditions => { :method => :get }
   map.files 'files', :controller => 'files', :action => 'full_index', :conditions => { :method => :get }
   map.s3_success 'files/s3_success/:id', :controller => 'files', :action => 's3_success'
+  map.public_url 'files/:id/public_url.:format', :controller => 'files', :action => 'public_url'
   map.file_create_pending 'files/pending', :controller=> 'files', :action => 'create_pending'
   map.assignments 'assignments', :controller => 'assignments', :action => 'index', :conditions => { :method => :get }
 

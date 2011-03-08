@@ -1,15 +1,27 @@
-<% content_for :page_title do %>Account Settings<% end %>
-
-<% content_for :right_side do %>
-  <%= render :partial => "courses_right_side" %>
-<% end %>
 <%
   @active_tab = "settings"
   add_crumb "Settings"
   jammit_js :account_settings
   jammit_css :account_settings
+  content_for :page_title, "Account Settings"
 %>
 <% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
+
+<% content_for :right_side do %>
+  <%= render :partial => "courses_right_side" %>
+<% end %>
+
+<% content_for :stylesheets do %>
+  <style type="text/css" media="screen">
+    fieldset {
+      margin: 2em 0;
+    }
+    legend{
+      font-size: 1.1em;
+    }
+  </style>
+<% end %>
+
 
 <div id="account_settings_tabs" style="display:none;">
   <ul>
@@ -24,220 +36,240 @@
     <li><a href="#tab-tools" id="tab-tols-link">External Tools</a></li>
   </ul>
   <div id="tab-settings">
-    <h2>Account Settings</h2>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
       <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings"} do |f| %>
-      <table class="formtable">
-        <tr>
-          <td><%= f.label :name, "Account Name:" %></td>
-          <td><%= f.text_field :name %></td>
-        </tr>
-        <tr>
-          <td>
-            <%= f.label :default_storage_quota, "Default File Quota:" %>
-          </td>
-          <td><%= f.text_field :default_storage_quota, :style => "width: 50px;", :title => "megabytes" %> megabytes</td>
-        </tr>
-        <% if @account.root_account_id == nil %>
-          <tr>
-            <td><%= f.label :default_time_zone, "Default Time Zone:" %></td>
-            <td>
-              <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
-            </td>
-          </tr>
-          <% f.fields_for :settings do |settings| %>
+        <fieldset id="account_settings" class="">
+          <legend> Account Settings </legend>
+          <table class="formtable">
             <tr>
-              <td><%= settings.label :self_enrollment, "Allow Self-Enrollment:" %></td>
-              <td>
-                <%= settings.select :self_enrollment, [['Never', ''], ['For Manually-Created Courses', 'manually_created'], ['For Any Courses', 'any']], :selected => @account.settings[:self_enrollment] %>
-              </td>
+              <td><%= f.label :name, "Account Name:" %></td>
+              <td><%= f.text_field :name %></td>
             </tr>
-          <% end %>
-          <% if current_user_is_site_admin? %>
-            <% f.fields_for :settings do |settings| %>
+            <tr>
+              <td>
+                <%= f.label :default_storage_quota, "Default File Quota:" %>
+              </td>
+              <td><%= f.text_field :default_storage_quota, :style => "width: 50px;", :title => "megabytes" %> megabytes</td>
+            </tr>
+            <% if @account.root_account_id == nil %>
               <tr>
-                <td style="padding-top: 15px;"><%= f.label :enable_user_notes, "Faculty Journal:" %></td>
-                <td style="padding-top: 15px;"><%= f.select :enable_user_notes, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.enable_user_notes) %></td>
+                <td><%= f.label :default_time_zone, "Default Time Zone:" %></td>
+                <td>
+                  <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
+                </td>
               </tr>
-              <tr>
-                <td><%= settings.label :admins_can_change_passwords, "Password Setting by Admins:" %></td>
-                <td><%= settings.select :admins_can_change_passwords, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.settings[:admins_can_change_passwords] == true) %></td>
-              </tr>
-              <tr>
-                <td><%= settings.label :global_includes, "External CSS/JS:" %></td>
-                <td><%= settings.select :global_includes, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.settings[:global_includes] == true) %></td>
-              </tr>
-              <% unless @account.site_admin? %>
+              <% f.fields_for :settings do |settings| %>
                 <tr>
-                  <td><%= f.label :allow_sis_import, "SIS Imports:" %></td>
-                  <td><%= f.select :allow_sis_import, options_for_select({"Enabled"=>true, "Disabled"=>false}, @account.allow_sis_import == true) %></td>
+                  <td><%= settings.label :self_enrollment, "Allow Self-Enrollment:" %></td>
+                  <td>
+                    <%= settings.select :self_enrollment, [['Never', ''], ['For Manually-Created Courses', 'manually_created'], ['For Any Courses', 'any']], :selected => @account.settings[:self_enrollment] %>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2"><%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>
+                  <%= settings.label :prevent_course_renaming_by_teachers, "Don't let teachers rename their courses" %>
+                  </td>
                 </tr>
               <% end %>
             <% end %>
-          <% end %>
-          <% if @account.settings[:global_includes] %>
+          </table>
+        </fieldset>
+
+        <fieldset>
+          <legend> Quiz IP Address Filters <%= link_to(image_tag('help.png'), '#', :class => 'ip_help_link no-hover', :title => "What are Quiz IP Filters?") %> </legend>
+
+          <div id="ip_filters_dialog" style="display: none;">
+            <h2>What are Quiz IP Filters?</h2>
+            <p>Quiz IP filters are a way to limit access to quizzes to
+            computers in a specified IP range.</p>
+
+            <p>Specify a set of IP address filters that teachers can use to
+            protect access to quizzes.  Filters can be a comma-separated
+            list of addresses, or an address followed by a mask
+            ("192.168.217.1/24" or "192.168.217.1/255.255.255.0").</p>
+          </div>
+          <table>
+            <tbody id="ip_filters">
+              
+              <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
+                <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
+                  <td>Name:</td>
+                  <td><input class="name" value="<%= name %>"/></td>
+                  <td>Filter:</td>
+                  <td><input class="value" value="<%= filter %>" maxlength="255"/></td>
+                  <td>
+                    <a href="#" class="delete_filter_link"><%= image_tag "delete_circle.png" %></a>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+          <a href="#" class="add-small add_ip_filter_link" style="font-size: 0.9em;">Add another filter</a>
+        </fieldset>
+
+        <fieldset>
+          <legend>Features</legend>
+          <% if current_user_is_site_admin? %>
             <% f.fields_for :settings do |settings| %>
+              <div>
+                <%= f.check_box :enable_user_notes, :checked => @account.enable_user_notes %>
+                <%= f.label :enable_user_notes, "Faculty Journal" %>
+              </div>
+              <div>
+                <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
+                <%= settings.label :admins_can_change_passwords, "Password setting by admins" %>
+              </div>
+              <% unless @account.site_admin? %>
+                <div>
+                  <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
+                  <%= f.label :allow_sis_import, "SIS imports" %>
+                </div>
+              <% end %>
+              <div>
+                <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
+                <%= settings.label :global_includes, "Global CSS/JavaScript includes" %>
+              </div>
+            <% end %>
+          <% end %>
+          <div>
+            <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
+            <label for="enable_equella">Equella</label>
+          </div>
+          <div>
+            <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
+            <label for="turnitin">Turnitin</label>
+          </div>
+        </fieldset>
+
+        <fieldset id="account_settings_global_includes_settings" style="display:none;">
+          <legend>Global JavaScript and CSS Includes</legend>
+          <p style="font-size: 0.9em;">These files will be included on all page loads for your account</p>
+          <% f.fields_for :settings do |settings| %>
+            <table class="formtable">
               <tr>
-                <td style="padding-top: 15px;"><%= settings.label :global_javascript, "Global Javascript URL:" %></td>
-                <td style="padding-top: 15px;"><%= settings.text_field :global_javascript, :value => @account.settings[:global_javascript] %></td>
+                <td><%= settings.label :global_javascript, "Global JavaScript URL:" %></td>
+                <td><%= settings.text_field :global_javascript, :value => @account.settings[:global_javascript] %></td>
               </tr>
               <tr>
                 <td><%= settings.label :global_stylesheet, "Global CSS URL:" %></td>
                 <td><%= settings.text_field :global_stylesheet, :value => @account.settings[:global_stylesheet] %></td>
               </tr>
+            </table>
+          <% end %>
+        </fieldset>
+
+        <fieldset id="enable_equella_settings" style="display: none;">
+          <legend>Equella Settings</legend>
+          <% f.fields_for :settings do |settings| %>
+            <table class="formtable">
               <tr>
-                <td></td>
-                <td style="font-size: 0.8em; padding-bottom: 15px;">
-                  these files will be included on all page loads for your account<br/>
-                  <!-- I'd like to include a link here to whatever documentation we put up -->
-                  <a style="display: none;" href="/docs/global_content.pdf">more information</a>
+                <td style="vertical-align: top;"><%= settings.label :equella_endpoint, "Equella Endpoint:" %></td>
+                <td>
+                  <%= settings.text_field :equella_endpoint, :value => @account.settings[:equella_endpoint] %>
+                  <div style="font-size: 0.9em;">This is the URL to your equella service.  It will probably look something like "http://oer.equella.com/signon.do".</div>
                 </td>
               </tr>
-            <% end %>
-          <% end %>
-          <% f.fields_for :settings do |settings| %>
-            <tr>
-              <td colspan="2">
-                <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
-                <label for="enable_equella">Enable Equella for this Account</label>
-              </td>
-            </tr><tr class="equella_row" style="display: none;">
-              <td style="vertical-align: top;"><%= settings.label :equella_endpoint, "Equella Endpoint:" %></td>
-              <td>
-                <%= settings.text_field :equella_endpoint, :value => @account.settings[:equella_endpoint] %>
-                <div style="font-size: 0.8em;">This is the URL to your equella service.  It will probably look something like "http://oer.equella.com/signon.do".</div>
-              </td>
-            </tr><tr class="equella_row" style="display: none;">
-              <td><%= settings.label :equella_teaser, "Equella Comments:" %></td>
-              <td><%= settings.text_area :equella_teaser, :style => "width: 250px; height: 75px;", :value => @account.settings[:equella_teaser] %></td>
-            </tr>
-          <% end %>
-        <% end %>
-        <tr>
-          <td style="padding-top: 10px; padding-bottom: 10px;">
-            Quiz IP Filters:
-            <%= link_to(image_tag('help.png'), '#', :class => 'ip_help_link no-hover', :title => "What are Quiz IP Filters?") %>
-          </td>
-          <td style="padding-top: 10px; padding-bottom: 10px;">
-            <div id="ip_filters_dialog" style="display: none;">
-              <h2>What are Quiz IP Filters?</h2>
-              <p>Quiz IP filters are a way to limit access to quizzes to 
-              computers in a specified IP range.</p>
-              
-              <p>Specify a set of IP address filters that teachers can use to 
-              protect access to quizzes.  Filters can be a comma-separated
-              list of addresses, or an address followed by a mask
-              ("192.168.217.1/24" or "192.168.217.1/255.255.255.0").</p>
-            </div>
-              
-            <table>
-              <tbody id="ip_filters">
-                <% (@account.settings[:ip_filters] || {}).sort_by(&:first).each do |key, filter| %>
-                  <tr class="ip_filter">
-                    <td>Name:</td>
-                    <td><input type="text" style="width: 75px;" class="name" value="<%= key %>"/></td>
-                    <td>Filter:</td>
-                    <td><input type="text" style="width: 100px;" class="value" value="<%= filter %>" maxlength="255"/></td>
-                    <td>
-                      <a href="#" class="delete_filter_link"><%= image_tag "delete_circle.png" %></a>
-                    </td>
-                  </tr>
-                <% end %>
-                <tr class="ip_filter blank" style="display: none;">
-                  <td>Name:</td>
-                  <td><input type="text" class="name" style="width: 75px;"/></td>
-                  <td>Filter:</td>
-                  <td><input type="text" class="value" style="width: 100px;"/></td>
-                  <td>
-                    <a href="#" class="delete_filter_link"><%= image_tag "delete_circle.png" %></a>
-                  </td>
-                </tr>
-              </tbody>
+              <tr>
+                <td><%= settings.label :equella_teaser, "Equella Comments:" %></td>
+                <td><%= settings.text_area :equella_teaser, :style => "width: 90%; height: 75px;", :value => @account.settings[:equella_teaser] %></td>
+              </tr>
             </table>
-            <a href="#" class="add-small add_ip_filter_link" style="font-size: 0.8em;">Add another filter</a>
-          </td>
-        </tr>
-        <tr style="<%= hidden unless RAILS_ENV == 'development' %>">
-          <td colspan="2">
-            <div style="margin-top: 10px;">
-              <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
-              <label for="turnitin">Enable Turnitin for this account</label>
-            </div>
-          </td>
-        </tr>
-        <tr class="turnitin_settings" style="display: none;">
-          <td><%= f.label :turnitin_account_id, "Turnitin Account ID:" %></td>
-          <td><%= f.text_field :turnitin_account_id, :style => "width: 150px;", :class => "turnitin_account_settings" %></td>
-        </tr>
-        <tr class="turnitin_settings" style="display: none;">
-          <td><%= f.label :turnitin_shared_secret, "Turnitin Shared Secret:" %></td>
-          <td><%= f.text_field :turnitin_shared_secret, :style => "width: 150px;", :class => "turnitin_account_settings" %></td>
-        </tr>
-        <tr class="turnitin_settings" style="display: none;">
-          <td>&nbsp;</td><td>
-            <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link">confirm Turnitin settings</a>
-          </td>
-        </tr>
-        <tr class="turnitin_settings" style="display: none;">
-          <td><%= f.label :turnitin_comments, "Turnitin Submission Comments:" %></td>
-          <td><span style="font-size: 0.8em;">these comments will be shown to students when submitting a Turnitin-enabled assignment</span><%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %></td>
-        </tr>
-        <tr class="turnitin_settings" style="display: none;">
-          <td><%= f.label :turnitin_pledge, "Turnitin Pledge:" %></td>
-          <td><span style="font-size: 0.8em;">students must check a box acknowledging that they agree with this pledge</span><%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %></td>
-        </tr>
-        <% if @account.root_account_id == nil %>
-          <% f.fields_for :settings do |settings| %>
-            <tr>
-              <td colspan="2">
-                <div style="margin-top: 10px;">
-                  <%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>
-                  <%= settings.label :prevent_course_renaming_by_teachers, "Don't let teachers rename their courses" %>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <div style="margin-top: 10px;">
-                  Choose who can create new courses: 
-                  <div style="font-size: 0.8em;">(Account Administrators can always create courses)</div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <div style="margin-top: 5px; padding-left: 20px;">
-                  <%= settings.check_box :teachers_can_create_courses, :checked => @account.settings[:teachers_can_create_courses] != false %>
-                  <%= settings.label :teachers_can_create_courses, "Teachers" %>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <div style="margin-top: 5px; padding-left: 20px;">
-                  <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.settings[:no_enrollments_can_create_courses] != false %>
-                  <%= settings.label :no_enrollments_can_create_courses, "Users with no enrollments" %>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <div style="margin-top: 5px; padding-left: 20px;">
-                  <%= settings.check_box :students_can_create_courses, :checked => @account.settings[:students_can_create_courses] != false %>
-                  <%= settings.label :students_can_create_courses, "Students" %>
-                </div>
-              </td>
-            </tr>
           <% end %>
-        <% end %>
-        <tr>
-          <td colspan="2">
-            <div class="button-container">
-              <button type="submit" class="button">Update Settings</button>
+        </fieldset>
+
+        <fieldset id="turnitin_settings" style="display: none;">
+          <legend>Turnitin Settings</legend>
+          <table class="formtable">
+            <tr>
+              <td><%= f.label :turnitin_account_id, "Turnitin Account ID:" %></td>
+              <td><%= f.text_field :turnitin_account_id, :class => "turnitin_account_settings" %></td>
+            </tr>
+            <tr>
+              <td><%= f.label :turnitin_shared_secret, "Turnitin Shared Secret:" %></td>
+              <td><%= f.text_field :turnitin_shared_secret, :style => "width: 150px;", :class => "turnitin_account_settings" %></td>
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+              <td>
+                <a href="<%= account_turnitin_confirmation_path(@account.id, "{{ account_id }}", "{{ shared_secret }}") %>" class="confirm_turnitin_settings_link button">confirm Turnitin settings</a>
+              </td>
+            </tr>
+            <tr>
+              <td><%= f.label :turnitin_comments, "Turnitin Submission Comments:" %></td>
+              <td>
+                <span style="font-size: 0.9em;">these comments will be shown to students when submitting a Turnitin-enabled assignment</span>
+                <%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %>
+              </td>
+            </tr>
+            <tr>
+              <td><%= f.label :turnitin_pledge, "Turnitin Pledge:" %></td>
+              <td>
+                <span style="font-size: 0.9em;">students must check a box acknowledging that they agree with this pledge</span>
+                <%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %>
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+
+        <% if @account.root_account_id == nil and not Account.services_exposed_to_ui_hash.empty? %>
+          <fieldset>
+            <legend> Enabled Web Services </legend>
+            <% f.fields_for :services do |services| %>
+              <% Account.services_exposed_to_ui_hash.each do |key, service| %>
+                <div>
+                  <%= services.check_box key, :checked => @account.service_enabled?(key) %>
+                  <%= services.label key, service[:name] + " " %>
+                </div>
+              <% end %>
+            <% end %>
+            <div style="display:none;">
+              <!-- put all of the helpful dialogs describing what each service does in here
+                   the magic is in giving it an id of "<name_of_service>_help_dialog" and class="service_help_dialog" -->
+              <div class="service_help_dialog" title="About Google Docs Previews" id="google_docs_previews_help_dialog">
+                <p>
+                  In order to make it easer for users, rather than forcing them to download
+                  things like Word docs, PDFs, Excel spreadsheets, and open office documents
+                  (In addition to requiring that those programs be installed on their on their
+                  computer), in many areas throughout Canvas, it will allow you an inline
+                  preview of the document.
+                </p>
+                <p>
+                  If Scribd has been enabled for this account, it will try to use it to show the preview.
+                  But because Scribd uses flash paper to display the documents, and many users
+                  (namely those using an iPad/iPhone) do not have the flash player installed, that preview
+                  will not work.  By leaving Google Docs Previews enabled, when a browser does not have
+                  flash enabled, or if Scribd is not enabled, it will use preview powered by google docs.
+                  Using this service is subject to Google's viewer <a href="https://docs.google.com/viewer/TOS">terms of service</a>
+                </p>
+              </div>
             </div>
-          </td>
-        </tr>
-      </table>
+          </fieldset>
+        <% end %>
+
+        <% if @account.root_account_id == nil %>
+          <fieldset>
+            <legend> Who Can Create New Courses </legend>
+            <div style="font-size: 0.8em;">(Account Administrators can always create courses)</div>
+            <% f.fields_for :settings do |settings| %>
+              <div>
+                <%= settings.check_box :teachers_can_create_courses, :checked => @account.settings[:teachers_can_create_courses] != false %>
+                <%= settings.label :teachers_can_create_courses, "Teachers" %>
+              </div>
+              <div>
+                <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.settings[:no_enrollments_can_create_courses] != false %>
+                <%= settings.label :no_enrollments_can_create_courses, "Users with no enrollments" %>
+              </div>
+              <div>
+                <%= settings.check_box :students_can_create_courses, :checked => @account.settings[:students_can_create_courses] != false %>
+                <%= settings.label :students_can_create_courses, "Students" %>
+              </div>
+            <% end %>
+          </fieldset>
+        <% end %>
+
+        <div class="button-container">
+          <button type="submit" class="button">Update Settings</button>
+        </div>
       <% end %>
     <% else %>
       You don't have permission to edit these settings
@@ -278,7 +310,7 @@
       Alerts are a way for you to post sticky messages on the dashboard
       of all users in your account.  They will appear on each user's
       dashboard for the given time period or until the user clicks the
-      "close" link to ignore the alert. <strong>These alerts should be 
+      "close" link to ignore the alert. <strong>These alerts should be
       used sparingly.</strong>
       <ul class="alerts_list unstyled_list">
         <% @account_notifications.each do |notification| %>
@@ -346,7 +378,7 @@
   <% end %>
   <% if !@available_reports.blank? %>
     <div id="tab-reports">
-      <% @available_reports.each do |report, print_name| 
+      <% @available_reports.each do |report, print_name|
          last_run = @last_reports[report]
       %>
         <div id="<%= report %>" style="margin-bottom: 10px;">

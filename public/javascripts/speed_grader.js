@@ -60,7 +60,7 @@ var anonymousAssignment = false;
       $grded_so_far = $("#x_of_x_graded span:first"),
       $average_score = $("#average_score"),
       $this_student_does_not_have_a_submission = $("#this_student_does_not_have_a_submission").hide(),
-      $scribd_doc_holder = $("#scribd_doc_holder"),
+      $doc_preview_holder = $("#doc_preview_holder"),
       $rubric_assessments_select = $("#rubric_assessments_select"),
       $rubric_summary_container = $("#rubric_summary_container"),
       $rubric_holder = $("#rubric_holder"),
@@ -709,27 +709,6 @@ var anonymousAssignment = false;
       resizeTimeOut = setTimeout(resizingFunction, 0);
     },
 
-    //args should be an object that looks like {"access_key": "key-20j3kkkct0fyyoar5luo" , doc_id: "15661305"}
-    loadScribdDoc: function(args){
-      var sd = this.scribdDoc = scribd.Document.getDoc( args.doc_id, args.access_key );
-
-        $.each({
-            'jsapi_version': 1,
-            'disable_related_docs': true,
-            'auto_size' : false,
-            'height' : '100%'
-          }, function(key, value){
-            sd.addParam(key, value);
-        });
-
-        sd.addEventListener('iPaperReady', function(){
-          EG.resizeFullHeight();
-        });
-
-        sd.write( 'scribd_doc_holder' );
-        $scribd_doc_holder.show();
-    },
-
     toggleFullRubric: function(force){
       //if there is no rubric associated with this assignment, then the edit rubric thing should never be shown.
       //the view should make sure that the edit rubric html is not even there but we also want to
@@ -989,8 +968,26 @@ var anonymousAssignment = false;
   	  else {
         $iframe_holder.empty();
         $iframe_holder.find("iframe").remove();
-  	    if (attachment && attachment.scribd_doc && attachment.scribd_doc.created && attachment.worflow_state != 'errored') { //if it's a scribd doc load it.
-	        this.loadScribdDoc(attachment.scribd_doc.attributes);
+        
+        //if it's a scribd doc load it.
+        var scribdDocAvailable = attachment && attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
+  	    if ( attachment && (scribdDocAvailable || $.isPreviewable(attachment.content_type, 'google')) ) { 
+  	      var options = {
+              height: '100%',
+              mimeType: attachment.content_type,
+              attachment_id: attachment.id,
+              submission_id: this.currentStudent.submission.id,
+              ready: function(){
+                EG.resizeFullHeight();
+              }
+            };
+          if (scribdDocAvailable) {
+            options = $.extend(options, {
+              scribd_doc_id: attachment.scribd_doc.attributes.doc_id, 
+              scribd_access_key: attachment.scribd_doc.attributes.access_key
+            });
+          }
+          $doc_preview_holder.show().loadDocPreview(options);
 	      }
 	      else if (attachment && broswerableCssClasses.test(attachment.mime_class)) {
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))

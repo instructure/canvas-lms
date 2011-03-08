@@ -762,31 +762,43 @@ class Account < ActiveRecord::Base
     {
       :google_docs => {
         :name => "Google Docs", 
-        :description => ""
+        :description => "",
+        :expose_to_ui => !!GoogleDocs.config
+      },
+      :google_docs_previews => {
+        :name => "Google Docs Previews", 
+        :description => "",
+        :expose_to_ui => true
       },
       :facebook => {
         :name => "Facebook", 
-        :description => ""
+        :description => "",
+        :expose_to_ui => !!(YAML.load_file(Rails.root + "config/facebooker.yml")[Rails.env] rescue nil)
       },
       :skype => {
         :name => "Skype", 
-        :description => ""
+        :description => "",
+        :expose_to_ui => true
       },
       :linked_in => {
         :name => "LinkedIn", 
-        :description => ""
+        :description => "",
+        :expose_to_ui => !!LinkedIn.config
       },
       :twitter => {
         :name => "Twitter", 
-        :description => ""
+        :description => "",
+        :expose_to_ui => !!Twitter.config
       },
       :delicious => {
         :name => "Delicious", 
-        :description => ""
+        :description => "",
+        :expose_to_ui => true
       },
       :diigo => {
         :name => "Diigo", 
-        :description => ""
+        :description => "",
+        :expose_to_ui => true
       },
       :avatars => {
         :name => "User Avatars",
@@ -798,6 +810,37 @@ class Account < ActiveRecord::Base
   
   def self.default_allowable_services
     self.allowable_services.reject {|s, info| info[:default] == false }
+  end
+  
+  def set_service_availability(service, enable)
+    service = service.to_sym
+    raise "Invalid Service" unless Account.allowable_services[service]
+    allowed_service_names = (self.allowed_services || "").split(",").compact
+    if allowed_service_names.count > 0 and not [ '+', '-' ].member?(allowed_service_names[0][0,1])
+      # This account has a hard-coded list of services, so handle accordingly
+      allowed_service_names.reject! { |flag| flag.match(service.to_s) }
+      allowed_service_names << service if enable
+    else
+      allowed_service_names.reject! { |flag| flag.match(service.to_s) }
+      if enable
+        # only enable if it is not enabled by default
+        allowed_service_names << "+#{service}" unless Account.default_allowable_services[service]
+      else
+        # only disable if it is not enabled by default
+        allowed_service_names << "-#{service}" if Account.default_allowable_services[service]
+      end
+    end
+    
+    @allowed_services_hash = nil
+    self.allowed_services = allowed_service_names.empty? ? nil : allowed_service_names.join(",")
+  end
+  
+  def enable_service(service)
+    set_service_availability(service, true)
+  end
+  
+  def disable_service(service)
+    set_service_availability(service, false)
   end
   
   def allowed_services_hash
@@ -827,6 +870,10 @@ class Account < ActiveRecord::Base
       end
     end
     @allowed_services_hash = account_allowed_services
+  end
+  
+  def self.services_exposed_to_ui_hash
+    self.allowable_services.reject { |key, setting| !setting[:expose_to_ui] }
   end
   
   def service_enabled?(service)

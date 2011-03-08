@@ -264,10 +264,10 @@ jQuery(function($) {
           $span.append("<a href='" + $link.attr('href') + "' target='_blank' title='View in a new window' style='padding-left: 5px;'><img src='/images/popout.png'/></a>");
         }
       });
-    if(INST && INST.filePreviewsEnabled) {
-      $("a.instructure_scribd_file:not(.inline_disabled)").each(function() {
+    if ($.filePreviewsEnabled()) {
+      $("a.instructure_scribd_file").not(".inline_disabled").each(function() {
         var $link = $(this);
-        if($.trim($link.text())) {
+        if ( $.trim($link.text()) ) {
           var $span = $("<span class='instructure_scribd_file_holder link_holder'/>"),
               $scribd_link = $("<a class='scribd_file_preview_link' href='" + $link.attr('href') + "' title='Preview the document' style='padding-left: 5px;'><img src='/images/preview.png'/></a>");
           $link.removeClass('instructure_scribd_file').before($span).appendTo($span);
@@ -311,42 +311,36 @@ jQuery(function($) {
       });
     $(".user_content.unenhanced").removeClass('unenhanced').addClass('enhanced');
   };
-  if(INST && INST.filePreviewsEnabled) {
+  if ($.filePreviewsEnabled()) {
     $("a.scribd_file_preview_link").live('click', function(event) {
       event.preventDefault();
-      $(this).loadingImage({image_size: 'small'});
-      var $link = $(this);
-      $.ajaxJSON($(this).attr('href').replace(/\/download.*/, ""), 'GET', {}, function(data) {
+      var $link = $(this).loadingImage({image_size: 'small'}).hide();
+      $.ajaxJSON($link.attr('href').replace(/\/download.*/, ""), 'GET', {}, function(data) {
+        var attachment = data && data.attachment,
+            scribdDocAttributes = attachment && attachment.scribd_doc && attachment.scribd_doc.attributes;
         $link.loadingImage('remove');
-        var attachment = data.attachment;
-        if(attachment && attachment.scribd_doc && attachment.scribd_doc.attributes) {
-          var id = $.uniqueId("scribd_preview_");
-          var $div = $("<span id='" + id + "'/>");
-          $link.parents(".link_holder:last").after($div);
-          var sd = scribd.Document.getDoc( attachment.scribd_doc.attributes.doc_id, attachment.scribd_doc.attributes.access_key );
-          $.each({
-              'jsapi_version': 1,
-              'disable_related_docs': true,
-              'auto_size' : false,
-              'height' : '400px'
-            }, function(key, value){
-              sd.addParam(key, value);
-          });
-
-          sd.write( id );
-          $div.append("<br/><a href='#' style='font-size: 0.8em;' class='hide_file_preview_link'>Minimize File Preview</a>");
-          $div.find(".hide_file_preview_link").click(function(event) {
-            event.preventDefault();
-            $link.show();
-            $div.remove();
-            $.trackEvent('hide_embedded_content', 'hide_file_preview');
-          });
+        if (attachment && (scribdDocAttributes || $.isPreviewable(attachment.content_type, 'google'))) {
+          var $div = $("<span><br /></span>")
+            .insertAfter($link.parents(".link_holder:last"))
+            .loadDocPreview({
+              scribd_doc_id: scribdDocAttributes && scribdDocAttributes.doc_id, 
+              scribd_access_key: scribdDocAttributes && scribdDocAttributes.access_key,
+              mimeType: attachment.content_type,
+              public_url: attachment.authenticated_s3_url
+            })
+            .append(
+              $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">Minimize File Preview</a>')
+              .click(function(event) {
+                event.preventDefault();
+                $link.show();
+                $div.remove();
+                $.trackEvent('hide_embedded_content', 'hide_file_preview');
+              })
+            );
           $.trackEvent('show_embedded_content', 'show_file_preview');
         }
-        $link.hide();
       }, function() {
-        $link.loadingImage('remove');
-        $link.hide();
+        $link.loadingImage('remove').hide();
       });
     });
   } else {
