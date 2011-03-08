@@ -71,6 +71,19 @@ class Submission < ActiveRecord::Base
             }
   }
 
+  named_scope :needs_grading, :conditions => <<-SQL
+    submissions.submission_type IS NOT NULL
+    AND (
+      submissions.score IS NULL
+      OR NOT submissions.grade_matches_current_submission
+      OR submissions.workflow_state IN ('submitted', 'pending_review')
+    )
+    SQL
+  def self.needs_grading_conditions(prefix = nil)
+    conditions = needs_grading.proxy_options[:conditions].gsub(/\s+/, ' ')
+    conditions.gsub!("submissions.", prefix + ".") if prefix
+    conditions
+  end
 
   
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
@@ -86,6 +99,16 @@ class Submission < ActiveRecord::Base
   after_save :update_final_score
   after_save :submit_to_turnitin_later
   after_save :update_admins_if_just_submitted
+
+  trigger.after(:update) do |t|
+    t.where('(#{Submission.needs_grading_conditions("OLD")}) <> (#{Submission.needs_grading_conditions("NEW")})') do
+      <<-SQL
+      UPDATE assignments
+      SET needs_grading_count = needs_grading_count + CASE WHEN (#{needs_grading_conditions('NEW')}) THEN 1 ELSE -1 END
+      WHERE id = NEW.assignment_id;
+      SQL
+    end
+  end
   
   attr_reader :suppress_broadcast
   attr_reader :group_broadcast_submission
@@ -343,7 +366,7 @@ class Submission < ActiveRecord::Base
     true
   end
   attr_accessor :created_correctly_from_assignment_rb
-  
+
   def update_admins_if_just_submitted
     if @just_submitted
       context.send_later_if_production(:resubmission_for, "assignment_#{assignment_id}")
@@ -537,11 +560,7 @@ class Submission < ActiveRecord::Base
   
   workflow do
     state :submitted do
-      event :grade_it, :transitions_to => :graded do
-        set_broadcast_flags
-        self.workflow_state = :graded
-        broadcast_notifications
-      end
+      event :grade_it, :transitions_to => :graded
     end
     state :unsubmitted
     state :pending_review
@@ -554,9 +573,6 @@ class Submission < ActiveRecord::Base
   
   named_scope :ungraded, lambda {
     {:conditions => ['submissions.grade IS NULL'], :include => :assignment}
-  }
-  named_scope :ungraded_or_needing_regrade, lambda {
-    {:conditions => ['submissions.grade IS NULL OR grade_matches_current_submission = ?', false], :include => :assignment }
   }
   named_scope :having_submission, lambda {
     {:conditions => ['submissions.submission_type IS NOT NULL'] }
@@ -590,10 +606,10 @@ class Submission < ActiveRecord::Base
     {:conditions => ['submissions.submission_type = ? AND submissions.attachment_id IS NULL AND submissions.process_attempts < 3', 'online_url'], :order => :updated_at}
   }
   
-  def ungraded?
-    !self.grade
+  def needs_regrading?
+    graded? && !grade_matches_current_submission?
   end
-  
+
   def readable_state
     if workflow_state == 'pending_review'
       'pending review'

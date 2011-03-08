@@ -34,7 +34,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
               </span>
             <% end %>
             <b>Grade <%= assignment.title %></b>
-            <em><%= assignment.need_graded_count %> need<%= 's' if assignment.need_graded_count == 1 %> grading</em>
+            <em><%= assignment.needs_grading_count %> need<%= 's' if assignment.needs_grading_count == 1 %> grading</em>
           </a>
           <a class='disable_item_link grading' title="Ignore this assignment" href="<%= dashboard_ignore_item_url(assignment.asset_string, 'grading') %>"><%= image_tag "earmark_hover.png", :alt => 'ignore' %></a>
         </li>

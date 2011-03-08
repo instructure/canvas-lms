@@ -9,7 +9,7 @@
         <% if title == "To Turn In" %>
           due: <%= datetime_string(menu_assignment.due_at, :due_date, nil, true) %>
         <% elsif title == "Needing Grading" %>
-          <%= menu_assignment.need_graded_count %> need<%= 's' if menu_assignment.need_graded_count.to_i == 1 %> grading
+          <%= menu_assignment.needs_grading_count %> need<%= 's' if menu_assignment.needs_grading_count.to_i == 1 %> grading
         <% elsif title == "Recently Graded" %>
           <% if menu_assignment.grading_type == 'points' %>
               <%= "#{menu_assignment.score}/#{menu_assignment.points_possible}" %>

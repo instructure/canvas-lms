@@ -599,17 +599,10 @@ class Assignment < ActiveRecord::Base
     submission_types && self.submission_types != "" && self.submission_types != "none" && self.submission_types != 'not_graded' && self.submission_types != "online_quiz" && self.submission_types != 'discussion_topic' && self.submission_types != 'attendance'
   end
   
-  def ungraded_count
-    return read_attribute(:ungraded_count).to_i if read_attribute(:ungraded_count)
-    Rails.cache.fetch(['ungraded_count', self].cache_key) do
-      self.submissions.select{|s| s.ungraded? && s.has_submission? }.length #having_submission.ungraded.count
-    end
-  end
-  
   def graded_count
     return read_attribute(:graded_count).to_i if read_attribute(:graded_count)
     Rails.cache.fetch(['graded_count', self].cache_key) do
-      self.submissions.select{|s| !s.ungraded? }.length
+      self.submissions.select(&:graded?).length
     end
   end
   
@@ -1067,13 +1060,6 @@ class Assignment < ActiveRecord::Base
     }
   }
   
-  named_scope :include_ungraded_count, lambda {
-    {:select => "assignments.*, (SELECT COUNT(*) FROM submissions 
-      WHERE assignments.id = submissions.assignment_id 
-      AND submissions.submission_type IS NOT NULL AND submissions.grade IS NULL) AS ungraded_count"
-    }
-  }
-  
   # don't really need this scope anymore since we are doing the auto_peer_reviews assigning as a delayed job instead of a poller, but I'll leave it here if it is useful to anyone. -RS
   named_scope :to_be_auto_peer_reviewed, lambda {
     {:conditions => ['assignments.peer_reviews_assigned != ? AND assignments.peer_reviews = ? AND assignments.due_at < ? AND assignments.automatic_peer_reviews = ?', true, true, Time.now.utc, true], :order => 'assignments.updated_at, assignments.peer_reviews_due_at' }
@@ -1132,35 +1118,15 @@ class Assignment < ActiveRecord::Base
     }
   }
 
-  # This should only be used in the course drop down to show assignments recently graded.
+  # This should only be used in the course drop down to show assignments not yet graded.
   named_scope :need_grading_info, lambda{|limit, ignore_ids|
     ignore_ids ||= []
-    # TODO: this could be faster using:
-    # SELECT assignments.id, title, points_possible, due_at, context_id, context_type, COUNT(submissions.id) AS need_graded_count
-    # FROM assignments 
-    # JOIN submissions ON submissions.assignment_id = assignments.id 
-    # JOIN enrollments ON enrollments.course_id = assignments.context_id  AND enrollments.user_id = submissions.user_id AND enrollments.workflow_state != 'deleted'
-    # WHERE submission_types IS NOT NULL AND (submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND (assignments.workflow_state != 'deleted')) AND (assignments.context_code IN ('course_20033','course_20036','course_20222','course_20237','course_20246','course_20247','course_20252','course_20257','course_20262','course_20263','course_20264','course_20265','course_20267','course_20268','course_20269','course_20270','course_20271','course_20272','course_20273','course_20276','course_20277','course_20281','course_20320','course_20325','course_20331','course_20341','course_20355','course_20363','course_20370','course_20428')) 
-    # AND submissions.submitted_at > '2010-04-15 21:46:19' AND submissions.score IS NULL AND submissions.workflow_state != 'graded' 
-    # GROUP BY assignments.id
-    # ORDER BY due_at DESC LIMIT 15
-    
-    sql_for_need_graded_count = "(SELECT COUNT(submissions.id) FROM submissions
-        JOIN enrollments ON enrollments.user_id = submissions.user_id AND enrollments.workflow_state = 'active'
-        WHERE assignment_id = assignments.id
-        AND enrollments.course_id = assignments.context_id
-        AND (
-          (score IS NULL AND submissions.workflow_state != 'graded')
-          OR submissions.workflow_state = 'submitted'
-          OR submissions.workflow_state = 'pending_review'
-        )
-        AND submission_type IS NOT NULL)"
-          {:select => 'assignments.id, title, points_possible, due_at, context_id, context_type, submission_types, ' +
-          '(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name,' +
-          "#{sql_for_need_graded_count} AS need_graded_count",
-          :conditions => "#{sql_for_need_graded_count} > 0 #{ignore_ids.empty? ? "" : "AND id NOT IN (#{ignore_ids.join(',')})"}",
-          :limit => limit,
-          :order=>'due_at ASC'
+    {
+      :select => 'assignments.id, title, points_possible, due_at, context_id, context_type, submission_types, ' +
+                 '(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count',
+      :conditions => "needs_grading_count > 0 #{ignore_ids.empty? ? "" : "AND id NOT IN (#{ignore_ids.join(',')})"}",
+      :limit => limit,
+      :order=>'due_at ASC'
     }
   }
 
@@ -1432,10 +1398,6 @@ class Assignment < ActiveRecord::Base
     if compairable.respond_to?(:due_at)
       (self.due_at || Time.new) <=> (compairable.due_at || Time.new) 
     end
-  end
-  
-  def submissions_needing_grading
-    self.submissions.select{|s| !s.graded? }
   end
   
   def special_class; nil; end

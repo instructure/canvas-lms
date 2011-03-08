@@ -50,6 +50,27 @@ describe Assignment do
     @submission.score.should eql(10.0)
     @submission.user_id.should eql(@user.id)
   end
+
+  it "should update needs_grading_count when submissions transition state" do
+    setup_assignment_with_homework
+    @assignment.needs_grading_count.should eql(1)
+    @assignment.grade_student(@user, :grade => "0")
+    @assignment.reload
+    @assignment.needs_grading_count.should eql(0)
+  end
+  
+  it "should update needs_grading_count when enrollment changes" do
+    setup_assignment_with_homework
+    @assignment.needs_grading_count.should eql(1)
+    @course.enrollments.find_by_user_id(@user.id).destroy
+    @assignment.reload
+    @assignment.needs_grading_count.should eql(0)
+    e = @course.enroll_student(@user)
+    e.invite
+    e.accept
+    @assignment.reload
+    @assignment.needs_grading_count.should eql(1)
+  end
   
   it "should not override the grade if the assignment has no points possible" do
     setup_assignment_without_submission
@@ -910,12 +931,14 @@ def setup_assignment_without_submission
   # Established course too, as a context
   assignment_model
   user_model
-  @course.enroll_student(@user)
+  e = @course.enroll_student(@user)
+  e.invite
+  e.accept
 end
 
 def setup_assignment_with_homework
   setup_assignment_without_submission
-  res = @assignment.submit_homework(@user)
+  res = @assignment.submit_homework(@user, {:submission_type => 'online_text_entry'})
   res.should_not be_nil
   res.should be_is_a(Submission)
   @assignment.reload

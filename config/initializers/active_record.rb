@@ -316,3 +316,30 @@ ActiveRecord::Associations::AssociationCollection.class_eval do
   end
   alias_method_chain :method_missing, :splat_fix
 end
+
+# See https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/66-true-false-conditions-broken-for-sqlite#ticket-66-9
+# The default 't' and 'f' are no good, since sqlite treats them both as 0 in boolean logic.
+# This patch makes it so you can do stuff like:
+#   :conditions => "active"
+# instead of having to do:
+#   :conditions => ["active = ?", true]
+if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
+  ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
+    def quoted_true
+      '1'
+    end
+    def quoted_false
+      '0'
+    end
+  end
+end
+
+if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
+  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
+    def configure_connection_with_pg_compat
+      configure_connection_without_pg_compat
+      execute "SET SESSION SQL_MODE='PIPES_AS_CONCAT'"
+    end
+    alias_method_chain :configure_connection, :pg_compat
+  end
+end

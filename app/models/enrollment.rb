@@ -38,6 +38,32 @@ class Enrollment < ActiveRecord::Base
   after_save :touch_user
   after_create :update_user_account_associations
 
+  trigger.after(:insert).where("NEW.workflow_state = 'active'") do
+    <<-SQL
+    UPDATE assignments
+    SET needs_grading_count = needs_grading_count + 1
+    WHERE id IN (SELECT assignment_id
+                 FROM submissions
+                 WHERE user_id = NEW.user_id
+                   AND context_code = 'course_' || NEW.course_id
+                   AND (#{Submission.needs_grading_conditions})
+                );
+    SQL
+  end
+
+  trigger.after(:update).where("NEW.workflow_state <> OLD.workflow_state AND (NEW.workflow_state = 'active' OR OLD.workflow_state = 'active')") do
+    <<-SQL
+    UPDATE assignments
+    SET needs_grading_count = needs_grading_count + CASE WHEN NEW.workflow_state = 'active' THEN 1 ELSE -1 END
+    WHERE id IN (SELECT assignment_id
+                 FROM submissions
+                 WHERE user_id = NEW.user_id
+                   AND context_code = 'course_' || NEW.course_id
+                   AND (#{Submission.needs_grading_conditions})
+                );
+    SQL
+  end
+
   adheres_to_policy
   
 
@@ -111,7 +137,7 @@ class Enrollment < ActiveRecord::Base
   def update_user_account_associations
     self.user.send_later(:update_account_associations)
   end
-  
+
   def conclude
     self.workflow_state = "completed"
     self.completed_at = Time.now

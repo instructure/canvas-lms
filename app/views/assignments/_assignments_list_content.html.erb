@@ -69,9 +69,9 @@ $(document).ready(function() {
       }
       if(submission && submission.submission_type && !submission.score) {
         $assignment.addClass('group_assignment_ungraded');
-        var cnt = parseInt($assignment.find(".ungraded_count").text(), 10) || 0;
+        var cnt = parseInt($assignment.find(".needs_grading_count").text(), 10) || 0;
         cnt++;
-        $assignment.find(".ungraded_count").text(cnt);
+        $assignment.find(".needs_grading_count").text(cnt);
       }
       $assignment.fillTemplateData({
         data: submission,
@@ -114,8 +114,8 @@ $(document).ready(function() {
     if($(this).hasClass('group_assignment_overdue')) {
       $(this).attr('title', "This assignment is overdue");
     } else if($(this).hasClass('group_assignment_ungraded')) {
-      var ungraded_count = $(this).getTemplateData({textValues: ['ungraded_count']}).ungraded_count;
-      $(this).attr('title', ungraded_count + " submissions for this assignment still need grading");
+      var needs_grading_count = $(this).getTemplateData({textValues: ['needs_grading_count']}).needs_grading_count;
+      $(this).attr('title', needs_grading_count + " submissions for this assignment still need grading");
     } else if($(this).hasClass('group_assignment_graded')) {
       $(this).attr('title', "This assignment has been graded");
     }

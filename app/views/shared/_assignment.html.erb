@@ -33,7 +33,7 @@
     </div>
     <div class="links data">
       <div style="display: none;">
-        <span class="ungraded_count">&nbsp;</span>
+        <span class="needs_grading_count">&nbsp;</span>
         <span class="timestamp"><%= (assignment.try_rescue(:due_at).try_rescue(:to_i) || "0") %></span>
         <span class="submission_types"><%= assignment.try_rescue(:submission_types) || nbsp %></span>
         <span class="due_date_string"><%= assignment.try_rescue(:due_at).try_rescue(:strftime, "%m/%d/%Y") || nbsp %></span>

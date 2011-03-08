@@ -5,11 +5,15 @@
     <% subs = @current_student_submissions %>
     <% unless @current_student_submissions.blank? %>
       <div style="margin-bottom: 0px;">
-      <% graded = subs.select{|s| s.graded? }.length %>
+      <% graded = subs.select(&:graded?).length # this includes resubmissions that were previously graded %>
+      <% resubmitted = subs.select(&:needs_regrading?).length %>
       <% submitted = subs.length %>
         <span style="<%= 'font-weight: bold;' if graded < submitted %>">
           <%= graded %> <span style="font-size: 0.8em;">out of</span> <%= submitted %> Submission<%= graded == 1 ? "" : "s" %> Graded
         </span>
+        <% if resubmitted > 0 %>
+        <b><br /><%= pluralize(resubmitted, "Ungraded Re-submission") %></b>
+        <% end %>
       </div>
     <% end %>
     <a target="_blank" class="button button-sidebar-wide" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>"><%= image_tag "grading_icon.png" %> SpeedGrader</a><br/>
