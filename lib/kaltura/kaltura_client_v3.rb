@@ -37,6 +37,7 @@ module Kaltura
     def initialize
       config = Kaltura::ClientV3.config
       @host = config['domain']
+      @resource_domain = config['resource_domain']
       @endpoint = config['endpoint']
       @partnerId = config['partner_id']
       @secret = config['secret_key']
@@ -47,6 +48,10 @@ module Kaltura
     
     def self.config
       Canvas::Plugin.find(:kaltura).try(:settings)
+    end
+    
+    def thumbnail_url(entryId, width, height, vid_sec = 5, bgcolor = "ffffff", type = "2")
+      "//#{@resource_domain}/p/#{@partnerId}/thumbnail/entry_id/#{entryId}/width/#{width}/height/#{height}/bgcolor/#{bgcolor}/type/#{type}/vid_sec/#{vid_sec}"
     end
     
     def startSession(type = SessionType::USER, userId = nil)

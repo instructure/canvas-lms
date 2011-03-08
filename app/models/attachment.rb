@@ -395,12 +395,10 @@ class Attachment < ActiveRecord::Base
     elsif self.thumbnail #handle attachment_fu iamges that we have made a thubnail for on our s3
       self.thumbnail.cached_s3_url
     elsif self.media_object && self.media_object.media_id
-      opts = {
-        :height => options[:height] || 100, 
-        :width => options[:width] || 140,
-        :video_seconds => options[:video_seconds] || 5
-      }
-      "http://cdn.kaltura.com/p/156652/thumbnail/entry_id/#{self.media_object.media_id}/width/#{opts[:width]}/height/#{opts[:height]}/bgcolor/ffffff/type/2/vid_sec/#{opts[:video_seconds]}";
+      Kaltura::ClientV3.new.thumbnail_url(self.media_object.media_id,
+                                          options[:width] | 140,
+                                          options[:height] || 100,
+                                          options[:video_seconds] || 5)
     else
       # "still need to handle things that are not images with thumbnails, scribd_docs, or kaltura docs"
     end

@@ -237,7 +237,7 @@
       }
       id = id || $.trim($(this).parent().find(".media_comment_id:first").text());
       if(id) {
-        var url = "http://" + INST.kalturaSettings.resource_domain + "/p/" + INST.kalturaSettings.partner_id + "/thumbnail/entry_id/";
+        var url = "//" + INST.kalturaSettings.resource_domain + "/p/" + INST.kalturaSettings.partner_id + "/thumbnail/entry_id/";
         url = url + id;
         url = url + "/width/" + dimensions.width + "/height/" + dimensions.height + "/bgcolor/000000/type/2/vid_sec/5";
         var $img = $("<img/>");
