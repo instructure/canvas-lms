@@ -305,7 +305,8 @@ $(document).ready(function() {
               'jsapi_version': 1,
               'disable_related_docs': true,
               'auto_size' : false,
-              'height' : '400px'
+              'height' : '400px',
+              'use_ssl' : (window.location.protocol == 'https:')
             }, function(key, value){
               sd.addParam(key, value);
           });

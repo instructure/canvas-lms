@@ -690,7 +690,8 @@ var anonymousAssignment = false;
             'jsapi_version': 1,
             'disable_related_docs': true,
             'auto_size' : false,
-            'height' : '100%'
+            'height' : '100%',
+            'use_ssl' : (window.location.protocol == 'https:')
           }, function(key, value){
             sd.addParam(key, value);
         });

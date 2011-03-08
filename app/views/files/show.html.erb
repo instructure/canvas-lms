@@ -45,7 +45,8 @@
               $.each({
                   'jsapi_version': 1,
                   'disable_related_docs': true,
-                  'height' : '400px'
+                  'height' : '400px',
+                  'use_ssl' : (window.location.protocol == 'https:')
                 }, function(key, value){
                   sd.addParam(key, value);
               });
