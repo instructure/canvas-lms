@@ -495,7 +495,9 @@ class FilesController < ApplicationController
       end
       
       @attachment.save!
-      @attachment.submit_to_scribd!
+      
+      # normally this would be called by attachment_fu after it had uploaded the file to S3.
+      @attachment.after_attachment_saved
       render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session})
     else
       render_for_text ""
