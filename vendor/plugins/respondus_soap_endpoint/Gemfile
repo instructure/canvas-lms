@@ -1,0 +1,3 @@
+group 'respondus_soap_endpoint' do
+  gem 'soap4r-middleware'
+end
