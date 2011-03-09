@@ -1,6 +1,72 @@
 require_dependency 'urn:RespondusAPI.rb'
 
 class RespondusAPIPort
+  attr_reader :session
+
+  protected
+
+  class BadAuth < Exception; end
+  class OtherError < Exception
+    attr_reader :errorStatus
+    def initialize(errorStatus, msg = nil)
+      super(msg)
+      @errorStatus = errorStatus
+    end
+  end
+
+  def load_session(context)
+    @verifier = ActiveSupport::MessageVerifier.new(
+      Canvas::Security.encryption_key,
+      'SHA1')
+    if context.blank?
+      @session = {}
+    else
+      @session = @verifier.verify(context)
+    end
+  end
+
+  def dump_session
+    raise("Must load session first") unless @verifier
+    @verifier.generate(session)
+  end
+
+  # See the wrapping code at the bottom of this class.
+  # We wrap these api calls with the code to load and dump the session to the
+  # context parameter. individual api methods just need to return any response
+  # params after the first three.
+  def make_call(method, userName, password, context, *args)
+    load_session(context)
+    return_args = send(method, userName, password, context, *args) || []
+    ["Success", '', dump_session] + Array(return_args)
+  rescue Exception => ex
+    case ex
+    when NotImplementedError
+      ["Function not implemented"]
+    when BadAuth
+      ["Invalid credentials"]
+    when ActiveSupport::MessageVerifier::InvalidSignature
+      ["Invalid context"]
+    when OtherError
+      [ex.errorStatus, ex.msg]
+    else
+      Rails.logger.error "Error in Respondus API call: #{ex.inspect}\n#{ex.backtrace.join("\n")}"
+      ["Server failure"]
+    end
+  end
+
+  def self.wrap_api_call(*methods)
+    methods.each do |method|
+      alias_method "_#{method}", method
+      class_eval(<<-METHOD, __FILE__, __LINE__+1)
+        def #{method}(userName, password, context, *args)
+          make_call(:_#{method}, userName, password, context, *args)
+        end
+      METHOD
+    end
+  end
+
+  public
+
   # SYNOPSIS
   #   IdentifyServer(userName, password, context)
   #
@@ -16,12 +82,10 @@ class RespondusAPIPort
   #   identification  C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def identifyServer(userName, password, context)
-    p [userName, password, context]
-    return "Success", nil, nil, <<-INFO
+    return %{
 Respondus Generic Server API
 Contract version: 1
-Implemented for: Canvas LMS
-INFO
+Implemented for: Canvas LMS}
   end
 
   # SYNOPSIS
@@ -39,8 +103,7 @@ INFO
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def validateAuth(userName, password, context, institution)
-    p [userName, password, context, institution]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -59,10 +122,18 @@ INFO
   #   itemList        NVPairList - {urn:RespondusAPI}NVPairList
   #
   def getServerItems(userName, password, context, itemType)
-    p [userName, password, context, itemType]
     list = NVPairList.new
-    list << NVPair.new('a', 'b')
-    raise NotImplementedError.new
+    case itemType
+    when "discovery"
+      list.item << NVPair.new("contractVersion", "1.0")
+      list.item << NVPair.new("quizAreas", "course,content,content")
+      list.item << NVPair.new("quizSupport", "publish")
+      list.item << NVPair.new("quizQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
+      list.item << NVPair.new("uploadTypes", "zipPackage")
+    else
+      raise NotImplementedError
+    end
+    return list
   end
 
   # SYNOPSIS
@@ -82,8 +153,7 @@ INFO
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def selectServerItem(userName, password, context, itemType, itemID, clearState)
-    p [userName, password, context, itemType, itemID, clearState]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -106,8 +176,7 @@ INFO
   #   itemID          C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def publishServerItem(userName, password, context, itemType, itemName, uploadType, fileName, fileData)
-    p [userName, password, context, itemType, itemName, uploadType, fileName, fileData]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -126,8 +195,7 @@ INFO
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def deleteServerItem(userName, password, context, itemType, itemID)
-    p [userName, password, context, itemType, itemID]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -149,8 +217,7 @@ INFO
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def replaceServerItem(userName, password, context, itemType, itemID, uploadType, fileName, fileData)
-    p [userName, password, context, itemType, itemID, uploadType, fileName, fileData]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -174,8 +241,7 @@ INFO
   #   fileData        Base64Binary - {http://www.w3.org/2001/XMLSchema}base64Binary
   #
   def retrieveServerItem(userName, password, context, itemType, itemID, retrievalType, options, downloadType)
-    p [userName, password, context, itemType, itemID, retrievalType, options, downloadType]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -197,8 +263,7 @@ INFO
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def appendServerItem(userName, password, context, itemType, itemID, uploadType, fileName, fileData)
-    p [userName, password, context, itemType, itemID, uploadType, fileName, fileData]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -220,8 +285,7 @@ INFO
   #   linkPath        C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def getAttachmentLink(userName, password, context, itemType, itemID, fileName, uploadType)
-    p [userName, password, context, itemType, itemID, fileName, uploadType]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -243,8 +307,7 @@ INFO
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def uploadAttachment(userName, password, context, itemType, itemID, fileName, fileData, overwrite)
-    p [userName, password, context, itemType, itemID, fileName, fileData, overwrite]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
 
   # SYNOPSIS
@@ -266,8 +329,11 @@ INFO
   #   fileData        Base64Binary - {http://www.w3.org/2001/XMLSchema}base64Binary
   #
   def downloadAttachment(userName, password, context, itemType, itemID, linkPath)
-    p [userName, password, context, itemType, itemID, linkPath]
-    raise NotImplementedError.new
+    raise NotImplementedError
   end
-end
 
+  wrap_api_call :identifyServer, :validateAuth, :getServerItems,
+    :selectServerItem, :publishServerItem, :deleteServerItem,
+    :replaceServerItem, :retrieveServerItem, :appendServerItem,
+    :getAttachmentLink, :uploadAttachment, :downloadAttachment
+end
