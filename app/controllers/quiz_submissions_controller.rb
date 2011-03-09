@@ -44,7 +44,7 @@ class QuizSubmissionsController < ApplicationController
       end
 
       @submission.snapshot!(params)
-      if @submission.untaken? && @submission.attempt == params[:attempt].to_i
+      if @submission.preview? || (@submission.untaken? && @submission.attempt == params[:attempt].to_i)
         @submission.mark_completed
         hash = {}
         hash = @submission.submission_data if @submission.submission_data.is_a?(Hash) && @submission.submission_data[:attempt] == @submission.attempt

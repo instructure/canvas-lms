@@ -155,7 +155,7 @@ class QuizzesController < ApplicationController
       end
     end
     
-    if @submission && @submission.untaken? && !@just_graded
+    if @submission && (@submission.untaken? || @submission.preview?) && !@just_graded
       if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] != @quiz.access_code
         render :action => 'access_code'
       elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
