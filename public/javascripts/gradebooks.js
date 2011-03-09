@@ -660,9 +660,11 @@ var gradebook = (function(){
           var columns = $.grep(($.store.userGet('hidden_columns_' + context_code) || '').split(/,/), function(e) { return e; });
           var columns_to_hide = [];
           
-          $("#" + columns.join(',#')).parent().each(function() {
-            columns_to_hide.push(this);
-          });
+          if(columns.length) {
+            $("#" + columns.join(',#')).parent().each(function() {
+              columns_to_hide.push(this);
+            });
+          }
           if($.store.userGet('show_attendance_' + context_code) != 'true') {
             $(".cell.assignment_name.attendance").each(function() {
               columns_to_hide.push(this);
