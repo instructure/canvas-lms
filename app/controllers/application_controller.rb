@@ -66,11 +66,10 @@ class ApplicationController < ActionController::Base
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone
     end
   end
-  
+
   # retrieves the root account for the given domain
   def load_account
-    @domain_root_account = Account.default
-    Attachment.domain_namespace = @domain_root_account.file_namespace
+    @domain_root_account = request.env['canvas.domain_root_account'] || Account.default
     @files_domain = request.host != HostUrl.context_host(@domain_root_account) && request.host == HostUrl.file_host(@domain_root_account)
     @domain_root_account
   end
