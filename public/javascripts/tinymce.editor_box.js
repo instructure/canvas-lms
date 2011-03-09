@@ -160,7 +160,7 @@
         }
       },
       onchange_callback: function(e) {
-        $("#" + id).triggerHandler('change');
+        $("#" + id).trigger('change');
       },
       setup : function(ed) {
         var focus = function() {
