@@ -951,7 +951,7 @@ var anonymousAssignment = false;
 	      }
 	      else if (attachment && broswerableCssClasses.test(attachment.mime_class)) {
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
-	                  .replace("{{submissionId}}", attachment.user_id)
+	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
 	                  .replace("{{attachmentId}}", attachment.id);
 	        $iframe_holder.html('<iframe src="'+src+'" frameborder="0"></iframe>').show();
 	      }
