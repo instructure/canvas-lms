@@ -1,0 +1,19 @@
+@import environment.sass
+#external_tools
+  .external_tool
+    +border-radius(5px)
+    .header
+      padding: 5px 10px 0
+      .name
+        float: left
+        font-size: 1.2em
+        font-weight: bold
+      .links
+        float: right
+        +opacity(0.5)
+    .content
+      padding: 0 20px 5px
+    &:hover
+      background-color: #eee
+      .links
+        +opacity(1.0)

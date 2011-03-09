@@ -893,6 +893,26 @@ class User < ActiveRecord::Base
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
   
+  def lti_role_types
+    memberships = current_enrollments.uniq + account_users.uniq
+    memberships.map{|membership|
+      case membership
+      when StudentEnrollment
+        'Student'
+      when TeacherEnrollment
+        'Instructor'
+      when TaEnrollment
+        'Instructor'
+      when ObserverEnrollment
+        'Observer'
+      when AccountUser
+        'AccountAdmin'
+      else
+        'Observer'
+      end
+    }.uniq
+  end
+  
   def avatar_url(size=nil, avatar_setting=nil, fallback=nil)
     size ||= 50
     avatar_setting ||= 'enabled'

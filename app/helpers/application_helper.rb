@@ -169,7 +169,7 @@ module ApplicationHelper
       opts.unshift context.id
       opts.push({}) unless opts[-1].is_a?(Hash)
       ajax = opts[-1].delete :ajax rescue nil
-      opts[-1][:only_path] = true
+      opts[-1][:only_path] = true unless opts[-1][:only_path] == false
       res = self.send name, *opts
     elsif opts[0].is_a? Hash
       opts = opts[0]

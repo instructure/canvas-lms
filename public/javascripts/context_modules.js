@@ -832,6 +832,8 @@ modules.initModuleManagement = function() {
         displayType = "Quizzes";
       } else if (data.type == 'external_url') {
         displayType = "External URLs";
+      } else if (data.type == 'context_external_tool') {
+        displayType = "External Tools";
       } else if (data.type == 'discussion_topic') {
         displayType = "Discussions";
       } else if (data.type == 'wiki_page') {
@@ -920,7 +922,7 @@ modules.initModuleManagement = function() {
     var $item = $(this).parents(".context_module_item");
     var data = $item.getTemplateData({textValues: ['title', 'url', 'indent']});
     data.indent = modules.currentIndent($item);
-    $("#edit_item_form").find(".external_url").showIf($item.hasClass('external_url'));
+    $("#edit_item_form").find(".external_url").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
     $("#edit_item_form").attr('action', $(this).attr('href'));
     $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
     $("#edit_item_form").dialog('close').dialog({

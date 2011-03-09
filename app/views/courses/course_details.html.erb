@@ -66,6 +66,7 @@
     <li><a href="#tab-sections">Sections</a></li>
     <li><a href="#tab-users" id="tab-users-link">Users</a></li>
     <li><a href="#tab-navigation">Navigation</a></li>
+    <li><a href="#tab-tools" id="tab-tols-link">External Tools</a></li>
   </ul>
   <div id="tab-details">
     <h2>Course Details</h2>
@@ -561,6 +562,10 @@
         <button type="submit" class="button">Save</button>
       </p>
     <% end %>
+  </div>
+  <div id="tab-tools">
+    <h2>External Tools</h2>
+    <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
   </div>
 </div>
 <% if current_user_is_site_admin? %>

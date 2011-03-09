@@ -754,6 +754,9 @@
           if(options.except && $.inArray(item, options.except) != -1) {
             continue;
           }
+          if (options.dataValues && $.inArray(item, options.dataValues) != -1) {
+            this.data(item, options.data[item].toString());
+          }
           var $found_all = this.find("." + item);
           var avoid = options.avoid || "";
           $found_all.each(function() {
@@ -831,6 +834,14 @@
           val = "";
         }
         result[options.textValues[item]] = val;
+      }
+    }
+    if(options.dataValues) {
+      for(item in options.dataValues) {
+        var val = this.data(options.dataValues[item]);
+        if(val) {
+          result[options.dataValues[item]] = val;
+        }
       }
     }
     if(options.htmlValues) {

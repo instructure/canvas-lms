@@ -16,6 +16,12 @@ class ActiveRecord::Base
     "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
   end
   
+  def opaque_identifier(column)
+    str = send(column).to_s
+    raise "Empty value" if str.blank?
+    Canvas::Security.hmac_sha1(str)
+  end
+  
   def self.maximum_text_length
     @maximum_text_length ||= 64.kilobytes-1
   end

@@ -83,7 +83,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def enforce_unique_in_modules
-    if self.workflow_state != 'deleted' && self.content_id && self.content_id > 0 && self.tag_type == 'context_module'
+    if self.workflow_state != 'deleted' && self.content_id && self.content_id > 0 && self.tag_type == 'context_module' && self.content_type != 'ContextExternalTool'
       tags = ContentTag.find_all_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(self.content_id, self.content_type, 'context_module', self.context_id, self.context_type)
       tags.select{|t| t != self }.each do |tag|
         tag.destroy

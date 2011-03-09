@@ -130,6 +130,9 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
+    course.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
+      tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
+    end
     course.resources :submissions
     course.resources :calendar_events
     course.resources :chats
@@ -373,6 +376,9 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :assignments
     account.resources :submissions
     account.resource :account_authorization_config
+    account.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
+      tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
+    end
     account.resources :chats
     account.user_outcomes_results 'outcomes/users/:user_id', :controller => 'outcomes', :action => 'user_outcome_results'
     account.resources :outcomes, :collection => {:list => :get, :add_outcome => :post} do |outcome|

@@ -257,6 +257,27 @@ class ContextModule < ActiveRecord::Base
       added_item.workflow_state = 'active'
       added_item.save
       added_item
+    elsif params[:type] == 'context_external_tool'
+      title = params[:title]
+      added_item ||= self.content_tags.build(
+        :context_id => self.context_id, 
+        :context_type => self.context_type
+      )
+      tool = ContextExternalTool.find_external_tool(params[:url], self.context)
+      added_item.attributes = {
+        :content_id => tool ? tool.id : 0, 
+        :content_type => 'ContextExternalTool', 
+        :url => params[:url], 
+        :tag_type => 'context_module', 
+        :title => title, 
+        :indent => params[:indent], 
+        :position => position
+      }
+      added_item.context_module_id = self.id
+      added_item.indent = params[:indent] || 0
+      added_item.workflow_state = 'active'
+      added_item.save
+      added_item
     elsif params[:type] == 'context_module_sub_header'
       title = params[:title]
       added_item ||= self.content_tags.build(

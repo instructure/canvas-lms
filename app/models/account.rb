@@ -62,6 +62,7 @@ class Account < ActiveRecord::Base
   has_one :account_authorization_config
   has_many :account_reports
   
+  has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :learning_outcomes, :as => :context
   has_many :learning_outcome_groups, :as => :context
   has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context

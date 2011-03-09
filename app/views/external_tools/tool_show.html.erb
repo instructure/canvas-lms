@@ -1,0 +1,15 @@
+<% content_for :page_title do %><%= @tag.title %><% end %>
+<% add_crumb @tag.context_module.name, context_url(@context, :context_context_modules_url) %>
+<% add_crumb @tag.title %>
+
+<% jammit_js :tool_inline %>
+<% settings = BasicLTI.generate(@tag.url, @tool, @current_user, @context, @tag.opaque_identifier(:asset_string), context_url(@context, :context_external_tool_finished_url, @tool.id, :only_path => false)) %>
+<form action="<%= @tag.url %>" method="POST" target="tool_content" id="tool_form">
+  <% settings.each do |key, value| %>
+    <%= hidden_field_tag key, value %>
+  <% end %>
+  <button class="button" type="submit">Load <%= @tool.name %></button>
+</form>
+
+<%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
+<%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>

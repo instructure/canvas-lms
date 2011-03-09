@@ -38,8 +38,13 @@ javascripts:
     - public/javascripts/speed_grader.js
   file_inline:
     - public/javascripts/file_inline.js
+  tool_inline:
+    - public/javascripts/tool_inline.js
   site_admin:
     - public/javascripts/site_admin.js
+  account_settings:
+    - public/javascripts/account_settings.js
+    - public/javascripts/external_tools.js
   graphael:
     - public/javascripts/raphael.js
     - public/javascripts/g.raphael/g.raphael.js
@@ -88,6 +93,7 @@ javascripts:
     - public/javascripts/jquery.cookie.js
     - public/javascripts/email_lists.js
     - public/javascripts/course_details.js
+    - public/javascripts/external_tools.js
   course:
     - public/javascripts/course.js
   wiki:
@@ -212,6 +218,7 @@ stylesheets:
     - public/stylesheets/static/calendar.css
   course_details:
     - public/stylesheets/compiled/course_details.css
+    - public/stylesheets/compiled/external_tools.css
   full_files:
     - public/stylesheets/compiled/full_files.css
   datagrid:
@@ -249,3 +256,6 @@ stylesheets:
     - public/stylesheets/compiled/user_logins.css
   account_settings:
     - public/stylesheets/compiled/account_settings.css
+    - public/stylesheets/compiled/external_tools.css
+  select_content_dialog:
+    - public/stylesheets/compiled/select_content_dialog.css

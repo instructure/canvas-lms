@@ -1,4 +1,5 @@
 <% jammit_js :select_content_dialog %>
+<% jammit_css :select_content_dialog %>
 <% cache([@context, 'select_context_content_dialog']) do %>
   <div id="select_context_content_dialog" style="display: none;">
     <div>
@@ -9,8 +10,9 @@
         <option value="attachment">File</option>
         <option value="wiki_page">Content Page</option>
         <option value="discussion_topic">Discussion</option>
-        <option value="external_url" class="context_module_content">External URL</option>
         <option value="context_module_sub_header" class="context_module_content">Text Header</option>
+        <option value="external_url" class="context_module_content">External URL</option>
+        <option value="context_external_tool" class="context_module_content">External Tool</option>
       </select>
       to <span class="holder_name">module</span>
     </div>
@@ -44,6 +46,38 @@
           <tr>
             <td><label for="content_tag_create_title">Page Name:</label></td>
             <td><input type="text" name="title" id="content_tag_create_title" style="width: 120px;"/></td>
+          </tr>
+        </table>
+      </div>
+      <div id="context_external_tools_select" class="module_item_option" style="margin: 5px 20px;">
+        <div style="font-size: 0.8em;">
+          <%= image_tag "link.png", :alt => "external_tool" %> Select a tool from the list below,
+          or enter a URL for an external tool you already know is configured to add a link to it
+          to this <span class="holder_type">module</span>.
+        </div>
+        <a href="<%= context_url(@context, :context_external_tools_url, :include_parents => '1') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
+        <table>
+          <tr>
+            <td colspan="2" class="tools">
+              <div class="message" style="margin: 10px 0;">Loading...</div>
+              <div class="tool" style="display: none;">
+                <div class="name"></div>
+                <div class="description"></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><label for="external_tool_create_url">URL:</label></td>
+            <td>
+              <input type="text" name="url" id="external_tool_create_url" style="width: 200px;"/>
+              <div class="domain_message" style="font-size: 0.8em; display: none;">
+                to use this tool the domain must match <span class="domain">&nbsp;</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><label for="external_tool_create_title">Page Name:</label></td>
+            <td><input type="text" name="title" id="external_tool_create_title" style="width: 120px;"/></td>
           </tr>
         </table>
       </div>

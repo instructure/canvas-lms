@@ -85,17 +85,24 @@ $(document).ready(function() {
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
         'item[id]': $("#select_context_content_dialog .module_item_option:visible:first .module_item_select").val(),
-        'item[title]': $("#select_context_content_dialog .module_item_option:visible:first .module_item_select option:selected").text(),
         'item[indent]': $("#content_tag_indent").val()
       }
       item_data['item[url]'] = $("#content_tag_create_url").val();
       item_data['item[title]'] = $("#content_tag_create_title").val();
       submit(item_data);   
+    } else if(item_type == 'context_external_tool') {
+      var item_data = {
+        'item[type]': $("#add_module_item_select").val(),
+        'item[id]': $("#external_urls_select .tools .tool.selected").data('id'),
+        'item[indent]': $("#content_tag_indent").val()
+      }
+      item_data['item[url]'] = $("#external_tool_create_url").val();
+      item_data['item[title]'] = $("#external_tool_create_title").val();
+      submit(item_data);   
     } else if(item_type == 'context_module_sub_header') {
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
         'item[id]': $("#select_context_content_dialog .module_item_option:visible:first .module_item_select").val(),
-        'item[title]': $("#select_context_content_dialog .module_item_option:visible:first .module_item_select option:selected").text(),
         'item[indent]': $("#content_tag_indent").val()
       }
       item_data['item[title]'] = $("#sub_header_title").val();
@@ -147,9 +154,46 @@ $(document).ready(function() {
       });
     }
   });
+  $("#context_external_tools_select .tools").delegate('.tool', 'click', function() {
+    var $tool = $(this);
+    if($(this).hasClass('selected')) { 
+      $(this).removeClass('selected'); 
+      return; 
+    }
+    $tool.parents(".tools").find(".tool.selected").removeClass('selected');
+    $tool.addClass('selected');
+    $("#external_tool_create_url").val($tool.data('url') || '');
+    $("#context_external_tools_select .domain_message").showIf($tool.data('domain'))
+      .find(".domain").text($tool.data('domain'));
+    $("#external_tool_create_title").val($tool.data('name'));
+  });
+  var $tool_template = $("#context_external_tools_select .tools .tool:first").detach();
   $("#add_module_item_select").change(function() {
     $("#select_context_content_dialog .module_item_option").hide();
     $("#" + $(this).val() + "s_select").show().find(".module_item_select").change();
+    if($(this).val() == 'context_external_tool') {
+      var $select = $("#context_external_tools_select");
+      if(!$select.hasClass('loaded')) {
+        $select.find(".message").text("Loading...");
+        var url = $("#select_context_content_dialog .external_tools_url").attr('href');
+        $.ajaxJSON(url, 'GET', {}, function(data) {
+          $select.find(".message").remove();
+          $select.addClass('loaded');
+          $select.find(".tools").empty();
+          for(var idx in data) {
+            var tool = data[idx];
+            var $tool = $tool_template.clone(true);
+            $tool.fillTemplateData({
+              data: tool,
+              dataValues: ['id', 'url', 'domain', 'name']
+            });
+            $select.find(".tools").append($tool.show());
+          }
+        }, function(data) {
+          $select.find(".message").text("Loading Failed");
+        });
+      }
+    }
   }).change();
   $("#select_context_content_dialog .module_item_select").change(function() {
     if($(this).val() == "new") {

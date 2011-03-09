@@ -771,7 +771,17 @@ class ApplicationController < ActionController::Base
       @tag = tag
       @module = tag.context_module
       tag.context_module_action(@current_user, :read)
-      render :action => 'url_show'
+      render :template => 'context_modules/url_show'
+    elsif tag.content_type == 'ContextExternalTool'
+      @tag = tag
+      @tool = ContextExternalTool.find_external_tool(tag.url, context)
+      tag.context_module_action(@current_user, :read)
+      if !@tool
+        flash[:error] = "Couldn't find valid settings for this this link"
+        redirect_to named_context_url(context, error_redirect_symbol)
+      else
+        render :template => 'external_tools/tool_show'
+      end
     else
       flash[:error] = "Didn't recognize the item type for this tag"
       redirect_to named_context_url(context, error_redirect_symbol)
