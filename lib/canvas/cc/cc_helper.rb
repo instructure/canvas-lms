@@ -19,6 +19,28 @@ module Canvas::CC
 module CCHelper
   IMS_DATE = "%Y-%m-%d"
   IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
+  MANIFEST = 'imsmanifest.xml'
+  LOR = "associatedcontent/imscc_xmlv1p0/learning-application-resource"
+  WEBCONTENT = "webcontent"
+  
+  OBJECT_TOKEN = "$CANVAS_OBJECT_REFERENCE$"
+  COURSE_TOKEN = "$CANVAS_COURSE_REFERENCE$"
+  WIKI_TOKEN = "$WIKI_REFERENCE$"
+  WEB_CONTENT_TOKEN = "$IMS_CC_FILEBASE$"
+  COURSE_SETTINGS = "course_settings.xml"
+  WIKI_FOLDER = 'wiki_content'
+  
+  def create_key(object, prepend="")
+    CCHelper.create_key(object, prepend)
+  end
+  
+  def ims_date(date=nil)
+    CCHelper.ims_date(date)
+  end
+  
+  def ims_datetime(date=nil)
+    CCHelper.ims_datetime(date)
+  end
   
   def self.create_key(object, prepend="")
     if object.is_a? ActiveRecord::Base
@@ -26,7 +48,7 @@ module CCHelper
     else
       key = object.to_s
     end
-    "id_" + Digest::MD5.hexdigest(prepend + key)
+    "i" + Digest::MD5.hexdigest(prepend + key)
   end
   
   def self.ims_date(date=nil)

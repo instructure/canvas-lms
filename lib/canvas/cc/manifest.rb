@@ -17,12 +17,12 @@
 #
 module Canvas::CC
   class Manifest
-    MANIFEST = 'imsmanifest.xml'
-    LOR = "associatedcontent/imscc_xmlv1p0/learning-application-resource"
+    include CCHelper
     
-    attr_accessor :export_dir, :course
+    attr_accessor :export_dir, :course, :exporter
 
     def initialize(exporter)
+      @exporter = exporter
       @export_dir = exporter.export_dir
       @course = exporter.course
       @file = nil
@@ -39,7 +39,7 @@ module Canvas::CC
       @file = File.new(File.join(@export_dir, MANIFEST), 'w')
       @document = Builder::XmlMarkup.new(:target=>@file, :indent=>2)
       @document.instruct!
-      @document.manifest("identifier" => CCHelper.create_key(@course, "common_cartridge_"),
+      @document.manifest("identifier" => create_key(@course, "common_cartridge_"),
                          "xmlns:canvas" => "http://www.instructure.com/xsd/cccv0p1",
                          "xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1",
                          "xmlns:lom"=>"http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource",
@@ -73,7 +73,7 @@ module Canvas::CC
         lom.lomimscc :lifeCycle do |general|
           general.lomimscc :contribute do |title|
             title.lomimscc :date do |date|
-              date.lomimscc :dateTime, CCHelper.ims_date
+              date.lomimscc :dateTime, ims_date
             end
           end
         end
