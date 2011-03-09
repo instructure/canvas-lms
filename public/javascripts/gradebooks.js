@@ -728,6 +728,7 @@ var gradebook = (function(){
         setTimeout(init, 500);
       }
       if(object_data && object_data.grid && object_data.assignments && object_data.students && object_data.submissions) {
+        $(".student_assignment .table_entry").css('visibility', '');
         $loading_gradebook_progressbar.progressbar('option', 'value', $loading_gradebook_progressbar.progressbar('option', 'value') + 50);
         $("#sort_rows_dialog .grade_sorts").show();
         $(window).triggerHandler('resize');
@@ -774,12 +775,19 @@ var gradebook = (function(){
             object_data.students = true;
           } else {
             tick();
+            var user_ids = [];
             for(var idx in data) {
               object_data['submission_' + data[idx].submission.user_id + '_' + data[idx].submission.assignment_id] = data[idx];
               updateSubmission(data[idx].submission);
+              user_ids.push(data[idx].submission.user_id);
             }
             object_data.student_submissions_count = object_data.student_submissions_count || 0;
             object_data.student_submissions_count = object_data.student_submissions_count + (clump_size || 1);
+            user_ids = $.uniq(user_ids);
+            for(var idx in user_ids) {
+              $(".table_entry.student_" + user_ids[idx]).css('visibility', '');
+            }
+
             if(object_data.student_submissions_count >= (object_data.students_count || 1)) {
               object_data.submissions = true;
             }
