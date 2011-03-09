@@ -206,7 +206,7 @@ class User < ActiveRecord::Base
     # Look up the current associations, and remove any duplicates.
     associations_hash = {}
     to_delete = {}
-    self.user_account_associations.each do |a|
+    self.user_account_associations.reload.each do |a|
       if !associations_hash[a.account_id]
         associations_hash[a.account_id] = a
         to_delete[a.account_id] = a
@@ -227,7 +227,7 @@ class User < ActiveRecord::Base
       start ||= enrollment.course
       starting_points << start if start
     end
-    starting_points += self.pseudonym_accounts
+    starting_points += self.pseudonym_accounts.reload
     
     # For each Course, Section, and Account, make sure an association exists.
     starting_points.each do |entity|
