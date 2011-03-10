@@ -37,13 +37,12 @@ task :stats => "spec:statsetup"
 
 desc "Run all specs in spec directory (excluding plugin specs)"
 Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_opts = ['--options', "\"#{RAILS_ROOT}/spec/spec.opts\""]
   # you can also do SPEC_OPTS='-e "test name"' but this is a little easier I
   # suppose.
   if ENV['SINGLE_TEST']
     t.spec_opts += ['-e', %{"#{ENV['SINGLE_TEST']}"}]
   end
-  t.spec_files = FileList['spec/**/*/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/*_spec.rb']
+  t.spec_files = ['spec'] + FileList['vendor/plugins/*/spec_canvas']
 end
 
 namespace :spec do
