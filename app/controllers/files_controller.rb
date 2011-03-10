@@ -459,6 +459,8 @@ class FilesController < ApplicationController
 
       res[:id] = @attachment.id
       res[:upload_params].merge!({
+        'Filename' => '',
+        'folder' => '',
         'key' => full_filename,
         'acl' => 'private',
         'Policy' => policy_encoded,

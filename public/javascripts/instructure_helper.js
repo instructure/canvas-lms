@@ -1950,7 +1950,7 @@
     $newForm.formSubmit({
       fileUpload: true,
       success: success,
-      onlyGivenParameters: options.onlyGivenParameters,
+      onlyGivenParameters: options ? options.onlyGivenParameters : false,
       error: error
     });
     (function() {

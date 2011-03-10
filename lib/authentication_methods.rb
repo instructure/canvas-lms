@@ -33,7 +33,8 @@ module AuthenticationMethods
   
   def load_pseudonym_from_policy
     skip_session_save = false
-    if (policy_encoded = params['Policy']) &&
+    if session.to_hash.empty? && # if there's already some session data, defer to normal auth
+        (policy_encoded = params['Policy']) &&
         (signature = params['Signature']) &&
         signature == Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded)).gsub(/\n/, '') &&
         (policy = JSON.parse(Base64.decode64(policy_encoded)) rescue nil) &&
