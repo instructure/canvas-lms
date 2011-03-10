@@ -210,20 +210,3 @@ class RespondusAPIPort
     ]
   ]
 end
-
-class RespondusAPIMiddleware < Soap4r::Middleware::Base
-  setup do
-    self.endpoint = %r{\A/api/respondus/soap}
-    servant = RespondusAPIPort.new
-    RespondusAPIPort::Methods.each do |definitions|
-      opt = definitions.last
-      if opt[:request_style] == :document
-        @router.add_document_operation(servant, *definitions)
-      else
-        @router.add_rpc_operation(servant, *definitions)
-      end
-    end
-    self.mapping_registry = UrnRespondusAPIMappingRegistry::EncodedRegistry
-    self.literal_mapping_registry = UrnRespondusAPIMappingRegistry::LiteralRegistry
-  end
-end

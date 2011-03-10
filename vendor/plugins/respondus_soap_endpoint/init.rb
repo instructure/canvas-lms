@@ -14,25 +14,11 @@ Rails.configuration.to_prepare do
           :validator => 'RespondusSoapEndpointPluginValidator'
   }
 
-  enabled = false
-  begin
-    enabled = plugin.settings[:enabled]
-  rescue
-    # the DB might not exist yet
-  end
-
-  if enabled
-    # only load up the endpoint if this plugin is enabled -- it pulls in a
-    # bunch of large libraries and stuff.
-    Bundler.require 'respondus_soap_endpoint'
-    require_dependency 'respondus_soap_endpoint'
-
-    # ActionController::ParamsParser sees that the request body is XML, reads
-    # the entire thing, and parses into an ActionPack params structure. This is
-    # so not what we want, so we make sure this middleware comes first.
-    # I guess we just gotta hope that no middlewares after that one have any
-    # useful-to-this-plugin functionality. At least we still get the AR query
-    # cache.
-    Rails.configuration.middleware.insert_before 'ActionController::ParamsParser', 'RespondusAPIMiddleware'
-  end
+  # ActionController::ParamsParser sees that the request body is XML, reads
+  # the entire thing, and parses into an ActionPack params structure. This is
+  # so not what we want, so we make sure this middleware comes first.
+  # I guess we just gotta hope that no middlewares after that one have any
+  # useful-to-this-plugin functionality. At least we still get the AR query
+  # cache.
+  Rails.configuration.middleware.insert_before 'ActionController::ParamsParser', 'RespondusAPIMiddleware'
 end

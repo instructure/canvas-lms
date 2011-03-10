@@ -1,7 +1,8 @@
 require_dependency 'urn:RespondusAPI.rb'
 
 class RespondusAPIPort
-  attr_reader :session
+  attr_reader :session, :user
+  attr_accessor :rack_env
 
   protected
 
@@ -23,6 +24,15 @@ class RespondusAPIPort
     else
       @session = @verifier.verify(context)
     end
+
+    # verify that the session was created for this user
+    if self.user
+      if session[:user_id]
+        raise(ActiveSupport::MessageVerifier::InvalidSignature) unless self.user.id == session[:user_id]
+      else
+        session[:user_id] = self.user.id
+      end
+    end
   end
 
   def dump_session
@@ -30,14 +40,26 @@ class RespondusAPIPort
     @verifier.generate(session)
   end
 
+  def load_user(method, userName, password)
+    return nil if %w(identifyServer).include?(method.to_s)
+    domain_root_account = rack_env['canvas.domain_root_account'] || Account.default
+    scope = domain_root_account.require_account_pseudonym? ?
+      domain_root_account.pseudonyms :
+      Pseudonym
+    pseudonym = scope.find_by_unique_id(userName) || raise(BadAuth)
+    raise(BadAuth) unless pseudonym.valid_arbitrary_credentials?(password)
+    @user = pseudonym.user
+  end
+
   # See the wrapping code at the bottom of this class.
   # We wrap these api calls with the code to load and dump the session to the
   # context parameter. individual api methods just need to return any response
   # params after the first three.
   def make_call(method, userName, password, context, *args)
+    load_user(method, userName, password)
     load_session(context)
-    return_args = send(method, userName, password, context, *args) || []
-    ["Success", '', dump_session] + Array(return_args)
+    return_args = send("_#{method}", userName, password, context, *args) || []
+    ["Success", '', dump_session] + return_args
   rescue Exception => ex
     case ex
     when NotImplementedError
@@ -59,7 +81,7 @@ class RespondusAPIPort
       alias_method "_#{method}", method
       class_eval(<<-METHOD, __FILE__, __LINE__+1)
         def #{method}(userName, password, context, *args)
-          make_call(:_#{method}, userName, password, context, *args)
+          make_call(:#{method}, userName, password, context, *args)
         end
       METHOD
     end
@@ -82,10 +104,10 @@ class RespondusAPIPort
   #   identification  C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def identifyServer(userName, password, context)
-    return %{
+    return [%{
 Respondus Generic Server API
 Contract version: 1
-Implemented for: Canvas LMS}
+Implemented for: Canvas LMS}]
   end
 
   # SYNOPSIS
@@ -103,7 +125,8 @@ Implemented for: Canvas LMS}
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def validateAuth(userName, password, context, institution)
-    raise NotImplementedError
+    # The validation happens in load_user
+    []
   end
 
   # SYNOPSIS
@@ -133,7 +156,7 @@ Implemented for: Canvas LMS}
     else
       raise NotImplementedError
     end
-    return list
+    return [list]
   end
 
   # SYNOPSIS
