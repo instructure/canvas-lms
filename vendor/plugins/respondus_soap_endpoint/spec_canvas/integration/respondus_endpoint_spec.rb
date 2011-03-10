@@ -20,7 +20,7 @@ class SpecStreamHandler < SOAP::StreamHandler
   end
 end
 
-describe "full soap stack", :type => :integration do
+describe "Respondus SOAP API", :type => :integration do
   # args is an array of [ arg_name, value ], not just raw values
   def soap_request(method, userName, password, context, *args)
     soap = SOAP::RPC::Driver.new('test', "urn:RespondusAPI")
@@ -100,5 +100,49 @@ Implemented for: Canvas LMS}
                                  context,
                                  ['Institution', ''])
     status.should == "Invalid context"
+  end
+
+  it "should allow selecting a course and then an assignment group" do
+    @course = factory_with_protected_attributes(Course, course_valid_attributes)
+    @course.enroll_teacher(@user).accept
+    @course.assert_assignment_group
+    @group = @course.assignment_groups.first
+
+    status, details, context, list = soap_request('GetServerItems',
+                                                  'nobody@example.com', 'asdfasdf',
+                                                  '', ['itemType', 'course'])
+    status.should == "Success"
+    pair = list.item
+    pair.name.should == "value for name"
+    pair.value.should == @course.to_param
+
+    # select the course
+    status, details, context = soap_request('SelectServerItem',
+                                            'nobody@example.com', 'asdfasdf',
+                                            context, ['itemType', 'course'],
+                                            ['itemID', @course.to_param],
+                                            ['clearState', ''])
+    status.should == "Success"
+
+    # list the assignment groups
+    status, details, context, list = soap_request('GetServerItems',
+                                                  'nobody@example.com', 'asdfasdf',
+                                                  context, ['itemType', 'content'])
+    status.should == "Success"
+    pair = list.item
+    pair.name.should == "Assignments"
+    pair.value.should == @group.to_param
+
+    # select the assignment group
+    status, details, context = soap_request('SelectServerItem',
+                                            'nobody@example.com', 'asdfasdf',
+                                            context, ['itemType', 'content'],
+                                            ['itemID', @group.to_param],
+                                            ['clearState', ''])
+    status.should == "Success"
+
+    # clear boxin
+    data = Marshal.load(Base64.decode64(context.split('--').first))
+    data['selection_state'].should == [ @course.to_param, @group.to_param ]
   end
 end

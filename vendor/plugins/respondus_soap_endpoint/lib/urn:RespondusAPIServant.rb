@@ -27,10 +27,10 @@ class RespondusAPIPort
 
     # verify that the session was created for this user
     if self.user
-      if session[:user_id]
-        raise(ActiveSupport::MessageVerifier::InvalidSignature) unless self.user.id == session[:user_id]
+      if session['user_id']
+        raise(ActiveSupport::MessageVerifier::InvalidSignature) unless self.user.id == session['user_id']
       else
-        session[:user_id] = self.user.id
+        session['user_id'] = self.user.id
       end
     end
   end
@@ -69,7 +69,7 @@ class RespondusAPIPort
     when ActiveSupport::MessageVerifier::InvalidSignature
       ["Invalid context"]
     when OtherError
-      [ex.errorStatus, ex.msg]
+      [ex.errorStatus, '']
     else
       Rails.logger.error "Error in Respondus API call: #{ex.inspect}\n#{ex.backtrace.join("\n")}"
       ["Server failure"]
@@ -145,17 +145,33 @@ Implemented for: Canvas LMS}]
   #   itemList        NVPairList - {urn:RespondusAPI}NVPairList
   #
   def getServerItems(userName, password, context, itemType)
+    selection_state = session['selection_state'] || []
+
     list = NVPairList.new
     case itemType
     when "discovery"
       list.item << NVPair.new("contractVersion", "1.0")
-      list.item << NVPair.new("quizAreas", "course,content,content")
+      list.item << NVPair.new("quizAreas", "course,content")
       list.item << NVPair.new("quizSupport", "publish")
       list.item << NVPair.new("quizQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
       list.item << NVPair.new("uploadTypes", "zipPackage")
+    when "course"
+      raise(OtherError, 'Item type incompatible with selection state') unless selection_state.empty?
+      @user.cached_current_enrollments.select { |e| e.participating_admin? }.map(&:course).uniq.each do |course|
+        list.item << NVPair.new(course.name, course.to_param)
+      end
+    when "content"
+      raise(OtherError, 'Item type incompatible with selection state') unless selection_state.size == 1
+      # selection_state comes from the session, which is safe from user modification
+      course = Course.find_by_id(selection_state.first)
+      raise(OtherError, 'Item type incompatible with selection state') unless course
+      course.assignment_groups.each do |group|
+        list.item << NVPair.new(group.name, group.to_param)
+      end
     else
-      raise NotImplementedError
+      raise OtherError, "Invalid item type"
     end
+    raise(OtherError, "No items found") if list.item.empty?
     return [list]
   end
 
@@ -176,7 +192,29 @@ Implemented for: Canvas LMS}]
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def selectServerItem(userName, password, context, itemType, itemID, clearState)
-    raise NotImplementedError
+    selection_state = session['selection_state'] ||= []
+    if clearState == "true"
+      selection_state.clear
+    end
+    if itemType == "none"
+      return []
+    end
+
+    # call the unwrapped version of getServerItem
+    list, _ = _getServerItems(userName, password, context, itemType)
+
+    case itemType
+    when "course", "content"
+      if list.item.find { |i| i.value == itemID }
+        selection_state << itemID
+      else
+        raise OtherError, "Invalid item identifier"
+      end
+    else
+      raise OtherError, "Invalid item type"
+    end
+
+    return []
   end
 
   # SYNOPSIS
