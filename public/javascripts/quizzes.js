@@ -1548,7 +1548,7 @@ var quiz = {};
             }
           }
         }
-        setTimoeut(nextQuestion, 100);
+        setTimeout(nextQuestion, 100);
         $findQuestionDialog.dialog('close');
       }, function(data) {
         $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text("Adding Questions Failed, please try again");
