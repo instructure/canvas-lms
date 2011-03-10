@@ -40,12 +40,12 @@ module Canvas::CC
       @document = Builder::XmlMarkup.new(:target=>@file, :indent=>2)
       @document.instruct!
       @document.manifest("identifier" => create_key(@course, "common_cartridge_"),
-                         "xmlns:canvas" => "http://www.instructure.com/xsd/cccv0p1",
+                         "xmlns:canvas" => CANVAS_NAMESPACE,
                          "xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1",
                          "xmlns:lom"=>"http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource",
                          "xmlns:lomimscc"=>"http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest",
                          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                         "xsi:schemaLocation"=>"http://www.example.com/xsd/cccv0p1 cccv0p1.xsd http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imscp_v1p1_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lomresource_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lommanifest_v1p0.xsd"
+                         "xsi:schemaLocation"=>"#{CANVAS_NAMESPACE} #{XSD_URI} http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imscp_v1p1_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lomresource_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lommanifest_v1p0.xsd"
       ) do |manifest_node|
         
         manifest_node.metadata do |md|

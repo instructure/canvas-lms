@@ -19,6 +19,7 @@ module Canvas::CC
   module CourseResource
     def add_course_settings
       #todo - Change this to an html page for syllabus and then course_settings xml file
+      #todo - add assignment group weighting and grading schemes
       migration_id = create_key(@course)
 
       @resources.resource(
@@ -33,9 +34,9 @@ module Canvas::CC
       document = Builder::XmlMarkup.new(:target=>course_file, :indent=>2)
 
       document.course("identifier" => migration_id,
-                      "xmlns" => "http://www.instructure.com/xsd/cccv0p1",
+                      "xmlns" => CCHelper::CANVAS_NAMESPACE,
                       "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                      "xsi:schemaLocation"=> "http://www.instructure.com/xsd/cccv0p1 cccv0p1.xsd"
+                      "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |c|
         c.title @course.name
         c.start_at ims_datetime(@course.start_at) if @course.start_at
