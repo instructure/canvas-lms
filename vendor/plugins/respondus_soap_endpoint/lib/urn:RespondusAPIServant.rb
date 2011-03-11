@@ -237,7 +237,49 @@ Implemented for: Canvas LMS}]
   #   itemID          C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def publishServerItem(userName, password, context, itemType, itemName, uploadType, fileName, fileData)
-    raise NotImplementedError
+    if itemType != "quiz"
+      raise OtherError, "Invalid item type"
+    end
+    if uploadType != 'zipPackage'
+      raise OtherError, "Invalid upload type"
+    end
+
+    selection_state = session['selection_state'] || []
+    course = Course.find_by_id(selection_state.first)
+    raise(OtherError, 'Item type incompatible with selection state') unless course
+
+    # TODO: select the assignment group to put the quiz in
+
+    migration = ContentMigration.new(:context => course,
+                                     :user => user)
+    migration.update_migration_settings(:migration_type => 'qti_exporter')
+    migration.save!
+
+    attachment = Attachment.new
+    attachment.context = migration
+    attachment.uploaded_data = StringIO.new(fileData)
+    attachment.filename = "qti_import.zip"
+    attachment.save!
+
+    migration.attachment = attachment
+    migration.export_content
+
+    # This is a sad excuse for a notification system, but we're just going to
+    # check the migration every couple seconds, see if it's done.
+    timeout(5.minutes.to_i) do
+      while %w[pre_processing exporting exported importing].include?(migration.workflow_state)
+        sleep(Setting.get_cached('respondus_endpoint.polling_time', '2').to_f)
+        ContentMigration.uncached { migration.reload }
+      end
+    end
+
+    assets = migration.migration_settings[:imported_assets]
+    raise(OtherError, "Invalid file data") if assets.blank? || assets.first !~ /^quiz_/
+
+    # asset is in the form "quiz_123"
+    quiz_id = assets.first.split("_").last
+
+    [ quiz_id ]
   end
 
   # SYNOPSIS

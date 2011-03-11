@@ -37,7 +37,7 @@ describe "Respondus SOAP API", :type => :integration do
 
   before(:each) do
     setting = PluginSetting.find_or_create_by_name('qti_exporter')
-    setting.settings = {:enabled => true}
+    setting.settings = Canvas::Plugin.find('qti_exporter').default_settings.merge({:enabled => true})
     setting.save!
     setting = PluginSetting.find_or_create_by_name('respondus_soap_endpoint')
     setting.settings = {:enabled => true}
@@ -46,6 +46,10 @@ describe "Respondus SOAP API", :type => :integration do
       :username => "nobody@example.com",
       :password => "asdfasdf"
     @user.save!
+    @course = factory_with_protected_attributes(Course, course_valid_attributes)
+    @course.enroll_teacher(@user).accept
+    @course.assert_assignment_group
+    @group = @course.assignment_groups.first
   end
 
   it "should identify the server without user credentials" do
@@ -103,11 +107,6 @@ Implemented for: Canvas LMS}
   end
 
   it "should allow selecting a course and then an assignment group" do
-    @course = factory_with_protected_attributes(Course, course_valid_attributes)
-    @course.enroll_teacher(@user).accept
-    @course.assert_assignment_group
-    @group = @course.assignment_groups.first
-
     status, details, context, list = soap_request('GetServerItems',
                                                   'nobody@example.com', 'asdfasdf',
                                                   '', ['itemType', 'course'])
@@ -144,5 +143,30 @@ Implemented for: Canvas LMS}
     # clear boxin
     data = Marshal.load(Base64.decode64(context.split('--').first))
     data['selection_state'].should == [ @course.to_param, @group.to_param ]
+  end
+
+  it "should queue QTI quiz uploads for processing" do
+    status, details, context = soap_request('SelectServerItem',
+                                            'nobody@example.com', 'asdfasdf',
+                                            '', ['itemType', 'course'],
+                                            ['itemID', @course.to_param],
+                                            ['clearState', ''])
+    status.should == "Success"
+
+    mock_migration = ContentMigration.new
+    mock_migration.should_receive(:export_content) do
+      mock_migration.workflow_state = :imported
+      mock_migration.migration_settings[:imported_assets] = ["quiz_xyz"]
+      mock_migration.save!
+    end
+    ContentMigration.stub(:new).and_return(mock_migration)
+
+    status, details, context, item_id = soap_request(
+      'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
+      ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
+      ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file'])
+    status.should == "Success"
+
+    item_id.should == "xyz"
   end
 end
