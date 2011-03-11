@@ -38,6 +38,12 @@ class AssessmentQuestion < ActiveRecord::Base
   
   def infer_defaults
     self.question_data ||= {}
+    if self.question_data.is_a?(Hash)
+      if self.question_data[:question_name].try(:strip).blank?
+        self.question_data[:question_name] = "Question"
+      end
+      self.question_data[:name] = self.question_data[:question_name]
+    end
     self.name = self.question_data[:question_name] || self.name
     self.assessment_question_bank ||= AssessmentQuestionBank.unfiled_for_context(self.context)
   end
@@ -84,6 +90,7 @@ class AssessmentQuestion < ActiveRecord::Base
   def data
     res = self.question_data || {}
     res[:assessment_question_id] = self.id
+    res[:question_name] = "Question" if res[:question_name].blank?
     res[:id] = self.id
     res
   end
