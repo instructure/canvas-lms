@@ -79,7 +79,9 @@ module SeleniumTestsHelperMethods
     HostUrl.file_host = APP_HOST
     server_pid = fork do
       base = File.expand_path(File.dirname(__FILE__))
-      exec("\"#{base}/../../script/server\" -p #{SERVER_PORT} -e #{Rails.env} >> \"#{base}/../../log/#{Rails.env}.log\" 2>&1")
+      STDOUT.reopen(File.open("/dev/null", "w"))
+      STDERR.reopen(File.open("#{base}/../../log/test-server.log", "a"))
+      exec("\"#{base}/../../script/server\" -p #{SERVER_PORT} -e #{Rails.env}")
     end
     for i in 0..MAX_SERVER_START_TIME
       s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
