@@ -21,19 +21,25 @@ module CCHelper
   CANVAS_NAMESPACE = 'http://www.instructure.com/xsd/cccv0p1'
   XSD_URI = 'cccv0p1.xsd'
   
+  # IMS formats/types
   IMS_DATE = "%Y-%m-%d"
   IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
-  MANIFEST = 'imsmanifest.xml'
   LOR = "associatedcontent/imscc_xmlv1p0/learning-application-resource"
   WEBCONTENT = "webcontent"
   
+  # substitution tokens
   OBJECT_TOKEN = "$CANVAS_OBJECT_REFERENCE$"
   COURSE_TOKEN = "$CANVAS_COURSE_REFERENCE$"
   WIKI_TOKEN = "$WIKI_REFERENCE$"
   WEB_CONTENT_TOKEN = "$IMS_CC_FILEBASE$"
+
+  # file names/paths
+  COURSE_SETTINGS_DIR = "course_settings"
   COURSE_SETTINGS = "course_settings.xml"
+  SYLLABUS = "syllabus.html"
   ASSIGNMENT_SETTINGS = "assignment_settings.xml"
   WIKI_FOLDER = 'wiki_content'
+  MANIFEST = 'imsmanifest.xml'
   
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)

@@ -26,7 +26,6 @@
         <xs:element name="storage_quota" type="xs:integer"/>
         <xs:element name="allow_wiki_comments" type="xs:boolean"/>
         <xs:element name="self_enrollment" type="xs:boolean"/>
-        <xs:element name="syllabus_body" type="xs:string"/>
         <xs:element name="turnitin_comments" type="xs:string"/>
         <xs:element name="default_view">
           <xs:simpleType>
