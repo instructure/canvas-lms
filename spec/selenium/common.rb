@@ -37,7 +37,7 @@ module SeleniumTestsHelperMethods
       driver = Selenium::WebDriver.for(
         :remote, 
         :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub', 
-        :desired_capabilities => :firefox
+        :desired_capabilities => (SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox)
       )
     end
     driver.get(app_host)
