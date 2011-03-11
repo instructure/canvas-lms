@@ -154,7 +154,38 @@ shared_examples_for "all selenium tests" do
       sleep 1
     end
   end
-    
+  
+  def find_with_jquery(selector)
+    driver.execute_script("return $('#{selector.gsub(/'/, '\\\'')}')[0];")
+  end
+  
+  def find_all_with_jquery(selector)
+    driver.execute_script("return $('#{selector.gsub(/'/, '\\\'')}').toArray();")
+  end
+  
+  # pass in an Element pointing to the textarea that is tinified.
+  def wait_for_tiny(element)
+    # TODO: Better to wait for an event from tiny?
+    parent = element.find_element(:xpath, '..')
+    tiny_frame = nil
+    keep_trying {
+      begin
+        tiny_frame = parent.find_element(:css, 'iframe')
+      rescue => e
+        puts "#{e.inspect}"
+        false
+      end
+    }
+    tiny_frame
+  end
+  
+  def in_frame(id, &block)
+    saved_window_handle = driver.window_handle
+    driver.switch_to.frame id
+    yield
+    driver.switch_to.window saved_window_handle
+  end
+  
   def get(link)
     driver.get(app_host + link)
     wait_for_dom_ready
