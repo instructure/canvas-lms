@@ -507,7 +507,8 @@ class ApplicationController < ActionController::Base
   def update_page_view
     if @page_view
       if @account || @context || @asset
-        @page_view.update_attributes(:context => @context, :asset => @asset)
+        @page_view.attributes = { :context => @context, :asset => @asset }
+        store_page_view(@page_view)
       end
     end
   end
@@ -596,7 +597,7 @@ class ApplicationController < ActionController::Base
         @page_view_update = true
       end
       if @page_view && @page_view_update
-        @page_view.save
+        store_page_view(@page_view)
       end
     else
       @page_view.destroy if @page_view && !@page_view.new_record?
@@ -911,7 +912,17 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_is_site_admin?
 
   def page_views_enabled?
-    Setting.get_cached('enable_page_views', 'false') != 'false'
+    enable_page_views = Setting.get_cached('enable_page_views', 'false')
+    @page_view_method = enable_page_views == 'log' ? :log : :db
+    enable_page_views != 'false'
   end
   helper_method :page_views_enabled?
+
+  def store_page_view(page_view)
+    if @page_view_method == :log
+      Rails.logger.info "PAGE VIEW: #{page_view.attributes.to_json}"
+    else
+      page_view.save
+    end
+  end
 end
