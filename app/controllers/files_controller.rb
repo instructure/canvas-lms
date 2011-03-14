@@ -180,53 +180,61 @@ class FilesController < ApplicationController
       end
       return
     end
-
     if (params[:download] && params[:verifier] && params[:verifier] == @attachment.uuid) || authorized_action(@attachment, @current_user, :read)
       if params[:download]
         if (params[:verifier] && params[:verifier] == @attachment.uuid) || (@attachment.grants_right?(@current_user, session, :download))
           disable_page_views if params[:preview]
-          @attachment.context_module_action(@current_user, :read) unless params[:preview]
-          log_asset_access(@attachment, "files", "files") unless params[:preview]
           begin
-            send_s3_file(@attachment)
+            send_attachment(@attachment)
           rescue => e
+            @headers = false if params[:ts] && params[:verifier]
             @not_found_message = "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
             logger.error "Error downloading a file: #{e} - #{e.backtrace}"
             render :template => 'shared/errors/404_message', :status => :bad_request
           end
           return
         elsif authorized_action(@attachment, @current_user, :read)
-          respond_to do |format|
-            if params[:preview] && @attachment.mime_class == 'image'
-              format.html { redirect_to '/images/lock.png' }
-            else
-              format.html { render :action => 'show' }
-            end
-            @attachment.scribd_doc = nil unless @attachment.grants_right?(@current_user, session, :download)
-            format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
-          end
+          render_attachment(@attachment)
         end
+      # This action is a callback used in our system to help record when
+      # a user views an inline preview of a file instead of downloading
+      # it, since this should also count as an access.
       elsif params[:inline]
         generate_new_page_view
+        @attachment.context_module_action(@current_user, :read) if @current_user
         log_asset_access(@attachment, 'files', 'files')
         render :json => {:ok => true}.to_json
       else
-        respond_to do |format|
-          if params[:preview] && @attachment.mime_class == 'image'
-            format.html { redirect_to '/images/lock.png' }
-          else
-            if @files_domain
-              @headers = false
-              @show_left_side = false
-            end
-            format.html # show.rhtml
-          end
-          @attachment.scribd_doc = nil unless @attachment.grants_right?(@current_user, session, :download)
-          format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
-        end
+        render_attachment(@attachment)
       end
     end
   end
+  
+  def render_attachment(attachment)
+    respond_to do |format|
+      if params[:preview] && attachment.mime_class == 'image'
+        format.html { redirect_to '/images/lock.png' }
+      else
+        if @files_domain
+          @headers = false
+          @show_left_side = false
+        end
+        format.html { render :action => 'show' }
+      end
+      if request.format == :json
+        attachment.context_module_action(@current_user, :read) if @current_user && attachment.scribd_doc
+        log_asset_access(@attachment, "files", "files")
+      end
+      format.json {
+        attachment.scribd_doc = nil unless attachment.grants_right?(@current_user, session, :download)
+        # Right now we assume if they ask for json data on the attachment
+        # which includes the scribd doc data, then that means they have 
+        # viewed or are about to view the file in some form.
+        render :json => attachment.to_json(:permissions => {:user => @current_user}) 
+      }
+    end
+  end
+  protected :render_attachment
 
   def show_relative
     path = params[:file_path]
@@ -289,55 +297,44 @@ class FilesController < ApplicationController
      end
   end
   
-  def send_s3_file(attachment)
+  def send_attachment(attachment)
     if params[:inline] && attachment.content_type && (attachment.content_type.match(/\Atext/) || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code')
-      if safer_domain_available?
-        redirect_to safe_domain_file_url(attachment, @safer_domain_host)
-      elsif Attachment.local_storage?
-        @headers = false if @files_domain
-        send_file(attachment.full_filename, :type => attachment.content_type, :disposition => 'inline')
-      else
-        require 'aws/s3'
-        send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
-        render :status => 200, :text => Proc.new { |response, output|
-          AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
-           output.write chunk
-          end
-        }
-      end
+      send_stored_file(attachment)
     elsif attachment.inline_content? && !@context.is_a?(AssessmentQuestion)
       if params[:file_path] || !params[:wrap]
-        if safer_domain_available?
-          redirect_to safe_domain_file_url(attachment, @safer_domain_host)
-        elsif Attachment.local_storage?
-          @headers = false if @files_domain
-          send_file(attachment.full_filename, :type => attachment.content_type, :disposition => 'inline')
-        else
-          require 'aws/s3'
-          send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
-          render :status => 200, :text => Proc.new { |response, output|
-            AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
-             output.write chunk
-            end
-          }
-        end
+        send_stored_file(attachment)
       else
         # If the file is inlineable then redirect to the 'show' action 
         # so we can wrap it in all the Canvas header/footer stuff
         redirect_to(named_context_url(@context, :context_file_url, attachment.id))
       end
     else
-      if safer_domain_available?
-        redirect_to safe_domain_file_url(attachment, @safer_domain_host)
-      elsif Attachment.local_storage?
-        @headers = false if @files_domain
-        send_file(attachment.full_filename, :type => attachment.content_type, :disposition => 'attachment')
-      else
-        redirect_to attachment.cacheable_s3_url
-      end
+      send_stored_file(attachment, false, true)
     end
   end
-  protected :send_s3_file
+  protected :send_attachment
+  
+  def send_stored_file(attachment, inline=true, redirect_to_s3=false)
+    attachment.context_module_action(@current_user, :read) if @current_user && !params[:preview]
+    log_asset_access(@attachment, "files", "files") unless params[:preview]
+    if safer_domain_available?
+      redirect_to safe_domain_file_url(attachment, @safer_domain_host)
+    elsif Attachment.local_storage?
+      @headers = false if @files_domain
+      send_file(attachment.full_filename, :type => attachment.content_type, :disposition => (inline ? 'inline' : 'attachment'))
+    elsif redirect_to_s3
+      redirect_to attachment.cacheable_s3_url
+    else
+      require 'aws/s3'
+      send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
+      render :status => 200, :text => Proc.new { |response, output|
+        AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
+         output.write chunk
+        end
+      }
+    end
+  end
+  protected :send_stored_file
   
   # GET /files/new
   def new

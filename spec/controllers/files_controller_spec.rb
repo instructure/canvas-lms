@@ -38,6 +38,19 @@ describe FilesController do
     @file
   end
   
+  def file_in_a_module
+    course_with_student_logged_in(:active_all => true)
+    @file = factory_with_protected_attributes(@course.attachments, :uploaded_data => io)
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({:type => 'attachment', :id => @file.id}) 
+    @module.reload
+    hash = {}
+    hash[@tag.id.to_s] = {:type => 'must_view'}
+    @module.completion_requirements = hash
+    @module.save!
+    @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+  end
+  
   describe "GET 'quota'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -153,6 +166,57 @@ describe FilesController do
       rescue => e
         e.to_s.should eql("Not Found")
       end
+    end
+    
+    it "should mark files as viewed for module progressions if the file is downloaded" do
+      file_in_a_module
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+    end
+    
+    it "should not mark a file as viewed for module progressions if the file is locked" do
+      file_in_a_module
+      @file.locked = true
+      @file.save!
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+    end
+    
+    it "should not mark a file as viewed for module progressions just because the files#show view is rendered" do
+      file_in_a_module
+      @file.locked = true
+      @file.save!
+      get 'show', :course_id => @course.id, :id => @file.id
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+    end
+    
+    it "should mark files as viewed for module progressions if the file is previewed inline" do
+      file_in_a_module
+      get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
+      response.body.should eql({:ok => true}.to_json)
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+    end
+    
+    it "should mark files as viewed for module progressions if the file data is requested and it includes the scribd_doc data" do
+      file_in_a_module
+      @file.scribd_doc = Scribd::Document.new
+      @file.save!
+      get 'show', :course_id => @course.id, :id => @file.id, :format => :json
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+    end
+    
+    it "should not mark files as viewed for module progressions if the file data is requested and it doesn't include the scribd_doc data" do
+      file_in_a_module
+      @file.scribd_doc = nil
+      @file.save!
+      get 'show', :course_id => @course.id, :id => @file.id, :format => :json
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
     end
   end
   

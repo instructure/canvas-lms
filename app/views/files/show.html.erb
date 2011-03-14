@@ -1,5 +1,6 @@
 <% content_for :page_title do %><%= @attachment.display_name %>: <%= @context.name %><% end %>
 <% add_crumb @attachment.display_name, context_url(@context, :context_file_url, @attachment) %>
+<% download_url = context_url(@context, :context_file_download_url, @attachment.id) %>
 <% if !can_do(@context, @current_user, :manage_files) && (locked = @attachment.locked_for?(@current_user)) %>
   <div style="margin: 10px 50px;">
     <% if @attachment.folder && @attachment.folder.locked? %>
@@ -29,18 +30,20 @@
     <iframe id="file_content" src="<%= safe_domain_file_url(@attachment) %>" style="width: 100%; height: 400px;"></iframe>
   <% elsif @attachment.content_type && @attachment.content_type.match(/\Aimage\//) %>
     <h2><%= @attachment.display_name %></h2>
-    <%= link_to(image_tag(@attachment.cacheable_s3_url, :alt => @attachment.display_name), @attachment.cached_s3_url) %>
+    <%= link_to(image_tag(download_url, :alt => @attachment.display_name), download_url) %>
   <% else %>
     <h2><%= @attachment.display_name %></h2>
     <span style="font-size: 1.2em;">
-      <%= link_to "Download #{@attachment.filename}", @attachment.cacheable_s3_url %>
+      <%= link_to "Download #{@attachment.filename}", download_url %>
     </span> (<%= @attachment.readable_size %>)
     <% if @attachment.scribdable? && @attachment.scribd_doc %>
       <div id="scribd_preview" data-doc-id="<%= @attachment.scribd_doc.doc_id %>" data-access-key="<%= @attachment.scribd_doc.access_key %>"></div>
+      <a href="<%= context_url(@context, :context_file_inline_view_url, @attachment.id) %>" style="display: none;" class="inline_view_attachment_url">&nbsp;</a>
       <% js_block do %>
         <script>
           $(function() {
             $('#scribd_preview').ifExists(function($preview){
+              var url = $(".inline_view_attachment_url").attr('href');
               var sd = scribd.Document.getDoc( $preview.data('doc-id'), $preview.data('access-key') );
               $.each({
                   'jsapi_version': 1,
@@ -50,6 +53,7 @@
                   sd.addParam(key, value);
               });
               sd.write('scribd_preview');
+              $.ajaxJSON(url, 'POST', {}, function() { }, function() { });
             });
           });
         </script>
