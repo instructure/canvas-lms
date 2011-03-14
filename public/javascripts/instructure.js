@@ -691,7 +691,7 @@ $(document).ready(function() {
               $link.addClass('module_button');
             }
             $link.fillTemplateData({ data: tag });
-            if (data.previous_item) {
+            if (data[label + '_item']) {
               $link.attr('href', $.replaceTags($sequence_footer.find('.module_item_url').attr('href'), 'id', tag.id));
             } else {
               $link.attr('href', $.replaceTags($sequence_footer.find('.module_url').attr('href'), 'id', tag.id) + '/items/' + (label === 'previous' ? 'last' : 'first'));
