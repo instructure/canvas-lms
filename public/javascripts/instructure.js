@@ -779,9 +779,10 @@ $(document).ready(function() {
     }, 500);
   });
   
-  // this is for things like the to-do, recent items and upcoming, it happend a lot so rather than duplicaing it everywhere I stuck it here
+  // this is for things like the to-do, recent items and upcoming, it 
+  // happend a lot so rather than duplicating it everywhere I stuck it here
   $(".more_link").click(function(event) {
-    $(this).slideUp().parents("ul").children(":hidden").slideDown().first().find(":tabbable:first").focus();
+    $(this).closest("li").slideUp().parents("ul").children(":hidden").slideDown().first().find(":tabbable:first").focus();
     return false;
   });
   $(".to-do-list").delegate('.disable_item_link', 'click', function(event) {
