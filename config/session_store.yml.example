@@ -1,0 +1,9 @@
+production:
+  session_store: active_record_store
+  # for memcache, the list of servers will be read from config/memcache.yml (or
+  # default to localhost:11211)
+  # session_store: mem_cache_store
+  # you can override that by adding a memcache_servers key with a list of servers, e.g.:
+  # memcache_servers:
+  #   - memcache1:11211
+  #   - memcache2:11211

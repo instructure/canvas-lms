@@ -4,13 +4,22 @@
 # If you change this key, all old sessions will become invalid!
 # Make sure the secret is at least 30 characters and all random, 
 # no regular words or you'll be exposed to dictionary attacks.
-ActionController::Base.session = {
-  :key         => '_normandy_session',
-  :secret      => (Setting.get_or_set("session_secret_key", 
+config = {
+  :key           => '_normandy_session',
+  :session_store => :active_record_store,
+  :secret        => (Setting.get_or_set("session_secret_key", 
       ActiveSupport::SecureRandom.hex(64)) rescue ActiveSupport::SecureRandom.hex(64)),
-}
+}.merge((Setting.from_config("session_store") || {}).symbolize_keys)
 
-# Use the database for sessions instead of the cookie-based default,
-# which shouldn't be used to store highly confidential information
-# (create the session table with "rake db:sessions:create")
-# ActionController::Base.session_store = :active_record_store
+session_store = config.delete(:session_store).to_sym
+
+case session_store
+when :mem_cache_store
+  require 'memcache'
+  config[:namespace] ||= config[:key]
+  servers = config[:memcache_servers] || Setting.from_config("memcache") || ['localhost:11211']
+  config[:cache] ||= MemCache.new(servers, config)
+end
+
+ActionController::Base.session = config
+ActionController::Base.session_store = session_store
