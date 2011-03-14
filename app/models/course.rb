@@ -817,16 +817,6 @@ class Course < ActiveRecord::Base
     WikiNamespace.default_for_context(self)
   end
   
-  def to_csv(options = {})
-    if all? { |e| e.respond_to?(:to_row) }
-      header_row = first.export_columns(options[:format]).to_csv
-      content_rows = map { |e| e.to_row(options[:format]) }.map(&:to_csv)
-      ([header_row] + content_rows).join
-    else
-      FasterCSV.generate_line(self, options)
-    end
-  end
-  
   def gradebook_to_csv(options = {})
     assignments = self.assignments.active.gradeable
     assignments = [assignments.find(options[:assignment_id])] if options[:assignment_id]

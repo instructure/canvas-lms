@@ -88,7 +88,7 @@ class ActiveRecord::Base
   end
   
   def export_columns(format = nil)
-    self.class.content_columns.map(&:name) - ['created_at', 'updated_at']
+    self.class.content_columns.map(&:name)
   end
   
   def to_row(format = nil)
