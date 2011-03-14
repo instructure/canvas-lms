@@ -15,7 +15,7 @@ About this Documentation
 This documentation is generated directly from the Canvas LMS code
 itself, using YARD. You can generate this documentation yourself if
 you've set up a local canvas environment following the instructions on
-<a href="https://www.github.com/instructure/canvas-lms">Github</a>, run
+<a href="https://www.github.com/instructure/canvas-lms/wiki">Github</a>, run
 the following command from your canvas directory:
 
     $ rake doc:api
