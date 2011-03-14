@@ -28,12 +28,13 @@ module Canvas::CC
       syl_rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, file_name)
       path = File.join(lo_folder, file_name)
       File.open(path, 'w') do |file|
-        file << CCHelper.html_content(@course.syllabus_body || '', "Syllabus", @course, @manifest.exporter.user)
+        file << CCHelper.html_page(@course.syllabus_body || '', "Syllabus", @course, @manifest.exporter.user)
       end
       
       course_file = File.new(File.join(lo_folder, CCHelper::COURSE_SETTINGS), 'w')
       course_rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::COURSE_SETTINGS)
       document = Builder::XmlMarkup.new(:target=>course_file, :indent=>2)
+      document.instruct!
       document.course("identifier" => migration_id,
                       "xmlns" => CCHelper::CANVAS_NAMESPACE,
                       "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",

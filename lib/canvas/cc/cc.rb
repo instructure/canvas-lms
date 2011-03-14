@@ -28,4 +28,5 @@ require 'canvas/cc/manifest'
 require 'canvas/cc/wiki_resources'
 require "canvas/cc/course_resource"
 require "canvas/cc/assignment_resources"
+require "canvas/cc/topic_resources"
 require 'canvas/cc/resource'

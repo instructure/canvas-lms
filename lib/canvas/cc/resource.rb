@@ -21,6 +21,7 @@ module Canvas::CC
     include WikiResources
     include CourseResource
     include AssignmentResources
+    include TopicResources
 
     def initialize(manifest, manifest_node)
       @manifest = manifest
@@ -41,7 +42,7 @@ module Canvas::CC
         add_course_settings
         add_wiki_pages
         add_assignments
-        #discussions/announcements
+        add_topics
         #quizzes
         #conferences
         #rubrics

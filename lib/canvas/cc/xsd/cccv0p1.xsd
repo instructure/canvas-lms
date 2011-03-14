@@ -65,33 +65,54 @@
     </xs:complexType>
   </xs:element>
   
-  <xs:element name="assignment">
+  <xs:element name="assignment" type="assignmentType"/>
+  <xs:complexType name="assignmentType">
+    <xs:all minOccurs="0">
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="due_at" type="xs:dateTime"/>
+      <xs:element name="lock_at" type="xs:dateTime"/>
+      <xs:element name="unlock_at" type="xs:dateTime"/>
+      <xs:element name="peer_reviews_due_at" type="xs:dateTime"/>
+      <xs:element name="all_day_date" type="xs:date"/>
+      <xs:element name="assignment_group_id" type="xs:ID"/>
+      <xs:element name="grading_scheme_id" type="xs:ID"/>
+      <xs:element name="allowed_extensions" type="xs:string"/>
+      <xs:element name="points_possible" type="xs:float"/>
+      <xs:element name="min_score" type="xs:float"/>
+      <xs:element name="max_score" type="xs:float"/>
+      <xs:element name="mastery_score" type="xs:float"/>
+      <xs:element name="grading_type" type="xs:string"/>
+      <xs:element name="all_day" type="xs:boolean"/>
+      <xs:element name="submission_types" type="xs:string"/>
+      <xs:element name="position" type="xs:integer"/>
+      <xs:element name="turnitin_enabled" type="xs:boolean"/>
+      <xs:element name="peer_review_count" type="xs:integer"/>
+      <xs:element name="peer_reviews_assigned" type="xs:boolean"/>
+      <xs:element name="peer_reviews" type="xs:boolean"/>
+      <xs:element name="automatic_peer_reviews" type="xs:boolean"/>
+      <xs:element name="anonymous_peer_reviews" type="xs:boolean"/>
+      <xs:element name="grade_group_students_individually" type="xs:boolean"/>
+    </xs:all>
+    <xs:attribute name="identifier" type="xs:ID" use="required"/>
+  </xs:complexType>
+  
+  <xs:element name="topicMeta">
     <xs:complexType>
       <xs:all minOccurs="0">
+        <xs:element name="topic_id" type="xs:ID"/>
         <xs:element name="title" type="xs:string"/>
-        <xs:element name="due_at" type="xs:dateTime"/>
-        <xs:element name="lock_at" type="xs:dateTime"/>
-        <xs:element name="unlock_at" type="xs:dateTime"/>
-        <xs:element name="peer_reviews_due_at" type="xs:dateTime"/>
-        <xs:element name="all_day_date" type="xs:date"/>
-        <xs:element name="assignment_group_id" type="xs:ID"/>
-        <xs:element name="grading_scheme_id" type="xs:ID"/>
-        <xs:element name="allowed_extensions" type="xs:string"/>
-        <xs:element name="points_possible" type="xs:float"/>
-        <xs:element name="min_score" type="xs:float"/>
-        <xs:element name="max_score" type="xs:float"/>
-        <xs:element name="mastery_score" type="xs:float"/>
-        <xs:element name="grading_type" type="xs:string"/>
-        <xs:element name="all_day" type="xs:boolean"/>
-        <xs:element name="submission_types" type="xs:string"/>
+        <xs:element name="assignment" type="assignmentType"/>
+        <xs:element name="posted_at" type="xs:dateTime"/>
+        <xs:element name="delayed_post_at" type="xs:dateTime"/>
         <xs:element name="position" type="xs:integer"/>
-        <xs:element name="turnitin_enabled" type="xs:boolean"/>
-        <xs:element name="peer_review_count" type="xs:integer"/>
-        <xs:element name="peer_reviews_assigned" type="xs:boolean"/>
-        <xs:element name="peer_reviews" type="xs:boolean"/>
-        <xs:element name="automatic_peer_reviews" type="xs:boolean"/>
-        <xs:element name="anonymous_peer_reviews" type="xs:boolean"/>
-        <xs:element name="grade_group_students_individually" type="xs:boolean"/>
+        <xs:element name="type">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="announcement"/>
+              <xs:enumeration value="topic"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
       </xs:all>
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>

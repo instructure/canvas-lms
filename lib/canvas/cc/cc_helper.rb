@@ -26,6 +26,15 @@ module CCHelper
   IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
   LOR = "associatedcontent/imscc_xmlv1p0/learning-application-resource"
   WEBCONTENT = "webcontent"
+  # The IMS documentation for Common Cartridge has conflicting values
+  # for these, and the validator wants different values as well
+  # todo use the correct value once IMS documentation is updated
+  #DISCUSSION_TOPIC = "imsccdt_xmlv1p1"
+  #DISCUSSION_TOPIC = "imsdt_xmlv1p1"
+  DISCUSSION_TOPIC = "imsdt_xmlv1p0"
+  #WEB_LINK = "imsccwl_xmlv1p1"
+  #WEB_LINK = "imswl_xmlv1p1"
+  WEB_LINK = "imswl_xmlv1p0"
   
   # substitution tokens
   OBJECT_TOKEN = "$CANVAS_OBJECT_REFERENCE$"
@@ -72,7 +81,12 @@ module CCHelper
     date.strftime(IMS_DATETIME)
   end
   
-  def self.html_content(html, title, course, user)
+  def self.html_page(html, title, course, user)
+    content = html_content(html, course, user)
+    "<html>\n<head>\n<title>#{title}</title>\n</head>\n<body>\n#{content}\n</body>\n</html>"
+  end
+  
+  def self.html_content(html, course, user)
       regex = Regexp.new(%r{/courses/#{course.id}/([^\s"]*)})
       html = html.gsub(regex) do |relative_url|
         sub_spot = $1
@@ -117,7 +131,7 @@ module CCHelper
         new_url || relative_url
       end
 
-      "<html>\n<head>\n<title>#{title}</title>\n</head>\n<body>\n#{html}\n</body>\n</html>"
+      html
     end
   
 end

@@ -33,11 +33,12 @@ module Canvas::CC
         # That way at least the content of the assignment will
         # appear when someone non-canvas imports the package
         File.open(path, 'w') do |file|
-          file << CCHelper.html_content(assignment.description || '', "Assignment: " + assignment.title, @course, @manifest.exporter.user)
+          file << CCHelper.html_page(assignment.description || '', "Assignment: " + assignment.title, @course, @manifest.exporter.user)
         end
         
         assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')
         document = Builder::XmlMarkup.new(:target=>assignment_file, :indent=>2)
+        document.instruct!
   
         # Save all the meta-data into a canvas-specific xml schema
         document.assignment("identifier" => migration_id,
@@ -45,22 +46,7 @@ module Canvas::CC
                         "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                         "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
         ) do |a|
-          a.title assignment.title
-          a.due_at ims_datetime(assignment.due_at) if assignment.due_at
-          a.lock_at ims_datetime(assignment.lock_at) if assignment.lock_at
-          a.unlock_at ims_datetime(assignment.unlock_at) if assignment.unlock_at
-          a.all_day_date ims_date(assignment.all_day_date) if assignment.all_day_date
-          a.peer_reviews_due_at ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
-          a.assignment_group_id CCHelper.create_key(assignment.assignment_group)
-          a.grading_scheme_id CCHelper.create_key(assignment.grading_scheme) if assignment.grading_scheme
-          a.allowed_extensions assignment.allowed_extensions.join(',') if assignment.allowed_extensions 
-          atts = [:points_possible, :min_score, :max_score, :mastery_score, :grading_type,
-          :all_day, :submission_types, :position, :turnitin_enabled, :peer_review_count, 
-          :peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews, 
-          :anonymous_peer_reviews, :grade_group_students_individually]
-          atts.each do |att|
-            a.tag!(att, assignment.send(att)) unless assignment.send(att).blank?
-          end
+          AssignmentResources.create_assignment(a, assignment)
         end
         assignment_file.close
 
@@ -72,6 +58,25 @@ module Canvas::CC
           res.file(:href=>relative_path)
           res.file(:href=>File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
         end
+      end
+    end
+    
+    def self.create_assignment(node, assignment)
+      node.title assignment.title
+      node.due_at CCHelper::ims_datetime(assignment.due_at) if assignment.due_at
+      node.lock_at CCHelper::ims_datetime(assignment.lock_at) if assignment.lock_at
+      node.unlock_at CCHelper::ims_datetime(assignment.unlock_at) if assignment.unlock_at
+      node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
+      node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
+      node.assignment_group_id CCHelper.create_key(assignment.assignment_group)
+      node.grading_scheme_id CCHelper.create_key(assignment.grading_scheme) if assignment.grading_scheme
+      node.allowed_extensions assignment.allowed_extensions.join(',') if assignment.allowed_extensions
+      atts = [:points_possible, :min_score, :max_score, :mastery_score, :grading_type,
+              :all_day, :submission_types, :position, :turnitin_enabled, :peer_review_count,
+              :peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews,
+              :anonymous_peer_reviews, :grade_group_students_individually]
+      atts.each do |att|
+        node.tag!(att, assignment.send(att)) unless assignment.send(att).blank?
       end
     end
 

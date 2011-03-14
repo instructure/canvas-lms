@@ -29,7 +29,7 @@ module Canvas::CC
         path = File.join(wiki_folder, file_name)
         
         File.open(path, 'w') do |file|
-          file << CCHelper.html_content(page.body, page.title, @course, @manifest.exporter.user)
+          file << CCHelper.html_page(page.body, page.title, @course, @manifest.exporter.user)
         end
         
         @resources.resource(
