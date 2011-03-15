@@ -33,13 +33,15 @@ describe "security" do
       get_via_redirect "/login"
       assert_response :success
       cookie = cookies['_normandy_session']
-      
+      cookie.should be_present
+      path.should == "/login"
+
       post_via_redirect "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
                                   "pseudonym_session[password]" => "asdfasdf",
                                   "pseudonym_session[remember_me]" => "1",
                                   "redirect_to_ssl" => "1"
       assert_response :success
-      path.should eql("/dashboard")
+      path.should eql("/?login_success=1")
       new_cookie = cookies['_normandy_session']
       new_cookie.should be_present
       cookie.should_not eql(new_cookie)
@@ -77,8 +79,8 @@ describe "security" do
       RoleOverride.send(:instance_variable_get, '@cached_permissions').should_not be_empty
       RoleOverride.send(:class_variable_get, '@@role_override_chain').should_not be_empty
 
-      get "/"
-      assert_response 302
+      get "/dashboard"
+      assert_response 301
 
       # verify the cache is emptied on every request
       RoleOverride.send(:instance_variable_get, '@cached_permissions').should be_empty

@@ -486,9 +486,15 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.resource :pseudonym_session
 
+  # dashboard_url is / , not /dashboard
+  map.dashboard '', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+  map.root :dashboard
+  # backwards compatibility with the old /dashboard url
+  map.dashboard_redirect 'dashboard', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+
   # Thought this idea of having dashboard-scoped urls was a good idea at the
   # time... now I'm not as big a fan.
-  map.resource :dashboard, :only => [:show], :controller => "users" do |dashboard|
+  map.resource :dashboard, :only => [] do |dashboard|
     dashboard.resources :files, :only => [:index,:show], :collection => {:quota => :get} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
@@ -572,7 +578,6 @@ ActionController::Routing::Routes.draw do |map|
   #     admin.resources :products
   #   end
 
-  map.root :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.errors "errors", :controller => "info", :action => "record_error", :conditions => {:method => :post}
   map.resources :errors, :as => :error_reports
   

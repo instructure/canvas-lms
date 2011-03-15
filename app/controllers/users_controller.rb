@@ -22,7 +22,7 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   ssl_required :create, :new
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard]
   before_filter :require_open_registration, :only => [:new, :create]
   
   def oauth
@@ -164,15 +164,16 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    if request.path =~ %r{\A/dashboard\z}
+      return redirect_to(dashboard_url, :status => :moved_permanently)
+    end
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
     if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
     @account_notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @is_default_account = @current_user.pseudonyms.active.map(&:account_id).include?(Account.default.id)
-    render :action => "user_dashboard"
   end
-  protected :user_dashboard
 
   def courses
     get_context
@@ -259,10 +260,6 @@ class UsersController < ApplicationController
   def show
     get_context
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-    if request.path.match(/\A\/dashboard/)
-      return if require_user == false
-      return user_dashboard
-    end
     @user = params[:id] ? User.find(params[:id]) : @current_user
     if current_user_is_site_admin? || authorized_action(@user, @current_user, :view_statistics)
       add_crumb("#{@user.short_name}'s profile", @user == @current_user ? profile_path : user_path(@user) )
