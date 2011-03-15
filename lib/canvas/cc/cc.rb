@@ -17,6 +17,8 @@
 #
 require 'builder'
 require 'digest'
+require 'set'
+require 'zip/zip'
 
 # Canvas Common Cartridge
 module Canvas::CC
@@ -29,4 +31,5 @@ require 'canvas/cc/wiki_resources'
 require "canvas/cc/course_resource"
 require "canvas/cc/assignment_resources"
 require "canvas/cc/topic_resources"
+require "canvas/cc/web_resources"
 require 'canvas/cc/resource'

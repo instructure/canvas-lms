@@ -17,14 +17,16 @@
 #
 module Canvas::CC
   class CCExporter
-    
-    attr_accessor :course, :user, :export_dir, :manifest
-    
+
+    attr_accessor :course, :user, :export_dir, :manifest, :zip_file
+
     def initialize(course, user, opts={})
       @course = course
       @user = user
       @export_dir = nil
       @manifest = nil
+      @zip_file = nil
+      @logger = Rails.logger
     end
 
     def self.export(course, user, opts={})
@@ -33,14 +35,26 @@ module Canvas::CC
     end
 
     def export
-      create_export_dir
-      @manifest = Manifest.new(self)
-      @manifest.create_document
-      @manifest.close
+      begin
+        create_export_dir
+        create_zip_file
+        @manifest = Manifest.new(self)
+        @manifest.create_document
+        @manifest.close
+        #copy all folder contents into zip file
+        #create attachment from zip file
+        #delete directory
+      rescue => e
+        #todo error handling
+        @logger.error e
+        #delete directory?
+      ensure
+        @zip_file.close if @zip_file
+      end
     end
     
     private
-    
+
     def create_export_dir
       slug = "common_cartridge_#{@course.id}_user_#{@user.id}"
       config = Setting.from_config('external_migration')
@@ -59,6 +73,11 @@ module Canvas::CC
 
       FileUtils::mkdir_p @export_dir
       @export_dir
+    end
+
+    def create_zip_file
+      path = File.join(@export_dir, "#{@course.name.to_url}-export.#{CCHelper::CC_EXTENSION}")
+      @zip_file = Zip::ZipFile.new(path, Zip::ZipFile::CREATE)
     end
 
   end

@@ -22,6 +22,7 @@ module Canvas::CC
     include CourseResource
     include AssignmentResources
     include TopicResources
+    include WebResources
 
     def initialize(manifest, manifest_node)
       @manifest = manifest
@@ -29,6 +30,7 @@ module Canvas::CC
       @course = @manifest.course
       @export_dir = @manifest.export_dir
       @resources = nil
+      @zip_file = manifest.zip_file
     end
     
     def self.create_resources(manifest, manifest_node)
@@ -43,11 +45,11 @@ module Canvas::CC
         add_wiki_pages
         add_assignments
         add_topics
+        add_course_files
         #quizzes
         #conferences
         #rubrics
         #learning outcomes
-        #course files
       end
     end
   end

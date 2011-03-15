@@ -26,6 +26,7 @@ module CCHelper
   IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
   LOR = "associatedcontent/imscc_xmlv1p0/learning-application-resource"
   WEBCONTENT = "webcontent"
+  CC_EXTENSION = 'imscc'
   # The IMS documentation for Common Cartridge has conflicting values
   # for these, and the validator wants different values as well
   # todo use the correct value once IMS documentation is updated
@@ -49,6 +50,7 @@ module CCHelper
   ASSIGNMENT_SETTINGS = "assignment_settings.xml"
   WIKI_FOLDER = 'wiki_content'
   MANIFEST = 'imsmanifest.xml'
+  WEB_RESOURCES_FOLDER = 'web_resources'
   
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)

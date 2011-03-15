@@ -19,14 +19,24 @@ module Canvas::CC
   class Manifest
     include CCHelper
     
-    attr_accessor :export_dir, :course, :exporter
+    attr_accessor :exporter
 
     def initialize(exporter)
       @exporter = exporter
-      @export_dir = exporter.export_dir
-      @course = exporter.course
       @file = nil
       @document = nil
+    end
+    
+    def course
+      @exporter.course
+    end
+    
+    def export_dir
+      @exporter.export_dir
+    end
+    
+    def zip_file
+      @exporter.zip_file
     end
 
     def close
@@ -36,10 +46,10 @@ module Canvas::CC
     end
     
     def create_document
-      @file = File.new(File.join(@export_dir, MANIFEST), 'w')
+      @file = File.new(File.join(export_dir, MANIFEST), 'w')
       @document = Builder::XmlMarkup.new(:target=>@file, :indent=>2)
       @document.instruct!
-      @document.manifest("identifier" => create_key(@course, "common_cartridge_"),
+      @document.manifest("identifier" => create_key(course, "common_cartridge_"),
                          "xmlns:canvas" => CANVAS_NAMESPACE,
                          "xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1",
                          "xmlns:lom"=>"http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource",
@@ -67,7 +77,7 @@ module Canvas::CC
       md.lomimscc :lom do |lom|
         lom.lomimscc :general do |general|
           general.lomimscc :title do |title|
-            title.lomimscc :string, @course.name
+            title.lomimscc :string, course.name
           end
         end
         lom.lomimscc :lifeCycle do |general|
@@ -82,7 +92,7 @@ module Canvas::CC
             node.lomimscc :value, "yes"
           end
           rights.lomimscc :description do |desc|
-            desc.lomimscc :string, "#{@course.license_data[:readable_license]} - #{@course.license_data[:license_url]}"
+            desc.lomimscc :string, "#{course.license_data[:readable_license]} - #{course.license_data[:license_url]}"
           end
         end
       end
