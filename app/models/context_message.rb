@@ -51,7 +51,7 @@ class ContextMessage < ActiveRecord::Base
   end
   
   on_update_send_to_streams do
-    if self.recipients && !self.recipients.empty?
+    if self.recipients && !self.recipients.empty? && !@skip_send_to_stream
       self.recipients
     end
   end
@@ -97,8 +97,10 @@ class ContextMessage < ActiveRecord::Base
   end
   
   def read(user)
+    @skip_send_to_stream = true
     self.viewed_user_ids ||= [self.user_id]
     self.viewed_user_ids << user.id if user
+    self.updated_at = Time.now # modifying the array doesn't trigger AR to update this
     transaction do
       if user && (item = user.inbox_items.find_by_asset_id_and_asset_type(self.id, "ContextMessage"))
         item.mark_as_read(false)
