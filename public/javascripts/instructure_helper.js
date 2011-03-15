@@ -2799,6 +2799,9 @@
   $.pluralize = function(string) {
     return (string || "") + "s";
   };
+  $.pluralize_with_count = function(count, string) {
+    return "" + count + " " + (count == 1 ? string : $.pluralize(string));
+  }
   
   $.parseUserAgentString = function(userAgent) {
     userAgent = (userAgent || "").toLowerCase();
