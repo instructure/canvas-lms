@@ -15,6 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'zip/zip'
+require 'action_controller'
+require 'action_controller/test_process.rb'
+require 'tmpdir'
+require 'set'
 
 class ContentZipper
   def initialize
@@ -52,7 +57,7 @@ class ContentZipper
       case attachment.context
       when Assignment: zip_assignment(attachment, attachment.context)
       when Eportfolio: zip_eportfolio(attachment, attachment.context)
-      when Folder: zip_folder(attachment, attachment.context)
+      when Folder: zip_base_folder(attachment, attachment.context)
       end
     rescue => e
       ErrorLogging.log_error(:default, {
@@ -69,9 +74,6 @@ class ContentZipper
   end
   
   def zip_assignment(zip_attachment, assignment)
-    require 'zip/zip'
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
     files = []
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
     zip_attachment.workflow_state = 'zipping'
@@ -176,9 +178,6 @@ class ContentZipper
       idx += 1
       obj
     end
-    require 'zip/zip'
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
     filename = "#{portfolio.name.gsub(/\s/, "_")}"
     make_zip_tmpdir(filename) do |zip_name|
       idx = 0
@@ -225,15 +224,12 @@ class ContentZipper
     res
   end
   
-  def self.zip_folder(*args)
-    ContentZipper.new.zip_folder(*args)
+  def self.zip_base_folder(*args)
+    ContentZipper.new.zip_base_folder(*args)
   end
   
-  def zip_folder(zip_attachment, folder)
-    require 'zip/zip'
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
-    files = []
+  def zip_base_folder(zip_attachment, folder)
+    @files_added = false
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
     zip_attachment.workflow_state = 'zipping' #!(:workflow_state => 'zipping')
     zip_attachment.scribd_attempts += 1
@@ -243,31 +239,27 @@ class ContentZipper
       @logger.debug("creating #{zip_name}")
       Zip::ZipFile.open(zip_name, Zip::ZipFile::CREATE) do |zipfile|
         @logger.debug("zip_name: #{zip_name}")
-        count = folder.active_file_attachments.count
-        folder.active_file_attachments.select{|a| !@user || a.grants_right?(@user, nil, :download)}.each_with_index do |attachment, idx|
-          @context = folder.context
-          filename = attachment.filename
-          content = nil
-          @logger.debug("  found attachment: #{attachment.display_name}")
-          if add_attachment_to_zip(attachment, zipfile)
-            files << filename
-          end
-          zip_attachment.file_state = ((idx + 1).to_f / count.to_f * 100).to_i
-          zip_attachment.save!
-          @logger.debug("status for #{zip_attachment.id} updated to #{zip_attachment.file_state}")
-        end
+        process_folder(folder, zipfile)
       end
-      if files.empty?
-        zip_attachment.workflow_state = 'errored'
-        zip_attachment.save!
-      else
+      if @files_added
         @logger.debug("data zipped!")
         uploaded_data = ActionController::TestUploadedFile.new(zip_name, 'application/zip')
         zip_attachment.uploaded_data = uploaded_data
         zip_attachment.workflow_state = 'zipped'
         zip_attachment.file_state = 'available'
         zip_attachment.save!
+      else
+        zip_attachment.workflow_state = 'errored'
+        zip_attachment.save!
       end
+    end
+  end
+  
+  def process_folder(folder, zipfile, start_dirs=[], &callback)
+    if callback
+      zip_folder(folder, zipfile, start_dirs, &callback)
+    else
+      zip_folder(folder, zipfile, start_dirs)
     end
   end
   
@@ -276,10 +268,30 @@ class ContentZipper
   # make a tmp directory and yield a filename under that directory to the block
   # given. the tmp directory is deleted when the block returns.
   def make_zip_tmpdir(filename)
-    require 'tmpdir'
     Dir.mktmpdir do |dirname|
       zip_name = File.join(dirname, "#{filename}.zip")
       yield zip_name
+    end
+  end
+  
+  # The callback should accept two arguments, the attachment and the folder names
+  def zip_folder(folder, zipfile, folder_names, &callback)
+    folder.active_file_attachments.select{|a| !@user || a.grants_right?(@user, nil, :download)}.each do |attachment|
+      callback.call(attachment, folder_names) if callback
+      @context = folder.context
+      @logger.debug("  found attachment: #{attachment.display_name}")
+      path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
+      if add_attachment_to_zip(attachment, zipfile, path)
+        @files_added = true
+      end
+    end
+    folder.active_sub_folders.select{|f| !@user || f.grants_right?(@user, nil, :read_contents)}.each do |sub_folder|
+      new_names = Array.new(folder_names) << sub_folder.name
+      if callback
+        zip_folder(sub_folder, zipfile, new_names, &callback)
+      else
+        zip_folder(sub_folder, zipfile, new_names)
+      end
     end
   end
   
@@ -288,7 +300,6 @@ class ContentZipper
 
     # we allow duplicate filenames in the same folder. it's a bit silly, but we
     # have to handle it here or people might not get all their files zipped up.
-    require 'set'
     @files_in_zip ||= Set.new
     if @files_in_zip.include?(filename)
       dir = File.dirname(filename)
