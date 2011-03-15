@@ -101,6 +101,15 @@ module Turnitin
     def createAssignment(assignment)
       course = assignment.context
       today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
+      # s_paper_check       - 1/0, check student paper repository (is this the CURRENT student's repo, or all other students on the same paper???)
+      # internet_check      - 1/0, check internet repo
+      # journal_check       - 1/0, check journals, periodicals, publications
+      # institution_check   - 1/0, check institution
+      # submit_papers_to    - 0=none, 1=standard, 2=institution
+      # exclude_biblio      - 1/0, exclude bibliographic material
+      # exclude_quoted      - 1/0, exclude quoted material
+      # exclude_type        - 0=none, 1=by_word_count, 2=by_percentage
+      # exclude_value       - goes with exclude_type, either num or pct based on type
       res = sendRequest(:create_assignment, '2',
         :user => course,
         :course => course,
