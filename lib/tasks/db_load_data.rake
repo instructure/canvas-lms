@@ -1027,42 +1027,66 @@ namespace :db do
   
   desc "Create an administrator account"
   task :configure_admin => :load_environment do
-    require 'highline/import'
 
-    while !Rails.env.test? do
-      while true do
-        email = ask("What email address will the site administrator account use? > ") { |q| q.echo = true }
-        email_confirm = ask("Please confirm > ") { |q| q.echo = true }
-        break if email == email_confirm
-      end
-    
-      while true do
-        password = ask("What password will the site administrator use? > ") { |q| q.echo = "*" }
-        password_confirm = ask("Please confirm > ") { |q| q.echo = "*" }
-        break if password == password_confirm
-      end
-      
+    def create_admin(email, password)
       begin
-        user = User.create!
-        user.register!
-        pseudonym = user.pseudonyms.create!(:unique_id => email, :path => email, :password => password, :password_confirmation => password)
-        user.communication_channels << pseudonym.communication_channel
+        pseudonym = Pseudonym.find_by_unique_id(email)
+        user = pseudonym ? pseudonym.user : User.create!
+        user.register! unless user.registered?
+        unless pseudonym
+          # don't pass the password in the create call, because that way is extra
+          # picky. the admin should know what they're doing, and we'd rather not
+          # fail here.
+          pseudonym = user.pseudonyms.create!(:unique_id => email, :path => email,
+              :password => "validpassword", :password_confirmation => "validpassword")
+          user.communication_channels << pseudonym.communication_channel
+        end
+        # set the password later.
+        pseudonym.password = pseudonym.password_confirmation = password
+        pseudonym.save
         Account.site_admin.add_user(user, 'AccountAdmin')
         Account.default.add_user(user, 'AccountAdmin')
-        break
-      rescue Exception => e
+        user
+      rescue => e
         STDERR.puts "Problem creating administrative account, please try again: " + e
+        nil
+      end
+    end
+
+    user = nil
+    if !(ENV['CANVAS_LMS_ADMIN_EMAIL'] || "").empty? && !(ENV['CANVAS_LMS_ADMIN_PASSWORD'] || "").empty?
+      user = create_admin(ENV['CANVAS_LMS_ADMIN_EMAIL'], ENV['CANVAS_LMS_ADMIN_PASSWORD'])
+    end
+
+    unless user
+      require 'highline/import'
+
+      while !Rails.env.test? do
+
+        while true do
+          email = ask("What email address will the site administrator account use? > ") { |q| q.echo = true }
+          email_confirm = ask("Please confirm > ") { |q| q.echo = true }
+          break if email == email_confirm
+        end
+
+        while true do
+          password = ask("What password will the site administrator use? > ") { |q| q.echo = "*" }
+          password_confirm = ask("Please confirm > ") { |q| q.echo = "*" }
+          break if password == password_confirm
+        end
+
+        break if create_admin(email, password)
       end
     end
   end
   
   desc "Configure usage statistics collection"
   task :configure_statistics_collection => [:load_environment] do
-    require 'highline/import'
+    gather_data = ENV["CANVAS_LMS_STATS_COLLECTION"] || ""
+    gather_data = "opt_out" if gather_data.empty?
 
-    gather_data = "opt_out"
-    
-    if !Rails.env.test?
+    if !Rails.env.test? && (ENV["CANVAS_LMS_STATS_COLLECTION"] || "").empty?
+      require 'highline/import'
       choose do |menu|
         menu.header = "To help our developers better serve you, Instructure would like to collect some usage data about your Canvas installation. You can change this setting at any time."
         menu.prompt = "> "
@@ -1100,13 +1124,19 @@ namespace :db do
   
   desc "Configure Default Account Name"
   task :configure_account_name => :load_environment do
-    require 'highline/import'
-    
-    if !Rails.env.test?
-      name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = true }
-    
+    if (ENV['CANVAS_LMS_ACCOUNT_NAME'] || "").empty?
+      require 'highline/import'
+
+      if !Rails.env.test?
+        name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = true }
+
+        a = Account.default
+        a.name = name
+        a.save!
+      end
+    else
       a = Account.default
-      a.name = name
+      a.name = ENV['CANVAS_LMS_ACCOUNT_NAME']
       a.save!
     end
   end
