@@ -108,6 +108,12 @@ class AssessmentQuestionBank < ActiveRecord::Base
     true
   end
   
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save
+  end
+  
   named_scope :active, lambda {
     {:conditions => ['assessment_question_banks.workflow_state != ?', 'deleted'] }
   }

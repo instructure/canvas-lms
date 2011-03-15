@@ -427,17 +427,19 @@ class Quiz < ActiveRecord::Base
     @submission_questions.each do |q|
       if q[:pick_count] #QuizGroup
         if q[:assessment_question_bank_id]
-          bank = AssessmentQuestionBank.find(q[:assessment_question_bank_id])
-          questions = bank.select_for_submission(q[:pick_count])
-          questions = questions.map{|aq| aq.data}
-          questions.each do |question|
-            if question[:answers]
-              question[:answers] = question[:answers].sort_by{|a| rand} if self.shuffle_answers && !non_shuffled_questions.include?(question[:question_type])
-              question[:matches] = question[:matches].sort_by{|m| m[:text] || ""} if question[:matches]
+          bank = AssessmentQuestionBank.find_by_id(q[:assessment_question_bank_id])
+          if bank
+            questions = bank.select_for_submission(q[:pick_count])
+            questions = questions.map{|aq| aq.data}
+            questions.each do |question|
+              if question[:answers]
+                question[:answers] = question[:answers].sort_by{|a| rand} if self.shuffle_answers && !non_shuffled_questions.include?(question[:question_type])
+                question[:matches] = question[:matches].sort_by{|m| m[:text] || ""} if question[:matches]
+              end
+              question[:points_possible] = q[:question_points]
+              question[:published_at] = q[:published_at]
+              user_questions << generate_submission_question(question)
             end
-            question[:points_possible] = q[:question_points]
-            question[:published_at] = q[:published_at]
-            user_questions << generate_submission_question(question)
           end
         else
           q[:pick_count].times do |i|

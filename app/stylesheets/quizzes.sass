@@ -1,3 +1,5 @@
+@import environment.sass
+
 fieldset.question, fieldset.display_question
   padding: 0
 
@@ -110,6 +112,9 @@ fieldset.question, fieldset.display_question
     :-moz-border-radius-topleft 5px
     :padding 5px 10px
     :background-color #eee
+    &.question_bank_top
+      .local_group_links
+        display: none
     &.ui-sortable-placeholder
       :border-bottom-width 1px
       :border-style dashed
@@ -138,6 +143,8 @@ fieldset.question, fieldset.display_question
         :opacity 1.0
       .group_edit
         :display inline
+      div.group_edit
+        :display block
       .group_display
         :display none
       .move
@@ -805,3 +812,25 @@ ul#quiz_versions
     .content
       font-size: 0.8em
       padding-left: 20px
+
+#find_bank_dialog
+  .bank_list
+    max-height: 220px
+    overflow: auto
+    margin: 10px 0
+  .bank
+    +border-radius(3px)
+    padding: 4px 5px
+    cursor: pointer
+    margin: 0 20px
+    border-bottom: 1px dotted #ccc
+    .title
+      font-weight: bold
+    .sub_content
+      font-size: 0.8em
+      padding-left: 20px
+    &:hover
+      background-color: #eee
+    &.selected
+      background-color: #ccc
+      font-weight: bold

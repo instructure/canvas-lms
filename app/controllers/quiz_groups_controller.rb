@@ -22,7 +22,10 @@ class QuizGroupsController < ApplicationController
   def create
     if authorized_action(@quiz, @current_user, :update)
       @quiz.did_edit if @quiz.created?
-      params[:position] = @quiz.root_entries_max_position + 1
+      if (bank_id = params[:quiz_group].delete(:assessment_question_bank_id)) && !bank_id.blank?
+        @bank = AssessmentQuestionBank.find(bank_id)
+        params[:quiz_group][:assessment_question_bank] = @bank if @bank.grants_right?(@current_user, session, :manage)
+      end
       @group = @quiz.quiz_groups.build(params[:quiz_group])
       @group.save
       render :json => @group.to_json

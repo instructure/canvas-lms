@@ -88,6 +88,7 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def track_outcomes(attempt)
+    return unless user_id
     question_ids = (self.quiz_data || []).map{|q| q[:assessment_question_id] }.compact.uniq
     questions = AssessmentQuestion.find_all_by_id(question_ids).compact
     bank_ids = questions.map(&:assessment_question_bank_id).uniq

@@ -304,7 +304,7 @@
 
 <%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
 <%= render_js_blocks %>
-<% if @domain_root_account && @domain_root_account.settings[:global_includes] && @domain_root_account.settings[:global_javascript] %>
+<% if @domain_root_account && @domain_root_account.settings[:global_includes] && !@domain_root_account.settings[:global_javascript].try(:strip).blank? %>
   <script src="<%= @domain_root_account.settings[:global_javascript] %>"></script>
 <% end %>
 </body>

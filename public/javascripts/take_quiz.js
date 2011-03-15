@@ -71,7 +71,7 @@ $(document).ready(function() {
   $(".jump_to_question_link").live('click', function(event) {
     event.preventDefault();
     var $obj = $($(this).attr('href'));
-    $("html,body").scrollTo({object: $obj});
+    $("html,body").scrollTo($obj.parent());
     $obj.find(":input:first").focus().select();
   });
   $("#questions").delegate(":checkbox,:radio,label", 'change mouseup', function(event) {

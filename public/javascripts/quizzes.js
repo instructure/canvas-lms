@@ -1308,6 +1308,63 @@ var quiz = {};
       $("html,body").scrollTo({top: $question.offset().top - 10, left: 0});
       $question.find(":input:first").focus().select();
     });
+    var $findBankDialog = $("#find_bank_dialog");
+    $(".find_bank_link").click(function(event) {
+      event.preventDefault();
+      var $dialog = $findBankDialog;
+      $dialog.data('form', $(this).closest(".quiz_group_form"));
+      if(!$dialog.hasClass('loaded')) {
+        $dialog.data('banks', {});
+        $dialog.find(".find_banks").hide();
+        $dialog.find(".message").show().text("Loading Question Banks...");
+        var url = $dialog.find(".find_question_banks_url").attr('href');
+        $.ajaxJSON(url, 'GET', {}, function(banks) {
+          $dialog.find(".message").hide();
+          $dialog.find(".find_banks").show();
+          $dialog.addClass('loaded');
+          for(idx in banks) {
+            var bank = banks[idx].assessment_question_bank;
+            bank.title = $.truncateText(bank.title)
+            var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
+            $bank.fillTemplateData({data: bank, dataValues: ['id', 'context_type', 'context_id']});
+            $dialog.find(".bank_list").append($bank);
+            $bank.data('bank_data', bank);
+            $bank.show();
+          }
+        }, function(data) {
+          $dialog.find(".message").text("Question Banks failed to load, please try again");
+        });
+      }
+      $dialog.find(".bank.selected").removeClass('selected');
+      $dialog.find(".submit_button").attr('disabled', true);
+      $dialog.dialog('close').dialog({
+        autoOpen: false,
+        title: "Find Question Bank",
+        width: 600,
+        height: 400
+      }).dialog('open');
+    });
+    $findBankDialog.delegate('.bank', 'click', function() {
+      $findBankDialog.find(".bank.selected").removeClass('selected');
+      $(this).addClass('selected');
+      $findBankDialog.find(".submit_button").attr('disabled', false);
+    }).delegate('.submit_button', 'click', function() {
+      var $bank = $findBankDialog.find(".bank.selected:first");
+      var bank = $bank.getTemplateData({textValues: ['title'], dataValues: ['id', 'context_id', 'context_type']});
+      var $form = $findBankDialog.data('form');
+      $form.find(".bank_id").val(bank.id);
+      bank.bank_name = bank.title;
+      var $formBank = $form.closest('.group_top').next(".assessment_question_bank")
+      if($formBank.length == 0) {
+        $formBank = $("#group_top_template").next(".assessment_question_bank").clone(true);
+        $form.closest('.group_top').after($formBank);
+      }
+      $formBank.show()
+        .fillTemplateData({data: bank}).data('bank_data', bank);
+      $findBankDialog.dialog('close');
+    }).delegate('.cancel_button', 'click', function() {
+      $findBankDialog.dialog('close');
+    });
     var $findQuestionDialog = $("#find_question_dialog");
     $(".find_question_link").click(function(event) {
       event.preventDefault();
@@ -1890,6 +1947,17 @@ var quiz = {};
           id: 'group_top_' + group.id,
           hrefValues: ['id']
         });
+        $group.toggleClass('question_bank_top', !!group.assessment_question_bank_id);
+        var $bank = $group.next('.assessment_question_bank');
+        if(!group.assessment_question_bank_id) {
+          $bank.remove();
+        } else if($bank.data('bank_data')) {
+          var bank = $bank.data('bank_data');
+          bank.bank_id = bank.id;
+          bank.context_type_string = $.pluralize($.underscore(bank.context_type));
+          $group.next(".assessment_question_bank").fillTemplateData({data: bank, hrefValues: ['bank_id', 'context_type_string', 'context_id']})
+            .find(".bank_name").hide().filter(".bank_name_link").show();
+        }
         $group.fillFormData(data, {object_name: 'quiz_group'});
         var $bottom = $group.next();
         while($bottom.length > 0 && !$bottom.hasClass('group_bottom')) {
@@ -2063,8 +2131,12 @@ var quiz = {};
       if($top.attr('id') == 'group_top_new') {
         var $next = $top.next();
         while($next.length > 0 && !$next.hasClass('group_bottom')) {
+          var $current = $next
           $next.removeClass('group');
           $next = $next.next();
+          if($current.hasClass('assessment_question_bank')) {
+            $current.remove();
+          }
         }
         $next.remove();
         $top.remove();

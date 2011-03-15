@@ -72,6 +72,11 @@ class QuizzesController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       student_ids = @context.students.map{|s| s.id }
+      @banks_hash = {}
+      bank_ids = @quiz.quiz_groups.map(&:assessment_question_bank_id)
+      AssessmentQuestionBank.active.find_all_by_id(bank_ids).compact.each do |bank|
+        @banks_hash[bank.id] = bank
+      end
       if has_student_submissions?
         flash[:notice] = "Keep in mind, some students have already taken or started taking this quiz"
       end

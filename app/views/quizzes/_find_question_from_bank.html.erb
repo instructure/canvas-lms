@@ -55,6 +55,32 @@
     </tr>
   </table>
 </div>
+<div id="find_bank_dialog" style="display: none;">
+  <a href="<%= context_url(@context, :context_question_banks_url, :managed => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
+  <h2 style="margin-top: 0; float: left;">Link to Question Bank</h2>
+  <div style="float: right; padding-right: 5px; line-height: 2.5em;">
+    <a href="<%= context_url(@context, :context_question_banks_url) %>">Manage <%= @context.class.to_s %> Question Banks</a>
+  </div>
+  <div class="clear"></div>
+  <div class="message" style="display: none;"></div>
+  <div class="find_banks">
+    Select a question bank from the list below to link it to the
+    this quiz as a question group.
+    <ul class="side_tabs bank_list unstyled_list">
+      <li class="bank blank" style="display: none;">
+        <span class="title">Bank Name</span>
+        <span class="id" style="display: none;">&nbsp;</span>
+        <div class="sub_content">
+          <span class="cached_context_short_name">&nbsp;</span>, <span class="assessment_question_count">&nbsp;</span> questions
+        </div>
+      </li>
+    </ul>
+    <div class="button-container" style="margin-bottom: 5px;">
+      <button type="button" class="button submit_button">Select Bank</button>
+      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+    </div>
+  </div>
+</div>
 <div id="add_question_group_dialog" style="display: none;" title="Add a New Question Group">
   <h2>Add a New Question Group</h2>
   <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_question_group_url" style="display: none;">&nbsp;</a>

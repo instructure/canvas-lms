@@ -185,11 +185,12 @@ $(document).ready(function() {
     });
   });
   $(".delete_bank_link").click(function(event) {
+    event.preventDefault();
     $(this).parents(".question_bank").confirmDelete({
       url: $(this).attr('href'),
       message: "Are you sure you want to delete this bank of questions?",
       success: function() {
-        location.href = $(".banks_list_url").attr('href');
+        location.href = $(".assessment_question_banks_url").attr('href');
       }
     });
   });
