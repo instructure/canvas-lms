@@ -137,7 +137,9 @@ module ApplicationHelper
   end
   
   def avatar(user_id, context_code, height=50)
-    link_to(avatar_image(user_id, height), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;')
+    if service_enabled?(:avatars)
+      link_to(avatar_image(user_id, height), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;')
+    end
   end
   
   def slugify(text="")
