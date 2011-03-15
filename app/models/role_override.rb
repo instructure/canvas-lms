@@ -33,31 +33,35 @@ class RoleOverride < ActiveRecord::Base
     end
     res
   end
-  
-  def self.enrollment_types
+
+  ENROLLMENT_TYPES =
     [
       {:name => 'StudentEnrollment', :label => 'Student'},
       {:name => 'TaEnrollment', :label => 'TA'},
       {:name => 'TeacherEnrollment', :label => 'Teacher'},
       {:name => 'DesignerEnrollment', :label => 'Course Designer'},
       {:name => 'ObserverEnrollment', :label => 'Observer'}
-    ]
+    ].freeze
+  def self.enrollment_types
+    ENROLLMENT_TYPES
   end
-  
-  def self.known_role_types
+
+  KNOWN_ROLE_TYPES =
     [
-      'TeacherEnrollment', 
-      'TaEnrollment', 
-      'DesignerEnrollment', 
+      'TeacherEnrollment',
+      'TaEnrollment',
+      'DesignerEnrollment',
       'StudentEnrollment',
       'ObserverEnrollment',
       'TeacherlessStudentEnrollment',
       'AccountAdmin'
-    ]
+    ].freeze
+  def self.known_role_types
+    KNOWN_ROLE_TYPES
   end
-  
-  def self.permissions
-    { 
+
+  PERMISSIONS =
+    {
       :manage_wiki => {
         :label => "Manage Wiki (add / edit / delete pages)",
         :available_to => [
@@ -479,9 +483,11 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
-    }
+    }.freeze
+  def self.permissions
+    PERMISSIONS
   end
-  
+
   def self.css_class_for(context, permission, enrollment_type)
     generated_permission = self.permission_for(context, permission, enrollment_type)
     
@@ -524,7 +530,7 @@ class RoleOverride < ActiveRecord::Base
   end
   
   def self.teacherless_permissions
-    @teacherless_permissions ||= permissions.to_a.select{|p, data| data[:available_to].include?('TeacherlessStudentEnrollment') }.map{|p, data| p }
+    @teacherless_permissions ||= permissions.select{|p, data| data[:available_to].include?('TeacherlessStudentEnrollment') }.map{|p, data| p }
   end
   
   def self.clear_cached_contexts
