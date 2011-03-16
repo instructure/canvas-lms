@@ -92,6 +92,11 @@ class AssessmentQuestion < ActiveRecord::Base
     res = self.question_data || {}
     res[:assessment_question_id] = self.id
     res[:question_name] = "Question" if res[:question_name].blank?
+    # TODO: there's a potential id conflict here, where if a quiz
+    # has some questions manually created and some pulled from a
+    # bank, it's possible that a manual question's id could match
+    # an assessment_question's id.  This would prevent the user
+    # from being able to answer both questions when taking the quiz.
     res[:id] = self.id
     res
   end

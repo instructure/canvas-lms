@@ -2,16 +2,20 @@
 <% question = question_statistic || nil %>
 <% ignore_correct_answers ||= false %>
 <% if question %>
-  <% rows = question[:multiple_responses] ? question[:answers].length : 1 %>
+  <% question[:answers] = question[:answers].select{|a| a[:responses] > 0} if question[:question_type] == 'calculated_question' %>
+  <% rows = question[:multiple_responses] ? (question[:answer_sets] || question[:answers]).length : 1 %>
+  <% first_column_done = false %>
   <% rows.times do |i| %>
     <tr class="question <%= 'group_row' if in_group %>">
-      <% if i == 0 %>
+      <% if !first_column_done %>
+        <% first_column_done = true %>
         <td class="question_name" rowspan="<%= rows %>">
           <div class="question_name">
           <%= question[:name] %>
             <div style="float: right;" style="width: 1px; height: 100px;"></div>
             <div class="clear"></div>
           </div>
+          <div class="question_attempts"><%= pluralize(question[:responses], 'attempt') %></div>
           <div class="question_text user_content">
             <%= user_content(question[:question_text], @context.try(:asset_string), @quiz.try(:asset_string)) %>
           </div>
@@ -23,33 +27,70 @@
           </div>
         </td>
       <% end %>
-      <td>
-        <% if question[:multiple_responses] %>
-          <% answer = question[:answers][i] %>
-          <div>
-            <%= answer[:left] || answer[:text] %>
-            <div style="float: right; height: 50px; width: 1px;"></div>
-            <div class="clear"></div>
-          </div>
-          <div>&nbsp;</div>
-        <% end %>
-      </td>
-      <td>
+      <% if question[:multiple_responses] %>
+        <td class="multi_row">
+          <% if question[:question_type] == 'calculated_question' %>
+            <div class="calculated_data">
+              <% answer = (question[:answer_sets] || question[:answers])[i] %>
+              <% if answer[:variables] %>
+                <% answer[:variables].each do |var| %>
+                  <div><%= var[:name] %>: <%= var[:value] %></div>
+                <% end %>
+              <% else %>
+                <div>No Data</div>
+              <% end %>
+              <div class="attempts"><%= pluralize(answer[:responses], 'attempt') %></div>
+            </div>
+          <% elsif question[:multiple_responses] %>
+            <% answer = (question[:answer_sets] || question[:answers])[i] %>
+            <div>
+              <%= answer[:left] || answer[:text] %>
+              <div style="float: right; height: 50px; width: 1px;"></div>
+              <div class="clear"></div>
+            </div>
+            <div>&nbsp;</div>
+          <% end %>
+        </td>
+      <% end %>
+      <td class="<%= 'multi_row' if question[:multiple_responses] %>" <%= 'colspan="2"' unless question[:multiple_responses] %>>
         <% if question[:responses] == 0 %>
           No responses recorded for this question
+        <% elsif question[:question_type] == 'calculated_question' %>
+          <div class="calculated_data">
+            <% if answer[:numbers] %>
+              <% answer[:numbers].each do |num, data| %>
+                <div class="number_answer <%= 'correct_answer' if data[:correct] %>" data-responses="<%= data[:responses] %>">
+                  <span class="answer_text"><%= num %></span>
+                  <span style="font-size: 0.8em; padding-left: 10px;"><%= pluralize(data[:responses], 'attempt') %></span>
+                  <span class="user_ids" style="display: none;"><%= data[:user_ids].join(',') %></span>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="number_answer" data-responses="<%= answer[:responses] %>">
+                <span class="answer_text">Empty Response</span>
+                <span style="font-size: 0.8em; padding-left: 10px;"><%= pluralize(answer[:responses], 'attempt') %></span>
+                <span class="user_ids" style="display: none;"><%= answer[:user_ids].join(',') %></span>
+              </div>
+            <% end %>
+          </div>
         <% elsif question[:multiple_responses] %>
           <table class="results">
-            <% answer = question[:answers][i] %>
+            <% answer = (question[:answer_sets] || question[:answers])[i] %>
             <tr>
               <% if answer[:answer_matches] %>
                 <% answer[:answer_matches].each do |right| %>
                   <% pct = (right[:responses].to_f / question[:responses].to_f) * 100 %>
-                  <td title="<%= pct.to_i %>% of <%= question[:responses] %> students selected this answer" class="answer <%= 'correct_answer' if answer[:id] == right[:id] && !ignore_correct_answers %>">
-                    <div class="response">
-                      <div class="response_bar" style="margin-top: <%= ((100 - pct) / 2).to_i %>px; height: <%= (pct / 2).to_i %>px;">
-                    </div>
-                    <div class="answer_text"><%= right[:text] %></div>
-                    <div class="user_ids" style="display: none;"><%= right[:user_ids].join(",") %></div>
+                  <td class="answer <%= 'correct_answer' if (right[:correct] || answer[:id] == right[:id]) && !ignore_correct_answers %>" data-responses="<%= right[:responses].to_f %>">
+                    <span href="#" class="tooltip answer_bar">
+                      <span class="tooltip_wrap" style="font-size: 1.2em;">
+                        <span class="tooltip_text" style="padding: 10px 5px;"><%= pct.to_i %>% of <%= question[:responses] %> attempts selected this answer</span>
+                      </span>
+                      <div class="response">
+                        <div class="response_bar" style="margin-top: <%= ((100 - pct) / 2).to_i %>px; height: <%= (pct / 2).to_i %>px;">
+                      </div>
+                      <div class="answer_text"><%= right[:text] %></div>
+                      <div class="user_ids" style="display: none;"><%= right[:user_ids].join(",") %></div>
+                    </span>
                   </td>
                 <% end %>
               <% end %>
@@ -81,10 +122,10 @@
           <table class="results"><tr>
             <% question[:answers].each do |answer| %>
               <% pct = (answer[:responses].to_f / question[:responses].to_f) * 100 %>
-              <td title="<%= pct.to_i %>% of <%= question[:responses] %> students selected this answer" class="answer <%= 'correct_answer' if answer[:weight] == 100 && !ignore_correct_answers %>">
+              <td title="<%= pct.to_i %>% of <%= question[:responses] %> attempts selected this answer" class="answer <%= 'correct_answer' if answer[:weight] == 100 && !ignore_correct_answers %>" data-responses="<%= answer[:responses].to_f %>">
                 <span href="#" class="tooltip answer_bar">
                   <span class="tooltip_wrap" style="font-size: 1.2em;">
-                    <span class="tooltip_text" style="padding: 10px 5px;"><%= pct.to_i %>% of <%= question[:responses] %> students selected this answer</span>
+                    <span class="tooltip_text" style="padding: 10px 5px;"><%= pct.to_i %>% of <%= question[:responses] %> attempts selected this answer</span>
                   </span>
                   <div class="response">
                     <div class="response_bar" style="margin-top: <%= (100 - pct).to_i %>px; height: <%= pct.to_i %>px;">

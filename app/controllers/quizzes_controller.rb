@@ -60,10 +60,22 @@ class QuizzesController < ApplicationController
   
   def statistics
     if authorized_action(@quiz, @current_user, :manage)
-      add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-      add_crumb("Statistics", named_context_url(@context, :context_quiz_statistics_url, @quiz))
-      @statistics = @quiz.statistics
-      @submitted_users = User.find_all_by_id(@quiz.quiz_submissions.select{|s| !s.settings_only? }.map(&:user_id)).compact.uniq.sort_by(&:last_name_first)
+      respond_to do |format|
+        format.html {
+          add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+          add_crumb("Statistics", named_context_url(@context, :context_quiz_statistics_url, @quiz))
+          @statistics = @quiz.statistics(params[:all_versions] == '1')
+          @submitted_users = User.find_all_by_id(@quiz.quiz_submissions.select{|s| !s.settings_only? }.map(&:user_id)).compact.uniq.sort_by(&:last_name_first)
+        }
+        format.csv {
+          send_data(
+            @quiz.statistics_csv(:include_all_versions => params[:all_versions] == '1', :anonymous => !@quiz.graded? && @quiz.anonymous_submissions), 
+            :type => "text/csv", 
+            :filename => "#{@quiz.title} #{@quiz.readable_type} Report.csv", 
+            :disposition => "attachment"
+          )
+        }
+      end
     end
   end
   

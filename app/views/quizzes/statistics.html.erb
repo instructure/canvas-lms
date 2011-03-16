@@ -16,6 +16,9 @@
   font-size: 0.7em;
   padding: 2px 5px;
 }
+#statistics td.multi_row {
+  border-bottom: 1px dotted #ccc;
+}
 tr.group td {
   font-size: 1.1em;
   font-weight: bold;
@@ -23,6 +26,7 @@ tr.group td {
 tr.question td.question_name, tr.group td.group_name {
   min-width: 30%;
   padding-left: 10px;
+  padding-right: 20px;
 }
 tr.question.group_row td.question_name {
   padding-left: 30px;
@@ -30,12 +34,20 @@ tr.question.group_row td.question_name {
 tr.question td.question_name .question_name {
   font-weight: bold;
 }
+tr.question td.question_name .question_attempts {
+  font-size: 0.8em;
+  margin-left: 10px;
+}
 tr.question td.question_name .question_text {
   font-size: 0.8em;
+  margin-left: 10px;
 }
 tr.question td.question_name .question_details {
   font-size: 0.8em;
   padding-left: 10px;
+}
+tr.question td .number_answer.correct_answer {
+  color: #5CA93D;
 }
 #statistics .response {
   min-width: 50px;
@@ -77,12 +89,22 @@ tr.question td.question_name .question_details {
   font-size: 1.2em;
 }
 #statistics_summary td {
-  border-top: 1px solid #aaa;
+  border-bottom: 1px dotted #ccc;
   padding: 2px 5px;
 }
 #statistics .answer {
   cursor: pointer;
 }
+#statistics .number_answer {
+  cursor: pointer;
+}
+#statistics .calculated_data {
+  padding: 5px 0;
+}
+#statistics .calculated_data .attempts {
+  font-size: 0.8em;
+}
+
 #statistics .essay_answers {
   max-height: 150px;
   overflow: auto;
@@ -103,13 +125,9 @@ tr.question td.question_name .question_details {
 </style>
 <% end %>
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
+  <h2><%= pluralize(@statistics[:unique_submission_count], "user") %> <%= @statistics[:submission_count] == 1 ? 'has' : 'have' %> taken this <%= @quiz.readable_type.downcase %></h2>
+  <div class="rs-margin-lr rs-margin-bottom">
     <table id="statistics_summary">
-      <thead>
-      <tr>
-        <th colspan="2"><%= pluralize(@statistics[:submission_count], "student") %> <%= @statistics[:submission_count] == 1 ? 'has' : 'have' %> taken this <%= @quiz.readable_type.downcase %></th>
-      </tr>
-      </thead>
       <tr>
         <td>Average Time:</td>
         <td><%= time_ago_in_words(Time.now + @statistics[:submission_duration_average]) %></td>
@@ -117,12 +135,16 @@ tr.question td.question_name .question_details {
     <% if @quiz.quiz_type != 'survey' && @quiz.quiz_type != 'graded_survey' %>
       <tr>
         <td>Average Correct:</td>
-        <td><%= #rails monkey patches the float class to let you round with precision so 23.round(2).to_s is "23" and (1.23456).round(2).to_s is "1.23"  
-                # see rails/active_support/lib/core_ext/float/rounding.rb 
-                @statistics[:submission_correct_count_average].to_f.round(2) %></td>
+        <td><%= @statistics[:submission_correct_count_average].to_f.round(2) %></td>
       </tr><tr>
         <td>Average Incorrect:</td>
         <td><%= @statistics[:submission_incorrect_count_average].to_f.round(2) %></td>
+      </tr><tr>
+        <td>High Score:</td>
+        <td><%= @statistics[:submission_score_max].to_f.round(2) %></td>
+      </tr><tr>
+        <td>Low Score:</td>
+        <td><%= @statistics[:submission_score_min].to_f.round(2) %></td>
       </tr><tr>
         <td>Mean Score:</td>
         <td><%= @statistics[:submission_score_average].to_f.round(2) %></td>
@@ -132,6 +154,29 @@ tr.question td.question_name .question_details {
       </tr>
     <% end %>
     </table>
+  </div>
+  <div class="rs-margin-lr">
+    <% if params[:all_versions] %>
+      <% if @statistics[:multiple_attempts_exist] %>
+        This report is showing <%= @quiz.readable_type.downcase %> statistics based on all attempts for all users.<br/>
+      <% end %>
+      <div style="margin-top: 5px;">
+        <% if @statistics[:multiple_attempts_exist] %>
+          <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="button button-sidebar-wide">Count Only Each Latest Attempt</a>
+        <% end %>
+        <a href="<%= context_url(@context, :context_quiz_formatted_statistics_url, @quiz.id, :all_versions => '1', :format => :csv) %>" class="button button-sidebar-wide"><%= image_tag "inst_tree/file_types/page_white_excel.png", :alt => '' %> Download csv</a>
+      </div>
+    <% else %>
+      <% if @statistics[:multiple_attempts_exist] %>
+        This report is showing <%= @quiz.readable_type.downcase %> statistics based on the latest attempt for each user.<br/>
+      <% end %>
+      <div style="margin-top: 5px;">
+        <% if @statistics[:multiple_attempts_exist] %>
+          <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id, :all_versions => '1') %>" class="button button-sidebar-wide">Count <strong>All</strong> Attempts</a>
+        <% end %>
+        <a href="<%= context_url(@context, :context_quiz_formatted_statistics_url, @quiz.id, :format => :csv) %>" class="button button-sidebar-wide"><%= image_tag "inst_tree/file_types/page_white_excel.png", :alt => '' %> Download csv</a>
+      </div>
+    <% end %>
   </div>
 <% end %>
 <h2><%= @quiz.title %> Statistics</h2> 
@@ -182,19 +227,30 @@ $(document).ready(function() {
     event.preventDefault();
     $(this).addClass('expanded');
   });
-  $(".answer").live('click', function(event) {
-    var ids = $(this).getTemplateData({textValues: ['user_ids']}).user_ids;
-    if(ids) {
-      var uncounted = 0;
+  $(".answer,.number_answer").live('click', function(event) {
+    var data = $(this).getTemplateData({textValues: ['user_ids'], dataValues: ['responses']});
+    var ids = data.user_ids;
+    var responses = parseInt(data.responses, 10) || 0;
+    if(ids != null && responses > 0) {
       var $dialog = $("#submitted_users_dialog");
       $dialog.find(".user:not(.blank)").remove();
       var names = [];
       var answer_text = $(this).find(".answer_text").text();
-      var question_name = $(this).parents("tr").find("td .question_name").text();
+      var $tr = $(this).parents("tr");
+      while($tr.length && $tr.find("td .question_name").length == 0) {
+        $tr = $tr.prev();
+      }
+      var question_name = $tr.find("td .question_name").text();
       ids = ids.split(",");
-      for(var idx in ids) {
-        var id = ids[idx];
+      var uncounted = responses - ids.length;
+      var unique_ids = $.uniq(ids);
+      for(var idx in unique_ids) {
+        var id = unique_ids[idx];
+        var cnt = $.grep(ids, function(i) { return i == id; }).length;
         var name = $("#submitted_users .user.user_" + id).text();
+        if(cnt > 1) {
+          name = name + " (" + cnt + " attempts)";
+        }
         if(name) {
           var $name = $dialog.find(".user.blank:first").clone(true).removeClass('blank');
           $name.fillTemplateData({data: {name: name}});
@@ -205,7 +261,7 @@ $(document).ready(function() {
       }
       if(uncounted > 0) {
         var $name = $dialog.find(".user.blank:first").clone(true).removeClass('blank');
-        $name.fillTemplateData({data: {name: uncounted + " other submissions"}});
+        $name.fillTemplateData({data: {name: uncounted + " other submission" + (uncounted > 1 ? "s" : "")}});
         $name.addClass('uncounted');
         $dialog.find(".users").append($name.show());
       }

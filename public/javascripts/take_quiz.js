@@ -145,6 +145,7 @@ $(document).ready(function() {
     });
   }, 1000);
   $("#submit_quiz_form").submit(function(event) {
+    $(".question_holder textarea.question_input").each(function() { $(this).change(); });
     unanswered = $("#question_list .list_question:not(.answered)").length;
     if(unanswered && !quizSubmission.submitting) {
       var result = confirm("You have " + unanswered + " unanswered question" + (unanswered == 1 ? "" : "s") + " (see the right sidebar for details).  Submit anyway?");

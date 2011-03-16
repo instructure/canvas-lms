@@ -259,6 +259,8 @@ class QuizSubmission < ActiveRecord::Base
   def submitted_versions
     found_attempts = {}
     res = []
+
+    found_attempts[self.attempt] = true if self.completed?
     self.versions.sort_by(&:created_at).each do |version|
       model = version.model
       if !found_attempts[model.attempt]
@@ -269,6 +271,7 @@ class QuizSubmission < ActiveRecord::Base
         end
       end
     end
+    res << self if self.completed?
     res
   end
   
@@ -515,8 +518,8 @@ class QuizSubmission < ActiveRecord::Base
       margin = q[:answers].first[:answer_tolerance].to_f rescue 0
       min = val - margin
       max = val + margin
+      user_answer[:answer_id] = q[:answers].first[:id]
       if answer_number >= min && answer_number <= max
-        user_answer[:answer_id] = q[:answers].first[:answer].id rescue nil
         user_answer[:correct] = true
         user_answer[:points] = q[:points_possible]
       end
