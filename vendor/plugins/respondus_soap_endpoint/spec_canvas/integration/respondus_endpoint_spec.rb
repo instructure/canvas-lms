@@ -48,8 +48,7 @@ describe "Respondus SOAP API", :type => :integration do
     @user.save!
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     @course.enroll_teacher(@user).accept
-    @course.assert_assignment_group
-    @group = @course.assignment_groups.first
+    @quiz = Quiz.create!(:title => 'quiz1', :context => @course)
   end
 
   it "should identify the server without user credentials" do
@@ -106,7 +105,7 @@ Implemented for: Canvas LMS}
     status.should == "Invalid context"
   end
 
-  it "should allow selecting a course and then an assignment group" do
+  it "should allow selecting a course" do
     status, details, context, list = soap_request('GetServerItems',
                                                   'nobody@example.com', 'asdfasdf',
                                                   '', ['itemType', 'course'])
@@ -123,26 +122,18 @@ Implemented for: Canvas LMS}
                                             ['clearState', ''])
     status.should == "Success"
 
-    # list the assignment groups
+    # list the existing quizzes
     status, details, context, list = soap_request('GetServerItems',
                                                   'nobody@example.com', 'asdfasdf',
-                                                  context, ['itemType', 'content'])
+                                                  context, ['itemType', 'quiz'])
     status.should == "Success"
     pair = list.item
-    pair.name.should == "Assignments"
-    pair.value.should == @group.to_param
-
-    # select the assignment group
-    status, details, context = soap_request('SelectServerItem',
-                                            'nobody@example.com', 'asdfasdf',
-                                            context, ['itemType', 'content'],
-                                            ['itemID', @group.to_param],
-                                            ['clearState', ''])
-    status.should == "Success"
+    pair.name.should == "quiz1"
+    pair.value.should == @quiz.to_param
 
     # clear boxin
     data = Marshal.load(Base64.decode64(context.split('--').first))
-    data['selection_state'].should == [ @course.to_param, @group.to_param ]
+    data['selection_state'].should == [ @course.to_param ]
   end
 
   it "should queue QTI quiz uploads for processing" do

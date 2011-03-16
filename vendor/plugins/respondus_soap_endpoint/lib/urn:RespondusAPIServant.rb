@@ -159,22 +159,24 @@ Implemented for: Canvas LMS}]
     case itemType
     when "discovery"
       list.item << NVPair.new("contractVersion", "1.0")
-      list.item << NVPair.new("quizAreas", "course,content")
+      list.item << NVPair.new("quizAreas", "course")
       list.item << NVPair.new("quizSupport", "publish")
       list.item << NVPair.new("quizQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
+      list.item << NVPair.new("quizSettings", "")
+      list.item << NVPair.new("attachmentLinking", "resolve")
       list.item << NVPair.new("uploadTypes", "zipPackage")
     when "course"
       raise(OtherError, 'Item type incompatible with selection state') unless selection_state.empty?
       @user.cached_current_enrollments.select { |e| e.participating_admin? }.map(&:course).uniq.each do |course|
         list.item << NVPair.new(course.name, course.to_param)
       end
-    when "content"
+    when "quiz"
       raise(OtherError, 'Item type incompatible with selection state') unless selection_state.size == 1
       # selection_state comes from the session, which is safe from user modification
       course = Course.find_by_id(selection_state.first)
       raise(OtherError, 'Item type incompatible with selection state') unless course
-      course.assignment_groups.each do |group|
-        list.item << NVPair.new(group.name, group.to_param)
+      course.quizzes.active.each do |quiz|
+        list.item << NVPair.new(quiz.title, quiz.to_param)
       end
     else
       raise OtherError, "Invalid item type"
