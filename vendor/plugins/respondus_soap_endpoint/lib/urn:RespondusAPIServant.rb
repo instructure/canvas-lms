@@ -1,4 +1,5 @@
 require_dependency 'urn:RespondusAPI.rb'
+require 'benchmark'
 
 class RespondusAPIPort
   attr_reader :session, :user
@@ -56,6 +57,10 @@ class RespondusAPIPort
   # context parameter. individual api methods just need to return any response
   # params after the first three.
   def make_call(method, userName, password, context, *args)
+    Rails.logger.debug "\nProcessing RespondusSoapApi##{method} (for #{rack_env['REMOTE_ADDR']} at #{Time.now}) [SOAP]"
+    log_args = args.dup
+    log_args.pop if method == 'publishServerItem'
+    Rails.logger.debug "Parameters: #{[userName, "[FILTERED]", context, *args].inspect}"
     load_user(method, userName, password)
     load_session(context)
     return_args = send("_#{method}", userName, password, context, *args) || []
@@ -81,7 +86,10 @@ class RespondusAPIPort
       alias_method "_#{method}", method
       class_eval(<<-METHOD, __FILE__, __LINE__+1)
         def #{method}(userName, password, context, *args)
-          make_call(:#{method}, userName, password, context, *args)
+          ret = nil
+          ms = [Benchmark.ms { ret = make_call(:#{method}, userName, password, context, *args) }, 0.01].max
+          Rails.logger.debug "Completed in \#{ms}ms | \#{ret.first.inspect} [Respondus SOAP API]\\n"
+          ret
         end
       METHOD
     end
