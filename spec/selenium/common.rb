@@ -53,7 +53,7 @@ module SeleniumTestsHelperMethods
     HostUrl.file_host = APP_HOST
     server = SpecFriendlyWEBrickServer
     app = Rack::Builder.new do
-      use Rails::Rack::Debugger
+      use Rails::Rack::Debugger unless Rails.env.test?
       map '/' do
         use Rails::Rack::Static
         run ActionController::Dispatcher.new
@@ -81,7 +81,7 @@ module SeleniumTestsHelperMethods
       base = File.expand_path(File.dirname(__FILE__))
       STDOUT.reopen(File.open("/dev/null", "w"))
       STDERR.reopen(File.open("#{base}/../../log/test-server.log", "a"))
-      exec("\"#{base}/../../script/server\" -p #{SERVER_PORT} -e #{Rails.env}")
+      exec("#{base}/../../script/server", "-p", SERVER_PORT.to_s, "-e", Rails.env)
     end
     for i in 0..MAX_SERVER_START_TIME
       s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
