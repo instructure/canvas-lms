@@ -250,7 +250,11 @@ jQuery(function($){
       $assignment.loadingImage('remove');
       $(this).triggerHandler('assignment_updated', data);
       $("#full_assignment_holder .redirect_on_finish_url").ifExists(function(){
-        window.location.href = $(this).attr('href') + "#assignment_" + assignment.id;
+        var return_to = $(this).attr('href');
+        if (return_to.indexOf('#') > 0) {
+          return_to = return_to.substr(0, return_to.indexOf('#'));
+        }
+        window.location.href = return_to + "#assignment_" + assignment.id;
       });
     },
     error: function(errors, $assignment) {
