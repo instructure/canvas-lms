@@ -19,12 +19,13 @@ module Canvas::CC
   class Manifest
     include CCHelper
     
-    attr_accessor :exporter
+    attr_accessor :exporter, :weblinks
 
     def initialize(exporter)
       @exporter = exporter
       @file = nil
       @document = nil
+      @weblinks = []
     end
     
     def course
@@ -50,21 +51,18 @@ module Canvas::CC
       @document = Builder::XmlMarkup.new(:target=>@file, :indent=>2)
       @document.instruct!
       @document.manifest("identifier" => create_key(course, "common_cartridge_"),
-                         "xmlns:canvas" => CANVAS_NAMESPACE,
                          "xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1",
                          "xmlns:lom"=>"http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource",
                          "xmlns:lomimscc"=>"http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest",
                          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                         "xsi:schemaLocation"=>"#{CANVAS_NAMESPACE} #{XSD_URI} http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imscp_v1p1_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lomresource_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lommanifest_v1p0.xsd"
+                         "xsi:schemaLocation"=>"http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imscp_v1p1_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lomresource_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lommanifest_v1p0.xsd"
       ) do |manifest_node|
         
         manifest_node.metadata do |md|
           create_metadata(md)
         end
         
-        manifest_node.organizations do |orgs|
-          create_organizations(orgs)
-        end
+        Organization.create_organizations(self, manifest_node)
 
         Resource.create_resources(self, manifest_node)
 
@@ -97,10 +95,5 @@ module Canvas::CC
         end
       end
     end
-    
-    def create_organizations(orgs)
-      #todo put the Modules in organizations? What about progressions?
-    end
-    
   end
 end

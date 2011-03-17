@@ -46,6 +46,7 @@ module CCHelper
   # file names/paths
   COURSE_SETTINGS_DIR = "course_settings"
   COURSE_SETTINGS = "course_settings.xml"
+  MODULE_META = "module_meta.xml"
   SYLLABUS = "syllabus.html"
   ASSIGNMENT_SETTINGS = "assignment_settings.xml"
   WIKI_FOLDER = 'wiki_content'

@@ -6,28 +6,28 @@
   <!-- todo: useful comments as documentation ;) -->
   <xs:element name="course">
     <xs:complexType>
-      <xs:all minOccurs="0">
-        <xs:element name="title" type="xs:string"/>
-        <xs:element name="course_code" type="xs:string"/>
-        <xs:element name="start_at" type="xs:dateTime"/>
-        <xs:element name="conclude_at" type="xs:dateTime"/>
-        <xs:element name="is_public" type="xs:boolean"/>
-        <xs:element name="indexed" type="xs:boolean"/>
-        <xs:element name="publish_grades_immediately" type="xs:boolean"/>
-        <xs:element name="allow_student_wiki_edits" type="xs:boolean"/>
-        <xs:element name="allow_student_assignment_edits" type="xs:boolean"/>
-        <xs:element name="hashtag" type="xs:string"/>
-        <xs:element name="show_public_context_messages" type="xs:boolean"/>
-        <xs:element name="allow_student_forum_attachments" type="xs:boolean"/>
-        <xs:element name="default_wiki_editing_roles" type="xs:string"/>
-        <xs:element name="allow_student_organized_groups" type="xs:boolean"/>
-        <xs:element name="show_all_discussion_entries" type="xs:boolean"/>
-        <xs:element name="open_enrollment" type="xs:boolean"/>
-        <xs:element name="storage_quota" type="xs:integer"/>
-        <xs:element name="allow_wiki_comments" type="xs:boolean"/>
-        <xs:element name="self_enrollment" type="xs:boolean"/>
-        <xs:element name="turnitin_comments" type="xs:string"/>
-        <xs:element name="default_view">
+      <xs:all minOccurs="0" maxOccurs="1">
+        <xs:element name="title" type="xs:string" minOccurs="1"/>
+        <xs:element name="course_code" type="xs:string" minOccurs="0"/>
+        <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="conclude_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="is_public" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="indexed" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="publish_grades_immediately" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_student_wiki_edits" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_student_assignment_edits" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="hashtag" type="xs:string" minOccurs="0"/>
+        <xs:element name="show_public_context_messages" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_student_forum_attachments" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="default_wiki_editing_roles" type="xs:string" minOccurs="0"/>
+        <xs:element name="allow_student_organized_groups" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="show_all_discussion_entries" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="open_enrollment" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="storage_quota" type="xs:integer" minOccurs="0"/>
+        <xs:element name="allow_wiki_comments" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="self_enrollment" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="turnitin_comments" type="xs:string" minOccurs="0"/>
+        <xs:element name="default_view" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:enumeration value="feed"/>
@@ -38,7 +38,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="license">
+        <xs:element name="license" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:enumeration value="private"/>
@@ -52,7 +52,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="group_weighting_scheme">
+        <xs:element name="group_weighting_scheme" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:enumeration value="percent"/>
@@ -67,45 +67,45 @@
   
   <xs:element name="assignment" type="assignmentType"/>
   <xs:complexType name="assignmentType">
-    <xs:all minOccurs="0">
-      <xs:element name="title" type="xs:string"/>
-      <xs:element name="due_at" type="xs:dateTime"/>
-      <xs:element name="lock_at" type="xs:dateTime"/>
-      <xs:element name="unlock_at" type="xs:dateTime"/>
-      <xs:element name="peer_reviews_due_at" type="xs:dateTime"/>
-      <xs:element name="all_day_date" type="xs:date"/>
-      <xs:element name="assignment_group_id" type="xs:ID"/>
-      <xs:element name="grading_scheme_id" type="xs:ID"/>
-      <xs:element name="allowed_extensions" type="xs:string"/>
-      <xs:element name="points_possible" type="xs:float"/>
-      <xs:element name="min_score" type="xs:float"/>
-      <xs:element name="max_score" type="xs:float"/>
-      <xs:element name="mastery_score" type="xs:float"/>
-      <xs:element name="grading_type" type="xs:string"/>
-      <xs:element name="all_day" type="xs:boolean"/>
-      <xs:element name="submission_types" type="xs:string"/>
-      <xs:element name="position" type="xs:integer"/>
-      <xs:element name="turnitin_enabled" type="xs:boolean"/>
-      <xs:element name="peer_review_count" type="xs:integer"/>
-      <xs:element name="peer_reviews_assigned" type="xs:boolean"/>
-      <xs:element name="peer_reviews" type="xs:boolean"/>
-      <xs:element name="automatic_peer_reviews" type="xs:boolean"/>
-      <xs:element name="anonymous_peer_reviews" type="xs:boolean"/>
-      <xs:element name="grade_group_students_individually" type="xs:boolean"/>
+    <xs:all minOccurs="0" maxOccurs="1">
+      <xs:element name="title" type="xs:string" minOccurs="1"/>
+      <xs:element name="due_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="peer_reviews_due_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
+      <xs:element name="assignment_group_id" type="xs:IDREF" minOccurs="0"/>
+      <xs:element name="grading_scheme_id" type="xs:IDREF" minOccurs="0"/>
+      <xs:element name="allowed_extensions" type="xs:string" minOccurs="0"/>
+      <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
+      <xs:element name="min_score" type="xs:float" minOccurs="0"/>
+      <xs:element name="max_score" type="xs:float" minOccurs="0"/>
+      <xs:element name="mastery_score" type="xs:float" minOccurs="0"/>
+      <xs:element name="grading_type" type="xs:string" minOccurs="0"/>
+      <xs:element name="all_day" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="submission_types" type="xs:string" minOccurs="0"/>
+      <xs:element name="position" type="xs:integer" minOccurs="0"/>
+      <xs:element name="turnitin_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="peer_review_count" type="xs:integer" minOccurs="0"/>
+      <xs:element name="peer_reviews_assigned" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="peer_reviews" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="automatic_peer_reviews" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="anonymous_peer_reviews" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="grade_group_students_individually" type="xs:boolean" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="identifier" type="xs:ID" use="required"/>
   </xs:complexType>
   
   <xs:element name="topicMeta">
     <xs:complexType>
-      <xs:all minOccurs="0">
-        <xs:element name="topic_id" type="xs:ID"/>
-        <xs:element name="title" type="xs:string"/>
-        <xs:element name="assignment" type="assignmentType"/>
-        <xs:element name="posted_at" type="xs:dateTime"/>
-        <xs:element name="delayed_post_at" type="xs:dateTime"/>
-        <xs:element name="position" type="xs:integer"/>
-        <xs:element name="type">
+      <xs:all minOccurs="0" maxOccurs="1">
+        <xs:element name="topic_id" type="xs:ID" minOccurs="1"/>
+        <xs:element name="title" type="xs:string" minOccurs="1"/>
+        <xs:element name="assignment" type="assignmentType" minOccurs="0"/>
+        <xs:element name="posted_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="delayed_post_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="position" type="xs:integer" minOccurs="0"/>
+        <xs:element name="type" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:enumeration value="announcement"/>
@@ -117,4 +117,77 @@
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>
   </xs:element>
+  
+  <xs:element name="modules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="module" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="1"/>
+              <xs:element name="position" type="xs:integer" minOccurs="0"/>
+              <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="end_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="require_sequential_progress" type="xs:boolean" minOccurs="0"/>
+              
+              <xs:element name="prerequisites" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="prerequisite">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="title" type="xs:string" minOccurs="0"/>
+                          <xs:element name="identifierref" type="xs:IDREF" minOccurs="0"/>
+                        </xs:all>
+                        <xs:attribute name="type" type="xs:string" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              
+              <xs:element name="contentTags" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="contentTag">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="content_type" type="xs:string" minOccurs="1"/>
+                          <xs:element name="identifierref" type="xs:IDREFS" minOccurs="0"/>
+                          <xs:element name="url" type="xs:string" minOccurs="0"/>
+                          <xs:element name="position" type="xs:integer" minOccurs="0"/>
+                          <xs:element name="indent" type="xs:integer" minOccurs="0"/>
+                        </xs:all>
+                        <xs:attribute name="identifier" type="xs:ID" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              
+              <xs:element name="completionRequirements" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="completionRequirement">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="identifierref" type="xs:IDREF" minOccurs="1"/>
+                          <xs:element name="min_score" type="xs:integer" minOccurs="0"/>
+                          <xs:element name="max_score" type="xs:integer" minOccurs="0"/>
+                        </xs:all>
+                        <xs:attribute name="type" type="xs:string" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
 </xs:schema>

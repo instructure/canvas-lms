@@ -32,4 +32,6 @@ require "canvas/cc/course_resource"
 require "canvas/cc/assignment_resources"
 require "canvas/cc/topic_resources"
 require "canvas/cc/web_resources"
+require "canvas/cc/web_links"
 require 'canvas/cc/resource'
+require 'canvas/cc/organization'
