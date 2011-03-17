@@ -165,7 +165,7 @@ module AuthenticationMethods
         else
           format.html {
             store_location
-            flash[:notice] = "You must be logged in to access this page"
+            flash[:notice] = "You must be logged in to access this page" unless request.path == '/'
             redirect_to login_url
           }
         end
