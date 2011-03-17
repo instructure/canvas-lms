@@ -2694,6 +2694,7 @@
   };
   
   $.fn.indicate = function(options) {
+    options = options || {};
     var $indicator;
     if(options == "remove") {
       $indicator = this.data('indicator');
