@@ -69,6 +69,9 @@ module SslRequirement
     def ssl_required_if(method_name)
       write_inheritable_array(:ssl_required_if, [method_name])
     end
+    def ssl_allowed_if(method_name)
+      write_inheritable_array(:ssl_allowed_if, [method_name])
+    end
   end
   
   protected
@@ -89,8 +92,14 @@ module SslRequirement
         !except.include?(action_name.to_sym)
       end
     end
-    
+
     def ssl_allowed?
+      methods = (self.class.read_inheritable_attribute(:ssl_allowed_if) || [])
+
+      if methods && methods.any? { |m| self.send(m) }
+        return true
+      end
+
       (self.class.read_inheritable_attribute(:ssl_allowed_actions) || []).include?(action_name.to_sym)
     end
 
