@@ -54,7 +54,7 @@
         <a class="button button-sidebar-wide"><%= image_tag "person.png" %> Restore Role and Permissions</a>
       </div>
     <% end %>
-    <%= render :partial => 'assignments_needing_grading', :locals => {:contexts => @context} %>
+    <%= render :partial => 'assignments_needing_grading', :locals => {:contexts => [@context]} %>
     <% if can_do(@context, @current_user, :manage_grades) && @assignments_needing_publishing && !@assignments_needing_publishing.empty? %>
       <h2>Unpublished Assignments</h2>
       <ul class="unstyled_list" title="You should publish assignments you're done grading.That way students can consider their grades are official." style="margin-left: 10px; margin-bottom: 20px;">
