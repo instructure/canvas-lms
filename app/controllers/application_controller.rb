@@ -171,7 +171,7 @@ class ApplicationController < ActionController::Base
   def require_context
     get_context
     if !@context
-      if request.path.match(/\A\/profile/) || request.path.match(/\A\/dashboard/)
+      if request.path.match(/\A\/profile/)
         store_location
         redirect_to login_url
       elsif params[:context_id]
@@ -235,7 +235,7 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user
-      elsif request.path.match(/\A\/profile/) || request.path.match(/\A\/dashboard/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
+      elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
         @context = @current_user
         @context_membership = @context
       end

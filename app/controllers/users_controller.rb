@@ -164,6 +164,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    get_context
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
