@@ -971,6 +971,7 @@ class User < ActiveRecord::Base
       preferences[:ignore][purpose.to_sym].delete(key) if item && (!item[:set] || item[:set] < 6.months.ago.utc.iso8601)
     end
     preferences[:ignore][purpose.to_sym][asset_string] = {:permanent => permanent, :set => Time.now.utc.iso8601}
+    self.updated_at = Time.now
     save!
   end
   
@@ -980,6 +981,7 @@ class User < ActiveRecord::Base
     if preferences[:ignore][purpose.to_sym][asset_string]
       preferences[:ignore][purpose.to_sym].delete(asset_string) if !preferences[:ignore][purpose.to_sym][asset_string][:permanent]
     end
+    self.updated_at = Time.now
     save!
   end
   
