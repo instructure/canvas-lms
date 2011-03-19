@@ -3,7 +3,7 @@
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
     <p>The submissions for this assignment are posts in the assignment's discussion.
-    Below are the discussion posts for <%= context_user_name(@context, @submission.user) %>, or you can 
+    Below are the discussion posts for <%= context_user_name(@context, @submission.user) %>, or you can
     <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1) %>"><b>view the full discussion</b></a>
     </p>
     <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
@@ -20,8 +20,8 @@
 <% elsif @submission.submission_type == "online_url" %>
   <div style="text-align: center; width: 500px; margin: 10px auto; font-size: 0.8em;">
     <% image = @submission.attachment if @submission.processed? %>
-    This submission was a URL to an external page.  
-    <% if image %>  
+    This submission was a URL to an external page.
+    <% if image %>
       We've included a snapshot of what the page looked like when it was submitted.  Or you
       can click to view the original submission.
     <% else %>
@@ -68,24 +68,33 @@
     <div class="centered-block-wrap">
       <div class="centered-block-inner">
         <ul class="ui-listview" style="margin-top: 30px">
-    			<li class="ui-listview-header">File Uploads for <b><%= @submission.user.name %></b></li>
-    			<% @submission.attachments.each do |attachment| %>
-      			<li>
-      			  <div class="ui-listview-text ui-listview-right">
-      			    <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
-                  <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
-                <% end %>
-        			  <span><%= number_to_human_size(attachment.size) %></span>
-      			  </div>
-      			  <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
-      			    <%= attachment.display_name %>
-      			    <% if attachment.scribdable? %>
-      			      <span style="padding: 0 3px;" title="Preview the document" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-scribd_doc_id="<%= attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= attachment.scribd_doc.try(:access_key) %>" ><%= image_tag('preview.png') %></span>
-      			    <% end %>
-      			  </a>
-      			</li>
+          <li class="ui-listview-header">File Uploads for <b><%= @submission.user.name %></b></li>
+          <% if @submission.attachments.empty? %>
+            <li>
+              <div class="ui-listview-text ui-listview-right"></div>
+              <span class="ui-listview-text">
+                No files were uploaded for this submission
+              </span>
+            </li>
+          <% else %>
+            <% @submission.attachments.each do |attachment| %>
+              <li>
+                <div class="ui-listview-text ui-listview-right">
+                  <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
+                    <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %> %</a>
+                  <% end %>
+                  <span><%= number_to_human_size(attachment.size) %></span>
+                </div>
+                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
+                  <%= attachment.display_name %>
+                  <% if attachment.scribdable? %>
+                    <span style="padding: 0 3px;" title="Preview the document" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-scribd_doc_id="<%= attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= attachment.scribd_doc.try(:access_key) %>" ><%= image_tag('preview.png') %></span>
+                  <% end %>
+                </a>
+              </li>
+            <% end %>
           <% end %>
-    		</ul>
+        </ul>
       </div>
     </div>
   </div>
@@ -106,7 +115,7 @@
                 width: document.width * .95,
                 height: document.height * .95
               })
-              .loadDocPreview($.extend({ 
+              .loadDocPreview($.extend({
                 height: '100%'
               }, $(this).data()));
             return false;
@@ -116,7 +125,7 @@
       });
     </script>
   <% end %>
-  
+
 <% elsif @submission.submission_type == "online_quiz" %>
   <% content_for :stylesheets do %>
     <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version) %>"/>
