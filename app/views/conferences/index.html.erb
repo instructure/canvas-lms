@@ -178,6 +178,7 @@
           $form.find("#members_list .member.user_" + id).find(":checkbox").attr('checked', true);
         }
       } else {
+        delete data.conference_type;
         $form.find("span.title").text("Start a New Conference");
         $form.find("button[type=submit]").text("Create Conference");
         $form.attr('method', 'POST').attr('action', $(".add_conference_url").attr('href'));
