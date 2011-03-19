@@ -272,7 +272,7 @@ class WebConference < ActiveRecord::Base
       plugin.settings &&
       !plugin.settings.values.all?(&:blank?) &&
       (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
-      klass < self
+      klass < self.base_ar_class
     }.
     map{ |plugin|
       plugin.settings.merge(
