@@ -324,7 +324,7 @@ module ApplicationHelper
   
   def equella_enabled?
     @equella_settings ||= @context.equella_settings if @context.respond_to?(:equella_settings)
-    @equella_settings ||= @domain_root_account.equella_settings
+    @equella_settings ||= @domain_root_account.try(:equella_settings)
     !!@equella_settings
   end
 
