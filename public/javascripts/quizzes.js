@@ -864,7 +864,7 @@ var quiz = {};
     $("#limit_attempts_option").change(function() {
       var $item = $("#quiz_allowed_attempts");
       if($(this).attr('checked')) {
-        var val = parseInt($item.data('saved_value') || $item.val() || "1", 10);
+        var val = parseInt($item.data('saved_value') || $item.val() || "2", 10);
         if(val == -1 || isNaN(val)) {
           val = 1;
         }
