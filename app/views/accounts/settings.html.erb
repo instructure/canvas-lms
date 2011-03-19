@@ -17,7 +17,7 @@
     <% if !@account.parent_account %>
       <li><a href="#tab-alerts" id="tab-alerts-link">Alerts</a></li>
     <% end %>
-    <% if @available_reports %>
+    <% if !@available_reports.blank? %>
       <li><a href="#tab-reports" id="tab-reports-link">Reports</a></li>
     <% end %>
   </ul>
@@ -333,7 +333,7 @@
       <% end %>
     </div>
   <% end %>
-  <% if @available_reports %>
+  <% if !@available_reports.blank? %>
     <div id="tab-reports">
       <% @available_reports.each do |report, print_name| 
          last_run = @last_reports[report]
