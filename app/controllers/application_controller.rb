@@ -211,7 +211,7 @@ class ApplicationController < ActionController::Base
           session[:enrollment_uuid_count] ||= 0
           if session[:enrollment_uuid_count] > 4
             session[:enrollment_uuid_count] = 0
-            flash[:notice] = "You'll need to <a href='#{course_url(@context)}'>accept the enrollment invitation</a> before you can fully participate in this course."
+            flash[:html_notice] = "You'll need to <a href='#{course_url(@context)}'>accept the enrollment invitation</a> before you can fully participate in this course."
           end
           session[:enrollment_uuid_count] += 1
         end
