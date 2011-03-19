@@ -278,7 +278,7 @@ class WebConference < ActiveRecord::Base
       plugin.settings.merge(
         :conference_type => plugin.id.classify,
         :class_name => (plugin.base || "#{plugin.id.classify}Conference")
-      )
+      ).with_indifferent_access
     }
   end
   
