@@ -28,7 +28,8 @@ require 'canvas/cc/cc_helper'
 require 'canvas/cc/cc_exporter'
 require 'canvas/cc/manifest'
 require 'canvas/cc/wiki_resources'
-require "canvas/cc/course_resource"
+require 'canvas/cc/module_meta'
+require "canvas/cc/canvas_resource"
 require "canvas/cc/assignment_resources"
 require "canvas/cc/topic_resources"
 require "canvas/cc/web_resources"

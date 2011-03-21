@@ -19,7 +19,7 @@ module Canvas::CC
   class Resource
     include CCHelper
     include WikiResources
-    include CourseResource
+    include CanvasResource
     include AssignmentResources
     include TopicResources
     include WebResources
@@ -42,16 +42,14 @@ module Canvas::CC
     def create_resources
       @manifest_node.resources do |resources|
         @resources = resources
-        add_course_settings
+        add_canvas_non_cc_data
         add_wiki_pages
         add_assignments
         add_topics
         add_web_links
         add_course_files
-        #quizzes
-        #conferences
-        #rubrics
-        #learning outcomes
+        #todo quizzes
+        #todo download kaltura videos?
       end
     end
   end

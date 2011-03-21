@@ -190,4 +190,46 @@
     </xs:complexType>
   </xs:element>
   
+  <xs:element name="externalFeeds">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="externalFeed" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="url" type="xs:anyURI" minOccurs="1"/>
+              <xs:element name="title" type="xs:string" minOccurs="0"/>
+              <xs:element name="header_match" type="xs:string" minOccurs="0"/>
+              <xs:element name="purpose" minOccurs="0" default="announcements">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="announcements"/>
+                    <!--<xs:enumeration value="calendar"/>-->
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="feed_type" minOccurs="1">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="rss/atom"/>
+                    <!--<xs:enumeration value="ical"/>-->
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="verbosity" minOccurs="1" default="full">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="full"/>
+                    <xs:enumeration value="truncate"/>
+                    <xs:enumeration value="link_only"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
 </xs:schema>
