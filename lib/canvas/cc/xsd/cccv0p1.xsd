@@ -74,8 +74,8 @@
       <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
       <xs:element name="peer_reviews_due_at" type="xs:dateTime" minOccurs="0"/>
       <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
-      <xs:element name="assignment_group_id" type="xs:IDREF" minOccurs="0"/>
-      <xs:element name="grading_scheme_id" type="xs:IDREF" minOccurs="0"/>
+      <xs:element name="assignment_group_identifierref" type="xs:IDREF" minOccurs="0"/>
+      <xs:element name="grading_standard_identifierref" type="xs:IDREF" minOccurs="0"/>
       <xs:element name="allowed_extensions" type="xs:string" minOccurs="0"/>
       <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
       <xs:element name="min_score" type="xs:float" minOccurs="0"/>
@@ -224,6 +224,62 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="assignmentGroups">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="assignmentGroup" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="1"/>
+              <xs:element name="position" type="xs:integer" minOccurs="0"/>
+              <xs:element name="group_weight" type="xs:float" minOccurs="0"/>
+              <xs:element name="rules" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="rule" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="drop_type" minOccurs="1">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:enumeration value="drop_lowest"/>
+                                <xs:enumeration value="drop_highest"/>
+                                <xs:enumeration value="never_drop"/>
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="identifierref" type="xs:IDREF" minOccurs="0"/>
+                          <xs:element name="drop_count" type="xs:integer" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="gradingStandards">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="gradingStandard" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="0"/>
+              <xs:element name="data" type="xs:string" minOccurs="1"/>
             </xs:all>
             <xs:attribute name="identifier" type="xs:ID" use="required"/>
           </xs:complexType>

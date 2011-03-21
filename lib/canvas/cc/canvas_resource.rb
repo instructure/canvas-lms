@@ -19,6 +19,8 @@ module Canvas::CC
   module CanvasResource
     include ModuleMeta
     include ExternalFeeds
+    include AssignmentGroups
+    include GradingStandards
     
     def add_canvas_non_cc_data
       migration_id = create_key(@course)
@@ -37,12 +39,12 @@ module Canvas::CC
       resources << create_course_settings(migration_id)
       resources << create_module_meta
       resources << create_external_feeds
+      resources << create_assignment_groups
+      resources << create_grading_standards
       # todo add all canvas-specific (non common cartridge supported) data
       #conferences
       #rubrics
       #learning outcomes
-      #assignment group weighting
-      #grading schemes
       
       @resources.resource(
               :identifier => migration_id,

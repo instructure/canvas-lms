@@ -68,9 +68,9 @@ module Canvas::CC
       node.unlock_at CCHelper::ims_datetime(assignment.unlock_at) if assignment.unlock_at
       node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
       node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
-      node.assignment_group_id CCHelper.create_key(assignment.assignment_group)
-      node.grading_scheme_id CCHelper.create_key(assignment.grading_scheme) if assignment.grading_scheme
-      node.allowed_extensions assignment.allowed_extensions.join(',') if assignment.allowed_extensions
+      node.assignment_group_identifierref CCHelper.create_key(assignment.assignment_group)
+      node.grading_standard_identifierref CCHelper.create_key(assignment.grading_standard) if assignment.grading_standard
+      node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
       atts = [:points_possible, :min_score, :max_score, :mastery_score, :grading_type,
               :all_day, :submission_types, :position, :turnitin_enabled, :peer_review_count,
               :peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews,

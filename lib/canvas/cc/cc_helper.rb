@@ -48,6 +48,8 @@ module CCHelper
   COURSE_SETTINGS = "course_settings.xml"
   MODULE_META = "module_meta.xml"
   EXTERNAL_FEEDS = "external_feeds.xml"
+  ASSIGNMENT_GROUPS = "assignment_groups.xml"
+  GRADING_STANDARDS = "grading_standards.xml"
   SYLLABUS = "syllabus.html"
   ASSIGNMENT_SETTINGS = "assignment_settings.xml"
   WIKI_FOLDER = 'wiki_content'
