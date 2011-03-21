@@ -49,7 +49,7 @@ already using those questions.
 <div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank">
   <% if @questions.total_pages <= 1 %>
     <% @questions.each do |question| %>
-      <%= render :partial => "quizzes/display_question", :object => question.question_data, :locals => {:is_assessment_question => true, :editing => true, :asset_string => question.asset_string} %>
+      <%= render :partial => "quizzes/display_question", :object => question.data, :locals => {:is_assessment_question => true, :editing => true, :asset_string => question.asset_string} %>
     <% end %>
   <% else %>
     <%= render :partial => "question_teaser", :collection => @questions %>
