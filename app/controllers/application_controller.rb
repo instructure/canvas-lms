@@ -502,15 +502,6 @@ class ApplicationController < ActionController::Base
     generate_page_view
     @page_view.generated_by_hand = true
   end
-  
-  def update_page_view
-    if @page_view
-      if @account || @context || @asset
-        @page_view.attributes = { :context => @context, :asset => @asset }
-        store_page_view(@page_view)
-      end
-    end
-  end
 
   def disable_page_views
     @log_page_views = false
@@ -553,6 +544,10 @@ class ApplicationController < ActionController::Base
           end
           seconds = [seconds, Time.now - @page_view.created_at].min
           @page_view.attributes = {:updated_at => Time.now, :contributed => contributed, :interaction_seconds => seconds, :context => @context}
+          @page_view_update = true
+        elsif @page_view_method == :log
+          @page_view = PageView.new { |p| p.request_id = params[:page_view_id] }
+          @page_view.attributes = { :updated_at => Time.now, :context => @context }
           @page_view_update = true
         end
       end
