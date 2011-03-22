@@ -68,7 +68,7 @@
 <% turnitin_enabled = @context.turnitin_enabled? && @assignments.any?(&:turnitin_enabled) %>
 <% @assignments.each do |assignment| %>
   <% submission = @submissions.find {|s| s.assignment_id == assignment.id} %>
-  <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade %> <%= "hard_coded " + (assignment.special_class || "editable") %>" id="<%= "submission_" + assignment.id.to_s %>">
+  <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade %> <%= assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable" %>" id="<%= "submission_" + assignment.id.to_s %>">
     <td class="title">
       <% if assignment.class.to_s == "Assignment" %>
         <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @student.id) %>"><%= assignment.title %></a>
