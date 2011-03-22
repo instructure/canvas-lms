@@ -301,3 +301,18 @@ ActiveRecord::ConnectionAdapters::TableDefinition.class_eval do
   end
   alias_method_chain :column, :foreign_key_check
 end
+
+# patch adapted from https://rails.lighthouseapp.com/projects/8994/tickets/6535-find_or_create_by-on-an-association-always-creates-new-records
+ActiveRecord::Associations::AssociationCollection.class_eval do
+  def method_missing_with_splat_fix(method, *args, &block)
+    if method.to_s =~ /^find_or_create_by_(.*)$/
+      rest = $1
+      find_args = pull_finder_args_from(::ActiveRecord::DynamicFinderMatch.match(method).attribute_names, *args)
+      return send("find_by_#{rest}", *find_args) ||
+             method_missing("create_by_#{rest}", *args, &block)
+    else
+      method_missing_without_splat_fix(method, *args, &block)
+    end
+  end
+  alias_method_chain :method_missing, :splat_fix
+end
