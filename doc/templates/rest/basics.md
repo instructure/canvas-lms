@@ -85,3 +85,6 @@ The value of `api_key` is the token you'll need to send with every
 request, for example:
 
     /api/v1/courses.json?api_key=YOUR_KEY
+
+If you have trouble getting your Rails console to start, please see the
+Rails console section on our <a href="https://github.com/instructure/canvas-lms/wiki/Troubleshooting">Troubleshooting wiki page</a>.
