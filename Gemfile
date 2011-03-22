@@ -60,6 +60,11 @@ group :development do
   gem 'ruby-debug',   '0.10.4'
 end
 
+group :redis do
+  gem 'redis-store', :git => 'https://github.com/jodosha/redis-store.git',
+                     :tag => 'v1.0.0.beta4'
+end
+
 # The closure-compiler gem has an undocumented
 # gem dependency on windows with ruby < 1.9.  I'm
 # working to get this fixed in the gem itself, but

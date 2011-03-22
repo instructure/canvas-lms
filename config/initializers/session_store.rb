@@ -19,6 +19,10 @@ when :mem_cache_store
   config[:namespace] ||= config[:key]
   servers = config[:memcache_servers] || Setting.from_config("memcache") || ['localhost:11211']
   config[:cache] ||= MemCache.new(servers, config)
+when :redis_session_store
+  Bundler.require 'redis'
+  config[:key_prefix] ||= config[:key]
+  config[:servers] ||= config[:redis_servers] || Setting.from_config("redis")
 end
 
 ActionController::Base.session = config

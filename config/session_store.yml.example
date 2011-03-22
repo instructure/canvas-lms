@@ -1,10 +1,22 @@
 production:
   session_store: active_record_store
   expire_after: 86400 # 1 day in seconds
+  #
   # for memcache, the list of servers will be read from config/memcache.yml (or
   # default to localhost:11211)
+  #
   # session_store: mem_cache_store
+  #
   # you can override that by adding a memcache_servers key with a list of servers, e.g.:
   # memcache_servers:
   #   - memcache1:11211
   #   - memcache2:11211
+  #
+  # redis is very similar to memcache, using the redis-store gem. the list of servers will be read from config/redis.yml (or default to localhost:6379)
+  #
+  # session_store: redis_session_store
+  #
+  # you can override that by adding a servers key with a list of servers, .e.g:
+  # redis_servers:
+  #   - redis1:6379
+  #   - redis2:6379
