@@ -83,6 +83,7 @@ class InfoController < ApplicationController
       @report ||= ErrorReport.find_by_id(session[:last_error_id])
       @report ||= ErrorReport.create()
       @report.user = @current_user
+      @report.account ||= @domain_root_account
       @report.error_type = params[:error][:error_type] rescue nil
       backtrace = params[:error].delete(:backtrace) rescue nil
       backtrace ||= ""
@@ -91,7 +92,7 @@ class InfoController < ApplicationController
       @report.http_env ||= ErrorReport.useful_http_env_stuff_from_request(request)
       @report.request_context_id = $request_context_id
       @report.update_attributes(error.delete_if{|k,v| !ErrorReport.column_names.include?(k.to_s)})
-      @report.send_to_external
+      @report.send_later(:send_to_external)
     rescue => e
       @exception = e
       ErrorLogging.log_error(:default, {

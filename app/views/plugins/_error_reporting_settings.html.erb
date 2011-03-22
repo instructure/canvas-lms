@@ -1,0 +1,55 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          Error reporting can be enabled on the console by calling
+          Setting.set('show_feedback_link', 'true').  Once this is
+          enabled you can specify an email address or a POST URL where
+          error messages will be delivered.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :action, "Action:" %></td>
+      <td>
+        <%= f.select :action, [['Do Nothing', 'nothing'], ['Send an Email', 'email'], ['Post to a URL', 'post']], {}, :class => "select_action" %>
+      </td>
+    </tr>
+    <tr class="email sub_setting" style="display: none;">
+      <td><%= f.label :email, "Email Address:" %></td>
+      <td>
+        <%= f.text_field :email %>
+      </td>
+    </tr>
+    <tr class="post sub_setting" style="display: none;">
+      <td><%= f.label :url, "URL:" %></td>
+      <td>
+        <%= f.text_field :url %>
+      </td>
+    </tr>
+    <tr class="post sub_setting" style="display: none;">
+      <td><%= f.label :subject_param, "Subject Param:" %></td>
+      <td>
+        <%= f.text_field :subject_param %>
+        <div style="font-size: 0.8em;">The subject of the message will be sent with this key</div>
+      </td>
+    </tr>
+    <tr class="post sub_setting" style="display: none;">
+      <td><%= f.label :body_param, "Body Param:" %></td>
+      <td>
+        <%= f.text_field :body_param %>
+        <div style="font-size: 0.8em;">The body of the message will be sent with this key</div>
+      </td>
+    </tr>
+  </table>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(".select_action").change(function() {
+    $(".sub_setting").hide().filter("." + $(this).val()).show();
+  }).change();
+});
+</script>
+<% end %>

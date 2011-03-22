@@ -71,8 +71,8 @@ class ErrorReport < ActiveRecord::Base
   end
 
   on_send_to_external do |error_report|
-    config = error_report.account && error_report.account.settings && error_report.account.settings[:error_reporting]
-    config ||= {}
+    config = Canvas::Plugin.find('error_reporting').try(:settings) || {}
+
     message_type = (error_report.backtrace || "").split("\n").first.match(/\APosted as[^_]*_([A-Z]*)_/)[1] rescue nil
     message_type ||= "ERROR"
     

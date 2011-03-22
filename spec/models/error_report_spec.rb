@@ -21,11 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ErrorReport do
   it "should send emails if configured" do
     account_model
-    @account.settings = {'error_reporting' => {
-      'action' => 'email',
-      'email' => 'nobody@nowhere.com'
-    }}
-    @account.save
+    PluginSetting.create!(:name => 'error_reporting', :settings => {
+      :action => 'email',
+      :email => 'nobody@nowhere.com'
+    })
     report = ErrorReport.new
     report.account = @account
     report.message = "test"

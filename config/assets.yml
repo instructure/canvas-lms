@@ -176,6 +176,8 @@ javascripts:
     - public/javascripts/content_migration.js
   link_enrollment:
     - public/javascripts/link_enrollment.js
+  plugins:
+    - public/javascripts/plugins.js
 
 stylesheets:
   common:
