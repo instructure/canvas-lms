@@ -144,9 +144,9 @@ class QuizzesController < ApplicationController
       # TODO: support multiple enabled lockdown browser plugins? Right now we
       # always just use the first enabled one.
       plugin = Canvas::Plugin.all_for_tag(:lockdown_browser).first.base
-      if plugin.require_authorization_redirect?(request)
-        return redirect_to(plugin.redirect_url(request, @context, @quiz))
-      elsif !plugin.authorized?(request)
+      if plugin.require_authorization_redirect?(self)
+        return redirect_to(plugin.redirect_url(self, @context, @quiz))
+      elsif !plugin.authorized?(self)
         return redirect_to(:action => 'lockdown_browser_required')
       end
     end
