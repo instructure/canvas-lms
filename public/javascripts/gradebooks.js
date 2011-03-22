@@ -1251,8 +1251,6 @@ var gradebook = (function(){
     if(submission.grade !== "" && submission.grade == 0) {
       submission.grade = "0";
     }
-    if(submission.grade && submission.grade.toString() == Math.round(submission.grade).toString()) {
-    }
     var $submission_score = $submission.find(".score"),
         $submission_pending_review = $submission.find(".pending_review"),
         $submission_turnitin = $submission.find(".turnitin"),
@@ -1399,9 +1397,12 @@ var gradebook = (function(){
     }
     if(grade == "_" || grade == "-") { grade = ""; }
     
-    if($grade_entry[0].tagName != "SELECT" || grade != "") {
+    if($grade_entry[0].tagName == "SELECT") {
+      $grade_entry.val(submission.grade);
+    } else if(grade != "") {
       $grade_entry.val(grade);
     }
+    
     url = $.replaceTags(url, 'assignment_id', submission.assignment_id);
     url = $.replaceTags(url, 'user_id', submission.user_id);
     $view.append($("#submission_view_image").clone(true).removeAttr('id'));
