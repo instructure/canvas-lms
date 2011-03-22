@@ -131,7 +131,7 @@
             </tr>
             <tr>
               <td colspan="2">
-                <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? || !@quiz.ip_filter.blank? %> name="protect_quiz" id="protect_quiz"/>
+                <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? || !@quiz.ip_filter.blank? ||!@quiz.require_lockdown_browser.blank? %> name="protect_quiz" id="protect_quiz"/>
                 <label for="protect_quiz">Restrict this Quiz</label>
               </td>
             </tr>
@@ -167,6 +167,16 @@
                 <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => 'Find IP Address Filter') %>
               </td>
             </tr>
+            <% if feature_enabled?(:lockdown_browser) %>
+              <tr class="protected_options">
+                <td colspan="2">
+                  <div style="padding-left: 20px;">
+                    <%= check_box :quiz, :require_lockdown_browser %>
+                    <%= label :quiz, :require_lockdown_browser, "Require the lockdown browser" %>  
+                  </div>
+                </td>
+              </tr>
+            <% end %>
             <tr>
               <td class="nobr">Due Date:</td>
               <td style="width: 200px;">

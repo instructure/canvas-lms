@@ -858,6 +858,8 @@ class ApplicationController < ActionController::Base
         !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
+      elsif feature == :lockdown_browser
+        Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
       else
         !Rails.env.production? || (@current_user && current_user_is_site_admin?)
       end
