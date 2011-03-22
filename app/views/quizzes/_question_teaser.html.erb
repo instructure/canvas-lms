@@ -17,6 +17,7 @@
     </div>
     <div class="bottom_links">
       <span class="id" style="display: none;"><%= question_teaser && question_teaser[:id] %></span>
+      <div class="question_points hidden" style="display: none;"><%= hash_get(question_teaser, :points_possible, "0") %></div>
     </div>
     <div class="clear"></div>
   </div>

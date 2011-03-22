@@ -545,7 +545,7 @@ var quiz = {};
       });
       var tally = 0;
       $("#questions .question_holder:not(.group) .question:not(#question_new)").each(function() {     
-        var val = parseFloat($(this).find(".question_points:visible").text());
+        var val = parseFloat($(this).find(".question_points:visible,.question_points.hidden").text());
         if(isNaN(val)) { val = 0; }
         tally += val;
       });
