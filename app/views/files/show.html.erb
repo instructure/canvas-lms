@@ -41,29 +41,12 @@
       <% js_block do %>
         <script>
           $(function() {
-            var $doc_preview = $('#doc_preview'),
-                $wrapper_container = $('#wrapper-container'),
-                $main = $('#main'),
-                $not_right_side = $('#not_right_side');
-                
-            $doc_preview.loadDocPreview({
+            $('#doc_preview').fillWindowWithMe().loadDocPreview({
               height: '100%',
               scribdParams: {
                 auto_size: true
               }
             });
-            
-            function fillWindowWithDocPreview(){
-              $doc_preview.height(0);
-              var spaceLeftForPreview = $(window).height() 
-                                        - ($wrapper_container.offset().top + $wrapper_container.height())
-                                        + ($main.height() - $not_right_side.height());
-                                       
-              $doc_preview.height( Math.max(400, spaceLeftForPreview) );
-            }
-            fillWindowWithDocPreview();
-            $(window).resize(fillWindowWithDocPreview);
-            
           });
         </script>
       <% end %>

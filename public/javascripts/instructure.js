@@ -723,6 +723,7 @@ jQuery(function($) {
           }
         });
         $sequence_footer.show();
+        $(window).resize(); //this will be helpful for things like $.fn.fillWindowWithMe so that it knows the dimensions of the page have changed.
       }
     });
   }
