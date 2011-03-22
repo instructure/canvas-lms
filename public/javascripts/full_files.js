@@ -798,25 +798,34 @@ var fileStructureData = [];
           if(hidden) {
             $content.hide();
           }
-          $content.fillTemplateData({
-            data: data
-          });
-          $content.data('parent_node', $item.parent().parent());
-          $content.data('node', $item);
           var file_url = $.replaceTags($("#file_context_links ." + data.context_string + "_attachment_url").attr('href'), "id", data.id);
           var download_url = $.replaceTags($("#file_context_links ." + data.context_string + "_download_attachment_url").attr('href'), "id", data.id);
-          $content.addClass('file_' + data.id);
-          $content.addClass(data.mime_class);
+          $content
+            .fillTemplateData({
+              data: data
+            })
+            .data({
+              parent_node: $item.parent().parent(),
+              node: $item
+            })
+            .addClass(data.mime_class + ' file_' + data.id);
           $content.find(".attachment_url").attr('href', file_url);
           $content.find(".download_url").attr('href', download_url);
           $content.find(".item_icon.draggable").attr('title', 'Click and drag to move file to another folder');
         }
-        $content.toggleClass('editable_folder_item', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)));
-        $content.removeClass('to_be_removed');
-        $content.find(".item_icon").attr('alt', 'File').attr('src', $("#content_blank_icon").attr('src'));
+        $content
+          .toggleClass('editable_folder_item', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)))
+          .removeClass('to_be_removed')
+          .find(".item_icon")
+            .attr({
+              alt: 'File',
+              src: $("#content_blank_icon").attr('src')
+            });
         if(data && data.currently_locked) {
-          $content.find(".item_icon").attr('alt', 'Locked File')
-            .attr('src', $("#content_locked_icon").attr('src'));
+          $content.find(".item_icon").attr({
+            alt: 'Locked File',
+            src: $("#content_locked_icon").attr('src')
+          });
         }
         $content.find(".lock_item_link").showIf(!data.currently_locked);
         $content.find(".unlock_item_link").showIf(data.currently_locked);
@@ -867,8 +876,10 @@ var fileStructureData = [];
           return (b.position || 0) - (a.position || 0);
         });
         for(var idx in $folders) {
-          $folder.children("ul").prepend($files[idx].prev(".separator"));
-          $folder.children("ul").prepend($files[idx]);
+          if ($files[idx]) {
+            $folder.children("ul").prepend($files[idx].prev(".separator"));
+            $folder.children("ul").prepend($files[idx]);
+          }
         }
       });
       files.refreshView();
@@ -1679,7 +1690,7 @@ var fileStructureData = [];
           $dialog.find(".loading_message").text("Error Loading File Contents.  Please try again.");
         },
         success: function(data) {
-          var body = data.body
+          var body = data.body;
           $dialog.find("textarea").val(body);
           $dialog.find(".loading_message").hide().end()
             .find(".content").show();
