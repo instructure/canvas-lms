@@ -3298,5 +3298,28 @@
       }
     });
   };
+  
+  // this is used if you want to fill the browser window with something inside #content but you want to also leave the footer and header on the page.
+  $.fn.fillWindowWithMe = function(){
+    var $this              = $(this),
+        $wrapper_container = $('#wrapper-container'),
+        $main              = $('#main'),
+        $not_right_side    = $('#not_right_side'),
+        $window            = $(window);
+
+    function fillWindowWithThisElement(){
+      $this.height(0);
+      var spaceLeftForThis = $window.height() 
+                             - ($wrapper_container.offset().top + $wrapper_container.height())
+                             + ($main.height() - $not_right_side.height());
+                               
+      $this.height( Math.max(400, spaceLeftForThis) );
+    }
+    fillWindowWithThisElement();
+    $window
+      .unbind('resize.fillWindowWithMe')
+      .bind('resize.fillWindowWithMe', fillWindowWithThisElement);
+    return this;
+  };
     
 })(jQuery);
