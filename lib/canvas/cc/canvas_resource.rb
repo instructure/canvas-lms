@@ -21,6 +21,7 @@ module Canvas::CC
     include ExternalFeeds
     include AssignmentGroups
     include GradingStandards
+    include LearningOutcomes
     
     def add_canvas_non_cc_data
       migration_id = create_key(@course)
@@ -41,10 +42,10 @@ module Canvas::CC
       resources << create_external_feeds
       resources << create_assignment_groups
       resources << create_grading_standards
+      resources << create_learning_outcomes
       # todo add all canvas-specific (non common cartridge supported) data
       #conferences
       #rubrics
-      #learning outcomes
       
       @resources.resource(
               :identifier => migration_id,

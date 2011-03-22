@@ -287,5 +287,49 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  
+
+  <xs:element name="learningOutcomes" type="learningOutcomesType"/>
+  <xs:complexType name="learningOutcomesType">
+    <xs:choice  minOccurs="0" maxOccurs="unbounded">
+
+      <xs:element name="learningOutcome">
+        <xs:complexType>
+          <xs:all minOccurs="0">
+            <xs:element name="title" type="xs:string" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
+            <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
+            <xs:element name="ratings" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="rating" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:all minOccurs="0">
+                        <xs:element name="description" type="xs:string" minOccurs="1"/>
+                        <xs:element name="points" type="xs:float" minOccurs="1"/>
+                      </xs:all>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:all>
+          <xs:attribute name="identifier" type="xs:ID" use="required"/>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="learningOutcomeGroup">
+        <xs:complexType>
+          <xs:all minOccurs="0">
+            <xs:element name="title" type="xs:string" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="learningOutcomes" type="learningOutcomesType" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="identifier" type="xs:ID" use="required"/>
+        </xs:complexType>
+      </xs:element>
+
+    </xs:choice>
+  </xs:complexType>
+
 </xs:schema>
