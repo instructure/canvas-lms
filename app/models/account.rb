@@ -695,7 +695,7 @@ class Account < ActiveRecord::Base
     if self.turnitin_comments && !self.turnitin_comments.empty?
       self.turnitin_comments
     else
-      self.parent_account.turnitin_settings rescue nil
+      self.parent_account.closest_turnitin_comments rescue nil
     end
   end
   
