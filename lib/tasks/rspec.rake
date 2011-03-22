@@ -43,6 +43,12 @@ Spec::Rake::SpecTask.new(:spec) do |t|
     t.spec_opts += ['-e', %{"#{ENV['SINGLE_TEST']}"}]
   end
   t.spec_files = ['spec'] + FileList['vendor/plugins/*/spec_canvas']
+  Gem.loaded_specs.values.each do |spec|
+    path = spec.full_gem_path
+    spec_canvas_path = File.expand_path(path+"/spec_canvas")
+    next unless File.directory?(spec_canvas_path)
+    t.spec_files << spec_canvas_path
+  end
 end
 
 namespace :spec do
