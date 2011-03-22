@@ -594,8 +594,7 @@
     if(event.start_time_string && event.start_time_string != event.end_time_string) {
       title_time += " to " + (event.end_time_formatted || "");
     }
-    // event.title is html escaped, so we need to unescape it for the tooltip
-    var event_title = $("<div/>").html(event.title).text();
+    event_title = event.title;
     event_title += (title_time ? " - " + title_time : "");
     if(data.assignment && title_time) {
       event_title = "due: " + event_title;

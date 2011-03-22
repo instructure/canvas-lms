@@ -170,13 +170,13 @@ class WikiPage < ActiveRecord::Base
   end
   
   def context_module_tag_for(context, user)
-    return nil unless user
     @tags ||= {}
+    user_id = user ? user.id : 0
     # for wiki_pages, context_module_association_id should be the wiki_namespace_id to use
     if context
-      @tags[user.id] ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s) #module_association_id(current_namespace(user).id)
-    else
-      @tags[user.id] ||= self.context_module_tags.find_by_context_module_association_id(current_namespace(user).id)
+      @tags[user_id] ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s) #module_association_id(current_namespace(user).id)
+    elsif user
+      @tags[user_id] ||= self.context_module_tags.find_by_context_module_association_id(current_namespace(user).id)
     end
   end
   
@@ -186,10 +186,10 @@ class WikiPage < ActiveRecord::Base
   end
   
   set_policy do
-    given {|user, session| self.current_namespace(user).grants_right?(user, session, :read) }
+    given {|user, session| self.current_namespace(user).grants_right?(user, session, :read) && can_read_page?(user) }
     set { can :read }
     
-    given {|user, session| self.current_namespace(user).grants_right?(user, session, :contribute) }
+    given {|user, session| self.current_namespace(user).grants_right?(user, session, :contribute) && can_read_page?(user) }
     set { can :read }
 
     given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
@@ -206,15 +206,21 @@ class WikiPage < ActiveRecord::Base
     
   end
   
+  def can_read_page?(user)
+    namespace = self.current_namespace(user)
+    context = namespace.context
+    !hide_from_students || (context.respond_to?(:admins) && context.admins.include?(user))
+  end
+  
   def editing_role?(user)
     namespace = self.current_namespace(user)
     context = namespace.context
     context_roles = context.default_wiki_editing_roles rescue nil
     roles = (self.editing_roles || context_roles || default_roles).split(",")
     return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
-    return true if roles.include?('students') && context.respond_to?(:students) && context.students.include?(user)
-    return true if roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
-    return true if roles.include?('public')
+    return true if !hide_from_students && roles.include?('students') && context.respond_to?(:students) && context.students.include?(user)
+    return true if !hide_from_students && roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
+    return true if !hide_from_students && roles.include?('public')
     false
   end
   

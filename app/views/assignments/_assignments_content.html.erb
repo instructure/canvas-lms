@@ -14,6 +14,28 @@
 
 <div style="display: none;">
   <a href="<%= context_url(@context, :controller => "assignment_groups", :action => "reorder") %>" class="reorder_groups_url">&nbsp;</a>
+  <div id="delete_assignments_dialog" title="Delete Assignment Group?">
+    <h2>Delete Assignment Group?</h2>
+    <p>The assignment group <span class="name" style="font-weight: bold;">&nbsp;</span> has 
+    <span class="assignment_count">&nbsp;</span> in it.  You can
+    either delete these assignments or move them to another 
+    assignment group.</p>
+    <p>
+      <input type="radio" name="action" value="delete" id="assignment_group_delete"/>
+      <label for="assignment_group_delete">Delete assignments in this group</label>
+    </p>
+    <p>
+      <input type="radio" name="action" value="move" id="assignment_group_move"/>
+      <label for="assignment_group_move">Move assignments from this group to </label>
+      <select name="group_id" class="group_select" title="Select a group to move this assignment to">
+        <option value="" class="blank">[ Select a Group ]</option>
+      </select>
+    </p>
+    <div class="button-container">
+      <button class="button delete_button">Delete Group</button>
+      <button class="button button-secondary cancel_button">Cancel</button>
+    </div>
+  </div>
 </div>
 <div id="full_assignment_details" style="display: none;">
   <!--%= render :partial => "shared/full_assignment", :object => @context.assignments.new, :locals => {:dialog => true} %-->

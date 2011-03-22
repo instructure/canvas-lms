@@ -178,7 +178,6 @@
       }
       if(error && !options.preventDegradeToFormSubmit) {
         if(INST && INST.environment == 'development') {
-          console.log(error);
           $.flashError('formSubmit error, trying to gracefully degrade. See console for details');
         }
         return;
@@ -189,6 +188,18 @@
         if($.isFunction(options.success)) {
           options.success.call($form, formData, submitParam);
         }
+      } else if(doUploadFile && options.preparedFileUpload && options.context_code) {
+        $.ajaxJSONPreparedFiles.call(this, {
+          handle_files: (options.upload_only ? options.success : options.handle_files),
+          single_file: options.singleFile,
+          context_code: $.isFunction(options.context_code) ? (options.context_code.call($form)) : options.context_code,
+          intent: options.intent,
+          folder_id: $.isFunction(options.folder_id) ? (options.folder_id.call($form)) : options.folder_id,
+          file_elements: $form.find("input[type='file']"),
+          url: (options.upload_only ? null : action),
+          success: options.success,
+          error: options.error
+        });
       } else if(doUploadFile && $.handlesHTML5Files && $form.hasClass('handlingHTML5Files')) {
         var args = $.extend({}, formData);
         $form.find("input[type='file']").each(function() {
@@ -243,13 +254,17 @@
             request       = new $.fakeXHR(0, ""),
             $originalForm = $form;
 
-            
         $frameForm.attr({
           'method' : method,
           'action' : action,
           'ENCTYPE' : 'multipart/form-data',
+          'encoding' : 'multipart/form-data',
           'target' :"frame_" + id
         });
+        if(options.onlyGivenParameters) {
+          $frameForm.find("input[name='_method']").remove();
+          $frameForm.find("input[name='authenticity_token']").remove();
+        }
 
         $.ajaxJSON.storeRequest(request, action, method, formData);
         
@@ -265,13 +280,16 @@
           } else {
             doc = window.frames[id].document;
           }
-          var text = "(" + $(doc).text() + ")";
-          if(doc.location.href == "about:blank") {
-            return;
-          }
+          var text = "";
+          var href = null;
+          var exception = null;
           try {
-            var data = eval(text);
-            if($.isFunction(options.success) && data && !data.errors) {
+            if(doc.location.href == "about:blank") {
+              return;
+            }
+            text = $(doc).text();
+            var data = JSON.parse(text);
+            if(options.success && $.isFunction(options.success) && data && !data.errors) {
               options.success.call($form, data, submitParam);
             }
           } catch(e) {
@@ -302,6 +320,7 @@
           setTimeout(function() {
             $form.attr({
               'ENCTYPE': priorEnctype,
+              'encoding': priorEnctype,
               'target':  priorTarget
             });
             $("#box_" + id).remove();
@@ -378,7 +397,7 @@
             $.ajaxJSON.unhandledXHRs.push(request);
           }
         }
-      });
+      }, options.binary === false);
     });
   };
   
@@ -389,11 +408,8 @@
     var xhr = new XMLHttpRequest();
     if(xhr.upload) {
       xhr.upload.addEventListener('progress', function(event) {
-        if(event && event.lengthComputable) {
-          console.log(event.loaded + " out of " + event.total);
-        }
         if(options.progress && $.isFunction(options.progress)) {
-          options.progress.call(this, event); //xhr.upload.addEventListener('progress', options.progress, false);
+          options.progress.call(this, event); 
         }
       }, false);
       xhr.upload.addEventListener('error', function(event) {
@@ -439,6 +455,9 @@
     if(not_binary) {
       xhr.send();
     } else {
+      if(!xhr.sendAsBinary) {
+        console.log('xhr.sendAsBinary not supported');
+      }
       xhr.sendAsBinary(body);
     }
   };
@@ -701,7 +720,9 @@
     }
     return r;
   }
-  
+  $.htmlEscape = function(str) {
+    return $('<div/>').text(str).html();
+  }
   
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
   //  data: data used to fill template.
@@ -752,8 +773,8 @@
                 $found.val(options.data[item]);
               } else {
                 try {
-                  var str = options.data[item].toString().replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
-                  $found.html(str);
+                  var str = options.data[item].toString();
+                  $found.html($.htmlEscape(str));
                 } catch(e) { }
               }
             }
@@ -792,6 +813,7 @@
     }
     return this;
   };
+  
   $.fn.fillTemplateData.defaults = {htmlValues: null, hrefValues: null};
   // Reverse version of fillTemplateData.  Lets you pull out the string versions of values held in divs, spans, etc.
   // Based on the usage of class names within an object to specify an object's sub-parts.
@@ -936,6 +958,7 @@
 
     if (options.object_name) {
       options.required = $._addObjectName(options.required, options.object_name);
+      options.date_fields = $._addObjectName(options.date_fields, options.object_name);
       options.dates = $._addObjectName(options.dates, options.object_name);
       options.times = $._addObjectName(options.times, options.object_name);
       options.numbers = $._addObjectName(options.numbers, options.object_name);
@@ -948,6 +971,17 @@
             errors[name] = []; 
           }
           errors[name].push("This field is required");
+        }
+      });
+    }
+    if(options.date_fields) {
+      $.each(options.date_fields, function(i, name) {
+        var $item = $form.find("input[name='" + name + "']").filter(".datetime_field_enabled");
+        if($item.length && $item.parent().children(".datetime_suggest").hasClass('invalid_datetime')) {
+          if (!errors[name]) { 
+            errors[name] = []; 
+          }
+          errors[name].push("Invalid date/time value");
         }
       });
     }
@@ -1077,6 +1111,9 @@
       var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":first");
       if(!$obj || $obj.length === 0 || name == "general") {
         $obj = $form;
+      }
+      if($obj[0].tagName == 'TEXTAREA' && $obj.next('.mceEditor').length) {
+        $obj = $obj.next().find(".mceIframeContainer");
       }
       hasErrors = true;
       var offset = $obj.errorBox(msg).offset();
@@ -1815,7 +1852,78 @@
     $.ajaxJSON.storeRequest(xhr, url, 'GET', data);
     return xhr;
   };
-  $.ajaxJSONFiles = function(url, submit_type, formData, files, success, error) {
+  var assert_option = function(data, arg) {
+    if(!data[arg]) {
+      throw arg + " option is required";
+    }
+  }
+  $.ajaxJSONPreparedFiles = function(options) {
+    assert_option(options, 'context_code');
+    var list = [];
+    var $this = this;
+    var pre_list = options.files || options.file_elements || [];
+    for(var idx = 0; idx < pre_list.length; idx++) {
+      var item = pre_list[idx];
+      item.name = (item.value || item.name).split(/(\/|\\)/).pop();
+      list.push(item);
+    }
+    var attachments = [];
+    var ready = function() {
+      var data = options.data;
+      if(options.handle_files) {
+        var result = attachments;
+        if(options.single_file) {
+          result = attachments[0];
+        }
+        data = options.handle_files.call(this, result, data);
+      }
+      if(options.url && options.success && data != false) {
+        $.ajaxJSON(options.url, options.method, data, options.success, options.error);
+      }
+    }
+    var uploadFile = function(parameters, file) {
+      $.ajaxJSON("/files/pending", 'POST', parameters, function(data) {
+        try {
+        if(data && data.upload_url) {
+          var post_params = data.upload_params;
+          var old_name = $(file).attr('name');
+          $(file).attr('name', data.file_param);
+          $.ajaxJSONFiles(data.upload_url, 'POST', post_params, $(file), function(data) {
+            attachments.push(data);
+            $(file).attr('name', old_name);
+            next.call($this);
+          }, function(data) {
+            $(file).attr('name', old_name);
+            (options.upload_error || options.error).call($this, data);
+          }, {onlyGivenParameters: data.remote_url});
+        } else {
+          (options.upload_error || options.error).call($this, data);
+        }
+        } catch(e) {
+          var ex = e;
+          debugger;
+          ex;
+        }
+      }, function() { 
+        return (options.upload_error || options.error).apply(this, arguments);
+      })
+    }
+    var next = function() {
+      var item = list.shift();
+      if(item) {
+        uploadFile.call($this, {
+          'attachment[folder_id]': options.folder_id,
+          'attachment[intent]': options.intent,
+          'attachment[filename]': item.name,
+          'attachment[context_code]': options.context_code
+        }, item);
+      } else {
+        ready.call($this);
+      }
+    }
+    next.call($this);
+  }
+  $.ajaxJSONFiles = function(url, submit_type, formData, files, success, error, options) {
     var $newForm = $(document.createElement("form"));
     $newForm.attr('action', url).attr('method', submit_type);
     if(!formData.authenticity_token) {
@@ -1824,10 +1932,6 @@
     var fileNames = {};
     files.each(function() {
       fileNames[$(this).attr('name')] = true;
-      var $newFile = $(this).clone(true);
-      $(this).after($newFile);
-      $newForm.append($(this));
-      $(this).removeAttr('id');
     });
     for(var idx in formData) {
       if(!fileNames[idx]) {
@@ -1836,13 +1940,22 @@
         $newForm.append($input);
       }
     }
+    files.each(function() {
+      var $newFile = $(this).clone(true);
+      $(this).after($newFile);
+      $newForm.append($(this));
+      $(this).removeAttr('id');
+    });
     $("body").append($newForm.hide());
     $newForm.formSubmit({
       fileUpload: true,
       success: success,
+      onlyGivenParameters: options ? options.onlyGivenParameters : false,
       error: error
     });
-    $newForm.submit();
+    (function() {
+      $newForm.submit();
+    }).call($newForm);
   };
   // Wrapper for default $.ajax behavior.  On error will call
   // the default error method if no error method is provided.
@@ -1850,7 +1963,7 @@
     data = data || {};
     if(!url && error) {
       error(null, null, "URL required for requests", null);
-      return; //throw "URL required for requests";
+      return;
     }
     url = url || ".";
     if(submit_type != "GET") {
@@ -2581,6 +2694,7 @@
   };
   
   $.fn.indicate = function(options) {
+    options = options || {};
     var $indicator;
     if(options == "remove") {
       $indicator = this.data('indicator');
@@ -2596,7 +2710,7 @@
     }
     var width = this.width();
     var height = this.height();
-    var zIndex = this.zIndex();
+    var zIndex = (options.container || this).zIndex();
     $indicator = $(document.createElement('div'));
     $indicator.css({
       width: width + 6,
@@ -2632,7 +2746,7 @@
       });
     }
     if(options && options.scroll) {
-      $("html,body").scrollTo($indicator);
+      $("html,body").scrollToVisible($indicator);
     }
   };
   
@@ -2686,17 +2800,21 @@
   $.pluralize = function(string) {
     return (string || "") + "s";
   };
+  $.pluralize_with_count = function(count, string) {
+    return "" + count + " " + (count == 1 ? string : $.pluralize(string));
+  }
   
   $.parseUserAgentString = function(userAgent) {
     userAgent = (userAgent || "").toLowerCase();
     var data = {
-      version: (userAgent.match( /.+(?:me|ox|it|ra|ie)[\/: ]([\d.]+)/ ) || [0,null])[1],
+      version: (userAgent.match( /.+(?:me|ox|it|ra|ie|er)[\/: ]([\d.]+)/ ) || [0,null])[1],
       chrome: /chrome/.test( userAgent ),
       safari: /webkit/.test( userAgent ),
       opera: /opera/.test( userAgent ),
       msie: /msie/.test( userAgent ) && !(/opera/.test( userAgent )),
       firefox: /firefox/.test( userAgent),
-      mozilla: /mozilla/.test( userAgent ) && !(/(compatible|webkit)/.test( userAgent ))
+      mozilla: /mozilla/.test( userAgent ) && !(/(compatible|webkit)/.test( userAgent )),
+      speedgrader: /speedgrader/.test( userAgent )
     };
     var browser = "Unrecognized Browser";
     if(data.chrome) {
@@ -2711,6 +2829,8 @@
       browser = "Firefox";
     } else if(data.mozilla) {
       browser = "Mozilla";
+    } else if(data.speedgrader) {
+      browser = "SpeedGrader for iPad";
     }
     if(browser != "Unrecognized Browser" && data.version) {
       data.version = data.version.split(/\./).slice(0,2).join(".");
@@ -3016,6 +3136,18 @@
       return results;
     else
       return decodeURIComponent(results[1].replace(/\+/g, " "));
+  };
+  
+  // tells you how many keys are in an object, 
+  // so: $.size({})  === 0  and $.size({foo: "bar"}) === 1
+  $.size = function(object) {
+    var keyCount = 0;
+    $.each(object,function(){ keyCount++; });
+    return keyCount;
+  }
+  
+  $.capitalize = function(string) {
+    return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
   };
   
 })(jQuery);

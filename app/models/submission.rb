@@ -507,7 +507,7 @@ class Submission < ActiveRecord::Base
     # since they're all being held on the assignment for now.
     attachments ||= []
     old_ids = (Array(self.attachment_ids || "").join(",")).split(",").map{|id| id.to_i}
-    write_attribute(:attachment_ids, attachments.select{|a| old_ids.include?(a.id) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map{|a| a.id}.join(","))
+    write_attribute(:attachment_ids, attachments.select{|a| a && a.id && old_ids.include?(a.id) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map{|a| a.id}.join(","))
   end
   
   def validate_single_submission

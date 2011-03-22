@@ -17,6 +17,7 @@
  */
 
 var jsonData, visibleRubricAssessments;
+var anonymousAssignment = false;
 (function($, INST, scribd, rubricAssessment) {
   
   // fire off the request to get the jsonData,
@@ -107,7 +108,7 @@ var jsonData, visibleRubricAssessments;
     
     // handle showing students only in a certain section.
     // the sectionToShow will be remembered for a given user in a given browser across all assignments in this course 
-    sectionToShow = Number($.store.userGet("eg_show_only_section"+jsonData.context_id));
+    sectionToShow = Number($.store.userGet("grading_show_only_section"+jsonData.context_id));
     if (sectionToShow) {
       var tempArray  = $.grep(jsonData.studentsWithSubmissions, function(student, i){
         return $.inArray(sectionToShow, student.section_ids) != -1;
@@ -116,6 +117,8 @@ var jsonData, visibleRubricAssessments;
         jsonData.studentsWithSubmissions = tempArray;
       } else {
         alert("Could not find any students in that section, falling back to showing all sections.");
+        $.store.userRemove("grading_show_only_section"+jsonData.context_id);
+        window.location.reload();
       }
     }
     
@@ -176,12 +179,12 @@ var jsonData, visibleRubricAssessments;
   function initDropdown(){
     var hideStudentNames;
     
-    if ($.store.userGet("eg_hide_student_names") == "true") {
+    if ($.store.userGet("eg_hide_student_names") == "true" || anonymousAssignment) {
       hideStudentNames = true;
     }
     $("#hide_student_names").attr('checked', hideStudentNames);
     var options = $.map(jsonData.studentsWithSubmissions, function(s, idx){
-      var name = s.name,
+      var name = $.htmlEscape(s.name),
           className = classNameBasedOnStudent(s);
 
       if(hideStudentNames) {
@@ -197,7 +200,7 @@ var jsonData, visibleRubricAssessments;
         style:'dropdown',
         format: function(text){
           var parts = text.split(" ---- ");
-          return '<span class="ui-selectmenu-item-header">' + parts[0] + '</span><span class="ui-selectmenu-item-footer">' + parts[1] + '</span>';
+          return '<span class="ui-selectmenu-item-header">' + $.htmlEscape(parts[0]) + '</span><span class="ui-selectmenu-item-footer">' + parts[1] + '</span>';
         },
         icons: [
           {find: '.graded'},
@@ -227,14 +230,16 @@ var jsonData, visibleRubricAssessments;
         .hide()
         .menu()
         .delegate('a', 'click mousedown', function(){
-          $.store[$(this).data('section-id') == 'all' ? 'userRemove' : 'userSet']("eg_show_only_section"+jsonData.context_id, $(this).data('section-id'));
+          $.store[$(this).data('section-id') == 'all' ? 'userRemove' : 'userSet']("grading_show_only_section"+jsonData.context_id, $(this).data('section-id'));
           window.location.reload();
         });
-        
+      
       if (sectionToShow) {
-        $("#section_currently_showing").text($.map(jsonData.context.active_course_sections, function(section){
-                                                    if (section.id == sectionToShow) { return section.name; }
-                                                  }).join(', '));
+        var text = $.map(jsonData.context.active_course_sections, function(section){
+                      if (section.id == sectionToShow) { return section.name; }
+                   }).join(', ');
+        
+        $("#section_currently_showing").text(text);
         $menu.find('ul li a')
           .removeClass('selected')
           .filter('[data-section-id='+ sectionToShow +']')
@@ -946,7 +951,7 @@ var jsonData, visibleRubricAssessments;
 	      }
 	      else if (attachment && broswerableCssClasses.test(attachment.mime_class)) {
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
-	                  .replace("{{submissionId}}", attachment.user_id)
+	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
 	                  .replace("{{attachmentId}}", attachment.id);
 	        $iframe_holder.html('<iframe src="'+src+'" frameborder="0"></iframe>').show();
 	      }
@@ -1020,7 +1025,7 @@ var jsonData, visibleRubricAssessments;
 
           // if(comment.anonymous) { comment.author_name = "Anonymous"; }
           var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
-          $comment.find('span.comment').html(comment.comment.replace(/\n/g, "<br />"));
+          $comment.find('span.comment').html($.htmlEscape(comment.comment).replace(/\n/g, "<br />"));
           // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
           // what this is saying is: if I am able to grade this assignment (I am administrator in the course) or if I wrote this comment...
           var commentIsDeleteableByMe = rubricAssessment.assessment_type === "grading" || 
@@ -1135,6 +1140,7 @@ var jsonData, visibleRubricAssessments;
           EG.setOrUpdateSubmission(this.submission);
         });
         EG.refreshSubmissionsToView();
+        $submission_to_view.change();
         EG.showGrade();
       });
     },

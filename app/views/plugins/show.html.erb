@@ -1,12 +1,26 @@
-<h2>Settings: <%=h @plugin.name %></h2>
+<% content_for :page_title do %>Plugin Settings: <%=h @plugin.name %><% end %>
+<% 
+  jammit_css :plugins
+  add_crumb('Plugins', plugins_path)
+  add_crumb(@plugin.name)
+%>  
+
+<h2>Plugin Settings: <%=h @plugin.name %></h2>
+
+<%= render :partial => "settings_header" %>
 
 <div id="settings">
-  <% form_tag(plugins_update_path(@plugin.id)) do %>
-      <div class="box tabular">
-        <%= render :partial => @plugin.settings_partial, :locals => {:settings => @plugin.settings} %>
-      </div>
-      <%= submit_tag "Apply" %>
+  <% form_for(@plugin_setting, :url => plugin_path(@plugin.id), :html => {:method => :put}) do |f| %>
+      <% partial = render :partial => @plugin.settings_partial, :locals => {:settings => (@plugin_setting.settings || {}).merge(params[:settings] || {})} %>
+      <%= f.error_messages if !@error_messages_handled %>
+    <div class="box tabular">
+        <%= partial %>
+    </div>
+    <div class='button-container'>
+      <button type="submit" class="button">Apply</button>
+      <%=link_to("Return to plugins list", plugins_path,:class => 'button button-secondary')%>
+    </div>
   <% end %>
 </div>
 
-<p><%=link_to("Return to plugins list", plugins_path)%></p>
+<p></p>

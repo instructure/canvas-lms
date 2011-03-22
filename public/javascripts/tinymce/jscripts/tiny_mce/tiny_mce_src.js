@@ -11490,7 +11490,23 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 					}
 
 					// Scroll to new position, scrollIntoView can't be used due to bug: http://bugs.webkit.org/show_bug.cgi?id=16117
-					ed.getWin().scrollTo(0, dom.getPos(selection.getRng().startContainer).y);
+					
+					
+					// INSTRUCTURE!!!!!!!!!,
+          // the real problem here was that selection.getRng().startContainer would return a text node
+          // and webkit thinks the scrollTop of a textNode is always 0 ( in dom.getPos() ) , 
+          // to fix, if you check the scrollTop of the inserted <br> than it will tell you a true value.
+          // 
+          // also, in reality chrome handles a shift+return just fine so this whole workaround is
+          // not needed but safari will still add
+          // a new <li> to an <ol> instead of just putting in a line break.
+          // 
+          // so my cange was to change this:
+          // ed.getWin().scrollTo(0, dom.getPos(selection.getRng().startContainer).y);
+          // to this:
+          var y = dom.getPos(selection.getRng().startContainer).y;
+          if (y > 0) { ed.getWin().scrollTo(0, y); }
+
 				};
 
 				ed.onKeyPress.add(function(ed, e) {

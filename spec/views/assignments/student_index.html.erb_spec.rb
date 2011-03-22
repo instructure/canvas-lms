@@ -34,6 +34,7 @@ describe "/assignments/student_index" do
     assigns[:just_viewing_just_one_course] = true
     assigns[:ungraded_assignments] = []
     assigns[:upcoming_assignments] = []
+    assigns[:undated_assignments] = []
     assigns[:future_assignments] = []
     assigns[:past_assignments] = []
     assigns[:overdue_assignments] = []

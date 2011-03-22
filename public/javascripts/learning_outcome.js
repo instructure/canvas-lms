@@ -34,7 +34,7 @@ $(document).ready(function() {
         var $result = $("#result_blank").clone(true).attr('id', 'result_' + result.id);
         result.assessed_at_formatted = $.parseFromISO(result.assessed_at).datetime_formatted;
         $result.toggleClass('mastery_result', !!result.mastery);
-        $result.fillTemplateData({data: result, except: ['mastery']});
+        $result.fillTemplateData({data: result, except: ['mastery'], hrefValues: ['id', 'user_id']});
         $("#outcome_results_list").append($result);
         $result.show();
       }

@@ -57,6 +57,12 @@ $(document).ready(function() {
     }
   });
   $(".context_message.read").find(".header_icon,.title").attr('title', 'Click to Expand Message');
+  $(".recipients_dialog .select_all_recipients_link").click(function(event) {
+    event.preventDefault();
+    var $dialog = $(this).parents(".recipients_dialog");
+    $dialog.find(".right_side :checkbox").attr('checked', true);
+    $dialog.find(".left_side .select_recipients_link").addClass('selected');
+  });
   $(".recipients_dialog .clear_recipients_link").click(function(event) {
     event.preventDefault();
     var $dialog = $(this).parents(".recipients_dialog");
@@ -173,23 +179,33 @@ $(document).ready(function() {
         var groups = data.groups;
         var categories = {};
         student_ids = {};
+        $dialog.find(".message_groups").showIf(data.groups && data.groups.length > 0);
         for(var idx in data.groups) {
           var group = (groups[idx].group || groups[idx].course_assigned_group);
           categories[group.category] = categories[group.category] || [];
           categories[group.category].push(group);
         }
+        $dialog.find(".message_all_teachers_link").parents(".message_group").showIf(data.students && data.students.length);
         for(var idx in data.teachers) {
-          var user = data.teachers[idx].user;
+          var user_id = data.teachers[idx];
           var $user = $dialog.find(".group_recipient.blank:first").clone(true).removeClass('blank');
-          $user.find(".user_id").text(user.id);
+          $user.find(".user_id").text(user_id);
           $dialog.find(".message_all_teachers_link").append($user);
         }
+        $dialog.find(".message_all_students_link").parents(".message_group").showIf(data.students && data.students.length);
         for(var idx in data.students) {
-          var user = data.students[idx].user;
+          var user_id = data.students[idx];
           var $user = $dialog.find(".group_recipient.blank:first").clone(true).removeClass('blank');
-          student_ids[user.id] = true;
-          $user.find(".user_id").text(user.id);
+          student_ids[user_id] = true;
+          $user.find(".user_id").text(user_id);
           $dialog.find(".message_all_students_link").append($user);
+        }
+        $dialog.find(".message_all_observers_link").parents(".message_group").showIf(data.observers && data.observers.length);
+        for(var idx in data.observers) {
+          var user_id = data.observers[idx];
+          var $user = $dialog.find(".group_recipient.blank:first").clone(true).removeClass('blank');
+          $user.find(".user_id").text(user_id);
+          $dialog.find(".message_all_observers_link").append($user);
         }
         for(var category in categories) {
           var groups = categories[category];
@@ -199,9 +215,9 @@ $(document).ready(function() {
             var $group = $category.find(".message_group.blank").clone(true).removeClass('blank');
             $group.find(".group_name").text(group.name);
             for(var jdx in data.group_members[group.id]) {
-              var user = data.group_members[group.id][jdx].user;
+              var user_id = data.group_members[group.id][jdx];
               var $user = $group.find(".group_recipient.blank").clone(true).removeClass('blank');
-              $user.find(".user_id").text(user.id);
+              $user.find(".user_id").text(user_id);
               $group.find(".message_group_link").append($user);
             }
             $category.append($group.show());
@@ -216,7 +232,7 @@ $(document).ready(function() {
             $user.find(":checkbox").addClass('student');
           }
           $user.find(":checkbox").attr('id', $dialog.attr('id') + "_user_" + user.id).val(user.id);
-          $user.find(".name").attr('for', $dialog.attr('id') + "_user_" + user.id)
+          $user.find(".user_name").attr('for', $dialog.attr('id') + "_user_" + user.id)
             .text(user.name || user.short_name || user.id);
           $dialog.find(".right_side .recipients").append($user.show());
         }
@@ -288,16 +304,12 @@ $(document).ready(function() {
     }
   });
   $("#current_message_context").change(function() {
-    $(".send_message_form").hide();
+    var $prevForm = $(".send_message_form:visible");
     var $form = $("#" + $(this).val() + "_recipients");
-    $form.find(".recipients .recipient:not(.blank)").remove();
-    $form.find(".no_recipients").remove();
-    $form.find(".recipients recipients_scroll").prepend("<div class='no_recipients'>No Recipients</div>");
-    $form.find(".context_message_attachment:not(.blank)").remove();
-    $form.find(".also_announcement").attr('checked', false);
-    $form.find(".root_context_message_id").val("");
-    $form.find(":text,textarea").val("");
-    messages.updateFacultyJournalOption($form)
+    if ($prevForm.length) {
+      $prevForm.hide();
+      messages.moveFormData($prevForm, $form);
+    }
     $form.show();
   }).change();
   $(".send_message_form .cancel_button").click(function() {
@@ -425,7 +437,7 @@ var messages = {
         if(!context_code || $("#possible_recipients .user_name_" + recipient.id + ".for_" + context_code).length > 0) {
           success = true;
           var $recipient = $form.find(".recipients .recipient.blank").clone(true).removeClass('blank');
-          $recipient.find(".name").text(recipient.user_name);
+          $recipient.find(".user_name").text(recipient.user_name);
           $recipient.find(".id").text(recipient.id);
           $recipient.addClass('user_' + recipient.id);
           if(recipient["is_student"]){
@@ -553,7 +565,7 @@ var messages = {
       data: message,
       id: 'context_message_' + message.id,
       hrefValues: ['user_id', 'recipient_id', 'id'],
-      htmlValues: ['formatted_body', 'subject']
+      htmlValues: ['formatted_body']
     });
     for(var idx in message.attachments) {
       var attachment = message.attachments[idx].attachment;
@@ -579,5 +591,49 @@ var messages = {
       }
     }
     return $message;
+  },
+  // move data from one context message form to another (e.g. when you change the dropdown option).
+  // recipient fu makes sure invalid recipients for the context get omitted.
+  moveFormData: function($source, $target) {
+    var target_context = $target[0].id.replace(/_recipients$/, ''),
+        recipients = [],
+        $attachment_td = $target.find(".context_message_attachment:.blank").parents("td");
+
+    messages.resetFormData($target);
+
+    $source.find(".recipients .recipient:not(.blank)").each(function() {
+      var data = $(this).getTemplateData({textValues: ['id', 'user_name']});
+      // note: when switching contexts, recipients will be blanked out completely if the target
+      // recipient list has not been loaded yet.
+      $valid_recipient = $("#" + target_context + "_recipients_dialog_user_" + data.id + ":checkbox");
+      if ($valid_recipient.length > 0) {
+        data['is_student'] = $valid_recipient.is('.student');
+        recipients.push(data);
+      }
+    });
+    if (recipients.length > 0) {
+      messages.addRecipientsToForm($target, recipients, target_context);
+    }
+    $source.find(".context_message_attachment:not(.blank)").each(function() {
+      // cloning file inputs is problematic (browser security), so we move it instead
+      $attachment_td.append($(this).remove());
+    });
+    $target.find(".also_announcement").attr('checked', $source.find(".also_announcement").attr('checked'));
+    $target.find(".subject").val($source.find(".subject").val());
+    $target.find("textarea").val($source.find("textarea").val());
+    $target.find('.add_as_user_note').attr('checked', $source.find(".add_as_user_note").attr('checked'));
+    messages.updateFacultyJournalOption($target);
+
+    messages.resetFormData($source);
+  },
+  resetFormData: function($form) {
+    $form.find(".recipients .recipient:not(.blank)").remove();
+    $form.find(".no_recipients").remove();
+    $form.find(".recipients .recipients_scroll").append("<div class='no_recipients'>No Recipients</div>");
+    $form.find(".context_message_attachment:not(.blank)").remove();
+    $form.find(".also_announcement").attr('checked', false);
+    $form.find(".root_context_message_id").val("");
+    $form.find(":text,textarea").val("");
+    messages.updateFacultyJournalOption($form);
   }
 };

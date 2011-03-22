@@ -17,40 +17,71 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require 'selenium/client'
+require "selenium-webdriver"
 require "socket"
+require File.expand_path(File.dirname(__FILE__) + '/server')
 
-SELENIUM_CONFIG = Setting.from_config("selenium") || {
-    :host => "localhost", :port => 4444 }
+SELENIUM_CONFIG = Setting.from_config("selenium") || {}
 SERVER_IP = UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
-SERVER_PORT = 3002
+SERVER_PORT = SELENIUM_CONFIG[:app_port] || 3002
+APP_HOST = "#{SERVER_IP}:#{SERVER_PORT}"
+SECONDS_UNTIL_COUNTDOWN = 5
+SECONDS_UNTIL_GIVING_UP = 60
 MAX_SERVER_START_TIME = 30
 
 module SeleniumTestsHelperMethods
-  def setup_selenium(selenium_env)
-    Selenium::Client::Driver.new \
-      :host => SELENIUM_CONFIG[:host],
-      :port => SELENIUM_CONFIG[:port],
-      :browser => selenium_env,
-      :url => "http://#{SERVER_IP}:#{SERVER_PORT}/",
-      :timeout_in_second => 60
+  def setup_selenium
+    if SELENIUM_CONFIG.empty?
+      driver = Selenium::WebDriver.for :firefox
+    else
+      driver = Selenium::WebDriver.for(
+        :remote, 
+        :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub', 
+        :desired_capabilities => (SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox)
+      )
+    end
+    driver.get(app_host)
+    driver
   end
   
-  def self.start_webrick_server
+  def app_host
+    "http://#{APP_HOST}"
+  end
+
+  def self.start_in_process_webrick_server
+    HostUrl.default_host = APP_HOST
+    HostUrl.file_host = APP_HOST
+    server = SpecFriendlyWEBrickServer
+    app = Rack::Builder.new do
+      use Rails::Rack::Debugger unless Rails.env.test?
+      map '/' do
+        use Rails::Rack::Static
+        run ActionController::Dispatcher.new
+      end
+    end.to_app
+    server.run(app, :Port => SERVER_PORT, :AccessLog => [])
+    shutdown = lambda do
+      server.shutdown
+      HostUrl.default_host = nil
+      HostUrl.file_host = nil
+    end
+    at_exit { shutdown.call }
+    return shutdown
+  end
+  
+  def self.start_forked_webrick_server
     domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
     domain_conf = YAML.load_file(domain_conf_path)
-    old_domain = domain_conf[RAILS_ENV]["domain"]
-    domain_conf[RAILS_ENV]["domain"] = "#{SERVER_IP}:#{SERVER_PORT}"
+    old_domain = domain_conf[Rails.env]["domain"]
+    domain_conf[Rails.env]["domain"] = APP_HOST
     File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
+    HostUrl.default_host = APP_HOST
+    HostUrl.file_host = APP_HOST
     server_pid = fork do
-      exec(File.expand_path(File.dirname(__FILE__) +
-          "/../../script/server -p #{SERVER_PORT} -e #{RAILS_ENV}"))
-    end
-    at_exit do
-      Process.kill 'KILL', server_pid
-      Process.wait server_pid
-      domain_conf[RAILS_ENV]["domain"] = old_domain
-      File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
+      base = File.expand_path(File.dirname(__FILE__))
+      STDOUT.reopen(File.open("/dev/null", "w"))
+      STDERR.reopen(File.open("#{base}/../../log/test-server.log", "a"))
+      exec("#{base}/../../script/server", "-p", SERVER_PORT.to_s, "-e", Rails.env)
     end
     for i in 0..MAX_SERVER_START_TIME
       s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
@@ -59,6 +90,20 @@ module SeleniumTestsHelperMethods
     end
     raise "Failed starting script/server" unless s
     s.close
+    closed = false
+    shutdown = lambda do
+      unless closed
+        Process.kill 'KILL', server_pid
+        Process.wait server_pid
+        domain_conf[Rails.env]["domain"] = old_domain
+        File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
+        HostUrl.default_host = nil
+        HostUrl.file_host = nil
+        closed = true
+      end
+    end
+    at_exit { shutdown.call }
+    return shutdown
   end
 end
 
@@ -67,40 +112,112 @@ shared_examples_for "all selenium tests" do
   include SeleniumTestsHelperMethods
 
   attr_reader :selenium_driver
-  alias_method :page, :selenium_driver
-
-  self.use_transactional_fixtures = false
-
-  before(:each) do
-    @selenium_driver.start_new_browser_session
+  alias_method :driver, :selenium_driver
+  
+  def login_as(username, password)
+    # log out (just in case)
+    driver.navigate.to(app_host + '/logout')
+    
+    driver.find_element(:css, '#pseudonym_session_unique_id').send_keys username
+    password_element = driver.find_element(:css, '#pseudonym_session_password')
+    password_element.send_keys(password)
+    password_element.submit
   end
   
+  def wait_for_dom_ready
+    driver.execute_script <<-JS
+      window.seleniumDOMIsReady = false; 
+      $(function(){ 
+        window.setTimeout(function(){
+          //by doing a setTimeout, we ensure that the execution of all js completes. then we run selenium.
+          window.seleniumDOMIsReady = true; 
+        }, 1);
+      });
+    JS
+    dom_is_ready = false
+    until (dom_is_ready) do
+      dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
+      sleep 1 
+    end
+  end
+  
+  def keep_trying
+    60.times do |i|
+      puts "trying #{SECONDS_UNTIL_GIVING_UP - i}" if i > SECONDS_UNTIL_COUNTDOWN
+      if i < SECONDS_UNTIL_GIVING_UP - 2
+        break if (yield rescue false)
+      elsif i == SECONDS_UNTIL_GIVING_UP - 1
+        yield
+      else
+        raise
+      end
+      sleep 1
+    end
+  end
+  
+  def find_with_jquery(selector)
+    driver.execute_script("return $('#{selector.gsub(/'/, '\\\'')}')[0];")
+  end
+  
+  def find_all_with_jquery(selector)
+    driver.execute_script("return $('#{selector.gsub(/'/, '\\\'')}').toArray();")
+  end
+  
+  # pass in an Element pointing to the textarea that is tinified.
+  def wait_for_tiny(element)
+    # TODO: Better to wait for an event from tiny?
+    parent = element.find_element(:xpath, '..')
+    tiny_frame = nil
+    keep_trying {
+      begin
+        tiny_frame = parent.find_element(:css, 'iframe')
+      rescue => e
+        puts "#{e.inspect}"
+        false
+      end
+    }
+    tiny_frame
+  end
+  
+  def in_frame(id, &block)
+    saved_window_handle = driver.window_handle
+    driver.switch_to.frame id
+    yield
+    driver.switch_to.window saved_window_handle
+  end
+  
+  def get(link)
+    driver.get(app_host + link)
+    wait_for_dom_ready
+  end
+
+  self.use_transactional_fixtures = false
+  
   append_after(:each) do
-    @selenium_driver.close_current_browser_session
     ALL_MODELS.each &:delete_all
   end
   
-  prepend_after(:each) do
-    begin 
-      if selenium_driver.session_started?
-        selenium_driver.set_context "Ending example '#{self.description}'"
-      end
-    rescue Exception => e
-      STDERR.puts "Problem while capturing system state" + e
-    end
+  append_before(:all) do
+    @selenium_driver = setup_selenium
   end
 
-  append_before(:each) do
-    begin 
-      if selenium_driver && selenium_driver.session_started?
-        selenium_driver.set_context "Starting example '#{self.description}'"
-      end
-    rescue Exception => e
-      STDERR.puts "Problem while setting context on example start" + e
-    end
+  append_after(:all) do
+    @webserver_shutdown.call
+    @selenium_driver.quit
   end
  
 end
 
-SeleniumTestsHelperMethods.start_webrick_server
+shared_examples_for "in-process server selenium tests" do
+  it_should_behave_like "all selenium tests"
+  prepend_before(:all) do
+    @webserver_shutdown = SeleniumTestsHelperMethods.start_in_process_webrick_server
+  end
+end
 
+shared_examples_for "forked server selenium tests" do
+  it_should_behave_like "all selenium tests"
+  prepend_before(:all) do
+    @webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
+  end
+end

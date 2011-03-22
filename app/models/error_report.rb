@@ -69,7 +69,7 @@ class ErrorReport < ActiveRecord::Base
                          "REQUEST_METHOD", "REQUEST_PATH", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", 
                          "SERVER_PROTOCOL", "action_controller.request.path_parameters"] )
   end
-  
+
   on_send_to_external do |error_report|
     config = error_report.account && error_report.account.settings && error_report.account.settings[:error_reporting]
     config ||= {}

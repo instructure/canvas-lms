@@ -71,7 +71,7 @@ class DelayedMessage < ActiveRecord::Base
     dm_ids = DelayedMessage.connection.select_values(
       "SELECT id
          FROM delayed_messages
-        WHERE workflow_state = 'pending' AND send_at <= now() AND communication_channel_id = #{cc_id}")
+        WHERE workflow_state = 'pending' AND send_at <= '#{Time.now.to_s(:db)}' AND communication_channel_id = #{cc_id}")
   end
   
   include Workflow

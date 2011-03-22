@@ -137,7 +137,9 @@ module ApplicationHelper
   end
   
   def avatar(user_id, context_code, height=50)
-    link_to(avatar_image(user_id, height), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;')
+    if service_enabled?(:avatars)
+      link_to(avatar_image(user_id, height), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;')
+    end
   end
   
   def slugify(text="")
@@ -157,9 +159,9 @@ module ApplicationHelper
   # context_url(@context, :controller => :assignments, :action => :show)
   def context_url(context, *opts)
     @context_url_lookup ||= {}
-    lookup = [context ? context.id : nil, *opts]
+    context_name = (context ? context.class.base_ar_class : context.class).name.underscore
+    lookup = [context ? context.id : nil, context_name, *opts]
     return @context_url_lookup[lookup] if @context_url_lookup[lookup]
-    context_name = context.class.base_ar_class.name.underscore
     res = nil
     if opts.length > 1 || (opts[0].is_a? String) || (opts[0].is_a? Symbol)
       name = opts.shift.to_s
@@ -322,7 +324,7 @@ module ApplicationHelper
   
   def equella_enabled?
     @equella_settings ||= @context.equella_settings if @context.respond_to?(:equella_settings)
-    @equella_settings ||= @domain_root_account.equella_settings
+    @equella_settings ||= @domain_root_account.try(:equella_settings)
     !!@equella_settings
   end
 
@@ -391,5 +393,21 @@ module ApplicationHelper
 
   def nbsp
     raw("&nbsp;")
+  end
+
+  # translate a URL intended for an iframe into an alternative URL, if one is
+  # avavailable. Right now the only supported translation is for youtube
+  # videos. Youtube video pages can no longer be embedded, but we can translate
+  # the URL into the player iframe data.
+  def iframe(src, html_options = {})
+    uri = URI.parse(src) rescue nil
+    if uri
+      query = Rack::Utils.parse_query(uri.query)
+      if uri.host == 'www.youtube.com' && uri.path == '/watch' && query['v'].present?
+        src = "http://www.youtube.com/embed/#{query['v']}"
+        html_options.merge!({:title => 'Youtube video player', :width => 640, :height => 480, :frameborder => 0, :allowfullscreen => 'allowfullscreen'})
+      end
+    end
+    content_tag('iframe', '', { :src => src }.merge(html_options))
   end
 end

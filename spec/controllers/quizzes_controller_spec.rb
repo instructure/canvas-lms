@@ -199,6 +199,99 @@ describe QuizzesController do
     end
   end
   
+  describe "GET 'take'" do
+    it "should require authorization" do
+      course_with_student(:active_all => true)
+      course_quiz(true)
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      assert_unauthorized
+    end
+    
+    it "should allow taking the quiz" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('take_quiz')
+    end
+    
+    it "should render verification page if password required" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.access_code = 'bacon'
+      @quiz.save!
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('access_code')
+    end
+    
+    it "should not let them take the quiz if it's locked" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.locked = true
+      @quiz.save!
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('show')
+      assigns[:locked].should_not be_nil
+    end
+    
+    it "should let them take the quiz if it's locked but they've been explicitly unlocked" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.locked = true
+      @quiz.save!
+      @sub = @quiz.find_or_create_submission(@user, nil, 'settings_only')
+      @sub.manually_unlocked = true
+      @sub.save!
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('take_quiz')
+    end
+    
+    it "should use default duration if no extensions specified" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.time_limit = 60
+      @quiz.save!
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('take_quiz')
+      assigns[:submission].should_not be_nil
+      assigns[:submission].user.should eql(@user)
+      (assigns[:submission].end_at - assigns[:submission].started_at).to_i.should eql(60.minutes.to_i)
+    end
+    
+    it "should give user more time if specified" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.time_limit = 60
+      @quiz.save!
+      @sub = @quiz.find_or_create_submission(@user, nil, 'settings_only')
+      @sub.extra_time = 30
+      @sub.save!
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('take_quiz')
+      assigns[:submission].should_not be_nil
+      assigns[:submission].user.should eql(@user)
+      (assigns[:submission].end_at - assigns[:submission].started_at).to_i.should eql(90.minutes.to_i)
+    end
+
+    it "should render ip_filter page if ip_filter doesn't match" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.ip_filter = '123.123.123.123'
+      @quiz.save!
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('invalid_ip')
+    end
+    
+    it" should let the user take the page if the ip_filter matches" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz(true)
+      @quiz.ip_filter = '123.123.123.123'
+      @quiz.save!
+      request.env['REMOTE_ADDR'] = '123.123.123.123'
+      get 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+      response.should render_template('take_quiz')
+    end
+  end
+  
   describe "GET 'history'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)

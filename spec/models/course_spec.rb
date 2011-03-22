@@ -283,6 +283,36 @@ describe Course, "tabs_available" do
     tab_ids.should_not be_include(Course::TAB_SETTINGS)
     tab_ids.length.should > 0
   end
+  
+  it "should show grades tab for students" do
+    course_with_student(:active_all => true)
+    tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+    tab_ids.should be_include(Course::TAB_GRADES)
+  end
+  
+  it "should not show grades tab for observers" do
+    course_with_student(:active_all => true)
+    @student = @user
+    user(:active_all => true)
+    @oe = @course.enroll_user(@user, 'ObserverEnrollment')
+    @oe.accept
+    @user.reload
+    tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+    tab_ids.should_not be_include(Course::TAB_GRADES)
+  end
+    
+  it "should show grades tab for observers if they are linked to a student" do
+    course_with_student(:active_all => true)
+    @student = @user
+    user(:active_all => true)
+    @oe = @course.enroll_user(@user, 'ObserverEnrollment')
+    @oe.accept
+    @oe.associated_user_id = @student.id
+    @oe.save!
+    @user.reload
+    tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+    tab_ids.should be_include(Course::TAB_GRADES)
+  end
 end
 
 describe Course, "backup" do

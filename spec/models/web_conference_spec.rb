@@ -20,19 +20,41 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WebConference do
   before(:all) do
-    WebConference.instance_variable_set('@configs', [{
-      'type' => 'dim_dim',
-      'name' => 'dimdim',
-      'domain' => 'dimdim.instructure.com'
-    }])
+    WebConference.instance_eval do
+      def plugins
+        [OpenObject.new(:id => "dim_dim", :settings => {:domain => "dimdim.instructure.com"}),
+         OpenObject.new(:id => "broken_plugin", :settings => {:foo => :bar})]
+      end
+    end
   end
+  after(:all) do
+    WebConference.instance_eval do
+      def plugins; Canvas::Plugin.all_for_tag(:web_conferencing); end
+    end
+  end
+
+  context "broken_plugin" do
+    it "should return false on valid_config? if no matching config" do
+      WebConference.new.valid_config?.should be_false
+      conf = WebConference.new
+      conf.conference_type = 'bad_type'
+      conf.valid_config?.should be_false
+    end
+
+    it "should return false on valid_config? if plugin subclass is broken/missing" do
+      conf = WebConference.new
+      conf.conference_type = "broken_plugin"
+      conf.valid_config?.should be_false
+    end
+  end
+
   context "dim_dim" do
     it "should correctly retrieve a config hash" do
       conference = DimDimConference.new
       config = conference.config
       config.should_not be_nil
-      config['type'].should eql('dim_dim')
-      config['name'].should eql('dimdim')
+      config[:conference_type].should eql('DimDim')
+      config[:class_name].should eql('DimDimConference')
     end
     
     it "should correctly generate join urls" do
@@ -47,14 +69,114 @@ describe WebConference do
     
     it "should confirm valid config" do
       DimDimConference.new.valid_config?.should be_true
-      DimDimConference.new(:conference_type => "dimdim").valid_config?.should be_true
+      DimDimConference.new(:conference_type => "DimDim").valid_config?.should be_true
+    end
+  end
+  
+  context "starting and ending" do
+    it "should not set start and end times by default" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.start_at.should be_nil
+      conference.end_at.should be_nil
+      conference.started_at.should be_nil
+      conference.ended_at.should be_nil
     end
     
-    it "should return false on valid_config? if no matching config" do
-      WebConference.new.valid_config?.should be_false
-      conf = DimDimConference.new
-      conf.write_attribute(:conference_type, 'bad_type')
-      conf.valid_config?.should be_false
+    it "should set start and end times when a paricipant is added" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.add_attendee(@user)
+      conference.start_at.should_not be_nil
+      conference.end_at.should eql(conference.start_at + conference.duration_in_seconds)
+      conference.started_at.should eql(conference.start_at)
+      conference.ended_at.should be_nil
+    end
+    
+    it "should not set ended_at if the conference is still active" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.add_attendee(@user)
+      conference.stub!(:conference_status).and_return(:active)
+      conference.ended_at.should eql(nil)
+      conference.active?.should eql(true)
+      conference.ended_at.should eql(nil)
+    end
+    
+    it "should not set ended_at if the conference is no longer active but end_at has not passed" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.add_attendee(@user)
+      conference.stub!(:conference_status).and_return(:closed)
+      conference.ended_at.should eql(nil)
+      conference.active?(true).should eql(false)
+      conference.ended_at.should be_nil
+    end
+    
+    it "should set ended_at if the conference is no longer active and end_at has passed" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.add_attendee(@user)
+      conference.stub!(:conference_status).and_return(:closed)
+      conference.start_at = 30.minutes.ago
+      conference.end_at = 20.minutes.ago
+      conference.save!
+      conference.ended_at.should eql(nil)
+      conference.active?(true).should eql(false)
+      conference.ended_at.should_not be_nil
+      conference.ended_at.should < Time.now
+    end
+    
+    it "should set ended_at if it's more than 15 minutes past end_at" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.add_attendee(@user)
+      conference.stub!(:conference_status).and_return(:active)
+      conference.ended_at.should eql(nil)
+      conference.start_at = 30.minutes.ago
+      conference.end_at = 20.minutes.ago
+      conference.save!
+      conference.active?(true).should eql(false)
+      conference.conference_status.should eql(:active)
+      conference.ended_at.should_not be_nil
+      conference.ended_at.should < Time.now
+    end
+    
+    it "should be restartable if end_at has not passed" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.add_attendee(@user)
+      conference.stub!(:conference_status).and_return(:active)
+      conference.finished?.should eql(false)
+      conference.restartable?.should eql(true)
+    end
+    
+    it "should not be restartable if end_at has passed" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.add_attendee(@user)
+      conference.start_at = 30.minutes.ago
+      conference.end_at = 20.minutes.ago
+      conference.save!
+      conference.stub!(:conference_status).and_return(:active)
+      conference.finished?.should eql(true)
+      conference.restartable?.should eql(false)
     end
   end
 end

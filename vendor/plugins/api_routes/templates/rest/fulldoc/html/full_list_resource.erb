@@ -1,5 +1,0 @@
-<% n = 1 %>
-<% @resources.each do |resource, controllers| %>
-  <li class="r<%= n %>"><a href="<%= url_for("#{resource.downcase}.html") %>"><%= resource %> API</li>
-<% n = n == 2 ? 1 : 2 %>
-<% end %>

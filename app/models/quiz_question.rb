@@ -22,14 +22,14 @@ class QuizQuestion < ActiveRecord::Base
   belongs_to :quiz
   belongs_to :assessment_question
   belongs_to :quiz_group
-  before_save :infer_position
+  before_save :infer_defaults
   before_save :create_assessment_question
   before_destroy :delete_assessment_question
   validates_presence_of :quiz_id
   serialize :question_data
   after_save :update_quiz
   
-  def infer_position
+  def infer_defaults
     if !self.position && self.quiz
       if self.quiz_group
         self.position = (self.quiz_group.quiz_questions.map(&:position).compact.max || 0) + 1
@@ -37,12 +37,18 @@ class QuizQuestion < ActiveRecord::Base
         self.position = self.quiz.root_entries_max_position + 1
       end
     end
+    if self.question_data.is_a?(Hash) 
+      if self.question_data[:question_name].try(:strip).blank?
+        self.question_data[:question_name] = "Question"
+      end
+      self.question_data[:name] = self.question_data[:question_name]
+    end
     if self.question_data && self.question_data[:question_text]
       config = Instructure::SanitizeField::SANITIZE
       self.question_data[:question_text] = Sanitize.clean(self.question_data[:question_text], config)
     end
   end
-  protected :infer_position
+  protected :infer_defaults
   
   def update_quiz
     Quiz.update_all({:last_edited_at => Time.now}, {:id => self.quiz_id})
@@ -96,7 +102,7 @@ class QuizQuestion < ActiveRecord::Base
     self.attributes.delete_if{|k,v| [:id, :quiz_id, :quiz_group_id, :question_data].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
-    data = self.question_data
+    data = self.question_data || {}
     if options[:old_context] && options[:new_context]
       data = QuizQuestion.migrate_question_hash(data, options)
     end
@@ -113,6 +119,7 @@ class QuizQuestion < ActiveRecord::Base
   def data
     res = (self.question_data || self.assessment_question.question_data) rescue {}
     res[:assessment_question_id] = self.assessment_question_id
+    res[:question_name] = "Question" if res[:question_name].blank?
     res[:id] = self.id
     res.with_indifferent_access
   end

@@ -8,7 +8,7 @@ class Account < ActiveRecord::Base
   
   set_policy do
     given { |u| self.user == u }
-    set { can :read and can :write and cannot :destroy and cannot :update }
+    set { can :read and can :write }
   end
 end
 

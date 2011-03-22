@@ -5,7 +5,6 @@
   showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]
 %>
 <div id="file_uploads" style="display: none;">
-  <div id="file_uploads_session_id" style="display: none;"><%= request.session_options[:id] %></div>
   <div class="file_upload" id="file_upload_blank" style="display: none;">
     <div style="float: left;">
     <span class="status"></span> <span class="file_name"></span>
@@ -27,45 +26,14 @@
     </div>
     <ul id="files_structure_list">
       <li id="swfupload_holder">
-        <div id="blech"></div>
+        <div id="file_swf"></div>
       </li>
-      <% @file_structures.each do |context, structure| %>
-        <% root_folder = structure[:folders].select{|f| f.root_folder? && f.context_id == context.id && f.context_type == context.class.base_ar_class.to_s }.first %>
+      <% @contexts.each do |context| %>
+        <% root_folder = Folder.root_folders(context).first %>
         <li class="context folder folder_<%= root_folder.id %> <%= context.asset_string %>" style="display: none;">
           <span class="text name"><%= context.name %></span>
           <span class="text id" style="display: none;"><%= root_folder.id %></span>
           <ul>
-            <%= render :partial => 'files/nested_content', :object => structure[:folders].select{|f| f.parent_folder_id == root_folder.id }, :locals => {:folders => structure[:folders], :skip_ul => true, :exclude_files => true} %>
-            <% if !context.is_a?(User) && (!structure[:collaborations].empty? || can_do((context.collaborations.new rescue nil), @current_user, :create)) %>
-            <li class="collaborations">
-              <span class="text name">collaborations</span>
-              <ul>
-              <% structure[:collaborations].select{|c| c.context == context}.each do |collaboration| %>
-                <li class="collaboration <%= collaboration.collaboration_type %> collaboration_<%= collaboration.id %>">
-                  <span class="text name"><%= collaboration.title %></span>
-                  <span class="text id" style="display: none;"><%= collaboration.id %></span>
-                </li>
-              <% end %>
-              </ul>
-            </li>
-            <% end %>
-            <% if !structure[:groups].empty? %>
-              <% structure[:groups].map{|g| g.category}.uniq.each do |category| %>
-                <li class="groups">
-                  <span class="text name"><%= category %></span>
-                  <ul>
-                  <% structure[:groups].select{|g| g.category == category }.each do |group| %>
-                    <% group_root_folder = Folder.root_folders(group).first %>
-                    <li class="group context folder folder_<%= group_root_folder.id %> <%= group.asset_string %>">
-                      <span class="text name"><%= group.name %></span>
-                      <span class="text id" style="display: none;"><%= group_root_folder.id %></span>
-                      <%= render :partial => 'files/nested_content', :object => group_root_folder.subcontent, :locals => {:folders => structure[:folders]} %>
-                    </li>
-                  <% end %>
-                  </ul>
-                </li>
-              <% end %>
-            <% end %>
           </ul>
         </li>
       <% end %>
@@ -146,7 +114,7 @@
   </li>
   <li class="folder_item folder">
     <div class="header">
-      <%= image_tag "blank.png", :class => "item_icon" %>
+      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <a href="#" class="name">&nbsp;</a>
     </div>
     <div class="links">
@@ -162,7 +130,7 @@
   </li>
   <li class="folder_item file">
     <div class="header">
-      <%= image_tag "blank.png", :class => "item_icon" %>
+      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <a href="#" class="name download_url">&nbsp;</a>
       <div class="sub_header">
         <span class="readable_size">&nbsp;</span>
@@ -185,7 +153,7 @@
   </li>
   <li class="folder_item collaboration">
     <div class="header">
-      <%= image_tag "blank.png", :class => "item_icon" %><a href="#" class="name collaboration_url" target="_blank">&nbsp;</a>
+      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %><a href="#" class="name collaboration_url" target="_blank">&nbsp;</a>
     </div>
     <div class="links">
       <a href="#" class="edit_collaboration_link no-hover collaboration_url" title="Edit this Collaboration"><%= image_tag "edit.png" %></a>
@@ -304,7 +272,7 @@
     <% form_for :attachment, :url => "#", :html => {:class => "add_file_form add_form"} do |f| %>
       <%= f.hidden_field :folder_id %>
       <div class="header">
-        <%= image_tag "blank.png", :class => "item_icon" %>
+        <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
         <%= f.file_field :uploaded_data, :title => "File to Upload" %>
       </div>
       <div class="clear"></div>
@@ -320,7 +288,7 @@
   <li class="folder_item folder add_item" id="add_folder_form">
     <% form_for :folder, :url => "#", :html => {:class => "add_folder_form add_form header"} do |f| %>
       <%= f.hidden_field :parent_folder_id %>
-      <%= image_tag "blank.png", :class => "item_icon" %>
+      <%= image_tag "blank.png", :alt => '', :class => "item_icon" %>
       <span class="name" style="display: none;">&nbsp;</span>
       <%= f.text_field :name, :title => "Folder Name" %>
     <% end %>
@@ -330,9 +298,7 @@
 <div style="display: none;" id="file_context_links">
   <input type="text" id="rename_entry_field" style="width: 200px;"/>
   <%= image_tag "ajax-loader.gif", :class => "preview_loading_image" %>
-  <% contexts = @file_structures.map{|s| s[0]} %>
-  <% contexts += @file_structures.map{|s| s[1][:groups]}.flatten %>
-  <% contexts.each do |context| %>
+  <% @contexts.each do |context| %>
     <% root_url = context_url(context, :context_url) rescue '' %>
     <a href="<%= root_url %>/files" class="<%= context.asset_string %>_attachments_url">&nbsp;</a>
     <a href="<%= root_url %>/folders" class="<%= context.asset_string %>_folders_url">&nbsp;</a>
@@ -374,7 +340,7 @@
   </div>
 </div>
 <div style="display: none;" id="form_templates">
-  <%= image_tag "blank.png", :id => "content_blank_icon" %>
+  <%= image_tag "blank.png", :alt => '', :id => "content_blank_icon" %>
   <%= image_tag "lock_for_file_folder.png", :id => "content_locked_icon" %>
 <div id="edit_collaboration_dialog">
   <% form_for :collaboration, :url => "", :html => {:id => "edit_collaboration_form"} do |f| %>
@@ -528,9 +494,7 @@
 </div>
 <% js_block do %>
 <script>
-<% @file_structures.each{|c, s| s.delete(:folders) } %>
-var fileStructureData = <%= raw @file_structures.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:read_contents,:manage_grades,:read_roster,:download]}, :methods => [:readable_size,:mime_class,:currently_locked,:collaborator_ids]) %>;
-
+var contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
 
 var INST = INST || {};
 INST.downloadFolderFiles = function(url) {

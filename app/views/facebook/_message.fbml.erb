@@ -11,7 +11,7 @@
     <div style="clear: left;"></div>
   </div>
   <div style="padding-top: 5px; padding-left: 25px;">
-    <div><%= message.try_rescue(:formatted_body) || nbsp %></div>
+    <div><%= raw(message.try_rescue(:formatted_body) || nbsp) %></div>
     <div style="clear: both;"></div>
   </div>
 </p>

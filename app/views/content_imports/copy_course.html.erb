@@ -32,6 +32,7 @@
     <p>Select the content you'd like copied into this course.  We'll try to auto-correct any mismatched
     due dates and calendar event dates as best we can.</p>
     <h3 style="margin-bottom: 10px;"><%= check_box :copy, :everything, :class => "copy_everything" %> <%= label :copy, :everything, image_tag('checked.png', :style => 'width: 16px;') + " Copy Everything from #{@copy_context.name}" %></h3>
+    <h3><%= check_box :copy, :course_settings, :class => "copy_all", :checked => false %><%= label :copy, :course_settings, image_tag('file_multiple.png') + " Settings from #{@copy_context.name}" %></h3>
     <% if @copy_context.assignment_groups.active.length > 0 %>
       <h3><%= check_box :copy, :all_assignments, :class => "copy_all", :checked => true %><%= label :copy, :all_assignments, image_tag('assignment.png') + " Assignments for #{@copy_context.name}" %></h3>
       <ul class="unstyled_list root_asset_list">

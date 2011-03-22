@@ -16,9 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+CONTENT_LENGTH_RANGE = 50*1024*1024
+S3_EXPIRATION_TIME = 30.minutes
+
 class FilesController < ApplicationController
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show, :image_thumbnail]
+  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show, :image_thumbnail,:create_pending,:s3_success]
   before_filter :check_file_access_flags, :only => :show_relative
+  prepend_around_filter :load_pseudonym_from_policy, :only => :create
 
   before_filter { |c| c.active_tab = "files" }
 
@@ -66,34 +70,30 @@ class FilesController < ApplicationController
   protected :retrieve_folders
   
   def index
-    return full_index if !params[:old_style] && request.format != :json
-    add_crumb("Files", named_context_url(@context, :context_files_url))
-    if authorized_action(@context.attachments.new, @current_user, :read)
-      @current_folder = Folder.find_folder(@context, params[:folder_id])
-      get_quota
-      retrieve_folders if !request.xhr? || !@current_folder
-      if !@current_folder || authorized_action(@current_folder, @current_user, :read)
-        @current_sub_folders = @current_folder.active_sub_folders
-        if @context.grants_right?(@current_user, session, :manage_files)
-          @current_attachments = @current_folder.active_file_attachments
-        else
-          @current_attachments = @current_folder.visible_file_attachments
-          @root_folders = @root_folders.select{|f| f.visible? } rescue []
-          @folders = @folders.select{|f| f.visible? } rescue []
-          @current_folder = @root_folders[0] if !@current_folder.visible?
-        end
-        @current_attachments = @current_attachments.scoped(:include => [:thumbnail, :media_object])
-        log_asset_access("files:#{@context.asset_string}", "files", 'other')
-        respond_to do |format|
-          format.html
-          format.xml  { render :xml => @current_attachments.to_xml }
+    if request.format == :json
+      if authorized_action(@context.attachments.new, @current_user, :read)
+        @current_folder = Folder.find_folder(@context, params[:folder_id])
+        get_quota
+        retrieve_folders if !@current_folder
+        if !@current_folder || authorized_action(@current_folder, @current_user, :read)
           if params[:folder_id]
-            format.json { render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked], :permissions => {:user => @current_user, :session => session}) }
+            if @context.grants_right?(@current_user, session, :manage_files)
+              @current_attachments = @current_folder.active_file_attachments
+            else
+              @current_attachments = @current_folder.visible_file_attachments
+              @root_folders = @root_folders.select{|f| f.visible? } rescue []
+              @folders = @folders.select{|f| f.visible? } rescue []
+              @current_folder = @root_folders[0] if !@current_folder.visible?
+            end
+            @current_attachments = @current_attachments.scoped(:include => [:thumbnail, :media_object])
+            render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked], :permissions => {:user => @current_user, :session => session})
           else
-            format.json { render :json => @context.file_structure_for(@current_user).to_json(:permissions => {:user => @current_user}, :methods => [:readable_size, :mime_class, :currently_locked, :collaborator_ids]) }
-           end
+            render :json => @context.file_structure_for(@current_user).to_json(:permissions => {:user => @current_user}, :methods => [:readable_size, :mime_class, :currently_locked, :collaborator_ids])
+          end
         end
       end
+    else
+      full_index
     end
   end
   
@@ -126,20 +126,14 @@ class FilesController < ApplicationController
       return
     end
     return unless tab_enabled?(@context.class::TAB_FILES)
-    @file_structures = []
-    @contexts.each do |context|
-      Folder.root_folders(context)
-      context.users rescue nil
-      @file_structures << [context, context.file_structure_for(@current_user)]
-    end
     @context = UserProfile.new(@context) if @context == @current_user
+    log_asset_access("files:#{@context.asset_string}", "files", 'other') if @context
     respond_to do |format|
-      if @contexts.empty? #authorized_action(@context, @current_user, :read)
+      if @contexts.empty?
         format.html { redirect_to !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
       else
         format.html { render :action => 'full_index' }
       end
-      format.xml  { render :xml => @file_structures.to_xml }
       format.json { render :json => @file_structures.to_json }
     end
   end
@@ -186,55 +180,61 @@ class FilesController < ApplicationController
       end
       return
     end
-
     if (params[:download] && params[:verifier] && params[:verifier] == @attachment.uuid) || authorized_action(@attachment, @current_user, :read)
       if params[:download]
         if (params[:verifier] && params[:verifier] == @attachment.uuid) || (@attachment.grants_right?(@current_user, session, :download))
           disable_page_views if params[:preview]
-          @attachment.context_module_action(@current_user, :read) unless params[:preview]
-          log_asset_access(@attachment, "files", "files") unless params[:preview]
           begin
-            send_s3_file(@attachment)
+            send_attachment(@attachment)
           rescue => e
+            @headers = false if params[:ts] && params[:verifier]
             @not_found_message = "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
             logger.error "Error downloading a file: #{e} - #{e.backtrace}"
             render :template => 'shared/errors/404_message', :status => :bad_request
           end
           return
         elsif authorized_action(@attachment, @current_user, :read)
-          respond_to do |format|
-            if params[:preview] && @attachment.mime_class == 'image'
-              format.html { redirect_to '/images/lock.png' }
-            else
-              format.html { render :action => 'show' }
-            end
-            @attachment.scribd_doc = nil unless @attachment.grants_right?(@current_user, session, :download)
-            format.xml  { render :xml => @attachment.to_xml }
-            format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
-          end
+          render_attachment(@attachment)
         end
+      # This action is a callback used in our system to help record when
+      # a user views an inline preview of a file instead of downloading
+      # it, since this should also count as an access.
       elsif params[:inline]
         generate_new_page_view
+        @attachment.context_module_action(@current_user, :read) if @current_user
         log_asset_access(@attachment, 'files', 'files')
         render :json => {:ok => true}.to_json
       else
-        respond_to do |format|
-          if params[:preview] && @attachment.mime_class == 'image'
-            format.html { redirect_to '/images/lock.png' }
-          else
-            if @files_domain
-              @headers = false
-              @show_left_side = false
-            end
-            format.html # show.rhtml
-          end
-          @attachment.scribd_doc = nil unless @attachment.grants_right?(@current_user, session, :download)
-          format.xml  { render :xml => @attachment.to_xml }
-          format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
-        end
+        render_attachment(@attachment)
       end
     end
   end
+  
+  def render_attachment(attachment)
+    respond_to do |format|
+      if params[:preview] && attachment.mime_class == 'image'
+        format.html { redirect_to '/images/lock.png' }
+      else
+        if @files_domain
+          @headers = false
+          @show_left_side = false
+        end
+        format.html { render :action => 'show' }
+      end
+      if request.format == :json
+        attachment.context_module_action(@current_user, :read) if @current_user && attachment.scribd_doc
+        log_asset_access(@attachment, "files", "files")
+      end
+      format.json {
+        attachment.scribd_doc = nil unless attachment.grants_right?(@current_user, session, :download)
+        # Right now we assume if they ask for json data on the attachment
+        # which includes the scribd doc data, then that means they have 
+        # viewed or are about to view the file in some form.
+        render :json => attachment.to_json(:permissions => {:user => @current_user}) 
+      }
+    end
+  end
+  protected :render_attachment
 
   def show_relative
     path = params[:file_path]
@@ -297,60 +297,206 @@ class FilesController < ApplicationController
      end
   end
   
-  def send_s3_file(attachment)
+  def send_attachment(attachment)
     if params[:inline] && attachment.content_type && (attachment.content_type.match(/\Atext/) || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code')
-      if safer_domain_available?
-        redirect_to safe_domain_file_url(attachment, @safer_domain_host)
-      elsif Attachment.local_storage?
-        @headers = false if @files_domain
-        send_file(attachment.full_filename, :type => attachment.content_type, :disposition => 'inline')
-      else
-        require 'aws/s3'
-        send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
-        render :status => 200, :text => Proc.new { |response, output|
-          AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
-           output.write chunk
-          end
-        }
-      end
+      send_stored_file(attachment)
     elsif attachment.inline_content? && !@context.is_a?(AssessmentQuestion)
       if params[:file_path] || !params[:wrap]
-        if safer_domain_available?
-          redirect_to safe_domain_file_url(attachment, @safer_domain_host)
-        elsif Attachment.local_storage?
-          @headers = false if @files_domain
-          send_file(attachment.full_filename, :type => attachment.content_type, :disposition => 'inline')
-        else
-          require 'aws/s3'
-          send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
-          render :status => 200, :text => Proc.new { |response, output|
-            AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
-             output.write chunk
-            end
-          }
-        end
+        send_stored_file(attachment)
       else
         # If the file is inlineable then redirect to the 'show' action 
         # so we can wrap it in all the Canvas header/footer stuff
         redirect_to(named_context_url(@context, :context_file_url, attachment.id))
       end
     else
-      if safer_domain_available?
-        redirect_to safe_domain_file_url(attachment, @safer_domain_host)
-      elsif Attachment.local_storage?
-        @headers = false if @files_domain
-        send_file(attachment.full_filename, :type => attachment.content_type, :disposition => 'attachment')
-      else
-        redirect_to attachment.cacheable_s3_url
-      end
+      send_stored_file(attachment, false, true)
     end
   end
-  protected :send_s3_file
+  protected :send_attachment
+  
+  def send_stored_file(attachment, inline=true, redirect_to_s3=false)
+    attachment.context_module_action(@current_user, :read) if @current_user && !params[:preview]
+    log_asset_access(@attachment, "files", "files") unless params[:preview]
+    if safer_domain_available?
+      redirect_to safe_domain_file_url(attachment, @safer_domain_host)
+    elsif Attachment.local_storage?
+      @headers = false if @files_domain
+      send_file(attachment.full_filename, :type => attachment.content_type, :disposition => (inline ? 'inline' : 'attachment'))
+    elsif redirect_to_s3
+      redirect_to attachment.cacheable_s3_url
+    else
+      require 'aws/s3'
+      send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
+      render :status => 200, :text => Proc.new { |response, output|
+        AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
+         output.write chunk
+        end
+      }
+    end
+  end
+  protected :send_stored_file
   
   # GET /files/new
   def new
     @attachment = @context.attachments.build
     if authorized_action(@attachment, @current_user, :create)
+    end
+  end
+  
+  def create_pending
+    @context = Context.find_by_asset_string(params[:attachment][:context_code])
+    @attachment = Attachment.new
+    @attachment.context = @context
+    permission_object = @attachment
+    permission = :create
+    
+    # Using workflow_state we can keep track of the files that have been built
+    # but we don't know that there's an s3 component for yet (it's still being
+    # uploaded)
+    workflow_state = 'unattached'
+    # There are multiple reasons why we could be building a file. The default
+    # is to upload it to a context.  In the other cases we need to check the
+    # permission related to the purpose to make sure the file isn't being
+    # uploaded just to disappear later
+    if @context.is_a?(Assignment) && params[:intent] == 'comment'
+      permission_object = @context
+      permission = :attach_submission_comment_files
+    elsif @context.is_a?(Assignment) && params[:intent] == 'submit'
+      permission_object = @context
+      permission = (@context.submission_types || "").match(/online_file_upload/) ? :submit : :nothing
+    elsif @context.respond_to?(:is_a_context) && params[:intent] == 'attach_discussion_file'
+      permission_object = @context.discussion_topics.new
+      permission = :attach
+    elsif @context.respond_to?(:is_a_context) && params[:intent] == 'message'
+      permission_object = @context
+      permission = :send_messages
+      workflow_state = 'unattached_temporary'
+    elsif @context.respond_to?(:is_a_context) && params[:intent] && params[:intent] != 'upload'
+      # In other cases (like unzipping a file, extracting a QTI, etc.
+      # we don't actually want the uploaded file to show up in the context's
+      # file listings.  If you set its workflow_state to unattached_temporary
+      # then it will never be activated.
+      workflow_state = 'unattached_temporary'
+    end
+    
+    if authorized_action(permission_object, @current_user, permission)
+      if @context.respond_to?(:is_a_context) && params[:intent] == 'upload'
+        get_quota
+        return if quota_exceeded(named_context_url(@context, :context_files_url))
+      end
+      @attachment.filename = params[:attachment][:filename]
+      @attachment.file_state = 'deleted'
+      @attachment.workflow_state = workflow_state
+      if @context.respond_to?(:folders)
+        @folder = @context.folders.active.find_by_id(params[:attachment][:folder_id])
+        @folder ||= Folder.unfiled_folder(@context)
+        @attachment.folder_id = @folder.id
+      end
+      @attachment.content_type = Attachment.mimetype(@attachment.filename)
+      @attachment.save!
+
+      if Attachment.s3_storage?
+        res = {
+          :upload_url => "http://#{@attachment.bucket_name}.s3.amazonaws.com/",
+          :remote_url => true,
+          :file_param => 'file',
+          :success_url => s3_success_url(@attachment.id, :uuid => @attachment.uuid),
+          :upload_params => {
+            'AWSAccessKeyId' => AWS::S3::Base.connection.access_key_id
+          }
+        }
+      elsif Attachment.local_storage?
+        res = {
+          :upload_url => named_context_url(@context, :context_files_url, :format => :text),
+          :remote_url => false,
+          :file_param => 'attachment[uploaded_data]', #uploadify ignores this and uses 'file',
+          :upload_params => {
+            'attachment[folder_id]' => params[:attachment][:folder_id] || '',
+            'attachment[unattached_attachment_id]' => @attachment.id
+          }
+        }
+      else
+        raise "Unknown storage system configured"
+      end
+
+      # Build the data that will be needed for the user to upload to s3
+      # without us being the middle-man
+      full_filename = @attachment.full_filename.gsub(/\+/, " ")
+      policy = {
+        'expiration' => S3_EXPIRATION_TIME.from_now.utc.iso8601,
+        'conditions' => [
+          {'bucket' => @attachment.bucket_name},
+          {'key' => full_filename},
+          {'acl' => 'private'},
+          ['starts-with', '$Filename', ''],
+          ['starts-with', '$folder', ''],
+          ['content-length-range', 1, CONTENT_LENGTH_RANGE]
+        ]
+      }
+      extras = []
+      if params[:no_redirect]
+        extras << {'success_action_status' => '201'}
+      elsif res[:success_url]
+        extras << {'success_action_redirect' => res[:success_url]}
+      end
+      if @attachment.content_type && @attachment.content_type != "unknown/unknown"
+        extras << {'content-type' => @attachment.content_type}
+      end
+      policy['conditions'] += extras
+      # flash won't send the session cookie, so for local uploads we put the user id in the signed
+      # policy so we can mock up the session for FilesController#create
+      policy['conditions'] << {'pseudonym_id' => @current_pseudonym.id} if Attachment.local_storage?
+
+      policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
+      signature = Base64.encode64(
+        OpenSSL::HMAC.digest(
+          OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded
+        )
+      ).gsub(/\n/, '')
+
+      res[:id] = @attachment.id
+      res[:upload_params].merge!({
+        'Filename' => '',
+        'folder' => '',
+        'key' => full_filename,
+        'acl' => 'private',
+        'Policy' => policy_encoded,
+        'Signature' => signature,
+      })
+      extras.map(&:to_a).each{ |extra| res[:upload_params][extra.first.first] = extra.first.last }
+
+      render :json => res.to_json
+    end
+  end
+  
+  def s3_success
+    @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
+    details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
+    if @attachment && details
+      unless @attachment.workflow_state == 'unattached_temporary'
+        @attachment.workflow_state = nil
+        @attachment.file_state = 'available'
+      end
+      @attachment.md5 = (details['etag'] || "").gsub(/\"/, '')
+      @attachment.content_type = details['content-type']
+      @attachment.size = details['content-length']
+      
+      if @attachment.md5 && !@attachment.md5.empty? && ns = @attachment.infer_namespace
+        if existing_attachment = Attachment.find_all_by_md5_and_namespace(@attachment.md5, ns).detect{|a| a.id != @attachment.id && !a.root_attachment_id && a.content_type == @attachment.content_type }
+          AWS::S3::S3Object.delete(@attachment.full_filename, @attachment.bucket_name) rescue nil
+          @attachment.root_attachment = existing_attachment
+          @attachment.write_attribute(:filename, nil)
+          @attachment.clear_cached_urls
+        end
+      end
+      
+      @attachment.save!
+      
+      # normally this would be called by attachment_fu after it had uploaded the file to S3.
+      @attachment.after_attachment_saved
+      render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session})
+    else
+      render_for_text ""
     end
   end
 
@@ -360,15 +506,19 @@ class FilesController < ApplicationController
     @folder = @context.folders.active.find_by_id(params[:attachment].delete(:folder_id))
     @folder ||= Folder.unfiled_folder(@context)
     params[:attachment][:uploaded_data] ||= params[:attachment_uploaded_data]
+    params[:attachment][:uploaded_data] ||= params[:file] 
     params[:attachment][:user] = @current_user
     params[:attachment].delete :context_id
     params[:attachment].delete :context_type
-    @attachment = @context.attachments.new #(params[:attachment])
+    @attachment = @context.attachments.find_by_id_and_workflow_state(params[:attachment].delete(:unattached_attachment_id), 'unattached')
+    @attachment ||= @context.attachments.new #(params[:attachment])
     if authorized_action(@attachment, @current_user, :create)
       get_quota
       return if quota_exceeded(named_context_url(@context, :context_files_url))
       respond_to do |format|
-        @attachment.folder_id = @folder.id
+        @attachment.folder_id ||= @folder.id
+        @attachment.workflow_state = nil
+        @attachment.file_state = 'available'
         success = nil
         if params[:attachment] && params[:attachment][:source_attachment_id]
           a = Attachment.find(params[:attachment].delete(:source_attachment_id))
@@ -380,7 +530,12 @@ class FilesController < ApplicationController
             success = @attachment.save
           end
         end
-        success = @attachment.update_attributes(params[:attachment]) if params[:attachment][:uploaded_data]
+        if params[:attachment][:uploaded_data]
+          success = @attachment.update_attributes(params[:attachment])
+          @attachment.errors.add_to_base("Upload failed, server error, please try again.") unless success
+        else
+          @attachment.errors.add_to_base("Upload failed, expected form field missing")
+        end
         unless (@attachment.cacheable_s3_url rescue nil)
           success = false
           if (params[:attachment][:uploaded_data].size == 0 rescue false)
@@ -394,14 +549,11 @@ class FilesController < ApplicationController
         end
         if success
           @attachment.move_to_bottom
-          flash[:notice] = 'File was successfully uploaded.'
           format.html { return_to(params[:return_to], named_context_url(@context, :context_files_url)) }
-          format.xml  { head :created, :location => named_context_url(@context, :context_files_url) }
           format.json { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}) }
           format.text { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "new" }
-          format.xml  { render :xml => @attachment.errors.to_xml }
           format.json { render :json => @attachment.errors.to_json }
           format.text { render :json => @attachment.errors.to_json }
         end
@@ -435,11 +587,9 @@ class FilesController < ApplicationController
           @attachment.move_to_bottom if @folder_id_changed
           flash[:notice] = 'File was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.xml  { head :ok }
           format.json { render :json => @attachment.to_json(:methods => [:readable_size, :mime_class, :currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
           format.html { render :action => "edit" }
-          format.xml  { render :xml => @attachment.errors.to_xml }
           format.json { render :json => @attachment.errors.to_json, :status => :bad_request }
         end
       end
@@ -463,7 +613,6 @@ class FilesController < ApplicationController
       @attachment.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_files_url) }# show.rhtml
-        format.xml  { render :xml => @attachment.to_xml }
         format.json { render :json => @attachment.to_json }
       end
     end

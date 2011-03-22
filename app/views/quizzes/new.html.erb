@@ -122,7 +122,7 @@
                     Quiz Score</label>
                   </div>
                   <div>
-                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 0 %> name="limit_attempts" id="limit_attempts_option"/><label for="limit_attempts_option"> Limit to</label> 
+                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 1 %> name="limit_attempts" id="limit_attempts_option"/><label for="limit_attempts_option"> Limit to</label> 
                     <%= text_field :quiz, :allowed_attempts, :style => "width: 20px;", :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts) %>
                     <%= label :quiz, :allowed_attempts, "attempts" %>
                   </div>
@@ -131,17 +131,52 @@
             </tr>
             <tr>
               <td colspan="2">
-                <input type="checkbox" <%= 'checked' if @quiz.access_code && !@quiz.access_code.empty? %> name="require_access_code" id="require_access_code"/><label for="require_access_code">Require an access code for this quiz</label>
+                <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? || !@quiz.ip_filter.blank? ||!@quiz.require_lockdown_browser.blank? %> name="protect_quiz" id="protect_quiz"/>
+                <label for="protect_quiz">Restrict this Quiz</label>
+              </td>
+            </tr>
+            <tr class="protected_options">
+              <td colspan="2">
+                <div style="padding-left: 20px;">
+                  <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? %> name="require_access_code" id="require_access_code"/>
+                  <label for="require_access_code">Require an access code</label>
+                </div>
               </td>
             </tr>
             <tr id="access_code_suboptions" style="display: none;">
               <td>
-                <label class="nobr" style="padding-left: 20px;" for="quiz_access_code">Access Code:</label>
+                <label class="nobr" style="padding-left: 40px;" for="quiz_access_code">Code:</label>
               </td>
               <td>
                 <input style="width:100%;" type="text" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>"/>
               </td>
             </tr>
+            <tr class="protected_options">
+              <td colspan="2">
+                <div style="padding-left: 20px;">
+                  <input type="checkbox" <%= 'checked' if !@quiz.ip_filter.blank? %> name="ip_filter" id="ip_filter">
+                  <label for="ip_filter">Filter IP Addresses</label>
+              </td>
+            </tr>
+            <tr id="ip_filter_suboptions" style="display: none;">
+              <td>
+                <label class="nobr" style="padding-left: 40px;" for="quiz_ip_filter">Filter:</label>
+              </td>
+              <td>
+                <input type="text" style="width: 100px;" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255"/>
+                <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => 'Find IP Address Filter') %>
+              </td>
+            </tr>
+            <% if feature_enabled?(:lockdown_browser) %>
+              <tr class="protected_options">
+                <td colspan="2">
+                  <div style="padding-left: 20px;">
+                    <%= check_box :quiz, :require_lockdown_browser %>
+                    <%= label :quiz, :require_lockdown_browser, "Require the lockdown browser" %>  
+                  </div>
+                </td>
+              </tr>
+            <% end %>
             <tr>
               <td class="nobr">Due Date:</td>
               <td style="width: 200px;">
@@ -201,8 +236,10 @@
     <% if @quiz.available? %>
       <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="no-hover back">Return to Quiz Page</a><br/>
     <% end %>
+    <% if @assignment %>
+    <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link rubric" style="<%= hidden unless @assignment %>">Show Assignment Rubric</a>
+    <% end %>
     <a href="#" class="add_question_link add">Add a New Question</a><br/>
-    <!--a class="add" href="#">Add an Existing Question</a><br/-->
   </div>
 <% end %>
 <% js_block do %>
@@ -227,8 +264,9 @@ $(document).ready(function() {
   <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_question_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_reorder_url, @quiz.id) %>" class="reorder_questions_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_group_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_quiz_filters_url, @quiz.id) %>" class="filters_url">&nbsp;</a>
 </div>
-<%= render :partial => "quiz_preview" %>
+
 <% if @has_student_submissions %>
 <div style="margin-bottom: 5px;">
   <%= image_tag "warning.png" %> Students have either already taken or started taking this quiz, 
@@ -236,6 +274,7 @@ $(document).ready(function() {
   want to consider re-grading students who took the old version of the quiz.
 </div>
 <% end %>
+
 <div style="margin-bottom: 25px;">
   Quiz Instructions:
   <a style="float: right; font-size: 0.8em; cursor: pointer;" href="#" class="toggle_description_views_link">Switch Views</a>
@@ -249,10 +288,11 @@ $(document).ready(function() {
     <% if question[:entry_type] == "quiz_group" %>
       <%= render :partial => "quizzes/question_group", :object => question %>
     <% else %>
-      <%= render :partial => "quizzes/display_question", :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question.id}"} %>
+      <%= render :partial => (@quiz.quiz_questions.count > 25 ? "quizzes/question_teaser" : "quizzes/display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
     <% end %>
   <% end %>
 </div>
+<%= render :partial => "quizzes/question_teaser", :object => nil, :locals => {:editing => true } %>
 <%= render :partial => "quizzes/display_question", :object => nil, :locals => {:editing => true } %>
 <%= render :partial => "quizzes/display_answer", :object => nil %>
 <%= render :partial => "quizzes/form_answer", :object => nil %>
@@ -349,4 +389,23 @@ $(document).ready(function() {
       </p>
     </div>
   </div>
+</div>
+<div id="ip_filters_dialog" style="display: none;">
+  <h2>What are Quiz IP Filters?</h2>
+  <p class="explanation">Quiz IP filters are a way to limit access to quizzes to 
+  computers in a specified IP range.  Filters can be a comma-separated
+  list of addresses, or an address followed by a mask
+  ("192.168.217.1", "192.168.217.1/24" or "192.168.217.1/255.255.255.0").</p>
+  <p class="searching_message">Retrieving Filters...</p>
+  <table class="filters" style="display: none;">
+    <tbody>
+      <tr class="ip_filter blank" style="display: none;" title="Click to select this filter">
+        <td class="name_and_account">
+          <div class="name">&nbsp;</div>
+          <div class="account">&nbsp;</div>
+        </td>
+        <td class="filter">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

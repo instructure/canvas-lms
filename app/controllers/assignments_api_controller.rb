@@ -25,14 +25,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::Assignment
 
   # @API
-  # Returns the list of assignments for the current context. The assignments are
-  # pre-sorted first by assignment group, and then by assignments within the
-  # group.
-  #
-  # Because the returned assignments are sorted first by group, and then within
-  # group, you can easily show a grouped display of all assignments for the
-  # context. Whenever the next assignment has a new group name, treat it as the
-  # start of a new group.
+  # Returns the list of assignments for the current context.
   #
   # @response_field id The unique identifier for the assignment.
   # @response_field name The name of the assignment.

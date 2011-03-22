@@ -211,9 +211,9 @@ img {
 
 #page_content .section .upload {
   font-size: 1.1em; }
-  #page_content .section .upload .filename {
-    font-weight: bold;
-    text-decoration: underline; }
+#page_content .section .upload .filename {
+  font-weight: bold;
+  text-decoration: underline; }
 #page_content .section .file_list {
   text-align: left; }
 #page_content .section .file_list .instTree .leaf.active {

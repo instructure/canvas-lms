@@ -34,6 +34,13 @@ ALL_MODELS = Dir.glob(File.expand_path(File.dirname(__FILE__) + '/../app/models'
 # cleaning up after themselves
 ALL_MODELS.each &:delete_all
 
+# rspec aliases :describe to :context in a way that it's pretty much defined
+# globally on every object. :context is already heavily used in our application,
+# so we remove rspec's definition.
+module Spec::DSL::Main
+  remove_method :context
+end
+
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
@@ -41,6 +48,7 @@ Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+  config.global_fixtures = :plugin_settings
 
   config.include Webrat::Matchers, :type => :views 
 
@@ -56,7 +64,8 @@ Spec::Runner.configure do |config|
       u = User.create!
       u.register!
       e = @course.enroll_teacher(u)
-      e.accept
+      e.workflow_state = 'active'
+      e.save!
     end
     @course
   end
@@ -68,22 +77,26 @@ Spec::Runner.configure do |config|
   end
 
   def user_with_pseudonym(opts={})
-    user(opts)
+    user(opts) unless opts[:user]
+    user = opts[:user] || @user
     username = opts[:username] || "nobody@example.com"
     password = opts[:password] || "asdfasdf"
-    @pseudonym = @user.pseudonyms.create!(:unique_id => username, :path => username, :password => password, :password_confirmation => password)
+    @pseudonym = user.pseudonyms.create!(:unique_id => username, :path => username, :password => password, :password_confirmation => password)
     @cc = @pseudonym.communication_channel
     @cc.should_not be_nil
     @cc.should_not be_new_record
-    @user.communication_channels << @cc
-    @user
+    user.communication_channels << @cc
+    user
   end
 
   def course_with_student(opts={})
     course(opts)
     @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
-    @enrollment.accept! if opts[:active_enrollment] || opts[:active_all]
+    if opts[:active_enrollment] || opts[:active_all]
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+    end
     @course.reload
     @enrollment
   end

@@ -217,11 +217,12 @@ $(document).ready(function() {
   });
 
   function enhanceUserContent() {
+    var $content = $("#content");
     $(".user_content:not(.enhanced):visible").addClass('unenhanced');
     $(".user_content.unenhanced:visible")
       .each(function() {
         var $this = $(this);
-        $this.find("img").css('maxWidth', $this.width());
+        $this.find("img").css('maxWidth', Math.min($content.width(), $this.width()));
         $this.data('unenhanced_content_html', $this.html());
       })
       .find("a:not(.not_external, .external):external").each(function(){
@@ -353,6 +354,19 @@ $(document).ready(function() {
     event.preventDefault();
     $(this).parents(".communication_message").find(".message_short").hide().end()
       .find(".message").show();
+  });
+  $(".communication_message .close_notification_link").live('click', function(event) {
+    event.preventDefault();
+    var $message = $(this).parents(".communication_message");
+    $message.confirmDelete({
+      url: $(this).attr('rel'),
+      noMessage: true,
+      success: function() {
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
+      }
+    });
   });
   $(".communication_message .add_entry_link").click(function(event) {
     event.preventDefault();
@@ -659,54 +673,36 @@ $(document).ready(function() {
   // ^^^^^^^^^^^^^^^^^^ END stuff for making pretty dates ^^^^^^^^^^^^^^^^^^^
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   
-  var sequence_url = $("#sequence_footer .sequence_details_url").filter(":last").attr('href');
-  if(sequence_url) {
+  var sequence_url = $('#sequence_footer .sequence_details_url').filter(':last').attr('href');
+  if (sequence_url) {
     $.ajaxJSON(sequence_url, 'GET', {}, function(data) {
-      if(data.current_item) {
-        $("#sequence_details .current").fillTemplateData({data: data.current_item.content_tag});
-        if(data.previous_item || data.previous_module) {
-          var tag = data.previous_item && data.previous_item.content_tag;
-          var $prev = $("#sequence_footer .prev");
-          tag = tag || (data.previous_module && data.previous_module.context_module);
-          if(!data.previous_item) {
-            tag.title = tag.title || tag.name;
-            tag.text = "Previous Module";
-            $prev.addClass('module_button');
-          }
-          $prev.fillTemplateData({
-            data: tag
-          });
-          if(data.previous_item) {
-            $prev.attr('href', $.replaceTags($("#sequence_footer .module_item_url").attr('href'), 'id', tag.id));
+      var $sequence_footer = $('#sequence_footer');
+      if (data.current_item) {
+        $('#sequence_details .current').fillTemplateData({data: data.current_item.content_tag});
+        $.each({previous:'.prev', next:'.next'}, function(label, cssClass) {
+          var $link = $sequence_footer.find(cssClass);
+          if (data[label + '_item'] || data[label + '_module']) {
+            var tag = (data[label + '_item']    && data[label + '_item'].content_tag) ||
+                      (data[label + '_module']  && data[label + '_module'].context_module);
+            
+            if (!data[label + '_item']) {
+              tag.title = tag.title || tag.name;
+              tag.text = $.capitalize(label) + ' Module';
+              $link.addClass('module_button');
+            }
+            $link.fillTemplateData({ data: tag });
+            if (data[label + '_item']) {
+              $link.attr('href', $.replaceTags($sequence_footer.find('.module_item_url').attr('href'), 'id', tag.id));
+            } else {
+              $link.attr('href', $.replaceTags($sequence_footer.find('.module_url').attr('href'), 'id', tag.id) + '/items/' + (label === 'previous' ? 'last' : 'first'));
+            }
           } else {
-            $prev.attr('href', $.replaceTags($("#sequence_footer .module_url").attr('href'), 'id', tag.id) + "/items/last");
+            $link.hide();
           }
-        } else {
-          $("#sequence_footer .prev").hide();
-        }
-        if(data.next_item || data.next_module) {
-          var tag = data.next_item && data.next_item.content_tag;
-          var $next = $("#sequence_footer .next")
-          tag = tag || (data.next_module && data.next_module.context_module);
-          if(!data.next_item) {
-            tag.title = tag.title || tag.name;
-            tag.text = "Next Module";
-            $next.addClass('module_button');
-          }
-          $next.fillTemplateData({
-            data: tag
-          });
-          if(data.next_item) {
-            $next.attr('href', $.replaceTags($("#sequence_footer .module_item_url").attr('href'), 'id', tag.id));
-          } else {
-            $next.attr('href', $.replaceTags($("#sequence_footer .module_url").attr('href'), 'id', tag.id) + "/items/first");
-          }
-        } else {
-          $("#sequence_footer .next").hide();
-        }
-        $("#sequence_footer").show();
+        });
+        $sequence_footer.show();
       }
-    }, function() { });
+    });
   }
   
   $(".module_legend_link").click(function(event) {
@@ -813,7 +809,7 @@ $(document).ready(function() {
             remove(url);
           }
         }
-      })
+      });
     } else {
       remove(url + "?permanent=1");
     }

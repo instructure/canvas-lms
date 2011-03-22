@@ -499,7 +499,7 @@ $(document).ready(function() {
           var code = "ContentMigration:" + $(".content_migration_id:first").text() + ":" + course_import.progress;
           var message = "There was an error during your migration import.  Please notify your system administrator and give them the following code: \"" + code + "\"";
           $.flashError(message);
-          $(".progress_message").html(message); //after("<div>" + message + "</div>")
+          $(".progress_message").text(message);
         } else {
           if(progress == lastProgress) {
             waitTime = Math.max(waitTime + 500, 30000);

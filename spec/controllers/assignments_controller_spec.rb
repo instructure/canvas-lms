@@ -41,7 +41,7 @@ describe AssignmentsController do
     it "should return unauthorized without a valid session" do
       course_with_student(:active_all => true)
       get 'index', :course_id => @course.id
-      response.should be_redirect
+      assert_status(401)
     end
     
     it "should redirect 'disabled', if disabled by the teacher" do

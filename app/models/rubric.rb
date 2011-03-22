@@ -99,9 +99,14 @@ class Rubric < ActiveRecord::Base
     self.save
   end
   
+  # If any rubric_associations for a given context are marked as
+  # bookmarked, then the rubric will show up in the context's list
+  # of rubrics.  The two main values for the 'purpose' field on
+  # a rubric_association are 'grading' and 'bookmark'.  Confusing,
+  # I know.
   def destroy_for(context)
     RubricAssociation.update_all({:bookmarked => false, :updated_at => Time.now}, {:rubric_id => self.id, :context_id => context.id, :context_type => context.class.to_s})
-    if !self.read_only && self.rubric_associations.for_grading.length < 2
+    if RubricAssociation.scoped(:conditions => {:rubric_id => self.id, :bookmarked => true}).count == 0
       self.destroy
     end
   end

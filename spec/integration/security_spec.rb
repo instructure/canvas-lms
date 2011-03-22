@@ -33,16 +33,125 @@ describe "security" do
       get_via_redirect "/login"
       assert_response :success
       cookie = cookies['_normandy_session']
-      
+      cookie.should be_present
+      path.should == "/login"
+
       post_via_redirect "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
                                   "pseudonym_session[password]" => "asdfasdf",
                                   "pseudonym_session[remember_me]" => "1",
                                   "redirect_to_ssl" => "1"
       assert_response :success
-      path.should eql("/dashboard")
+      path.should eql("/?login_success=1")
       new_cookie = cookies['_normandy_session']
       new_cookie.should be_present
       cookie.should_not eql(new_cookie)
+    end
+  end
+
+  describe "permissions" do
+    it "should flush the role_override caches on permission changes" do
+      course_with_teacher_logged_in
+
+      get "/courses/#{@course.to_param}/users"
+      assert_response :success
+
+      RoleOverride.create!(:context => @course,
+                           :permission => 'read_roster',
+                           :enrollment_type => 'TeacherEnrollment',
+                           :enabled => false)
+
+      # if this second get doesn't fail with a permission denied error, we've
+      # still got the permissions cached and haven't seen the change
+      get "/courses/#{@course.to_param}/users"
+      assert_response 401
+    end
+
+    # if we end up moving the permissions cache to memcache, this test won't be
+    # valid anymore and we need some more extensive tests for actual cache
+    # invalidation. right now, though, this is the only really valid way to
+    # test that we're actually flushing on every request.
+    it "should flush the role_override caches on every request" do
+      course_with_teacher_logged_in
+
+      get "/courses/#{@course.to_param}/users"
+      assert_response :success
+
+      RoleOverride.send(:instance_variable_get, '@cached_permissions').should_not be_empty
+      RoleOverride.send(:class_variable_get, '@@role_override_chain').should_not be_empty
+
+      get "/dashboard"
+      assert_response 301
+
+      # verify the cache is emptied on every request
+      RoleOverride.send(:instance_variable_get, '@cached_permissions').should be_empty
+      RoleOverride.send(:class_variable_get, '@@role_override_chain').should be_empty
+    end
+  end
+
+  it "should make both session-related cookies httponly" do
+    u = user_with_pseudonym :active_user => true,
+                            :username => "nobody@example.com",
+                            :password => "asdfasdf"
+    u.save!
+
+    https!
+
+    post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+      "pseudonym_session[password]" => "asdfasdf",
+      "pseudonym_session[remember_me]" => "1",
+      "redirect_to_ssl" => "1"
+    assert_response 302
+    response['Set-Cookie'].each do |cookie|
+      if cookie =~ /\Apseudonym_credentials=/ || cookie =~ /\A_normandy_session=/
+        cookie.should match(/; *HttpOnly/)
+      end
+    end
+  end
+
+  class Basic
+    extend ActionController::HttpAuthentication::Basic
+  end
+
+  describe "API" do
+    it "should require a developer key for /api non-GETs" do
+      AssignmentsApiController.allow_forgery_protection = true
+
+      # well, unless they have an authenticity token
+      course_with_teacher(:active_all => true)
+      user_with_pseudonym(:user => @user,
+                          :username => "nobody@example.com",
+                          :password => "asdfasdf")
+
+      post "/api/v1/courses/#{@course.id}/assignments",
+      {},
+        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      assert_response 422
+
+      post "/api/v1/courses/#{@course.id}/assignments",
+      {:api_key => "MYKEY"},
+        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      assert_response 422
+
+      key = DeveloperKey.create(:api_key => "MYKEY")
+      post "/api/v1/courses/#{@course.id}/assignments",
+        {:api_key => "MYKEY", :assignment => { :name => 'new assignment' } },
+        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      assert_response 201
+    end
+
+    # this might change eventually
+    it "should allow GET for /api even without a key" do
+      AssignmentsApiController.allow_forgery_protection = true
+
+      # well, unless they have an authenticity token
+      course_with_teacher(:active_all => true)
+      user_with_pseudonym(:user => @user,
+                          :username => "nobody@example.com",
+                          :password => "asdfasdf")
+      get "/api/v1/courses/#{@course.id}/assignments",
+      {},
+        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      assert_response 200
     end
   end
 end

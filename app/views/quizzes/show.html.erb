@@ -14,6 +14,9 @@
         <% end %>
         <% if can_do(@quiz, @current_user, :update) %>
           <a href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="button button-sidebar button-sidebar-wide"><%= image_tag "edit.png" %> Edit This <%= @quiz.readable_type %></a>
+          <% if can_do(@quiz, @current_user, :manage) %>
+            <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>" class="button button-sidebar button-sidebar-wide"><%= image_tag "ball.png" %> Moderate This <%= @quiz.readable_type %></a>
+          <% end %>
           <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link button button-sidebar button-sidebar-wide"><%= image_tag "delete.png" %> Delete This <%= @quiz.readable_type %></a>
           <% if @quiz.locked? %>
             <% form_for @quiz, :url => context_url(@context, :context_quiz_url, @quiz.id, :id => 'quiz_unlock_form') do |f| %>
@@ -42,6 +45,9 @@
             <% end %>
           <% end %>
         <% end %>
+        <% if can_do(@assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
+          <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide" style="<%= hidden unless @assignment %>"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
+        <% end %>
         <% if can_do(@quiz, @current_user, :grade) && @quiz.available? %>
           <% submitted_student_ids = @submitted_students.map{|s| s.id} %>
           <a href="#" class="button quiz_details_link button-sidebar-wide">
@@ -69,10 +75,10 @@
       <div class="rs-margin-lr rs-margin-top">
         <% if @submission && @submission.completed? %>
           <%= render :partial => "quizzes/quiz_right_side", :locals => {:allow_take => !@locked} %>
-        <% elsif @submission && !@submission.completed? %>
+        <% elsif @submission && @submission.untaken? %>
           <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
             You're in the middle of taking this <%= @quiz.readable_type.downcase %>.<br/>
-            <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>">Resume <%= @quiz.readable_type %></a>
+            <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" class="button">Resume <%= @quiz.readable_type %></a>
           </div>
         <% end %>
         <% if @quiz.for_assignment? %>
@@ -155,17 +161,22 @@
             <% end %>
           </ul>
         </td><td style="vertical-align: top; padding-left: 20px;">
-          <h3>Students who haven't taken the <%= @quiz.readable_type.downcase %></h3>
-          <ul class="student_list">
-            <% if @unsubmitted_students.empty? && !@submitted_students.empty? %>
-              <li>All Students have taken the <%= @quiz.readable_type.downcase %></li>
-            <% end %>
-            <% @unsubmitted_students.each do |s| %>
-              <li class="student" data-id="<%= s.id %>">
-                <span class="name"><%= s.name %></span>
-              </li>
-            <% end %>
-          </ul>
+          <% if @quiz.survey? && @quiz.anonymous_submissions %>
+            <h3><%= pluralize(@unsubmitted_students.length, "student") %>
+                haven't taken the <%= @quiz.readable_type.downcase %></h3>
+          <% else %>
+            <h3>Students who haven't taken the <%= @quiz.readable_type.downcase %></h3>
+            <ul class="student_list">
+              <% if @unsubmitted_students.empty? && !@submitted_students.empty? %>
+                <li>All Students have taken the <%= @quiz.readable_type.downcase %></li>
+              <% end %>
+              <% @unsubmitted_students.each do |s| %>
+                <li class="student" data-id="<%= s.id %>">
+                  <span class="name"><%= s.name %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
         </td>
       </tr>
     </table>
@@ -184,13 +195,13 @@
       <div style="text-align: left; margin-top: 20px;">
         Only registered, enrolled users can take graded quizzes
       </div>
-    <% elsif @submission && !@submission.completed? %>
+    <% elsif @submission && @submission.untaken? %>
       <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
         <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" target="_top">Resume <%= @quiz.readable_type %></a>
       </div>
     <% elsif can_do(@quiz, @current_user, :submit) %>
       <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
-        <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" target="_top">Take the <%= @quiz.readable_type %> <%= 'Again' if @submission %></a>
+        <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" target="_top">Take the <%= @quiz.readable_type %> <%= 'Again' if @submission && !@submission.settings_only? %></a>
       </div>
     <% end %>
   <% end %>

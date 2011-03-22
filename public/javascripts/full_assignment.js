@@ -250,7 +250,11 @@ jQuery(function($){
       $assignment.loadingImage('remove');
       $(this).triggerHandler('assignment_updated', data);
       $("#full_assignment_holder .redirect_on_finish_url").ifExists(function(){
-        window.location.href = $(this).attr('href') + "#assignment_" + assignment.id;
+        var return_to = $(this).attr('href');
+        if (return_to.indexOf('#') > 0) {
+          return_to = return_to.substr(0, return_to.indexOf('#'));
+        }
+        window.location.href = return_to + "#assignment_" + assignment.id;
       });
     },
     error: function(errors, $assignment) {
@@ -621,7 +625,13 @@ jQuery(function($){
     }
   }).change();
   setTimeout(function() {
-    if($("#full_assignment_holder").hasClass('editing')) {
+    if(location.hash == '#add_rubric') {
+      $(".add_rubric_link:visible:first").click();
+    } else if(location.hash == '#edit_rubric') {
+      var $link = $(".edit_rubric_link:visible:first");
+      $("html,body").scrollTo($link.closest(".rubric"));
+      $link.click();
+    } else if($("#full_assignment_holder").hasClass('editing')) {
       $(".edit_full_assignment_link:first").click();
       $("#full_assignment_holder .more_options_link:first").click();
     }

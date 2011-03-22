@@ -17,23 +17,7 @@
  */
 
 $(document).ready(function () {
-  $(".delete_quiz_link").click(function(event) {
-    event.preventDefault();
-    $("nothing").confirmDelete({
-      url: $(this).attr('href'),
-      message: "Are you sure you want to delete this quiz?",
-      success: function() {
-        window.location.href = $('#context_quizzes_url').attr('href');
-      }
-    });
-  });
-  $(".quiz_details_link").click(function(event) {
-    event.preventDefault();
-    $("#quiz_details").slideToggle();
-  });
-  $(".message_students_link").click(function(event) {
-    event.preventDefault();
-    
+  function loadStudents() {
     var students_hash = {};
     var title = $("#quiz_title").text();
     $(".student_list .student").each(function(i) {
@@ -47,6 +31,33 @@ $(document).ready(function () {
     for(var idx in students_hash) {
       students.push(students_hash[idx]);
     }
+    return students;
+  }
+  
+  $(".delete_quiz_link").click(function(event) {
+    event.preventDefault();
+    students = loadStudents();
+    submittedCount = $.grep(students, function(s) { return s.submitted; }).length
+    $("nothing").confirmDelete({
+      url: $(this).attr('href'),
+      message: "Are you sure you want to delete this quiz?" +
+        (submittedCount > 0 ?
+          "\n\nWarning: " + $.pluralize_with_count(submittedCount, "student") +
+            " " + (submittedCount == 1 ? "has" : "have") + " already taken this quiz. If you delete it, " +
+            "any completed submissions will be deleted and no longer appear in the gradebook." :
+          ""),
+      success: function() {
+        window.location.href = $('#context_quizzes_url').attr('href');
+      }
+    });
+  });
+  $(".quiz_details_link").click(function(event) {
+    event.preventDefault();
+    $("#quiz_details").slideToggle();
+  });
+  $(".message_students_link").click(function(event) {
+    event.preventDefault();
+    students = loadStudents();
     
     window.messageStudents({
       options: [

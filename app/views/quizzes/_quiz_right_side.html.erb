@@ -12,7 +12,7 @@
     <table class="summary" style="font-size: 1.1em;">
       <tr>
         <th>Time:</th>
-        <td><%= time_ago_in_words(Time.now - (@submission.finished_at - @submission.started_at)) %></td>
+        <td><%= time_ago_in_words(Time.now - ((@submission.finished_at || @submission.end_at || @submission.started_at) - @submission.started_at)) %></td>
       </tr>
       <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
         <th>Current Score:</th>

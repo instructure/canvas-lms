@@ -236,7 +236,7 @@ class CommunicationChannel < ActiveRecord::Base
     CommunicationChannel.connection.select_values(
       "SELECT distinct communication_channel_id
          FROM delayed_messages
-        WHERE workflow_state = 'pending' AND send_at <= now()")
+        WHERE workflow_state = 'pending' AND send_at <= '#{Time.now.to_s(:db)}'")
   end
   
   

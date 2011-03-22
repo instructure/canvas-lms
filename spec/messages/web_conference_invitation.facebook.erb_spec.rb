@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'web_conference_invitation.facebook' do
   it "should render" do
     course_model(:reusable => true)
-    @object = @course.web_conferences.create!
+    @object = @course.web_conferences.create!(:conference_type => 'DimDim')
     generate_message(:web_conference_invitation, :facebook, @object)
   end
 end

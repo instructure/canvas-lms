@@ -17,8 +17,10 @@
 #
 
 class EnrollmentTerm < ActiveRecord::Base
-  attr_accessible :name, :start_at, :end_at
+  include EnrollmentDateRestrictions
   include Workflow
+
+  attr_accessible :name, :start_at, :end_at, :ignore_term_date_restrictions
   belongs_to :root_account, :class_name => 'Account'
   has_many :enrollment_dates_overrides
   has_many :courses
@@ -41,6 +43,16 @@ class EnrollmentTerm < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
+  end
+  
+  def enrollment_dates_for(enrollment)
+    return [nil, nil] if ignore_term_date_restrictions
+    override = EnrollmentDatesOverride.find_by_enrollment_term_id_and_enrollment_type(self.id, enrollment.type.to_s)
+    if override
+      [override.start_at, override.end_at]
+    else
+      [start_at, end_at]
+    end
   end
   
   alias_method :destroy!, :destroy

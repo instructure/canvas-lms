@@ -3,5 +3,5 @@
 <% e = @context.course_sections.active.count > 1 && @enrollments_hash && @enrollments_hash[student.id] && @enrollments_hash[student.id].course_section && @enrollments_hash[student.id] %>
 <div class="secondary_identifier <%= 'with_section' if e %>" title="<%= student.secondary_identifier %>"><%= student.secondary_identifier %></div>
 <% if e %>
-  <div class="course_section" title="<%= e.course_section.display_name %>"><%= e.course_section.display_name %></div>
+  <div class="course_section" data-course_section_id="<%= e.course_section.id %>" title="<%= e.course_section.display_name %>"><%= e.course_section.display_name %></div>
 <% end %>

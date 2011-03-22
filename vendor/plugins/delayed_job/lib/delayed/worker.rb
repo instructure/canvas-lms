@@ -30,7 +30,7 @@ module Delayed
 
     def procline(string)
       $0 = "#{worker_type_string}:#{string}"
-      say "* #{string}"
+      say "* (#{Process.pid}) #{string}"
     end
   end
 
@@ -116,6 +116,11 @@ module Delayed
 
       waiting = false # avoid logging "waiting for queue" over and over
 
+      # rails always connects to the ActiveRecord::Base connection, which we
+      # don't want to ever access from this parent process; we want every
+      # child to get its own connection.
+      ActiveRecord::Base.connection_handler.clear_all_connections! unless cant_fork
+
       loop do
         job = Delayed::Job.get_and_lock_next_available(name,
                                                        self.class.max_run_time,
@@ -123,12 +128,19 @@ module Delayed
         if job
           waiting = false
           start_time = Time.now
-          if @child = fork
+          unless self.class.cant_fork
+            @child = fork do
+              run(job, start_time)
+            end
             procline "watch: #{@child}:#{start_time.to_i}"
             Process.wait
+            # establish a new connection to the job queue, since when the child
+            # exits it disconnects the parent as well.
+            # the parent shouldn't ever access any table but delayed_jobs, so
+            # we don't have to worry about other connections here.
+            Delayed::Job.connection.reconnect!
           else
             run(job, start_time)
-            exit! unless self.class.cant_fork
           end
         elsif exit_when_queues_empty
           break
@@ -147,8 +159,7 @@ module Delayed
 
     def run(job, start_time = Time.now)
       procline "run: #{job.name}:#{start_time.to_i}"
-      self.ensure_db_connection
-      runtime =  Benchmark.realtime do
+      runtime = Benchmark.realtime do
         Timeout.timeout(self.class.max_run_time.to_i) { job.invoke_job }
         job.destroy
       end
@@ -159,7 +170,7 @@ module Delayed
       handle_failed_job(job, e)
       return false  # work failed
     end
-    
+
     # Reschedule the job in the future (when a job fails).
     # Uses an exponential scale depending on the number of failed attempts.
     def reschedule(job, error = nil, time = nil)
@@ -206,36 +217,6 @@ module Delayed
       "delayed"
     end
 
-    # Makes a dummy call to the database to make sure we're still connected
-    def ensure_db_connection
-      begin
-        ActiveRecord::Base.connection.execute("select 'I am alive'")
-      rescue ActiveRecord::StatementInvalid
-        ActiveRecord::Base.connection.reconnect!
-        unless @already_retried
-          @already_retried = true
-          retry
-        end
-        raise
-      else
-        @already_retried = false
-      end
-    end
-
-    def fork
-      return nil if self.class.cant_fork
-
-      begin
-        if Kernel.respond_to?(:fork)
-          Kernel.fork
-        else
-          raise NotImplementedError
-        end
-      rescue NotImplementedError
-        self.class.cant_fork = true
-        nil
-      end
-    end
   end
 
   class PeriodicWorker < WorkerBase

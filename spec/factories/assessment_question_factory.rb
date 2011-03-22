@@ -23,6 +23,6 @@ end
 def valid_assessment_question_attributes
   {
     :name => "value for name",
-    :question_data => "value for question data"
+    :question_data => {}
   }
 end

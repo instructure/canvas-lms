@@ -232,10 +232,10 @@
     var dimensions = $.fn.mediaCommentThumbnail.sizes[size] || $.fn.mediaCommentThumbnail.sizes['normal'];
     this.each(function() {
       var id = $.trim($(this).find(".media_comment_id:first").text());
-      id = id || $.trim($(this).parent().find(".media_comment_id:first").text());
       if(!id && $(this).attr('id') && $(this).attr('id').match(/^media_comment_/)) {
         id = $(this).attr('id').substring(14);
       }
+      id = id || $.trim($(this).parent().find(".media_comment_id:first").text());
       if(id) {
         var url = "http://" + INST.kalturaSettings.resource_domain + "/p/" + INST.kalturaSettings.partner_id + "/thumbnail/entry_id/";
         url = url + id;

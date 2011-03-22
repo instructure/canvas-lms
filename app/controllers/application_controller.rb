@@ -40,6 +40,8 @@ class ApplicationController < ActionController::Base
   before_filter :fix_xhr_requests
   before_filter :init_body_classes_and_active_tab
 
+  ssl_allowed_if(:api_request?)
+
   protected
   
   def init_body_classes_and_active_tab
@@ -64,11 +66,10 @@ class ApplicationController < ActionController::Base
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone
     end
   end
-  
+
   # retrieves the root account for the given domain
   def load_account
-    @domain_root_account = Account.default
-    Attachment.domain_namespace = @domain_root_account.file_namespace
+    @domain_root_account = request.env['canvas.domain_root_account'] || Account.default
     @files_domain = request.host != HostUrl.context_host(@domain_root_account) && request.host == HostUrl.file_host(@domain_root_account)
     @domain_root_account
   end
@@ -89,6 +90,12 @@ class ApplicationController < ActionController::Base
     self.send name, *opts
   end
   
+  def user_url(*opts)
+    opts[0] == @current_user && !current_user_is_site_admin? && !@current_user.grants_right?(@current_user, session, :view_statistics) ?
+      profile_url :
+      super
+  end
+
   def tab_enabled?(id)
     if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :include_hidden_unused => true).any?{|t| t[:id] == id }
       flash[:notice] = "That page has been disabled for this #{@context.class.to_s.downcase}"
@@ -106,6 +113,12 @@ class ApplicationController < ActionController::Base
   #   render
   # end
   def authorized_action(object, *opts)
+    can_do = is_authorized_action?(object, *opts)
+    render_unauthorized_action(object) unless can_do
+    can_do
+  end
+  
+  def is_authorized_action?(object, *opts)
     user = opts.shift
     action_session = nil
     action_session ||= session
@@ -122,31 +135,32 @@ class ApplicationController < ActionController::Base
     rescue => e
       logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}"
     end
-    unless can_do
-      object ||= User.new
-      object.errors.add_to_base("You are not authorized to perform this action")
-      respond_to do |format|
-        if !request.xhr?
-          flash[:notice] = "You are not authorized to perform this action"
-        end
-        @show_left_side = false
-        clear_crumbs
-        params = request.path_parameters
-        params[:format] = nil
-        @headers = !!@current_user if @headers != false
-        @files_domain = @account_domain && @account_domain.host_type == 'files'
-        format.html { 
-          store_location if request.get?
-          render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
-        }
-        format.zip { redirect_to(url_for(params)) }
-        format.xml { render :xml => object.errors.to_xml, :status => :unauthorized }
-        format.json { render :json => object.errors.to_json, :status => :unauthorized }
-      end
-      response.headers["Pragma"] = "no-cache"
-      response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
-    end
     can_do
+  end
+  
+  def render_unauthorized_action(object=nil)
+    object ||= User.new
+    object.errors.add_to_base("You are not authorized to perform this action")
+    respond_to do |format|
+      if !request.xhr?
+        flash[:notice] = "You are not authorized to perform this action"
+      end
+      @show_left_side = false
+      clear_crumbs
+      params = request.path_parameters
+      params[:format] = nil
+      @headers = !!@current_user if @headers != false
+      @files_domain = @account_domain && @account_domain.host_type == 'files'
+      format.html { 
+        store_location if request.get?
+        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
+      }
+      format.zip { redirect_to(url_for(params)) }
+      format.xml { render :xml => object.errors.to_xml, :status => :unauthorized }
+      format.json { render :json => object.errors.to_json, :status => :unauthorized }
+    end
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
   
   # To be used as a before_filter, requires controller or controller actions
@@ -156,7 +170,7 @@ class ApplicationController < ActionController::Base
   def require_context
     get_context
     if !@context
-      if request.path.match(/\A\/profile/) || request.path.match(/\A\/dashboard/)
+      if request.path.match(/\A\/profile/)
         store_location
         redirect_to login_url
       elsif params[:context_id]
@@ -196,7 +210,7 @@ class ApplicationController < ActionController::Base
           session[:enrollment_uuid_count] ||= 0
           if session[:enrollment_uuid_count] > 4
             session[:enrollment_uuid_count] = 0
-            flash[:notice] = "You'll need to <a href='#{course_url(@context)}'>accept the enrollment invitation</a> before you can fully participate in this course."
+            flash[:html_notice] = "You'll need to <a href='#{course_url(@context)}'>accept the enrollment invitation</a> before you can fully participate in this course."
           end
           session[:enrollment_uuid_count] += 1
         end
@@ -220,7 +234,7 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user
-      elsif request.path.match(/\A\/profile/) || request.path.match(/\A\/dashboard/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
+      elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
         @context = @current_user
         @context_membership = @context
       end
@@ -231,45 +245,48 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  # This is used by both /calendar and /assignments.
-  # Retrieves a list of all contexts associated with
-  # the given context.  If the context is a user then 
-  # it will include all the user's current contexts.
-  # Assigns it to the variable @context
-  def get_all_pertinent_contexts(include_groups=false)
-    unless @already_ran_get_all_pertinent_contexts
-      @already_ran_get_all_pertinent_contexts = true
-      @contexts = [@context].compact
-      @included_contexts = []
-      if params[:only_contexts]
-        params[:only_contexts].split(",").each do |include_context|
-          context = Context.find_by_asset_string(include_context)
-          @included_contexts << context if context
-          @contexts << context if context
-        end
-      else
-        if (@context && @context.is_a?( User))
-          @contexts.concat @context.courses
-          @contexts.concat @context.groups if include_groups
-        end
-        if params[:include_contexts]
-          params[:include_contexts].split(",").each do |include_context|
-            context = Context.find_by_asset_string(include_context)
-            @included_contexts << context if context
-            @contexts << context if context
-          end
-        end
+  # This is used by a number of actions to retrieve a list of all contexts
+  # associated with the given context.  If the context is a user then it will
+  # include all the user's current contexts.
+  # Assigns it to the variable @contexts
+  def get_all_pertinent_contexts(include_groups = false)
+    return if @already_ran_get_all_pertinent_contexts
+    @already_ran_get_all_pertinent_contexts = true
+
+    raise(ArgumentError, "Need a starting context") if @context.nil?
+
+    @contexts = [@context]
+    only_contexts = ActiveRecord::Base.parse_asset_string_list(params[:only_contexts])
+    if @context && @context.is_a?(User)
+      # we already know the user can read these courses and groups, so skip
+      # the grants_right? check to avoid querying for the various memberships
+      # again.
+      courses = @context.courses.active
+      groups = include_groups ? @context.groups.active : []
+      if only_contexts.present?
+        # find only those courses and groups passed in the only_contexts
+        # parameter, but still scoped by user so we know they have rights to
+        # view them.
+        courses = courses.find_all_by_id(only_contexts.select { |c| c.first == "Course" }.map(&:last))
+        groups = groups.find_all_by_id(only_contexts.select { |c| c.first == "Group" }.map(&:last)) if include_groups
       end
-      @contexts = @contexts.uniq.select{|c| c == @current_user || c.grants_rights?(@current_user, nil, nil)[:read] }
-      Course.require_assignment_groups(@contexts)
-      @original_context = @context
-      @context = ((@contexts & @included_contexts).first rescue @context) if @included_contexts && !@included_contexts.empty?
-      @context ||= @contexts.first
-      @context_enrollment = @context.membership_for_user(@current_user) rescue nil
-      @context_membership = @context_enrollment
+      @contexts.concat courses
+      @contexts.concat groups
     end
+    if params[:include_contexts]
+      params[:include_contexts].split(",").each do |include_context|
+        # don't load it again if we've already got it
+        next if @contexts.any? { |c| c.asset_string == include_context }
+        context = Context.find_by_asset_string(include_context)
+        @contexts << context if context && context.grants_right?(@current_user, nil, :read)
+      end
+    end
+    @contexts = @contexts.uniq
+    Course.require_assignment_groups(@contexts)
+    @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)
+    @context_membership = @context_enrollment
   end
-  
+
   # Retrieves all assignments for all contexts held in the @contexts variable.
   # Also retrieves submissions and sorts the assignments based on
   # their due dates and submission status for the given user.
@@ -319,7 +336,8 @@ class ApplicationController < ActionController::Base
       a.submissions.having_submission.ungraded.count > 0
     }
     @assignment_groups = @groups
-    @past_assignments = @assignments.select{ |a| !a.due_at || a.due_at < Time.now }
+    @past_assignments = @assignments.select{ |a| a.due_at && a.due_at < Time.now }
+    @undated_assignments = @assignments.select{ |a| !a.due_at }
     @past_assignments.each do |assignment|
       submission = @submissions_hash[assignment.id]
       if assignment.overdue? && 
@@ -346,7 +364,7 @@ class ApplicationController < ActionController::Base
       @ungraded_assignments = @ungraded_assignments.select{|a| a.due_at && a.due_at > 2.weeks.ago }
     end
     
-    [@assignments, @upcoming_assignments, @past_assignments, @overdue_assignments, @ungraded_assignments].map(&:sort!)
+    [@assignments, @upcoming_assignments, @past_assignments, @overdue_assignments, @ungraded_assignments, @undated_assignments].map(&:sort!)
   end
   
   # Calculates the file storage quota for @context
@@ -453,6 +471,7 @@ class ApplicationController < ActionController::Base
   
   def clear_cached_contexts
     ActiveRecord::Base.clear_cached_contexts
+    RoleOverride.clear_cached_contexts
   end
   
   def set_page_view
@@ -487,7 +506,8 @@ class ApplicationController < ActionController::Base
   def update_page_view
     if @page_view
       if @account || @context || @asset
-        @page_view.update_attributes(:context => @context, :asset => @asset)
+        @page_view.attributes = { :context => @context, :asset => @asset }
+        store_page_view(@page_view)
       end
     end
   end
@@ -576,7 +596,7 @@ class ApplicationController < ActionController::Base
         @page_view_update = true
       end
       if @page_view && @page_view_update
-        @page_view.save
+        store_page_view(@page_view)
       end
     else
       @page_view.destroy if @page_view && !@page_view.new_record?
@@ -619,9 +639,9 @@ class ApplicationController < ActionController::Base
       ErrorLogging.log_error(:default, {
         "message" => "rendered error page failed unexpectedly",
         "method" => (request.method rescue "none"),
-        'referrer' => request.referrer, 
-        'format' => request.format,
-        'xhr' => request.xhr?,
+        'referrer' => (request.referrer rescue 'none'),
+        'format' => (request.format rescue 'none'),
+        'xhr' => (request.xhr? rescue false),
         'user_id' => (@current_user ? @current_user.id : ''),
         "error_id" => (@error ? @error.id : ""),
         "backtrace" => (e.backtrace.join("<br/>\n") rescue "none"),
@@ -668,23 +688,23 @@ class ApplicationController < ActionController::Base
     session[:course_uuid] = nil
   end
 
-  class InvalidDeveloperAPIKey < ActionController::ActionControllerError #:nodoc:
+  class InvalidDeveloperAPIKey < ActionController::InvalidAuthenticityToken #:nodoc:
   end
+  rescue_responses['ApplicationController::InvalidDeveloperAPIKey'] = rescue_responses['ActionController::InvalidAuthenticityToken']
 
-  alias_method :original_verify_authenticity_token, :verify_authenticity_token
   # Had to overwrite this method so we can say you don't need to have an
   # authenticity_token if the request is coming from an api request.
   # we also check for the session token not being set at all here, to catch
   # those who have cookies disabled.
   def verify_authenticity_token
     params[request_forgery_protection_token] = params[request_forgery_protection_token].gsub(" ", "+") rescue nil
-    if params[:api_key] && request.path.match(/\A\/api\//)
+    if params[:api_key] && api_request?
       @developer_key = DeveloperKey.find_by_api_key(params[:api_key])
-      @developer_key || raise(ApplicationController::InvalidDeveloperAPIKey)
+      @developer_key || raise(InvalidDeveloperAPIKey)
     elsif protect_against_forgery? &&
           request.method != :get &&
           verifiable_request_format?
-      if session[:_csrf_token].nil? && session.empty? && !request.xhr?
+      if session[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
         # the session should have the token stored by now, but doesn't? sounds
         # like the user doesn't have cookies enabled.
         redirect_to(login_url(:needs_cookies => '1'))
@@ -693,6 +713,10 @@ class ApplicationController < ActionController::Base
         raise(ActionController::InvalidAuthenticityToken) unless form_authenticity_token == form_authenticity_param
       end
     end
+  end
+
+  def api_request?
+    !!request.path.match(/\A\/api\//)
   end
 
   def session_loaded?
@@ -834,6 +858,8 @@ class ApplicationController < ActionController::Base
         !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
+      elsif feature == :lockdown_browser
+        Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
       else
         !Rails.env.production? || (@current_user && current_user_is_site_admin?)
       end
@@ -887,7 +913,17 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_is_site_admin?
 
   def page_views_enabled?
-    Setting.get_cached('enable_page_views', 'false') != 'false'
+    enable_page_views = Setting.get_cached('enable_page_views', 'false')
+    @page_view_method = enable_page_views == 'log' ? :log : :db
+    enable_page_views != 'false'
   end
   helper_method :page_views_enabled?
+
+  def store_page_view(page_view)
+    if @page_view_method == :log
+      Rails.logger.info "PAGE VIEW: #{page_view.attributes.to_json}"
+    else
+      page_view.save
+    end
+  end
 end

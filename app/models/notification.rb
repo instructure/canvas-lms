@@ -213,18 +213,20 @@ class Notification < ActiveRecord::Base
       end
     end
     @delayed_messages_to_save.each{|m| m.save! }
-    
 
-    messages.each{|m| 
-      if m.to != 'dashboard'
-        m.save!
-      elsif Notification.types_to_show_in_feed.include?(self.name)
+    dashboard_messages, dispatch_messages = messages.partition { |m| m.to == 'dashboard' }
+
+    dashboard_messages.each do |m|
+      if Notification.types_to_show_in_feed.include?(self.name)
         m.set_asset_context_code
         m.infer_defaults
         m.create_stream_items
       end
-    }
-    
+    end
+
+    dispatch_messages.each { |m| m.stage_without_dispatch!; m.save! }
+    MessageDispatcher.batch_dispatch(dispatch_messages)
+
     # re-set cached values
     @user_counts.each{|user_id, cnt| recent_messages_for_user(user_id, cnt) }
 

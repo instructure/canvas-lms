@@ -1,0 +1,17 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          You will need access to a Dim Dim instance.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :domain, "Domain:" %></td>
+      <td>
+        <%= f.text_field :domain %>
+      </td>
+    </tr>
+  </table>
+<% end %>

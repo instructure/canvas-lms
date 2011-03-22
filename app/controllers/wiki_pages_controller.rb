@@ -28,7 +28,7 @@ class WikiPagesController < ApplicationController
       redirect_to named_context_url(@context, :context_wiki_page_url, 'front-page')
       return
     end
-    if @context.try_rescue(:wiki_is_public) || authorized_action(@page, @current_user, :read)
+    if @context.try_rescue(:wiki_is_public) || is_authorized_action?(@page, @current_user, :read)
       add_crumb(@page.title)
       unless @page.new_record?
         @page.with_versioning(false) do |page|
@@ -42,6 +42,8 @@ class WikiPagesController < ApplicationController
         format.html {render :action => "show" }
         format.json {render :json => @page.to_json }
       end
+    else
+      render_unauthorized_action(@page)
     end
   end
   

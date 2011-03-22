@@ -18,6 +18,8 @@
 
 class CourseSection < ActiveRecord::Base
   include Workflow
+  include EnrollmentDateRestrictions
+  
   attr_protected :sis_source_id, :sis_batch_id, :course_id, :abstract_course_id,
       :root_account_id, :enrollment_term_id, :sis_cross_listed_section_id, :sis_cross_listed_section_sis_batch_id
   belongs_to :course
@@ -26,6 +28,7 @@ class CourseSection < ActiveRecord::Base
   belongs_to :sis_cross_listed_section
   belongs_to :abstract_course
   belongs_to :enrollment_term
+  belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :course_account_associations
   

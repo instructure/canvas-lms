@@ -1,0 +1,56 @@
+#students
+  border-collapse: collapse
+  thead
+    td,th
+      border-bottom: 1px dotted #aaa
+      padding: 3px 8px
+      font-weight: bold
+      text-align: center
+  .student
+    border-bottom: 1px dotted #ddd
+    td,th
+      padding: 3px 5px
+      vertical-align: top
+    .number
+      text-align: center
+    .time_holder
+      color: #888
+      font-size: 0.8em
+      text-align: left
+      vertical-align: middle
+      .extend_time_link
+        display: none
+    .extra_time_allowed
+      color: #888
+      font-size: 0.8em
+      padding-left: 15px
+    .score_holder
+      text-align: center
+    .links
+      text-align: right
+    &.in_progress
+      .time_holder
+        color: #222
+        font-size: 1.1em
+        text-align: right
+        padding-right: 10px
+      &.extendable
+        .extend_time_link
+          display: inline
+          padding-left: 5px
+    &.manually_unlocked
+      .unlocked
+        display: inline
+    &:hover
+      background-color: #eee
+#moderate_student_dialog
+  table
+    td
+      padding-bottom: 10px
+      padding-right: 5px
+#extend_time_dialog
+  table
+    margin: 10px 20px 15px
+    th
+      font-weight: bold
+      padding-right: 5px

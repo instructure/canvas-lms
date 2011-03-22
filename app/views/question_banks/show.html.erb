@@ -49,7 +49,7 @@ already using those questions.
 <div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank">
   <% if @questions.total_pages <= 1 %>
     <% @questions.each do |question| %>
-      <%= render :partial => "quizzes/display_question", :object => question.question_data, :locals => {:is_assessment_question => true, :editing => true, :asset_string => question.asset_string} %>
+      <%= render :partial => "quizzes/display_question", :object => question.data, :locals => {:is_assessment_question => true, :editing => true, :asset_string => question.asset_string} %>
     <% end %>
   <% else %>
     <%= render :partial => "question_teaser", :collection => @questions %>
@@ -131,27 +131,6 @@ $(document).ready(function() {
     }, function(data) {
     });
   }
-  $("#questions").delegate('.question_teaser_link', 'click', function(event) {
-    event.preventDefault();
-    var $teaser = $(this).parents(".question_teaser");
-    if($teaser.data('question')) {
-      var question_data = $teaser.data('question');
-      var $question = $("#question_template").clone().removeAttr('id');
-      var question = question_data;
-      var questionData = $.extend({}, question, question.question_data);
-      quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
-      $teaser.after($question);
-      $teaser.remove();
-      $question.show();
-      if($teaser.hasClass('to_edit')) {
-        $question.find(".edit_question_link").click();
-      }
-    }
-  }).delegate('.edit_teaser_link', 'click', function(event) {
-    event.preventDefault();
-    $(this).parents(".question_teaser").addClass('to_edit');
-    $(this).parents(".question_teaser").find(".question_teaser_link").click();
-  });
   $(".more_questions_link").click(function(event) {
     event.preventDefault();
     if($(this).hasClass('loading')) { return; }
@@ -228,14 +207,14 @@ $(document).ready(function() {
     beforeSubmit: function(data) {
       $("#edit_bank_form h2").text(data.title);
       $(this).loadingImage();
-      return $bank;
     },
-    success: function(data, $bank) {
+    success: function(data) {
       $(this).loadingImage('remove');
       var bank = data.assessment_question_bank;
+      $("#edit_bank_form .bank_name_box").blur();
       $("#edit_bank_form h2").text(bank.title);
     },
-    error: function(data, $bank) {
+    error: function(data) {
       $(this).loadingImage('remove');
       $(".edit_bank_link").click();
       $("#edit_bank_form").formErrors(data);

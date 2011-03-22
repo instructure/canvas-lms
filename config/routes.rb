@@ -116,6 +116,7 @@ ActionController::Routing::Routes.draw do |map|
       assignment.resources :submissions do |submission|
         submission.turnitin_report 'turnitin/:asset_string', :controller => 'submissions', :action => 'turnitin_report'
       end
+      assignment.rubric "rubric", :controller => 'assignments', :action => 'rubric'
       assignment.resource :rubric_association, :as => :rubric do |association|
         association.resources :rubric_assessments, :as => 'assessments'
       end
@@ -170,16 +171,19 @@ ActionController::Routing::Routes.draw do |map|
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
       quiz.history "history", :controller => "quizzes", :action => "history"
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
+      quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
       quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put} do |submission|
-        submission.add_attempts 'add_attempts', :controller => 'quiz_submissions', :action => 'add_attempts'
       end
-      quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy)
+      quiz.extensions 'extensions/:user_id', :controller => 'quiz_submissions', :action => 'extensions', :conditions => {:method => :post}
+      quiz.resources :quiz_questions, :as => "questions", :only => %w(create update destroy show)
       quiz.resources :quiz_groups, :as => "groups", :only => %w(create update destroy) do |group|
         group.reorder "reorder", :controller => "quiz_groups", :action => "reorder"
       end
       quiz.take "take", :controller => "quizzes", :action => "show", :take => '1'
+      quiz.moderate "moderate", :controller => "quizzes", :action => "moderate"
+      quiz.lockdown_browser_required "lockdown_browser_required", :controller => "quizzes", :action => "lockdown_browser_required"
     end
-    
+
     course.resources :collaborations
     course.resources :short_messages
     
@@ -364,6 +368,7 @@ ActionController::Routing::Routes.draw do |map|
     account.confirm_delete_user 'users/:user_id/delete', :controller => 'accounts', :action => 'confirm_delete_user'
     account.delete_user 'users/:user_id', :controller => 'accounts', :action => 'remove_user', :conditions => {:method => :delete}
     account.resources :users
+    account.resources :account_notifications, :only => [:create, :destroy]
     account.resources :announcements
     account.resources :assignments
     account.resources :submissions
@@ -483,9 +488,15 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.resource :pseudonym_session
 
+  # dashboard_url is / , not /dashboard
+  map.dashboard '', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+  map.root :dashboard
+  # backwards compatibility with the old /dashboard url
+  map.dashboard_redirect 'dashboard', :controller => 'users', :action => 'user_dashboard', :conditions => {:method => :get}
+
   # Thought this idea of having dashboard-scoped urls was a good idea at the
   # time... now I'm not as big a fan.
-  map.resource :dashboard, :only => [:show], :controller => "users" do |dashboard|
+  map.resource :dashboard, :only => [] do |dashboard|
     dashboard.resources :files, :only => [:index,:show], :collection => {:quota => :get} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
@@ -495,6 +506,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    dashboard.close_notification 'account_notifications/:id', :controller => 'users', :action => 'close_notification', :conditions => {:method => :delete}
     dashboard.resources :notifications, :only => [:index, :destroy, :update]
     dashboard.eportfolios "eportfolios", :controller => "eportfolios", :action => "user_index"
     dashboard.grades "grades", :controller => "users", :action => "grades"
@@ -504,9 +516,7 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.dashboard_ignore_channel 'dashboard/ignore_path', :controller => "users", :action => "ignore_channel", :conditions => {:method => :post}
 
-  map.plugins 'plugins', :controller => 'plugins', :action => 'index'
-  map.plugins_show 'plugins/:id', :controller => 'plugins', :action => 'show', :method => 'get'
-  map.plugins_update 'plugins/:id/update', :controller => 'plugins', :action => 'update', :method => 'post'
+  map.resources :plugins, :only => [:index, :show, :update]
 
   # The getting_started pages are a short wizard used to help
   # a teacher start a new course from scratch.
@@ -535,6 +545,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.calendar 'calendar', :controller => 'calendars', :action => 'show', :conditions => { :method => :get }
   map.files 'files', :controller => 'files', :action => 'full_index', :conditions => { :method => :get }
+  map.s3_success 'files/s3_success/:id', :controller => 'files', :action => 's3_success'
+  map.file_create_pending 'files/pending', :controller=> 'files', :action => 'create_pending'
   map.assignments 'assignments', :controller => 'assignments', :action => 'index', :conditions => { :method => :get }
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -568,7 +580,6 @@ ActionController::Routing::Routes.draw do |map|
   #     admin.resources :products
   #   end
 
-  map.root :controller => "pseudonym_sessions", :action => "new", :conditions => {:method => :get}
   map.errors "errors", :controller => "info", :action => "record_error", :conditions => {:method => :post}
   map.resources :errors, :as => :error_reports
   
@@ -589,7 +600,7 @@ ActionController::Routing::Routes.draw do |map|
   ApiRouteSet.new(map, "/api/v1") do |api|
     api.resources :courses,
                   :only => %w(index) do |course|
-      course.students 'students.:format',
+      course.api_students 'students.:format',
         :controller => 'courses', :action => 'students',
         :conditions => { :method => :get }
       course.resources :assignments,

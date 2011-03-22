@@ -13,7 +13,30 @@ body.modal
     margin: 0
     padding: 0
     
-  #modal-box
+  #modal-box-top
+    background: url(/images/login-bg.jpg) no-repeat
+    width: $modal_box_width
+    height: 10px
+    overflow: hidden
+    margin: 75px auto 0
+    padding: 10px 20px 0 20px
+    position: relative
+  #modal-box-bottom
+    background: url(/images/login-bg.jpg) no-repeat bottom center
+    width: $modal_box_width
+    height: 9px
+    overflow: hidden
+    margin: 0 auto 0
+    padding: 0px 20px 10px 20px
+    position: relative
+  #modal-box-arbitrary-size    
+    margin-top: -30px !important
+    padding-top: 0 !important
+    height: auto !important
+    background-image: url(/images/login-bg-middle-tall.jpg) !important
+    #register_form
+      margin-top: 40px
+  #modal-box,#modal-box-arbitrary-size
     background: url(/images/login-bg.jpg) no-repeat
     width: $modal_box_width
     height: 358px

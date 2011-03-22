@@ -30,8 +30,9 @@
     <% end %>
     
     <% if can_do(@context, @current_user, :update) %>
-        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %>End This Course</a>
-        <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Copy This Course</a>
+        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %>End this Course</a>
+        <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Copy this Course</a>
+        <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Import Content into this Course</a>
     <% end %>
     <table class="summary" style="margin-top: 20px;">
       <thead>
@@ -186,6 +187,20 @@
           <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at) || "No Date Set" %></span>
         </td>
       </tr><tr>
+        <td></td>
+        <td>
+          <div class="course_form">
+            <%= f.check_box :restrict_enrollments_to_course_dates %>
+            <%= f.label :restrict_enrollments_to_course_dates, "Users can only access the course between these dates" %>
+            <div style="font-size: 0.8em; padding-left: 25px;">
+              This will override any term availability settings.
+            </div>
+          </div>
+          <div class="course_info restrict_dates" style="font-size: 0.8em;">
+            <%= @context.restrict_enrollments_to_course_dates ? "Users can only access the course between these dates" : "These dates will not affect course availability" %>
+          </div>
+        </td>
+      </tr><tr>
         <td style="width: 10%;"><%= f.label :storage_quota, "File Storage:" %></td>
         <td>
           <span class="course_form">
@@ -252,8 +267,6 @@
               <%= f.label :open_enrollment, "Add a \"Join this Course\" link to the course home page" %><br/>
               </div>
             <% end %>
-            <%= f.check_box :publish_grades_immediately %>
-            <%= f.label :publish_grades_immediately, "Publish Grades Immediately" %><br/>
             <%= f.check_box :allow_student_assignment_edits %>
             <%= f.label :allow_student_assignment_edits, "Let Students edit Assignment Descriptions" %><br/>
             <%= f.check_box :allow_student_forum_attachments %>
@@ -511,32 +524,7 @@
         </div>
       </div>
     </div>
-    <div id="link_student_dialog" style="display: none;">
-      <% form_tag context_url(@context, :context_link_enrollment_url), {:id => "link_student_dialog_form"} do %>
-        <input type="hidden" name="enrollment_id" class="enrollment_id"/>
-        <p>
-          When an observer is linked to a student, they have access to that student's grades
-          and course interactions.
-          <span class="existing_user">
-            Right now this observer is linked to the student, <b class="existing_user_name">&nbsp;</b>.
-          </span>
-        </p>
-        <p>
-        To link the course observer <b class="short_name">&nbsp;</b> to a student, select
-        the student's name from the list below.
-        </p>
-        <p>
-          <label for="student_enrollment_link_option">Student:</label>
-          <select name="student_id" class="student_options" id="student_enrollment_link_option">
-            <option value="none" class="blank">[ Select Student ]</option>
-          </select>
-        </p>
-        <div class="button-container">
-          <button type="submit" class="button save_button">Link to Student</button>
-          <button type="button" class="button button-secondary">Cancel</button>
-        </div>
-      <% end %>
-    </div>
+    <%= render :partial => 'link_enrollment' %>
   </div>
   <div id="tab-navigation">
     <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => "Edit Course Navigation" } do %>

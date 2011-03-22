@@ -671,10 +671,10 @@ class ContextModule < ActiveRecord::Base
     existing_item.migration_id = hash[:migration_id]
     hash[:indents] = [hash[:indents] || 0, level].max
     if hash[:linked_resource_type] =~ /wiki_type/i
-      wiki = self.context.wiki_pages.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
+      wiki = self.context.wiki.wiki_pages.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if wiki
         item = self.add_item({
-          :title => hash[:title],
+          :title => hash[:title] || hash[:linked_resource_title],
           :type => 'wiki_page',
           :id => wiki.id,
           :indent => hash[:indents].to_i
@@ -685,7 +685,7 @@ class ContextModule < ActiveRecord::Base
       file = self.context.attachments.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if file
         item = self.add_item({
-          :title => hash[:title],
+          :title => hash[:title] || hash[:linked_resource_title],
           :type => 'attachment',
           :id => file.id,
           :indent => hash[:indents].to_i
@@ -696,16 +696,16 @@ class ContextModule < ActiveRecord::Base
       ass = self.context.assignments.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if ass
         item = self.add_item({
-          :title => hash[:title],
+          :title => hash[:title] || hash[:linked_resource_title],
           :type => 'assignment',
           :id => ass.id,
           :indent => hash[:indents].to_i
         }, existing_item)
       end
-    elsif ['FOLDER_TYPE', 'HEADING'].member? hash[:linked_resource_type]
+    elsif ['FOLDER_TYPE', 'HEADING'].member?(hash[:linked_resource_type] || hash[:type])
       # just a snippet of text
       item = self.add_item({
-        :title => hash[:title],
+        :title => hash[:title] || hash[:linked_resource_title],
         :type => 'context_module_sub_header',
         :indent => hash[:indents].to_i
       }, existing_item)
@@ -713,7 +713,7 @@ class ContextModule < ActiveRecord::Base
       # external url
       if hash['url']
         item = self.add_item({
-          :title => hash[:title] || hash['description'],
+          :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
           :type => 'external_url',
           :indent => hash[:indents].to_i,
           :url => hash['url']
@@ -723,7 +723,7 @@ class ContextModule < ActiveRecord::Base
       quiz = self.context.quizzes.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if quiz
         item = self.add_item({
-          :title => hash[:title],
+          :title => hash[:title] || hash[:linked_resource_title],
           :type => 'quiz',
           :indent => hash[:indents].to_i,
           :id => quiz.id
@@ -733,7 +733,7 @@ class ContextModule < ActiveRecord::Base
       topic = self.context.discussion_topics.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if topic
         item = self.add_item({
-          :title => hash[:title],
+          :title => hash[:title] || hash[:linked_resource_title],
           :type => 'discussion_topic',
           :indent => hash[:indents].to_i,
           :id => topic.id

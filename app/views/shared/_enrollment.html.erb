@@ -38,7 +38,7 @@
     <% end %>
   <% end %>
   <span class="invitation_sent_at" style="display: none;"><%= datetime_string(enrollment.try_rescue(:updated_at)) || nbsp %></span>
-  <span class="associated_user_id" style="display: none;"><%= enrollment.try_rescue(:association_user_id) %></span>
+  <span class="associated_user_id" style="display: none;"><%= enrollment.try_rescue(:associated_user_id) %></span>
   <span class="id" style="display: none;"><%= enrollment.try_rescue(:id) %></span>
   <span class="user_id" style="display: none;"><%= enrollment.try_rescue(:user_id) %></span>
   <span class="clear"></span>

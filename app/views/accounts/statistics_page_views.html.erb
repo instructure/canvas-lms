@@ -56,10 +56,10 @@
         r.g.axis(40, 230, 220, 0, 100, 5, 1, [' ', '20%', '40%', '60%', '80%', '100%'], '|');
         r.g.axis(40, 230, 500, 0, 23, 24, 0, ['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm', '12am'], '+');
       } else {
-        $("#hourly_usage").html("No data found for report");
+        $("#hourly_usage").text("No data found for report");
       }
     } catch(e) { 
-      $("#hourly_usage").html("Error building usage report: " + e.toString());
+      $("#hourly_usage").text("Error building usage report: " + e.toString());
     }
 
     var pageViewData = <%= raw @account.page_view_data(@start_at, @end_at).to_json %>;

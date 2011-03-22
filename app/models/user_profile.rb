@@ -43,7 +43,7 @@ class UserProfile
     @tabs ||= [
       { :id => TAB_HOME, :label => "Home", :href => :dashboard_path,             :no_args => true },
       { :id => TAB_PROFILE, :label => "Profile", :href => :profile_path,               :no_args => true },
-      { :id => TAB_COMMUNICATION_PREFERENCES, :label => "Communication Preferences", :href => :communication_profile_path, :no_args => true },
+      { :id => TAB_COMMUNICATION_PREFERENCES, :label => "Notifications", :href => :communication_profile_path, :no_args => true },
       { :id => TAB_FILES, :label => "Files", :href => :dashboard_files_path,       :no_args => true },
       { :id => TAB_EPORTFOLIOS, :label => "ePortfolios", :href => :dashboard_eportfolios_path, :no_args => true }
     ]

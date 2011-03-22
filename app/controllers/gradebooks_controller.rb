@@ -50,16 +50,11 @@ class GradebooksController < ApplicationController
         if @student
           add_crumb(@student.name, named_context_url(@context, :context_student_grades_url, @student.id))
           
-          @assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title')
+          @groups = @context.assignment_groups.active
+          @assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title') +
+            groups_as_assignments(:groups => @groups, :group_percent_string => "%s%% of Final", :total_points_string => '-')
           @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id])
           @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
-          @groups = @context.assignment_groups.active
-          @groups.each do |group|
-            points_possible = ""
-            points_possible = "#{group.group_weight}% of Final" if @context.group_weighting_scheme == 'percent'
-            @assignments = @assignments << OpenObject.build('assignment', :id => 'group-' + group.id.to_s, :rules => group.rules, :title => group.name, :points_possible => points_possible, :hard_coded => true, :special_class => 'group_total', :assignment_group_id => group.id, :group_weight => group.group_weight)
-          end
-          @assignments = @assignments << OpenObject.build('assignment', :id => 'final-grade', :title => 'Total', :points_possible => "-", :hard_coded => true, :special_class => 'final_grade')
           format.html { render :action => 'grade_summary' }
         else
           format.html { render :action => 'grade_summary_list' }
@@ -146,8 +141,8 @@ class GradebooksController < ApplicationController
       @just_assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title').select{|a| @groups_order[a.assignment_group_id] }
       newest = Time.parse("Jan 1 2010")
       @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
-      @assignments = @just_assignments.dup
-      @gradebook_upload = @context.build_gradebook_upload
+      @assignments = @just_assignments.dup + groups_as_assignments(:groups => @groups)
+      @gradebook_upload = @context.build_gradebook_upload      
       @submissions = []
       @submissions = @context.submissions
       @new_submissions = @submissions
@@ -163,11 +158,6 @@ class GradebooksController < ApplicationController
       @enrollments_hash = {}
       @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
       @students = @context.students_visible_to(@current_user).sort_by{|u| u.sortable_name }.uniq
-      @groups.each do |group|
-        group_weight = (@context.group_weighting_scheme == "percent") ? "#{group.group_weight}%"  : nil
-        @assignments = @assignments << OpenObject.build('assignment', :id => 'group-' + group.id.to_s, :title => group.name, :points_possible => group_weight, :hard_coded => true, :special_class => 'group_total', :assignment_group_id => group.id, :asset_string => "group_total_#{group.id}")
-      end
-      @assignments << OpenObject.build('assignment', :id => 'final-grade', :title => 'Total', :points_possible => "100%", :hard_coded => true, :special_class => 'final_grade', :asset_string => "final_grade_column")
       
       log_asset_access("gradebook:#{@context.asset_string}", "grades", "other")
       respond_to do |format|
@@ -177,15 +167,15 @@ class GradebooksController < ApplicationController
         else
           format.html { render :action => "show" }
         end
-        format.csv {
+        format.csv { 
           headers["Pragma"] = "no-cache"
           headers["Cache-Control"] = "no-cache"
           send_data(
-            @context.gradebook_to_csv,
-            :type => "text/csv",
-            :filename => "Grades-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
+            @context.gradebook_to_csv, 
+            :type => "text/csv", 
+            :filename => "Grades-" + @context.name.to_s.gsub(/ /, "_") + ".csv", 
             :disposition => "attachment"
-          )
+          ) 
         }
         format.xml  { render :xml => @gradebook.to_xml }
         format.json  { render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments]) }
@@ -197,50 +187,32 @@ class GradebooksController < ApplicationController
     # res = "{"
     if params[:assignments]
       # you need to specify specifically which assignment fields you want returned to the gradebook via json here
-      # that makes it so we do a lot less querying to the db, which means less active record instanciation, 
+      # that makes it so we do a lot less querying to the db, which means less active record instantiation, 
       # which means less AR -> JSON serialization overhead which means less data transfer over the wire and faster request.
       # (in this case, the worst part was the assignment 'description' which could be a massive wikipage)
       render :json => @context.assignments.active.gradeable.scoped(
         :select => ["id", "title", "due_at", "unlock_at", "lock_at", "points_possible", "min_score", "max_score", "mastery_score", "grading_type", "submission_types", "assignment_group_id", "grading_scheme_id", "grading_standard_id", "group_category", "grade_group_students_individually"].join(", ")
-      )
-      # @context.assignments.active.gradeable.each do |assignment|
-        # res += "\"assignment_#{assignment.id}\": #{assignment.to_json},"
-      # end
-      # res += "\"assignments\": true"
+      ) + groups_as_assignments
     elsif params[:students]
       # you need to specify specifically which student fields you want returned to the gradebook via json here
       render :json => @context.students_visible_to(@current_user).to_json(:only => ["id", "name", "sortable_name", "short_name"])
-      # @context.students.each do |student|
-        # res += "\"student_#{student.id}\": #{student.to_json},"
-      # end
-      # res += "\"students\": true";
     else
-      # @submissions = @context.submissions.find(:all, :include => [:quiz_submission,:attachments,:submission_comments])
-      # res += Rails.cache.fetch(['gradebook_submission_json', @submissions.sort_by{|s| s.updated_at }.last].cache_key) do
-        # val = ""
-        params[:user_ids] ||= params[:user_id]
-        user_ids = params[:user_ids].split(",").map(&:to_i) if params[:user_ids]
-        assignment_ids = params[:assignment_ids].split(",").map(&:to_i) if params[:assignment_ids]
-        # you need to specify specifically which submission fields you want returned to the gradebook here
-        scope_options = {
-          :select => ["assignment_id", "attachment_id", "grade", "grade_matches_current_submission", "group_id", "has_rubric_assessment", "id", "score", "submission_comments_count", "submission_type", "submitted_at", "url", "user_id"].join(" ,")
-        }
-        if user_ids && assignment_ids
-          @submissions = @context.submissions.scoped(scope_options).find(:all, :conditions => {:user_id => user_ids, :assignment_id => assignment_ids})
-        elsif user_ids
-          @submissions = @context.submissions.scoped(scope_options).find(:all, :conditions => {:user_id => user_ids})
-        else
-          @submissions = @context.submissions.scoped(scope_options)
-        end
-        render :json => @submissions #(:include => [:attachments,:quiz_submission,:submission_comments])
-        # @submissions.each do |submission|
-          # res += "\"submission_#{submission.user_id}_#{submission.assignment_id}\": #{submission.to_json(:include => [:attachments,:quiz_submission,:submission_comments])},"
-        # end
-        # res += "\"submissions\": true";
-      # end
+      params[:user_ids] ||= params[:user_id]
+      user_ids = params[:user_ids].split(",").map(&:to_i) if params[:user_ids]
+      assignment_ids = params[:assignment_ids].split(",").map(&:to_i) if params[:assignment_ids]
+      # you need to specify specifically which submission fields you want returned to the gradebook here
+      scope_options = {
+        :select => ["assignment_id", "attachment_id", "grade", "grade_matches_current_submission", "group_id", "has_rubric_assessment", "id", "score", "submission_comments_count", "submission_type", "submitted_at", "url", "user_id"].join(" ,")
+      }
+      if user_ids && assignment_ids
+        @submissions = @context.submissions.scoped(scope_options).find(:all, :conditions => {:user_id => user_ids, :assignment_id => assignment_ids})
+      elsif user_ids
+        @submissions = @context.submissions.scoped(scope_options).find(:all, :conditions => {:user_id => user_ids})
+      else
+        @submissions = @context.submissions.scoped(scope_options)
+      end
+      render :json => @submissions
     end
-    # res += "}"
-    # render :json => res
   end
   protected :gradebook_init_json
   
@@ -361,5 +333,14 @@ class GradebooksController < ApplicationController
       format.atom { render :text => feed.to_xml }
     end
   end
-  
+
+  def groups_as_assignments(options = {})
+    options[:groups] ||= @context.assignment_groups.active
+    options[:group_percent_string] ||= "%s%%"
+    options[:total_points_string] ||= "100%"
+    options[:groups].map{ |group|
+      points_possible = (@context.group_weighting_scheme == "percent") ? options[:group_percent_string] % group.group_weight : nil
+      OpenObject.build('assignment', :id => 'group-' + group.id.to_s, :rules => group.rules, :title => group.name, :points_possible => points_possible, :hard_coded => true, :special_class => 'group_total', :assignment_group_id => group.id, :group_weight => group.group_weight, :asset_string => "group_total_#{group.id}")
+    } << OpenObject.build('assignment', :id => 'final-grade', :title => 'Total', :points_possible => options[:total_points_string], :hard_coded => true, :special_class => 'final_grade', :asset_string => "final_grade_column")
+  end
 end

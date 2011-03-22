@@ -37,7 +37,8 @@ module FacebookHelper
   end
   
   def facebook_host
+    @original_host_with_port = @oauth_request.original_host_with_port if @oauth_request
     return "http://#{@original_host_with_port}" if @original_host_with_port
-    HostUrl.default_host
+    "http://#{HostUrl.default_host}"
   end
 end

@@ -1,7 +1,7 @@
 <% 
   @active_tab = "courses"
   add_crumb "Courses", account_courses_path(@account)
-  add_crumb "Search results for &quot;#{@query}&quot;"
+  add_crumb "Search results for \"#{@query}\""
 %>
 <% content_for :page_title do %>Course Search results for "<%= h @query %>" <% end %>
 <% content_for :right_side do %>

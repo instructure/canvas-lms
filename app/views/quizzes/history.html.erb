@@ -39,9 +39,10 @@
             <%= user_name %> has <%= pluralize(@current_submission.attempts_left, "attempt") %>  left
           <% end %>
           <% if can_do(@submission, @current_user, :add_attempts) %>
-            <div>
-              <a class="button" href="<%= context_url(@context, :context_quiz_quiz_submission_add_attempts_url, @quiz.id, @submission.id, :extra_attempts => 1) %>">allow this student an extra attempt</a>
-            </div>
+            <% form_for :quiz_submission, :url => context_url(@context, :context_quiz_extensions_url, @quiz.id, @submission.user_id), :html => {:method => :post} do |f| %>
+              <input type="hidden" name="extra_attempts" value="<%= (@submission.extra_attempts || 0) + 1 %>"/>
+              <button type="submit" class="button">allow this student an extra attempt</button>
+            <% end %>
           <% end %>
         <% else %>
           This <%= @quiz.readable_type.downcase %> has unlimited attempts
@@ -56,7 +57,9 @@
 <h2><%= @quiz.quiz_title || @quiz.readable_type %> Results for <%= user_name %></h2>
 <div id="feel_free_to_toggle_message">
 </div>
-<% if @submission.untaken? %>
+<% if !@submission || @submission.settings_only? %>
+  <%= @quiz.readable_type %> hasn't been taken yet.
+<% elsif @submission.untaken? %>
   <%= @quiz.readable_type %> hasn't been taken yet or is currently in progress
 <% else %>
   <% form_tag context_url(@context, :context_quiz_quiz_submission_url, @quiz.id, @submission.id), {:method => :put, :id => "update_history_form"} do %>
@@ -82,8 +85,7 @@
     <% if params[:score_updated] %>
     window.parent && 
     window.parent.INST && 
-    window.parent.INST.refreshGrades && 
-    $.isFunction(window.parent.INST.refreshGrades &&
+    $.isFunction(window.parent.INST.refreshGrades) &&
     window.parent.INST.refreshGrades();
     <% end %>    
   });
@@ -199,15 +201,15 @@
   });
   </script>
   <% if params[:score_updated] %>
-  <script>
-  $(document).ready(function() {
-    if(window.parent && window.parent.INST && window.parent.INST.refreshGrades && $.isFunction(window.parent.INST.refreshGrades)) {
-      window.parent.INST.refreshGrades();
-    }
-    if(window.parent && window.parent.INST && window.parent.INST.clearQuizSubmissionSnapshot && $.isFunction(window.parent.INST.clearQuizSubmissionSnapshot)) {
-      window.parent.INST.clearQuizSubmissionSnapshot(scoringSnapshot.snapshot);
-    }
-  });
-  </script>
+    <script>
+    $(document).ready(function() {
+      if(window.parent && window.parent.INST && window.parent.INST.refreshGrades && $.isFunction(window.parent.INST.refreshGrades)) {
+        window.parent.INST.refreshGrades();
+      }
+      if(window.parent && window.parent.INST && window.parent.INST.clearQuizSubmissionSnapshot && $.isFunction(window.parent.INST.clearQuizSubmissionSnapshot)) {
+        window.parent.INST.clearQuizSubmissionSnapshot(scoringSnapshot.snapshot);
+      }
+    });
+    </script>
   <% end %>
 <% end %>

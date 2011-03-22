@@ -38,6 +38,19 @@ describe FilesController do
     @file
   end
   
+  def file_in_a_module
+    course_with_student_logged_in(:active_all => true)
+    @file = factory_with_protected_attributes(@course.attachments, :uploaded_data => io)
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({:type => 'attachment', :id => @file.id}) 
+    @module.reload
+    hash = {}
+    hash[@tag.id.to_s] = {:type => 'must_view'}
+    @module.completion_requirements = hash
+    @module.save!
+    @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+  end
+  
   describe "GET 'quota'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -80,8 +93,8 @@ describe FilesController do
       course_with_teacher_logged_in(:active_all => true)
       get 'index', :course_id => @course.id
       response.should be_success
-      assigns[:file_structures].should_not be_nil
-      assigns[:file_structures][0][0].should eql(@course)
+      assigns[:contexts].should_not be_nil
+      assigns[:contexts][0].should eql(@course)
     end
     
     it "should select a default folder" do
@@ -98,10 +111,10 @@ describe FilesController do
       a1 = folder_file
       get 'index', :course_id => @course.id, :format => 'json'
       response.should be_success
-      assigns[:current_folder].should eql(f1)
-      assigns[:current_attachments].should_not be_nil
-      assigns[:current_attachments].should_not be_empty
-      assigns[:current_attachments][0].should eql(a1)
+      data = JSON.parse(response.body) rescue nil
+      data.should_not be_nil
+      data['contexts'].length.should eql(1)
+      data['contexts'][0]['course']['id'].should eql(@course.id)
       
       f2 = course_folder
       a2 = folder_file
@@ -153,6 +166,57 @@ describe FilesController do
       rescue => e
         e.to_s.should eql("Not Found")
       end
+    end
+    
+    it "should mark files as viewed for module progressions if the file is downloaded" do
+      file_in_a_module
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+    end
+    
+    it "should not mark a file as viewed for module progressions if the file is locked" do
+      file_in_a_module
+      @file.locked = true
+      @file.save!
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+    end
+    
+    it "should not mark a file as viewed for module progressions just because the files#show view is rendered" do
+      file_in_a_module
+      @file.locked = true
+      @file.save!
+      get 'show', :course_id => @course.id, :id => @file.id
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+    end
+    
+    it "should mark files as viewed for module progressions if the file is previewed inline" do
+      file_in_a_module
+      get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
+      response.body.should eql({:ok => true}.to_json)
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+    end
+    
+    it "should mark files as viewed for module progressions if the file data is requested and it includes the scribd_doc data" do
+      file_in_a_module
+      @file.scribd_doc = Scribd::Document.new
+      @file.save!
+      get 'show', :course_id => @course.id, :id => @file.id, :format => :json
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+    end
+    
+    it "should not mark files as viewed for module progressions if the file data is requested and it doesn't include the scribd_doc data" do
+      file_in_a_module
+      @file.scribd_doc = nil
+      @file.save!
+      get 'show', :course_id => @course.id, :id => @file.id, :format => :json
+      @module.reload
+      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
     end
   end
   
@@ -235,4 +299,90 @@ describe FilesController do
       # assigns[:attachment].should be_frozen
     end
   end
+  
+  describe "POST 'create_pending'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      post 'create_pending', {:attachment => {:context_code => @course.asset_string}}
+      assert_unauthorized
+    end
+    
+    it "should create file placeholder (in local mode)" do
+      class Attachment
+        class <<self
+          alias :old_s3_storage? :s3_storage?
+          alias :old_local_storage? :local_storage?
+        end
+        def self.s3_storage?; false; end
+        def self.local_storage?; true; end
+      end
+      begin
+        Attachment.local_storage?.should eql(true)
+        Attachment.s3_storage?.should eql(false)
+        course_with_teacher_logged_in(:active_all => true)
+        post 'create_pending', {:attachment => {
+          :context_code => @course.asset_string,
+          :filename => "bob.txt"
+        }}
+        response.should be_success
+        assigns[:attachment].should_not be_nil
+        assigns[:attachment].id.should_not be_nil
+        json = JSON.parse(response.body) rescue nil
+        json.should_not be_nil
+        json['id'].should eql(assigns[:attachment].id)
+        json['upload_url'].should_not be_nil
+        json['upload_params'].should_not be_nil
+        json['upload_params'].should_not be_empty
+        json['remote_url'].should eql(false)
+      ensure
+        class Attachment
+          class <<self
+            alias :s3_storage? :old_s3_storage?
+            alias :local_storage? :old_local_storage?
+          end
+        end
+      end
+    end
+    
+    it "should create file placeholder (in s3 mode)" do
+      class Attachment
+        class <<self
+          alias :old_s3_storage? :s3_storage?
+          alias :old_local_storage? :local_storage?
+        end
+        def self.s3_storage?; true; end
+        def self.local_storage?; false; end
+      end
+      begin
+        Attachment.s3_storage?.should eql(true)
+        Attachment.local_storage?.should eql(false)
+        course_with_teacher_logged_in(:active_all => true)
+        post 'create_pending', {:attachment => {
+          :context_code => @course.asset_string,
+          :filename => "bob.txt"
+        }}
+        response.should be_success
+        assigns[:attachment].should_not be_nil
+        assigns[:attachment].id.should_not be_nil
+        json = JSON.parse(response.body) rescue nil
+        json.should_not be_nil
+        json['id'].should eql(assigns[:attachment].id)
+        json['upload_url'].should_not be_nil
+        json['upload_params'].should_not be_nil
+        json['upload_params'].should_not be_empty
+        json['remote_url'].should eql(true)
+      ensure
+        class Attachment
+          class <<self
+            alias :s3_storage? :old_s3_storage?
+            alias :local_storage? :old_local_storage?
+          end
+        end
+      end
+    end
+  end
+  
+  describe "POST 's3_success'" do
+  end
+  
 end

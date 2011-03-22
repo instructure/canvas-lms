@@ -17,6 +17,23 @@
  */
 (function() {
   var lastLookup = null;
+  
+  function calculateBorders(element) {
+    var borders = {};
+    element = $(element);    
+    $.each(['width', 'style', 'color'], function(i, widthStyleColor) {
+      borders[widthStyleColor] = {all: 'not-set'};
+      $.each(['top', 'right', 'bottom', 'left'], function(i, topRightBottomLeft){
+        var val = element.css('border-' + topRightBottomLeft + '-' + widthStyleColor);
+        borders[widthStyleColor][topRightBottomLeft] = val;
+        borders[widthStyleColor].all = borders[widthStyleColor].all === 'not-set' ? 
+          val :
+          (borders[widthStyleColor].all === val) && val;
+      });
+    });
+    return borders;
+  }
+  
   tinymce.create('tinymce.plugins.InstructureLinks', {
     init : function(ed, url) {
       var promptInteraction = {};
@@ -54,6 +71,7 @@
         if($box.length == 0) {
           var $box = $(document.createElement('div'));
           $.getUserServices("BookmarkService", function(data) {
+            var $editor = $box.data('editor');
             var $services = $("<div style='text-align: left; margin-left: 20px;'/>");
             var service, $service;
             for(var idx in data) {
@@ -96,6 +114,7 @@
             $box.find(".auto_show").showIf(!$(this).attr('checked') && $box.hasClass('for_inline_content_can_auto_show'));
           });
           $box.find("#instructure_link_prompt_form").submit(function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             event.stopPropagation();
             var text = $(this).find(".prompt").val();
@@ -120,12 +139,14 @@
             updateLinks(true);
           });
           $box.find(".actions").delegate('.embed_image_link', 'click', function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             $editor.editorBox('insert_code', "<img src='" + $(event.target).closest('img').attr('src') + "'/>");
             $box.dialog('close');
           });
           // http://img.youtube.com/vi/BOegH4uYe-c/3.jpg
           $box.find(".actions").delegate('.embed_youtube_link', 'click', function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             $editor.editorBox('create_link', $(event.target).closest('img').attr('alt'));
             $box.dialog('close');
@@ -162,7 +183,7 @@
               $img.css('cursor', 'pointer');
               var img = new Image();
               img.src = val;
-              var checkCompletion = function() {
+              function checkCompletion() {
                 if(img.complete) {
                   if(img.height < 100 || (img.height > 100 && img.height < 200)) {
                     $img.height(img.height);
@@ -207,6 +228,7 @@
           $box.attr('id', 'instructure_link_prompt');
           $("body").append($box);
         }
+        $box.data('editor', $editor);
         $box.data('original_data', null);
         var e = ed.selection.getNode();
         while(e.nodeName != 'A' && e.nodeName != 'BODY' && e.parentNode) {
@@ -331,8 +353,24 @@
           }
         }).end()
         .find("table").each(function() {
-          var $table = $(this);
-          var maps = {
+          var $table                 = $(this).removeClass('mceItemTable'),
+              $dummyTable            = $('<table><tr><td>&nbsp;</td></tr></table>').appendTo($table.parent('body'));
+          
+          // hanlde left, right, center alignment
+          var align = $table.attr('align');
+          if (align) {
+            if (align === 'center') {
+              $table.css({marginLeft: 'auto', marginRight: 'auto'});
+            } else if (align === 'left') {
+              $table.css('align', 'auto');
+            } else if (align === 'right') {
+              $table.css('marginLeft', 'auto');
+            }
+            $table.removeAttr('align');
+          }
+          
+          // convert html attributes to css styles
+          $.each({
             'border': 'borderWidth',
             'bordercolor': 'borderColor',
             'bgcolor': 'backgroundColor',
@@ -340,88 +378,92 @@
             'cellpadding': '',
             'width': 'width',
             'height': 'height'
-          };
-          for(var idx in maps) {
-            if($table.attr(idx)) {
-              $table.css(maps[idx], $table.attr(idx));
-              $table.removeAttr(idx);
+          }, function(htmlAttr, cssAttr) {
+            var val = $table.attr(htmlAttr);
+            if (val) {
+              // if they set the width to 0 just get rid of it
+              $table.css(cssAttr, (htmlAttr === 'border' && val === '0') ? '': val).removeAttr(htmlAttr);
             }
-          }
-          $table.removeClass('mceItemTable');
+          });
           
-          var tableBorderWidth = $table.css('borderWidth');
-          var width = parseInt(tableBorderWidth, 10);
-          if(width == 0) {
-            $table.addClass('borderless');
-            tableBorderWidth = 1;
-          }
-          if($table.hasClass('borderless')) {
-            $table.css('borderStyle', '');
-          }
-          $table.css('borderWidth', width || 1);
-
-          if($table.attr('align')) {
-            if($table.attr('align') == 'center') {
-              $table.css({marginLeft: 'auto', marginRight: 'auto'});
-              if(!$table.css('width')) {
-                $table.css('width', 300);
-              }
-            } else {
-              $table.css('float', $table.attr('align'));
-              $table.removeAttr('align');
-            }
-          }
-          var tableBorderStyle = $table.css('borderStyle');
-          var tableBorderWidth = $table.css('borderWidth');
-          if(parseInt(tableBorderWidth, 10) == 1) { 
+          // in our instructure_style.css stylesheet, we say that the default style for a table is
+          // border: 1px solid #888;  so if that is the case, I assume it is not a manually styled table
+          var tableBorders = calculateBorders($table); 
+          var dummyTableBorders = calculateBorders($table.hasClass('borderless') ? $dummyTable.addClass('borderless') : $dummyTable);
+          
+          // if there is a 0px border and no custom color or style, then clear the inline BorderWidth
+          if ( tableBorders.width.all === "0px" && 
+               dummyTableBorders.style.all == tableBorders.style.all && 
+               dummyTableBorders.color.all == tableBorders.color.all ) {
             $table.css('borderWidth', '');
-            tableBorderWidth = ""; 
+            tableBorders = calculateBorders($table);
           }
-          if(tableBorderStyle == 'solid') {
+          var borderless = JSON.stringify(tableBorders) == JSON.stringify(dummyTableBorders);
+          $table.add($dummyTable).toggleClass('borderless',  borderless);
+          if (borderless) {
+            $table.css({'borderStyle': '', 'borderColor': '', 'borderWidth' : ''});
+          } else if (tableBorders.style.all == 'solid') {
             $table.css('borderStyle', '');
-            tableBorderStyle = '';
           }
-          var tableBorderColor = $table.css('borderColor');
-          if(arg == "contentJustSet") {
+          
+          if (arg == "contentJustSet" || true) {
+            // recalculate table borders just in case they changed.
+            tableBorders = calculateBorders($table); 
+            var dummyTdBorders = calculateBorders($dummyTable.find('td'));
+      
             $table.find("td").each(function() {
               var $td = $(this);
-              var tdBorderStyle = $td.css('borderStyle');
-              var tdBorderWidth = $td.css('borderWidth');
-              var tdBorderColor = $td.css('borderColor');
+
+              // transfer html attributes to css attributes
+              var align = $td.attr('align');
+              if (align != 'left') {
+                ed.dom.setStyle(this, 'textAlign', align);
+              }
+              $.each({
+                'valign': 'verticalAlign',
+                'border': 'borderWidth',
+                'bordercolor': 'borderColor',
+                'bgcolor': 'backgroundColor',
+                'width': 'width',
+                'height': 'height'
+              }, function(htmlAttr, cssAttr) {
+                var val = $td.attr(htmlAttr);
+                if (val) {
+                  ed.dom.setStyle($td[0], cssAttr, htmlAttr);
+                  $td.removeAttr(htmlAttr);
+                }
+              });
+
               // Right now we're inferring td styling from table styling.  So if
               // you set a table's border to "1px solid #000" then it will get
               // set on all the td's as well.  This technically isn't the
               // expected behavior, so someone may complain about this.
-              $td.toggleClass('manually_styled', !!((!tableBorderStyle || tdBorderStyle) && tdBorderStyle != tableBorderStyle && (!tableBorderWidth || tdBorderWidth) && tdBorderWidth != tableBorderWidth && (!tableBorderColor || tdBorderColor) && tdBorderColor != tableBorderColor));
-              // $td.toggleClass('manually_styled', !!(tdBorderStyle != tableBorderStyle && tdBorderWidth != tableBorderWidth && tdBorderColor != tableBorderColor));
+              var tdBorders = calculateBorders($td);
+              // if the td's styles match the table's previous border styles 
+              // then get rid of all of the td's styles
+              var previous = $table.data('previousBorders');
+              if ( previous && 
+                   previous.width.all == tdBorders.width.all && 
+                   previous.color.all == tdBorders.color.all &&
+                   (previous.style.all == "solid" || previous.style.all == tdBorders.style.all) 
+                 ) {
+                $td.css({'borderStyle': '', 'borderColor': '', 'borderWidth' : ''});
+                tdBorders = calculateBorders($td);
+              }
+              
+              var manuallyStyled = JSON.stringify(dummyTdBorders) != JSON.stringify(tdBorders);
+              $td.toggleClass('manually_styled', manuallyStyled);
+              if (!borderless && !manuallyStyled) {
+                $.each({'width' : 'Width', 'style' : 'Style', 'color' : 'Color'}, function(lowercase, titlecase) {
+                  if (tdBorders[lowercase].all != tableBorders[lowercase].all) {
+                    ed.dom.setStyle($td[0], ('border' + titlecase), tableBorders[lowercase].all || "");
+                  }
+                });
+              }
             });
           }
-          $table.find("td:not(.manually_styled)").each(function() {
-            ed.dom.setStyle(this, 'borderStyle', tableBorderStyle);
-            ed.dom.setStyle(this, 'borderWidth', tableBorderWidth);
-            ed.dom.setStyle(this, 'borderColor', tableBorderColor);
-          });
-        }).end()
-        .find("td").each(function() {
-          var $td = $(this);
-          var maps = {
-            'valign': 'verticalAlign',
-            'border': 'borderWidth',
-            'bordercolor': 'borderColor',
-            'bgcolor': 'backgroundColor',
-            'width': 'width',
-            'height': 'height'
-          };
-          if($td.attr('align') != 'left') {
-            ed.dom.setStyle($td[0], 'textAlign', $td.attr('align'));
-          }
-          for(var idx in maps) {
-            if($td.attr(idx)) {
-              ed.dom.setStyle($td[0], maps[idx], $td.attr(idx));
-              // $td.css(maps[idx], $td.attr(idx));
-              $td.removeAttr(idx);
-            }
-          }
+          $table.data('previousBorders', !borderless && tableBorders);
+          $dummyTable.remove();
         });
       }
       ed.onPreProcess.add(function(ed, o) {

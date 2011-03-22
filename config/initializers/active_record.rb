@@ -29,7 +29,16 @@ class ActiveRecord::Base
     id = code.pop
     code.join("_").classify.constantize.find(id) rescue nil
   end
-  
+
+  # takes an asset string list, like "course_5,user_7" and turns it into an
+  # array of [class_name, id] like [ ["Course", 5], ["User", 7] ]
+  def self.parse_asset_string_list(asset_string_list)
+    asset_string_list.to_s.split(",").map do |str|
+      code = str.split("_", 2)
+      [code.first.classify, code.last.to_i]
+    end
+  end
+
   def self.initialize_by_asset_string(string, asset_types)
     code = string.split("_")
     id = code.pop
@@ -40,13 +49,11 @@ class ActiveRecord::Base
   
   def self.find_cached(key, &block)
     attrs = Rails.cache.read(key)
-    from_cache = true
     if !attrs || attrs.empty? || attrs.is_a?(String) || attrs[:assigned_cache_key] != key
       obj = block.call rescue nil
       attrs = obj && obj.is_a?(self) ? obj.attributes : nil
       attrs[:assigned_cache_key] = key if attrs
       Rails.cache.write(key, attrs) if attrs
-      from_cache = false
     end
     return nil if !attrs || attrs.empty?
     obj = self.new
@@ -57,12 +64,31 @@ class ActiveRecord::Base
     obj
   end
   
+  def self.find_all_cached(key, &block)
+    attrs_list = Rails.cache.read(key)
+    if !attrs_list || attrs_list.empty? || !attrs_list.is_a?(Array) || attrs_list.any?{|attr| attr[:assigned_cache_key] != key }
+      list = block.call.to_a rescue nil
+      attrs_list = list.map{|obj| obj && obj.is_a?(self) ? obj.attributes : nil }.compact
+      attrs_list.each{|attrs| attrs[:assigned_cache_key] = key }
+      Rails.cache.write(key, attrs_list)
+    end
+    return [] if !attrs_list || attrs_list.empty?
+    attrs_list.map do |attrs|
+      obj = self.new
+      attrs = attrs.dup if attrs.frozen?
+      attrs.delete(:assigned_cache_key)
+      obj.instance_variable_set("@attributes", attrs)
+      obj.instance_variable_set("@new_record", false)
+      obj
+    end
+  end
+  
   def asset_string
     @asset_string ||= "#{self.class.base_ar_class.name.underscore}_#{id.to_s}"
   end
   
   def export_columns(format = nil)
-    self.class.content_columns.map(&:name) - ['created_at', 'updated_at']
+    self.class.content_columns.map(&:name)
   end
   
   def to_row(format = nil)
@@ -298,6 +324,21 @@ ActiveRecord::ConnectionAdapters::TableDefinition.class_eval do
     column_without_foreign_key_check(name, type, options)
   end
   alias_method_chain :column, :foreign_key_check
+end
+
+# patch adapted from https://rails.lighthouseapp.com/projects/8994/tickets/6535-find_or_create_by-on-an-association-always-creates-new-records
+ActiveRecord::Associations::AssociationCollection.class_eval do
+  def method_missing_with_splat_fix(method, *args, &block)
+    if method.to_s =~ /^find_or_create_by_(.*)$/
+      rest = $1
+      find_args = pull_finder_args_from(::ActiveRecord::DynamicFinderMatch.match(method).attribute_names, *args)
+      return send("find_by_#{rest}", *find_args) ||
+             method_missing("create_by_#{rest}", *args, &block)
+    else
+      method_missing_without_splat_fix(method, *args, &block)
+    end
+  end
+  alias_method_chain :method_missing, :splat_fix
 end
 
 # postgres doesn't support limit on text columns, but it does on varchars. assuming we don't exceed

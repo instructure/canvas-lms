@@ -21,7 +21,7 @@ class Account < ActiveRecord::Base
   attr_accessible :name, :parent_account_id, :turnitin_account_id,
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
-    :storage_quota
+    :storage_quota, :ip_filters
 
   include Workflow
   adheres_to_policy
@@ -57,6 +57,7 @@ class Account < ActiveRecord::Base
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_one :account_authorization_config
   has_many :account_reports
@@ -68,6 +69,7 @@ class Account < ActiveRecord::Base
   has_many :associated_learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome
   has_many :page_views
   has_many :error_reports
+  has_many :account_notifications
 
   before_save :ensure_defaults
   before_save :set_update_account_associations_if_changed
@@ -131,12 +133,32 @@ class Account < ActiveRecord::Base
     settings
   end
   
+  def ip_filters=(params)
+    filters = {}
+    require 'ipaddr'
+    params.each do |key, str|
+      ips = []
+      vals = str.split(/,/)
+      vals.each do |val|
+        ip = IPAddr.new(val) rescue nil
+        # right now the ip_filter column on quizzes is just a string,
+        # so it has a max length.  I figure whatever we set it to this
+        # setter should at the very least limit stored values to that
+        # length.
+        ips << val if ip && val.length <= 255 
+      end
+      filters[key] = ips.join(',') unless ips.empty?
+    end
+    settings[:ip_filters] = filters
+  end
+  
   def ensure_defaults
     self.uuid ||= UUIDSingleton.instance.generate
   end
   
   def set_update_account_associations_if_changed
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
+    self.root_account_id ||= self.parent_account_id
     self.parent_account_id ||= self.root_account_id
     Account.invalidate_cache(self.id) if self.id
     @should_update_account_associations = self.parent_account_id_changed? || self.root_account_id_changed?
@@ -165,7 +187,7 @@ class Account < ActiveRecord::Base
   end
   
   def sub_accounts_as_options(indent=0)
-    res = [[("&nbsp;&nbsp;" * indent) + self.name, self.id]]
+    res = [[("&nbsp;&nbsp;" * indent).html_safe + self.name, self.id]]
     self.sub_accounts.each do |account|
       res += account.sub_accounts_as_options(indent + 1)
     end
@@ -407,8 +429,6 @@ class Account < ActiveRecord::Base
     @self_and_all_sub_accounts ||= ActiveRecord::Base.connection.send(:select, "SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id] #(self.all_accounts + [self]).map &:id
   end
   
-  # validates_uniqueness_of :name
-  
   def abstract_courses
     if self.is_a?(Department)
       self.department_abstract_courses
@@ -436,7 +456,7 @@ class Account < ActiveRecord::Base
       given {|user, session| self.parent_account && self.parent_account.grants_right?(user, session, permission) }
       set { can permission }
 
-      given {|user, session| self != Account.site_admin && Account.site_admin_user?(user) }
+      given {|user, session| !site_admin? && Account.site_admin_user?(user) }
       set { can permission }
     end
 
@@ -449,7 +469,7 @@ class Account < ActiveRecord::Base
     given { |user| self.parent_account && self.parent_account.grants_right?(user, nil, :manage) }
     set { can :read and can :read_roster and can :manage and can :update and can :delete }
     
-    given { |user| self != Account.site_admin && Account.site_admin_user?(user) }
+    given { |user| !site_admin? && Account.site_admin_user?(user) }
     set { can :read and can :read_roster and can :manage and can :update and can :delete }
   end
 
@@ -519,7 +539,7 @@ class Account < ActiveRecord::Base
   end
 
   def email_pseudonyms
-    false #true
+    false
   end
   
    def password_authentication?
@@ -587,8 +607,8 @@ class Account < ActiveRecord::Base
     return @special_accounts[special_account_type] = account
   end
 
-  def special_account?
-    self == Account.site_admin || self == Account.default
+  def site_admin?
+    self == Account.site_admin
   end
 
   def display_name
@@ -598,7 +618,7 @@ class Account < ActiveRecord::Base
   # Updates account associations for all the courses and users associated with this account
   def update_account_associations
     all_user_ids = []
-    self.associated_courses.compact.each do |course|
+    self.associated_courses.compact.uniq.each do |course|
       # Don't update the user associations yet, we'll do that afterwards so we only do it once per user
       course.update_account_associations(false)
       all_user_ids += course.user_ids
@@ -641,7 +661,7 @@ class Account < ActiveRecord::Base
   end
   
   def course_count
-    self.child_courses.not_deleted.count
+    self.child_courses.not_deleted.uniq.count
   end
   memoize :course_count
   
@@ -675,7 +695,7 @@ class Account < ActiveRecord::Base
     if self.turnitin_comments && !self.turnitin_comments.empty?
       self.turnitin_comments
     else
-      self.parent_account.turnitin_settings rescue nil
+      self.parent_account.closest_turnitin_comments rescue nil
     end
   end
   
@@ -693,19 +713,25 @@ class Account < ActiveRecord::Base
   TAB_SIS_IMPORT = 11
   
   def tabs_available(user=nil, opts={})
-    tabs = [
-      { :id => TAB_COURSES, :label => "Courses", :href => :account_path },
-      { :id => TAB_USERS, :label => "Users", :href => :account_users_path },
-      { :id => TAB_STATISTICS, :label => "Statistics", :href => :statistics_account_path },
-      { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
-      { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path },
-      { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path },
-      { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path },
-    ]
-    tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
-    tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id
-    tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil?
-    tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.allow_sis_import
+    if site_admin?
+      tabs = [
+        { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
+      ]
+    else
+      tabs = [
+        { :id => TAB_COURSES, :label => "Courses", :href => :account_path },
+        { :id => TAB_USERS, :label => "Users", :href => :account_users_path },
+        { :id => TAB_STATISTICS, :label => "Statistics", :href => :statistics_account_path },
+        { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
+        { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path },
+        { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path },
+        { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path },
+      ]
+      tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
+      tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id
+      tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil?
+      tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.allow_sis_import
+    end
     tabs << { :id => TAB_SETTINGS, :label => "Settings", :href => :account_settings_path }
     tabs
   end

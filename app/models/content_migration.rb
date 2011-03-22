@@ -64,7 +64,7 @@ class ContentMigration < ActiveRecord::Base
     state :imported
     state :failed
   end
-  
+
   set_broadcast_policy do |p|
     p.dispatch :migration_export_ready
     p.to { [user] }

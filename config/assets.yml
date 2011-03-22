@@ -64,7 +64,6 @@ javascripts:
     - public/javascripts/topics.js
   topic:
     - public/javascripts/topic.js
-    - public/javascripts/edit_rubric.js
   account_statistics:
     - public/javascripts/account_statistics.js
   assignments:
@@ -97,10 +96,7 @@ javascripts:
     - public/javascripts/eportfolio.js
   full_files:
     - public/javascripts/full_files.js
-    - public/javascripts/swfupload.js
-  files_index:
-    - public/javascripts/swfupload.js
-    - public/javascripts/files.js
+    - public/flash/uploadify/jquery.uploadify.v2.1.0.js
   email_lists:
     - public/javascripts/email_lists.js
   datagrid:
@@ -123,12 +119,20 @@ javascripts:
     - public/javascripts/quizzes.js
     - public/javascripts/supercalc.js
     - public/javascripts/calcCmd.js
+    - public/javascripts/quiz_rubric.js
   quizzes_index:
     - public/javascripts/quiz_index.js
     - public/javascripts/content_locks.js
   quiz_show:
     - public/javascripts/quiz_show.js
+    - public/javascripts/quiz_rubric.js
     - public/javascripts/message_students.js
+  take_quiz:
+    - public/javascripts/quiz_timing.js
+    - public/javascripts/take_quiz.js
+  moderate_quiz:
+    - public/javascripts/quiz_timing.js
+    - public/javascripts/moderate_quiz.js
   question_banks:
     - public/javascripts/question_banks.js
   sub_accounts:
@@ -163,6 +167,8 @@ javascripts:
     - public/javascripts/json2.js
   content_migration:
     - public/javascripts/content_migration.js
+  link_enrollment:
+    - public/javascripts/link_enrollment.js
 
 stylesheets:
   common:
@@ -176,6 +182,7 @@ stylesheets:
     - public/stylesheets/compiled/g_util_buttons.css
     - public/stylesheets/compiled/g_util_inst_tree.css
     - public/stylesheets/compiled/g_util_chevron_crumbs.css
+    - public/stylesheets/compiled/g_util_ui_listview.css
     - public/stylesheets/compiled/g_assignments.css
     - public/stylesheets/compiled/g_content_imports.css
     - public/stylesheets/compiled/g_gradebook_history.css
@@ -196,6 +203,8 @@ stylesheets:
   speed_grader:
     - public/stylesheets/static/ui.selectmenu.css
     - public/stylesheets/compiled/speed_grader.css
+  plugins:
+    - public/stylesheets/compiled/plugins.css
   gradebook_uploads:
     - public/stylesheets/static/slick.grid.css
     - public/stylesheets/compiled/gradebook_uploads.css
@@ -215,6 +224,8 @@ stylesheets:
   quizzes:
     - public/stylesheets/compiled/quizzes.css
     - public/stylesheets/compiled/message_students.css
+  moderate_quiz:
+    - public/stylesheets/compiled/moderate_quiz.css
   full_assignment:
     - public/stylesheets/compiled/full_assignment.css
     - public/stylesheets/static/embed_content.css
@@ -236,3 +247,5 @@ stylesheets:
     - public/stylesheets/compiled/sub_accounts.css
   user_logins:
     - public/stylesheets/compiled/user_logins.css
+  account_settings:
+    - public/stylesheets/compiled/account_settings.css

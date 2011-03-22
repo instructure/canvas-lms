@@ -5,19 +5,18 @@
 @import base/typography.sass
 
 
-// I dont know why these styles are here, they are a remenant of the tiny css that we had before the new canvas UI.  
-// Brian, if you dont know what they are for and dont think they are needed you can delete them -RS
 table
   :border-collapse collapse
+  border-style: solid
+  border-color: #888
+td
   :border 1px solid #888
-  tr
-    td
-      :border 1px solid #888
-      :padding 2px
-      :min-width 20px
-      p
-        :margin-bottom 0
-table.mceItemTable,table.mceItemTable td
-  :border 1px solid #888
+  :padding 2px
+  :min-width 20px
+  p
+    :margin-bottom 0
+
+// table.mceItemTable,table.mceItemTable td
+//   :border 1px solid #888
 table.borderless,table.borderless td
-  border-style: dashed
+  border: 1px dashed #888

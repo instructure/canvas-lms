@@ -78,8 +78,6 @@
   $(document).ready(function() {
     $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
     $(window).bind('resize', function() {
-//      $(document).css('overflow', 'hidden');
-//      $("body").css('overflow', 'hidden');
       var $frame = $("#preview_frame");
       var top = $frame.offset().top;
       var height = $(window).height() - top;
@@ -227,13 +225,26 @@
       $("#add_comment_form").show();
       $("#media_media_recording").hide();
     });
-    $(".play_comment_link").live('click', function(event) {
-      event.preventDefault();
-      var comment_id = $(this).parents(".comment_media").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
-      if(comment_id) {
-        $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'audio');
-      }
-    });
+    $(".comments .comment_list")
+      .delegate(".play_comment_link", 'click', function(event) {
+        event.preventDefault();
+        var comment_id = $(this).parents(".comment_media").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
+        if(comment_id) {
+          $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'audio');
+        }
+      })
+      
+      // this is to prevent the default behavior of loading the video inline from happening
+      // the .delegate(".play_comment_link"... and the .delegate('a.instructure_inline_media_comment'...
+      // are actually selecting the same links I just wanted to use the different selectors because
+      // instructure.js uses 'a.instructure_inline_media_comment' as the selector for its .live handler
+      // to show things inline.
+      .delegate('a.instructure_inline_media_comment', 'click', function(e){ 
+        // dont let it bubble past this so it doesnt get to the .live handler to show the video inline
+        e.preventDefault(); 
+        e.stopPropagation();
+      });
+    
   });
   $(document).fragmentChange(function(event, hash) {
     if(hash == '#rubric') {

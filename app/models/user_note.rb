@@ -55,8 +55,8 @@ class UserNote < ActiveRecord::Base
   
   def formatted_note(truncate=nil)
     self.extend TextHelper
-    res = format_message(note).first
-    res = truncate_html(res, :max_length => truncate, :words => true) if truncate
+    res = self.note
+    res = truncate_html(self.note, :max_length => truncate, :words => true) if truncate
     res
   end
   
@@ -83,6 +83,9 @@ class UserNote < ActiveRecord::Base
         note.note += "In reply to: #{root_note.subject}\nFrom: #{root_note.user.name}\n\n"
         note.note += root_note.body
       end
+      # The note content built up above is all plaintext, but note is an html field.
+      self.extend TextHelper
+      note.note = format_message(note.note).first
       note.save
     end
   end

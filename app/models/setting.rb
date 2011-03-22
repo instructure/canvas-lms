@@ -60,14 +60,14 @@ class Setting < ActiveRecord::Base
   end
   
   def self.from_config(config_name, with_current_rails_env=true)
-    key = "yaml_config_#{config_name}_#{RAILS_ENV}_#{with_current_rails_env}"
+    key = "yaml_config_#{config_name}_#{Rails.env}_#{with_current_rails_env}"
     return @@cache[key] if @@cache[key] # if the config wasn't found it'll try again
     
     config = nil
-    path = File.join(RAILS_ROOT, 'config', "#{config_name}.yml")
+    path = File.join(Rails.root, 'config', "#{config_name}.yml")
     if File.exists?(path)
       config = YAML.load_file(path).with_indifferent_access
-      config = config[RAILS_ENV] if with_current_rails_env
+      config = config[Rails.env] if with_current_rails_env
     end
     @@cache[key] = config
   end

@@ -868,7 +868,11 @@ modules.initModuleManagement = function() {
     var $option = $(this).parents(".completion_criterion_option");
     $option.find(".min_score_box").showIf($(this).val() == 'min_score');
     var id = $option.find(".id").val();
-    $option.find(".points_possible").text($("#context_module_item_" + id + " .points_possible").text());
+    $option.find(".points_possible").text(
+      $("#context_module_item_" + id + " .points_possible").text() ||
+      // for some reason the previous did not have anything in it sometimes (noticed when you are dealing with a newly added module)
+      $("#context_module_item_" + id + " .points_possible_block").text()
+    );
   });
   $("#add_context_module_form .delete_criterion_link").click(function(event) {
     event.preventDefault();

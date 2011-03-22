@@ -1,50 +1,65 @@
 <% content_for :page_title do %><%= @attachment.display_name %>: <%= @context.name %><% end %>
 <% add_crumb @attachment.display_name, context_url(@context, :context_file_url, @attachment) %>
-<% if @attachment.locked_for?(@current_user) %>
+<% download_url = context_url(@context, :context_file_download_url, @attachment.id) %>
+<% if !can_do(@context, @current_user, :manage_files) && (locked = @attachment.locked_for?(@current_user)) %>
   <div style="margin: 10px 50px;">
     <% if @attachment.folder && @attachment.folder.locked? %>
       The folder "<%= @attachment.folder.name %>," which includes this file, has been locked.
-    <% elsif @attachment.lock_at && Time.now > lock_at %>
-      This file has been locked since <%= datetime_string(@attachment.lock_at) %>
-    <% elsif @attachment.unlock_at && Time.now < @attachment.unlock_at %>
-      This file is set to be unlocked <%= datetime_string(@attachment.unlock_at) %>
     <% else %>
-      This file has not been unlocked yet.
+      <%= locked.is_a?(Hash) ? lock_explanation(locked, 'file', @context) : "This file has not been unlocked yet." %>
     <% end %>
   </div>
 <% else %>
-  <% if @attachment.inline_content? %>
+  <% if @attachment.content_type == "application/x-shockwave-flash" %>
+    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="100%" height="500">
+      <param name="movie" value="<%= safe_domain_file_url(@attachment) %>" />
+      <param name="wmode" value="transparent" />
+      <param name="allowscriptaccess" value="never" />
+      <!--[if !IE]>-->
+      <object type="application/x-shockwave-flash" data="<%= safe_domain_file_url(@attachment) %>" width="100%" height="500">
+        <param name="wmode" value="transparent" />
+        <param name="allowscriptaccess" value="never" />
+        <!--<![endif]-->
+        <!--[if !IE]>-->
+      </object>
+      <!--<![endif]-->
+    </object>
+    <a style="display:block;" href="<%= safe_domain_file_url(@attachment) %>">Download <%= @attachment.display_name %></a>
+  <% elsif @attachment.inline_content? %>
     <% jammit_js :file_inline %>
     <iframe id="file_content" src="<%= safe_domain_file_url(@attachment) %>" style="width: 100%; height: 400px;"></iframe>
   <% elsif @attachment.content_type && @attachment.content_type.match(/\Aimage\//) %>
     <h2><%= @attachment.display_name %></h2>
-    <%= link_to(image_tag(@attachment.cacheable_s3_url, :alt => @attachment.display_name), @attachment.cached_s3_url) %>
+    <%= link_to(image_tag(download_url, :alt => @attachment.display_name), download_url) %>
   <% else %>
     <h2><%= @attachment.display_name %></h2>
     <span style="font-size: 1.2em;">
-      <%= link_to "Download #{@attachment.filename}", @attachment.cacheable_s3_url %>
+      <%= link_to "Download #{@attachment.filename}", download_url %>
     </span> (<%= @attachment.readable_size %>)
     <% if @attachment.scribdable? && @attachment.scribd_doc %>
       <div id="scribd_preview" data-doc-id="<%= @attachment.scribd_doc.doc_id %>" data-access-key="<%= @attachment.scribd_doc.access_key %>"></div>
+      <a href="<%= context_url(@context, :context_file_inline_view_url, @attachment.id) %>" style="display: none;" class="inline_view_attachment_url">&nbsp;</a>
+      <% js_block do %>
+        <script>
+          $(function() {
+            $('#scribd_preview').ifExists(function($preview){
+              var url = $(".inline_view_attachment_url").attr('href');
+              var sd = scribd.Document.getDoc( $preview.data('doc-id'), $preview.data('access-key') );
+              $.each({
+                  'jsapi_version': 1,
+                  'disable_related_docs': true,
+                  'height' : '400px'
+                }, function(key, value){
+                  sd.addParam(key, value);
+              });
+              sd.write('scribd_preview');
+              $.ajaxJSON(url, 'POST', {}, function() { }, function() { });
+            });
+          });
+        </script>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @attachment} %>
-<% js_block do %>
-<script>
-$(document).ready(function() {
-  var $preview = $("#scribd_preview");
-  if($preview.length) {
-    var sd = scribd.Document.getDoc( $preview.attr('data-doc-id'), $preview.attr('data-access-key'));
-    $.each({
-        'jsapi_version': 1,
-        'disable_related_docs': true,
-        'height' : '400px'
-      }, function(key, value){
-        sd.addParam(key, value);
-    });
-    sd.write($preview.attr('id'));
-  }
-});
-</script>
-<% end %>
+

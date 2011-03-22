@@ -8,10 +8,6 @@ class ActiveRecord::Base
       super
     end
   end
-  
-  def dump_for_delayed_job
-    "#{self.class};#{id}"
-  end
 end
 
 module Delayed

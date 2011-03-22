@@ -21,8 +21,8 @@ class Group < ActiveRecord::Base
   include Workflow
 
   attr_accessible :name, :context, :max_membership, :category, :join_level, :default_view
-  has_many :group_memberships, :dependent => :destroy
-  has_many :users, :through => :group_memberships
+  has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
+  has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
   has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
   has_many :invited_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'invited']
@@ -43,6 +43,7 @@ class Group < ActiveRecord::Base
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :external_feeds, :as => :context, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
@@ -252,7 +253,7 @@ class Group < ActiveRecord::Base
   private :ensure_defaults
   
   set_policy do
-    given { |user| user && self.participating_users.include?(user) }
+    given { |user| user && self.participating_group_memberships.find_by_user_id(user.id) }
     set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and
       can :manage_files and can :moderate_forum and
       can :post_to_forum and
@@ -273,7 +274,7 @@ class Group < ActiveRecord::Base
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     set { can :read and can :read_roster }
   end
-  
+
   def file_structure_for(user)
     User.file_structure_for(self, user)
   end

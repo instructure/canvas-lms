@@ -324,7 +324,7 @@ class Attachment < ActiveRecord::Base
   def inline_content?
     self.content_type.match(/\Atext/) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
   end
-
+  
   def self.s3_config
     # Return existing value, even if nil, as long as it's defined
     return @s3_config if defined?(@s3_config)
@@ -338,13 +338,19 @@ class Attachment < ActiveRecord::Base
   end
   
   def self.s3_storage?
-    file_store_config['storage'] == 's3' && s3_config
+    file_store_config['storage'] == 's3' && s3_config || (RAILS_ENV == "test" && (Setting.get("file_storage_test_override", nil) rescue nil) == "s3")
   end
   
   def self.local_storage?
-    file_store_config['storage'] == 'local' || !s3_storage?
+    rv = !s3_storage?
+    raise "Unknown storage type!" if rv && file_store_config['storage'] != 'local'
+    rv
   end
-  
+
+  def self.shared_secret
+    self.s3_storage? ? AWS::S3::Base.connection.secret_access_key : "local_storage" + Canvas::Security.encryption_key
+  end
+
   def downloadable?
     !!(self.authenticated_s3_url rescue false)
   end
@@ -368,6 +374,9 @@ class Attachment < ActiveRecord::Base
         self.attachment_fu_filename = val
       end
     end
+    
+    def bucket_name; "no-bucket"; end
+    
     def after_attachment_saved
       # No point in submitting to scribd since there's not a reliable
       # URL to provide for referencing
@@ -473,6 +482,12 @@ class Attachment < ActiveRecord::Base
     h = ActionView::Base.new
     h.extend ActionView::Helpers::NumberHelper
     h.number_to_human_size(self.size) rescue "size unknown"
+  end
+  
+  def clear_cached_urls
+    self.cached_s3_url = nil
+    self.s3_url_cached_at = nil
+    self.cached_scribd_thumbnail = nil
   end
   
   def cacheable_s3_url
@@ -595,8 +610,14 @@ class Attachment < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :read) } #students.include? user }
     set { can :read }
     
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) && !self.locked_for?(user) } #students.include? user }
+    given { |user, session| 
+      self.cached_context_grants_right?(user, session, :read) && 
+      (self.cached_context_grants_right?(user, session, :manage_files) || !self.locked_for?(user))
+    }
     set { can :download }
+    
+    given { |user, session| self.context_type == 'Submission' && self.context.grant_rights?(user, session, :comment) }
+    set { can :create }
     
     given { |user, session| 
         u = session && User.find_by_id(session['file_access_user_id'])
@@ -607,7 +628,8 @@ class Attachment < ActiveRecord::Base
     
     given { |user, session| 
         u = session && User.find_by_id(session['file_access_user_id'])
-        u && self.cached_context_grants_right?(u, session, :read) && !self.locked_for?(u) &&
+        u && self.cached_context_grants_right?(u, session, :read) && 
+        (self.cached_context_grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     set { can :download }
@@ -691,6 +713,8 @@ class Attachment < ActiveRecord::Base
     state :to_be_zipped
     state :zipping
     state :zipped
+    state :unattached
+    state :unattached_temporary
   end
   
   named_scope :to_be_zipped, lambda{

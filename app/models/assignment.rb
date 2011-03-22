@@ -174,6 +174,10 @@ class Assignment < ActiveRecord::Base
   end
   protected :default_values
   
+  def attendance?
+    submission_types == 'attendance'
+  end
+  
   def due_date
     self.all_day ? self.all_day_date : self.due_at
   end
@@ -628,7 +632,7 @@ class Assignment < ActiveRecord::Base
       self.cached_context_grants_right?(user, session, :participate_as_student) &&
       !self.locked_for?(user)
     }
-    set { can :submit }
+    set { can :submit and can :attach_submission_comment_files }
     
     given { |user, session| !self.locked_for?(user) && 
       (self.context.allow_student_assignment_edits rescue false) && 
@@ -637,10 +641,10 @@ class Assignment < ActiveRecord::Base
     set { can :update_content }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#self.context.admins.find_by_id(user) }
-    set { can :update and can :update_content and can :grade and can :delete and can :create and can :read }
+    set { can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#self.context.admins.find_by_id(user) }
-    set { can :update and can :update_content and can :delete and can :create and can :read }
+    set { can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files }
   end
 
   def self.search(query)
@@ -1148,6 +1152,7 @@ class Assignment < ActiveRecord::Base
         AND (
           (score IS NULL AND submissions.workflow_state != 'graded')
           OR submissions.workflow_state = 'submitted'
+          OR submissions.workflow_state = 'pending_review'
         )
         AND submission_type IS NOT NULL)"
           {:select => 'assignments.id, title, points_possible, due_at, context_id, context_type, submission_types, ' +
@@ -1432,6 +1437,8 @@ class Assignment < ActiveRecord::Base
   def submissions_needing_grading
     self.submissions.select{|s| !s.graded? }
   end
+  
+  def special_class; nil; end
   
   def submission_action_string
     if self.submission_types == "online_quiz"

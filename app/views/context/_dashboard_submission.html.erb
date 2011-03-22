@@ -19,12 +19,12 @@
   </div>
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((submission_comment.try_rescue(:author_id)), context_code) %></div>
-    <div class="message user_content"><%= user_content(submission_comment.try_rescue(:formatted_body), context_code, submission_comment.try_rescue(:asset_string) || dashboard_submission.try_rescue(:asset_string)) || nbsp %>
+    <div class="message user_content"><%= raw(submission_comment.try_rescue(:formatted_body) || nbsp) %>
       <% if submission_comment && submission_comment.media_comment_id %>
         <a href="#" class="instructure_inline_media_comment no-underline"><span class="media_comment_id" style="display: none;"><%= submission_comment.media_comment_id %></span>&nbsp;</a>
       <% end %>
     </div>
-    <div class="attachments_list" style="margin-top: 5px; <%= hidden unless submission_comment && !submission_comment.cached_attachments.empty? %>">
+    <div class="attachments_list" style="margin-top: 5px; <%= hidden unless submission_comment.try(:cached_attachments) && !submission_comment.cached_attachments.empty? %>">
       <% (submission_comment.try_rescue(:cached_attachments) || []).each do |attachment| %>
         <div class="attachment">
           <a href="<%= context_prefix(context_code) %>/assignments/<%= dashboard_submission ? dashboard_submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= dashboard_submission ? dashboard_submission.user_id : "{{ user_id }}" %>?comment_id=<%= submission_comment ? submission_comment.id : "{{ comment_id }}" %>&download=<%= attachment.id %>" class="comment_attachment_link download"> <%= attachment.try_rescue(:display_name) %> - <%= attachment.try_rescue(:readable_size) %></a>

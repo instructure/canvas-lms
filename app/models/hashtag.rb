@@ -65,6 +65,6 @@ class Hashtag < ActiveRecord::Base
   end
   
   named_scope :to_be_polled, lambda {
-    { :conditions => ['hashtags.refresh_at <= now()' ], :order => :refresh_at, :limit => 1 }
+    { :conditions => ['hashtags.refresh_at <= ?', Time.now ], :order => :refresh_at, :limit => 1 }
   }
 end

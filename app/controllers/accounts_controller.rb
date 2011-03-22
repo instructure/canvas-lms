@@ -17,6 +17,7 @@
 #
 
 class AccountsController < ApplicationController
+  before_filter :require_user, :only => [:index]
   before_filter :get_context
   
   def index
@@ -24,6 +25,7 @@ class AccountsController < ApplicationController
   end
   
   def show
+    return redirect_to account_settings_url(@account) if @account.site_admin?
     if authorized_action(@account, @current_user, :manage)
       load_course_right_side
       @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show)
@@ -71,6 +73,7 @@ class AccountsController < ApplicationController
         order_hash[type] = idx
       end
       @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.membership_type] || 999, au.user.sortable_name] }
+      @account_notifications = AccountNotification.for_account(@account)
     end
   end
   
@@ -166,7 +169,7 @@ class AccountsController < ApplicationController
     @maximum_courses_im_gonna_show = 100
     @term = @root_account.enrollment_terms.active.find(params[:enrollment_term_id]) rescue nil
     @term ||= @root_account.enrollment_terms.active[-1]
-    @associated_courses_count = @account.associated_courses.active.for_term(@term).count
+    @associated_courses_count = @account.associated_courses.active.for_term(@term).uniq.count
   end
   protected :load_course_right_side
   

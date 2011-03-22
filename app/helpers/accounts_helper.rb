@@ -23,41 +23,11 @@ module AccountsHelper
     
   def print_messages(batch)
     return '' unless batch
-    output = "<ul>"
-    if batch.processing_errors && batch.processing_errors.length > 0
-      output += "<li>Errors that prevent importing\n<ul>"
-      batch.processing_errors.each do |message|
-        output += "<li>#{message.first} - #{message.last}</li>"
-      end
-      output += "</ul>\n</li>"
-    end
-    if batch.processing_warnings && batch.processing_warnings.length > 0
-      output += "<li>Warnings\n<ul>"
-      batch.processing_warnings.each do |message|
-        output += "<li>#{message.first} - #{message.last}</li>"
-      end
-      output += "</ul>\n</li>"
-    end
-    output += "</ul>"
-    output
+    render :partial => 'accounts/sis_batch_messages', :object => batch
   end
   
   def print_counts(batch)
     return '' unless batch.data && batch.data[:counts]
-    counts = batch.data[:counts]
-    <<-EOF
-    <ul>
-      <li>Imported Items
-        <ul>
-          <li>Accounts: #{counts[:accounts]}</li>
-          <li>Terms: #{counts[:terms]}</li>
-          <li>Courses: #{counts[:courses]}</li>
-          <li>Sections: #{counts[:sections]}</li>
-          <li>Users: #{counts[:users]}</li>
-          <li>Enrollments: #{counts[:enrollments]}</li>
-        </ul>
-      </li>
-    </ul>
-    EOF
+    render :partial => 'accounts/sis_batch_counts', :object => batch
   end
 end

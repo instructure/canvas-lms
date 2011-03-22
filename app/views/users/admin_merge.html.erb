@@ -67,7 +67,7 @@
         <tr>
           <td style="vertical-align: top; padding: 10px 30px 10px;">
             <h3>Find a User</h3>
-            <% accounts = @current_user.associated_accounts.sort_by(&:name) %>
+            <% accounts = @current_user.associated_accounts.sort_by(&:name).uniq %>
             <% if accounts.empty? %>
               You don't have permission to search any accounts
             <% else %>

@@ -83,8 +83,8 @@
             <a target="_blank" class="button button-sidebar button-sidebar-wide" href="<%= context_url(@topic.assignment.context, :speed_grader_context_gradebook_url, :assignment_id => @topic.assignment_id) %>"><%= image_tag "grading_icon.png" %> Speed Grader</a>
           <% end %>
         <% end %>
-        <% if @assignment && @assignment.rubric_association && @assignment.rubric_association.rubric %>
-          <a href="#" class="show_rubric_link button button-sidebar-wide"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
+        <% if can_do(@topic.assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
+          <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
         <% end %>
       </div>
     <% end %>
@@ -100,6 +100,11 @@
 <a href="<%= context_url(@context, :context_discussion_topic_permissions_url, @topic.id) %>" class="discussion_entry_permissions_url" style="display: none;">&nbsp;</a>
 <% if @headers == false || @locked %>
   <div style="width: 600px; margin: 10px auto;">
+<% end %>
+<% if @assignment %>
+  <% if can_do(@assignment, @current_user, :update) %>
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
+  <% end %>
 <% end %>
 <% if (@topic && @topic.context_module_tag && @topic.context_module_tag.context_module) || (@topic.for_assignment? && @topic.assignment.context_module_tag && @topic.assignment.context_module_tag.context_module) %>
   <%= render :partial => "shared/context_module_legend", :object => (@topic && @topic.context_module_tag && @topic.context_module_tag.context_module) || (@topic.assignment && @topic.assignment.context_module_tag && @topic.assignment.context_module_tag.context_module) %>
@@ -177,16 +182,6 @@
 <% if @headers == false || @locked %>
   </div>
 <% end %>
-
-<div id="rubric_dialog" style="display: none;">
-  <% if @assignment && @assignment.rubric_association && @assignment.rubric_association.rubric %>
-    <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric, :locals => {:association => @assignment, :rubric_association => @assignment.rubric_association, :editable => false, :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => false} %>
-  <% end %>
-  <% if @assignment && (can_do(@assignment, @current_user, :grade) || (@assignment.context && can_do(@assignment.context, @current_user, :manage_assignments))) %>
-    <a href="<%= context_url(@topic.assignment.context, :edit_context_assignment_url, @topic.assignment_id, :return_to => request.url) %>" class="button"><%= image_tag "edit.png" %> Edit Assignment Settings</a>
-  <% end %>
-  <%= render :partial => "shared/rubric_criterion_dialog" %>
-</div>
 
 <% content_for :keyboard_navigation do %>
   <ul class="navigation_list" tabindex="-1">

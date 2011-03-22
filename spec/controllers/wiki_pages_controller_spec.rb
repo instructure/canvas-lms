@@ -94,6 +94,32 @@ describe WikiPagesController do
       assigns[:page].should_not be_nil
       assigns[:page].title.should eql("Some Page")
     end
+    
+    it "should allow students when allowed" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create', :course_id => @course.id, :wiki_page => {:title => "Some Secret Page"}
+      response.should be_redirect
+      page = assigns[:page]
+      page.should_not be_nil
+      page.should_not be_new_record
+      page.title.should == "Some Secret Page"
+      student = user()
+      enrollment = @course.enroll_student(student)
+      enrollment.accept!
+      @course.reload
+      user_session(student)
+      get 'show', :course_id => @course.id, :id => page.wiki_id
+      response.should be_success
+      assigns[:wiki].should_not be_nil
+      assigns[:namespace].should_not be_nil
+      assigns[:page].should_not be_nil
+      assigns[:page].title.should eql("Some Secret Page")
+      page.hide_from_students = true
+      page.save
+      page.reload
+      get 'show', :course_id => @course.id, :id => page.wiki_id
+      assert_unauthorized
+    end
   end
   
   # describe "GET 'revisions'" do

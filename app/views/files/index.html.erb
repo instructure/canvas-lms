@@ -92,7 +92,6 @@
       <% end %>
       <% if can_do(@context.attachments.new, @current_user, :create) %>
         <a href="<%= context_url(@context, :context_files_url, :format => :json) %>" id="file_uploads_url" style="display: none;">&nbsp;</a>
-        <div id="file_uploads_session_id" style="display: none;"><%= request.session_options[:id] %></div>
         <div id="multi_file_uploads_link">
           <span id="file_upload">
           </span>

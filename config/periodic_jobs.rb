@@ -13,8 +13,13 @@
 # You should only use "cron" type jobs, not "every". Cron jobs have deterministic
 # times to run which help across daemon restarts.
 
-scheduler.cron '*/5 * * * *' do
-  ActiveRecord::SessionStore::Session.delete_all(['created_at < ? OR updated_at < ?', 3.weeks.ago, 1.day.ago])
+if ActionController::Base.session_store == ActiveRecord::SessionStore
+  expire_after = (Setting.from_config("session_store") || {})[:expire_after]
+  expire_after ||= 1.day
+
+  scheduler.cron '*/5 * * * *' do
+    ActiveRecord::SessionStore::Session.delete_all(['updated_at < ?', expire_after.ago])
+  end
 end
 
 scheduler.cron '*/30 * * * *' do
@@ -36,4 +41,11 @@ end
 
 scheduler.cron '0 11 * * *' do
   Reporting::CountsReport.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
+end
+
+scheduler.cron '45 11 * * *' do
+  # we pass false for the touch_users argument, on the assumption that these
+  # stream items that we delete aren't visible on the user's dashboard anymore
+  # anyway, so there's no need to invalidate all the caches.
+  StreamItem.send_later_enqueue_args(:destroy_stream_items, { :priority => Delayed::LOW_PRIORITY }, 4.weeks.ago, false)
 end

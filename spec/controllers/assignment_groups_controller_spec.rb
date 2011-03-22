@@ -175,5 +175,41 @@ describe AssignmentGroupsController do
       assigns[:assignment_group].should_not be_frozen
       assigns[:assignment_group].should be_deleted
     end
+    
+    it "should delete assignments in the group" do
+      course_with_teacher_logged_in(:active_all => true)
+      @group1 = @course.assignment_groups.create!(:name => "group 1")
+      @assignment1 = @course.assignments.create!(:title => "assignment 1", :assignment_group => @group1)
+      delete 'destroy', :course_id => @course.id, :id => @group1.id
+      assigns[:assignment_group].should eql(@group1)
+      assigns[:assignment_group].should be_deleted
+      @group1.reload.assignments.length.should eql(1)
+      @group1.reload.assignments[0].should eql(@assignment1)
+      @group1.assignments.active.length.should eql(0)
+    end
+    
+    it "should move assignments to a different group if specified" do
+      course_with_teacher_logged_in(:active_all => true)
+      @group1 = @course.assignment_groups.create!(:name => "group 1")
+      @assignment1 = @course.assignments.create!(:title => "assignment 1", :assignment_group => @group1)
+      @group2 = @course.assignment_groups.create!(:name => "group 2")
+      @assignment2 = @course.assignments.create!(:title => "assignment 2", :assignment_group => @group2)
+      @assignment1.position.should eql(1)
+      @assignment1.assignment_group_id.should eql(@group1.id)
+      @assignment2.position.should eql(1)
+      @assignment2.assignment_group_id.should eql(@group2.id)
+      
+      delete 'destroy', :course_id => @course.id, :id => @group2.id, :move_assignments_to => @group1.id
+      assigns[:new_group].should eql(@group1)
+      assigns[:assignment_group].should eql(@group2)
+      assigns[:assignment_group].should be_deleted
+      @group2.reload.assignments.length.should eql(0)
+      @group1.reload.assignments.length.should eql(2)
+      @group1.assignments.active.length.should eql(2)
+      @assignment1.reload.position.should eql(1)
+      @assignment1.assignment_group_id.should eql(@group1.id)
+      @assignment2.reload.position.should eql(2)
+      @assignment2.assignment_group_id.should eql(@group1.id)
+    end
   end
 end

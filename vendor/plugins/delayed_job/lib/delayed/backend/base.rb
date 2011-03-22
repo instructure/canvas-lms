@@ -72,13 +72,13 @@ module Delayed
 
       def reschedule_at
         new_time = self.class.db_time_now + (attempts ** 4) + 5
-        if payload_object.respond_to?(:reschedule_at)
-          begin
+        begin
+          if payload_object.respond_to?(:reschedule_at)
             new_time = payload_object.reschedule_at(
                                         self.class.db_time_now, attempts)
-          rescue
-            # TODO: just swallow errors from reschedule_at ?
           end
+        rescue
+          # TODO: just swallow errors from reschedule_at ?
         end
         new_time
       end

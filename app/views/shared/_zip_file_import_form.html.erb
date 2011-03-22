@@ -71,6 +71,7 @@
         $("#zip_file_import_form").prepend($ul).prepend($div);
         $("#uploading_please_wait_dialog").dialog('close');
       }
+      var hadSomeProgress = false;
       var pollImport = function() {
         $.getJSON(url, function(data) {
           if(data && data.errors) {
@@ -79,7 +80,7 @@
             $("#uploading_progressbar").progressbar('value', 100);
             $("#uploading_please_wait_dialog").prepend("Uploading complete!");
             location.href = $("#return_to").val();
-          } else if(!data || data.progress == null) {
+          } else if(hadSomeProgress && (!data || data.progress == null)) {
             pollImport.blankCount = pollImport.blankCount || 0;
             pollImport.blankCount++;
             if(pollImport.blankCount > 10) {
@@ -90,6 +91,7 @@
           } else {
             pollImport.errorCount = 0;
             pollImport.blankCount = 0;
+            hadSomeProgress = true;
             setTimeout(pollImport, 2000);
             $("#uploading_progressbar").progressbar('value', ((data.progress || 0) * 100));
           }

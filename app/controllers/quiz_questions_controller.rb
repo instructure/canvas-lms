@@ -19,6 +19,13 @@
 class QuizQuestionsController < ApplicationController
   before_filter :require_context, :get_quiz
 
+  def show
+    if authorized_action(@quiz, @current_user, :update)
+      @question = @quiz.quiz_questions.find(params[:id])
+      render :json => @question.to_json(:include => :assessment_question)
+    end
+  end
+  
   def create
     if authorized_action(@quiz, @current_user, :update)
       if params[:existing_questions]

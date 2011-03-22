@@ -45,7 +45,7 @@ var GradebookUploader = {
     $.each(mergedGradebook.assignments, function(){
       gridData.columns.push({
         id: this.id,
-        name: this.title,
+        name: $.htmlEscape(this.title),
         field: this.id, 
         width:200,
         editor: NullGradeEditor,
@@ -79,7 +79,7 @@ var GradebookUploader = {
       else {
         col = {
           id: assignment.id,
-          name: assignment.title,
+          name: $.htmlEscape(assignment.title),
           field: assignment.id,
           formatter: simpleGradeCellFormatter,
           cssClass: "active new"

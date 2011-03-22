@@ -68,7 +68,7 @@ class PseudonymsController < ApplicationController
     @headers = false
     # Allow unregistered users to change password.  How else can they come back later
     # and finish the registration process? 
-    if !@cc || @cc.path_type != 'email' #|| !@pseudonym.user.registered?
+    if !@cc || @cc.path_type != 'email'
       flash[:error] = "Cannot change the password for that login, or login does not exist"
       redirect_to root_url
     end
@@ -144,7 +144,7 @@ class PseudonymsController < ApplicationController
       else
         flash[:notice] = "Registration failed."
         respond_to do |format|
-          format.html { redirect_to claim_pseudonym_url(@pseudonym.id, nonce) }#back_or_default profile_url }
+          format.html { redirect_to claim_pseudonym_url(@pseudonym.id, nonce) }
           format.json { render :json => cc.to_json }
         end
       end
@@ -239,7 +239,7 @@ class PseudonymsController < ApplicationController
     end
     if @failed
       respond_to do |format|
-        format.html { render :action => "registration_confirmation_failed" } #redirect_back_or_default root_url }
+        format.html { render :action => "registration_confirmation_failed" }
         format.json { render :json => {}.to_json, :status => :bad_request }
       end
     end

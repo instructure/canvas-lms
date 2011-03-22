@@ -144,7 +144,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def plaintext_message=(val)
     self.extend TextHelper
-    self.message = format_message(strip_tags(val)).first
+    self.message = format_message(val).first
   end
   
   def truncated_message(length=nil)

@@ -5,6 +5,7 @@ end
 
 require 'canvas_migration'
 require 'qti_exporter/qti'
+require 'qti_exporter/qti_plugin_validator'
 require 'qti_exporter/qti_exporter'
 require 'workers/qti_worker'
 require 'qti_exporter/assessment_item_converter'

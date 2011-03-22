@@ -1,5 +1,5 @@
 <% context ||= @context; asset ||= nil %>
-<% if context && context.is_a?(Course) && asset %>
+<% if context && context.is_a?(Course) && asset && @headers != false %>
   <div id="sequence_footer" style="display: none;">
     <a class="prev button" href="#">
       <%= image_tag "back.png" %> <span class="text">Previous</span>

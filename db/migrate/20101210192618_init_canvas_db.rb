@@ -117,7 +117,6 @@ class InitCanvasDb < ActiveRecord::Migration
       t.text     "settings"
       t.string   "sis_name"
       t.string   "uuid"
-      t.integer  "fake_id", :limit => 8,                          :limit => 8
     end
 
     add_index "accounts", ["id", "type"], :name => "index_accounts_on_id_and_type"

@@ -23,7 +23,8 @@ class Quiz < ActiveRecord::Base
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
-    :hide_results, :locked
+    :hide_results, :locked, :ip_filter, :require_lockdown_browser, :context
+
   attr_readonly :context_id, :context_type
   
   has_many :quiz_questions, :dependent => :destroy, :order => 'position'
@@ -61,6 +62,7 @@ class Quiz < ActiveRecord::Base
     self.allowed_attempts = 1 if self.allowed_attempts == nil
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= [[self.lock_at, self.due_at].compact.min, self.unlock_at].compact.max
+    self.ip_filter = nil if self.ip_filter && self.ip_filter.strip.empty?
     if !self.available? && self.quiz_type != 'survey' && self.quiz_type != 'graded_survey'
       self.points_possible = self.current_points_possible
     end
@@ -91,6 +93,15 @@ class Quiz < ActiveRecord::Base
   
   def readable_type
     (self.quiz_type || "").match(/survey/) ? "Survey" : "Quiz"
+  end
+  
+  def valid_ip?(ip)
+    require 'ipaddr'
+    ip_filter.split(/,/).any? do |filter|
+      addr_range = IPAddr.new(filter) rescue nil
+      addr = IPAddr.new(ip) rescue nil
+      addr && addr_range && addr_range.include?(addr)
+    end
   end
   
   def survey?
@@ -338,7 +349,7 @@ class Quiz < ActiveRecord::Base
       variables.each do |variable|
         variable_id = AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub(re, "<input class='question_input' type='text' style='width: 120px;' name='question_#{q.id}_#{variable_id}'/>")
+        text = text.sub(re, "<input class='question_input' type='text' style='width: 120px;' name='question_#{q[:id]}_#{variable_id}'/>")
       end
       q[:original_question_text] = q[:question_text]
       q[:question_text] = text
@@ -348,7 +359,7 @@ class Quiz < ActiveRecord::Base
       variables.each do |variable|
         variable_id = AssessmentQuestion.variable_id(variable)
         variable_answers = q[:answers].select{|a| a[:blank_id] == variable }
-        options = variable_answers.map{|a| "<option value='#{a[:id]}'>#{a[:text]}</option>" }
+        options = variable_answers.map{|a| "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>" }
         select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>[ Select ]</option>#{options}</select>"
         re = Regexp.new("\\[#{variable}\\]")
         text = text.sub(re, select)
@@ -374,8 +385,9 @@ class Quiz < ActiveRecord::Base
     q
   end
   
-  def find_or_create_submission(user, temporary=false)
+  def find_or_create_submission(user, temporary=false, state=nil)
     s = nil
+    state ||= 'untaken'
     attempts = 0
     user_id = user.is_a?(User) ? user.id : user
     begin
@@ -383,9 +395,11 @@ class Quiz < ActiveRecord::Base
         user_code = "#{user.to_s}"
         user_code = "user_#{user.id}" if user.is_a?(User)
         s = QuizSubmission.find_or_initialize_by_quiz_id_and_temporary_user_code(self.id, user_code)
+        s.workflow_state ||= state
         s.save
       else
         s = QuizSubmission.find_or_initialize_by_quiz_id_and_user_id(self.id, user_id)
+        s.workflow_state ||= state
         s.save
       end
     rescue => e
@@ -399,7 +413,7 @@ class Quiz < ActiveRecord::Base
   # on the SAVED version of the quiz.  Does not consider permissions.
   def generate_submission(user, preview=false)
     submission = nil
-    submission = self.find_or_create_submission(user, preview) #quiz_submissions.find_or_create_by_user_id(user_id)
+    submission = self.find_or_create_submission(user, preview)
     submission.retake
     submission.attempt = (submission.attempt + 1) rescue 1
     user_questions = []
@@ -445,6 +459,11 @@ class Quiz < ActiveRecord::Base
     submission.started_at = Time.now
     submission.end_at = nil
     submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
+    # Admins can take the full quiz whenever they want
+    unless user.is_a?(User) && self.grants_right?(user, nil, :grade)
+      submission.end_at = self.due_at if self.due_at && Time.now < self.due_at && (!submission.end_at || self.due_at < submission.end_at)
+    end
+    submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
     submission.finished_at = nil
     submission.submission_data = nil
     submission.workflow_state = 'preview' if preview
@@ -507,13 +526,25 @@ class Quiz < ActiveRecord::Base
     @locks[user ? user.id : 0] ||= Rails.cache.fetch(['_locked_for', self, user].cache_key, :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && self.unlock_at > Time.now)
-        locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
+        sub = user && quiz_submissions.find_by_user_id(user.id)
+        if !sub || !sub.manually_unlocked
+          locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
+        end
       elsif (self.lock_at && self.lock_at <= Time.now)
-        locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
+        sub = user && quiz_submissions.find_by_user_id(user.id)
+        if !sub || !sub.manually_unlocked
+          locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
+        end
       elsif (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
-        locked = l
+        sub = user && quiz_submissions.find_by_user_id(user.id)
+        if !sub || !sub.manually_unlocked
+          locked = l
+        end
       elsif (self.context_module_tag && !self.context_module_tag.available_for?(user, opts[:deep_check_if_needed]))
-        locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
+        sub = user && quiz_submissions.find_by_user_id(user.id)
+        if !sub || !sub.manually_unlocked
+          locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
+        end
       end
       locked
     end
@@ -890,6 +921,8 @@ class Quiz < ActiveRecord::Base
     context.imported_migration_items << item if context.imported_migration_items
     item
   end
+  
+  def self.serialization_excludes; [:access_code]; end
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#admins.include? user }

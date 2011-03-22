@@ -52,7 +52,7 @@
                 <div class="due_at"><%= datetime_string(assignment.due_at) rescue nbsp %>&nbsp;</div>
               <% end %>
               <div class="possible" style="float: left;"><%= "out of #{assignment.points_possible}" if assignment.points_possible %></div>
-              <div class="options"><a href="#" class="options_dropdown no-hover"><%= image_tag "blank.png" %></a></div>
+              <div class="options"><a href="#" class="options_dropdown no-hover"><%= image_tag "blank.png", :alt => '' %></a></div>
             </div>
           </td>
         <% end %>
@@ -75,7 +75,7 @@
           </td>
           <% @assignments.each do |assignment| %>
             <td id="submission_<%= student.id %>_<%= assignment.id %>" class="submission" title="Click to Change">
-              <div class="submission_content" title="Click to Change"><%= image_tag "blank.png", :class => "blank_attendance" %></div>
+              <div class="submission_content" title="Click to Change"><%= image_tag "blank.png", :alt => '', :class => "blank_attendance" %></div>
             </td>
           <% end %>
           <td class="false_submission">
@@ -129,7 +129,7 @@
       <h3>Edit Attendance Details</h3>
       <p>To edit the details for an attendance assignment, click the dropdown icon just below the assignment's name and then click "Edit Assignment".</p>
     </div>
-    <%= image_tag "blank.png", :class => "blank_attendance" %>
+    <%= image_tag "blank.png", :alt => '', :class => "blank_attendance" %>
     <%= image_tag "pass.png", :class => "pass_attendance" %>
     <%= image_tag "pass.png", :class => "complete_attendance" %>
     <%= image_tag "fail.png", :class => "fail_attendance" %>

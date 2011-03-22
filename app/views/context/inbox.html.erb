@@ -63,7 +63,7 @@
             <button type="button" class="button small-button nobr select_recipients" style="float: left;">Select Recipients</button>
             <div class="no_recipients">No Recipients</div>
             <div class="recipient blank" style="display: none;">
-              <span class="name">user name</span>
+              <span class="user_name">user name</span>
               <a href="#" class="delete_recipient_link">&#215;</a>
               <span class="id" style="display: none;">&nbsp;</span>
             </div>
@@ -150,11 +150,15 @@
         <h3 style="margin-top: 0; margin-bottom: 0;">Possible Recipients</h3>
         <ul class="unstyled_list" style="margin-left: 10px; margin-bottom: 15px;">
           <li class="message_group">
-            <a href="#" class="message_all_students_link select_recipients_link email">Select All Students
+            <a href="#" class="message_all_students_link select_recipients_link email">Current Students
             </a>
           </li>
           <li class="message_group">
-            <a href="#" class="message_all_teachers_link select_recipients_link email">Select Teachers
+            <a href="#" class="message_all_teachers_link select_recipients_link email">Current Teachers
+            </a>
+          </li>
+          <li class="message_group">
+            <a href="#" class="message_all_observers_link select_recipients_link email">Current Observers
             </a>
           </li>
         </ul>
@@ -176,13 +180,16 @@
     <div class="right_side" style="float: left; width: 60%; height: 300px; overflow: auto; padding-left: 10px;">
       
       <h3 style="margin-top: 0; float: left;">Recipients</h3>
-      <a href="#" class="clear_recipients_link" style="float: right; margin-right: 5px;">clear all</a>
+      <div style="float: right; margin-right: 5px;">
+        <a href="#" class="select_all_recipients_link">select all</a> | 
+        <a href="#" class="clear_recipients_link">clear all</a>
+      </div>
       <div class="clear"></div>
       <div style="margin-left: 10px;">
       <ul class="unstyled_list recipients">
         <li class="recipient blank" style="display: none;">
           <input type="checkbox" id=""/>
-          <label for="" class="name">&nbsp;</label>
+          <label for="" class="user_name">&nbsp;</label>
         </li>
       </ul>
       </div>

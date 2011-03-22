@@ -1,0 +1,177 @@
+<% 
+  add_crumb @quiz.title, context_url(@context, :context_quiz_url, @quiz)
+  add_crumb 'Moderate Quiz' 
+%>
+<% content_for :page_title do %>Moderate Quiz<% end %>
+
+<h2>Moderate Quiz</h2>
+<table id="students" class="<%= 'can_add_attempts' if @quiz.allowed_attempts < 0 %>">
+  <thead>
+    <tr>
+      <th style="padding-left: 5px;"><input type="checkbox" id="check_all" title="Select/Deselect All"/></th>
+      <th>Student</th>
+      <th>Attempt</th>
+      <th>Time</th>
+      <th>Attempts<br/>Left</th>
+      <th>Current<br/>Score</th>
+      <th style="text-align: right;">
+        <a href="#" class="reload_link"><%= image_tag "ajax-reload.gif" %></a>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% count = @students.offset %>
+    <% @students.each do |student| %>
+      <% count += 1 %>
+      <% submission = @submissions.detect{|s| s.user_id == student.id} %>
+      <tr class="student <%= 'extendable' if submission && submission.extendable? %> <%= 'in_progress' if submission && submission.untaken? %> <%= 'manually_unlocked' if submission && submission.manually_unlocked %>" id="student_<%= student.id %>" data-started-at="<%= submission && submission.started_at && submission.started_at.iso8601 %>" data-end-at="<%= submission && submission.end_at && submission.end_at.iso8601 %>" data-user-id="<%= student.id %>">
+        <td>
+          <input type="checkbox" class="student_check" data-id="<%= student.id %>" title="Select <%= h(student.last_name_first) %>"/>
+        </td>
+        <td class="name">
+          <% if submission %>
+            <a class="student_name" href="<%= context_url(@context, :context_quiz_history_url, @quiz.id, :quiz_submission_id => submission.id) %>">
+          <% end %>
+          <% if @quiz.survey? && @quiz.anonymous_submissions %>
+            Student <%= count %>
+          <% else %>
+            <%= student.last_name_first %>
+          <% end %>
+          <% if submission %></a><% end %>
+          <div class='extra_time_allowed' style="<%= hidden unless submission && submission.extra_time %>">
+            gets <span class='extra_time'><%= (submission && submission.extra_time) || '&nbsp;' %></span> extra minutes on each attempt
+          </div>
+        </td>
+        <td class="attempt number"><%= submission && !submission.settings_only? ? submission.attempt : "--" %></td>
+        <td class="time_holder">
+          <span class="time">
+          <% if submission && !submission.settings_only? %>
+            <% if submission.completed? %>
+              finished in <%= submission.finished_in_words %>
+            <% elsif submission.overdue? %>
+              --
+            <% else %>
+              in progress
+            <% end %>
+          <% end %>
+          </span>
+          <a href="#" class="extend_time_link no-hover"><%= image_tag "history.png", :alt => "Add Time" %></a>
+        </td>
+        <td class="attempts_left number">
+          <% if @quiz.allowed_attempts < 0 %>
+            -- 
+          <% elsif submission %>
+            <%= submission.attempts_left %>
+          <% else %>
+            <%= @quiz.allowed_attempts %>
+          <% end %>
+        </td>
+        <td class="score_holder">
+          <span class="score"><%= submission && submission.score %></span>
+        </td>
+        <td class="links">
+          <span class="unlocked" title="Manually Unlocked" style="<%= hidden unless submission && submission.manually_unlocked %>"><%= image_tag "unlock.png" %></span>
+          <span class="extra_attempts" style="display: none;"><%= submission && submission.extra_attempts %></span>
+          <a href="#" class="moderate_student_link no-hover" title="Change user extensions"><%= image_tag "edit.png" %></a>
+        </td>
+      </tr>
+    <% end %>
+    <tr>
+      <td colspan="5">
+        <div class="button-container">
+          <button class="button moderate_multiple_button" style="display: none;"><%= image_tag "edit.png" %>Change Extensions for <span id="checked_count">X</span> Selected Students</button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<%= will_paginate(@students) %>
+
+<div id="extend_time_dialog" style="display: none;">
+  <h2>Extend Quiz Time</h2>
+  You can give this student extra time on their current quiz attempt.
+  How much time would you like to give them?
+  <table>
+    <tr>
+      <th>Started:</th>
+      <td class="started_at">&nbsp;</td>
+    </tr>
+    <tr>
+      <th>Ending:</td>
+      <td class="end_at">&nbsp;</td>
+    </tr>
+  </table>
+  <div>
+    End the quiz
+    <input type="text" name="time" style="width: 50px;" title="minutes to add"/>
+    minutes
+    <select name="time_type">
+      <option value="extend_from_now">from now</option>
+      <option value="extend_from_end_at">from the current end time</option>
+    </select>
+  </div>
+  <div class="button-container">
+    <button type="button" class="button save_button">Extend Time</button>
+    <button type="button" class="button button-secondary cancel_button">Cancel</button>
+  </div>
+</div>
+<div id="moderate_student_dialog" style="display: none;">
+  <h2>Student Extensions</h2>
+  <% form_for :quiz, :url => "", :html => {:id => "moderate_student_form", :method => :post} do |f| %>
+    <table>
+      <% if @quiz.allowed_attempts > 0 %>
+        <tr>
+          <td style="white-space: nowrap; width: 10%;">
+            <label for="extension_extra_attempts">Extra Attempts: </label>
+          </td>
+          <td>
+            <input id="extension_extra_attempts" type="text" name="extra_attempts" style="width: 50px"/> (everyone gets <%= @quiz.allowed_attempts %> already)
+          </tr>
+        </tr>
+      <% end %>
+      <% if @quiz.time_limit %>
+        <tr>
+          <td style="white-space: nowrap; width: 10%;">
+            <label for="extension_extra_time">Extra Time on Every Attempt: </label>
+          </td>
+          <td>
+            <input id="extension_extra_time" type="text" name="extra_time" style="width: 50px;"/> minutes
+          </tr>
+        </tr>
+      <% end %>
+      <tr>
+        <td colspan="2">
+          <input type="hidden" name="manually_unlocked" value="0"/>
+          <input type="checkbox" name="manually_unlocked" id="extension_manually_unlocked" value="1"/>
+          <label for="extension_manually_unlocked">Manually unlock the quiz for the next attempt</label>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="button-container">
+            <button type="submit" class="button save_button">Save</button>
+            <button type="button" class="button button-secondary cancel_button">Cancel</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+</div>
+<div id="add_time_dialog" style="display: none;">
+  <h2>Add Time to the Current Attempt</h2>
+  Time to add: []
+  <div class="button-container">
+    <button type="button" class="button save_button">Add Time</button>
+    <button type="button" class="button secondary-button cancel_button">Cancel</button>
+  </div>
+</div>
+<div style="display: none;">
+  <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone) %></span>
+  <span class="utc_offset"><%= Time.now.utc_offset %></span>
+  <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id, :page => params[:page], :last_updated_at => "{{ update }}") %>" class="update_url">&nbsp;</span>
+  <span class="last_updated_at"><%= @submissions.map(&:updated_at).max.try(:in_time_zone).try(:iso8601) %></span>
+  <a href="<%= context_url(@context, :context_quiz_extensions_url, @quiz.id, "{{ user_id }}") %>" class="extension_url">&nbsp;</a>
+</div>
+
+<% jammit_js :moderate_quiz %>
+<% jammit_css :moderate_quiz %>

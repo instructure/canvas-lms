@@ -37,7 +37,7 @@ class ExternalFeed < ActiveRecord::Base
   end
   
   named_scope :to_be_polled, lambda {
-    { :conditions => ['external_feeds.consecutive_failures < ? and external_feeds.refresh_at < now()', 5], :order => :refresh_at }
+    { :conditions => ['external_feeds.consecutive_failures < ? and external_feeds.refresh_at < ?', 5, Time.now ], :order => :refresh_at }
   }
   
   named_scope :for, lambda {|obj|

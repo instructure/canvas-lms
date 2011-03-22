@@ -17,6 +17,7 @@
     <% [ { :label => "Overdue", :variable => @overdue_assignments},
          { :label => "Ungraded", :variable => @ungraded_assignments},
          { :label => "Upcoming", :variable => @future_assignments},
+         { :label => "Undated", :variable => @undated_assignments},
          { :label => "Past", :variable => @past_assignments}
        ].each do |group| %>
     <div style="margin-bottom: 25px; <%= hidden if !group[:variable] || group[:variable].empty? %>" class="assignment_list <%= 'show_context' unless @just_viewing_one_course %>">

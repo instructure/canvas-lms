@@ -22,7 +22,7 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   ssl_required :create, :new
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :mark_avatar_image]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard]
   before_filter :require_open_registration, :only => [:new, :create]
   
   def oauth
@@ -52,10 +52,6 @@ class UsersController < ApplicationController
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
       @current_enrollments = @user.current_enrollments
-      if @current_enrollments.length == 1
-        redirect_to course_grades_url(@current_enrollments.first.course_id)
-        return
-      end
       
       @student_enrollments = @current_enrollments.select{|e| e.is_a?(StudentEnrollment) }
       
@@ -65,6 +61,11 @@ class UsersController < ApplicationController
         @observed_enrollments << StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)
       end
       @observed_enrollments = @observed_enrollments.uniq.compact
+      
+      if @current_enrollments.length + @observed_enrollments.length == 1
+        redirect_to course_grades_url(@current_enrollments.first.course_id)
+        return
+      end
       
       @teacher_enrollments = @current_enrollments.select{|e| e.admin? }
       @prior_enrollments = @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
@@ -163,14 +164,17 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    get_context
+    if request.path =~ %r{\A/dashboard\z}
+      return redirect_to(dashboard_url, :status => :moved_permanently)
+    end
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
     if @show_recent_feedback = (@current_user.student_enrollments.active.size > 0)
       @recent_feedback = (@current_user && @current_user.recent_feedback) || []
     end
+    @account_notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @is_default_account = @current_user.pseudonyms.active.map(&:account_id).include?(Account.default.id)
-    render :action => "user_dashboard"
   end
-  protected :user_dashboard
 
   def courses
     get_context
@@ -194,6 +198,11 @@ class UsersController < ApplicationController
   
   def ignore_item
     @current_user.ignore_item!(params[:asset_string], params[:purpose], params[:permanent] == '1')
+    render :json => @current_user.to_json
+  end
+  
+  def close_notification
+    @current_user.close_notification(params[:id])
     render :json => @current_user.to_json
   end
   
@@ -252,10 +261,6 @@ class UsersController < ApplicationController
   def show
     get_context
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-    if request.path.match(/\A\/dashboard/)
-      return if require_user == false
-      return user_dashboard
-    end
     @user = params[:id] ? User.find(params[:id]) : @current_user
     if current_user_is_site_admin? || authorized_action(@user, @current_user, :view_statistics)
       add_crumb("#{@user.short_name}'s profile", @user == @current_user ? profile_path : user_path(@user) )
@@ -297,11 +302,11 @@ class UsersController < ApplicationController
     # If a teacher created the student, and the student then comes to register, they
     # should still be allowed to.
     if @active_cc && @active_cc.user && !@pseudonym.user
-      @user = @active_cc.user
+      @user ||= @active_cc.user
     elsif @any_cc && @any_cc.user && !@pseudonym.user
-      @user = @any_cc.user
+      @user ||= @any_cc.user
     elsif @pseudonym && (!@pseudonym.user || @pseudonym.user.creation_pending?)
-      @user = @pseudonym.user
+      @user ||= @pseudonym.user
     else
       # If not creation_pending, we want to throw an already_exists error, which
       # we'll get if we set this to nil, since then a few lines down will try to
@@ -311,7 +316,7 @@ class UsersController < ApplicationController
     @user ||= User.new
     @user.attributes = params[:user]
     @user.name ||= params[:pseudonym][:unique_id]
-    if @user.save
+    if @user.errors.empty? && @user.save
       @pseudonym ||= @user.pseudonyms.build
       @pseudonym.attributes = params[:pseudonym]
       @pseudonym.account_id = @domain_root_account.id

@@ -27,12 +27,64 @@
 #  updated_at :datetime
 #
 class PluginSetting < ActiveRecord::Base
-  validates_uniqueness_of :name
+  validates_uniqueness_of :name, :if => :validate_uniqueness_of_name?
+  before_save :validate_posted_settings
   serialize :settings
+  attr_accessor :posted_settings
+  attr_writer :plugin
+
+  before_save :encrypt_settings
+  
+  def validate_uniqueness_of_name?
+    true
+  end
+
+  def validate_posted_settings
+    if @posted_settings
+      plugin = Canvas::Plugin.find(name.to_s)
+      plugin.validate_settings(self, @posted_settings)
+    end
+  end
+
+  def plugin
+    @plugin ||= Canvas::Plugin.find(name.to_s)
+  end
+
+  # dummy value for encrypted fields so that you can still have something in the form (to indicate
+  # it's set) and be able to tell when it gets blanked out.
+  DUMMY_STRING = "~!?3NCRYPT3D?!~"
+  def after_initialize
+    if settings && self.plugin && self.plugin.encrypted_settings
+      self.plugin.encrypted_settings.each do |key|
+        if settings["#{key}_enc".to_sym]
+          settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc"], settings["#{key}_salt".to_sym])
+          settings[key] = DUMMY_STRING
+        end
+      end
+    end
+  end
+
+  def encrypt_settings
+    if settings && self.plugin && self.plugin.encrypted_settings
+      self.plugin.encrypted_settings.each do |key|
+        unless settings[key].blank?
+          value = settings.delete(key)
+          settings.delete("#{key}_dec".to_sym)
+          if value == DUMMY_STRING  # no change, use what was there previously
+            settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
+            settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
+          else
+            settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym] = self.class.encrypt(value)
+          end
+        end
+      end
+    end
+  end
 
   def self.settings_for_plugin(name, plugin=nil)
-    if settings = PluginSetting.find_by_name(name.to_s)
-      settings = settings.settings
+    if plugin_setting = PluginSetting.find_by_name(name.to_s)
+      plugin_setting.plugin = plugin
+      settings = plugin_setting.settings
     else
       plugin ||= Canvas::Plugin.find(name.to_s)
       raise Canvas::NoPluginError unless plugin
@@ -42,4 +94,11 @@ class PluginSetting < ActiveRecord::Base
     settings
   end
 
+  def self.encrypt(text)
+    Canvas::Security.encrypt_password(text, 'instructure_plugin_setting')
+  end
+
+  def self.decrypt(text, salt)
+    Canvas::Security.decrypt_password(text, salt, 'instructure_plugin_setting')
+  end
 end

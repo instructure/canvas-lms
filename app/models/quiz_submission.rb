@@ -26,6 +26,7 @@ class QuizSubmission < ActiveRecord::Base
   belongs_to :user
   belongs_to :submission, :touch => true
   before_save :update_kept_score
+  before_save :sanitize_responses
   after_save :update_assignment_submission
   
   serialize :quiz_data
@@ -44,6 +45,9 @@ class QuizSubmission < ActiveRecord::Base
       event :retake, :transitions_to => :untaken
     end
     state :complete do
+      event :retake, :transitions_to => :untaken
+    end
+    state :settings_only do
       event :retake, :transitions_to => :untaken
     end
     state :preview
@@ -66,10 +70,27 @@ class QuizSubmission < ActiveRecord::Base
     set { can :add_attempts }
   end
   
+  def sanitize_responses
+    questions && questions.select {|q| q['question_type'] == 'essay_question' }.each do |q|
+      question_id = q['id']
+      if submission_data.is_a?(Array)
+        if submission = submission_data.find {|s| s[:question_id] == question_id }
+          submission[:text] = Sanitize.clean(submission[:text] || "", Instructure::SanitizeField::SANITIZE)
+        end
+      elsif submission_data.is_a?(Hash)
+        question_key = "question_#{question_id}"
+        if submission_data[question_key]
+          submission_data[question_key] = Sanitize.clean(submission_data[question_key] || "", Instructure::SanitizeField::SANITIZE)
+        end
+      end
+    end
+    true
+  end
+  
   def temporary_data
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
     raise "Cannot view temporary data for completed quiz" if self.submission_data && !self.submission_data.is_a?(Hash)
-    res = self.submission_data || {}
+    res = (self.submission_data || {}).with_indifferent_access
     res
   end
   
@@ -98,12 +119,21 @@ class QuizSubmission < ActiveRecord::Base
     end
   end
   
-  def needs_grading?
-    if !self.completed? && self.overdue?(true)
+  def needs_grading?(strict=false)
+    if strict && self.untaken? && self.overdue?(true)
+      true
+    elsif self.untaken? && self.end_at && self.end_at < Time.now && !self.extendable?
       true
     elsif self.completed? && self.submission_data && self.submission_data.is_a?(Hash)
       true
+    else
+      false
     end
+  end
+  
+  def finished_in_words
+    extend ActionView::Helpers::DateHelper
+    started_at && finished_at && time_ago_in_words(Time.now - (finished_at - started_at))
   end
   
   def points_possible_at_submission_time
@@ -178,14 +208,23 @@ class QuizSubmission < ActiveRecord::Base
     end
   end
   
+  def less_than_allotted_time?
+    self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes
+  end
+  
   def completed?
     self.complete? || self.pending_review?
   end
   
   def overdue?(strict=false)
     now = (Time.now - ((strict ? 1 : 5) * 60))
-    !!(self.end_at && self.end_at.localtime < now)
+    !!(end_at && end_at.localtime < now)
   end
+  
+  def extendable?
+    !!(untaken? && end_at && end_at < 1.hour.from_now)
+  end
+  
   protected :update_assignment_submission
   
   def submitted_versions
@@ -205,7 +244,8 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def attempts_left
-    [0, self.quiz.allowed_attempts - self.attempt + (self.extra_attempts || 0)].max
+    return -1 if self.quiz.allowed_attempts < 0
+    [0, self.quiz.allowed_attempts - (self.attempt || 0) + (self.extra_attempts || 0)].max
   end
   
   def mark_completed
@@ -231,6 +271,7 @@ class QuizSubmission < ActiveRecord::Base
     end
     self.context_module_action
     self.finished_at = Time.now
+    self.manually_unlocked = nil
     self.finished_at = opts[:finished_at] if opts[:finished_at]
     if self.quiz.for_assignment?
       assignment_submission = self.quiz.assignment.find_or_create_submission(self.user_id)
@@ -309,7 +350,7 @@ class QuizSubmission < ActiveRecord::Base
     res = []
     tally = 0
     self.workflow_state = "complete"
-    self.fudge_points = params[:fudge_points].to_i if params[:fudge_points] && params[:fudge_points] != ""
+    self.fudge_points = params[:fudge_points].to_f if params[:fudge_points] && params[:fudge_points] != ""
     tally += self.fudge_points if self.fudge_points
     data.each do |answer|
       unless answer.respond_to?(:with_indifferent_access)
@@ -533,5 +574,13 @@ class QuizSubmission < ActiveRecord::Base
   
   named_scope :before, lambda{|date|
     {:conditions => ['quiz_submissions.created_at < ?', date]}
+  }
+  named_scope :updated_after, lambda{|date|
+    if date
+      {:conditions => ['quiz_submissions.updated_at > ?', date]}
+    end
+  }
+  named_scope :for_user_ids, lambda{|user_ids|
+    {:conditions => {:user_id => user_ids} }
   }
 end

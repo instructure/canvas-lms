@@ -1,10 +1,35 @@
+YAML.add_ruby_type("object:Class") do |type, val|
+  val.constantize
+end
+
 class Class
+  def to_yaml(opts = {})
+    YAML.quick_emit(self.object_id, opts) do |out|
+      out.scalar(taguri, name)
+    end
+  end
+
   def load_for_delayed_job(arg)
     self
   end
+end
 
-  def dump_for_delayed_job
-    name
+class ActiveRecord::Base
+  yaml_as "tag:ruby.yaml.org,2002:ActiveRecord"
+
+  def to_yaml(opts = {})
+    if id.nil?
+      raise("Can't serialize unsaved ActiveRecord object for delayed job: #{self.inspect}")
+    end
+    YAML.quick_emit(self.object_id, opts) do |out|
+      out.scalar(taguri, id.to_s)
+    end
+  end
+
+  def self.yaml_new(klass, tag, val)
+    klass.find(val)
+  rescue ActiveRecord::RecordNotFound
+    raise Delayed::Backend::DeserializationError, "Couldn't find #{klass} with id #{val.inspect}"
   end
 end
 
@@ -31,16 +56,14 @@ module Delayed
       self.args   = args.map { |a| dump(a) }
       self.method = method.to_sym
 
-      if object.is_a?(Module)
-        self.tag = "#{object.name}.#{method}"
-      else
-        self.tag = "#{object.class}##{method}"
-      end
+      self.tag = display_name
     end
     
     def display_name
       if STRING_FORMAT === object
         "#{$1}#{$2 ? '#' : '.'}#{method}"
+      elsif object.is_a?(Module)
+        "#{object}.#{method}"
       else
         "#{object.class}##{method}"
       end
@@ -68,11 +91,7 @@ module Delayed
     end
 
     def dump(obj)
-      if obj.respond_to?(:dump_for_delayed_job)
-        "LOAD;#{obj.dump_for_delayed_job}"
-      else
-        obj
-      end
+      obj
     end
   end
 end

@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var swfUpload;
 var files = {};
+var fileStructureData = [];
 (function() {
   var $files_content = $("#files_content"),
     $swfupload_holder = $("#swfupload_holder"),
@@ -33,9 +33,22 @@ var files = {};
       $add_file_link = $("#add_file_link");
       $files_structure = $("#files_structure");
       $files_structure_list = $("#files_structure_list");
-      
       $files_content.prepend($swfupload_holder);
       files.clearDataCache.cacheIndex = 0;
+      for(var idx in contexts) {
+        var obj = {
+          context: contexts[idx],
+          context_name: contexts[idx].name,
+          context_string: contexts[idx].asset_string
+        };
+        if(contexts[idx].asset_string) {
+          var context_type = contexts[idx].asset_string.replace(/_\d+$/, '');
+          obj[context_type] = contexts[idx];
+        }
+        fileStructureData.push([
+          obj, {}
+        ]);
+      }
       for(var idx in fileStructureData) {
         if(fileStructureData[idx]) {
           var context = fileStructureData[idx][0];
@@ -443,7 +456,7 @@ var files = {};
         $(ui.helper).find(".header .sub_header").text("move to " + droppable.name);
         if(draggable && droppable && draggable.context_string != droppable.context_string) {
           $(ui.helper).addClass('copy_drag');
-          $(ui.helper).find(".header .sub_header").html("<strong>copy</strong> to " + droppable.name);
+          $(ui.helper).find(".header .sub_header").html("<strong>copy</strong> to " + $.htmlEscape(droppable.name));
         }
       },
       out: function(event, ui) {
@@ -526,7 +539,7 @@ var files = {};
         if(!$context_folder || $context_folder.length === 0) {
           $context_folder = $files_structure.find(".folder_blank").clone(true).removeClass('folder_blank');
         }
-        $context_folder.children(".name").html(context_name);
+        $context_folder.children(".name").text(context_name);
         $context_folder.children(".id").text(root_folder.id);
         $context_folder.addClass('context folder folder_' + root_folder.id + ' ' + context_string);
         $context_folder.find("li").addClass('to_be_removed');
@@ -1273,7 +1286,7 @@ var files = {};
           if(location.hash != "#" + path) {
             location.replace("#" + path);
           }
-          $swfupload_holder.css('left', -1000);
+          // $swfupload_holder.css('left', -1000);
           if(!data.includes_files && data.full_name) {
             files.getFilesForFolder(data);
           }
@@ -1308,10 +1321,10 @@ var files = {};
                 var download_folder_url = $.replaceTags($("." + data.context_string + "_folder_url").attr('href') + "/download", 'id', data.id);
                 $(".download_zip_link").attr('href', download_folder_url);
                 $(".upload_zip_link").attr('href', $("." + data.context_string + "_import_url").attr('href') + "?return_to=" + encodeURIComponent(location.href) + "&folder_id=" + data.id);
-                data.unlock_at_string = $.parseFromISO(data.unlock_at).datetime_string;
-                data.lock_at_string = $.parseFromISO(data.lock_at).datetime_string;
-                $panel.find(".lock_until").showIf(data.lock_at);
-                $panel.find(".lock_after").showIf(data.unlock_at);
+                data.unlock_at_string = $.parseFromISO(data.unlock_at).datetime_formatted;
+                data.lock_at_string = $.parseFromISO(data.lock_at).datetime_formatted;
+                $panel.find(".lock_after").showIf(data.lock_at);
+                $panel.find(".lock_until").showIf(data.unlock_at);
                 $panel.find(".currently_locked_box").showIf(data.currently_locked);
                 $panel.find(".lock_item_link").showIf(data.parent_folder_id && !data.currently_locked);
                 $panel.find(".unlock_item_link").showIf(data.parent_folder_id && data.currently_locked);
@@ -1409,10 +1422,10 @@ var files = {};
               // show a file control panel with file size, download link, etc.
               var $panel = $("#file_panel");
               var $preview = null;
-              data.unlock_at_string = $.parseFromISO(data.unlock_at).datetime_string;
-              data.lock_at_string = $.parseFromISO(data.lock_at).datetime_string;
-              $panel.find(".lock_until").showIf(data.lock_at);
-              $panel.find(".lock_after").showIf(data.unlock_at);
+              data.unlock_at_string = $.parseFromISO(data.unlock_at).datetime_formatted;
+              data.lock_at_string = $.parseFromISO(data.lock_at).datetime_formatted;
+              $panel.find(".lock_after").showIf(data.lock_at);
+              $panel.find(".lock_until").showIf(data.unlock_at);
               $panel.find(".currently_locked_box").showIf(data.currently_locked);
               $panel.find(".lock_item_link").showIf(!data.currently_locked);
               $panel.find(".unlock_item_link").showIf(data.currently_locked);
@@ -1686,6 +1699,7 @@ var files = {};
       $.ajaxFileUpload({
         url: $dialog.data('update_url'),
         method: 'PUT',
+        binary: false,
         data: {
           'attachment[uploaded_data]': {
             fake_file: true, 
@@ -2015,40 +2029,34 @@ var files = {};
     
     setTimeout(function() {
       $(window).triggerHandler('resize');
-      swfUpload = new SWFUpload({
-        upload_url: "/bad_location",
-        flash_url: "/flash/swf_upload/Flash/swfupload.swf",
-        file_size_limit: "100 MB",
-        swfupload_loaded_handler: function() { 
+      $("#file_swf").uploadify({
+        fileDataName: 'file',
+        uploader: '/flash/uploadify/uploadify.swf',
+        buttonText: 'testing',
+        folder: 'no_idea',
+        script: 's3_url',
+        scriptAccess: 'always',
+        multi: true,
+        auto: false,
+        sizeLimit: 52428800,
+        simUploadLimit: 1,
+        buttonText: "",
+        hideButton: true,
+        wmode: 'transparent',
+        width: 60,
+        height: 22,
+        cancelImg: '/images/blank.png',
+        onInit: function() {
           $add_file_link.text("Add Files").triggerHandler('show'); 
         },
-        button_image_url: "/images/not_a_file.png",
-        file_queue_error_handler : fileUpload.fileQueueError,
-        file_queued_handler: fileUpload.fileQueued,
-        file_dialog_complete_handler : fileUpload.fileDialogComplete,
-        assume_success_timeout: 15,
-        upload_progress_handler : fileUpload.uploadProgress,
-        upload_error_handler : fileUpload.uploadError,
-        upload_start_handler: fileUpload.uploadStart,
-        upload_success_handler : fileUpload.uploadSuccess,
-        upload_complete_handler : fileUpload.uploadComplete,
-        button_placeholder_id : "blech",
-        button_width: 50,
-        button_height: 22,
-        button_text : '<span class="link">&nbsp;</span>',
-        button_text_style : '.link { font-family: Arial, sans-serif; font-size: 15px; color: transparent; text-align: right; text-decoration: none;}',
-        button_text_top_padding: 4,
-        button_text_left_padding: 0,
-        button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
-        button_cursor: SWFUpload.CURSOR.HAND,
-        file_post_name: 'attachment_uploaded_data',
-        use_query_string: true,
-        post_params: {
-          authenticity_token: $("#ajax_authenticity_token").text(),
-          '_normandy_session': $("#file_uploads_session_id").text(),
-          format: 'json'
-        },
-        http_success: [200,201]
+        onSelect: fileUpload.swfFileQueue,
+        onCancel: fileUpload.swfCancel,
+        onClearQueue: fileUpload.swfQueueClear,
+        onError: fileUpload.swfFileError,
+        onOpen: fileUpload.swfFileOpen,
+        onProgress: fileUpload.swfFileProgress,
+        onComplete: fileUpload.swfFileComplete,
+        onAllComplete: fileUpload.swfQueueComplete
       });
     }, 1000);
   });
@@ -2069,7 +2077,7 @@ var fileUpload = {
     };
     var $file = fileUpload.initFile(fileWrapper);
     $file.data('folder', files.currentItemData());
-    $file.find(".status").text("Queued");
+    $file.find(".status").text("Queued ");
     fileUpload.queuedAjaxUploads.push(fileWrapper);
     fileUpload.updateUploadCount();
     fileUpload.uploadAjaxFiles();
@@ -2084,7 +2092,7 @@ var fileUpload = {
     } else {
       fileUpload.currentlyUploading = true;
       var $file = fileUpload.initFile(file);
-      $file.find(".status").text("Uploading");
+      $file.find(".status").text("Uploading ");
       $file.find(".progress_bar").progressbar('value', 10);
       var folder = $file.data('folder');
       var fileData = file.file;
@@ -2103,7 +2111,7 @@ var fileUpload = {
           var attachment = data.attachment;
           var context_code = $.underscore(attachment.context_type) + "_" + attachment.context_id;
           $file.find(".cancel_upload_link").hide().end()
-            .find(".status").text("Done uploading");
+            .find(".status").text("Done uploading ");
           $file.addClass('done');
           setTimeout(function() {
             $file.slideUp(function() {
@@ -2116,27 +2124,26 @@ var fileUpload = {
           setTimeout(function() {
             fileUpload.uploadAjaxFiles(true);
           }, 500);
-          $file.find(".status").text("Failed").end()
+          $file.find(".status").text("Failed ").end()
             .find(".cancel_upload_link").hide();
         }
       });
     }
   },
-  
-  updateSwfUploadCount: function(count) {
-    fileUpload.swfUploadCount = count;
-    fileUpload.updateUploadCount();
-  },
   updateUploadCount: function() {
     fileUpload.ajaxUploadCount = fileUpload.queuedAjaxUploads.length;
     if(fileUpload.currentlyUploading) { fileUpload.ajaxUploadCount++; }
-    var count = (fileUpload.swfUploadCount + fileUpload.ajaxUploadCount);
-    if(count === 0) {
+    var count = (fileUpload.swfFiles.length + fileUpload.ajaxUploadCount);
+    var errorCount = $("#file_uploads .file_upload.errored:visible").length;
+    if(count === 0 && errorCount == 0) {
       $("#file_uploads_progress").slideUp();
       $("#file_uploads_spinner").slideUp();
-      var $msg = $("#file_upload_blank").clone(true).removeAttr('id').empty();
+      var $msg = $("#file_upload_blank").clone(true).removeAttr('id').addClass('finished_message').empty();
       $msg.text("Finished uploading all files");
-      $("#file_uploads").prepend($msg.slideDown('fast'));
+      if(!$("#file_uploads .file_upload:visible:first").hasClass('finished_message')) {
+        $("#file_uploads").prepend($msg);
+        $msg.slideDown('fast');
+      }
       $msg.addClass('finished_message');
       $msg.click(function() {
         $(this).slideUp(function() {
@@ -2149,7 +2156,10 @@ var fileUpload = {
         });
       }, 5000);
     } else {
-      $("#file_uploads_dialog_link").text("Uploading " + count + " Files...");
+      $("#file_uploads_dialog_link").text("Uploading " + count + " File" + (count > 1 ? "s" : "") + "...");
+      if(count === 0) {
+        $("#file_uploads_dialog_link").text(errorCount + " Error" + (errorCount > 1 ? "s" : ""));
+      }
       $("#file_uploads_progress").slideDown();
     }
   },
@@ -2165,14 +2175,159 @@ var fileUpload = {
   fileQueued: function(file) {
     var $file = fileUpload.initFile(file);
     $file.data('folder', files.currentItemData());
-    $file.find(".status").text("Queued");
+    $file.find(".status").text("Queued ");
     fileUpload.updateSwfUploadCount(this.getStats().files_queued);
   },
   fileQueueError: function(file, error, message) {
     var $file = fileUpload.initFile(file);
-    $file.find(".status").text("Failed").end()
+    $file.find(".status").text("Failed ").end()
       .find(".cancel_upload_link").hide();
     $file.append(message);
+  },
+  swfQueuedAndPendingFiles: [],
+  swfFiles: [],
+  swfFileQueue: function(event, id, file) { //onSelect
+    file.id = id;
+    var $file = fileUpload.initFile(file);
+    $file.data('folder', files.currentItemData());
+    $file.find(".status").text("Queued ");
+    fileUpload.swfFiles.push(file);
+    var folder = $file.data('folder');
+    var post_params = {
+      'attachment[folder_id]': folder.id,
+      'attachment[filename]': file.name,
+      'attachment[context_code]': folder.context_string,
+      'no_redirect': true
+    };
+    fileUpload.updateUploadCount();
+    $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {
+      file.upload_url = data.proxied_upload_url || data.upload_url;
+      // It seems that the swf uploader is unencoding some of these params, so we need
+      // to encode them now.
+      data.upload_params.key = encodeURIComponent(data.upload_params.key);
+      data.upload_params.Signature = encodeURIComponent(data.upload_params.Signature);
+      file.upload_params = data.upload_params;
+      $file.data('success_url', data.success_url);
+      if(!$file.hasClass('done')) {
+        fileUpload.swfQueuedAndPendingFiles.push(file);
+        fileUpload.swfUploadNext(file);
+      } 
+      fileUpload.updateUploadCount();
+    }, function(data) {
+      $("#file_swf").uploadifyCancel(id);
+      $file.find(".cancel_upload_link").hide().end()
+        .find(".status").text("Upload Failed ");
+    });
+  },
+  swfUploadNext: function(file) {
+    if(file || fileUpload.swfQueuedAndPendingFiles.length > 0) {
+      file = file || fileUpload.swfQueuedAndPendingFiles.shift();
+      if(file) {
+        $("#file_swf").uploadifySettings('script', file.upload_url);
+        $("#file_swf").uploadifySettings('scriptData', file.upload_params);
+        $("#file_swf").uploadifyUpload(file.id);
+      }
+    }
+    fileUpload.updateUploadCount();
+  },
+  swfCancel: function(event, id, file, data) { // onCancel
+    file.id = id;
+    var $file = fileUpload.initFile(file);
+    $("#file_uploads_dialog_link").text("Uploading Error");
+    $file.addClass('done');
+    if(!$file.hasClass('errored') && !$file.hasClass('error_cancelled')) {
+      $file.find(".cancel_upload_link").hide().end()
+        .find(".status").text("Cancelled ");
+      fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
+    } 
+    fileUpload.swfUploadNext();
+    return false;
+  },
+  swfQueueClear: function(event, data) { // onClearQueue
+  },
+  swfFileError: function(event, id, file, error, cancelable) { // onError
+    cancelable = typeof(cancelable) != 'undefined' ? cancelable : true;
+    file.id = id;
+    var $file = fileUpload.initFile(file);
+    setTimeout(function() {
+      $file.addClass('error_cancelled');
+      if(cancelable) $("#file_swf").uploadifyCancel(id);
+    }, 50);
+    fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
+    $("#file_uploads_dialog_link").text("Uploading Error");
+    $("#file_uploads_progress").slideDown();
+    $file.find(".cancel_upload_link").hide().end()
+      .find(".status").text("Failed uploading: " + error.info + " ");
+    $file.addClass('done').addClass('errored');
+    fileUpload.swfUploadNext();
+    return false;
+  },
+  swfFileOpen: function(event, id, file) { // onOpen
+    file.id = id;
+    var $file = fileUpload.initFile(file);
+    if(file.upload_url) $("#file_swf").uploadifySettings('script', file.upload_url);
+    if(file.upload_params) $("#file_swf").uploadifySettings('scriptData', file.upload_params);
+    fileUpload.swfQueuedAndPendingFiles = $.grep(fileUpload.swfQueuedAndPendingFiles, function(f) { return f.id != file.id; });
+    $file.find(".progress_bar").progressbar('value', 1);
+    $file.find(".status").text("Uploading ");
+  },
+  swfFileProgress: function(event, id, file, data) { // onProgress
+    file.id = id;
+    var $file = fileUpload.initFile(file);
+    $file.find(".status").text("Uploading (" + parseInt(data.speed, 10) + "KB/s) ");
+    $file.find(".cancel_upload_link").showIf(data.percentage < 100);
+    $file.find(".progress_bar").progressbar('value', data.percentage);
+  },
+  swfFileComplete: function(event, id, file, response, data) { // onComplete
+    file.id = id;
+    var $file = fileUpload.initFile(file);
+    if(response.indexOf("<PostResponse>") >= 0) {
+      // we just got back XML stuff from S3. do the s3 success url
+      $file.find(".status").text("Finalizing ");
+      var errored = function() {
+        fileUpload.swfFileError({}, file.id, file, {type: "server", info: "didn't get back expected response"});
+      };
+      $.ajaxJSON($file.data('success_url'), 'GET', {}, function(data) {
+        if(data && data.attachment) {
+          fileUpload.swfFileComplete({}, file.id, file, JSON.stringify(data), {});
+        } else {
+          errored();
+        }
+      }, errored);
+      return;
+    }
+    fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
+    $file.find(".status").text("Done uploading ");
+    $file.find(".cancel_upload_link").remove();
+    $file.find(".progress_bar").progressbar('value', 100);
+    $file.addClass('done');
+    var context_string = $file.data('folder').context_string;
+    setTimeout(function() {
+      $file.slideUp(function() {
+        $file.remove();
+      });
+    }, 5000);
+    if(response) {
+      try {
+        var data = JSON.parse(response);
+        if("errors" in data && !jQuery.isEmptyObject(data["errors"])) {
+          fileUpload.swfFileError(event, id, file, {type: "server", info: JSON.stringify(data["errors"])}, false);
+        } else {
+          data.swf = true;
+          setTimeout(function() {
+            files.updateFile(context_string, data);
+          }, 500);
+        }
+      } catch(e) { 
+        fileUpload.swfFileError(event, id, file, {type: "JS", info: e.toString()}, false);
+      }
+    } else {
+      $file.find(".status").text("File may have uploaded, but the server failed to respond.  Reload the page to confirm. ");
+    }
+    fileUpload.swfUploadNext();
+  },
+  swfQueueComplete: function(event, data) { // onAllComplete
+    fileUpload.updateUploadCount();
   },
   initFile: function(file) {
     if(!file.id) {
@@ -2188,124 +2343,20 @@ var fileUpload = {
           event.preventDefault();
           $(this).slideUp(function() {
             $(this).remove();
+            fileUpload.updateUploadCount();
           });
         }
       });
       $file.find(".cancel_upload_link").click(function(event) {
         event.preventDefault();
         var id = ($(this).parents(".file_upload").attr('id') || "").substring(12);      
-        swfUpload.cancelUpload(id, true);
+        $("#file_swf").uploadifyCancel(file.id);
       });
     }
     $file.find(".file_name").text(file.name);
     $file.slideDown('fast');
     return $file;
   },
-  uploadStart: function(file) {
-    var $file = fileUpload.initFile(file);
-    var folder = $file.data('folder');
-    this.addFileParam(file.id, 'file_extension', file.type);
-    if(folder) {
-      this.addPostParam('attachment[folder_id]', folder.id);
-      this.setUploadURL($("." + folder.context_string + "_attachments_url").attr('href'));
-    }
-  },
-  uploadProgress: function(file, bytesLoaded) {
-    try {
-      var percent = Math.ceil((bytesLoaded / file.size) * 100);
-      $("#file_upload_" + file.id).find(".progress_bar").progressbar('value', percent);
-      if (percent === 100) {
-        $("#file_upload_" + file.id).find(".cancel_upload_link").hide().end()
-          .find(".status").text("Uploading");
-      } else {
-        $("#file_upload_" + file.id).find(".status").text("Uploading");
-      }
-    } catch (ex) {
-      this.debug(ex);
-    }
-  },
-  uploadSuccess: function(file, serverData) {
-    try {
-      $("#file_upload_" + file.id).find(".cancel_upload_link").hide().end()
-        .find(".status").text("Done uploading");
-      var $file = $("#file_upload_" + file.id);
-      $file.addClass('done');
-      var context_string = $file.data('folder').context_string;
-      setTimeout(function() {
-        $file.slideUp(function() {
-          $file.remove();
-        });
-      }, 5000);
-      if(serverData) {
-        var data = JSON.parse(serverData); //eval("(" + serverData + ")");
-        data.swf = true;
-        setTimeout(function() {
-          files.updateFile(context_string, data);
-        }, 500);
-      } else {
-        $("#file_upload_" + file.id).find(".cancel_upload_link").hide().end()
-          .find(".status").text("File may have uploaded, but the server failed to respond.  Reload the page to confirm.");
-      }
-      fileUpload.updateSwfUploadCount(this.getStats().files_queued);
-    } catch (ex) {
-      console.log("upload processing error");
-      this.debug(ex);
-    }
-  },
-  uploadComplete: function(file) {
-    try {
-      /*  I want the next upload to continue automatically so I'll call startUpload here */
-      if (this.getStats().files_queued > 0) {
-        this.startUpload();
-        files.updateQuota();
-      } else {
-        fileUpload.updateSwfUploadCount(0);
-        files.updateQuota();
-        // All done!
-      }
-    } catch (ex) {
-      console.log("upload completion error");
-      this.debug(ex);
-    }
-  },
-  uploadError: function(file, errorCode, message) {
-    var imageName =  "error.gif";
-    var progress;
-    try {
-      $("#file_uploads_dialog_link").text("Uploading Error");
-      $("#file_uploads_progress").slideDown();
-      $("#file_upload_" + file.id).find(".cancel_upload_link").hide().end()
-        .find(".status").text("Failed uploading");
-      $("#file_upload_" + file.id).addClass('done');
-      switch (errorCode) {
-      case SWFUpload.UPLOAD_ERROR.FILE_CANCELLED:
-        try {
-          $("#file_upload_" + file.id).find(".status").text("Cancelled");
-        }
-        catch (ex1) {
-          this.debug(ex1);
-        }
-        break;
-      case SWFUpload.UPLOAD_ERROR.UPLOAD_STOPPED:
-        try {
-          $("#file_upload_" + file.id).find(".status").text("Stopped Uploading");
-        }
-        catch (ex2) {
-          this.debug(ex2);
-        }
-        break;
-      case SWFUpload.UPLOAD_ERROR.UPLOAD_LIMIT_EXCEEDED:
-        imageName = "uploadlimit.gif";
-        break;
-      default:
-        break;
-      }
-
-
-    } catch (ex3) {
-      console.log("upload error error");
-      this.debug(ex3);
-    }
-
-  }
+  attempt: 0,
+  file_details: {}
 };

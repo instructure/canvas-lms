@@ -39,15 +39,17 @@ namespace :db do
   end
 
   namespace :test do
-    task :reset => [:environment, :load_config] do
-      raise "Run with RAILS_ENV=test" unless Rails.env.test?
-      config = ActiveRecord::Base.configurations['test']
-      queue = config['queue']
-      drop_database(queue) if queue rescue nil
-      drop_database(config) rescue nil
-      create_database(queue) if queue
-      create_database(config)
-      Rake::Task['db:migrate'].invoke
+    unless Rake::Task.task_defined?('db:test:reset')
+      task :reset => [:environment, :load_config] do
+        raise "Run with RAILS_ENV=test" unless Rails.env.test?
+        config = ActiveRecord::Base.configurations['test']
+        queue = config['queue']
+        drop_database(queue) if queue rescue nil
+        drop_database(config) rescue nil
+        create_database(queue) if queue
+        create_database(config)
+        Rake::Task['db:migrate'].invoke
+      end
     end
   end
 end

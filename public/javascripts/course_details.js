@@ -235,6 +235,7 @@ $(document).ready(function() {
       course.conclude_at = $.parseFromISO(course.conclude_at).datetime_formatted;
       course.is_public = course.is_public ? 'Public' : 'Private';
       course.indexed = course.indexed ? "Included in public course index" : "";
+      course.restrict_dates = course.restrict_enrollments_to_course_dates ? "Users can only access the course between these dates" : "These dates will not affect course availability";
       $("#course_form .public_options").showIf(course.is_public);
       $("#course_form .self_enrollment_message").css('display', course.self_enrollment ? '' : 'none');
       $("#course_form").fillTemplateData({data: course});
@@ -261,47 +262,8 @@ $(document).ready(function() {
   $(".associate_user_link").click(function(event) {
     event.preventDefault();
     var $user = $(this).parents(".user");
-    var $dialog = $("#link_student_dialog");
-    var data = $user.getTemplateData({textValues: ['name', 'id', 'associated_user_id', 'associated_user_name']});
-    data.existing_user_name = $(".user.user_" + data.associated_user_id + " .name").text() || data.associated_user_name || "User " + data.associated_user_id;
-    $dialog.find(".existing_user").hide();
-    if(data.associated_user_id) {
-      $dialog.find(".existing_user").show();
-    }
-    $dialog.find(".enrollment_id").val(data.id);
-    $dialog.find(".student_options option:not(.blank)").remove();
-    $(".student_enrollments .user").each(function() {
-      var user = $(this).getTemplateData({textValues: ['name', 'user_id']});
-      var $option = $("<option/>");
-      if(user.user_id && user.name) {
-        $option.val(user.user_id).text(user.name);
-        $dialog.find(".student_options").append($option);
-      }
-    });
-    $dialog.find(".student_options").val("none").val(data.associated_user_id);
-    
-    $dialog
-    .fillTemplateData({data: data})
-    .dialog('close').dialog({
-      autoOpen: false,
-      title: "Link to Student",
-      width: 400
-    }).dialog('open');
-  });
-  $("#link_student_dialog .cancel_button").click(function() {
-    $("#link_student_dialog").dialog('close');
-  });
-  $("#link_student_dialog_form").formSubmit({
-    beforeSubmit: function(data) {
-      $(this)
-        .find("button").attr('disabled', true).end()
-        .find(".save_button").text("Linking to Student...");
-    },
-    success: function(data) {
-      $(this)
-        .find("button").attr('disabled', false).end()
-        .find(".save_button").text("Link to Student");
-      var enrollment = data.observer_enrollment;
+    var data = $user.getTemplateData({textValues: ['name', 'associated_user_id', 'id']});
+    link_enrollment.choose(data.name, data.id, data.associated_user_id, function(enrollment) {
       if(enrollment) {
         var user_name = enrollment.associated_user_name;
         $("#enrollment_" + enrollment.id)
@@ -309,13 +271,7 @@ $(document).ready(function() {
           .find(".associated_user.unassociated").showIf(!enrollment.associated_user_id).end()
           .fillTemplateData({data: enrollment});
       }
-      $("#link_student_dialog").dialog('close');
-    },
-    error: function(data) {
-      $(this)
-        .find("button").attr('disabled', false)
-        .find(".save_button").text("Linking Failed, please try again");
-    }
+    });
   });
   $(".course_info").attr('title', 'Click to Edit').click(function() {
     $(".edit_course_link:first").click();

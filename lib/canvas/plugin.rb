@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require 'canvas'
 
 module Canvas
@@ -21,7 +39,9 @@ module Canvas
               :author_website=>nil,
               :version=>nil,
               :settings_partial=>nil,
-              :settings=>nil
+              :settings=>nil,
+              :encrypted_settings=>nil,
+              :base=>nil
       }.with_indifferent_access
     end
     
@@ -38,9 +58,15 @@ module Canvas
     end
     
     def settings
-      @settings ||= saved_settings
+      # TODO: once we have distributed memcache we can
+      # cache this properly across all web servers
+      saved_settings
     end
-    
+
+    def encrypted_settings
+      @meta[:encrypted_settings]
+    end
+
     def description
       @meta[:description]
     end
@@ -57,6 +83,10 @@ module Canvas
       @meta[:author_website]
     end
     
+    def validator
+      @meta[:validator]
+    end
+    
     def version
       @meta[:version]
     end
@@ -69,13 +99,43 @@ module Canvas
       !meta[:settings_partial].blank?
     end
 
+    # base class/module for this plugin
+    def base
+      @meta[:base]
+    end
+    
+    # Let the plugin do any validations necessary.
+    # If the plugin has defined a validator, call
+    # the :validate method on that validator.  If it
+    # doesn't return a hash then consider it a failure.
+    # The validator receives the model so that it can
+    # add any errors that it would like.
+    def validate_settings(plugin_setting, settings)
+      if validator
+        validator_module = Canvas::Plugins::Validators.const_defined?(validator) && Canvas::Plugins::Validators.const_get(validator)
+        if validator_module && validator_module.respond_to?(:validate)
+          res = validator_module.validate(settings, plugin_setting)
+          if res.is_a?(Hash)
+            plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(res || {})
+          else
+            false
+          end
+        else
+          plugin_setting.errors.add_to_base("provided validator #{validator} failed to load")
+          false
+        end
+      else
+        plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(settings || {})
+      end
+    end
+
     def self.register(id, tag=nil, meta={})
       raise "Id required for a plugin" if id.nil?
       p = Plugin.new(id, tag)
       p.meta.merge! meta
       @registered_plugins[p.id] = p
     end
-
+    
     def self.all
       @registered_plugins.values.sort{|p,p2| p.name <=> p2.name}
     end
@@ -85,8 +145,17 @@ module Canvas
     end
 
     def self.find(id)
+      @registered_plugins[id.to_s] || nil
+    end
+
+    def self.find!(id)
       raise(NoPluginError) if id.nil?
       @registered_plugins[id.to_s] || raise(NoPluginError)
+    end
+  end
+  
+  module Plugins
+    module Validators
     end
   end
 end

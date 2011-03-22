@@ -84,7 +84,7 @@
       }
     }
     $(document).ready(function() {
-      $("#add_assignment_inline_form .datetime_field").datetime_field();
+      $("#add_assignment_inline_form .datetime_field").not(".datetime_field_enabled").datetime_field();
       $("#add_assignment_inline_form").formSubmit({
         beforeSubmit: function(data) {
           $("#add_assignment_inline").loadingImage();

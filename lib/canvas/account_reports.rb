@@ -32,7 +32,7 @@ module Canvas::AccountReports
   end
   
   def self.for_account(id)
-    AvailableReports.reports[id]
+    (AvailableReports.reports['default'] || {}).merge (AvailableReports.reports[id] || {})
   end
 
   def self.generate_report(account_report)
@@ -41,8 +41,12 @@ module Canvas::AccountReports
     account_report.end_at ||= Time.now
     begin
       module_name = AvailableReports.module_names[account_report.root_account.id]
-      if Canvas::AccountReports.const_defined?(module_name)
+      if module_name && Canvas::AccountReports.const_defined?(module_name) &&
+              Canvas::AccountReports.const_get(module_name).respond_to?(account_report.report_type)
         Canvas::AccountReports.const_get(module_name).send(account_report.report_type, account_report)
+      elsif Canvas::AccountReports.const_defined?('Default') &&
+              Canvas::AccountReports.const_get('Default').respond_to?(account_report.report_type)
+        Canvas::AccountReports.const_get('Default').send(account_report.report_type, account_report)
       else
         nil
       end

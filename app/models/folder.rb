@@ -24,7 +24,7 @@ class Folder < ActiveRecord::Base
   belongs_to :cloned_item
   belongs_to :parent_folder, :class_name => "Folder"
   has_many :file_attachments, :class_name => "Attachment", :order => 'position'
-  has_many :active_file_attachments, :class_name => 'Attachment', :conditions => ['attachments.file_state in (?, ?, ?)', 'available', 'public', 'hidden'], :order => 'position, display_name'
+  has_many :active_file_attachments, :class_name => 'Attachment', :conditions => ['attachments.file_state != ? AND attachments.file_state != ?', 'deleted', 'hidden'], :order => 'position, display_name'
   has_many :visible_file_attachments, :class_name => 'Attachment', :conditions => ['attachments.file_state in (?, ?)', 'available', 'public'], :order => 'position, display_name'
   has_many :sub_folders, :class_name => "Folder", :foreign_key => "parent_folder_id", :dependent => :destroy, :order => 'position'
   has_many :active_sub_folders, :class_name => "Folder", :conditions => ['folders.workflow_state != ?', 'deleted'], :foreign_key => "parent_folder_id", :dependent => :destroy, :order => 'position'

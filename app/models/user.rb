@@ -61,6 +61,7 @@ class User < ActiveRecord::Base
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :folders, :as => 'context', :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :calendar_events, :as => 'context', :dependent => :destroy
   has_many :eportfolios, :dependent => :destroy
@@ -202,7 +203,7 @@ class User < ActiveRecord::Base
     # Look up the current associations, and remove any duplicates.
     associations_hash = {}
     to_delete = {}
-    self.user_account_associations.each do |a|
+    self.user_account_associations.reload.each do |a|
       if !associations_hash[a.account_id]
         associations_hash[a.account_id] = a
         to_delete[a.account_id] = a
@@ -223,7 +224,7 @@ class User < ActiveRecord::Base
       start ||= enrollment.course
       starting_points << start if start
     end
-    starting_points += self.pseudonym_accounts
+    starting_points += self.pseudonym_accounts.reload
     
     # For each Course, Section, and Account, make sure an association exists.
     starting_points.each do |entity|
@@ -751,8 +752,8 @@ class User < ActiveRecord::Base
     @submissions.detect{|s| s.assignment_id == assignment_id }
   end
   
-  def quiz_submission_for(quiz_id)
-    @quiz_submissions ||= self.quiz_submissions.to_a
+  def attempted_quiz_submission_for(quiz_id)
+    @quiz_submissions ||= self.quiz_submissions.select{|s| !s.settings_only? }
     @quiz_submissions.detect{|qs| qs.quiz_id == quiz_id }
   end
   
@@ -950,6 +951,14 @@ class User < ActiveRecord::Base
     read_attribute(:preferences) || write_attribute(:preferences, {})
   end
   
+  def close_notification(id)
+    preferences[:closed_notifications] ||= []
+    preferences[:closed_notifications] << id.to_i
+    preferences[:closed_notifications].uniq!
+    self.updated_at = Time.now
+    save
+  end
+  
   def ignore_item!(asset_string, purpose, permanent=nil)
     permanent ||= false
     asset_string = asset_string.gsub(/![0-9a-z_]/, '')
@@ -959,6 +968,7 @@ class User < ActiveRecord::Base
       preferences[:ignore][purpose.to_sym].delete(key) if item && (!item[:set] || item[:set] < 6.months.ago.utc.iso8601)
     end
     preferences[:ignore][purpose.to_sym][asset_string] = {:permanent => permanent, :set => Time.now.utc.iso8601}
+    self.updated_at = Time.now
     save!
   end
   
@@ -968,6 +978,7 @@ class User < ActiveRecord::Base
     if preferences[:ignore][purpose.to_sym][asset_string]
       preferences[:ignore][purpose.to_sym].delete(asset_string) if !preferences[:ignore][purpose.to_sym][asset_string][:permanent]
     end
+    self.updated_at = Time.now
     save!
   end
   
@@ -1059,25 +1070,18 @@ class User < ActiveRecord::Base
   def self.file_structure_for(context, user)
     res = {
       :contexts => [context],
-      :groups => [],
       :collaborations => [],
       :folders => [],
       :folders_with_subcontent => [],
       :files => []
     }
-    visible_groups = []
-    if context.respond_to?(:groups) && !context.is_a?(User) && context.grants_right?(user, nil, :manage)
-      visible_groups = context.groups.active.select{|g| g.grants_right?(user, nil, :read) }
-    end
-    res[:contexts] += visible_groups
-    res[:groups] += visible_groups
     context_codes = res[:contexts].map{|c| c.asset_string }
     if !context.is_a?(User) && user
       res[:collaborations] = user.collaborations.active.find(:all, :include => [:user, :users]).select{|c| c.context_id && c.context_type && context_codes.include?("#{c.context_type.underscore}_#{c.context_id}") }
       res[:collaborations] = res[:collaborations].sort_by{|c| c.created_at}.reverse
     end
     res[:contexts].each do |context|
-      res[:folders] += context.active_folders_detailed
+      res[:folders] += context.active_folders_with_sub_folders
     end
     res[:folders] = res[:folders].sort_by{|f| [f.parent_folder_id || 0, f.position || 0, f.name || "", f.created_at]}
     res
@@ -1223,7 +1227,7 @@ class User < ActiveRecord::Base
     submissions = []
     submissions += self.submissions.after(opts[:fallback_start_at]).for_context_codes(context_codes).find(
       :all, 
-      :conditions => 'submissions.score IS NOT NULL',
+      :conditions => "submissions.score IS NOT NULL AND assignments.workflow_state != 'deleted'",
       :include => [:assignment, :user, :submission_comments],
       :order => 'submissions.created_at DESC',
       :limit => opts[:limit]
@@ -1242,6 +1246,7 @@ class User < ActiveRecord::Base
                     AND (submission_comments.author_id <> ?)
                   GROUP BY submission_id
                 ) AS relevant_submission_comments ON submissions.id = submission_id
+                INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
                 SQL
       :order => 'last_updated_at_from_db DESC',
       :limit => opts[:limit]
@@ -1352,9 +1357,16 @@ class User < ActiveRecord::Base
   def cached_contexts
     @cached_contexts ||= begin
       context_groups = []
-      self.courses.scoped({:include => :active_groups}).each{|c| context_groups += c.active_groups.select{|g| g.grants_right?(self, nil, :manage)} }
-      # @contexts = @courses + @groups + @context_groups
-      self.courses + self.groups.active + context_groups
+      # according to the set_policy block in group.rb, user u can manage group
+      # g if either:
+      # (a) g.context.grants_right?(u, :manage_groups)
+      # (b) g.participating_users.include(u)
+      # this is a very performance sensitive method, so we're bypassing the
+      # normal policy checking and somewhat duplicating auth logic here. which
+      # is a shame. it'd be really nice to add support to our policy framework
+      # for understanding how to load associations based on policies.
+      self.courses.all(:include => :active_groups).select { |c| c.grants_right?(self, :manage_groups) }.each { |c| context_groups += c.active_groups }
+      self.courses + (self.groups.active + context_groups).uniq
     end
   end
   

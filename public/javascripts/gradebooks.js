@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(){
+var gradebook = (function(){
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
       $assignment_details_dialog = $("#assignment_details_dialog"),
@@ -26,9 +26,34 @@
       $message_students_dialog = $("#message_students_dialog"),
       $information_link = $("#information_link"),
       $total_tooltip = $("#total_tooltip"),
-      content_offset = $("#content").offset();
+      content_offset = $("#content").offset(),
+      context_code = $("#gradebook_full_content").data('context_code'),
+      ignoreUngradedSubmissions = true;
+  $("body").append($total_tooltip);
+  var possibleSections = {},
+      $courseSections = $(".outer_student_name .course_section").each(function(){
+        possibleSections[$(this).data('course_section_id')] = $(this).attr('title'); 
+      }),
+      contextId = $("#current_context_code").text().split("_")[1],
+      sectionToShow = $.store.userGet("grading_show_only_section" + contextId);
   
-  window.gradebook = {
+  if (sectionToShow) {
+    var atLeastOnePersonExistsInThisSection = false;
+    $courseSections.add('.gradebook_table .course_section').each(function() {
+      if ($(this).data('course_section_id') != sectionToShow){
+        $(this).closest('tr').remove();
+      } else {
+        atLeastOnePersonExistsInThisSection = true;
+      }
+    });
+    if (!atLeastOnePersonExistsInThisSection) {
+      alert("Could not find any students in that section, falling back to showing all sections.");
+      $.store.userRemove("grading_show_only_section"+contextId);
+      window.location.reload();
+    }
+  }
+  
+  var gradebook = {
     hoverCount: -1,
     fileIndex: 1,
     assignmentIndexes: {},
@@ -45,8 +70,8 @@
           $total_tooltip.show().find(".text").text($obj.attr('data-tip'));
           var height = $total_tooltip.outerHeight();
           $total_tooltip.css({
-            left: position.left - content_offset.left + 2,
-            top: position.top - content_offset.top - height - 3
+            left: position.left - 2,
+            top: position.top - height - 3
           });
         } else {
           $total_tooltip.hide();
@@ -81,7 +106,7 @@
         .attr('role', 'grid')
         .prepend(function(){
           var topRowHtml = $("#datagrid_top .assignment_title").map(function(){
-            return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).text() + "</div>"
+            return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).text() + "</div>";
           }).get().join("");
           return "<div class='hidden-readable' role='row'><div role='columnheader' tabindex='-1'>Student Name</div>" + topRowHtml +"</div>";
         })
@@ -101,8 +126,8 @@
         }
       });
     }
-
   };
+  
   $(document).ready(function() {
     gradebook.pointCalculations = !$("#class_weighting_policy").attr('checked');
     var init = function() {
@@ -111,12 +136,22 @@
         $("#gradebook_table").bind('entry_over', function(event, grid) {
           if(grid.trueEvent) {
             gradebook.showInfoLink(grid.cell);
+            function showTooltip(tip, skinny) {
+              var position = grid.cell.offset();
+              $total_tooltip.show().find(".text").html(tip);
+              var height = $total_tooltip.outerHeight();
+              $total_tooltip.css({
+                left: position.left - (skinny ? 15 : 2),
+                top: position.top - height - 3
+              });
+            }
             if(grid.cell.hasClass('late')) {
-              grid.cell.attr('title', 'This submission was submitted late');
+              showTooltip('This submission was submitted late');
             } else if(grid.cell.hasClass('dropped')) {
-              grid.cell.attr('title', 'This submission is dropped for grading purposes');
-            } else {
-              grid.cell.attr('title', '');
+              showTooltip('This submission is dropped for grading purposes');
+            } else if(datagrid.columns[grid.cell.column].hidden) {
+              var name = objectData(datagrid.cells['0,' + grid.cell.column]).title;
+              showTooltip(name + "<br/><span style='font-size: 0.9em;'>Click to expand</span>", true)
             }
           } else if(event && event.originalEvent && event.originalEvent.type && !event.originalEvent.type.match(/mouse/)) {
             grid.cell.find(".grade").focus().css('outline', 0);
@@ -289,192 +324,179 @@
             columnData = objectData($td);
             
         if(!$td.hasClass('group_total') && !$td.hasClass('final_grade')) {
-          options['<span class="ui-icon ui-icon-info">&nbsp;</span> Assignment Details'] = function() {
-            var data = objectData($td),
-                $submissions = $(".student_assignment .assignment_" + data.assignment_id);
-                
-            data.url = $td.find(".assignment_link").attr('href');
-            data.cnt = 0;
-            data.score_total = 0.0;
-            $submissions.each(function() {
-              var $submission = $(this),
-                  submission = objectData($submission.parent());
-              if(submission.score !== null && submission.score !== undefined && submission.score !== "") {
-                data.cnt++;
-                data.score_total += submission.score;
-                if(data.max == null || submission.score > data.max) {
-                  data.max = submission.score;
-                }
-                if(data.min == null || submission.score < data.min) {
-                  data.min = submission.score;
-                }
-              }
-            });
-            data.max = data.max || 0.0;
-            data.min = data.min || 0.0;
-            data.average = Math.round(data.score_total * 10.0 / data.cnt) / 10.0;
-            if(isNaN(data.average) || !isFinite(data.average)) {
-              data.average = "N/A";
-            }
-            var tally = 0, width = 0, totalWidth = 200;
-            $assignment_details_dialog
-              .find(".distribution").showIf(data.average && data.points_possible)
-                .find(".none_left").width(width = totalWidth * (data.min / data.points_possible)).css('left', (tally += width) - width).end()
-                .find(".some_left").width(width = totalWidth * ((data.average - data.min) / data.points_possible)).css('left', (tally += width) - width).end()
-                .find(".some_right").width(width = totalWidth * ((data.max - data.average) / data.points_possible)).css('left', (tally += width) - width - 2).end()
-                .find(".none_right").width(width = totalWidth * ((data.points_possible - data.max) / data.points_possible)).css('left', (tally += width) - width);
-            $assignment_details_dialog.fillTemplateData({
-                data: data
-              })
-              .dialog('close').dialog({
-                autoOpen: false,
-                title: "Details: " + data.title
-              }).dialog('open')
-              .find(".assignment_link").attr('href', data.url);
-          };
-          options['<span class="ui-icon ui-icon-newwin">&nbsp;</span> SpeedGrader'] = function() {
-            window.open(extendedGradebookURL);
-          };
-          options['<span class="ui-icon ui-icon-mail-closed">&nbsp;</span> Message Students Who...'] = function() {
-            var data = objectData($td),
-                title = data.title,
-                $submissions = $("#datagrid_data .assignment_" + data.id);
-            
-            var students_hash = {};
-            $("#datagrid_left .student_header").each(function(i) {
-              var student = {};
-              student.id = $(this).attr('id').substring(8);
-              student.name = $(this).find(".display_name").text();
-              students_hash[student.id] = student;
-            });
-            $submissions.each(function() {
-              var data = objectData($(this).parent());
-              if(students_hash[data.user_id]) {
-                students_hash[data.user_id].score = data.score;
-                students_hash[data.user_id].submitted_at = data.submitted_at;
-                students_hash[data.user_id].graded_at = data.graded_at;
-              }
-            });
-            var students = [];
-            for(var idx in students_hash) {
-              students.push(students_hash[idx]);
-            }
-            
-            window.messageStudents({
-              options: [
-                {text: "Haven't submitted yet"},
-                {text: "Scored less than", cutoff: true},
-                {text: "Scored more than", cutoff: true}
-              ],
-              title: title,
-              points_possible: data.points_possible,
-              students: students,
-              callback: function(selected, cutoff, students) {
-                students = $.grep(students, function($student, idx) {
-                  var student = $student.user_data;
-                  if(selected == "Haven't submitted yet") {
-                    return !student.submitted_at && !student.graded_at;
-                  } else if(selected == "Scored less than") {
-                    return student.score != null && student.score != "" && cutoff != null && student.score < cutoff;
-                  } else if(selected == "Scored more than") {
-                    return student.score != null && student.score != "" && cutoff != null && student.score > cutoff;
-                  }
-                });
-                return $.map(students, function(student) { return student.user_data.id });
-              }
-            });
-          };
-          options['<span class="ui-icon ui-icon-check">&nbsp;</span> Set Default Grade'] = function() {
-            var data = objectData($td),
-                title = data.title;
-            
-            $default_grade_form.find(".assignment_title").text(title).end();
-            $default_grade_form.find(".assignment_id").val(data.assignment_id);
-            $default_grade_form.find(".out_of").showIf(data.points_possible || data.points_possible === '0');
-            $default_grade_form.find(".points_possible").text(data.points_possible);
-            var url = $.replaceTags($default_grade_form.find(".default_grade_url").attr('href'), 'id', data.id);
-            url = $update_submission_form.attr('action');
-            $default_grade_form.attr('action', url).attr('method', 'POST');
-            var $input = $box = $("#student_grading_" + data.id).clone();
-            if(!$box.hasClass('grading_value')) { $input = $box.find(".grading_value"); }
-            $input.attr('name', 'default_grade').show();
-            $default_grade_form.find(".grading_box_holder").empty().append($box);
-            $default_grade_form.dialog('close').dialog({
-              autoOpen: false,
-              width: 350,
-              height: "auto",
-              open: function() {
-                $default_grade_form.find(".grading_box").focus();
-              }
-            }).dialog('open').dialog('option', 'title', "Default Grade for " + title);
-          };
-          if(columnData.grading_type != 'pass_fail' && columnData.points_possible) {
-            options['<span class="ui-icon ui-icon-check">&nbsp;</span> Curve Grades'] = function() {
+          if(object_data.submissions) {
+            options['<span class="ui-icon ui-icon-info">&nbsp;</span> Assignment Details'] = function() {
               var data = objectData($td),
-                  title = data.title;    
-              $curve_grade_dialog
-                .find(".assignment_title").text(title).end()
-                .find(".assignment_id").val(data.assignment_id).end()
-                .find(".out_of").showIf(data.points_possible || data.points_possible === '0').end()
-                .find("#middle_score").val(parseInt((data.points_possible || 0) * 0.6, 10)).end()
-                .find(".points_possible").text(data.points_possible).end()
+                  $submissions = $(".student_assignment .assignment_" + data.assignment_id);
+                  
+              data.url = $td.find(".assignment_link").attr('href');
+              data.cnt = 0;
+              data.score_total = 0.0;
+              $submissions.each(function() {
+                var $submission = $(this),
+                    submission = objectData($submission.parent());
+                if(submission.score !== null && submission.score !== undefined && submission.score !== "") {
+                  data.cnt++;
+                  data.score_total += submission.score;
+                  if(data.max == null || submission.score > data.max) {
+                    data.max = submission.score;
+                  }
+                  if(data.min == null || submission.score < data.min) {
+                    data.min = submission.score;
+                  }
+                }
+              });
+              data.max = data.max || 0.0;
+              data.min = data.min || 0.0;
+              data.average = Math.round(data.score_total * 10.0 / data.cnt) / 10.0;
+              if(isNaN(data.average) || !isFinite(data.average)) {
+                data.average = "N/A";
+              }
+              var tally = 0, width = 0, totalWidth = 200;
+              $assignment_details_dialog
+                .find(".distribution").showIf(data.average && data.points_possible)
+                  .find(".none_left").width(width = totalWidth * (data.min / data.points_possible)).css('left', (tally += width) - width).end()
+                  .find(".some_left").width(width = totalWidth * ((data.average - data.min) / data.points_possible)).css('left', (tally += width) - width).end()
+                  .find(".some_right").width(width = totalWidth * ((data.max - data.average) / data.points_possible)).css('left', (tally += width) - width - 2).end()
+                  .find(".none_right").width(width = totalWidth * ((data.points_possible - data.max) / data.points_possible)).css('left', (tally += width) - width);
+              $assignment_details_dialog.fillTemplateData({
+                  data: data
+                })
                 .dialog('close').dialog({
                   autoOpen: false,
-                  width: 350,
-                  height: "auto",
-                  open: function() {
-                    gradebook.curve();
-                  }
-                })
-                .dialog('open').dialog('option', 'title', "Curve Grade for " + title);
+                  title: "Details: " + data.title
+                }).dialog('open')
+                .find(".assignment_link").attr('href', data.url);
             };
           }
-          if(!$td.hasClass('published')) {
-            options['<span class="ui-icon ui-icon-comment">&nbsp;</span> Publish Grades'] = function() {
-              var url = $td.find(".assignment_link").attr('href');
-              var sendData = {publish: true};
-              $.ajaxJSON(url, 'PUT', sendData, function(data) {
-                $td.removeClass('unpublished').addClass('published');
+          options['<span class="ui-icon ui-icon-newwin">&nbsp;</span> SpeedGrader'] = function() {
+            window.location.href = extendedGradebookURL;
+          };
+          if(object_data.submissions) {
+            options['<span class="ui-icon ui-icon-mail-closed">&nbsp;</span> Message Students Who...'] = function() {
+              var data = objectData($td),
+                  title = data.title,
+                  $submissions = $("#datagrid_data .assignment_" + data.id);
+              
+              var students_hash = {};
+              $("#datagrid_left .student_header").each(function(i) {
+                var student = {};
+                student.id = $(this).attr('id').substring(8);
+                student.name = $(this).find(".display_name").text();
+                students_hash[student.id] = student;
+              });
+              $submissions.each(function() {
+                var data = objectData($(this).parent());
+                if(students_hash[data.user_id]) {
+                  students_hash[data.user_id].score = data.score;
+                  students_hash[data.user_id].submitted_at = data.submitted_at;
+                  students_hash[data.user_id].graded_at = data.graded_at;
+                }
+              });
+              var students = [];
+              for(var idx in students_hash) {
+                students.push(students_hash[idx]);
+              }
+              
+              window.messageStudents({
+                options: [
+                  {text: "Haven't submitted yet"},
+                  {text: "Scored less than", cutoff: true},
+                  {text: "Scored more than", cutoff: true}
+                ],
+                title: title,
+                points_possible: data.points_possible,
+                students: students,
+                callback: function(selected, cutoff, students) {
+                  students = $.grep(students, function($student, idx) {
+                    var student = $student.user_data;
+                    if(selected == "Haven't submitted yet") {
+                      return !student.submitted_at;
+                    } else if(selected == "Scored less than") {
+                      return student.score != null && student.score !== "" && cutoff != null && student.score < cutoff;
+                    } else if(selected == "Scored more than") {
+                      return student.score != null && student.score !== "" && cutoff != null && student.score > cutoff;
+                    }
+                  });
+                  return $.map(students, function(student) { return student.user_data.id; });
+                }
               });
             };
-          } else {
-            options['<span class="ui-icon ui-icon-minus">&nbsp;</span> Unpublish Grades'] = function() {
-              var url = $td.find(".assignment_link").attr('href');
-              var sendData = {unpublish: true};
-              $.ajaxJSON(url, 'PUT', sendData, function(data) {
-                $td.addClass('unpublished').removeClass('published');
-              });
-            };
-          }
-          var data = objectData($td);
-          if(data.submission_types && data.submission_types.match(/(online_upload|online_text_entry|online_url)/)) {
-            options['<span class="ui-icon ui-icon-disk">&nbsp;</span> Download Submissions'] = function() {
-              var url = $(".download_assignment_submissions_url").attr('href');
-              url = $.replaceTags(url, "assignment_id", data.assignment_id);
-              try {
-                object_data['assignment_' + data.assignment_id].assignment.submissions_downloads = (data.submissions_downloads || 0) + 1;
-              } catch(e) { }
-              INST.downloadSubmissions(url);
-            };
-          }
-          if(data.submissions_downloads && data.submissions_downloads > 0) {
-            options['<span class="ui-icon ui-icon-arrowthickstop-1-n">&nbsp;</span> Re-Upload Submissions'] = function() {
-              var url = $("#re_upload_submissions_form").find(".re_upload_submissions_url").attr('href');
-              url = $.replaceTags(url, "assignment_id", data.assignment_id);
-              $("#re_upload_submissions_form").attr('action', url);
-              $("#re_upload_submissions_form").dialog('close').dialog({
+            options['<span class="ui-icon ui-icon-check">&nbsp;</span> Set Default Grade'] = function() {
+              var data = objectData($td),
+                  title = data.title;
+              
+              $default_grade_form.find(".assignment_title").text(title).end();
+              $default_grade_form.find(".assignment_id").val(data.assignment_id);
+              $default_grade_form.find(".out_of").showIf(data.points_possible || data.points_possible === '0');
+              $default_grade_form.find(".points_possible").text(data.points_possible);
+              var url = $.replaceTags($default_grade_form.find(".default_grade_url").attr('href'), 'id', data.id);
+              url = $update_submission_form.attr('action');
+              $default_grade_form.attr('action', url).attr('method', 'POST');
+              var $input = $box = $("#student_grading_" + data.id).clone();
+              if(!$box.hasClass('grading_value')) { $input = $box.find(".grading_value"); }
+              $input.attr('name', 'default_grade').show();
+              $default_grade_form.find(".grading_box_holder").empty().append($box);
+              $default_grade_form.dialog('close').dialog({
                 autoOpen: false,
-                title: "Re-Upload Submission Files",
-                width: 350
-              }).dialog('open');
+                width: 350,
+                height: "auto",
+                open: function() {
+                  $default_grade_form.find(".grading_box").focus();
+                }
+              }).dialog('open').dialog('option', 'title', "Default Grade for " + title);
             };
+            if(columnData.grading_type != 'pass_fail' && columnData.points_possible) {
+              options['<span class="ui-icon ui-icon-check">&nbsp;</span> Curve Grades'] = function() {
+                var data = objectData($td),
+                    title = data.title;    
+                $curve_grade_dialog
+                  .find(".assignment_title").text(title).end()
+                  .find(".assignment_id").val(data.assignment_id).end()
+                  .find(".out_of").showIf(data.points_possible || data.points_possible === '0').end()
+                  .find("#middle_score").val(parseInt((data.points_possible || 0) * 0.6, 10)).end()
+                  .find(".points_possible").text(data.points_possible).end()
+                  .dialog('close').dialog({
+                    autoOpen: false,
+                    width: 350,
+                    height: "auto",
+                    open: function() {
+                      gradebook.curve();
+                    }
+                  })
+                  .dialog('open').dialog('option', 'title', "Curve Grade for " + title);
+              };
+            }
+            var data = objectData($td);
+            if(data.submission_types && data.submission_types.match(/(online_upload|online_text_entry|online_url)/)) {
+              options['<span class="ui-icon ui-icon-disk">&nbsp;</span> Download Submissions'] = function() {
+                var url = $(".download_assignment_submissions_url").attr('href');
+                url = $.replaceTags(url, "assignment_id", data.assignment_id);
+                try {
+                  object_data['assignment_' + data.assignment_id].assignment.submissions_downloads = (data.submissions_downloads || 0) + 1;
+                } catch(e) { }
+                INST.downloadSubmissions(url);
+              };
+            }
+            if(data.submissions_downloads && data.submissions_downloads > 0) {
+              options['<span class="ui-icon ui-icon-arrowthickstop-1-n">&nbsp;</span> Re-Upload Submissions'] = function() {
+                var url = $("#re_upload_submissions_form").find(".re_upload_submissions_url").attr('href');
+                url = $.replaceTags(url, "assignment_id", data.assignment_id);
+                $("#re_upload_submissions_form").attr('action', url);
+                $("#re_upload_submissions_form").dialog('close').dialog({
+                  autoOpen: false,
+                  title: "Re-Upload Submission Files",
+                  width: 350
+                }).dialog('open');
+              };
+            }
           }
         }
         options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> Hide Column'] = function() {
           datagrid.toggleColumn(datagrid.position($cell).column);
         };
         if($td.hasClass('group_total')) {
-          var type = $td.find(".assignment_title").text();
+          var type = $td.find(".assignment_title").html();
           options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> Hide All ' + type] = function() {
             var check_id = objectData($td).assignment_group_id;
             $(".outer_assignment_name").each(function() {
@@ -482,7 +504,7 @@
               var group_id = assignment.assignment_group_id;
               if(check_id && (check_id == "group-" + group_id || check_id == group_id)) {
                 var column = datagrid.position($("#assignment_" + assignment.id).parents(".cell")).column;
-                datagrid.toggleColumn(column, false, true);
+                datagrid.toggleColumn(column, false, {skipSizeGrid: true});
                 datagrid.sizeGrid();
               }
             });
@@ -635,8 +657,36 @@
           object_data.grid = true;
           $(document).fragmentChange(fragmentCallback);
           $(document).fragmentChange();
+          var columns = $.grep(($.store.userGet('hidden_columns_' + context_code) || '').split(/,/), function(e) { return e; });
+          var columns_to_hide = [];
+          
+          if(columns.length) {
+            $("#" + columns.join(',#')).parent().each(function() {
+              columns_to_hide.push(this);
+            });
+          }
+          if($.store.userGet('show_attendance_' + context_code) != 'true') {
+            $(".cell.assignment_name.attendance").each(function() {
+              columns_to_hide.push(this);
+            });
+          }
+          function nextColumn(i) {
+            var column = columns_to_hide.shift();
+            if(column) {
+              datagrid.toggleColumn(datagrid.position($(column)).column, false, {callback: false, skipSizeGrid: true});
+              if(i > 5) {
+                setTimeout(function() { nextColumn(0); }, 500);
+              } else {
+                nextColumn(i + 1);
+              }
+            } else {
+              datagrid.sizeGrid();
+            }
+          }
+          setTimeout(function() { nextColumn(0); }, 50);
+          var clump_size = INST.browser.ie ? 25 : 100;
           function moreSubmissions() {
-            for(var idx = 0; idx < 25; idx++) {
+            for(var idx = 0; idx < clump_size; idx++) {
               var item = gradebook.queuedSubmissions && gradebook.queuedSubmissions.shift();
               if(item) {
                 updateSubmission(item);
@@ -653,6 +703,16 @@
         },
         tick: function() {
           $loading_gradebook_progressbar.progressbar('option', 'value', $loading_gradebook_progressbar.progressbar('option', 'value') + (25 / students_count));
+        },
+        toggle: function(column, show) {
+          var $cell = datagrid.cells[0 + ',' + column];
+          var id = $cell.children('.assignment_header').attr('id');
+          var columns = $.grep(($.store.userGet('hidden_columns_' + context_code) || '').split(/,/), function(e) { return e && (!show || e != id); });
+          if(!show) {
+            columns.push(id);
+          }
+          columns = $.uniq(columns);
+          $.store.userSet('hidden_columns_' + context_code, columns.join(','));
         }
       });
     };
@@ -664,12 +724,15 @@
     var checkInit = function() {
       if(object_data && object_data.grid && object_data.assignments && object_data.students && !checkInit.initialized) {
         checkInit.initialized = true;
+        $("#gradebook_table, .datagrid, #no_students_message").removeClass('hidden-readable');
+        $("#loading_gradebook_message").hide();
+        $(window).triggerHandler('resize');
         setTimeout(init, 500);
       }
       if(object_data && object_data.grid && object_data.assignments && object_data.students && object_data.submissions) {
-        $("#gradebook_table, .datagrid, #no_students_message").removeClass('hidden-readable');
-        $("#loading_gradebook_message").hide();
+        $(".student_assignment .table_entry").css('visibility', '');
         $loading_gradebook_progressbar.progressbar('option', 'value', $loading_gradebook_progressbar.progressbar('option', 'value') + 50);
+        $("#sort_rows_dialog .grade_sorts").show();
         $(window).triggerHandler('resize');
         setTimeout(gradebook.populate, 1);
       } else {
@@ -714,12 +777,19 @@
             object_data.students = true;
           } else {
             tick();
+            var user_ids = [];
             for(var idx in data) {
               object_data['submission_' + data[idx].submission.user_id + '_' + data[idx].submission.assignment_id] = data[idx];
               updateSubmission(data[idx].submission);
+              user_ids.push(data[idx].submission.user_id);
             }
             object_data.student_submissions_count = object_data.student_submissions_count || 0;
             object_data.student_submissions_count = object_data.student_submissions_count + (clump_size || 1);
+            user_ids = $.uniq(user_ids);
+            for(var idx in user_ids) {
+              $(".table_entry.student_" + user_ids[idx]).css('visibility', '');
+            }
+
             if(object_data.student_submissions_count >= (object_data.students_count || 1)) {
               object_data.submissions = true;
             }
@@ -910,9 +980,167 @@
         $curve_grade_dialog.dialog('close');
       });
     }, 1500);
+    
+    $('#gradebook_options').live('click', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+          
+      var options = {
+        '<span class="ui-icon ui-icon-carat-2-e-w" /> Sort Columns By...' : function() {
+          $(".sort_gradebook").each(function() {
+            $(this).attr('disabled', false).text($(this).attr('title'));
+          });
+          $("#sort_columns_dialog").dialog('close').dialog({
+            autoOpen: false,
+            width: 400,
+            height: 300
+          }).dialog('open');
+        },
+        '<span class="ui-icon ui-icon-carat-2-n-s" /> Sort Rows By...' : function() {
+          $(".sort_gradebook").each(function() {
+            $(this).attr('disabled', false).text($(this).attr('title'));
+          });
+          $("#sort_rows_dialog").dialog('close').dialog({
+            autoOpen: false,
+            width: 400,
+            height: 300
+          }).dialog('open');
+        },
+        '<span class="ui-icon ui-icon-pencil" /> Set Group Weights' : function() {
+          $("#groups_data").dialog('close').dialog({
+            title: "Assignment Groups",
+            autoOpen: false
+          }).dialog('open').show();
+        },
+        '<span class="ui-icon ui-icon-clock" /> View Grading History' : function() {
+          window.location.href = $(".gradebook_history_url").attr('href');
+        },
+        '<span class="ui-icon ui-icon-disk" /> Download Scores (.csv)' : function() {
+          window.location.href = $(".gradebook_csv_url").attr('href');
+        },
+        '<span class="ui-icon ui-icon-clock" /> Upload Scores (from .csv) ' : function() {
+          $("#upload_modal").dialog({
+            bgiframe: true,
+            autoOpen: false,
+            modal: true,
+            width: 410,
+            resizable: false,
+            buttons: {
+              'Upload Data': function() {
+                $(this).submit();
+              }
+            }
+          }).dialog('open');
+        }
+      };
+      
+      var show = $("#hide_students_option").attr('checked');
+      options['<span class="ui-icon ui-icon-person" /> ' + (show ? 'Show' : 'Hide') + ' Student Names'] = function() {
+        $("#hide_students_option").attr('checked', !show).change();
+      };
+      var show = $.store.userGet('show_attendance_' + context_code) == 'true';
+      options['<span class="ui-icon ui-icon-contact" /> ' + (show ? 'Hide' : 'Show') + ' Attendance Columns'] = function() {
+        $.store.userSet('show_attendance_' + context_code, show ? 'false' : 'true');
+        var columns_to_toggle = [];
+        $(".cell.assignment_name.attendance").each(function() {
+          columns_to_toggle.push(this);
+        });
+        function nextColumn(i) {
+          var column = columns_to_toggle.shift();
+          if(column) {
+            datagrid.toggleColumn(datagrid.position($(column)).column, !show, {skipSizeGrid: true});
+            if(i > 5) {
+              setTimeout(function() { nextColumn(0); }, 500);
+            } else {
+              nextColumn(i + 1);
+            }
+          } else {
+            datagrid.sizeGrid();
+          }
+        }
+        setTimeout(function() { nextColumn(0); }, 50);
+      };
+
+      
+      options['<span class="ui-icon ui-icon-check" /> ' + (ignoreUngradedSubmissions ? 'Include' : 'Ignore') + ' Ungraded Assignments'] = function() {
+        ignoreUngradedSubmissions = !ignoreUngradedSubmissions;
+        gradebook.updateAllStudentGrades(); 
+      };
+      
+      
+      
+      if ($.size(possibleSections) > 1) {  
+        var sectionToShowLabel = sectionToShow ? 
+                                    ('Showing Section: ' + possibleSections[sectionToShow]) : 
+                                    'Showing All Sections';
+        options['<span class="ui-icon ui-icon-search" />' + sectionToShowLabel] = function() {
+          var $dialog = $("#section_to_show_dialog").dialog({
+                modal: true,
+                resizable: false,
+                buttons: {
+                  'Change Section': function() {
+                    var val = $("#section_to_show_dialog select").val();
+                    $.store[val == "all" ? 'userRemove' : 'userSet']("grading_show_only_section"+contextId, val);
+                    window.location.reload();
+                  }
+                }
+              });
+          var $select = $dialog.find('select');
+          $select.find('[value != all]').remove();
+          for (var key in possibleSections) {
+            $select.append('<option value="' + key + '" ' + (sectionToShow == key ? 'selected' : '') + ' >' + possibleSections[key] + '</option>'); 
+          }
+        };
+      }
+      
+      $(this).dropdownList({
+        options: options
+      });
+    });
+    
+    $(".sort_gradebook").click(function(event) {
+      event.preventDefault();
+      var $button = $(this);
+      if($button.hasClass('by_grade') && !gradebook.finalGradesReady) {
+        $button.attr('disabled', true).text("Computing Grades...");
+        setTimeout(function() {
+          if($button.filter(":visible").length > 0) {
+            $button.click();
+          }
+        }, 1000);
+        return;
+      }
+      $button.attr('disabled', false);
+      $button.text($button.attr('title'));
+      if($button.hasClass('sort_rows')) {
+        sortStudentRows(function(student) {
+          if($button.hasClass('by_secondary_identifier')) {
+            return [student.secondary_identifier, student.display_name, student.course_section];
+          } else if($button.hasClass('by_section')) {
+            return [student.course_section, student.display_name, student.secondary_identifier];
+          } else if($button.hasClass('by_grade_desc')) { 
+            return [Math.round((1000 - student.grade) * 10.0), student.display_name, student.secondary_identifier, student.course_section];
+          } else if($button.hasClass('by_grade_asc')) {
+            return [10000 + Math.round(student.grade * 10.0), student.display_name, student.secondary_identifier, student.course_section];
+          } else {
+            return [student.display_name, student.secondary_identifier, student.course_section];
+          }
+        });
+      } else {
+        sortAssignmentColumns(function(assignment) {
+          var list = [assignment.special_sort, assignment.date_sortable || "1050-12-12T99:99", assignment.title];
+          if($button.hasClass('by_group')) {
+            list.unshift(parseInt(assignment.groupData[assignment.group_id || assignment.id.toString().substring(6)], 10));
+          }
+          return list;
+        });
+      }
+      $("#sort_rows_dialog").dialog('close');
+      $("#sort_columns_dialog").dialog('close');
+    });
 
   });
-
+    
 
   function objectData($td) {
     var id = $td.data('object_id');
@@ -955,6 +1183,7 @@
     }
     return data;
   }
+
   function submitDataEntry(data, fromDialog) {
     var formData = $update_submission_form.getFormData();
     var $div = $("#submission_" + data.student_id + "_" + data.assignment_id);
@@ -995,6 +1224,7 @@
       $.ajaxJSON($update_submission_form.attr('action'), 'POST', formData, formSuccess, formError);
     }
   }
+
   function updateSubmission(submission) {
     if(!submission) { return; }
     var $submission = null;
@@ -1014,6 +1244,7 @@
     var assignment = assignment && assignment.assignment;
     submission.student_id = submission.user_id;
     $submission = $submission || $("#submission_" + submission.student_id + "_" + submission.assignment_id);
+    $submission.css('visibility', '');
     var submission_stamp = submission && $.parseFromISO(submission.submitted_at).minute_timestamp;
     var assignment_stamp = assignment && $.parseFromISO(assignment.due_at).minute_timestamp;
     $submission.parent().toggleClass('late', !!(assignment && submission && assignment.due_at && submission.submission_type && submission.submitted_at && submission_stamp > assignment_stamp));
@@ -1084,6 +1315,7 @@
       $submission_grade.empty().append(emptySubmissionText(submission));
     }
   }
+
   function emptySubmissionText(submission) {
     var result = $("#submission_" + submission.submission_type + "_image").clone().attr('id', '');
     if(result.length === 0) {
@@ -1091,6 +1323,7 @@
     }
     return result;
   }
+
   function updateDataEntry($box, forceUpdate) {
     var $input = $box;
     var $parent = $input.parents(".table_entry");
@@ -1128,6 +1361,7 @@
     }
     $parent.find(".grade").show().empty().append(val);
   }
+
   function toggleColumn($obj, show) {
     var assignment_id = objectData($obj).assignment_id;
     var $list = $(".assignment_" + assignment_id);
@@ -1137,6 +1371,7 @@
       $list.hide().parent().addClass('hidden_column');
     }
   }
+
   function populateSubmissionInformation($submission, submission) {
     var $td = $submission,
         assignment = object_data["assignment_" + submission.assignment_id].assignment,
@@ -1304,6 +1539,7 @@
       autoOpen: false
     }).dialog('open').dialog('option', 'title', title);
   }
+
   function submissionInformation($submission) {
     var $td = $submission;
     var submission = objectData($td);
@@ -1328,6 +1564,7 @@
       });
     }
   }
+
   var studentsToUpdate = [];
   gradebook.finalGradesReady = true;
   var studentsToInitialize = {};
@@ -1387,6 +1624,7 @@
       $assignment.data('assignment_object', assignment);
     });
   }
+
   function moveAssignmentColumn(assignment_id, movement, relative_assignment_id) {
     if(movement == "first") {
       movement = "before";
@@ -1409,6 +1647,7 @@
       }
     }
   }
+
   window.sortStudentRows = function(callback) {
     var $students = $(".outer_student_name");
     var students = [];
@@ -1443,6 +1682,7 @@
     });
     datagrid.reorderRows(new_order);
   };
+
   window.reverseRows = function() {
     var new_order = [0];
     for(var idx = datagrid.rows.length - 1; idx > 0; idx--) {
@@ -1450,6 +1690,7 @@
     }
     datagrid.reorderRows(new_order);
   };
+
   window.sortAssignmentColumns = function(callback) {
     var $assignments = $(".outer_assignment_name");
     var assignments = [];
@@ -1486,6 +1727,7 @@
     });
     datagrid.reorderColumns(new_order);
   }
+
   function updateGroupTotal(updateGrades) {
     var total = 0.0;
     var weighted = $("#class_weighting_policy").attr('checked');
@@ -1515,6 +1757,7 @@
       gradebook.updateAllStudentGrades();
     }
   }
+
   function setGroupData(groups, $group) {
     if(!$group) { return; }
     if($group && $group.length === 0) { return; }
@@ -1563,6 +1806,7 @@
     groups[data.assignment_group_id] = groupData;
     return groupData;
   }
+
   function updateStudentGrades(student_id) {
     var $submissions = $(".table_entry.student_" + student_id);
     if($submissions.length === 0) { return; }
@@ -1664,6 +1908,7 @@
       var groupData = setGroupData(groups, $("#group_" + i));
       var score = Math.round(group.calculated_score * 1000.0) / 10.0;
       $("#submission_" + student_id + "_group-" + i)
+        .css('visibility', '')
         .attr('data-tip', 'pts: ' +  group.score_total + ' / ' + group.full_total)
         .find(".grade").text(score).end()
         .find(".score").hide().end()
@@ -1703,30 +1948,36 @@
       finalGrade = 0;
     }
     $("#submission_" + student_id + "_final-grade")
+      .css('visibility', '')
       .attr('data-tip', gradebook.pointCalculations ? ('pts: ' + totalUserPoints + ' / ' + totalPointsPossible) : '')
       .find(".grade").text(finalGrade).end()
       .find(".score").hide().end()
       .find(".pct").text(' %').show();
   }
+
   $(document).ready(function(){
     $(document).bind('update_student_grades', function(event, student_id) {
       updateStudentGrades(student_id);
     });
   });
+
   $.fn.gradebookLoading = function(action) {
     this.find(".refresh_grades_link").find(".static").showIf(action).end()
       .find(".animated").showIf(!action);
   };
+
   function updateGrades(refresh) {
+    var url = window.location.protocol + "//" + 
+              window.location.host + 
+              window.location.pathname + 
+              "?updated=" + lastGradebookUpdate;
+    
     $("#datagrid_topleft").gradebookLoading();
-    var url = "http://" + location.host + location.pathname + "?updated=" + lastGradebookUpdate;
-    var options = {};
-    $.ajaxJSON(url, 'GET', {}, function(data) {
+    $.ajaxJSON(url, 'GET', {}, function(submissions) {
       if(refresh) {
         setTimeout(function() { updateGrades(true); }, 120000);
       }
       $("#datagrid_topleft").gradebookLoading('remove');
-      var submissions = data;
       var newGradebookUpdate = lastGradebookUpdate;
       for(idx in submissions) {
         var submission = submissions[idx].submission;
@@ -1744,6 +1995,8 @@
         setTimeout(function() { updateGrades(true); }, 240000);
       }
       $("#datagrid_topleft").gradebookLoading('remove');
-    }, options);
+    });
   }
+
+  return gradebook;
 })();

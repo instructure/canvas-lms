@@ -1,0 +1,81 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          You will need an account either at <a href="http://www.kaltura.com">Kaltura.com</a>
+          or with a self-hosted instance of Kaltura.
+        </p>
+        <p>
+          <strong>Note:</strong> once you have Kaltura configured within Canvas,
+          you need to go to the Kaltura Management Console and under "Settings -> 
+          Integration Settings" enable server notifications with a 
+          Notification URL of:
+        </p>
+        <p>http://your_canvas_domain/media_objects/kaltura_notifications</p>
+        <p>
+          Then check the boxes for "Add Entry" and "Delete Entry" in the "Sent by Server" column.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" class="sub">
+        <h3>Domain Settings</h3>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :domain, "Domain:" %></td>
+      <td>
+        <%= f.text_field :domain %>
+        <div class="hint">For hosted accounts, use "www.kaltura.com"</div>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :resource_domain, "Resource Domain:" %></td>
+      <td>
+        <%= f.text_field :resource_domain %>
+        <div class="hint">For hosted accounts, use "cdn.kaltura.com"</div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" class="sub">
+        <h3>Account Settings</h3>
+        <p>These values can be found in the Kaltura Management Console under "Settings -> Integration Settings"</p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :partner_id, "Partner ID:" %></td>
+      <td><%= f.text_field :partner_id %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :subpartner_id, "Sub Partner ID:" %></td>
+      <td><%= f.text_field :subpartner_id %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :secret_key, "Administrator Secret:" %></td>
+      <td><%= f.text_field :secret_key %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :user_secret_key, "User Secret:" %></td>
+      <td><%= f.text_field :user_secret_key %></td>
+    </tr>
+    <tr>
+      <td colspan="2" class="sub">
+        <h3>UI Conf IDs</h3>
+        <p>For Kaltura-hosted customers, you can ask Kaltura to provide you with these ids.  Self-hosted instances can find these values in the ui_confs table.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :player_ui_conf, "Player UI Conf ID:" %></td>
+      <td><%= f.text_field :player_ui_conf %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :kcw_ui_conf, "KCW UI Conf ID:" %></td>
+      <td><%= f.text_field :kcw_ui_conf %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :upload_ui_conf, "Uploader UI Conf ID:" %></td>
+      <td><%= f.text_field :upload_ui_conf %></td>
+    </tr>
+  </table>
+<% end %>

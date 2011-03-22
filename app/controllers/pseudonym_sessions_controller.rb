@@ -34,7 +34,6 @@ class PseudonymSessionsController < ApplicationController
 
     @pseudonym_session = PseudonymSession.new
     @headers = false
-    store_location(dashboard_url(:only_path => true), false)
     @is_saml = @domain_root_account.saml_authentication? && !params[:canvas_login]
     if @is_saml && !params[:no_auto]
       reset_session

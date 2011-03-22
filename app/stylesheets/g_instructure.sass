@@ -1,17 +1,5 @@
 @import environment.sass
 
-#noscript
-  background-color: white
-  height: 100%
-  left: 0
-  padding: 30px
-  position: absolute
-  top: 0
-  width: 100%
-  z-index: 999999
-  a
-    text-decoration: underline
-
 #instructure_ajax_error_box
   :display none
   :position fixed
@@ -859,6 +847,16 @@ ul.group_list
       :text-align center
     &.subcontent
       /* :border-left 1px solid #ddd */
+  &.pinned_notification
+    border: 1px solid #bbb
+    background: #ffb
+    .header
+      .links
+        float: right
+        font-size: 0.8em
+    .user_content
+      p:last-child
+        margin-bottom: 0
 .communication_message_hover
   div.header
     .link_box

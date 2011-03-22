@@ -20,7 +20,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb("Quizzes") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters]
   
   def index
     if authorized_action(@context, @current_user, :read)
@@ -53,8 +53,7 @@ class QuizzesController < ApplicationController
   end
   
   def has_student_submissions?
-    @has_student_submissions ||= @quiz.quiz_submissions.any?{|s| @context.students.include?(s.user) }
-    # !@quiz.quiz_submissions.select{|s| !@context.admins.include?(s.user) }.empty?
+    @has_student_submissions ||= @quiz.quiz_submissions.any?{|s| !s.settings_only? && @context.students.include?(s.user) }
     @has_student_submissions
   end
   protected :has_student_submissions?
@@ -62,9 +61,9 @@ class QuizzesController < ApplicationController
   def statistics
     if authorized_action(@quiz, @current_user, :manage)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-      add_crumb("History", named_context_url(@context, :context_quiz_statistics_url, @quiz))
+      add_crumb("Statistics", named_context_url(@context, :context_quiz_statistics_url, @quiz))
       @statistics = @quiz.statistics
-      @submitted_users = User.find_all_by_id(@quiz.quiz_submissions.map(&:user_id)).compact.uniq.sort_by(&:last_name_first)
+      @submitted_users = User.find_all_by_id(@quiz.quiz_submissions.select{|s| !s.settings_only? }.map(&:user_id)).compact.uniq.sort_by(&:last_name_first)
     end
   end
   
@@ -95,36 +94,33 @@ class QuizzesController < ApplicationController
       if session[:quiz_id] == @quiz.id && !request.xhr?
         session[:quiz_id] = nil
       end
-      if @quiz.for_assignment?
-        @locked_reason = @quiz.assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-        @locked = @locked_reason && !@quiz.grants_right?(@current_user, session, :update)
-      else
-        @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) #&& !@quiz.grants_right?(@current_user, session, :update)#(@quiz.unlock_at && Time.now < @quiz.unlock_at) || (@quiz.lock_at && Time.now > @quiz.lock_at)
-        @locked = !!@locked_reason
-      end
+      @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+      @locked = @locked_reason && !@quiz.grants_right?(@current_user, session, :update)
+
       @quiz.context_module_action(@current_user, :read) if !@locked
-      
+
+      @assignment = @quiz.assignment
       @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id, :order => 'created_at') rescue nil
       if !@current_user || (params[:preview] && @quiz.grants_right?(@current_user, session, :update))
         user_code = temporary_user_code
         @submission = @quiz.quiz_submissions.find_by_temporary_user_code(user_code)
       end
       @just_graded = false
-      if @submission && @submission.needs_grading?
+      if @submission && @submission.needs_grading?(!!params[:take])
         @submission.grade_submission(:finished_at => @submission.end_at)
         @submission.reload
         @just_graded = true
       end
       managed_quiz_data if @quiz.grants_right?(@current_user, session, :grade)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && @submission.untaken?
-      @stored_params ||= OpenObject.new
+      @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")
       take_quiz if params[:take] && !@locked
     end
   end
   
   def managed_quiz_data
-    @submissions = @quiz.quiz_submissions.to_a
+    @submissions = @quiz.quiz_submissions.select{|s| !s.settings_only? }
     submission_ids = {}
     @submissions.each{|s| submission_ids[s.user_id] = s.id }
     submission_users = @submissions.map{|s| s.user_id}
@@ -136,18 +132,37 @@ class QuizzesController < ApplicationController
     @unsubmitted_students = students.reject{|stu| submission_ids[stu.id] }
   end
   protected :managed_quiz_data
-  
+
+  def lockdown_browser_required
+    render
+  end
+
   def take_quiz
     return unless authorized_action(@quiz, @current_user, :submit)
-    if @submission && (!@submission.attempt || !@submission.submission_data)
+
+    if feature_enabled?(:lockdown_browser) && @quiz.require_lockdown_browser? && !@quiz.grants_right?(@current_user, session, :grade)
+      # TODO: support multiple enabled lockdown browser plugins? Right now we
+      # always just use the first enabled one.
+      plugin = Canvas::Plugin.all_for_tag(:lockdown_browser).first.base
+      if plugin.require_authorization_redirect?(request)
+        return redirect_to(plugin.redirect_url(request, @context, @quiz))
+      elsif !plugin.authorized?(request)
+        return redirect_to(:action => 'lockdown_browser_required')
+      end
+    end
+
+    if @submission && !@submission.settings_only? && (!@submission.attempt || !@submission.submission_data)
       @submission.destroy
       @submission = nil
     end
     can_retry = @submission && (@quiz.unlimited_attempts? || @submission.attempts_left > 0 || @quiz.grants_right?(@current_user, session, :update))
     preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
-    if !@submission || (@submission.completed? && can_retry && !@just_graded) || preview
+    if !@submission || @submission.settings_only? || (@submission.completed? && can_retry && !@just_graded) || preview
       if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] != @quiz.access_code
         render :action => 'access_code'
+        return
+      elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+        render :action => 'invalid_ip'
         return
       else
         user_code = @current_user 
@@ -157,12 +172,15 @@ class QuizzesController < ApplicationController
       end
     end
     
-    if @submission && !@submission.completed? && !@just_graded
-      if !@quiz.access_code || @quiz.access_code.empty? || params[:access_code] == @quiz.access_code
-        log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
-        render :action => "take_quiz"
-      else
+    if @submission && (@submission.untaken? || @submission.preview?) && !@just_graded
+      if @quiz.access_code && !@quiz.access_code.empty? && params[:access_code] != @quiz.access_code
         render :action => 'access_code'
+      elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+        render :action => 'invalid_ip'
+      else
+        log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
+        flash[:notice] = "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz." if @submission.less_than_allotted_time?
+        render :action => "take_quiz"
       end
     else
       if @just_graded
@@ -187,6 +205,31 @@ class QuizzesController < ApplicationController
       end
       flash[:notice] = "#{@quizzes.length} quizzes successfully published!"
       redirect_to named_context_url(@context, :context_quizzes_url)
+    end
+  end
+  
+  def filters
+    if authorized_action(@quiz, @current_user, :update)
+      @filters = []
+      @account = @quiz.context.account
+      if @quiz.ip_filter
+        @filters << {
+          :name => 'Current Filter',
+          :account => @quiz.title,
+          :filter => @quiz.ip_filter
+        }
+      end
+      while @account
+        (@account.settings[:ip_filters] || {}).sort_by(&:first).each do |key, filter|
+          @filters << {
+            :name => key,
+            :account => @account.name,
+            :filter => filter
+          }
+        end
+        @account = @account.parent_account
+      end
+      render :json => @filters.to_json
     end
   end
   
@@ -233,6 +276,7 @@ class QuizzesController < ApplicationController
         user_id = params[:user_id] if params[:user_id] && @quiz.grants_right?(@current_user, session, :grade)
         @submission = @quiz.quiz_submissions.find_by_user_id(user_id, :order => 'created_at') rescue nil
       end
+      @submission = nil if @submission && @submission.settings_only?
       @user = @submission && @submission.user
       if @submission && @submission.needs_grading?
         @submission.grade_submission(:finished_at => @submission.end_at)
@@ -244,11 +288,12 @@ class QuizzesController < ApplicationController
         return
       end
       if !@submission
+        flash[:notice] = "There is no submission available for that user"
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
       end
       if authorized_action(@submission, @current_user, :read)
-        add_crumb("History", named_context_url(@context, :context_quiz_history_url, @quiz))
+        add_crumb((!@submission.user || @submission.user == @current_user ? "History" : @submission.user.name))
         @headers = !params[:headless]
         @current_submission = @submission
         @version_instances = @submission.submitted_versions.sort_by{|v| v.version_number }
@@ -306,7 +351,6 @@ class QuizzesController < ApplicationController
   def update
     n = Time.now.to_f
     if authorized_action(@quiz, @current_user, :update)
-      logger.warn "QUIZZES_CONTROLLER: parsing parameters #{Time.now.to_f - n}"
       params[:quiz] ||= {}
       params[:quiz][:title] = "New Quiz" if params[:quiz][:title] == "undefined"
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
@@ -319,7 +363,6 @@ class QuizzesController < ApplicationController
         params[:quiz][:assignment_group_id] = @assignment_group && @assignment_group.id
       end
       
-      logger.warn "QUIZZES_CONTROLLER: activating quiz #{Time.now.to_f - n}"
       if params[:activate]
         @quiz.with_versioning(true) do
           @quiz.generate_quiz_data
@@ -331,7 +374,6 @@ class QuizzesController < ApplicationController
 
       params[:quiz][:lock_at] = nil if params[:quiz].delete(:do_lock_at) == 'false'
 
-      logger.warn "QUIZZES_CONTROLLER: marking as edited #{Time.now.to_f - n}"
       @quiz.with_versioning(false) do
         @quiz.did_edit if @quiz.created?
       end
@@ -342,11 +384,8 @@ class QuizzesController < ApplicationController
         @quiz.with_versioning(false) do
           res = @quiz.update_attributes(params[:quiz])
         end
-        logger.warn "QUIZZES_CONTROLLER: updating attributes #{Time.now.to_f - n}"
         if res
-          logger.warn "QUIZZES_CONTROLLER: reloading quiz #{Time.now.to_f - n}"
           @quiz.reload
-          logger.warn "QUIZZES_CONTROLLER: rendering response #{Time.now.to_f - n}"
           flash[:notice] = "Quiz successfully updated"
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
           format.json {render :json =>  @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})}
@@ -369,6 +408,23 @@ class QuizzesController < ApplicationController
           format.html { redirect_to course_quiz_url(@context, @quiz) }
           format.json { render :json => @quiz.errors.to_json }
         end
+      end
+    end
+  end
+  
+  def moderate
+    if authorized_action(@quiz, @current_user, :grade)
+      @all_students = @context.students
+      if @quiz.survey? && @quiz.anonymous_submissions
+        @students = @all_students.paginate(:per_page => 50, :page => params[:page], :order => :uuid)
+      else
+        @students = @all_students.paginate(:per_page => 50, :page => params[:page])
+      end
+      last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
+      @submissions = @quiz.quiz_submissions.updated_after(last_updated_at).for_user_ids(@students.map(&:id))
+      respond_to do |format|
+        format.html
+        format.json { render :json => @submissions.to_json(:include_root => false, :exclude => :submission_data, :methods => ['extendable?', :finished_in_words, :attempts_left]) }
       end
     end
   end

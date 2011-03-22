@@ -27,8 +27,9 @@ class ZipFileImportsController < ApplicationController
   def import_status
     if authorized_action(@context, @current_user, :manage_files)
       @status = SisBatch.find_by_account_id_and_batch_id(0, params[:batch_id])
+      res = (@status && @status.data) || {}
       @status.data ||= {} if @status
-      render :json => (@status.data rescue {}).to_json
+      render :json => res.to_json
     end
   end
   

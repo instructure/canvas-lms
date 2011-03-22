@@ -1,8 +1,8 @@
 <% 
-# I am assuming that any new submission or grading will touch the course (or the user) so that will make this cache work, 
+# TODO: I am assuming that any new submission or grading will touch the course (or the user) so that will make this cache work, 
 # if not we need to cache smarter. -RS
 cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do 
-  
+ show_context = !contexts || contexts.length > 1
  max_to_show = 16
  if @current_user && [
     @current_user.assignments_needing_submitting(:contexts => contexts, :limit => max_to_show), 
@@ -16,7 +16,23 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
       <% cnt += 1 %>
       <% if cnt <= 15 %>
         <li style="<%= hidden if cnt > 5 %>">
-          <a class="item icon-grading-gray" href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>">
+          <a class="item icon-grading-gray tooltip" href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>">
+            <% if assignment.due_at || assignment.points_possible || show_context %>
+              <span class="tooltip_wrap">
+                <span class='tooltip-carat'></span>
+                <span class="tooltip_text">
+                  <% if assignment.due_at %>
+                    <span style="display: block;">due: <%= datetime_string(assignment.due_at) %></span>
+                  <% end %>
+                  <% if assignment.points_possible %>
+                    <span style="display: block; font-size: 0.8em;">out of <%= assignment.points_possible %></span>
+                  <% end %>
+                  <% if show_context %>
+                    <span style="display: block; font-size: 0.8em;"><%= assignment.context.short_name %></span>
+                  <% end %>
+                </span>
+              </span>
+            <% end %>
             <b>Grade <%= assignment.title %></b>
             <em><%= assignment.need_graded_count %> need<%= 's' if assignment.need_graded_count == 1 %> grading</em>
           </a>
@@ -28,7 +44,20 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
       <% cnt += 1 %>
       <% if cnt <= 15 %>
         <li style="<%= hidden if cnt > 5 %>">
-          <a class="item icon-grading-gray" href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit">
+          <a class="item icon-grading-gray tooltip" href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit">
+            <% if show_context || assignment.points_possible %>
+              <span class="tooltip_wrap">
+                <span class='tooltip-carat'></span>
+                <span class="tooltip_text">
+                  <% if assignment.points_possible %>
+                    <span style="display: block; font-size: 0.8em;">out of <%= assignment.points_possible %></span>
+                  <% end %>
+                  <% if show_context %>
+                    <span style="display: block; font-size: 0.8em;"><%= assignment.context.short_name %></span>
+                  <% end %>
+                </span>
+              </span>
+            <% end %>
             <b><%= assignment.submission_action_string %> <%= assignment.title %></b>
             <em>Due <%= datetime_string(assignment.due_at) %></em>
           </a>
@@ -51,8 +80,6 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
       <li>
         <a href="#" class="more_link"><%= [10, cnt - 5].min %> more...</a>
       </li>
-    <% end %>
-    <% if cnt > 15 %>
       <li style="display: none;">
         <a href="#" class="even_more_link">see all...</a>
       </li>

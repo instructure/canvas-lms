@@ -1,8 +1,8 @@
 <% 
   add_crumb(@user.short_name, profile_path )
-  add_crumb("Communication Preferences", communication_profile_path )
+  add_crumb("Notification Preferences", communication_profile_path )
 %>
-<% content_for :page_title do %>Communication Preferences<% end %>
+<% content_for :page_title do %>Notification Preferences<% end %>
 
 <% content_for :right_side do %>
   <%= render :partial => "ways_to_contact" %>

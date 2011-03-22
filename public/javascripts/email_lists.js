@@ -75,6 +75,7 @@
               message += ".  The following addresses had problems:<br/><span style='font-size:0.8em;'>" + erroredEmails.join(',') + "</span>";
               $.flashError(message, 20000);
             }
+            $(document).triggerHandler('enrollment_added');
           } else {
             setTimeout(checkForFinish, 500);
           }

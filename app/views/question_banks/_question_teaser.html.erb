@@ -3,7 +3,7 @@
   <div class="display_question question">
     <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
     <div class="header">
-      <a href="#" class="question_name question_teaser_link" title="Click to show full question details"><%= data.try_rescue(:question_name) %></a>
+      <a href="#" class="question_name question_teaser_link" title="Click to show full question details"><%= hash_get(data, :question_name) %></a>
     </div>
     <div class="links">
       <a href="#" class="edit_teaser_link no-hover" title="Edit this Question"><%= image_tag "edit.png" %></a>
@@ -12,7 +12,7 @@
     </div>
     <div class="text">
       <div class="teaser question_text user_content">
-        <%= user_content(data.try_rescue(:question_text), @context.asset_string, question_teaser.try_rescue(:asset_string)) %>
+        <%= user_content(hash_get(data, :question_text), @context.asset_string, question_teaser.try_rescue(:asset_string)) %>
       </div>
     </div>
     <div class="bottom_links">

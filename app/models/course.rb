@@ -22,8 +22,9 @@ class Course < ActiveRecord::Base
   
   include Context
   include Workflow
+  include EnrollmentDateRestrictions
 
-  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :abstract_course, :root_account, :storage_quota
+  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :abstract_course, :root_account, :storage_quota, :restrict_enrollments_to_course_dates
 
   serialize :tab_configuration
   belongs_to :root_account, :class_name => 'Account'
@@ -33,18 +34,20 @@ class Course < ActiveRecord::Base
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
-  has_many :current_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'rejected', 'completed', 'deleted'], :include => :user
+  has_many :current_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'rejected', 'completed', 'deleted', 'inactive'], :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
   has_many :students, :through => :student_enrollments, :source => :user, :order => :sortable_name
   has_many :all_students, :through => :all_student_enrollments, :source => :user, :order => :sortable_name
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'StudentEnrollment' and enrollments.workflow_state = 'active'"
-  has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected'], :include => :user #, :conditions => "type = 'StudentEnrollment'"
+  has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected', 'inactive'], :include => :user #, :conditions => "type = 'StudentEnrollment'"
   has_many :all_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :detailed_enrollments, :class_name => 'Enrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => {:user => {:pseudonym => :communication_channel}}
   has_many :teachers, :through => :teacher_enrollments, :source => :user
   has_many :teacher_enrollments, :class_name => 'TeacherEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :tas, :through => :ta_enrollments, :source => :user
   has_many :ta_enrollments, :class_name => 'TaEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
+  has_many :designers, :through => :designer_enrollments, :source => :user
+  has_many :designer_enrollments, :class_name => 'DesignerEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :observers, :through => :observer_enrollments, :source => :user
   has_many :observer_enrollments, :class_name => 'ObserverEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :admins, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment'"
@@ -74,6 +77,7 @@ class Course < ActiveRecord::Base
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :messages, :as => :context, :dependent => :destroy
   belongs_to :wiki
@@ -205,9 +209,10 @@ class Course < ActiveRecord::Base
     associations_hash = {}
     to_delete = {}
     self.course_account_associations.each do |association|
-      if !associations_hash[association.account_id]
-        associations_hash[association.account_id] = association
-        to_delete[association.account_id] = association
+      key = [association.account_id, association.course_section_id]
+      if !associations_hash[key]
+        associations_hash[key] = association
+        to_delete[key] = association
       else
         association.destroy
       end
@@ -218,23 +223,24 @@ class Course < ActiveRecord::Base
     # Courses are tied to accounts directly and through cross-listed sections.
     initial_entities = [self] + self.course_sections.active.find(:all, :include => { :abstract_course => :department })
     initial_entities.each do |entity|
-      accounts = if entity.is_a?(Course) && entity.account
+      accounts = if entity.account
                    entity.account.account_chain
                  elsif entity.abstract_course && entity.abstract_course.department
                    entity.abstract_course.department.account_chain
                  else
                    [ ]
                  end
+      section = (entity.is_a?(Course) ? entity.default_section : entity)
       accounts.each_with_index do |account, idx|
-        section = (entity.is_a?(Course) ? entity.default_section : entity)
-        if associations_hash[account.id]
-          unless associations_hash[account.id].depth == idx && associations_hash[account.id].course_section_id == section.id
-            associations_hash[account.id].update_attributes(:depth => idx, :course_section_id => section.id)
+        key = [account.id, section.id]
+        if associations_hash[key]
+          unless associations_hash[key].depth == idx
+            associations_hash[key].update_attributes(:depth => idx)
             did_an_update = true
           end
-          to_delete.delete(account.id)
+          to_delete.delete(key)
         else
-          self.course_account_associations.create(:account_id => account.id, :depth => idx, :course_section_id => section.id)
+          associations_hash[key] = self.course_account_associations.create(:account_id => account.id, :depth => idx, :course_section_id => section.id)
           did_an_update = true
         end
       end
@@ -435,6 +441,9 @@ class Course < ActiveRecord::Base
     if self.completed?
       enrollments = self.enrollments.scoped(:select => "id, user_id, course_id", :conditions=>"workflow_state IN ('active', 'invited')")
       Enrollment.update_all({:workflow_state => 'completed'}, {:id => enrollments.map(&:id)})
+    elsif self.deleted?
+      enrollments = self.enrollments.scoped(:select => "id, user_id, course_id", :conditions=>"workflow_state != 'deleted'")
+      Enrollment.update_all({:workflow_state => 'deleted'}, {:id => enrollments.map(&:id)})
     end
     enrollments = self.enrollments.scoped(:select => "id, user_id, course_id")
     Enrollment.update_all({:updated_at => Time.now}, {:id => enrollments.map(&:id)})
@@ -658,13 +667,16 @@ class Course < ActiveRecord::Base
     
     given { |user| self.available? && user &&  user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
     set { can :read and can :participate_as_student and can :read_grades and can :read_groups }
-    
+
     given { |user| self.completed? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
     set { can :read and can :read_groups }
     
     given { |user| (self.available? || self.completed?) && user &&  user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? } }
     set { can :read }
     
+    given { |user| (self.available? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? && e.associated_user_id} }
+    set { can :read_grades }
+     
     given { |user, session| self.available? && self.teacherless? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } && (!session || !session["role_course_#{self.id}"]) }
     set { can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p } }
     
@@ -713,6 +725,40 @@ class Course < ActiveRecord::Base
   def self.find_all_by_context_code(codes)
     ids = codes.map{|c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }.compact
     Course.find(:all, :conditions => {:id => ids}, :include => :current_enrollments)
+  end
+  
+  def enrollment_dates_for(enrollment)
+    if enrollment.start_at && enrollment.end_at
+      [enrollment.start_at, enrollment.end_at]
+    elsif (section = enrollment.course_section_id && course_sections.find_by_id(enrollment.course_section_id)) && 
+          section && section.restrict_enrollments_to_section_dates && !enrollment.admin?
+      [section.start_at, section.end_at]
+    elsif self.restrict_enrollments_to_course_dates && !enrollment.admin?
+      [start_at, end_at]
+    elsif enrollment_term
+      enrollment_term.enrollment_dates_for(enrollment)
+    else
+      [nil, nil]
+    end
+  end
+  
+  def enrollment_state_based_on_date(enrollment)
+    start_at, end_at = enrollment_dates_for(enrollment)
+    if start_at && start_at >= Time.now
+      'inactive'
+    elsif end_at && end_at <= Time.now
+      'completed'
+    else
+      'active'
+    end
+  end
+  
+  def end_at
+    conclude_at
+  end
+  
+  def end_at_changed?
+    conclude_at_changed?
   end
   
   def state_sortable
@@ -767,16 +813,6 @@ class Course < ActiveRecord::Base
   
   def wiki_namespace
     WikiNamespace.default_for_context(self)
-  end
-  
-  def to_csv(options = {})
-    if all? { |e| e.respond_to?(:to_row) }
-      header_row = first.export_columns(options[:format]).to_csv
-      content_rows = map { |e| e.to_row(options[:format]) }.map(&:to_csv)
-      ([header_row] + content_rows).join
-    else
-      FasterCSV.generate_line(self, options)
-    end
   end
   
   def gradebook_to_csv(options = {})
@@ -1256,6 +1292,14 @@ class Course < ActiveRecord::Base
     @to_migrate_links = []
     added_items = []
     delete_placeholder = nil
+    
+    if bool_res(options[:course_settings])
+      #Copy the course settings too
+      course.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
+        self.send("#{attr}=", course.send(attr))
+      end
+      self.save
+    end
     if self.assignment_groups.length == 1 && self.assignment_groups.first.name == "Assignments" && self.assignment_groups.first.assignments.empty?
       delete_placeholder = self.assignment_groups.first
       self.group_weighting_scheme = course.group_weighting_scheme
@@ -1451,7 +1495,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.clonable_attributes
-    [:name, :group_weighting_scheme, :start_at, :conclude_at, 
+    [:name, :course_code, :group_weighting_scheme, :start_at, :conclude_at, 
     :grading_standard_id, :is_public, :publish_grades_immediately, 
     :allow_student_wiki_edits, :allow_student_assignment_edits, 
     :hashtag, :show_public_context_messages, :syllabus_body, 
@@ -1709,7 +1753,9 @@ class Course < ActiveRecord::Base
       
       # remove some tabs for logged-out users or non-students
       tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } unless self.grants_right?(user, nil, :participate_as_student)
-      tabs.delete_if {|t| [TAB_GRADES].include?(t[:id]) } unless self.grants_right?(user, nil, :read_grades)
+      if !self.grants_right?(user, nil, :read_grades)
+        tabs.delete_if {|t| [TAB_GRADES].include?(t[:id]) } 
+      end
       
       # remove hidden tabs from students
       tabs.delete_if {|t| t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused]) }

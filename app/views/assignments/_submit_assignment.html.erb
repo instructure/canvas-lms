@@ -5,7 +5,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
   var submitting = false;
-  $("form").submit(function(event) {
+  $(".submit_assignment_form").submit(function(event) {
     var $turnitin = $(this).find(".turnitin_pledge");
     if($turnitin.length > 0 && !$turnitin.attr('checked')) {
       alert('You must agree to the submission pledge before you can submit this assignment.');
@@ -15,7 +15,37 @@ $(document).ready(function() {
     }
     $(this).find("button[type='submit']").text("Submitting...");
     $(this).find("button").attr('disabled', true);
-    submitting = true;
+    if($(this).attr('id') == 'submit_online_upload_form') {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log("uploading files");
+      $.ajaxJSONPreparedFiles.call(this, {
+        handle_files: function(attachments, data) {
+          var ids = (data['submission[attachment_ids]'] || "").split(",")
+          for(var idx in attachments) {
+            ids.push(attachments[idx].attachment.id);
+          }
+          data['submission[attachment_ids]'] = ids.join(",");
+          return data;
+        },
+        context_code: $("#submit_assignment .context_code").text(),
+        file_elements: $(this).find("input[type='file']:visible"),
+        data: $(this).getFormData(),
+        url: $(this).attr('action'),
+        success: function(data) {
+          console.log("successfully uploaded files");
+          submitting = true;
+          window.location = window.location.href.replace(window.location.hash, "");
+        },
+        error: function(data) {
+          console.log("failed uploading files");
+          $(this).find("button[type='submit']").text("Submit Failed, please try again");
+          $(this).find("button").attr('disabled', false);
+        }
+      });
+    } else {
+      submitting = true;
+    }
   });
   window.onbeforeunload = function() {
     if($("#submit_assignment:visible").length > 0 && !submitting) {
@@ -122,6 +152,7 @@ var submissionAttachmentIndex = -1;
   var allowed_extensions = <%= raw((@assignment.allowed_extensions || []).to_json) %>
 </script>
 <div style="display: none;" id="submit_assignment">
+  <span class="context_code" style="display: none;"><%= @current_user.asset_string %></span>
   <div class="content" id="submit_assignment_tabs">
     <ul>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
@@ -190,7 +221,7 @@ var submissionAttachmentIndex = -1;
       <% end %>
       <tr>
         <td colspan="2" class='button-container'>
-          <button type="submit" class="button">Submit Assignment</button>
+          <button type="submit" class="button" id="submit_file_button">Submit Assignment</button>
           <button type="button" class='cancel_button button-secondary'>Cancel</button>
         </td>
       </tr><tr style="display: none;">
@@ -434,7 +465,7 @@ var submissionAttachmentIndex = -1;
                     <%= image_tag "media_comment.png" %>
                   </div>
                 </div>
-                <a href="#" class="record_media_comment_link" style="font-size: 1.5em;">Record Media Comment</a>
+                <a href="#" class="record_media_comment_link button" style="font-size: 1.1em;"><%= image_tag "record.gif" %> Record Media Comment</a>
                 <div id="media_media_recording_submission" style="display: none; float: left; width: auto; border: 2px solid #444;">
                 </div>
                 <div class="clear"></div>

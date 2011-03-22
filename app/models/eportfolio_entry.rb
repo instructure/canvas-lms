@@ -74,7 +74,7 @@ class EportfolioEntry < ActiveRecord::Base
   def attachments
     res = []
     content_sections.each do |section|
-      res << (self.eportfolio.user.all_attachments.find_by_uuid(section["attachment_id"]) rescue nil) if section["section_type"] == "upload"
+      res << (self.eportfolio.user.all_attachments.find_by_id(section["attachment_id"]) rescue nil) if section["section_type"] == "attachment"
     end
     res.compact
   end

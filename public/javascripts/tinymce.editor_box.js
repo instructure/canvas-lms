@@ -160,7 +160,7 @@
         }
       },
       onchange_callback: function(e) {
-        $("#" + id).triggerHandler('change');
+        $("#" + id).trigger('change');
       },
       setup : function(ed) {
         var focus = function() {
@@ -628,7 +628,7 @@
         left: boxOffset.left + nodeOffset.left,
         top: boxOffset.top + nodeOffset.top - frameTop
       };
-      $(e).indicate({offset: offset, singleFlash: true, scroll: true});
+      $(e).indicate({offset: offset, singleFlash: true, scroll: true, container: $(box).find('iframe')});
     }
   };
   

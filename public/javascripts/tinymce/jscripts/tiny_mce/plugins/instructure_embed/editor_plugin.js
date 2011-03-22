@@ -48,6 +48,7 @@
           $a.addClass('flickr_search_link');
           $a.text("Search flickr creative commons");
           $a.click(function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             $("#instructure_embed_prompt").dialog('close');
             $.findImageForService("flickr_creative_commons", function(data) {
@@ -67,6 +68,7 @@
           });
           $box.append($a);
           $box.find("#instructure_embed_prompt_form").submit(function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             event.stopPropagation();
             var alt = $("#instructure_embed_prompt_form .alt_text").val() || "";
@@ -75,6 +77,7 @@
             $box.dialog('close');
           });
           $box.find(".actions").delegate('.embed_image_link', 'click', function(event) {
+            var $editor = $box.data('editor');
             event.preventDefault();
             var alt = $("#instructure_embed_prompt_form .alt_text").val() || "";
             $editor.editorBox('insert_code', "<img src='" + $(event.target).closest('img').attr('src') + "' alt='" + alt + "'/>");
@@ -114,6 +117,7 @@
           $box.attr('id', 'instructure_embed_prompt');
           $("body").append($box);
         }
+        $box.data('editor', $editor);
         $box.dialog('close').dialog({
           autoOpen: false,
           width: 425,

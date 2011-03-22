@@ -142,7 +142,7 @@ class ProfileController < ApplicationController
             pseudonymed = true
             flash[:error] = "Invalid old password for the login #{pseudonym_to_update.unique_id}"
             format.html { redirect_to profile_url }
-            format.json { render :json => pseudonym.errors.to_json, :status => :bad_request }
+            format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
           if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_password?(old_password)
             params[:pseudonym].delete :password
@@ -153,7 +153,7 @@ class ProfileController < ApplicationController
             pseudonymed = true
             flash[:error] = "Login failed to update"
             format.html { redirect_to profile_url }
-            format.json { render :json => pseudonym.errors.to_json, :status => :bad_request }
+            format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
         end
         if params[:default_communication_channel_id]

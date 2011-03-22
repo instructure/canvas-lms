@@ -73,7 +73,7 @@ describe User do
     @user.associated_accounts.first.should eql(account2)
   end
   
-  it "should update account associations when a course account moves in the heirachy" do
+  it "should update account associations when a course account moves in the hierachy" do
     account1 = account_model
     
     @enrollment = course_with_student(:account => account1)
@@ -98,7 +98,9 @@ describe User do
   
   it "should update account associations when a user is associated to an account just by pseudonym" do
     account1 = account_model
+    account2 = account_model
     user = user_with_pseudonym
+
     pseudonym = user.pseudonyms.first
     pseudonym.account = account1
     pseudonym.save
@@ -106,8 +108,16 @@ describe User do
     user.reload
     user.associated_accounts.length.should eql(1)
     user.associated_accounts.first.should eql(account1)
-    
-    account2 = account_model
+
+    # Make sure that multiple sequential updates also work
+    pseudonym.account = account2
+    pseudonym.save
+    pseudonym.account = account1
+    pseudonym.save
+    user.reload
+    user.associated_accounts.length.should eql(1)
+    user.associated_accounts.first.should eql(account1)
+
     account1.parent_account = account2
     account1.save!
     
