@@ -49,10 +49,11 @@ Rails::Initializer.run do |config|
 
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
-  
+
   config.autoload_paths += %W( #{RAILS_ROOT}/app/middleware )
-  
-  config.middleware.use("RequestContextGenerator")
+
+  config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
+  config.middleware.insert_before('ActionController::ParamsParser', "RequestContextGenerator")
   config.to_prepare do
     require_dependency 'canvas/plugins/default_plugins'
   end

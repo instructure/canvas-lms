@@ -23,7 +23,7 @@ class Quiz < ActiveRecord::Base
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
-    :hide_results, :locked, :ip_filter
+    :hide_results, :locked, :ip_filter, :context
   attr_readonly :context_id, :context_type
   
   has_many :quiz_questions, :dependent => :destroy, :order => 'position'
