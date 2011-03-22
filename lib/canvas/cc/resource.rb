@@ -50,6 +50,7 @@ module Canvas::CC
         add_course_files
         #todo quizzes
         #todo download kaltura videos?
+        #todo basic LTI links
       end
     end
   end

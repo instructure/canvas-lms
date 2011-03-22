@@ -76,6 +76,7 @@
       <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
       <xs:element name="assignment_group_identifierref" type="xs:IDREF" minOccurs="0"/>
       <xs:element name="grading_standard_identifierref" type="xs:IDREF" minOccurs="0"/>
+      <xs:element name="rubric_identifierref" type="xs:IDREF" minOccurs="0"/>
       <xs:element name="allowed_extensions" type="xs:string" minOccurs="0"/>
       <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
       <xs:element name="min_score" type="xs:float" minOccurs="0"/>
@@ -288,6 +289,22 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:complexType name="ratingsType">
+    <xs:sequence>
+      <xs:element name="rating" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:all minOccurs="0">
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="1"/>
+            <xs:element name="points" type="xs:float" minOccurs="1"/>
+            <xs:element name="criterion_id" type="xs:string" minOccurs="0"/>
+            <xs:element name="long_description" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:element name="learningOutcomes" type="learningOutcomesType"/>
   <xs:complexType name="learningOutcomesType">
     <xs:choice  minOccurs="0" maxOccurs="unbounded">
@@ -299,20 +316,7 @@
             <xs:element name="description" type="xs:string" minOccurs="0"/>
             <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
             <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
-            <xs:element name="ratings" minOccurs="0">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element name="rating" minOccurs="0" maxOccurs="unbounded">
-                    <xs:complexType>
-                      <xs:all minOccurs="0">
-                        <xs:element name="description" type="xs:string" minOccurs="1"/>
-                        <xs:element name="points" type="xs:float" minOccurs="1"/>
-                      </xs:all>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
+            <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
           </xs:all>
           <xs:attribute name="identifier" type="xs:ID" use="required"/>
         </xs:complexType>
@@ -331,5 +335,49 @@
 
     </xs:choice>
   </xs:complexType>
+
+  <xs:element name="rubrics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rubric" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="0"/>
+              <xs:element name="description" type="xs:string" minOccurs="0"/>
+              <xs:element name="read_only" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="reusable" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="public" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
+              <xs:element name="hide_score_total" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="free_form_criterion_comments" type="xs:boolean" minOccurs="0"/>
+
+              <xs:element name="criteria">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0">
+                    <xs:element name="criterion" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="criterion_id" type="xs:string" minOccurs="0"/>
+                          <xs:element name="description" type="xs:string" minOccurs="0"/>
+                          <xs:element name="long_description" type="xs:string" minOccurs="0"/>
+                          <xs:element name="points" type="xs:float" minOccurs="0"/>
+                          <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
+                          <xs:element name="ignore_for_scoring" type="xs:boolean" minOccurs="0"/>
+                          <xs:element name="learning_outcome_identifierref" type="xs:IDREF" minOccurs="0"/>
+                          <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>

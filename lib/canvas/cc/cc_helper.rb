@@ -50,6 +50,7 @@ module CCHelper
   EXTERNAL_FEEDS = "external_feeds.xml"
   ASSIGNMENT_GROUPS = "assignment_groups.xml"
   LEARNING_OUTCOMES = "learning_outcomes.xml"
+  RUBRICS = "rubrics.xml"
   GRADING_STANDARDS = "grading_standards.xml"
   SYLLABUS = "syllabus.html"
   ASSIGNMENT_SETTINGS = "assignment_settings.xml"

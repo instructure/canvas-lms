@@ -72,7 +72,7 @@ module Canvas::CC
           if criterion[:ratings] && criterion[:ratings].length > 0
             out_node.ratings do |ratings_node|
               criterion[:ratings].each do |rating|
-                out_node.rating do |rating_node|
+                ratings_node.rating do |rating_node|
                   rating_node.description rating[:description]
                   rating_node.points rating[:points]
                 end
