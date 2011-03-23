@@ -74,7 +74,7 @@ class SisBatch < ActiveRecord::Base
   handle_asynchronously :process
 
   named_scope :needs_processing, lambda{
-    {:conditions => ['sis_batches.workflow_state = "needs_processing"'], :order => :created_at}
+    {:conditions => ["sis_batches.workflow_state = 'needs_processing'"], :order => :created_at}
   }
 
   def fast_update_progress(val)

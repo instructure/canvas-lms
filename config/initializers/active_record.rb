@@ -235,6 +235,30 @@ class ActiveRecord::Base
   def self.base_ar_class
     class_of_active_record_descendant(self)
   end
+
+  def wildcard(*args)
+    self.class.wildcard(*args)
+  end
+
+  def self.wildcard(*args)
+    options = args.last.is_a?(Hash) ? args.pop : {}
+    options[:type] ||= :full
+
+    value = args.pop
+    value = value.to_s.downcase.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
+    value = '%' + value unless options[:type] == :right
+    value += '%' unless options[:type] == :left
+
+    cols = case connection.adapter_name
+      when 'SQLite'
+        # sqlite is always case-insensitive, and you must specify the escape char
+        args.map{|col| "#{col} LIKE ? ESCAPE '\\'"}
+      else
+        # postgres is always case-sensitive (mysql depends on the collation)
+        args.map{|col| "LOWER(#{col}) LIKE ?"}
+    end
+    sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
+  end
 end
 
 class ActiveRecord::Serialization::Serializer
@@ -342,4 +366,39 @@ if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
     end
     alias_method_chain :configure_connection, :pg_compat
   end
+end
+
+# postgres doesn't support limit on text columns, but it does on varchars. assuming we don't exceed
+# the varchar limit, change the type. otherwise drop the limit. not a big deal since we already
+# have max length validations in the models.
+if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+    def type_to_sql_with_text_to_varchar(type, limit = nil, *args)
+      if type == :text && limit
+        if limit <= 10485760
+          type = :string
+        else
+          limit = nil
+        end
+      end
+      type_to_sql_without_text_to_varchar(type, limit, *args)
+    end
+    alias_method_chain :type_to_sql, :text_to_varchar
+  end
+end
+
+# patch adapted from https://rails.lighthouseapp.com/projects/8994/tickets/4887-has_many-through-belongs_to-association-bug
+# this isn't getting fixed in rails 2.3.x, and we need it. otherwise the following sorts of things
+# will generate sql errors:
+#  Course.new.default_wiki_wiki_pages.scoped(:limit => 10)
+#  Group.new.active_default_wiki_wiki_pages.size
+ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
+  def construct_scope_with_has_many_fix
+    if target_reflection_has_associated_record?
+      construct_scope_without_has_many_fix
+    else
+      {:find => {:conditions => "1 != 1"}}
+    end
+  end
+  alias_method_chain :construct_scope, :has_many_fix
 end

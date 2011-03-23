@@ -201,7 +201,7 @@ class Account < ActiveRecord::Base
     
   def fast_all_courses(opts = {})
     @cached_fast_all_courses ||= {}
-    @cached_fast_all_courses[opts] ||= self.associated_courses.active.for_term(opts[:term]).active_first.limit(opts[:limit]).find(:all, :select => "DISTINCT(courses.id), name, section, courses.workflow_state, courses.course_code")
+    @cached_fast_all_courses[opts] ||= self.associated_courses.active.for_term(opts[:term]).active_first.limit(opts[:limit]).find(:all, :select => "courses.id, name, section, courses.workflow_state, courses.course_code")
   end
   
   def all_users(limit=250)
@@ -211,7 +211,7 @@ class Account < ActiveRecord::Base
   
   def fast_all_users(limit=nil)
     @cached_fast_all_users ||= {}
-    @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select=> "DISTINCT users.id, name")
+    @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select => "users.id, name")
   end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
@@ -227,7 +227,7 @@ class Account < ActiveRecord::Base
   end
   
   def courses_name_like(query="")
-    self.associated_courses.active.active_first.name_like(query).limit(200).find(:all, :select => "DISTINCT(courses.id), name, courses.workflow_state, courses.course_code")
+    self.associated_courses.active.active_first.name_like(query).limit(200).find(:all, :select => "courses.id, name, courses.workflow_state, courses.course_code")
   end
   memoize :courses_name_like
 
@@ -850,7 +850,7 @@ class Account < ActiveRecord::Base
     {:conditions => ['accounts.current_sis_batch_id IS NOT NULL'], :order => :updated_at}
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => ["accounts.name LIKE ?", "%#{name}%"] }
+    { :conditions => wildcard('accounts.name', name) }
   }
   named_scope :active, lambda {
     { :conditions => ['accounts.workflow_state != ?', 'deleted'] }

@@ -1057,6 +1057,7 @@ class InitCanvasDb < ActiveRecord::Migration
       t.datetime "updated_at"
       t.integer  "context_id", :limit => 8
       t.string   "context_type"
+      t.string   "type"
       t.string   "category"
       t.integer  "max_membership"
       t.string   "hashtag"
@@ -1070,7 +1071,6 @@ class InitCanvasDb < ActiveRecord::Migration
       t.string   "default_view",                 :default => "feed"
       t.string   "migration_id"
       t.integer  "storage_quota"
-      t.string   "type"
       t.string   "uuid"
     end
 
@@ -1344,6 +1344,11 @@ class InitCanvasDb < ActiveRecord::Migration
       t.boolean  "participated"
       t.boolean  "summarized"
       t.integer  "account_id", :limit => 8
+    end
+    if connection.adapter_name =~ /\Asqlite/i
+      execute('CREATE UNIQUE INDEX "index_page_views_request_id" ON page_views(request_id)')
+    else
+      execute('ALTER TABLE page_views ADD PRIMARY KEY (request_id)')
     end
 
     add_index "page_views", ["account_id"], :name => "index_page_views_on_account_id"

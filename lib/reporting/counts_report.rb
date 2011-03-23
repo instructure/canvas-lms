@@ -34,7 +34,7 @@ class CountsReport
 
   DISTINCT_ENROLLMENT_USERS = "SELECT COUNT(DISTINCT user_id) FROM enrollments e WHERE course_id IN (%s)"
   DISTINCT_ENROLLMENT_USERS_WITH_TYPE = "SELECT COUNT(DISTINCT user_id) FROM enrollments e WHERE type = '%s' AND course_id IN (%s)"
-  PAGE_VIEWS_FOR_ACCOUNT = "SELECT count(request_id) FROM `#{PageView.table_name}` WHERE `account_id` = '%s' AND created_at > '%s' AND created_at < '%s'"
+  PAGE_VIEWS_FOR_ACCOUNT = "SELECT count(request_id) FROM #{PageView.table_name} WHERE account_id = '%s' AND created_at > '%s' AND created_at < '%s'"
   ATTACHMENT_BYTES_FOR_ACCOUNT = "SELECT COUNT(id), SUM(size) FROM attachments WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'"
   MEDIA_OBJECT_KILOBYTES_FOR_ACCOUNT = "SELECT COUNT(id), SUM(total_size) FROM media_objects WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'"
   
@@ -221,7 +221,7 @@ class CountsReport
   end
 
   def last_activity(account_id)
-    query = "SELECT max(created_at) FROM `#{PageView.table_name}` WHERE account_id = #{account_id}"
+    query = "SELECT max(created_at) FROM #{PageView.table_name} WHERE account_id = #{account_id}"
     res = ActiveRecord::Base.connection.execute(query)
     res.fetch_row[0] rescue nil
   end

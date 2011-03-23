@@ -128,7 +128,7 @@ class User < ActiveRecord::Base
     {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{ActiveRecord::Base.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => ["users.name LIKE ?", "%#{name}%"] }
+    { :conditions => wildcard('users.name', name) }
   }
   named_scope :active, lambda {
     { :conditions => ["users.workflow_state != ?", 'deleted'] }
@@ -159,12 +159,9 @@ class User < ActiveRecord::Base
   # User.x_most_active_in_context(30, Course.find(112)) # will give you the 30 most active users in course 112
   named_scope :x_most_active_in_context, lambda { |*args|
     {
-      :select => "#{(User.columns.map{ |c| "users.#{c.name}" } - ['page_views_count']).join(', ') }, COUNT(*) AS page_views_count",
-      :joins => [:page_views],
+      :select => "users.*, (SELECT COUNT(*) FROM page_views WHERE user_id = users.id AND context_id = #{args.last.id} AND context_type = '#{args.last.class.to_s}') AS page_views_count",
       :order => "page_views_count DESC",
-      :group => '`users`.id',
-      :limit => (args.first || 10), 
-      :conditions => ['page_views.context_id = ? AND page_views.context_type = ?', args.last.id, args.last.class.to_s]
+      :limit => (args.first || 10),
     }
   }
 
@@ -1230,7 +1227,7 @@ class User < ActiveRecord::Base
     submissions = []
     submissions += self.submissions.after(opts[:fallback_start_at]).for_context_codes(context_codes).find(
       :all, 
-      :conditions => 'submissions.score IS NOT NULL AND assignments.workflow_state != "deleted"',
+      :conditions => "submissions.score IS NOT NULL AND assignments.workflow_state != 'deleted'",
       :include => [:assignment, :user, :submission_comments],
       :order => 'submissions.created_at DESC',
       :limit => opts[:limit]
@@ -1238,11 +1235,20 @@ class User < ActiveRecord::Base
     # THIS IS SLOW, it takes ~230ms for mike
     submissions += Submission.for_context_codes(context_codes).find(
       :all,
-      :select => "submissions.*, MAX(submission_comments.created_at) as last_updated_at_from_db",
-      :joins => [:assignment, {:submission_comments => :submission_comment_participants}],
-      :conditions => ["(submission_comments.created_at > ?) AND (`submission_comment_participants`.user_id = ?) AND (`submission_comments`.author_id != ?) AND assignments.workflow_state != 'deleted'", opts[:fallback_start_at], self.id, self.id ],
-      :order => 'submissions.created_at DESC',
-      :group => 'submissions.id',
+      :select => "submissions.*, last_updated_at_from_db",
+      :joins => self.class.send(:sanitize_sql_array, [<<-SQL, opts[:fallback_start_at], self.id, self.id]),
+                INNER JOIN (
+                  SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
+                  FROM submission_comments, submission_comment_participants
+                  WHERE submission_comments.id = submission_comment_id
+                    AND (submission_comments.created_at > ?)
+                    AND (submission_comment_participants.user_id = ?)
+                    AND (submission_comments.author_id <> ?)
+                  GROUP BY submission_id
+                ) AS relevant_submission_comments ON submissions.id = submission_id
+                INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
+                SQL
+      :order => 'last_updated_at_from_db DESC',
       :limit => opts[:limit]
     )
     
@@ -1265,7 +1271,7 @@ class User < ActiveRecord::Base
     opts[:start_at] ||= 2.weeks.ago
     opts[:fallback_start_at] = opts[:start_at]
   
-    # dont make the query do an `stream_items`.`context_code` IN ('course_20033','course_20237','course_20247' ...) if they dont pass any contexts, just assume it wants any context code.
+    # dont make the query do an stream_items.context_code IN ('course_20033','course_20237','course_20247' ...) if they dont pass any contexts, just assume it wants any context code.
     items = stream_items_simple
     if opts[:contexts]
       # still need to optimize the query to use a root_context_code.  that way a

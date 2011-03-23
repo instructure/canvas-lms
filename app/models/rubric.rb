@@ -37,7 +37,7 @@ class Rubric < ActiveRecord::Base
     {:conditions => {:reusable => true}, :order => :title}
   }
   named_scope :matching, lambda {|search|
-    {:order => 'rubrics.association_count DESC', :conditions => "LOWER(rubrics.title) LIKE '%#{quote_value(search.downcase || "")[1..-2].gsub('%', '\%')}%'"}
+    {:order => 'rubrics.association_count DESC', :conditions => wildcard('rubrics.title', search)}
   }
   named_scope :before, lambda{|date|
     {:conditions => ['rubrics.created_at < ?', date]}

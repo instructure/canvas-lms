@@ -70,7 +70,7 @@ class QuizGroup < ActiveRecord::Base
   
   def self.import_from_migration(hash, context, quiz, question_data)
     hash = hash.with_indifferent_access
-    item ||= QuizGroup.find_by_quiz_id_and_migration_id(quiz.id, hash[:migration_id])
+    item ||= QuizGroup.find_by_quiz_id_and_migration_id(quiz.id, hash[:migration_id].nil? ? nil : hash[:migration_id].to_s)
     item ||= quiz.quiz_groups.new
     item.migration_id = hash[:migration_id]
     item.question_points = hash[:question_points]

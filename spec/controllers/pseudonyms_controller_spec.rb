@@ -34,7 +34,9 @@ describe PseudonymsController do
     it "should not approve an already-approved communication channel" do
       user_with_pseudonym
       user_session(@user, @pseudonym)
-      get 'claim_pseudonym', :id => @pseudonym, :nonce => @cc, :claim => '1'
+      code = @cc.confirmation_code
+      @cc.confirm
+      get 'claim_pseudonym', :id => @pseudonym, :nonce => code, :claim => '1'
       response.should be_redirect
       response.should redirect_to(root_url)
     end

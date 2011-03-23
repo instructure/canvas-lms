@@ -23,7 +23,6 @@ gem 'mime-types',     '1.16',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
 gem 'mini_magick',    '1.3.2'
-gem 'mysql',          '2.8.1'
 gem 'nokogiri',       '1.4.1'
 gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
 gem 'ratom',          '0.6.7',  :require => "atom"
@@ -37,6 +36,14 @@ gem 'uuid',           '2.3.1'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 gem 'will_paginate',  '2.3.15'
 gem 'hairtrigger',    '0.1.1'
+
+group :mysql do
+  gem 'mysql',        '2.8.1'
+end
+
+group :postgres do
+  gem 'pg',           '0.10.1'
+end
 
 group :test do
   gem 'sqlite3-ruby', '1.3.2'
