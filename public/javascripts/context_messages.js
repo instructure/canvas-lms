@@ -238,6 +238,7 @@ $(document).ready(function() {
         }
         var users = data.users;
         $dialog.addClass('loaded');
+        $dialog.find(".left_side.not_course").hide();
         $form.triggerHandler('recipients_loaded');
       });
     }

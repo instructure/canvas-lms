@@ -144,7 +144,7 @@
 <div id="recipients_dialogs" style="display: none;">
 <% @message_contexts.each do |context| %>
   <div id="<%= context.asset_string %>_recipients_dialog" class="recipients_dialog" title="Recipients for <%=h context.name %>">
-    <div class="left_side" style="float: left; width: 35%; height: 300px; overflow: auto;">
+    <div class="left_side <%= 'not_course' unless context.is_a?(Course) %>" style="float: left; width: 35%; height: 300px; overflow: auto;">
       <% if context.is_a?(Course) %>
       <div>
         <h3 style="margin-top: 0; margin-bottom: 0;">Possible Recipients</h3>

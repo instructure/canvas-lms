@@ -331,7 +331,7 @@ class ContextController < ApplicationController
     @messages = @messages.paginate(:page => params[:page], :per_page => @per_page)
     @past_message_contexts = @messages.once_per(&:context_code).map(&:context).compact.uniq rescue []
     @context = @current_user
-    get_all_pertinent_contexts
+    get_all_pertinent_contexts(true)
     @contexts << @included_message.context if @included_message && !@contexts.include?(@included_message.context)
     log_asset_access("inbox:#{@context.asset_string}", "inbox", 'other')
     @message_contexts = @contexts.select{|c| c.grants_right?(@current_user, session, :send_messages) }
@@ -362,23 +362,26 @@ class ContextController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :send_messages)
       @users = @context.users.sort_by{|u| u.sortable_name }.uniq
-      res = {:users => @context.teachers, :teachers => @context.teachers}
+      @default_users = @context.is_a?(Course) ? @context.teachers : @context.users
+      res = {:users => @default_users, :teachers => @default_users}
       if @context.grants_right?(@current_user, session, :read_roster)
-        @visible_students = @context.students_visible_to(@current_user)
-        if @context.visibility_limited_to_course_sections?(@current_user)
-          @bad_students = @context.students - @visible_students
-          @users -= @bad_students
-        end
-        @groups = @context.groups.active.scoped(:include => {:group_memberships => :user})
-        res = {:users => @users.sort_by{|u| u.sortable_name }.uniq,
-          :groups => @groups,
-          :teachers => @context.teachers.scoped(:select => 'id').map(&:id),
-          :students => @visible_students.map(&:id),
-          :observers => @context.observers.scoped(:select => 'id').map(&:id)
-          }
-        res[:group_members] = {}
-        @groups.each do |group|
-          res[:group_members][group.id] = group.group_memberships.active.map(&:user_id)
+        if @context.is_a?(Course)
+          @visible_students = @context.students_visible_to(@current_user)
+          if @context.visibility_limited_to_course_sections?(@current_user)
+            @bad_students = @context.students - @visible_students
+            @users -= @bad_students
+          end
+          @groups = @context.groups.active.scoped(:include => {:group_memberships => :user})
+          res = {:users => @users.sort_by{|u| u.sortable_name }.uniq,
+            :groups => @groups,
+            :teachers => @context.teachers.scoped(:select => 'id').map(&:id),
+            :students => @visible_students.map(&:id),
+            :observers => @context.observers.scoped(:select => 'id').map(&:id)
+            }
+          res[:group_members] = {}
+          @groups.each do |group|
+            res[:group_members][group.id] = group.group_memberships.active.map(&:user_id)
+          end
         end
       end
       render :json => res.to_json
