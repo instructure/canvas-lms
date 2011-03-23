@@ -304,8 +304,33 @@ var anonymousAssignment = false;
       }, true);
       EG.resizeFullHeight();
     });
+    
     $("#media_recorder_container a").live('click', hideMediaRecorderContainer);
 
+    // handle speech to text for browsers that can (right now only chrome)
+    function browserSupportsSpeech(){
+      var elem = document.createElement('input');
+      var support = 'onwebkitspeechchange' in elem || 'speech' in elem;
+      return support;
+    }
+    if (browserSupportsSpeech()) {
+      $(".speech_recognition_link").click(function() {
+          $('<input style="font-size: 30px;" speech x-webkit-speech />')
+            .dialog({
+              title: "Click the mic to record your comments",
+              open: function(){
+                $(this).width(100);
+              }
+            })
+            .bind('webkitspeechchange', function(){
+              $add_a_comment_textarea.val($(this).val());
+              $(this).dialog('close').remove();
+            });
+          return false;
+        })
+        // show the li that contains the button because it is hidden from browsers that dont support speech
+        .closest('li').show();
+    }
   }
   
   function hideMediaRecorderContainer(){
@@ -438,6 +463,7 @@ var anonymousAssignment = false;
         EG.toggleFullRubric();
       }
     });
+    $(window).shake($.proxy(EG.next, EG));
   }
   
   function resizingFunction(){
@@ -838,7 +864,15 @@ var anonymousAssignment = false;
             .attr('class', 'turnitin_similarity_score ' + ((turnitin && turnitin.state) || 'no') + '_score')
             .attr('target', '_blank')
             .css('display', (turnitin && turnitin.similarity_score != null) ? '' : 'none')
-            .end()
+          .end()
+          .find('a.submission-file-download')
+            .bind('dragstart', function(event){
+              // check that event dataTransfer exists
+              event.originalEvent.dataTransfer &&
+              // handle dragging out of the browser window only if it is supported.
+              event.originalEvent.dataTransfer.setData('DownloadURL', attachment.content_type + ':' + attachment.filename + ':' + this.href);
+            })
+          .end()
           .show();
       });
 

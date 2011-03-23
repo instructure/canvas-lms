@@ -34,6 +34,7 @@ javascripts:
     - public/javascripts/jquery.elastic.js
     - public/javascripts/ui.selectmenu.js
     - public/javascripts/jquery.getScrollbarWidth.js
+    - public/javascripts/jquery.shake.js
     - public/javascripts/rubric_assessment.js
     - public/javascripts/speed_grader.js
   file_inline:
