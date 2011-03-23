@@ -114,16 +114,18 @@ class SubmissionsController < ApplicationController
         params[:submission][:attachments].compact!
       end
       if params[:attachments] && params[:submission][:submission_type] == 'online_upload'
-
         # check that the attachments are in allowed formats. we do this here
         # so the attachments don't get saved and possibly uploaded to
         # S3, etc. if they're invalid.
-        if @assignment.allowed_extensions.present? && params[:attachments].detect { |i, a| !@assignment.allowed_extensions.include?((a[:uploaded_data].original_filename.split('.').last || '').downcase) }
+        if @assignment.allowed_extensions.present? && params[:attachments].any? {|i, a|
+            !a[:uploaded_data].empty? &&
+            !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
+          }
           flash[:error] = "Invalid file type"
           return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
         end
         params[:attachments].each do |idx, attachment|
-          if attachment[:uploaded_data] && attachment[:uploaded_data] != ""
+          if attachment[:uploaded_data] && !attachment[:uploaded_data].is_a?(String)
             attachment[:user] = @current_user
             if @group
               attachment = @group.attachments.new(attachment)
