@@ -12,7 +12,7 @@
       <% if can_do(@context, @current_user, :manage_students) && @context.enable_user_notes %>
         <a href="<%= course_user_notes_path(@context) %>" class="button button-sidebar-wide">View Faculty Journals</a>
       <% end %>
-      <% if can_do(@context, @current_user, :manage_admin_users) %>
+      <% if can_do(@context, @current_user, :manage_admin_users) || can_do(@context, @current_user, :read_as_admin)%>
         <a href="<%= course_prior_users_path(@context) %>" class="button button-sidebar-wide"><%= image_tag "history.png" %> View Prior Enrollments</a>
       <% end %>
     <% end %>

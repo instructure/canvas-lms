@@ -60,7 +60,7 @@ class QuizSubmission < ActiveRecord::Base
     given {|user| user && user.id == self.user_id && self.untaken? }
     set { can :update }
     
-    given {|user, session| self.quiz.grants_right?(user, session, :manage) }
+    given {|user, session| self.quiz.grants_right?(user, session, :manage) || self.quiz.grants_right?(user, session, :review_grades) }
     set { can :read }
     
     given {|user, session| self.quiz.grants_right?(user, session, :manage) }

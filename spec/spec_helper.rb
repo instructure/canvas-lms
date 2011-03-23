@@ -150,6 +150,7 @@ Spec::Runner.configure do |config|
   def course_with_teacher(opts={})
     course(opts)
     @user = opts[:user] || user(opts)
+    @teacher = @user
     @enrollment = @course.enroll_teacher(@user)
     @enrollment.accept! if opts[:active_enrollment] || opts[:active_all]
     @enrollment

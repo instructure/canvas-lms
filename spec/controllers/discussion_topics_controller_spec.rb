@@ -46,6 +46,7 @@ describe DiscussionTopicsController do
       assigns[:topics].should_not be_empty
       assigns[:topics][0].should eql(@topic)
     end
+    
   end
   
   describe "GET 'show'" do
@@ -69,6 +70,26 @@ describe DiscussionTopicsController do
       assigns[:entries].should_not be_nil
       assigns[:entries].should_not be_empty
       assigns[:entries][0].should eql(@entry)
+    end
+    
+    it "should allow concluded teachers to see discussions" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic
+      @enrollment.conclude
+      get 'show', :course_id => @course.id, :id => @topic.id
+      response.should be_success
+      get 'index', :course_id => @course.id
+      response.should be_success
+    end
+    
+    it "should allow concluded students to see discussions" do
+      course_with_student_logged_in(:active_all => true)
+      course_topic
+      @enrollment.conclude
+      get 'show', :course_id => @course.id, :id => @topic.id
+      response.should be_success
+      get 'index', :course_id => @course.id
+      response.should be_success
     end
   end
   

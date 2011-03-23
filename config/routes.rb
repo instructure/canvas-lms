@@ -186,6 +186,7 @@ ActionController::Routing::Routes.draw do |map|
       quiz.history "history", :controller => "quizzes", :action => "history"
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
       quiz.formatted_statistics "statistics.:format", :controller => 'quizzes', :action => 'statistics'
+      quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
       quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put} do |submission|
       end

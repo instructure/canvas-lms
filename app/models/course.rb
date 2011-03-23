@@ -728,6 +728,9 @@ class Course < ActiveRecord::Base
     given { |user| !self.deleted? && self.prior_enrollments.map(&:user_id).include?(user && user.id) }
     set { can :read}
     
+    given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user && user.id) }
+    set { can :read_as_admin and can :read_user_notes and can :read_roster }
+    
     given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user && user.id) }
     set { can :read and can :read_grades}
     
@@ -2037,8 +2040,12 @@ class Course < ActiveRecord::Base
       tabs.delete_if{ |t| t[:label] == "Settings"}
       
       # remove some tabs for logged-out users or non-students
-      tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } unless self.grants_right?(user, nil, :participate_as_student)
-      if !self.grants_right?(user, nil, :read_grades)
+      if self.grants_right?(user, nil, :read_as_admin)
+        tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) } 
+      elsif !self.grants_right?(user, nil, :participate_as_student)
+        tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } 
+      end
+      if !self.grants_right?(user, nil, :read_grades) && !self.grants_right?(user, nil, :read_as_admin)
         tabs.delete_if {|t| [TAB_GRADES].include?(t[:id]) } 
       end
       
