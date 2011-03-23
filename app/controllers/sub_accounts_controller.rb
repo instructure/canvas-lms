@@ -77,7 +77,7 @@ class SubAccountsController < ApplicationController
 
   def require_account_management
     @account = @context
-    if @context.root_account != nil || !@context.is_a?(Account)
+    if !@context.is_a?(Account)
       redirect_to named_context_url(@context, :context_url)
       return false
     else
