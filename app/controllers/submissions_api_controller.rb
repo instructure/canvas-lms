@@ -241,12 +241,17 @@ class SubmissionsApiController < ApplicationController
   end
 
   def attachment_json(attachment, url_params = {})
-    url_params.merge!({ :download => attachment.id })
+    url = case attachment.context_type
+          when "Course"
+            course_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
+          else
+            course_assignment_submission_url(url_params.merge(:download => attachment.id))
+          end
     {
       'content-type' => attachment.content_type,
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
-      'url' => course_assignment_submission_url(url_params),
+      'url' => url,
     }
   end
 
