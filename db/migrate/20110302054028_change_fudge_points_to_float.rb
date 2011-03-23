@@ -4,6 +4,6 @@ class ChangeFudgePointsToFloat < ActiveRecord::Migration
   end
 
   def self.down
-    change_column :quiz_submission, :fudge_points, :integer
+    change_column :quiz_submissions, :fudge_points, :integer
   end
 end
