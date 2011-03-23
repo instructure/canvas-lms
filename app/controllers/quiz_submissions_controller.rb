@@ -27,6 +27,7 @@ class QuizSubmissionsController < ApplicationController
   
   # submits the quiz as final
   def create
+    redirect_params = {}
     @quiz = @context.quizzes.find(params[:quiz_id])
     if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
       flash[:error] = "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz."
@@ -54,13 +55,13 @@ class QuizSubmissionsController < ApplicationController
         @submission.grade_submission
       end
       if preview
-        redirect_to course_quiz_url(@context, @quiz, :preview => 1)
-      else
-        redirect_to course_quiz_url(@context, @quiz)
+        redirect_params[:preview] = 1
       end
-    else
-      redirect_to course_quiz_url(@context, @quiz)
     end
+    if session.delete('lockdown_browser_popup')
+      redirect_params.merge!(Canvas::LockdownBrowser.plugin.base.quiz_exit_params(self))
+    end
+    redirect_to course_quiz_url(@context, @quiz, redirect_params)
   end
   
   def backup

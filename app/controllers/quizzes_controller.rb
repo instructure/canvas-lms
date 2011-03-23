@@ -141,14 +141,19 @@ class QuizzesController < ApplicationController
     return unless authorized_action(@quiz, @current_user, :submit)
 
     if feature_enabled?(:lockdown_browser) && @quiz.require_lockdown_browser? && !@quiz.grants_right?(@current_user, session, :grade)
-      # TODO: support multiple enabled lockdown browser plugins? Right now we
-      # always just use the first enabled one.
-      plugin = Canvas::Plugin.all_for_tag(:lockdown_browser).first.base
+      plugin = Canvas::LockdownBrowser.plugin.base
       if plugin.require_authorization_redirect?(self)
         return redirect_to(plugin.redirect_url(self, @context, @quiz))
       elsif !plugin.authorized?(self)
         return redirect_to(:action => 'lockdown_browser_required')
+      elsif @query_params = plugin.popup_window(self)
+        session['lockdown_browser_popup'] = true
+        return render(:action => 'take_quiz_in_popup')
       end
+      @headers = false
+      @show_left_side = false
+      @padless = true
+      @lockdown_browser_params = plugin.quiz_exit_params(self)
     end
 
     if @submission && !@submission.settings_only? && (!@submission.attempt || !@submission.submission_data)
