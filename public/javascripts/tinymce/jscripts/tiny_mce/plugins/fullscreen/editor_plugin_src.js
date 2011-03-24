@@ -13,7 +13,7 @@
 
 	tinymce.create('tinymce.plugins.FullScreenPlugin', {
 		init : function(ed, url) {
-			var t = this, s = {}, vp;
+			var t = this, s = {}, vp, posCss;
 
 			t.editor = ed;
 
@@ -78,7 +78,15 @@
 					if (tinymce.isIE)
 						vp.h -= 1;
 
-					n = DOM.add(DOM.doc.body, 'div', {id : 'mce_fullscreen_container', style : 'position:' + (tinymce.isIE6 || (tinymce.isIE && !DOM.boxModel) ? 'absolute' : 'fixed') + ';top:0;left:0;width:' + vp.w + 'px;height:' + vp.h + 'px;z-index:200000;'});
+					// Use fixed position if it exists
+					if (tinymce.isIE6)
+						posCss = 'absolute;top:' + vp.y;
+					else
+						posCss = 'fixed;top:0';
+
+					n = DOM.add(DOM.doc.body, 'div', {
+						id : 'mce_fullscreen_container', 
+						style : 'position:' + posCss + ';left:0;width:' + vp.w + 'px;height:' + vp.h + 'px;z-index:200000;'});
 					DOM.add(n, 'div', {id : 'mce_fullscreen'});
 
 					tinymce.each(ed.settings, function(v, n) {
@@ -110,16 +118,19 @@
 					});
 
 					t.fullscreenEditor.render();
-					tinyMCE.add(t.fullscreenEditor);
 
 					t.fullscreenElement = new tinymce.dom.Element('mce_fullscreen_container');
 					t.fullscreenElement.update();
 					//document.body.overflow = 'hidden';
 
 					t.resizeFunc = tinymce.dom.Event.add(DOM.win, 'resize', function() {
-						var vp = tinymce.DOM.getViewPort();
+						var vp = tinymce.DOM.getViewPort(), fed = t.fullscreenEditor, outerSize, innerSize;
 
-						t.fullscreenEditor.theme.resizeTo(vp.w, vp.h);
+						// Get outer/inner size to get a delta size that can be used to calc the new iframe size
+						outerSize = fed.dom.getSize(fed.getContainer().firstChild);
+						innerSize = fed.dom.getSize(fed.getContainer().getElementsByTagName('iframe')[0]);
+
+						fed.theme.resizeTo(vp.w - outerSize.w + innerSize.w, vp.h - outerSize.h + innerSize.h);
 					});
 				}
 			});

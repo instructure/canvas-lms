@@ -142,7 +142,7 @@ var ImageDialog = {
 		}
 
 		tinymce.extend(args, {
-			src : nl.src.value,
+			src : nl.src.value.replace(/ /g, '%20'),
 			width : nl.width.value,
 			height : nl.height.value,
 			alt : nl.alt.value,
@@ -177,6 +177,8 @@ var ImageDialog = {
 			ed.undoManager.add();
 		}
 
+		tinyMCEPopup.editor.execCommand('mceRepaint');
+		tinyMCEPopup.editor.focus();
 		tinyMCEPopup.close();
 	},
 
@@ -383,7 +385,7 @@ var ImageDialog = {
 				v = f.border.value;
 				if (v || v == '0') {
 					if (v == '0')
-						img.style.border = '0';
+						img.style.border = '0 none none';
 					else
 						img.style.border = v + 'px solid black';
 				}

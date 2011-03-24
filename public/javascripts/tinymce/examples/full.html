@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Full featured example</title>
-
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <!-- TinyMCE -->
 <script type="text/javascript" src="../jscripts/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
@@ -10,7 +10,7 @@
 		// General options
 		mode : "textareas",
 		theme : "advanced",
-		plugins : "pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist,autosave",
+		plugins : "autolink,lists,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist,autosave",
 
 		// Theme options
 		theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
@@ -76,15 +76,15 @@
 		</div>
 
 		<!-- Some integration calls -->
-		<a href="javascript:;" onmousedown="tinyMCE.get('elm1').show();">[Show]</a>
-		<a href="javascript:;" onmousedown="tinyMCE.get('elm1').hide();">[Hide]</a>
-		<a href="javascript:;" onmousedown="tinyMCE.get('elm1').execCommand('Bold');">[Bold]</a>
-		<a href="javascript:;" onmousedown="alert(tinyMCE.get('elm1').getContent());">[Get contents]</a>
-		<a href="javascript:;" onmousedown="alert(tinyMCE.get('elm1').selection.getContent());">[Get selected HTML]</a>
-		<a href="javascript:;" onmousedown="alert(tinyMCE.get('elm1').selection.getContent({format : 'text'}));">[Get selected text]</a>
-		<a href="javascript:;" onmousedown="alert(tinyMCE.get('elm1').selection.getNode().nodeName);">[Get selected element]</a>
-		<a href="javascript:;" onmousedown="tinyMCE.execCommand('mceInsertContent',false,'<b>Hello world!!</b>');">[Insert HTML]</a>
-		<a href="javascript:;" onmousedown="tinyMCE.execCommand('mceReplaceContent',false,'<b>{$selection}</b>');">[Replace selection]</a>
+		<a href="javascript:;" onclick="tinyMCE.get('elm1').show();return false;">[Show]</a>
+		<a href="javascript:;" onclick="tinyMCE.get('elm1').hide();return false;">[Hide]</a>
+		<a href="javascript:;" onclick="tinyMCE.get('elm1').execCommand('Bold');return false;">[Bold]</a>
+		<a href="javascript:;" onclick="alert(tinyMCE.get('elm1').getContent());return false;">[Get contents]</a>
+		<a href="javascript:;" onclick="alert(tinyMCE.get('elm1').selection.getContent());return false;">[Get selected HTML]</a>
+		<a href="javascript:;" onclick="alert(tinyMCE.get('elm1').selection.getContent({format : 'text'}));return false;">[Get selected text]</a>
+		<a href="javascript:;" onclick="alert(tinyMCE.get('elm1').selection.getNode().nodeName);return false;">[Get selected element]</a>
+		<a href="javascript:;" onclick="tinyMCE.execCommand('mceInsertContent',false,'<b>Hello world!!</b>');return false;">[Insert HTML]</a>
+		<a href="javascript:;" onclick="tinyMCE.execCommand('mceReplaceContent',false,'<b>{$selection}</b>');return false;">[Replace selection]</a>
 
 		<br />
 		<input type="submit" name="save" value="Submit" />
@@ -92,5 +92,10 @@
 	</div>
 </form>
 
+<script type="text/javascript">
+if (document.location.protocol == 'file:') {
+	alert("The examples might not work properly on the local file system due to security settings in your browser. Please use a real webserver.");
+}
+</script>
 </body>
 </html>

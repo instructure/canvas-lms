@@ -21,16 +21,17 @@ function setElementAttribs(elm) {
 	setAllCommonAttribs(elm);
 	setAttrib(elm, 'datetime');
 	setAttrib(elm, 'cite');
+	elm.removeAttribute('data-mce-new');
 }
 
 function insertIns() {
 	var elm = tinyMCEPopup.editor.dom.getParent(SXE.focusElement, 'INS');
-	tinyMCEPopup.execCommand('mceBeginUndoLevel');
+
 	if (elm == null) {
 		var s = SXE.inst.selection.getContent();
 		if(s.length > 0) {
-			insertInlineElement('INS');
-			var elementArray = tinymce.grep(SXE.inst.dom.select('ins'), function(n) {return n.id == '#sxe_temp_ins#';});
+			insertInlineElement('ins');
+			var elementArray = SXE.inst.dom.select('ins[data-mce-new]');
 			for (var i=0; i<elementArray.length; i++) {
 				var elm = elementArray[i];
 				setElementAttribs(elm);
@@ -47,16 +48,6 @@ function insertIns() {
 function removeIns() {
 	SXE.removeElement('ins');
 	tinyMCEPopup.close();
-}
-
-function insertInlineElement(en) {
-	var ed = tinyMCEPopup.editor, dom = ed.dom;
-
-	ed.getDoc().execCommand('FontName', false, 'mceinline');
-	tinymce.each(dom.select(tinymce.isWebKit ? 'span' : 'font'), function(n) {
-		if (n.style.fontFamily == 'mceinline' || n.face == 'mceinline')
-			dom.replace(dom.create(en), n, 1);
-	});
 }
 
 tinyMCEPopup.onInit.add(init);

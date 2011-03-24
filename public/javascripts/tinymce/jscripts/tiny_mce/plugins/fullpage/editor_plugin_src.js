@@ -49,7 +49,7 @@
 		// Private plugin internal methods
 
 		_setBodyAttribs : function(ed, o) {
-			var bdattr, i, len, kv, k, v, t, attr = this.head.match(/body(.*?)>/i);
+			var bdattr, i, len, kv, k, v, t, attr = this.head.match(/body(.*?)>/i), bddir = '',htattr, hattr = this.head.match(/<html([^>]*?)>/i);
 
 			if (attr && attr[1]) {
 				bdattr = attr[1].match(/\s*(\w+\s*=\s*".*?"|\w+\s*=\s*'.*?'|\w+\s*=\s*\w+|\w+)\s*/g);
@@ -66,6 +66,8 @@
 
 							if (t)
 								v = t[1];
+							if(k == 'dir')
+								bddir = v;
 						} else
 							v = k;
 
@@ -73,17 +75,32 @@
 					}
 				}
 			}
+			//if found fetch the dir-attribute from the html-tag and apply it to the editor-body
+			if(bddir == '' && hattr && hattr[1]){
+				htattr = hattr[1].match(/dir\s*=\s*["']([^"']*)["']/i);
+				if (htattr && htattr[1])
+					bddir = htattr[1];
+			}
+			bd = ed.getBody();
+			bd.setAttribute('dir', bddir);
 		},
 
 		_createSerializer : function() {
 			return new tinymce.dom.Serializer({
 				dom : this.editor.dom,
-				apply_source_formatting : true
+				indent : true,
+				apply_source_formatting : true,
+				indent_before : 'p,h1,h2,h3,h4,h5,h6,blockquote,div,title,style,pre,script,td,ul,li,area,title,meta,head',
+				indent_after : 'p,h1,h2,h3,h4,h5,h6,blockquote,div,title,style,pre,script,td,ul,li,area,title,meta,head'
 			});
 		},
 
 		_setContent : function(ed, o) {
 			var t = this, sp, ep, c = o.content, v, st = '';
+
+			// Ignore raw updated if we already have a head, this will fix issues with undo/redo keeping the head/foot separate
+			if (o.format == 'raw' && t.head)
+				return;
 
 			if (o.source_view && ed.getParam('fullpage_hide_in_source_view'))
 				return;
@@ -96,9 +113,20 @@
 				sp = c.indexOf('>', sp);
 				t.head = c.substring(0, sp + 1);
 
+				// Concatenate all <style>'s text into t.css
+				var ss = 0, es;
+				t.css = '';
+				while ((ss = t.head.indexOf('<style', ss)) != -1) {
+					ss = c.indexOf('>', ss) + 1;
+					if ( (es = t.head.indexOf('</style', ss)) == -1)
+						break;
+					t.css += t.head.substring(ss, es);
+					ss = es;
+				}
+
 				ep = c.indexOf('</body', sp);
 				if (ep == -1)
-					ep = c.indexOf('</body', ep);
+					ep = c.length;
 
 				o.content = c.substring(sp + 1, ep);
 				t.foot = c.substring(ep);
@@ -117,10 +145,13 @@
 					t.head += '<?xml version="1.0" encoding="' + ed.getParam('fullpage_default_encoding', 'ISO-8859-1') + '" ?>\n';
 
 				t.head += ed.getParam('fullpage_default_doctype', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">');
-				t.head += '\n<html>\n<head>\n<title>' + ed.getParam('fullpage_default_title', 'Untitled document') + '</title>\n';
+				t.head += '\n<html>\n<head>\n';
+
+				if (v = ed.getParam('fullpage_default_title'))
+					t.head += '<title>' + v + '</title>\n';
 
 				if (v = ed.getParam('fullpage_default_encoding'))
-					t.head += '<meta http-equiv="Content-Type" content="' + v + '" />\n';
+					t.head += '<meta http-equiv="Content-Type" content="text/html; charset=' + v + '" />\n';
 
 				if (v = ed.getParam('fullpage_default_font_family'))
 					st += 'font-family: ' + v + ';';
@@ -139,9 +170,27 @@
 		_getContent : function(ed, o) {
 			var t = this;
 
-			if (!o.source_view || !ed.getParam('fullpage_hide_in_source_view'))
+			if (!o.source_view || !ed.getParam('fullpage_hide_in_source_view')) {
 				o.content = tinymce.trim(t.head) + '\n' + tinymce.trim(o.content) + '\n' + tinymce.trim(t.foot);
-		}
+
+				if (t.css)
+					t._setStyle(ed, t.css);
+			}
+		},
+
+		_setStyle : function(ed, css) {
+			ed.dom.remove('injectedCSS');
+			var doc = ed.dom.doc, style = doc.createElement('style');
+			style.type = 'text/css';
+			style.id = 'injectedCSS';
+
+			if (style.styleSheet) // IE
+				style.styleSheet.cssText = css;
+			else // other browsers
+				style.appendChild(doc.createTextNode(css));
+
+			doc.getElementsByTagName('head')[0].appendChild(style);
+ 		}
 	});
 
 	// Register plugin

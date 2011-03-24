@@ -17,14 +17,14 @@ function init() {
 
 	// Get table cell data
 	var celltype = tdElm.nodeName.toLowerCase();
-	var align = ed.dom.getAttrib(tdElm, 'align') || ed.dom.getStyle(tdElm, 'textAlign');
-	var valign = ed.dom.getAttrib(tdElm, 'valign') || ed.dom.getStyle(tdElm, 'verticalAlign');
+	var align = ed.dom.getAttrib(tdElm, 'align');
+	var valign = ed.dom.getAttrib(tdElm, 'valign');
 	var width = trimSize(getStyle(tdElm, 'width', 'width'));
 	var height = trimSize(getStyle(tdElm, 'height', 'height'));
 	var bordercolor = convertRGBToHex(getStyle(tdElm, 'bordercolor', 'borderLeftColor'));
 	var bgcolor = convertRGBToHex(getStyle(tdElm, 'bgcolor', 'backgroundColor'));
 	var className = ed.dom.getAttrib(tdElm, 'class');
-	var backgroundimage = getStyle(tdElm, 'background', 'backgroundImage').replace(new RegExp("url\\('?([^']*)'?\\)", 'gi'), "$1");;
+	var backgroundimage = getStyle(tdElm, 'background', 'backgroundImage').replace(new RegExp("url\\(['\"]?([^'\"]*)['\"]?\\)", 'gi'), "$1");
 	var id = ed.dom.getAttrib(tdElm, 'id');
 	var lang = ed.dom.getAttrib(tdElm, 'lang');
 	var dir = ed.dom.getAttrib(tdElm, 'dir');
@@ -82,8 +82,6 @@ function updateAction() {
 		tinyMCEPopup.close();
 		return;
 	}
-
-	ed.execCommand('mceBeginUndoLevel');
 
 	switch (getSelectValue(formObj, 'action')) {
 		case "cell":
@@ -166,17 +164,15 @@ function updateCell(td, skip_id) {
 	var dom = ed.dom;
 
 	if (!skip_id)
-		td.setAttribute('id', formObj.id.value);
+		dom.setAttrib(td, 'id', formObj.id.value);
 
-  dom.setStyle(td, 'textAlign', formObj.align.value);
-	// td.setAttribute('align', formObj.align.value);
-  dom.setStyle(td, 'verticalAlign', formObj.valign.value);
-	// td.setAttribute('vAlign', formObj.valign.value);
-	td.setAttribute('lang', formObj.lang.value);
-	td.setAttribute('dir', getSelectValue(formObj, 'dir'));
-	// td.setAttribute('style', ed.dom.serializeStyle(ed.dom.parseStyle(formObj.style.value)));
-	td.setAttribute('scope', formObj.scope.value);
-	// ed.dom.setAttrib(td, 'class', getSelectValue(formObj, 'class'));
+	dom.setAttrib(td, 'align', formObj.align.value);
+	dom.setAttrib(td, 'vAlign', formObj.valign.value);
+	dom.setAttrib(td, 'lang', formObj.lang.value);
+	dom.setAttrib(td, 'dir', getSelectValue(formObj, 'dir'));
+	dom.setAttrib(td, 'style', ed.dom.serializeStyle(ed.dom.parseStyle(formObj.style.value)));
+	dom.setAttrib(td, 'scope', formObj.scope.value);
+	dom.setAttrib(td, 'class', getSelectValue(formObj, 'class'));
 
 	// Clear deprecated attributes
 	ed.dom.setAttrib(td, 'width', '');
@@ -192,11 +188,8 @@ function updateCell(td, skip_id) {
 		td.style.borderColor = formObj.bordercolor.value;
 		td.style.borderStyle = td.style.borderStyle == "" ? "solid" : td.style.borderStyle;
 		td.style.borderWidth = td.style.borderWidth == "" ? "1px" : td.style.borderWidth;
-    ed.dom.addClass(td, 'manually_styled');
-	} else {
+	} else
 		td.style.borderColor = '';
-    ed.dom.removeClass(td, 'manually_styled');
-  }
 
 	td.style.backgroundColor = formObj.bgcolor.value;
 
@@ -219,8 +212,7 @@ function updateCell(td, skip_id) {
 		td = newCell;
 	}
 
-	// dom.setAttrib(td, 'style', dom.serializeStyle(dom.parseStyle(td.style.cssText)));
-  console.log(td);
+	dom.setAttrib(td, 'style', dom.serializeStyle(dom.parseStyle(td.style.cssText)));
 
 	return td;
 }
