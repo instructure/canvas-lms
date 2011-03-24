@@ -41,6 +41,25 @@
   <% if @domain_root_account && @domain_root_account.settings[:global_stylesheet] %>
     <link href="<%= @domain_root_account.settings[:global_stylesheet] %>" media="all" rel="stylesheet" type="text/css" />
   <% end %>
+  <script>
+    // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.
+      _earlyClick = function(e){
+        e = e || window.event;
+        var cur = e.target || e.srcElement;
+        while ( cur && cur.ownerDocument ) {
+          if ( cur.getAttribute('href') === '#' ) {
+            e.preventDefault ? e.preventDefault() : e.returnValue = false;
+            _earlyClick.clicks = _earlyClick.clicks || [];
+            _earlyClick.clicks.push(cur);
+            break;
+          }
+          cur = cur.parentNode;
+        }
+      };
+      document.addEventListener ?
+        document.addEventListener('click', _earlyClick, false) :
+        document.attachEvent('onclick', _earlyClick);
+  </script>
 </head>
 <body class="<%= (@body_classes << @active_tab).uniq.join(" ") %>">
   <% unless @body_class_no_headers %>

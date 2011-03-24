@@ -16,7 +16,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$(document).ready(function() {
+jQuery(function($) {
+  
+  // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
+  if (window._earlyClick) {
+    
+    // unset the onclick handler we were using to capture the events
+    document.removeEventListener ?
+      document.removeEventListener('click', _earlyClick, false) :
+      document.detachEvent('onclick', _earlyClick);
+      
+    if (_earlyClick.clicks) {
+      // wait to fire the "click" events till after all of the event hanlders loaded at dom ready are initialized
+      setTimeout(function(){
+        $.each($.uniq(_earlyClick.clicks), function() {
+          // cant use .triggerHandler because it will not bubble, 
+          // but we do want to preventDefault, so this is what we have to do
+          var event = $.Event('click');
+          event.preventDefault();
+          $(this).trigger(event);
+        });
+      }, 1);
+    }
+  }
+
   ///////////// START layout related stuff
   // make sure that #main is at least as big as the tallest of #right_side, #content, and #left_side and ALWAYS at least 500px tall
   $('#main:not(.already_sized)').css({"minHeight" : Math.max($("#left_side").height(), parseInt(($('#main').css('minHeight') || "").replace('px', ''), 10))});
