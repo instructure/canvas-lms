@@ -10,4 +10,13 @@ module Canvas
       raise ArgumentError, "All foreign keys need to be 8-byte integers. #{name} looks like a foreign key to me, please add this option: `:limit => 8`"
     end
   end
+
+  def self.redis
+    return @redis if @redis
+    # create the redis cluster connection using config/redis.yml
+    redis_settings = Setting.from_config('redis')
+    raise("Redis is not enabled for this install") if redis_settings.blank?
+    Bundler.require 'redis'
+    @redis = ::Redis::Factory.create(redis_settings)
+  end
 end

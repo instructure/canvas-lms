@@ -49,3 +49,11 @@ scheduler.cron '45 11 * * *' do
   # anyway, so there's no need to invalidate all the caches.
   StreamItem.send_later_enqueue_args(:destroy_stream_items, { :priority => Delayed::LOW_PRIORITY }, 4.weeks.ago, false)
 end
+
+if PageView.page_view_method == :cache
+  # periodically pull new page views off the cache and insert them into the db
+  scheduler.cron '*/5 * * * *' do
+    PageView.send_later_enqueue_args(:process_cache_queue,
+                                     { :priority => Delayed::LOW_PRIORITY })
+  end
+end

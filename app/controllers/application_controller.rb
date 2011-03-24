@@ -475,7 +475,7 @@ class ApplicationController < ActionController::Base
   end
   
   def set_page_view
-    return true if Rails.env.test? || !page_views_enabled?
+    return true if !page_views_enabled?
 
     ENV['RAILS_HOST_WITH_PORT'] ||= request.host_with_port rescue nil
     # We only record page_views for html page requests coming from within the
@@ -487,7 +487,7 @@ class ApplicationController < ActionController::Base
   end
   
   def generate_page_view
-    @page_view = PageView.new(:url => request.url[0,255], :user_id => @current_user.id, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => (session_loaded? ? session[:session_id] : nil), :developer_key => @developer_key, :user_agent => request.headers['User-Agent'])
+    @page_view = PageView.new(:url => request.url[0,255], :user_id => @current_user.id, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'])
     @page_view.interaction_seconds = 5
     @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.method == :get)
     @page_view.created_at = Time.now
@@ -497,7 +497,7 @@ class ApplicationController < ActionController::Base
   end
   
   def generate_new_page_view
-    return true if Rails.env.test? || !page_views_enabled?
+    return true if !page_views_enabled?
 
     generate_page_view
     @page_view.generated_by_hand = true
@@ -525,29 +525,22 @@ class ApplicationController < ActionController::Base
   end
   
   def log_page_view
-    return true if Rails.env.test? || !page_views_enabled?
+    return true if !page_views_enabled?
 
     if @current_user && @log_page_views != false
       if @page_view && @page_view.generated_by_hand
       elsif request.xhr? && params[:page_view_id]
-        @page_view = PageView.find_by_request_id(params[:page_view_id])
-        if @page_view
-          response.headers["X-Canvas-Page-View-Id"] = @page_view.id.to_s
-          contributed = params[:page_view_contributed] || @page_view.contributed || false
-          seconds = @page_view.interaction_seconds || 0
-          if params[:interaction_seconds]
-            seconds += params[:interaction_seconds].to_i
-          elsif seconds == 0
-            seconds += [5, (Time.now - @page_view.updated_at)].min
-          else
-            seconds += [1, Time.now - @page_view.updated_at].min
-          end
-          seconds = [seconds, Time.now - @page_view.created_at].min
-          @page_view.attributes = {:updated_at => Time.now, :contributed => contributed, :interaction_seconds => seconds, :context => @context}
-          @page_view_update = true
-        elsif @page_view_method == :log
+        if PageView.page_view_method != :db
           @page_view = PageView.new { |p| p.request_id = params[:page_view_id] }
-          @page_view.attributes = { :updated_at => Time.now, :context => @context }
+        else
+          @page_view = PageView.find_by_request_id(params[:page_view_id])
+          if @page_view
+            response.headers["X-Canvas-Page-View-Id"] = @page_view.id.to_s
+          end
+        end
+
+        if @page_view
+          @page_view.do_update(params.slice(:interaction_seconds, :page_view_contributed))
           @page_view_update = true
         end
       end
@@ -591,7 +584,7 @@ class ApplicationController < ActionController::Base
         @page_view_update = true
       end
       if @page_view && @page_view_update
-        store_page_view(@page_view)
+        @page_view.store
       end
     else
       @page_view.destroy if @page_view && !@page_view.new_record?
@@ -601,7 +594,7 @@ class ApplicationController < ActionController::Base
     raise e if Rails.env == 'development'
     true
   end
-  
+
   # Custom error catching and message rendering.
   def rescue_action_in_public(exception)
     response_code = response_code_for_rescue(exception)
@@ -918,17 +911,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_is_site_admin?
 
   def page_views_enabled?
-    enable_page_views = Setting.get_cached('enable_page_views', 'false')
-    @page_view_method = enable_page_views == 'log' ? :log : :db
-    enable_page_views != 'false'
+    PageView.page_views_enabled?
   end
   helper_method :page_views_enabled?
-
-  def store_page_view(page_view)
-    if @page_view_method == :log
-      Rails.logger.info "PAGE VIEW: #{page_view.attributes.to_json}"
-    else
-      page_view.save
-    end
-  end
 end

@@ -34,6 +34,7 @@ class PageView < ActiveRecord::Base
   }
   
   attr_accessor :generated_by_hand
+  attr_accessor :is_update
   
   def ensure_account
     self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
@@ -95,5 +96,88 @@ class PageView < ActiveRecord::Base
     day_end = day_start + 1.day
     range = PageViewRange.find_or_create_by_context_id_and_context_type_and_start_at_and_end_at(self.context_id, self.context_type, day_start, day_end)
     range.re_summarize
+  end
+
+  def self.page_views_enabled?
+    return false if Rails.env.test?
+    !!page_view_method
+  end
+
+  def self.page_view_method
+    enable_page_views = Setting.get_cached('enable_page_views', 'false')
+    return false if enable_page_views == 'false'
+    enable_page_views = 'db' if enable_page_views == 'true' # backwards compat
+    enable_page_views.to_sym
+  end
+
+  def store
+    case PageView.page_view_method
+    when :log
+      Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
+    when :cache
+      begin
+        json = self.attributes.as_json
+        json['is_update'] = true if self.is_update
+        Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
+      rescue Errno::ECONNREFUSED
+        # we're going to ignore the error for now, if redis is unavailable
+      end
+    when :db
+      self.save
+    end
+  end
+
+  def do_update(params = {})
+    updated_at = params['updated_at'] || self.updated_at || Time.now
+    self.contributed ||= params['page_view_contributed'] || params['contributed']
+    seconds = self.interaction_seconds || 0
+    if params['interaction_seconds'].to_i > 0
+      seconds += params['interaction_seconds'].to_i
+    else
+      seconds += [5, (Time.now - updated_at)].min
+      seconds = [seconds, Time.now - created_at].min if created_at
+    end
+    self.updated_at = Time.now
+    self.interaction_seconds = seconds
+    self.is_update = true
+  end
+
+  def self.cache_queue_name
+    'page_view_queue'
+  end
+
+  def self.process_cache_queue
+    redis = Canvas.redis
+    lock_key = 'page_view_queue_processing'
+    # lock other processors out until we're done. if more than an hour
+    # passes, the lock will be dropped and we'll assume this processor died.
+    #
+    # we're really being pessimistic here, there shouldn't ever be more than
+    # one periodic job worker running anyway.
+    unless redis.setnx lock_key, 1
+      return
+    end
+    redis.expire lock_key, 1.hour
+
+    begin
+      # process as many items as were in the queue when we started.
+      qlen = redis.llen(self.cache_queue_name)
+      qlen.times do
+        json = redis.lpop(self.cache_queue_name)
+        break unless json
+        attrs = JSON.parse(json)
+        if attrs['is_update']
+          page_view = self.find_by_request_id(attrs['request_id'])
+          next unless page_view
+          page_view.do_update(attrs)
+          page_view.save
+        else
+          # request_id is primary key, so auto-protected from mass assignment
+          self.create(attrs) { |p| p.request_id = attrs['request_id'] }
+        end
+      end
+    ensure
+      redis.del lock_key
+    end
   end
 end
