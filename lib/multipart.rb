@@ -60,7 +60,7 @@ module Multipart
     end
   end
   class MultipartPost
-    BOUNDARY = 'canvas-rules0000'
+    BOUNDARY = AutoHandle.generate('canvas-rules', 15)
     HEADER = {"Content-type" => "multipart/form-data, boundary=" + BOUNDARY + " "}
 
     def prepare_query (params)
