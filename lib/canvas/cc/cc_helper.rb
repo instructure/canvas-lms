@@ -22,20 +22,23 @@ module CCHelper
   XSD_URI = 'cccv0p1.xsd'
   
   # IMS formats/types
-  IMS_DATE = "%Y-%m-%d"
-  IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
-  LOR = "associatedcontent/imscc_xmlv1p0/learning-application-resource"
-  WEBCONTENT = "webcontent"
-  CC_EXTENSION = 'imscc'
   # The IMS documentation for Common Cartridge has conflicting values
-  # for these, and the validator wants different values as well
+  # for assessments, discussions and web links, and the validator 
+  # wants different values as well
   # todo use the correct value once IMS documentation is updated
+  #ASSESSMENT_TYPE = 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment'
+  ASSESSMENT_TYPE = 'imsqti_xmlv1p2/imscc_xmlv1p0/assessment'
+  CC_EXTENSION = 'imscc'
   #DISCUSSION_TOPIC = "imsccdt_xmlv1p1"
   #DISCUSSION_TOPIC = "imsdt_xmlv1p1"
   DISCUSSION_TOPIC = "imsdt_xmlv1p0"
+  IMS_DATE = "%Y-%m-%d"
+  IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
+  LOR = "associatedcontent/imscc_xmlv1p0/learning-application-resource"
   #WEB_LINK = "imsccwl_xmlv1p1"
   #WEB_LINK = "imswl_xmlv1p1"
   WEB_LINK = "imswl_xmlv1p0"
+  WEBCONTENT = "webcontent"
   
   # substitution tokens
   OBJECT_TOKEN = "$CANVAS_OBJECT_REFERENCE$"
@@ -44,19 +47,22 @@ module CCHelper
   WEB_CONTENT_TOKEN = "$IMS_CC_FILEBASE$"
 
   # file names/paths
-  COURSE_SETTINGS_DIR = "course_settings"
-  COURSE_SETTINGS = "course_settings.xml"
-  MODULE_META = "module_meta.xml"
-  EXTERNAL_FEEDS = "external_feeds.xml"
+  ASSESSMENT_CC_QTI = "assessment_cc_qti.xml"
+  ASSESSMENT_CANVAS_QTI = "assessment_non_cc_qti.xml"
+  ASSESSMENT_INSTRUCTIONS = "assessment_instructions.html"
   ASSIGNMENT_GROUPS = "assignment_groups.xml"
-  LEARNING_OUTCOMES = "learning_outcomes.xml"
-  RUBRICS = "rubrics.xml"
-  GRADING_STANDARDS = "grading_standards.xml"
-  SYLLABUS = "syllabus.html"
   ASSIGNMENT_SETTINGS = "assignment_settings.xml"
-  WIKI_FOLDER = 'wiki_content'
+  COURSE_SETTINGS = "course_settings.xml"
+  COURSE_SETTINGS_DIR = "course_settings"
+  EXTERNAL_FEEDS = "external_feeds.xml"
+  GRADING_STANDARDS = "grading_standards.xml"
+  LEARNING_OUTCOMES = "learning_outcomes.xml"
   MANIFEST = 'imsmanifest.xml'
+  MODULE_META = "module_meta.xml"
+  RUBRICS = "rubrics.xml"
+  SYLLABUS = "syllabus.html"
   WEB_RESOURCES_FOLDER = 'web_resources'
+  WIKI_FOLDER = 'wiki_content'
   
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)

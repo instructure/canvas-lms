@@ -15,26 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'builder'
-require 'digest'
-require 'set'
-require 'zip/zip'
-
-# Canvas Common Cartridge
-module Canvas::CC
+module Canvas:CC
+  module QTI
+  end
 end
 
-require 'canvas/cc/cc_helper'
-require 'canvas/cc/cc_exporter'
-require 'canvas/cc/manifest'
-require 'canvas/cc/wiki_resources'
-require 'canvas/cc/module_meta'
-require 'canvas/cc/learning_outcomes'
-require "canvas/cc/canvas_resource"
-require "canvas/cc/assignment_resources"
-require "canvas/cc/topic_resources"
-require "canvas/cc/web_resources"
-require "canvas/cc/web_links"
-require 'canvas/cc/resource'
-require 'canvas/cc/organization'
-require 'canvas/cc/qti/qti'
+require 'canvas/cc/qti/qti_generator'
+

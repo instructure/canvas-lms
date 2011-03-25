@@ -9,7 +9,7 @@
 #
 # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
 # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more 
 # details.
 #
 # You should have received a copy of the GNU Affero General Public License along
@@ -48,7 +48,7 @@ module Canvas::CC
         add_topics
         add_web_links
         add_course_files
-        #todo quizzes
+        QTI::QTIGenerator.generate_qti(@manifest, resources)
         #todo download kaltura videos?
         #todo basic LTI links
       end
