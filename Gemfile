@@ -35,7 +35,7 @@ gem 'sanitize',       '1.2.1'
 gem 'uuid',           '2.3.1'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 gem 'will_paginate',  '2.3.15'
-gem 'hairtrigger',    '0.1.1'
+gem 'hairtrigger',    '0.1.3'
 
 group :mysql do
   gem 'mysql',        '2.8.1'
