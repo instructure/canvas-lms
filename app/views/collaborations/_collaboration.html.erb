@@ -22,7 +22,6 @@
   <div class="content">
     <div class="message user_content formatted_body"><%= user_content(collaboration.description, @context.asset_string, collaboration.asset_string) rescue nbsp %></div>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @role_lookups %></div>
     <div class="links">
       <a href="<%= context_url(context, :context_users_url, :all_messages => 1) %>#message_<%= context_message.id rescue 'none' %>" class="show_participants_link brief_footer_link"><span class="users_count"><%= (collaboration.users + [collaboration.user]).compact.uniq.length rescue "0" %></span> Participants</a>
       <a href="#" class="show_participants_link verbose_footer_link"><span class="users_count"><%= (collaboration.users + [collaboration.user]).compact.uniq.length rescue "0" %></span> Participants</a>

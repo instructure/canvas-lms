@@ -27,7 +27,6 @@
     <div class="user_content description">&nbsp;</div>
     <textarea style="display: none;" class="description"></textarea>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @role_lookups %></div>
     <div class="aligned_artifacts">
       <span class="artifacts_count_for_tied_context">&nbsp;</span> artifacts
     </div>

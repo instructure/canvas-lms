@@ -14,7 +14,6 @@
   </div>
   <div class="content">
     <div class="course_id" style="display: none;"><%= collab.context_id if collab && collab.context_type == "Course" %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups["#{collab.try_rescue(:context_code)}"] if @role_lookups %></div>
     <div class="message user_content">
       <%= user_content(collab.try_rescue(:description), collab.try_rescue(:context_code), collab.try_rescue(:asset_string)) || nbsp %>
     </div>

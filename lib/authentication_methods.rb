@@ -111,19 +111,6 @@ module AuthenticationMethods
       end
     end
 
-    @role_lookups = {}
-    if @current_user
-      @role_lookups = Rails.cache.fetch(['role_lookups', @current_user].cache_key) do
-        lookups = {}
-        @current_user.current_enrollments.select{|e| e.participating? }.each do |enrollment|
-          lookups[enrollment.class.to_s] = true
-          lookups["course_#{enrollment.course_id}"] = Enrollment.highest_enrollment_type(lookups["course_#{enrollment.course_id}"], enrollment.class.to_s) 
-        end
-        lookups
-      end
-    else
-      @userless=true
-    end
     @current_user
   end
   private :load_user

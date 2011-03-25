@@ -16,7 +16,6 @@
     <li><%= link_to "Profile", profile_path %></li>
     <li class="user_id" style="display: none;"><%= @current_user.id %></li>
     <li class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></li>
-    <li class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @context.is_a?(Course) && @role_lookups %></li>
     <li id="current_context_code" style="display: none;"><%= @context.try_rescue(:asset_string) %></li>
     <li class="user_long_name" style="display: none;"><%= @current_user.name %></li>
     <li class="logout"><%= link_to "Logout", logout_path, :method => :delete %></li>

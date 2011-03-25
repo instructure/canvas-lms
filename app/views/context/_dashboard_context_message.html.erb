@@ -40,7 +40,6 @@
   </div>
   <div class="content">
     <div class="course_id" style="display: none;"><%= message.try_rescue(:context_id) %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups[message.try_rescue(:context_code)] if message && @role_lookups %></div>
     <div class="message user_content formatted_body"><%= user_content(message.try_rescue(:formatted_body), message.try_rescue(:context_code), message.try_rescue(:asset_string)) || nbsp %></div>
     <div class="attachments_list" style="margin-top: 5px; <%= hidden unless message && !message.attachments.empty? %>">
       <% (message.try_rescue(:attachments) || []).select{|a| a }.each do |attachment| %>

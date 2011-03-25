@@ -10,7 +10,6 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((comment.try_rescue(:user_id)), context_code, 30) %></div>
     <div class="course_id" style="display: none;"><%= comment.try_rescue(:context_id) if comment.try_rescue(:context_type) == 'Course' %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups[context_code] if @role_lookups %></div>
     <div class="message user_content" style="<%= hidden unless comment %>"><%= user_content(comment.try_rescue(:formatted_body), comment.try_rescue(:context_code), comment.try_rescue(:asset_string)) || nbsp %></div>
     <% if !comment %>
      <% form_for :context_message, :url => "#{context_prefix(context_code)}/messages", :html => {:class => "add_sub_message_form context_message_form"} do |f| %>

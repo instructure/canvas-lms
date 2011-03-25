@@ -68,7 +68,6 @@
     
     <div class="description user_content"><%= assignment && assignment.description && !assignment.description.empty? ? user_content(assignment.description, @context.asset_string, assignment.asset_string) : 'No Content' %></div>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @role_lookups %></div>
 
     <div style="display: none;">
       <span class="timestamp"><%= assignment.due_at.to_i rescue "" %></span>

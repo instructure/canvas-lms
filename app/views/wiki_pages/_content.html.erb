@@ -55,7 +55,6 @@
     <%= link_to "Click here to reload the page", request.url %>
   </div>
   <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
-  <div class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @role_lookups %></div>
   <% if @page.deleted? %>
     <div id="deleted_message" class="user_content" style="margin-top: 10px;">
       This page has been deleted.

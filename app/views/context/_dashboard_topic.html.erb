@@ -29,7 +29,6 @@
       </div>
     <% end %>
     <div class="course_id" style="display: none;"><%= topic.context_id if topic && topic.context_type == 'Course' %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups["#{context_code}"] if topic && @role_lookups %></div>
     <div class="notes" style="font-size: 0.8em; float: left;">
       <% if topic && topic.context && topic.context.respond_to?(:assignments) %>
         <div class="for_assignment" style="font-style: italic; <%= hidden unless topic && topic.assignment_id %>">

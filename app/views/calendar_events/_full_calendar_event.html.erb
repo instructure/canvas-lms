@@ -26,7 +26,6 @@
     
     <div class="description user_content"><%= calendar_event && calendar_event.description && !calendar_event.description.empty? ? user_content(calendar_event.description, @context.asset_string, calendar_event.asset_string) : 'No Content' %></div>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups[@context.asset_string] if @context && @role_lookups %></div>
   </div>
   <% if can_do(calendar_event, @current_user, :update_content) %>
   <% url = calendar_event.new_record? ? context_url(@context, :context_calendar_events_url) : context_url(@context, :context_calendar_event_url, calendar_event.id) %>

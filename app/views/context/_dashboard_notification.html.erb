@@ -18,7 +18,6 @@
   <div class="content">
     <div class="message user_content" style="white-space: pre-wrap;"><%= message.try_rescue(:body) || nbsp %></div>
     <div class="course_id" style="display: none;"><%= message.asset_context_id if message && message.asset_context_type == 'Course' %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups["#{message.try_rescue(:context_code)}"] if message && @role_lookups %></div>
     <div class="clear"></div>
   </div>
 </div>

@@ -10,7 +10,6 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), context_code, 30) %></div>
     <div class="course_id" style="display: none;"><%= topic ? topic.context_id : "" %></div>
-    <div class="course_role" style="display: none;"><%= @role_lookups[context_code] if @role_lookups %></div>
     <div class="message user_content" style="<%= hidden unless entry %>"><%= raw entry.try_rescue(:truncated_message) || nbsp %></div>
     <% if !entry %>
      <% form_for :discussion_entry, :url => "#{context_prefix(context_code)}/discussion_entries", :html => {:class => "add_sub_message_form"} do |f| %>
