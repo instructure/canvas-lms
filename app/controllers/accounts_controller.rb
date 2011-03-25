@@ -141,9 +141,15 @@ class AccountsController < ApplicationController
   def remove_user
     if authorized_action(@account, @current_user, :manage_admin_users)
       @user = UserAccountAssociation.find_by_account_id_and_user_id(@account.id, params[:user_id]).user rescue nil
-      # if the user is in more than one account, just remove them from the 
-      # current account instead of deleting them completely
-      if @user && @user.pseudonyms.active.map(&:account_id).uniq.length > 1
+      # if the user is in any account other then the
+      # current one, remove them from the current account
+      # instead of deleting them completely
+      account_ids = []
+      if @user
+        account_ids = @user.associated_root_accounts.map(&:id)
+      end
+      account_ids = account_ids.compact.uniq - [@account.id]
+      if @user && !account_ids.empty?
         @root_account = @account.root_account || @account
         @user.remove_from_root_account(@root_account)
       else

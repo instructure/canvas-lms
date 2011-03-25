@@ -3,6 +3,7 @@
   managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :manage_admin_users) }
   can_manage_admin_users = managed_accounts
   account ||= managed_accounts.first
+  root_account = account.root_account || account
   can_manage_user_logins = @user.associated_root_accounts.active.any?{|a| can_do(a, @current_user, :manage_user_logins) } 
 %>
 <% jammit_js :user_name %>
@@ -46,9 +47,9 @@
           <% if can_manage_user_logins %>
             | 
             <a href="<%= user_admin_merge_url(@user.id) %>">Merge with Another User</a>
-            <% if account %>
+            <% if (@context.is_a?(User) || @context.is_a?(Account)) && root_account %>
               |
-              <a href="<%= account_confirm_delete_user_url(account.id, @user.id) %>">Delete from <%= account.name %></a>
+              <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>">Delete from <%= root_account.name %></a>
             <% end %>
           <% end %>
         </td>
