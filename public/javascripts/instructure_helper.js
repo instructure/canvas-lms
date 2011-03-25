@@ -24,51 +24,28 @@
   }
   // ============================================================================================
   // = Try to figure out what browser they are using and set INST.broswer.theirbrowser to true  =
-  // = and add a css class to the body for that broser                                          =
+  // = and add a css class to the body for that browser                                       =
   // ============================================================================================
-
-  // see: http://yura.thinkweb2.com/cft/
+  
   INST.browser = {};
-  INST.browser.ie = ('ActiveXObject' in window);
-  if (INST.browser.ie) {
-    //you could also use var isMSIE = /*@cc_on!@*/false; here, see http://www.thefutureoftheweb.com/blog/detect-ie6-in-javascript
-
-    //see http://ajaxian.com/archives/detecting-ie7-in-javascript
-    //you could do (typeof document.body.style.maxHeight != "undefined")  but then the document would have to be loaded
-    INST.browser.ie6 =  !window.XMLHttpRequest;
-    if(!INST.browser.ie6){
-      // see: http://www.strictly-software.com/scripts/downloads/IE8.js
-      // documentMode is only supported in IE 8 so we know if its here its really IE 8
-      if(document.documentMode){
-        INST.browser.ie8 = true;
-      } else {
-        INST.browser.ie7 = true;
-      }
-    }
-  }
-  //its not IE, is it webkit?
-  else if (window.devicePixelRatio) {
+  $.each([7,8,9], function() {
+    if ($('html').hasClass('ie'+this)) {
+      INST.browser['ie'+this] = INST.browser.ie = true;
+    }  
+  });
+  if (window.devicePixelRatio) {
     INST.browser.webkit = true;
-
     //from: http://www.byond.com/members/?command=view_post&post=53727
-    if (escape(navigator.javaEnabled.toString()) == 'function%20javaEnabled%28%29%20%7B%20%5Bnative%20code%5D%20%7D') {
-      INST.browser.chrome = true;
-    } else {
-      INST.browser.safari = true;
-    }
+    INST.browser[(escape(navigator.javaEnabled.toString()) == 'function%20javaEnabled%28%29%20%7B%20%5Bnative%20code%5D%20%7D') ? 'chrome' : 'safari'] = true;
   }
-  //its not IE or webkit, is it firefox?
-  else {
-    //this is just using jquery's browser sniffing result of if its firefox, it should probably use feature detection
-    INST.browser.ff = $.browser.mozilla;
-  }
+  //this is just using jquery's browser sniffing result of if its firefox, it should probably use feature detection
+  INST.browser.ff = $.browser.mozilla;
   // now we have some degree of knowing which of the common browsers it is, on dom ready, give the body those classes
   // so for example, if you were on IE6 the body would have the classes "ie" AND "ie6"
   $(function(){
-    var $body = $('body');
     $.each(INST.browser, function(k,v){
       if (v) {
-        $body.addClass(k);
+        $('body').addClass(k);
       }
     });
   });
