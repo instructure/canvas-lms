@@ -6,13 +6,13 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
  max_to_show = 16
  if @current_user && [
     @current_user.assignments_needing_submitting(:contexts => contexts, :limit => max_to_show), 
-    @current_user.assignments_needing_grading(:contexts => contexts, :limit => max_to_show), 
+    @current_user.assignments_needing_grading(:contexts => contexts)[0,max_to_show], 
     (@assessments_needing_completing || []) 
   ].any?{ |set| set.length > 0} %>
   <h2>To Do</h2>
   <% cnt = 0 %>
   <ul class="right-side-list to-do-list">
-    <% @current_user.assignments_needing_grading(:contexts => contexts, :limit => max_to_show).each do |assignment| %>
+    <% @current_user.assignments_needing_grading(:contexts => contexts)[0,max_to_show].each do |assignment| %>
       <% cnt += 1 %>
       <% if cnt <= 15 %>
         <li style="<%= hidden if cnt > 5 %>">
