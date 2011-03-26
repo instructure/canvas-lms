@@ -1430,6 +1430,8 @@ var gradebook = (function(){
     
     url = $.replaceTags(url, 'assignment_id', submission.assignment_id);
     url = $.replaceTags(url, 'user_id', submission.user_id);
+    re = new RegExp('("|%22)' + submission.user_id + '("|%22)');
+    url = url.replace(re, submission.user_id);
     $view.append($("#submission_view_image").clone(true).removeAttr('id'));
     $view.append($(" <a href='" + url + "'>Submission Details</a>"));
 
