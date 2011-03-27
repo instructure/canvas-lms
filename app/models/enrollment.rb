@@ -221,6 +221,7 @@ class Enrollment < ActiveRecord::Base
   end
   
   def rank_sortable(student_first=false)
+    type = self.class.to_s
     case type
     when 'StudentEnrollment'
       student_first ? 0 : 4

@@ -32,7 +32,7 @@ module Canvas::AccountReports
   end
   
   def self.for_account(id)
-    (AvailableReports.reports['default'] || {}).merge (AvailableReports.reports[id] || {})
+    (AvailableReports.reports['default'] || {}).merge(AvailableReports.reports[id] || {})
   end
 
   def self.generate_report(account_report)
