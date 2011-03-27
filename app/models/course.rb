@@ -452,7 +452,7 @@ class Course < ActiveRecord::Base
   end
   
   def self_enrollment_allowed?
-    !sis_source_id && (!self.root_account || self.root_account == Account.default)
+    !!(self.account && self.account.self_enrollment_allowed?(self))
   end
   
   def self_enrollment_code

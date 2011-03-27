@@ -45,6 +45,14 @@
               <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
             </td>
           </tr>
+          <% f.fields_for :settings do |settings| %>
+            <tr>
+              <td><%= settings.label :self_enrollment, "Allow Self-Enrollment:" %></td>
+              <td>
+                <%= settings.select :self_enrollment, [['Never', ''], ['For Manually-Created Courses', 'manually_created'], ['For Any Courses', 'any']], :selected => @account.settings[:self_enrollment] %>
+              </td>
+            </tr>
+          <% end %>
           <% if current_user_is_site_admin? %>
             <% f.fields_for :settings do |settings| %>
               <tr>
@@ -191,13 +199,14 @@
             <tr>
               <td colspan="2">
                 <div style="margin-top: 10px;">
-                  Choose who can create new courses: (Account Administrators can always create courses)
+                  Choose who can create new courses: 
+                  <div style="font-size: 0.8em;">(Account Administrators can always create courses)</div>
                 </div>
               </td>
             </tr>
             <tr>
               <td colspan="2">
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 5px; padding-left: 20px;">
                   <%= settings.check_box :teachers_can_create_courses, :checked => @account.settings[:teachers_can_create_courses] != false %>
                   <%= settings.label :teachers_can_create_courses, "Teachers" %>
                 </div>
@@ -205,17 +214,17 @@
             </tr>
             <tr>
               <td colspan="2">
-                <div style="margin-top: 10px;">
-                  <%= settings.check_box :students_can_create_courses, :checked => @account.settings[:students_can_create_courses] != false %>
-                  <%= settings.label :students_can_create_courses, "Students" %>
+                <div style="margin-top: 5px; padding-left: 20px;">
+                  <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.settings[:no_enrollments_can_create_courses] != false %>
+                  <%= settings.label :no_enrollments_can_create_courses, "Users with no enrollments" %>
                 </div>
               </td>
             </tr>
             <tr>
               <td colspan="2">
-                <div style="margin-top: 10px;">
-                  <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.settings[:no_enrollments_can_create_courses] != false %>
-                  <%= settings.label :no_enrollments_can_create_courses, "Users with no enrollments" %>
+                <div style="margin-top: 5px; padding-left: 20px;">
+                  <%= settings.check_box :students_can_create_courses, :checked => @account.settings[:students_can_create_courses] != false %>
+                  <%= settings.label :students_can_create_courses, "Students" %>
                 </div>
               </td>
             </tr>

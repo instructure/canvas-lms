@@ -103,6 +103,7 @@ class Account < ActiveRecord::Base
   add_setting :students_can_create_courses, :boolean => true, :root_only => true
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true
   add_setting :support_url, :root_only => true
+  add_setting :self_enrollment
   add_setting :equella_endpoint
   add_setting :equella_teaser
   
@@ -697,6 +698,14 @@ class Account < ActiveRecord::Base
       self.turnitin_comments
     else
       self.parent_account.closest_turnitin_comments rescue nil
+    end
+  end
+  
+  def self_enrollment_allowed?(course)
+    if !settings[:self_enrollment].blank?
+      !!(settings[:self_enrollment] == 'any' || (!course.sis_source_id && settings[:self_enrollment] == 'manually_created'))
+    else
+      !!(parent_account && parent_account.self_enrollment_allowed?(course))
     end
   end
   
