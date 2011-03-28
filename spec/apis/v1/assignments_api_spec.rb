@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe AssignmentsApiController, :type => :controller do
+describe AssignmentsApiController, :type => :integration do
   context "index" do
 
     it "should sort the returned list of assignments" do
@@ -199,6 +199,6 @@ describe AssignmentsApiController, :type => :controller do
             :format => 'json', :course_id => @course.id.to_s,
             :id => @assignment.id.to_s, })
     json['discussion_topic']['id'].should == @topic.id
-    json['discussion_topic']['url'].should == "http://test.host/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    json['discussion_topic']['url'].should == "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}"
   end
 end

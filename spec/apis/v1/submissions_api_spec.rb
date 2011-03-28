@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SubmissionsApiController, :type => :controller do
+describe SubmissionsApiController, :type => :integration do
 
   def submit_homework(assignment, student, opts = {:body => "test!"})
     @submit_homework_time ||= 0
@@ -83,8 +83,32 @@ describe SubmissionsApiController, :type => :controller do
       }]
   end
 
+  it "should return a valid preview url for quiz submissions" do
+    student1 = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    @course.enroll_student(student1).accept!
+    quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+    quiz.did_edit!
+    quiz.offer!
+    a1 = quiz.assignment
+    sub = a1.find_or_create_submission(student1)
+    sub.submission_type = 'online_quiz'
+    sub.workflow_state = 'submitted'
+    sub.save!
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s },
+          { :include => %w(submission_history submission_comments rubric_assessment) })
+
+    get_via_redirect json.first['preview_url']
+    response.should be_success
+    response.body.should match(/Redirecting to quiz page/)
+  end
+
   it "should return all submissions for an assignment" do
-    Account.default.update_attribute(:default_time_zone, 'UTC')
     student1 = user(:active_all => true)
     student2 = user(:active_all => true)
 
@@ -124,10 +148,11 @@ describe SubmissionsApiController, :type => :controller do
         "prior"=>nil,
         "body"=>"test!",
         "submitted_at"=>"1970-01-01T03:00:00Z",
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1",
         "attachments" =>
          [
            { "content-type" => "application/loser",
-             "url" => "http://test.host/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?download=#{sub1.attachments.first.id}",
+             "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?download=#{sub1.attachments.first.id}",
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser" },
          ],
@@ -142,11 +167,12 @@ describe SubmissionsApiController, :type => :controller do
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
            "comparison"=>nil,
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=0",
            "score"=>nil},
           {"grade"=>nil,
            "media_comment" =>
             { "content-type" => "video/mp4",
-              "url" => "http://test.host/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+              "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
            "prior"=>nil,
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T02:00:00Z",
@@ -156,15 +182,16 @@ describe SubmissionsApiController, :type => :controller do
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
            "comparison"=>nil,
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
            "score"=>nil},
           {"grade"=>"A-",
            "media_comment" =>
             { "content-type" => "video/mp4",
-              "url" => "http://test.host/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+              "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
            "attachments" =>
             [
               { "content-type" => "application/loser",
-                "url" => "http://test.host/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?download=#{sub1.attachments.first.id}",
+                "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?download=#{sub1.attachments.first.id}",
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser" },
             ],
@@ -177,6 +204,7 @@ describe SubmissionsApiController, :type => :controller do
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
            "comparison"=>nil,
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
            "score"=>13.5}],
         "attempt"=>3,
         "url"=>nil,
@@ -187,7 +215,7 @@ describe SubmissionsApiController, :type => :controller do
          [{"comment"=>"Well here's the thing...",
            "media_comment" => {
              "content-type" => "audio/mp4",
-             "url" => "http://test.host/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
+             "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
            },
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
@@ -195,11 +223,12 @@ describe SubmissionsApiController, :type => :controller do
         "comparison"=>nil,
         "media_comment" =>
          { "content-type" => "video/mp4",
-           "url" => "http://test.host/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
+           "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
         "score"=>13.5},
        {"grade"=>"F",
         "prior"=>nil,
         "body"=>nil,
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1",
         "submitted_at"=>"1970-01-01T04:00:00Z",
         "submission_history"=>
          [{"grade"=>"F",
@@ -212,11 +241,12 @@ describe SubmissionsApiController, :type => :controller do
            "submission_type"=>"online_url",
            "user_id"=>student2.id,
            "comparison"=>nil,
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=0",
            "attachments" =>
             [{"content-type" => "image/png",
               "display_name" => "snapshot.png",
               "filename" => "snapshot.png",
-              "url" => "http://test.host/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",}],
+              "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",}],
            "score"=>9}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
@@ -227,7 +257,7 @@ describe SubmissionsApiController, :type => :controller do
          [{"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
-           "url" => "http://test.host/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",}],
+           "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",}],
         "submission_comments"=>[],
         "comparison"=>nil,
         "score"=>9,
@@ -446,7 +476,7 @@ describe SubmissionsApiController, :type => :controller do
     json['submission_comments'].size.should == 1
     comment = json['submission_comments'].first
     comment['comment'].should == 'This is a media comment.'
-    comment['media_comment']['url'].should == "http://test.host/courses/#{@course.id}/media_download?entryId=1234&redirect=1&type=mp4"
+    comment['media_comment']['url'].should == "http://www.example.com/courses/#{@course.id}/media_download?entryId=1234&redirect=1&type=mp4"
     comment['media_comment']["content-type"].should == "audio/mp4"
   end
 

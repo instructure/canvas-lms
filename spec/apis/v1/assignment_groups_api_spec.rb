@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe AssignmentGroupsController, :type => :controller do
+describe AssignmentGroupsController, :type => :integration do
   it "should sort the returned list of assignment groups" do
     # the API returns the assignments sorted by
     # assignment_groups.position

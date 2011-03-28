@@ -166,8 +166,9 @@ class SubmissionsApiController < ApplicationController
     hash = submission_attempt_json(submission)
 
     if includes.include?("submission_history")
-      hash['submission_history'] = submission.submission_history.map do |ver|
-        submission_attempt_json(ver)
+      hash['submission_history'] = []
+      submission.submission_history.each_with_index do |ver, idx|
+        hash['submission_history'] << submission_attempt_json(ver, idx)
       end
     end
 
@@ -198,10 +199,14 @@ class SubmissionsApiController < ApplicationController
 
   SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body)
 
-  def submission_attempt_json(attempt)
+  def submission_attempt_json(attempt, version_idx = nil)
     hash = attempt.as_json(
       :include_root => false,
       :only => SUBMISSION_JSON_FIELDS)
+
+    hash['preview_url'] = course_assignment_submission_url(
+      @context, @assignment, attempt[:user_id], 'preview' => '1',
+      'version' => version_idx)
 
     unless attempt.media_comment_id.blank?
       hash['media_comment'] = media_comment_json(attempt.media_comment_id,
