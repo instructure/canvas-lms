@@ -251,7 +251,9 @@ class Group < ActiveRecord::Base
     end
   end
   private :ensure_defaults
-  
+
+  # if you modify this set_policy block, note that we've denormalized this
+  # permission check for efficiency -- see User#cached_contexts
   set_policy do
     given { |user| user && self.participating_group_memberships.find_by_user_id(user.id) }
     set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and
