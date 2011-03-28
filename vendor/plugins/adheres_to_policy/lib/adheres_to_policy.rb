@@ -234,9 +234,7 @@ module Instructure #:nodoc:
 
         # Used for a more-natural: user.has_rights?(@account, :destroy)
         def has_rights?(obj, *sought_rights)
-          granted_rights = obj.check_policy(self)
-          sought_rights = granted_rights if sought_rights.empty? or not sought_rights
-          sought_rights.inject({}) { |h, r| h[r] = granted_rights.include?(r); h }
+          obj.grants_rights?(self, *sought_rights)
         end
 
       end # InstanceMethods
