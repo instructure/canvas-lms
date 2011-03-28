@@ -109,7 +109,6 @@ class QuizSubmission < ActiveRecord::Base
     questions.each do |question|
       question_tags = tags.select{|t| t.content_id == question.assessment_question_bank_id }
       question_tags.each do |tag|
-        debugger unless versioned_submission
         tag.create_outcome_result(self.user, self.quiz, versioned_submission, {:assessment_question => question})
       end
     end
