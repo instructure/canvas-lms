@@ -186,8 +186,7 @@ module Instructure #:nodoc:
           cache_lookup = nil if session && session[:session_affects_permissions]
           user_id = user ? user.id : nil
           cache_param = [user_id, sought_rights].flatten
-          # return @rights_cache[cache_param] if user_id && @rights_cache && @rights_cache[cache_param] != nil
-          
+
           # According to my understanding, calling Rails.cache.fetch with an
           # empty string will always return the contents of the block, and
           # will not cache the value at all
@@ -202,11 +201,10 @@ module Instructure #:nodoc:
 
           sought_rights = granted_rights if sought_rights.empty?
           res = sought_rights.inject({}) { |h, r| h[r] = granted_rights.include?(r); h }
-          @rights_cache ||= {}
-          @rights_cache[cache_param] = res
           res
         end
-        
+
+        # TODO: I don't think this is used anywhere, check and remove
         def true_user_grants_right?(user, *sought_rights)
           session = nil
           if !sought_rights[0].is_a? Symbol
@@ -215,7 +213,7 @@ module Instructure #:nodoc:
           sought_right = sought_rights[0].to_sym rescue nil
           grants_right?(user, {:session_affects_permissions => true}, sought_right)
         end
-        
+
         def grants_right?(user, *sought_rights)
           session = nil
           if !sought_rights[0].is_a? Symbol
@@ -223,10 +221,17 @@ module Instructure #:nodoc:
           end
           sought_right = sought_rights[0].to_sym rescue nil
           return false unless sought_right
+
+          # if this is a course, call grants_rights which has specific logic to
+          # cache course rights lookups. otherwise we lose the benefits of that cache.
+          if self.is_a?(Course) && !(session && session[:session_affects_permissions])
+            return !!(self.grants_rights?(user, *[session].compact)[sought_right])
+          end
+
           granted_rights = check_policy(user, session, *sought_rights)
           granted_rights.include?(sought_right)
         end
-        
+
         # Used for a more-natural: user.has_rights?(@account, :destroy)
         def has_rights?(obj, *sought_rights)
           granted_rights = obj.check_policy(self)

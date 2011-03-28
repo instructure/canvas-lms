@@ -705,22 +705,16 @@ class Course < ActiveRecord::Base
   
   def enrollment_allows(user, session, permission)
     return false unless user && permission
+
     @enrollment_lookup ||= {}
-    @enrollment_permission_lookup ||= (Rails.cache.read([self, 'enrollment_permission_lookup'].cache_key) || {}).dup
-    if session && temp_type = session["role_course_#{self.id}"]
-      @enrollment_lookup[user.id] = [Enrollment.typed_enrollment(temp_type).new(:course_id => self.id, :user_id => user.id, :workflow_state => 'active')] rescue nil
-    elsif session && session[:session_affects_permissions]
-      @enrollment_lookup[user.id] = nil
-    end
-    
-    if !@enrollment_permission_lookup.has_key?([user.id, permission]) || (session && session[:session_affects_permissions]) 
-      @enrollment_lookup[user.id] ||= self.enrollments.active_or_pending.for_user(user)
-      @enrollment_permission_lookup[[user.id, permission]] = @enrollment_lookup[user.id].any?{|e| e.has_permission_to?(permission) }
-      unless session && session[:session_affects_permissions]
-        Rails.cache.write([self, 'enrollment_permission_lookup'].cache_key, @enrollment_permission_lookup.dup)
+    @enrollment_lookup[user.id] ||=
+      if session && temp_type = session["role_course_#{self.id}"]
+        [Enrollment.typed_enrollment(temp_type).new(:course_id => self.id, :user_id => user.id, :workflow_state => 'active')] rescue nil
+      else
+        self.enrollments.active_or_pending.for_user(user)
       end
-    end
-    @enrollment_permission_lookup[[user.id, permission]]
+
+    @enrollment_lookup[user.id].any? {|e| e.has_permission_to?(permission) }
   end
   
   def self.find_all_by_context_code(codes)
