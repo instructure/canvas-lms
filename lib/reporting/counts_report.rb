@@ -222,8 +222,7 @@ class CountsReport
 
   def last_activity(account_id)
     query = "SELECT max(created_at) FROM #{PageView.table_name} WHERE account_id = #{account_id}"
-    res = ActiveRecord::Base.connection.execute(query)
-    res.fetch_row[0] rescue nil
+    ActiveRecord::Base.connection.select_value(query)
   end
 
   def get_course_ids(account, course_ids)
@@ -237,14 +236,11 @@ class CountsReport
   end
 
   def get_count_from_query(query)
-    res = ActiveRecord::Base.connection.execute(query)
-    res.fetch_row[0].to_i
+    ActiveRecord::Base.connection.select_value(query).to_i
   end
   
   def get_count_and_size_from_query(query)
-    res = ActiveRecord::Base.connection.execute(query)
-    row = res.fetch_row
-    [row[0].to_i, row[1].to_i]
+    ActiveRecord::Base.connection.select_rows(query).first.map(&:to_i)
   end
 
   def should_use_default_account_course(course)
