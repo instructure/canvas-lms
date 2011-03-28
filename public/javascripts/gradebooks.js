@@ -552,7 +552,7 @@ var gradebook = (function(){
           }
         }
       });
-      $("#datagrid_data").delegate("#information_link, .new_message, .pending_review", "click", function() {
+      $("#datagrid_data").delegate("#information_link, .new_message, .pending_review, .turnitin", "click", function() {
         submissionInformation($(this).parents(".student_assignment"));
         return false;
       });
