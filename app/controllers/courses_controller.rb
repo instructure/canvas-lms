@@ -31,11 +31,20 @@ class CoursesController < ApplicationController
   #   example, set to "teacher" to return only courses where the user is
   #   enrolled as a Teacher.
   #
+  # @argument include[] ["needs_grading_count"] Optional information to include with each Course.
+  #   When needs_grading_count is given, and the current user has grading
+  #   rights, the total number of submissions needing grading for all
+  #   assignments is returned.
+  #
   # @response_field id The unique identifier for the course.
   # @response_field name The name of the course.
   # @response_field course_code The course code.
   # @response_field enrollments A list of enrollments linking the current user
   #   to the course.
+  #
+  # @response_field needs_grading_count Number of submissions needing grading
+  #   for all the course assignments. Only returned if
+  #   include[]=needs_grading_count
   #
   # @example_response
   #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'enrollments': [{'type': 'student'}] },
@@ -53,11 +62,17 @@ class CoursesController < ApplicationController
           enrollments = enrollments.reject { |e| e.type != e_type }
         end
 
+        include_grading = Array(params[:include]).include?('needs_grading_count')
+
         hash = []
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
-          hash << course_enrollments.first.course.as_json(
+          course = course_enrollments.first.course
+          hash << course.as_json(
             :include_root => false, :only => %w(id name course_code))
           hash.last['enrollments'] = course_enrollments.map { |e| { :type => e.readable_type.downcase } }
+          if include_grading && course_enrollments.any? { |e| e.participating_admin? }
+            hash.last['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
+          end
         end
         render :json => hash.to_json
       }
