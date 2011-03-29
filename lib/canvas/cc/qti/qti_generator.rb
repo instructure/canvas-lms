@@ -19,6 +19,7 @@ module Canvas::CC
   module QTI
     class QTIGenerator
       include Canvas::CC::CCHelper
+      include QTIItems
 
       def initialize(manifest, resources_node)
         @manifest = manifest
@@ -162,20 +163,6 @@ module Canvas::CC
         end
       end
       
-      # if the question is a supported CC type it will be added
-      # it it's not supported it's just skipped
-      # returns boolean - whether the question was added
-      def add_cc_question(node, question)
-        node.item(
-                :ident => question['id'],
-                :title => question['name']
-        ) do |item_node|
-          item_node.comment! "todo: make #{question['question_type']} questions"
-        end
-        
-        true
-      end
-      
       # Common Cartridge only allows for one section in an assessment
       # that means that you can't have any groups. So we just choose
       # however many (supported) questions there are supposed to be
@@ -197,15 +184,6 @@ module Canvas::CC
             chosen += 1 if add_cc_question(node, question)
             break if chosen == pick_count
           end
-        end
-      end
-      
-      def add_question(node, question)
-        node.item(
-                :ident => question['id'],
-                :title => question['name']
-        ) do |item_node|
-          item_node.comment! "todo: make #{question['question_type']} questions"
         end
       end
       
