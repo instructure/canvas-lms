@@ -63,8 +63,7 @@ group :development do
 end
 
 group :redis do
-  gem 'redis-store', :git => 'https://github.com/jodosha/redis-store.git',
-                     :tag => 'v1.0.0.beta4'
+  gem 'redis-store', '1.0.0.beta4'
 end
 
 # The closure-compiler gem has an undocumented
