@@ -26,7 +26,7 @@
   <div class="rs-margin-lr rs-margin-top">
     <% if can_do(@context, @current_user, :manage) %>
       <a href="<%= context_url(@context, :context_statistics_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> Course Statistics</a>
-      <a href="<%= calendar_url(:include_contexts => @context.asset_string, :anchor => {:show => "group_#{@context.asset_string}"}.to_json) %>" class="button button-sidebar-wide"><%= image_tag "calendar_icon.png" %> Course Calendar</a>
+      <a href="<%= calendar_url_for(@context) %>" class="button button-sidebar-wide"><%= image_tag "calendar_icon.png" %> Course Calendar</a>
     <% end %>
     
     <% if can_do(@context, @current_user, :update) %>

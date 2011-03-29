@@ -791,7 +791,7 @@ class ApplicationController < ActionController::Base
     options[:query][:include_contexts] = contexts_to_link_to.map{|c| c.asset_string}.join(",") unless contexts_to_link_to.empty?
     calendar_url(
       options[:query].merge(options[:anchor].empty? ? {} : {
-        :anchor => options[:anchor]
+        :anchor => options[:anchor].unpack('H*') # calendar anchor is hex encoded
       })
     )
   end
