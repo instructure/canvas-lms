@@ -119,14 +119,14 @@ module TextHelper
   def truncate_text(text, options={})
     max_length = options[:max_length] || 30
     ellipsis = options[:ellipsis] || "..."
-    words = options[:words] || false
     ellipsis_length = ellipsis.length
-    content_length = text.length
     actual_length = max_length - ellipsis_length
-    if content_length > max_length
-      truncated = text[0, actual_length] + ellipsis
+
+    truncated = (text || "")[/.{0,#{actual_length}}/mu]
+    if truncated.length < text.length
+      truncated + ellipsis
     else
-      text
+      truncated
     end
   end
   
