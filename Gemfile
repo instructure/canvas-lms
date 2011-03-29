@@ -9,16 +9,17 @@ gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
 gem 'erubis',         '2.6.6'
 gem 'facebooker',     '1.0.75'
+gem 'fastercsv',      '1.5.3'
+gem 'hairtrigger',    '0.1.4'
+gem 'haml',           '3.0.22'
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
 gem 'highline',       '1.6.1'
-gem 'fastercsv',      '1.5.3'
-gem 'haml',           '3.0.22'
 gem 'hpricot',        '0.8.2'
+gem 'icalendar',      '1.1.5'
 gem 'jammit',         '0.6.0'
 gem 'json',           '1.5.1'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '1.1.3',  :require => 'xml/libxml'
-gem 'icalendar',      '1.1.5'
 gem 'mime-types',     '1.16',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
@@ -33,9 +34,8 @@ gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'rufus-scheduler','2.0.6'
 gem 'sanitize',       '1.2.1'
 gem 'uuid',           '2.3.1'
-gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 gem 'will_paginate',  '2.3.15'
-gem 'hairtrigger',    '0.1.4'
+gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 
 group :mysql do
   gem 'mysql',        '2.8.1'
@@ -46,14 +46,14 @@ group :postgres do
 end
 
 group :test do
-  gem 'sqlite3-ruby', '1.3.2'
+  gem 'bluecloth',    '2.0.10' # for generating api docs
+  gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.1'
   gem 'rspec-rails',  '1.3.3'
-  gem 'webrat',       '0.7.2'
-  gem 'rcov',         '0.9.9'
-  gem 'yard',         '0.6.3'
-  gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'selenium-webdriver', '0.1.3'
+  gem 'sqlite3-ruby', '1.3.2'
+  gem 'webrat',       '0.7.2'
+  gem 'yard',         '0.6.3'
 end
 
 group :development do
