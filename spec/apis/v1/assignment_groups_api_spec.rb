@@ -88,6 +88,7 @@ describe AssignmentGroupsController, :type => :integration do
             'name' => 'test3',
             'position' => 1,
             'points_possible' => 8,
+            'needs_grading_count' => 0,
             "submission_types" => [
               "none",
             ],
@@ -115,6 +116,7 @@ describe AssignmentGroupsController, :type => :integration do
             'name' => 'test4',
             'position' => 2,
             'points_possible' => 9,
+            'needs_grading_count' => 0,
             "submission_types" => [
               "none",
             ],
@@ -132,6 +134,7 @@ describe AssignmentGroupsController, :type => :integration do
             'name' => 'test1',
             'position' => 1,
             'points_possible' => 10,
+            'needs_grading_count' => 0,
             "submission_types" => [
               "none",
             ],
@@ -142,6 +145,7 @@ describe AssignmentGroupsController, :type => :integration do
             'name' => 'test2',
             'position' => 2,
             'points_possible' => 12,
+            'needs_grading_count' => 0,
             "submission_types" => [
               "none",
             ],

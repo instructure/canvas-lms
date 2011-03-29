@@ -17,11 +17,15 @@
 #
 
 module Api::V1::Assignment
-  def assignment_json(assignment, includes = [])
+  def assignment_json(assignment, includes = [], show_admin_fields = false)
   # no includes supported right now
   hash = assignment.as_json(:include_root => false, :only => %w(id grading_type points_possible position))
 
   hash['name'] = assignment.title
+
+  if show_admin_fields
+    hash['needs_grading_count'] = assignment.needs_grading_count
+  end
 
   hash['submission_types'] = assignment.submission_types.split(',')
 
