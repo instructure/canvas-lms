@@ -116,11 +116,6 @@ module Delayed
 
       waiting = false # avoid logging "waiting for queue" over and over
 
-      # rails always connects to the ActiveRecord::Base connection, which we
-      # don't want to ever access from this parent process; we want every
-      # child to get its own connection.
-      ActiveRecord::Base.connection_handler.clear_all_connections! unless cant_fork
-
       loop do
         job = Delayed::Job.get_and_lock_next_available(name,
                                                        self.class.max_run_time,

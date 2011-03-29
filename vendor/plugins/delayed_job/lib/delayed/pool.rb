@@ -69,7 +69,7 @@ module Delayed
           end
         end
 
-        ActiveRecord::Base.connection.disconnect!
+        ActiveRecord::Base.connection_handler.clear_all_connections!
 
         start
         join
@@ -115,7 +115,6 @@ module Delayed
       end
 
       pid = fork do
-        ActiveRecord::Base.connection.reconnect!
         worker.start
       end
       workers[pid] = worker
