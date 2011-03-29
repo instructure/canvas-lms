@@ -59,14 +59,14 @@ var moderation = {
       moderation.lastUpdatedAt = new Date(Math.max(Date.parse(submission.updated_at), moderation.lastUpdatedAt));
     }
     var state_text = "";
-    if(submission.workflow_state == 'complete' || submission.workflow_state == 'needs_review') {
+    if(submission.workflow_state == 'complete' || submission.workflow_state == 'pending_review') {
       state_text = "finished in " + submission.finished_in_words;
     }
     var data = {
       attempt: submission.attempt || '--',
       extra_time: submission.extra_time,
       extra_attempts: submission.extra_attempts,
-      score: submission.score
+      score: submission.kept_score
     };
     if(submission.attempts_left == -1) {
       data.attempts_left = '--';

@@ -12,8 +12,8 @@
       <th>Student</th>
       <th>Attempt</th>
       <th>Time</th>
-      <th>Attempts<br/>Left</th>
-      <th>Current<br/>Score</th>
+      <th style="<%= hidden if @quiz.allowed_attempts < 0 %>">Attempts<br/>Left</th>
+      <th>Score</th>
       <th style="text-align: right;">
         <a href="#" class="reload_link"><%= image_tag "ajax-reload.gif" %></a>
       </th>
@@ -57,7 +57,7 @@
           </span>
           <a href="#" class="extend_time_link no-hover"><%= image_tag "history.png", :alt => "Add Time" %></a>
         </td>
-        <td class="attempts_left number">
+        <td class="attempts_left number" style="<%= hidden if @quiz.allowed_attempts < 0 %>">
           <% if @quiz.allowed_attempts < 0 %>
             -- 
           <% elsif submission %>
@@ -67,7 +67,7 @@
           <% end %>
         </td>
         <td class="score_holder">
-          <span class="score"><%= submission && submission.score %></span>
+          <span class="score"><%= submission && submission.kept_score %></span>
         </td>
         <td class="links">
           <span class="unlocked" title="Manually Unlocked" style="<%= hidden unless submission && submission.manually_unlocked %>"><%= image_tag "unlock.png" %></span>
