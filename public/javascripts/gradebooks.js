@@ -25,24 +25,45 @@ var gradebook = (function(){
       $curve_grade_dialog = $("#curve_grade_dialog"),
       $message_students_dialog = $("#message_students_dialog"),
       $information_link = $("#information_link"),
-      $total_tooltip = $("#total_tooltip"),
+      $total_tooltip = $("#total_tooltip").appendTo('body'),
       content_offset = $("#content").offset(),
       context_code = $("#gradebook_full_content").data('context_code'),
       ignoreUngradedSubmissions = true;
-  $("body").append($total_tooltip);
+      
+      
+  // ==================================================
+  // = begin stuff to handle showing only one section =
+  // ==================================================
   var possibleSections = {},
-      $courseSections = $(".outer_student_name .course_section").each(function(){
-        possibleSections[$(this).data('course_section_id')] = $(this).attr('title'); 
-      }),
+      $courseSections  = $(".outer_student_name .course_section"),
       contextId = $("#current_context_code").text().split("_")[1],
       sectionToShow = $.store.userGet("grading_show_only_section" + contextId);
+      
+  $courseSections.each(function(){
+    possibleSections[$(this).data('course_section_id')] = $(this).attr('title'); 
+  }); 
   
   if (sectionToShow) {
-    var atLeastOnePersonExistsInThisSection = false;
+    var atLeastOnePersonExistsInThisSection = false,
+        keptPersonCount = 0;
+    // have to clear out all of the row_xxx entries in the id_maps object,
+    // because we are going to get rid of a bunch of the students
+    // we will re-add them for the students we keep
+    $.each(id_maps, function(k, v) {
+      if (k.match('row_')) {
+        delete id_maps[k];
+      }
+    });
+    
     $courseSections.add('.gradebook_table .course_section').each(function() {
       if ($(this).data('course_section_id') != sectionToShow){
         $(this).closest('tr').remove();
       } else {
+        var studentId = $(this).closest('.student_header').attr('id');
+        if (studentId) {
+          ++keptPersonCount;
+          id_maps['row_' + keptPersonCount] = Number(studentId.replace('student_', ''));
+        }
         atLeastOnePersonExistsInThisSection = true;
       }
     });
@@ -52,6 +73,10 @@ var gradebook = (function(){
       window.location.reload();
     }
   }
+  // =============================================
+  // = end stuff to handle more than one section =
+  // =============================================
+  
   
   var gradebook = {
     hoverCount: -1,
@@ -1068,7 +1093,7 @@ var gradebook = (function(){
       };
       
       
-      
+      // handle showing only one section
       if ($.size(possibleSections) > 1) {  
         var sectionToShowLabel = sectionToShow ? 
                                     ('Showing Section: ' + possibleSections[sectionToShow]) : 
