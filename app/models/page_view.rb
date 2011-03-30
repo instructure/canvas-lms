@@ -129,6 +129,7 @@ class PageView < ActiveRecord::Base
 
   def do_update(params = {})
     updated_at = params['updated_at'] || self.updated_at || Time.now
+    updated_at = Time.parse(updated_at) if updated_at.is_a?(String)
     self.contributed ||= params['page_view_contributed'] || params['contributed']
     seconds = self.interaction_seconds || 0
     if params['interaction_seconds'].to_i > 0
@@ -173,7 +174,8 @@ class PageView < ActiveRecord::Base
           page_view.save
         else
           # request_id is primary key, so auto-protected from mass assignment
-          self.create(attrs) { |p| p.request_id = attrs['request_id'] }
+          request_id = attrs.delete('request_id')
+          self.create(attrs) { |p| p.request_id = request_id }
         end
       end
     ensure
