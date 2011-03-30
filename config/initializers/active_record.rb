@@ -171,22 +171,6 @@ class ActiveRecord::Base
   def context_url_prefix
     "#{self.context_type.downcase.pluralize}/#{self.context_id}"
   end
-  
-  def send_later_if_production(*args)
-    if ENV['RAILS_ENV'] == 'production'
-      send_later(*args)
-    else
-      send(*args)
-    end
-  end
-
-  def self.send_later_if_production(*args)
-    if ENV['RAILS_ENV'] == 'production'
-      send_later(*args)
-    else
-      send(*args)
-    end
-  end
 
   # Example: 
   # obj.to_json(:permissions => {:user => u, :policies => [:read, :write, :update]})

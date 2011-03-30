@@ -28,3 +28,21 @@ Delayed::Worker.on_max_failures = proc do |job, err|
   # by default, keep failed jobs around for investigation
   false
 end
+
+class Object
+  def send_later_if_production(*args)
+    if Rails.env.production?
+      send_later(*args)
+    else
+      send(*args)
+    end
+  end
+
+  def send_later_if_production_enqueue_args(method, enqueue_args, *args)
+    if Rails.env.production?
+      send_later_enqueue_args(method, enqueue_args, *args)
+    else
+      send(method, *args)
+    end
+  end
+end

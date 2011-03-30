@@ -106,7 +106,10 @@ module Instructure #:nodoc:
             return false 
           end
           to_list = Array[to_list].flatten
-          n = DelayedNotification.send_later_if_production(:process, record, notification, (to_list || []).compact.map(&:asset_string))
+          n = DelayedNotification.send_later_if_production_enqueue_args(
+            :process,
+            { :priority => Delayed::LOW_PRIORITY },
+            record, notification, (to_list || []).compact.map(&:asset_string))
           n ||= DelayedNotification.new(:asset => record, :notification => notification, :recipient_keys => (to_list || []).compact.map(&:asset_string))
           if Rails.env.test?
             record.messages_sent[self.dispatch] = n.is_a?(DelayedNotification) ? n.process : n
