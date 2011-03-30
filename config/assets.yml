@@ -1,6 +1,8 @@
 javascript_compressor: closure
 embed_assets: off
 gzip_assets: off
+css_compressor_options:
+  line_break: 0
 
 javascripts:
   common:

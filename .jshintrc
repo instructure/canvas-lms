@@ -1,0 +1,11 @@
+{
+  "browser": true,
+  "onevar": false,
+  "jquery": true,
+  "asi": true,
+  "plusplus": false,
+  "curly": true,
+  "forin": true,
+  "strict": false,
+  "undef": true
+}
