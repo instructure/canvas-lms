@@ -45,6 +45,7 @@ module Delayed
         raise ArgumentError,
           "Invalid config file #{config_filename}"
       end
+      logger.auto_flushing = true
     end
 
     def environment
@@ -57,16 +58,29 @@ module Delayed
         @files_to_reopen << file unless file.closed?
       end
       Daemons.run_proc('delayed_jobs_pool',
-                       :dir => "#{RAILS_ROOT}/tmp/pids",
+                       :dir => "#{Rails.root}/tmp/pids",
                        :dir_mode => :normal) do
-        Dir.chdir(RAILS_ROOT)
+
+        Dir.chdir(Rails.root)
+        log_path = Rails.root+"log/delayed_job.log"
+
         # Re-open file handles
         @files_to_reopen.each do |file|
           begin
-            file.reopen File.join(RAILS_ROOT, 'log', 'delayed_job.log'), 'a+'
+            file.reopen(log_path, 'a+')
             file.sync = true
           rescue ::Exception
           end
+        end
+
+        if $0 == 'delayed_jobs_pool'
+          # TODO: Daemons library doesn't provide a great way to redirect
+          # stdout/stderr to an arbitrary log file, and it also doesn't provid
+          # a great way to detect if we actually daemonized (or if we're
+          # running in the FG).
+          STDOUT.reopen(log_path, 'a+')
+          STDERR.reopen(STDOUT)
+          STDOUT.sync = STDERR.sync = true
         end
 
         ActiveRecord::Base.connection_handler.clear_all_connections!
