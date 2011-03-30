@@ -194,7 +194,7 @@ module Canvas::CC
                 :title => group['name']
         ) do |section_node|
           section_node.selection_ordering do |so_node|
-            section_node.selection do |sel_node|
+            so_node.selection do |sel_node|
               if group[:assessment_question_bank_id]
                 if bank = @course.assessment_question_banks.find(group[:assessment_question_bank_id])
                   sel_node.sourcebank_ref create_key(bank)

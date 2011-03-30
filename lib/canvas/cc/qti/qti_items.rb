@@ -250,7 +250,7 @@ module Canvas::CC
       def item_feedback(node, id, message)
         node.itemfeedback(:ident=>id) do |f_node|
           f_node.flow_mat do |flow_node|
-            f_node.material do |m_node|
+            flow_node.material do |m_node|
               m_node.mattext(message, :texttype=>'text')
             end
           end

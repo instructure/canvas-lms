@@ -19,13 +19,14 @@ module Canvas::CC
   class Manifest
     include CCHelper
     
-    attr_accessor :exporter, :weblinks
+    attr_accessor :exporter, :weblinks, :basic_ltis
 
     def initialize(exporter)
       @exporter = exporter
       @file = nil
       @document = nil
       @weblinks = []
+      @basic_ltis = []
     end
     
     def course

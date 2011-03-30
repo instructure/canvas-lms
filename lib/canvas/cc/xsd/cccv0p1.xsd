@@ -379,5 +379,34 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
+  <xs:element name="externalTools">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="externalTool" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="0"/>
+              <xs:element name="url" type="xs:anyURI" minOccurs="0"/>
+              <xs:element name="description" type="xs:string" minOccurs="0"/>
+              <xs:element name="domain" type="xs:string" minOccurs="0"/>
+              
+              <xs:element name="privacy_level" minOccurs="1" default="full">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="name_only"/>
+                    <xs:enumeration value="public"/>
+                    <xs:enumeration value="anonymous"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>

@@ -24,6 +24,7 @@ module Canvas::CC
     include TopicResources
     include WebResources
     include WebLinks
+    include BasicLTILinks
 
     def initialize(manifest, manifest_node)
       @manifest = manifest
@@ -49,8 +50,8 @@ module Canvas::CC
         add_web_links
         add_course_files
         QTI::QTIGenerator.generate_qti(@manifest, resources)
+        create_basic_lti_links
         #todo download kaltura videos?
-        #todo basic LTI links
       end
     end
   end

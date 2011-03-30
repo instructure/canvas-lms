@@ -45,6 +45,7 @@ module Canvas::CC
       resources << create_grading_standards
       resources << create_learning_outcomes
       resources << create_rubrics
+      resources << create_external_tools
       
       @resources.resource(
               :identifier => migration_id,

@@ -39,6 +39,7 @@ module CCHelper
   #WEB_LINK = "imswl_xmlv1p1"
   WEB_LINK = "imswl_xmlv1p0"
   WEBCONTENT = "webcontent"
+  BASIC_LTI = 'imsbasiclti_xmlv1p0'
   
   # substitution tokens
   OBJECT_TOKEN = "$CANVAS_OBJECT_REFERENCE$"
@@ -60,6 +61,7 @@ module CCHelper
   MANIFEST = 'imsmanifest.xml'
   MODULE_META = "module_meta.xml"
   RUBRICS = "rubrics.xml"
+  EXTERNAL_TOOLS = "external_tools.xml"
   SYLLABUS = "syllabus.html"
   WEB_RESOURCES_FOLDER = 'web_resources'
   WIKI_FOLDER = 'wiki_content'
