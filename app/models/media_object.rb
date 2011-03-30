@@ -144,6 +144,7 @@ class MediaObject < ActiveRecord::Base
       self.title = entry[:name]
       self.media_type = client.mediaTypeToSymbol(entry[:mediaType]).to_s
       self.duration = entry[:duration].to_i
+      self.data[:plays] = entry[:plays].to_i
     end
     assets = client.flavorAssetGetByEntryId(self.media_id)
     self.data[:extensions] ||= {}
@@ -169,11 +170,33 @@ class MediaObject < ActiveRecord::Base
     data
   end
   
+  def delete_from_remote
+    return unless self.media_id
+
+    client = Kaltura::ClientV3.new
+    client.startSession(Kaltura::SessionType::ADMIN)
+    client.mediaDelete(self.media_id)
+  end
+  
   alias_method :destroy!, :destroy
   def destroy
-    self.workflow_state = 'deleted' #destroy
+    self.workflow_state = 'deleted'
     self.attachment.destroy if self.attachment
     save!
+  end
+  
+  def data
+    self.read_attribute(:data) || self.write_attribute(:data, {})
+  end
+
+  def viewed!
+    send_later(:updated_viewed_at_and_retrieve_details, Time.now) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
+    true
+  end
+    
+  def updated_viewed_at_and_retrieve_details(time)
+    self.data[:last_viewed_at] = [time, self.data[:last_viewed_at]].compact.max
+    self.retrieve_details
   end
   
   def destroy_without_destroying_attachment

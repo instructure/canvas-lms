@@ -17,7 +17,7 @@
 #
 
 class ContextController < ApplicationController
-  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :context_message_reply]
+  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :context_message_reply, :media_object_redirect, :media_object_inline]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image]
   protect_from_forgery :except => [:kaltura_notifications]
   
@@ -75,6 +75,24 @@ class ContextController < ApplicationController
         @media_object.save
       end
       render :json => @media_object.to_json
+    end
+  end
+  
+  def media_object_inline
+    @show_left_side = false
+    @show_right_side = false
+    @media_object = MediaObject.find_by_media_id(params[:id])
+    render
+  end
+  
+  def media_object_redirect
+    mo = MediaObject.find_by_media_id(params[:id])
+    mo.viewed! if mo
+    config = Kaltura::ClientV3.config
+    if config
+      redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id])
+    else
+      render :text => "Media Objects not configured"
     end
   end
   

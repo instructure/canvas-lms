@@ -46,7 +46,9 @@ module Kaltura
     end
     
     def self.config
-      Canvas::Plugin.find(:kaltura).try(:settings)
+      res = Canvas::Plugin.find(:kaltura).try(:settings)
+      res = nil unless res && res['partner_id'] && res['subpartner_id']		
+      res
     end
     
     def startSession(type = SessionType::USER, userId = nil)
@@ -85,6 +87,15 @@ module Kaltura
         item[child.name.to_sym] = child.content
       end
       item
+    end
+    
+    def mediaDelete(entryId)
+      hash = {
+        :ks => @ks,
+        :entryId => entryId
+      }
+      result = sendRequest(:media, :delete, hash)
+      result
     end
     
     def mediaTypeToSymbol(type)
@@ -180,6 +191,12 @@ module Kaltura
                            :ks => @ks,
                            :id => assetId)
       return result.content
+    end
+    
+    def assetSwfUrl(assetId)
+      config = Kaltura::ClientV3.config
+      return nil unless config
+      "http://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
     end
     
     @private

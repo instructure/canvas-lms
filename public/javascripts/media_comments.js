@@ -140,7 +140,7 @@
           bgcolor: "#000000",
           wmode: 'opaque'
         };
-        var url = "http://" + INST.kalturaSettings.domain + "/kwidget/wid/_" + INST.kalturaSettings.partner_id + "/uiconf_id/" + INST.kalturaSettings.player_ui_conf + "/entry_id/" + id;
+        var url = "/media_objects/" + id + "/redirect";
         var width = Math.min($holder.closest("div,p,table").width() || 550, 550);
         var height = width / 550 * 448;
         if(mediaType == 'audio') {
@@ -174,7 +174,7 @@
         allowFullScreen: true,
         bgcolor: "#000000"
       };
-      var url = "http://" + INST.kalturaSettings.domain + "/index.php/kwidget/wid/_" + INST.kalturaSettings.partner_id + "/uiconf_id/" + INST.kalturaSettings.player_ui_conf + "/entry_id/" + id;
+      var url = "/media_objects/" + id + "/redirect";
       var $dialog = $("#media_comment_player_dialog");
       if($dialog.length === 0) {
         $dialog = $("<div id='media_comment_player_dialog'/>");

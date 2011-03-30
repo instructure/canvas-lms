@@ -21,7 +21,7 @@
       ed.addCommand('instructureRecord', function() {
         var $editor = $("#" + ed.id);
         $.mediaComment('create', 'any', function(id, mediaType) {
-          $editor.editorBox('insert_code', "<a href='#' class='instructure_inline_media_comment " + (mediaType || "video") + "_comment' id='media_comment_" + id + "'>this is a media comment</a><br>");
+          $editor.editorBox('insert_code', "<a href='/media_objects/" + id + "' class='instructure_inline_media_comment " + (mediaType || "video") + "_comment' id='media_comment_" + id + "'>this is a media comment</a><br>");
           ed.selection.select($(ed.getBody()).find("#media_comment_"+id+" + br")[0]);
           ed.selection.collapse(true);
         })
