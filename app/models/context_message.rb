@@ -129,7 +129,7 @@ class ContextMessage < ActiveRecord::Base
         new_user_ids << user.id
       end
     end
-    send_later(:add_new_recipients, new_user_ids) unless new_user_ids.empty?
+    add_new_recipients(new_user_ids) unless new_user_ids.empty?
   end
   
   def add_new_recipients(user_ids)
