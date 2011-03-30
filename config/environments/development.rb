@@ -25,9 +25,7 @@ SslRequirement.standard_host = "localhost:3000"
 SslRequirement.disable_ssl_check = true
 
 # eval <env>-local.rb if it exists
-(File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-local.rb").tap { |localfile|
-  eval(File.new(localfile).read) if FileTest.exists?(localfile)
-}
+Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
 # allow debugging only in development environment by default
 require "ruby-debug"

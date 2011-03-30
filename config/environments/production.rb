@@ -18,6 +18,4 @@ config.action_view.cache_template_loading            = true
 # SslRequirement.disable_ssl_check = true
 
 # eval <env>-local.rb if it exists
-(File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-local.rb").tap { |localfile|
-  eval(File.new(localfile).read) if FileTest.exists?(localfile)
-}
+Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
