@@ -87,6 +87,7 @@ class ContextController < ApplicationController
   
   def media_object_redirect
     mo = MediaObject.find_by_media_id(params[:id])
+    mo ||= MediaObject.find_by_old_media_id(params[:id])
     mo.viewed! if mo
     config = Kaltura::ClientV3.config
     if config

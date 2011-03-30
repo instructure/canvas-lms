@@ -138,22 +138,30 @@ module Kaltura
       data
     end
     
+    def bulkUploadCsv(csv)
+      result = postRequest(:bulkUpload, :add,
+                           :ks => @ks,
+                           :conversionProfileId => -1,
+                           :csvFileData => StringIO.new(csv)
+                       )
+      parseBulkUpload(result)
+      # results will have entryId values -- do we get them right away?
+    end
+    
     def bulkUploadAdd(files)
       rows = []
       files.each do |file|
         filename = (file[:name] || "Media File").gsub(/,/, "")
         description = (file[:description] || "no description").gsub(/,/, "")
         url = file[:url]
-        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:id] || ''].join(',') if file[:url]
+        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:id] || ''] if file[:url]
       end
-      csv = rows.join("\n")
-      result = postRequest(:bulkUpload, :add,
-                           :ks => @ks,
-                           :conversionProfileId => -1,
-                           :csvFileData => StringIO.new(rows.join("\r\n"))
-                       )
-      parseBulkUpload(result)
-      # results will have entryId values -- do we get them right away?
+      res = FasterCSV.generate do |csv|
+        rows.each do |row|
+          csv << row
+        end
+      end
+      bulkUploadCsv(res)
     end
     
     def flavorAssetGetByEntryId(entryId)

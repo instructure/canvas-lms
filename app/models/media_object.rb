@@ -21,6 +21,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :user
   belongs_to :context, :polymorphic => true
   belongs_to :attachment
+  belongs_to :root_account, :class_name => 'Account'
   validates_presence_of :media_id, :context_id, :context_type
   before_save :infer_defaults
   after_create :retrieve_details_later
@@ -49,6 +50,7 @@ class MediaObject < ActiveRecord::Base
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)
     files = []
+    root_account_id = attachments.map{|a| a.namespace.split(/_/)[1] }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
       files << {
                   :name       => attachment.display_name,
@@ -59,42 +61,74 @@ class MediaObject < ActiveRecord::Base
     end
     res = client.bulkUploadAdd(files)
     if !res[:ready]
-      MediaObject.send_at(1.minute.from_now, :refresh_media_files, res[:id], attachments.map(&:id))
+      MediaObject.send_at(1.minute.from_now, :refresh_media_files, res[:id], attachments.map(&:id), root_account_id)
     else
-      build_media_objects(res)
+      build_media_objects(res, root_account_id)
     end
     res
   end
   
-  def self.build_media_objects(data)
-    data[:entries].each do |entry|
-      attachment = Attachment.find_by_id(entry[:originalId])
-      if attachment
-        mo = MediaObject.find_or_initialize_by_media_id(entry[:entryId])
-        mo.context = attachment.context
-        mo.title ||= entry[:name]
-        mo.user_id ||= attachment.user_id
-        mo.attachment_id = attachment.id
-        mo.save
-        attachment.update_attribute(:media_entry_id, entry[:entryId])
+  def self.bulk_migration(csv, root_account_id)
+    client = Kaltura::ClientV3.new
+    client.startSession(Kaltura::SessionType::ADMIN)
+    res = client.bulkUploadCsv(csv)
+    if !res[:ready]
+      MediaObject.send_at(1.minute.from_now, :refresh_media_files, res[:id], [], root_account_id)
+    else
+      build_media_objects(res, root_account_id)
+    end
+    res
+  end
+  
+  def self.migration_csv(media_objects)
+    FasterCSV.generate do |csv|
+      media_objects.each do |mo|
+        mo.retrieve_details unless mo.data[:download_url]
+        if mo.data[:download_url]
+          row = []
+          row << mo.title
+          row << ""
+          row << "old_id_#{mo.media_id}"
+          row << mo.data[:download_url]
+          row << mo.media_type.capitalize
+          csv << row
+        end
       end
     end
   end
   
-  def self.refresh_media_files(bulk_upload_id, attachment_ids, attempt=0)
+  def self.build_media_objects(data, root_account_id)
+    root_account = Account.find_by_id(root_account_id)
+    data[:entries].each do |entry|
+      attachment = Attachment.find_by_id(entry[:originalId])
+      mo = MediaObject.find_or_initialize_by_media_id(entry[:entryId])
+      mo.root_account ||= root_account || Account.default
+      mo.title ||= entry[:name]
+      if attachment
+        mo.user_id ||= attachment.user_id
+        mo.context = attachment.context
+        mo.attachment_id = attachment.id
+        attachment.update_attribute(:media_entry_id, entry[:entryId])
+      end
+      mo.context ||= mo.root_account
+      mo.save
+    end
+  end
+  
+  def self.refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt=0)
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)
     res = client.bulkUploadGet(bulk_upload_id)
     if !res[:ready]
       if attempt < 5
-        MediaObject.send_at(10.minute.from_now, :refresh_media_files, bulk_upload_id, attachment_ids, attempt + 1) 
+        MediaObject.send_at(10.minute.from_now, :refresh_media_files, bulk_upload_id, attachment_ids, root_account_id, attempt + 1) 
       else
         # if it fails, then the attachment should no longer consider itself kalturable
-        Attachment.update_all({:media_entry_id => nil}, "id IN (#{attachment_ids.join(",")}) OR root_attachment_id IN (#{attachment_ids.join(",")})") unless attachment_ids.empty? #['id = ? OR root_attachment_id = ?', self.attachment_id, self.attachment_id]) if self.attachment_id
+        Attachment.update_all({:media_entry_id => nil}, "id IN (#{attachment_ids.join(",")}) OR root_attachment_id IN (#{attachment_ids.join(",")})") unless attachment_ids.empty?
       end
       res
     else
-      build_media_objects(res)
+      build_media_objects(res, root_account_id)
     end
   end
   
@@ -145,10 +179,15 @@ class MediaObject < ActiveRecord::Base
       self.media_type = client.mediaTypeToSymbol(entry[:mediaType]).to_s
       self.duration = entry[:duration].to_i
       self.data[:plays] = entry[:plays].to_i
+      self.data[:download_url] = entry[:downloadUrl]
+      tags = (entry[:tags] || "").split(/,/).map(&:strip)
+      old_id = tags.detect{|t| t.match(/old_id_/) }
+      self.old_media_id = old_id.sub(/old_id_/, '') if old_id
     end
     assets = client.flavorAssetGetByEntryId(self.media_id)
     self.data[:extensions] ||= {}
     assets.each do |asset|
+      asset[:fileExt] = "none" if asset[:fileExt].blank?
       self.data[:extensions][asset[:fileExt].to_sym] = asset #.slice(:width, :height, :id, :entryId, :status, :containerFormat, :fileExt, :size
       if asset[:size]
         self.max_size = [self.max_size || 0, asset[:size].to_i].max
@@ -188,6 +227,7 @@ class MediaObject < ActiveRecord::Base
   def data
     self.read_attribute(:data) || self.write_attribute(:data, {})
   end
+  
 
   def viewed!
     send_later(:updated_viewed_at_and_retrieve_details, Time.now) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
