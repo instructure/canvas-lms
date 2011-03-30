@@ -365,7 +365,28 @@ describe SIS::SisCsv do
       course.designers.first.name.should == "User Cinco"
     end
 
-
+    it "should not try looking up a section to enroll into if the section name is empty" do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active",
+        "test_2,TC 102,Test Course 102,,,active"
+      )
+      bad_course = @account.courses.find_by_sis_source_id("test_1")
+      bad_course.course_sections.length.should == 1
+      good_course = @account.courses.find_by_sis_source_id("test_2")
+      good_course.course_sections.length.should == 1
+      process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active"
+      )
+      importer = process_csv_data(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_2,user_1,teacher,,active,"
+      )
+      importer.warnings.length.should == 0
+      importer.errors.length.should == 0
+      good_course.teachers.first.name.should == "User Uno"
+    end
   end
 
   context 'account importing' do

@@ -41,8 +41,8 @@ module SIS
         update_progress
         pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, row['user_id'])
         user = pseudo.user rescue nil
-        course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id'])
-        section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
+        course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id']) unless row['course_id'].blank?
+        section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id']) unless row['section_id'].blank?
         unless user && (course || section)
           add_warning csv, "Neither course #{row['course_id']} nor section #{row['section_id']} existed for user enrollment" unless (course || section)
           add_warning csv, "User #{row['user_id']} didn't exist for user enrollment" unless user
