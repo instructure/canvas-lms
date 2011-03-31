@@ -26,14 +26,13 @@ module SIS
     end
     
     def verify(csv, verify)
-      #section ids only need to be unique per course
+      # section ids must be unique across the account
       section_ids = (verify[:sections_id] ||= {})
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         section_id = row['section_id']
         course_id = row['course_id']
-        add_error(csv, "Duplicate section id #{section_id} for course #{course_id}") if section_ids[section_id] && section_ids[section_id][course_id]
-        section_ids[section_id] ||= {}
-        section_ids[section_id][course_id] = true
+        add_error(csv, "Duplicate section id #{section_id}") if section_ids[section_id]
+        section_ids[section_id] = true
         add_error(csv, "No section_id given for a section in course #{course_id}") if section_id.blank?
         add_error(csv, "No course_id given for a section #{section_id}") if course_id.blank?
         add_error(csv, "No name given for section #{section_id} in course #{course_id}") if row['name'].blank?

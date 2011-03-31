@@ -496,17 +496,17 @@ describe SIS::SisCsv do
         "S001,C001,Sec2,,,active",
         "S002,,Sec2,,,active",
         ",C001,Sec2,,,active",
-        "S001,C002,Sec1,,,inactive",
-        "S003,C002,,,,active"
+        "S003,C002,Sec1,,,inactive",
+        "S004,C002,,,,active"
       )
       CourseSection.count.should == before_count
 
       errors = importer.errors.map { |r| r.last }
-      errors.should == ["Duplicate section id S001 for course C001",
+      errors.should == ["Duplicate section id S001",
                         "No course_id given for a section S002",
                         "No section_id given for a section in course C001",
-                        "Improper status \"inactive\" for section S001 in course C002",
-                        "No name given for section S003 in course C002"]
+                        "Improper status \"inactive\" for section S003 in course C002",
+                        "No name given for section S004 in course C002"]
     end
     
     it 'should create sections' do
