@@ -40,7 +40,7 @@ module Canvas::CC
               "short_answer_question" => 'short_answer',
               "essay_question" => 'essay',
               "matching_question" => 'matching',
-              "missing_word_question" => 'missing_word',
+              "missing_word_question" => 'multiple_dropdowns',
               "multiple_dropdowns_question" => 'multiple_dropdowns',
               "fill_in_multiple_blanks_question" => 'fill_in_multiple_blanks',
               "numerical_question" => 'numerical',
@@ -48,6 +48,12 @@ module Canvas::CC
               "text_only_question" => 'text_only'
       }
       
+      # These types don't stop processing response conditions once the correct
+      # answer is found, so they need to show the incorrect response differently
+      NO_INCORRECT_COND = ['matching_question', 
+                           'multiple_dropdowns_question', 
+                           'fill_in_multiple_blanks_question']
+
       # if the question is a supported CC type it will be added
       # it it's not supported it's just skipped
       # returns boolean - whether the question was added
@@ -80,7 +86,7 @@ module Canvas::CC
               html = CCHelper.html_content(question['question_text'] || '', @course, @manifest.exporter.user)
               mat_node.mattext html, :texttype=>'text/html'
             end
-            response_str(pres_node, question)
+            presentation_options(pres_node, question)
           end # presentation
           
           item_node.resprocessing do |res_node|
@@ -109,11 +115,19 @@ module Canvas::CC
       
       ## question response_str methods
       
-      def response_str(node, question)
+      def presentation_options(node, question)
         if ['multiple_choice_question', 'true_false_question', 'multiple_answers_question'].member? question['question_type']
           multiple_choice_response_str(node, question)
         elsif ['short_answer_question', 'essay_question'].member? question['question_type']
           short_answer_response_str(node, question)
+        elsif question['question_type'] == 'matching_question'
+          matching_response_lid(node, question)
+        elsif question['question_type'] == 'missing_word_question'
+          missing_word_response_lid(node, question)
+        elsif question['question_type'] == 'multiple_dropdowns_question'
+          multiple_dropdowns_response_lid(node, question)
+        elsif question['question_type'] == 'fill_in_multiple_blanks_question'
+          multiple_dropdowns_response_lid(node, question)
         end
       end
       
@@ -137,12 +151,64 @@ module Canvas::CC
         end
       end
       
+      def matching_response_lid(node, question)
+        question['answers'].each do |answer|
+          node.response_lid(:ident=>"response_#{answer['id']}") do |lid_node|
+            lid_node.material do |mat_node|
+              mat_node.mattext answer['text']
+            end
+            
+            lid_node.render_choice do |rc_node|
+              question['matches'].each do |match|
+                rc_node.response_label(:ident=>match['match_id']) do |r_node|
+                  r_node.material do |mat_node|
+                    mat_node.mattext match['text']
+                  end
+                end #r_node
+              end
+            end #rc_node
+          end #lid_node
+        end
+      end
+      
       def short_answer_response_str(node, question)
         node.response_str(
                 :ident => "response1",
                 :rcardinality => 'Single'
         ) do |r_node|
           r_node.render_fib {|n| n.response_label(:ident=>'answer1', :rshuffle=>'No')}
+        end
+      end
+      
+      def missing_word_response_lid(node, question)
+        # Convert this to a multiple_dropdowns_question then send it on its way
+        question['question_text'] = "#{question['question_text']} [drop1] #{question['text_after_answers']}"
+        question['answers'].each do |answer|
+          answer['blank_id'] = 'drop1'
+        end
+        question['question_type'] = 'multiple_dropdowns_question'
+        
+        multiple_dropdowns_response_lid(node, question)
+      end
+      
+      def multiple_dropdowns_response_lid(node, question)
+        groups = question['answers'].group_by{|a|a[:blank_id]}
+        
+        groups.each_pair do |id, answers|
+          node.response_lid(:ident=>"response_#{id}") do |lid_node|
+            lid_node.material do |mat_node|
+              mat_node.mattext id
+            end
+            lid_node.render_choice do |rc_node|
+              answers.each do |answer|
+                rc_node.response_label(:ident=>answer['id']) do |r_node|
+                  r_node.material do |mat_node|
+                    mat_node.mattext answer['text']
+                  end
+                end # r_node
+              end
+            end # rc_node
+          end # lid_node
         end
       end
 
@@ -153,16 +219,8 @@ module Canvas::CC
           other_respcondition(node, 'Yes', 'general_fb')
         end
         
-        #answer-specific comments
-        question['answers'].each do |answer|
-          unless answer['comments'].blank?
-            node.respcondition(:continue=>'Yes') do |res_node|
-              res_node.conditionvar do |c_node|
-                c_node.varequal answer['id'], :respident=>"response1"
-              end #c_node
-              node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>"#{answer['id']}_fb")
-            end
-          end
+        unless question['question_type'] == 'matching_question'
+          answer_feedback_respconditions(node, question)
         end
         
         # question type specific resprocessing
@@ -174,9 +232,15 @@ module Canvas::CC
           short_answer_resprocessing(node, question)
         elsif question['question_type'] == 'essay_question'
           essay_resprocessing(node, question)
+        elsif question['question_type'] == 'matching_question'
+          matching_resprocessing(node, question)
+        elsif question['question_type'] == 'multiple_dropdowns_question'
+          multiple_dropdowns_resprocessing(node, question)
+        elsif question['question_type'] == 'fill_in_multiple_blanks_question'
+          multiple_dropdowns_resprocessing(node, question)
         end
         
-        if !question['incorrect_comments'].blank?
+        if !question['incorrect_comments'].blank? && !NO_INCORRECT_COND.member?(question['question_type'])
           other_respcondition(node, 'Yes', 'general_incorrect_fb')
         end
       end
@@ -231,8 +295,70 @@ module Canvas::CC
         other_respcondition(node)
       end
       
-      def other_respcondition(node, continue='No', feedback_ref=nil)
+      def matching_resprocessing(node, question)
+        return nil unless question['answers'] && question['answers'].count > 0
         
+        correct_points = 100.0 / question['answers'].count
+        correct_points = "%.2f" % correct_points
+        
+        question['answers'].each do |answer|
+          node.respcondition do |r_node|
+            r_node.conditionvar do |c_node|
+              c_node.varequal(answer['match_id'], :respident=>"response_#{answer['id']}")
+            end
+            r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
+          end
+          
+          unless answer['comments'].blank?
+            node.respcondition do |r_node|
+              r_node.conditionvar do |c_node|
+                c_node.not do |n_node|
+                  c_node.varequal(answer['match_id'], :respident=>"response_#{answer['id']}")
+                end
+              end
+              r_node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>"#{answer['id']}_fb")
+            end
+          end
+        end
+      end
+      
+      def multiple_dropdowns_resprocessing(node, question)
+        groups = question['answers'].group_by{|a|a[:blank_id]}
+        correct_points = 100.0 / groups.length
+        correct_points = "%.2f" % correct_points
+        
+        groups.each_pair do |id, answers|
+          answer = answers.find{|a| a['weight'] > 0}
+          node.respcondition do |r_node|
+            r_node.conditionvar do |c_node|
+              c_node.varequal(answer['id'], :respident=>"response_#{id}")
+            end
+            r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
+          end
+        end
+        
+      end
+      
+      # feedback helpers
+      
+      def answer_feedback_respconditions(node, question)
+        question['answers'].each do |answer|
+          unless answer['comments'].blank?
+            respident = 'response1'
+            if NO_INCORRECT_COND.member? question['question_type']
+              respident = "response_#{answer['blank_id']}"
+            end
+            node.respcondition(:continue=>'Yes') do |res_node|
+              res_node.conditionvar do |c_node|
+                c_node.varequal answer['id'], :respident=>respident
+              end #c_node
+              node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>"#{answer['id']}_fb")
+            end
+          end
+        end
+      end
+      
+      def other_respcondition(node, continue='No', feedback_ref=nil)
         node.respcondition(:continue=>continue) do |res_node|
           res_node.conditionvar do |c_node|
             c_node.other
