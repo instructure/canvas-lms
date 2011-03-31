@@ -430,7 +430,7 @@
     xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*');
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     if(not_binary) {
-      xhr.send();
+      xhr.send(body);
     } else {
       if(!xhr.sendAsBinary) {
         console.log('xhr.sendAsBinary not supported');

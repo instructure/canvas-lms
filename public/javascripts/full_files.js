@@ -1682,7 +1682,7 @@ var fileStructureData = [];
       $dialog.dialog('close').dialog({
         autoOpen: false,
         width: 600,
-        height: 400
+        height: 410
       }).dialog('open');
       $.ajax({
         dataType: 'json',
