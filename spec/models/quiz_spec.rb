@@ -407,6 +407,17 @@ describe Quiz do
       new_q.assignment.assignment_group.should_not eql(ag)
       new_q.assignment.assignment_group.context.should eql(@course)
     end
+    
+    it "should not blow up when a quiz question has a link to the quiz it's in" do
+      q = @course.quizzes.create!(:title => "some quiz")
+      question_text = "<a href='/courses/#{@course.id}/quizzes/#{q.id}/edit'>hi</a>"
+      q.quiz_questions.create!(:question_data => { :name => "test 1", :question_text => question_text })
+      q.generate_quiz_data
+      q.save
+      course
+      new_q = q.clone_for(@course)
+      new_q.quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
+    end
   end
   
   describe "Quiz with QuestionGroup pointing to QuestionBank" do

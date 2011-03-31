@@ -635,7 +635,7 @@ class Quiz < ActiveRecord::Base
   end
   
   attr_accessor :clone_updated
-  def clone_for(context, original_dup=nil, options={})
+  def clone_for(context, original_dup=nil, options={}, retrying = false)
     dup = original_dup
     if !self.cloned_item && !self.new_record?
       self.cloned_item ||= ClonedItem.create(:original_item => self)
@@ -652,6 +652,11 @@ class Quiz < ActiveRecord::Base
     self.attributes.delete_if{|k,v| [:id, :assignment_id, :assignment_group_id].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
+    # We need to save the quiz now so that the migrate_question_hash call will find
+    # the duplicated quiz and not try to make it itself.
+    dup.context = context
+    dup.saved_by = :assignment if options[:cloning_for_assignment]
+    dup.save!
     data = self.quiz_data
     if data
       data.each_with_index do |obj, idx|
@@ -670,21 +675,18 @@ class Quiz < ActiveRecord::Base
     dup.quiz_data = data
     dup.assignment_id = context.merge_mapped_id(self.assignment) rescue nil
     if !dup.assignment_id && self.assignment_id && self.assignment && !options[:cloning_for_assignment]
-      new_assignment = self.assignment.clone_for(context,nil,:cloning_for_quiz=>true)
+      new_assignment = self.assignment.clone_for(context, nil, :cloning_for_quiz => true)
       new_assignment.saved_by = :quiz
       new_assignment.save_without_broadcasting!
       context.map_merge(self.assignment, new_assignment)
       dup.assignment_id = new_assignment.id
     end
-    dup.context = context
-    dup.saved_by = :assignment if options[:cloning_for_assignment]
     begin
       dup.save!
     rescue => e
-      raise e if options[:already_retrying]
-      options[:already_retrying] = true
-      self.clone_for(context, original_dup, options)
-      options[:already_retrying] = false
+      logger.warn "Couldn't save quiz copy: #{e.to_s}"
+      raise e if retrying
+      return self.clone_for(context, original_dup, options, true)
     end
     entities = self.quiz_groups + self.quiz_questions
     entities.each do |entity|
