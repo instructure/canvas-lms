@@ -166,6 +166,10 @@ describe Assignment do
       res = @a.assign_peer_reviews
       # log.info("done assigning peer reviews #{Time.now - n}")
       res.length.should eql(@submissions.length)
+      @submissions.each do |s|
+        res.map{|a| a.asset}.should be_include(s)
+        res.map{|a| a.assessor_asset}.should be_include(s)
+      end
     end
     
     it "should assign multiple peer reviews" do
@@ -180,6 +184,15 @@ describe Assignment do
       @a.peer_review_count = 2
       res = @a.assign_peer_reviews
       res.length.should eql(@submissions.length * 2)
+      @submissions.each do |s|
+        assets = res.select{|a| a.asset == s}
+        assets.length.should be > 0 #eql(2)
+        assets.map{|a| a.assessor_id}.uniq.length.should eql(assets.length)
+
+        assessors = res.select{|a| a.assessor_asset == s}
+        assessors.length.should eql(2)
+        assessors[0].asset_id.should_not eql(assessors[1].asset_id)
+      end
     end
 
     it "should assign late peer reviews" do

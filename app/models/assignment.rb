@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'set'
+
 class Assignment < ActiveRecord::Base
   include Workflow
   include TextHelper
@@ -981,61 +983,72 @@ class Assignment < ActiveRecord::Base
     reviewee_submission = self.find_or_create_submission(reviewee)
     reviewee_submission.assign_assessor(reviewer_submission)
   end
-  
+
   def assign_peer_reviews
     return [] unless self.peer_review_count && self.peer_review_count > 0
-    student_ids = self.context.students.map(&:id)
+
     submissions = self.submissions.having_submission.include_assessment_requests
+    student_ids = self.context.students.map(&:id)
     submissions = submissions.select{|s| student_ids.include?(s.user_id) }
+    submission_ids = Set.new(submissions) { |s| s.id }
+
+    # we track existing assessment requests, and the ones we create here, so
+    # that we don't have to constantly re-query the db.
+    assessment_request_counts = {}
+    submissions.each do |s|
+      assessment_request_counts[s.id] = s.assessment_requests.size
+    end
     res = []
-    self.peer_review_count.times do |i|
-      pairs = nil
-      attempt = 0
-      while !pairs || pairs.any?{|p| p[0] == p[1]}
-        pairs = []
-        need_assessing = submissions.select{|s| s.assessment_request_count < self.peer_review_count }.sort_by{ rand }
-        need_assignment = submissions.select{|s| s.assigned_assessment_count < self.peer_review_count }.sort_by{ rand }
-        needed_assessing = need_assessing + []
-        needed_assignment = need_assignment + []
-        already_assessed = submissions.select{|s| s.assessment_request_count >= self.peer_review_count }.sort_by{|s| s.assessment_request_count }
-        # Try a few times to just match up the new guys
-        already_assessed = [] if attempt < 2 && needed_assessing.length == needed_assignment.length && needed_assessing.length > 1
-        missed_submission = false
-        need_assignment.each do |submission|
-          submission.reload
-          already_assigned = submission.assigned_assessments.map{|a| a.asset }
-          list = need_assessing + already_assessed - already_assigned - [submission]
-          to_be_assigned = list[0]
-          missed_submission = !to_be_assigned
-          if to_be_assigned
-            need_assessing.delete_at(need_assessing.index(to_be_assigned)) rescue nil
-            already_assessed << to_be_assigned
-            pairs << [submission, to_be_assigned]
-          end
-        end
-        if attempt < 5
-          # If there are more that need assessing than can possibly be assigned...
-          if needed_assessing.length > needed_assignment.length
-            # Make sure that everything assigned actually needed assessing
-            pairs = nil unless (pairs.map{|p| p[1]} & needed_assessing).length == pairs.length
-          # If there aren't enough that need assessing
-          elsif needed_assessing.length < needed_assignment.length
-            # Make sure that all the ones that did need assigning were hit
-            pairs = nil unless (pairs.map{|p| p[1]} & needed_assessing).length == needed_assessing.length
-          end
-          pairs = nil if missed_submission
-        end
-        attempt += 1
+
+    # for each submission that needs to do more assessments...
+    # we sort the submissions randomly so that if there aren't enough
+    # submissions still needing reviews, it's random who gets the duplicate
+    # reviews.
+    submissions.sort_by { rand }.each do |submission|
+      existing = submission.assigned_assessments
+      needed = self.peer_review_count - existing.size
+      next if needed <= 0
+
+      candidate_set = submission_ids - existing.map { |a| a.asset_id }
+      candidate_set.delete(submission.id) # don't assign to ourselves
+
+      # First try to select from the submissions that don't yet have
+      # peer_review_count review requests (they still need assessing)
+      candidates = submissions.select { |c|
+        candidate_set.include?(c.id) &&
+          assessment_request_counts[c.id] < self.peer_review_count
+      }
+
+      # randomly pick the number needed
+      assessees = candidates.sort_by { rand }[0, needed]
+
+      # If there aren't enough of those, append all the other submissions. This
+      # means that some submissions will get reviewed more than they need to
+      # be. We prefer this to some students not reviewing at least
+      # peer_review_count other submissions.
+      if assessees.size < needed
+        candidates = submissions.select { |c|
+          candidate_set.include?(c.id) && !candidates.include?(c)
+        }
+        assessees.concat(candidates.sort_by { rand }[0, needed - assessees.size])
       end
-      pairs.each do |submission, to_be_assigned|
-        res << to_be_assigned.assign_assessor(submission)
+
+      # if there aren't enough candidates, we'll just not assign as many as
+      # peer_review_count would allow. this'll only happen if peer_review_count
+      # >= the number of submissions.
+
+      assessees.each do |to_assess|
+        # make the assignment
+        res << to_assess.assign_assessor(submission)
+        assessment_request_counts[to_assess.id] += 1
       end
     end
+
     if self.peer_reviews_due_at && self.peer_reviews_due_at < Time.now
       self.peer_reviews_assigned = true
     end
     self.save
-    res
+    return res
   end
   
   def has_peer_reviews?
