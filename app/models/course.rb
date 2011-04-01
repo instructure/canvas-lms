@@ -885,19 +885,16 @@ class Course < ActiveRecord::Base
   end
   
   def gradebook_json
-    to_json(
-      :include_root => false,
-      :include => {
-      :active_assignments => {}, 
-      :students => {
-        :include => {
-          :submissions => {
-            :include => :quiz_submission
-          }
-        }
-      }
-    })
-  end  
+    hash = self.as_json(:include_root => false)
+    submissions = self.submissions
+    hash['active_assignments'] = self.active_assignments.map{|a| a.as_json(:include_root => false) }
+    hash['students'] = self.students.map do |user|
+      res = user.as_json(:include_root => false)
+      res['submissions'] = submissions.select{|s| s.user_id == user.id }.map{|s| s.as_json(:include_root => false) }
+      res
+    end
+    hash.to_json
+  end
   
   def add_aggregate_entries(entries, feed)
     if feed.feed_purpose == 'announcements'
