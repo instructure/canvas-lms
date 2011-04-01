@@ -38,7 +38,7 @@
   <!--[if lte IE 8]> <%= javascript_include_tag "html5.js" %> <![endif]-->
   <!--[if lte IE 7]> <%= include_javascripts :ie7 %> <![endif]-->
   <%= yield :stylesheets %>
-  <% if @domain_root_account && @domain_root_account.settings[:global_stylesheet] %>
+  <% if @domain_root_account && @domain_root_account.settings[:global_stylesheet] && !@domain_root_account.settings[:global_stylesheet].try(:strip).empty?  %>
     <link href="<%= @domain_root_account.settings[:global_stylesheet] %>" media="all" rel="stylesheet" type="text/css" />
   <% end %>
   <script>
