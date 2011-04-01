@@ -708,15 +708,15 @@ class Submission < ActiveRecord::Base
   def assigned_assessment_count
     @assigned_assessment_count ||= self.assigned_assessments.length
   end
-  
+
   def assign_assessment(obj)
     @assigned_assessment_count ||= 0
     @assigned_assessment_count += 1
     assigned_assessments << obj
-    save
+    touch
   end
   protected :assign_assessment
-  
+
   def assign_assessor(obj)
     @assessment_request_count ||= 0
     @assessment_request_count += 1
