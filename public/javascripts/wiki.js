@@ -184,6 +184,14 @@
         $(this).find("button").attr('disabled', false).filter(".submit_button").text("Add Comment Failed, Please Try Again");
       }
     });
+    $("#add_wiki_page_form,#rename_wiki_page_form").formSubmit({
+      success: function(data) {
+        location.href = data.success_url;
+      },
+      error: function(data) {
+        $(this).formErrors(data);
+      }
+    });
   });
 
 })(jQuery);

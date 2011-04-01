@@ -74,13 +74,13 @@ describe Context do
     end
     it "should find a valid wiki page" do
       course_model
-      page = @course.wiki.wiki_pages.create!
+      page = @course.wiki.wiki_pages.create!(:title => 'test')
       @course.find_asset(page.asset_string).should eql(page)
       @course.find_asset(page.asset_string, [:wiki_page]).should eql(page)
     end
     it "should not find a valid wiki page if told to ignore wiki pages" do
       course_model
-      page = @course.wiki.wiki_pages.create!
+      page = @course.wiki.wiki_pages.create!(:title => 'test')
       @course.find_asset(page.asset_string, [:assignment]).should eql(nil)
     end
     it "should not find an invalid assignment" do

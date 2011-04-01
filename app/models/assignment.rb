@@ -52,6 +52,7 @@ class Assignment < ActiveRecord::Base
 
   validates_presence_of :context_id
   validates_presence_of :context_type
+  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
 
   acts_as_list :scope => :assignment_group_id

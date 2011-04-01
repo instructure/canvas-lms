@@ -28,6 +28,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   DEFAULT_IMPORTED_TITLE = 'Imported Questions'
   DEFAULT_UNFILED_TITLE = 'Unfiled Questions'
   adheres_to_policy
+  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   
   workflow do
     state :active

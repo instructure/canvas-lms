@@ -64,10 +64,13 @@ class WikiPagesController < ApplicationController
         flash[:notice] = 'Page was successfully updated.'
         respond_to do |format|
           format.html { return_to(params[:return_to], context_wiki_page_url(:edit => params[:action] == 'create')) }
-          format.json { render :json => @page.to_json }
+          format.json { render :json => {:success_url => context_wiki_page_url(:edit => params[:action] == 'create')} }
         end
       else
-        render :action => "show"
+        respond_to do |format|
+          format.html { render :action => "show" }
+          format.json { render :json => @page.errors.to_json, :status => :bad_request }
+        end
       end
     end
   end

@@ -27,8 +27,11 @@ class QuizGroupsController < ApplicationController
         params[:quiz_group][:assessment_question_bank] = @bank if @bank.grants_right?(@current_user, session, :manage)
       end
       @group = @quiz.quiz_groups.build(params[:quiz_group])
-      @group.save
-      render :json => @group.to_json
+      if @group.save
+        render :json => @group.to_json
+      else
+        render :json => @group.errors.to_json, :status => :bad_request
+      end
     end
   end
 
@@ -38,8 +41,11 @@ class QuizGroupsController < ApplicationController
       @quiz.did_edit if @quiz.created?
       params[:quiz_group][:position] = @quiz.root_entries_max_position + 1
       params[:quiz_group].delete(:position) # position is taken care of in reorder
-      @group.update_attributes(params[:quiz_group])
-      render :json => @group.to_json
+      if @group.update_attributes(params[:quiz_group])
+        render :json => @group.to_json
+      else
+        render :json => @group.errors.to_json, :status => :bad_request
+      end
     end
   end
 

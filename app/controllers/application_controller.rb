@@ -725,8 +725,8 @@ class ApplicationController < ActionController::Base
     @namespace = WikiNamespace.default_for_context(@context)
     @wiki = @namespace.wiki
     if params[:action] != 'create'
-      @page = @wiki.wiki_pages.find_by_url(page_name.to_s) || 
-              @wiki.wiki_pages.find_by_url(page_name.to_s.to_url) || 
+      @page = @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s) ||
+              @wiki.wiki_pages.deleted_last.find_by_url(page_name.to_s.to_url) ||
               @wiki.wiki_pages.find_by_id(page_name.to_i)
     end
     @page ||= @wiki.wiki_pages.build(

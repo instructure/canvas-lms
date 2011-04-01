@@ -24,6 +24,7 @@ class QuizGroup < ActiveRecord::Base
   has_many :quiz_questions, :dependent => :destroy
   before_save :infer_position
   validates_presence_of :quiz_id
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   
   def infer_position
     if !self.position && self.quiz

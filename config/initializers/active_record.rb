@@ -27,9 +27,13 @@ class ActiveRecord::Base
   end
   
   def self.maximum_long_text_length
-    @maximum_text_length ||= 500.kilobytes-1
+    @maximum_long_text_length ||= 500.kilobytes-1
   end
-  
+
+  def self.maximum_string_length
+    255
+  end
+
   def self.find_by_asset_string(string, asset_types)
     code = string.split("_")
     id = code.pop

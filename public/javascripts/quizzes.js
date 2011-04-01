@@ -1966,6 +1966,13 @@ var quiz = {};
         $("#unpublished_changes_message").slideDown();
         $bottom.attr('id', 'group_bottom_' + group.id);
         quiz.updateDisplayComments();
+      },
+      error: function(data) {
+        var $form = $(this);
+        var $group = $form.parents(".group_top");
+        $group.addClass('editing');
+        $form.loadingImage('remove');
+        $form.formErrors(data);
       }
     });
     $("#questions").sortable({

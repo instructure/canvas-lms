@@ -31,19 +31,20 @@ class WikiPage < ActiveRecord::Base
   belongs_to :user
   has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
   has_many :wiki_page_comments, :order => "created_at DESC"
-  acts_as_url :title, :scope => :wiki_id, :sync_url => true
+  acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
   
   before_save :set_revised_at
   before_validation :ensure_unique_title
   
   def ensure_unique_title
+    return if deleted?
     self.title ||= (self.url || "page").to_cased_title
     return unless self.wiki
     if self.title == "Front Page" && self.new_record?
-      baddies = self.wiki.wiki_pages.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
+      baddies = self.wiki.wiki_pages.not_deleted.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = p.url.to_cased_title; p.save_without_broadcasting! }
     end
-    while !(self.wiki.wiki_pages.find_all_by_title(self.title) - [self]).empty?
+    while !(self.wiki.wiki_pages.not_deleted.find_all_by_title(self.title) - [self]).empty?
       n, real_title = self.title.reverse.split("-", 2).map(&:reverse)
       if n.to_i.to_s == n
         self.title = "#{real_title}-#{(n.to_i + 1)}"
@@ -62,11 +63,23 @@ class WikiPage < ActiveRecord::Base
       conditions.first << " and id != ?"
       conditions << id
     end
-    if self.class.scope_for_url
-      conditions.first << " and #{self.class.scope_for_url} = ?"
-      conditions << send(self.class.scope_for_url)
+    # make stringex scoping a little more useful/flexible... in addition to
+    # the normal constructed attribute scope(s), it also supports paramater-
+    # less named_scopeds. note that there needs to be an instance_method of
+    # the same name for this to work
+    scopes = self.class.scope_for_url ? Array(self.class.scope_for_url) : []
+    base_scope = self.class
+    scopes.each do |scope|
+      next unless self.respond_to?(scope)
+      if base_scope.respond_to?(scope)
+        return unless send(scope)
+        base_scope = base_scope.send(scope)
+      else
+        conditions.first << " and #{connection.quote_column_name(scope)} = ?"
+        conditions << send(scope)
+      end
     end
-    url_owners = self.class.find(:all, :conditions => conditions)
+    url_owners = base_scope.find(:all, :conditions => conditions)
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
@@ -85,8 +98,15 @@ class WikiPage < ActiveRecord::Base
   sanitize_field :body, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:body) { [self.current_namespace(self.user).context, self.user] }
   
-  validates_uniqueness_of :title, :scope => :wiki_id
-  validates_uniqueness_of :url, :scope => :wiki_id
+  validates_each :title do |record, attr, value|
+    if value.blank?
+      record.errors.add(attr, "Title can't be blank")
+    elsif value.size > maximum_string_length
+      record.errors.add(attr, "Title can't exceed #{maximum_string_length} characters")
+    elsif value.to_url.blank?
+      record.errors.add(attr, "Title must contain at least one letter or number") # it's a bit more liberal than this, but let's not complicate things
+    end
+  end
   
   has_a_broadcast_policy
   adheres_to_policy
@@ -135,6 +155,17 @@ class WikiPage < ActiveRecord::Base
     {:conditions => ['wiki_pages.workflow_state = ?', 'active'] }
   }
   
+  named_scope :deleted_last, lambda{
+    {:order => "workflow_state = 'deleted'" }
+  }
+
+  named_scope :not_deleted, lambda{
+    {:conditions => ['wiki_pages.workflow_state <> ?', 'deleted'] }
+  }
+  def not_deleted
+    !deleted?
+  end
+
   attr_writer :current_namespace
   
   def current_namespace(user=nil)

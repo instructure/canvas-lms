@@ -168,6 +168,8 @@ class User < ActiveRecord::Base
   adheres_to_policy
   has_a_broadcast_policy
 
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+
   before_save :assign_uuid
   before_save :update_avatar_image
   after_save :generate_reminders_if_changed

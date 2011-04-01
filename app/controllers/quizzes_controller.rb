@@ -345,16 +345,20 @@ class QuizzesController < ApplicationController
       @quiz = @context.quizzes.build(params[:quiz])
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
-      @quiz.save
-      if params[:activate]
+      res = @quiz.save
+      if res && params[:activate]
         @quiz.generate_quiz_data
         @quiz.published_at = Time.now
         @quiz.workflow_state = 'available'
-        @quiz.save
+        res = @quiz.save
       end
       @quiz.did_edit if @quiz.created?
-      
-      render :json =>  @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})
+      if res
+        @quiz.reload
+        render :json => @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})
+      else
+        render :json => @quiz.errors.to_json, :status => :bad_request
+      end
     end
   end
   

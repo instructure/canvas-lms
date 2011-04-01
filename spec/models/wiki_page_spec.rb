@@ -47,7 +47,45 @@ describe WikiPage do
     p.messages_sent["Updated Wiki Page"].should_not be_empty
     p.messages_sent["Updated Wiki Page"].map(&:user).should be_include(@user)
   end
-  
+
+  it "should validate the title" do
+    course_with_teacher(:active_all => true)
+    @course.wiki.wiki_pages.new(:title => "").valid?.should_not be_true
+    @course.wiki.wiki_pages.new(:title => "!!!").valid?.should_not be_true
+    @course.wiki.wiki_pages.new(:title => "a"*256).valid?.should_not be_true
+    @course.wiki.wiki_pages.new(:title => "asdf").valid?.should be_true
+  end
+
+  it "should make the title/url unique" do
+    course_with_teacher(:active_all => true)
+    p1 = @course.wiki.wiki_pages.create(:title => "Asdf")
+    p2 = @course.wiki.wiki_pages.create(:title => "Asdf")
+    p2.title.should eql('Asdf-2')
+    p2.url.should eql('asdf-2')
+  end
+
+  it "should let you reuse the title/url of a deleted page" do
+    course_with_teacher(:active_all => true)
+    p1 = @course.wiki.wiki_pages.create(:title => "Asdf")
+    p1.workflow_state = 'deleted'
+    p1.save
+
+    p2 = @course.wiki.wiki_pages.create(:title => "Asdf")
+    p2.reload
+    p2.title.should eql('Asdf')
+    p2.url.should eql('asdf')
+
+    # so long as it's deleted, we don't care about uniqueness of the title/url
+    p1.save.should be_true
+    p1.title.should eql('Asdf')
+    p1.url.should eql('asdf')
+    
+    p1.workflow_state = 'active'
+    p1.save.should be_true
+    p1.title.should eql('Asdf-2')
+    p1.url.should eql('asdf-2')
+  end
+
   context "atom" do
     
     it "should use the wiki namespace context name in the title" do

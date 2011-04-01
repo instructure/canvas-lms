@@ -34,6 +34,8 @@ class AssignmentGroup < ActiveRecord::Base
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_length_of :rules, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :default_assignment_name, :maximum => maximum_string_length, :allow_nil => true
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   
   before_save :set_context_code
   before_save :generate_default_values
