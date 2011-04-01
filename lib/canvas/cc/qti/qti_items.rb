@@ -50,7 +50,7 @@ module Canvas::CC
       
       # These types don't stop processing response conditions once the correct
       # answer is found, so they need to show the incorrect response differently
-      NO_INCORRECT_COND = ['matching_question', 
+      MULTI_ANSWER_TYPES = ['matching_question', 
                            'multiple_dropdowns_question', 
                            'fill_in_multiple_blanks_question']
 
@@ -76,7 +76,6 @@ module Canvas::CC
               else
                 meta_field(qm_node, 'question_type', TYPE_PROFILES[question['question_type']])
                 meta_field(qm_node, 'points_possible', question['points_possible'])
-                #todo other canvas-metadata
               end
             end
           end # meta data
@@ -89,27 +88,30 @@ module Canvas::CC
             presentation_options(pres_node, question)
           end # presentation
           
-          item_node.resprocessing do |res_node|
-            res_node.outcomes do |out_node|
-              out_node.decvar(
-                      :maxvalue => '100',
-                      :minvalue => '0',
-                      :varname => 'SCORE',
-                      :vartype => 'Decimal'
-              )
-            end
-            resprocessing(res_node, question)
-          end # resprocessing
-          
-          item_feedback(item_node, 'general_fb', question['neutral_comments']) unless question['neutral_comments'].blank?
-          item_feedback(item_node, 'correct_fb', question['correct_comments']) unless question['correct_comments'].blank?
-          item_feedback(item_node, 'general_incorrect_fb', question['incorrect_comments']) unless question['incorrect_comments'].blank?
-          question['answers'].each do |answer|
-            unless answer['comments'].blank?
-              item_feedback(item_node, "#{answer['id']}_fb", answer['comments'])
+          if question['question_type'] != 'text_only_question'
+            item_node.resprocessing do |res_node|
+              res_node.outcomes do |out_node|
+                out_node.decvar(
+                        :maxvalue => '100',
+                        :minvalue => '0',
+                        :varname => 'SCORE',
+                        :vartype => 'Decimal'
+                )
+              end
+              resprocessing(res_node, question)
+            end # resprocessing
+            
+            itemproc_extenstion(node, question)
+            
+            item_feedback(item_node, 'general_fb', question['neutral_comments']) unless question['neutral_comments'].blank?
+            item_feedback(item_node, 'correct_fb', question['correct_comments']) unless question['correct_comments'].blank?
+            item_feedback(item_node, 'general_incorrect_fb', question['incorrect_comments']) unless question['incorrect_comments'].blank?
+            question['answers'].each do |answer|
+              unless answer['comments'].blank?
+                item_feedback(item_node, "#{answer['id']}_fb", answer['comments'])
+              end
             end
           end
-          
         end # item
       end
       
@@ -128,6 +130,10 @@ module Canvas::CC
           multiple_dropdowns_response_lid(node, question)
         elsif question['question_type'] == 'fill_in_multiple_blanks_question'
           multiple_dropdowns_response_lid(node, question)
+        elsif question['question_type'] == 'calculated_question'
+          calculated_response_str(node, question)
+        elsif question['question_type'] == 'numerical_question'
+          calculated_response_str(node, question)
         end
       end
       
@@ -211,6 +217,15 @@ module Canvas::CC
           end # lid_node
         end
       end
+      
+      def calculated_response_str(node, question)
+        node.response_str(
+                :ident => "response1",
+                :rcardinality => 'Single'
+        ) do |r_node|
+          r_node.render_fib(:fibtype=>'Decimal') {|n| n.response_label(:ident=>'answer1')}
+        end
+      end
 
       ## question resprocessing methods
       
@@ -219,7 +234,7 @@ module Canvas::CC
           other_respcondition(node, 'Yes', 'general_fb')
         end
         
-        unless question['question_type'] == 'matching_question'
+        unless ['matching_question', 'numerical_question'].member? question['question_type']
           answer_feedback_respconditions(node, question)
         end
         
@@ -238,9 +253,13 @@ module Canvas::CC
           multiple_dropdowns_resprocessing(node, question)
         elsif question['question_type'] == 'fill_in_multiple_blanks_question'
           multiple_dropdowns_resprocessing(node, question)
+        elsif question['question_type'] == 'calculated_question'
+          calculated_resprocessing(node, question)
+        elsif question['question_type'] == 'numerical_question'
+          numerical_resprocessing(node, question)
         end
         
-        if !question['incorrect_comments'].blank? && !NO_INCORRECT_COND.member?(question['question_type'])
+        if !question['incorrect_comments'].blank? && !MULTI_ANSWER_TYPES.member?(question['question_type'])
           other_respcondition(node, 'Yes', 'general_incorrect_fb')
         end
       end
@@ -291,6 +310,37 @@ module Canvas::CC
         end #res_node
       end
       
+      def numerical_resprocessing(node, question)
+        question['answers'].each do |answer|
+          node.respcondition(:continue=>'No') do |res_node|
+            res_node.conditionvar do |c_node|
+              if answer['exact']
+                # exact answer
+                c_node.or do |or_node|
+                  exact = answer['exact'].to_f
+                  or_node.varequal exact, :respident=>"response1"
+                  unless answer['margin'].blank?
+                    or_node.and do |and_node|
+                      margin = answer['margin'].to_f
+                      and_node.vargte(exact - margin, :respident=>"response1")
+                      and_node.varlte(exact + margin, :respident=>"response1")
+                    end
+                  end
+                end
+              else
+                # answer in range
+                c_node.vargte(answer['start'], :respident=>"response1")
+                c_node.varlte(answer['end'], :respident=>"response1")
+              end
+            end #c_node
+            
+            res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
+            res_node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>"#{answer['id']}_fb") unless answer['comments'].blank?
+            correct_feedback_ref(res_node, question)
+          end #res_node
+        end
+      end
+      
       def essay_resprocessing(node, question)
         other_respcondition(node)
       end
@@ -336,7 +386,21 @@ module Canvas::CC
             r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
         end
-        
+      end
+
+      def calculated_resprocessing(node, question)
+        node.respcondition(:title=>'correct') do |r_node|
+          r_node.conditionvar do |c_node|
+            c_node.other
+          end
+          r_node.setvar(100, :varname => 'SCORE', :action => 'Set')
+        end
+        node.respcondition(:title=>'incorrect') do |r_node|
+          r_node.conditionvar do |c_node|
+            c_node.not {|n_node|n_node.other}
+          end
+          r_node.setvar(0, :varname => 'SCORE', :action => 'Set')
+        end
       end
       
       # feedback helpers
@@ -345,7 +409,7 @@ module Canvas::CC
         question['answers'].each do |answer|
           unless answer['comments'].blank?
             respident = 'response1'
-            if NO_INCORRECT_COND.member? question['question_type']
+            if MULTI_ANSWER_TYPES.member? question['question_type']
               respident = "response_#{answer['blank_id']}"
             end
             node.respcondition(:continue=>'Yes') do |res_node|
@@ -381,6 +445,46 @@ module Canvas::CC
             end
           end
         end
+      end
+      
+      # Custom extensions
+      
+      def itemproc_extenstion(node, question)
+        if question['question_type'] == 'calculated_question'
+          calculated_extension(node, question)
+        end
+      end
+      
+      def calculated_extension(node, question)
+        node.itemproc_extension do |ext_node|
+          ext_node.answer_tolerance question['answer_tolerance']
+          
+          ext_node.formulas(:decimal_places=>question['formula_decimal_places']) do |forms_node|
+            question['formulas'].each do |f|
+              forms_node.formula f['formula']
+            end
+          end
+          
+          ext_node.vars do |vars_node|
+            question['variables'].each do |var|
+              vars_node.var(:name=>var['name'], :scale=>var['scale']) do |var_node|
+                var_node.min var['min']
+                var_node.max var['max']
+              end
+            end
+          end
+          
+          ext_node.var_sets do |sets_node|
+            question['answers'].each do |answer|
+              sets_node.var_set(:ident=>answer['id']) do |set_node|
+                answer['variables'].each do |var|
+                  set_node.var(var['value'], :name=>var['name'])
+                end
+              end
+            end
+          end
+          
+        end # ext_node
       end
       
     end

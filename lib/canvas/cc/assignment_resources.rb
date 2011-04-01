@@ -19,7 +19,8 @@ module Canvas::CC
   module AssignmentResources
 
     def add_assignments
-      @course.assignments.active.no_graded_quizzes_or_topics.each do |assignment|
+      @course.assignments.active.each do |assignment|
+        next if assignment.submission_types == 'discussion_topic'
         migration_id = CCHelper.create_key(assignment)
 
         lo_folder = File.join(@export_dir, migration_id)
@@ -71,6 +72,7 @@ module Canvas::CC
       node.assignment_group_identifierref CCHelper.create_key(assignment.assignment_group)
       node.grading_standard_identifierref CCHelper.create_key(assignment.grading_standard) if assignment.grading_standard
       node.rubric_identifierref CCHelper.create_key(assignment.rubric) if assignment.rubric
+      node.quiz_identifierref CCHelper.create_key(assignment.quiz) if assignment.quiz
       node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
       atts = [:points_possible, :min_score, :max_score, :mastery_score, :grading_type,
               :all_day, :submission_types, :position, :turnitin_enabled, :peer_review_count,
