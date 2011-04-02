@@ -992,6 +992,12 @@ class Assignment < ActiveRecord::Base
     submissions = submissions.select{|s| student_ids.include?(s.user_id) }
     submission_ids = Set.new(submissions) { |s| s.id }
 
+    # there could be any conceivable configuration of peer reviews already
+    # assigned when this method is called, since teachers can assign individual
+    # reviews manually and change peer_review_count at any time. so we can't
+    # make many assumptions. that's where most of the complexity here comes
+    # from.
+
     # we track existing assessment requests, and the ones we create here, so
     # that we don't have to constantly re-query the db.
     assessment_request_counts = {}
@@ -1009,29 +1015,28 @@ class Assignment < ActiveRecord::Base
       needed = self.peer_review_count - existing.size
       next if needed <= 0
 
+      # candidate_set is all submissions for the assignment that this
+      # submission isn't already assigned to review.
       candidate_set = submission_ids - existing.map { |a| a.asset_id }
       candidate_set.delete(submission.id) # don't assign to ourselves
 
-      # First try to select from the submissions that don't yet have
-      # peer_review_count review requests (they still need assessing)
       candidates = submissions.select { |c|
-        candidate_set.include?(c.id) &&
-          assessment_request_counts[c.id] < self.peer_review_count
+        candidate_set.include?(c.id)
+      }.sort_by { |c|
+        [
+          # prefer those who still need more reviews done.
+          assessment_request_counts[c.id] < self.peer_review_count ? 0 : 1,
+          # then prefer those who are assigned fewer reviews at this point --
+          # this helps avoid loops where everybody is reviewing those who are
+          # reviewing them, leaving the final assignee out in the cold.
+          c.assigned_assessments.size,
+          # random sort, all else being equal.
+          rand,
+        ]
       }
 
-      # randomly pick the number needed
-      assessees = candidates.sort_by { rand }[0, needed]
-
-      # If there aren't enough of those, append all the other submissions. This
-      # means that some submissions will get reviewed more than they need to
-      # be. We prefer this to some students not reviewing at least
-      # peer_review_count other submissions.
-      if assessees.size < needed
-        candidates = submissions.select { |c|
-          candidate_set.include?(c.id) && !candidates.include?(c)
-        }
-        assessees.concat(candidates.sort_by { rand }[0, needed - assessees.size])
-      end
+      # pick the number needed
+      assessees = candidates[0, needed]
 
       # if there aren't enough candidates, we'll just not assign as many as
       # peer_review_count would allow. this'll only happen if peer_review_count
