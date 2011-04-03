@@ -39,6 +39,18 @@ describe GradebookImporter do
       new_gradebook_importer
       @gi.contents.should_not be_nil
     end
+    
+    it "should handle points possible being sorted in weird places" do
+      importer_with_rows(
+        'Student,ID,Section,Assignment 1,Final Score',
+        '"Blend, Bill",6,My Course,-,',
+        'Points Possible,,,10,',
+        '"Farner, Todd",4,My Course,-,')
+      puts @gi.to_json
+      @gi.assignments.length.should == 1
+      @gi.assignments.first.points_possible.should == 10
+      @gi.students.length.should == 2
+    end
   end
   
   context "to_json" do
@@ -67,8 +79,14 @@ end
 
 def new_gradebook_importer(contents = valid_gradebook_contents)
   @gi = GradebookImporter.new(course_model, contents)
+  @gi.parse!
+  @gi
 end
 
 def valid_gradebook_contents
   @contents ||= File.read(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course.csv)))
+end
+
+def importer_with_rows(*rows)
+  new_gradebook_importer(rows.join("\n"))
 end

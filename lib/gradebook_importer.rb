@@ -32,7 +32,7 @@ class GradebookImporter
     end
   end
   
-  attr_reader :context, :contents
+  attr_reader :context, :contents, :assignments, :students, :submissions
   def initialize(context=nil, contents=nil)
     raise ArgumentError, "Must provide a valid context for this gradebook." unless valid_context?(context)
     raise ArgumentError, "Must provide CSV contents." unless contents
@@ -43,70 +43,82 @@ class GradebookImporter
   FasterCSV::Converters[:nil] = lambda{|e| (e.nil? ? e : raise) rescue e}
   FasterCSV::Converters[:nil_saving_numeric] = [:nil, :numeric]
   
-  def parsed_contents
-    @parsed_contents ||= FasterCSV.parse( self.contents, :converters => :nil_saving_numeric )
-    @students_start_at = 2
-    @last_assignment_column = @parsed_contents[0].length - 1 
-    while @parsed_contents[0][@last_assignment_column].match(/Current Score|Final Score/)
-      @last_assignment_column -= 1
+  def parse!
+    @student_columns = 3 # name, user id, section
+    
+    csv = FasterCSV.new(self.contents, :converters => :nil_saving_numeric)
+    header = csv.shift
+    @assignments = process_header(header)
+    
+    @students = []
+    @submissions = []
+    csv.each do |row|
+      if row[0] =~ /Points Possible/
+        row.shift(@student_columns)
+        process_pp(row)
+        next
+      end
+      
+      @students << process_student(row.shift(@student_columns))
+      @submissions << process_submissions(row, @students.last)
     end
-    @parsed_contents
   end
   
-  def students
-    return @students if @students
-    @students = self.parsed_contents[@students_start_at..-1].inject([]) do |l, e|
-      unsorted_name = to_unsorted_name(e.first)
-      student_id = e[1] # the second column in the csv should have the student_id for each row
-      student = @context.students.find_by_id(student_id) || @context.students.find_by_name(unsorted_name)
-      student ||= User.new(:name => unsorted_name)
-      student.original_id = student.id
-      student.id ||= NegativeId.generate
-      l << student
+  def process_header(row)
+    if row.length < 3 || row[0] !~ /Student/ || row[1] !~ /ID/ || row[2] !~ /Section/
+      raise "Couldn't find header row"
     end
-    @students
-  end
-  
-  def assignments
-    return @assignments if @assignments
-    assignment_names = self.parsed_contents[0][3..@last_assignment_column]
-    points_possible = self.parsed_contents[@students_start_at - 1][3..@last_assignment_column]
-    @assignments = (0...assignment_names.size).inject([]) do |l, i|
-      title,id = Assignment.title_and_id(assignment_names[i])
-      name = assignment_names[i]
-      points = points_possible[i]
+    
+    row.shift(@student_columns)
+    while row.last =~ /Current Score|Final Score/
+      row.pop
+    end
+    
+    row.map do |name_and_id|
+      title, id = Assignment.title_and_id(name_and_id)
       assignment = @context.assignments.active.gradeable.find_by_id(id) if id
       assignment ||= @context.assignments.active.gradeable.find_by_title(title)
-      assignment ||= @context.assignments.active.gradeable.find_by_title(name)
-      assignment ||= Assignment.new(:title => title || name)
-      assignment.points_possible = points
+      assignment ||= @context.assignments.active.gradeable.find_by_title(name_and_id) #backward compat
+      assignment ||= Assignment.new(:title => title || name_and_id)
       assignment.original_id = assignment.id
       assignment.id ||= NegativeId.generate
-      l << assignment
+      assignment
     end
-    @assignments
   end
   
-  def submissions
-    return @submissions if @submissions
-    @submissions = []
-    self.students.each_with_index do |student, i|
-      list = []
-      self.assignments.each_with_index do |assignment, j|
-        list << {'grade' => self.parsed_contents[i + @students_start_at][j + 3], 'assignment_id' => assignment.new_record? ? assignment.id : assignment.original_id}
-      end
-      @submissions << list
+  def process_pp(row)
+    @assignments.each_with_index do |assignment, idx|
+      assignment.points_possible = row[idx] if row[idx]
     end
-    @submissions
+  end
+  
+  def process_student(row)
+    unsorted_name = to_unsorted_name(row[0])
+    student_id = row[1] # the second column in the csv should have the student_id for each row
+    student = @context.students.find_by_id(student_id) || @context.students.find_by_name(unsorted_name)
+    student ||= User.new(:name => unsorted_name)
+    student.original_id = student.id
+    student.id ||= NegativeId.generate
+    student
+  end
+  
+  def process_submissions(row, student)
+    l = []
+    @assignments.each_with_index do |assignment, idx|
+      l << {
+        'grade' => row[idx],
+        'assignment_id' => assignment.new_record? ? assignment.id : assignment.original_id
+      }
+    end
+    l
   end
   
   def to_json
     {
-      :students => self.students.inject([]) { |l, s| l << student_to_hash(s) },
-      :assignments => self.assignments.inject([]) { |l, a| l << assignment_to_hash(a)}
+      :students => @students.inject([]) { |l, s| l << student_to_hash(s) },
+      :assignments => @assignments.inject([]) { |l, a| l << assignment_to_hash(a)}
     }.to_json
   end
-
   
   protected
 
@@ -115,7 +127,7 @@ class GradebookImporter
         h[k] = user.send(k.to_sym)
         h
       end
-      user_attributes[:submissions] = self.submissions[students.index(user)]
+      user_attributes[:submissions] = @submissions[@students.index(user)]
       user_attributes
     end
     

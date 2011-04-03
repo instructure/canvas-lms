@@ -33,9 +33,7 @@ class GradebookUploadsController < ApplicationController
       @uploaded_gradebook = GradebookImporter.new(@context, @attachment_contents)
       errored_csv = false
       begin
-        @uploaded_gradebook.assignments
-        @uploaded_gradebook.students
-        @uploaded_gradebook.submissions
+        @uploaded_gradebook.parse!
       rescue => e
         errored_csv = true
       end
