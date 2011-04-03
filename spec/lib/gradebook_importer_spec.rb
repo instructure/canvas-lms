@@ -27,6 +27,7 @@ describe GradebookImporter do
     end
     
     it "should store the context and make it available" do
+      course_model
       new_gradebook_importer
       @gi.context.should be_is_a(Course)
     end
@@ -36,17 +37,18 @@ describe GradebookImporter do
     end
     
     it "should store the contents and make them available" do
+      course_model
       new_gradebook_importer
       @gi.contents.should_not be_nil
     end
     
     it "should handle points possible being sorted in weird places" do
+      course_model
       importer_with_rows(
         'Student,ID,Section,Assignment 1,Final Score',
         '"Blend, Bill",6,My Course,-,',
         'Points Possible,,,10,',
         '"Farner, Todd",4,My Course,-,')
-      puts @gi.to_json
       @gi.assignments.length.should == 1
       @gi.assignments.first.points_possible.should == 10
       @gi.students.length.should == 2
@@ -55,6 +57,7 @@ describe GradebookImporter do
   
   context "to_json" do
     before do
+      course_model
       new_gradebook_importer
     end
     
@@ -78,7 +81,7 @@ describe GradebookImporter do
 end
 
 def new_gradebook_importer(contents = valid_gradebook_contents)
-  @gi = GradebookImporter.new(course_model, contents)
+  @gi = GradebookImporter.new(@course, contents)
   @gi.parse!
   @gi
 end

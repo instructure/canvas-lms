@@ -77,7 +77,6 @@ class GradebookImporter
     row.map do |name_and_id|
       title, id = Assignment.title_and_id(name_and_id)
       assignment = @context.assignments.active.gradeable.find_by_id(id) if id
-      assignment ||= @context.assignments.active.gradeable.find_by_title(title)
       assignment ||= @context.assignments.active.gradeable.find_by_title(name_and_id) #backward compat
       assignment ||= Assignment.new(:title => title || name_and_id)
       assignment.original_id = assignment.id

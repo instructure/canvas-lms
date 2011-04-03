@@ -190,7 +190,7 @@ var GradebookUploader = {
     // but everthing else here expects there to be an originalGradebook.assignments array.
     originalGradebook.assignments = originalGradebook.active_assignments;
 
-// first, figure out if there is anything that needs to be resolved
+    // first, figure out if there is anything that needs to be resolved
     $.each(["student", "assignment"], function(i, thing){
       var $template = $("#" + thing + "_resolution_template").remove(),
           $select   = $template.find("select");
@@ -284,7 +284,7 @@ var GradebookUploader = {
                 uploadedGradebook[thing+"s"].splice(i, 1);
                 break;
               }
-            }       
+            }
             break;
           default:
             //merge
