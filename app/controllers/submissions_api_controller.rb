@@ -32,7 +32,8 @@ class SubmissionsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @submissions = @assignment.submissions
+      @submissions = @assignment.submissions.all(
+        :conditions => { :user_id => @context.student_ids })
 
       includes = Array(params[:include])
 

@@ -287,6 +287,31 @@ describe SubmissionsApiController, :type => :integration do
     json['score'].should == 12.9
   end
 
+  it "should not return submissions for no-longer-enrolled students" do
+    student = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    enrollment = @course.enroll_student(student)
+    enrollment.accept!
+    assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    submit_homework(assignment, student)
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => assignment.id.to_s })
+    json.length.should == 1
+
+    enrollment.destroy
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => assignment.id.to_s })
+    json.length.should == 0
+  end
+
   it "should allow updating the grade for an existing submission" do
     student = user(:active_all => true)
     course_with_teacher_logged_in(:active_all => true)
