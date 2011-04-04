@@ -77,6 +77,10 @@ javascripts:
   edit_rubric:
     - public/javascripts/edit_rubric.js
     - public/javascripts/find_outcome.js
+  slickgrid:
+    - public/javascripts/slickgrid-1.4.3/lib/jquery.event.drag-2.0.min.js
+    - public/javascripts/slickgrid-1.4.3/slick.grid.js
+    - public/javascripts/slickgrid-1.4.3/slick.editors.js
   syllabus:
     - public/javascripts/calendar_move.js
     - public/javascripts/syllabus.js
@@ -149,7 +153,7 @@ javascripts:
   sub_accounts:
     - public/javascripts/sub_accounts.js
   aligned_outcomes:
-    - public/javascripts/aligned_outcomes.js    
+    - public/javascripts/aligned_outcomes.js
   full_assignment:
     - public/javascripts/full_assignment.js
   select_content_dialog:
@@ -257,6 +261,8 @@ stylesheets:
     - public/stylesheets/compiled/prior_users.css
   statistics:
     - public/stylesheets/compiled/statistics.css
+  slickgrid:
+    - public/javascripts/slickgrid-1.4.3/slick.grid.css
   sub_accounts:
     - public/stylesheets/compiled/sub_accounts.css
   user_logins:
