@@ -132,6 +132,10 @@ class ContextMessage < ActiveRecord::Base
     add_new_recipients(new_user_ids) unless new_user_ids.empty?
   end
   
+  def from_name
+    self.user.name
+  end
+  
   def add_new_recipients(user_ids)
     user_ids.each do |user_id|
       p = self.context_message_participants.find_by_user_id_and_participation_type(user_id, 'recipient')

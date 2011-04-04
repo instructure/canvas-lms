@@ -344,6 +344,7 @@ class Message < ActiveRecord::Base
     self.to_email = true if self.path_type == 'email' || self.path_type == 'sms'
     self.from_name = "Instructure Canvas"
     self.from_name = self.asset_context.name if (self.asset_context && self.asset_context.name && self.notification.dashboard? rescue false)
+    self.from_name = self.from_name if self.respond_to?(:from_name)
     true
   end
     
