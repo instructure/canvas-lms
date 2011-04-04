@@ -9,7 +9,7 @@ javascripts:
     - public/javascripts/firebugx.js
     - public/javascripts/datejs_to_iso_string_patch.js
     - public/javascripts/date.js
-    - public/javascripts/jquery-1.4.js
+    - public/javascripts/jquery-1.5.2.js
     - public/javascripts/jquery.ba-hashchange.js
     - public/javascripts/jquery-ui-1.8.js
     - public/javascripts/jquery.ba-throttle-debounce.js
