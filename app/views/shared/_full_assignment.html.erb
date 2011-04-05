@@ -221,12 +221,13 @@
           <tr class="auto_peer_reviews">
             <td><%= f.label :peer_review_count, "Reviews Per User:" %></td>
             <td><%= f.text_field :peer_review_count, :style => "width: 20px;" %></td>
-          </tr><tr>
-            <td><%= f.label :peer_reviews_due_at, "Finish Reviews By:", :style => "float: left;" %></td>
+          </tr><tr class="auto_peer_reviews">
+            <td style="vertical-align: top;"><%= f.label :peer_reviews_assign_at, "Assign Reviews:", :style => "float: left;" %></td>
             <td>
               <div>
-                <%= f.text_field :peer_reviews_due_at, :value => datetime_string(assignment.peer_reviews_due_at, :due_date), :style => "width: 120px;", :class => "date_field" %>
+                <%= f.text_field :peer_reviews_assign_at, :value => datetime_string(assignment.peer_reviews_assign_at, :due_date), :style => "width: 120px;", :class => "date_field" %>
               </div>
+              <div style="font-size: 0.8em;">Must come after due date. If blank, uses due date.</div>
             </td>
           </tr>
         </table>
@@ -240,7 +241,7 @@
           <option value="on_paper" <%= "selected" if (assignment.submission_types == "on_paper") %>>On Paper</option>
         </select>
       </td>
-      <td style="width: 10%; vertical-align: top;" class="more_assignment_values">Lock After:</td>
+      <td style="width: 10%; vertical-align: top;" class="more_assignment_values">Lock Submits After:</td>
       <td style="width: 40%; vertical-align: top;" class="more_assignment_values">
         <%= f.text_field :lock_at, :value => datetime_string(assignment.lock_at), :style => "width: 120px;", :class => "date_field" %>
       </td>

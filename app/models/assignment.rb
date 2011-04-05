@@ -168,6 +168,7 @@ class Assignment < ActiveRecord::Base
     self.mastery_score = [self.mastery_score, self.points_possible].min if self.mastery_score && self.points_possible
     self.all_day_date = (zoned_due_at.to_date rescue nil) if !self.all_day_date || self.due_at_changed? || self.all_day_date_changed?
     self.submission_types ||= "none"
+    self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
     self.anonymous_peer_reviews = true if self.peer_reviews
     @workflow_state_was = self.workflow_state_was
     @points_possible_was = self.points_possible_was
@@ -1053,11 +1054,22 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    if self.peer_reviews_due_at && self.peer_reviews_due_at < Time.now
+    reviews_due_at = self.peer_reviews_assign_at || self.due_at
+    if reviews_due_at && reviews_due_at < Time.now
       self.peer_reviews_assigned = true
     end
     self.save
     return res
+  end
+  
+  # TODO: on a future deploy, rename the column peer_reviews_due_at
+  # to peer_reviews_assign_at
+  def peer_reviews_assign_at
+    peer_reviews_due_at
+  end
+  
+  def peer_reviews_assign_at=(val)
+    peer_reviews_due_at = val
   end
   
   def has_peer_reviews?
@@ -1082,10 +1094,6 @@ class Assignment < ActiveRecord::Base
     }
   }
   
-  # don't really need this scope anymore since we are doing the auto_peer_reviews assigning as a delayed job instead of a poller, but I'll leave it here if it is useful to anyone. -RS
-  named_scope :to_be_auto_peer_reviewed, lambda {
-    {:conditions => ['assignments.peer_reviews_assigned != ? AND assignments.peer_reviews = ? AND assignments.due_at < ? AND assignments.automatic_peer_reviews = ?', true, true, Time.now.utc, true], :order => 'assignments.updated_at, assignments.peer_reviews_due_at' }
-  }
   named_scope :include_quiz_and_topic, lambda {
     {:include => [:quiz, :discussion_topic] }
   }
