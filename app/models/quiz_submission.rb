@@ -379,7 +379,7 @@ class QuizSubmission < ActiveRecord::Base
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]
     raise "Can't update submission scores unless it's completed" if !self.completed? && version == versions.current
     
-    data = self.submission_data || []
+    data = version.model.submission_data || []
     res = []
     tally = 0
     self.workflow_state = "complete"

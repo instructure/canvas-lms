@@ -36,8 +36,12 @@ describe QuizSubmission do
     @quiz = @course.quizzes.create!
     qs = @quiz.generate_submission(@user)
     qs.workflow_state = 'complete'
+    qs.submission_data = [{ :points => 0, :text => "", :correct => "undefined", :question_id => -1 }]
+    qs.save
     
     qs = @quiz.generate_submission(@user)
+    qs.submission_data = { "foo" => "bar" } # simulate k/v pairs we store for quizzes in progress
+    qs.save
     lambda {qs.update_scores}.should raise_error
     lambda {qs.update_scores(:submission_version_number => 3) }.should_not raise_error
   end
