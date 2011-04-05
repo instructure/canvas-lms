@@ -31,6 +31,17 @@ describe QuizSubmission do
     res.should eql(false)
   end
   
+  it "should allow updating scores on a completed version of a submission while the current version is in progress" do
+    course_with_student(:active_all => true)
+    @quiz = @course.quizzes.create!
+    qs = @quiz.generate_submission(@user)
+    qs.workflow_state = 'complete'
+    
+    qs = @quiz.generate_submission(@user)
+    lambda {qs.update_scores}.should raise_error
+    lambda {qs.update_scores(:submission_version_number => 3) }.should_not raise_error
+  end
+  
   it "should not allowed grading on an already-graded submission" do
     q = @quiz.quiz_submissions.create!
     q.workflow_state = "complete"

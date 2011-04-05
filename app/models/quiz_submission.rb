@@ -373,11 +373,12 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def update_scores(params)
-    raise "Can't update submission scores unless it's completed" if !self.completed?
     params = (params || {}).with_indifferent_access
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]
+    raise "Can't update submission scores unless it's completed" if !self.completed? && version == versions.current
+    
     data = self.submission_data || []
     res = []
     tally = 0
