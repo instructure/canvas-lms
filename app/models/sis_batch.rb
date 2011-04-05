@@ -33,12 +33,31 @@ class SisBatch < ActiveRecord::Base
   
   def self.valid_import_types
     @valid_import_types ||= {
-        "instructure_csv_zip" => {
-            :name => "Instructure formatted CSV zip",
+        "instructure_csv" => {
+            :name => "Instructure formatted CSV or zipfile of CSVs",
             :callback => lambda {|batch| batch.process_instructure_csv_zip},
             :default => true
           }
       }
+  end
+
+  def self.create_with_attachment(account, import_type, attachment)
+    batch = SisBatch.new
+    batch.account = account
+    batch.progress = 0
+    batch.workflow_state = :created
+    batch.data = {:import_type => import_type}
+    batch.save
+
+    att = Attachment.new
+    att.context = batch
+    att.uploaded_data = attachment
+    att.display_name = "sis_upload_#{batch.id}.zip"
+    att.save
+    batch.attachment = att
+    batch.save
+
+    batch
   end
 
   workflow do
@@ -124,6 +143,7 @@ class SisBatch < ActiveRecord::Base
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if messages?
     end
+    self.ended_at = Time.now
     self.save
   end
   private

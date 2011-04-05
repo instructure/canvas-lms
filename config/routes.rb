@@ -629,6 +629,11 @@ ActionController::Routing::Routes.draw do |map|
         :controller => 'submissions_api', :action => 'for_students',
         :conditions => { :method => :get }
     end
+    api.resources :accounts, :only => %{} do |account|
+      account.resources :sis_imports,
+                        :controller => 'sis_imports_api',
+                        :only => %w(show create)
+    end
   end
 
   # TODO: look at the FacebookController actions in more detail, sort out the

@@ -53,6 +53,7 @@ Rails::Initializer.run do |config|
   config.autoload_paths += %W( #{RAILS_ROOT}/app/middleware )
 
   config.middleware.insert_before('ActionController::ParamsParser', 'LoadAccount')
+  config.middleware.insert_before('ActionController::ParamsParser', 'PreventNonMultipartParse')
   config.middleware.insert_before('ActionController::ParamsParser', "RequestContextGenerator")
   config.to_prepare do
     require_dependency 'canvas/plugins/default_plugins'

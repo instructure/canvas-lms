@@ -271,30 +271,16 @@ class AccountsController < ApplicationController
     raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
 
     if authorized_action(@account, @current_user, :manage)
-      if !@account.current_sis_batch || !['importing', 'created'].member?(@account.current_sis_batch.workflow_state) 
-        batch = SisBatch.new
-        batch.account = @account
-        batch.progress = 0
-        batch.workflow_state = :created
-        batch.data = {:import_type=>params[:import_type]}
-        batch.save
-
-        att = Attachment.new
-        att.context = batch
-        att.uploaded_data = params[:attachment]
-        att.display_name = "sis_upload_#{batch.id}.zip"
-        att.save
-        batch.attachment = att
-        batch.save
-
-        @account.current_sis_batch_id = batch.id
-        @account.save
-
-        batch.process
-        
-        render :text => batch.to_json(:include => :sis_batch_log_entries)
-      else
-        render :text => {:error=>true, :error_message=>"An SIS import is already in process.", :batch_in_progress=>true}.to_json
+      ActiveRecord::Base.transaction do
+        if !@account.current_sis_batch || !@account.current_sis_batch.importing?
+          batch = SisBatch.create_with_attachment(@account, params[:import_type], params[:attachment])
+          @account.current_sis_batch_id = batch.id
+          @account.save
+          batch.process
+          render :text => batch.to_json(:include => :sis_batch_log_entries)
+        else
+          render :text => {:error=>true, :error_message=>"An SIS import is already in process.", :batch_in_progress=>true}.to_json
+        end
       end
     end
 

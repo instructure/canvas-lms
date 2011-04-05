@@ -1,0 +1,2 @@
+email,status,user_id,first_name,last_name,login_id,password
+user@example.edu,active,100,Jamie,Kennedy,A00000001,{SSHA}NgdtY1oUVBmBaBcDeFgHIIGCwzsyNkZSR0pJSw==

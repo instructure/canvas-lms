@@ -25,7 +25,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 # don't affect routing.
 def api_call(method, path, params, body_params = {}, headers = {})
   raw_api_call(method, path, params, body_params, headers)
-  response.should be_success
+  response.should be_success, response.body
   case params[:format]
   when 'json'
     response.header['content-type'].should == 'application/json; charset=utf-8'
