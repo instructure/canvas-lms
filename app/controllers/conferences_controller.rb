@@ -41,6 +41,7 @@ class ConferencesController < ApplicationController
   def create
     if authorized_action(@context.web_conferences.new, @current_user, :create)
       @conference = @context.web_conferences.build(params[:web_conference])
+      @conference.settings[:default_return_url] = named_context_url(@context, :context_url, :include_host => true)
       @conference.user = @current_user
       members = get_new_members
       respond_to do |format|

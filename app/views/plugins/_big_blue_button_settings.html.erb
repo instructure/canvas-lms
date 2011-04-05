@@ -1,0 +1,25 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          You will need access to a <a href="http://bigbluebutton.org">BigBlueButton</a> instance.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :domain, "Domain:" %></td>
+      <td>
+        <%= f.text_field :domain %><br>
+        <b>hostname</b> or <b>ip address</b> of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :secret, "Secret:" %></td>
+      <td>
+        <%= f.password_field :secret, :autocomplete => false %><br>
+        This is the <b>beans.dynamicConferenceService.securitySalt</b> paramater that can be found in the <b>bigbluebutton.properties</b> config file.
+      </td>
+    </tr>
+  </table>
+<% end %>

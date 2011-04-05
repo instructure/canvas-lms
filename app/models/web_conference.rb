@@ -41,6 +41,11 @@ class WebConference < ActiveRecord::Base
     :conditions => {:context_code => context_codes} } 
   }
 
+  serialize :settings
+  def settings
+    read_attribute(:settings) || write_attribute(:settings, {})
+  end
+
   def assign_uuid
     self.uuid ||= UUIDSingleton.instance.generate
   end

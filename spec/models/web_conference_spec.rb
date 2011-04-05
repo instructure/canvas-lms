@@ -23,6 +23,7 @@ describe WebConference do
     WebConference.instance_eval do
       def plugins
         [OpenObject.new(:id => "dim_dim", :settings => {:domain => "dimdim.instructure.com"}),
+         OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
          OpenObject.new(:id => "broken_plugin", :settings => {:foo => :bar})]
       end
     end
@@ -70,6 +71,41 @@ describe WebConference do
     it "should confirm valid config" do
       DimDimConference.new.valid_config?.should be_true
       DimDimConference.new(:conference_type => "DimDim").valid_config?.should be_true
+    end
+  end
+
+  context "big_blue_button" do
+    it "should correctly retrieve a config hash" do
+      conference = BigBlueButtonConference.new
+      config = conference.config
+      config.should_not be_nil
+      config[:conference_type].should eql('BigBlueButton')
+      config[:class_name].should eql('BigBlueButtonConference')
+    end
+
+    it "should correctly generate join urls" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user)
+      conference.config.should_not be_nil
+
+      # set some vars so it thinks it's been created and doesn't do an api call
+      conference.conference_key = 'test'
+      conference.settings[:admin_key] = 'admin'
+      conference.settings[:user_key] = 'user'
+      conference.save
+
+      params = {:fullName => user.name, :meetingID => conference.conference_key, :userID => user.id}
+      admin_params = params.merge(:password => 'admin').to_query
+      user_params = params.merge(:password => 'user').to_query
+      conference.admin_join_url(@user).should eql("http://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" + Digest::SHA1.hexdigest("join#{admin_params}secret"))
+      conference.participant_join_url(@user).should eql("http://bbb.instructure.com/bigbluebutton/api/join?#{user_params}&checksum=" + Digest::SHA1.hexdigest("join#{user_params}secret"))
+    end
+
+    it "should confirm valid config" do
+      BigBlueButtonConference.new.valid_config?.should be_true
+      BigBlueButtonConference.new(:conference_type => "BigBlueButton").valid_config?.should be_true
     end
   end
   

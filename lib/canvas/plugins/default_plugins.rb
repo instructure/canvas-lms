@@ -37,3 +37,13 @@ Canvas::Plugin.register('error_reporting', :error_reporting, {
   :version => 1.0,
   :settings_partial => 'plugins/error_reporting_settings'
 })
+Canvas::Plugin.register('big_blue_button', :web_conferencing, {
+  :description => 'Big Blue Button web conferencing support',
+  :website => 'http://bigbluebutton.org',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => 1.0,
+  :settings_partial => 'plugins/big_blue_button_settings',
+  :validator => 'BigBlueButtonValidator',
+  :encrypted_settings => [:secret]
+})
