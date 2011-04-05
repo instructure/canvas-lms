@@ -25,7 +25,8 @@ define([
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'media_comments' /* mediaComment, mediaCommentThumbnail */
+  'compiled/jquery/mediaCommentThumbnail',
+  'media_comments' /* mediaComment */
 ], function(INST, I18n, $) {
 
   function setGroupData(groups, $group) {

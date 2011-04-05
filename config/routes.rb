@@ -974,6 +974,16 @@ ActionController::Routing::Routes.draw do |map|
       context_modules.get "courses/:course_id/modules/:module_id/items/:id", :action => :show_module_item, :path_name => 'course_context_module_item'
       context_modules.get "courses/:course_id/module_item_redirect/:id", :action => :module_item_redirect, :path_name => 'course_context_module_item_redirect'
     end
+
+    api.with_options(:controller => :media_objects) do |media_objects|
+      media_objects.get 'media_objects/:media_object_id', :action => :show, :path_name => 'media_object'
+    end
+
+    api.with_options(:controller => :media_tracks) do |media_tracks|
+      media_tracks.post   'media_objects/:media_object_id/media_tracks', :action => :create, :path_name => 'create_media_track'
+      media_tracks.delete "media_objects/:media_object_id/media_tracks/:media_track_id", :action => :destroy, :path_name => 'destroy_media_track'
+      media_tracks.get    "media_objects/:media_object_id/media_tracks/:id", :action => :show, :path_name => 'media_track'
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

@@ -24,6 +24,7 @@ require [
   # 'compiled/behaviors/repin-item'
   # 'compiled/behaviors/follow'
   'compiled/behaviors/tooltip'
+  'compiled/behaviors/instructure_inline_media_comment'
 
   # other stuff several bundles use
   'media_comments'
