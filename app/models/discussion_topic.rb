@@ -209,18 +209,28 @@ class DiscussionTopic < ActiveRecord::Base
     state :deleted
   end
   
-  on_create_send_to_streams do
+  def should_send_to_stream
     if self.delayed_post_at && self.delayed_post_at > Time.now
+      false
     elsif self.cloned_item_id
+      false
     elsif self.assignment && self.root_topic_id && self.assignment.group_category && !self.assignment.group_category.empty?
+      false
     elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now)
+      false
     else
+      true
+    end
+  end
+  
+  on_create_send_to_streams do
+    if should_send_to_stream
       self.participants
     end
   end
   
   on_update_send_to_streams do
-    if @delayed_just_posted || @content_changed
+    if should_send_to_stream && (@delayed_just_posted || @content_changed)
       self.participants
     end
   end

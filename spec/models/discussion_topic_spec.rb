@@ -59,6 +59,21 @@ describe DiscussionTopic do
     a.should be_deleted
   end
   
+  context "delayed posting" do
+    it "shouldn't send to streams on creation or update if it's delayed" do
+      course_with_student(:active_all => true)
+      @user.register
+      topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
+      StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
+      
+      topic = @course.discussion_topics.create!(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
+      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+      
+      topic.message = "content changed!"
+      topic.save
+      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+    end
+  end
   
   context "clone_for" do
     it "should clone to another context" do
