@@ -37,7 +37,39 @@ class SubmissionsApiController < ApplicationController
 
       includes = Array(params[:include])
 
-      result = @submissions.map { |s| submission_json(s, includes) }
+      result = @submissions.map { |s| submission_json(s, @assignment, includes) }
+
+      render :json => result.to_json
+    end
+  end
+
+  # @API
+  #
+  # Get all existing submissions for a given set of students and assignments.
+  #
+  # @argument student_ids[] List of student ids to return submissions for. At least one is required.
+  # @argument assignment_ids[] List of assignments to return submissions for. If none are given, submissions for all assignments are returned.
+  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
+  def for_students
+    if authorized_action(@context, @current_user, :manage_grades)
+      student_ids = Array(params[:student_ids]).map(&:to_i)
+      raise ActiveRecord::RecordNotFound if student_ids.blank?
+
+      assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
+
+      scope = @context.submissions.scoped(:include => :assignment)
+
+      if assignment_ids.present?
+        @submissions = scope.all(
+          :conditions => {:user_id => student_ids, :assignment_id => assignment_ids})
+      else
+        @submissions = scope.all(
+          :conditions => {:user_id => student_ids})
+      end
+
+      includes = Array(params[:include])
+
+      result = @submissions.map { |s| submission_json(s, s.assignment, includes) }
 
       render :json => result.to_json
     end
@@ -54,7 +86,7 @@ class SubmissionsApiController < ApplicationController
       @submission = @assignment.submissions.find_by_user_id(params[:id]) or raise ActiveRecord::RecordNotFound
 
       includes = Array(params[:include])
-      render :json => submission_json(@submission, includes).to_json
+      render :json => submission_json(@submission, @assignment, includes).to_json
     end
   end
 
@@ -155,7 +187,7 @@ class SubmissionsApiController < ApplicationController
       # fix this at some point.
       @submission.reload
 
-      render :json => submission_json(@submission, %w(submission_comments)).to_json
+      render :json => submission_json(@submission, @assignment, %w(submission_comments)).to_json
     end
   end
 
@@ -163,13 +195,13 @@ class SubmissionsApiController < ApplicationController
 
   # We might want to make a Helper that holds all these methods to convert AR
   # objects to the API json formatting.
-  def submission_json(submission, includes = [])
-    hash = submission_attempt_json(submission)
+  def submission_json(submission, assignment, includes = [])
+    hash = submission_attempt_json(submission, assignment)
 
     if includes.include?("submission_history")
       hash['submission_history'] = []
       submission.submission_history.each_with_index do |ver, idx|
-        hash['submission_history'] << submission_attempt_json(ver, idx)
+        hash['submission_history'] << submission_attempt_json(ver, assignment, idx)
       end
     end
 
@@ -183,7 +215,7 @@ class SubmissionsApiController < ApplicationController
                                                         sc.media_comment_type)
         end
         sc_hash['attachments'] = sc.attachments.map do |a|
-          attachment_json(a, {:comment_id => sc.id, :id => submission.user_id})
+          attachment_json(a, assignment, {:comment_id => sc.id, :id => submission.user_id})
         end unless sc.attachments.blank?
         sc_hash
       end
@@ -198,15 +230,15 @@ class SubmissionsApiController < ApplicationController
     hash
   end
 
-  SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body)
+  SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id)
 
-  def submission_attempt_json(attempt, version_idx = nil)
+  def submission_attempt_json(attempt, assignment, version_idx = nil)
     hash = attempt.as_json(
       :include_root => false,
       :only => SUBMISSION_JSON_FIELDS)
 
     hash['preview_url'] = course_assignment_submission_url(
-      @context, @assignment, attempt[:user_id], 'preview' => '1',
+      @context, assignment, attempt[:user_id], 'preview' => '1',
       'version' => version_idx)
 
     unless attempt.media_comment_id.blank?
@@ -216,19 +248,19 @@ class SubmissionsApiController < ApplicationController
     attachments = attempt.versioned_attachments.dup
     attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
     hash['attachments'] = attachments.map do |attachment|
-      attachment_json(attachment, :id => attempt.user_id)
+      attachment_json(attachment, assignment, :id => attempt.user_id)
     end unless attachments.blank?
 
     # include the discussion topic entries
-    if @assignment.submission_types =~ /discussion_topic/ &&
-           @assignment.discussion_topic
+    if assignment.submission_types =~ /discussion_topic/ &&
+           assignment.discussion_topic
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the
       # individual group one. so we search far and wide for all student entries.
-      if @assignment.group_category
-        entries = @assignment.discussion_topic.child_topics.map {|t| t.discussion_entries.active.for_user(attempt.user_id) }.flatten.sort_by{|e| e.created_at}
+      if assignment.group_category
+        entries = assignment.discussion_topic.child_topics.map {|t| t.discussion_entries.active.for_user(attempt.user_id) }.flatten.sort_by{|e| e.created_at}
       else
-        entries = @assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
+        entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
       end
       hash['discussion_entries'] = entries.map do |entry|
         ehash = entry.as_json(
@@ -237,7 +269,7 @@ class SubmissionsApiController < ApplicationController
         )
         attachments = (entry.attachments.dup + [entry.attachment]).compact
         ehash['attachments'] = attachments.map do |attachment|
-          attachment_json(attachment, :id => attempt.user_id)
+          attachment_json(attachment, assignment, :id => attempt.user_id)
         end unless attachments.blank?
         ehash
       end
@@ -246,12 +278,13 @@ class SubmissionsApiController < ApplicationController
     hash
   end
 
-  def attachment_json(attachment, url_params = {})
+  def attachment_json(attachment, assignment, url_params = {})
     url = case attachment.context_type
           when "Course"
             course_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
           else
-            course_assignment_submission_url(url_params.merge(:download => attachment.id))
+            course_assignment_submission_url(@context, assignment,
+                                             url_params.merge(:download => attachment.id))
           end
     {
       'content-type' => attachment.content_type,

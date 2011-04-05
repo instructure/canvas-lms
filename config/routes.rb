@@ -608,8 +608,9 @@ ActionController::Routing::Routes.draw do |map|
   # API routes
   ApiRouteSet.new(map, "/api/v1") do |api|
     api.resources :courses,
+                  :name_prefix => "api_v1_",
                   :only => %w(index) do |course|
-      course.api_students 'students.:format',
+      course.students 'students.:format',
         :controller => 'courses', :action => 'students',
         :conditions => { :method => :get }
       course.resources :assignments,
@@ -621,6 +622,9 @@ ActionController::Routing::Routes.draw do |map|
       end
       course.resources :assignment_groups,
                         :only => %w(index)
+      course.student_submissions 'students/submissions.:format',
+        :controller => 'submissions_api', :action => 'for_students',
+        :conditions => { :method => :get }
     end
   end
 

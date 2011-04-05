@@ -147,6 +147,7 @@ describe SubmissionsApiController, :type => :integration do
       [{"grade"=>"A-",
         "prior"=>nil,
         "body"=>"test!",
+        "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1",
         "attachments" =>
@@ -160,6 +161,7 @@ describe SubmissionsApiController, :type => :integration do
          [{"grade"=>nil,
            "prior"=>nil,
            "body"=>"test!",
+           "assignment_id" => a1.id,
            "submitted_at"=>"1970-01-01T01:00:00Z",
            "attempt"=>1,
            "url"=>nil,
@@ -170,6 +172,7 @@ describe SubmissionsApiController, :type => :integration do
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=0",
            "score"=>nil},
           {"grade"=>nil,
+            "assignment_id" => a1.id,
            "media_comment" =>
             { "content-type" => "video/mp4",
               "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
@@ -185,6 +188,7 @@ describe SubmissionsApiController, :type => :integration do
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
            "score"=>nil},
           {"grade"=>"A-",
+            "assignment_id" => a1.id,
            "media_comment" =>
             { "content-type" => "video/mp4",
               "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
@@ -226,12 +230,14 @@ describe SubmissionsApiController, :type => :integration do
            "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
         "score"=>13.5},
        {"grade"=>"F",
+        "assignment_id" => a1.id,
         "prior"=>nil,
         "body"=>nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1",
         "submitted_at"=>"1970-01-01T04:00:00Z",
         "submission_history"=>
          [{"grade"=>"F",
+           "assignment_id" => a1.id,
            "prior"=>nil,
            "body"=>nil,
            "submitted_at"=>"1970-01-01T04:00:00Z",
@@ -265,6 +271,50 @@ describe SubmissionsApiController, :type => :integration do
          {"crit2"=>{"comments"=>"Hmm", "points"=>2},
           "crit1"=>{"comments"=>nil, "points"=>7}}}]
     json.should == res
+  end
+
+  it "should return all submissions for a student" do
+    student1 = user(:active_all => true)
+    student2 = user(:active_all => true)
+
+    course_with_teacher_logged_in(:active_all => true)
+
+    @course.enroll_student(student1).accept!
+    @course.enroll_student(student2).accept!
+
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a2 = @course.assignments.create!(:title => 'assignment2', :grading_type => 'letter_grade', :points_possible => 25)
+
+    submit_homework(a1, student1)
+    submit_homework(a2, student1)
+    submit_homework(a1, student2)
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param] })
+
+    json.size.should == 2
+    json.all? { |submission| submission['user_id'].should == student1.id }.should be_true
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, student2.to_param] })
+
+    json.size.should == 3
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, student2.to_param],
+            :assignment_ids => [a1.to_param] })
+
+    json.size.should == 2
+    json.all? { |submission| submission['assignment_id'].should == a1.id }.should be_true
   end
 
   it "should allow grading an uncreated submission" do
