@@ -392,7 +392,7 @@
               <xs:element name="description" type="xs:string" minOccurs="0"/>
               <xs:element name="domain" type="xs:string" minOccurs="0"/>
               
-              <xs:element name="privacy_level" minOccurs="1" default="full">
+              <xs:element name="privacy_level" minOccurs="1" default="anonymous">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:enumeration value="name_only"/>

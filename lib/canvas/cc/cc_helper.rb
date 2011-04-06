@@ -22,22 +22,13 @@ module CCHelper
   XSD_URI = 'http://canvas.instructure.com/xsd/cccv1p0.xsd'
   
   # IMS formats/types
-  # The IMS documentation for Common Cartridge has conflicting values
-  # for assessments, discussions and web links, and the validator 
-  # wants different values as well
-  # todo use the correct value once IMS documentation is updated
-  #ASSESSMENT_TYPE = 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment'
-  ASSESSMENT_TYPE = 'imsqti_xmlv1p2/imscc_xmlv1p0/assessment'
+  ASSESSMENT_TYPE = 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment'
   CC_EXTENSION = 'imscc'
-  #DISCUSSION_TOPIC = "imsccdt_xmlv1p1"
-  #DISCUSSION_TOPIC = "imsdt_xmlv1p1"
-  DISCUSSION_TOPIC = "imsdt_xmlv1p0"
+  DISCUSSION_TOPIC = "imsdt_xmlv1p1"
   IMS_DATE = "%Y-%m-%d"
   IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
-  LOR = "associatedcontent/imscc_xmlv1p0/learning-application-resource"
-  #WEB_LINK = "imsccwl_xmlv1p1"
-  #WEB_LINK = "imswl_xmlv1p1"
-  WEB_LINK = "imswl_xmlv1p0"
+  LOR = "associatedcontent/imscc_xmlv1p1/learning-application-resource"
+  WEB_LINK = "imswl_xmlv1p1"
   WEBCONTENT = "webcontent"
   BASIC_LTI = 'imsbasiclti_xmlv1p0'
   

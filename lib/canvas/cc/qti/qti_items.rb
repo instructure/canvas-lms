@@ -73,6 +73,9 @@ module Canvas::CC
             meta_node.qtimetadata do |qm_node|
               if for_cc
                 meta_field(qm_node, 'cc_profile', CC_TYPE_PROFILES[question['question_type']])
+                if question['question_type'] == 'essay_question'
+                  meta_field(qm_node, 'qmd_computerscored', 'No')
+                end
               else
                 meta_field(qm_node, 'question_type', TYPE_PROFILES[question['question_type']])
                 meta_field(qm_node, 'points_possible', question['points_possible'])

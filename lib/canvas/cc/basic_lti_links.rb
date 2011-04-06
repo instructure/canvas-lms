@@ -36,15 +36,19 @@ module Canvas::CC
                                         "xmlns:lticp" => 'http://www.imsglobal.org/xsd/imslticp_v1p0',
                                         "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                                         "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
-                          http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+                          http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd
                           http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
                           http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd"
         ) do |blti_node|
           blti_node.tag! "blti:title", ct.title
           if ct.url =~ %r{http://}
-            blti_node.launch_url ct.url
+            blti_node.tag! "blti:launch_url", ct.url
           elsif ct.url =~ %r{https://}  
-            blti_node.secure_launch_url ct.url
+            blti_node.tag! "blti:secure_launch_url", ct.url
+          end
+          blti_node.tag! "blti:vendor" do |v_node|
+            v_node.tag! "lticp:code", 'unknown'
+            v_node.tag! "lticp:name", 'unknown'
           end
         end
         lti_file.close

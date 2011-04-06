@@ -88,7 +88,7 @@ module Canvas::CC
         link_doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
         link_doc.instruct!
         
-        xsd_uri = for_cc ? 'http://www.imsglobal.org/profile/cc/ccv1p0/derived_schema/domainProfile_4/ims_qtiasiv1p2_localised.xsd' : 'http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd'
+        xsd_uri = for_cc ? 'http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_qtiasiv1p2p1_v1p0.xsd' : 'http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd'
   
         link_doc.questestinterop("xmlns" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2",
                         "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
