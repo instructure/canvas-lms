@@ -19,6 +19,10 @@
 class ErrorsController < ApplicationController
   before_filter :require_user, :require_site_admin
   def index
-    @reports = ErrorReport.find(:all, :order => 'created_at DESC', :limit => 25, :offset => params[:start] || 0)
+    @reports = ErrorReport.find(:all, :order => 'created_at DESC', :include => :user, :limit => 25, :offset => params[:start] || 0)
+  end
+  def show
+    @reports = [ErrorReport.find(params[:id])]
+    render :action => 'index'
   end
 end

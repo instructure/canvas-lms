@@ -588,7 +588,7 @@ ActionController::Routing::Routes.draw do |map|
   #   end
 
   map.errors "errors", :controller => "info", :action => "record_error", :conditions => {:method => :post}
-  map.resources :errors, :as => :error_reports
+  map.resources :errors, :as => :error_reports, :only => [:show, :index]
   
   map.health_check "health_check", :controller => 'info', :action => 'health_check'
   

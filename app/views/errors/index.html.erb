@@ -1,8 +1,15 @@
+<% 
+  content_for :page_title, "Error Reports"
+  add_crumb "Error Reports"
+%>
 <% @reports.each do |report| %>
   <div style="margin-bottom: 20px;">
     <h3><%= h(report.message) %></h3>
       <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
       <%= h(report.url) %><br/>
+      <% if report.user_id %>
+        <%= link_to report.user.try(:name), user_url(report.user_id) %>
+      <% end %>
       <pre style="font-size: 0.8em; margin-left: 20px; height: 150px; overflow: auto;">
         <%= h(report.backtrace) %>
       </pre>
