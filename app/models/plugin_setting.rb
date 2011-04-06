@@ -54,14 +54,24 @@ class PluginSetting < ActiveRecord::Base
   # it's set) and be able to tell when it gets blanked out.
   DUMMY_STRING = "~!?3NCRYPT3D?!~"
   def after_initialize
-    if settings && self.plugin && self.plugin.encrypted_settings
+    return unless settings && self.plugin
+    @valid_settings = true
+    if self.plugin.encrypted_settings
       self.plugin.encrypted_settings.each do |key|
         if settings["#{key}_enc".to_sym]
-          settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc"], settings["#{key}_salt".to_sym])
+          begin
+            settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym])
+          rescue
+            @valid_settings = false
+          end
           settings[key] = DUMMY_STRING
         end
       end
     end
+  end
+
+  def valid_settings?
+    @valid_settings
   end
 
   def encrypt_settings
@@ -82,7 +92,7 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def self.settings_for_plugin(name, plugin=nil)
-    if plugin_setting = PluginSetting.find_by_name(name.to_s)
+    if (plugin_setting = PluginSetting.find_by_name(name.to_s)) && plugin_setting.valid_settings? 
       plugin_setting.plugin = plugin
       settings = plugin_setting.settings
     else
