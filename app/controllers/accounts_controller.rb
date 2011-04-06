@@ -256,6 +256,7 @@ class AccountsController < ApplicationController
   
   def sis_import
     if authorized_action(@account, @current_user, :manage)
+      return redirect_to account_settings_url(@account) if !@account.allow_sis_import || @account.root_account_id
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.scoped(:order=>'created_at DESC', :limit=>1).first
       respond_to do |format|
