@@ -21,6 +21,6 @@ $(document).ready(function() {
   $(window).resize(function() {
     var top = $("#file_content").offset().top;
     var height = $(window).height();
-    $("#file_content").height(height - top);
+    $("#file_content").css('width', '100%').height(height - top);
   }).triggerHandler('resize');
 });
