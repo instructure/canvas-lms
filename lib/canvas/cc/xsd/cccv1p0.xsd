@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://www.instructure.com/xsd/cccv0p1"
-           xmlns="http://www.instructure.com/xsd/cccv0p1"
+<xs:schema targetNamespace="http://canvas.instructure.com/xsd/cccv1p0"
+           xmlns="http://canvas.instructure.com/xsd/cccv1p0"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified">
   <!-- todo: useful comments as documentation ;) -->
@@ -74,10 +74,10 @@
       <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
       <xs:element name="peer_reviews_due_at" type="xs:dateTime" minOccurs="0"/>
       <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
-      <xs:element name="assignment_group_identifierref" type="xs:IDREF" minOccurs="0"/>
-      <xs:element name="grading_standard_identifierref" type="xs:IDREF" minOccurs="0"/>
-      <xs:element name="rubric_identifierref" type="xs:IDREF" minOccurs="0"/>
-      <xs:element name="quiz_identifierref" type="xs:IDREF" minOccurs="0"/>
+      <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="grading_standard_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="rubric_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="quiz_identifierref" type="xs:string" minOccurs="0"/>
       <xs:element name="allowed_extensions" type="xs:string" minOccurs="0"/>
       <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
       <xs:element name="min_score" type="xs:float" minOccurs="0"/>
@@ -140,7 +140,7 @@
                       <xs:complexType>
                         <xs:all minOccurs="0">
                           <xs:element name="title" type="xs:string" minOccurs="0"/>
-                          <xs:element name="identifierref" type="xs:IDREF" minOccurs="0"/>
+                          <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
                         </xs:all>
                         <xs:attribute name="type" type="xs:string" use="required"/>
                       </xs:complexType>
@@ -156,7 +156,7 @@
                       <xs:complexType>
                         <xs:all minOccurs="0">
                           <xs:element name="content_type" type="xs:string" minOccurs="1"/>
-                          <xs:element name="identifierref" type="xs:IDREFS" minOccurs="0"/>
+                          <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
                           <xs:element name="url" type="xs:string" minOccurs="0"/>
                           <xs:element name="position" type="xs:integer" minOccurs="0"/>
                           <xs:element name="indent" type="xs:integer" minOccurs="0"/>
@@ -174,7 +174,7 @@
                     <xs:element name="completionRequirement">
                       <xs:complexType>
                         <xs:all minOccurs="0">
-                          <xs:element name="identifierref" type="xs:IDREF" minOccurs="1"/>
+                          <xs:element name="identifierref" type="xs:string" minOccurs="1"/>
                           <xs:element name="min_score" type="xs:integer" minOccurs="0"/>
                           <xs:element name="max_score" type="xs:integer" minOccurs="0"/>
                         </xs:all>
@@ -258,7 +258,7 @@
                               </xs:restriction>
                             </xs:simpleType>
                           </xs:element>
-                          <xs:element name="identifierref" type="xs:IDREF" minOccurs="0"/>
+                          <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
                           <xs:element name="drop_count" type="xs:integer" minOccurs="0"/>
                         </xs:all>
                       </xs:complexType>
@@ -364,7 +364,7 @@
                           <xs:element name="points" type="xs:float" minOccurs="0"/>
                           <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
                           <xs:element name="ignore_for_scoring" type="xs:boolean" minOccurs="0"/>
-                          <xs:element name="learning_outcome_identifierref" type="xs:IDREF" minOccurs="0"/>
+                          <xs:element name="learning_outcome_identifierref" type="xs:string" minOccurs="0"/>
                           <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
                         </xs:all>
                       </xs:complexType>

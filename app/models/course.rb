@@ -107,6 +107,7 @@ class Course < ActiveRecord::Base
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
   has_many :role_overrides, :as => :context
+  has_many :content_exports
   attr_accessor :import_source
   
   before_save :assign_uuid

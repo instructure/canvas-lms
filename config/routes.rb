@@ -219,6 +219,7 @@ ActionController::Routing::Routes.draw do |map|
       m.last_redirect 'items/last', :controller => 'context_modules', :action => 'module_redirect', :last => 1
       m.first_redirect 'items/first', :controller => 'context_modules', :action => 'module_redirect', :first => 1
     end
+    course.resources :content_exports, :only => %w(create index destroy show)
     course.context_modules_assignment_info 'modules/items/assignment_info', :controller => 'context_modules', :action => 'content_tag_assignment_data', :conditions => {:method => :get}
     course.context_modules_item_redirect 'modules/items/:id', :controller => 'context_modules', :action => 'item_redirect', :conditions => {:method => :get}
     course.context_modules_item_details 'modules/items/sequence/:id', :controller => 'context_modules', :action => 'item_details', :conditions => {:method => :get}
@@ -599,6 +600,14 @@ ActionController::Routing::Routes.draw do |map|
   map.saml_consume "saml_consume", :controller => "pseudonym_sessions", :action => "saml_consume" 
   map.saml_logout "saml_logout", :controller => "pseudonym_sessions", :action => "saml_logout" 
   map.saml_meta_data "saml_meta_data", :controller => 'accounts', :action => 'saml_meta_data'
+  
+  # Routes for course exports
+  map.connect 'xsd/:version.xsd', :controller => 'content_exports', :action => 'xml_schema'
+  map.resources :content_exports do |ce|
+    ce.resources :files do |file|
+      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
+    end
+  end
   
   Jammit::Routes.draw(map)
 

@@ -238,7 +238,7 @@ module Instructure #:nodoc:
         def broadcast_notifications
           return if @broadcasted
           @broadcasted = true
-          raise ArgumentError, "Block not supplied for #{self.class.to_s}" unless self.class.broadcast_policy_block
+          raise ArgumentError, "Broadcast Policy block not supplied for #{self.class.to_s}" unless self.class.broadcast_policy_block
           self.instance_eval &self.class.broadcast_policy_block
           self.broadcast_policy_list.each {|p| p.broadcast(self) }
         end

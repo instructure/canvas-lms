@@ -20,17 +20,20 @@ module Canvas::CC
 
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file
 
-    def initialize(course, user, opts={})
-      @course = course
-      @user = user
+    def initialize(content_export, opts={})
+      @content_export = content_export
+      @course = opts[:course] || @content_export.course 
+      @user = opts[:user] || @content_export.user
       @export_dir = nil
       @manifest = nil
       @zip_file = nil
+      @zip_name = nil
       @logger = Rails.logger
+      @migration_config = Setting.from_config('external_migration')
     end
 
-    def self.export(course, user, opts={})
-      exporter = CCExporter.new(course, user, opts)
+    def self.export(content_export, opts={})
+      exporter = CCExporter.new(content_export, opts)
       exporter.export
     end
 
@@ -41,25 +44,53 @@ module Canvas::CC
         @manifest = Manifest.new(self)
         @manifest.create_document
         @manifest.close
-        #copy all folder contents into zip file
-        #create attachment from zip file
-        #delete directory
-      rescue => e
-        #todo error handling
-        @logger.error e
-        #delete directory?
+        copy_all_to_zip
+        @zip_file.close
+        
+        if @content_export && File.exists?(@zip_path)
+          att = Attachment.new
+          att.context = @content_export
+          att.user = @content_export.user
+          up_data = ActionController::TestUploadedFile.new(@zip_path, Attachment.mimetype(@zip_path))
+          att.uploaded_data = up_data
+          if att.save
+            @content_export.attachment = att
+            @content_export.save
+          end
+        end
+      rescue
+        message = $!.to_s
+        stack = "#{$!}: #{$!.backtrace.join("\n")}"
+        @content_export.add_error(message, stack) if @content_export
+        @logger.error $!
+        return false
       ensure
         @zip_file.close if @zip_file
+        if !@migration_config[:keep_after_complete] && File.directory?(@export_dir)
+          FileUtils::rm_rf(@export_dir)
+        end
       end
+      true
+    end
+    
+    def set_progress(progress)
+      @content_export.fast_update_progress(progress) if @content_export  
     end
     
     private
+    
+    def copy_all_to_zip
+      Dir["#{@export_dir}/**/**"].each do |file|
+        next if File.basename(file) == @zip_name
+        file_path = file.sub(@export_dir+'/', '')
+        @zip_file.add(file_path, file)
+      end
+    end
 
     def create_export_dir
       slug = "common_cartridge_#{@course.id}_user_#{@user.id}"
-      config = Setting.from_config('external_migration')
-      if config && config[:data_folder]
-        folder = config[:data_folder]
+      if @migration_config && @migration_config[:data_folder]
+        folder = @migration_config[:data_folder]
       else
         folder = Dir.tmpdir
       end
@@ -76,8 +107,9 @@ module Canvas::CC
     end
 
     def create_zip_file
-      path = File.join(@export_dir, "#{@course.name.to_url}-export.#{CCHelper::CC_EXTENSION}")
-      @zip_file = Zip::ZipFile.new(path, Zip::ZipFile::CREATE)
+      @zip_name = "#{@course.name.to_url}-export.#{CCHelper::CC_EXTENSION}"
+      @zip_path = File.join(@export_dir, @zip_name)
+      @zip_file = Zip::ZipFile.new(@zip_path, Zip::ZipFile::CREATE)
     end
 
   end

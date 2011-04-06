@@ -62,8 +62,10 @@ module Canvas::CC
         manifest_node.metadata do |md|
           create_metadata(md)
         end
+        set_progress(5)
         
         Organization.create_organizations(self, manifest_node)
+        set_progress(10)
 
         Resource.create_resources(self, manifest_node)
 
@@ -95,6 +97,10 @@ module Canvas::CC
           end
         end
       end
+    end
+    
+    def set_progress(progress)
+      @exporter.set_progress(progress)
     end
   end
 end

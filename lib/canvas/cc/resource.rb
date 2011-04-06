@@ -44,15 +44,26 @@ module Canvas::CC
       @manifest_node.resources do |resources|
         @resources = resources
         add_canvas_non_cc_data
+        set_progress(15)
         add_wiki_pages
+        set_progress(30)
         add_assignments
+        set_progress(35)
         add_topics
         add_web_links
+        set_progress(40)
         add_course_files
+        set_progress(70)
         QTI::QTIGenerator.generate_qti(@manifest, resources)
+        set_progress(90)
         create_basic_lti_links
         #todo download kaltura videos?
       end
     end
+    
+    def set_progress(progress)
+      @manifest.set_progress(progress)
+    end
+    
   end
 end

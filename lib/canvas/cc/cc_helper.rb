@@ -18,8 +18,8 @@
 module Canvas::CC
 module CCHelper
   
-  CANVAS_NAMESPACE = 'http://www.instructure.com/xsd/cccv0p1'
-  XSD_URI = 'cccv0p1.xsd'
+  CANVAS_NAMESPACE = 'http://canvas.instructure.com/xsd/cccv1p0'
+  XSD_URI = 'http://canvas.instructure.com/xsd/cccv1p0.xsd'
   
   # IMS formats/types
   # The IMS documentation for Common Cartridge has conflicting values

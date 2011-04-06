@@ -182,6 +182,8 @@ javascripts:
     - public/javascripts/link_enrollment.js
   plugins:
     - public/javascripts/plugins.js
+  content_exports:
+    - public/javascripts/content_exports.js
 
 stylesheets:
   common:

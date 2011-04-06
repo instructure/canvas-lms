@@ -188,6 +188,28 @@ namespace :db do
     }, %{
       There was a problem importing <%= asset.migration_settings[:course_name] %> into <%= asset.context.name %>.  Please notify your system administrator, and give them the following error code: "ContentMigration:<%= asset.id %>:<%= asset.progress %>".
     }
+    
+    create_notification 'ContentExport', 'Message', 0,
+    'http://<%= HostUrl.default_host %>', %{
+      Content Export Finished
+
+      Course Export Finished: <%= asset.context.name %>
+      
+      Your course export for "<%= asset.context.name %>" has finished.
+    }, %{
+      Your course export for "<%= asset.context.name %>" has finished.
+    }
+    
+    create_notification 'ContentExport', 'Message', 0,
+    'http://<%= HostUrl.default_host %>', %{
+      Content Export Failed
+
+      Course Export failed: <%= asset.context.name %>
+      
+      There was a problem exporting the course "<%= asset.context.name %>".
+    }, %{
+      There was a problem exporting the course "<%= asset.context.name %>".
+    }
 
     create_notification 'User', 'Other', 0,
     'http://<%= HostUrl.default_host %>', %{
