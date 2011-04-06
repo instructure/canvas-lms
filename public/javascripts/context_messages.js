@@ -149,6 +149,7 @@ $(document).ready(function() {
         $("#message_list").prepend($message);
       } else {
         $.flashMessage('Message Sent!');
+        $("#context_message_body").text("");
         var $form = $(this);
         setTimeout(function() {
           $form.slideUp(function() {
