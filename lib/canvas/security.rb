@@ -18,10 +18,12 @@
 
 module Canvas::Security
   def self.encryption_key
-    res = config && config['encryption_key']
-    raise('encryption key required, see security.yml.example') unless res
-    raise('encryption key is too short, see security.yml.example') unless res.to_s.length >= 20
-    res.to_s
+    @encryption_key ||= begin
+      res = config && config['encryption_key']
+      abort('encryption key required, see security.yml.example') unless res
+      abort('encryption key is too short, see security.yml.example') unless res.to_s.length >= 20
+      res.to_s
+    end
   end
   
   def self.config
@@ -54,5 +56,17 @@ module Canvas::Security
     OpenSSL::HMAC.hexdigest(
       OpenSSL::Digest::Digest.new('sha1'), encryption_key, str
     )
+  end
+
+  def self.validate_encryption_key(overwrite = false)
+    config_hash = Digest::SHA1.hexdigest(Canvas::Security.encryption_key)
+    db_hash = Setting.get('encryption_key_hash', nil) rescue return # in places like rake db:test:reset, we don't care that the db/table doesn't exist
+    return if db_hash == config_hash
+
+    if db_hash.nil? || overwrite
+      Setting.set("encryption_key_hash", config_hash)
+    else
+      abort "encryption key is incorrect. if you have intentionally changed it, you may want to run `rake db:reset_encryption_key_hash`"
+    end
   end
 end

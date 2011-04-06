@@ -30,6 +30,12 @@ namespace :db do
     raise "Please configure domain.yml" unless HostUrl.default_host
   end
 
+  desc "Resets the encryption_key hash in the database. Needed if you change the encryption_key"
+  task :reset_encryption_key_hash do
+    ENV['UPDATE_ENCRYPTION_KEY_HASH'] = "1"
+    Rake::Task['db:load_environment'].invoke
+  end
+
   desc "Make sure all scribd mime types are set up correctly"
   task :ensure_scribd_mime_types => :load_environment do
     ping

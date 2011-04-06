@@ -63,8 +63,7 @@ end
 # Extend any base classes, even gem classes
 Dir.glob("#{RAILS_ROOT}/lib/ext/**/*.rb").each { |file| require file }
 
-Canvas::Security.encryption_key
-
+Canvas::Security.validate_encryption_key(ENV['UPDATE_ENCRYPTION_KEY_HASH'])
 
 # Require parts of the lib that are interesting
 %w(
