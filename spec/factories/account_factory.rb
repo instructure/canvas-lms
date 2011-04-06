@@ -17,7 +17,7 @@
 #
 
 def account_model(opts={})
-  @account = Account.create!(valid_account_attributes.merge(opts))
+  @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
 end
 
 def valid_account_attributes

@@ -21,6 +21,10 @@ config.action_controller.allow_forgery_protection    = false
 # ActionMailer::Base.deliveries array.
 config.action_mailer.delivery_method = :test
 
+# Raise an exception on bad mass assignment. Helps us catch these bugs before
+# they hit.
+Canvas.protected_attribute_error = :raise
+
 # Inject our Rails 2.3.x broken cookie fix. See the whole sordid tale
 # here:
 # https://rails.lighthouseapp.com/projects/8994/tickets/4743-session-cookie-breaks-if-used-with-custom-cookie-in-rails-238
