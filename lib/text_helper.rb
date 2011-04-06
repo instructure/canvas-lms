@@ -88,7 +88,8 @@ module TextHelper
     processed_lines = []
     quote_block = []
     message.split("\n").each do |line|
-      if line[0,5] == "&gt; " || line[0,2] == "> "
+      # check for lines starting with '>'
+      if /^(&gt;|>)/ =~ line
         quote_block << line
       else
         processed_lines << quote_clump(quote_block) if !quote_block.empty?

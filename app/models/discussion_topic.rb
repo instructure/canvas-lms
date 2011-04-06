@@ -238,7 +238,9 @@ class DiscussionTopic < ActiveRecord::Base
   
   def reply_from(opts)
     user = opts[:user]
-    message = opts[:html].strip
+    message = opts[:text].strip
+    self.extend TextHelper
+    message = format_message(message).first
     user = nil unless user && self.context.users.include?(user)
     if !user
       raise "Only context participants may reply to messages"
@@ -247,8 +249,8 @@ class DiscussionTopic < ActiveRecord::Base
     else
       DiscussionEntry.create!({
         :message => message,
-        :discussion_topic_id => self.id,
-        :user_id => user.id
+        :discussion_topic => self,
+        :user => user,
       })
     end
   end

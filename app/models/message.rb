@@ -285,13 +285,19 @@ class Message < ActiveRecord::Base
     Time.zone = old_time_zone
     self.body
   end
-  
+
+  def reply_to_secure_id
+    Canvas::Security.hmac_sha1(self.id.to_s)
+  end
+
   def reply_to_address
     res = (self.forced_reply_to || nil) rescue nil
     res = nil if self.path_type == 'sms' rescue false
     res = self.from if self.context_type == 'ErrorReport'
-    res ||= HostUrl.outgoing_email_address
-    res
+    unless res
+      addr, domain = HostUrl.outgoing_email_address.split(/@/)
+      res = "#{addr}+#{self.reply_to_secure_id}-#{self.id}@#{domain}"
+    end
   end
   
   def deliver
@@ -354,7 +360,7 @@ class Message < ActiveRecord::Base
       logger.info "Delivering mail: #{self.inspect}"
       res = nil
       begin
-        res = Mailman.deliver_message(self)
+        res = Mailer.deliver_message(self)
       rescue Net::SMTPServerBusy => e
         @exception = e
         logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"

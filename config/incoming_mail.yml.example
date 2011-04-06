@@ -1,0 +1,32 @@
+# See http://rubydoc.info/github/titanous/mailman/master/file/USER_GUIDE.md for
+# available options.  rails_root will be configured automatically.
+#
+# Currently, there are three ways to process incoming mail:
+#  * Fetch directly from POP3, controlled by the Canvas job server
+#    * Make sure to configure pop3, ignore stdin, and set the poll_interval to 0
+#  * Process messages by piping them to script/process_incoming_messages
+#    * Make sure to not ignore stdin
+#  * Monitor a maildir
+#    * Make sure to ignore stdin
+#    * If poll_interval is 0, it will be run periodically by the Canvas job
+#      server
+#    * If poll_interval is non-0, script/process_incoming_messages will never
+#      return, continually monitoring the directory
+
+development:
+  # defaults are to allow reading from stdin
+
+test:
+  maildir: "maildir"
+  ignore_stdin: true
+  poll_interval: 0
+
+production:
+  poll_interval: 0
+  ignore_stdin: true
+  pop3:
+    server: "pop.example.com"
+    port: 110
+    username: "user"
+    password: "password"
+    ssl: true

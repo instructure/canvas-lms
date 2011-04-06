@@ -14,5 +14,5 @@ A new discussion has been started that may be interesting to you:
 <% if asset.attachment %>File Included: <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
   http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download<% end %>
 
-Join to the conversation here: 
+Join the conversation here: 
 <%= content :link %>

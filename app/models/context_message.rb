@@ -195,7 +195,7 @@ class ContextMessage < ActiveRecord::Base
     else
       ContextMessage.create!({
         :context => self.context,
-        :user_id => user,
+        :user => user,
         :subject => subject,
         :recipients => "#{self.user_id}",
         :root_context_message_id => self.root_context_message_id || self.id,

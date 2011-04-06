@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mailman < ActionMailer::Base
-  
+class Mailer < ActionMailer::Base
+
   attr_reader :email
 
   def message(m)

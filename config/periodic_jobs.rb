@@ -50,6 +50,12 @@ scheduler.cron '45 11 * * *' do
   StreamItem.send_later_enqueue_args(:destroy_stream_items, { :priority => Delayed::LOW_PRIORITY }, 4.weeks.ago, false)
 end
 
+if Mailman.config.poll_interval == 0 && Mailman.config.ignore_stdin == true
+  scheduler.cron '*/1 * * * *' do
+    IncomingMessageProcessor.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
+  end
+end
+
 if PageView.page_view_method == :cache
   # periodically pull new page views off the cache and insert them into the db
   scheduler.cron '*/5 * * * *' do
