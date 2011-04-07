@@ -69,7 +69,7 @@ $(document).ready(function() {
   });
   $("#edit_bank_form .bank_name_box").blur(function() {
     var $bank = $(this).parents(".question_bank");
-    if(!$bank.hasClass('dont_save') && $bank.attr('id') != 'question_bank_new') {
+    if(!$bank.hasClass('dont_save') && !$bank.hasClass('save_in_progress') && $bank.attr('id') != 'question_bank_new') {
       $("#edit_bank_form").submit();
       return;
     }
@@ -86,9 +86,8 @@ $(document).ready(function() {
       var $bank = $(this).parents(".question_bank");
       $bank.attr('id', 'question_bank_adding');
       try {
-        $bank.addClass('dont_save');
+        $bank.addClass('save_in_progress')
         $bank.find(".bank_name_box").blur();
-        $bank.removeClass('saving');
       } catch(e) { }
       $bank.fillTemplateData({
         data: data
@@ -98,6 +97,7 @@ $(document).ready(function() {
     },
     success: function(data, $bank) {
       $bank.loadingImage('remove');
+      $bank.removeClass('save_in_progress')
       var bank = data.assessment_question_bank;
       bank.last_updated_at = $.parseFromISO(bank.updated_at).datetime_formatted;
       $bank.fillTemplateData({
@@ -107,6 +107,7 @@ $(document).ready(function() {
     },
     error: function(data, $bank) {
       $bank.loadingImage('remove');
+      $bank.removeClass('save_in_progress')
       $bank.find(".edit_bank_link").click();
       $("#edit_bank_form").formErrors(data);
     }
