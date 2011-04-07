@@ -698,7 +698,18 @@
     return r;
   }
   $.htmlEscape = function(str) {
-    return $('<div/>').text(str).html();
+    return $.htmlEscape.element.text(str).html();
+  }
+  $.htmlEscape.element = $('<div/>');
+  // escape all string values (not keys) in an object
+  $.htmlEscapeValues = function(obj) {
+    var k,v;
+    for (k in obj) {
+      v = obj[k];
+      if (typeof v === "string") {
+        obj[k] = $.htmlEscape(v);
+      }
+    }
   }
   
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
