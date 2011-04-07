@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Canvas::CC
+module CC
   module LearningOutcomes
     def create_learning_outcomes
       return nil unless LearningOutcome.active.find_all_by_context_id_and_context_type(@course.id, 'Course').count > 0

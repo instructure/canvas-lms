@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Canvas::CC
+module CC
   module BasicLTILinks
     def create_basic_lti_links
       return nil unless @manifest.basic_ltis.length > 0

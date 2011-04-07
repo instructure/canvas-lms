@@ -17,7 +17,7 @@
 #
 
 class ContentExportsController < ApplicationController
-  before_filter :require_context
+  before_filter :require_context, :except => :xml_schema
   before_filter { |c| c.active_tab = "settings" }
   
   def index
@@ -77,7 +77,7 @@ class ContentExportsController < ApplicationController
   def xml_schema
     file = nil
     if params[:version]
-      file = Rails.root + "lib/canvas/cc/xsd/#{params[:version]}.xsd"
+      file = Rails.root + "lib/cc/xsd/#{params[:version]}.xsd"
     end
     
     if File.exists?(file)

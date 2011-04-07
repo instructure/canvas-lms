@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
+require 'cc/cc'
 class ContentExport < ActiveRecord::Base
   include Workflow
   belongs_to :course
@@ -51,7 +51,7 @@ class ContentExport < ActiveRecord::Base
     self.workflow_state = 'exporting'
     self.save
     begin
-      if Canvas::CC::CCExporter.export(self)
+      if CC::CCExporter.export(self)
         self.workflow_state = 'exported'
       else
         self.workflow_state = 'failed'

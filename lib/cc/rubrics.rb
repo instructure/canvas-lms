@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Canvas::CC
+module CC
   module Rubrics
     def create_rubrics
       return nil unless @course.rubrics.active.count > 0

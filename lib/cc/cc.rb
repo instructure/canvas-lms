@@ -15,23 +15,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Canvas::CC
-  module WebResources
-    def add_course_files
-      course_folder = Folder.root_folders(@course).first
-      
-      zipper = ContentZipper.new
-      zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER]) do |attachment, folder_names|
-        path = File.join(folder_names, attachment.display_name)
-        migration_id = CCHelper.create_key(attachment)
-        @resources.resource(
-                "type" => CCHelper::WEBCONTENT,
-                :identifier => migration_id,
-                :href => path
-        ) do |res|
-          res.file(:href=>path)
-        end
-      end
-    end
-  end
+require 'builder'
+require 'digest'
+require 'set'
+require 'zip/zip'
+
+# Canvas Common Cartridge
+module CC
 end
+
+require 'cc/cc_helper'
+require 'cc/cc_exporter'
+require 'cc/manifest'
+require 'cc/wiki_resources'
+require 'cc/module_meta'
+require 'cc/learning_outcomes'
+require "cc/canvas_resource"
+require "cc/assignment_resources"
+require "cc/topic_resources"
+require "cc/web_resources"
+require "cc/web_links"
+require 'cc/resource'
+require 'cc/organization'
+require 'cc/qti/qti'

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Canvas::CC
+module CC
   module GradingStandards
     def create_grading_standards
       return nil unless @course.grading_standards.count > 0
