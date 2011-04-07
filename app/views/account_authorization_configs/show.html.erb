@@ -17,14 +17,15 @@
         <%= link_to image_tag("delete.png") + 'Remove Authentication', context_url(@account, :context_account_authorization_config_url, @account.id), :confirm => 'Are you sure? Users may not be able to log in if this is removed.', :method => :delete, :class=>"delete_auth_link button button-sidebar-wide", :style => "#{ hidden unless has_auth}" %>
         <div class="add_auth_div" style="<%= hidden if has_auth %>">
           <span class="add">Add an identity provider to this account:</span><br/>
-          <%= select("", "", {:SAML=>'saml', :LDAP=>'ldap'},{:include_blank=>"Choose an authentication service"}, :id => "add_auth_select") %>
+          <%= select("", "", [[:CAS, 'cas'], [:LDAP, 'ldap'], [:SAML, 'saml']],{:include_blank=>"Choose an authentication service"}, :id => "add_auth_select") %>
         </div>
     </div>
 <% end %>
 
 <h2>Authentication Settings</h2>
-<%= render :partial => "saml_settings" %>
+<%= render :partial => "cas_settings" %>
 <%= render :partial => "ldap_settings" %>
+<%= render :partial => "saml_settings" %>
 <% unless @account_config.auth_type %>
     <div id="no_auth">This account doesn't currently integrate with an identity provider.</div>
 <% end %>
@@ -43,10 +44,10 @@
         display: none;
     }
 
-    #saml_div, #ldap_div{
+    #cas_div, #ldap_div, #saml_div {
         display: none;
     }
-    #saml_div.active, #ldap_div.active{
+    #cas_div.active, #ldap_div.active, #saml_div.active {
         display: block;
     }
 </style>

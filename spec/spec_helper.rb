@@ -57,6 +57,16 @@ Spec::Runner.configure do |config|
     Account.default.update_attribute(:default_time_zone, 'UTC')
   end
 
+  def account_with_cas(opts={})
+    account = opts[:account]
+    config = AccountAuthorizationConfig.new
+    cas_url = opts[:cas_url] || "https://localhost/cas"
+    config.auth_type = "cas"
+    config.auth_base = cas_url
+    account.account_authorization_config = config
+    account
+  end
+
   def course(opts={})
     @course = Course.create!
     @course.offer! if opts[:active_course] || opts[:active_all]

@@ -544,8 +544,16 @@ class Account < ActiveRecord::Base
     false
   end
   
-   def password_authentication?
+  def password_authentication?
     !!(!self.account_authorization_config || self.account_authorization_config.password_authentication?)
+  end
+
+  def delegated_authentication?
+    !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
+  end
+
+  def cas_authentication?
+    !!(self.account_authorization_config && self.account_authorization_config.cas_authentication?)
   end
   
   def ldap_authentication?

@@ -1,0 +1,33 @@
+<% form_id = @account_config.cas_authentication? ? 'auth_form' : 'cas_form' %>
+<% active = @account_config.cas_authentication? ? 'class="active"' : '' %>
+<div id="cas_div" <%= raw active %>>
+<% form_for @account_config, :url => context_url(@account, :context_account_authorization_config_url, @account.id), :html => {:id => form_id, :class=>"auth_type cas_form"} do |f| %>
+    <input type="hidden" name="account_authorization_config[auth_type]" value="<%= @account_config.auth_type || 'cas' %>"/>
+    <table class="formtable" style="margin-left: 20px;">
+      <tr>
+        <td><%= f.label :auth_type, "Type:" %></td>
+        <td>
+          <span class="auth_form">
+            <%= @account_config.auth_type || 'CAS' %>
+          </span>
+          <span class="auth_info"><%= @account_config.auth_type || 'CAS' %></span>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.label :auth_base, "CAS URL:" %></td>
+        <td class="nobr">
+          <%= f.text_field :auth_base, :class => "auth_form", :style => "width: 450px;" %>
+          <span class="auth_info auth_base"><%= @account_config.auth_base %></span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          <span class="auth_form">
+            <button type="submit" class="button">Save Authentication Settings</button>
+            <button type="button" class="cancel_button button-secondary">Cancel</button>
+          </span>
+        </td>
+      </tr>
+    </table>
+<% end %>
+</div>

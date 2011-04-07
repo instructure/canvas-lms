@@ -57,14 +57,14 @@ $(document).ready(function() {
 </script>
 <% end %>
 <% login_handle_name = @domain_root_account.login_handle_name rescue "Email Address" %>
-<% @is_saml = @domain_root_account.saml_authentication? if @domain_root_account and @is_saml.nil? %>
+<% @is_delegated = @domain_root_account.delegated_authentication? if @domain_root_account and @is_delegated.nil? %>
 <div id="modal-box">
   <div id="modal-box-inner">
-    <% if @is_saml %>
+    <% if @is_delegated %>
         <div id="login_form">
-            <% if flash[:saml_message] %>
+            <% if flash[:delegated_message] %>
                 <div class="error_box errorBox" style="display: block; position:relative; top: auto; left: auto; max-width: 400px">
-                  <div class="error_text"><%= flash[:saml_message] %></div>
+                  <div class="error_text"><%= flash[:delegated_message] %></div>
                 </div>
         <% end %>
             <a href="<%= login_path %>" style="font-size: 1.3em;" class="button">Log in at <%= @domain_root_account.display_name rescue "your institution" %></a>

@@ -31,6 +31,7 @@ gem 'ratom',          '0.6.7',  :require => "atom"
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
 gem 'ruby-saml-mod',  '0.1.0'
+gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'rufus-scheduler','2.0.6'
 gem 'sanitize',       '1.2.1'

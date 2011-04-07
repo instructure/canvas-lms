@@ -34,8 +34,52 @@ class PseudonymSessionsController < ApplicationController
 
     @pseudonym_session = PseudonymSession.new
     @headers = false
+    @is_cas = @domain_root_account.cas_authentication? && !params[:canvas_login]
     @is_saml = @domain_root_account.saml_authentication? && !params[:canvas_login]
-    if @is_saml && !params[:no_auto]
+    if @is_cas && !params[:no_auto]
+      if params[:ticket]
+        # handle the callback from CAS
+        logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
+        st = CASClient::ServiceTicket.new(params[:ticket], login_url)
+        begin
+          cas_client.validate_service_ticket(st)
+        rescue => e
+          logger.warn "Failed to validate CAS ticket: #{e.inspect}"
+          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          redirect_to login_url(:no_auto=>'true')
+          return
+        end
+        if st.is_valid?
+          @pseudonym = nil
+          @pseudonym = Pseudonym.find_by_unique_id_and_workflow_state(st.response.user, 'active')
+          if @pseudonym
+            # Successful login and we have a user
+            PseudonymSession.create!(@pseudonym, false)
+            session[:cas_login] = true
+            @user = @pseudonym.login_assertions_for_user rescue nil
+
+            flash[:notice] = 'Login successful.'
+            default_url = dashboard_url
+            redirect_back_or_default default_url
+            return
+          else
+            logger.warn "Received CAS login for unknown user: #{st.response.user}"
+            session[:delegated_message] = "Canvas doesn't have an account for user: #{st.response.user}"
+            redirect_to :action => :destroy
+            return
+          end
+        else
+          logger.warn "Failed CAS login attempt."
+          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          redirect_to login_url(:no_auto=>'true')
+          return
+        end
+      end
+
+      # initial session; redirect to CAS
+      reset_session
+      redirect_to(cas_client.add_service_to_login_url(login_url))
+    elsif @is_saml && !params[:no_auto]
       reset_session
       settings = @domain_root_account.account_authorization_config.saml_settings
       request = Onelogin::Saml::AuthRequest.create(settings)
@@ -133,28 +177,33 @@ class PseudonymSessionsController < ApplicationController
   
   def destroy
     # the saml message has to survive a couple redirects and reset_session calls
-    message = session[:saml_message]
+    message = session[:delegated_message]
     @pseudonym_session.destroy rescue true 
-    
+
     if @domain_root_account.saml_authentication? and session[:name_id]
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
       settings = @domain_root_account.account_authorization_config.saml_settings
       request = Onelogin::Saml::LogOutRequest.create(settings, session)
       reset_session
-      session[:saml_message] = message if message
+      session[:delegated_message] = message if message
       redirect_to(request)
+      return
+    elsif @domain_root_account.cas_authentication? and session[:cas_login]
+      reset_session
+      session[:delegated_message] = message if message
+      redirect_to(cas_client.logout_url(login_url))
       return
     else
       reset_session
-      flash[:saml_message] = message if message
+      flash[:delegated_message] = message if message
     end
     
     flash[:notice] = "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
       session[:return_to] = nil      
-      if @domain_root_account.saml_authentication?
+      if @domain_root_account.delegated_authentication?
         format.html { redirect_to login_url(:no_auto=>'true') }
       else
         format.html { redirect_to login_url }
@@ -203,12 +252,12 @@ class PseudonymSessionsController < ApplicationController
           else
             logger.warn "Received SAML login request for unknown user: #{response.name_id}"
             # the saml message has to survive a couple redirects
-            session[:saml_message] = "Canvas doesn't have an account for user: #{response.name_id}"
+            session[:delegated_message] = "Canvas doesn't have an account for user: #{response.name_id}"
             redirect_to :action => :destroy
           end
         elsif response.auth_failure?
           logger.warn "Failed SAML login attempt."
-          flash[:saml_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
           redirect_to login_url(:no_auto=>'true')
         else
           logger.warn "Unexpected SAML status code - status code: #{response.status_code rescue ""}"
@@ -221,26 +270,32 @@ class PseudonymSessionsController < ApplicationController
         logger.warn "SAML Response:";i=0;while temp=params[:SAMLResponse][i...i+1500] do logger.warn temp;i+=1500;end
         @pseudonym_session.destroy rescue true
         reset_session
-        flash[:saml_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+        flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
         redirect_to login_url(:no_auto=>'true')
       end
     elsif !params[:SAMLResponse]
       logger.error "saml_consume request with no SAMLResponse parameter"
       @pseudonym_session.destroy rescue true
       reset_session
-      flash[:saml_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+      flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
       redirect_to login_url(:no_auto=>'true')
     else
       logger.error "Attempted SAML login on non-SAML enabled account."
       @pseudonym_session.destroy rescue true
       reset_session
-      flash[:saml_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+      flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
       redirect_to login_url(:no_auto=>'true')
     end
   end
   
   def saml_logout
     redirect_to :action => :destroy
+  end
+
+  def cas_client
+      return @cas_client if @cas_client
+      config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
+      @cas_client = CASClient::Client.new(config)
   end
   
 end

@@ -99,7 +99,15 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
   
   def password_authentication?
-    !['ldap', 'saml'].member?(self.auth_type)
+    !['cas', 'ldap', 'saml'].member?(self.auth_type)
+  end
+
+  def delegated_authentication?
+    ['cas', 'saml'].member?(self.auth_type)
+  end
+
+  def cas_authentication?
+    self.auth_type == 'cas'
   end
   
   def ldap_authentication?

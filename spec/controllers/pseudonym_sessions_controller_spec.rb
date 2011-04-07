@@ -20,13 +20,71 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe PseudonymSessionsController do
 
-  #Delete this example and add some real ones
-  it "should use PseudonymSessionsController" do
-    controller.should be_an_instance_of(PseudonymSessionsController)
+  it "should log in and log out a user CAS has validated" do
+    account = account_with_cas({:account => Account.default})
+    user = user_with_pseudonym({:active_all => true})
+
+    get 'new'
+    response.should redirect_to(controller.cas_client.add_service_to_login_url(login_url))
+
+    controller.cas_client.should_receive(:validate_service_ticket).and_return { |st|
+      st.response = CASClient::ValidationResponse.new("yes\n#{user.pseudonyms.first.unique_id}\n")
+    }
+
+    get 'new', :ticket => 'ST-abcd'
+    response.should redirect_to(dashboard_url)
+    session[:cas_login].should == true
+
+    get 'destroy'
+    response.should redirect_to(controller.cas_client.logout_url(login_url))
   end
-  
-  it "should not cause the session to be loaded" do
-    # dbg
+
+  it "should inform the user CAS validation denied" do
+    account = account_with_cas({:account => Account.default})
+
+    get 'new'
+    response.should redirect_to(controller.cas_client.add_service_to_login_url(login_url))
+
+    controller.cas_client.should_receive(:validate_service_ticket).and_return { |st|
+      st.response = CASClient::ValidationResponse.new("no\n\n")
+    }
+
+    get 'new', :ticket => 'ST-abcd'
+    response.should redirect_to(:action => 'new', :no_auto => true)
+    flash[:delegated_message].should match(/There was a problem logging in/)
   end
+
+  it "should inform the user CAS validation failed" do
+    account = account_with_cas({:account => Account.default})
+
+    get 'new'
+    response.should redirect_to(controller.cas_client.add_service_to_login_url(login_url))
+
+    controller.cas_client.should_receive(:validate_service_ticket).and_return { |st|
+      raise "can't contact CAS"
+    }
+
+    get 'new', :ticket => 'ST-abcd'
+    response.should redirect_to(:action => 'new', :no_auto => true)
+    flash[:delegated_message].should match(/There was a problem logging in/)
+  end
+
+  it "should inform the user that CAS account doesn't exist" do
+    account = account_with_cas({:account => Account.default})
+
+    get 'new'
+    response.should redirect_to(controller.cas_client.add_service_to_login_url(login_url))
+
+    controller.cas_client.should_receive(:validate_service_ticket).and_return { |st|
+      st.response = CASClient::ValidationResponse.new("yes\nnonexistentuser\n")
+    }
+
+    get 'new', :ticket => 'ST-abcd'
+    response.should redirect_to(:action => 'destroy')
+    get 'destroy'
+    response.should redirect_to(:action => 'new', :no_auto => true)
+    flash[:delegated_message].should match(/Canvas doesn't have an account for user/)
+  end
+
 
 end
