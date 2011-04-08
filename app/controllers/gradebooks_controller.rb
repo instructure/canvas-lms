@@ -177,7 +177,6 @@ class GradebooksController < ApplicationController
             :disposition => "attachment"
           ) 
         }
-        format.xml  { render :xml => @gradebook.to_xml }
         format.json  { render :json => @new_submissions.to_json(:include => [:quiz_submission, :submission_comments, :attachments]) }
       end
     end
