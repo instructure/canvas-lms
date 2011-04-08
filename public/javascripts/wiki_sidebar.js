@@ -26,7 +26,6 @@
         $sidebar_upload_image_form = $("form#sidebar_upload_image_form"),
         $sidebar_upload_file_form = $("form#sidebar_upload_file_form");
     
-    
     var wikiSidebar = window.wikiSidebar = {
       fileSelected: function(node) {
         var $span = node.find('span.text'),
@@ -101,157 +100,9 @@
         }
       },
       show: function() {
- 
         $editor_tabs.addClass('showing');
-        if(!$tree1.hasClass('initialized')) {
-          $tree1.addClass('initialized unstyled_list');
-          var url = $("#editor_tabs_2 .files_list_url").attr('href');
-          $.ajaxJSON(url, 'GET', {}, function(data) {
-            var hasFiles = false;
-            $tree1.removeClass('unstyled_list').empty().hide();
-            $("#editor_tabs_3 .image_list .img_link:not(.default_image)").remove();
-            // load the tree in batches
-            var idx = 0;
-            var addList = [];
-            var options_list = [];
-
-            var finish = function() {
-              if(!hasFiles) {
-                $tree1.append("<li>No Files</li>");
-              }
-              $("#editor_tabs_3 .image_list .loading").remove();
-              if(options_list.length > 0) {
-                $("#editor_tabs_2 #attachment_folder_id").empty();
-                $("#editor_tabs_3 #image_folder_id").empty();
-                for(var idx in options_list) {
-                  var $option = options_list[idx];
-                  $("#editor_tabs_2 #attachment_folder_id").append($option.clone());
-                  $("#editor_tabs_3 #image_folder_id").append($option.clone());
-                }
-              }
-              //make the tree that holds the folders and files for this course
-              $tree1.instTree({                
-                multi: false,
-                dragdrop: false,
-                onClick: function (event,node) {
-                  if (node.hasClass('leaf') || node.hasClass('file')) {
-                    wikiSidebar.fileSelected(node);
-                  } else if (node.hasClass('node')) {
-                    node.children('.sign').click();
-                  }
-                }
-              });
-              $tree1.show();
-              $editor_tabs.find("ul#tree1_temp").remove();
-              $tree1.find("li.leaf.to_be_removed").remove();
-              if($editor_tabs.tabs('option', 'selected') == 2) {
-                $editor_tabs.triggerHandler('tabsselect');
-              }
-              $editor_tabs.tabs('select', $editor_tabs.tabs('option', 'selected'));
-            };
-
-            var addToOptions = function($folder, level) {
-              level = level || 0;
-              var id = $folder.attr('id');
-              if($folder.hasClass('folder')) {
-                var folder_id = id.split("_").pop();
-                var name = $folder.getTemplateData({textValues: ['name']}).name;
-                var $option = $("<option/>");
-                $option.val(folder_id);
-                if(level > 0) {
-                  name = "- " + name;
-                }
-                if(name.length + level + 1 > 38) {
-                  name = name.substring(0, 35) + "...";
-                }
-                name = $.htmlEscape(name);
-                for(var idx = 0; idx < level; idx++) {
-                  name = "&nbsp;&nbsp;" + name;
-                }
-                $option.html(name);
-                options_list.push($option);
-              }
-              $editor_tabs.find("li.folder.in_" + id).each(function() {
-                addToOptions($(this), level + 1);
-              });
-            };
-
-            var processBatch = function(first_time) {
-              var batchCount = 0;
-              if (first_time) {
-                $tree1.find("li.file").addClass('to_be_removed');
-                $tree1.find("li.folder.in_sidebar_folder_0").each(function() {
-                  addList.push($(this));
-                  addToOptions($(this));
-                });
-              }
-
-              while (batchCount < 50) {
-                var $item = addList.shift();
-                if($item) {
-                  var id = $item.attr('id');
-                  $editor_tabs.find("li.in_" + id).each(function() {
-                    var $this = $(this);
-                    $item.children("ul").append($this);
-                    $this.removeClass('to_be_removed');
-                    if($this.hasClass('folder')) {
-                      addList.push($this);
-                    }
-                  });
-                } else {
-                  finish();
-                  return;
-                }
-                ++batchCount;
-              }
-
-              setTimeout(processBatch, 50);
-            };
-
-            var addBatch = function() {
-              var batchCount = 0;
-              while (idx < data.length && batchCount < 50) {
-                var item = data[idx];
-                if(item.attachment) {
-                  hasFiles = true;
-                  var attachment = item.attachment;
-                  wikiSidebar.fileAdded(attachment);
-                } else if(item.folder) {
-                  var folder = item.folder;
-                  var $folder = $("#editor_tabs_2 .tree_node_template li.folder").clone(true);
-                  $folder.attr('class', 'folder')
-                         .data('position', folder['position']);
-                  $folder.addClass('in_sidebar_folder_' + (folder.parent_folder_id || 0));
-                  $folder.fillTemplateData({
-                    data: folder,
-                    hrefValues: ['id'],
-                    id: 'sidebar_folder_' + folder.id
-                  });
-                  wikiSidebar.insertSorted($folder, $tree1, 'li.folder');
-                }
-                ++idx;
-                ++batchCount;
-              }
-
-              if (idx < data.length) {
-                setTimeout(addBatch, 50);
-              } else {
-                processBatch(true);
-              }
-            };
-
-            addBatch();
-          });
-        }
         $editor_tabs.show();
         $course_show_secondary.hide();
-        $editor_tabs.find(".image_list img").each(function() {
-          var $this = $(this),
-              src = $this.attr('src');
-          if(!src || src === "") {
-            $this.attr('src', $this.attr('rel'));
-          }
-        });
       },
       hide: function() {
         $editor_tabs.removeClass('showing').hide();
@@ -285,6 +136,163 @@
           $sidebar_upload_file_form.slideToggle('fast');
         });
         //make the tabs for the right side
+        
+        $editor_tabs.bind( "tabsshow tagselect", function(event, ui) { 
+          // defer loading everything in the "files" tree until we click on that tab
+          // if ui.index is 1 or 2, then we are on the "files" or the "images" tab, the both need this initialization
+          if ((ui.index === 1 || ui.index === 2) && !$tree1.hasClass('.initialized')) {
+            $tree1.addClass('initialized unstyled_list');
+            var url = $("#editor_tabs_2 .files_list_url").attr('href');
+            $.ajaxJSON(url, 'GET', {}, function(data) {
+              var hasFiles = false;
+              $tree1.removeClass('unstyled_list').empty().hide();
+              $("#editor_tabs_3 .image_list .img_link:not(.default_image)").remove();
+              // load the tree in batches
+              var idx = 0;
+              var addList = [];
+              var options_list = [];
+
+              var finish = function() {
+                if(!hasFiles) {
+                  $tree1.append("<li>No Files</li>");
+                }
+                $("#editor_tabs_3 .image_list .loading").remove();
+                if(options_list.length > 0) {
+                  $("#editor_tabs_2 #attachment_folder_id").empty();
+                  $("#editor_tabs_3 #image_folder_id").empty();
+                  for(var idx in options_list) {
+                    var $option = options_list[idx];
+                    $("#editor_tabs_2 #attachment_folder_id").append($option.clone());
+                    $("#editor_tabs_3 #image_folder_id").append($option.clone());
+                  }
+                }
+                //make the tree that holds the folders and files for this course
+                $tree1.instTree({                
+                  multi: false,
+                  dragdrop: false,
+                  onClick: function (event,node) {
+                    if (node.hasClass('leaf') || node.hasClass('file')) {
+                      wikiSidebar.fileSelected(node);
+                    } else if (node.hasClass('node')) {
+                      node.children('.sign').click();
+                    }
+                  }
+                });
+                $tree1.show();
+                $editor_tabs.find("ul#tree1_temp").remove();
+                $tree1.find("li.leaf.to_be_removed").remove();
+                if($editor_tabs.tabs('option', 'selected') == 2) {
+                  $editor_tabs.triggerHandler('tabsselect');
+                }
+                $editor_tabs.tabs('select', $editor_tabs.tabs('option', 'selected'));
+              };
+
+              var addToOptions = function($folder, level) {
+                level = level || 0;
+                var id = $folder.attr('id');
+                if($folder.hasClass('folder')) {
+                  var folder_id = id.split("_").pop();
+                  var name = $folder.getTemplateData({textValues: ['name']}).name;
+                  var $option = $("<option/>");
+                  $option.val(folder_id);
+                  if(level > 0) {
+                    name = "- " + name;
+                  }
+                  if(name.length + level + 1 > 38) {
+                    name = name.substring(0, 35) + "...";
+                  }
+                  name = $.htmlEscape(name);
+                  for(var idx = 0; idx < level; idx++) {
+                    name = "&nbsp;&nbsp;" + name;
+                  }
+                  $option.html(name);
+                  options_list.push($option);
+                }
+                $editor_tabs.find("li.folder.in_" + id).each(function() {
+                  addToOptions($(this), level + 1);
+                });
+              };
+
+              var processBatch = function(first_time) {
+                var batchCount = 0;
+                if (first_time) {
+                  $tree1.find("li.file").addClass('to_be_removed');
+                  $tree1.find("li.folder.in_sidebar_folder_0").each(function() {
+                    addList.push($(this));
+                    addToOptions($(this));
+                  });
+                }
+
+                while (batchCount < 50) {
+                  var $item = addList.shift();
+                  if($item) {
+                    var id = $item.attr('id');
+                    $editor_tabs.find("li.in_" + id).each(function() {
+                      var $this = $(this);
+                      $item.children("ul").append($this);
+                      $this.removeClass('to_be_removed');
+                      if($this.hasClass('folder')) {
+                        addList.push($this);
+                      }
+                    });
+                  } else {
+                    finish();
+                    return;
+                  }
+                  ++batchCount;
+                }
+
+                setTimeout(processBatch, 50);
+              };
+
+              var addBatch = function() {
+                var batchCount = 0;
+                while (idx < data.length && batchCount < 50) {
+                  var item = data[idx];
+                  if(item.attachment) {
+                    hasFiles = true;
+                    var attachment = item.attachment;
+                    wikiSidebar.fileAdded(attachment);
+                  } else if(item.folder) {
+                    var folder = item.folder;
+                    var $folder = $("#editor_tabs_2 .tree_node_template li.folder").clone(true);
+                    $folder.attr('class', 'folder')
+                           .data('position', folder['position']);
+                    $folder.addClass('in_sidebar_folder_' + (folder.parent_folder_id || 0));
+                    $folder.fillTemplateData({
+                      data: folder,
+                      hrefValues: ['id'],
+                      id: 'sidebar_folder_' + folder.id
+                    });
+                    wikiSidebar.insertSorted($folder, $tree1, 'li.folder');
+                  }
+                  ++idx;
+                  ++batchCount;
+                }
+
+                if (idx < data.length) {
+                  setTimeout(addBatch, 50);
+                } else {
+                  processBatch(true);
+                }
+              };
+
+              addBatch();
+            });
+          }
+          // defer setting up the <img>es until we click the "images" tab
+          if ($(ui.panel).find('.image_list').not('.initialized').length) {
+            $(ui.panel).find(".image_list").addClass('.initialized').find("img").each(function() {
+              var $this = $(this),
+                  src = $this.attr('src');
+              if(!src || src === "") {
+                $this.attr('src', $this.attr('rel'));
+              }
+            });
+          }
+        });
+        
+        
         $editor_tabs.tabs();
         $('.wiki_pages li a').live('click', function(event){
           event.preventDefault();
