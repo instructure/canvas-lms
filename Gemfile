@@ -27,6 +27,7 @@ gem 'mime-types',     '1.16',   :require => 'mime/types'
 gem 'mini_magick',    '1.3.2'
 gem 'nokogiri',       '1.4.1'
 gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
+gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
 gem 'ratom',          '0.6.7',  :require => "atom"
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
