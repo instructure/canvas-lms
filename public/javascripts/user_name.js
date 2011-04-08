@@ -21,7 +21,6 @@ $(document).ready(function() {
     event.preventDefault();
     $("#edit_student_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: "Edit Student Details",
       width: 450
     }).dialog('open');
     $("#edit_student_form :text:visible:first").focus().select();
@@ -29,17 +28,17 @@ $(document).ready(function() {
   $("#edit_student_form").formSubmit({
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true)
-        .filter(".submit_button").text("Updating Student...");
+        .filter(".submit_button").text("Updating User Details...");
     },
     success: function(data) {
       $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text("Update Student");
+        .filter(".submit_button").text("Update User");
       $("#name_and_email .user_details").fillTemplateData({data: data && data.user});
       $("#edit_student_dialog").dialog('close');
     },
     error: function(data) {
       $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text("Updating Student Failed, please try again");
+        .filter(".submit_button").text("Updating user details failed, please try again");
     }
   });
   $("#edit_student_dialog .cancel_button").click(function() {

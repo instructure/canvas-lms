@@ -56,10 +56,8 @@
       <% end %>
     </table>
   </fieldset>
-<div id="edit_student_dialog" style="display: none;">
-  <h2>Edit Student Details</h2>
-  You can update some of the student's information, but they can change
-  it back if they choose.
+<div title="Edit User Details" id="edit_student_dialog" style="display: none;">
+  <p>You can update some of this user's information, but they can change it back if they choose.</p>
   <% form_for @user, :url => user_url(@user), :html => {:id => "edit_student_form"} do |f| %>
     <input type="hidden" name="rename" value="1"/>
     <table class="formtable">
@@ -79,7 +77,7 @@
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button class="button submit_button" type="submit">Update Student</button>
+            <button class="button submit_button" type="submit">Update Details</button>
             <button class="button button-secondary cancel_button" type="button">Cancel</button>
           </div>
         </td>
