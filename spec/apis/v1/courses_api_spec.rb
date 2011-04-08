@@ -69,6 +69,20 @@ describe CoursesController, :type => :integration do
         :only => %w(id name))
   end
 
+  it "should return the list of sections for the course" do
+    user1 = @user
+    user2 = User.create!(:name => 'Zombo')
+    section1 = @course2.default_section
+    section2 = @course2.course_sections.create!(:name => 'Section B')
+    @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
+
+    json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
+            { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
+    json.size.should == 2
+    json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => %w(id name))
+    json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => %w(id name))
+  end
+
   it "should return the needs_grading_count for all assignments" do
     @group = @course1.assignment_groups.create!({:name => "some group"})
     @assignment = @course1.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)

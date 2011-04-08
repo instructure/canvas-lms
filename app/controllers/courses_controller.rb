@@ -131,6 +131,50 @@ class CoursesController < ApplicationController
     end
   end
 
+  STUDENT_API_FIELDS = %w(id name)
+
+  # @API
+  # Returns the list of sections for this course.
+  #
+  # @argument include[] ["students"] Associations to include with the group.
+  #
+  # @response_field id The unique identifier for the course section.
+  # @response_field name The name of the section.
+  #
+  # @example_response
+  #   ?include[]=students
+  #
+  # [
+  #   {
+  #     "id": 1,
+  #     "name": "Section A",
+  #     "students": [...]
+  #   },
+  #   {
+  #     "id": 2,
+  #     "name": "Section B",
+  #     "students": [...]
+  #   }
+  # ]
+  def sections
+    get_context
+    if authorized_action(@context, @current_user, :read_roster)
+      includes = Array(params[:include])
+      include_students = includes.include?('students')
+
+      result = @context.course_sections.map do |section|
+        res = section.as_json(:include_root => false,
+                              :only => %w(id name))
+        if include_students
+          res['students'] = section.enrollments.all(:conditions => "type = 'StudentEnrollment'").map { |e| e.user.as_json(:include_root => false, :only => STUDENT_API_FIELDS) }
+        end
+        res
+      end
+
+      render :json => result
+    end
+  end
+
   # @API
   # Returns the list of students enrolled in this course.
   #
@@ -144,7 +188,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       render :json => @context.students.to_json(:include_root => false,
-                                                :only => %w(id name))
+                                                :only => STUDENT_API_FIELDS)
     end
   end
 

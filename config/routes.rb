@@ -613,6 +613,9 @@ ActionController::Routing::Routes.draw do |map|
       course.students 'students.:format',
         :controller => 'courses', :action => 'students',
         :conditions => { :method => :get }
+      course.sections 'sections.:format',
+        :controller => 'courses', :action => 'sections',
+        :conditions => { :method => :get }
       course.resources :assignments,
                         :controller => 'assignments_api',
                         :only => %w(show index create update) do |assignment|
