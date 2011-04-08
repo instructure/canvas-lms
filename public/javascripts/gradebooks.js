@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+var grading_scheme;
 var gradebook = (function(){
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
@@ -2002,11 +2003,20 @@ var gradebook = (function(){
     if(isNaN(finalGrade) || !isFinite(finalGrade)) {
       finalGrade = 0;
     }
+    var letterGrade = "";
+    if(grading_scheme) {
+      var letters = $.grep(grading_scheme, function(row, i) {
+        return finalGrade <= row[1] * 100 || i == 0;
+      });
+      var letter = letters[letters.length - 1];
+      letterGrade = letter[0];
+    }
     $("#submission_" + student_id + "_final-grade")
       .css('visibility', '')
       .attr('data-tip', gradebook.pointCalculations ? ('pts: ' + totalUserPoints + ' / ' + totalPointsPossible) : '')
       .find(".grade").text(finalGrade).end()
       .find(".score").hide().end()
+      .find(".letter_grade").showIf(grading_scheme).text(letterGrade).end()
       .find(".pct").text(' %').show();
   }
 

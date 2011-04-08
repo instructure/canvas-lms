@@ -61,6 +61,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_one :account_authorization_config
   has_many :account_reports
+  has_many :grading_standards, :as => :context
   
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :learning_outcomes, :as => :context
@@ -747,6 +748,7 @@ class Account < ActiveRecord::Base
   TAB_SETTINGS = 9
   TAB_FACULTY_JOURNAL = 10
   TAB_SIS_IMPORT = 11
+  TAB_GRADING_STANDARDS = 12
   
   def tabs_available(user=nil, opts={})
     if site_admin?
@@ -761,6 +763,7 @@ class Account < ActiveRecord::Base
         { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
         { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path },
         { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path },
+        { :id => TAB_GRADING_STANDARDS, :label => "Grading Schemes", :href => :account_grading_standards_path },
         { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path },
       ]
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
@@ -901,6 +904,16 @@ class Account < ActiveRecord::Base
       self.allowed_services_hash.empty?
     else
       self.allowed_services_hash.has_key?(service)
+    end
+  end
+  
+  def self.all_accounts_for(context)
+    if context.respond_to?(:account)
+      context.account.account_chain
+    elsif context.respond_to?(:parent_account)
+      context.account_chain
+    else
+      []
     end
   end
   

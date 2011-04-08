@@ -782,6 +782,10 @@ class CoursesController < ApplicationController
       if root_account_id && current_user_is_site_admin?
         @course.root_account = Account.root_accounts.find(root_account_id)
       end
+      standard_id = params[:course].delete :grading_standard_id
+      if standard_id && @course.grants_right?(@current_user, session, :manage_grades)
+        @course.grading_standard = GradingStandard.standards_for(@course, @current_user).detect{|s| s.id == standard_id.to_i }
+      end
       if @course.root_account.grants_right?(@current_user, session, :manage)
         if params[:course][:account_id]
           account = Account.find(params[:course].delete(:account_id))
@@ -813,7 +817,7 @@ class CoursesController < ApplicationController
           flash[:notice] = 'Course was successfully updated.'
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
           format.xml  { head :ok }
-          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name]), :status => :ok }
+          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.xml  { render :xml => @course.errors.to_xml }

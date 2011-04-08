@@ -955,13 +955,6 @@ class User < ActiveRecord::Base
   # Import stuff
   attr_accessor :comparison, :prior, :focus
   
-  def sorted_grading_standards
-    standards = self.grading_standards
-    context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
-    standards += GradingStandard.find_all_by_context_code(context_codes)
-    standards.uniq.sort_by{|s| [(s.usage_count || 0) > 3 ? 'a' : 'b', (s.title.downcase rescue "zzzzz")]}
-  end 
-  
   def sorted_rubrics
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active

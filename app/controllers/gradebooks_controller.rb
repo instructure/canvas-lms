@@ -63,11 +63,6 @@ class GradebooksController < ApplicationController
     end
   end
   
-  def grading_standards
-    @current_user_grading_standards = @current_user.sorted_grading_standards rescue []
-    render :json => @current_user_grading_standards.to_json(:methods => :display_name)
-  end
-  
   def grading_rubrics
     @rubric_contexts = @context.rubric_contexts(@current_user)
     if params[:context_code]

@@ -233,7 +233,25 @@
           <span class="course_info turnitin_comments"><%= @context.turnitin_comments %></span>
         </td>
       <% end %>
-      </tr><tr>
+      </tr>
+      <tr>
+        <td style="width: 10%;">
+          Grading Scheme:
+        </td>
+        <td>
+          <span class="course_info grading_scheme_set">
+            <%= @context.grading_standard_id ? (@context.grading_standard_title || "Currently Set") : "Not Set" %>
+          </span>
+          <span class="course_form">
+            <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox" %>
+            <%= f.label :grading_standard_enabled, "Enable course grading scheme" %>
+            <div class="grading_standard_link" style="margin-left: 20px;">
+              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_id ? "view" : "set" %> grading scheme</a>
+            </div>
+          </span>
+        </td>
+      </tr>
+      <tr>
         <td style="vertical-align: top; width: 10%;"><%= f.label :license, "License:" %></td>
         <td colspan="3">
           <span class="course_form">
@@ -626,3 +644,9 @@
   var sisPublishStatus = "<%= @context.grade_publishing_status %>";
   var sisPublishEnabled = "<%= publishing_enabled %>";
 </script>
+<div id="edit_letter_grades_form" style="display: none;" data-context_code="<%= @context.asset_string %>">
+  <%= render :partial => "shared/grading_standard", :object => @context.grading_standard %>
+  <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_url) %>" style="display: none;" id="update_course_url">&nbsp;</a>
+</div>

@@ -25,31 +25,32 @@ class GradebookUploadsController < ApplicationController
   end
   
   def create
-    if @context.grants_right?(@current_user, session, :manage_grades) &&
-       params[:gradebook_upload] &&
+    if authorized_action(@context, @current_user, :manage_grades)
+      if params[:gradebook_upload] &&
        (@attachment = params[:gradebook_upload][:uploaded_data]) &&
        (@attachment_contents = @attachment.read)
 
-      @uploaded_gradebook = GradebookImporter.new(@context, @attachment_contents)
-      errored_csv = false
-      begin
-        @uploaded_gradebook.parse!
-      rescue => e
-        logger.warn "Error importing gradebook: #{e.inspect}"
-        errored_csv = true
-      end
-      respond_to do |format|
-        if errored_csv
-          flash[:error] = "Invalid csv file, grades could not be updated"
-          format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
-        else
-          format.html { render :action => "show" }
+        @uploaded_gradebook = GradebookImporter.new(@context, @attachment_contents)
+        errored_csv = false
+        begin
+          @uploaded_gradebook.parse!
+        rescue => e
+          logger.warn "Error importing gradebook: #{e.inspect}"
+          errored_csv = true
         end
-      end
-    else
-      respond_to do |format|
-        flash[:error] = 'File could not be uploaded.'
-        format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
+        respond_to do |format|
+          if errored_csv
+            flash[:error] = "Invalid csv file, grades could not be updated"
+            format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
+          else
+            format.html { render :action => "show" }
+          end
+        end
+      else
+        respond_to do |format|
+          flash[:error] = 'File could not be uploaded.'
+          format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
+        end
       end
     end
   end

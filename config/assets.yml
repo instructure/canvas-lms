@@ -104,6 +104,9 @@ javascripts:
     - public/javascripts/email_lists.js
     - public/javascripts/course_details.js
     - public/javascripts/external_tools.js
+    - public/javascripts/grading_standards.js
+  grading_standards:
+    - public/javascripts/grading_standards.js
   course:
     - public/javascripts/course.js
   section:
@@ -162,6 +165,7 @@ javascripts:
     - public/javascripts/aligned_outcomes.js
   full_assignment:
     - public/javascripts/full_assignment.js
+    - public/javascripts/grading_standards.js
   select_content_dialog:
     - public/javascripts/select_content_dialog.js
   rubric_assessment:
@@ -240,6 +244,7 @@ stylesheets:
   course_details:
     - public/stylesheets/compiled/course_details.css
     - public/stylesheets/compiled/external_tools.css
+    - public/stylesheets/compiled/grading_standards.css
   full_files:
     - public/stylesheets/compiled/full_files.css
   datagrid:
@@ -256,7 +261,10 @@ stylesheets:
     - public/stylesheets/compiled/moderate_quiz.css
   full_assignment:
     - public/stylesheets/compiled/full_assignment.css
+    - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
+  grading_standards:
+    - public/stylesheets/compiled/grading_standards.css
   login:
     - public/stylesheets/compiled/login.css
   roster_user:

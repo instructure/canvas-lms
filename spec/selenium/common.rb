@@ -155,6 +155,7 @@ shared_examples_for "all selenium tests" do
   alias_method :login, :login_as
 
   def wait_for_dom_ready
+    (driver.execute_script "return $").should_not be_nil
     driver.execute_script <<-JS
       window.seleniumDOMIsReady = false; 
       $(function(){ 
@@ -172,7 +173,7 @@ shared_examples_for "all selenium tests" do
   end
   
   def keep_trying
-    60.times do |i|
+    SECONDS_UNTIL_GIVING_UP.times do |i|
       puts "trying #{SECONDS_UNTIL_GIVING_UP - i}" if i > SECONDS_UNTIL_COUNTDOWN
       if i < SECONDS_UNTIL_GIVING_UP - 2
         val = (yield rescue false)

@@ -105,7 +105,6 @@ ActionController::Routing::Routes.draw do |map|
     course.resource :gradebook_upload
     course.resources :notifications, :only => [:index, :destroy, :update], :collection => {:clear => :post}
     course.grades "grades", :controller => 'gradebooks', :action => 'grade_summary', :id => nil
-    course.grading_standards "grading_standards", :controller => 'gradebooks', :action => 'grading_standards', :conditions => {:method => :get}
     course.grading_rubrics "grading_rubrics", :controller => 'gradebooks', :action => 'grading_rubrics'
     course.student_grades "grades/:id", :controller => 'gradebooks', :action => 'grade_summary'
     course.resources :announcements
@@ -133,7 +132,7 @@ ActionController::Routing::Routes.draw do |map|
       assignment.remind_peer_review "peer_reviews/:id", :controller => 'assignments', :action => 'remind_peer_review', :conditions => {:method => :post}
       assignment.assign_peer_review "peer_reviews/users/:reviewer_id", :controller => 'assignments', :action => 'assign_peer_review', :conditions => {:method => :post}
     end
-    course.resources :grading_standards, :only => %w(create update)
+    course.resources :grading_standards, :only => %w(index create update destroy)
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
@@ -370,6 +369,8 @@ ActionController::Routing::Routes.draw do |map|
     account.add_account_user 'account_users', :controller => 'accounts', :action => 'add_account_user', :conditions => {:method => :post}
     account.remove_account_user 'account_users/:id', :controller => 'accounts', :action => 'remove_account_user', :conditions => {:method => :delete}
     
+    account.resources :grading_standards, :only => %w(index create update destroy)
+
     account.statistics 'statistics', :controller => 'accounts', :action => 'statistics'
     account.statistics_page_views 'statistics/page_views', :controller => 'accounts', :action => 'statistics_page_views'
     account.statistics_graph 'statistics/over_time/:attribute', :controller => 'accounts', :action => 'statistics_graph'
