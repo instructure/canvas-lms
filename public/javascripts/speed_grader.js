@@ -602,7 +602,7 @@ var anonymousAssignment = false;
     
     domReady: function(){
       //attach to window resize and
-      $window.resize(EG.resizeFullHeight).resize();
+      $window.bind('resize orientationchange', EG.resizeFullHeight).resize();
 
       function makeFullWidth(){
         $full_width_container.addClass("full_width");
