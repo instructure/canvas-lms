@@ -135,6 +135,11 @@
           </td>
         <% end %>
       <% if current_user_is_site_admin? %>
+        <% if @context.sis_source_id %>
+          </tr><tr>
+            <td><%= f.label :sis_source_id, "SIS ID:" %></td>
+            <td><%= @context.sis_source_id %></td>
+        <% end %>
         </tr><tr>
           <td><%= f.label :root_account_id, "Root Account:" %></td>
           <td><%= @context.root_account.name %></td>
@@ -319,7 +324,11 @@
             <%= section.display_name %>
           </a>
           <span class="users_count">
-            (<%= pluralize(section.enrollments.count, "User") %>)
+            (
+              <%= pluralize(section.enrollments.count, "User") %><% if current_user_is_site_admin? && section && section.sis_source_id %>, 
+                SIS ID: <%= section.sis_source_id %>
+              <% end %>
+            )
           </span>
           <div class="clear"></div>
         </li>

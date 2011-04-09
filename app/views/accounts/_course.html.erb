@@ -9,9 +9,14 @@
     </div>
     <% if course %>
     <div class="details ellipsis">
-      <% if course.course_code != course.name %>
-        <div><%= course.course_code %></div>
-      <% end %>
+      <div>
+        <% if course.course_code != course.name %>
+          <span style="padding-right: 30px;"><%= course.course_code %></span>
+        <% end %>
+        <% if current_user_is_site_admin? && course.respond_to?(:sis_source_id) && course.sis_source_id %>
+          SIS ID: <%= course.sis_source_id %>
+        <% end %>
+      </div>
       <% teacher_string = teacher_names[0,2].join(',') %>
       <% teacher_string += ", #{teacher_names[2..-1].length} more" if teacher_names.length > 2 %>
       <span style="display: inline-block; min-width: 80px;"><%= pluralize(student_count || 0, 'Student') %></span>

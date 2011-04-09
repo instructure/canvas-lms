@@ -45,6 +45,14 @@
               <% end %>
             <% end %>
           </td>
+          <% if current_user_is_site_admin? %>
+            <td>
+              <% if pseudonym && pseudonym.sis_source_id %>
+                SIS ID:
+                <%= pseudonym.sis_source_id %>
+              <% end %>
+            </td>
+          <% end %>
           <% if !pseudonym || can_do(pseudonym.account, @current_user, :manage_user_logins) %>
             <td class='links <%= 'passwordable' if (!pseudonym && can_only_select_current_account_which_is_passwordable) || can_change_pseudonym_password %>'>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link"><%= image_tag "edit.png" %></a>

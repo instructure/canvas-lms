@@ -200,10 +200,10 @@ class Account < ActiveRecord::Base
     @cached_users_name_like ||= {}
     @cached_users_name_like[query] ||= self.fast_all_users.name_like(query)
   end
-    
+  
   def fast_all_courses(opts = {})
     @cached_fast_all_courses ||= {}
-    @cached_fast_all_courses[opts] ||= self.associated_courses.active.for_term(opts[:term]).active_first.limit(opts[:limit]).find(:all, :select => "courses.id, name, section, courses.workflow_state, courses.course_code")
+    @cached_fast_all_courses[opts] ||= self.associated_courses.active.for_term(opts[:term]).active_first.limit(opts[:limit]).find(:all, :select => "courses.id, name, section, courses.workflow_state, courses.course_code, courses.sis_source_id")
   end
   
   def all_users(limit=250)
@@ -229,7 +229,7 @@ class Account < ActiveRecord::Base
   end
   
   def courses_name_like(query="")
-    self.associated_courses.active.active_first.name_like(query).limit(200).find(:all, :select => "courses.id, name, courses.workflow_state, courses.course_code")
+    self.associated_courses.active.active_first.name_like(query).limit(200).find(:all, :select => "courses.id, name, courses.workflow_state, courses.course_code, courses.sis_source_id")
   end
   memoize :courses_name_like
 
