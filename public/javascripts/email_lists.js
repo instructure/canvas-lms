@@ -197,7 +197,7 @@
     },
 
     updateCounts: function() {
-      $.each(['student', 'teacher', 'ta', 'teacher_and_ta', 'student_and_observer'], function(){
+      $.each(['student', 'teacher', 'ta', 'teacher_and_ta', 'student_and_observer', 'observer'], function(){
         $("." + this + "_count").text( $("." + this + "_enrollments .user:visible").length );
       });
     },
