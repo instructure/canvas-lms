@@ -65,7 +65,7 @@
               <a href="#" class="add_entry_link button button-sidebar-wide"><%= image_tag "add.png", :alt => "" %> Add New Entry</a>
             <% end %>
             <% if can_do(@topic, @current_user, :delete) && !params[:combined] %>
-              <a href="#" class="delete_topic_link button button-sidebar-wide"><%= image_tag "delete.png", :alt => "" %> Delete Topic</a>
+              <%= link_to image_tag('delete.png') + " Delete Topic", context_url(@context, :context_discussion_topic_url, @topic), :method => :delete, :confirm => "Are you sure you want to delete this topic?", :class => "button button-sidebar-wide" %>
             <% end %>
           </p>
           <div id="podcast_link_holder" style="<%= hidden unless @topic.podcast_enabled %>">
