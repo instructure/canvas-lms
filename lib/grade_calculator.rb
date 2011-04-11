@@ -140,7 +140,8 @@ class GradeCalculator
       
       # Calculate the tally for this group
       sums[:group_weight] = group.group_weight || 0
-      sums[:tally] = sums[:user_points].to_f / sums[:total_points].to_f rescue 0
+      sums[:tally] = sums[:user_points].to_f / sums[:total_points].to_f
+      sums[:tally] = 0.0 unless sums[:tally].finite?
       sums[:weighted_tally] = sums[:tally] * sums[:group_weight].to_f
       group_sums[group.id] = sums
     end
