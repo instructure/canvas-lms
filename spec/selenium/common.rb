@@ -222,6 +222,15 @@ shared_examples_for "all selenium tests" do
     driver.get(app_host + link)
     wait_for_dom_ready
   end
+  
+  def make_full_screen
+    driver.execute_script <<-JS
+      if (window.screen) {
+        window.moveTo(0, 0);
+        window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+      }
+    JS
+  end
 
   self.use_transactional_fixtures = false
   

@@ -1269,7 +1269,7 @@
       }
     });
     $(document).delegate('.add_event_link', 'click', function(event) {
-      // HACK, HACK, HACK - this is an ugly way to remember which "add event" link was clicked.
+      // this is an ugly way to remember which "add event" link was clicked.
       // because of some weird scope issue, over in editEvent -> dialog -> open() $day would be a cached 
       // value of the first "add event" link they clicked on so we cant use it, to figure out which context
       // to select in the dropdown of contexts on the create event dialog.
