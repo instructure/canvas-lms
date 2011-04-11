@@ -173,10 +173,6 @@ class QuizzesController < ApplicationController
       @lockdown_browser_params = plugin.quiz_exit_params(self)
     end
 
-    if @submission && !@submission.settings_only? && (!@submission.attempt || !@submission.submission_data)
-      @submission.destroy
-      @submission = nil
-    end
     can_retry = @submission && (@quiz.unlimited_attempts? || @submission.attempts_left > 0 || @quiz.grants_right?(@current_user, session, :update))
     preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
     if !@submission || @submission.settings_only? || (@submission.completed? && can_retry && !@just_graded) || preview
