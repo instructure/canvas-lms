@@ -87,6 +87,20 @@
          </div>
       </div>
       <% end %>
+
+      <% if @context.respond_to?(:context_modules) %>
+      <div>
+        <h5 class="header"><a href="#">Modules</a></h5>
+          <div>
+            <ul class="wiki_pages page_list">
+              <li title="Click to insert a link to this module"><%= link_to "Modules List", context_url(@context, :context_context_modules_url) %></li>
+              <% for m in @wiki_sidebar_data[:active_context_modules] %>
+                <li title="Clieck to insert a link to this module"><%= link_to m.name, context_url(@context, :context_context_module_url, m) %></li>
+              <% end %>
+            </ul>
+          </div>
+      </div>
+      <% end %>
       
       <div>
         <h5 class="header"><a href="#"><%= @context.class.to_s %> Navigation</a></h5>
@@ -119,6 +133,9 @@
               <% end %>
               <% if @context.respond_to?(:users) %>
                 <li title="Click to insert a link to the people page"><%= link_to "People", context_url(@context, :context_users_url) %></li>
+              <% end %>
+              <% if @context.respond_to?(:context_modules) %>
+                <li title="Click to insert a link to the modules page"><%= link_to "Modules", context_url(@context, :context_context_modules_url) %></li>
               <% end %>
             </ul>
          </div>

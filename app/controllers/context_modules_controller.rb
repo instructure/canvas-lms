@@ -212,7 +212,7 @@ class ContextModulesController < ApplicationController
   def show
     @module = @context.context_modules.find(params[:id])
     respond_to do |format|
-      format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
+      format.html { redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{params[:id]}") }
       format.json { render :json => (@module.content_tags.active.to_json) }
     end
   end

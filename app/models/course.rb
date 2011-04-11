@@ -103,6 +103,7 @@ class Course < ActiveRecord::Base
   has_many :grading_standards, :as => :context
   has_many :context_messages, :as => :context, :dependent => :destroy
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
+  has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
   has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
