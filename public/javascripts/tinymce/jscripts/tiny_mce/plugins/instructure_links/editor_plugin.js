@@ -75,7 +75,7 @@
             var $services = $("<div style='text-align: left; margin-left: 20px;'/>");
             var service, $service;
             for(var idx in data) {
-              service = data[idx].bookmark_service;
+              service = data[idx].user_service;
               if(service) {
                 $service = $("<a href='#' class='bookmark_service no-hover'/>");
                 $service.addClass(service.service);
