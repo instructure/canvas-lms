@@ -819,7 +819,7 @@ class Attachment < ActiveRecord::Base
     return 'ERROR' if self.errored?
     if !self.scribd_doc
       if self.scribdable?
-        self.resubmit_to_scribd!
+        self.send_later(:resubmit_to_scribd!, 10.minutes)
       else
         self.process unless self.processed?
       end
