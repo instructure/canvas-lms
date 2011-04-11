@@ -95,6 +95,7 @@ ActionController::Routing::Routes.draw do |map|
     course.import_migrate_choose 'imports/migrate/:id', :controller => 'content_imports', :action => 'migrate_content_choose'
     course.import_migrate_execute 'imports/migrate/:id/execute', :controller => 'content_imports', :action => 'migrate_content_execute'
     course.import_review 'imports/review', :controller => 'content_imports', :action => 'review'
+    course.import_list 'imports/list', :controller => 'content_imports', :action => 'index'
     course.resource :gradebook_upload
     course.resources :notifications, :only => [:index, :destroy, :update], :collection => {:clear => :post}
     course.grades "grades", :controller => 'gradebooks', :action => 'grade_summary', :id => nil

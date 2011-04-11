@@ -1,0 +1,45 @@
+<% add_crumb "Migrations" %>
+
+<% content_for :page_title do %>Active Migrations
+<% end %>
+
+<% content_for :page_header do %>
+  <h1>Active Migrations</h1>
+<% end %>
+
+<% if @waiting.length > 0 %>
+  <h2>Migrations Needing Action</h2>
+  <% @waiting.each do |mig| %>
+    <% 
+       url = "/#{@context.class.to_s.downcase.pluralize}/#{@context.id}/imports/migrate/#{mig.id}"
+    %>
+      <p>
+        <%= mig.plugin_type %> migration - 
+        <a href="<%= url %>">
+        Click here to choose the content to import.
+      </a>
+      </p>
+  <% end %>
+<% end %>
+
+<% if @successful.length > 0 %>
+  <h2>Successful Migrations</h2>
+  <% @successful.each do |mig| %>
+    <p><%= mig.plugin_type %> migration - This migration was successfully imported.</p>
+  <% end %>
+<% end %>
+
+<% if @running.length > 0 %>
+  <h2>Migrations Being Processed</h2>
+  <% @running.each do |mig| %>
+    <p><%= mig.plugin_type %> migration - This migration is being processed.</p>
+  <% end %>
+<% end %>
+
+<% if @failed.length > 0 %>
+  <h2>Failed Migrations</h2>
+  <% @failed.each do |mig| %>
+    <p><%= mig.plugin_type %> migration - There was an error with this migration. Please give
+    your administrator this migration identifier: <%= "ContentMigration:#{mig.id}" %></p>
+  <% end %>
+<% end %>

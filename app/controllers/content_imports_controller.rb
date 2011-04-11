@@ -70,6 +70,7 @@ class ContentImportsController < ApplicationController
       else
         @plugins = Canvas::Plugin.all_for_tag(:export_system)
         @select_options = @plugins.map{|p|[p.settings[:select_text], p.id]}
+        @pending_migrations = ContentMigration.find_all_by_context_id(@context.id).any?
         render
       end
     end
@@ -182,6 +183,15 @@ class ContentImportsController < ApplicationController
       @events = @context.calendar_events.active
       @entries = (@assignments + @events).sort_by{|e| [e.start_at || Time.parse("Jan 1 2000"), e.title]}
       @quizzes = @context.quizzes.active
+    end
+  end
+  
+  def index
+    if authorized_action(@context, @current_user, :update)
+      @successful = ContentMigration.successful.find_all_by_context_id(@context.id)
+      @running = ContentMigration.running.find_all_by_context_id(@context.id)
+      @waiting = ContentMigration.waiting.find_all_by_context_id(@context.id)
+      @failed = ContentMigration.failed.find_all_by_context_id(@context.id)
     end
   end
 end

@@ -145,6 +145,14 @@ class ContentMigration < ActiveRecord::Base
     self.context.root_account rescue nil
   end
   
+  def plugin_type
+    if plugin = Canvas::Plugin.find(migration_settings['migration_type'])
+      plugin.settings['select_text'] || plugin.name
+    else
+      migration_settings['migration_type'].titleize
+    end
+  end
+  
   def export_content
     plugin = Canvas::Plugin.find(migration_settings['migration_type'])
     if plugin
@@ -215,6 +223,11 @@ class ContentMigration < ActiveRecord::Base
   named_scope :for_context, lambda{|context|
     {:conditions => {:context_id => context.id, :context_type => context.class.to_s} }
   }
+  
+  named_scope :successful, :conditions=>"workflow_state = 'imported'"
+  named_scope :running, :conditions=>"workflow_state IN ('exporting', 'importing')"
+  named_scope :waiting, :conditions=>"workflow_state IN ('exported')"
+  named_scope :failed, :conditions=>"workflow_state IN ('failed', 'pre_process_error')"
   
   def download_exported_data
     raise "No exported data to import" unless self.exported_attachment

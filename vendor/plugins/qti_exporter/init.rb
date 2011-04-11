@@ -4,12 +4,12 @@ Rails.configuration.to_prepare do
 
   Canvas::Plugin.register :qti_exporter, nil, {
           :name =>'QTI Exporter',
-          :author => 'Bracken Mosbacker',
+          :author => 'Instructure',
           :description => 'This enables exporting QTI .zip files to Canvas quiz json.',
           :version => '1.0.0',
           :settings_partial => 'plugins/qti_exporter_settings',
           :settings => {
-          :enabled=>python_converter_found, :worker=>'QtiWorker'},
+          :enabled=>python_converter_found, :worker=>'QtiWorker', :select_text=>'QTI .zip file'},
           :validator => 'QtiPluginValidator'
   }
 end

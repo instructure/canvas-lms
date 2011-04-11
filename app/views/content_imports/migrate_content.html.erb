@@ -10,6 +10,12 @@
   from your course, and you can then specify which parts you'd
   like to have added to your new course.
 </p>
+
+<% if @pending_migrations %>
+  <p>There are previous migrations for this course: <%= link_to "View Migrations", course_import_list_path(@context) %></p>
+<% end %>
+
+
 <% form_tag context_url(@context, :context_import_migrate_url), :method => :post, :class=> 'file_upload', :id => "migration_form", :multipart => true do %>
   <input type="hidden" name="export_file_enabled" value="0" id="export_file_enabled"/>
   <input type="hidden" name="content_migration_id" id="content_migration_id"/>

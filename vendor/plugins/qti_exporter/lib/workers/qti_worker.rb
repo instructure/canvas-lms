@@ -8,7 +8,7 @@ module Canvas
           raise "Can't export QTI without the python converter tool installed."
         end
         cm = ContentMigration.find migration_id
-        settings = cm.migration_settings
+        settings = cm.migration_settings.clone
         settings[:content_migration_id] = migration_id
         settings[:user_id] = cm.user_id
         settings[:attachment_id] = cm.attachment.id rescue nil
