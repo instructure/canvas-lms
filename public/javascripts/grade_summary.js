@@ -225,6 +225,10 @@
       event.preventDefault();
       $(this).parents("tr.student_assignment").next("tr.comments").toggle();
     });
+    $(".toggle_rubric_assessments_link").click(function(event) {
+      event.preventDefault();
+      $(this).parents("tr.student_assignment").next("tr.comments").next("tr.rubric_assessments").toggle();
+    });
     $(".student_assignment.editable .assignment_score").click(function(event) {
       if($("#grades_summary.editable").length === 0 || $(this).find("#grade_entry").length > 0 || $(event.target).closest('.revert_score_link').length > 0) {
         return;
@@ -350,6 +354,11 @@
     $("#only_consider_graded_assignments").change(function() {
       updateStudentGrades();
     }).triggerHandler('change');
+    $("#show_all_details_link").click(function(event) {
+      event.preventDefault();
+      $("tr.comments").show();
+      $("tr.rubric_assessments").show();
+    });
     $.scrollSidebar();
   });
 })();

@@ -1,5 +1,5 @@
 <% 
-  jammit_js :grade_summary
+  jammit_js :grade_summary, :rubric_assessment
   jammit_css :grade_summary 
   content_for :page_title, "Grades for #{@student.name} - #{@context.name}" 
 %>
@@ -17,6 +17,9 @@
     <div class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
       <b>NOTE</b>: This is NOT your official score.<br/>
       <a href="#" class="button revert_all_scores_link"><%= image_tag "back.png" %> Revert to Actual Score</a>
+    </div>
+    <div class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
+      <a href="#" class="button" id="show_all_details_link">Show All Details</a>
     </div>
     <div style="margin-top: 10px;">
       <%= render :partial => "courses/sidebar_weighting", :object => @groups %>
@@ -68,6 +71,8 @@
 <% turnitin_enabled = @context.turnitin_enabled? && @assignments.any?(&:turnitin_enabled) %>
 <% @assignments.each do |assignment| %>
   <% submission = @submissions.find {|s| s.assignment_id == assignment.id} %>
+  <% visible_rubric_assessments = [] %>
+  <% visible_rubric_assessments = submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] } if submission %>
   <tr class="student_assignment <%= 'assignment_graded' if submission && submission.grade %> <%= assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable" %>" id="<%= "submission_" + assignment.id.to_s %>">
     <td class="title">
       <% if assignment.class.to_s == "Assignment" %>
@@ -123,19 +128,21 @@
     <td class="possible points_possible" <%= "colspan='2'" if assignment.special_class %>><%= assignment.points_possible %></td>
     <% if !assignment.special_class %>
     <td style="padding-left: 10px; white-space: nowrap;">
-      <a href="#" class="toggle_comments_link tooltip" title="View comments and scoring details" style="<%= 'visibility: hidden;' unless submission && submission.submission_comments && !submission.submission_comments.empty? %>">
+      <% has_comments = submission && submission.submission_comments && !submission.submission_comments.empty? %>
+      <a href="#" class="toggle_comments_link tooltip" title="View comments and scoring details" style="<%= 'visibility: hidden;' unless has_comments %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text"><%= pluralize(submission && submission.submission_comments && submission.submission_comments.count, "comment") %></span>
         </span>
         <%= image_tag "word_bubble.png" %>
       </a>
-      <a href="#" class="toggle_comments_link tooltip" title="View Scoring Details" style="<%= 'visibility: hidden;' unless submission && submission.score && assignment.points_possible && assignment.points_possible > 0 %>">
+      <% has_scoring_details = submission && submission.score && assignment.points_possible && assignment.points_possible > 0 %>
+      <a href="#" class="toggle_comments_link tooltip" title="View Scoring Details" style="<%= 'visibility: hidden;' unless has_scoring_details %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text">See scoring details</span>
         </span>
         <%= image_tag "grading_icon.png", :style => "opacity: 0.5;" %>
       </a>
-      <a class="tooltip" title="View Rubric Evaluation" href="<%= context_url(assignment.context, :context_assignment_submission_url, assignment.id, submission ? submission.user_id : "{{ user_id }}") %>#rubric" style="<%= 'visibility: hidden;' unless submission && submission.rubric_assessment %>">
+      <a href="#" class="toggle_rubric_assessments_link tooltip" title="View Rubric Evaluation" style="<%= 'visibility: hidden;' if visible_rubric_assessments.empty? %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text">See rubric results</span>
         </span>
@@ -168,7 +175,7 @@
     </td>
     <% end %>
   </tr>
-  <% if !assignment.special_class %>
+  <% if !assignment.special_class && (has_comments || has_scoring_details) %>
     <tr class="comments <%= 'assignment_graded' if submission && submission.grade %>" style="display: none;">
       <td colspan="5" style="padding-bottom: 20px;">
         <% if assignment && assignment.points_possible && assignment.points_possible > 0 %>
@@ -250,6 +257,16 @@
         <% end %>
       </td>
     </tr>
+    <% unless visible_rubric_assessments.empty? %>
+      <tr class="rubric_assessments <%= 'assignment_graded' if submission && submission.grade %>" style="display: none;">
+        <td colspan="5">
+          <% visible_rubric_assessments.each do |assessment| %>
+            <div id="assessor" style="text-align: right; margin-bottom: 5px">Assessment by <%= assessment.assessor_name %></span>
+            <%= render :partial => "shared/rubric", :object => assessment.rubric, :locals => { :assessment => assessment } %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
   <% end %>
 <% end %>
 </table>
@@ -259,6 +276,7 @@
   end
 %>
 <div id="total_groups_weight" style="display: none;"><%= total_weight %></div>
+<%= render :partial => "shared/rubric_criterion_dialog" %>
 <input type="text" style="width: 40px; display: none;" id="grade_entry"/>
 <a href="#" id="revert_score_template" class="revert_score_link" title="Revert to original score"><%= image_tag "back.png" %></a>
 <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @student.id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>

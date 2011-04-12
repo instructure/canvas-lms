@@ -1,4 +1,4 @@
-<% criterion = rubric_criterion || nil; assessing ||= false; rubric ||= nil; rubric_association ||= nil; edit_view ||= false %>
+<% criterion = rubric_criterion || nil; assessing ||= false; rubric ||= nil; rubric_association ||= nil; edit_view ||= false; assessment_rating ||= nil %>
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if criterion && criterion.learning_outcome_id %>" style="<%= hidden unless criterion %>">
   <td class="criterion_description">
   <div class="container">
@@ -82,13 +82,13 @@
     </div>
     <div class="displaying">
       <span style="white-space: nowrap;">
-        <span class="criterion_rating_points_holder" style="display: none;">
-          <span class="criterion_rating_points">&nbsp;</span> / 
+        <span class="criterion_rating_points_holder" style="<%= hidden unless assessment_rating %>">
+          <span class="criterion_rating_points"><%= assessment_rating ? assessment_rating[:points] : nbsp %></span> /
         </span>
         <span class="display_criterion_points"><%= criterion.points rescue 5 %></span> pts<br />
       </span>
       <% if rubric && !rubric.free_form_criterion_comments %>
-        <a href="#" class="<%= 'empty' if edit_view %> no-hover criterion_comments" title="Additional Comments"><%= image_tag "rubric_comment.png" %></a>
+        <a href="#" class="<%= 'empty' if edit_view || (assessment_rating && assessment_rating[:comments].blank?)%> no-hover criterion_comments" title="Additional Comments"><%= image_tag "rubric_comment.png" %></a>
       <% end %>
     </div>
     <div class="ignoring">

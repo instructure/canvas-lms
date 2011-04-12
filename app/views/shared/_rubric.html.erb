@@ -74,7 +74,7 @@
 <tbody>
   <% if rubric && rubric.criteria %>
     <% rubric.criteria_object.each do |criterion| %>
-      <% rating = assessment.ratings.find{|r| r.criterion_id == criterion.id} rescue nil %>
+      <% rating = assessment.ratings.find{|r| r[:criterion_id] == criterion.id} rescue nil %>
       <%= render :partial => "shared/rubric_criterion", :object => criterion, :locals => {:assessing => assessing, :assessment_rating => rating, :rubric => rubric, :rubric_association => rubric_association, :edit_view => edit_view} %>
     <% end %>
   <% end %>
@@ -83,7 +83,7 @@
     <td colspan="4">
       <div style="float: right;" class="total_points_holder">
         <span style="padding-right: 10px;">Total Points: 
-          <span class="rubric_total"><%= assessing ? "0" : (rubric.points_possible rescue 5) %></span>
+          <span class="rubric_total"><%= assessment ? assessment.score : (rubric.points_possible rescue 5) %></span>
           <span class="assessing">out of <%= rubric.points_possible rescue 5 %></span>
         </span>
       </div>
