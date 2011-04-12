@@ -1,3 +1,5 @@
+<% jammit_css :learning_outcomes %>
+<% jammit_js :rubric_assessment %>
 <% content_for :page_title do %>Outcomes for <%= @user.name %><% end %>
   
 <% content_for :right_side do %>
@@ -11,6 +13,9 @@
       <% end %>
       </ul>
     <% end %>
+    <div class="show_all_artificts">
+      <a href="#" class="button" id="show_all_artifacts_link">Show All Artifacts</a>
+    </div>
   </div>
 <% end %>
 
@@ -50,7 +55,26 @@
 #outcomes .latest_score {
   background-color: #fee;
 }
+#outcomes td#outcome_results {
+  text-align: left;
+}
 </style>
+<% end %>
+<% js_block do %>
+  <script>
+  $(document).ready(function() {
+    var showAllArtifacts = $("#show_all_artifacts_link");
+    showAllArtifacts.click(function(event) {
+      event.preventDefault();
+      $("tr.artifact_details").toggle();
+      if (showAllArtifacts.html() === 'Show All Artifacts') {
+        showAllArtifacts.html('Hide All Artifacts');
+      } else {
+        showAllArtifacts.html('Show All Artifacts');
+      }
+    });
+  });
+  </script>
 <% end %>
 
 <table id="outcomes">
@@ -87,6 +111,18 @@
         <% end %>
       </td>
     </tr>
+    <% unless results.empty? %>
+      <tr class="artifact_details" style="display: none;">
+        <td colspan="4" id="outcome_results">
+          <ul id="outcome_results_list">
+            <% results.each do |result| %>
+              <%= render :partial => "outcome_result", :locals => { :outcome_result => result, :show_results_link => false } %>
+            <% end %>
+          </ul>
+        </td>
+      </tr>
+    <% end %>
   <% end %>
   </tbody>
 </table>
+<%= render :partial => "shared/rubric_criterion_dialog" %>
