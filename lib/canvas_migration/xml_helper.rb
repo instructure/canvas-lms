@@ -22,6 +22,13 @@ module Canvas::XMLHelper
     Time.parse(string).to_i * 1000 rescue nil
   end
 
+  def get_node_att(node, selector, attribute, default=nil)
+    if node = node.at_css(selector)
+      return node[attribute]
+    end
+    default
+  end
+
   def get_node_val(node, selector, default=nil)
     node.at_css(selector) ? node.at_css(selector).text : default
   end
@@ -68,10 +75,10 @@ module Canvas::XMLHelper
   end
 
   def open_file(path)
-    ::Nokogiri::HTML(open(path))
+    File.exists?(path) ? ::Nokogiri::HTML(open(path)) : nil
   end
 
   def open_file_xml(path)
-    ::Nokogiri::XML(open(path))
+    File.exists?(path) ? ::Nokogiri::XML(open(path)) : nil
   end
 end

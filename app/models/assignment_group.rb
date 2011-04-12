@@ -194,10 +194,35 @@ class AssignmentGroup < ActiveRecord::Base
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     item.name = hash[:title]
+    item.position = hash[:position].to_i if hash[:position] && hash[:position].to_i > 0
+    item.group_weight = hash[:group_weight] if hash[:group_weight]
+    
+    if hash[:rules] && hash[:rules].length > 0
+      rules = ""
+      hash[:rules].each do |rule|
+        if rule[:drop_type] == "drop_lowest" || rule[:drop_type] == "drop_highest"
+          rules += "#{rule[:drop_type]}:#{rule[:drop_count]}\n"
+        elsif rule[:drop_type] == "never_drop"
+          if context.respond_to?(:assignment_group_no_drop_assignments)
+            context.assignment_group_no_drop_assignments[rule[:assignment_migration_id]] = item
+          end
+        end
+      end
+      item.rules = rules unless rules == ''
+    end
     
     item.save!
-    context.imported_migration_items << item
     item
+  end
+  
+  def self.add_never_drop_assignment(group, assignment)
+    rule = "never_drop:#{assignment.id}\n"
+    if group.rules
+      group.rules += rule
+    else
+      group.rules = rule
+    end
+    group.save
   end
 
 end

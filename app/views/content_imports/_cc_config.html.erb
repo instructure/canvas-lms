@@ -1,0 +1,11 @@
+<% js_block do %>
+  <script>
+    $(function() {
+
+      $("#plugin_common_cartridge_importer").bind("pluginShown", function(event, enableFileUpload) {
+        enableFileUpload();
+      });
+
+    });
+  </script>
+<% end %>

@@ -80,12 +80,12 @@ module CCHelper
   
   def self.ims_date(date=nil)
     date ||= Time.now
-    date.strftime(IMS_DATE)
+    date.utc.strftime(IMS_DATE)
   end
   
   def self.ims_datetime(date=nil)
     date ||= Time.now
-    date.strftime(IMS_DATETIME)
+    date.utc.strftime(IMS_DATETIME)
   end
   
   def self.html_page(html, title, course, user)

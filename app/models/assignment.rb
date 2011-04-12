@@ -1373,9 +1373,17 @@ class Assignment < ActiveRecord::Base
     end
     timestamp = hash[:due_date].to_i rescue 0
     item.due_at = Time.at(timestamp / 1000) if timestamp > 0
+    item.assignment_group ||= context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id]) if hash[:assignment_group_migration_id]
     item.assignment_group ||= context.assignment_groups.find_or_create_by_name("Imported Assignments")
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.save_without_broadcasting!
+    
+    if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
+      if group = context.assignment_group_no_drop_assignments[item.migration_id]
+        AssignmentGroup.add_never_drop_assignment(group, item)
+      end
+    end
+    
     item
   end
 

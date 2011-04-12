@@ -63,12 +63,18 @@ module CC
 
     end
 
-    def create_external_tools
+    def create_external_tools(document=nil)
       return nil unless @course.context_external_tools.count > 0
       
-      lti_file = File.new(File.join(@canvas_resource_dir, CCHelper::EXTERNAL_TOOLS), 'w')
-      rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::EXTERNAL_TOOLS)
-      document = Builder::XmlMarkup.new(:target=>lti_file, :indent=>2)
+      if document
+        lti_file = nil
+        rel_path = nil
+      else
+        lti_file = File.new(File.join(@canvas_resource_dir, CCHelper::EXTERNAL_TOOLS), 'w')
+        rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::EXTERNAL_TOOLS)
+        document = Builder::XmlMarkup.new(:target=>lti_file, :indent=>2)
+      end
+      
       document.instruct!
       document.externalTools(
           "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -88,7 +94,7 @@ module CC
         end
       end
 
-      lti_file.close
+      lti_file.close if lti_file
       rel_path
     end
   end

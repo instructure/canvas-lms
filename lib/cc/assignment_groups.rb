@@ -17,12 +17,18 @@
 #
 module CC
   module AssignmentGroups
-    def create_assignment_groups
+    def create_assignment_groups(document=nil)
       return nil unless @course.assignment_groups.active.count > 0
       
-      group_file = File.new(File.join(@canvas_resource_dir, CCHelper::ASSIGNMENT_GROUPS), 'w')
-      rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::ASSIGNMENT_GROUPS)
-      document = Builder::XmlMarkup.new(:target=>group_file, :indent=>2)
+      if document
+        group_file = nil
+        rel_path = nil
+      else
+        group_file = File.new(File.join(@canvas_resource_dir, CCHelper::ASSIGNMENT_GROUPS), 'w')
+        rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::ASSIGNMENT_GROUPS)
+        document = Builder::XmlMarkup.new(:target=>group_file, :indent=>2)
+      end
+      
       document.instruct!
       document.assignmentGroups(
               "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -60,7 +66,7 @@ module CC
         end
       end
       
-      group_file.close
+      group_file.close if group_file
       rel_path
     end
   end

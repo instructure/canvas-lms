@@ -59,10 +59,15 @@ module CC
       end
     end
     
-    def create_course_settings(migration_id)
-      course_file = File.new(File.join(@canvas_resource_dir, CCHelper::COURSE_SETTINGS), 'w')
-      rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::COURSE_SETTINGS)
-      document = Builder::XmlMarkup.new(:target=>course_file, :indent=>2)
+    def create_course_settings(migration_id, document=nil)
+      if document
+        course_file = nil
+        rel_path = nil
+      else
+        course_file = File.new(File.join(@canvas_resource_dir, CCHelper::COURSE_SETTINGS), 'w')
+        rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::COURSE_SETTINGS)
+        document = Builder::XmlMarkup.new(:target=>course_file, :indent=>2)
+      end
       document.instruct!
       document.course("identifier" => migration_id,
                       "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -75,10 +80,10 @@ module CC
         atts = Course.clonable_attributes
         atts -= [:name, :start_at, :conclude_at, :grading_standard_id, :hidden_tabs, :tab_configuration, :syllabus_body]
         atts.each do |att|
-          c.tag!(att, @course.send(att)) unless @course.send(att).blank?
+          c.tag!(att, @course.send(att)) unless @course.send(att).nil? || @course.send(att) == ''
         end
       end
-      course_file.close
+      course_file.close if course_file
       rel_path
     end
   end

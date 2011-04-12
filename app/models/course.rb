@@ -1176,6 +1176,8 @@ class Course < ActiveRecord::Base
     @imported_migration_items = []
 
     # These only need to be processed once
+    import_settings_from_migration(data)
+    migration.fast_update_progress(0.5)
     process_migration_files(data, migration)
     migration.fast_update_progress(20)
     Attachment.process_migration(data, migration)
@@ -1185,10 +1187,13 @@ class Course < ActiveRecord::Base
     Group.process_migration(data, migration)
     LearningOutcome.process_migration(data, migration)
     Rubric.process_migration(data, migration)
+    @assignment_group_no_drop_assignments = {}
     AssignmentGroup.process_migration(data, migration)
     migration.fast_update_progress(40)
     Quiz.process_migration(data, migration, question_data)
     migration.fast_update_progress(50)
+    #todo - Import external tools when there are post-migration messages to tell the user to add shared secret/password
+    #ContextExternalTool.process_migration(data, migration)
 
     2.times do |i|
       DiscussionTopic.process_migration(data, migration)
@@ -1236,6 +1241,25 @@ class Course < ActiveRecord::Base
   attr_accessor :full_migration_hash
   attr_accessor :external_url_hash
   attr_accessor :folder_name_lookups
+  attr_accessor :assignment_group_no_drop_assignments
+  
+  def import_settings_from_migration(data)
+    return unless data[:course_settings]
+    settings = data[:course_settings]
+    self.name = settings['title']
+    dates = ['conclude_at', 'start_at']
+    settings.slice(*Course.clonable_attributes.map(&:to_s)).each do |key, val|
+      if dates.member? key
+        timestamp = val.to_i/ 1000 rescue 0
+        if timestamp > 0
+          t = Time.at(timestamp)
+          self.send("#{key}=", Time.utc(t.year, t.month, t.day, t.hour, t.min, t.sec))
+        end
+      else
+        self.send("#{key}=", val)
+      end
+    end
+  end
   
   def backup_to_json
     backup.to_json
