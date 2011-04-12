@@ -804,95 +804,103 @@ var anonymousAssignment = false;
     },
 
     handleSubmissionSelectionChange: function(){
-      var currentSelectedIndex = ( 
-            $submission_to_view.filter(":visible").length ? 
-            Number($submission_to_view.filter(":visible").val()) : 
-            (this.currentStudent.submission.currentSelectedIndex || 0)
-          ),
-          submission  = this.currentStudent.submission.submission_history[currentSelectedIndex].submission,
-          dueAt       = jsonData.due_at && $.parseFromISO(jsonData.due_at),
-          submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
-          gradedAt    = submission.graded_at && $.parseFromISO(submission.graded_at),
-          scribdableAttachments = [],
-          browserableAttachments = [];
+      try {
+        var currentSelectedIndex = ( 
+              $submission_to_view.filter(":visible").length ? 
+              Number($submission_to_view.filter(":visible").val()) : 
+              (this.currentStudent.submission.currentSelectedIndex || 0)
+            ),
+            submission  = this.currentStudent.submission.submission_history[currentSelectedIndex].submission,
+            dueAt       = jsonData.due_at && $.parseFromISO(jsonData.due_at),
+            submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
+            gradedAt    = submission.graded_at && $.parseFromISO(submission.graded_at),
+            scribdableAttachments = [],
+            browserableAttachments = [];
 
-      $single_submission_submitted_at.html(submittedAt && submittedAt.datetime_formatted);
-      var turnitin = submission.turnitin_data && submission.turnitin_data['submission_' + submission.id];
-      var turnitin_url = "#";
-      if(turnitin) {
-        turnitin_url = $.replaceTags($.replaceTags($("#assignment_submission_turnitin_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'submission_' + submission.id);
-      }
-      $grade_container.find(".turnitin_similarity_score")
-        .css('display', (turnitin && turnitin.similarity_score != null) ? '' : 'none')
-        .attr('href', turnitin_url)
-        .attr('class', 'turnitin_similarity_score ' + ((turnitin && turnitin.state) || 'no') + '_score')
-        .find(".similarity_score").text((turnitin && turnitin.similarity_score) || "--");
-      
-      //handle the files
-      $submission_files_list.html("");
-      $.each(submission.versioned_attachments, function(i,a){
-        var attachment = a.attachment;
-        if (attachment.scribd_doc && attachment.scribd_doc.created) {
-          scribdableAttachments.push(attachment);
-        }
-        if (broswerableCssClasses.test(attachment.mime_class)) {
-          browserableAttachments.push(attachment);
-        }
-        var turnitin = submission.turnitin_data && submission.turnitin_data['attachment_' + attachment.id];
+        $single_submission_submitted_at.html(submittedAt && submittedAt.datetime_formatted);
+        var turnitin = submission.turnitin_data && submission.turnitin_data['submission_' + submission.id];
         var turnitin_url = "#";
         if(turnitin) {
-          turnitin_url = $.replaceTags($.replaceTags($("#assignment_submission_turnitin_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'attachment_' + attachment.id);
+          turnitin_url = $.replaceTags($.replaceTags($("#assignment_submission_turnitin_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'submission_' + submission.id);
         }
-        $submission_file_hidden.clone(true).fillTemplateData({
-          data: {
-            submissionId: submission.user_id,
-            attachmentId: attachment.id,
-            display_name: attachment.display_name,
-            similarity_score: turnitin && turnitin.similarity_score
-          },
-          hrefValues: ['submissionId', 'attachmentId']
-        }).appendTo($submission_files_list)
-          .find('a.display_name')
-            .addClass(attachment.mime_class)
-            .data('attachment', attachment)
-            .click(function(event){
-              event.preventDefault();
-              EG.loadAttachmentInline($(this).data('attachment'));
-            })
-          .end()
-          .find('a.turnitin_similarity_score')
-            .attr('href', turnitin_url)
-            .attr('class', 'turnitin_similarity_score ' + ((turnitin && turnitin.state) || 'no') + '_score')
-            .attr('target', '_blank')
-            .css('display', (turnitin && turnitin.similarity_score != null) ? '' : 'none')
-          .end()
-          .find('a.submission-file-download')
-            .bind('dragstart', function(event){
-              // check that event dataTransfer exists
-              event.originalEvent.dataTransfer &&
-              // handle dragging out of the browser window only if it is supported.
-              event.originalEvent.dataTransfer.setData('DownloadURL', attachment.content_type + ':' + attachment.filename + ':' + this.href);
-            })
-          .end()
-          .show();
-      });
+        $grade_container.find(".turnitin_similarity_score")
+          .css('display', (turnitin && turnitin.similarity_score != null) ? '' : 'none')
+          .attr('href', turnitin_url)
+          .attr('class', 'turnitin_similarity_score ' + ((turnitin && turnitin.state) || 'no') + '_score')
+          .find(".similarity_score").text((turnitin && turnitin.similarity_score) || "--");
 
-      $submitted_files_plurality.html(submission.versioned_attachments.length > 1 ? "s" : "");
-      $submission_files_container.showIf(submission.versioned_attachments.length);
+        //handle the files
+        $submission_files_list.empty();
+        $.each(submission.versioned_attachments, function(i,a){
+          var attachment = a.attachment;
+          if (attachment.scribd_doc && attachment.scribd_doc.created) {
+            scribdableAttachments.push(attachment);
+          }
+          if (broswerableCssClasses.test(attachment.mime_class)) {
+            browserableAttachments.push(attachment);
+          }
+          var turnitin = submission.turnitin_data && submission.turnitin_data['attachment_' + attachment.id];
+          var turnitin_url = "#";
+          if(turnitin) {
+            turnitin_url = $.replaceTags($.replaceTags($("#assignment_submission_turnitin_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'attachment_' + attachment.id);
+          }
+          $submission_file_hidden.clone(true).fillTemplateData({
+            data: {
+              submissionId: submission.user_id,
+              attachmentId: attachment.id,
+              display_name: attachment.display_name,
+              similarity_score: turnitin && turnitin.similarity_score
+            },
+            hrefValues: ['submissionId', 'attachmentId']
+          }).appendTo($submission_files_list)
+            .find('a.display_name')
+              .addClass(attachment.mime_class)
+              .data('attachment', attachment)
+              .click(function(event){
+                event.preventDefault();
+                EG.loadAttachmentInline($(this).data('attachment'));
+              })
+            .end()
+            .find('a.turnitin_similarity_score')
+              .attr('href', turnitin_url)
+              .attr('class', 'turnitin_similarity_score ' + ((turnitin && turnitin.state) || 'no') + '_score')
+              .attr('target', '_blank')
+              .css('display', (turnitin && turnitin.similarity_score != null) ? '' : 'none')
+            .end()
+            .find('a.submission-file-download')
+              .bind('dragstart', function(event){
+                // check that event dataTransfer exists
+                event.originalEvent.dataTransfer &&
+                // handle dragging out of the browser window only if it is supported.
+                event.originalEvent.dataTransfer.setData('DownloadURL', attachment.content_type + ':' + attachment.filename + ':' + this.href);
+              })
+            .end()
+            .show();
+        });
 
-      // load up a preview of one of the attachments if we can.
-      // do it in this order:
-      // show the first scridbable doc if there is one
-      // then show the first image if there is one,
-      // if not load the generic thing for the current submission (by not passing a value)
-      this.loadAttachmentInline(scribdableAttachments[0] || browserableAttachments[0]);
-      
-      // if there is any submissions after this one, show a notice that they are not looking at the newest
-      $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
+        $submitted_files_plurality.html(submission.versioned_attachments.length > 1 ? "s" : "");
+        $submission_files_container.showIf(submission.versioned_attachments.length);
 
-      // if the submission was after the due date, mark it as late
-      this.resizeFullHeight();
-      $submission_late_notice.showIf(dueAt && submittedAt && (submittedAt.minute_timestamp > dueAt.minute_timestamp) );
+        // load up a preview of one of the attachments if we can.
+        // do it in this order:
+        // show the first scridbable doc if there is one
+        // then show the first image if there is one,
+        // if not load the generic thing for the current submission (by not passing a value)
+        this.loadAttachmentInline(scribdableAttachments[0] || browserableAttachments[0]);
+
+        // if there is any submissions after this one, show a notice that they are not looking at the newest
+        $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
+
+        // if the submission was after the due date, mark it as late
+        this.resizeFullHeight();
+        $submission_late_notice.showIf(dueAt && submittedAt && (submittedAt.minute_timestamp > dueAt.minute_timestamp) );
+      } catch(e) {
+        INST.log_error({
+          'Msg': "SG_submissions_" + (e.message || e.description || ""),
+          'Line': e.lineNumber || ''
+        });
+        throw e;
+      }
     },
 
     refreshSubmissionsToView: function(){

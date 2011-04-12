@@ -38,7 +38,7 @@ INST.log_error = function(params) {
 window.onerror = function (msg, url, line) {
   var ignoredErrors = ["webkitSafeEl"];
   for(var idx in ignoredErrors) {
-    if(ignoredErrors[idx] && msg.match(ignoredErrors[idx])) {
+    if(ignoredErrors[idx] && msg && msg.match && msg.match(ignoredErrors[idx])) {
       return true;
     }
   }
