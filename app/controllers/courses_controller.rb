@@ -59,7 +59,7 @@ class CoursesController < ApplicationController
         enrollments = @current_user.cached_current_enrollments
         if params[:enrollment_type]
           e_type = "#{params[:enrollment_type].capitalize}Enrollment"
-          enrollments = enrollments.reject { |e| e.type != e_type }
+          enrollments = enrollments.reject { |e| e.class.name != e_type }
         end
 
         include_grading = Array(params[:include]).include?('needs_grading_count')
