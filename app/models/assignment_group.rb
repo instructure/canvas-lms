@@ -56,7 +56,7 @@ class AssignmentGroup < ActiveRecord::Base
   
   def update_student_grades
     if @grades_changed
-      self.context.recompute_student_grades rescue nil
+      self.context.recompute_student_scores rescue nil
     end
   end
   

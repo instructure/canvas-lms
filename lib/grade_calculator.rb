@@ -28,17 +28,17 @@ class GradeCalculator
     @final_updates = []
   end
   
-  def self.recompute_final_grade(user_ids, course_id)
+  def self.recompute_final_score(user_ids, course_id)
     calc = GradeCalculator.new user_ids, course_id
-    calc.recompute_and_save_grades
+    calc.recompute_and_save_scores
   end
   
-  # recomputes the grades and saves them to each user's Enrollment
-  def recompute_and_save_grades
+  # recomputes the scores and saves them to each user's Enrollment
+  def recompute_and_save_scores
     @user_ids.each do |user_id|
       submissions = Submission.for_user(user_id)
-      calculate_current_grade(user_id, submissions)
-      calculate_final_grade(user_id, submissions)
+      calculate_current_score(user_id, submissions)
+      calculate_final_score(user_id, submissions)
     end
     
     conn = ActiveRecord::Base.connection
@@ -53,15 +53,15 @@ class GradeCalculator
 
   :private
   
-  # The grade ignoring unsubmitted assignments
-  def calculate_current_grade(user_id, submissions)
+  # The score ignoring unsubmitted assignments
+  def calculate_current_score(user_id, submissions)
     group_sums = create_group_sums(submissions)
     score = calculate_total_from_group_scores(group_sums)
     @current_updates << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"
   end
 
-  # The final grade for the class, so unsubmitted assignments count as zeros
-  def calculate_final_grade(user_id, submissions)
+  # The final score for the class, so unsubmitted assignments count as zeros
+  def calculate_final_score(user_id, submissions)
     group_sums = create_group_sums(submissions, false)
     score = calculate_total_from_group_scores(group_sums, false)
     @final_updates << "WHEN user_id=#{user_id} THEN #{score || "NULL"}"

@@ -385,15 +385,19 @@ class Enrollment < ActiveRecord::Base
     Enrollment.readable_type(self.class.to_s)
   end
   
-  def self.recompute_final_grades(user_id)
+  def self.recompute_final_scores(user_id)
     user = User.find(user_id)
     user.student_enrollments.each do |enrollment|
-      send_later(:recompute_final_grade, user_id, enrollment.course_id)
+      send_later(:recompute_final_score, user_id, enrollment.course_id)
     end
   end
   
-  def self.recompute_final_grade(user_ids, course_id)
-    GradeCalculator.recompute_final_grade(user_ids, course_id)
+  def self.recompute_final_score(user_ids, course_id)
+    GradeCalculator.recompute_final_score(user_ids, course_id)
+  end
+  
+  def computed_final_grade
+    raise "TODO"
   end
 
   def self.students(opts={})

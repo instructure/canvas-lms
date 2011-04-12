@@ -112,7 +112,7 @@ class AssignmentGroupsController < ApplicationController
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
       AssignmentGroup.update_all({:updated_at => Time.now}, {:id => group_ids})
       ids = @group.assignments.map(&:id)
-      @context.recompute_student_grades rescue nil
+      @context.recompute_student_scores rescue nil
       respond_to do |format|
         format.json { render :json => {:reorder => true, :order => ids}, :status => :ok }
       end

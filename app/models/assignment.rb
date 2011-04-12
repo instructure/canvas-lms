@@ -687,7 +687,7 @@ class Assignment < ActiveRecord::Base
         end
       end
     end
-    Enrollment.send_later_if_production(:recompute_final_grade, context.students.map(&:id), self.context_id) rescue nil
+    Enrollment.send_later_if_production(:recompute_final_score, context.students.map(&:id), self.context_id) rescue nil
     send_later_if_production(:multiple_module_actions, context.students.map(&:id), :scored, score)
     
     changed_since_publish = !!self.available?

@@ -114,7 +114,7 @@ class Course < ActiveRecord::Base
   before_save :assert_defaults
   before_save :set_update_account_associations_if_changed
   before_save :update_enrollments_later
-  after_save :update_final_grades_on_weighting_scheme_change
+  after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   
@@ -461,14 +461,14 @@ class Course < ActiveRecord::Base
   end
   memoize :self_enrollment_code
   
-  def update_final_grades_on_weighting_scheme_change
+  def update_final_scores_on_weighting_scheme_change
     if @group_weighting_scheme_changed
-      Enrollment.send_later_if_production(:recompute_final_grade, self.students.map(&:id), self.id)
+      Enrollment.send_later_if_production(:recompute_final_score, self.students.map(&:id), self.id)
     end
   end
   
-  def recompute_student_grades
-    Enrollment.send_later_if_production(:recompute_final_grade, self.students.map(&:id), self.id)
+  def recompute_student_scores
+    Enrollment.send_later_if_production(:recompute_final_score, self.students.map(&:id), self.id)
   end
   
   def home_page

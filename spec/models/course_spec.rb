@@ -122,7 +122,7 @@ describe Course, "gradebook_to_csv" do
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
     @assignment.grade_student(@user, :grade => "10")
     @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
-    @course.recompute_student_grades
+    @course.recompute_student_scores
     @user.reload
     @course.reload
     

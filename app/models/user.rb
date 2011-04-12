@@ -612,7 +612,7 @@ class User < ActiveRecord::Base
       end
     end
     self.reload
-    Enrollment.send_later(:recompute_final_grades, new_user.id)
+    Enrollment.send_later(:recompute_final_scores, new_user.id)
     self.destroy
   end
   
