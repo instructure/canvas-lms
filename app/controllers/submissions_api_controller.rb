@@ -230,7 +230,7 @@ class SubmissionsApiController < ApplicationController
     hash
   end
 
-  SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id)
+  SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission)
 
   def submission_attempt_json(attempt, assignment, version_idx = nil)
     hash = attempt.as_json(

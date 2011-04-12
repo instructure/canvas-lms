@@ -150,6 +150,7 @@ describe SubmissionsApiController, :type => :integration do
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1",
+        "grade_matches_current_submission"=>true,
         "attachments" =>
          [
            { "content-type" => "application/loser",
@@ -170,6 +171,7 @@ describe SubmissionsApiController, :type => :integration do
            "user_id"=>student1.id,
            "comparison"=>nil,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=0",
+           "grade_matches_current_submission"=>nil,
            "score"=>nil},
           {"grade"=>nil,
             "assignment_id" => a1.id,
@@ -186,6 +188,7 @@ describe SubmissionsApiController, :type => :integration do
            "user_id"=>student1.id,
            "comparison"=>nil,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
+           "grade_matches_current_submission"=>nil,
            "score"=>nil},
           {"grade"=>"A-",
             "assignment_id" => a1.id,
@@ -209,6 +212,7 @@ describe SubmissionsApiController, :type => :integration do
            "user_id"=>student1.id,
            "comparison"=>nil,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
+           "grade_matches_current_submission"=>true,
            "score"=>13.5}],
         "attempt"=>3,
         "url"=>nil,
@@ -234,6 +238,7 @@ describe SubmissionsApiController, :type => :integration do
         "prior"=>nil,
         "body"=>nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1",
+        "grade_matches_current_submission"=>true,
         "submitted_at"=>"1970-01-01T04:00:00Z",
         "submission_history"=>
          [{"grade"=>"F",
@@ -248,6 +253,7 @@ describe SubmissionsApiController, :type => :integration do
            "user_id"=>student2.id,
            "comparison"=>nil,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=0",
+          "grade_matches_current_submission"=>true,
            "attachments" =>
             [{"content-type" => "image/png",
               "display_name" => "snapshot.png",
