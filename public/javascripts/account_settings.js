@@ -146,4 +146,16 @@ $(document).ready(function() {
       .appendTo('label[for="account_services_' + serviceName + '"]');    
   });
   
+  $(".report_description_link").click(function(event) {
+    event.preventDefault();
+    $(this).parent().find("div.report_description").toggle();
+  });
+
+  $("div.report_description table.report_example").before('<a href="#" class="report_example_link">Example...</a>');
+
+  $(".report_example_link").click(function(event) {
+    event.preventDefault();
+    $(this).parent().find("table.report_example").toggle();
+  });
+
 });

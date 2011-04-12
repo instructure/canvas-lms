@@ -378,11 +378,22 @@
   <% end %>
   <% if !@available_reports.blank? %>
     <div id="tab-reports">
-      <% @available_reports.each do |report, print_name|
+      <% @available_reports.each do |report, details|
+         title = details[:title] || details
+         description = details[:description]
+         description_partial = details[:description_partial]
+         description_partial = report + '_description' if description_partial == true
          last_run = @last_reports[report]
       %>
         <div id="<%= report %>" style="margin-bottom: 10px;">
-          <h3 style="margin-bottom: 3px;"><%= print_name %></h3>
+          <h3 style="margin-bottom: 3px;"><%= title %></h3>
+          <% if description || description_partial %>
+            <a href="#" class="report_description_link">Description...</a><br />
+            <div class="report_description">
+              <%= render :partial => description_partial if description_partial %>
+              <%= description unless description_partial %>
+            </div>
+          <% end %>
           Last Run:
           <% if last_run %>
               <%= datetime_string(last_run.created_at) %><br/>
