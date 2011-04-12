@@ -1189,6 +1189,8 @@ class Course < ActiveRecord::Base
     Rubric.process_migration(data, migration)
     @assignment_group_no_drop_assignments = {}
     AssignmentGroup.process_migration(data, migration)
+    ExternalFeed.process_migration(data, migration)
+    GradingStandard.process_migration(data, migration)
     migration.fast_update_progress(40)
     Quiz.process_migration(data, migration, question_data)
     migration.fast_update_progress(50)

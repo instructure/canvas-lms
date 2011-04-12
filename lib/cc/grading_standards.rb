@@ -17,12 +17,18 @@
 #
 module CC
   module GradingStandards
-    def create_grading_standards
+    def create_grading_standards(document=nil)
       return nil unless @course.grading_standards.count > 0
       
-      standards_file = File.new(File.join(@canvas_resource_dir, CCHelper::GRADING_STANDARDS), 'w')
-      rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::GRADING_STANDARDS)
-      document = Builder::XmlMarkup.new(:target=>standards_file, :indent=>2)
+      if document
+        standards_file = nil
+        rel_path = nil
+      else
+        standards_file = File.new(File.join(@canvas_resource_dir, CCHelper::GRADING_STANDARDS), 'w')
+        rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::GRADING_STANDARDS)
+        document = Builder::XmlMarkup.new(:target=>standards_file, :indent=>2)
+      end
+      
       document.instruct!
       document.gradingStandards(
               "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -38,7 +44,7 @@ module CC
         end
       end
       
-      standards_file.close
+      standards_file.close if standards_file
       rel_path
     end
   end

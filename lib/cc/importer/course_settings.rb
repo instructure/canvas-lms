@@ -18,15 +18,19 @@
 module CC::Importer
   module CourseSettings
     include CC::Importer
+    include LearningOutcomesConverter
     
-    def course_settings_doc(file)
+    def settings_doc(file)
       open_file_xml File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, file)
     end
     
     def convert_non_dependant_course_settings
-      @course[:course] = convert_course_settings(course_settings_doc(COURSE_SETTINGS))
-      @course[:assignment_groups] = convert_assignment_groups(course_settings_doc(ASSIGNMENT_GROUPS))
-      @course[:external_tools] = convert_external_tools(course_settings_doc(EXTERNAL_TOOLS))
+      @course[:course] = convert_course_settings(settings_doc(COURSE_SETTINGS))
+      @course[:assignment_groups] = convert_assignment_groups(settings_doc(ASSIGNMENT_GROUPS))
+      @course[:external_tools] = convert_external_tools(settings_doc(EXTERNAL_TOOLS))
+      @course[:external_feeds] = convert_external_feeds(settings_doc(EXTERNAL_FEEDS))
+      @course[:grading_standards] = convert_grading_standards(settings_doc(GRADING_STANDARDS))
+      @course[:learning_outcomes] = convert_learning_outcomes(settings_doc(LEARNING_OUTCOMES))
     end
 
     def convert_course_settings(doc)
@@ -98,6 +102,39 @@ module CC::Importer
       end
 
       tools
+    end
+
+    def convert_external_feeds(doc)
+      feeds = []
+      return feeds unless doc
+      doc.css('externalFeed').each do |node|
+        feed = {}
+        feed['migration_id'] = node['identifier']
+        feed['title'] = get_node_val(node, 'title')
+        feed['url'] = get_node_val(node, 'url')
+        feed['feed_type'] = get_node_val(node, 'feed_type')
+        feed['purpose'] = get_node_val(node, 'purpose')
+        feed['verbosity'] = get_node_val(node, 'verbosity')
+        feed['header_match'] = get_node_val(node, 'header_match')
+        
+        feeds << feed
+      end
+
+      feeds
+    end
+
+    def convert_grading_standards(doc)
+      standards = []
+      return standards unless doc
+      doc.css('gradingStandard').each do |node|
+        standard = {}
+        standard['migration_id'] = node['identifier']
+        standard['title'] = get_node_val(node, 'title')
+        standard['data'] = get_node_val(node, 'data')
+        standards << standard
+      end
+
+      standards
     end
 
   end

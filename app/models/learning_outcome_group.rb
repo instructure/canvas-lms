@@ -155,6 +155,32 @@ class LearningOutcomeGroup < ActiveRecord::Base
     outcome
   end
   
+  def self.import_from_migration(hash, context, item=nil)
+    hash = hash.with_indifferent_access
+    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+    item ||= context.learning_outcome_groups.new
+    item.context = context
+    item.migration_id = hash[:migration_id]
+    item.title = hash[:title]
+    item.description = hash[:description]
+    
+    item.save!
+    
+    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+
+    if hash[:outcomes]
+      hash[:outcomes].each do |outcome|
+        outcome[:learning_outcome_group] = item
+        LearningOutcome.import_from_migration(outcome, context)
+      end
+    end
+    
+    log = LearningOutcomeGroup.default_for(context)
+    log.add_item(item)
+
+    item
+  end
+  
   named_scope :active, lambda{
     {:conditions => ['learning_outcome_groups.workflow_state != ?', 'deleted'] }
   }

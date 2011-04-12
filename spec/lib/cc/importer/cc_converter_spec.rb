@@ -62,7 +62,7 @@ describe "Common Cartridge importing" do
     end
   end
 
-  it "should convert assignment groups" do
+  it "should import assignment groups" do
     ag1 = @copy_from.assignment_groups.new
     ag1.name = "Boring assignments"
     ag1.position = 1
@@ -116,7 +116,7 @@ describe "Common Cartridge importing" do
     ag2_2.rules.should == "drop_lowest:2\ndrop_highest:5\nnever_drop:%s\n" % a_2.id
   end
 
-  it "should convert external tools" do
+  it "should import external tools" do
     tool1 = @copy_from.context_external_tools.new
     tool1.url = 'http://instructure.com'
     tool1.name = 'instructure'
@@ -162,6 +162,110 @@ describe "Common Cartridge importing" do
     t2.workflow_state.should == tool2.workflow_state
     t2.consumer_key.should == 'fake'
     t2.shared_secret.should == 'fake'
+  end
+  
+  it "should import external feeds" do
+    ef = @copy_from.external_feeds.new
+    ef.url = "http://search.twitter.com/search.atom?q=instructure"
+    ef.title = "Instructure on Twitter"
+    ef.feed_type = "rss/atom"
+    ef.feed_purpose = 'announcements'
+    ef.verbosity = 'full'
+    ef.header_match = "canvas"
+    ef.save!
+    
+    #export to xml
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_external_feeds(builder)
+    #convert to json
+    doc = Nokogiri::XML(builder.target!)
+    hash = @converter.convert_external_feeds(doc)
+    #import json into new course
+    ExternalFeed.process_migration({'external_feeds'=>hash}, @migration)
+    @copy_to.save!
+  
+    ef_2 = @copy_to.external_feeds.find_by_migration_id(CC::CCHelper.create_key(ef))
+    ef_2.url.should == ef.url
+    ef_2.title.should == ef.title
+    ef_2.feed_type.should == ef.feed_type
+    ef_2.feed_purpose.should == ef.feed_purpose
+    ef_2.verbosity.should == ef.verbosity
+    ef_2.header_match.should == ef.header_match
+  end
+  
+  it "should import grading standards" do
+    gs = @copy_from.grading_standards.new
+    gs.title = "Standard eh"
+    gs.data = [["A", 1], ["A-", 0.92], ["B+", 0.88], ["B", 0.84], ["B!-", 0.82], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]]
+    gs.save!
+    
+    #export to xml
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_grading_standards(builder)
+    #convert to json
+    doc = Nokogiri::XML(builder.target!)
+    hash = @converter.convert_grading_standards(doc)
+    #import json into new course
+    GradingStandard.process_migration({'grading_standards'=>hash}, @migration)
+    @copy_to.save!
+  
+    gs_2 = @copy_to.grading_standards.find_by_migration_id(CC::CCHelper.create_key(gs))
+    gs_2.title.should == gs.title
+    gs_2.data.should == gs.data
+  end
+  
+  it "should import learning outcomes" do
+    lo = @copy_from.learning_outcomes.new
+    lo.context = @copy_from
+    lo.short_description = "Lone outcome"
+    lo.description = "<p>Descriptions are boring</p>"
+    lo.workflow_state = 'active'
+    lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
+    lo.save!
+    
+    default = LearningOutcomeGroup.default_for(@copy_from)
+    default.add_item(lo)
+    
+    lo_g = @copy_from.learning_outcome_groups.new
+    lo_g.context = @copy_from
+    lo_g.title = "Lone outcome group"
+    lo_g.description = "<p>Groupage</p>"
+    lo_g.save!
+    
+    lo2 = @copy_from.learning_outcomes.new
+    lo2.context = @copy_from
+    lo2.short_description = "outcome in group"
+    lo2.workflow_state = 'active'
+    lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+    lo2.save!
+    lo_g.add_item(lo2)
+    
+    default.add_item(lo_g)
+    
+    #export to xml
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_learning_outcomes(builder)
+    #convert to json
+    doc = Nokogiri::XML(builder.target!)
+    hash = @converter.convert_learning_outcomes(doc)
+    #import json into new course
+    LearningOutcome.process_migration({'learning_outcomes'=>hash}, @migration)
+    @copy_to.save!
+  
+    lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2.short_description.should == lo.short_description
+    lo_2.description.should == lo.description
+    lo_2.data.with_indifferent_access.should == lo.data.with_indifferent_access
+    
+    lo2_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo2))
+    lo2_2.short_description.should == lo2.short_description
+    lo2_2.description.should == lo2.description
+    lo2_2.data.with_indifferent_access.should == lo2.data.with_indifferent_access
+    
+    lo_g_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g))
+    lo_g_2.title.should == lo_g.title
+    lo_g_2.description.should == lo_g.description
+    lo_g_2.sorted_content.length.should == 1
   end
 
 end

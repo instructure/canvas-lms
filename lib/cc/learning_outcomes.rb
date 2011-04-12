@@ -17,15 +17,21 @@
 #
 module CC
   module LearningOutcomes
-    def create_learning_outcomes
+    def create_learning_outcomes(document=nil)
       return nil unless LearningOutcome.active.find_all_by_context_id_and_context_type(@course.id, 'Course').count > 0
       return nil unless @course.learning_outcome_groups.find_by_learning_outcome_group_id(nil)
 
       root_group = @course.learning_outcome_groups.find_by_learning_outcome_group_id(nil)
+      
+      if document
+        outcomes_file = nil
+        rel_path = nil
+      else
+        outcomes_file = File.new(File.join(@canvas_resource_dir, CCHelper::LEARNING_OUTCOMES), 'w')
+        rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::LEARNING_OUTCOMES)
+        document = Builder::XmlMarkup.new(:target=>outcomes_file, :indent=>2)
+      end
 
-      outcomes_file = File.new(File.join(@canvas_resource_dir, CCHelper::LEARNING_OUTCOMES), 'w')
-      rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::LEARNING_OUTCOMES)
-      document = Builder::XmlMarkup.new(:target=>outcomes_file, :indent=>2)
       document.instruct!
       document.learningOutcomes(
           "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -35,7 +41,7 @@ module CC
         process_outcome_group_content(outs_node, root_group)
       end
 
-      outcomes_file.close
+      outcomes_file.close if outcomes_file
       rel_path
     end
 

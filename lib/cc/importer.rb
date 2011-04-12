@@ -23,5 +23,6 @@ module CC
   end
 end
 
+require 'cc/importer/learning_outcomes_converter'
 require 'cc/importer/course_settings'
 require 'cc/importer/cc_converter'

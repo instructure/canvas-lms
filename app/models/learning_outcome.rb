@@ -169,9 +169,10 @@ class LearningOutcome < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
-    to_import = migration.to_import 'learning_outcomes'
     outcomes.each do |outcome|
-      if !to_import || to_import[migration_id]
+      if outcome[:type] == 'learning_outcome_group'
+        LearningOutcomeGroup.import_from_migration(outcome, migration.context)
+      else
         import_from_migration(outcome, migration.context)
       end
     end
@@ -183,12 +184,20 @@ class LearningOutcome < ActiveRecord::Base
     item ||= context.learning_outcomes.new
     item.context = context
     item.migration_id = hash[:migration_id]
+    item.short_description = hash[:title]
     item.description = hash[:description]
-
+    
+    if hash[:ratings]
+      item.data = {:rubric_criterion=>{:ratings=>hash[:ratings]}}
+      item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
+      item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
+      item.data[:rubric_criterion][:description] = item.short_description || item.description
+    end
+    
     item.save!
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
-
-    log = LearningOutcomeGroup.default_for(context)
+    
+    log = hash[:learning_outcome_group] || LearningOutcomeGroup.default_for(context)
     log.add_item(item)
 
     item
