@@ -17,12 +17,18 @@
 #
 module CC
   module Rubrics
-    def create_rubrics
+    def create_rubrics(document=nil)
       return nil unless @course.rubrics.active.count > 0
+      
+      if document
+        rubrics_file = nil
+        rel_path = nil
+      else
+        rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), 'w')
+        rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::RUBRICS)
+        document = Builder::XmlMarkup.new(:target=>rubrics_file, :indent=>2)
+      end
 
-      rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), 'w')
-      rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::RUBRICS)
-      document = Builder::XmlMarkup.new(:target=>rubrics_file, :indent=>2)
       document.instruct!
       document.rubrics(
           "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -51,7 +57,7 @@ module CC
         end
       end
 
-      rubrics_file.close
+      rubrics_file.close if rubrics_file
       rel_path
     end
 

@@ -38,15 +38,21 @@ describe "Common Cartridge importing" do
     @copy_from.turnitin_comments = "Don't plagiarize"
     @copy_from.self_enrollment = true
     @copy_from.license = "cc_by_nc_nd"
-
     @copy_from.save!
+
+    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    @copy_from.syllabus_body = body_with_link % @copy_from.id 
 
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
     @resource.create_course_settings("1", builder)
+    syllabus = StringIO.new
+    @resource.create_syllabus(syllabus)
     #convert to json
     doc = Nokogiri::XML(builder.target!)
     hash = @converter.convert_course_settings(doc)
+    syl_doc = Nokogiri::XML(syllabus.string)
+    hash[:syllabus_body] = @converter.convert_syllabus(syl_doc)
     #import json into new course
     hash = hash.with_indifferent_access
     @copy_to.import_settings_from_migration({:course_settings=>hash})
@@ -55,6 +61,7 @@ describe "Common Cartridge importing" do
     #compare settings
     @copy_to.conclude_at.to_i.should == @copy_from.conclude_at.to_i
     @copy_to.start_at.to_i.should == @copy_from.start_at.to_i
+    @copy_to.syllabus_body.should == body_with_link % @copy_to.id
     atts = Course.clonable_attributes
     atts -= [:start_at, :conclude_at, :grading_standard_id, :hidden_tabs, :tab_configuration, :syllabus_body]
     atts.each do |att|
@@ -214,7 +221,7 @@ describe "Common Cartridge importing" do
     gs_2.data.should == gs.data
   end
   
-  it "should import learning outcomes" do
+  def create_learning_outcome
     lo = @copy_from.learning_outcomes.new
     lo.context = @copy_from
     lo.short_description = "Lone outcome"
@@ -222,9 +229,25 @@ describe "Common Cartridge importing" do
     lo.workflow_state = 'active'
     lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
     lo.save!
-    
     default = LearningOutcomeGroup.default_for(@copy_from)
     default.add_item(lo)
+    lo
+  end
+  
+  def import_learning_outcomes
+    #export to xml
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_learning_outcomes(builder)
+    #convert to json
+    doc = Nokogiri::XML(builder.target!)
+    hash = @converter.convert_learning_outcomes(doc)
+    #import json into new course
+    LearningOutcome.process_migration({'learning_outcomes'=>hash}, @migration)
+    @copy_to.save!
+  end
+  
+  it "should import learning outcomes" do
+    lo = create_learning_outcome
     
     lo_g = @copy_from.learning_outcome_groups.new
     lo_g.context = @copy_from
@@ -240,18 +263,11 @@ describe "Common Cartridge importing" do
     lo2.save!
     lo_g.add_item(lo2)
     
+    default = LearningOutcomeGroup.default_for(@copy_from)
     default.add_item(lo_g)
     
-    #export to xml
-    builder = Builder::XmlMarkup.new(:indent=>2)
-    @resource.create_learning_outcomes(builder)
-    #convert to json
-    doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_learning_outcomes(doc)
-    #import json into new course
-    LearningOutcome.process_migration({'learning_outcomes'=>hash}, @migration)
-    @copy_to.save!
-  
+    import_learning_outcomes
+    
     lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.short_description.should == lo.short_description
     lo_2.description.should == lo.description
@@ -266,6 +282,93 @@ describe "Common Cartridge importing" do
     lo_g_2.title.should == lo_g.title
     lo_g_2.description.should == lo_g.description
     lo_g_2.sorted_content.length.should == 1
+  end
+  
+  it "should import rubrics" do
+    # create an outcome to reference
+    lo = create_learning_outcome
+    import_learning_outcomes
+    
+    rubric = @copy_from.rubrics.new
+    rubric.title = "Rubric"
+    rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}, {:ignore_for_scoring=>false, :mastery_points=>3, :learning_outcome_id=>lo.id, :ratings=>[{:criterion_id=>"309_343", :points=>5, :description=>"Exceeds Expectations", :id=>"309_6516", :long_description=>""}, {:criterion_id=>"309_343", :points=>0, :description=>"Does Not Meet Expectations", :id=>"309_9962", :long_description=>""}], :points=>5, :description=>"Learning Outcome", :id=>"309_343", :long_description=>"<p>Outcome</p>"}]
+    rubric.save!
+    
+    #export to xml
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_rubrics(builder)
+    #convert to json
+    doc = Nokogiri::XML(builder.target!)
+    hash = @converter.convert_rubrics(doc)
+    #import json into new course
+    hash[0] = hash[0].with_indifferent_access
+    Rubric.process_migration({'rubrics'=>hash}, @migration)
+    @copy_to.save!
+  
+    lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
+    lo_2.should_not be_nil
+    rubric_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric))
+    rubric_2.title.should == rubric.title
+    rubric_2.data[1][:learning_outcome_id].should == lo_2.id
+  end
+  
+  it "should import modules" do 
+    mod1 = @copy_from.context_modules.create!(:name => "some module", :unlock_at => 1.week.from_now)
+    mod2 = @copy_from.context_modules.create!(:name => "next module")
+    mod2.prerequisites = [{:type=>"context_module", :name=>mod1.name, :id=>mod1.id}]
+    mod2.require_sequential_progress = true
+    mod2.save!
+    
+    asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
+    tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment'})
+    c_reqs = []
+    c_reqs << {:type => 'min_score', :min_score => 5, :id => tag.id}
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+    tag = mod1.add_item({:id => page.id, :type => 'wiki_page'})
+    c_reqs << {:type => 'must_view', :id => tag.id}
+    mod1.completion_requirements = c_reqs
+    mod1.save!
+    
+    #Add assignment/page to @copy_to so the module can reference them on import
+    asmnt2 = @copy_to.assignments.create(:title => "some assignment")
+    asmnt2.migration_id = CC::CCHelper.create_key(asmnt1)
+    asmnt2.save!
+    page2 = @copy_to.wiki.wiki_pages.create(:title => "some page")
+    page2.migration_id = CC::CCHelper.create_key(page)
+    page2.save!
+    
+    #export to xml
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_module_meta(builder)
+    #convert to json
+    doc = Nokogiri::XML(builder.target!)
+    hash = @converter.convert_modules(doc)
+    #import json into new course
+    hash[0] = hash[0].with_indifferent_access
+    hash[1] = hash[1].with_indifferent_access
+    ContextModule.process_migration({'modules'=>hash}, @migration)
+    @copy_to.save!
+    
+    mod1_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod1))
+    mod1_2.name.should == mod1.name
+    mod1_2.unlock_at.to_i.should == mod1.unlock_at.to_i
+    mod1_2.content_tags.count.should == mod1.content_tags.count
+    tag = mod1_2.content_tags.first
+    tag.content_id.should == asmnt2.id
+    tag.content_type.should == 'Assignment'
+    cr1 = mod1_2.completion_requirements.find {|cr| cr[:id] == tag.id}
+    cr1[:type].should == 'min_score'
+    cr1[:min_score].should == 5
+    tag = mod1_2.content_tags.last
+    tag.content_id.should == page2.id
+    tag.content_type.should == 'WikiPage'
+    cr2 = mod1_2.completion_requirements.find {|cr| cr[:id] == tag.id}
+    cr2[:type].should == 'must_view'
+    
+    mod2_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod2))
+    mod2_2.prerequisites.length.should == 1
+    mod2_2.prerequisites.first.should == {:type=>"context_module", :name=>mod1_2.name, :id=>mod1_2.id}
+    
   end
 
 end

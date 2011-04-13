@@ -17,13 +17,19 @@
 #
 module CC
   module ModuleMeta
-    def create_module_meta
+    def create_module_meta(document=nil)
       return nil unless @course.context_modules.active.count > 0
       
+      if document
+        meta_file = nil
+        rel_path = nil
+      else
+        meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::MODULE_META), 'w')
+        rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MODULE_META)
+        document = Builder::XmlMarkup.new(:target=>meta_file, :indent=>2)
+      end
+      
       module_id_map = {}
-      meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::MODULE_META), 'w')
-      rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MODULE_META)
-      document = Builder::XmlMarkup.new(:target=>meta_file, :indent=>2)
       document.instruct!
       document.modules(
               "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -42,7 +48,7 @@ module CC
             m_node.unlock_at CCHelper::ims_datetime(cm.unlock_at) if cm.unlock_at
             m_node.start_at CCHelper::ims_datetime(cm.start_at) if cm.start_at
             m_node.end_at CCHelper::ims_datetime(cm.end_at) if cm.end_at
-            m_node.require_sequential_progress cm.require_sequential_progress.to_s
+            m_node.require_sequential_progress cm.require_sequential_progress.to_s unless cm.require_sequential_progress.nil?
             
             if cm.prerequisites && !cm.prerequisites.empty?
               m_node.prerequisites do |pre_reqs|
@@ -56,16 +62,17 @@ module CC
             end
             
             ct_id_map = {}
-            m_node.contentTags do |cts_node|
+            m_node.items do |items_node|
               cm.content_tags.active.each do |ct|
                 ct_migration_id = CCHelper.create_key(ct)
                 ct_id_map[ct.id] = ct_migration_id
-                cts_node.contentTag(:identifier=>ct_migration_id) do |ct_node|
-                  ct_node.content_type ct.content_type
-                  ct_node.identifierref CCHelper.create_key(ct.content) unless ct.content_type == 'ContextModuleSubHeader'
-                  ct_node.url ct.url if ct.content_type == 'ExternalUrl'
-                  ct_node.position ct.position
-                  ct_node.indent ct.indent
+                items_node.item(:identifier=>ct_migration_id) do |item_node|
+                  item_node.content_type ct.content_type
+                  item_node.title ct.title
+                  item_node.identifierref CCHelper.create_key(ct.content) unless ct.content_type == 'ContextModuleSubHeader'
+                  item_node.url ct.url if ["ContextExternalTool", 'ExternalUrl'].member? ct.content_type
+                  item_node.position ct.position
+                  item_node.indent ct.indent
                 end
               end
             end
@@ -85,7 +92,7 @@ module CC
           end
         end
       end
-      meta_file.close
+      meta_file.close if meta_file
       rel_path
     end
   end

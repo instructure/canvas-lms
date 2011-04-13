@@ -32,6 +32,16 @@ module Canvas::XMLHelper
   def get_node_val(node, selector, default=nil)
     node.at_css(selector) ? node.at_css(selector).text : default
   end
+  
+  # You can't do a css selector that only looks for direct
+  # descendants of the current node, so you have to iterate
+  # over the children and see if it's there.
+  def get_val_if_child(node, name)
+    if child = node.children.find{|c|c.name == name}
+      return child.text
+    end
+    nil
+  end
 
   def get_unescaped_html_val(node, selector)
     ::CGI.unescapeHTML(get_node_val(node, selector, ''))
@@ -72,6 +82,12 @@ module Canvas::XMLHelper
     path = get_node_val(node, selector)
     path = path.gsub('\\', '/') if path
     path
+  end
+  
+  def get_html_title_and_body(doc)
+    title = get_node_val(doc, 'html head title')
+    body = doc.at_css('html body').to_s.gsub(%r{</?body>}, '').strip
+    [title, body]
   end
 
   def open_file(path)

@@ -33,8 +33,7 @@ module CC::Importer
       unzip_archive
       
       @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
-      convert_non_dependant_course_settings
-      
+      convert_all_course_settings
       
       #close up shop
       save_to_file

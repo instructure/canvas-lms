@@ -19,18 +19,22 @@ module CC::Importer
   module CourseSettings
     include CC::Importer
     include LearningOutcomesConverter
+    include RubricsConverter
+    include ModuleConverter
     
     def settings_doc(file)
       open_file_xml File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, file)
     end
     
-    def convert_non_dependant_course_settings
+    def convert_all_course_settings
       @course[:course] = convert_course_settings(settings_doc(COURSE_SETTINGS))
+      @course[:course][:syllabus_body] = convert_syllabus(settings_doc(SYLLABUS))
       @course[:assignment_groups] = convert_assignment_groups(settings_doc(ASSIGNMENT_GROUPS))
       @course[:external_tools] = convert_external_tools(settings_doc(EXTERNAL_TOOLS))
       @course[:external_feeds] = convert_external_feeds(settings_doc(EXTERNAL_FEEDS))
       @course[:grading_standards] = convert_grading_standards(settings_doc(GRADING_STANDARDS))
       @course[:learning_outcomes] = convert_learning_outcomes(settings_doc(LEARNING_OUTCOMES))
+      @course[:modules] = convert_modules(settings_doc(MODULE_META))
     end
 
     def convert_course_settings(doc)
@@ -60,6 +64,10 @@ module CC::Importer
       course['storage_quota'] = get_int_val(doc, 'storage_quota')
       
       course
+    end
+    
+    def convert_syllabus(doc)
+      get_html_title_and_body(doc).last
     end
 
     def convert_assignment_groups(doc = nil)

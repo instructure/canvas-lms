@@ -69,15 +69,5 @@ module CC::Importer
       outcome
     end
     
-    # You can't do a css selector that only looks for direct
-    # descendants of the current node, so you have to iterate
-    # over the children and see if it's there.
-    def get_val_if_child(node, name)
-      if child = node.children.find{|c|c.name == name}
-        return child.text
-      end
-      nil
-    end
-    
   end
 end

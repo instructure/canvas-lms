@@ -24,6 +24,16 @@ module Canvas::MigratorHelper
   OVERVIEW_JSON = "overview.json"
   
   attr_reader :overview
+  
+  def self.get_utc_time_from_timestamp(timestamp)
+    timestamp = timestamp.to_i/ 1000 rescue 0
+    t = nil
+    if timestamp > 0
+      t = Time.at(timestamp)
+      t = Time.utc(t.year, t.month, t.day, t.hour, t.min, t.sec)
+    end
+    t
+  end
 
   def self.unzip_command(zip_file, dest_dir)
     "unzip -qo #{zip_file.gsub(/ /, "\\ ")} -d #{dest_dir.gsub(/ /, "\\ ")} 2>&1"

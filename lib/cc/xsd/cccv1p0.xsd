@@ -149,13 +149,14 @@
                 </xs:complexType>
               </xs:element>
               
-              <xs:element name="contentTags" minOccurs="0">
+              <xs:element name="items" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                    <xs:element name="contentTag">
+                    <xs:element name="item">
                       <xs:complexType>
                         <xs:all minOccurs="0">
                           <xs:element name="content_type" type="xs:string" minOccurs="1"/>
+                          <xs:element name="title" type="xs:string" minOccurs="1"/>
                           <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
                           <xs:element name="url" type="xs:string" minOccurs="0"/>
                           <xs:element name="position" type="xs:integer" minOccurs="0"/>
@@ -175,8 +176,8 @@
                       <xs:complexType>
                         <xs:all minOccurs="0">
                           <xs:element name="identifierref" type="xs:string" minOccurs="1"/>
-                          <xs:element name="min_score" type="xs:integer" minOccurs="0"/>
-                          <xs:element name="max_score" type="xs:integer" minOccurs="0"/>
+                          <xs:element name="min_score" type="xs:float" minOccurs="0"/>
+                          <xs:element name="max_score" type="xs:float" minOccurs="0"/>
                         </xs:all>
                         <xs:attribute name="type" type="xs:string" use="required"/>
                       </xs:complexType>

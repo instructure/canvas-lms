@@ -29,14 +29,9 @@ module CC
       
       @canvas_resource_dir = File.join(@export_dir, CCHelper::COURSE_SETTINGS_DIR)
       FileUtils::mkdir_p @canvas_resource_dir
-
-      file_name = CCHelper::SYLLABUS
-      syl_rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, file_name)
-      path = File.join(@canvas_resource_dir, file_name)
-      File.open(path, 'w') do |file|
-        file << CCHelper.html_page(@course.syllabus_body || '', "Syllabus", @course, @manifest.exporter.user)
-      end
-
+      
+      syl_rel_path = create_syllabus
+      
       resources = []
       resources << create_course_settings(migration_id)
       resources << create_module_meta
@@ -57,6 +52,20 @@ module CC
           res.file(:href=>resource) if resource
         end
       end
+    end
+    
+    def create_syllabus(io_object=nil)
+      syl_rel_path = nil
+      
+      unless io_object
+        syl_rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::SYLLABUS)
+        path = File.join(@canvas_resource_dir, CCHelper::SYLLABUS)
+        io_object = File.open(path, 'w')
+      end
+      io_object << CCHelper.html_page(@course.syllabus_body || '', "Syllabus", @course, @manifest.exporter.user)
+      io_object.close
+        
+      syl_rel_path
     end
     
     def create_course_settings(migration_id, document=nil)

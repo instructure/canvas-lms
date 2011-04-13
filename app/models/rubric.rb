@@ -268,14 +268,28 @@ class Rubric < ActiveRecord::Base
     item ||= find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
     item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
     item ||= self.new(:context => context)
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     item.description = hash[:description]
-    item.data = hash[:data]
     item.points_possible = hash[:points_possible].to_f
+    item.read_only = hash[:read_only] unless hash[:read_only].nil?
+    item.reusable = hash[:reusable] unless hash[:reusable].nil?
+    item.public = hash[:public] unless hash[:public].nil?
+    item.hide_score_total = hash[:hide_score_total] unless hash[:hide_score_total].nil?
+    item.free_form_criterion_comments = hash[:free_form_criterion_comments] unless hash[:free_form_criterion_comments].nil?
+    
+    item.data = hash[:data]
+    item.data.each do |crit|
+      if crit[:learning_outcome_migration_id]
+        if lo = context.learning_outcomes.find_by_migration_id(crit[:learning_outcome_migration_id])
+          crit[:learning_outcome_id] = lo.id
+        end
+        crit.delete :learning_outcome_migration_id
+      end
+    end
+    
+    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.save!
-    context.imported_migration_items << item
     item
   end
   

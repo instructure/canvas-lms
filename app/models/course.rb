@@ -1252,11 +1252,9 @@ class Course < ActiveRecord::Base
     dates = ['conclude_at', 'start_at']
     settings.slice(*Course.clonable_attributes.map(&:to_s)).each do |key, val|
       if dates.member? key
-        timestamp = val.to_i/ 1000 rescue 0
-        if timestamp > 0
-          t = Time.at(timestamp)
-          self.send("#{key}=", Time.utc(t.year, t.month, t.day, t.hour, t.min, t.sec))
-        end
+        self.send("#{key}=", Canvas::MigratorHelper.get_utc_time_from_timestamp(val))
+      elsif key == 'syllabus_body'
+        self.syllabus_body = ImportedHtmlConverter.convert(val, self)
       else
         self.send("#{key}=", val)
       end

@@ -94,52 +94,53 @@ module CCHelper
   end
   
   def self.html_content(html, course, user)
-      regex = Regexp.new(%r{/courses/#{course.id}/([^\s"]*)})
-      html = html.gsub(regex) do |relative_url|
-        sub_spot = $1
-        new_url = nil
-        
-        {'assignments' => Assignment,
-         'announcements' => Announcement,
-         'calendar_events' => CalendarEvent,
-         'discussion_topics' => DiscussionTopic,
-         'collaborations' => Collaboration,
-         'files' => Attachment,
-         'conferences' => WebConference,
-         'quizzes' => Quiz,
-         'groups' => Group,
-         'wiki' => WikiPage,
-         'grades' => nil,
-         'users' => nil
-        }.each do |type, obj_class|
-          if type != 'wiki' && sub_spot =~ %r{#{type}/(\d+)[^\s"]*$}
-            # it's pointing to a specific file or object
-            obj = obj_class.find($1) rescue nil
-            if obj && obj.respond_to?(:grants_right?) && obj.grants_right?(user, nil, :read)
-              if type == 'files'
-                folder = obj.folder.full_name.gsub("course files", WEB_CONTENT_TOKEN)
-                new_url = "#{folder}/#{obj.display_name}"
-              elsif migration_id = CCHelper.create_key(obj)
-                new_url = "#{OBJECT_TOKEN}/#{type}/#{migration_id}"
-              end
+    return html if html.blank?
+    regex = Regexp.new(%r{/courses/#{course.id}/([^\s"]*)})
+    html = html.gsub(regex) do |relative_url|
+      sub_spot = $1
+      new_url = nil
+      
+      {'assignments' => Assignment,
+       'announcements' => Announcement,
+       'calendar_events' => CalendarEvent,
+       'discussion_topics' => DiscussionTopic,
+       'collaborations' => Collaboration,
+       'files' => Attachment,
+       'conferences' => WebConference,
+       'quizzes' => Quiz,
+       'groups' => Group,
+       'wiki' => WikiPage,
+       'grades' => nil,
+       'users' => nil
+      }.each do |type, obj_class|
+        if type != 'wiki' && sub_spot =~ %r{#{type}/(\d+)[^\s"]*$}
+          # it's pointing to a specific file or object
+          obj = obj_class.find($1) rescue nil
+          if obj && obj.respond_to?(:grants_right?) && obj.grants_right?(user, nil, :read)
+            if type == 'files'
+              folder = obj.folder.full_name.gsub("course files", WEB_CONTENT_TOKEN)
+              new_url = "#{folder}/#{obj.display_name}"
+            elsif migration_id = CCHelper.create_key(obj)
+              new_url = "#{OBJECT_TOKEN}/#{type}/#{migration_id}"
             end
-            break
-          elsif sub_spot =~ %r{#{type}(?:/([^\s"]*))?$}
-            # it's pointing to a course content index or a wiki page
-            if type == 'wiki' && $1
-              new_url = "#{WIKI_TOKEN}/#{type}/#{$1}"
-            else
-              new_url = "#{COURSE_TOKEN}/#{type}"
-              new_url += "/#{$1}" if $1
-            end
-            break
           end
+          break
+        elsif sub_spot =~ %r{#{type}(?:/([^\s"]*))?$}
+          # it's pointing to a course content index or a wiki page
+          if type == 'wiki' && $1
+            new_url = "#{WIKI_TOKEN}/#{type}/#{$1}"
+          else
+            new_url = "#{COURSE_TOKEN}/#{type}"
+            new_url += "/#{$1}" if $1
+          end
+          break
         end
-        new_url || relative_url
       end
-
-      html
+      new_url || relative_url
     end
+
+    html
+  end
   
 end
 end
