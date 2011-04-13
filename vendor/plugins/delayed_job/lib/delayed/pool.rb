@@ -45,7 +45,7 @@ module Delayed
         raise ArgumentError,
           "Invalid config file #{config_filename}"
       end
-      logger.auto_flushing = true
+      logger.auto_flushing = true if logger.respond_to?(:auto_flushing)
     end
 
     def environment
