@@ -11,7 +11,7 @@ class File
        end
      elsif file.class == String
        mime = EXTENSIONS[(file[file.rindex('.')+1, file.size]).downcase.to_sym] rescue nil
-     elsif file.class == StringIO
+     elsif file.respond_to?(:string)
        temp = File.open(Dir.tmpdir + '/upload_file.' + Process.pid.to_s, "wb")
        temp << file.string
        temp.close

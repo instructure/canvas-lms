@@ -11,7 +11,7 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
       self.content_type = detect_mimetype(file_data) rescue 'unknown/unknown'
       self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
       file_from_path = true
-      if file_data.is_a?(StringIO) || file_data.is_a?((Rack::RewindableInput rescue Class))
+      unless file_data.respond_to?(:path)
         file_data.rewind
         self.temp_data = file_data.read
         file_from_path = false
