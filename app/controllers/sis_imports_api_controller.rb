@@ -32,6 +32,9 @@ class SisImportsApiController < ApplicationController
   #
   # Import SIS data into Canvas. Must be on a root account with SIS imports enabled.
   #
+  # For more information on the format that's expected here, please see our
+  # documentation at http://github.com/instructure/canvas-lms/raw/stable/public/resources/CanvasSISImport.pdf
+  #
   # There are two ways to post SIS import data - either via a multipart/form-data
   # form-field-style attachment, or via a non-multipart raw post request. For the
   # latter to work, you must provide a suitable Content-Type header.
