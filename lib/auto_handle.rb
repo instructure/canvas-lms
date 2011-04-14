@@ -38,5 +38,9 @@ class AutoHandle
       n.times { slug << rand_char }
       slug
     end
+
+    def generate_securish_uuid
+      Canvas::Security.hmac_sha1("#{UUIDSingleton.instance.generate}#{AutoHandle.generate(nil, 20)}")
+    end
   end
 end

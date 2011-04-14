@@ -595,7 +595,7 @@ class Course < ActiveRecord::Base
   end
   
   def self.create_unique(uuid=nil, account_id=nil, root_account_id=nil)
-    uuid ||= UUIDSingleton.instance.generate
+    uuid ||= AutoHandle.generate_securish_uuid
     course = find_or_initialize_by_uuid(uuid)
     course = Course.new if course.deleted?
     course.name = "My Course" if course.new_record?
@@ -627,7 +627,7 @@ class Course < ActiveRecord::Base
   end
   
   def assign_uuid
-    self.uuid ||= UUIDSingleton.instance.generate
+    self.uuid ||= AutoHandle.generate_securish_uuid
   end
   protected :assign_uuid
 

@@ -240,8 +240,8 @@ class Group < ActiveRecord::Base
   end
   
   def ensure_defaults
-    self.name ||= UUIDSingleton.instance.generate
-    self.uuid ||= UUIDSingleton.instance.generate
+    self.name ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= AutoHandle.generate_securish_uuid
     self.category ||= Group.student_organized_category
     self.join_level ||= 'invitation_only'
     if self.context && self.context.is_a?(Course)

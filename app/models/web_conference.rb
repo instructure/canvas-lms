@@ -47,7 +47,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def assign_uuid
-    self.uuid ||= UUIDSingleton.instance.generate
+    self.uuid ||= AutoHandle.generate_securish_uuid
   end
   protected :assign_uuid
   

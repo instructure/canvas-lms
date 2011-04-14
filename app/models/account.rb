@@ -155,7 +155,7 @@ class Account < ActiveRecord::Base
   end
   
   def ensure_defaults
-    self.uuid ||= UUIDSingleton.instance.generate
+    self.uuid ||= AutoHandle.generate_securish_uuid
   end
   
   def set_update_account_associations_if_changed

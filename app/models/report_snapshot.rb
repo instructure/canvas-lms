@@ -90,7 +90,7 @@ class ReportSnapshot < ActiveRecord::Base
       
       installation_uuid = Setting.get("installation_uuid", "")
       if installation_uuid == ""
-        installation_uuid = UUIDSingleton.instance.generate
+        installation_uuid = AutoHandle.generate_securish_uuid
         Setting.set("installation_uuid", installation_uuid)
       end
   

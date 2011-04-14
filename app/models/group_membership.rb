@@ -66,7 +66,7 @@ class GroupMembership < ActiveRecord::Base
   end
   
   def assign_uuid
-    self.uuid ||= UUIDSingleton.instance.generate
+    self.uuid ||= AutoHandle.generate_securish_uuid
     self.workflow_state = 'accepted' if self.requested? && self.group && self.group.auto_accept?(self.user)
   end
   protected :assign_uuid

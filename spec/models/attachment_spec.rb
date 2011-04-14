@@ -114,7 +114,7 @@ describe Attachment do
   
   it "should set the uuid" do
     attachment_model
-    @attachment.uuid.should match(uuid_regex)
+    @attachment.uuid.should_not be_nil
   end
   
   context "workflow" do

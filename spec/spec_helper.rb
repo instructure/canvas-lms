@@ -189,10 +189,6 @@ Spec::Runner.configure do |config|
     File.read(File.expand_path(File.join(File.dirname(__FILE__), %w(fixtures default_gradebook.csv))))
   end
 
-  def uuid_regex
-    /[\d|\w]{8}-[\d|\w]{4}-[\d|\w]{4}-[\d|\w]{4}-[\d|\w]{12}/
-  end
-
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
     return ar_klass.create!(attrs) if ar_klass.accessible_attributes.nil?
     obj = ar_klass.new(attrs.reject { |k,v| !ar_klass.accessible_attributes.include?(k) })

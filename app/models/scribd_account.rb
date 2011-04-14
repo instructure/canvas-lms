@@ -23,7 +23,7 @@ class ScribdAccount < ActiveRecord::Base
   before_create :assure_uuid
   
   def assure_uuid
-    self.uuid ||= UUIDSingleton.instance.generate
+    self.uuid ||= AutoHandle.generate_securish_uuid
   end
   private :assure_uuid
   

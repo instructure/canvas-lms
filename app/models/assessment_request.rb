@@ -33,7 +33,7 @@ class AssessmentRequest < ActiveRecord::Base
   has_a_broadcast_policy
   
   def infer_uuid
-    self.uuid ||= UUIDSingleton.instance.generate
+    self.uuid ||= AutoHandle.generate_securish_uuid
   end
   protected :infer_uuid
   
