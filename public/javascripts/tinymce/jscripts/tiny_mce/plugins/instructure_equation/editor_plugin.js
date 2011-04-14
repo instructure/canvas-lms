@@ -16,124 +16,117 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 (function() {
-	tinymce.create('tinymce.plugins.InstructureEquation', {
-		init : function(ed, url) {
-      var promptInteraction = {};
-      setInterval(function() {
-        promptInteraction.counter = (promptInteraction.counter || 0) + 1;
-        if(promptInteraction.counter > 5) {
-          promptInteraction.counter = 0;
-          if (promptInteraction.hasChanged) {
-            promptInteraction.hasChanged = false;
-            $("#instructure_equation_prompt_form .prompt").triggerHandler('data_update');
-          }
+  $("<link/>", {
+     rel: "stylesheet",
+     type: "text/css",
+     href: location.protocol + "//" + location.host + "/stylesheets/static/mathquill.css"
+  }).appendTo("head");
+  $.getScript("/javascripts/mathquill.js", function() {
+    // hidden span so that we pre-load Symbola long before the equation popup ever opens
+    $("<span class='mathquill-embedded-latex' style='position: absolute; z-index: -1; top: 0; left: 0; width: 0; height: 0; overflow: hidden;'>a</span>").appendTo("body").mathquill();
+  });
+
+  // like $.text() / Sizzle.getText(elems), except it also gets alt attributes
+  // from images
+  function getEquationText(elems) {
+    var ret = "", elem;
+    for ( var i = 0; elems[i]; i++ ) {
+      elem = elems[i];
+      // Get the text from text nodes and CDATA nodes
+      if ( elem.nodeType === 3 || elem.nodeType === 4 ) {
+        ret += elem.nodeValue;
+      // Get alt attributes from IMG nodes
+      } else if ( elem.nodeName == 'IMG' && elem.className == 'equation_image' ) {
+        ret += $(elem).attr('alt');
+      // Traverse everything else, except comment nodes
+      } else if ( elem.nodeType !== 8 ) {
+        ret += getEquationText( elem.childNodes );
+      }
+    }
+    return ret;
+  }
+
+  tinymce.create('tinymce.plugins.InstructureEquation', {
+    init : function(ed, url) {
+      var prevSelection;
+      ed.addCommand('instructureEquation', function() {
+        var nodes = $('<span>' + ed.selection.getContent() + '</span>');
+        prevSelection = ed.selection.getBookmark();
+        var equation = getEquationText(nodes).replace(/^\s+|\s+$/g, '');
+        if (!equation) {
+          equation = "1 + 1";
         }
-      }, 100);
-			ed.addCommand('instructureEquation', function() {
-        var node = ed.selection.getNode()
-        var equation = "1 + 1";
-        if(node.nodeName == 'IMG' && node.className == 'equation_image') {
-          equation = $(node).attr('alt');
-        }
-				var $editor = $("#" + ed.id);
+
+        var $editor = $("#" + ed.id);
         var $box = $("#instructure_equation_prompt");
         if($box.length == 0) {
           var $box = $(document.createElement('div'));
-          $box.append("Paste or type your equation in the box below (using the LaTeX format). " +
-                      "You should see a preview show up below the box: " +
+          $box.append("Use the equation editor below (or type/paste in your equation in LaTeX format). " +
                       "<form id='instructure_equation_prompt_form' style='margin-top: 5px;'>" +
-                      "<textarea class='prompt' style='width: 100%; height: 50%'></textarea>" +
-                      "<div class='rendered'></div>" +
-                      "<div class='actions'><input type='submit' style='float: right' value='Insert Equation'/></div>" +
+                      "<span class='mathquill-editor' style='width: auto; font-size: 1.5em'></span>" +
+                      "<div class='actions' style='padding-top: 10px'><button type='submit' class='button' style='float: right'>Insert Equation</button></div>" +
                       "</form>");
           $box.find("#instructure_equation_prompt_form").submit(function(event) {
             var $editor = $box.data('editor');
             event.preventDefault();
             event.stopPropagation();
-            var text = $(this).find(".prompt").val();
+            var text = $(this).find(".mathquill-editor").mathquill('latex');
             var url = "http://latex.codecogs.com/gif.latex?" + escape(text);
             var $div = $(document.createElement('div'));
             var $img = $(document.createElement('img'));
             $img.attr('src', url).attr('alt', text).attr('title', text).attr('class', 'equation_image');
             $div.append($img);
-            $editor.editorBox('insert_code', $div.html()); //"<img src='" + url + "' alt='" + text + "' class='equation_image'/>");
+            ed.selection.moveToBookmark(prevSelection);
+            $editor.editorBox('insert_code', $div.html());
             $box.dialog('close');
           });
-          $box.find(".rendered").delegate('.embed_image_link', 'click', function(event) {
-            event.preventDefault();
-            $box.find("#instructure_equation_prompt_form").submit();
-          });
-          $box.find("#instructure_equation_prompt_form .prompt").bind('change keypress', function() {
-            promptInteraction.counter = 0;
-            promptInteraction.hasChanged = true;
-          }).bind('data_update', function() {
-            var $img = $(".embed_image_link");
-            var val = $(this).val();
-            var url = "http://latex.codecogs.com/gif.latex?" + escape(val);
-            if($img.length == 0) {
-              var $div = $(document.createElement('div'));
-              $div.css({
-                textAlign: 'center',
-                padding: 20
-              });
-              var $img = $(document.createElement('img'));
-              $img.addClass('embed_image_link');
-              $img.css('cursor', 'pointer');
-              $img.attr('title', 'Click to Embed the Equation');
-              $div.append($img);
-              $("#instructure_equation_prompt .rendered").append($div);
-            }
-            $img.attr('src', url);
-          }).triggerHandler('data_update');
           $box.attr('id', 'instructure_equation_prompt');
           $("body").append($box);
         }
+
         $box.data('editor', $editor);
-        $box.find("#instructure_equation_prompt_form .prompt").val(equation)
-          .triggerHandler('data_update');
         $box.dialog('close').dialog({
           autoOpen: false,
-          width: 425,
-          minWidth: 425,
-          minHeight: 215,
+          width: 690,
+          minWidth: 690,
+          minHeight: 300,
           resizable: true,
           height: "auto",
           title: "Embed Math Equation",
-          open: function() {
-            $(this).find(".prompt").focus().select();
-            promptInteraction.heightDelta = $(this).height() - $(this).find("textarea").height();
-          },
-          resize: function(event, ui) {
-            $(this).find("textarea").height($(this).height() - promptInteraction.heightDelta);
-          }
         }).dialog('open');
-			});
-			ed.addButton('instructure_equation', {
-				title: 'Insert Math Equation',
-				cmd: 'instructureEquation',
-				image: url + '/img/button.gif'
-			});
-			ed.onNodeChange.add(function(ed, cm, e) {
-				if(e.nodeName == 'IMG' && e.className == 'equation_image') {
-					cm.setActive('instructure_equation', true);
-				} else {
-					cm.setActive('instructure_equation', false);
-				}
-			});
-		},
 
-		getInfo : function() {
-			return {
-				longname : 'InstructureEquation',
-				author : 'Brian Whitmer',
-				authorurl : 'http://www.instructure.com',
-				infourl : 'http://www.instructure.com',
-				version : tinymce.majorVersion + "." + tinymce.minorVersion
-			};
-		}
-	});
-	
-	// Register plugin
-	tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation);
+        // needs to be visible for some computed styles to work when we write
+        // the equation
+        $box.find(".mathquill-editor").mathquill('revert').
+          addClass('mathquill-editor').mathquill('editor').
+          mathquill('write', equation).focus();
+      });
+      ed.addButton('instructure_equation', {
+        title: 'Insert Math Equation',
+        cmd: 'instructureEquation',
+        image: url + '/img/button.gif'
+      });
+      ed.onNodeChange.add(function(ed, cm, e) {
+        if(e.nodeName == 'IMG' && e.className == 'equation_image') {
+          cm.setActive('instructure_equation', true);
+        } else {
+          cm.setActive('instructure_equation', false);
+        }
+      });
+    },
+
+    getInfo : function() {
+      return {
+        longname : 'InstructureEquation',
+        author : 'Brian Whitmer',
+        authorurl : 'http://www.instructure.com',
+        infourl : 'http://www.instructure.com',
+        version : tinymce.majorVersion + "." + tinymce.minorVersion
+      };
+    }
+  });
+  
+  // Register plugin
+  tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation);
 })();
 
