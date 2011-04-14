@@ -16,6 +16,37 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+function checkup() {
+  $.ajaxJSON($("#sis_publish_link").attr('href'), 'GET', {}, function(data) {
+    if (!data.hasOwnProperty("sis_publish_status")) {
+      return;
+    }
+    sisPublishStatus = data["sis_publish_status"];
+    updatePublishingStatus();
+  });
+}
+
+function updatePublishingStatus(requestInProgress) {
+  var $publish_grades_link = $("#publish_grades_link"),
+      $publish_grades_error = $("#publish_grades_error");
+  if (sisPublishStatus == 'published') {
+    $publish_grades_error.hide();
+    $publish_grades_link.html("Republish grades to SIS");
+    $publish_grades_link.removeClass("disabled");
+  } else if (sisPublishStatus == 'publishing' || sisPublishStatus == 'pending') {
+    $publish_grades_error.hide();
+    $publish_grades_link.html("Publishing grades to SIS...");
+    if (!requestInProgress) {
+      setTimeout(checkup, 5000);
+    }
+    $publish_grades_link.addClass("disabled");
+  } else {
+    $publish_grades_error.show();
+    $publish_grades_link.html("Republish grades to SIS");
+    $publish_grades_link.removeClass("disabled");
+  }
+}
+
 $(document).ready(function() {
   var $add_section_form = $("#add_section_form"),
       $edit_section_form = $("#edit_section_form"),
@@ -379,5 +410,40 @@ $(document).ready(function() {
   $(".self_enrollment_checkbox").change(function() {
     $(".open_enrollment_holder").showIf($(this).attr('checked'));
   }).change();
+
+  var $publish_to_sis_form = $("#publish_to_sis_form");
+  $("#publish_grades_link").click(function(event) {
+    event.preventDefault();
+    if (sisPublishStatus == 'publishing' || sisPublishStatus == 'pending') {
+      return;
+    }
+    if (sisPublishStatus == 'published') {
+      if (!confirm("Are you sure you want to republish these grades to the student information system?"))
+        return;
+    } else {
+      if (!confirm("Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized."))
+        return;
+    }
+    sisPublishStatus = "publishing";
+    updatePublishingStatus(true);
+    var successful_statuses = { "published": 1, "publishing": 1, "pending": 1 };
+    var error = function(data, xhr, status, error) {
+      sisPublishStatus = "unknown";
+      $.flashError("Something went wrong when trying to publish grades to the student information system. Please try again later.");
+      updatePublishingStatus();
+    };
+    $.ajaxJSON($publish_to_sis_form.attr('action'), 'POST', $publish_to_sis_form.getFormData(), function(data) {
+      if (!data.hasOwnProperty("sis_publish_status") || !successful_statuses.hasOwnProperty(data["sis_publish_status"])) {
+        error(null, null, "Invalid SIS publish status", null);
+        return;
+      }
+      sisPublishStatus = data["sis_publish_status"];
+      updatePublishingStatus();
+    }, error);
+  });
+  if (sisPublishEnabled) {
+    updatePublishingStatus();
+  }
+
   $.scrollSidebar();
 });

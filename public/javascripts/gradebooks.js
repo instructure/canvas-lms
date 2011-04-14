@@ -22,6 +22,7 @@ var gradebook = (function(){
       $assignment_details_dialog = $("#assignment_details_dialog"),
       $submission_information = $("#submission_information"),
       $update_submission_form = $("#update_submission_form"),
+      $publish_to_sis_form = $("#publish_to_sis_form"),
       $curve_grade_dialog = $("#curve_grade_dialog"),
       $message_students_dialog = $("#message_students_dialog"),
       $information_link = $("#information_link"),
@@ -150,6 +151,28 @@ var gradebook = (function(){
           return "th_assignment_"+assignment_id+" th_student_"+student_id;
         }
       });
+    },
+    publishGradesToSis: function() {
+      if(sisPublishStatus == 'published') {
+        if(!confirm("Are you sure you want to republish these grades to the student information system?"))
+          return;
+      } else {
+        if(!confirm("Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized."))
+          return;
+      }
+      sisPublishStatus = "publishing";
+      var successful_statuses = { "published": 1, "publishing": 1, "pending": 1 };
+      var error = function(data, xhr, status, error) {
+        sisPublishStatus = "unknown";
+        $.flashError("Something went wrong when trying to publish grades to the student information system. Please try again later.");
+      };
+      $.ajaxJSON($publish_to_sis_form.attr('action'), 'POST', $publish_to_sis_form.getFormData(), function(data) {
+        if(!data.hasOwnProperty("sis_publish_status") || !successful_statuses.hasOwnProperty(data["sis_publish_status"])) {
+          error(null, null, "Invalid SIS publish status", null);
+          return;
+        }
+        sisPublishStatus = data["sis_publish_status"];
+      }, error);
     }
   };
   
@@ -1117,7 +1140,11 @@ var gradebook = (function(){
           }
         };
       }
-      
+
+      if(sisPublishEnabled) {
+        options['<span class="ui-icon ui-icon-gear" /> <a href="details#tab-grade-publishing">Publish grades to SIS</a>'] = function() {};
+      }
+
       $(this).dropdownList({
         options: options
       });

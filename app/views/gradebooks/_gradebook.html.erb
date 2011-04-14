@@ -27,6 +27,8 @@
   <div class="clear"></div>
   <% form_tag context_url(@context, :update_submission_context_gradebook_url), { :id => "update_submission_form", :style => "display: none;" } do %>
   <% end %>
+  <% form_tag context_url(@context, :context_details_url, :fragment => "publish_grades"), { :id => "publish_to_sis_form", :style => "display: none;" } do %>
+  <% end %>
 
   <div id="loading_gradebook_message" style="margin-top: 10px; margin-left: 10px;">
     <h3 id="loading_gradebook_status">Loading Gradebook...</h3>
@@ -339,4 +341,5 @@
 
 <script>
   var lastGradebookUpdate = "<%= ActiveSupport::TimeWithZone.new(Time.now, Time.zone).strftime("%Y-%m-%dT%H:%M:%S") %>";
+  var sisPublishEnabled = <%= PluginSetting.settings_for_plugin('grade_export')[:enabled] %>;
 </script>

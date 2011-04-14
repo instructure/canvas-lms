@@ -20,6 +20,8 @@
   tas = enrollment_hashes['TaEnrollment'].map{|k, v| v[0]} #@context.detailed_enrollments.select{|e| e.type == 'TaEnrollment' && e.active_or_pending?}.sort_by{|e| e.user.sortable_name rescue "a" }
   observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]} #@context.detailed_enrollments.select{|e| e.type == 'ObserverEnrollment' && e.active_or_pending?}.sort_by{|e| e.user.sortable_name rescue "a" }
   has_multiple_sections = @context.course_sections.active.count > 1
+
+  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled];
 %>
 <% content_for :right_side do %>
 
@@ -68,6 +70,9 @@
     <li><a href="#tab-users" id="tab-users-link">Users</a></li>
     <li><a href="#tab-navigation">Navigation</a></li>
     <li><a href="#tab-tools" id="tab-tols-link">External Tools</a></li>
+    <% if publishing_enabled %>
+      <li><a href="#tab-grade-publishing" id="tab-grade-publishing-link">Grade Publishing</a></li>
+    <% end %>
   </ul>
   <div id="tab-details">
     <h2>Course Details</h2>
@@ -577,6 +582,17 @@
     <h2>External Tools</h2>
     <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
   </div>
+  <% if publishing_enabled %>
+    <div id="tab-grade-publishing">
+      <h2>Grade Publishing</h2>
+      <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %>
+      <a href="<%= context_url(@context, :context_publish_to_sis_url) %>" id="sis_publish_link" style="display: none;">&nbsp;</a>
+      <% end %>
+      <a href="#" id="publish_grades_link" class="button disabled">Publishing grades to SIS...</a>
+      <span id="publish_grades_error" style="display: none;">&nbsp;An error occurred
+        on the last attempt to publish grades to SIS.</span>
+    </div>
+  <% end %>
 </div>
 <% if current_user_is_site_admin? %>
   <div id="move_course_dialog" style="display: none;">
@@ -606,3 +622,7 @@
     <% end %>
   </div>
 <% end %>
+<script>
+  var sisPublishStatus = "<%= @context.grade_publishing_status %>";
+  var sisPublishEnabled = "<%= publishing_enabled %>";
+</script>

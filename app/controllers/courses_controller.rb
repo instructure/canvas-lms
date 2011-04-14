@@ -21,7 +21,7 @@
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
-  before_filter :require_user_for_context, :only => [:roster, :roster_user, :locks, :switch_role]
+  before_filter :require_user_for_context, :only => [:roster, :roster_user, :locks, :switch_role, :publish_to_sis]
 
   # @API
   # Returns the list of active courses for the current user.
@@ -833,5 +833,15 @@ class CoursesController < ApplicationController
     respond_to do |format|
       format.atom { render :text => feed.to_xml }
     end
+  end
+
+  def publish_to_sis
+    @context.publish_final_grades(@current_user)
+    render :json => {:sis_publish_status => @context.grade_publishing_status}.to_json
+  end
+
+  def sis_publish_status
+    get_context
+    render :json => {:sis_publish_status => @context.grade_publishing_status}
   end
 end

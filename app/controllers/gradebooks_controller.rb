@@ -224,7 +224,7 @@ class GradebooksController < ApplicationController
       end
     end
   end
-  
+
   def update_submission
     if authorized_action(@context, @current_user, :manage_grades)
       submissions = [params[:submission]]
