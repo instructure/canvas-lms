@@ -20,7 +20,7 @@ class ContextMessage < ActiveRecord::Base
   include Workflow
   include SendToInbox
   include SendToStream
-  attr_accessible :context, :user, :body, :subject, :recipients, :root_context_message, :protect_recipients
+  attr_accessible :context, :user, :body, :subject, :recipients, :root_context_message, :protect_recipients, :media_comment_id, :media_comment_type
   belongs_to :context, :polymorphic => true
   belongs_to :root_context_message, :class_name => 'ContextMessage'
   has_many :attachments, :as => :context, :dependent => :destroy
@@ -35,7 +35,7 @@ class ContextMessage < ActiveRecord::Base
   serialize :viewed_user_ids
   
   
-  before_save :set_defaults
+  before_save :set_defaults, :infer_values
   after_save :set_attachments
   after_save :record_participants
   adheres_to_policy
@@ -92,6 +92,15 @@ class ContextMessage < ActiveRecord::Base
     self.viewed_user_ids ||= [self.user_id]
   end
   
+  def infer_values
+    self.media_comment_id = nil if self.media_comment_id && self.media_comment_id.strip.empty?
+    if self.media_comment_id && self.media_comment_id_changed?
+      mo = MediaObject.find_by_media_id(self.media_comment_id)
+      self.media_comment_id = nil unless mo
+    end
+    self.media_comment_type = nil unless self.media_comment_id
+  end
+
   def unread?(user)
     !read?(user)
   end

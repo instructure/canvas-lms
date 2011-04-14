@@ -23,6 +23,29 @@
   </div>
 <% end %>
 
+<% js_block do %>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var send_message_form = $(".send_message_form");
+      send_message_form.find(".media_comment_link").click(function(event) {
+        event.preventDefault();
+        $(this).mediaComment('create', 'audio', function(id, type) {
+          send_message_form.find(".media_comment_id").val(id);
+          send_message_form.find(".media_comment_type").val(type);
+          send_message_form.find(".context_message_media_comment").show();
+          send_message_form.find(".media_comment_span").hide();
+        });
+      });
+      send_message_form.find(".remove_media_comment_link").click(function(event) {
+        event.preventDefault();
+        send_message_form.find(".media_comment_id, .media_comment_type").val('');
+        send_message_form.find(".context_message_media_comment").hide();
+        send_message_form.find(".media_comment_span").show();
+      })
+    });
+  </script>
+<% end %>
+
 <h2 id="messages_view" style="float: left;"><%= @messages_view_header %></h2>
 <% if @messages_view == :action_items %>
   <div style="float: left; padding-top: 0.5em; margin-left: 15px;">
@@ -93,11 +116,22 @@
             <label for="<%= context.asset_string %>_also_announcement">Also post as an announcement</label>
           <% end %>
         </td>
-        <td style="width: 250px;">
+        <td style="width: 250px; padding-right: 50px;">
+          <% if feature_enabled?(:kaltura) %>
+            <span class="media_comment_span"><a href="#" style="float: left;" class="media_comment_link media-comment">Media Comment</a>&nbsp;</span>
+            <%= f.hidden_field :media_comment_id, :class => "media_comment_id" %>
+            <%= f.hidden_field :media_comment_type, :class => "media_comment_type" %>
+          <% end %>
           <a class="add-small add_attachment_link" href="#">Add Attachment</a>
+          <div class="context_message_media_comment" style="display: none;">
+            Media Comment
+            <a href="#" class="remove_media_comment_link" style="float: right;"><%= image_tag "delete_circle.png" %></a>
+            <div class="clear" />
+          </div>
           <div class="context_message_attachment blank" style="display: none;">
             <input type="file" name="" class="file_input"/>
-            <a href="#" class="remove_attachment_link"><%= image_tag "delete_circle.png" %></a>
+            <a href="#" class="remove_attachment_link" style="float: right;"><%= image_tag "delete_circle.png" %></a>
+            <div class="clear" />
           </div>
         </td>
       </tr>

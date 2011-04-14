@@ -10,9 +10,17 @@
 <%= asset.body %>
 
 
+<% if asset.media_comment_id.nil? %>
 To reply to this message, click the link below:
 
 <%= content :link %>
+<% else %>
+This message includes an audio comment. To listen or reply, click the link below:
+
+<% mo = MediaObject.find_by_media_id(asset.media_comment_id) %>
+http://<%= HostUrl.context_host(asset.context) %>/inbox/<%= InboxItem.find_by_asset_id_and_asset_type(asset.id, 'ContextMessage').id %>
+<% end %>
+
 
 <% unless asset.all_attachments.empty? %>
 Attached Files:

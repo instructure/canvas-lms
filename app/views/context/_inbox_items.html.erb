@@ -76,6 +76,9 @@
               $message.find(".reply_link").click();
             }
             $item.remove();
+            // Trigger a change event in case the new message has any media comments or other
+            // things that need enhancing in it.
+            $(document).trigger('user_content_change');
           }, function(data) {
             $item.loadingImage('remove');
           });
