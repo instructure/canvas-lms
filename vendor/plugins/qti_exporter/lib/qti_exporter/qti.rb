@@ -30,11 +30,11 @@ module Qti
     questions
   end
 
-  def self.convert_assessments(manifest_path, is_webct=true)
+  def self.convert_assessments(manifest_path, is_webct=true, questions = [])
     assessments = []
     doc = Nokogiri::HTML(open(manifest_path))
     doc.css('manifest resources resource[type=imsqti_assessment_xmlv2p1]').each do |item|
-      a = AssessmentTestConverter.new(item, File.dirname(manifest_path), is_webct).create_instructure_quiz
+      a = AssessmentTestConverter.new(item, File.dirname(manifest_path), is_webct, questions).create_instructure_quiz
       assessments << a if a
     end
     assessments

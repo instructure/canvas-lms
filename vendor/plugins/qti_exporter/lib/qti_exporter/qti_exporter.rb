@@ -24,7 +24,7 @@ class QtiExporter < Canvas::Migrator
     end
 
     @course[:assessment_questions] = convert_questions
-    @course[:assessments] = convert_assessments
+    @course[:assessments] = convert_assessments(@course[:assessment_questions])
 
     if @id_prepender
       @course[:assessment_questions][:assessment_questions].each do |q|
@@ -90,11 +90,11 @@ class QtiExporter < Canvas::Migrator
     @questions
   end
 
-  def convert_assessments
+  def convert_assessments(questions = [])
     raise "The QTI must be converted to 2.1 before converting to JSON" unless @converted
     begin
       manifest_file = File.join(@dest_dir_2_1, MANIFEST_FILE)
-      @quizzes[:assessments] = Qti.convert_assessments(manifest_file, false)
+      @quizzes[:assessments] = Qti.convert_assessments(manifest_file, false, questions[:assessment_questions])
     rescue => e
       message = "Error processing assessment QTI data: #{$!}: #{$!.backtrace.join("\n")}"
       add_error "qti_assessments", message, @questions, e

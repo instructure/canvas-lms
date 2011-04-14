@@ -160,7 +160,7 @@ Implemented for: Canvas LMS}]
     when "discovery"
       list.item << NVPair.new("contractVersion", "1.0")
       list.item << NVPair.new("quizAreas", "course")
-      list.item << NVPair.new("quizSupport", "publish")
+      list.item << NVPair.new("quizSupport", "publish,randomBlocks")
       list.item << NVPair.new("quizQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
       list.item << NVPair.new("quizSettings", "")
       list.item << NVPair.new("attachmentLinking", "resolve")

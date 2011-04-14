@@ -5,12 +5,13 @@ class AssessmentTestConverter
 
   attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :quiz
 
-  def initialize(manifest_node, base_dir, is_webct=true)
+  def initialize(manifest_node, base_dir, is_webct=true, converted_questions = [])
     @log = Canvas::Migration::logger
     @manifest_node = manifest_node
     @base_dir = base_dir
     @href = File.join(@base_dir, @manifest_node['href'])
     @is_webct = is_webct
+    @converted_questions = converted_questions
 
     @quiz = {
             :questions=>[],
@@ -19,7 +20,7 @@ class AssessmentTestConverter
     }
   end
 
-  def create_instructure_quiz
+  def create_instructure_quiz(converted_questions = [])
     begin
       # Get manifest data
       if md = @manifest_node.at_css("instructuremetadata")
@@ -109,7 +110,6 @@ class AssessmentTestConverter
       select = select['select'].to_i
       if select > 0
         group = {:questions=>[], :pick_count => select, :question_type => 'question_group'}
-        group[:question_points] = DEFAULT_POINTS_POSSIBLE
         if weight = section.at_css('weight @value')
           group[:question_points] = convert_weight_to_points(weight)
         end
@@ -134,7 +134,22 @@ class AssessmentTestConverter
         process_question(child, questions_list)
       end
     end
-    
+
+    # if we didn't get a question weight, and all the questions have the same
+    # points possible, use that as the group points possible per question
+    if select && select > 0 && group[:question_points].blank? && group[:questions].present?
+      migration_ids = group[:questions].map { |q| q[:migration_id] }
+      questions = @converted_questions.find_all { |q| migration_ids.include?(q[:migration_id]) }
+
+      points = questions.first[:points_possible] || 0
+      if points > 0 && questions.size == group[:questions].size && questions.all? { |q| q[:points_possible] == points }
+        group[:question_points] = points
+      else
+      end
+    end
+
+    group && group[:question_points] ||= DEFAULT_POINTS_POSSIBLE
+
     @quiz[:questions] << group if group and (!group[:questions].empty? || group[:question_bank_migration_id])
     
     questions_list
