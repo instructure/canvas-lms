@@ -811,7 +811,86 @@ class Course < ActiveRecord::Base
   def wiki_namespace
     WikiNamespace.default_for_context(self)
   end
-  
+
+  def grade_publishing_status
+    statuses = {}
+    success_deadline = PluginSetting.settings_for_plugin('grade_export')[:success_timeout].to_i.seconds.ago.to_s(:db)
+    student_enrollments.find(:all, :select => "DISTINCT grade_publishing_status, 0 AS user_id").each do |enrollment|
+        status = enrollment.grade_publishing_status
+        status ||= "unpublished"
+        statuses[status] = true
+    end
+    return "unpublished" unless statuses.size > 0
+    # to fake a course-level grade publishing status, we look at all possible
+    # enrollments, and return statuses if we find any, in this order.
+    ["error", "unpublished", "pending", "publishing", "published"].each do |status|
+      return status if statuses.has_key?(status)
+    end
+    return "error"
+  end
+
+  def publish_final_grades(publishing_user)
+    # we want to set all the publishing statuses to 'pending' immediately,
+    # and then as a delayed job, actually go publish them.
+
+    settings = PluginSetting.settings_for_plugin('grade_export')
+    raise "final grade publishing disabled" unless settings[:enabled] == "true"
+    raise "endpoint undefined" if settings[:publish_endpoint].nil? || settings[:publish_endpoint].empty?
+
+    last_publish_attempt_at = Time.now.utc
+    self.student_enrollments.update_all :grade_publishing_status => "pending",
+                                        :last_publish_attempt_at => last_publish_attempt_at
+
+    send_later_if_production(:send_final_grades_to_endpoint, publishing_user)
+    send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if settings[:success_timeout].present? && settings[:wait_for_success]
+  end
+
+  def send_final_grades_to_endpoint(publishing_user)
+    # actual grade publishing logic is here, but you probably want
+    # 'publish_final_grades'
+
+    settings = PluginSetting.settings_for_plugin('grade_export')
+    raise "final grade publishing disabled" unless settings[:enabled] == "true"
+    raise "endpoint undefined" if settings[:publish_endpoint].nil? || settings[:publish_endpoint].empty?
+
+    enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
+    enrollment_ids = []
+
+    publishing_pseudonym = publishing_user.pseudonyms.active.find_all_by_account_id(self.root_account_id, :order => "sis_source_id DESC").first
+
+    res = FasterCSV.generate do |csv|
+
+      csv << ["publisher_id", "publisher_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "grade"]
+
+      enrollments.each do |enrollment|
+        enrollment_ids << enrollment.id
+        enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).each do |user_pseudonym|
+          csv << [publishing_pseudonym.try(:id), publishing_pseudonym.try(:sis_source_id), enrollment.course_section.id, enrollment.course_section.sis_source_id, user_pseudonym.id, user_pseudonym.sis_source_id, enrollment.id, enrollment.workflow_state, enrollment.computed_final_grade]
+        end
+      end
+
+    end
+
+    publish_status = "error"
+    error = nil
+    begin
+      SSLCommon.post_data(settings[:publish_endpoint], res, 'text/csv')
+      publish_status = (settings[:wait_for_success] == "yes" ? "publishing" : "published")
+    rescue => e
+      error = e
+    end
+
+    Enrollment.update enrollment_ids, [{ :grade_publishing_status => publish_status }] * enrollment_ids.size
+    
+    raise error unless error.nil?
+  end
+
+  def expire_pending_grade_publishing_statuses(last_publish_attempt_at)
+    puts "#{last_publish_attempt_at}"
+    self.student_enrollments.scoped(:conditions => ["grade_publishing_status IN ('pending', 'publishing') AND last_publish_attempt_at = ?",
+      last_publish_attempt_at]).update_all :grade_publishing_status => 'error'
+  end
+
   def gradebook_to_csv(options = {})
     assignments = self.assignments.active.gradeable
     assignments = [assignments.find(options[:assignment_id])] if options[:assignment_id]

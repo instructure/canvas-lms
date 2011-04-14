@@ -60,3 +60,15 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
     :select_text => "Canvas Course Export"
   }
 }
+Canvas::Plugin.register('grade_export', :sis, {
+  :description => 'Grade Export for SIS',
+  :website => 'http://www.instructure.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => 1.0,
+  :settings_partial => 'plugins/grade_export_settings',
+  :settings => { :enabled => "false",
+                 :publish_endpoint => "",
+                 :wait_for_success => "no",
+                 :success_timeout => "600" }
+})

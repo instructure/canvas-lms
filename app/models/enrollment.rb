@@ -406,7 +406,7 @@ class Enrollment < ActiveRecord::Base
   end
   
   def computed_final_grade
-    raise "TODO"
+    return "TODO"
   end
 
   def self.students(opts={})

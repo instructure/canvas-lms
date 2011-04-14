@@ -21,7 +21,7 @@ require 'net/https'
 class SSLCommon
   SSL_CA_PATH = "/etc/ssl/certs/"
   
-  class <<self
+  class << self
     def get_http_conn(host, port, ssl)
       http = Net::HTTP.new(host, port)
       http.use_ssl = true if ssl
@@ -34,10 +34,18 @@ class SSLCommon
     
     def post_form(url, form_data)
       url = URI.parse(url)
-      http = self.get_http_conn(url.host, url.port, url.scheme == 'https')
+      http = self.get_http_conn(url.host, url.port, url.scheme.downcase == 'https')
       req = Net::HTTP::Post.new(url.path)
       req.form_data = form_data
       http.start {|http| http.request(req) }
+    end
+    
+    def post_data(url, data, content_type)
+      url = URI.parse(url)
+      http = self.get_http_conn(url.host, url.port, url.scheme.downcase == 'https')
+      req = Net::HTTP::Post.new(url.path)
+      req['Content-Type'] = content_type
+      http.start {|http| http.request(req, data) }
     end
   end
 end
