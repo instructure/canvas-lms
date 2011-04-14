@@ -96,16 +96,18 @@
     </td>
     <td class="assignment_score" title="<%= "Click to test a different score" unless (!editable || assignment.special_class) %>">
       <div style="position: relative; height: 100%;" class="score_holder">
-        <span class="tooltip">
-          <span class="tooltip_wrap right">
-            <span class="tooltip_text score_teaser">
-              <% if assignment.special_class %>
-                Percent
-              <% else %>
-                Click to test a different score
-              <% end %>
+        <% unless (!editable || assignment.special_class) %>
+          <span class="tooltip">
+            <span class="tooltip_wrap right">
+              <span class="tooltip_text score_teaser">
+                <% if assignment.special_class %>
+                  Percent
+                <% else %>
+                  Click to test a different score
+                <% end %>
+              </span>
             </span>
-          </span>
+          <% end %>
           <span class="grade">
             <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
           </span>
