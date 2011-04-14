@@ -17,8 +17,8 @@
 #
 
 require 'canvas/plugin'
-require 'cc/importer/cc_worker'
 Rails.configuration.to_prepare do
+  require 'cc/importer/cc_worker'
   Canvas::Plugin.register :common_cartridge_importer, :export_system, {
           :name => 'Common Cartridge Importer',
           :author => 'Instructurecon',
@@ -27,7 +27,7 @@ Rails.configuration.to_prepare do
           :settings => {
                   :worker=>'CCWorker',
                   :migration_partial => 'cc_config',
-                  :select_text => "Canvas Course Export (.imscc)"
+                  :select_text => "Canvas Course Export"
           }
   }
 end

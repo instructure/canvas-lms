@@ -23,7 +23,6 @@
         <xs:element name="allow_student_organized_groups" type="xs:boolean" minOccurs="0"/>
         <xs:element name="show_all_discussion_entries" type="xs:boolean" minOccurs="0"/>
         <xs:element name="open_enrollment" type="xs:boolean" minOccurs="0"/>
-        <xs:element name="storage_quota" type="xs:integer" minOccurs="0"/>
         <xs:element name="allow_wiki_comments" type="xs:boolean" minOccurs="0"/>
         <xs:element name="self_enrollment" type="xs:boolean" minOccurs="0"/>
         <xs:element name="turnitin_comments" type="xs:string" minOccurs="0"/>

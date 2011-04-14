@@ -29,7 +29,7 @@ class Canvas::Migrator
     @manifest = nil
     @error_count = 0
     @errors = []
-    @course = {:file_map=>{}, :wikis=>[]}
+    @course = {:file_map=>{}, :wikis=>[]}.with_indifferent_access
     @course[:name] = @settings[:course_name]
     
     return if settings[:testing]

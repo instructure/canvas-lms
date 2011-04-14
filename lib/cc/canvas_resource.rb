@@ -84,10 +84,11 @@ module CC
                       "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |c|
         c.title @course.name
+        c.course_code @course.course_code
         c.start_at ims_datetime(@course.start_at) if @course.start_at
         c.conclude_at ims_datetime(@course.conclude_at) if @course.conclude_at
         atts = Course.clonable_attributes
-        atts -= [:name, :start_at, :conclude_at, :grading_standard_id, :hidden_tabs, :tab_configuration, :syllabus_body]
+        atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
         atts.each do |att|
           c.tag!(att, @course.send(att)) unless @course.send(att).nil? || @course.send(att) == ''
         end

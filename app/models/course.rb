@@ -1246,18 +1246,15 @@ class Course < ActiveRecord::Base
   attr_accessor :assignment_group_no_drop_assignments
   
   def import_settings_from_migration(data)
-    return unless data[:course_settings]
-    settings = data[:course_settings]
-    self.name = settings['title']
-    dates = ['conclude_at', 'start_at']
-    settings.slice(*Course.clonable_attributes.map(&:to_s)).each do |key, val|
-      if dates.member? key
-        self.send("#{key}=", Canvas::MigratorHelper.get_utc_time_from_timestamp(val))
-      elsif key == 'syllabus_body'
-        self.syllabus_body = ImportedHtmlConverter.convert(val, self)
-      else
-        self.send("#{key}=", val)
-      end
+    return unless data[:course]
+    settings = data[:course]
+    self.conclude_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
+    self.start_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
+    self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
+    atts = Course.clonable_attributes
+    atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
+    settings.slice(*atts.map(&:to_s)).each do |key, val|
+      self.send("#{key}=", val)
     end
   end
   

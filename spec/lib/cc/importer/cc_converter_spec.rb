@@ -6,6 +6,8 @@ describe "Common Cartridge importing" do
     @copy_from = course_model
     @from_teacher = @user
     @copy_to = course_model
+    @copy_to.name = "alt name"
+    @copy_to.course_code = "alt name"
 
     exporter = CC::CCExporter.new(nil, :course=>@copy_from, :user=>@from_teacher)
     manifest = CC::Manifest.new(exporter)
@@ -55,15 +57,18 @@ describe "Common Cartridge importing" do
     hash[:syllabus_body] = @converter.convert_syllabus(syl_doc)
     #import json into new course
     hash = hash.with_indifferent_access
-    @copy_to.import_settings_from_migration({:course_settings=>hash})
+    @copy_to.import_settings_from_migration({:course=>hash})
     @copy_to.save!
 
     #compare settings
     @copy_to.conclude_at.to_i.should == @copy_from.conclude_at.to_i
     @copy_to.start_at.to_i.should == @copy_from.start_at.to_i
     @copy_to.syllabus_body.should == body_with_link % @copy_to.id
+    @copy_to.storage_quota.should_not == @copy_from.storage_quota
+    @copy_to.name.should_not == @copy_from.name
+    @copy_to.course_code.should_not == @copy_from.course_code
     atts = Course.clonable_attributes
-    atts -= [:start_at, :conclude_at, :grading_standard_id, :hidden_tabs, :tab_configuration, :syllabus_body]
+    atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
     atts.each do |att|
       @copy_to.send(att).should == @copy_from.send(att)
     end
@@ -305,6 +310,7 @@ describe "Common Cartridge importing" do
     Rubric.process_migration({'rubrics'=>hash}, @migration)
     @copy_to.save!
   
+    @copy_to.rubric_associations.count.should == 1
     lo_2 = @copy_to.learning_outcomes.find_by_migration_id(CC::CCHelper.create_key(lo))
     lo_2.should_not be_nil
     rubric_2 = @copy_to.rubrics.find_by_migration_id(CC::CCHelper.create_key(rubric))

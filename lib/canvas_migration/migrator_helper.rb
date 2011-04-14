@@ -23,6 +23,8 @@ module Canvas::MigratorHelper
   ERROR_FILENAME = "errors.json"
   OVERVIEW_JSON = "overview.json"
   
+  COURSE_NO_COPY_ATTS = [:name, :course_code, :start_at, :conclude_at, :grading_standard_id, :hidden_tabs, :tab_configuration, :syllabus_body, :storage_quota]
+  
   attr_reader :overview
   
   def self.get_utc_time_from_timestamp(timestamp)
@@ -129,8 +131,8 @@ module Canvas::MigratorHelper
     @overview[:end_timestamp] = nil
     dates = []
     if @overview[:course] = @course[:course]
-      @overview[:start_timestamp] = @course[:course][:start_timestamp]
-      @overview[:end_timestamp] = @course[:course][:end_timestamp]
+      @overview[:start_timestamp] = @course[:course][:start_timestamp] || @course[:course][:start_at]
+      @overview[:end_timestamp] = @course[:course][:end_timestamp] || @course[:course][:conclude_at]
     end
     @overview[:role] = @course[:role]
     @overview[:base_url] = @course[:base_url]

@@ -1,9 +1,18 @@
+<div class="migration_config"></div>
+
 <% js_block do %>
   <script>
     $(function() {
 
       $("#plugin_common_cartridge_importer").bind("pluginShown", function(event, enableFileUpload) {
-        enableFileUpload();
+        enableFileUpload(".imscc");
+        $(".qti_settings").hide();
+        $(".migration_part_selection").hide();
+      });
+      
+      $("#plugin_common_cartridge_importer").bind("pluginHidden", function(event) {
+        $(".qti_settings").show();
+        $(".migration_part_selection").show();
       });
 
     });

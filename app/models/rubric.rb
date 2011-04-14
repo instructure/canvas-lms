@@ -290,6 +290,11 @@ class Rubric < ActiveRecord::Base
     
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.save!
+    
+    unless context.rubric_associations.find_by_rubric_id(item.id)
+      item.associate_with(context, context)
+    end
+    
     item
   end
   

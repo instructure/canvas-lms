@@ -35,6 +35,7 @@ module CC::Importer
       @course[:grading_standards] = convert_grading_standards(settings_doc(GRADING_STANDARDS))
       @course[:learning_outcomes] = convert_learning_outcomes(settings_doc(LEARNING_OUTCOMES))
       @course[:modules] = convert_modules(settings_doc(MODULE_META))
+      @course[:rubrics] = convert_rubrics(settings_doc(RUBRICS))
     end
 
     def convert_course_settings(doc)
@@ -61,8 +62,6 @@ module CC::Importer
         course[date_type] = val unless val.nil?
       end
 
-      course['storage_quota'] = get_int_val(doc, 'storage_quota')
-      
       course
     end
     
