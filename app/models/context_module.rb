@@ -783,7 +783,7 @@ class ContextModule < ActiveRecord::Base
           :url => hash['url']
         }, existing_item)
       end
-    elsif hash[:linked_resource_type] =! /assessment|quiz/i
+    elsif hash[:linked_resource_type] =~ /assessment|quiz/i
       quiz = self.context.quizzes.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if quiz
         item = self.add_item({
