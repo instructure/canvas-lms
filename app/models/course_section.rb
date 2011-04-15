@@ -94,13 +94,16 @@ class CourseSection < ActiveRecord::Base
   end
   
   def move_to_course(course)
-    raise "Cannot move to a course in another term" unless self.enrollment_term_id == course.enrollment_term_id
-    return self if self.course_id == course.id
-    self.last_course_id = self.course_id unless self.last_course_id == self.course_id
-    self.course_id = course.id
-    self.root_account_id = course.root_account_id
+    return self if self.course == course
+    self.last_course = self.course unless self.last_course == self.course
+    self.course = course
+    root_account_change = (self.root_account != course.root_account)
+    self.root_account = course.root_account if root_account_change
     self.save!
-    self.enrollments.each{|e| e.root_account_id = self.root_account_id; e.save! }
+    if root_account_change
+      self.enrollments.update_all :root_account_id => self.root_account.id
+      User.send_later_if_production(:update_account_associations, self.enrollments.map{|e|e.user.id})
+    end
     self
   end
   

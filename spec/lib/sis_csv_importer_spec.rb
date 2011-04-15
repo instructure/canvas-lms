@@ -540,6 +540,247 @@ describe SIS::SisCsv do
       importer.warnings.map{|r|r.last}.should == ["Bad date format for section S002",
                                                   "Section S003 references course C002 which doesn't exist"]
     end
+    
+    it 'should verify xlist files' do
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        ",S001,active"
+      )
+      importer.warnings.should == []
+      importer.errors.map{|r|r.last}.should == ["No xlist_course_id given for a cross-listing"]
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,,active"
+      )
+      importer.warnings.should == []
+      importer.errors.map{|r|r.last}.should == ["No section_id given for a cross-listing"]
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,"
+      )
+      importer.warnings.should == []
+      importer.errors.map{|r|r.last}.should == ['Improper status "" for a cross-listing']
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,baleeted"
+      )
+      importer.warnings.should == []
+      importer.errors.map{|r|r.last}.should == ['Improper status "baleeted" for a cross-listing']
+      @account.courses.size.should == 0
+    end
+    
+    it 'should work with xlists with no xlist course' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
+        "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
+      )
+      
+      course = @account.courses.find_by_sis_source_id("C001")
+      s1 = course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.last_course.should be_nil
+      s1.account.should be_nil
+      course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+      @account.courses.find_by_sis_source_id("X001").should be_nil
+      
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,active"
+      )
+      
+      importer.warnings.should == []
+      importer.errors.should == []
+      
+      xlist_course = @account.courses.find_by_sis_source_id("X001")
+      course = @account.courses.find_by_sis_source_id("C001")
+      s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.last_course.should eql(course)
+      s1.account.should eql(course.account)
+      course.course_sections.find_by_sis_source_id("S001").should be_nil
+      course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+      
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,deleted"
+      )
+      
+      importer.warnings.should == []
+      importer.errors.should == []
+      
+      xlist_course = @account.courses.find_by_sis_source_id("X001")
+      course = @account.courses.find_by_sis_source_id("C001")
+      xlist_course.course_sections.find_by_sis_source_id("S001").should be_nil
+      s1 = course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.last_course.should be_nil
+      s1.account.should be_nil
+      course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+
+      xlist_course.name.should == "X001"
+    end
+      
+    it 'should work with xlists with an xlist course defined' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "X001,TC 102,Test Course 102,,,active",
+        "C001,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
+        "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
+      )
+      
+      course = @account.courses.find_by_sis_source_id("C001")
+      s1 = course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.last_course.should be_nil
+      s1.account.should be_nil
+      course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+      @account.courses.find_by_sis_source_id("X001").should_not be_nil
+      
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,active"
+      )
+      
+      importer.warnings.should == []
+      importer.errors.should == []
+      
+      xlist_course = @account.courses.find_by_sis_source_id("X001")
+      course = @account.courses.find_by_sis_source_id("C001")
+      s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.last_course.should eql(course)
+      s1.account.should eql(course.account)
+      course.course_sections.find_by_sis_source_id("S001").should be_nil
+      course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+      
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,deleted"
+      )
+      
+      importer.warnings.should == []
+      importer.errors.should == []
+      
+      xlist_course = @account.courses.find_by_sis_source_id("X001")
+      course = @account.courses.find_by_sis_source_id("C001")
+      xlist_course.course_sections.find_by_sis_source_id("S001").should be_nil
+      s1 = course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.last_course.should be_nil
+      s1.account.should be_nil
+      course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+
+      xlist_course.name.should == "Test Course 102"
+    end
+      
+    it 'should work with xlist courses in crazy orders' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
+        "S002,C001,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
+        "S003,C001,Sec3,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
+        "S004,C001,Sec4,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
+        "S005,C001,Sec5,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,active",
+        "X001,S002,active",
+        "X001,S003,active",
+        "X002,S004,active",
+        "X001,S005,active"
+      )
+      
+      importer.warnings.should == []
+      importer.errors.should == []
+      
+      xlist_course_1 = @account.courses.find_by_sis_source_id("X001")
+      xlist_course_2 = @account.courses.find_by_sis_source_id("X002")
+      xlist_course_1.course_sections.find_by_sis_source_id("S001").should_not be_nil
+      xlist_course_1.course_sections.find_by_sis_source_id("S002").should_not be_nil
+      xlist_course_1.course_sections.find_by_sis_source_id("S003").should_not be_nil
+      xlist_course_2.course_sections.find_by_sis_source_id("S004").should_not be_nil
+      xlist_course_1.course_sections.find_by_sis_source_id("S005").should_not be_nil
+    end
+      
+    it 'should be idempotent with active xlists' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      3.times do 
+        importer = process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S001,active"
+        )
+        importer.warnings.should == []
+        importer.errors.should == []
+        
+        xlist_course = @account.courses.find_by_sis_source_id("X001")
+        course = @account.courses.find_by_sis_source_id("C001")
+        s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+        s1.should_not be_nil
+        s1.last_course.should eql(course)
+        s1.account.should eql(course.account)
+      end
+    end
+
+    it 'should be idempotent with deleted xlists' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,active"
+      )
+      importer.warnings.should == []
+      importer.errors.should == []
+      
+      xlist_course = @account.courses.find_by_sis_source_id("X001")
+      course = @account.courses.find_by_sis_source_id("C001")
+      s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.last_course.should eql(course)
+      s1.account.should eql(course.account)
+
+      3.times do 
+        importer = process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S001,deleted"
+        )
+        importer.warnings.should == []
+        importer.errors.should == []
+        
+        course = @account.courses.find_by_sis_source_id("C001")
+        s1 = course.course_sections.find_by_sis_source_id("S001")
+        s1.should_not be_nil
+        s1.last_course.should be_nil
+        s1.account.should be_nil
+      end
+    end
+
   end
   
 end

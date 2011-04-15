@@ -36,7 +36,7 @@ class Enrollment < ActiveRecord::Base
   before_save :assign_uuid
   before_save :assert_section
   after_save :touch_user
-  after_create :update_user_account_associations
+  after_save :update_user_account_associations
 
   trigger.after(:insert).where("NEW.workflow_state = 'active'") do
     <<-SQL

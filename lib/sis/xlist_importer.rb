@@ -20,14 +20,13 @@ module SIS
   class CrossListImporter < SisImporter
     
     def self.is_xlist_csv?(row)
-      row.header?('xlist_course_id') && row.header('section_id')
+      row.header?('xlist_course_id') && row.header?('section_id')
     end
     
     def verify(csv, verify)
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         add_error(csv, "No xlist_course_id given for a cross-listing") if row['xlist_course_id'].blank?
         add_error(csv, "No section_id given for a cross-listing") if row['section_id'].blank?
-        add_error(csv, "No status given for a cross-listing") if row['status'].blank?
         add_error(csv, "Improper status \"#{row['status']}\" for a cross-listing") unless row['status'] =~ /\A(active|deleted)\z/i
       end
     end
@@ -66,6 +65,7 @@ module SIS
           
           section.account ||= section.course.account
           section.save
+          
           begin
             section.move_to_course course
           rescue => e
@@ -78,13 +78,16 @@ module SIS
           
           section.account = nil
           section.save
+
           begin
             section.move_to_course section.last_course
+            section.last_course = nil
+            section.save
           rescue => e
             add_warning(csv, "A deleted cross-listing failed: #{e}")
             next
           end
-
+          
         else
           add_error(csv, "Improper status #{row['status']} for a cross-listing")
         end
