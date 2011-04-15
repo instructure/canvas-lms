@@ -88,9 +88,22 @@ module CCHelper
     date.respond_to?(:utc) ? date.utc.strftime(IMS_DATETIME) : date.strftime(IMS_DATETIME)
   end
   
-  def self.html_page(html, title, course, user)
+  def get_html_title_and_body_and_id(doc)
+    id = get_node_val(doc, 'html head meta[name=identifier] @content')
+    get_html_title_and_body(doc) << id
+  end
+  
+  def get_html_title_and_body(doc)
+    title = get_node_val(doc, 'html head title')
+    body = doc.at_css('html body').to_s.gsub(%r{</?body>}, '').strip
+    [title, body]
+  end
+  
+  def self.html_page(html, title, course, user, id=nil)
     content = html_content(html, course, user)
-    "<html>\n<head>\n<title>#{title}</title>\n</head>\n<body>\n#{content}\n</body>\n</html>"
+    meta_html = id.nil? ? "" : %{<meta name="identifier" content="#{id}"/>\n}
+    
+    %{<html>\n<head>\n<title>#{title}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
   end
   
   def self.html_content(html, course, user)

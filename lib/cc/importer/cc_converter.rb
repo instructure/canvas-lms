@@ -19,6 +19,8 @@ module CC::Importer
   class CCConverter < Canvas::Migrator
     include CC::Importer
     include CourseSettings
+    include WikiConverter
+    include AssignmentConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -34,6 +36,8 @@ module CC::Importer
       
       @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
       convert_all_course_settings
+      @course[:wikis] = convert_wikis
+      @course[:assignments] = convert_assignments
       
       #close up shop
       save_to_file

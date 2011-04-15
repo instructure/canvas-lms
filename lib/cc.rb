@@ -24,18 +24,18 @@ require 'zip/zip'
 module CC
 end
 
-require 'cc/cc_helper'
-require 'cc/cc_exporter'
-require 'cc/manifest'
-require 'cc/wiki_resources'
-require 'cc/module_meta'
-require 'cc/learning_outcomes'
-require "cc/canvas_resource"
-require "cc/assignment_resources"
-require "cc/topic_resources"
-require "cc/web_resources"
-require "cc/web_links"
-require 'cc/resource'
-require 'cc/organization'
-require 'cc/qti/qti'
-require 'cc/importer'
+require_dependency 'cc/cc_helper'
+require_dependency 'cc/cc_exporter'
+require_dependency 'cc/manifest'
+require_dependency 'cc/wiki_resources'
+require_dependency 'cc/module_meta'
+require_dependency 'cc/learning_outcomes'
+require_dependency "cc/canvas_resource"
+require_dependency "cc/assignment_resources"
+require_dependency "cc/topic_resources"
+require_dependency "cc/web_resources"
+require_dependency "cc/web_links"
+require_dependency 'cc/resource'
+require_dependency 'cc/organization'
+require_dependency 'cc/qti/qti'
+require_dependency 'cc/importer'

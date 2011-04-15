@@ -53,22 +53,22 @@ module Canvas::XMLHelper
 
   def get_int_val(node, selector, default=nil)
     val = get_node_val(node, selector, default)
-    return default if val.nil? || val == ""
+    return default if val.nil? || val == "" || val.nil?
     begin
       val = val.to_i
     rescue
-      val = nil
+      val = default
     end
     val
   end
 
   def get_float_val(node, selector, default=nil)
     val = get_node_val(node, selector, default)
-    return default if val == ""
+    return default if val == "" || val.nil?
     begin
       val = val.to_f
     rescue
-      val = nil
+      val = default
     end
     val
   end
@@ -84,12 +84,6 @@ module Canvas::XMLHelper
     path
   end
   
-  def get_html_title_and_body(doc)
-    title = get_node_val(doc, 'html head title')
-    body = doc.at_css('html body').to_s.gsub(%r{</?body>}, '').strip
-    [title, body]
-  end
-
   def open_file(path)
     File.exists?(path) ? ::Nokogiri::HTML(open(path)) : nil
   end

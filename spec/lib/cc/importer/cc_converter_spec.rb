@@ -376,5 +376,79 @@ describe "Common Cartridge importing" do
     mod2_2.prerequisites.first.should == {:type=>"context_module", :name=>mod1_2.name, :id=>mod1_2.id}
     
   end
+  
+  it "should import wiki pages" do
+    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % @copy_from.id)
+    @copy_from.save!
+    
+    #export to html file
+    migration_id = CC::CCHelper.create_key(page)
+    exported_html = CC::CCHelper.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
+    #convert to json
+    doc = Nokogiri::XML(exported_html)
+    hash = @converter.convert_wiki(doc, 'some-page-different')
+    hash = hash.with_indifferent_access
+    #import into new course
+    WikiPage.import_from_migration(hash, @copy_to)
+    
+    page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
+    page_2.title.should == page.title
+    page_2.url.should == page.url
+    page_2.body.should == body_with_link % @copy_to.id
+  end
+  
+  it "should import assignments" do 
+    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    asmnt = @copy_from.assignments.new
+    asmnt.title = "Nothing Assignment"
+    asmnt.description = body_with_link % @copy_from.id
+    asmnt.points_possible = 9.8
+    asmnt.assignment_group = @copy_from.assignment_groups.find_or_create_by_name("Whatever")
+    asmnt.peer_reviews_due_at = 2.weeks.from_now
+    asmnt.allowed_extensions = ["doc", "odt"]
+    asmnt.unlock_at = 1.day.from_now
+    asmnt.submission_types = "online_upload,online_text_entry,online_url"
+    asmnt.grading_type = 'points'
+    asmnt.due_at = 1.week.from_now
+    asmnt.all_day_date = 1.week.from_now
+    asmnt.turnitin_enabled = true
+    asmnt.peer_reviews = true
+    asmnt.anonymous_peer_reviews = true
+    asmnt.peer_review_count = 37
+    asmnt.save!
+
+    #export to xml/html
+    migration_id = CC::CCHelper.create_key(asmnt)
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    builder.assignment("identifier" => migration_id) {|a|CC::AssignmentResources.create_assignment(a, asmnt)}
+    html = CC::CCHelper.html_page(asmnt.description, "Assignment: " + asmnt.title, @copy_from, @from_teacher)
+    #convert to json
+    meta_doc = Nokogiri::XML(builder.target!)
+    html_doc = Nokogiri::XML(html)
+    hash = @converter.convert_assignment(meta_doc, html_doc)
+    hash = hash.with_indifferent_access
+    #import
+    Assignment.import_from_migration(hash, @copy_to)
+    
+    asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
+    asmnt_2.title.should == asmnt.title
+    asmnt_2.description.should == body_with_link % @copy_to.id
+    asmnt_2.points_possible.should == asmnt.points_possible
+    asmnt_2.allowed_extensions.should == asmnt.allowed_extensions
+    asmnt_2.submission_types.should == asmnt.submission_types
+    asmnt_2.grading_type.should == asmnt.grading_type
+    asmnt_2.unlock_at.to_i.should == asmnt.unlock_at.to_i
+    asmnt_2.due_at.to_i.should == asmnt.due_at.to_i
+    asmnt_2.peer_reviews_due_at.to_i.should == asmnt.peer_reviews_due_at.to_i
+    asmnt_2.all_day_date.should == asmnt.all_day_date
+    asmnt_2.turnitin_enabled.should == asmnt.turnitin_enabled
+    asmnt_2.peer_reviews.should == asmnt.peer_reviews
+    asmnt_2.anonymous_peer_reviews.should == asmnt.peer_reviews
+    asmnt_2.peer_review_count.should == asmnt.peer_review_count
+    asmnt_2.mastery_score.should be_nil
+    asmnt_2.max_score.should be_nil
+    asmnt_2.min_score.should be_nil
+  end
 
 end

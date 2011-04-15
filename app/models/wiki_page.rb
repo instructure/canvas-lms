@@ -502,7 +502,7 @@ class WikiPage < ActiveRecord::Base
     # item.due_at = Time.at(timestamp / 1000) if timestamp > 0
     if allow_save && hash[:migration_id]
       item.save_without_broadcasting!
-      context.imported_migration_items << item
+      context.imported_migration_items << item if context.imported_migration_items
       return item
     end
   end
