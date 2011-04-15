@@ -151,7 +151,7 @@ class QuizzesController < ApplicationController
   def take_quiz
     return unless authorized_action(@quiz, @current_user, :submit)
 
-    if feature_enabled?(:lockdown_browser) && @quiz.require_lockdown_browser? && !@quiz.grants_right?(@current_user, session, :grade)
+    if @quiz.require_lockdown_browser? && !@quiz.grants_right?(@current_user, session, :grade)
       plugin = Canvas::LockdownBrowser.plugin.base
       if plugin.require_authorization_redirect?(self)
         return redirect_to(plugin.redirect_url(self, @context, @quiz))
