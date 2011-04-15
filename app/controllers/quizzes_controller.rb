@@ -51,13 +51,7 @@ class QuizzesController < ApplicationController
       redirect_to(named_context_url(@context, :edit_context_quiz_url, @quiz))
     end
   end
-  
-  def has_student_submissions?
-    @has_student_submissions ||= @quiz.quiz_submissions.any?{|s| !s.settings_only? && @context.students.include?(s.user) }
-    @has_student_submissions
-  end
-  protected :has_student_submissions?
-  
+
   def statistics
     if authorized_action(@quiz, @current_user, :manage)
       respond_to do |format|
@@ -89,7 +83,7 @@ class QuizzesController < ApplicationController
       AssessmentQuestionBank.active.find_all_by_id(bank_ids).compact.each do |bank|
         @banks_hash[bank.id] = bank
       end
-      if has_student_submissions?
+      if @has_student_submissions = @quiz.has_student_submissions?
         flash[:notice] = "Keep in mind, some students have already taken or started taking this quiz"
       end
       render :action => "new"

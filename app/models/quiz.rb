@@ -1050,27 +1050,51 @@ class Quiz < ActiveRecord::Base
     self.last_edited_at && self.published_at && self.last_edited_at > self.published_at
   end
   
+  def has_student_submissions?
+    self.quiz_submissions.any?{|s| !s.settings_only? && self.context.students.include?(s.user) }
+  end
+
+  # clear out all questions so that the quiz can be replaced. this is currently
+  # used by the respondus API.
+  # returns false if the quiz can't be safely replaced, for instance if anybody
+  # has taken the quiz.
+  def clear_for_replacement
+    return false if has_student_submissions?
+
+    self.question_count = 0
+    self.quiz_questions.destroy_all
+    self.quiz_groups.destroy_all
+    self.quiz_data = nil
+    true
+  end
+
   def self.process_migration(data, migration, question_data)
     assessments = data['assessments'] ? data['assessments']['assessments'] : []
     to_import = migration.to_import 'quizzes'
     assessments.each do |assessment|
       migration_id = assessment['migration_id'] || assessment['assessment_id']
       if migration_id && (!to_import || to_import[migration_id])
-        Quiz.import_from_migration(assessment, migration.context, question_data)
+        allow_update = false
+        # allow update if we find an existing item based on this migration setting
+        if item_id = migration.migration_settings[:quiz_id_to_update]
+          allow_update = true
+          assessment[:id] = item_id.to_i
+        end
+        Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
       end
     end
-  end 
-  
+  end
+
   # Import a quiz from a hash.
   # It assumes that all the referenced questions are already in the database
-  def self.import_from_migration(hash, context, question_data, item=nil)
+  def self.import_from_migration(hash, context, question_data, item=nil, allow_update = false)
     hash = hash.with_indifferent_access
     # there might not be an import id if it's just a text-only type...
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id]) if hash[:id]
     item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    return if item # We don't update existing quizzes from migrations because OpenObjects leak memory
+    return if item && !allow_update
     item ||= context.quizzes.new
-    
+
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]

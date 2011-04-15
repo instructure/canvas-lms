@@ -15,6 +15,11 @@ class RespondusAPIPort
       @errorStatus = errorStatus
     end
   end
+  class CantReplaceError < OtherError
+    def initialize
+      super("Item cannot be replaced")
+    end
+  end
 
   def load_session(context)
     @verifier = ActiveSupport::MessageVerifier.new(
@@ -59,8 +64,8 @@ class RespondusAPIPort
   def make_call(method, userName, password, context, *args)
     Rails.logger.debug "\nProcessing RespondusSoapApi##{method} (for #{rack_env['REMOTE_ADDR']} at #{Time.now}) [SOAP]"
     log_args = args.dup
-    log_args.pop if method == 'publishServerItem'
-    Rails.logger.debug "Parameters: #{[userName, "[FILTERED]", context, *args].inspect}"
+    log_args.pop if %w(publishServerItem replaceServerItem appendServerItem).include?(method.to_s)
+    Rails.logger.debug "Parameters: #{([userName, "[FILTERED]", context] + log_args).inspect}"
     load_user(method, userName, password)
     load_session(context)
     return_args = send("_#{method}", userName, password, context, *args) || []
@@ -160,7 +165,7 @@ Implemented for: Canvas LMS}]
     when "discovery"
       list.item << NVPair.new("contractVersion", "1.0")
       list.item << NVPair.new("quizAreas", "course")
-      list.item << NVPair.new("quizSupport", "publish,randomBlocks")
+      list.item << NVPair.new("quizSupport", "publish,replace,randomBlocks")
       list.item << NVPair.new("quizQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
       list.item << NVPair.new("quizSettings", "")
       list.item << NVPair.new("attachmentLinking", "resolve")
@@ -247,49 +252,7 @@ Implemented for: Canvas LMS}]
   #   itemID          C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def publishServerItem(userName, password, context, itemType, itemName, uploadType, fileName, fileData)
-    if itemType != "quiz"
-      raise OtherError, "Invalid item type"
-    end
-    if uploadType != 'zipPackage'
-      raise OtherError, "Invalid upload type"
-    end
-
-    selection_state = session['selection_state'] || []
-    course = Course.find_by_id(selection_state.first)
-    raise(OtherError, 'Item type incompatible with selection state') unless course
-
-    # TODO: select the assignment group to put the quiz in
-
-    migration = ContentMigration.new(:context => course,
-                                     :user => user)
-    migration.update_migration_settings(:migration_type => 'qti_exporter')
-    migration.save!
-
-    attachment = Attachment.new
-    attachment.context = migration
-    attachment.uploaded_data = StringIO.new(fileData)
-    attachment.filename = "qti_import.zip"
-    attachment.save!
-
-    migration.attachment = attachment
-    migration.export_content
-
-    # This is a sad excuse for a notification system, but we're just going to
-    # check the migration every couple seconds, see if it's done.
-    timeout(5.minutes.to_i) do
-      while %w[pre_processing exporting exported importing].include?(migration.workflow_state)
-        sleep(Setting.get_cached('respondus_endpoint.polling_time', '2').to_f)
-        ContentMigration.uncached { migration.reload }
-      end
-    end
-
-    assets = migration.migration_settings[:imported_assets]
-    raise(OtherError, "Invalid file data") if assets.blank? || assets.first !~ /^quiz_/
-
-    # asset is in the form "quiz_123"
-    quiz_id = assets.first.split("_").last
-
-    [ quiz_id ]
+    do_import(nil, itemType, uploadType, fileName, fileData)
   end
 
   # SYNOPSIS
@@ -330,7 +293,11 @@ Implemented for: Canvas LMS}]
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def replaceServerItem(userName, password, context, itemType, itemID, uploadType, fileName, fileData)
-    raise NotImplementedError
+    selection_state = session['selection_state'] || []
+    course = Course.find_by_id(selection_state.first)
+    quiz = course.quizzes.active.find_by_id(itemID)
+    raise(CantReplaceError) unless quiz
+    do_import(quiz, itemType, uploadType, fileName, fileData)
   end
 
   # SYNOPSIS
@@ -449,4 +416,60 @@ Implemented for: Canvas LMS}]
     :selectServerItem, :publishServerItem, :deleteServerItem,
     :replaceServerItem, :retrieveServerItem, :appendServerItem,
     :getAttachmentLink, :uploadAttachment, :downloadAttachment
+
+  protected
+
+  def do_import(quiz, itemType, uploadType, fileName, fileData)
+    if itemType != "quiz"
+      raise OtherError, "Invalid item type"
+    end
+    if uploadType != 'zipPackage'
+      raise OtherError, "Invalid upload type"
+    end
+
+    selection_state = session['selection_state'] || []
+    course = Course.find_by_id(selection_state.first)
+    raise(OtherError, 'Item type incompatible with selection state') unless course
+
+    settings = { :migration_type => 'qti_exporter' }
+
+    if quiz
+      if !quiz.clear_for_replacement
+        raise CantReplaceError
+      end
+      quiz.save!
+      settings[:quiz_id_to_update] = quiz.id
+    end
+
+    migration = ContentMigration.new(:context => course,
+                                     :user => user)
+    migration.update_migration_settings(settings)
+    migration.save!
+
+    attachment = Attachment.new
+    attachment.context = migration
+    attachment.uploaded_data = StringIO.new(fileData)
+    attachment.filename = "qti_import.zip"
+    attachment.save!
+
+    migration.attachment = attachment
+    migration.export_content
+
+    # This is a sad excuse for a notification system, but we're just going to
+    # check the migration every couple seconds, see if it's done.
+    timeout(5.minutes.to_i) do
+      while %w[pre_processing exporting exported importing].include?(migration.workflow_state)
+        sleep(Setting.get_cached('respondus_endpoint.polling_time', '2').to_f)
+        ContentMigration.uncached { migration.reload }
+      end
+    end
+
+    assets = migration.migration_settings[:imported_assets]
+    raise(OtherError, "Invalid file data") if assets.blank? || assets.first !~ /^quiz_/
+
+    # asset is in the form "quiz_123"
+    quiz_id = assets.first.split("_").last
+
+    [ quiz_id ]
+  end
 end
