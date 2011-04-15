@@ -496,7 +496,7 @@ var submissionAttachmentIndex = -1;
               $("#submit_media_recording_form .submit_button").attr('disabled', true).text("Record Before Submitting");
               $("#media_media_recording_submission_holder .record_media_comment_link").click(function(event) {
                 event.preventDefault();
-                $("#media_media_recording_submission").mediaComment('create', 'audio', function(id, type) {
+                $("#media_media_recording_submission").mediaComment('create', 'video', function(id, type) {
                   $("#submit_media_recording_form .submit_button").attr('disabled', false).text("Submit Assignment");
                   $("#submit_media_recording_form .media_comment_id").val(id);
                   $("#submit_media_recording_form .media_comment_type").val(type);

@@ -296,7 +296,7 @@ var anonymousAssignment = false;
 
     $(".media_comment_link").click(function(event) {
       event.preventDefault();
-      $("#media_media_recording").show().find(".media_recording").mediaComment('create', 'audio', function(id, type) {
+      $("#media_media_recording").show().find(".media_recording").mediaComment('create', 'video', function(id, type) {
         $("#media_media_recording").data('comment_id', id).data('comment_type', type);
         EG.handleCommentFormSubmit();
       }, function() {
