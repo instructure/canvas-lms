@@ -114,6 +114,13 @@ class AssessmentQuestionBank < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.save
   end
+
+  # clear out all questions so that the bank can be replaced. this is currently
+  # used by the respondus API.
+  def clear_for_replacement
+    assessment_questions.destroy_all
+    quiz_groups.destroy_all
+  end
   
   named_scope :active, lambda {
     {:conditions => ['assessment_question_banks.workflow_state != ?', 'deleted'] }

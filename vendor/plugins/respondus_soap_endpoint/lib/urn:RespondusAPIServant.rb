@@ -7,17 +7,13 @@ class RespondusAPIPort
 
   protected
 
-  class BadAuth < Exception; end
+  class BadAuthError < Exception; end
+  class CantReplaceError < Exception; end
   class OtherError < Exception
     attr_reader :errorStatus
     def initialize(errorStatus, msg = nil)
       super(msg)
       @errorStatus = errorStatus
-    end
-  end
-  class CantReplaceError < OtherError
-    def initialize
-      super("Item cannot be replaced")
     end
   end
 
@@ -52,8 +48,8 @@ class RespondusAPIPort
     scope = domain_root_account.require_account_pseudonym? ?
       domain_root_account.pseudonyms :
       Pseudonym
-    pseudonym = scope.find_by_unique_id(userName) || raise(BadAuth)
-    raise(BadAuth) unless pseudonym.valid_arbitrary_credentials?(password)
+    pseudonym = scope.find_by_unique_id(userName) || raise(BadAuthError)
+    raise(BadAuthError) unless pseudonym.valid_arbitrary_credentials?(password)
     @user = pseudonym.user
   end
 
@@ -74,10 +70,12 @@ class RespondusAPIPort
     case ex
     when NotImplementedError
       ["Function not implemented"]
-    when BadAuth
+    when BadAuthError
       ["Invalid credentials"]
     when ActiveSupport::MessageVerifier::InvalidSignature
       ["Invalid context"]
+    when CantReplaceError
+      ["Item cannot be replaced"]
     when OtherError
       [ex.errorStatus, '']
     else
@@ -168,6 +166,10 @@ Implemented for: Canvas LMS}]
       list.item << NVPair.new("quizSupport", "publish,replace,randomBlocks")
       list.item << NVPair.new("quizQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
       list.item << NVPair.new("quizSettings", "")
+      list.item << NVPair.new("qdbAreas", "course")
+      list.item << NVPair.new("qdbSupport", "publish,replace")
+      list.item << NVPair.new("qdbQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
+      list.item << NVPair.new("qdbSettings", "")
       list.item << NVPair.new("attachmentLinking", "resolve")
       list.item << NVPair.new("uploadTypes", "zipPackage")
     when "course"
@@ -175,13 +177,10 @@ Implemented for: Canvas LMS}]
       @user.cached_current_enrollments.select { |e| e.participating_admin? }.map(&:course).uniq.each do |course|
         list.item << NVPair.new(course.name, course.to_param)
       end
-    when "quiz"
-      raise(OtherError, 'Item type incompatible with selection state') unless selection_state.size == 1
-      # selection_state comes from the session, which is safe from user modification
-      course = Course.find_by_id(selection_state.first)
-      raise(OtherError, 'Item type incompatible with selection state') unless course
-      course.quizzes.active.each do |quiz|
-        list.item << NVPair.new(quiz.title, quiz.to_param)
+    when "quiz", "qdb"
+      coll = get_scope(session, itemType)
+      coll.each do |item|
+        list.item << NVPair.new(item.title, item.to_param)
       end
     else
       raise OtherError, "Invalid item type"
@@ -293,11 +292,10 @@ Implemented for: Canvas LMS}]
   #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
   #
   def replaceServerItem(userName, password, context, itemType, itemID, uploadType, fileName, fileData)
-    selection_state = session['selection_state'] || []
-    course = Course.find_by_id(selection_state.first)
-    quiz = course.quizzes.active.find_by_id(itemID)
-    raise(CantReplaceError) unless quiz
-    do_import(quiz, itemType, uploadType, fileName, fileData)
+    scope = get_scope(session, itemType)
+    item = scope.find_by_id(itemID)
+    raise(CantReplaceError) unless item
+    do_import(item, itemType, uploadType, fileName, fileData)
   end
 
   # SYNOPSIS
@@ -419,8 +417,27 @@ Implemented for: Canvas LMS}]
 
   protected
 
-  def do_import(quiz, itemType, uploadType, fileName, fileData)
-    if itemType != "quiz"
+  def get_scope(session, itemType)
+    selection_state = session['selection_state'] || []
+
+    raise(OtherError, 'Item type incompatible with selection state') unless selection_state.size == 1
+    # selection_state comes from the session, which is safe from user modification
+    course = Course.find_by_id(selection_state.first)
+    raise(OtherError, 'Item type incompatible with selection state') unless course
+
+    case itemType
+    when "quiz"; course.quizzes.active
+    when "qdb"; course.assessment_question_banks.active
+    end
+  end
+
+  ASSET_TYPES = {
+    'quiz' => /^quiz_/,
+    'qdb' => /^assessment_question_bank_/,
+  }
+
+  def do_import(item, itemType, uploadType, fileName, fileData)
+    unless %w(quiz qdb).include?(itemType)
       raise OtherError, "Invalid item type"
     end
     if uploadType != 'zipPackage'
@@ -433,17 +450,24 @@ Implemented for: Canvas LMS}]
 
     settings = { :migration_type => 'qti_exporter' }
 
-    if quiz
-      if !quiz.clear_for_replacement
+    if item
+      if !item.clear_for_replacement
         raise CantReplaceError
       end
-      quiz.save!
-      settings[:quiz_id_to_update] = quiz.id
+      item.save!
+      case itemType
+      when 'quiz'
+        settings[:quiz_id_to_update] = item.id
+      end
     end
 
     migration = ContentMigration.new(:context => course,
                                      :user => user)
     migration.update_migration_settings(settings)
+    if itemType == 'qdb'
+      # skip creating the quiz, just import the questions into the bank
+      migration.migration_ids_to_import = { :copy => { :quizzes => {} } }
+    end
     migration.save!
 
     attachment = Attachment.new
@@ -465,11 +489,13 @@ Implemented for: Canvas LMS}]
     end
 
     assets = migration.migration_settings[:imported_assets]
-    raise(OtherError, "Invalid file data") if assets.blank? || assets.first !~ /^quiz_/
+    a_type = ASSET_TYPES[itemType]
+    asset = assets.find { |a| a =~ a_type }
+    raise(OtherError, "Invalid file data") unless asset
 
     # asset is in the form "quiz_123"
-    quiz_id = assets.first.split("_").last
+    item_id = asset.split("_").last
 
-    [ quiz_id ]
+    [ item_id ]
   end
 end

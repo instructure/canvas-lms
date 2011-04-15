@@ -28,7 +28,7 @@ module Canvas
           Canvas::MigrationWorker::clear_exported_data(export_folder_path)
         end
 
-        cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}
+        cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}.merge(cm.migration_settings[:migration_ids_to_import] || {})
         cm.save
         cm.import_content
       end

@@ -450,6 +450,7 @@ class AssessmentQuestion < ActiveRecord::Base
         bank.save!
       end
     end
+    context.imported_migration_items << bank if context.imported_migration_items && !context.imported_migration_items.include?(bank)
     hash[:question_text] = ImportedHtmlConverter.convert(hash[:question_text], context) if hash[:question_text]
     question_data = ActiveRecord::Base.connection.quote hash.to_yaml
     question_name = ActiveRecord::Base.connection.quote hash[:question_name]

@@ -49,6 +49,7 @@ describe "Respondus SOAP API", :type => :integration do
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     @course.enroll_teacher(@user).accept
     @quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+    @question_bank = AssessmentQuestionBank.create!(:title => 'questionbank1', :context => @course)
   end
 
   it "should identify the server without user credentials" do
@@ -130,6 +131,15 @@ Implemented for: Canvas LMS}
     pair = list.item
     pair.name.should == "quiz1"
     pair.value.should == @quiz.to_param
+
+    # list the existing question banks
+    status, details, context, list = soap_request('GetServerItems',
+                                                  'nobody@example.com', 'asdfasdf',
+                                                  context, ['itemType', 'qdb'])
+    status.should == "Success"
+    pair = list.item
+    pair.name.should == "questionbank1"
+    pair.value.should == @question_bank.to_param
 
     # clear boxin
     data = Marshal.load(Base64.decode64(context.split('--').first))
