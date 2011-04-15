@@ -34,7 +34,7 @@ module Instructure #:nodoc:
 
       :attributes => {
         :all        => ['style', 'class', 'id'],
-        'a'          => ['href', 'title', 'target'],
+        'a'          => ['href', 'title', 'target', 'name'],
         'blockquote' => ['cite'],
         'col'        => ['span', 'width'],
         'colgroup'   => ['span', 'width'],
