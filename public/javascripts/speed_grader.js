@@ -310,7 +310,8 @@ var anonymousAssignment = false;
     // handle speech to text for browsers that can (right now only chrome)
     function browserSupportsSpeech(){
       var elem = document.createElement('input');
-      var support = 'onwebkitspeechchange' in elem || 'speech' in elem;
+      // chrome 10 advertises support but it LIES!!! doesn't work till chrome 11
+      var support = ('onwebkitspeechchange' in elem || 'speech' in elem) && !navigator.appVersion.match(/Chrome\/10/);
       return support;
     }
     if (browserSupportsSpeech()) {
