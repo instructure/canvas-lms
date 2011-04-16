@@ -106,6 +106,8 @@
         <xs:element name="posted_at" type="xs:dateTime" minOccurs="0"/>
         <xs:element name="delayed_post_at" type="xs:dateTime" minOccurs="0"/>
         <xs:element name="position" type="xs:integer" minOccurs="0"/>
+        <xs:element name="external_feed_identifierref" type="xs:string" minOccurs="0"/>
+        <xs:element name="attachment_identifierref" type="xs:string" minOccurs="0"/>
         <xs:element name="type" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">

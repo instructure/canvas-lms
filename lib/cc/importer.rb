@@ -26,5 +26,6 @@ end
 require_dependency 'cc/importer/learning_outcomes_converter'
 require_dependency 'cc/importer/wiki_converter'
 require_dependency 'cc/importer/assignment_converter'
+require_dependency 'cc/importer/topic_converter'
 require_dependency 'cc/importer/course_settings'
 require_dependency 'cc/importer/cc_converter'

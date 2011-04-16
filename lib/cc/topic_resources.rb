@@ -33,16 +33,7 @@ module CC
                         "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                         "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1  http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imsdt_v1p1.xsd"
         ) do |t|
-          t.title topic.title
-          html = CCHelper.html_content(topic.message || '', @course, @manifest.exporter.user)
-          t.text(html, :texttype=>'text/html')
-          if topic.attachment
-            t.attachments do |atts|
-              folder = topic.attachment.folder.full_name.gsub("course files", CCHelper::WEB_CONTENT_TOKEN)
-                path = "#{folder}/#{topic.attachment.display_name}"
-              atts.attachment(:href=>path)
-            end
-          end
+          create_cc_topic(t, topic)
         end
         topic_file.close
         
@@ -58,23 +49,7 @@ module CC
                         "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                         "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
         ) do |t|
-          t.topic_id migration_id
-          t.title topic.title
-          t.posted_at ims_datetime(topic.posted_at) if topic.posted_at
-          t.delayed_post_at ims_datetime(topic.delayed_post_at) if topic.delayed_post_at
-          t.position topic.position
-          t.external_feed_id CCHelper.create_key(topic.external_feed) if topic.external_feed
-          if topic.is_announcement
-            t.tag!('type', 'announcement')
-          else
-            t.tag!('type', 'topic')
-          end
-          if topic.assignment
-            assignment_migration_id = CCHelper.create_key(topic.assignment)
-            t.assignment(:identifier=>assignment_migration_id) do |a|
-              AssignmentResources.create_assignment(a, topic.assignment)
-            end
-          end
+          create_canvas_topic(t, topic)
         end
         meta_file.close
         
@@ -91,6 +66,40 @@ module CC
                 :href => meta_file_name
         ) do |res|
           res.file(:href=>meta_file_name)
+        end
+      end
+    end
+    
+    def create_cc_topic(doc, topic)
+      doc.title topic.title
+      html = CCHelper.html_content(topic.message || '', @course, @manifest.exporter.user)
+      doc.text(html, :texttype=>'text/html')
+      if topic.attachment
+        doc.attachments do |atts|
+          folder = topic.attachment.folder.full_name.gsub("course files", CCHelper::WEB_CONTENT_TOKEN)
+          path = "#{folder}/#{topic.attachment.display_name}"
+          atts.attachment(:href=>path)
+        end
+      end
+    end
+    
+    def create_canvas_topic(doc, topic)
+      doc.topic_id CCHelper.create_key(topic)
+      doc.title topic.title
+      doc.posted_at ims_datetime(topic.posted_at) if topic.posted_at
+      doc.delayed_post_at ims_datetime(topic.delayed_post_at) if topic.delayed_post_at
+      doc.position topic.position
+      doc.external_feed_identifierref CCHelper.create_key(topic.external_feed) if topic.external_feed
+      doc.attachment_identifierref CCHelper.create_key(topic.attachment) if topic.attachment
+      if topic.is_announcement
+        doc.tag!('type', 'announcement')
+      else
+        doc.tag!('type', 'topic')
+      end
+      if topic.assignment
+        assignment_migration_id = CCHelper.create_key(topic.assignment)
+        doc.assignment(:identifier=>assignment_migration_id) do |a|
+          AssignmentResources.create_assignment(a, topic.assignment)
         end
       end
     end

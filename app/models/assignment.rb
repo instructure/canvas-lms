@@ -1345,7 +1345,6 @@ class Assignment < ActiveRecord::Base
     if !hash[:submission_types].blank?
       item.submission_types = hash[:submission_types]
     elsif ['discussion_topic'].include?(hash[:submission_format])
-      item.saved_by = :discussion_topic
       item.submission_types = "discussion_topic"
     elsif ['online_file_upload','textwithattachments'].include?(hash[:submission_format])
       item.submission_types = "online_file_upload,online_text_entry"
@@ -1358,6 +1357,9 @@ class Assignment < ActiveRecord::Base
     end
     if item.submission_types == "online_quiz"
       item.saved_by = :quiz
+    end
+    if item.submission_types == "discussion_topic"
+      item.saved_by = :discussion_topic
     end
     
     if hash[:grading_type]

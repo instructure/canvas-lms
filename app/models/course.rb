@@ -1176,24 +1176,18 @@ class Course < ActiveRecord::Base
     @imported_migration_items = []
 
     # These only need to be processed once
-    import_settings_from_migration(data)
-    migration.fast_update_progress(0.5)
-    process_migration_files(data, migration)
-    migration.fast_update_progress(20)
-    Attachment.process_migration(data, migration)
-    migration.fast_update_progress(30)
-    question_data = AssessmentQuestion.process_migration(data, migration)
-    migration.fast_update_progress(35)
-    Group.process_migration(data, migration)
-    LearningOutcome.process_migration(data, migration)
-    Rubric.process_migration(data, migration)
+    import_settings_from_migration(data); migration.fast_update_progress(0.5)
+    process_migration_files(data, migration); migration.fast_update_progress(20)
+    Attachment.process_migration(data, migration); migration.fast_update_progress(30)
+    question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
+    Group.process_migration(data, migration); migration.fast_update_progress(36)
+    LearningOutcome.process_migration(data, migration); migration.fast_update_progress(37)
+    Rubric.process_migration(data, migration); migration.fast_update_progress(38)
     @assignment_group_no_drop_assignments = {}
-    AssignmentGroup.process_migration(data, migration)
-    ExternalFeed.process_migration(data, migration)
-    GradingStandard.process_migration(data, migration)
-    migration.fast_update_progress(40)
-    Quiz.process_migration(data, migration, question_data)
-    migration.fast_update_progress(50)
+    AssignmentGroup.process_migration(data, migration); migration.fast_update_progress(39)
+    ExternalFeed.process_migration(data, migration); migration.fast_update_progress(39.5)
+    GradingStandard.process_migration(data, migration); migration.fast_update_progress(40)
+    Quiz.process_migration(data, migration, question_data); migration.fast_update_progress(50)
     #todo - Import external tools when there are post-migration messages to tell the user to add shared secret/password
     #ContextExternalTool.process_migration(data, migration)
 

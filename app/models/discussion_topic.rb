@@ -485,19 +485,33 @@ class DiscussionTopic < ActiveRecord::Base
     hash[:skip_replies] = true if hash[:migration_id] && hash[:topic_entries_to_import] && !hash[:topic_entries_to_import][hash[:migration_id]]
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
     item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.discussion_topics.new
+    if hash[:type] =~ /announcement/i
+      item ||= context.announcements.new
+    else
+      item ||= context.discussion_topics.new
+    end
     context.imported_migration_items << item if context.imported_migration_items && item.new_record? if context.respond_to?(:imported_migration_items)
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
-    if hash[:start_date]
-      timestamp = hash[:start_date].to_i rescue 0
-      item.delayed_post_at = Time.at(timestamp / 1000) if timestamp > 0
+    item.posted_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
+    item.delayed_post_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
+    item.delayed_post_at ||= Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
+    item.position = hash[:position] if hash[:position]
+    if hash[:attachment_migration_id]
+      item.attachment context.attachments.find_by_migration_id(hash[:attachment_migration_id])
+    end
+    if hash[:external_feed_migration_id]
+      item.external_feed = context.external_feeds.find_by_migration_id(hash[:external_feed_migration_id])
     end
     if hash[:attachment_ids] && !hash[:attachment_ids].empty?
       item.message += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
     end
-    if grading = hash[:grading]
+
+    if hash[:assignment]
+      assignment = Assignment.import_from_migration(hash[:assignment], context)
+      item.assignment = assignment
+    elsif grading = hash[:grading]
       assignment = Assignment.import_from_migration({
         :grading => grading,
         :migration_id => hash[:migration_id],
@@ -516,7 +530,7 @@ class DiscussionTopic < ActiveRecord::Base
         DiscussionEntry.import_from_migration(message, context, nil, item, item)
       end
     end
-    context.imported_migration_items << item if context.respond_to?(:imported_migration_items)
+    context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items
     item
   end
   

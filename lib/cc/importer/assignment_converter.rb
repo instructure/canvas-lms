@@ -45,6 +45,7 @@ module CC::Importer
       end
       
       assignment['migration_id'] = get_node_att(meta_doc, 'assignment', 'identifier')
+      assignment['migration_id'] ||= meta_doc['identifier']
       assignment["assignment_group_migration_id"] = get_node_val(meta_doc, "assignment_group_identifierref")
       assignment["grading_standard_migration_id"] = get_node_val(meta_doc, "grading_standard_identifierref")
       assignment["rubric_migration_id"] = get_node_val(meta_doc, "rubric_identifierref")

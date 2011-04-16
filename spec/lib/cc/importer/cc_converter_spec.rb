@@ -260,6 +260,11 @@ describe "Common Cartridge importing" do
     lo_g.description = "<p>Groupage</p>"
     lo_g.save!
     
+    lo_g2 = @copy_from.learning_outcome_groups.new
+    lo_g2.context = @copy_from
+    lo_g2.title = "Empty Group"
+    lo_g2.save!
+    
     lo2 = @copy_from.learning_outcomes.new
     lo2.context = @copy_from
     lo2.short_description = "outcome in group"
@@ -270,6 +275,7 @@ describe "Common Cartridge importing" do
     
     default = LearningOutcomeGroup.default_for(@copy_from)
     default.add_item(lo_g)
+    default.add_item(lo_g2)
     
     import_learning_outcomes
     
@@ -287,6 +293,11 @@ describe "Common Cartridge importing" do
     lo_g_2.title.should == lo_g.title
     lo_g_2.description.should == lo_g.description
     lo_g_2.sorted_content.length.should == 1
+    
+    lo_g2_2 = @copy_to.learning_outcome_groups.find_by_migration_id(CC::CCHelper.create_key(lo_g2))
+    lo_g2_2.title.should == lo_g2.title
+    lo_g2_2.description.should == lo_g2.description
+    lo_g2_2.sorted_content.length.should == 0
   end
   
   it "should import rubrics" do
@@ -449,6 +460,84 @@ describe "Common Cartridge importing" do
     asmnt_2.mastery_score.should be_nil
     asmnt_2.max_score.should be_nil
     asmnt_2.min_score.should be_nil
+  end
+  
+  it "should import announcements (discussion topics)" do
+    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    dt = @copy_from.announcements.new
+    dt.title = "Topic"
+    dt.message = body_with_link % @copy_from.id
+    dt.delayed_post_at = 1.week.from_now
+    dt.posted_at = 1.day.ago
+    dt.save!
+    
+    #export to xml
+    migration_id = CC::CCHelper.create_key(dt)
+    cc_topic_builder = Builder::XmlMarkup.new(:indent=>2)
+    cc_topic_builder.topic("identifier" => migration_id) {|t| @resource.create_cc_topic(t, dt)}
+    canvas_topic_builder = Builder::XmlMarkup.new(:indent=>2)
+    canvas_topic_builder.topicMeta {|t| @resource.create_canvas_topic(t, dt)}
+    #convert to json
+    cc_doc = Nokogiri::XML(cc_topic_builder.target!)
+    meta_doc = Nokogiri::XML(canvas_topic_builder.target!)
+    hash = @converter.convert_topic(cc_doc, meta_doc)
+    hash = hash.with_indifferent_access
+    #import
+    DiscussionTopic.import_from_migration(hash, @copy_to)
+    
+    dt_2 = @copy_to.discussion_topics.find_by_migration_id(migration_id)
+    dt_2.title.should == dt.title
+    dt_2.message.should == body_with_link % @copy_to.id
+    dt_2.delayed_post_at.to_i.should == dt.delayed_post_at.to_i
+    dt_2.posted_at.to_i.should == dt.posted_at.to_i
+    dt_2.type.should == dt.type
+  end
+  
+  it "should import assignment discussion topic" do
+    body_with_link = "<p>What do you think about the <a href=\"/courses/%s/grades\">grades?</a>?</p>"
+    dt = @copy_from.announcements.new
+    dt.title = "Topic"
+    dt.message = body_with_link % @copy_from.id
+    dt.posted_at = 1.day.ago
+    dt.save!
+    
+    assignment = @copy_from.assignments.build
+    assignment.submission_types = 'discussion_topic'
+    assignment.assignment_group = @copy_from.assignment_groups.find_or_create_by_name("Stupid Group")
+    assignment.title = dt.title
+    assignment.points_possible = 13.37
+    assignment.due_at = 1.week.from_now
+    assignment.saved_by = :discussion_topic
+    assignment.save
+    
+    dt.assignment = assignment
+    dt.save
+    
+    #export to xml
+    migration_id = CC::CCHelper.create_key(dt)
+    cc_topic_builder = Builder::XmlMarkup.new(:indent=>2)
+    cc_topic_builder.topic("identifier" => migration_id) {|t| @resource.create_cc_topic(t, dt)}
+    canvas_topic_builder = Builder::XmlMarkup.new(:indent=>2)
+    canvas_topic_builder.topicMeta {|t| @resource.create_canvas_topic(t, dt)}
+    #convert to json
+    cc_doc = Nokogiri::XML(cc_topic_builder.target!)
+    meta_doc = Nokogiri::XML(canvas_topic_builder.target!)
+    hash = @converter.convert_topic(cc_doc, meta_doc)
+    hash = hash.with_indifferent_access
+    #import
+    DiscussionTopic.import_from_migration(hash, @copy_to)
+    
+    dt_2 = @copy_to.discussion_topics.find_by_migration_id(migration_id)
+    dt_2.title.should == dt.title
+    dt_2.message.should == body_with_link % @copy_to.id
+    dt_2.type.should == dt.type
+    
+    a = dt_2.assignment
+    a.title.should == assignment.title
+    a.migration_id.should == CC::CCHelper.create_key(assignment)
+    a.due_at.to_i.should == assignment.due_at.to_i
+    a.points_possible.should == assignment.points_possible
+    a.discussion_topic.should == dt_2
   end
 
 end

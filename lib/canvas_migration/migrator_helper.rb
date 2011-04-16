@@ -224,7 +224,6 @@ module Canvas::MigratorHelper
         assign[:title] = a[:title]
         assign[:due_date] = a[:due_date]
         assign[:migration_id] = a[:migration_id]
-        assign[:description] = a[:description]
         assign[:error_message] = a[:error_message] if a[:error_message]
       end
     end
@@ -235,7 +234,6 @@ module Canvas::MigratorHelper
         @overview[:discussion_topics] << topic
         topic[:title] = t[:title]
         topic[:topic_type] = t[:topic_type]
-        topic[:description] = t[:description]
         topic[:migration_id] = t[:migration_id]
         topic[:error_message] = t[:error_message] if t[:error_message]
       end
