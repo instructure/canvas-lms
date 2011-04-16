@@ -57,13 +57,13 @@ class ActiveRecord::Base
     res
   end
   
-  def self.find_cached(key, &block)
+  def self.find_cached(key, opts = nil, &block)
     attrs = Rails.cache.read(key)
     if !attrs || attrs.empty? || attrs.is_a?(String) || attrs[:assigned_cache_key] != key
       obj = block.call rescue nil
       attrs = obj && obj.is_a?(self) ? obj.attributes : nil
       attrs[:assigned_cache_key] = key if attrs
-      Rails.cache.write(key, attrs) if attrs
+      Rails.cache.write(key, attrs, opts) if attrs
     end
     return nil if !attrs || attrs.empty?
     obj = self.new
@@ -74,13 +74,13 @@ class ActiveRecord::Base
     obj
   end
   
-  def self.find_all_cached(key, &block)
+  def self.find_all_cached(key, opts = nil, &block)
     attrs_list = Rails.cache.read(key)
     if !attrs_list || attrs_list.empty? || !attrs_list.is_a?(Array) || attrs_list.any?{|attr| attr[:assigned_cache_key] != key }
       list = block.call.to_a rescue nil
       attrs_list = list.map{|obj| obj && obj.is_a?(self) ? obj.attributes : nil }.compact
       attrs_list.each{|attrs| attrs[:assigned_cache_key] = key }
-      Rails.cache.write(key, attrs_list)
+      Rails.cache.write(key, attrs_list, opts)
     end
     return [] if !attrs_list || attrs_list.empty?
     attrs_list.map do |attrs|
