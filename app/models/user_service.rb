@@ -184,7 +184,7 @@ class UserService < ActiveRecord::Base
     when 'twitter'
       'Twitter is a great resource for out-of-class communication.'
     when 'facebook'
-      'Listing your Facebook profile will let you more esaily connect with friends you make in your classes and groups.'
+      'Listing your Facebook profile will let you more easily connect with friends you make in your classes and groups.'
     when 'delicious'
       'Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Delicious accounts to share links of similar interest.'
     when 'diigo'
