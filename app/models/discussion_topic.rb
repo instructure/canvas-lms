@@ -499,7 +499,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.delayed_post_at ||= Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
     item.position = hash[:position] if hash[:position]
     if hash[:attachment_migration_id]
-      item.attachment context.attachments.find_by_migration_id(hash[:attachment_migration_id])
+      item.attachment = context.attachments.find_by_migration_id(hash[:attachment_migration_id])
     end
     if hash[:external_feed_migration_id]
       item.external_feed = context.external_feeds.find_by_migration_id(hash[:external_feed_migration_id])

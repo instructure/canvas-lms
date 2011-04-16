@@ -185,6 +185,7 @@ class ContentMigration < ActiveRecord::Base
       @zip_file = Zip::ZipFile.open(@exported_data_zip.path)
       data = JSON.parse(@zip_file.read('course_export.json'))
       data = data.with_indifferent_access if data.is_a? Hash
+      data['all_files_export'] ||= {}
       
       if @zip_file.find_entry('all_files.zip')
         # the file importer needs an actual file to process
@@ -192,7 +193,7 @@ class ContentMigration < ActiveRecord::Base
         @zip_file.extract('all_files.zip', all_files_path)
         data['all_files_export']['file_path'] = all_files_path
       else
-        data['all_files_export']['file_path'] = nil if data['all_files_export']
+        data['all_files_export']['file_path'] = nil
       end
       
       @zip_file.close

@@ -22,6 +22,7 @@ module CC::Importer
     include WikiConverter
     include AssignmentConverter
     include TopicConverter
+    include WebcontentConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -40,6 +41,8 @@ module CC::Importer
       @course[:wikis] = convert_wikis
       @course[:assignments] = convert_assignments
       @course[:discussion_topics] = convert_topics
+      @course[:file_map] = create_file_map
+      package_course_files
       
       #close up shop
       save_to_file
