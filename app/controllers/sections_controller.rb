@@ -36,6 +36,50 @@ class SectionsController < ApplicationController
     end
   end
   
+  def crosslist_check
+    @section = @context.course_sections.find(params[:section_id])
+    course_id = params[:new_course_id]
+    # cross-listing should only be allowed within the same root account
+    @new_course = @section.root_account.all_courses.find_by_id(course_id)
+    @new_course ||= @section.root_account.all_courses.find_by_sis_source_id(course_id)
+    allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage_admin_users)
+    res = {:allowed => !!allowed}
+    if allowed
+      @account = @new_course.account
+      res[:section] = @section
+      res[:course] = @new_course
+      res[:account] = @account
+    end
+    render :json => res.to_json(:include_root => false)
+  end
+  
+  def crosslist
+    @section = @context.course_sections.find(params[:section_id])
+    course_id = params[:new_course_id]
+    @new_course = Course.find_by_id(course_id)
+    if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage_admin_users)
+      @section.crosslist_to_course @new_course
+      respond_to do |format|
+        flash[:notice] = "Section successfully cross-listed!"
+        format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
+        format.json { render :json => @section.to_json }
+      end
+    end
+  end
+  
+  def uncrosslist
+    @section = @context.course_sections.find(params[:section_id])
+    @new_course = @section.nonxlist_course
+    if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage_admin_users)
+      @section.uncrosslist
+      respond_to do |format|
+        flash[:notice] = "Section successfully de-cross-listed!"
+        format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
+        format.json { render :json => @section.to_json }
+      end
+    end
+  end
+  
   def update
     @section = @context.course_sections.find(params[:id])
     params[:course_section][:name]
@@ -59,6 +103,7 @@ class SectionsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_students)
       add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
       @enrollments = @section.enrollments.sort_by{|e| e.user.sortable_name }
+      @student_enrollments = @enrollments.select{|e| e.student? }
       @current_enrollments = @enrollments.select{|e| !e.completed? }
       @completed_enrollments = @enrollments.select{|e| e.completed? }
     end

@@ -3,6 +3,15 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <a href="#" class="button button-sidebar-wide edit_section_link"><%= image_tag "edit.png" %> Edit Section</a>
+    <% if can_do(@section, @current_user, :update) %>
+      <% if @section.nonxlist_course_id %>
+        <% if can_do(@section.nonxlist_course, @current_user, :manage_admin_users) %>
+          <a href="#" class="button button-sidebar-wide uncrosslist_link"><%= image_tag "move.png" %> De-Cross-List this Section</a>
+        <% end %>
+      <% else %>
+        <a href="#" class="button button-sidebar-wide crosslist_link"><%= image_tag "move.png" %> Cross-List this Section</a>
+      <% end %>
+    <% end %>
     <a href="<%= context_url(@context, :context_details_url) %>" class="button button-sidebar-wide edit_section_link"><%= image_tag "back.png" %> Back to Course Settings</a>
   </div>
 <% end %>
@@ -148,30 +157,71 @@ h3 .tally {
 <% end %>
 </ul>
 <% end %>
-<% js_block do %>
-<script>
-$(document).ready(function() {
-  $("#edit_section_form .cancel_button").click(function() {
-    $("#edit_section_form").hide();
-  });
-  $(".edit_section_link").click(function(event) {
-    event.preventDefault();
-    $("#edit_section_form").toggle();
-    $("#edit_section_form :text:visible:first").focus().select();
-  });
-  $(".unenroll_user_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".user").confirmDelete({
-      message: "Are you sure you want to delete this enrollment permanently?",
-      url: $(this).attr('href'),
-      success: function() {
-        $(this).slideUp(function() {
-          $(this).remove();
-        });
-      }
-    });
-  });
-  $(".datetime_field").datetime_field();
-});
-</script>
-<% end %>
+<% jammit_js :section %>
+
+<div style="display: none;">
+  <% form_tag context_url(@context, :context_section_crosslist_url, @section.id), :id => "crosslist_course_form", :title => "Cross-List this Section", :method => :post do %>
+    <h2>Cross-List Section</h2>
+    <p>
+      Cross-listing allows you to create a section in one account and
+      then move it to a course on a different account.  
+      To cross-list this course, you'll need to find the course you
+      want to move it to, either using the search tool or by 
+      entering the course's ID.
+    </p>
+    <table class="formtable">
+      <tr>
+        <td><label for="course_autocomplete_id_lookup">Search for Course: </label></td>
+        <td>
+          <a href="<%= context_url(@current_user, :context_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
+          <a href="<%= context_url(@context, :context_section_confirm_crosslist_url, @section.id, "{{ id }}") %>" id="course_confirm_crosslist_url" style="display: none;">&nbsp;</a>
+          <input type="hidden" name="new_course_id" id="course_autocomplete_id"/>
+          <input type="text" id="course_autocomplete_id_lookup" style="width: 250px;"/>
+        </td>
+      </tr><tr>
+        <td><label for="course_id">Or Enter the Course's ID:</label></td>
+        <td>
+          <input type="text" id="course_id" style="width: 75px;"/>
+        </td>
+      </tr><tr>
+        <td colspan="2">
+          <div id="course_autocomplete_name_holder" style="margin-top: 20px;">
+            Selected Course: 
+            <div style="margin-left: 20px;">
+              <div id="course_autocomplete_name" style="font-weight: bold;"></div>
+              <div id="sis_id_holder" style="display: none;">SIS ID: <span class="sis_id">&nbsp;</span></div>
+              <div id="account_name_holder" style="display: none;">Account: <span class="account_name"></span></div>
+            </div>
+            <div class="button-container">
+              <button type="submit" class="button submit_button">Cross-List This Section</button>
+              <button type="button" class="button button-secondary cancel_button">Cancel</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+
+  <% form_tag context_url(@context, :context_section_uncrosslist_url, @section.id), :id => "uncrosslist_form", :title => "De-Cross-List this Section", :method => :delete do %>
+    <h2>De-Cross-List Section</h2>
+    <p>
+      Are you sure you want to de-cross-list this section?
+      <% if @section.nonxlist_course %>
+        This will move the section back to its original course,
+        <strong><%= @section.nonxlist_course.name %></strong>.
+      <% end %>
+    </p>
+    <% if @student_enrollments.length > 0 %>
+      <p>
+        All grades for the <strong><%= pluralize(@student_enrollments.length, "student") %></strong>
+        in this course will no longer be visible.  You can retrieve the grades
+        later by re-cross-listing the course, but in the mean time 
+        the grades for these students will come from the original course.
+      </p>
+    <% end %>
+    <div class="button-container">
+      <button type="submit" class="button submit_button">De-Cross-List This Section</button>
+      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+    </div>
+  <% end %>
+</div>

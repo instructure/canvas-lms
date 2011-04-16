@@ -106,6 +106,7 @@ class CourseSection < ActiveRecord::Base
     else
       self.enrollments.update_all :course_id => course.id
     end
+    Enrollment.send_later(:recompute_final_score, user_ids, course.id)
     self
   end
   

@@ -65,7 +65,11 @@ ActionController::Routing::Routes.draw do |map|
     course.limit_user_grading 'limit_user_grading/:id', :controller => 'courses', :action => 'limit_user', :conditions => {:method => :post}
     course.conclude_user_enrollment 'conclude_user/:id', :controller => 'courses', :action => 'conclude_user', :conditions => {:method => :delete}
     course.unconclude_user_enrollment 'unconclude_user/:id', :controller => 'courses', :action => 'unconclude_user', :conditions => {:method => :post}
-    course.resources :sections, :except => %w(index edit new)
+    course.resources :sections, :except => %w(index edit new) do |section|
+      section.confirm_crosslist 'crosslist/confirm/:new_course_id', :controller => 'sections', :action => 'crosslist_check'
+      section.crosslist 'crosslist', :controller => 'sections', :action => 'crosslist', :conditions => {:method => :post}
+      section.uncrosslist 'crosslist', :controller => 'sections', :action => 'uncrosslist', :conditions => {:method => :delete}
+    end
     course.undelete_items 'undelete', :controller => 'context', :action => 'undelete_index'
     course.undelete_item 'undelete/:asset_string', :controller => 'context', :action => 'undelete_item'
     course.details 'details', :controller => 'courses', :action => 'course_details'

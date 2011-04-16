@@ -104,6 +104,8 @@ javascripts:
     - public/javascripts/external_tools.js
   course:
     - public/javascripts/course.js
+  section:
+    - public/javascripts/section.js
   wiki:
     - public/javascripts/wiki.js
   eportfolio:
