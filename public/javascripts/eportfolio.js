@@ -45,7 +45,7 @@
         } else if(section_type == "submission") {
           data[name + '[section_type]'] = "submission";
           data[name + '[submission_id]'] = $(this).getTemplateData({textValues: ['submission_id']}).submission_id;
-        } else if(section_type == "upload") {
+        } else if(section_type == "attachment") {
           data[name + '[section_type]'] = "attachment";
           data[name + '[attachment_id]'] = $(this).getTemplateData({textValues: ['attachment_id']}).attachment_id;
         }
@@ -197,7 +197,7 @@
         section_type = "submission";
         section_type_name = "Course Submission";
       } else if($(this).hasClass('add_file_link')) {
-        section_type = "upload";
+        section_type = "attachment";
         section_type_name = "Image/File Upload";
       }
       var edit_type = "edit_" + section_type + "_content";
