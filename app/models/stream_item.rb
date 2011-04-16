@@ -173,6 +173,7 @@ class StreamItem < ActiveRecord::Base
       end
     when Submission
       res = object.attributes
+      res.delete 'body' # this can be pretty large, and we don't display it
       res['assignment'] = object.assignment.attributes.slice('id', 'title', 'due_at', 'points_possible', 'submission_types')
       res[:submission_comments] = object.submission_comments.select{|c| true }.map do |comment|
         hash = comment.attributes
