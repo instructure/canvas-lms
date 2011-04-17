@@ -418,6 +418,16 @@ describe Quiz do
       new_q = q.clone_for(@course)
       new_q.quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
     end
+    
+    it "should only create one associated assignment for a graded quiz" do
+      q = @course.quizzes.create!(:title => "graded quiz", :quiz_type => 'assignment')
+      q.workflow_state = 'available'
+      q.save
+      course
+      expect {
+        new_q = q.clone_for(@course)
+      }.to change(@course.assignments, :count).by(1)
+    end
   end
   
   describe "Quiz with QuestionGroup pointing to QuestionBank" do

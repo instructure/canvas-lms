@@ -84,7 +84,7 @@ class Quiz < ActiveRecord::Base
   protected :set_defaults
   
   def build_assignment
-    if self.available? && !self.assignment_id && self.graded? && @saved_by != :assignment
+    if self.available? && !self.assignment_id && self.graded? && @saved_by != :assignment && @saved_by != :clone
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
@@ -658,7 +658,7 @@ class Quiz < ActiveRecord::Base
     # We need to save the quiz now so that the migrate_question_hash call will find
     # the duplicated quiz and not try to make it itself.
     dup.context = context
-    dup.saved_by = :assignment if options[:cloning_for_assignment]
+    dup.saved_by = :clone
     dup.save!
     data = self.quiz_data
     if data
@@ -685,6 +685,7 @@ class Quiz < ActiveRecord::Base
       dup.assignment_id = new_assignment.id
     end
     begin
+      dup.saved_by = :assignment if options[:cloning_for_assignment]
       dup.save!
     rescue => e
       logger.warn "Couldn't save quiz copy: #{e.to_s}"
