@@ -222,14 +222,12 @@ class User < ActiveRecord::Base
     #      User -> Pseudonym -> Account
     starting_points = []
     self.enrollments.find(:all, :include => {:course_section => [:course, :course_account_associations], :course => :course_account_associations}).each do |enrollment|
-      start = enrollment.course_section
-      start ||= enrollment.course
-      starting_points << start if start
+      starting_points << enrollment.course_section << enrollment.course
     end
     starting_points += self.pseudonym_accounts.reload
     
     # For each Course, Section, and Account, make sure an association exists.
-    starting_points.each do |entity|
+    starting_points.compact.each do |entity|
       account_ids = []
       if entity.is_a?(Course)
         account_ids = entity.course_account_associations.sort_by{|a| a.depth }.map{|a| a.account_id}.uniq
