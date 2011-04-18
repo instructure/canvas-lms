@@ -115,10 +115,7 @@
                 <div id="multiple_attempts_suboptions" style="padding-left: 20px;">
                   <div>
                     <label for="keep_score_select">Keep
-                    <select id="keep_score_select" name="quiz[scoring_policy]">
-                      <option value="keep_highest">Highest</option>
-                      <option value="keep_latest">Latest</option>
-                    </select>
+                    <%= select(:quiz, :scoring_policy, [['Highest', 'keep_highest'], ['Latest', 'keep_latest'],], {}, :id => 'keep_score_select') %>
                     Quiz Score</label>
                   </div>
                   <div>
