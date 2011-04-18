@@ -168,4 +168,34 @@ class ContextExternalTool < ActiveRecord::Base
   named_scope :active, :conditions => ['context_external_tools.workflow_state != ?', 'deleted']
   
   def self.serialization_excludes; [:shared_secret,:settings]; end
+  
+  def self.process_migration(data, migration)
+    tools = data['external_tools'] ? data['external_tools']: []
+    to_import = migration.to_import 'external_tools'
+    tools.each do |tool|
+      if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
+        import_from_migration(tool, migration.context)
+      end
+    end
+  end
+  
+  def self.import_from_migration(hash, context, item=nil)
+    hash = hash.with_indifferent_access
+    return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
+    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+    item ||= context.context_external_tools.new
+    item.migration_id = hash[:migration_id]
+    item.name = hash[:title]
+    item.description = hash[:description]
+    item.url = hash[:url] unless hash[:url].blank?
+    item.domain = hash[:domain] unless hash[:domain].blank?
+    item.privacy_level = hash[:privacy_level]
+    item.consumer_key = 'fake'
+    item.shared_secret = 'fake'
+    
+    item.save!
+    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+    item
+  end
+  
 end

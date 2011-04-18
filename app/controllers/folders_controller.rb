@@ -57,7 +57,8 @@ class FoldersController < ApplicationController
                                 sort_by{|a| a.created_at }
       @attachment = @attachments.pop
       @attachments.each{|a| a.destroy! }
-      if @attachment && @attachment.created_at < @folder.active_file_attachments.map(&:updated_at).compact.max
+      last_date = (@folder.active_file_attachments.map(&:updated_at) + @folder.active_sub_folders.map(&:updated_at)).compact.max
+      if @attachment && last_date && @attachment.created_at < last_date
         @attachment.destroy!
         @attachment = nil
       end

@@ -666,21 +666,54 @@ class ContextModule < ActiveRecord::Base
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
     item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
     item ||= new(:context => context)
-    item.name = hash[:title] || hash[:description]
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+    item.name = hash[:title] || hash[:description]
     item.migration_id = hash[:migration_id]
-    item.position = hash[:order]
+    item.position = hash[:position] || hash[:order]
     item.context = context
+    item.unlock_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
+    item.start_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]
+    item.end_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) if hash[:end_at]
+    
+    if hash[:prerequisites]
+      preqs = []
+      hash[:prerequisites].each do |prereq|
+        if prereq[:module_migration_id]
+          if ref_mod = find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, prereq[:module_migration_id])
+            preqs << {:type=>"context_module", :name=>ref_mod.name, :id=>ref_mod.id}
+          end
+        end
+      end
+      item.prerequisites = preqs if preqs.length > 0
+    end
+    
     item.save!
+    
+    item_map = {}
     @item_migration_position = item.content_tags.active.map(&:position).compact.max || 0
     (hash[:items] || []).each do |tag_hash|
-      item.add_item_from_migration(tag_hash, 0, context)
+      item.add_item_from_migration(tag_hash, 0, context, item_map)
     end
-    context.imported_migration_items << item
+    
+    if hash[:completion_requirements]
+      c_reqs = []
+      hash[:completion_requirements].each do |req|
+        if item_ref = item_map[req[:item_migration_id]]
+          req[:id] = item_ref.id
+          req.delete :item_migration_id
+          c_reqs << req
+        end
+      end
+      if c_reqs.length > 0
+        item.completion_requirements = c_reqs
+        item.save
+      end
+    end
+
     item
   end
   
-  def add_item_from_migration(hash, level, context)
+  def add_item_from_migration(hash, level, context, item_map)
     hash = hash.with_indifferent_access
     hash[:migration_id] ||= hash[:linked_resource_id] 
     hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
@@ -691,7 +724,7 @@ class ContextModule < ActiveRecord::Base
     context.imported_migration_items << existing_item if context.imported_migration_items && existing_item.new_record?
     existing_item.migration_id = hash[:migration_id]
     hash[:indents] = [hash[:indents] || 0, level].max
-    if hash[:linked_resource_type] =~ /wiki_type/i
+    if hash[:linked_resource_type] =~ /wiki_type|wikipage/i
       wiki = self.context.wiki.wiki_pages.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if wiki
         item = self.add_item({
@@ -701,7 +734,7 @@ class ContextModule < ActiveRecord::Base
           :indent => hash[:indents].to_i
         }, existing_item)
       end
-    elsif ['PAGE_TYPE', 'FILE_TYPE'].member? hash[:linked_resource_type]
+    elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
       # this is a file of some kind
       file = self.context.attachments.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if file
@@ -712,7 +745,7 @@ class ContextModule < ActiveRecord::Base
           :indent => hash[:indents].to_i
         }, existing_item)
       end
-    elsif ['ASSIGNMENT_TYPE', 'PROJECT_TYPE'].member? hash[:linked_resource_type]
+    elsif hash[:linked_resource_type] =~ /assignment|project/i
       # this is a file of some kind
       ass = self.context.assignments.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if ass
@@ -723,14 +756,14 @@ class ContextModule < ActiveRecord::Base
           :indent => hash[:indents].to_i
         }, existing_item)
       end
-    elsif ['FOLDER_TYPE', 'HEADING'].member?(hash[:linked_resource_type] || hash[:type])
+    elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
       # just a snippet of text
       item = self.add_item({
         :title => hash[:title] || hash[:linked_resource_title],
         :type => 'context_module_sub_header',
         :indent => hash[:indents].to_i
       }, existing_item)
-    elsif hash[:linked_resource_type] == 'URL_TYPE'
+    elsif hash[:linked_resource_type] =~ /url/i
       # external url
       if hash['url']
         item = self.add_item({
@@ -740,7 +773,17 @@ class ContextModule < ActiveRecord::Base
           :url => hash['url']
         }, existing_item)
       end
-    elsif hash[:linked_resource_type] == 'ASSESSMENT_TYPE'
+    elsif hash[:linked_resource_type] =~ /contextexternaltool/i
+      # external tool
+      if hash['url']
+        item = self.add_item({
+          :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
+          :type => 'context_external_tool',
+          :indent => hash[:indents].to_i,
+          :url => hash['url']
+        }, existing_item)
+      end
+    elsif hash[:linked_resource_type] =~ /assessment|quiz/i
       quiz = self.context.quizzes.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if quiz
         item = self.add_item({
@@ -750,7 +793,7 @@ class ContextModule < ActiveRecord::Base
           :id => quiz.id
         }, existing_item)
       end
-    elsif hash[:linked_resource_type] == 'DISCUSSION_TOPIC_TYPE'
+    elsif hash[:linked_resource_type] =~ /discussion|topic/i
       topic = self.context.discussion_topics.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if topic
         item = self.add_item({
@@ -766,6 +809,7 @@ class ContextModule < ActiveRecord::Base
       # We don't know what this is
     end
     if item
+      item_map[hash[:item_migration_id]] = item if hash[:item_migration_id]
       item.migration_id = hash[:migration_id]
       item.position = (@item_migration_position ||= self.content_tags.active.map(&:position).compact.max || 0)
       item.workflow_state = 'active'

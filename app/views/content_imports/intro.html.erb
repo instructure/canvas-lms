@@ -18,11 +18,11 @@
   <p>
     <h4>You can also:</h4> 
     <div>
+      <p><a class="button" href="<%= context_url(@context, :context_import_copy_url) %>"> Copy content from <b>another Canvas course</b></a></p>
+        
       <% if exports_enabled? %>
-          <a class="button" href="<%= context_url(@context, :context_import_migrate_url) %>"> Migrate content from <b>another system</b> into Canvas</a>
-          or &nbsp;
+        <p><a class="button" href="<%= context_url(@context, :context_import_migrate_url) %>"> Import content from a <b>content package</b> or from <b>another system</b></a></p>
       <% end %>
-      <a class="button" href="<%= context_url(@context, :context_import_copy_url) %>"> Copy content from <b>another Canvas course</b></a>
     </div>
   </p>
 </div>

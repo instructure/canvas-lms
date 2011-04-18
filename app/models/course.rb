@@ -108,6 +108,7 @@ class Course < ActiveRecord::Base
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
   has_many :role_overrides, :as => :context
+  has_many :content_exports
   attr_accessor :import_source
   
   before_save :assign_uuid
@@ -1173,19 +1174,20 @@ class Course < ActiveRecord::Base
     @imported_migration_items = []
 
     # These only need to be processed once
-    process_migration_files(data, migration)
-    migration.fast_update_progress(20)
-    Attachment.process_migration(data, migration)
-    migration.fast_update_progress(30)
-    question_data = AssessmentQuestion.process_migration(data, migration)
-    migration.fast_update_progress(35)
-    Group.process_migration(data, migration)
-    LearningOutcome.process_migration(data, migration)
-    Rubric.process_migration(data, migration)
-    AssignmentGroup.process_migration(data, migration)
-    migration.fast_update_progress(40)
-    Quiz.process_migration(data, migration, question_data)
-    migration.fast_update_progress(50)
+    import_settings_from_migration(data); migration.fast_update_progress(0.5)
+    process_migration_files(data, migration); migration.fast_update_progress(20)
+    Attachment.process_migration(data, migration); migration.fast_update_progress(30)
+    question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
+    Group.process_migration(data, migration); migration.fast_update_progress(36)
+    LearningOutcome.process_migration(data, migration); migration.fast_update_progress(37)
+    Rubric.process_migration(data, migration); migration.fast_update_progress(38)
+    @assignment_group_no_drop_assignments = {}
+    AssignmentGroup.process_migration(data, migration); migration.fast_update_progress(39)
+    ExternalFeed.process_migration(data, migration); migration.fast_update_progress(39.5)
+    GradingStandard.process_migration(data, migration); migration.fast_update_progress(40)
+    Quiz.process_migration(data, migration, question_data); migration.fast_update_progress(50)
+    #todo - Import external tools when there are post-migration messages to tell the user to add shared secret/password
+    #ContextExternalTool.process_migration(data, migration)
 
     2.times do |i|
       DiscussionTopic.process_migration(data, migration)
@@ -1233,6 +1235,20 @@ class Course < ActiveRecord::Base
   attr_accessor :full_migration_hash
   attr_accessor :external_url_hash
   attr_accessor :folder_name_lookups
+  attr_accessor :assignment_group_no_drop_assignments
+  
+  def import_settings_from_migration(data)
+    return unless data[:course]
+    settings = data[:course]
+    self.conclude_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(settings[:conclude_at]) if settings[:conclude_at]
+    self.start_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(settings[:start_at]) if settings[:start_at]
+    self.syllabus_body = ImportedHtmlConverter.convert(settings[:syllabus_body], self) if settings[:syllabus_body]
+    atts = Course.clonable_attributes
+    atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
+    settings.slice(*atts.map(&:to_s)).each do |key, val|
+      self.send("#{key}=", val)
+    end
+  end
   
   def backup_to_json
     backup.to_json

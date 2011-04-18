@@ -107,4 +107,33 @@ class GradingStandard < ActiveRecord::Base
       # "F" => 0.0
     # }
   end
+  
+  def self.process_migration(data, migration)
+    standards = data['grading_standards'] ? data['grading_standards']: []
+    to_import = migration.to_import 'grading_standards'
+    standards.each do |tool|
+      if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
+        import_from_migration(tool, migration.context)
+      end
+    end
+  end
+  
+  def self.import_from_migration(hash, context, item=nil)
+    hash = hash.with_indifferent_access
+    return nil if hash[:migration_id] && hash[:grading_standards_to_import] && !hash[:grading_standards_to_import][hash[:migration_id]]
+    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+    item ||= context.grading_standards.new
+    item.migration_id = hash[:migration_id]
+    item.title = hash[:title]
+    begin
+      item.data = JSON.parse hash[:data]
+    rescue
+      #todo - add to message to display to user
+    end
+    
+    item.save!
+    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+    item
+  end
+  
 end

@@ -23,7 +23,19 @@ module Canvas::MigratorHelper
   ERROR_FILENAME = "errors.json"
   OVERVIEW_JSON = "overview.json"
   
+  COURSE_NO_COPY_ATTS = [:name, :course_code, :start_at, :conclude_at, :grading_standard_id, :hidden_tabs, :tab_configuration, :syllabus_body, :storage_quota]
+  
   attr_reader :overview
+  
+  def self.get_utc_time_from_timestamp(timestamp)
+    timestamp = timestamp.to_i/ 1000 rescue 0
+    t = nil
+    if timestamp > 0
+      t = Time.at(timestamp)
+      t = Time.utc(t.year, t.month, t.day, t.hour, t.min, t.sec)
+    end
+    t
+  end
 
   def self.unzip_command(zip_file, dest_dir)
     "unzip -qo #{zip_file.gsub(/ /, "\\ ")} -d #{dest_dir.gsub(/ /, "\\ ")} 2>&1"
@@ -119,8 +131,8 @@ module Canvas::MigratorHelper
     @overview[:end_timestamp] = nil
     dates = []
     if @overview[:course] = @course[:course]
-      @overview[:start_timestamp] = @course[:course][:start_timestamp]
-      @overview[:end_timestamp] = @course[:course][:end_timestamp]
+      @overview[:start_timestamp] = @course[:course][:start_timestamp] || @course[:course][:start_at]
+      @overview[:end_timestamp] = @course[:course][:end_timestamp] || @course[:course][:conclude_at]
     end
     @overview[:role] = @course[:role]
     @overview[:base_url] = @course[:base_url]
@@ -212,7 +224,6 @@ module Canvas::MigratorHelper
         assign[:title] = a[:title]
         assign[:due_date] = a[:due_date]
         assign[:migration_id] = a[:migration_id]
-        assign[:description] = a[:description]
         assign[:error_message] = a[:error_message] if a[:error_message]
       end
     end
@@ -223,7 +234,6 @@ module Canvas::MigratorHelper
         @overview[:discussion_topics] << topic
         topic[:title] = t[:title]
         topic[:topic_type] = t[:topic_type]
-        topic[:description] = t[:description]
         topic[:migration_id] = t[:migration_id]
         topic[:error_message] = t[:error_message] if t[:error_message]
       end

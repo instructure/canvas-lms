@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://canvas.instructure.com/xsd/cccv1p0"
+           xmlns="http://canvas.instructure.com/xsd/cccv1p0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+  <!-- todo: useful comments as documentation ;) -->
+  <xs:element name="course">
+    <xs:complexType>
+      <xs:all minOccurs="0" maxOccurs="1">
+        <xs:element name="title" type="xs:string" minOccurs="1"/>
+        <xs:element name="course_code" type="xs:string" minOccurs="0"/>
+        <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="conclude_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="is_public" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="indexed" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="publish_grades_immediately" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_student_wiki_edits" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_student_assignment_edits" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="hashtag" type="xs:string" minOccurs="0"/>
+        <xs:element name="show_public_context_messages" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_student_forum_attachments" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="default_wiki_editing_roles" type="xs:string" minOccurs="0"/>
+        <xs:element name="allow_student_organized_groups" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="show_all_discussion_entries" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="open_enrollment" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_wiki_comments" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="self_enrollment" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="turnitin_comments" type="xs:string" minOccurs="0"/>
+        <xs:element name="default_view" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="feed"/>
+              <xs:enumeration value="wiki"/>
+              <xs:enumeration value="modules"/>
+              <xs:enumeration value="assignments"/>
+              <xs:enumeration value="syllabus"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="license" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="private"/>
+              <xs:enumeration value="public_domain"/>
+              <xs:enumeration value="cc_by_nc_nd"/>
+              <xs:enumeration value="cc_by_nc_sa"/>
+              <xs:enumeration value="cc_by_nc"/>
+              <xs:enumeration value="cc_by_nd"/>
+              <xs:enumeration value="cc_by_sa"/>
+              <xs:enumeration value="cc_by"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="group_weighting_scheme" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="percent"/>
+              <xs:enumeration value="equal"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:all>
+      <xs:attribute name="identifier" type="xs:ID" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="assignment" type="assignmentType"/>
+  <xs:complexType name="assignmentType">
+    <xs:all minOccurs="0" maxOccurs="1">
+      <xs:element name="title" type="xs:string" minOccurs="1"/>
+      <xs:element name="due_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="peer_reviews_due_at" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="all_day_date" type="xs:date" minOccurs="0"/>
+      <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="grading_standard_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="rubric_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="quiz_identifierref" type="xs:string" minOccurs="0"/>
+      <xs:element name="allowed_extensions" type="xs:string" minOccurs="0"/>
+      <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
+      <xs:element name="min_score" type="xs:float" minOccurs="0"/>
+      <xs:element name="max_score" type="xs:float" minOccurs="0"/>
+      <xs:element name="mastery_score" type="xs:float" minOccurs="0"/>
+      <xs:element name="grading_type" type="xs:string" minOccurs="0"/>
+      <xs:element name="all_day" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="submission_types" type="xs:string" minOccurs="0"/>
+      <xs:element name="position" type="xs:integer" minOccurs="0"/>
+      <xs:element name="turnitin_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="peer_review_count" type="xs:integer" minOccurs="0"/>
+      <xs:element name="peer_reviews_assigned" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="peer_reviews" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="automatic_peer_reviews" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="anonymous_peer_reviews" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="grade_group_students_individually" type="xs:boolean" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="identifier" type="xs:ID" use="required"/>
+  </xs:complexType>
+  
+  <xs:element name="topicMeta">
+    <xs:complexType>
+      <xs:all minOccurs="0" maxOccurs="1">
+        <xs:element name="topic_id" type="xs:ID" minOccurs="1"/>
+        <xs:element name="title" type="xs:string" minOccurs="1"/>
+        <xs:element name="assignment" type="assignmentType" minOccurs="0"/>
+        <xs:element name="posted_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="delayed_post_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="position" type="xs:integer" minOccurs="0"/>
+        <xs:element name="external_feed_identifierref" type="xs:string" minOccurs="0"/>
+        <xs:element name="attachment_identifierref" type="xs:string" minOccurs="0"/>
+        <xs:element name="type" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="announcement"/>
+              <xs:enumeration value="topic"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:all>
+      <xs:attribute name="identifier" type="xs:ID" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="modules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="module" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="1"/>
+              <xs:element name="position" type="xs:integer" minOccurs="0"/>
+              <xs:element name="start_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="end_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="require_sequential_progress" type="xs:boolean" minOccurs="0"/>
+              
+              <xs:element name="prerequisites" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="prerequisite">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="title" type="xs:string" minOccurs="0"/>
+                          <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
+                        </xs:all>
+                        <xs:attribute name="type" type="xs:string" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              
+              <xs:element name="items" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="item">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="content_type" type="xs:string" minOccurs="1"/>
+                          <xs:element name="title" type="xs:string" minOccurs="1"/>
+                          <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
+                          <xs:element name="url" type="xs:string" minOccurs="0"/>
+                          <xs:element name="position" type="xs:integer" minOccurs="0"/>
+                          <xs:element name="indent" type="xs:integer" minOccurs="0"/>
+                        </xs:all>
+                        <xs:attribute name="identifier" type="xs:ID" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              
+              <xs:element name="completionRequirements" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="completionRequirement">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="identifierref" type="xs:string" minOccurs="1"/>
+                          <xs:element name="min_score" type="xs:float" minOccurs="0"/>
+                          <xs:element name="max_score" type="xs:float" minOccurs="0"/>
+                        </xs:all>
+                        <xs:attribute name="type" type="xs:string" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="externalFeeds">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="externalFeed" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="url" type="xs:anyURI" minOccurs="1"/>
+              <xs:element name="title" type="xs:string" minOccurs="0"/>
+              <xs:element name="header_match" type="xs:string" minOccurs="0"/>
+              <xs:element name="purpose" minOccurs="0" default="announcements">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="announcements"/>
+                    <!--<xs:enumeration value="calendar"/>-->
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="feed_type" minOccurs="1">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="rss/atom"/>
+                    <!--<xs:enumeration value="ical"/>-->
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="verbosity" minOccurs="1" default="full">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="full"/>
+                    <xs:enumeration value="truncate"/>
+                    <xs:enumeration value="link_only"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="assignmentGroups">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="assignmentGroup" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="1"/>
+              <xs:element name="position" type="xs:integer" minOccurs="0"/>
+              <xs:element name="group_weight" type="xs:float" minOccurs="0"/>
+              <xs:element name="rules" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="rule" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="drop_type" minOccurs="1">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:enumeration value="drop_lowest"/>
+                                <xs:enumeration value="drop_highest"/>
+                                <xs:enumeration value="never_drop"/>
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="identifierref" type="xs:string" minOccurs="0"/>
+                          <xs:element name="drop_count" type="xs:integer" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="gradingStandards">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="gradingStandard" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="0"/>
+              <xs:element name="data" type="xs:string" minOccurs="1"/>
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="ratingsType">
+    <xs:sequence>
+      <xs:element name="rating" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:all minOccurs="0">
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="1"/>
+            <xs:element name="points" type="xs:float" minOccurs="1"/>
+            <xs:element name="criterion_id" type="xs:string" minOccurs="0"/>
+            <xs:element name="long_description" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="learningOutcomes" type="learningOutcomesType"/>
+  <xs:complexType name="learningOutcomesType">
+    <xs:choice  minOccurs="0" maxOccurs="unbounded">
+
+      <xs:element name="learningOutcome">
+        <xs:complexType>
+          <xs:all minOccurs="0">
+            <xs:element name="title" type="xs:string" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
+            <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
+            <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="identifier" type="xs:ID" use="required"/>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="learningOutcomeGroup">
+        <xs:complexType>
+          <xs:all minOccurs="0">
+            <xs:element name="title" type="xs:string" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="learningOutcomes" type="learningOutcomesType" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="identifier" type="xs:ID" use="required"/>
+        </xs:complexType>
+      </xs:element>
+
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:element name="rubrics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rubric" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="0"/>
+              <xs:element name="description" type="xs:string" minOccurs="0"/>
+              <xs:element name="read_only" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="reusable" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="public" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
+              <xs:element name="hide_score_total" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="free_form_criterion_comments" type="xs:boolean" minOccurs="0"/>
+
+              <xs:element name="criteria">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0">
+                    <xs:element name="criterion" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:all minOccurs="0">
+                          <xs:element name="criterion_id" type="xs:string" minOccurs="0"/>
+                          <xs:element name="description" type="xs:string" minOccurs="0"/>
+                          <xs:element name="long_description" type="xs:string" minOccurs="0"/>
+                          <xs:element name="points" type="xs:float" minOccurs="0"/>
+                          <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
+                          <xs:element name="ignore_for_scoring" type="xs:boolean" minOccurs="0"/>
+                          <xs:element name="learning_outcome_identifierref" type="xs:string" minOccurs="0"/>
+                          <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
+                        </xs:all>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="externalTools">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="externalTool" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all minOccurs="0">
+              <xs:element name="title" type="xs:string" minOccurs="0"/>
+              <xs:element name="url" type="xs:anyURI" minOccurs="0"/>
+              <xs:element name="description" type="xs:string" minOccurs="0"/>
+              <xs:element name="domain" type="xs:string" minOccurs="0"/>
+              
+              <xs:element name="privacy_level" minOccurs="1" default="anonymous">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="name_only"/>
+                    <xs:enumeration value="public"/>
+                    <xs:enumeration value="anonymous"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+            </xs:all>
+            <xs:attribute name="identifier" type="xs:ID" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
