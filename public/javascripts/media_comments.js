@@ -395,10 +395,15 @@
         modal: (opts.modal == false ? false : true)
       }).dialog('open');
       $dialog.dialog('option', 'close', function() {
+        $("#audio_record").before("<div id='audio_record'/>").remove();
+        $("#video_record").before("<div id='video_record'/>").remove();
         if(opts && opts.close && $.isFunction(opts.close)) {
           opts.close.call($dialog);
         }
       });
+      $("#audio_record").before("<div id='audio_record'/>").remove();
+      $("#video_record").before("<div id='video_record'/>").remove();
+      
       var ks = $dialog.data('ks');
 
       if(media_type == "video") {
@@ -421,41 +426,45 @@
       // Re-set the recorders, too?  I guess probably, yeah, if you can.
       $(document).triggerHandler('reset_media_comment_forms');
       var temporaryName = $.trim($("#identity .user_name").text()) + " " + (new Date()).toISOString();
-      var flashVars = {
-        host:INST.kalturaSettings.domain,
-        kshowId:"-1",
-        pid:INST.kalturaSettings.partner_id,
-        subpid:INST.kalturaSettings.subpartner_id,
-        uid:$dialog.data('uid') || "ANONYMOUS",
-        ks:ks,
-        partnerData: $.mediaComment.partnerData(),
-        partner_data: $.mediaComment.partnerData(),
-        themeUrl:"/media_record/skin.swf",
-        localeUrl:"/media_record/locale.xml",
-        entryName:temporaryName,
-        thumbOffset:"1",
-        licenseType:"CC-0.1",
-        showUi:"true",
-        useCamera:"false",
-        maxFileSize: 50,
-        maxUploads: 1
-      }
-      var params = {
-        "align": "middle",
-        "quality": "high",
-        "bgcolor": "#ffffff",
-        "name": "KRecordAudio",
-        "allowScriptAccess":"sameDomain",
-        "type": "application/x-shockwave-flash",
-        "pluginspage": "http://www.adobe.com/go/getflashplayer",
-        "wmode": "opaque"
-      }
-      $("#audio_record").html("Flash required for recording audio.")
-      swfobject.embedSWF("/media_record/KRecordAudio.swf", "audio_record", "400", "300", "9.0.0", false, flashVars, params);
+      setTimeout(function() {
+        var recordVars = {
+          host:INST.kalturaSettings.domain,
+          kshowId:"-1",
+          pid:INST.kalturaSettings.partner_id,
+          subpid:INST.kalturaSettings.subpartner_id,
+          uid:$dialog.data('uid') || "ANONYMOUS",
+          ks:ks,
+          themeUrl:"/media_record/skin.swf",
+          localeUrl:"/media_record/locale.xml",
+          thumbOffset:"1",
+          licenseType:"CC-0.1",
+          showUi:"true",
+          useCamera:"false",
+          maxFileSize: 50,
+          maxUploads: 1,
+          partnerData: $.mediaComment.partnerData(),
+          partner_data: $.mediaComment.partnerData(),
+          entryName:temporaryName
+        }
+        var params = {
+          "align": "middle",
+          "quality": "high",
+          "bgcolor": "#ffffff",
+          "name": "KRecordAudio",
+          "allowScriptAccess":"sameDomain",
+          "type": "application/x-shockwave-flash",
+          "pluginspage": "http://www.adobe.com/go/getflashplayer",
+          "wmode": "opaque"
+        }
+        $("#audio_record").html("Flash required for recording audio.")
+        swfobject.embedSWF("/media_record/KRecordAudio.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
 
-      var params = $.extend({}, params, {name: 'KRecordVideo'})
-      $("#video_record").html("Flash required for recording video.")
-      swfobject.embedSWF("/media_record/KRecordVideo.swf", "video_record", "400", "300", "9.0.0", false, flashVars, params);
+        var params = $.extend({}, params, {name: 'KRecordVideo'})
+        $("#video_record").html("Flash required for recording video.")
+        swfobject.embedSWF("/media_record/KRecordVideo.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
+        // give the dialog time to initialize or the recorder will
+        // render funky in ie
+      }, INST.browser.ie ? 500 : 10);
 
       var flashVars = {
         host:location.protocol + "//" + INST.kalturaSettings.domain,
@@ -515,12 +524,12 @@
         audio_record_counter++;
         video_record_counter++;
         var audio_level = null, video_level = null;
-        if($audio_record && $audio_record[0] && $audio_record[0].getMicophoneActivityLevel) {
+        if($audio_record && $audio_record[0] && $audio_record[0].getMicophoneActivityLevel && $audio_record.parent().length) {
           audio_level = $audio_record[0].getMicophoneActivityLevel();
         } else {
           $audio_record = $("#audio_record");
         }
-        if($video_record && $video_record[0] && $video_record[0].getMicophoneActivityLevel) {
+        if($video_record && $video_record[0] && $video_record[0].getMicophoneActivityLevel && $video_record.parent().length) {
           video_level = $video_record[0].getMicophoneActivityLevel();
         } else {
           $video_record = $("#video_record");
