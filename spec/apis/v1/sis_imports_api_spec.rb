@@ -81,6 +81,7 @@ describe SisImportsApiController, :type => :integration do
                                     "sections" => 0,
                                     "accounts" => 0,
                                     "enrollments" => 0,
+                                    "grade_publishing_results" => 0,
                                     "users" => 1,
                                     "xlists" => 0,
                                     "terms" => 0}},

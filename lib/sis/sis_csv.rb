@@ -36,11 +36,12 @@ module SIS
       @course_csvs = []
       @enrollment_csvs = []
       @xlist_csvs = []
+      @grade_publishing_results_csvs = []
       
       @files = opts[:files] || []
       @batch = opts[:batch]
       @logger = opts[:logger]
-      @counts = {:accounts=>0,:terms=>0,:courses=>0,:sections=>0,:users=>0,:enrollments=>0,:xlists=>0}
+      @counts = {:accounts=>0,:terms=>0,:courses=>0,:sections=>0,:users=>0,:enrollments=>0,:xlists=>0,:grade_publishing_results=>0}
       
       @total_rows = 1
       @current_row = 0
@@ -80,7 +81,7 @@ module SIS
         end
       end
 
-      [ @course_csvs, @user_csvs, @enrollment_csvs, @section_csvs, @xlist_csvs, @term_csvs, @account_csvs ].flatten.each do |csv|
+      [ @course_csvs, @user_csvs, @enrollment_csvs, @grade_publishing_results_csvs, @section_csvs, @xlist_csvs, @term_csvs, @account_csvs ].flatten.each do |csv|
         @total_rows += (%x{wc -l '#{csv[:fullpath]}'}.split.first.to_i rescue 0)
       end
       
@@ -108,6 +109,9 @@ module SIS
       xlist_importer = CrossListImporter.new(self)
       @xlist_csvs.each {|csv| xlist_importer.verify(csv, @verify) }
 
+      grade_publishing_results_importer = GradePublishingResultsImporter.new(self)
+      @grade_publishing_results_csvs.each {|csv| grade_publishing_results_importer.verify(csv, @verify) }
+
       @verify = nil
       return unless @errors.empty?
 
@@ -118,6 +122,7 @@ module SIS
       @section_csvs.each {|csv| section_importer.process(csv) }
       @enrollment_csvs.each {|csv| enrollment_importer.process(csv) }
       @xlist_csvs.each {|csv| xlist_importer.process(csv) }
+      @grade_publishing_results_csvs.each {|csv| grade_publishing_results_importer.process(csv) }
       
       @finished = true
     rescue => e
@@ -214,6 +219,8 @@ module SIS
             @section_csvs << csv
           elsif CrossListImporter.is_xlist_csv?(row)
             @xlist_csvs << csv
+          elsif GradePublishingResultsImporter.is_grade_publishing_results_csv?(row)
+            @grade_publishing_results_csvs << csv
           else
             add_error(csv, "Couldn't find Canvas CSV import headers")
           end

@@ -927,4 +927,38 @@ describe SIS::SisCsv do
 
   end
   
+  context 'grade publishing results importing' do
+    it 'should detect bad content' do
+      importer = process_csv_data(
+        "enrollment_id,grade_publishing_status",
+        ",published",
+        "1,published",
+        "1,error",
+        "2,asplode")
+
+      errors = importer.errors.map { |r| r.last }
+      errors.should == ["No enrollment_id given",
+                        "Duplicate enrollment id 1",
+                        "Improper grade_publishing_status \"asplode\" for enrollment 2"]
+    end
+
+    it 'should properly update the db' do
+      course_with_student
+      @course.account = @account;
+      @course.save!
+
+      @enrollment.grade_publishing_status = 'publishing';
+      @enrollment.save!
+
+      importer = process_csv_data(
+        "enrollment_id,grade_publishing_status",
+        "#{@enrollment.id},published")
+
+      importer.warnings.length.should == 0
+      importer.errors.length.should == 0
+
+      @enrollment.reload
+      @enrollment.grade_publishing_status.should == 'published'
+    end
+  end
 end
