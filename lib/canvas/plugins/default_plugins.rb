@@ -26,6 +26,7 @@ Canvas::Plugin.register('wimba', :web_conferencing, {
   :author_website => 'http://www.instructure.com',
   :version => 1.0,
   :settings_partial => 'plugins/wimba_settings',
+  :settings => {:timezone => 'Eastern Time (US & Canada)'},
   :validator => 'WimbaValidator',
   :encrypted_settings => [:password]
 })

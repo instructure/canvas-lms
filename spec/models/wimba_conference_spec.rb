@@ -50,6 +50,8 @@ describe WimbaConference do
               extra = "\nauthToken=s3kr1tfor#{opts['target']}\nuser_id=#{opts['target']}\n=END RECORD"
             when 'statusClass'
               extra = "\nnum_users=#{@mocked_users[:joined].size}\nroomlock=\n=END RECORD"
+            when 'listClass'
+              extra = "\nclass_id=abc123\nlongname=ABC 123\n=END RECORD\nlongname=DEF 456\nclass_id=def456\n=END RECORD"
           end
         end
         "100 OK#{extra}"
@@ -113,6 +115,22 @@ describe WimbaConference do
       join_url = "http://wimba.test/launcher.cgi.pl?hzA=s3kr1tfor#{conference.wimba_id(@user.uuid)}&room=#{conference.wimba_id}"
       conference.admin_join_url(@user).should eql(join_url)
       conference.participant_join_url(@user).should eql(join_url)
+    end
+
+    it "should correctly return archive urls" do
+      conference = WimbaConference.create!(:title => "my conference", :user => @user)
+      conference.initiate_conference
+      conference.admin_join_url(@user)
+      conference.started_at = 1.hour.ago
+      conference.ended_at = 1.hour.ago
+      conference.save
+      urls = conference.external_url_for("archive", @user)
+      urls.should eql [{:id => "abc123", :name => "ABC 123"}, {:id => "def456", :name => "DEF 456"}]
+    end
+
+    it "should not return archive urls if the conference hasn't started" do
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 120)
+      conference.external_url_for("archive", @user).should be_empty
     end
   end
 end

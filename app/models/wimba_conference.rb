@@ -20,6 +20,31 @@ require 'net/http'
 require 'uri'
 
 class WimbaConference < WebConference
+  external_url :archive, :text => "View archive(s)",
+                         :restricted_to => lambda{ |conf| conf.active? || conf.finished? }
+
+  def archive_external_url(user, url_id)
+    urls = []
+    if (res = send_request('listClass', {'filter00' => 'archive_of', 'filter00value' => wimba_id, 'attribute' => 'longname'}))
+      res.sub(/\A100 OK\n/, '').split(/\n=END RECORD\n?/).each do |match|
+        data = match.split(/\n/).inject({}){ |hash, line| key, hash[key.to_sym] = line.split(/=/, 2); hash}
+        unless data[:longname] && data[:class_id]
+          logger.error "wimba error reading archive list"
+          break
+        end
+        if date_info = data[:longname].match(Regexp.new(" - (\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2})\\z"))
+          # convert from wimba's local time to the user's local time
+          tz = ActiveSupport::TimeZone[config[:timezone] || config[:plugin].default_settings[:timezone]]
+          new_date = datetime_string(tz.parse(date_info[1]))
+          data[:longname].sub!(date_info[1], new_date)
+        end
+        urls << {:id => data[:class_id], :name => data[:longname]} unless url_id && data[:class_id] != url_id
+      end
+      urls.first[:url] = join_url(user, urls.first[:id]) if urls.size == 1 && touch_user(user)
+    end
+    urls
+  end
+
   def server
     config[:domain]
   end
@@ -90,20 +115,22 @@ class WimbaConference < WebConference
     nil
   end
 
-  def add_user_to_conference(user, role='participant')
+  def touch_user(user)
     names = user.last_name_first.split(/, /, 2)
-    (
-      send_request('modifyUser', {
-        'target' => wimba_id(user.uuid),
-        'password_type' => 'A',
-        'first_name' => names[1],
-        'last_name' => names[0]}) ||
-      send_request('createUser', {
-        'target' => wimba_id(user.uuid),
-        'password_type' => 'A',
-        'first_name' => names[1],
-        'last_name' => names[0]})
-    ) &&
+    send_request('modifyUser', {
+      'target' => wimba_id(user.uuid),
+      'password_type' => 'A',
+      'first_name' => names[1],
+      'last_name' => names[0]}) ||
+    send_request('createUser', {
+      'target' => wimba_id(user.uuid),
+      'password_type' => 'A',
+      'first_name' => names[1],
+      'last_name' => names[0]})
+  end
+
+  def add_user_to_conference(user, role='participant')
+    touch_user(user) &&
     send_request('createRole', {
       'target' => wimba_id,
       'user_id' => wimba_id(user.uuid),
@@ -118,13 +145,17 @@ class WimbaConference < WebConference
     })
   end
 
-  def join_url(user)
-    if (res = send_request('getAuthToken', {
+  def join_url(user, room_id=wimba_id)
+    (token = get_auth_token(user)) &&
+    "http://#{server}/launcher.cgi.pl?hzA=#{CGI::escape(token)}&room=#{CGI::escape(room_id)}"
+  end
+
+  def get_auth_token(user)
+    (res = send_request('getAuthToken', {
         'target'    => wimba_id(user.uuid),
-        'nickname' => user.name.gsub(/[^a-zA-Z0-9]/, '')
-      })) && (token = res.split("\n").detect{|s| s.match(/^authToken/) })
-      "http://#{server}/launcher.cgi.pl?hzA=#{CGI::escape(token.split(/=/, 2).last.chomp)}&room=#{CGI::escape(wimba_id)}"
-    end
+        'nickname' => user.name.gsub(/[^a-zA-Z0-9]/, '')})) &&
+    (token = res.split("\n").detect{|s| s.match(/^authToken/) }) &&
+    token.split(/=/, 2).last.chomp
   end
 
   def admin_join_url(user, return_to="http://www.instructure.com")

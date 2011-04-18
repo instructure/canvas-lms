@@ -18,7 +18,8 @@
 
 class WebConference < ActiveRecord::Base
   include SendToStream
-  attr_accessible :title, :duration, :description, :conference_type, :user
+  include TextHelper
+  attr_accessible :title, :duration, :description, :conference_type, :user, :user_settings
   attr_readonly :context_id, :context_type
   belongs_to :context, :polymorphic => true
   has_many :web_conference_participants
@@ -43,7 +44,85 @@ class WebConference < ActiveRecord::Base
 
   serialize :settings
   def settings
-    read_attribute(:settings) || write_attribute(:settings, {})
+    read_attribute(:settings) || write_attribute(:settings, default_settings)
+  end
+
+  # whether they replace the whole hash or just update some values, make sure
+  # we save those changes (after we sanitize it)
+  before_save :merge_user_settings
+  def merge_user_settings
+    unless user_settings.empty?
+      (type ? type.constantize : self).user_settings.each do |name, data|
+        next if data[:restricted_to] && !data[:restricted_to].call(self)
+        settings[name] = cast_setting(user_settings[name], data[:type])
+      end
+      @user_settings = nil
+    end
+  end
+
+  def user_settings=(new_settings)
+    @user_settings = new_settings.symbolize_keys
+  end
+
+  def user_settings
+    @user_settings ||= 
+      self.class.user_settings.keys.inject({}){ |hash, key|
+        hash[key] = settings[key]
+        hash
+      }
+  end
+
+  def cast_setting(value, type)
+    case type
+      when :boolean: ['1', 'on', 'true'].include?(value.to_s)
+      else value
+    end
+  end
+
+  def friendly_setting(value)
+    case value
+      when true: "on"
+      when false: "off"
+      else value.to_s
+    end
+  end
+
+  def default_settings
+    @default_settings ||= 
+    self.class.user_settings.inject({}){ |hash, (name, data)|
+      hash[name] = data[:default] if data[:default]
+      hash
+    }
+  end
+
+  def self.user_setting(name, options)
+    user_settings[name] = options
+  end
+
+  def self.user_settings
+    read_inheritable_attribute(:user_settings) || write_inheritable_attribute(:user_settings, {})
+  end
+
+  def external_urls
+    @external_urls ||= self.class.external_urls.dup.delete_if{ |key, info| info[:restricted_to] && !info[:restricted_to].call(self) }
+  end
+
+  # #{key}_external_url should return an array of hashes with url information (:name, :id, and :url).
+  # if there is just one, we will redirect, otherwise we'll present links to all of them (possibly
+  # redirecting through here again in case the url has a short-lived token and needs to be
+  # regenerated)
+  def external_url_for(key, user, url_id = nil)
+    external_urls[key.to_sym] &&
+    respond_to?("#{key}_external_url") &&
+    send("#{key}_external_url", user, url_id) || []
+  end
+
+  def self.external_urls
+    read_inheritable_attribute(:external_urls) || write_inheritable_attribute(:external_urls, {})
+  end
+
+  def self.external_url(name, options)
+    external_urls[name] = options
   end
 
   def assign_uuid
@@ -273,18 +352,18 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.conference_types
-    plugins.select{ |plugin|
-      plugin.settings &&
-      !plugin.settings.values.all?(&:blank?) &&
-      (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
-      klass < self.base_ar_class
-    }.
-    map{ |plugin|
+    plugins.map{ |plugin|
+      next unless plugin.settings &&
+          !plugin.settings.values.all?(&:blank?) &&
+          (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
+          klass < self.base_ar_class
       plugin.settings.merge(
         :conference_type => plugin.id.classify,
-        :class_name => (plugin.base || "#{plugin.id.classify}Conference")
+        :class_name => (plugin.base || "#{plugin.id.classify}Conference"),
+        :user_settings => klass.user_settings,
+        :plugin => plugin
       ).with_indifferent_access
-    }
+    }.compact
   end
   
   def self.config(class_name=nil)

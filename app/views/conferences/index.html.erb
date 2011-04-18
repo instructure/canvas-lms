@@ -45,6 +45,9 @@
       </tr><tr style="<%= hidden unless WebConference.conference_types.length > 1 %>">
         <td class="nobr" style="width: 5px;"><%= f.label :conference_type, "Type:" %></td>
         <td><%= f.select :conference_type, WebConference.conference_types.map{|c| [c[:conference_type], c[:conference_type]] } %></td>
+      </tr><tr style="<%= hidden %>">
+        <td class="nobr" style="width: 5px;"><label>Options:</label></td>
+        <td id="web_conference_user_settings"></td>
       </tr><tr>
         <td class="nobr" style="width: 5px;"><%= f.label :duration, "Duration:" %></td>
         <td><%= f.text_field :duration, :style => "width: 25px;", :value => "60" %> minutes</td>
@@ -95,6 +98,26 @@
 
 <% js_block do %>
   <script>
+  INST.webConferenceUserSettings = <%=
+    WebConference.conference_types.map{ |type|
+      type[:user_settings].keys.map{ |setting| "user_settings[#{setting}]" }
+    }.flatten.to_json.html_safe
+  %>;
+  INST.webConferenceUserSettingTemplates = <%=
+    WebConference.conference_types.inject({}){ |types, type|
+      types[type[:conference_type]] = type[:user_settings].inject({}) {|settings, (name, options)|
+        field_name = "web_conference[user_settings][#{name}]"
+        settings[name] = options
+        settings[name][:html] = case options[:type]
+          when :boolean
+            check_box_tag(field_name, "true", options[:default]) + " " + label_tag(field_name, options[:description])
+        end
+        settings
+      }
+      types
+    }.to_json.html_safe
+  %>;
+
   $(document).ready(function() {
     $("#add_conference_form .cancel_button").click(function() {
       if($("#add_conference_form").prev(".conference").length > 0) {
@@ -146,6 +169,19 @@
         $(this).show();
       }
     });
+    $("#add_conference_form select").change(function(event){
+      var settings = INST.webConferenceUserSettingTemplates[$(this).val()];
+      var contents = ''
+      $.each(settings, function(name, html){
+        contents += html.html + "<br>";
+      });
+      $("#web_conference_user_settings").html(contents);
+      if (contents) {
+        $("#web_conference_user_settings").parent().show();
+      } else {
+        $("#web_conference_user_settings").parent().hide();
+      }
+    });
     $(".edit_conference_link, .add_conference_link").click(function(event) {
       event.preventDefault();
       var $form = $("#add_conference_form");
@@ -162,7 +198,7 @@
         $conference = $("#conference_blank");
       }
       var data = $conference.getTemplateData({
-        textValues: ['title', 'duration', 'description', 'user_ids', 'conference_type']
+        textValues: ['title', 'duration', 'description', 'user_ids', 'conference_type'].concat(INST.webConferenceUserSettings)
       });
       if(edit) {
         $form.find("span.title").text("Edit Conference Details");
@@ -176,6 +212,12 @@
         for(var idx in ids) {
           var id = ids[idx];
           $form.find("#members_list .member.user_" + id).find(":checkbox").attr('checked', true);
+        }
+        // this ensures our user_setting inputs exist so fillFormData can
+        // populate them
+        if (data.conference_type) {
+          $form.find('select').val(data.conference_type).change();
+          delete data.conference_type;
         }
       } else {
         delete data.conference_type;
@@ -220,6 +262,11 @@
         $("#members_list").slideUp();
       }
     }).change();
+    $(document).fragmentChange(function(event, hash){
+      if (match = hash.match(/^#conference_\d+$/)) {
+        $(match[0]).find(".edit_conference_link").click();
+      }
+    });
   });
   </script>
 <% end %>

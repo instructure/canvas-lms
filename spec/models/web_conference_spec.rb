@@ -24,6 +24,7 @@ describe WebConference do
       def plugins
         [OpenObject.new(:id => "dim_dim", :settings => {:domain => "dimdim.instructure.com"}, :valid_settings? => true),
          OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}, :valid_settings? => true),
+         OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true),
          OpenObject.new(:id => "broken_plugin", :settings => {:foo => :bar}, :valid_settings? => true)]
       end
     end
@@ -108,7 +109,28 @@ describe WebConference do
       BigBlueButtonConference.new(:conference_type => "BigBlueButton").valid_config?.should be_true
     end
   end
-  
+
+  context "user settings" do
+    it "should ignore invalid user settings" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar})
+      conference.user_settings.should be_empty
+    end
+
+    it "should not expose internal settings to users" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.new(:title => "my conference", :user => @user)
+      conference.settings = {:not => :for_user}
+      conference.save
+      conference.reload
+      conference.user_settings.should be_empty
+    end
+  end
+
   context "starting and ending" do
     it "should not set start and end times by default" do
       user_model

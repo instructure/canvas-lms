@@ -9,7 +9,7 @@
         <a href="<%= context_url(@context, :context_conference_url, conference ? conference.id : "{{ id }}") %>" style="<%= hidden unless can_do(conference, @current_user, :delete) %>" class="delete_conference_link no-hover"><%= image_tag "delete.png", :title => "Delete Conference" %></a>
       </div>
     <% end %>
-    <span class="title"><%= conference.title rescue ("#{@context.name} Conference" rescue "Conference") %></span>
+    <%= link_to((conference.title rescue ("#{@context.name} Conference" rescue "Conference")), context_url(@context, :context_conference_url, conference ? conference.id : "{{ id }}"), :class => "title") %>
     <span style="font-size: 0.8em; padding-left: 10px;">
       <%= "#{pluralize(conference.added_users.length, 'participant')}" if conference && conference.added_users.length > 0 %>
     </span>
@@ -27,6 +27,11 @@
       <div style="display: none;" class="duration"><%= conference.duration.to_i rescue "60" %></div>
       <div style="display: none;" class="user_ids"><%= Array(conference.user_ids).join(",") rescue nbsp %></div>
       <div style="display: none;" class="conference_type"><%= conference && conference.conference_type %></div>
+      <%- if conference && conference.user_settings -%>
+      <%- conference.user_settings.each do |key, value| -%>
+      <div style="display: none;" class="user_settings[<%= key %>]"><%= value %></div>
+      <%- end -%>
+      <%- end -%>
     </div>
     <div class="description">
       <%= conference.description rescue "" %>
@@ -34,12 +39,12 @@
   </div>
   <div class="base_links">
     <% txt = nil
-      if conference && conference.available? && can_do(conference, @current_user, :initiate)
-        txt = "Start it now"
-      elsif conference && conference.active? && can_do(conference, @current_user, :join)
-        txt = "Join it now"
-      elsif conference && conference.finished? && conference.restartable? && can_do(conference, @current_user, :initiate)
-        txt = "Re-start it now"
+      if conference && conference.available?
+        txt = "Start it now" if can_do(conference, @current_user, :initiate)
+      elsif conference && conference.active?
+        txt = "Join it now" if can_do(conference, @current_user, :join)
+      elsif conference && conference.finished?
+        txt = "Re-start it now" if can_do(conference, @current_user, :initiate)
       elsif !conference
         txt = "Start it now"
       end 

@@ -34,6 +34,14 @@ class ConferencesController < ApplicationController
   def show
     get_conference
     if authorized_action(@conference, @current_user, :read)
+      if params[:external_url]
+        urls = @conference.external_url_for(params[:external_url], @current_user, params[:url_id])
+        if request.xhr?
+          return render :json => urls
+        elsif urls.size == 1
+          return redirect_to(urls.first[:url])
+        end
+      end
       log_asset_access(@conference, "conferences", "conferences")
     end
   end

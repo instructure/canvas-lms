@@ -1,0 +1,144 @@
+<% content_for :page_title do %>Web Conference: <%=h @conference.title %><% end %>
+
+<% if can_do(@conference, @current_user, :update) && !@conference.finished? %>
+  <% content_for :right_side do %>
+    <div class="rs-margin-all">
+      <div id="sidebar_content">
+        <p>
+          <%= link_to(image_tag("edit.png", :alt => "") + " Edit Conference ", context_url(@context, :context_conferences_url) + "#conference_#{@conference.id}", :class => "button button-sidebar-wide") %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<h2>Conference Details</h2>
+
+<fieldset>
+  <legend>Basic Info</legend>
+  <table class="formtable">
+    <tr>
+      <th>Name:</th>
+      <td><%=h @conference.title %></td>
+    </tr>
+    <% unless WebConference.conference_types.length > 1 -%>
+    <tr>
+      <th>Type:</th>
+      <td><%=h @conference.conference_type %></td>
+    </tr>
+    <% end -%>
+    <% if can_do(@conference, @current_user, :update) %>
+    <% @conference.user_settings.each do |key, value| %>
+    <tr>
+      <th><%=h key.to_s.humanize %>:</th>
+      <td><%=h @conference.friendly_setting(value) %></td>
+    </tr>
+    <% end %>
+    <% end %>
+    <tr>
+      <th>Duration:</th>
+      <td><%= @conference.duration %> minutes</td>
+    </tr>
+    <tr>
+      <th>Status:</th>
+      <td>
+      <% if @conference.available? %>
+        Hasn't started yet
+      <% elsif @conference.active? %>
+        Started <%= time_string(@conference.started_at) %>
+      <% elsif @conference.finished? %>
+        Finished <%= datetime_string(@conference.ended_at) %> (<%= pluralize((@conference.running_time / 60).to_i, 'minute') %>)
+      <% end %>
+      </td>
+    </tr>
+    <% unless @conference.description.blank? -%>
+    <tr>
+      <th>Description:</th>
+      <td><%= @conference.description %></td>
+    </tr>
+    <% end -%>
+  </table>
+</fieldset>
+
+<% unless @conference.external_urls.empty? %>
+<fieldset>
+  <legend>External Links</legend>
+  <ul>
+  <% @conference.external_urls.each do |key, url_info| %>
+    <li><%= link_to(url_info[:text], context_url(@context, :context_conference_url, @conference.id) + "?external_url=#{key}", :name => key, :class => "external_url") %></li>
+  <% end %>
+  </ul>
+</fieldset>
+<% end %>
+
+<fieldset>
+  <legend>Members</legend>
+  <ul>
+    <% @conference.users.each do |user| %>
+      <li>
+        <%= h user.last_name_first %>
+      </li>
+    <% end %>
+  </ul>
+</fieldset>
+
+<div class="communication_message" style="border-bottom: 0px;">
+  <div class="base_links">
+    <% txt = nil
+      if @conference.available?
+        txt = "Start it now" if can_do(@conference, @current_user, :initiate)
+      elsif @conference.active?
+        txt = "Join it now" if can_do(@conference, @current_user, :join)
+      elsif @conference.finished? && @conference.restartable?
+        txt = "Re-start it now" if can_do(@conference, @current_user, :initiate)
+      end 
+    %>
+    <% if txt %>
+    <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, @conference.id) %>" class="button join_conference_link">
+      <%= txt %>
+    </a>
+    <% end %>
+  </div>
+</div>
+
+<% js_block do %>
+  <script>
+  $(document).ready(function() {
+    $(".external_url").click(function(e) {
+      e.preventDefault();
+      var loading_text = 'Loading, please wait...';
+      var $self = $(this);
+      var link_text = $self.text();
+      if (link_text == loading_text) {
+        return;
+      }
+      $self.text(loading_text);
+      $.ajaxJSON($self.attr('href'), 'GET', {}, function(data) {
+        $self.text(link_text);
+        if (data.length == 0) {
+          $.flashError("Sorry, it looks like there aren't any " + $self.attr('name') + " pages for this conference yet.");
+        } else if (data.length > 1) {
+          $box = $(document.createElement('DIV'));
+          $box.append("<p>There are multiple " + $self.attr('name') + " pages available for this conference. Please select one:</p>");
+          for (var i = 0; i < data.length; i++) {
+            $a = $("<a />", {href: data[i].url || $self.attr('href') + '&url_id=' + data[i].id, target: '_blank'});
+            $a.text(data[i].name);
+            $box.append($a).append("<br>");
+          }
+          $box.dialog('close').dialog({
+            autoOpen: false,
+            width: 425,
+            minWidth: 425,
+            minHeight: 215,
+            resizable: true,
+            height: "auto",
+            title: $self.text()
+          }).dialog('open');
+        } else {
+          window.open(data[0].url);
+        }
+      });
+    });
+  });
+  </script>
+<% end %>

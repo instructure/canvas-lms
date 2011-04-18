@@ -25,7 +25,7 @@ module Canvas::Plugins::Validators::WimbaValidator
         plugin_setting.errors.add_to_base('All fields are required')
         false
       else
-        settings.slice(:domain, :user, :password)
+        settings.slice(:domain, :user, :password, :timezone)
       end
     end
   end

@@ -21,13 +21,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/conference/index" do
   it "should render" do
-    course_with_teacher
+    course_with_teacher(:active_all => true)
     view_context(@course, @user)
-    @conference = @course.web_conferences.create
+    @conference = @course.web_conferences.build(:conference_type => "DimDim")
+    @conference.user = @user
+    @conference.save!
+    @conference.add_initiator(@user)
     assigns[:conferences] = [@conference]
     assigns[:users] = @course.users
     render "conferences/index"
-    response.should have_tag("div.conference")
+    response.should have_tag("div#conference_#{@conference.id}")
   end
 end
 

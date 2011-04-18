@@ -21,8 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/conference/show" do
   it "should render" do
-    course_with_teacher
+    course_with_teacher(:active_all => true)
     view_context(@course, @user)
+    @conference = @course.web_conferences.build(:conference_type => "DimDim")
+    @conference.user = @user
+    @conference.save!
+    @conference.add_initiator(@user)
+    assigns[:conference] = @conference
     render "conferences/show"
     response.should_not be_nil
   end
