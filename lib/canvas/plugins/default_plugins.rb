@@ -37,3 +37,15 @@ Canvas::Plugin.register('error_reporting', :error_reporting, {
   :version => 1.0,
   :settings_partial => 'plugins/error_reporting_settings'
 })
+require_dependency 'cc/importer/cc_worker'
+Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
+  :name => 'Common Cartridge Importer',
+  :author => 'Instructure',
+  :description => 'This enables converting a canvas CC export to the intermediary json format to be imported',
+  :version => '1.0.0',
+  :settings => {
+    :worker=>'CCWorker',
+    :migration_partial => 'cc_config',
+    :select_text => "Canvas Course Export"
+  }
+}
