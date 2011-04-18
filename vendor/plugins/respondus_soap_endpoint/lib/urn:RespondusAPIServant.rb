@@ -165,7 +165,7 @@ Implemented for: Canvas LMS}]
       list.item << NVPair.new("quizAreas", "course")
       list.item << NVPair.new("quizSupport", "publish,replace,randomBlocks")
       list.item << NVPair.new("quizQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
-      list.item << NVPair.new("quizSettings", "")
+      list.item << NVPair.new("quizSettings", "publish")
       list.item << NVPair.new("qdbAreas", "course")
       list.item << NVPair.new("qdbSupport", "publish,replace")
       list.item << NVPair.new("qdbQuestions", "multipleChoice,multipleResponse,trueFalse,essay,matchingSimple,matchingComplex,fillInBlank")
@@ -448,7 +448,10 @@ Implemented for: Canvas LMS}]
     course = Course.find_by_id(selection_state.first)
     raise(OtherError, 'Item type incompatible with selection state') unless course
 
-    settings = { :migration_type => 'qti_exporter' }
+    settings = {
+      :migration_type => 'qti_exporter',
+      :apply_respondus_settings_file => (itemType != 'qdb'),
+    }
 
     if item
       if !item.clear_for_replacement

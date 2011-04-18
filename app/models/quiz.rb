@@ -1096,14 +1096,11 @@ class Quiz < ActiveRecord::Base
     return if item && !allow_update
     item ||= context.quizzes.new
 
-    item.migration_id = hash[:migration_id]
-    item.title = hash[:title]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
-    item.allowed_attempts = hash[:allowed_attempts] if hash[:allowed_attempts]
-    item.time_limit = hash[:time_limit] if hash[:time_limit]
-    item.shuffle_answers = hash[:shuffle_answers] unless hash[:shuffle_answers].nil?
-    item.show_correct_answers = hash[:show_correct_answers] unless hash[:show_correct_answers].nil?
-    item.points_possible = hash[:points_possible] if hash[:points_possible]
+    [:migration_id, :title, :description, :allowed_attempts, :time_limit, :shuffle_answers, :show_correct_answers, :points_possible, :lock_at, :unlock_at, :access_code, :ip_filter, :scoring_policy].each do |attr|
+      item.send("#{attr}=", hash[attr]) if hash.key?(attr)
+    end
+
     timestamp = hash[:due_date]
     if hash[:quiz_type] =~ /assignment/i && !item.assignment
       # The actual assignment will be created when the quiz is published

@@ -1,3 +1,5 @@
+require_dependency 'qti_exporter/respondus_settings'
+
 module Qti
 class QtiExporter < Canvas::Migrator
 
@@ -25,6 +27,10 @@ class QtiExporter < Canvas::Migrator
 
     @course[:assessment_questions] = convert_questions
     @course[:assessments] = convert_assessments(@course[:assessment_questions])
+
+    if settings[:apply_respondus_settings_file]
+      apply_respondus_settings
+    end
 
     if @id_prepender
       @course[:assessment_questions][:assessment_questions].each do |q|
@@ -101,6 +107,19 @@ class QtiExporter < Canvas::Migrator
       @quizzes[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
     end
     @quizzes
+  end
+
+  def apply_respondus_settings
+    settings_path = File.join(@unzipped_file_path, 'settings.xml')
+    if File.file?(settings_path)
+      doc = Nokogiri::XML(open(settings_path))
+    end
+    if doc
+      respondus_settings = Qti::RespondusSettings.new(doc)
+      @course[:assessments][:assessments].each do |assessment|
+        respondus_settings.apply(assessment)
+      end
+    end
   end
 
 end

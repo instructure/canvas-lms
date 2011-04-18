@@ -21,7 +21,7 @@ class Canvas::Migrator
   SCRAPE_ALL_HASH = { 'course_outline' => true, 'announcements' => true, 'assignments' => true, 'goals' => true, 'rubrics' => true, 'web_links' => true, 'learning_modules' => true, 'calendar_events' => true, 'calendar_start' => nil, 'calendar_end' => nil, 'discussions' => true, 'assessments' => true, 'question_bank' => true, 'all_files' => true, 'groups' => true, 'assignment_groups' => true, 'tasks' => true, 'wikis' => true }
 
   attr_accessor :course, :unzipped_file_path, :extra_settings, :total_error_count
-  attr_reader :base_export_dir, :unzipped_file_path, :manifest, :import_objects
+  attr_reader :base_export_dir, :unzipped_file_path, :manifest, :import_objects, :settings
 
   def initialize(settings, migration_type)
     @settings = settings
