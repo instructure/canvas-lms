@@ -22,12 +22,15 @@ $(function(){
       $migration_form = $('#migration_form'),
       $submit_button = $migration_form.find(".submit_button"),
       $file_upload = $migration_form.find("#file_upload"),
+      $upload_extension = $migration_form.find("#upload_extension"),
       $export_file_input = $migration_form.find("#export_file_input"),
       $migration_config = $migration_form.find("#migration_config"),
       $migration_configs = $("#migration_configs"),
       $migration_alt_div = $("#migration_alt_div");
 
-  function enableFileUpload(){
+  function enableFileUpload(file_type){
+    file_type = typeof(file_type) != 'undefined' ? file_type : ".zip";
+    $upload_extension.text(file_type);
     $export_file_enabled.val("1");
     $file_upload.show();
   }
@@ -78,7 +81,7 @@ $(function(){
   }).change();
 
   $("#export_file_input").change(function() {
-    if($(this).val().match(/\.zip$/i)) {
+    if($(this).val().match(/\.zip$|\.imscc$/i)) {
       $submit_button.attr('disabled', false);
       $('.zip_error').hide();
     } else {

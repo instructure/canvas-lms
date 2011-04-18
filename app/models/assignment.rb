@@ -1364,8 +1364,9 @@ class Assignment < ActiveRecord::Base
     description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context)
     description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
     item.description = description
-    if ['discussion_topic'].include?(hash[:submission_format])
-      item.saved_by = :discussion_topic
+    if !hash[:submission_types].blank?
+      item.submission_types = hash[:submission_types]
+    elsif ['discussion_topic'].include?(hash[:submission_format])
       item.submission_types = "discussion_topic"
     elsif ['online_file_upload','textwithattachments'].include?(hash[:submission_format])
       item.submission_types = "online_file_upload,online_text_entry"
@@ -1374,30 +1375,78 @@ class Assignment < ActiveRecord::Base
     elsif ['webpage'].include?(hash[:submission_format])
       item.submission_types = "online_file_upload"
     elsif ['online_quiz'].include?(hash[:submission_format])
-      item.saved_by = :quiz
       item.submission_types = "online_quiz"
     end
-    if grading = hash[:grading]
-      hash[:due_date] ||= grading[:due_date]
-      item.assignment_group = context.assignment_groups.find_by_migration_id(grading[:assignment_group_migration_id]) if grading[:assignment_group_migration_id]
-      if grading[:grade_type] == 'numeric'
+    if item.submission_types == "online_quiz"
+      item.saved_by = :quiz
+    end
+    if item.submission_types == "discussion_topic"
+      item.saved_by = :discussion_topic
+    end
+    
+    if hash[:grading_type]
+      item.grading_type = hash[:grading_type]
+      item.points_possible = hash[:points_possible]
+    elsif grading = hash[:grading]
+      hash[:due_at] ||= grading[:due_at] || grading[:due_date]
+      hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
+      if grading[:grade_type] =~ /numeric|points/i
         item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 10
-      elsif grading[:grade_type] == 'alphanumeric'
+      elsif grading[:grade_type] =~ /alphanumeric|letter_grade/i
         item.grading_type = "letter_grade"
-        item.points_possible = 100
+        item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 100
       elsif grading[:grade_type] == 'rubric'
-        rubric = context.rubrics.find_by_migration_id(grading[:rubric_id])
-        rubric.associate_with(item, context, :purpose => 'grading') if rubric
-        # raise "Need to implement rubric_association, probably on the second go-round"
+        hash[:rubric_migration_id] ||= grading[:rubric_id]
       elsif grading[:grade_type] == 'not_graded'
         item.submission_types = 'not_graded'
       end
     end
-    timestamp = hash[:due_date].to_i rescue 0
-    item.due_at = Time.at(timestamp / 1000) if timestamp > 0
+    
+    if hash[:rubric_migration_id]
+      rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id])
+      rubric.associate_with(item, context, :purpose => 'grading') if rubric
+    end
+    if hash[:grading_standard_migration_id]
+      gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])
+      item.grading_standard = gs if gs
+    end
+    if hash[:quiz_migration_id]
+      if quiz = context.quizzes.find_by_migration_id(hash[:quiz_migration_id])
+        # the quiz is published because it has an assignment
+        quiz.assignment = item
+        quiz.generate_quiz_data
+        quiz.published_at = Time.now
+        quiz.workflow_state = 'available'
+        quiz.save
+      end
+    end
+    if hash[:assignment_group_migration_id]
+      item.assignment_group = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
+    end
     item.assignment_group ||= context.assignment_groups.find_or_create_by_name("Imported Assignments")
+    
+    hash[:due_at] ||= hash[:due_date]
+    [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at, :all_day_date].each do |key|
+      item.send"#{key}=", Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[key]) unless hash[key].nil?
+    end
+    
+    [:all_day, :turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
+     :automatic_peer_reviews, :anonymous_peer_reviews,
+     :grade_group_students_individually, :allowed_extensions, :min_score, 
+     :max_score, :mastery_score, :position, :peer_review_count
+    ].each do |prop|
+      item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
+    end
+
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.save_without_broadcasting!
+    
+    if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
+      if group = context.assignment_group_no_drop_assignments[item.migration_id]
+        AssignmentGroup.add_never_drop_assignment(group, item)
+      end
+    end
+    
     item
   end
 

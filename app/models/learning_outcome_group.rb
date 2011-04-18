@@ -20,18 +20,22 @@ class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :title, :description, :learning_outcome_group
   belongs_to :learning_outcome_group
+  belongs_to :root_learning_outcome_group
   has_many :learning_outcome_groups
   has_many :content_tags, :as => :associated_asset, :order => :position
   belongs_to :context, :polymorphic => true
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
+
+  attr_accessor :building_default
   
   def infer_defaults
     self.context ||= self.learning_outcome_group && self.learning_outcome_group.context
-    if self.context && !self.context.learning_outcome_groups.empty?
-      self.learning_outcome_group ||= LearningOutcomeGroup.default_for(self.context) rescue nil
-      self.root_learning_outcome_group ||= LearningOutcomeGroup.default_for(self.context) rescue nil
+    if self.context && !self.context.learning_outcome_groups.empty? && !building_default
+      default = LearningOutcomeGroup.default_for(self.context)
+      self.learning_outcome_group ||= default unless self == default
+      self.root_learning_outcome_group ||= default
     end
     true
   end
@@ -101,6 +105,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
  end
   
   def add_item(item, opts={})
+    return if item == self
     if item.is_a?(LearningOutcome)
       all_tags = all_tags_for_context
       tag = all_tags.detect{|t| t.content_asset_string == item.asset_string }
@@ -149,10 +154,41 @@ class LearningOutcomeGroup < ActiveRecord::Base
   end
   
   def self.default_for(context)
-    outcome = LearningOutcomeGroup.find_or_create_by_context_type_and_context_id_and_learning_outcome_group_id(context.class.to_s, context.id, nil)
-    outcome.root_learning_outcome_group_id ||= outcome.id
-    outcome.save if outcome.changed?
+    outcome = LearningOutcomeGroup.find_by_context_type_and_context_id_and_learning_outcome_group_id(context.class.to_s, context.id, nil)
+    return outcome if outcome
+
+    outcome = LearningOutcomeGroup.new(:context => context)
+    outcome.building_default = true
+    outcome.save!
+    outcome.root_learning_outcome_group_id = outcome.id
+    outcome.save!
     outcome
+  end
+  
+  def self.import_from_migration(hash, context, item=nil)
+    hash = hash.with_indifferent_access
+    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
+    item ||= context.learning_outcome_groups.new
+    item.context = context
+    item.migration_id = hash[:migration_id]
+    item.title = hash[:title]
+    item.description = hash[:description]
+    
+    item.save!
+    
+    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+
+    if hash[:outcomes]
+      hash[:outcomes].each do |outcome|
+        outcome[:learning_outcome_group] = item
+        LearningOutcome.import_from_migration(outcome, context)
+      end
+    end
+    
+    log = LearningOutcomeGroup.default_for(context)
+    log.add_item(item)
+
+    item
   end
   
   named_scope :active, lambda{

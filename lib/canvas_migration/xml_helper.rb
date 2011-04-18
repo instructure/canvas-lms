@@ -22,8 +22,25 @@ module Canvas::XMLHelper
     Time.parse(string).to_i * 1000 rescue nil
   end
 
+  def get_node_att(node, selector, attribute, default=nil)
+    if node = node.at_css(selector)
+      return node[attribute]
+    end
+    default
+  end
+
   def get_node_val(node, selector, default=nil)
     node.at_css(selector) ? node.at_css(selector).text : default
+  end
+  
+  # You can't do a css selector that only looks for direct
+  # descendants of the current node, so you have to iterate
+  # over the children and see if it's there.
+  def get_val_if_child(node, name)
+    if child = node.children.find{|c|c.name == name}
+      return child.text
+    end
+    nil
   end
 
   def get_unescaped_html_val(node, selector)
@@ -36,22 +53,22 @@ module Canvas::XMLHelper
 
   def get_int_val(node, selector, default=nil)
     val = get_node_val(node, selector, default)
-    return default if val.nil? || val == ""
+    return default if val.nil? || val == "" || val.nil?
     begin
       val = val.to_i
     rescue
-      val = nil
+      val = default
     end
     val
   end
 
   def get_float_val(node, selector, default=nil)
     val = get_node_val(node, selector, default)
-    return default if val == ""
+    return default if val == "" || val.nil?
     begin
       val = val.to_f
     rescue
-      val = nil
+      val = default
     end
     val
   end
@@ -66,12 +83,12 @@ module Canvas::XMLHelper
     path = path.gsub('\\', '/') if path
     path
   end
-
+  
   def open_file(path)
-    ::Nokogiri::HTML(open(path))
+    File.exists?(path) ? ::Nokogiri::HTML(open(path)) : nil
   end
 
   def open_file_xml(path)
-    ::Nokogiri::XML(open(path))
+    File.exists?(path) ? ::Nokogiri::XML(open(path)) : nil
   end
 end

@@ -26,18 +26,21 @@ class Canvas::Migrator
   def initialize(settings, migration_type)
     @settings = settings
     @settings[:migration_type] = migration_type
+    @manifest = nil
+    @error_count = 0
+    @errors = []
+    @course = {:file_map=>{}, :wikis=>[]}.with_indifferent_access
+    @course[:name] = @settings[:course_name]
+    
+    return if settings[:testing]
+    
     download_archive
-    @course = {:file_map=>{}, :wikis=>[]}
     @archive_file_path = @settings[:export_archive_path]
     raise "The #{migration_type} archive zip wasn't at the specified location: #{@archive_file_path}." if @archive_file_path.nil? or !File.exists?(@archive_file_path)
     @unzipped_file_path = File.join(File.dirname(@archive_file_path), "#{migration_type}_#{File.basename(@archive_file_path, '.zip')}")
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
     @course[:export_folder_path] = File.expand_path(@base_export_dir)
-    @course[:name] = @settings[:course_name]
     make_export_dir
-    @manifest = nil
-    @error_count = 0
-    @errors = []
   end
 
   def export
