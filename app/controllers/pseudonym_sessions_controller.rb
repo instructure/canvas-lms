@@ -34,8 +34,9 @@ class PseudonymSessionsController < ApplicationController
 
     @pseudonym_session = PseudonymSession.new
     @headers = false
-    @is_cas = @domain_root_account.cas_authentication? && !params[:canvas_login]
-    @is_saml = @domain_root_account.saml_authentication? && !params[:canvas_login]
+    @is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
+    @is_cas = @domain_root_account.cas_authentication? && @is_delegated
+    @is_saml = @domain_root_account.saml_authentication? && @is_delegated
     if @is_cas && !params[:no_auto]
       if params[:ticket]
         # handle the callback from CAS
