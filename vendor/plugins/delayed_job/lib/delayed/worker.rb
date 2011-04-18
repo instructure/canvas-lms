@@ -35,7 +35,9 @@ module Delayed
   end
 
   class Worker < WorkerBase
-    cattr_accessor :min_priority, :max_priority, :max_attempts, :max_run_time, :sleep_delay, :queue, :cant_fork
+    Settings = [ :max_attempts, :max_run_time, :sleep_delay, ]
+    cattr_accessor *Settings
+    cattr_accessor :min_priority, :max_priority, :queue, :cant_fork
     self.sleep_delay = 5
     self.max_attempts = 25
     self.max_run_time = 4.hours

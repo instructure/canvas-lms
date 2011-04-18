@@ -6,6 +6,7 @@ production:
   - queue: canvas_queue
     workers: 4
   - periodic: config/periodic_jobs.rb
+  max_run_time: 28800
 
 default:
   workers:

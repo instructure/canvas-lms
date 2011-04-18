@@ -46,6 +46,9 @@ module Delayed
           "Invalid config file #{config_filename}"
       end
       logger.auto_flushing = true if logger.respond_to?(:auto_flushing)
+      Worker::Settings.each do |setting|
+        Worker.send("#{setting}=", @config[setting.to_s]) if @config.key?(setting.to_s)
+      end
     end
 
     def environment
