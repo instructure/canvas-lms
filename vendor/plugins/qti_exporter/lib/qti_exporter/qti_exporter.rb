@@ -11,22 +11,29 @@ class QtiExporter < Canvas::Migrator
     super(settings, 'qti')
     @questions = {}
     @quizzes = {}
+    @files = {}
     @converted = false
     @dest_dir_2_1 = nil
     @id_prepender = settings[:id_prepender]
   end
 
   def export
-    unzip_archive
-    if QtiExporter.is_qti_2(File.join(@unzipped_file_path, MANIFEST_FILE))
-      @dest_dir_2_1 = @unzipped_file_path
-      @converted = true
-    else
-      run_qti_converter
-    end
+    unzip_archive(false)
 
-    @course[:assessment_questions] = convert_questions
-    @course[:assessments] = convert_assessments(@course[:assessment_questions])
+    begin
+      if QtiExporter.is_qti_2(File.join(@unzipped_file_path, MANIFEST_FILE))
+        @dest_dir_2_1 = @unzipped_file_path
+        @converted = true
+      else
+        run_qti_converter
+      end
+
+      @course[:assessment_questions] = convert_questions
+      @course[:assessments] = convert_assessments(@course[:assessment_questions])
+      @course[:file_map] = convert_files
+    ensure
+      delete_archive
+    end
 
     if settings[:apply_respondus_settings_file]
       apply_respondus_settings
@@ -107,6 +114,28 @@ class QtiExporter < Canvas::Migrator
       @quizzes[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
     end
     @quizzes
+  end
+
+  def convert_files
+    begin
+      manifest_file = File.join(@dest_dir_2_1, MANIFEST_FILE)
+      Qti.convert_files(manifest_file).each do |attachment|
+        @files[attachment] = {
+          'migration_id' => "#{@quizzes[:assessments].first.try(:[], :migration_id)}_#{attachment}",
+          'path_name' => attachment,
+        }
+      end
+    rescue => e
+      message = "Error processing assessment QTI data: #{$!}: #{$!.backtrace.join("\n")}"
+      add_error "qti_assessments", message, @files, e
+      @files[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
+    end
+    unless @files.empty?
+      # move the original archive to all_files.zip and it can be processed
+      # during the import to grab attachments
+      FileUtils.move(@archive_file_path, File.join(@base_export_dir, Canvas::MigratorHelper::ALL_FILES_ZIP))
+    end
+    @files
   end
 
   def apply_respondus_settings

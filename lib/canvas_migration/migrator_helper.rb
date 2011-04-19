@@ -22,6 +22,7 @@ module Canvas::MigratorHelper
   FULL_COURSE_JSON_FILENAME = "course_export.json"
   ERROR_FILENAME = "errors.json"
   OVERVIEW_JSON = "overview.json"
+  ALL_FILES_ZIP = "all_files.zip"
   
   COURSE_NO_COPY_ATTS = [:name, :course_code, :start_at, :conclude_at, :grading_standard_id, :hidden_tabs, :tab_configuration, :syllabus_body, :storage_quota]
   

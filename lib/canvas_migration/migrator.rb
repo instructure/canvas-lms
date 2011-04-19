@@ -47,7 +47,7 @@ class Canvas::Migrator
     raise "Migrator.export should have been overwritten by a sub-class"
   end
 
-  def unzip_archive
+  def unzip_archive(do_delete_archive = true)
     begin
       command = Canvas::MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
       logger.debug "Running unzip command: #{command}"
@@ -64,7 +64,7 @@ class Canvas::Migrator
       message = "Error unzipping archive file: #{e.message}"
       add_error "qti", message, nil, e
     ensure
-      delete_archive
+      delete_archive if do_delete_archive
     end
 
     false

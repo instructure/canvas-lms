@@ -40,6 +40,19 @@ module Qti
     assessments
   end
 
+  def self.convert_files(manifest_path)
+    attachments = []
+    doc = Nokogiri::HTML(open(manifest_path))
+    resource_nodes = doc.css('resource')
+    doc.css('file').each do |file|
+      # skip resource nodes, which are things like xml metadata and other sorts
+      next if resource_nodes.any? { |node| node['href'] == file['href'] }
+      # anything left is a file that needs to become an attachment on the context
+      attachments << file['href']
+    end
+    attachments
+  end
+
   def self.get_conversion_command(out_dir, manifest_file)
     "\"#{@migration_executable}\" --ucvars --nogui --overwrite --cpout=#{out_dir.gsub(/ /, "\\ ")} #{manifest_file.gsub(/ /, "\\ ")} 2>&1"
   end

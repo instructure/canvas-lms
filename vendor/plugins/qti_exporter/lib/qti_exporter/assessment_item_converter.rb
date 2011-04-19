@@ -62,11 +62,11 @@ class AssessmentItemConverter
       # The colons are replaced with dashes in the conversion from QTI 1.2
       @question[:migration_id] = @doc.at_css('assessmentitem @identifier').text.gsub(/:/, '-')
       if @doc.at_css('itembody').children.first.name == 'div' #because the selector 'itembody + div' doesn't work...
-        @question[:question_text] = @doc.at_css('itembody div').text.strip.gsub(/ +/, " ")
+        @question[:question_text] = @doc.at_css('itembody div').inner_html
       elsif @doc.at_css('itembody p')
-        @question[:question_text] = @doc.at_css('itembody p').text.strip.gsub(/ +/, " ")
+        @question[:question_text] = @doc.at_css('itembody p').inner_html
       elsif @doc.at_css('itembody')
-        @question[:question_text] = @doc.at_css('itembody').text.strip.gsub(/ +/, " ")
+        @question[:question_text] = @doc.at_css('itembody').inner_html
       end
       parse_instructure_metadata
 
