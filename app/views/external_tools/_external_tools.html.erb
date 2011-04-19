@@ -1,4 +1,10 @@
 <div id="external_tools">
+  <p>External tools are tools outside of Canvas that support
+  Basic LTI integrations.  You will need to check with the author
+  of the tool for the correct configuration parameters to add.
+  Tools are configured at the account level, and can then be
+  added as content in course modules for courses in the account.
+  </p>
   <% @context.context_external_tools.active.each do |tool| %>
     <%= render :partial => 'external_tools/external_tool', :object => tool %>
   <% end %>
