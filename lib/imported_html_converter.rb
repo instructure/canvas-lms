@@ -22,7 +22,6 @@ class ImportedHtmlConverter
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
     course_path = "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
-    root_folder_name = Folder.root_folders(context).first.name
     doc.search("*").each do |node|
       attrs.each do |attr|
         if node[attr]
@@ -57,17 +56,30 @@ class ImportedHtmlConverter
             section = $1
             node[attr] = URI::escape("#{course_path}/#{section}")
           elsif node[attr] =~ %r{\$IMS_CC_FILEBASE\$/([^'"]*)}
-            rel_path = $1
-            # the rel_path should already be escaped
-            node[attr] = URI::escape("#{course_path}/file_contents/#{root_folder_name}/") + rel_path
+            node[attr] = replace_relative_file_url($1, context, course_path)
           elsif relative_url?(node[attr])
-            # the rel_path should already be escaped
-            node[attr] = URI::escape("#{course_path}/file_contents/#{root_folder_name}/") + node[attr]
+            node[attr] = replace_relative_file_url(node[attr], context, course_path)
           end
         end
       end
     end
     doc.at_css('body').inner_html rescue ""
+  end
+
+  def self.replace_relative_file_url(rel_path, context, course_path)
+    new_url = nil
+    if context.respond_to?(:attachment_path_id_lookup) &&
+        context.attachment_path_id_lookup &&
+        context.attachment_path_id_lookup[rel_path]
+      if file = context.attachments.find_by_migration_id(context.attachment_path_id_lookup[rel_path])
+        new_url = "/courses/#{context.id}/files/#{file.id}/preview"
+      end
+    end
+    unless new_url
+      # the rel_path should already be escaped
+      new_url = URI::escape("#{course_path}/file_contents/#{Folder.root_folders(context).first.name}/") + rel_path
+    end
+    new_url
   end
   
   def self.relative_url?(url)

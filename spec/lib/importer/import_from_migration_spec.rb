@@ -91,7 +91,9 @@ describe Course do
     page.body.scan(/<li>/).length.should eql(4)
     page.body.should match(/Orientation/)
     page.body.should match(/Orientation Quiz/)
-    re = Regexp.new("\\/courses\\/#{course.id}\\/file_contents\\/course%20files\\/Pictures\\/banner_kandinsky.jpg")
+    file = course.attachments.find_by_migration_id("1865116527002")
+    file.should_not be_nil
+    re = Regexp.new("\\/courses\\/#{course.id}\\/files\\/#{file.id}\\/preview")
     page.body.should match(re) #)
     
     # assignment tests
