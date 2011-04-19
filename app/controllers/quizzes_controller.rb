@@ -100,7 +100,11 @@ class QuizzesController < ApplicationController
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       
       @headers = !params[:headless]
-      
+
+      if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
+        return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_url', @quiz.to_param, :viewing => "1"))
+      end
+
       @question_count = @quiz.question_count
       if session[:quiz_id] == @quiz.id && !request.xhr?
         session[:quiz_id] = nil
@@ -151,20 +155,8 @@ class QuizzesController < ApplicationController
   def take_quiz
     return unless authorized_action(@quiz, @current_user, :submit)
 
-    if @quiz.require_lockdown_browser? && !@quiz.grants_right?(@current_user, session, :grade)
-      plugin = Canvas::LockdownBrowser.plugin.base
-      if plugin.require_authorization_redirect?(self)
-        return redirect_to(plugin.redirect_url(self, @context, @quiz))
-      elsif !plugin.authorized?(self)
-        return redirect_to(:action => 'lockdown_browser_required')
-      elsif @query_params = plugin.popup_window(self)
-        session['lockdown_browser_popup'] = true
-        return render(:action => 'take_quiz_in_popup')
-      end
-      @headers = false
-      @show_left_side = false
-      @padless = true
-      @lockdown_browser_params = plugin.quiz_exit_params(self)
+    if @quiz.require_lockdown_browser?
+      return unless check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.to_param))
     end
 
     can_retry = @submission && (@quiz.unlimited_attempts? || @submission.attempts_left > 0 || @quiz.grants_right?(@current_user, session, :update))
@@ -321,6 +313,10 @@ class QuizzesController < ApplicationController
           @version_number = "current" if @current_version
         end
         log_asset_access(@quiz, "quizzes", 'quizzes')
+        
+        if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
+          return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_history_url', @quiz.to_param, :viewing => "1", :version => params[:version]))
+        end
       end
     end
   end
@@ -451,5 +447,27 @@ class QuizzesController < ApplicationController
     @quiz = @context.quizzes.find(params[:id] || params[:quiz_id])
     @quiz_name = @quiz.title
     @quiz
+  end
+
+  # if this returns false, it's rendering or redirecting, so return from the
+  # action that called it
+  def check_lockdown_browser(security_level, redirect_return_url)
+    return true if @quiz.grants_right?(@current_user, session, :grade)
+    plugin = Canvas::LockdownBrowser.plugin.base
+    if plugin.require_authorization_redirect?(self)
+      redirect_to(plugin.redirect_url(self, redirect_return_url))
+      return false
+    elsif !plugin.authorized?(self)
+      redirect_to(:action => 'lockdown_browser_required', :quiz_id => @quiz.id)
+      return false
+    elsif @query_params = plugin.popup_window(self, security_level)
+      session['lockdown_browser_popup'] = true
+      render(:action => 'take_quiz_in_popup')
+      return false
+    end
+    @lockdown_browser_authorized_to_view = true
+    @headers = false
+    @show_left_side = false
+    @padless = true
   end
 end

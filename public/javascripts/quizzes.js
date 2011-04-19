@@ -882,6 +882,11 @@ var quiz = {};
       }
     });
   }).triggerHandler('change');
+  $("#quiz_require_lockdown_browser").change(function() {
+    $("#lockdown_browser_suboptions").showIf($(this).attr('checked'));
+    $("#quiz_require_lockdown_browser_for_results").attr('checked', true).change();
+  });
+  $("#lockdown_browser_suboptions").showIf($("#quiz_require_lockdown_browser").attr('checked'));
   $("#ip_filter").change(function() {
     $("#ip_filter_suboptions").showIf($(this).attr('checked'));
     if(!$(this).attr('checked')) {

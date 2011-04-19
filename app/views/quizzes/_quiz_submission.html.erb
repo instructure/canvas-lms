@@ -56,6 +56,13 @@
 <div class="quiz_duration" style="<%= hidden if @quiz.quiz_type == 'survey' %>">
   This attempt took <%= time_ago_in_words(Time.now + @submission.duration) %>.
 </div>
+<% if @quiz.require_lockdown_browser && @quiz.require_lockdown_browser_for_results && !@lockdown_browser_authorized_to_view && !can_do(@quiz, @current_user, :grade) %>
+<p>
+  <br /><br />
+  Respondus LockDown Browser is required to view your quiz results.
+  <%= link_to "Click here to view the results.", { :viewing => 1, :version => params[:version] }, :target => "_top" %>
+</p>
+<% else %>
 <% jammit_css :quizzes %>
 <% js_block do %>
 <script>
@@ -147,5 +154,6 @@ $(document).ready(function() {
 <div class="quiz_score" style="text-align: right; font-size: 1.2em; <%= hidden if @quiz.quiz_type == 'survey' %>">
   <%= @quiz.readable_type %> Score: <span class="score_value"><%= render :partial => "submission_score", :object => @submission, :locals => {:quiz => @quiz, :context => @context} %></span> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %>
 </div>
+<% end %>
 <% end %>
 <% end %>

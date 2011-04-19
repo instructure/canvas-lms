@@ -199,7 +199,7 @@
       <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
         <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" target="_top">Resume <%= @quiz.readable_type %></a>
       </div>
-    <% elsif can_do(@quiz, @current_user, :submit) %>
+    <% elsif can_do(@quiz, @current_user, :submit) && !@lockdown_browser_authorized_to_view %>
       <div style="text-align: center; margin-top: 20px; font-size: 1.3em;">
         <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>" target="_top">Take the <%= @quiz.readable_type %> <%= 'Again' if @submission && !@submission.settings_only? %></a>
       </div>

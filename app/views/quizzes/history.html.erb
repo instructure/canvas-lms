@@ -3,7 +3,7 @@
 
 <% unless params[:headless] %>
 <% content_for :right_side do %>
-  <% if @current_version %>
+  <% if @current_version && can_do(@quiz, @current_user, :grade) %>
     <div class="rs-margin-lr rs-margin-top">
       <p>Here's the latest <%= @quiz.readable_type.downcase %> results for <%= user_name %>.  You can modify the
       points for any question and add more comments, then click "Update Scores"

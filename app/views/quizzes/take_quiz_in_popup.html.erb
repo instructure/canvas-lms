@@ -1,9 +1,11 @@
 <h1>
-  Quiz Loading
+  Loading Quiz in Respondus LockDown Browser
 </h1>
 <script type="text/javascript">
   // open the quiz in a popup window with the plugin's given query param hash
   window.open(<%= raw url_for(params.merge(@query_params).merge(:escape => false)).to_json %>);
-  // redirect this window back to the quiz show page
-  window.location = <%= raw context_url(@context, "context_quiz_url", @quiz).to_json %>;
 </script>
+
+<p>
+  <a href="#" onclick="history.go(-1); return false;">Click here</a> to return to the quiz page.
+</p>

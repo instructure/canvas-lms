@@ -169,7 +169,15 @@
                 <td colspan="2">
                   <div style="padding-left: 20px;">
                     <%= check_box :quiz, :require_lockdown_browser %>
-                    <%= label :quiz, :require_lockdown_browser, "Require the lockdown browser" %>  
+                    <%= label :quiz, :require_lockdown_browser, "Require Respondus LockDown Browser" %>
+                  </div>
+                </td>
+              </tr>
+              <tr id="lockdown_browser_suboptions" style="display: none;">
+                <td colspan="2">
+                  <div style="padding-left: 40px;">
+                    <%= check_box :quiz, :require_lockdown_browser_for_results %>
+                    <%= label :quiz, :require_lockdown_browser_for_results, "Required to view quiz results" %>
                   </div>
                 </td>
               </tr>
