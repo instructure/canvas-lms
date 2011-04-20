@@ -79,8 +79,8 @@ module SIS
           end
         end
       end
-      
-      [ @course_csvs, @user_csvs, @enrollment_csvs ].flatten.each do |csv|
+
+      [ @course_csvs, @user_csvs, @enrollment_csvs, @section_csvs, @xlist_csvs, @term_csvs, @account_csvs ].flatten.each do |csv|
         @total_rows += (%x{wc -l '#{csv[:fullpath]}'}.split.first.to_i rescue 0)
       end
       

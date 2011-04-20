@@ -61,8 +61,11 @@ module SIS
         end
         
         if row['status'] =~ /\Aactive\z/i
-          next if section.course.id == course.id
-          
+          if section.course.id == course.id
+            @sis.counts[:xlists] += 1
+            next
+          end
+
           section.account ||= section.course.account
           section.save
           
@@ -74,7 +77,10 @@ module SIS
           end
   
         elsif row['status'] =~ /\Adeleted\z/i
-          next if course && section.course != course 
+          if course && section.course != course 
+            @sis.counts[:xlists] += 1
+            next
+          end
           
           section.account = nil
           section.save

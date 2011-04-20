@@ -59,6 +59,7 @@ $(document).ready(function(event) {
     output += "<li>Sections: " + batch.data.counts.sections + "</li>";
     output += "<li>Users: " + batch.data.counts.users + "</li>";
     output += "<li>Enrollments: " + batch.data.counts.enrollments + "</li>";
+    output += "<li>Crosslists: " + batch.data.counts.xlists + "</li>";
     output += "</ul></li></ul>";
     
     return output
