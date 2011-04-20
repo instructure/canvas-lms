@@ -76,6 +76,7 @@ class Canvas::Migrator
 
   def delete_archive
     delete_file(@archive_file_path)
+    @archive_file = nil
   end
   
   def delete_file(file)
@@ -124,6 +125,7 @@ class Canvas::Migrator
     end
     
     temp_file.close
+    @archive_file = temp_file # so that the tempfile doesn't get gc'd underneath us
     @settings[:export_archive_path] = temp_file.path
   end
 end

@@ -18,7 +18,7 @@
 
 class ImportedHtmlConverter
   include TextHelper
-  def self.convert(html, context)
+  def self.convert(html, context, remove_outer_nodes_if_one_child = false)
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
     course_path = "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
@@ -63,7 +63,13 @@ class ImportedHtmlConverter
         end
       end
     end
-    doc.at_css('body').inner_html rescue ""
+    node = doc.at_css('body')
+    if remove_outer_nodes_if_one_child
+      node = node.child while node.children.size == 1 && node.child.child
+    end
+    node.inner_html
+  rescue
+    ""
   end
 
   def self.replace_relative_file_url(rel_path, context, course_path)

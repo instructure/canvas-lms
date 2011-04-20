@@ -161,6 +161,29 @@ class AssessmentItemConverter
     text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
   end
 
+  def sanitize_html!(node)
+    # root may not be an html element, so we just sanitize its children so we
+    # don't blow away the whole thing
+    node.children.each do |child|
+      Sanitize.clean_node!(child, Sanitize::Config::RELAXED)
+    end
+
+    while true
+      node.children.each do |child|
+        break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+        child.remove
+      end
+
+      node.children.reverse.each do |child|
+        break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+        child.remove
+      end
+      break unless node.children.size == 1 && node.child.element?
+      node = node.child
+    end
+    node
+  end
+
   def self.create_instructure_question(opts)
     q = nil
     manifest_node = opts[:manifest_node]

@@ -34,7 +34,7 @@ class AssociateInteraction < AssessmentItemConverter
     @doc.css('choiceinteraction').each do |a|
       answer = {}
       @question[:answers] << answer
-      answer[:text] = a.at_css('prompt').text
+      extract_answer!(answer, a.at_css('prompt'))
       answer[:id] = unique_local_id
       answer[:migration_id] = a['responseidentifier']
       answer[:comments] = ""
@@ -74,7 +74,7 @@ class AssociateInteraction < AssessmentItemConverter
     @doc.css('div.RESPONSE_BLOCK p').each_with_index do |a, i|
       answer = {}
       @question[:answers] << answer
-      answer[:text] = clear_html a.text.strip
+      extract_answer!(answer, a)
       answer[:id] = unique_local_id 
       answer[:comments] = ""
       answer[:match_id] = @question[:matches][i][:match_id]
@@ -97,7 +97,7 @@ class AssociateInteraction < AssessmentItemConverter
     @doc.css('associateinteraction').each do |a|
       answer = {}
       @question[:answers] << answer
-      answer[:text] = a.at_css('prompt').text.strip
+      extract_answer!(answer, a.at_css('prompt'))
       answer[:id] = unique_local_id 
       answer[:comments] = ""
       
@@ -123,7 +123,7 @@ class AssociateInteraction < AssessmentItemConverter
     answer_map={}
     interaction_node.at_css('simplematchset').css('simpleassociablechoice').each do |node|
       answer = {}
-      answer[:text] = node.text.strip
+      extract_answer!(answer, node)
       answer[:id] = unique_local_id
       @question[:answers] << answer
       id = get_node_val(node, '@identifier')
@@ -146,6 +146,14 @@ class AssociateInteraction < AssessmentItemConverter
       if answer = answer_map[answer_id.strip] and m = match_map[match_id.strip]
         answer[:match_id] = m[:match_id]
       end
+    end
+  end
+
+  def extract_answer!(answer, node)
+    answer[:text] = clear_html node.text.strip
+    node = sanitize_html!(node)
+    if (sanitized = node.inner_html.strip) != answer[:text]
+      answer[:html] = sanitized
     end
   end
 

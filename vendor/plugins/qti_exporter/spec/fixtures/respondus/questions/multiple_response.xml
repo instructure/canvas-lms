@@ -21,7 +21,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
                             Select all answers that rhyme with &quot;box&quot;.</p>
 <choiceInteraction responseIdentifier="QUE_1041_RL" shuffle="false" maxChoices="1">
 <simpleChoice identifier="QUE_1042_A1" fixed="true">
-<p>fox</p></simpleChoice>
+<p>fox <sup>hint ... this is one of them</sup></p></simpleChoice>
 <simpleChoice identifier="QUE_1043_A2" fixed="true">
 <p>bacon</p></simpleChoice>
 <simpleChoice identifier="QUE_1044_A3" fixed="true">

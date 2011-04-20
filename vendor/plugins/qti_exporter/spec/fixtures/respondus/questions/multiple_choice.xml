@@ -23,7 +23,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <simpleChoice identifier="QUE_1007_A2" fixed="true">
 <p>B</p></simpleChoice>
 <simpleChoice identifier="QUE_1008_A3" fixed="true">
-<p>C</p></simpleChoice>
+<p>C ... or <i>is</i> it?</p></simpleChoice>
 <simpleChoice identifier="QUE_1009_A4" fixed="true">
 <p>E </p></simpleChoice>
 </choiceInteraction>

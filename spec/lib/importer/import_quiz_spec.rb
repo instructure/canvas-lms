@@ -100,7 +100,9 @@ describe "Quiz Import" do
     context = course_model
     import_example_questions context
     question = AssessmentQuestion.find_by_migration_id('4393906433391')
-    question.data[:question_text].should == "<p>Why does that bee/rocket ship company suck? <img src=\"/courses/#{context.id}/file_contents/course%20files/rocket.png\"></p>"
+    question.data[:question_text].should == "Why does that bee/rocket ship company suck? <img src=\"/courses/#{context.id}/file_contents/course%20files/rocket.png\">"
+    question = AssessmentQuestion.find_by_migration_id('URN-X-WEBCT-VISTA_V2-790EA1350E1A681DE0440003BA07D9B4')
+    question.data[:answers].last[:html].should == "Chance can't; this is a big problem for evolution. BTW, rockets are cool: <img src=\"/courses/#{context.id}/file_contents/course%20files/rocket.png\">"
   end
     
 end

@@ -17,7 +17,8 @@
         },
         {
             "weight":0,
-            "text":"Chance can't; this is a big problem for evolution.",
+            "text":"Chance can't; this is a big problem for evolution. BTW, rockets are cool: ",
+            "html":"Chance can't; this is a big problem for evolution. BTW, rockets are cool: <img src=\"rocket.png\">",
             "id":390,
             "migration_id":"MC2"
         }

@@ -56,6 +56,10 @@ class ChoiceInteraction < AssessmentItemConverter
         answer[:id] = unique_local_id
         answer[:migration_id] = choice['identifier']
         answer[:text] = clear_html choice.text.strip.gsub(/\s+/, " ")
+        node = sanitize_html!(choice)
+        if (sanitized = node.inner_html.strip) != answer[:text]
+          answer[:html] = sanitized
+        end
         if answer[:text] == ""
           if answer[:migration_id] =~ /true|false/i
             answer[:text] = clear_html(answer[:migration_id])

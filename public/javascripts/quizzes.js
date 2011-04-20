@@ -51,6 +51,9 @@ var quiz = {};
       answer.answer_weight = parseFloat(answer.answer_weight);
       if(isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
       $answer.fillFormData(answer, {call_change: false});
+      $answer.find('.select_answer input').showIf(!answer.answer_html);
+      $answer.find('.matching_answer .answer_match_left').showIf(!answer.answer_match_left_html);
+      $answer.find('.matching_answer .answer_match_left_html').showIf(answer.answer_match_left_html);
       if(answer.answer_comment) {
         $answer.find(".answer_comments").removeClass('empty')
       }
@@ -78,11 +81,15 @@ var quiz = {};
       if(question_type == "essay_question") {
         templateData.comments_header = "Comments for this question:";
       } else if(question_type == "matching_question") {
+        templateData.answer_match_left_html = answer.answer_match_left_html;
         templateData.comments_header = "Comments if the user gets this match wrong:";
         $answer.find(".comment_focus").attr('title', 'Click to enter comments for the student if they miss this match');
       } else if(question_type == "missing_word_question") {
         templateData.short_answer_header = "Answer text:";
+      } else if(question_type == "multiple_choice_question") {
+        templateData.answer_html = answer.answer_html;
       } else if(question_type == "multiple_answers_question") {
+        templateData.answer_html = answer.answer_html;
         templateData.short_answer_header = "Answer text:";
       } else if(question_type == "fill_in_multiple_blanks_question") {
         templateData.blank_id = answer.blank_id;
@@ -96,7 +103,7 @@ var quiz = {};
       if(answer.blank_index >= 0) {
         $answer.addClass('answer_idx_' + answer.blank_index);
       }
-      $answer.fillTemplateData({data: templateData });
+      $answer.fillTemplateData({data: templateData, htmlValues: ['answer_html', 'answer_match_left_html'] });
       if(answer.answer_weight == 100) {
         $answer.addClass('correct_answer');
       } else if(answer.answer_weight > 0) {
@@ -404,6 +411,7 @@ var quiz = {};
       result.answer_type = "select_answer";
       result.answer_selection_type = quiz.answerSelectionType(question_type);
       result.textValues = ['answer_weight', 'answer_text', 'answer_comment', 'blank_id', 'id', 'match_id'];
+      result.htmlValues = ['answer_html', 'answer_match_left_html'];
       result.question_type = question_type;
       $formQuestion.find(".explanation").hide().filter("." + question_type + "_explanation").show();
       $formQuestion.attr('class', 'question').addClass('selectable');
@@ -636,7 +644,9 @@ var quiz = {};
     data.answer_weight = data.weight || data.answer_weight;
     data.answer_comment = data.comments || data.answer_comment;
     data.answer_text = data.text || data.answer_text;
+    data.answer_html = data.html || data.answer_html;
     data.answer_match_left = data.left || data.answer_match_left;
+    data.answer_match_left_html = data.left_html || data.answer_match_left_html;
     data.answer_match_right = data.right || data.answer_match_right;
     data.answer_exact = data.exact || data.answer_exact;
     data.answer_error_margin = data.answer_error_margin || data.margin;
@@ -651,11 +661,14 @@ var quiz = {};
     }
     $answer.addClass('answer_for_' + data.blank_id);
     $answer.find(".answer_type").hide().filter("." + answer_class).show();
+    $answer.find('div.answer_text').showIf(!data.answer_html);
+    $answer.find('div.answer_match_left').showIf(!data.answer_match_left_html);
+    $answer.find('div.answer_match_left_html').showIf(data.answer_match_left_html);
     delete answer['answer_type'];
     answer.answer_weight = parseFloat(answer.answer_weight);
     if(isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
     $answer.fillFormData({answer_text: answer.answer_text});
-    $answer.fillTemplateData({data: answer});
+    $answer.fillTemplateData({data: answer, htmlValues: ['answer_html', 'answer_match_left_html']});
     if(!answer.answer_comment || answer.answer_comment == "" || answer.answer_comment == "Answer comments") {
       $answer.find(".answer_comment_holder").hide();
     }
@@ -717,7 +730,8 @@ var quiz = {};
         $question.find(".answer").each(function() {
           var $answer = $(this);
           var answerData = $answer.getTemplateData({
-            textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment']
+            textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment'],
+            htmlValues: ['answer_html', 'answer_match_left_html']
           });
           var answer = $.extend({}, quiz.defaultAnswerData, answerData);
           if(only_add_for_blank_ids && answer.blank_id && !blank_ids_hash[answer.blank_id]) {
@@ -809,9 +823,11 @@ var quiz = {};
           var answer = question.answers[jdx];
           var jd = id + "[answers][answer_" + jdx + "]";
           data[jd + '[answer_text]'] = answer.answer_text;
+          data[jd + '[answer_html]'] = answer.answer_html;
           data[jd + '[answer_comments]'] = answer.answer_comment;
           data[jd + '[answer_weight]'] = answer.answer_weight;
           data[jd + '[answer_match_left]'] = answer.answer_match_left;
+          data[jd + '[answer_match_left_html]'] = answer.answer_match_left_html;
           data[jd + '[answer_match_right]'] = answer.answer_match_right;
           data[jd + '[numerical_answer_type]'] = answer.numerical_answer_type;
           data[jd + '[answer_exact]'] = answer.answer_exact;

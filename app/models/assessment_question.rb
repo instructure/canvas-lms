@@ -193,6 +193,7 @@ class AssessmentQuestion < ActiveRecord::Base
       answers.each do |key, answer|
         found_correct = true if answer[:answer_weight].to_i == 100
         a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
+        a[:html] = answer[:answer_html] if answer[:answer_html].present?
         question[:answers] << a
       end
       question[:answers][0][:weight] = 100 unless found_correct
@@ -228,6 +229,7 @@ class AssessmentQuestion < ActiveRecord::Base
     elsif question[:question_type] == "matching_question"
       answers.each do |key, answer|
         a = {:text => check_length(answer[:answer_match_left], 'answer match', min_size), :left => check_length(answer[:answer_match_left], 'answer match', min_size), :right => check_length(answer[:answer_match_right], 'answer match', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size)}
+        a[:left_html] = a[:html] = answer[:answer_match_left_html] if answer[:answer_match_left_html].present?
         a[:match_id] = unique_local_id(answer[:match_id].to_i)
         a[:id] = unique_local_id(answer[:id].to_i)
         question[:answers] << a
@@ -324,6 +326,7 @@ class AssessmentQuestion < ActiveRecord::Base
       answers.each do |key, answer|
         found_correct = true if answer[:answer_weight].to_i == 100
         a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
+        a[:html] = answer[:answer_html] if answer[:answer_html].present?
         question[:answers] << a
       end
       question[:answers][0][:weight] = 100 unless found_correct
@@ -451,7 +454,8 @@ class AssessmentQuestion < ActiveRecord::Base
       end
     end
     context.imported_migration_items << bank if context.imported_migration_items && !context.imported_migration_items.include?(bank)
-    hash[:question_text] = ImportedHtmlConverter.convert(hash[:question_text], context) if hash[:question_text]
+    hash[:question_text] = ImportedHtmlConverter.convert(hash[:question_text], context, true) if hash[:question_text]
+    hash[:answers].each{ |answer| answer[:html] = ImportedHtmlConverter.convert(answer[:html], context, true) unless answer[:html].blank? } if hash[:answers]
     question_data = ActiveRecord::Base.connection.quote hash.to_yaml
     question_name = ActiveRecord::Base.connection.quote hash[:question_name]
     query = "INSERT INTO assessment_questions (name, question_data, context_id, context_type, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
