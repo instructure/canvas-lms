@@ -123,8 +123,7 @@ $(document).ready(function() {
           var data = $("#select_context_content_dialog .module_item_option:visible:first").getFormData();
           var callback = function(data) {
             $("#select_context_content_dialog").loadingImage('remove');
-            var obj = null;
-            for(var idx in data) { obj = data[idx]; }
+            var obj = data[item_data['item[type]']] // e.g. data['wiki_page'] for wiki pages
             item_data['item[id]'] = obj.id;
             item_data['item[title]'] = $("#select_context_content_dialog .module_item_option:visible:first .item_title").val();
             item_data['item[title]'] = item_data['item[title]'] || obj.display_name
