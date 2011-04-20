@@ -149,6 +149,10 @@ class QuizzesController < ApplicationController
   protected :managed_quiz_data
 
   def lockdown_browser_required
+    plugin = Canvas::LockdownBrowser.plugin
+    if plugin
+      @lockdown_browser_download_url = plugin.settings[:download_url]
+    end
     render
   end
 
