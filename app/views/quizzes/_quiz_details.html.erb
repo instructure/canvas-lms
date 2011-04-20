@@ -44,6 +44,9 @@
           <% else %>
             Always available
           <% end %>
+          <% if @quiz.require_lockdown_browser %>
+            <br />Requires Respondus LockDown Browser
+          <% end %>
         </td>
       </tr>
     </table>
