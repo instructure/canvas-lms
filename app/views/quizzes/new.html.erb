@@ -243,6 +243,7 @@
     <% end %>
     <% if @assignment %>
     <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link rubric" style="<%= hidden unless @assignment %>">Show Assignment Rubric</a>
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display:hidden">&nbsp;</a>
     <% end %>
     <a href="#" class="add_question_link add">Add a New Question</a><br/>
   </div>
