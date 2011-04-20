@@ -47,6 +47,7 @@
         <% end %>
         <% if can_do(@assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
           <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide" style="<%= hidden unless @assignment %>"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
+          <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display:hidden">&nbsp;</a>
         <% end %>
         <% if can_do(@quiz, @current_user, :grade) && @quiz.available? %>
           <% submitted_student_ids = @submitted_students.map{|s| s.id} %>

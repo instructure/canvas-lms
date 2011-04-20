@@ -312,10 +312,10 @@
           }
         }, function(data, request, status, error) {
           // error function
+          data = data || {};
           var $formObj = $form,
               needValidForm = true;
           if($.isFunction(options.error)) {
-            data = data || {};
             var $obj = options.error.call($form, data.errors || data, submitParam);
             if($obj) {
               $formObj = $obj;
