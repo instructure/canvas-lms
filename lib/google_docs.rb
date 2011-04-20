@@ -25,7 +25,7 @@ module GoogleDocs
     if retrieve_current_user
       service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', @current_user].cache_key) do
         service = @current_user.user_services.find_by_service("google_docs")
-        service ? [service.token, service.secret] : [nil, nil]
+        service && [service.token, service.secret]
       end
       raise "User does not have valid Google Docs token" unless service_token && service_secret
       access_token = OAuth::AccessToken.new(consumer, service_token, service_secret)
