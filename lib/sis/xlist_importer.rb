@@ -40,24 +40,29 @@ module SIS
         update_progress
         logger.debug("Processing CrossListing #{row.inspect}")
         
-        # reduce database hits if possible (csv sorted by xlist_course_id will be faster)
-        unless course && course.sis_source_id == row['xlist_course_id']
-          course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['xlist_course_id'])
-          if !course && row['status'] =~ /\Aactive\z/i
-            course = Course.new
-            course.root_account_id = @root_account.id
-            course.account_id = @root_account.id
-            course.sis_source_id = course.name = course.sis_name = course.short_name = course.sis_course_code = row['xlist_course_id']
-            course.sis_batch_id = @batch.id if @batch
-            course.workflow_state = 'claimed'
-            course.save_without_broadcasting!
-          end
-        end
-        
         section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
         unless section
           add_warning(csv, "A cross-listing referenced a non-existent section #{row['section_id']}")
           next
+        end
+        
+        # reduce database hits if possible (csv sorted by xlist_course_id will be faster)
+        unless course && course.sis_source_id == row['xlist_course_id']
+          course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['xlist_course_id'])
+          if !course && row['status'] =~ /\Aactive\z/i
+            # no course with this crosslist id found, make a new course,
+            # using the section's current course as a template
+            course = Course.new
+            course.root_account_id = @root_account.id
+            course.account_id = section.course.account_id
+            course.name = course.sis_name = section.course.name
+            course.short_name = course.sis_course_code = section.course.short_name
+            course.sis_source_id = row['xlist_course_id']
+            course.enrollment_term_id = section.course.enrollment_term_id
+            course.sis_batch_id = @batch.id if @batch
+            course.workflow_state = section.course.workflow_state
+            course.save_without_broadcasting!
+          end
         end
         
         if row['status'] =~ /\Aactive\z/i

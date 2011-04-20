@@ -622,7 +622,14 @@ describe SIS::SisCsv do
       s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
 
-      xlist_course.name.should == "X001"
+      xlist_course.name.should == "Test Course 101"
+      xlist_course.sis_name.should == "Test Course 101"
+      xlist_course.short_name.should == "TC 101"
+      xlist_course.sis_course_code.should == "TC 101"
+      xlist_course.sis_source_id.should == "X001"
+      xlist_course.root_account_id.should == @account.id
+      xlist_course.account_id.should == @account.id
+      xlist_course.workflow_state.should == "claimed"
     end
       
     it 'should work with xlists with an xlist course defined' do
