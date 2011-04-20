@@ -71,11 +71,8 @@ module SIS
             next
           end
 
-          section.account ||= section.course.account
-          section.save
-          
           begin
-            section.move_to_course course
+            section.crosslist_to_course course
           rescue => e
             add_warning(csv, "An active cross-listing failed: #{e}")
             next
@@ -87,13 +84,8 @@ module SIS
             next
           end
           
-          section.account = nil
-          section.save
-
           begin
-            section.move_to_course section.last_course
-            section.last_course = nil
-            section.save
+            section.uncrosslist
           rescue => e
             add_warning(csv, "A deleted cross-listing failed: #{e}")
             next

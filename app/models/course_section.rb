@@ -23,7 +23,7 @@ class CourseSection < ActiveRecord::Base
   attr_protected :sis_source_id, :sis_batch_id, :course_id, :abstract_course_id,
       :root_account_id, :enrollment_term_id, :sis_cross_listed_section_id, :sis_cross_listed_section_sis_batch_id
   belongs_to :course
-  belongs_to :last_course, :class_name => 'Course'
+  belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :sis_cross_listed_section
   belongs_to :abstract_course
@@ -95,16 +95,40 @@ class CourseSection < ActiveRecord::Base
   
   def move_to_course(course)
     return self if self.course == course
-    self.last_course = self.course unless self.last_course == self.course
     self.course = course
     root_account_change = (self.root_account != course.root_account)
     self.root_account = course.root_account if root_account_change
     self.save!
+    user_ids = self.enrollments.map(&:user_id).uniq
     if root_account_change
-      self.enrollments.update_all :root_account_id => self.root_account.id
-      User.send_later_if_production(:update_account_associations, self.enrollments.map{|e|e.user.id})
+      self.enrollments.update_all :course_id => course.id, :root_account_id => self.root_account.id
+      User.send_later_if_production(:update_account_associations, user_ids)
+    else
+      self.enrollments.update_all :course_id => course.id
     end
     self
+  end
+  
+  def crosslist_to_course(course)
+    return self if self.course == course
+    unless self.nonxlist_course
+      self.nonxlist_course = self.course 
+      self.account = self.course.account
+      self.save!
+    end
+    self.move_to_course(course)
+  end
+  
+  def uncrosslist
+    return unless self.nonxlist_course
+    self.move_to_course(self.nonxlist_course)
+    self.nonxlist_course = nil
+    self.account = nil
+    self.save!
+  end
+  
+  def crosslisted?
+    return !!self.nonxlist_course
   end
   
   def destroy_course_if_no_more_sections

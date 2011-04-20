@@ -583,7 +583,7 @@ describe SIS::SisCsv do
       course = @account.courses.find_by_sis_source_id("C001")
       s1 = course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
-      s1.last_course.should be_nil
+      s1.nonxlist_course.should be_nil
       s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       @account.courses.find_by_sis_source_id("X001").should be_nil
@@ -600,7 +600,7 @@ describe SIS::SisCsv do
       course = @account.courses.find_by_sis_source_id("C001")
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
-      s1.last_course.should eql(course)
+      s1.nonxlist_course.should eql(course)
       s1.account.should eql(course.account)
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
@@ -618,7 +618,7 @@ describe SIS::SisCsv do
       xlist_course.course_sections.find_by_sis_source_id("S001").should be_nil
       s1 = course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
-      s1.last_course.should be_nil
+      s1.nonxlist_course.should be_nil
       s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
 
@@ -647,7 +647,7 @@ describe SIS::SisCsv do
       course = @account.courses.find_by_sis_source_id("C001")
       s1 = course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
-      s1.last_course.should be_nil
+      s1.nonxlist_course.should be_nil
       s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       @account.courses.find_by_sis_source_id("X001").should_not be_nil
@@ -664,7 +664,7 @@ describe SIS::SisCsv do
       course = @account.courses.find_by_sis_source_id("C001")
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
-      s1.last_course.should eql(course)
+      s1.nonxlist_course.should eql(course)
       s1.account.should eql(course.account)
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
@@ -682,7 +682,7 @@ describe SIS::SisCsv do
       xlist_course.course_sections.find_by_sis_source_id("S001").should be_nil
       s1 = course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
-      s1.last_course.should be_nil
+      s1.nonxlist_course.should be_nil
       s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
 
@@ -744,7 +744,7 @@ describe SIS::SisCsv do
         course = @account.courses.find_by_sis_source_id("C001")
         s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
         s1.should_not be_nil
-        s1.last_course.should eql(course)
+        s1.nonxlist_course.should eql(course)
         s1.account.should eql(course.account)
       end
     end
@@ -769,7 +769,7 @@ describe SIS::SisCsv do
       course = @account.courses.find_by_sis_source_id("C001")
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
-      s1.last_course.should eql(course)
+      s1.nonxlist_course.should eql(course)
       s1.account.should eql(course.account)
 
       3.times do 
@@ -783,9 +783,146 @@ describe SIS::SisCsv do
         course = @account.courses.find_by_sis_source_id("C001")
         s1 = course.course_sections.find_by_sis_source_id("S001")
         s1.should_not be_nil
-        s1.last_course.should be_nil
+        s1.nonxlist_course.should be_nil
         s1.account.should be_nil
       end
+    end
+
+    it 'should be able to move around a section and then uncrosslist back to the original' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      3.times do |i|
+        importer = process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X00#{i},S001,active"
+        )
+        importer.warnings.should == []
+        importer.errors.should == []
+        
+        xlist_course = @account.courses.find_by_sis_source_id("X00#{i}")
+        course = @account.courses.find_by_sis_source_id("C001")
+        s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+        s1.should_not be_nil
+        s1.nonxlist_course.should eql(course)
+        s1.course.should eql(xlist_course)
+        s1.account.should eql(course.account)
+        s1.crosslisted?.should be_true
+      end
+      importer = process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X101,S001,deleted"
+      )
+      importer.warnings.should == []
+      importer.errors.should == []
+      
+      course = @account.courses.find_by_sis_source_id("C001")
+      s1 = course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.nonxlist_course.should be_nil
+      s1.course.should eql(course)
+      s1.account.should be_nil
+      s1.crosslisted?.should be_false
+    end
+    
+    it 'should be able to handle additional section updates and not screw up the crosslisting' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,active"
+      )
+      xlist_course = @account.courses.find_by_sis_source_id("X001")
+      course = @account.courses.find_by_sis_source_id("C001")
+      s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.nonxlist_course.should eql(course)
+      s1.course.should eql(xlist_course)
+      s1.account.should eql(course.account)
+      s1.crosslisted?.should be_true
+      s1.name.should == "Sec1"
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      xlist_course = @account.courses.find_by_sis_source_id("X001")
+      course = @account.courses.find_by_sis_source_id("C001")
+      s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.nonxlist_course.should eql(course)
+      s1.course.should eql(xlist_course)
+      s1.account.should eql(course.account)
+      s1.crosslisted?.should be_true
+      s1.name.should == "Sec2"
+    end
+    
+    it 'should be able to move a non-crosslisted section between courses' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active",
+        "C002,TC 102,Test Course 102,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      course1 = @account.courses.find_by_sis_source_id("C001")
+      course2 = @account.courses.find_by_sis_source_id("C002")
+      s1 = course1.course_sections.find_by_sis_source_id("S001")
+      s1.course.should eql(course1)
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      course1.reload
+      course2.reload
+      s1.reload
+      s1.course.should eql(course2)
+    end
+    
+    it 'should uncrosslist a section if it is getting moved from the original course' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active",
+        "C002,TC 102,Test Course 102,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,active"
+      )
+      xlist_course = @account.courses.find_by_sis_source_id("X001")
+      course1 = @account.courses.find_by_sis_source_id("C001")
+      course2 = @account.courses.find_by_sis_source_id("C002")
+      s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
+      s1.should_not be_nil
+      s1.nonxlist_course.should eql(course1)
+      s1.course.should eql(xlist_course)
+      s1.account.should eql(course1.account)
+      s1.crosslisted?.should be_true
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      )
+      s1.reload
+      s1.nonxlist_course.should be_nil
+      s1.course.should eql(course2)
+      s1.account.should be_nil
+      s1.crosslisted?.should be_false
     end
 
   end

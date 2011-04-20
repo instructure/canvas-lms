@@ -130,7 +130,7 @@ class ContentImportsController < ApplicationController
         end
       else
         if request.format != :json
-          @possible_courses = (@current_user.available_courses + @context.course_sections.active.map(&:last_course)).compact.select{|c| c.grants_right?(@current_user, session, :manage) }
+          @possible_courses = (@current_user.available_courses + @context.course_sections.active.map(&:nonxlist_course)).compact.select{|c| c.grants_right?(@current_user, session, :manage) }
           @possible_courses += @domain_root_account.all_courses if @domain_root_account.grants_right?(@current_user, session, :manage)
           @possible_courses -= [@context]
           @possible_courses = @possible_courses.compact.uniq

@@ -55,16 +55,33 @@ module SIS
         end
         
         name = row['name']
-        section = course.course_sections.find_by_sis_source_id(row['section_id'])
+        section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
+        section ||= course.course_sections.find_by_sis_source_id(row['section_id'])
         section ||= course.course_sections.find_by_name(name)
         section ||= course.course_sections.new
         section.root_account_id = @root_account.id
         
-        section.account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
+        section.account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
         
         # only update the name on new records, and ones that haven't been changed since the last sis import
         if section.new_record? || (section.sis_name && section.sis_name == section.name)
           section.name = section.sis_name = row['name']
+        end
+        
+        # update the course id if necessary
+        if section.course != course
+          if section.nonxlist_course
+            # this section is crosslisted
+            if section.nonxlist_course != course
+              # but the course id we were given didn't match the crosslist info
+              # we have, so, uncrosslist and move
+              section.uncrosslist
+              section.move_to_course course
+            end
+          else
+            # this section isn't crosslisted and lives on the wrong course. move
+            section.move_to_course course
+          end
         end
         
         section.sis_source_id = row['section_id']
