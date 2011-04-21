@@ -1255,7 +1255,7 @@
   $.fn.formSuggestion = function() {
     return this.each(function() {
       var $this = $(this);
-      $(this).focus(function(event) {
+      $this.focus(function(event) {
         var $this = $(this),
             title = $this.attr('title');
         $this.addClass('suggestionFocus');
@@ -1275,7 +1275,11 @@
         if($this.val() == title) {
           $this.addClass("form_text_hint");
         }
-      }).change(function(event) {
+      })
+      // Workaround a strage bug where the input would be selected then immediately unselected 
+      // every other time you clicked on the input with its defaultValue being shown
+      .mouseup(false)
+      .change(function(event) {
         var $this = $(this),
             title;
         if ( !$this.hasClass('suggestionFocus') && ( title = $(this).attr('title') ) ) {
