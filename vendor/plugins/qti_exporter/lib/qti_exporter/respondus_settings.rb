@@ -16,7 +16,7 @@ class RespondusSettings
     apply_if_set(assessment, :unlock_at, 'availableFrom') { |v| readtime(v) }
     apply_if_set(assessment, :lock_at, 'availableTo') { |v| readtime(v) }
     apply_if_set(assessment, :access_code, 'password')
-    apply_if_set(assessment, :ip_filter, 'ipRestriction')
+    apply_if_set(assessment, :ip_filter, 'ipRestriction') { |v| v == 'unlimited' ? nil : v }
     apply_if_set(assessment, :shuffle_answers, 'shuffleAnswers') { |v| v == 'true' }
     apply_if_set(assessment, :due_at, 'dueDate') { |v| readtime(v) }
 
