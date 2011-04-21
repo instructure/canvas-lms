@@ -452,6 +452,18 @@ class UsersController < ApplicationController
     
     if url
       if params[:redirect] == '1'
+        if %w(mp3 mp4).include?(params[:type])
+          # hack alert -- iTunes (and maybe others who follow the same podcast
+          # spec) requires that the download URL for podcast items end in .mp3
+          # or another supported media type. Normally, the Kaltura download URL
+          # doesn't end in .mp3. But Kaltura's first download URL redirects to
+          # the same download url with /relocate/filename.ext appended, so we're
+          # just going to explicitly append that to skip the first redirect, so
+          # that iTunes will download the podcast items. This doesn't appear to
+          # be documented anywhere though, so we're talking with Kaltura about
+          # a more official solution.
+          url = "#{url}/relocate/download.#{params[:type]}"
+        end
         redirect_to url
       else
         render :json => { 'url' => url }
