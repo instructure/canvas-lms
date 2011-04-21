@@ -55,7 +55,7 @@ jQuery(function($){
       data.due_date = data.due_date_string;
       data.due_time = data.due_time_string;
       var parsedDate = Date.parse($.trim(data.due_date + " " + data.due_time));
-      data.due_at = $.parseFromISO(parsedDate && parsedDate.toISOString()).datetime_formatted;
+      data.due_at = parsedDate && ($.dateString(parsedDate) + " at " + $.timeString(parsedDate));
       $form.find("select[name='points_type']").change();
       $form.fillFormData(data, {object_name: 'assignment'});
       $assignment.find(".description, .edit_full_assignment_link").hide();

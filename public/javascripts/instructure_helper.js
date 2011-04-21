@@ -1630,6 +1630,9 @@
   $.dateString = function(date) {
     return (date && (date.toString($.thisYear(date) ? 'MMM d' : 'MMM d, yyyy'))) || "";
   };
+  $.timeString = function(date) {
+    return (date && date.toString('h:mmtt').toLowerCase()) || "";
+  };
   $.fn.parseFromISO = $.parseFromISO;
 
   $.timeDiff = function(seconds, format) {
