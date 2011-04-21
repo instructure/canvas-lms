@@ -1177,7 +1177,9 @@ namespace :db do
   end # Task: load_initial_data
   
   desc "Useful initial setup task"
-  task :initial_setup => [:generate_security_key, :migrate, :load_initial_data] do
+  task :initial_setup => [:generate_security_key, :migrate] do
+    load 'app/models/pseudonym.rb'
+    Rake::Task['db:load_initial_data'].invoke
   end
   
 end # Namespace: db
