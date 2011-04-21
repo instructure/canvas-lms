@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 1
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Unknown text type: ignored mattext with texttype="text" treated as text/plain
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="id79fb07bfd06d28f0c92a599116244f1"
+ title="essay"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="6" />
+<instructureField name="question_type" value="essay_question" />
+</instructureMetadata>
+<responseDeclaration identifier="response1" cardinality="single" baseType="string"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>Why do we have so many types now&#8253; &lt;-- unicode character, you're screwed!</p>
+<extendedTextInteraction responseIdentifier="response1"/>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">general_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><baseValue baseType="boolean">true</baseValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="general_fb">
+<p>You're wrong.</p></modalFeedback>
+</assessmentItem>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 3
+Warning: numeric fibtype does not match enclosing <response_str>, assuming string
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "correct"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="i142fdc979baef6a8b5bc4168cb614423"
+ title="Formula question"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="3" />
+<instructureField name="question_type" value="calculated_question" />
+</instructureMetadata>
+<responseDeclaration identifier="response1" cardinality="single" baseType="string"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>1+[x]</p>
+<extendedTextInteraction responseIdentifier="response1"/>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+</responseIf>
+<responseElseIf><not><baseValue baseType="boolean">true</baseValue></not>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<itemproc_extension>
+<calculated>
+<formulas decimal_places="2"><formula>1 + x</formula>
+</formulas>
+<answer_tolerance type="None">0.01</answer_tolerance>
+<vars>
+<var name="x" scale="2">
+<min>1</min>
+<max>10</max>
+</var>
+</vars>
+<var_sets><var_set ident="6991">
+<var name="x">9.84</var>
+<answer>10.84</answer>
+</var_set><var_set ident="145">
+<var name="x">8.21</var>
+<answer>9.21</answer>
+</var_set><var_set ident="5594">
+<var name="x">8.57</var>
+<answer>9.57</answer>
+</var_set><var_set ident="576">
+<var name="x">9.72</var>
+<answer>10.72</answer>
+</var_set><var_set ident="6250">
+<var name="x">9.2</var>
+<answer>10.2</answer>
+</var_set><var_set ident="703">
+<var name="x">6.4</var>
+<answer>7.4</answer>
+</var_set><var_set ident="5540">
+<var name="x">9.18</var>
+<answer>10.18</answer>
+</var_set><var_set ident="5884">
+<var name="x">1.76</var>
+<answer>2.76</answer>
+</var_set><var_set ident="6843">
+<var name="x">9.52</var>
+<answer>10.52</answer>
+</var_set><var_set ident="1137">
+<var name="x">1.44</var>
+<answer>2.44</answer>
+</var_set>
+</var_sets>
+</calculated>
+</itemproc_extension>
+</assessmentItem>

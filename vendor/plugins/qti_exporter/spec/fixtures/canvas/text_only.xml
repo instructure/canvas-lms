@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 0
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="if47b767d37e06559ff801f2d253307ba"
+ title="Intermission"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="0" />
+<instructureField name="question_type" value="text_only_question" />
+</instructureMetadata>
+<itemBody>
+<p>This is just a text area for stuff.</p>
+</itemBody>
+</assessmentItem>

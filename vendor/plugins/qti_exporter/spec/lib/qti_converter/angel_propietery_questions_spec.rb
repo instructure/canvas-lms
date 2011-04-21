@@ -180,7 +180,7 @@ module AngelPropExpected
 
   MATCHING =
       {
-          :answers=>[{:text=>"a"}, {:text=>"b"}, {:text=>"c"}],
+          :answers=>[{:right=>"1", :text=>"a"}, {:right=>"2", :text=>"b"}, {:right=>"3", :text=>"c"}],
           :correct_comments=>"",
           :question_name=>"Matching question",
           :incorrect_comments=>"",

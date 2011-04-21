@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 1
+Warning: replacing bad NMTOKEN "9438" with "RESPONSE_9438"
+Warning: replacing bad NMTOKEN "2237" with "RESPONSE_2237"
+Warning: replacing bad NMTOKEN "2071" with "RESPONSE_2071"
+Warning: replacing bad NMTOKEN "183" with "RESPONSE_183"
+Warning: replacing bad NMTOKEN "1965" with "RESPONSE_1965"
+Warning: replacing bad NMTOKEN "1498" with "RESPONSE_1498"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: replacing bad NMTOKEN "1965_fb" with "FEEDBACK_1965_fb"
+Warning: replacing bad NMTOKEN "1498_fb" with "FEEDBACK_1498_fb"
+Unknown text type: ignored mattext with texttype="text" treated as text/plain
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="i36799979e4e9ad1be11a85889095e11c"
+ title="Multiple droppers"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="1" />
+<instructureField name="question_type" value="multiple_dropdowns" />
+</instructureMetadata>
+<responseDeclaration identifier="response_number1tobemean" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="response_number2" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="response_thisone" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>Select 1 from [number1tobemean], and 2 from [number2], and 72394 from [thisone].</p>
+<choiceInteraction responseIdentifier="response_number2" shuffle="false" maxChoices="1">
+<prompt>number2</prompt>
+<simpleChoice identifier="RESPONSE_9438" fixed="true">
+<p>1</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_2237" fixed="true">
+<p>2</p></simpleChoice>
+</choiceInteraction>
+<choiceInteraction responseIdentifier="response_thisone" shuffle="false" maxChoices="1">
+<prompt>thisone</prompt>
+<simpleChoice identifier="RESPONSE_2071" fixed="true">
+<p>72394</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_183" fixed="true">
+<p>3</p></simpleChoice>
+</choiceInteraction>
+<choiceInteraction responseIdentifier="response_number1tobemean" shuffle="false" maxChoices="1">
+<prompt>number1tobemean</prompt>
+<simpleChoice identifier="RESPONSE_1965" fixed="true">
+<p>1</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_1498" fixed="true">
+<p>2</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="response_number1tobemean"/><baseValue baseType="identifier">RESPONSE_1965</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_1965_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><match><variable identifier="response_number1tobemean"/><baseValue baseType="identifier">RESPONSE_1498</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_1498_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><match><variable identifier="response_number2"/><baseValue baseType="identifier">RESPONSE_9438</baseValue></match>
+<setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE"/><baseValue baseType="float">33.33</baseValue></sum></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="response_thisone"/><baseValue baseType="identifier">RESPONSE_2071</baseValue></match>
+<setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE"/><baseValue baseType="float">33.33</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="response_number1tobemean"/><baseValue baseType="identifier">RESPONSE_1965</baseValue></match>
+<setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE"/><baseValue baseType="float">33.33</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_1965_fb">
+<p>nice job</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_1498_fb">
+<p>you're so stupid.</p></modalFeedback>
+</assessmentItem>

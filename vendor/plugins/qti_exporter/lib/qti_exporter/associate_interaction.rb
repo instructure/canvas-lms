@@ -20,15 +20,76 @@ class AssociateInteraction < AssessmentItemConverter
     elsif @flavor == 'respondus_matching'
       get_respondus_answers
       get_respondus_matches
+    elsif @flavor == 'canvas_matching'
+      match_map = {}
+      get_canvas_matches(match_map)
+      get_canvas_answers(match_map)
+      attach_feedback_values(@question[:answers])
     else
       get_all_matches_from_body
       get_all_answers_from_body
     end
+    
     get_feedback()
+    ensure_correct_format
+    
     @question
   end
   
   private
+  
+  def ensure_correct_format
+    @question[:answers].each do |answer|
+      if answer[:match_id]
+        if @question[:matches] && match = @question[:matches].find{|m|m[:match_id] == answer[:match_id]}
+          answer[:right] = match[:text]
+        end
+      end
+    end
+  end
+  
+  def get_canvas_matches(match_map)
+    if ci = @doc.at_css('choiceInteraction')
+      ci.css('simpleChoice').each do |sc|
+        match = {}
+        @question[:matches] << match
+        match_map[sc['identifier']] = match
+        if sc['identifier'] =~ /(\d+)/
+          match[:match_id] = $1.to_i
+        else
+          match[:match_id] = unique_local_id
+        end
+        match[:text] = sc.text.strip
+      end
+    end
+  end
+  
+  def get_canvas_answers(match_map)
+    answer_map = {}
+    @doc.css('choiceInteraction').each do |ci|
+      answer = {}
+      @question[:answers] << answer
+      answer_map[ci['responseIdentifier']] = answer
+      extract_answer!(answer, ci.at_css('prompt'))
+      answer[:id] = unique_local_id
+    end
+    
+    # connect to match
+    @doc.css('responseIf, responseElseIf').each do |r_if|
+      answer_mig_id = nil
+      match_mig_id = nil
+      if match = r_if.at_css('match')
+        answer_mig_id = get_node_att(match, 'variable', 'identifier')
+        match_mig_id = match.at_css('baseValue[baseType=identifier]').text rescue nil
+      end
+      if answer = answer_map[answer_mig_id]
+        answer[:feedback_id] = get_feedback_id(r_if)
+        if r_if.at_css('setOutcomeValue[identifier=SCORE] sum') && match = match_map[match_mig_id]
+          answer[:match_id] = match[:match_id]
+        end
+      end
+    end
+  end
 
   def get_respondus_answers
     @doc.css('choiceInteraction').each do |a|

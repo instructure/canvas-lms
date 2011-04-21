@@ -13,6 +13,7 @@ class ExtendedTextInteraction < AssessmentItemConverter
     if @short_answer
       @question[:question_type] ||= "short_answer_question"
       process_response_conditions
+      attach_feedback_values(@question[:answers])
     else
       @question[:question_type] ||= "essay_question"
     end
@@ -40,13 +41,24 @@ class ExtendedTextInteraction < AssessmentItemConverter
     end
     @doc.search('responseProcessing responseCondition').each do |cond|
       cond.css('stringMatch').each do |match|
-        answer = {}
-        answer[:text] = match.at_css('baseValue[baseType=string]').text.strip
-        if @question[:question_type] == 'fill_in_multiple_blanks_question' and id = get_node_att(match, 'variable','identifier')
+        text = match.at_css('baseValue[baseType=string]').text.strip
+        existing = false
+        if answer = @question[:answers].find { |a| a[:text] == text }
+          existing = true
+        else
+          answer = {}
+        end
+        answer[:text] ||= text
+        unless answer[:feedback_id] 
+          if f_id = get_feedback_id(cond)
+            answer[:feedback_id] = f_id
+          end
+        end
+        if @question[:question_type] == 'fill_in_multiple_blanks_question' and id = get_node_att(match, 'variable', 'identifier')
           id = id.strip
           answer[:blank_id] = vista_fib_map[id] || id
         end
-        unless answer[:text] == ""
+        unless existing || answer[:text] == ""
           @question[:answers] << answer
           answer[:weight] = 100
           answer[:comments] = ""

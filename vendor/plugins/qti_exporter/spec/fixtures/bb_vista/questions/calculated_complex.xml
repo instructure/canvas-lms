@@ -83,70 +83,70 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <var name="F">37.0</var>
 <var name="Y">26.0</var>
 <var name="n">59.0</var>
-<answer>96.29073206806152</answer>
+<answer>96.290</answer>
 </var_set><var_set>
 <var name="i">5.22</var>
 <var name="r">6.0</var>
 <var name="F">45.0</var>
 <var name="Y">35.0</var>
 <var name="n">104.0</var>
-<answer>112.49332315590588</answer>
+<answer>112.493</answer>
 </var_set><var_set>
 <var name="i">5.94</var>
 <var name="r">6.0</var>
 <var name="F">31.0</var>
 <var name="Y">35.0</var>
 <var name="n">33.0</var>
-<answer>101.32503627131828</answer>
+<answer>101.325</answer>
 </var_set><var_set>
 <var name="i">4.1</var>
 <var name="r">5.0</var>
 <var name="F">29.0</var>
 <var name="Y">34.0</var>
 <var name="n">85.0</var>
-<answer>114.76384174670255</answer>
+<answer>114.763</answer>
 </var_set><var_set>
 <var name="i">4.48</var>
 <var name="r">5.0</var>
 <var name="F">34.0</var>
 <var name="Y">25.0</var>
 <var name="n">23.0</var>
-<answer>105.93776569026855</answer>
+<answer>105.937</answer>
 </var_set><var_set>
 <var name="i">4.87</var>
 <var name="r">5.0</var>
 <var name="F">20.0</var>
 <var name="Y">25.0</var>
 <var name="n">76.0</var>
-<answer>102.41455528556143</answer>
+<answer>102.414</answer>
 </var_set><var_set>
 <var name="i">5.04</var>
 <var name="r">6.0</var>
 <var name="F">29.0</var>
 <var name="Y">31.0</var>
 <var name="n">87.0</var>
-<answer>113.71906047989066</answer>
+<answer>113.719</answer>
 </var_set><var_set>
 <var name="i">4.88</var>
 <var name="r">5.0</var>
 <var name="F">39.0</var>
 <var name="Y">20.0</var>
 <var name="n">84.0</var>
-<answer>102.09005071167273</answer>
+<answer>102.090</answer>
 </var_set><var_set>
 <var name="i">4.52</var>
 <var name="r">5.0</var>
 <var name="F">32.0</var>
 <var name="Y">26.0</var>
 <var name="n">104.0</var>
-<answer>106.8019020148115</answer>
+<answer>106.801</answer>
 </var_set><var_set>
 <var name="i">4.9</var>
 <var name="r">5.0</var>
 <var name="F">44.0</var>
 <var name="Y">39.0</var>
 <var name="n">30.0</var>
-<answer>101.95412167352283</answer>
+<answer>101.954</answer>
 </var_set>
 </var_sets>
 </calculated>

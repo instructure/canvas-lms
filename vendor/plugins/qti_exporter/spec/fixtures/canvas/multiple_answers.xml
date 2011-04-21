@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 0.24
+Warning: replacing bad NMTOKEN "1702" with "RESPONSE_1702"
+Warning: replacing bad NMTOKEN "6878" with "RESPONSE_6878"
+Warning: replacing bad NMTOKEN "491" with "RESPONSE_491"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: replacing bad NMTOKEN "1702_fb" with "FEEDBACK_1702_fb"
+Warning: replacing bad NMTOKEN "6878_fb" with "FEEDBACK_6878_fb"
+Warning: replacing bad NMTOKEN "491_fb" with "FEEDBACK_491_fb"
+Unknown text type: ignored mattext with texttype="text" treated as text/plain
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="iba79d2c5133c7e82f451eee0fda14079"
+ title="Multiple Answers"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="0.24" />
+<instructureField name="question_type" value="multiple_answers_question" />
+</instructureMetadata>
+<responseDeclaration identifier="response1" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>this question isn't even worth a whole point. Just skip it.</p>
+<choiceInteraction responseIdentifier="response1" shuffle="false" maxChoices="1">
+<simpleChoice identifier="RESPONSE_1702" fixed="true">
+<p>Great idea</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_6878" fixed="true">
+<p>I'll do that!</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_491" fixed="true">
+<p>Now way! every 0.24 points counts.</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><member><baseValue baseType="identifier">RESPONSE_1702</baseValue><variable identifier="response1"/></member>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_1702_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><member><baseValue baseType="identifier">RESPONSE_6878</baseValue><variable identifier="response1"/></member>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_6878_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><member><baseValue baseType="identifier">RESPONSE_491</baseValue><variable identifier="response1"/></member>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_491_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><and><member><baseValue baseType="identifier">RESPONSE_1702</baseValue><variable identifier="response1"/></member><member><baseValue baseType="identifier">RESPONSE_6878</baseValue><variable identifier="response1"/></member><not><member><baseValue baseType="identifier">RESPONSE_491</baseValue><variable identifier="response1"/></member></not></and>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_1702_fb">
+<p>What does it mean to have this feedback?</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_6878_fb">
+<p>I don't know!</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_491_fb">
+<p>baby.</p></modalFeedback>
+</assessmentItem>

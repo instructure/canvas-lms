@@ -38,6 +38,9 @@ module CC
       # everything needed for Canvas quizzes. In addition to the canvas-specific
       # QTI file there will be a Canvas-specific metadata file.
       def generate
+        non_cc_folder = File.join(@export_dir, ASSESSMENT_NON_CC_FOLDER)
+        FileUtils::mkdir_p non_cc_folder
+        
         @course.quizzes.active.each do |quiz|
           cc_qti_migration_id = create_key(quiz)
           resource_dir = File.join(@export_dir, cc_qti_migration_id)
@@ -47,23 +50,25 @@ module CC
           cc_qti_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_CC_QTI)
           cc_qti_path = File.join(resource_dir, ASSESSMENT_CC_QTI)
           File.open(cc_qti_path, 'w') do |file|
-            generate_assessment(file, quiz, cc_qti_migration_id)
+            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+            generate_assessment(doc, quiz, cc_qti_migration_id)
           end
 
           # Create the Canvas-specific QTI data
-          qti_migration_id = create_key(quiz, 'canvas_')
-          qti_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_CANVAS_QTI)
-          qti_path = File.join(resource_dir, ASSESSMENT_CANVAS_QTI)
-          File.open(qti_path, 'w') do |file|
-            generate_assessment(file, quiz, qti_migration_id, false)
+          canvas_qti_rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, cc_qti_migration_id + ".xml")
+          canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
+          File.open(canvas_qti_path, 'w') do |file|
+            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+            generate_assessment(doc, quiz, cc_qti_migration_id, false)
           end
 
           # Create the canvas metadata
-          inst_file_name = ASSESSMENT_INSTRUCTIONS
-          inst_rel_path = File.join(cc_qti_migration_id, inst_file_name)
-          inst_path = File.join(resource_dir, inst_file_name)
-          File.open(inst_path, 'w') do |file|
-            file << CCHelper.html_page(quiz.description || '', "Quiz: " + quiz.title, @course, @manifest.exporter.user)
+          alt_migration_id = create_key(quiz, 'canvas_')
+          meta_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_META)
+          meta_path = File.join(resource_dir, ASSESSMENT_META)
+          File.open(meta_path, 'w') do |file|
+            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+            generate_assessment_meta(doc, quiz, cc_qti_migration_id)
           end
 
           @resources_node.resource(
@@ -71,26 +76,63 @@ module CC
                   "type" => ASSESSMENT_TYPE
           ) do |res|
             res.file(:href=>cc_qti_rel_path)
-            res.dependency(:identifierref=>qti_migration_id)
+            res.dependency(:identifierref=>alt_migration_id)
           end
           @resources_node.resource(
-                  :identifier => qti_migration_id,
+                  :identifier => alt_migration_id,
                   :type => LOR,
-                  :href => qti_rel_path
+                  :href => meta_rel_path
           ) do |res|
-            res.file(:href=>qti_rel_path)
-            res.file(:href=>inst_rel_path)
+            res.file(:href=>meta_rel_path)
+            res.file(:href=>canvas_qti_rel_path)
           end
         end
       end
       
-      def generate_assessment(file, quiz, migration_id, for_cc=true)
-        link_doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
-        link_doc.instruct!
+      def generate_assessment_meta(doc, quiz, migration_id)
+        doc.instruct!
+        doc.quiz("identifier" => migration_id,
+                        "xmlns" => CCHelper::CANVAS_NAMESPACE,
+                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
+                        "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+        ) do |q_node|
+          q_node.title quiz.title
+          q_node.description CCHelper.html_content(quiz.description || '', @course, @manifest.exporter.user)
+          q_node.lock_at ims_datetime(quiz.lock_at) if quiz.lock_at
+          q_node.unlock_at ims_datetime(quiz.unlock_at) if quiz.unlock_at
+          q_node.due_at ims_datetime(quiz.due_at) if quiz.due_at
+          q_node.shuffle_answers quiz.shuffle_answers unless quiz.shuffle_answers.nil?
+          q_node.scoring_policy quiz.scoring_policy
+          q_node.hide_results quiz.hide_results unless quiz.hide_results.nil?
+          q_node.quiz_type quiz.quiz_type
+          q_node.points_possible quiz.points_possible
+          q_node.require_lockdown_browser quiz.require_lockdown_browser unless quiz.require_lockdown_browser.nil?
+          q_node.access_code quiz.access_code unless quiz.access_code.blank?
+          q_node.ip_filter quiz.ip_filter unless quiz.ip_filter.blank?
+          q_node.show_correct_answers quiz.show_correct_answers unless quiz.show_correct_answers.nil?
+          q_node.anonymous_submissions quiz.anonymous_submissions unless quiz.anonymous_submissions.nil?
+          q_node.could_be_locked quiz.could_be_locked unless quiz.could_be_locked.nil?
+          q_node.time_limit quiz.time_limit unless quiz.time_limit.nil?
+          q_node.allowed_attempts quiz.allowed_attempts unless quiz.allowed_attempts.nil?
+          if quiz.assignment
+            assignment_migration_id = CCHelper.create_key(quiz.assignment)
+            doc.assignment(:identifier=>assignment_migration_id) do |a|
+              AssignmentResources.create_assignment(a, quiz.assignment)
+            end
+          end
+          if quiz.assignment_group_id
+            ag = @course.assignment_groups.find(quiz.assignment_group_id)
+            q_node.assignment_group_identifierref create_key(ag)
+          end
+        end
+      end
+      
+      def generate_assessment(doc, quiz, migration_id, for_cc=true)
+        doc.instruct!
         
         xsd_uri = for_cc ? 'http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_qtiasiv1p2p1_v1p0.xsd' : 'http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd'
   
-        link_doc.questestinterop("xmlns" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2",
+        doc.questestinterop("xmlns" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2",
                         "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                         "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/ims_qtiasiv1p2 #{xsd_uri}"
         ) do |qti_node|
@@ -104,30 +146,7 @@ module CC
                 meta_field(meta_node, 'cc_profile', 'cc.exam.v0p1')
                 meta_field(meta_node, 'qmd_assessmenttype', 'Examination')
                 meta_field(meta_node, 'qmd_scoretype', 'Percentage')
-              else
-                # Canvas properties
-                meta_field(meta_node, 'canvas_lock_at', ims_datetime(quiz.lock_at)) if quiz.lock_at
-                meta_field(meta_node, 'canvas_unlock_at', ims_datetime(quiz.unlock_at)) if quiz.unlock_at
-                meta_field(meta_node, 'canvas_due_at', ims_datetime(quiz.due_at)) if quiz.due_at
-                meta_field(meta_node, 'canvas_shuffle_answers', quiz.shuffle_answers.to_s)
-                meta_field(meta_node, 'canvas_scoring_policy', quiz.scoring_policy)
-                meta_field(meta_node, 'canvas_hide_results', quiz.hide_results) unless quiz.hide_results.nil?
-                meta_field(meta_node, 'canvas_quiz_type', quiz.quiz_type)
-                meta_field(meta_node, 'canvas_points_possible', quiz.points_possible)
-                meta_field(meta_node, 'canvas_require_lockdown_browser', quiz.require_lockdown_browser) unless quiz.require_lockdown_browser.nil?
-                meta_field(meta_node, 'canvas_access_code', quiz.access_code) unless quiz.access_code.blank?
-                meta_field(meta_node, 'canvas_ip_filter', quiz.ip_filter) unless quiz.ip_filter.blank?
-                meta_field(meta_node, 'canvas_show_correct_answers', quiz.show_correct_answers)
-                meta_field(meta_node, 'canvas_anonymous_submissions', quiz.anonymous_submissions)
-                meta_field(meta_node, 'canvas_could_be_locked', quiz.could_be_locked) unless quiz.could_be_locked.nil?
-                meta_field(meta_node, 'assignment_identifierref', create_key(quiz.assignment)) if quiz.assignment
-                if quiz.assignment_group_id
-                  ag = @course.assignment_groups.find(quiz.assignment_group_id)
-                  meta_field(meta_node, 'assignment_group_identifierref', create_key(ag))
-                end
               end
-              
-              # Properties for both
               meta_field(meta_node, 'qmd_timelimit', quiz.time_limit) if quiz.time_limit
               allowed = quiz.allowed_attempts == -1 ? 'unlimited' : quiz.allowed_attempts
               meta_field(meta_node, 'cc_maxattempts', allowed)

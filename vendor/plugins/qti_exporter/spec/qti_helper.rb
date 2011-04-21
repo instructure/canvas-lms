@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
 unless defined? BASE_FIXTURE_DIR
   BASE_FIXTURE_DIR = File.dirname(__FILE__) + '/fixtures/'
+  CANVAS_FIXTURE_DIR = BASE_FIXTURE_DIR + 'canvas/'
   VISTA_FIXTURE_DIR = BASE_FIXTURE_DIR + 'bb_vista/'
   BB8_FIXTURE_DIR = BASE_FIXTURE_DIR + 'bb8/'
   BB9_FIXTURE_DIR = BASE_FIXTURE_DIR + 'bb9/'
@@ -33,13 +34,13 @@ def get_manifest_node(question, opts={})
   end
   manifest_node.stub!(:at_css).with(('interactionType')).and_return(it)
   
-  qt = nil
+  bbqt = nil
   if opts[:bb_question_type]
-    qt = {}
-    qt.stub!(:text).and_return(opts[:bb_question_type])
-    qt["value"] = opts[:bb_question_type]
+    bbqt = {}
+    bbqt.stub!(:text).and_return(opts[:bb_question_type])
+    bbqt["value"] = opts[:bb_question_type]
   end
-  manifest_node.stub!(:at_css).with(('instructureMetadata instructureField[name=bb_question_type]')).and_return(qt)
+  manifest_node.stub!(:at_css).with(('instructureMetadata instructureField[name=bb_question_type]')).and_return(bbqt)
 
   qt = nil
   if opts[:question_type]

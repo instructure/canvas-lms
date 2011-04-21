@@ -13,7 +13,7 @@ class ChoiceInteraction < AssessmentItemConverter
     answers_hash = {}
     get_answers(answers_hash)
     process_response_conditions(answers_hash)
-    attach_feedback_values(answers_hash)
+    attach_feedback_values(answers_hash.values)
     set_question_type
     get_feedback
     process_either_or_question
@@ -115,24 +115,24 @@ class ChoiceInteraction < AssessmentItemConverter
         migration_id = migration_id.sub('.', '_') if is_either_or
         answer = answers_hash[migration_id]
         answer[:weight] = get_response_weight(cond)
-        answer[:feedback_id] = get_feedback_id(cond)
+        answer[:feedback_id] ||= get_feedback_id(cond)
       elsif cond.at_css('member variable[identifier=RESP_MC]')
         migration_id = cond.at_css('member baseValue[baseType=identifier]').text
         answer = answers_hash[migration_id]
         answer[:weight] = get_response_weight(cond)
-        answer[:feedback_id] = get_feedback_id(cond)
+        answer[:feedback_id] ||= get_feedback_id(cond)
       elsif cond.at_css('match variable[identifier^=TF]')
         migration_id = cond.at_css('match baseValue[baseType=identifier]').text
         answer = answers_hash[migration_id]
         answer[:weight] = get_response_weight(cond)
-        answer[:feedback_id] = get_feedback_id(cond)
+        answer[:feedback_id] ||= get_feedback_id(cond)
         @question[:question_type] = "true_false_question"
       elsif cond.at_css('and > member')
         cond.css('and > member').each do |m|
           migration_id = m.at_css('baseValue[baseType=identifier]').text.strip()
           answer = answers_hash[migration_id]
           answer[:weight] = get_response_weight(cond)
-          answer[:feedback_id] = get_feedback_id(cond)
+          answer[:feedback_id] ||= get_feedback_id(cond)
         end
       else
         cond.css('responseIf, responseElseIf').each do |r_if|
@@ -142,7 +142,7 @@ class ChoiceInteraction < AssessmentItemConverter
             migration_id = migration_id.text.strip()
             if answer = answers_hash[migration_id]
               answer[:weight] = get_response_weight(r_if)
-              answer[:feedback_id] = get_feedback_id(r_if)
+              answer[:feedback_id] ||= get_feedback_id(r_if)
             end
           end
         end
@@ -157,45 +157,6 @@ class ChoiceInteraction < AssessmentItemConverter
         answer[:weight] = DEFAULT_CORRECT_WEIGHT
       end
     end
-  end
-
-  # Sets the actual feedback values and clears the feedback ids
-  def attach_feedback_values(answers_hash)
-    feedback_hash = {}
-    @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
-      id = feedback['identifier']
-      text = clear_html(feedback.at_css('p').text.gsub(/\s+/, " ")).strip
-      feedback_hash[id] = text
-
-      if @question[:feedback_id] == id
-        @question[:correct_comments] = text
-        @question[:incorrect_comments] = text
-      end
-    end
-
-    #clear extra entries
-    @question.delete :feedback_id
-    answers_hash.each_key do |key|
-      answer = answers_hash[key]
-      if feedback_hash.has_key? answer[:feedback_id]
-        answer[:comments] = feedback_hash[answer[:feedback_id]]
-      end
-      answer.delete :feedback_id
-    end
-  end
-
-  # pulls the feedback id from the condition
-  def get_feedback_id(cond)
-    id = nil
-
-    if feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]')
-      if feedback.at_css('variable[identifier=FEEDBACK]')
-        if feedback = feedback.at_css('baseValue[baseType=identifier]')
-          id = feedback.text.strip
-        end
-      end
-    end
-    id
   end
 
   # parses the wight of a response to determine whether it is a correct response

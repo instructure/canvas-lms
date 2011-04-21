@@ -19,49 +19,101 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 	-->
 
 <assessmentItem
-	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="_153004_1"
- title=""
- adaptive="false"
- timeDependent="false">
-<instructureMetadata>
-<instructureField name="max_score" value="10.0" />
-<instructureField name="bb_question_type" value="Fill in the Blank Plus" />
-</instructureMetadata>
-<responseDeclaration identifier="family" cardinality="single" baseType="string"/>
-<responseDeclaration identifier="poor" cardinality="single" baseType="string"/>
-<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
-<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
-<defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
-<itemBody>
-<div class="QUESTION_BLOCK">
-<p class="FORMATTED_TEXT_BLOCK">I'm just a [poor] boy from a poor [family]&lt;br /&gt;</p></div>
-<div class="RESPONSE_BLOCK">
-<extendedTextInteraction responseIdentifier="poor" class="Box"/>
-<extendedTextInteraction responseIdentifier="family" class="Box"/></div>
-</itemBody>
-<responseProcessing>
-<responseCondition>
-<responseIf><and><or><stringMatch  caseSensitive="false" substring="false"><variable identifier="poor"/><baseValue baseType="string">poor</baseValue></stringMatch><stringMatch  caseSensitive="false" substring="false"><variable identifier="poor"/><baseValue baseType="string">sad</baseValue></stringMatch></or><or><stringMatch  caseSensitive="false" substring="false"><variable identifier="family"/><baseValue baseType="string">family</baseValue></stringMatch></or></and>
-<setOutcomeValue identifier="SCORE"><baseValue baseType="float">SCORE.max</baseValue></setOutcomeValue>
-<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
-</responseIf>
-<responseElseIf><baseValue baseType="boolean">true</baseValue>
-<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0.0</baseValue></setOutcomeValue>
-<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect</baseValue></multiple></setOutcomeValue>
-</responseElseIf>
-</responseCondition>
-<responseCondition>
-<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">10.0</baseValue></gt>
-<setOutcomeValue identifier="SCORE"><baseValue baseType="float">10.0</baseValue></setOutcomeValue>
-</responseIf>
-</responseCondition>
-</responseProcessing>
-<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct">
-<div class="flow_1">
-<p class="FORMATTED_TEXT_BLOCK">right</p></div></modalFeedback>
-<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect">
-<div class="flow_1">
-<p class="FORMATTED_TEXT_BLOCK">wrong</p></div></modalFeedback>
+        xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+        identifier="_153004_1"
+        title=""
+        adaptive="false"
+        timeDependent="false">
+  <instructureMetadata>
+    <instructureField name="max_score" value="10.0"/>
+    <instructureField name="bb_question_type" value="Fill in the Blank Plus"/>
+  </instructureMetadata>
+  <responseDeclaration identifier="family" cardinality="single"
+                       baseType="string"/>
+  <responseDeclaration identifier="poor" cardinality="single"
+                       baseType="string"/>
+  <outcomeDeclaration identifier="FEEDBACK" cardinality="multiple"
+                      baseType="identifier"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0.0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <itemBody>
+    <div class="QUESTION_BLOCK">I'm just a [poor] boy from a poor [family]</div>
+    <div class="RESPONSE_BLOCK">
+      <extendedTextInteraction responseIdentifier="poor" class="Box"/>
+      <extendedTextInteraction responseIdentifier="family" class="Box"/>
+    </div>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf>
+        <and>
+          <or>
+            <stringMatch caseSensitive="false" substring="false">
+              <variable identifier="poor"/>
+              <baseValue baseType="string">poor</baseValue>
+            </stringMatch>
+            <stringMatch caseSensitive="false" substring="false">
+              <variable identifier="poor"/>
+              <baseValue baseType="string">sad</baseValue>
+            </stringMatch>
+          </or>
+          <or>
+            <stringMatch caseSensitive="false" substring="false">
+              <variable identifier="family"/>
+              <baseValue baseType="string">family</baseValue>
+            </stringMatch>
+          </or>
+        </and>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">SCORE.max</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">correct</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+      <responseElseIf>
+        <baseValue baseType="boolean">true</baseValue>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">0.0</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">incorrect</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseElseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <gt>
+          <variable identifier="SCORE"/>
+          <baseValue baseType="float">10.0</baseValue>
+        </gt>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">10.0</baseValue>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="correct">
+    <div class="flow_1">
+      <p class="FORMATTED_TEXT_BLOCK">right</p>
+    </div>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="incorrect">
+    <div class="flow_1">
+      <p class="FORMATTED_TEXT_BLOCK">wrong</p>
+    </div>
+  </modalFeedback>
 </assessmentItem>

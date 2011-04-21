@@ -1097,25 +1097,20 @@ class Quiz < ActiveRecord::Base
     return if item && !allow_update
     item ||= context.quizzes.new
 
+    hash[:due_at] ||= hash[:due_date]
+    hash[:due_at] ||= hash[:grading][:due_date] if hash[:grading]
+    item.lock_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
+    item.unlock_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
+    item.due_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
-    [:migration_id, :title, :description, :allowed_attempts, :time_limit, :shuffle_answers, :show_correct_answers, :points_possible, :lock_at, :unlock_at, :access_code, :ip_filter, :scoring_policy].each do |attr|
+    item.description = ImportedHtmlConverter.convert(hash[:description], context)
+    [:migration_id, :title, :allowed_attempts, :time_limit, 
+     :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
+     :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
+    :anonymous_submissions, :could_be_locked, :quiz_type].each do |attr|
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
-
-    timestamp = hash[:due_date]
-    if hash[:quiz_type] =~ /assignment/i && !item.assignment
-      # The actual assignment will be created when the quiz is published
-      item.quiz_type = 'assignment'
-      if grading = hash[:grading]
-        if grading[:assignment_group_migration_id]
-          assignment_group = context.assignment_groups.find_by_migration_id(grading[:assignment_group_migration_id])
-          item.assignment_group_id = assignment_group.id if assignment_group 
-        end
-        timestamp ||= grading[:due_date]
-      end
-    end
-    timestamp = timestamp.to_i rescue 0
-    item.due_at = Time.at(timestamp / 1000) if timestamp > 0
+    
     item.save!
     if hash[:questions] && (!item.question_count || item.question_count == 0)
       count = 0
@@ -1149,6 +1144,25 @@ class Quiz < ActiveRecord::Base
         end
       end
     end
+    
+    if hash[:assignment]
+      assignment = Assignment.import_from_migration(hash[:assignment], context)
+      item.assignment = assignment
+      item.workflow_state = 'available'
+      item.published_at = Time.now
+    elsif !item.assignment && grading = hash[:grading]
+      # The actual assignment will be created when the quiz is published
+      item.quiz_type = 'assignment'
+      hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id] 
+    end
+    
+    if hash[:assignment_group_migration_id]
+      if g = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
+        item.assignment_group_id = g.id
+      end
+    end
+    
+    item.save
 
     context.imported_migration_items << item if context.imported_migration_items
     item

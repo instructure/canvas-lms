@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 10.23
+Warning: replacing bad NMTOKEN "6125" with "RESPONSE_6125"
+Warning: replacing bad NMTOKEN "568" with "RESPONSE_568"
+Warning: replacing bad NMTOKEN "1461" with "RESPONSE_1461"
+Warning: replacing bad NMTOKEN "7834" with "RESPONSE_7834"
+Warning: replacing bad NMTOKEN "2647" with "RESPONSE_2647"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: replacing bad NMTOKEN "6125_fb" with "FEEDBACK_6125_fb"
+Warning: replacing bad NMTOKEN "568_fb" with "FEEDBACK_568_fb"
+Warning: replacing bad NMTOKEN "1461_fb" with "FEEDBACK_1461_fb"
+Unknown text type: ignored mattext with texttype="text" treated as text/plain
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="i75996dc02b46cf432bc285f6ced9027b"
+ title="FIMB"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="10.23" />
+<instructureField name="question_type" value="fill_in_multiple_blanks_question" />
+</instructureMetadata>
+<responseDeclaration identifier="response_begin" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="response_problems" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="response_something" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>You have so many [problems] that I don't even know where to [begin] to fix them. You just need to give up and become a [something].</p>
+<choiceInteraction responseIdentifier="response_problems" shuffle="false" maxChoices="1">
+<prompt>problems</prompt>
+<simpleChoice identifier="RESPONSE_6125" fixed="true">
+<p>problems</p></simpleChoice>
+</choiceInteraction>
+<choiceInteraction responseIdentifier="response_begin" shuffle="false" maxChoices="1">
+<prompt>begin</prompt>
+<simpleChoice identifier="RESPONSE_568" fixed="true">
+<p>begin</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_1461" fixed="true">
+<p>start</p></simpleChoice>
+</choiceInteraction>
+<choiceInteraction responseIdentifier="response_something" shuffle="false" maxChoices="1">
+<prompt>something</prompt>
+<simpleChoice identifier="RESPONSE_7834" fixed="true">
+<p>something</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_2647" fixed="true">
+<p>anything</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="response_problems"/><baseValue baseType="identifier">RESPONSE_6125</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_6125_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><match><variable identifier="response_begin"/><baseValue baseType="identifier">RESPONSE_568</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_568_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><match><variable identifier="response_begin"/><baseValue baseType="identifier">RESPONSE_1461</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_1461_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><match><variable identifier="response_problems"/><baseValue baseType="identifier">RESPONSE_6125</baseValue></match>
+<setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE"/><baseValue baseType="float">33.33</baseValue></sum></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="response_begin"/><baseValue baseType="identifier">RESPONSE_568</baseValue></match>
+<setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE"/><baseValue baseType="float">33.33</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="response_something"/><baseValue baseType="identifier">RESPONSE_7834</baseValue></match>
+<setOutcomeValue identifier="SCORE"><sum><variable identifier="SCORE"/><baseValue baseType="float">33.33</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct_fb">
+<p>Oi!</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="general_incorrect_fb">
+<p>Hoyt!</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_6125_fb">
+<p>you have problems.</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_568_fb">
+<p>what, feedback here! that's just mean.</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_1461_fb">
+<p>I would have preferred &quot;begin&quot; but this is okay too.</p></modalFeedback>
+</assessmentItem>

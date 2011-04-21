@@ -114,6 +114,9 @@ class AssessmentTestConverter
         if weight = get_node_att(section, 'weight','value')
           group[:question_points] = convert_weight_to_points(weight)
         end
+        if points = section.at_css('points_per_item')
+          group[:question_points] = points.text.to_f
+        end
         if bank_id = section.at_css('sourcebank_ref')
           group[:question_bank_migration_id] = bank_id.text
         end
@@ -142,7 +145,7 @@ class AssessmentTestConverter
       migration_ids = group[:questions].map { |q| q[:migration_id] }
       questions = @converted_questions.find_all { |q| migration_ids.include?(q[:migration_id]) }
 
-      points = questions.first[:points_possible] || 0
+      points = questions.first ? (questions.first[:points_possible] || 0) : 0
       if points > 0 && questions.size == group[:questions].size && questions.all? { |q| q[:points_possible] == points }
         group[:question_points] = points
       else

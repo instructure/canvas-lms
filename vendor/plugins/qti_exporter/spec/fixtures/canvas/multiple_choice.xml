@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 1
+Warning: replacing bad NMTOKEN "7611" with "RESPONSE_7611"
+Warning: replacing bad NMTOKEN "6958" with "RESPONSE_6958"
+Warning: replacing bad NMTOKEN "5674" with "RESPONSE_5674"
+Warning: replacing bad NMTOKEN "465" with "RESPONSE_465"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: replacing bad NMTOKEN "7611_fb" with "FEEDBACK_7611_fb"
+Warning: replacing bad NMTOKEN "5674_fb" with "FEEDBACK_5674_fb"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Unknown text type: ignored mattext with texttype="text" treated as text/plain
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="if87ef626591c52375b6a4f16cdab8bd0"
+ title="Oi!"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="10.3" />
+<instructureField name="question_type" value="multiple_choice_question" />
+</instructureMetadata>
+<responseDeclaration identifier="response1" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>Ole</p>
+<p>
+</p>
+<p>
+<a>Test Page</a></p>
+<p>
+</p>
+<p>Why would you link to a wiki page from a quiz question? That doesn't seem right.</p>
+<choiceInteraction responseIdentifier="response1" shuffle="false" maxChoices="1">
+<simpleChoice identifier="RESPONSE_7611" fixed="true">
+<p>ole ole ole</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_6958" fixed="true">
+<p>ole</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_5674" fixed="true">
+<p>ole ole</p></simpleChoice>
+<simpleChoice identifier="RESPONSE_465" fixed="true">
+<p>hoyt</p></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="response1"/><baseValue baseType="identifier">RESPONSE_7611</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_7611_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><match><variable identifier="response1"/><baseValue baseType="identifier">RESPONSE_5674</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_5674_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><match><variable identifier="response1"/><baseValue baseType="identifier">RESPONSE_7611</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElse>
+<responseCondition>
+<responseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">general_incorrect_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseElse>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct_fb">
+<p>Good job, you are obviously familiar with: http://www.youtube.com/watch?v=KABUQxllGbk</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="general_incorrect_fb">
+<p>You need to see this: http://www.youtube.com/watch?v=KABUQxllGbk</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_7611_fb">
+<p>You are correct sir.</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_5674_fb">
+<p>Oh so close.</p></modalFeedback>
+</assessmentItem>

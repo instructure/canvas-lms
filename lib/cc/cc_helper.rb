@@ -39,9 +39,9 @@ module CCHelper
   WEB_CONTENT_TOKEN = "$IMS_CC_FILEBASE$"
 
   # file names/paths
-  ASSESSMENT_CC_QTI = "assessment_cc_qti.xml"
-  ASSESSMENT_CANVAS_QTI = "assessment_non_cc_qti.xml"
-  ASSESSMENT_INSTRUCTIONS = "assessment_instructions.html"
+  ASSESSMENT_CC_QTI = "assessment_qti.xml"
+  ASSESSMENT_NON_CC_FOLDER = 'non_cc_assessments'
+  ASSESSMENT_META = "assessment_meta.xml"
   ASSIGNMENT_GROUPS = "assignment_groups.xml"
   ASSIGNMENT_SETTINGS = "assignment_settings.xml"
   COURSE_SETTINGS = "course_settings.xml"

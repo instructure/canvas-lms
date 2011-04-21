@@ -23,6 +23,7 @@ module CC::Importer
     include AssignmentConverter
     include TopicConverter
     include WebcontentConverter
+    include QuizConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -43,6 +44,7 @@ module CC::Importer
       @course[:discussion_topics] = convert_topics
       @course[:file_map] = create_file_map
       package_course_files
+      convert_quizzes
       
       #close up shop
       save_to_file

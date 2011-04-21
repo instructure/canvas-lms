@@ -19,8 +19,7 @@ module CC
   module AssignmentResources
 
     def add_assignments
-      @course.assignments.active.each do |assignment|
-        next if assignment.submission_types == 'discussion_topic'
+      @course.assignments.active.no_graded_quizzes_or_topics.each do |assignment|
         migration_id = CCHelper.create_key(assignment)
 
         lo_folder = File.join(@export_dir, migration_id)

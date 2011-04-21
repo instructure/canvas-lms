@@ -71,7 +71,7 @@ class AssessmentItemConverter
       if @migration_type and UNSUPPORTED_TYPES.member?(@migration_type)
         @question[:question_type] = @migration_type
         @question[:unsupported] = true
-      else
+      elsif @migration_type != 'text_only_question'
         self.parse_question_data
       end
     rescue => e
@@ -94,6 +94,9 @@ class AssessmentItemConverter
     if score =  get_node_att(@doc, 'instructureMetadata instructureField[name=max_score]', 'value')
       @question[:points_possible] = score.to_f
     end
+    if score = get_node_att(@doc, 'instructureMetadata instructureField[name=points_possible]', 'value')
+      @question[:points_possible] = score.to_f
+    end
     if type =  get_node_att(@doc, 'instructureMetadata instructureField[name=bb_question_type]', 'value')
       @migration_type = type
       case @migration_type
@@ -114,9 +117,10 @@ class AssessmentItemConverter
     end
     if type =  get_node_att(@doc, 'instructureMetadata instructureField[name=question_type]', 'value')
       @migration_type = type
-      case @migration_type
-        when /matching/i
-          @question[:question_type] = 'matching_question'
+      if AssessmentQuestion::ALL_QUESTION_TYPES.member?(@migration_type)
+        @question[:question_type] = @migration_type
+      elsif @migration_type =~ /matching/i
+        @question[:question_type] = 'matching_question'
       end
     end
   end
@@ -139,9 +143,7 @@ class AssessmentItemConverter
     @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |f|
       id = f['identifier']
       feedback = clear_html(f.text.strip.gsub(/\s+/, " "))
-      if id =~ /general|all/i
-        @question[:general_comments] = feedback
-      elsif id =~ /wrong|incorrect/i
+      if id =~ /wrong|incorrect/i
         @question[:incorrect_comments] = feedback
       elsif id =~ /correct/i
         if f.at_css('div.solution')
@@ -151,6 +153,12 @@ class AssessmentItemConverter
         end
       elsif id =~ /solution/i
         @question[:example_solution] = feedback
+      elsif id =~ /general|all/i
+        @question[:general_comments] = feedback
+      elsif id =~ /feedback_(\d*)_fb/i
+        if answer = @question[:answers].find{|a|a[:migration_id]== "RESPONSE_#{$1}"}
+          answer[:comments] = feedback
+        end
       end
     end
   end
@@ -195,9 +203,19 @@ class AssessmentItemConverter
         opts[:custom_type] ||= type.downcase
       end
       if type = get_node_att(manifest_node,'instructureMetadata instructureField[name=question_type]', 'value')
-        opts[:custom_type] ||= type.downcase
-        if opts[:custom_type] == 'matching'
+        type = type.downcase
+        opts[:custom_type] ||= type
+        if type == 'matching_question'
+          opts[:interaction_type] = 'choiceinteraction'
+          opts[:custom_type] = 'canvas_matching'
+        elsif type == 'matching'
           opts[:custom_type] = 'respondus_matching'
+        elsif type == 'fill_in_multiple_blanks_question'
+          opts[:interaction_type] = 'fill_in_multiple_blanks_question'
+        elsif type == 'multiple_dropdowns_question'
+          opts[:interaction_type] = 'multiple_dropdowns_question'
+        else
+          opts[:custom_type] = type
         end
       end
     end
@@ -206,12 +224,12 @@ class AssessmentItemConverter
       guesser = QuestionTypeEducatedGuesser.new(opts)
       opts[:interaction_type], opts[:custom_type] = guesser.educatedly_guess_type
     end
-
+    
     case opts[:interaction_type]
       when /choiceinteraction|multiple_choice_question|multiple_answers_question|true_false_question|stupid_likert_scale_question/i
         if opts[:custom_type] and opts[:custom_type] == "matching"
           q = AssociateInteraction.new(opts)
-        elsif opts[:custom_type] and opts[:custom_type] == "respondus_matching"
+        elsif opts[:custom_type] && opts[:custom_type] =~ /respondus_matching|canvas_matching/
           q = AssociateInteraction.new(opts)
         else
           q = ChoiceInteraction.new(opts)
@@ -219,16 +237,16 @@ class AssessmentItemConverter
       when /associateinteraction|matching_question/i
         q = AssociateInteraction.new(opts)
       when /extendedtextinteraction|essay_question|short_answer_question/i
-        if opts[:custom_type] and opts[:custom_type] == "calculated"
+        if opts[:custom_type] and opts[:custom_type] =~ /calculated/i
           q = CalculatedInteraction.new(opts)
-        elsif opts[:custom_type] and opts[:custom_type] == "numeric"
+        elsif opts[:custom_type] and opts[:custom_type] =~ /numeric|numerical_question/
           q = NumericInteraction.new(opts)
         else
           q = ExtendedTextInteraction.new(opts)
         end
       when /orderinteraction|ordering_question/i
         q = OrderInteraction.new(opts)
-      when /fill_in_multiple_blanks_question/i
+      when /fill_in_multiple_blanks_question|multiple_dropdowns_question/i
         q = FillInTheBlank.new(opts)
       when nil
         q = AssessmentItemConverter.new(opts)
@@ -238,6 +256,46 @@ class AssessmentItemConverter
     end
 
     q.create_instructure_question if q
+  end
+  
+  # Sets the actual feedback values and clears the feedback ids
+  def attach_feedback_values(answers)
+    feedback_hash = {}
+    @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
+      id = feedback['identifier']
+      text = clear_html(feedback.at_css('p').text.gsub(/\s+/, " ")).strip
+      feedback_hash[id] = text
+
+      if @question[:feedback_id] == id
+        @question[:correct_comments] = text
+        @question[:incorrect_comments] = text
+      end
+    end
+    
+    #clear extra entries
+    @question.delete :feedback_id
+    answers.each do |answer|
+      if feedback_hash.has_key? answer[:feedback_id]
+        answer[:comments] = feedback_hash[answer[:feedback_id]]
+      end
+      answer.delete :feedback_id
+    end
+  end
+
+  # pulls the feedback id from the condition
+  def get_feedback_id(cond)
+    id = nil
+
+    if feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]')
+      if feedback.at_css('variable[identifier=FEEDBACK]')
+        if feedback = feedback.at_css('baseValue[baseType=identifier]')
+          id = feedback.text.strip
+        end
+      end
+    end
+    # Sometimes individual answers are assigned general feedback, don't return
+    # the identifier if that's the case
+    id =~ /general|all|wrong|incorrect|correct/i ? nil : id
   end
 
 end

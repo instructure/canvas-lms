@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 1
+Warning: numeric fibtype does not match enclosing <response_str>, assuming string
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: vargte not supported on String in QTI v2, re-run with - - forcefibfloat to treat string fibs as numbers
+Warning: varlte not supported on String in QTI v2, re-run with - - forcefibfloat to treat string fibs as numbers
+Warning: replacing bad NMTOKEN "7991_fb" with "FEEDBACK_7991_fb"
+Warning: replacing bad NMTOKEN "9307_fb" with "FEEDBACK_9307_fb"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Unknown text type: ignored mattext with texttype="text" treated as text/plain
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="ic7e7f06a79092f0672f0ee014b709e27"
+ title="Numerical Answer"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="1" />
+<instructureField name="question_type" value="numerical_question" />
+</instructureMetadata>
+<responseDeclaration identifier="response1" cardinality="single" baseType="string"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>This is just getting annoying. The answer is 10.6652</p>
+<extendedTextInteraction responseIdentifier="response1"/>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><or><stringMatch  caseSensitive="false" substring="false"><variable identifier="response1"/><baseValue baseType="string">10.6652</baseValue></stringMatch><and><customOperator class="vargte"><variable identifier="response1"/><baseValue baseType="string">10.1652</baseValue></customOperator><customOperator class="varlte"><variable identifier="response1"/><baseValue baseType="string">11.1652</baseValue></customOperator></and></or>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_7991_fb</baseValue></multiple></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><and><customOperator class="vargte"><variable identifier="response1"/><baseValue baseType="string">9</baseValue></customOperator><customOperator class="varlte"><variable identifier="response1"/><baseValue baseType="string">11</baseValue></customOperator></and>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">FEEDBACK_9307_fb</baseValue></multiple></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct_fb</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElse>
+<responseCondition>
+<responseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">general_incorrect_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseElse>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct_fb">
+<p>Correct yo!</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="general_incorrect_fb">
+<p>So wrong!</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_7991_fb">
+<p>You got it exactly! Nice.</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="FEEDBACK_9307_fb">
+<p>I guess I'll take this.</p></modalFeedback>
+</assessmentItem>

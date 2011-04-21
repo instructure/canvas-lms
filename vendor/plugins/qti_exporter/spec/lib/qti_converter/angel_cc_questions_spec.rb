@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
 
-describe "Converting Angel QTI" do
+describe "Converting Angel CC QTI" do
   it "should convert multiple choice" do
     manifest_node=get_manifest_node('multiple_choice')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>angel_question_dir)
@@ -45,24 +45,16 @@ module AngelExpected
                   :question_name=>"",
                   :migration_id=>"543c53e4-f001-41a7-af6d-3312572801d3",
                   :answers=>
-                          [{:comments=>
-                                    "If you chose one of the incorrect answers, you may have been thinking that the scores were averaged or that the master reviewer's \"Yes\" score carried more weight than the other reviewers' scores. Majority rules in QM rubric scoring. Since two out of the three reviewers scored the standard \"No,\" no points are awarded for this standard.",
-                                   :migration_id=>"answerChoice1",
+                          [{:migration_id=>"answerChoice1",
                                    :weight=>0,
                                    :text=>"3 points"},
-                           {:comments=>
-                                    "If you chose one of the incorrect answers, you may have been thinking that the scores were averaged or that the master reviewer's \"Yes\" score carried more weight than the other reviewers' scores. Majority rules in QM rubric scoring. Since two out of the three reviewers scored the standard \"No,\" no points are awarded for this standard.",
-                                   :migration_id=>"answerChoice2",
+                           {:migration_id=>"answerChoice2",
                                    :weight=>0,
                                    :text=>"2 points"},
-                           {:comments=>
-                                    "If you chose one of the incorrect answers, you may have been thinking that the scores were averaged or that the master reviewer's \"Yes\" score carried more weight than the other reviewers' scores. Majority rules in QM rubric scoring. Since two out of the three reviewers scored the standard \"No,\" no points are awarded for this standard.",
-                                   :migration_id=>"answerChoice3",
+                           {:migration_id=>"answerChoice3",
                                    :weight=>0,
                                    :text=>"1 point"},
-                           {:comments=>
-                                    "You got it! Majority rules in QM rubric scoring. Since two out of the three reviewers scored the standard \"No,\" no points are awarded for this standard.",
-                                   :migration_id=>"answerChoice4",
+                           {:migration_id=>"answerChoice4",
                                    :weight=>100,
                                    :text=>"0 points"}],
                   :incorrect_comments=>
@@ -90,11 +82,9 @@ module AngelExpected
                   :question_type=>"multiple_answers_question",
                   :answers=>
                           [{:migration_id=>"answerChoice1",
-                                   :comments=> "Correct! The QM peer review team must include a subject matter expert, an external reviewer, and a master reviewer.",
                                    :text=>"A subject matter expert",
                                    :weight=>100},
                            {:migration_id=>"answerChoice2",
-                                   :comments=> "Correct! The QM peer review team must include a subject matter expert, an external reviewer, and a master reviewer.",
                                    :text=>"An external reviewer",
                                    :weight=>100},
                            {:migration_id=>"answerChoice3",
@@ -102,7 +92,6 @@ module AngelExpected
                                    :weight=>0},
                            {:migration_id=>"answerChoice4", :text=>"A student", :weight=>0},
                            {:migration_id=>"answerChoice5",
-                                   :comments=>"Correct! The QM peer review team must include a subject matter expert, an external reviewer, and a master reviewer.",
                                    :text=>"A master reviewer",
                                    :weight=>100}],
                   :migration_id=>"f2e9bd5b-8dae-4829-a639-c38e97a96c62",

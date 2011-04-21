@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Converting proprietary canvas metadata field points_possible = 15
+Warning: numeric fibtype does not match enclosing <response_str>, assuming string
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "correct"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Unknown text type: ignored mattext with texttype="text" treated as text/plain
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="i0ee13510954fd805d707623ee2c46729"
+ title="Formula 2"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="points_possible" value="15" />
+<instructureField name="question_type" value="calculated_question" />
+</instructureMetadata>
+<responseDeclaration identifier="response1" cardinality="single" baseType="string"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+<itemBody>
+<p>1 + [x] + [x] + [y] + [brian]</p>
+<extendedTextInteraction responseIdentifier="response1"/>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100</baseValue></setOutcomeValue>
+</responseIf>
+<responseElseIf><not><baseValue baseType="boolean">true</baseValue></not>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+</responseElseIf>
+<responseElse>
+<responseCondition>
+<responseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">general_incorrect_fb</baseValue></multiple></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseElse>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct_fb">
+<p>Calculated Correct</p></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="general_incorrect_fb">
+<p>Calculated incorrect. (idiot)</p></modalFeedback>
+<itemproc_extension>
+<calculated>
+<formulas decimal_places="2"><formula>temp = 1 + x</formula><formula>temp + x + y + brian</formula>
+</formulas>
+<answer_tolerance type="None">0.1</answer_tolerance>
+<vars>
+<var name="x" scale="2">
+<min>1</min>
+<max>10</max>
+</var>
+<var name="y" scale="0">
+<min>-10</min>
+<max>10</max>
+</var>
+<var name="brian" scale="3">
+<min>1</min>
+<max>10</max>
+</var>
+</vars>
+<var_sets><var_set ident="6503">
+<var name="x">7.88</var>
+<var name="y">1</var>
+<var name="brian">5.566</var>
+<answer>23.33</answer>
+</var_set><var_set ident="19">
+<var name="x">4.71</var>
+<var name="y">8</var>
+<var name="brian">6.831</var>
+<answer>25.25</answer>
+</var_set><var_set ident="647">
+<var name="x">1.98</var>
+<var name="y">9</var>
+<var name="brian">7.116</var>
+<answer>21.08</answer>
+</var_set><var_set ident="4834">
+<var name="x">8.19</var>
+<var name="y">3</var>
+<var name="brian">2.923</var>
+<answer>23.3</answer>
+</var_set><var_set ident="7685">
+<var name="x">4.45</var>
+<var name="y">4</var>
+<var name="brian">5.631</var>
+<answer>19.53</answer>
+</var_set><var_set ident="1455">
+<var name="x">6.44</var>
+<var name="y">4</var>
+<var name="brian">6.755</var>
+<answer>24.64</answer>
+</var_set><var_set ident="7028">
+<var name="x">2.41</var>
+<var name="y">6</var>
+<var name="brian">2.35</var>
+<answer>14.17</answer>
+</var_set><var_set ident="3059">
+<var name="x">2.33</var>
+<var name="y">2</var>
+<var name="brian">6.798</var>
+<answer>14.46</answer>
+</var_set><var_set ident="4209">
+<var name="x">1.29</var>
+<var name="y">8</var>
+<var name="brian">2.589</var>
+<answer>14.17</answer>
+</var_set><var_set ident="2043">
+<var name="x">4.45</var>
+<var name="y">5</var>
+<var name="brian">7.926</var>
+<answer>22.83</answer>
+</var_set>
+</var_sets>
+</calculated>
+</itemproc_extension>
+</assessmentItem>

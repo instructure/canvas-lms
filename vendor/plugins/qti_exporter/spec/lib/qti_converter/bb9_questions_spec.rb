@@ -33,9 +33,9 @@ module BB9Expected
               :points_possible=>25.0,
               :question_type=>"matching_question",
               :answers=>
-                      [{:text=>"Mars", :comments=>""},
-                       {:text=>"Saturn", :comments=>""},
-                       {:text=>"Earth", :comments=>""},
-                       {:text=>"Jupiter", :comments=>""}],
+                      [{:right=>"Mimas", :text=>"Mars", :comments=>""},
+                       {:right=>"Phobos", :text=>"Saturn", :comments=>""},
+                       {:right=>"Luna", :text=>"Earth", :comments=>""},
+                       {:right=>"Ganymede", :text=>"Jupiter", :comments=>""}],
               :question_name=>""}
 end

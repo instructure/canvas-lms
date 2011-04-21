@@ -32,21 +32,6 @@ module CC
               'short_answer_question' => 'cc.fib.v0p1',
               'essay_question' => 'cc.essay.v0p1'
       }
-
-      TYPE_PROFILES = {
-              "multiple_choice_question" => 'multiple_choice',
-              "multiple_answers_question" => 'multiple_answers',
-              "true_false_question" => 'true_false',
-              "short_answer_question" => 'short_answer',
-              "essay_question" => 'essay',
-              "matching_question" => 'matching',
-              "missing_word_question" => 'multiple_dropdowns',
-              "multiple_dropdowns_question" => 'multiple_dropdowns',
-              "fill_in_multiple_blanks_question" => 'fill_in_multiple_blanks',
-              "numerical_question" => 'numerical',
-              "calculated_question" => 'calculated',
-              "text_only_question" => 'text_only'
-      }
       
       # These types don't stop processing response conditions once the correct
       # answer is found, so they need to show the incorrect response differently
@@ -65,6 +50,9 @@ module CC
       
       def add_question(node, question, for_cc=false)
         question['migration_id'] = create_key("assessment_question_#{question['assessment_question_id']}")
+        if question['question_type'] == 'missing_word_question'
+          change_missing_word(question)
+        end
         node.item(
                 :ident => question['migration_id'],
                 :title => question['name']
@@ -77,7 +65,7 @@ module CC
                   meta_field(qm_node, 'qmd_computerscored', 'No')
                 end
               else
-                meta_field(qm_node, 'question_type', TYPE_PROFILES[question['question_type']])
+                meta_field(qm_node, 'question_type', question['question_type'])
                 meta_field(qm_node, 'points_possible', question['points_possible'])
               end
             end
@@ -85,6 +73,7 @@ module CC
           
           item_node.presentation do |pres_node|
             pres_node.material do |mat_node|
+              #todo missing word badness...
               html = CCHelper.html_content(question['question_text'] || '', @course, @manifest.exporter.user)
               mat_node.mattext html, :texttype=>'text/html'
             end
@@ -127,8 +116,6 @@ module CC
           short_answer_response_str(node, question)
         elsif question['question_type'] == 'matching_question'
           matching_response_lid(node, question)
-        elsif question['question_type'] == 'missing_word_question'
-          missing_word_response_lid(node, question)
         elsif question['question_type'] == 'multiple_dropdowns_question'
           multiple_dropdowns_response_lid(node, question)
         elsif question['question_type'] == 'fill_in_multiple_blanks_question'
@@ -189,15 +176,13 @@ module CC
         end
       end
       
-      def missing_word_response_lid(node, question)
+      def change_missing_word(question)
         # Convert this to a multiple_dropdowns_question then send it on its way
-        question['question_text'] = "#{question['question_text']} [drop1] #{question['text_after_answers']}"
+        question['question_text'] = "#{question['question_text'].gsub(%r{^<p>|</p>$}, '')} [drop1] #{question['text_after_answers'].gsub(%r{^<p>|</p>$}, '')}"
         question['answers'].each do |answer|
           answer['blank_id'] = 'drop1'
         end
         question['question_type'] = 'multiple_dropdowns_question'
-        
-        multiple_dropdowns_response_lid(node, question)
       end
       
       def multiple_dropdowns_response_lid(node, question)
@@ -417,7 +402,11 @@ module CC
             end
             node.respcondition(:continue=>'Yes') do |res_node|
               res_node.conditionvar do |c_node|
-                c_node.varequal answer['id'], :respident=>respident
+                if question[:question_type] == 'short_answer_question'
+                  c_node.varequal answer['text'], :respident=>respident
+                else
+                  c_node.varequal answer['id'], :respident=>respident
+                end
               end #c_node
               node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>"#{answer['id']}_fb")
             end
@@ -460,33 +449,35 @@ module CC
       
       def calculated_extension(node, question)
         node.itemproc_extension do |ext_node|
-          ext_node.answer_tolerance question['answer_tolerance']
-          
-          ext_node.formulas(:decimal_places=>question['formula_decimal_places']) do |forms_node|
-            question['formulas'].each do |f|
-              forms_node.formula f['formula']
-            end
-          end
-          
-          ext_node.vars do |vars_node|
-            question['variables'].each do |var|
-              vars_node.var(:name=>var['name'], :scale=>var['scale']) do |var_node|
-                var_node.min var['min']
-                var_node.max var['max']
+          ext_node.calculated do |calc_node|
+            calc_node.answer_tolerance question['answer_tolerance']
+            
+            calc_node.formulas(:decimal_places=>question['formula_decimal_places']) do |forms_node|
+              question['formulas'].each do |f|
+                forms_node.formula f['formula']
               end
             end
-          end
-          
-          ext_node.var_sets do |sets_node|
-            question['answers'].each do |answer|
-              sets_node.var_set(:ident=>answer['id']) do |set_node|
-                answer['variables'].each do |var|
-                  set_node.var(var['value'], :name=>var['name'])
+            
+            calc_node.vars do |vars_node|
+              question['variables'].each do |var|
+                vars_node.var(:name=>var['name'], :scale=>var['scale']) do |var_node|
+                  var_node.min var['min']
+                  var_node.max var['max']
                 end
               end
             end
-          end
-          
+            
+            calc_node.var_sets do |sets_node|
+              question['answers'].each do |answer|
+                sets_node.var_set(:ident=>answer['id']) do |set_node|
+                  answer['variables'].each do |var|
+                    set_node.var(var['value'], :name=>var['name'])
+                  end
+                  set_node.answer answer[:answer]
+                end
+              end
+            end
+          end # calc_node
         end # ext_node
       end
       
