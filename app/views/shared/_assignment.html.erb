@@ -5,7 +5,7 @@
     context = assignment.try_rescue(:context) || @context
   end
 %>
-<% cache(['assignment_render', assignment || context.asset_string, Time.zone.utc_offset].cache_key) do %>
+<% cache(['assignment_render', assignment || context.asset_string, Time.zone.utc_offset].cache_key, :expires_in => (tomorrow_at_midnight - Time.now).to_i) do %>
 <% assignment_url = context_url(context, :context_assignment_url, assignment_id) %>
 <% submission_url = context_url(context, :context_assignment_submission_url, "{{ assignment_id }}", "{{ user_id }}") %>
 <div class=" group_assignment <%= 'points_uneditable' if assignment && assignment.points_uneditable? %> assignment_<%= assignment ? assignment.id : "blank" %>" id="assignment_<%= assignment ? assignment.id : "blank" %>" style="<%= hidden unless assignment %>">

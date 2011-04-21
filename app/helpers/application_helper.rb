@@ -410,4 +410,9 @@ module ApplicationHelper
     end
     content_tag('iframe', '', { :src => src }.merge(html_options))
   end
+
+  # returns a time object at 00:00:00 tomorrow
+  def tomorrow_at_midnight
+    1.day.from_now.to_date.to_time
+  end
 end

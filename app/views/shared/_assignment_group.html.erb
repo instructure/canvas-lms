@@ -1,7 +1,7 @@
 <% group = assignment_group
   multiple_groups ||= false
   skip_assignments ||= false %>
-<% cache(['assignment_group_render', @current_user || 'nobody', group || @context.asset_string, skip_assignments].cache_key) do %>
+<% cache(['assignment_group_render', @current_user || 'nobody', group || @context.asset_string, skip_assignments, Time.zone.utc_offset].cache_key, :expires_in => (tomorrow_at_midnight - Time.now).to_i) do %>
 <div class="assignment_group <%= 'assignment_group_editable' if can_do(assignment_group, @current_user, :update) %> group_<%= group ? group.id : "blank" %>" id="group_<%= group ? group.id : "blank" %>" style="min-width: 300px; <%= group ? "" : "display: none;" %>">
   <div class="header group_header">
     <div class="header_content">
