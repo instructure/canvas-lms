@@ -217,24 +217,23 @@ class User < ActiveRecord::Base
     # Users are tied to accounts a couple ways:
     #   Through enrollments:
     #      User -> Enrollment -> Section -> Course -> Account
+    #      User -> Enrollment -> Section -> Non-Xlisted Course -> Account
     #      User -> Enrollment -> Course -> Account
     #   Through pseudonyms:
     #      User -> Pseudonym -> Account
     starting_points = []
     self.enrollments.find(:all, :include => {:course_section => [:course, :course_account_associations], :course => :course_account_associations}).each do |enrollment|
-      starting_points << enrollment.course_section << enrollment.course
+      starting_points << enrollment.course << enrollment.course_section.try(:course) << enrollment.course_section.try(:nonxlist_course)
     end
     starting_points += self.pseudonym_accounts.reload
     
-    # For each Course, Section, and Account, make sure an association exists.
+    # For each Course and Account, make sure an association exists.
     starting_points.compact.each do |entity|
       account_ids = []
       if entity.is_a?(Course)
         account_ids = entity.course_account_associations.sort_by{|a| a.depth }.map{|a| a.account_id}.uniq
       elsif entity.is_a?(Account)
         account_ids = entity.account_chain.map(&:id)
-      else
-        account_ids = entity.course_account_associations.sort_by{|a| a.depth }.map{|a| a.account_id}.uniq
       end
       account_ids.uniq.each_with_index do |account_id, idx|
         if associations_hash[account_id]
