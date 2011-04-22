@@ -129,7 +129,7 @@ module CCHelper
          'grades' => nil,
          'users' => nil
         }.each do |type, obj_class|
-          if type != 'wiki' && sub_spot =~ %r{#{type}/(\d+)[^\s"]*$}
+          if type != 'wiki' && sub_spot =~ %r{\A#{type}/(\d+)[^\s"]*$}
             # it's pointing to a specific file or object
             obj = obj_class.find($1) rescue nil
             if obj && obj.respond_to?(:grants_right?) && obj.grants_right?(user, nil, :read)
@@ -141,7 +141,7 @@ module CCHelper
               end
             end
             break
-          elsif sub_spot =~ %r{#{type}(?:/([^\s"]*))?$}
+          elsif sub_spot =~ %r{\A#{type}(?:/([^\s"]*))?$}
             # it's pointing to a course content index or a wiki page
             if type == 'wiki' && $1
               new_url = "#{WIKI_TOKEN}/#{type}/#{$1}"
