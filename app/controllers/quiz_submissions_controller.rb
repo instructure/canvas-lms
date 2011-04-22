@@ -59,7 +59,7 @@ class QuizSubmissionsController < ApplicationController
       end
     end
     if session.delete('lockdown_browser_popup')
-      redirect_params.merge!(Canvas::LockdownBrowser.plugin.base.quiz_exit_params(self))
+      return render(:action => 'close_quiz_popup_window')
     end
     redirect_to course_quiz_url(@context, @quiz, redirect_params)
   end

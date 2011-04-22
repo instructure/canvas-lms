@@ -7,5 +7,5 @@
 </script>
 
 <p>
-  <a href="#" onclick="history.go(-1); return false;">Click here</a> to return to the quiz page.
+  <%= link_to("Click here", context_url(@context, :context_quiz_url, @quiz)) %> to return to the quiz page.
 </p>

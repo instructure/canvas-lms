@@ -465,6 +465,7 @@ class QuizzesController < ApplicationController
       redirect_to(:action => 'lockdown_browser_required', :quiz_id => @quiz.id)
       return false
     elsif @query_params = plugin.popup_window(self, security_level)
+      @security_level = security_level
       session['lockdown_browser_popup'] = true
       render(:action => 'take_quiz_in_popup')
       return false
