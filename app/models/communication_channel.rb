@@ -41,9 +41,16 @@ class CommunicationChannel < ActiveRecord::Base
   
   attr_reader :request_password
   attr_reader :send_confirmation
+  attr_accessor :do_delayed_jobs_immediately
 
   def setup_default_notification_policies
-    (NotificationPolicy.send_later(:defaults_for, self.user) if self.user && self.user.communication_channels.length == 1 && self.user.notification_policies.empty?) rescue nil
+    if self.user.try(:communication_channels).try(:length) == 1 && self.user.try(:notification_policies).try(:empty?)
+      if @do_delayed_jobs_immediately
+        NotificationPolicy.defaults_for(self.user)
+      else
+        NotificationPolicy.send_later(:defaults_for, self.user)
+      end
+    end
   end
   protected :setup_default_notification_policies
   

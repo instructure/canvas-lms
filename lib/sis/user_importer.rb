@@ -104,6 +104,7 @@ module SIS
           comm.path = row['email']
           comm.pseudonym_id = pseudo.id
           comm.workflow_state = 'active'
+          comm.do_delayed_jobs_immediately = true
           comm.save_without_broadcasting
 
           pseudo.communication_channel_id = comm.id
