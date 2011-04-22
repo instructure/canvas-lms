@@ -1493,7 +1493,7 @@ var fileStructureData = [];
                     attachment_id: data.id,
                     height: '100%',
                     scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id, 
-                    scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key,
+                    scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key
                   });
                   files.viewFile(data.context_string, data.id);
                 }
