@@ -9,7 +9,7 @@ class OrderInteraction < AssessmentItemConverter
   def parse_question_data
     match_map = {}
     get_all_matches(match_map)
-    if node = @doc.at_css('correctresponse')
+    if node = @doc.at_css('correctResponse')
       get_correct_responses(match_map)
     else
       get_all_answers(match_map)
@@ -19,8 +19,8 @@ class OrderInteraction < AssessmentItemConverter
   end
   
   def get_all_matches(match_map)
-    if matches = @doc.at_css('orderinteraction')
-      matches.css('simplechoice').each do |sc|
+    if matches = @doc.at_css('orderInteraction')
+      matches.css('simpleChoice').each do |sc|
         match = {}
         @question[:matches] << match
         match[:text] = clear_html(sc.text.strip)
@@ -31,21 +31,21 @@ class OrderInteraction < AssessmentItemConverter
   end
   
   def get_all_answers(match_map)
-    @doc.css('responsecondition member').each_with_index do |a, i|
+    @doc.css('responseCondition member').each_with_index do |a, i|
       answer = {}
       @question[:answers] << answer
       answer[:text] = "#{i + 1}"
       answer[:id] = unique_local_id 
       answer[:comments] = ""
       
-      if option = a.at_css('basevalue')
+      if option = a.at_css('baseValue')
         answer[:match_id] = match_map[option.text.strip]
       end
     end
   end
 
   def get_correct_responses(match_map)
-    @doc.css('correctresponse > value').each_with_index do |answ, i|
+    @doc.css('correctResponse > value').each_with_index do |answ, i|
       answer = {}
       @question[:answers] << answer
       answer[:text] = "#{i + 1}"

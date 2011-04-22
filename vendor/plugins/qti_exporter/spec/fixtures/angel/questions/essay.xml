@@ -16,8 +16,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <responseDeclaration identifier="f6129250-3baf-4128-8c81-efc5d495eef1" cardinality="single" baseType="string"/>
 <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
 <itemBody>
-<div>Explain what happens when a course meets expectations and when a
-            course does not meet expectations.</div>
+<div>Explain what happens when a course meets expectations and when a course does not meet expectations.</div>
 <div></div>
 <extendedTextInteraction responseIdentifier="f6129250-3baf-4128-8c81-efc5d495eef1"/>
 </itemBody>

@@ -47,8 +47,7 @@ Warning: flow_label is no longer supported in version 2, ignoring
 <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
 <defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
 <itemBody>
-<p>Match these.<br/>
-</p>
+<p>Match these.</p>
 <div class="Row">
 <associateInteraction responseIdentifier="STAT1" shuffle="true" maxAssociations="1">
 <prompt>left 1</prompt>

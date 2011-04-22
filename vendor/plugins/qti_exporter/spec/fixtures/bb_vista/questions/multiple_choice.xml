@@ -36,9 +36,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
     </defaultValue>
   </outcomeDeclaration>
   <itemBody>
-    <p>The answer is nose.
-      <br/>
-    </p>
+    <p>The answer is nose.</p>
     <choiceInteraction responseIdentifier="RESP_MC" shuffle="false"
                        maxChoices="1">
       <simpleChoice identifier="MC0" fixed="false">

@@ -17,8 +17,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <outcomeDeclaration identifier="QUE_SCORE" cardinality="single" baseType="integer">
 <defaultValue><value>0</value></defaultValue></outcomeDeclaration>
 <itemBody>
-<p>
-                            Select all the words that start with an &quot;A&quot;.</p>
+<p>Select all the words that start with an &quot;A&quot;.</p>
 <choiceInteraction responseIdentifier="QUE_1052_RL" shuffle="false" maxChoices="1">
 <simpleChoice identifier="QUE_1053_A1" fixed="true">
 <p>Alabaster</p></simpleChoice>
@@ -63,18 +62,13 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 </responseCondition>
 </responseProcessing>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1057_C">
-<p>
-                            &quot;Alabaster&quot; starts with an &quot;a&quot;, yes.</p></modalFeedback>
+<p>&quot;Alabaster&quot; starts with an &quot;a&quot;, yes.</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1058_IC">
-<p>
-                            &quot;Brandish&quot; starts with a &quot;b&quot;, so no</p></modalFeedback>
+<p>&quot;Brandish&quot; starts with a &quot;b&quot;, so no</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1059_C">
-<p>
-                            &quot;Architecture&quot; starts with an &quot;a&quot;, yes</p></modalFeedback>
+<p>&quot;Architecture&quot; starts with an &quot;a&quot;, yes</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1060_IC">
-<p>
-                            &quot;Streamline&quot; starts with an &quot;s&quot;, so no</p></modalFeedback>
+<p>&quot;Streamline&quot; starts with an &quot;s&quot;, so no</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1050_ALL">
-<p>
-                            &quot;Alabaster&quot; and &quot;architecture&quot; both start with an &quot;A&quot;.</p></modalFeedback>
+<p>&quot;Alabaster&quot; and &quot;architecture&quot; both start with an &quot;A&quot;.</p></modalFeedback>
 </assessmentItem>

@@ -10,12 +10,12 @@ class AssociateInteraction < AssessmentItemConverter
   end
 
   def parse_question_data
-    if @doc.at_css('associateinteraction')
+    if @doc.at_css('associateInteraction')
       match_map = {}
       get_all_matches_with_interaction(match_map)
       get_all_answers_with_interaction(match_map)
       check_for_meta_matches
-    elsif node = @doc.at_css('matchinteraction')
+    elsif node = @doc.at_css('matchInteraction')
       get_all_match_interaction(node)
     elsif @flavor == 'respondus_matching'
       get_respondus_answers
@@ -31,12 +31,12 @@ class AssociateInteraction < AssessmentItemConverter
   private
 
   def get_respondus_answers
-    @doc.css('choiceinteraction').each do |a|
+    @doc.css('choiceInteraction').each do |a|
       answer = {}
       @question[:answers] << answer
       extract_answer!(answer, a.at_css('prompt'))
       answer[:id] = unique_local_id
-      answer[:migration_id] = a['responseidentifier']
+      answer[:migration_id] = a['responseIdentifier']
       answer[:comments] = ""
       #answer[:match_id] = @question[:matches][i][:match_id]
     end
@@ -44,12 +44,12 @@ class AssociateInteraction < AssessmentItemConverter
 
   def get_respondus_matches
     @question[:answers].each do |answer|
-      @doc.css('responseif, responseelseif').each do |r_if|
-        if r_if.at_css("match variable[identifier=#{answer[:migration_id]}]") && r_if.at_css('setoutcomevalue[identifier$=_CORRECT]')
+      @doc.css('responseIf, responseElseIf').each do |r_if|
+        if r_if.at_css("match variable[identifier=#{answer[:migration_id]}]") && r_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
           match = {}
           @question[:matches] << match
-          migration_id = r_if.at_css('match basevalue').text
-          match[:text] = @doc.at_css("simplechoice[identifier=#{migration_id}] p").text
+          migration_id = r_if.at_css('match baseValue').text
+          match[:text] = @doc.at_css("simpleChoice[identifier=#{migration_id}] p").text
           match[:match_id] = unique_local_id
           answer[:match_id] = match[:match_id]
           answer.delete :migration_id
@@ -82,8 +82,8 @@ class AssociateInteraction < AssessmentItemConverter
   end
   
   def get_all_matches_with_interaction(match_map)
-    if matches = @doc.at_css('associateinteraction')
-      matches.css('simpleassociablechoice').each do |m|
+    if matches = @doc.at_css('associateInteraction')
+      matches.css('simpleAssociableChoice').each do |m|
         match = {}
         @question[:matches] << match
         match[:text] = m.text.strip
@@ -94,14 +94,14 @@ class AssociateInteraction < AssessmentItemConverter
   end
   
   def get_all_answers_with_interaction(match_map)
-    @doc.css('associateinteraction').each do |a|
+    @doc.css('associateInteraction').each do |a|
       answer = {}
       @question[:answers] << answer
       extract_answer!(answer, a.at_css('prompt'))
       answer[:id] = unique_local_id 
       answer[:comments] = ""
       
-      if option = a.at_css('simpleassociablechoice[identifier^=MATCH]')
+      if option = a.at_css('simpleAssociableChoice[identifier^=MATCH]')
         answer[:match_id] = match_map[option.text.strip]
       end
     end
@@ -109,7 +109,7 @@ class AssociateInteraction < AssessmentItemConverter
   
   # Replaces the matches with their full-text instead of a,b,c/1,2,3/etc.
   def check_for_meta_matches
-    if long_matches = @doc.search('instructuremetadata matchingmatch')
+    if long_matches = @doc.search('instructureMetadata matchingMatch')
       @question[:matches].each_with_index do |match, i|
         match[:text] = long_matches[i].text.strip.gsub(/ +/, " ") if long_matches[i]
       end
@@ -121,7 +121,7 @@ class AssociateInteraction < AssessmentItemConverter
 
   def get_all_match_interaction(interaction_node)
     answer_map={}
-    interaction_node.at_css('simplematchset').css('simpleassociablechoice').each do |node|
+    interaction_node.at_css('simpleMatchSet').css('simpleAssociableChoice').each do |node|
       answer = {}
       extract_answer!(answer, node)
       answer[:id] = unique_local_id
@@ -131,7 +131,7 @@ class AssociateInteraction < AssessmentItemConverter
     end
 
     match_map = {}
-    interaction_node.css('simplematchset').last.css('simpleassociablechoice').each do |node|
+    interaction_node.css('simpleMatchSet').last.css('simpleAssociableChoice').each do |node|
       match = {}
       match[:text] = node.text.strip
       match[:match_id] = unique_local_id
@@ -141,7 +141,7 @@ class AssociateInteraction < AssessmentItemConverter
     end
 
     #Check if there are correct answers explicitly specified
-    @doc.css('correctresponse > value').each do |match|
+    @doc.css('correctResponse > value').each do |match|
       answer_id, match_id = match.text.split
       if answer = answer_map[answer_id.strip] and m = match_map[match_id.strip]
         answer[:match_id] = m[:match_id]

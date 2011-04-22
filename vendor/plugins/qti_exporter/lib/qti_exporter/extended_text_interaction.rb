@@ -8,7 +8,7 @@ class ExtendedTextInteraction < AssessmentItemConverter
 
   def parse_question_data
     if !@short_answer
-      @short_answer = @doc.at_css('setoutcomevalue[identifier=SCORE]') || @doc.at_css('setoutcomevalue[identifier$=SCORE]') || @doc.at_css('setoutcomevalue[identifier^=SCORE]')
+      @short_answer = @doc.at_css('setOutcomeValue[identifier=SCORE]') || @doc.at_css('setOutcomeValue[identifier$=SCORE]') || @doc.at_css('setOutcomeValue[identifier^=SCORE]')
     end
     if @short_answer
       @question[:question_type] ||= "short_answer_question"
@@ -38,12 +38,12 @@ class ExtendedTextInteraction < AssessmentItemConverter
       end
       @question.delete :is_vista_fib
     end
-    @doc.search('responseprocessing responsecondition').each do |cond|
-      cond.css('stringmatch').each do |match|
+    @doc.search('responseProcessing responseCondition').each do |cond|
+      cond.css('stringMatch').each do |match|
         answer = {}
-        answer[:text] = match.at_css('basevalue[basetype=string]').text.strip
-        if @question[:question_type] == 'fill_in_multiple_blanks_question' and id = match.at_css('variable @identifier')
-          id = id.text.strip
+        answer[:text] = match.at_css('baseValue[baseType=string]').text.strip
+        if @question[:question_type] == 'fill_in_multiple_blanks_question' and id = get_node_att(match, 'variable','identifier')
+          id = id.strip
           answer[:blank_id] = vista_fib_map[id] || id
         end
         unless answer[:text] == ""
@@ -55,7 +55,7 @@ class ExtendedTextInteraction < AssessmentItemConverter
       end
     end
     #Check if there are correct answers explicitly specified
-    @doc.css('correctresponse value').each do |correct_id|
+    @doc.css('correctResponse value').each do |correct_id|
       answer = {}
       answer[:id] = unique_local_id
       answer[:weight] = DEFAULT_CORRECT_WEIGHT

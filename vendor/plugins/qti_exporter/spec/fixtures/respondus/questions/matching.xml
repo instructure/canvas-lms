@@ -51,9 +51,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
         </defaultValue>
     </outcomeDeclaration>
     <itemBody>
-        <p>
-            Match each lowercase letter with its capitalized letter
-        </p>
+        <p>Match each lowercase letter with its capitalized letter</p>
         <choiceInteraction responseIdentifier="QUE_1027_RL" shuffle="true" maxChoices="1">
             <prompt>a</prompt>
             <simpleChoice identifier="QUE_1028_A1" fixed="true">
@@ -377,8 +375,6 @@ Warning: replacing <other/> with the base value true - what did you want me to d
         </responseCondition>
     </responseProcessing>
     <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1025_ALL">
-        <p>
-            This should have been fairly straightforward, if you know the alphabet at all.
-        </p>
+        <p>This should have been fairly straightforward, if you know the alphabet at all.</p>
     </modalFeedback>
 </assessmentItem>

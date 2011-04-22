@@ -45,6 +45,5 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 </responseCondition>
 </responseProcessing>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1035_ALL">
-<p>
-                            The answer was &quot;2&quot;.  Or &quot;two&quot;.  Or I would even take &quot;abs(2)&quot;</p></modalFeedback>
+<p>The answer was &quot;2&quot;.  Or &quot;two&quot;.  Or I would even take &quot;abs(2)&quot;</p></modalFeedback>
 </assessmentItem>

@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
 
-describe "Converting a respondus QTI" do
+describe "Converting D2L QTI" do
   it "should convert multiple choice" do
     manifest_node=get_manifest_node('multiple_choice')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>d2l_question_dir)
@@ -43,7 +43,7 @@ module D2LExpected
                   :migration_id=>"d2l_multiple_choice",
                   :points_possible=>1,
                   :question_text=>
-                          "<!--BBQ-001-->Akkadian is a Semitic language, related to Hebrew and Arabic.",
+                          "&lt;!--BBQ-001--&gt;Akkadian is a Semitic language, related to Hebrew and Arabic.",
                   :question_name=>""}
   TRUE_FALSE =
           {:question_type=>"multiple_choice_question",

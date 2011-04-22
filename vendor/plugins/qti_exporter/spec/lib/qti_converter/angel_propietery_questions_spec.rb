@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
 
-describe "Converting a respondus QTI" do
+describe "Converting Angel QTI" do
 
   it "should convert multiple_choice" do
     qti_data = file_as_string(angel_question_dir, 'p_multiple_choice.xml')
@@ -94,7 +94,7 @@ module AngelPropExpected
           :incorrect_comments=>"",
           :question_type=>"multiple_choice_question",
           :migration_id=>"",
-          :question_text=>"This is annoying.]]>\n TrueFalse]]>",
+          :question_text=>"<div>This is annoying.</div>",
           :answers=>
               [{:text=>"True", :migration_id=>"ChoiceTrue", :weight=>100},
                {:text=>"False", :migration_id=>"ChoiceFalse", :weight=>0}],
@@ -107,8 +107,7 @@ module AngelPropExpected
           :incorrect_comments=>"",
           :question_type=>"multiple_choice_question",
           :migration_id=>"",
-          :question_text=>
-              "What is an LMS]]>Learning microsoft systemListening management systemLiberal management systemlearning management system]]>",
+          :question_text=>"<div>What is an LMS</div>",
           :answers=>
               [{:text=>"Learning microsoft system",
                 :migration_id=>"answerChoice1",
@@ -131,7 +130,7 @@ module AngelPropExpected
           :incorrect_comments=>"",
           :question_type=>"essay_question",
           :migration_id=>"",
-          :question_text=>"Rhode Island is neither a road nor an island. Discuss]]>]]>",
+          :question_text=>"<div>Rhode Island is neither a road nor an island. Discuss</div>",
           :answers=>[],
           :question_name=>"Essay question title here",
           :points_possible=>1,
@@ -151,23 +150,23 @@ module AngelPropExpected
           :question_type=>"multiple_choice_question",
           :correct_comments=>"",
           :migration_id=>"",
-          :question_text=>"How good is Instructure]]>\n ]]>"}
+          :question_text=>"<div>How good <em>is</em> Instructure</div>"}
 
   MULTIPLE_ANSWER =
       {
           :question_name=>"Multiple select",
           :answers=>
-              [{:migration_id=>"answerChoice1", :text=>"a", :weight=>0},
-               {:migration_id=>"answerChoice2", :text=>"b", :weight=>100},
-               {:migration_id=>"answerChoice3", :text=>"c", :weight=>0},
-               {:migration_id=>"answerChoice4", :text=>"d", :weight=>0},
+              [{:migration_id=>"answerChoice1", :text=>"a", :weight=>0, :comments=>"feedback - a"},
+               {:migration_id=>"answerChoice2", :text=>"b", :weight=>100, :comments=>"feedback - b"},
+               {:migration_id=>"answerChoice3", :text=>"c", :weight=>0, :comments=>"feedback - c"},
+               {:migration_id=>"answerChoice4", :text=>"d", :weight=>0, :comments=>"feedback - d"},
                {:migration_id=>"answerChoice5", :text=>"e", :weight=>100}],
           :incorrect_comments=>"",
           :points_possible=>1,
           :question_type=>"multiple_answers_question",
           :correct_comments=>"",
           :migration_id=>"",
-          :question_text=>"go!]]>abcde]]>"}
+          :question_text=>"<div>go!</div>"}
 
   SHORT_ANSWER =
       {:answers=>[{:text=>"cat", :weight=>100}],
@@ -177,7 +176,7 @@ module AngelPropExpected
        :migration_id=>"",
        :points_possible=>1,
        :question_type=>"short_answer_question",
-       :question_text=>"What is your answer]]>]]>"}
+       :question_text=>"<div>What is your answer</div>"}
 
   MATCHING =
       {
@@ -188,7 +187,7 @@ module AngelPropExpected
           :migration_id=>"",
           :points_possible=>1,
           :question_type=>"matching_question",
-          :question_text=>"matching question]]>abc123]]>",
+          :question_text=>"<div>matching question</div>",
           :matches=>[{:text=>"1"}, {:text=>"2"}, {:text=>"3"}]}
 
   ORDER =
@@ -202,7 +201,7 @@ module AngelPropExpected
        :migration_id=>"",
        :points_possible=>1,
        :question_type=>"matching_question",
-       :question_text=>"Order these]]>123]]>",
+       :question_text=>"<div>Order these</div>",
        :matches=>[{:text=>"1"}, {:text=>"2"}, {:text=>"3"}]}
 
   FILE_RESPONSE =
@@ -214,7 +213,7 @@ module AngelPropExpected
           :migration_id=>"",
           :points_possible=>1,
           :question_type=>"file_upload_question",
-          :question_text=>"This is an offline item. I don't know what to do.]]>]]>",
+          :question_text=>"<div>This is an offline item. I don't know what to do.</div>",
           :unsupported=>true}
 
   FIB =

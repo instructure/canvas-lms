@@ -32,8 +32,7 @@ Warning: solution material is being replaced by div with class="solution"
 </instructureMetadata>
 <responseDeclaration identifier="PARA" cardinality="single" baseType="string"/>
 <itemBody>
-<p>Who likes to use Blackboard?<br/>
-</p>
+<p>Who likes to use Blackboard?</p>
 <extendedTextInteraction responseIdentifier="PARA" class="Box" expectedLength="99999999" maxStrings="1"/>
 </itemBody>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="CORRECT_ANSWER">

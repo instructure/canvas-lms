@@ -19,7 +19,7 @@ class AssessmentItemConverter
       @base_dir = opts[:base_dir]
       @identifier = @manifest_node['identifier']
       @href = File.join(@base_dir, @manifest_node['href'])
-      if title = @manifest_node.at_css('title langstring')
+      if title = @manifest_node.at_css('title langstring') || title = @manifest_node.at_css('xmlns|title xmlns|langstring', 'xmlns' => Qti::QtiExporter::IMS_MD)
         @title = title.text
       end
     else
@@ -40,11 +40,7 @@ class AssessmentItemConverter
   end
 
   def create_doc
-    if @manifest_node
-      @doc = Nokogiri::HTML(open(@href))
-    else
-      @doc = Nokogiri::HTML(@qti_data)
-    end
+    create_xml_doc
   end
 
   def create_xml_doc
@@ -58,15 +54,17 @@ class AssessmentItemConverter
   def create_instructure_question
     begin
       create_doc
-      @question[:question_name] = @title || @doc.at_css('assessmentitem @title').text
+      @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
       # The colons are replaced with dashes in the conversion from QTI 1.2
-      @question[:migration_id] = @doc.at_css('assessmentitem @identifier').text.gsub(/:/, '-')
-      if @doc.at_css('itembody').children.first.name == 'div' #because the selector 'itembody + div' doesn't work...
-        @question[:question_text] = @doc.at_css('itembody div').inner_html
-      elsif @doc.at_css('itembody p')
-        @question[:question_text] = @doc.at_css('itembody p').inner_html
-      elsif @doc.at_css('itembody')
-        @question[:question_text] = @doc.at_css('itembody').inner_html
+      @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier').gsub(/:/, '-')
+      if text = @doc.at_css('itemBody div:first-child') || text = @doc.at_css('itemBody p:first-child')
+        @question[:question_text] = text.inner_html
+      elsif text = @doc.at_css('itemBody div') || text = @doc.at_css('itemBody p')
+        @question[:question_text] = text.inner_html
+      elsif @doc.at_css('itemBody')
+        if text = @doc.at_css('itemBody').children.find{|c|c.text.strip != ''}
+          @question[:question_text] = text.text.strip
+        end
       end
       parse_instructure_metadata
 
@@ -87,17 +85,17 @@ class AssessmentItemConverter
   end
   
   def parse_instructure_metadata
-    if bank = @doc.at_css('instructuremetadata instructurefield[name=question_bank] @value')
-      @question[:question_bank_name] = bank.text
+    if bank =  get_node_att(@doc, 'instructureMetadata instructureField[name=question_bank]',  'value')
+      @question[:question_bank_name] = bank
     end
-    if bank = @doc.at_css('instructuremetadata instructurefield[name=question_bank_iden] @value')
-      @question[:question_bank_id] = bank.text
+    if bank =  get_node_att(@doc, 'instructureMetadata instructureField[name=question_bank_iden]', 'value')
+      @question[:question_bank_id] = bank
     end
-    if score = @doc.at_css('instructuremetadata instructurefield[name=max_score] @value')
-      @question[:points_possible] = score.text.to_f
+    if score =  get_node_att(@doc, 'instructureMetadata instructureField[name=max_score]', 'value')
+      @question[:points_possible] = score.to_f
     end
-    if type = @doc.at_css('instructuremetadata instructurefield[name=bb_question_type] @value')
-      @migration_type = type.text
+    if type =  get_node_att(@doc, 'instructureMetadata instructureField[name=bb_question_type]', 'value')
+      @migration_type = type
       case @migration_type
         when 'True/False'
           @question[:question_type] = 'true_false_question'
@@ -114,8 +112,8 @@ class AssessmentItemConverter
           @question[:question_type] = 'essay_question'
       end
     end
-    if type = @doc.at_css('instructuremetadata instructurefield[name=question_type] @value')
-      @migration_type = type.text
+    if type =  get_node_att(@doc, 'instructureMetadata instructureField[name=question_type]', 'value')
+      @migration_type = type
       case @migration_type
         when /matching/i
           @question[:question_type] = 'matching_question'
@@ -138,7 +136,7 @@ class AssessmentItemConverter
   end
   
   def get_feedback
-    @doc.search('modalfeedback[outcomeidentifier=FEEDBACK]').each do |f|
+    @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |f|
       id = f['identifier']
       feedback = clear_html(f.text.strip.gsub(/\s+/, " "))
       if id =~ /general|all/i
@@ -185,18 +183,19 @@ class AssessmentItemConverter
   end
 
   def self.create_instructure_question(opts)
+    extend Canvas::XMLHelper
     q = nil
     manifest_node = opts[:manifest_node]
 
     if manifest_node
-      if type = manifest_node.at_css('interactiontype')
+      if type = manifest_node.at_css('interactionType') || type = manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_1_URL)
         opts[:interaction_type] ||= type.text.downcase
       end
-      if type = manifest_node.at_css('instructuremetadata instructurefield[name=bb_question_type] @value')
-        opts[:custom_type] ||= type.text.downcase
+      if type = get_node_att(manifest_node,'instructureMetadata instructureField[name=bb_question_type]', 'value')
+        opts[:custom_type] ||= type.downcase
       end
-      if type = manifest_node.at_css('instructuremetadata instructurefield[name=question_type] @value')
-        opts[:custom_type] ||= type.text.downcase
+      if type = get_node_att(manifest_node,'instructureMetadata instructureField[name=question_type]', 'value')
+        opts[:custom_type] ||= type.downcase
         if opts[:custom_type] == 'matching'
           opts[:custom_type] = 'respondus_matching'
         end

@@ -38,8 +38,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
 <defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
 <itemBody>
-<p>What is 10 - ?<br/>
-</p>
+<p>What is 10 - ?</p>
 <extendedTextInteraction responseIdentifier="CALC" class="Box" base="10" expectedLength="20" maxStrings="1"/>
 </itemBody>
 <responseProcessing>

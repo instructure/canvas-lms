@@ -34,8 +34,7 @@ Warning: ignoring rows x columns on render_fib in favour of maxchars
 <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
 <defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
 <itemBody>
-<p>We all live in what?<br/>
-</p>
+<p>We all live in what?</p>
 <extendedTextInteraction responseIdentifier="SA01" class="Box" expectedLength="200" maxStrings="1">
 <prompt>1. </prompt></extendedTextInteraction>
 </itemBody>

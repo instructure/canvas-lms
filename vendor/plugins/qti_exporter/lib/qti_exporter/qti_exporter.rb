@@ -6,6 +6,7 @@ class QtiExporter < Canvas::Migrator
   MANIFEST_FILE = "imsmanifest.xml"
   QTI_2_1_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p1'
   QTI_2_0_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p0'
+  IMS_MD = "http://www.imsglobal.org/xsd/imsmd_v1p2"
 
   def initialize(settings)
     super(settings, 'qti')

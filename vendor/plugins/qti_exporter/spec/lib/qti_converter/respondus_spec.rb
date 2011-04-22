@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
 
-describe "Converting a respondus QTI" do
+describe "Converting respondus QTI" do
   it "should convert multiple choice" do
     manifest_node=get_manifest_node('multiple_choice')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>respondus_question_dir)
@@ -102,8 +102,7 @@ module RespondusExpected
                            {:comments=>"", :text=>"abs(2)", :weight=>100}],
                   :incorrect_comments=>"",
                   :points_possible=>1,
-                  :general_comments=>
-                          "The answer was \"2\". Or \"two\". Or I would even take \"abs(2)\"",
+                  :general_comments=>"The answer was \"2\". Or \"two\". Or I would even take \"abs(2)\"",
                   :question_type=>"short_answer_question",
                   :question_text=>"The absolute value of (-2) is __________"
           }
@@ -116,8 +115,7 @@ module RespondusExpected
                   :answers=>[],
                   :incorrect_comments=>"",
                   :points_possible=>1,
-                  :general_comments=>
-                          "You should have typed something coherent and meaningful into the essay box.",
+                  :general_comments=>"You should have typed something coherent and meaningful into the essay box.",
                   :question_type=>"essay_question",
                   :question_text=>"Please type your essay question answer in the box below."
           }

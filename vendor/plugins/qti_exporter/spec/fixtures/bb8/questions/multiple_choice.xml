@@ -45,9 +45,7 @@ Warning: solution material is being replaced by div with class="solution"
     </defaultValue>
   </outcomeDeclaration>
   <itemBody>
-    <div class="QUESTION_BLOCK">
-      <p class="FORMATTED_TEXT_BLOCK">The answer is nose.&lt;br /&gt;</p>
-    </div>
+    <div class="QUESTION_BLOCK"><p class="FORMATTED_TEXT_BLOCK">The answer is nose.&lt;br /&gt;</p></div>
     <div class="RESPONSE_BLOCK">
       <choiceInteraction responseIdentifier="response" shuffle="false"
                          maxChoices="1">

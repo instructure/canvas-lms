@@ -3,23 +3,23 @@ class QuestionTypeEducatedGuesser < AssessmentItemConverter
   def educatedly_guess_type
     begin
       create_doc
-      if @doc.at_css('choiceinteraction')
+      if @doc.at_css('choiceInteraction')
         # multiple choice, matching, multiple response, true/false, and respondus algorithm question
-        if @doc.css('choiceinteraction').length > 1
-          # only matching has more than one choiceinteraction
-          if @doc.at_css('outcomedeclaration[identifier^=RESPONDUS]')
-            return ['choiceinteraction', 'respondus_matching']
+        if @doc.css('choiceInteraction').length > 1
+          # only matching has more than one choiceInteraction
+          if @doc.at_css('outcomeDeclaration[identifier^=RESPONDUS]')
+            return ['choiceInteraction', 'respondus_matching']
           else
-            return ['choiceinteraction', 'matching']
+            return ['choiceInteraction', 'matching']
           end
         end
-        return ['choiceinteraction', nil]
+        return ['choiceInteraction', nil]
       end
-      if @doc.at_css('associateinteraction')
+      if @doc.at_css('associateInteraction')
         return ['associateinteraction', 'matching']
       end
-      if@doc.at_css('extendedtextinteraction')
-        return ['extendedtextinteraction', nil]
+      if@doc.at_css('extendedTextInteraction')
+        return ['extendedTextInteraction', nil]
       end
     rescue => e
       message = "There was an error educatedly guessing the type for an assessment question"

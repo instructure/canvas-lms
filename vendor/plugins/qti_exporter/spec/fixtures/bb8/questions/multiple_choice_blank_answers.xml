@@ -43,10 +43,7 @@ Warning: solution material is being replaced by div with class="solution"
 <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
 <defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
 <itemBody>
-<div class="QUESTION_BLOCK">
-<p class="FORMATTED_TEXT_BLOCK">This is a great question.&lt;br
-                      /&gt;</p></div>
-<div class="RESPONSE_BLOCK">
+<div class="QUESTION_BLOCK"><p class="FORMATTED_TEXT_BLOCK">This is a great question.&lt;br/&gt;</p></div><div class="RESPONSE_BLOCK">
 <choiceInteraction responseIdentifier="response" shuffle="false" maxChoices="1">
 <simpleChoice identifier="RESPONSE_44dc8fdb5e0a4c0c99de864f8a4ca983" fixed="true">
 <p class="FORMATTED_TEXT_BLOCK">True</p></simpleChoice>

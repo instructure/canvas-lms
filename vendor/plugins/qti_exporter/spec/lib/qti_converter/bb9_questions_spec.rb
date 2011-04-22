@@ -21,7 +21,7 @@ end
 
 module BB9Expected
   # removed ids on the answers
-  MATCHING = {:question_text=>"Match the correct satellite with the correct planet.",
+  MATCHING = {:question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">Match the correct satellite with the correct planet.</p>",
               :correct_comments=>"",
               :migration_id=>"_bb9_matching_",
               :incorrect_comments=>"",

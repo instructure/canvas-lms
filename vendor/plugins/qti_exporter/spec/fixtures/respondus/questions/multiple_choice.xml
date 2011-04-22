@@ -16,7 +16,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <outcomeDeclaration identifier="QUE_SCORE" cardinality="single" baseType="integer">
 <defaultValue><value>0</value></defaultValue></outcomeDeclaration>
 <itemBody>
-<p>Please select the answer &quot;C&quot; </p>
+<p>Please select the answer &quot;C&quot;</p>
 <choiceInteraction responseIdentifier="QUE_1005_RL" shuffle="false" maxChoices="1">
 <simpleChoice identifier="QUE_1006_A1" fixed="true">
 <p>A</p></simpleChoice>
@@ -56,17 +56,13 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 </responseCondition>
 </responseProcessing>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1010_IC">
-<p>
-                            No, that's not &quot;C&quot;, that's &quot;A&quot;</p></modalFeedback>
+<p>No, that's not &quot;C&quot;, that's &quot;A&quot;</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1011_IC">
-<p>
-                            No, that's not &quot;C&quot;, that's &quot;B&quot;</p></modalFeedback>
+<p>No, that's not &quot;C&quot;, that's &quot;B&quot;</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1012_C">
 <p>That's right!</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1013_IC">
-<p>
-                            No, that's not &quot;C&quot;, that's &quot;D&quot;</p></modalFeedback>
+<p>No, that's not &quot;C&quot;, that's &quot;D&quot;</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1003_ALL">
-<p>
-                            Well, the correct answer should have been &quot;C&quot;.  If you didn't put that, you're wrong.</p></modalFeedback>
+<p>Well, the correct answer should have been &quot;C&quot;.  If you didn't put that, you're wrong.</p></modalFeedback>
 </assessmentItem>

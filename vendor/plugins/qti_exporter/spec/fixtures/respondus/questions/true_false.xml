@@ -16,7 +16,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <outcomeDeclaration identifier="QUE_SCORE" cardinality="single" baseType="integer">
 <defaultValue><value>0</value></defaultValue></outcomeDeclaration>
 <itemBody>
-<p>The correct answer is &quot;false&quot; </p>
+<p>The correct answer is &quot;false&quot;</p>
 <choiceInteraction responseIdentifier="QUE_1016_RL" shuffle="false" maxChoices="1">
 <simpleChoice identifier="QUE_1017_A1" fixed="true">
 <p>True</p></simpleChoice>
@@ -46,6 +46,5 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1020_C">
 <p>Yes, that is the correct answer!</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1014_ALL">
-<p>
-                            Like I said, the correct answer should have been &quot;false&quot;.  If you didn't select &quot;false&quot; you deserve to be called an idiot.</p></modalFeedback>
+<p>Like I said, the correct answer should have been &quot;false&quot;.  If you didn't select &quot;false&quot; you deserve to be called an idiot.</p></modalFeedback>
 </assessmentItem>

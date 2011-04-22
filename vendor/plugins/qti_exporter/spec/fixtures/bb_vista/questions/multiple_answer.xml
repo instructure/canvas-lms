@@ -36,9 +36,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
     </defaultValue>
   </outcomeDeclaration>
   <itemBody>
-    <p>The answers are house and garage.
-      <br/>
-    </p>
+    <p>The answers are house and garage.</p>
     <choiceInteraction responseIdentifier="RESP_MC" shuffle="false"
                        maxChoices="1">
       <simpleChoice identifier="MC0" fixed="false">

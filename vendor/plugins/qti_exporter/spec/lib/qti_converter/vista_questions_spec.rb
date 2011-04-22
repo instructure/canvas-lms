@@ -4,7 +4,7 @@ describe "Converting Blackboard Vista qti" do
 
   it "should mock the manifest node correctly" do
     manifest_node=get_manifest_node('multiple_choice', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Calculated')
-    manifest_node.at_css("instructuremetadata").should == manifest_node
+    manifest_node.at_css("instructureMetadata").should == manifest_node
     manifest_node['identifier'].should == nil
     manifest_node['href'].should == 'multiple_choice.xml'
     if title = manifest_node.at_css('title langstring')
@@ -13,11 +13,11 @@ describe "Converting Blackboard Vista qti" do
     if type = manifest_node.at_css('interactiontype')
       type.text.downcase.should == 'extendedtextinteraction'
     end
-    if type = manifest_node.at_css('instructuremetadata instructurefield[name=quiz_type] @value')
-      type.text.downcase.should == 'calculated'
+    if type = manifest_node.at_css('instructureMetadata instructureField[name=quiz_type]')
+      type['value'].downcase.should == 'calculated'
     end
-    if type = manifest_node.at_css('instructurefield[name=bb8_assessment_type] @value')
-      type.text.downcase.should == 'calculated'
+    if type = manifest_node.at_css('instructureField[name=bb8_assessment_type]')
+      type['value'].downcase.should == 'calculated'
     end
   end
 
@@ -400,8 +400,7 @@ module VistaExpected
                                            {:value=>"39.0", :name=>"Y"},
                                            {:value=>"30.0", :name=>"n"}],
                                   :answer=>"101.95412167352283"}],
-                        :question_text=>
-                                "Based on her excellent performance as a district sales manager, Maria receives a sizable bonus at work. Since her generous salary is more than enough to provide for the needs of her family, she decides to use the bonus to buy a bond as an investment. The par value of the bond that Maria would like to purchase is $ thousand. The bond pays % interest, compounded semiannually (with payment on January 1 and July 1) and matures on July 1, 20. Maria wants a return of %, compounded semiannually. How much would she be willing to pay for the bond if she buys it days after the July 2010 interest anniversary? Give your answer in the format of a quoted bond price, as a percentage of par to three decimal places -- like you would see in the Wall Street Journal. Use the formula discussed in class -- and from the book, NOT the HP 12c bond feature. (Write only the digits, to three decimal palces, e.g. 114.451 and no $, commas, formulas, etc.)",
+                        :question_text=> "Based on her excellent performance as a district sales manager, Maria receives a sizable bonus at work. Since her generous salary is more than enough to provide for the needs of her family, she decides to use the bonus to buy a bond as an investment. The par value of the bond that Maria would like to purchase is $ thousand. The bond pays % interest, compounded semiannually (with payment on January 1 and July 1) and matures on July 1, 20. Maria wants a return of %, compounded semiannually. How much would she be willing to pay for the bond if she buys it  days after the July 2010 interest anniversary? Give your answer in the format of a quoted bond price, as a percentage of par to three decimal places -- like you would see in the Wall Street Journal. Use the formula discussed in class -- and from the book, NOT the HP 12c bond feature. (Write only the digits, to three decimal palces, e.g. 114.451 and no $, commas, formulas, etc.)",
                         :imported_formula=>
                                 "(10*[F])**(-1) * (1000*[F]*[r]*[i]**(-1) * (1-(1 ([i]/200))**(-2*([Y]-10)))   1000*[F]*(1 ([i]/200))**(-2*([Y]-10))) * (1 ([i]/100)*([n]/360))",
                         :incorrect_comments=>"",
@@ -413,8 +412,7 @@ module VistaExpected
                  :answers=>[{:weight=>100, :text=>"B, C", :migration_id=>"MC0"}],
                  :points_possible=>1,
                  :question_name=>"Combination",
-                 :question_text=>
-                         "This should just be a multiple answer. B and C are correct\nA. wrong 1\nB. right 1\nC. right 2\nD. wrong 2\nE. wrong 3",
+                 :question_text=>"This should just be a multiple answer. B and C are correct<br></br>\nA. wrong 1<br></br>\nB. right 1<br></br>\nC. right 2<br></br>\nD. wrong 2<br></br>\nE. wrong 3<br></br>\n",
                  :incorrect_comments=>"",
                  :question_type=>"multiple_choice_question"}
 

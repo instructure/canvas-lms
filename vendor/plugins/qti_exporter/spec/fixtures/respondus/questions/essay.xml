@@ -15,8 +15,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <responseDeclaration identifier="QUE_1022_RS" cardinality="single" baseType="string"/>
 <outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
 <itemBody>
-<p>
-                            Please type your essay question answer in the box below.</p>
+<p>Please type your essay question answer in the box below.</p>
 <extendedTextInteraction responseIdentifier="QUE_1022_RS" class="Box" expectedLength="250"/>
 </itemBody>
 <responseProcessing>
@@ -27,6 +26,5 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 </responseCondition>
 </responseProcessing>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1024_ALL">
-<p>
-                            You should have typed something coherent and meaningful into the essay box.</p></modalFeedback>
+<p>You should have typed something coherent and meaningful into the essay box.</p></modalFeedback>
 </assessmentItem>

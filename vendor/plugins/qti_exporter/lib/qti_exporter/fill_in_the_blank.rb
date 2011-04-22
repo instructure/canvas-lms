@@ -38,7 +38,7 @@ class FillInTheBlank < AssessmentItemConverter
           answer[:weight] = 100
           answer[:comments] = ""
           answer[:id] = unique_local_id
-          answer[:blank_id] = get_node_val(match, 'variable @identifier')
+          answer[:blank_id] = get_node_att(match, 'variable', 'identifier')
         end
       end
     end

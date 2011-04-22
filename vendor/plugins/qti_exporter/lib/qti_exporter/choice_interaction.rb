@@ -49,17 +49,25 @@ class ChoiceInteraction < AssessmentItemConverter
 
   # creates an answer hash for each of the available options
   def get_answers(answers_hash)
-    @doc.css('choiceinteraction').each do |ci|
-      ci.search('simplechoice').each do |choice|
+    @doc.css('choiceInteraction').each do |ci|
+      ci.search('simpleChoice').each do |choice|
         answer = {}
         answer[:weight] = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
         answer[:id] = unique_local_id
         answer[:migration_id] = choice['identifier']
-        answer[:text] = clear_html choice.text.strip.gsub(/\s+/, " ")
-        node = sanitize_html!(choice)
-        if (sanitized = node.inner_html.strip) != answer[:text]
-          answer[:html] = sanitized
+        
+        if feedback = choice.at_css('feedbackInline')
+          # weird Angel feedback
+          answer[:text] = choice.children.first.text.strip
+          answer[:comments] = feedback.text.strip
+        else
+          answer[:text] = clear_html choice.text.strip.gsub(/\s+/, " ")
+          node = sanitize_html!(choice)
+          if (sanitized = node.inner_html.strip) != answer[:text]
+            answer[:html] = sanitized
+          end
         end
+        
         if answer[:text] == ""
           if answer[:migration_id] =~ /true|false/i
             answer[:text] = clear_html(answer[:migration_id])
@@ -68,8 +76,8 @@ class ChoiceInteraction < AssessmentItemConverter
           end
         end
         @question[:answers] << answer
-        if ci['responseidentifier'] and @question[:question_type] == 'multiple_dropdowns_question'
-          answer[:blank_id] = ci['responseidentifier']
+        if ci['responseIdentifier'] and @question[:question_type] == 'multiple_dropdowns_question'
+          answer[:blank_id] = ci['responseIdentifier']
           answers_hash["#{answer[:blank_id]}_#{answer[:migration_id]}"] = answer
         else
           answers_hash[answer[:migration_id]] = answer
@@ -81,7 +89,7 @@ class ChoiceInteraction < AssessmentItemConverter
     # Angel can have a whole table of options but we're
     # just grabbing one dimension of it
     if @is_really_stupid_likert
-      @doc.css('choicetablecolumns choicetablecolumn').each do |cc|
+      @doc.css('choiceTableColumns choiceTableColumn').each do |cc|
         answer = {}
         answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         answer[:id] = unique_local_id
@@ -94,42 +102,42 @@ class ChoiceInteraction < AssessmentItemConverter
 
   # pulls the weights and response ids from the responseConditions
   def process_response_conditions(answers_hash)
-    @doc.search('responseprocessing responsecondition').each do |cond|
+    @doc.search('responseProcessing responseCondition').each do |cond|
       if @question[:question_type] == 'multiple_dropdowns_question'
         cond.css('match').each do |match|
-          blank_id = match.at_css('variable @identifier').text
-          migration_id = match.at_css('basevalue').text
+          blank_id = get_node_att(match,'variable', 'identifier')
+          migration_id = match.at_css('baseValue').text
           answer = answers_hash["#{blank_id}_#{migration_id}"]
           answer[:weight] = get_response_weight(cond)
         end
       elsif cond.at_css('match variable[identifier=RESP_MC]') or cond.at_css('match variable[identifier=response]')
-        migration_id = cond.at_css('match basevalue[basetype=identifier]').text.strip()
+        migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip()
         migration_id = migration_id.sub('.', '_') if is_either_or
         answer = answers_hash[migration_id]
         answer[:weight] = get_response_weight(cond)
         answer[:feedback_id] = get_feedback_id(cond)
       elsif cond.at_css('member variable[identifier=RESP_MC]')
-        migration_id = cond.at_css('member basevalue[basetype=identifier]').text
+        migration_id = cond.at_css('member baseValue[baseType=identifier]').text
         answer = answers_hash[migration_id]
         answer[:weight] = get_response_weight(cond)
         answer[:feedback_id] = get_feedback_id(cond)
       elsif cond.at_css('match variable[identifier^=TF]')
-        migration_id = cond.at_css('match basevalue[basetype=identifier]').text
+        migration_id = cond.at_css('match baseValue[baseType=identifier]').text
         answer = answers_hash[migration_id]
         answer[:weight] = get_response_weight(cond)
         answer[:feedback_id] = get_feedback_id(cond)
         @question[:question_type] = "true_false_question"
       elsif cond.at_css('and > member')
         cond.css('and > member').each do |m|
-          migration_id = m.at_css('basevalue[basetype=identifier]').text.strip()
+          migration_id = m.at_css('baseValue[baseType=identifier]').text.strip()
           answer = answers_hash[migration_id]
           answer[:weight] = get_response_weight(cond)
           answer[:feedback_id] = get_feedback_id(cond)
         end
       else
-        cond.css('responseif, responseelseif').each do |r_if|
-          migration_id = r_if.at_css('match basevalue[basetype=identifier]')
-          migration_id ||= r_if.at_css('member basevalue[basetype=identifier]')
+        cond.css('responseIf, responseElseIf').each do |r_if|
+          migration_id = r_if.at_css('match baseValue[baseType=identifier]')
+          migration_id ||= r_if.at_css('member baseValue[baseType=identifier]')
           if migration_id
             migration_id = migration_id.text.strip()
             if answer = answers_hash[migration_id]
@@ -143,7 +151,7 @@ class ChoiceInteraction < AssessmentItemConverter
     end
 
     #Check if there are correct answers explicitly specified
-    @doc.css('correctresponse > value').each do |correct_id|
+    @doc.css('correctResponse > value').each do |correct_id|
       correct_id = correct_id.text if correct_id
       if correct_id && answer = answers_hash[correct_id]
         answer[:weight] = DEFAULT_CORRECT_WEIGHT
@@ -154,7 +162,7 @@ class ChoiceInteraction < AssessmentItemConverter
   # Sets the actual feedback values and clears the feedback ids
   def attach_feedback_values(answers_hash)
     feedback_hash = {}
-    @doc.search('modalfeedback[outcomeidentifier=FEEDBACK]').each do |feedback|
+    @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
       id = feedback['identifier']
       text = clear_html(feedback.at_css('p').text.gsub(/\s+/, " ")).strip
       feedback_hash[id] = text
@@ -180,9 +188,9 @@ class ChoiceInteraction < AssessmentItemConverter
   def get_feedback_id(cond)
     id = nil
 
-    if feedback = cond.at_css('setoutcomevalue[identifier=FEEDBACK]')
+    if feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]')
       if feedback.at_css('variable[identifier=FEEDBACK]')
-        if feedback = feedback.at_css('basevalue[basetype=identifier]')
+        if feedback = feedback.at_css('baseValue[baseType=identifier]')
           id = feedback.text.strip
         end
       end
@@ -194,14 +202,14 @@ class ChoiceInteraction < AssessmentItemConverter
   def get_response_weight(cond)
     weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
     
-    if sum = cond.at_css('setoutcomevalue[identifier=SCORE] sum basevalue[basetype]')
+    if sum = cond.at_css('setOutcomeValue[identifier=SCORE] sum baseValue[baseType]')
       #it'll only be true if the score is a sum > 0
       weight = get_base_value(sum)
-    elsif base = cond.at_css('setoutcomevalue[identifier=SCORE] > basevalue[basetype]')
+    elsif base = cond.at_css('setOutcomeValue[identifier=SCORE] > baseValue[baseType]')
       weight = get_base_value(base)
-    elsif base = cond.at_css('setoutcomevalue[identifier^=SCORE] basevalue[basetype]')
+    elsif base = cond.at_css('setOutcomeValue[identifier^=SCORE] baseValue[baseType]')
       weight = get_base_value(base)
-    elsif base = cond.at_css('setoutcomevalue[identifier$=SCORE] basevalue[basetype]')
+    elsif base = cond.at_css('setOutcomeValue[identifier$=SCORE] baseValue[baseType]')
       weight = get_base_value(base)
     end
 
@@ -210,15 +218,15 @@ class ChoiceInteraction < AssessmentItemConverter
 
   def get_base_value(node)
     weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
-    if node['basetype'] == "float" #base_value = node.at_css('basevalue[basetype=float]')
+    if node['baseType'] == "float" #base_value = node.at_css('baseValue[baseType=float]')
       if node.text =~ /score\.max/i or node.text.to_f > 0
         weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
       end
-    elsif node['basetype'] == "integer" #elsif base_value = node.at_css('basevalue[basetype=integer]')
+    elsif node['baseType'] == "integer" #elsif base_value = node.at_css('baseValue[baseType=integer]')
       if node.text.to_i > 0
         weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
       end
-    elsif node['basetype'] == "boolean"  #elsif base_value = node.at_css('basevalue[basetype=boolean]')
+    elsif node['baseType'] == "boolean"  #elsif base_value = node.at_css('baseValue[baseType=boolean]')
       if node.text.downcase == "true"
         weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
       end

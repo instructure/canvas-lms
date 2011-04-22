@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../../qti_helper'
 
-describe "Converting a respondus QTI" do
+describe "Converting Angel QTI" do
   it "should convert multiple choice" do
     manifest_node=get_manifest_node('multiple_choice')
     hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>angel_question_dir)
@@ -70,7 +70,7 @@ module AngelExpected
                   :points_possible=>1,
                   :question_type=>"multiple_choice_question",
                   :question_text=>
-                          "A peer review team is reviewing a course. They are considering Standard 1.1. Reviewer 1 scores the standard \"No.\" Reviewer 2 scores the standard \"No.\" The Master Reviewer scores the standard \"Yes.\" How many points will the course receive for Standard 1.1?"}
+                          "A peer review team is reviewing a course.  They are considering Standard 1.1.  Reviewer 1 scores the standard \"No.\"  Reviewer 2 scores the standard \"No.\" The Master Reviewer scores the standard \"Yes.\" How many points will the course receive for Standard 1.1?"}
   TRUE_FALSE =
           {:question_type=>"multiple_choice_question",
                   :migration_id=>"0ee472e8-5bc2-4b30-a341-2fa93a50bc54",
@@ -121,7 +121,7 @@ module AngelExpected
                   :question_type=>"short_answer_question",
                   :migration_id=>"f6129250-3baf-4128-8c81-efc5d495eef1",
                   :question_text=>
-                          "Explain what happens when a course meets expectations and when a\n course does not meet expectations."}
+                          "Explain what happens when a course meets expectations and when a course does not meet expectations."}
   ASSESSMENT =
           {:grading=>
                    {:grade_type=>"numeric",

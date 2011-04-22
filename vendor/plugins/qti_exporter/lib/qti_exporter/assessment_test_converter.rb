@@ -1,5 +1,6 @@
 module Qti
 class AssessmentTestConverter
+  include Canvas::XMLHelper
   TEST_FILE = "/home/bracken/projects/QTIMigrationTool/assessments/out/assessmentTests/assmnt_URN-X-WEBCT-VISTA_V2-790EA1350A1A681DE0440003BA07D9B4.xml"
   DEFAULT_POINTS_POSSIBLE = 1
 
@@ -23,33 +24,33 @@ class AssessmentTestConverter
   def create_instructure_quiz(converted_questions = [])
     begin
       # Get manifest data
-      if md = @manifest_node.at_css("instructuremetadata")
-        if item = md.at_css('instructurefield[name=show_score] @value')
-          @quiz[:show_score] = item.text =~ /true/i ? true : false
+      if md = @manifest_node.at_css("instructureMetadata")
+        if item = get_node_att(md, 'instructureField[name=show_score]', 'value')
+          @quiz[:show_score] = item =~ /true/i ? true : false
         end
-        if item = md.at_css('instructurefield[name=quiz_type] @value') or  item = md.at_css('instructurefield[name=bb8_assessment_type] @value')
+        if item = get_node_att(md, 'instructureField[name=quiz_type]', 'value') || item = get_node_att(md, 'instructureField[name=bb8_assessment_type]', 'value')
           # known possible values: Self-assessment, Survey, Examination (practice is instructure default)
           # BB8: Test, Pool
-          @quiz[:quiz_type] = "assignment" if item.text =~ /examination|test|quiz/i
-          if item.text =~ /pool/i
+          @quiz[:quiz_type] = "assignment" if item =~ /examination|test|quiz/i
+          if item =~ /pool/i
             # if it's pool we don't need to make a quiz object.
             return nil
           end
         end
-        if item = md.at_css('instructurefield[name=which_attempt_to_keep] @value')
+        if item = get_node_att(md, 'instructureField[name=which_attempt_to_keep]', 'value')
           # known possible values: Highest, First, Last (highest is instructure default)
-          @quiz[:which_attempt_to_keep] = "keep_latest" if item.text =~ /last/i
+          @quiz[:which_attempt_to_keep] = "keep_latest" if item =~ /last/i
         end
-        if item = md.at_css('instructurefield[name=max_score] @value')
-          @quiz[:points_possible] = item.text
+        if item = get_node_att(md, 'instructureField[name=max_score]', 'value')
+          @quiz[:points_possible] = item
         end
-        if item = md.at_css('instructurefield[name=bb8_object_id] @value')
-          @quiz[:alternate_migration_id] = item.text
+        if item = get_node_att(md, 'instructureField[name=bb8_object_id]', 'value')
+          @quiz[:alternate_migration_id] = item
         end
       end
 
       # Get the actual assessment file
-      doc = Nokogiri::HTML(open(@href))
+      doc = Nokogiri::XML(open(@href))
       parse_quiz_data(doc)
       
       if @quiz[:quiz_type] == 'assignment'
@@ -71,22 +72,22 @@ class AssessmentTestConverter
   end
 
   def parse_quiz_data(doc)
-    @quiz[:title] = @title || doc.at_css('assessmenttest @title').text
+    @quiz[:title] = @title || get_node_att(doc, 'assessmentTest', 'title')
     @quiz[:quiz_name] = @quiz[:title]
-    @quiz[:migration_id] = doc.at_css('assessmenttest @identifier').text
-    if part = doc.at_css('testpart[identifier=BaseTestPart]')
-      if control = part.at_css('itemsessioncontrol')
-        if max = control.at_css('@maxattempts')
-          max = max.text.to_i
+    @quiz[:migration_id] = get_node_att(doc, 'assessmentTest', 'identifier')
+    if part = doc.at_css('testPart[identifier=BaseTestPart]')
+      if control = part.at_css('itemSessionControl')
+        if max = control['maxAttempts']
+          max = max.to_i
           # -1 means no limit in instructure, 0 means no limit in QTI
           @quiz[:allowed_attempts] = max >= 1 ? max : -1
         end
-        if show = control.at_css('@showSolution')
-          show = show.text
+        if show = control['showSolution']
+          show = show
           @quiz[:show_correct_answers] = show.downcase == "true" ? true : false
         end
-        if limit = doc.search('timelimits').first
-          limit = limit['maxtime'].to_i
+        if limit = doc.search('timeLimits').first
+          limit = limit['maxTime'].to_i
           #instructure uses minutes, QTI uses seconds
           @quiz[:time_limit] = limit / 60
         end
@@ -103,14 +104,14 @@ class AssessmentTestConverter
     group = nil
     questions_list = @quiz[:questions]
     
-    if shuffle = section.at_css('ordering @shuffle')
-      @quiz[:shuffle_answers] = true if shuffle.text =~ /true/i
+    if shuffle = get_node_att(section, 'ordering','shuffle')
+      @quiz[:shuffle_answers] = true if shuffle =~ /true/i
     end
     if select = section.children.find {|child| child.name == "selection"}
       select = select['select'].to_i
       if select > 0
         group = {:questions=>[], :pick_count => select, :question_type => 'question_group'}
-        if weight = section.at_css('weight @value')
+        if weight = get_node_att(section, 'weight','value')
           group[:question_points] = convert_weight_to_points(weight)
         end
         if bank_id = section.at_css('sourcebank_ref')
@@ -128,9 +129,9 @@ class AssessmentTestConverter
     end
     
     section.children.each do |child|
-      if child.name == "assessmentsection"
+      if child.name == "assessmentSection"
         process_section(child)
-      elsif child.name == "assessmentitemref"
+      elsif child.name == "assessmentItemRef"
         process_question(child, questions_list)
       end
     end
@@ -161,7 +162,7 @@ class AssessmentTestConverter
     @quiz[:question_count] += 1
     # The colons are replaced with dashes in the conversion from QTI 1.2
     question[:migration_id] = item_ref['identifier'].gsub(/:/, '-')
-    if weight = item_ref.at_css('weight @value')
+    if weight = get_node_att(item_ref, 'weight','value')
       question[:points_possible] = convert_weight_to_points(weight)
     end
   end
@@ -171,7 +172,7 @@ class AssessmentTestConverter
   # webct multiply it by 100
   def convert_weight_to_points(weight)
     begin
-      weight = weight.text.to_f
+      weight = weight.to_f
       if @is_webct
         weight = weight * 100 
       end

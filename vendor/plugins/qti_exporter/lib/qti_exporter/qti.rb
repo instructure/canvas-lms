@@ -22,7 +22,7 @@ module Qti
 
   def self.convert_questions(manifest_path)
     questions = []
-    doc = Nokogiri::HTML(open(manifest_path))
+    doc = Nokogiri::XML(open(manifest_path))
     doc.css('manifest resources resource[type^=imsqti_item_xmlv2p]').each do |item|
       q = AssessmentItemConverter::create_instructure_question(:manifest_node=>item, :base_dir=>File.dirname(manifest_path))
       questions << q if q
@@ -32,7 +32,7 @@ module Qti
 
   def self.convert_assessments(manifest_path, is_webct=true, questions = [])
     assessments = []
-    doc = Nokogiri::HTML(open(manifest_path))
+    doc = Nokogiri::XML(open(manifest_path))
     doc.css('manifest resources resource[type=imsqti_assessment_xmlv2p1]').each do |item|
       a = AssessmentTestConverter.new(item, File.dirname(manifest_path), is_webct, questions).create_instructure_quiz
       assessments << a if a
@@ -42,7 +42,7 @@ module Qti
 
   def self.convert_files(manifest_path)
     attachments = []
-    doc = Nokogiri::HTML(open(manifest_path))
+    doc = Nokogiri::XML(open(manifest_path))
     resource_nodes = doc.css('resource')
     doc.css('file').each do |file|
       # skip resource nodes, which are things like xml metadata and other sorts

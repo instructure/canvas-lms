@@ -23,8 +23,7 @@ Warning: mat_extension not supported, looking inside for needed data.
 <responseDeclaration identifier="TF01" cardinality="single" baseType="identifier"/>
 <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
 <itemBody>
-<p>I am wearing a black hat.<br/>
-</p>
+<p>I am wearing a black hat.</p>
 <choiceInteraction responseIdentifier="TF01" shuffle="true" maxChoices="1">
 <simpleChoice identifier="true" fixed="true">
 <p></p></simpleChoice>

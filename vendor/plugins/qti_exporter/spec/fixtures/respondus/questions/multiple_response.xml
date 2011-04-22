@@ -17,8 +17,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <outcomeDeclaration identifier="QUE_SCORE" cardinality="single" baseType="integer">
 <defaultValue><value>0</value></defaultValue></outcomeDeclaration>
 <itemBody>
-<p>
-                            Select all answers that rhyme with &quot;box&quot;.</p>
+<p>Select all answers that rhyme with &quot;box&quot;.</p>
 <choiceInteraction responseIdentifier="QUE_1041_RL" shuffle="false" maxChoices="1">
 <simpleChoice identifier="QUE_1042_A1" fixed="true">
 <p>fox <sup>hint ... this is one of them</sup></p></simpleChoice>
@@ -63,18 +62,13 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 </responseCondition>
 </responseProcessing>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1046_C">
-<p>
-                            &quot;fox&quot; does rhyme with &quot;box&quot;, yes</p></modalFeedback>
+<p>&quot;fox&quot; does rhyme with &quot;box&quot;, yes</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1047_IC">
-<p>
-                            &quot;bacon&quot; does not rhyme with &quot;box&quot;, no</p></modalFeedback>
+<p>&quot;bacon&quot; does not rhyme with &quot;box&quot;, no</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1048_C">
-<p>
-                            &quot;clocks&quot; does rhyme with &quot;box&quot;, yes</p></modalFeedback>
+<p>&quot;clocks&quot; does rhyme with &quot;box&quot;, yes</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1049_IC">
-<p>
-                            &quot;sugar&quot; does not rhyme with &quot;box&quot;, no</p></modalFeedback>
+<p>&quot;sugar&quot; does not rhyme with &quot;box&quot;, no</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1039_ALL">
-<p>
-                            the words &quot;fox&quot; and &quot;clocks&quot; rhyme with &quot;box&quot;.  I know, that was a tricky one because &quot;clocks&quot; doesn't end in &quot;ox&quot; like &quot;box&quot; and &quot;fox&quot; do.</p></modalFeedback>
+<p>the words &quot;fox&quot; and &quot;clocks&quot; rhyme with &quot;box&quot;.  I know, that was a tricky one because &quot;clocks&quot; doesn't end in &quot;ox&quot; like &quot;box&quot; and &quot;fox&quot; do.</p></modalFeedback>
 </assessmentItem>

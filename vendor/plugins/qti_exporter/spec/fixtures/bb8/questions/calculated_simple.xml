@@ -36,8 +36,7 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
 <itemBody>
 <div class="QUESTION_BLOCK">
-<p class="FORMATTED_TEXT_BLOCK">What is 10 - [x]?&lt;br
-                      /&gt;</p></div>
+<p class="FORMATTED_TEXT_BLOCK">What is 10 - [x]?&lt;br/&gt;</p></div>
 <div class="RESPONSE_BLOCK">
 <extendedTextInteraction responseIdentifier="response" class="Box"/></div>
 </itemBody>
