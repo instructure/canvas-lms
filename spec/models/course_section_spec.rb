@@ -96,13 +96,22 @@ describe CourseSection, "moving to new course" do
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     course3 = account3.courses.create!
+    course2.assert_section
+    course3.assert_section
     cs = course1.course_sections.create!
     u = User.create!
     u.register!
+    e = course2.enroll_user(u, 'StudentEnrollment')
+    e.workflow_state = 'active'
+    e.save!
     e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
     e.workflow_state = 'active'
     e.save!
     course1.reload
+    course2.reload
+    course3.workflow_state = 'active'
+    course3.save
+    e.reload
     
     course1.course_sections.find_by_id(cs.id).should_not be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
@@ -111,6 +120,9 @@ describe CourseSection, "moving to new course" do
     cs.nonxlist_course.should be_nil
     e.root_account.should eql(account1)
     cs.crosslisted?.should be_false
+    course1.workflow_state.should == 'created'
+    course2.workflow_state.should == 'created'
+    course3.workflow_state.should == 'created'
     
     cs.crosslist_to_course(course2)
     course1.reload
@@ -125,6 +137,9 @@ describe CourseSection, "moving to new course" do
     cs.nonxlist_course.should eql(course1)
     e.root_account.should eql(account2)
     cs.crosslisted?.should be_true
+    course1.workflow_state.should == 'deleted'
+    course2.workflow_state.should == 'created'
+    course3.workflow_state.should == 'created'
       
     cs.crosslist_to_course(course3)
     course1.reload
@@ -140,6 +155,9 @@ describe CourseSection, "moving to new course" do
     cs.nonxlist_course.should eql(course1)
     e.root_account.should eql(account3)
     cs.crosslisted?.should be_true
+    course1.workflow_state.should == 'deleted'
+    course2.workflow_state.should == 'created'
+    course3.workflow_state.should == 'created'
       
     cs.uncrosslist
     course1.reload
@@ -155,6 +173,9 @@ describe CourseSection, "moving to new course" do
     cs.nonxlist_course.should be_nil
     e.root_account.should eql(account1)
     cs.crosslisted?.should be_false
+    course1.workflow_state.should == 'created'
+    course2.workflow_state.should == 'created'
+    course3.workflow_state.should == 'created'
   end
   
 end

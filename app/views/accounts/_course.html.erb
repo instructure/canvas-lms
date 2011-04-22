@@ -13,7 +13,7 @@
         <% if course.course_code != course.name %>
           <span style="padding-right: 30px;"><%= course.course_code %></span>
         <% end %>
-        <% if current_user_is_site_admin? && course.respond_to?(:sis_source_id) && course.sis_source_id %>
+        <% if course.respond_to?(:sis_source_id) && course.sis_source_id %>
           SIS ID: <%= course.sis_source_id %>
         <% end %>
       </div>

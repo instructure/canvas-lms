@@ -120,7 +120,7 @@ h3 .tally {
   <div>
     <%= pluralize((@current_enrollments + @completed_enrollments).length, 'Enrollment') %>
   </div>
-  <% if current_user_is_site_admin? && @section && @section.sis_source_id %>
+  <% if @section && @section.sis_source_id %>
     <div>SIS ID: <%= @section.sis_source_id %></div>
   <% end %>
   <% if @section.start_at || @section.end_at %>
