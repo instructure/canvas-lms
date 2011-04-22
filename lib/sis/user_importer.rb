@@ -49,7 +49,6 @@ module SIS
     # user_id,login_id,first_name,last_name,email,status
     def process(csv)
       start = Time.now
-      new_user_ids = []
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         logger.debug("Processing User #{row.inspect}")
 
@@ -111,10 +110,10 @@ module SIS
           pseudo.save_without_broadcasting
         end
         
+        user.update_account_associations if update_account_association
+        
         @sis.counts[:users] += 1
-        new_user_ids << user.id if update_account_association
       end
-      User.update_account_associations(new_user_ids)
       logger.debug("Users took #{Time.now - start} seconds")
     end
   end
