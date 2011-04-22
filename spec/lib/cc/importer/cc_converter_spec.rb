@@ -389,8 +389,8 @@ describe "Common Cartridge importing" do
   end
   
   it "should import wiki pages" do
-    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
-    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % @copy_from.id)
+    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a><a href=\"/courses/%s/file_contents/course%%20files/tbe_banner.jpg\">Some file</a></p>"
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id ])
     @copy_from.save!
     
     #export to html file
@@ -406,7 +406,7 @@ describe "Common Cartridge importing" do
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
     page_2.url.should == page.url
-    page_2.body.should == body_with_link % @copy_to.id
+    page_2.body.should == body_with_link % [ @copy_to.id, @copy_to.id ]
   end
   
   it "should import assignments" do 
