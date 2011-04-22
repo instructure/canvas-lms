@@ -75,13 +75,13 @@ class ContentMigration < ActiveRecord::Base
     p.dispatch :migration_import_finished
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:imported)
+      record.changed_state(:imported) && !record.migration_settings[:skip_import_notification]
     }
     
     p.dispatch :migration_import_failed
     p.to { [user] }
     p.whenever {|record|
-      record.changed_state(:failed)
+      record.changed_state(:failed) && !record.migration_settings[:skip_import_notification]
     }
   end
 

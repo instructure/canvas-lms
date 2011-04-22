@@ -451,6 +451,7 @@ Implemented for: Canvas LMS}]
     settings = {
       :migration_type => 'qti_exporter',
       :apply_respondus_settings_file => (itemType != 'qdb'),
+      :skip_import_notification => true,
     }
 
     if item
