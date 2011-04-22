@@ -36,7 +36,9 @@ class Enrollment < ActiveRecord::Base
   before_save :assign_uuid
   before_save :assert_section
   after_save :touch_user
-  after_save :update_user_account_associations
+  before_save :update_user_account_associations_if_necessary
+
+  attr_accessor :skip_updating_user_account_associations
 
   trigger.after(:insert).where("NEW.workflow_state = 'active'") do
     <<-SQL
@@ -134,9 +136,16 @@ class Enrollment < ActiveRecord::Base
     res
   end
   
-  def update_user_account_associations
-    self.user.send_later(:update_account_associations)
+  def should_update_user_account_association?
+    self.new_record? || self.course_id_changed? || self.course_section_id_changed? || self.root_account_id_changed?
   end
+  
+  def update_user_account_associations_if_necessary
+    if !@skip_updating_user_account_associations && should_update_user_account_association?
+      self.user.send_later(:update_account_associations)
+    end
+  end
+  protected :update_user_account_associations_if_necessary
 
   def conclude
     self.workflow_state = "completed"

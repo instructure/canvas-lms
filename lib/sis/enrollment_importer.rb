@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "set"
+
 module SIS
   class EnrollmentImporter < SisImporter
 
@@ -36,6 +38,7 @@ module SIS
     # course_id,user_id,role,section_id,status
     def process(csv)
       start = Time.now
+      update_account_association_user_ids = Set.new
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         logger.debug("Processing Enrollment #{row.inspect}")
         update_progress
@@ -121,9 +124,15 @@ module SIS
           enrollment.workflow_state = 'inactive'
         end
 
+        update_account_association_user_ids.add(user.id) if enrollment.should_update_user_account_association?
+        enrollment.skip_updating_user_account_associations = true
         enrollment.save_without_broadcasting
         @sis.counts[:enrollments] += 1
       end
+      # We batch these up at the end because normally a user would get several enrollments, and there's no reason
+      # to update their account associations on each one.
+      User.update_account_associations(update_account_association_user_ids.to_a)
+
       logger.debug("Enrollments took #{Time.now - start} seconds")
     end
   end
