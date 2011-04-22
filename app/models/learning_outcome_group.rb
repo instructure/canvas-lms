@@ -20,7 +20,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :title, :description, :learning_outcome_group
   belongs_to :learning_outcome_group
-  belongs_to :root_learning_outcome_group
+  belongs_to :root_learning_outcome_group, :class_name => "LearningOutcomeGroup"
   has_many :learning_outcome_groups
   has_many :content_tags, :as => :associated_asset, :order => :position
   belongs_to :context, :polymorphic => true
