@@ -315,9 +315,13 @@ class ContentZipper
     @files_in_zip << filename
 
     if Attachment.s3_storage?
-      url = URI.parse(attachment.authenticated_s3_url)
-      req = Net::HTTP::Get.new(url.path + "?" + url.query)
-      Net::HTTP.start(url.host, url.port) do |http|
+      # We're not using URI.parse right here because we have some escaping problems
+      # that are generating invalid URLs. (attachment_fu is not escaping filenames.)
+      # This should be temporary until we can fix the escaping issues.
+      attachment.authenticated_s3_url =~ %r{\A(https?)://(.*?)/(.*)\z}
+      scheme, host, path = $1, $2, $3
+      req = Net::HTTP::Get.new(path)
+      Net::HTTP.start(host, scheme == 'https' ? 443 : 80) do |http|
         http.request(req) do |res|
           zipfile.get_output_stream(filename) do |f|
             res.read_body do |segment|
