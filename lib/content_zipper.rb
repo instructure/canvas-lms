@@ -318,7 +318,7 @@ class ContentZipper
       # We're not using URI.parse right here because we have some escaping problems
       # that are generating invalid URLs. (attachment_fu is not escaping filenames.)
       # This should be temporary until we can fix the escaping issues.
-      attachment.authenticated_s3_url =~ %r{\A(https?)://(.*?)/(.*)\z}
+      attachment.authenticated_s3_url =~ %r{\A(https?)://(.*?)(/.*)\z}
       scheme, host, path = $1, $2, $3
       req = Net::HTTP::Get.new(path)
       Net::HTTP.start(host, scheme == 'https' ? 443 : 80) do |http|
