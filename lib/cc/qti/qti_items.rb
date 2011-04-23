@@ -38,6 +38,28 @@ module CC
       MULTI_ANSWER_TYPES = ['matching_question', 
                            'multiple_dropdowns_question', 
                            'fill_in_multiple_blanks_question']
+      
+      def add_ref_or_question(node, question)
+        aq = nil
+        unless question[:assessment_question_id].blank?
+          if aq = AssessmentQuestion.find_by_id(question[:assessment_question_id])
+            if aq.deleted? || 
+                    !aq.assessment_question_bank || 
+                    aq.assessment_question_bank.deleted? || 
+                    aq.assessment_question_bank.context_id != @course.id ||
+                    aq.assessment_question_bank.context_type != @course.class.to_s
+              aq = nil
+            end
+          end
+        end
+        
+        if aq
+          ref = CC::CCHelper::create_key(aq)
+          node.itemref(:linkrefid => ref)
+        else
+          add_question(node, question)
+        end
+      end
 
       # if the question is a supported CC type it will be added
       # it it's not supported it's just skipped
@@ -48,8 +70,16 @@ module CC
         true
       end
       
+      def add_quiz_question(node, question)
+        question[:is_quiz_question] = true
+        add_question(node, question)
+      end
+
       def add_question(node, question, for_cc=false)
-        question['migration_id'] = create_key("assessment_question_#{question['assessment_question_id']}")
+        aq_mig_id = create_key("assessment_question_#{question['assessment_question_id']}")
+        qq_mig_id = create_key("assessment_question_#{question['id']}")
+        question['migration_id'] = question[:is_quiz_question] ? qq_mig_id : aq_mig_id  
+
         if question['question_type'] == 'missing_word_question'
           change_missing_word(question)
         end
@@ -67,6 +97,9 @@ module CC
               else
                 meta_field(qm_node, 'question_type', question['question_type'])
                 meta_field(qm_node, 'points_possible', question['points_possible'])
+                if question[:is_quiz_question] 
+                  meta_field(qm_node, 'assessment_question_identifierref', aq_mig_id)
+                end
               end
             end
           end # meta data

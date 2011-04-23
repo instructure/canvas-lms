@@ -85,42 +85,47 @@ class AssessmentItemConverter
   end
   
   def parse_instructure_metadata
-    if bank =  get_node_att(@doc, 'instructureMetadata instructureField[name=question_bank]',  'value')
-      @question[:question_bank_name] = bank
-    end
-    if bank =  get_node_att(@doc, 'instructureMetadata instructureField[name=question_bank_iden]', 'value')
-      @question[:question_bank_id] = bank
-    end
-    if score =  get_node_att(@doc, 'instructureMetadata instructureField[name=max_score]', 'value')
-      @question[:points_possible] = score.to_f
-    end
-    if score = get_node_att(@doc, 'instructureMetadata instructureField[name=points_possible]', 'value')
-      @question[:points_possible] = score.to_f
-    end
-    if type =  get_node_att(@doc, 'instructureMetadata instructureField[name=bb_question_type]', 'value')
-      @migration_type = type
-      case @migration_type
-        when 'True/False'
-          @question[:question_type] = 'true_false_question'
-        when 'Short Response'
-          @question[:question_type] = 'essay_question'
-        when 'Fill in the Blank Plus'
-          @question[:question_type] = 'fill_in_multiple_blanks_question'
-        when 'WCT_FillInTheBlank'
-          @question[:question_type] = 'fill_in_multiple_blanks_question'
-          @question[:is_vista_fib] = true
-        when 'Jumbled Sentence'
-          @question[:question_type] = 'multiple_dropdowns_question'
-        when 'Essay'
-          @question[:question_type] = 'essay_question'
+    if meta = @doc.at_css('instructureMetadata')
+      if bank =  get_node_att(meta, 'instructureField[name=question_bank]',  'value')
+        @question[:question_bank_name] = bank
       end
-    end
-    if type =  get_node_att(@doc, 'instructureMetadata instructureField[name=question_type]', 'value')
-      @migration_type = type
-      if AssessmentQuestion::ALL_QUESTION_TYPES.member?(@migration_type)
-        @question[:question_type] = @migration_type
-      elsif @migration_type =~ /matching/i
-        @question[:question_type] = 'matching_question'
+      if bank =  get_node_att(meta, 'instructureField[name=question_bank_iden]', 'value')
+        @question[:question_bank_id] = bank
+      end
+      if score =  get_node_att(meta, 'instructureField[name=max_score]', 'value')
+        @question[:points_possible] = score.to_f
+      end
+      if score = get_node_att(meta, 'instructureField[name=points_possible]', 'value')
+        @question[:points_possible] = score.to_f
+      end
+      if ref = get_node_att(meta, 'instructureField[name=assessment_question_identifierref]', 'value')
+        @question[:assessment_question_migration_id] = ref
+      end
+      if type =  get_node_att(meta, 'instructureField[name=bb_question_type]', 'value')
+        @migration_type = type
+        case @migration_type
+          when 'True/False'
+            @question[:question_type] = 'true_false_question'
+          when 'Short Response'
+            @question[:question_type] = 'essay_question'
+          when 'Fill in the Blank Plus'
+            @question[:question_type] = 'fill_in_multiple_blanks_question'
+          when 'WCT_FillInTheBlank'
+            @question[:question_type] = 'fill_in_multiple_blanks_question'
+            @question[:is_vista_fib] = true
+          when 'Jumbled Sentence'
+            @question[:question_type] = 'multiple_dropdowns_question'
+          when 'Essay'
+            @question[:question_type] = 'essay_question'
+        end
+      end
+      if type =  get_node_att(meta, 'instructureField[name=question_type]', 'value')
+        @migration_type = type
+        if AssessmentQuestion::ALL_QUESTION_TYPES.member?(@migration_type)
+          @question[:question_type] = @migration_type
+        elsif @migration_type =~ /matching/i
+          @question[:question_type] = 'matching_question'
+        end
       end
     end
   end

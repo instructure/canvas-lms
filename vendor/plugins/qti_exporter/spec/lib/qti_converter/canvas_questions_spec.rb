@@ -208,7 +208,8 @@ module CanvasExpected
                         :match_id=>2840,
                         :text=>"4"}],
               :question_text=>"Make it stop! Please!",
-              :migration_id=>"i7ee7c77592c6cd4ac58509c3e41dace8",
+              :migration_id=>"i27a2844e09afc2eb6e4a6bf0599bf010",
+              :assessment_question_migration_id=>"i7ee7c77592c6cd4ac58509c3e41dace8",
               :question_type=>"matching_question",
               :incorrect_comments=>"How could you get this wrong?"}
   

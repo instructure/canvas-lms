@@ -50,12 +50,12 @@ def get_import_data(sub_folder, hash_name)
 end
 
 def import_example_questions(context)
-  question_data = {}
+  question_data = {:aq_data=>{}, :qq_data=>{}}
   QUESTIONS.each do |question|
     if import_data_exists?(['vista', 'quiz'], question[0])
       q = get_import_data ['vista', 'quiz'], question[0]
       q = AssessmentQuestion.import_from_migration(q, context)
-      question_data[q['migration_id']] = q
+      question_data[:aq_data][q['migration_id']] = q
     end
   end
   question_data

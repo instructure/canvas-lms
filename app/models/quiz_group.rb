@@ -83,10 +83,20 @@ class QuizGroup < ActiveRecord::Base
     end
     item.save!
     hash[:questions].each do |question|
-      if aq = question_data[question[:migration_id]]
+      if qq = question_data[:qq_data][question[:migration_id]]
+        if qq[:assessment_question_migration_id]
+          if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
+            qq['assessment_question_id'] = aq['assessment_question_id']
+            AssessmentQuestion.prep_for_import(qq, context)
+            QuizQuestion.import_from_migration(qq, context, quiz, item)
+          else
+            AssessmentQuestion.import_from_migration(qq, context)
+            QuizQuestion.import_from_migration(qq, context, quiz, item)
+          end
+        end
+      elsif aq = question_data[:aq_data][question[:migration_id]]
+        aq[:points_possible] = question[:points_possible] if question[:points_possible]
         QuizQuestion.import_from_migration(aq, context, quiz, item)
-      else
-        #TODO: no assessment question was imported for this question...
       end
     end
     

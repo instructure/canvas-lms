@@ -19,13 +19,14 @@ Unknown text type: ignored mattext with texttype="text" treated as text/plain
 <assessmentItem
 	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="i7ee7c77592c6cd4ac58509c3e41dace8"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="i27a2844e09afc2eb6e4a6bf0599bf010"
  title="Match"
  adaptive="false"
  timeDependent="false">
 <instructureMetadata>
 <instructureField name="points_possible" value="1" />
 <instructureField name="question_type" value="matching_question" />
+<instructureField name="assessment_question_identifierref" value="i7ee7c77592c6cd4ac58509c3e41dace8" />
 </instructureMetadata>
 <responseDeclaration identifier="response_1971" cardinality="single" baseType="identifier"/>
 <responseDeclaration identifier="response_338" cardinality="single" baseType="identifier"/>

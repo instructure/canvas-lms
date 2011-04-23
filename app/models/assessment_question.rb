@@ -391,7 +391,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def self.process_migration(data, migration)
-    question_data = {}
+    question_data = {:aq_data=>{}, :qq_data=>{}}
     questions = data['assessment_questions'] ? data['assessment_questions']['assessment_questions'] : []
     questions ||= []
     to_import = migration.to_import 'quizzes'
@@ -425,6 +425,10 @@ class AssessmentQuestion < ActiveRecord::Base
 
       banks = {}
       questions.each do |question|
+        if question[:assessment_question_migration_id]
+          question_data[:qq_data][question['migration_id']] = question
+          next
+        end
         question[:question_bank_name] = nil if question[:question_bank_name] == ''
         question[:question_bank_name] ||= bank_map[question[:migration_id]]
         question[:question_bank_name] ||= migration.question_bank_name
@@ -441,7 +445,7 @@ class AssessmentQuestion < ActiveRecord::Base
         end
 
         question = AssessmentQuestion.import_from_migration(question, migration.context, banks[hash_id])
-        question_data[question['migration_id']] = question
+        question_data[:aq_data][question['migration_id']] = question
       end
     end
 
@@ -461,8 +465,7 @@ class AssessmentQuestion < ActiveRecord::Base
       end
     end
     context.imported_migration_items << bank if context.imported_migration_items && !context.imported_migration_items.include?(bank)
-    hash[:question_text] = ImportedHtmlConverter.convert(hash[:question_text], context, true) if hash[:question_text]
-    hash[:answers].each{ |answer| answer[:html] = ImportedHtmlConverter.convert(answer[:html], context, true) unless answer[:html].blank? } if hash[:answers]
+    prep_for_import(hash, context)
     question_data = ActiveRecord::Base.connection.quote hash.to_yaml
     question_name = ActiveRecord::Base.connection.quote hash[:question_name]
     query = "INSERT INTO assessment_questions (name, question_data, context_id, context_type, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
@@ -470,6 +473,11 @@ class AssessmentQuestion < ActiveRecord::Base
     id = ActiveRecord::Base.connection.insert(query)
     hash['assessment_question_id'] = id
     hash
+  end
+  
+  def self.prep_for_import(hash, context)
+    hash[:question_text] = ImportedHtmlConverter.convert(hash[:question_text], context, true) if hash[:question_text]
+    hash[:answers].each{ |answer| answer[:html] = ImportedHtmlConverter.convert(answer[:html], context, true) unless answer[:html].blank? } if hash[:answers]
   end
   
   named_scope :active, lambda {

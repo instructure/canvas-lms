@@ -41,6 +41,17 @@ module CC
         non_cc_folder = File.join(@export_dir, ASSESSMENT_NON_CC_FOLDER)
         FileUtils::mkdir_p non_cc_folder
         
+        @course.assessment_question_banks.active.each do |bank|
+          bank_mig_id = create_key(bank)
+          
+          rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, bank_mig_id + ".xml")
+          full_path = File.join(@export_dir, rel_path)
+          File.open(full_path, 'w') do |file|
+            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+            generate_bank(doc, bank, bank_mig_id)
+          end
+        end
+        
         @course.quizzes.active.each do |quiz|
           cc_qti_migration_id = create_key(quiz)
           resource_dir = File.join(@export_dir, cc_qti_migration_id)
@@ -160,7 +171,7 @@ module CC
                   if for_cc
                     add_cc_question(section_node, item)
                   else
-                    add_question(section_node, item)
+                    add_quiz_question(section_node, item)
                   end
                 elsif item[:questions] # It's a QuizGroup
                   if for_cc
@@ -172,6 +183,28 @@ module CC
               end
             end # section_node
           end # assessment_node
+        end # qti node
+      end
+      
+      def generate_bank(doc, bank, migration_id)
+        doc.instruct!
+        doc.questestinterop("xmlns" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2",
+                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
+                        "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd"
+        ) do |qti_node|
+          qti_node.objectbank(
+                  :ident => migration_id
+          ) do |bank_node|
+            
+            bank_node.qtimetadata do |meta_node|
+              meta_field(meta_node, 'bank_title', bank.title)
+            end # meta_node
+            
+            bank.assessment_questions.each do |aq|            
+              add_question(bank_node, aq.data.with_indifferent_access)
+            end
+            
+          end # bank_node
         end # qti node
       end
       
@@ -228,7 +261,7 @@ module CC
           
           unless group[:assessment_question_bank_id]
             group[:questions].each do |question|
-              add_question(section_node, question)
+              add_quiz_question(section_node, question)
             end
           end
         end # section node
