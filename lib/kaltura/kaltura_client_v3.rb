@@ -179,21 +179,13 @@ module Kaltura
       items
     end
 
-    def flavorAssetGetByEntryId(entryId)
-      result = sendRequest(:flavorAsset, :getByEntryId,
-                           :ks => @ks,
-                           :entryId => entryId)
-      items = []
-      result.css('item').each do |node|
-        item = {}
-        node.children.each do |child|
-          item[child.name.to_sym] = child.content
-        end
-        items << item
-      end
-      items
+    # returns the original flavor of the asset, or the first flavor if for some
+    # reason the original can't be found.
+    def flavorAssetGetOriginalAsset(entryId)
+      flavors = flavorAssetGetByEntryId(entryId)
+      flavors.find { |f| f[:isOriginal] == 1 } || flavors.first
     end
-    
+
     def flavorAssetGetDownloadUrl(assetId)
       result = sendRequest(:flavorAsset, :getDownloadUrl,
                            :ks => @ks,
@@ -206,9 +198,9 @@ module Kaltura
       return nil unless config
       "http://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
     end
-    
-    @private
-    
+
+    private
+
     def postRequest(service, action, params)
       mp = Multipart::MultipartPost.new
       query, headers = mp.prepare_query(params)

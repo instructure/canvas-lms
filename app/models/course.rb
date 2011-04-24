@@ -1177,8 +1177,15 @@ class Course < ActiveRecord::Base
 
     # These only need to be processed once
     import_settings_from_migration(data); migration.fast_update_progress(0.5)
-    process_migration_files(data, migration); migration.fast_update_progress(20)
-    Attachment.process_migration(data, migration); migration.fast_update_progress(30)
+    Attachment.skip_media_object_creation do
+      process_migration_files(data, migration); migration.fast_update_progress(10)
+      Attachment.process_migration(data, migration); migration.fast_update_progress(20)
+      mo_attachments = self.attachments.all(:conditions => "media_entry_id is not null")
+      # we'll wait synchronously for the media objects to be uploaded, so that
+      # we have the media_ids that we need later.
+      MediaObject.add_media_files(mo_attachments, true) unless mo_attachments.blank?
+    end
+    migration.fast_update_progress(30)
     question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
     Group.process_migration(data, migration); migration.fast_update_progress(36)
     LearningOutcome.process_migration(data, migration); migration.fast_update_progress(37)

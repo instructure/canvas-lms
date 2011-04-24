@@ -33,5 +33,34 @@ module CC
         end
       end
     end
+
+    def add_media_objects
+      client = Kaltura::ClientV3.new
+      client.startSession(Kaltura::SessionType::ADMIN)
+
+      @course.media_objects.active.find_all do |obj|
+        migration_id = CCHelper.create_key(obj)
+        info = CCHelper.media_object_info(obj, client)
+        next unless info[:asset]
+        url = client.flavorAssetGetDownloadUrl(info[:asset][:id])
+
+        path = base_path = File.join(CCHelper::WEB_RESOURCES_FOLDER, 'media_objects', info[:filename])
+
+        remote_stream = open(url)
+        @zip_file.get_output_stream(path) do |stream|
+          FileUtils.copy_stream(remote_stream, stream)
+        end
+
+        if url
+          @resources.resource(
+            "type" => CCHelper::WEBCONTENT,
+            :identifier => migration_id,
+            :href => path
+          ) do |res|
+            res.file(:href => path)
+          end
+        end
+      end
+    end
   end
 end

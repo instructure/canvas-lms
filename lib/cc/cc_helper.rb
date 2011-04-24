@@ -157,8 +157,30 @@ module CCHelper
       new_url || relative_url
     end
 
-    html
+    doc = Nokogiri::HTML::DocumentFragment.parse(html)
+    doc.css('a.instructure_inline_media_comment').each do |anchor|
+      media_id = anchor['id'].gsub(/^media_comment_/, '')
+      obj = MediaObject.find_by_media_id(media_id)
+      if obj && obj.context == course && migration_id = CCHelper.create_key(obj)
+        info = media_object_info(obj)
+        anchor['href'] = File.join(WEB_CONTENT_TOKEN, 'media_objects', info[:filename])
+      end
+    end
+
+    doc.to_s
   end
-  
+
+  def self.media_object_info(obj, client = nil)
+    unless client
+      client = Kaltura::ClientV3.new
+      client.startSession(Kaltura::SessionType::ADMIN)
+    end
+    asset = client.flavorAssetGetOriginalAsset(obj.media_id)
+    # we use the media_id as the export filename, since it is guaranteed to
+    # be unique
+    filename = "#{obj.media_id}.#{asset[:fileExt]}" if asset
+    { :asset => asset, :filename => filename }
+  end
+
 end
 end

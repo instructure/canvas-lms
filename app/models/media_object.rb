@@ -45,7 +45,10 @@ class MediaObject < ActiveRecord::Base
     @push_user_title = nil
   end
   
-  def self.add_media_files(attachments)
+  # if wait_for_completion is true, this will wait SYNCHRONOUSLY for the bulk
+  # upload to complete. Wrap it in a timeout if you ever want it to give up
+  # waiting.
+  def self.add_media_files(attachments, wait_for_completion)
     attachments = Array(attachments)
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)
@@ -60,9 +63,21 @@ class MediaObject < ActiveRecord::Base
                }
     end
     res = client.bulkUploadAdd(files)
+
     if !res[:ready]
-      MediaObject.send_at(1.minute.from_now, :refresh_media_files, res[:id], attachments.map(&:id), root_account_id)
-    else
+      if wait_for_completion
+        bulk_upload_id = res[:id]
+        Rails.logger.debug "waiting for bulk upload id: #{bulk_upload_id}"
+        while !res[:ready]
+          sleep(1.minute.to_i)
+          res = client.bulkUploadGet(bulk_upload_id)
+        end
+      else
+        MediaObject.send_at(1.minute.from_now, :refresh_media_files, res[:id], attachments.map(&:id), root_account_id)
+      end
+    end
+
+    if res[:ready]
       build_media_objects(res, root_account_id)
     end
     res

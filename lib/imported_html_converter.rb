@@ -40,7 +40,7 @@ class ImportedHtmlConverter
                 node[attr] = URI::escape("#{course_path}/discussion_topics/#{linked_topic.id}")
               end
             end
-          elsif node[attr] =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/(.*)}
+          elsif node[attr] =~ %r{(?:(?:%24|\$)CANVAS_OBJECT_REFERENCE(?:%24|\$)|(?:%24|\$)WIKI_REFERENCE(?:%24|\$))/([^/]*)/(.*)}
             type = $1
             migration_id = $2
             if type == 'wiki'
@@ -52,17 +52,23 @@ class ImportedHtmlConverter
                 node[attr] = URI::escape("#{course_path}/#{type}/#{object.id}")
               end
             end
-          elsif node[attr] =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
+          elsif node[attr] =~ %r{(?:%24|\$)CANVAS_COURSE_REFERENCE(?:%24|\$)/(.*)}
             section = $1
             node[attr] = URI::escape("#{course_path}/#{section}")
-          elsif node[attr] =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
-            node[attr] = replace_relative_file_url($1, context, course_path)
+          elsif node[attr] =~ %r{(?:%24|\$)IMS_CC_FILEBASE(?:%24|\$)/(.*)}
+            rel_path = $1
+            if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
+              replace_media_comment_data(node, rel_path, context, course_path)
+            else
+              node[attr] = replace_relative_file_url(rel_path, context, course_path)
+            end
           elsif relative_url?(node[attr])
             node[attr] = replace_relative_file_url(node[attr], context, course_path)
           end
         end
       end
     end
+
     node = doc.at_css('body')
     if remove_outer_nodes_if_one_child
       node = node.child while node.children.size == 1 && node.child.child
@@ -86,6 +92,21 @@ class ImportedHtmlConverter
       new_url = URI::escape("#{course_path}/file_contents/#{Folder.root_folders(context).first.name}/") + rel_path
     end
     new_url
+  end
+
+  def self.replace_media_comment_data(node, rel_path, context, course_path)
+    if context.respond_to?(:attachment_path_id_lookup) &&
+      context.attachment_path_id_lookup &&
+        context.attachment_path_id_lookup[rel_path]
+      file = context.attachments.find_by_migration_id(context.attachment_path_id_lookup[rel_path])
+      if file && file.media_object
+        media_id = file.media_object.media_id
+        node['href'] = "/media_objects/#{media_id}"
+        node['id'] = "media_comment_#{media_id}"
+        return
+      end
+    end
+    node['href'] = replace_relative_file_url(rel_path, context, course_path)
   end
   
   def self.relative_url?(url)

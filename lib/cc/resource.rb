@@ -53,11 +53,11 @@ module CC
         add_web_links
         set_progress(40)
         add_course_files
+        add_media_objects
         set_progress(70)
         QTI::QTIGenerator.generate_qti(@manifest, resources)
         set_progress(90)
         create_basic_lti_links
-        #todo download kaltura videos?
       end
     end
     

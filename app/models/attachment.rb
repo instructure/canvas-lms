@@ -93,8 +93,9 @@ class Attachment < ActiveRecord::Base
   end
   
   def build_media_object
+    return true if @skip_media_object_creation
     if self.content_type && self.content_type.match(/\A(video|audio)/)
-      MediaObject.send_later(:add_media_files, self)
+      MediaObject.send_later(:add_media_files, self, false)
     end
   end
 
@@ -286,7 +287,7 @@ class Attachment < ActiveRecord::Base
       self.namespace = infer_namespace
     end
     
-    self.media_entry_id ||= 'maybe' if self.new_record? && self.content_type && self.content_type.match(/\A(video|audio)/)
+    self.media_entry_id ||= 'maybe' if self.new_record? && self.content_type && self.content_type.match(/(video|audio)/)
 
     # Raise an error if this is scribdable without a scribdable context?
     if scribdable_context? and scribdable? and ScribdAPI.enabled?
@@ -766,6 +767,13 @@ class Attachment < ActiveRecord::Base
   
   def self.skip_scribd_submits?
     !!@skip_scribd_submits
+  end
+
+  def self.skip_media_object_creation(&block)
+    @skip_media_object_creation = true
+    block.call
+  ensure
+    @skip_media_object_creation = false
   end
   
   # This is the engine of the Scribd machine.  Submits the code to
