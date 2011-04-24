@@ -93,7 +93,7 @@ class Attachment < ActiveRecord::Base
   end
   
   def build_media_object
-    return true if @skip_media_object_creation
+    return true if self.class.skip_media_object_creation?
     if self.content_type && self.content_type.match(/\A(video|audio)/)
       MediaObject.send_later(:add_media_files, self, false)
     end
@@ -774,6 +774,9 @@ class Attachment < ActiveRecord::Base
     block.call
   ensure
     @skip_media_object_creation = false
+  end
+  def self.skip_media_object_creation?
+    !!@skip_media_object_creation
   end
   
   # This is the engine of the Scribd machine.  Submits the code to
