@@ -286,8 +286,8 @@
     entriesAddedHandler: function(entries) {
       $.mediaComment.upload_delegate.entriesAddedHandler('audio', entries);
     },
-    progressHandler: function(loaded_bytes, total_bytes, entry) {
-      $.mediaComment.upload_delegate.progressHandler('audio', loaded_bytes, total_bytes, entry);
+    progressHandler: function(info) {
+      $.mediaComment.upload_delegate.progressHandler('audio', info[0], info[1], info[2]);
     }
   };
   $.mediaComment.video_delegate = {
@@ -306,8 +306,8 @@
     entriesAddedHandler: function(entries) {
       $.mediaComment.upload_delegate.entriesAddedHandler('video', entries);
     },
-    progressHandler: function(loaded_bytes, total_bytes, entry) {
-      $.mediaComment.upload_delegate.progressHandler('video', loaded_bytes, total_bytes, entry);
+    progressHandler: function(info) {
+      $.mediaComment.upload_delegate.progressHandler('video', info[0], info[1], info[2]);
     }
   }
   $.mediaComment.upload_delegate = {
