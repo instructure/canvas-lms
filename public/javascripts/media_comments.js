@@ -288,6 +288,9 @@
     },
     progressHandler: function(info) {
       $.mediaComment.upload_delegate.progressHandler('audio', info[0], info[1], info[2]);
+    },
+    uploadErrorHandler: function() {
+      $.mediaComment.upload_delegate.uploadErrorHandler('audio');
     }
   };
   $.mediaComment.video_delegate = {
@@ -308,6 +311,9 @@
     },
     progressHandler: function(info) {
       $.mediaComment.upload_delegate.progressHandler('video', info[0], info[1], info[2]);
+    },
+    uploadErrorHandler: function() {
+      $.mediaComment.upload_delegate.uploadErrorHandler('video');
     }
   }
   $.mediaComment.upload_delegate = {
@@ -334,11 +340,23 @@
       }
       var file = $("#" + type + "_upload")[0].getFiles()[0];
       $("#media_upload_settings .icon").attr('src', '/images/file-' + type + '.png');
+      $("#media_upload_submit").show();
       $("#media_upload_submit").attr('disabled', file ? false : true)
       $("#media_upload_settings").css('visibility', file ? 'visible' : 'hidden');
       $("#media_upload_title").val(file.title);
       $("#media_upload_display_title").text(file.title);
       $("#media_upload_file_size").text($.fileSize(file.bytesTotal));
+      
+      
+      $("#media_upload_feedback_text").html("");
+      $("#media_upload_feedback").css('visibility', 'hidden');
+      if (file.bytesTotal > (INST.kalturaSettings.max_file_size_bytes || 104857600)) {
+        $("#media_upload_feedback_text").html("<b>This file is too large.</b> The maximum size is " + (INST.kalturaSettings.max_file_size_bytes || 104857600) / 1048576 + "MB.");
+        $("#media_upload_feedback").css('visibility', 'visible');
+        $("#media_upload_submit").hide();
+        return;
+      }
+      
       // Currently there is a known problem with the 
       // KUpload widget, where unless you submit the uploaded
       // file as part of the select callback, the flash widget
@@ -372,6 +390,11 @@
     progressHandler: function(type, loaded_bytes, total_bytes, entry) {
       var pct = 100.0 * loaded_bytes / total_bytes;
       $("#media_upload_progress").progressbar('option', 'value', pct);
+    },
+    uploadErrorHandler: function(type) {
+      var error = $("#" + type + "_upload")[0].getError();
+      $("#media_upload_errors").text("Upload failed with error " + error);
+      $("#media_upload_progress").hide();
     }
   }
   var reset_selectors = false;
@@ -440,7 +463,7 @@
           licenseType:"CC-0.1",
           showUi:"true",
           useCamera:"false",
-          maxFileSize: 50,
+          maxFileSize: (INST.kalturaSettings.max_file_size_bytes || 104857600) / 1048576,
           maxUploads: 1,
           partnerData: $.mediaComment.partnerData(),
           partner_data: $.mediaComment.partnerData(),
@@ -475,7 +498,7 @@
         ks:ks,
         thumbOffset:"1",
         licenseType:"CC-0.1",
-        maxFileSize: 50,
+        maxFileSize: (INST.kalturaSettings.max_file_size_bytes || 104857600) / 1048576,
         maxUploads: 1,
         uiConfId: INST.kalturaSettings.upload_ui_conf,
         jsDelegate: "$.mediaComment.audio_delegate"

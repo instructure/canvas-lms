@@ -91,8 +91,14 @@
           <img src="/images/file.png" alt="" class="icon"/>
           <span id="media_upload_display_title">&nbsp;</span>
           <span id="media_upload_file_size">&nbsp;</span>
+          <br />
+          <div id="media_upload_feedback" style="visibility: hidden; margin-top: 5px;">
+            <img src="/images/warning.png" alt="" />
+            <span id="media_upload_feedback_text"></span>
+          </div>
         </div>
-        <div class="content" id="media_upload_progress" style="visibility: hidden; margin-top: 50px;"></div>
+        <div class="content" id="media_upload_progress" style="visibility: hidden; margin-top: 20px;"></div>
+        <div class="content" id="media_upload_errors" style="visibility: hidden; margin-top: 20px;"></div>
         <div class="content">
           <button class="button disabled" disabled="true" type="button" id="media_upload_submit">Submit Media File</button>
         </div>
