@@ -400,6 +400,12 @@ class WikiPage < ActiveRecord::Base
     item ||= find_by_wiki_id_and_id(context.wiki.id, hash[:id]) #find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
     item ||= find_by_wiki_id_and_migration_id(context.wiki.id, hash[:migration_id]) #context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
     item ||= context.wiki.wiki_pages.new
+    # force the url to be the same as the url_name given, since there are
+    # likely other resources in the import that link to that url
+    if hash[:url_name].present?
+      item.url = hash[:url_name]
+      item.only_when_blank = true
+    end
     if hash[:root_folder] && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
       front_page = context.wiki.wiki_page
       if front_page.id

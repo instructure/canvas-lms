@@ -414,7 +414,7 @@ describe "Common Cartridge importing" do
     exported_html = CC::CCHelper.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
     #convert to json
     doc = Nokogiri::XML(exported_html)
-    hash = @converter.convert_wiki(doc, 'some-page-different')
+    hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
     @copy_to.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
@@ -444,7 +444,7 @@ describe "Common Cartridge importing" do
     exported_html = CC::CCHelper.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
     #convert to json
     doc = Nokogiri::XML(exported_html)
-    hash = @converter.convert_wiki(doc, 'some-page-different')
+    hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
     WikiPage.import_from_migration(hash, @copy_to)
