@@ -45,11 +45,14 @@ jQuery(function($) {
   $('#main:not(.already_sized)').css({"minHeight" : Math.max($("#left_side").height(), parseInt(($('#main').css('minHeight') || "").replace('px', ''), 10))});
   
   var $menu_items = $(".menu-item"),
+      $menu = $("#menu"),
       menuItemHoverTimeoutId;
       
   function clearMenuHovers(){
     window.clearTimeout(menuItemHoverTimeoutId);
-    $menu_items.removeClass("hover hover-pending");
+    // this is explicitly finding every time in case
+    // someone has added menu items to the list after init
+    $menu.find(".menu-item").removeClass("hover hover-pending");
   }
   
   function unhoverMenuItem(){
@@ -72,7 +75,9 @@ jQuery(function($) {
     return false;  
   }
   
-  $menu_items.bind('mouseenter focusin' , hoverMenuItem ).bind('mouseleave focusout', unhoverMenuItem);
+  $menu
+    .delegate('.menu-item', 'mouseenter focusin', hoverMenuItem )
+    .delegate('.menu-item', 'mouseleave focusout', unhoverMenuItem );
 
   // ie7 needs some help forcing the columns to be as wide as (width_of_one_column * #_of_columns_in_this_dropdown)
   if (INST.browser.ie7) {
@@ -84,7 +89,7 @@ jQuery(function($) {
   }
   
   // this stuff is for the ipad, it needs a little help getting the drop menus to show up
-  $menu_items.bind('touchstart', function(){
+  $menu_items.live('touchstart', function(){
     // if we are not in an alredy hovering drop-down, drop it down, otherwise do nothing 
     // (so that if a link is clicked in one of the li's it gets followed).
     if(!$(this).hasClass('hover')){
