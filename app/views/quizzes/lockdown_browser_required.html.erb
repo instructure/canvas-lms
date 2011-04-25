@@ -6,7 +6,7 @@
   This quiz requires Respondus LockDown Browser.  Please launch Respondus LockDown Browser to take this quiz or view your quiz results.
 </p>
 
-<% if @lockdown_browser_download_url %>
+<% unless @lockdown_browser_download_url.blank? %>
   <p>
     If you have not already installed the browser, please download it from here: <%= link_to("[Download Respondus LockDown Browser]", @lockdown_browser_download_url) %>
   </p>
