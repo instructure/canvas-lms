@@ -818,7 +818,7 @@ class ContextModule < ActiveRecord::Base
     end
     if hash[:sub_items]
       hash[:sub_items].each do |tag_hash|
-        self.add_item_from_migration(tag_hash, level + 1, context)
+        self.add_item_from_migration(tag_hash, level + 1, context, item_map)
       end
     end
     item
