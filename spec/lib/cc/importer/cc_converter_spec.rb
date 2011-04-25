@@ -398,8 +398,8 @@ describe "Common Cartridge importing" do
   end
 
   it "should translate attachment links on import" do
-    attachment = Attachment.create!(:filename => 'ohai.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-    attachment_import = factory_with_protected_attributes(Attachment, :filename => 'ohai.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to, :migration_id => 'ohai')
+    attachment = Attachment.create!(:filename => 'ohai there.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+    attachment_import = factory_with_protected_attributes(Attachment, :filename => 'ohai there.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to, :migration_id => 'ohai')
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href="/courses/%s/files/%s/preview">Preview File</a>
       <a href="/courses/%s/files/%s/download">Download File</a>
@@ -417,7 +417,7 @@ describe "Common Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'some-page-different')
     hash = hash.with_indifferent_access
     #import into new course
-    @copy_to.attachment_path_id_lookup = { 'unfiled/ohai.txt' => attachment_import.migration_id }
+    @copy_to.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
     WikiPage.import_from_migration(hash, @copy_to)
     
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)

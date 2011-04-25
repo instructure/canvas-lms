@@ -25,7 +25,8 @@ class ImportedHtmlConverter
     doc.search("*").each do |node|
       attrs.each do |attr|
         if node[attr]
-          if node[attr] =~ /wiki_page_migration_id=(.*)/
+          val = URI.unescape(node[attr])
+          if val =~ /wiki_page_migration_id=(.*)/
             # This would be from a BB9 migration. 
             #todo: refactor migration systems to use new $CANVAS...$ flags
             #todo: FLAG UNFOUND REFERENCES TO re-attempt in second loop?
@@ -34,13 +35,13 @@ class ImportedHtmlConverter
                 node[attr] = URI::escape("#{course_path}/wiki/#{linked_wiki.url}")
               end
             end
-          elsif node[attr] =~ /discussion_topic_migration_id=(.*)/
+          elsif val =~ /discussion_topic_migration_id=(.*)/
             if topic_migration_id = $1
               if linked_topic = context.discussion_topics.find_by_migration_id(topic_migration_id)
                 node[attr] = URI::escape("#{course_path}/discussion_topics/#{linked_topic.id}")
               end
             end
-          elsif node[attr] =~ %r{(?:(?:%24|\$)CANVAS_OBJECT_REFERENCE(?:%24|\$)|(?:%24|\$)WIKI_REFERENCE(?:%24|\$))/([^/]*)/(.*)}
+          elsif val =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/(.*)}
             type = $1
             migration_id = $2
             if type == 'wiki'
@@ -52,10 +53,10 @@ class ImportedHtmlConverter
                 node[attr] = URI::escape("#{course_path}/#{type}/#{object.id}")
               end
             end
-          elsif node[attr] =~ %r{(?:%24|\$)CANVAS_COURSE_REFERENCE(?:%24|\$)/(.*)}
+          elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
             section = $1
             node[attr] = URI::escape("#{course_path}/#{section}")
-          elsif node[attr] =~ %r{(?:%24|\$)IMS_CC_FILEBASE(?:%24|\$)/(.*)}
+          elsif val =~ %r{\$IMS_CC_FILEBASE\$/(.*)}
             rel_path = $1
             if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/
               replace_media_comment_data(node, rel_path, context, course_path)
