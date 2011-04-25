@@ -1107,7 +1107,8 @@ class Quiz < ActiveRecord::Base
     [:migration_id, :title, :allowed_attempts, :time_limit, 
      :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
      :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
-    :anonymous_submissions, :could_be_locked, :quiz_type].each do |attr|
+     :require_lockdown_browser_for_results, :anonymous_submissions, 
+     :could_be_locked, :quiz_type].each do |attr|
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
     
@@ -1154,7 +1155,7 @@ class Quiz < ActiveRecord::Base
       end
     end
     
-    if hash[:assignment]
+    if hash[:assignment] && hash[:available]
       assignment = Assignment.import_from_migration(hash[:assignment], context)
       item.assignment = assignment
       item.workflow_state = 'available'

@@ -118,6 +118,7 @@ module CC
           q_node.quiz_type quiz.quiz_type
           q_node.points_possible quiz.points_possible
           q_node.require_lockdown_browser quiz.require_lockdown_browser unless quiz.require_lockdown_browser.nil?
+          q_node.require_lockdown_browser_for_results quiz.require_lockdown_browser_for_results unless quiz.require_lockdown_browser_for_results.nil?
           q_node.access_code quiz.access_code unless quiz.access_code.blank?
           q_node.ip_filter quiz.ip_filter unless quiz.ip_filter.blank?
           q_node.show_correct_answers quiz.show_correct_answers unless quiz.show_correct_answers.nil?
@@ -125,6 +126,7 @@ module CC
           q_node.could_be_locked quiz.could_be_locked unless quiz.could_be_locked.nil?
           q_node.time_limit quiz.time_limit unless quiz.time_limit.nil?
           q_node.allowed_attempts quiz.allowed_attempts unless quiz.allowed_attempts.nil?
+          q_node.available quiz.available?
           if quiz.assignment
             assignment_migration_id = CCHelper.create_key(quiz.assignment)
             doc.assignment(:identifier=>assignment_migration_id) do |a|

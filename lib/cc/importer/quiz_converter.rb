@@ -62,7 +62,8 @@ module CC::Importer
       quiz['time_limit'] = get_int_val(doc, 'time_limit')
       quiz['allowed_attempts'] = get_int_val(doc, 'allowed_attempts')
       ['could_be_locked','anonymous_submissions','show_correct_answers',
-       'require_lockdown_browser','hide_results','shuffle_answers'
+       'require_lockdown_browser','require_lockdown_browser_for_results',
+       'hide_results','shuffle_answers','available'
       ].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         quiz[bool_val] = val unless val.nil?
