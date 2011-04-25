@@ -20,7 +20,7 @@ class RespondusSettings
     apply_if_set(assessment, :shuffle_answers, 'shuffleAnswers') { |v| v == 'true' }
     apply_if_set(assessment, :due_at, 'dueDate') { |v| readtime(v) }
 
-    feedback = (read_setting('feedbackOptions') || "").split(",")
+    feedback = read_csv_setting('feedbackOptions')
     if feedback.include?('showResults') || feedback.include?('all')
       if feedback.include?('lastAttemptOnly')
          assessment[:hide_results] = 'until_after_last_attempt'
@@ -30,6 +30,10 @@ class RespondusSettings
     elsif feedback.include?('none')
       assessment[:hide_results] = 'always'
     end
+
+    ldb = read_csv_setting('lockDownBrowser')
+    assessment['require_lockdown_browser'] = true if ldb.include?('assessment')
+    assessment['require_lockdown_browser_for_results'] = true if ldb.include?('results')
 
     apply_if_set(assessment, :scoring_policy, 'attemptGrading') do |v|
       case v
@@ -57,6 +61,10 @@ class RespondusSettings
 
   def read_setting(setting_name)
     @doc.at_css("settings setting[name=#{setting_name}]").try(:text)
+  end
+
+  def read_csv_setting(setting_name)
+    (read_setting(setting_name) || "").split(",")
   end
 
 end
