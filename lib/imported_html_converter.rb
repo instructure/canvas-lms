@@ -44,13 +44,15 @@ class ImportedHtmlConverter
           elsif val =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/(.*)}
             type = $1
             migration_id = $2
+            type_for_url = type
+            type = 'context_modules' if type == 'modules'
             if type == 'wiki'
               if page = context.wiki.wiki_pages.find_by_url(migration_id)
                 node[attr] = URI::escape("#{course_path}/wiki/#{page.url}")
               end
             elsif context.respond_to?(type) && context.send(type).respond_to?(:find_by_migration_id)
               if object = context.send(type).find_by_migration_id(migration_id)
-                node[attr] = URI::escape("#{course_path}/#{type}/#{object.id}")
+                node[attr] = URI::escape("#{course_path}/#{type_for_url}/#{object.id}")
               end
             end
           elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}

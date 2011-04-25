@@ -127,7 +127,8 @@ module CCHelper
          'groups' => Group,
          'wiki' => WikiPage,
          'grades' => nil,
-         'users' => nil
+         'users' => nil,
+         'modules' => ContextModule
         }.each do |type, obj_class|
           if type != 'wiki' && sub_spot =~ %r{\A#{type}/(\d+)([^\s"]*)$}
             # it's pointing to a specific file or object

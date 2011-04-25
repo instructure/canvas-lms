@@ -430,13 +430,19 @@ describe "Common Cartridge importing" do
     # make sure that the wiki page we're linking to in the test below exists
     @copy_from.wiki.wiki_pages.create!(:title => "assignments", :body => "ohai")
     @copy_to.wiki.wiki_pages.create!(:title => "assignments", :body => "ohai")
+    mod = @copy_from.context_modules.create!(:name => "some module")
+    mod2 = @copy_to.context_modules.create(:name => "some module")
+    mod2.migration_id = CC::CCHelper.create_key(mod)
+    mod2.save!
     
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
       <a href=\"/courses/%s/file_contents/course%%20files/tbe_banner.jpg\">Some file</a>
       <a href=\"/courses/%s/wiki/assignments\">Assignments wiki link</a>
+      <a href=\"/courses/%s/modules\">Modules</a>
+      <a href=\"/courses/%s/modules/%s\">some module</a>
       </p>}
-    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id ])
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id ])
     @copy_from.save!
     
     #export to html file
@@ -452,7 +458,7 @@ describe "Common Cartridge importing" do
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
     page_2.url.should == page.url
-    page_2.body.should == body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id ]
+    page_2.body.should == body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id ]
   end
   
   it "should import assignments" do 
