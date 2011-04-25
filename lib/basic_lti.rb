@@ -53,6 +53,10 @@ module BasicLTI
     if tool.include_email?
       hash['lis_person_contact_email_primary'] = user.email
     end
+    if tool.public?
+      hash['custom_canvas_user_id'] = user.id
+      hash['custom_canvas_course_id'] = context.id
+    end
     hash['context_id'] = context.opaque_identifier(:asset_string)
     hash['context_title'] = context.name
     hash['context_label'] = context.course_code rescue nil
