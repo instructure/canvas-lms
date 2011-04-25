@@ -49,6 +49,7 @@ class MediaObject < ActiveRecord::Base
   # upload to complete. Wrap it in a timeout if you ever want it to give up
   # waiting.
   def self.add_media_files(attachments, wait_for_completion)
+    return unless Kaltura::ClientV3.config
     attachments = Array(attachments)
     client = Kaltura::ClientV3.new
     client.startSession(Kaltura::SessionType::ADMIN)

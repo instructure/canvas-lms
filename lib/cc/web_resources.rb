@@ -35,6 +35,7 @@ module CC
     end
 
     def add_media_objects
+      return unless Kaltura::ClientV3.config
       client = Kaltura::ClientV3.new
       client.startSession(Kaltura::SessionType::ADMIN)
 
