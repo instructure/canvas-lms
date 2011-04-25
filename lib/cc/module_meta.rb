@@ -69,7 +69,7 @@ module CC
                 items_node.item(:identifier=>ct_migration_id) do |item_node|
                   item_node.content_type ct.content_type
                   item_node.title ct.title
-                  item_node.identifierref CCHelper.create_key(ct.content) unless ct.content_type == 'ContextModuleSubHeader'
+                  item_node.identifierref CCHelper.create_key(ct.content_or_self) unless ct.content_type == 'ContextModuleSubHeader'
                   item_node.url ct.url if ["ContextExternalTool", 'ExternalUrl'].member? ct.content_type
                   item_node.position ct.position
                   item_node.indent ct.indent

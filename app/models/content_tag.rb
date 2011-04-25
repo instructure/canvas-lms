@@ -139,6 +139,10 @@ class ContentTag < ActiveRecord::Base
     klass.respond_to?("tableless?") && klass.tableless? ? nil : old_content
   end
   
+  def content_or_self
+    content || self
+  end
+  
   def update_asset_name!
     correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
     correct_context ||= self.context && self.content.is_a?(WikiPage) && self.content.wiki && self.content.wiki.wiki_namespaces.length == 1 && self.content.wiki.wiki_namespaces.map(&:context_code).include?(self.context_code)
