@@ -119,7 +119,7 @@ class PageView < ActiveRecord::Base
         json = self.attributes.as_json
         json['is_update'] = true if self.is_update
         Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
-      rescue Errno::ECONNREFUSED
+      rescue Exception
         # we're going to ignore the error for now, if redis is unavailable
       end
     when :db
