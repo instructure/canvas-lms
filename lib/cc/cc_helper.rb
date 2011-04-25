@@ -129,13 +129,14 @@ module CCHelper
          'grades' => nil,
          'users' => nil
         }.each do |type, obj_class|
-          if type != 'wiki' && sub_spot =~ %r{\A#{type}/(\d+)[^\s"]*$}
+          if type != 'wiki' && sub_spot =~ %r{\A#{type}/(\d+)([^\s"]*)$}
             # it's pointing to a specific file or object
             obj = obj_class.find($1) rescue nil
+            rest = $2
             if obj && obj.respond_to?(:grants_right?) && obj.grants_right?(user, nil, :read)
               if type == 'files'
                 folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
-                new_url = "#{folder}/#{obj.display_name}"
+                new_url = "#{folder}/#{obj.display_name}#{file_query_string(rest)}"
               elsif migration_id = CCHelper.create_key(obj)
                 new_url = "#{OBJECT_TOKEN}/#{type}/#{migration_id}"
               end
@@ -180,6 +181,25 @@ module CCHelper
     # be unique
     filename = "#{obj.media_id}.#{asset[:fileExt]}" if asset
     { :asset => asset, :filename => filename }
+  end
+
+  # sub_path is the last part of a file url: /courses/1/files/1(/download)
+  # we want to handle any sort of extra params to the file url, both in the
+  # path components and the query string
+  def self.file_query_string(sub_path)
+    return if sub_path.blank?
+    qs = []
+    uri = URI.parse(sub_path)
+    unless uri.path == "/preview" # defaults to preview, so no qs added
+      qs << "canvas_#{Rack::Utils.escape(uri.path[1..-1])}=1"
+    end
+
+    Rack::Utils.parse_query(uri.query).each do |k,v|
+      qs << "canvas_qs_#{Rack::Utils.escape(k)}=#{Rack::Utils.escape(v)}"
+    end
+
+    return nil if qs.blank?
+    "?#{qs.join("&")}"
   end
 
 end

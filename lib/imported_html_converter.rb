@@ -80,11 +80,29 @@ class ImportedHtmlConverter
 
   def self.replace_relative_file_url(rel_path, context, course_path)
     new_url = nil
+    rel_path, qs = rel_path.split('?', 2)
     if context.respond_to?(:attachment_path_id_lookup) &&
         context.attachment_path_id_lookup &&
         context.attachment_path_id_lookup[rel_path]
       if file = context.attachments.find_by_migration_id(context.attachment_path_id_lookup[rel_path])
-        new_url = "/courses/#{context.id}/files/#{file.id}/preview"
+        new_url = "/courses/#{context.id}/files/#{file.id}"
+        # support other params in the query string, that were exported from the
+        # original path components and query string. see
+        # CCHelper::file_query_string
+        params = Rack::Utils.parse_nested_query(qs.presence || "")
+        qs = []
+        params.each do |k,v|
+          case k
+          when /canvas_qs_(.*)/
+            qs << "#{Rack::Utils.escape($1)}=#{Rack::Utils.escape(v)}"
+          when /canvas_(.*)/
+            new_url += "/#{$1}"
+          end
+        end
+        new_url += "?#{qs.join("&")}" if qs.present?
+        if params.blank?
+          new_url += "/preview"
+        end
       end
     end
     unless new_url

@@ -396,7 +396,36 @@ describe "Common Cartridge importing" do
     mod3_2.content_tags[0].url.should == "http://a.example.com/"
     mod3_2.content_tags[1].url.should == "http://b.example.com/"
   end
-  
+
+  it "should translate attachment links on import" do
+    attachment = Attachment.create!(:filename => 'ohai.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+    attachment_import = factory_with_protected_attributes(Attachment, :filename => 'ohai.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to, :migration_id => 'ohai')
+    body_with_link = %{<p>Watup? <strong>eh?</strong>
+      <a href="/courses/%s/files/%s/preview">Preview File</a>
+      <a href="/courses/%s/files/%s/download">Download File</a>
+      <a href="/courses/%s/files/%s/download?wrap=1">Download (wrap) File</a>
+      <a href="/courses/%s/files/%s/bogus?someattr=1">Download (wrap) File</a>
+      </p>}
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % ([ @copy_from.id, attachment.id ] * 4))
+    @copy_from.save!
+
+    #export to html file
+    migration_id = CC::CCHelper.create_key(page)
+    exported_html = CC::CCHelper.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
+    #convert to json
+    doc = Nokogiri::XML(exported_html)
+    hash = @converter.convert_wiki(doc, 'some-page-different')
+    hash = hash.with_indifferent_access
+    #import into new course
+    @copy_to.attachment_path_id_lookup = { 'unfiled/ohai.txt' => attachment_import.migration_id }
+    WikiPage.import_from_migration(hash, @copy_to)
+    
+    page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
+    page_2.title.should == page.title
+    page_2.url.should == page.url
+    page_2.body.should == body_with_link % ([ @copy_to.id, attachment_import.id ] * 4)
+  end
+
   it "should import wiki pages" do
     # make sure that the wiki page we're linking to in the test below exists
     @copy_from.wiki.wiki_pages.create!(:title => "assignments", :body => "ohai")
