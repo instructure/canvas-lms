@@ -460,5 +460,40 @@
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>
   </xs:element>
+  
+  <xs:element name="fileMeta">
+    <xs:complexType>
+      <xs:all minOccurs="0" maxOccurs="1">
+        <xs:element name="hidden_folders" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="folder" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="locked_folders" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="folder" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="hidden_files" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="attachment_identifierref" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="locked_files" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="attachment_identifierref" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>

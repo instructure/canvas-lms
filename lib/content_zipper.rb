@@ -274,9 +274,12 @@ class ContentZipper
     end
   end
   
-  # The callback should accept two arguments, the attachment and the folder names
+  # The callback should accept two arguments, the attachment/folder and the folder names
   def zip_folder(folder, zipfile, folder_names, &callback)
-    folder.active_file_attachments.select{|a| !@user || a.grants_right?(@user, nil, :download)}.each do |attachment|
+    if callback && (folder.hidden? || folder.locked)
+      callback.call(folder, folder_names)
+    end
+    folder.file_attachments.scoped(:conditions => "file_state IN ('available', 'hidden')").select{|a| !@user || a.grants_right?(@user, nil, :download)}.each do |attachment|
       callback.call(attachment, folder_names) if callback
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.display_name}")

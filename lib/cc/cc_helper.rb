@@ -53,6 +53,7 @@ module CCHelper
   MODULE_META = "module_meta.xml"
   RUBRICS = "rubrics.xml"
   EXTERNAL_TOOLS = "external_tools.xml"
+  FILES_META = "files_meta.xml"
   SYLLABUS = "syllabus.html"
   WEB_RESOURCES_FOLDER = 'web_resources'
   WIKI_FOLDER = 'wiki_content'

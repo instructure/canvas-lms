@@ -31,8 +31,44 @@ module CC::Importer
 
         file_map[file['migration_id']] = file
       end
-
+      
+      convert_locked_hidden_files(file_map)
+      
       file_map
+    end
+    
+    def convert_locked_hidden_files(file_map)
+      doc = open_file_xml File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, FILES_META)
+      
+      
+      if hidden_folders = doc.at_css('hidden_folders')
+        @course[:hidden_folders] = []
+        hidden_folders.css('folder').each do |folder|
+          @course[:hidden_folders] << folder.text
+        end
+      end
+      if locked_folders = doc.at_css('locked_folders')
+        @course[:locked_folders] = []
+        locked_folders.css('folder').each do |folder|
+          @course[:locked_folders] << folder.text
+        end
+      end
+      if hidden_files = doc.at_css('hidden_files')
+        hidden_files.css('attachment_identifierref').each do |id|
+          id = id.text
+          if file_map[id]
+            file_map[id][:hidden] = true
+          end
+        end
+      end
+      if hidden_files = doc.at_css('locked_files')
+        hidden_files.css('attachment_identifierref').each do |id|
+          id = id.text
+          if file_map[id]
+            file_map[id][:locked] = true
+          end
+        end
+      end
     end
 
     def package_course_files

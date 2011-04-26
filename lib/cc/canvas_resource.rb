@@ -41,11 +41,13 @@ module CC
       resources << create_learning_outcomes
       resources << create_rubrics
       resources << create_external_tools
+      resources << files_meta_path
       
       @resources.resource(
               :identifier => migration_id,
               "type" => Manifest::LOR,
-              :href => syl_rel_path
+              :href => syl_rel_path,
+              :intendeduse => "syllabus"
       ) do |res|
         res.file(:href=>syl_rel_path)
         resources.each do |resource|

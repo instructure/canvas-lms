@@ -107,6 +107,23 @@ class Attachment < ActiveRecord::Base
         import_from_migration(att, migration.context)
       end
     end
+    
+    if data[:locked_folders]
+      data[:locked_folders].each do |path|
+        if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
+          f.locked = true
+          f.save
+        end
+      end
+    end
+    if data[:hidden_folders]
+      data[:hidden_folders].each do |path|
+        if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
+          f.workflow_state = 'hidden'
+          f.save
+        end
+      end
+    end
   end
 
   def self.import_from_migration(hash, context, item=nil)
@@ -120,6 +137,8 @@ class Attachment < ActiveRecord::Base
       item.context = context
       context.imported_migration_items << item if context.imported_migration_items && item.migration_id != hash[:migration_id]
       item.migration_id = hash[:migration_id]
+      item.locked = true if hash[:locked]
+      item.file_state = 'hidden' if hash[:hidden]
       item.save_without_broadcasting!
     end
     item
