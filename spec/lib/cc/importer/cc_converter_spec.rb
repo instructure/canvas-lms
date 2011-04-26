@@ -333,6 +333,7 @@ describe "Common Cartridge importing" do
     mod1 = @copy_from.context_modules.create!(:name => "some module", :unlock_at => 1.week.from_now)
     mod2 = @copy_from.context_modules.create!(:name => "next module")
     mod3 = @copy_from.context_modules.create!(:name => "url module")
+    mod4 = @copy_from.context_modules.create!(:name => "attachment module")
     mod2.prerequisites = [{:type=>"context_module", :name=>mod1.name, :id=>mod1.id}]
     mod2.require_sequential_progress = true
     mod2.save!
@@ -358,6 +359,16 @@ describe "Common Cartridge importing" do
     mod3.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
     mod3.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://b.example.com/' })
     
+    # attachments are migrated with just their filename as display_name, 
+    # but if a content tag has a different title the display_name should update
+    att = Attachment.create!(:filename => 'boring.txt', :display_name => "Super exciting!", :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+    att.display_name.should == "Super exciting!"
+    # create @copy_to attachment with normal display_name
+    att_2 = Attachment.create!(:filename => 'boring.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to)
+    att_2.migration_id = CC::CCHelper.create_key(att)
+    att_2.save
+    mod4.add_item({:title => att.display_name, :type => "attachment", :id => att.id})
+    
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
     @resource.create_module_meta(builder)
@@ -368,6 +379,7 @@ describe "Common Cartridge importing" do
     hash[0] = hash[0].with_indifferent_access
     hash[1] = hash[1].with_indifferent_access
     hash[2] = hash[2].with_indifferent_access
+    hash[3] = hash[3].with_indifferent_access
     ContextModule.process_migration({'modules'=>hash}, @migration)
     @copy_to.save!
     
@@ -395,6 +407,11 @@ describe "Common Cartridge importing" do
     mod3_2.content_tags.length.should == 2
     mod3_2.content_tags[0].url.should == "http://a.example.com/"
     mod3_2.content_tags[1].url.should == "http://b.example.com/"
+    
+    mod4_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod4))
+    mod4_2.content_tags.first.title.should == att.display_name
+    att_2.reload
+    att_2.display_name.should == att.display_name
   end
 
   it "should translate attachment links on import" do

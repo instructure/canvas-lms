@@ -138,7 +138,7 @@ module CCHelper
             if obj && obj.respond_to?(:grants_right?) && obj.grants_right?(user, nil, :read)
               if type == 'files'
                 folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
-                new_url = "#{folder}/#{obj.display_name}#{file_query_string(rest)}"
+                new_url = "#{folder}/#{obj.filename}#{file_query_string(rest)}"
               elsif migration_id = CCHelper.create_key(obj)
                 new_url = "#{OBJECT_TOKEN}/#{type}/#{migration_id}"
               end

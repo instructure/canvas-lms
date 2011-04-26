@@ -77,7 +77,7 @@ module CC
       if topic.attachment
         doc.attachments do |atts|
           folder = topic.attachment.folder.full_name.gsub("course files", CCHelper::WEB_CONTENT_TOKEN)
-          path = "#{folder}/#{topic.attachment.display_name}"
+          path = "#{folder}/#{topic.attachment.filename}"
           atts.attachment(:href=>path)
         end
       end

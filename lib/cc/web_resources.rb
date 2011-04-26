@@ -30,7 +30,7 @@ module CC
           next
         end
 
-        path = File.join(folder_names, file.display_name)
+        path = File.join(folder_names, file.filename)
         migration_id = CCHelper.create_key(file)
         hidden_locked_files[:hidden_files] << migration_id if file.hidden?
         @resources.resource(
