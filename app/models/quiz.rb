@@ -729,7 +729,6 @@ class Quiz < ActiveRecord::Base
     columns << 'id'
     columns << 'submitted'
     columns << 'attempt' if options[:include_all_versions]
-    columns2 = [''] * columns.length
     first_question_index = columns.length
     submissions = self.quiz_submissions.scoped(:include => (options[:include_all_versions] ? [:versions] : [])).select{|s| s.completed? && s.submission_data.is_a?(Array) && self.context.students.map(&:id).include?(s.user_id) }
     if options[:include_all_versions]
@@ -740,11 +739,10 @@ class Quiz < ActiveRecord::Base
     quiz_datas = [quiz_data] + submissions.map(&:quiz_data)
     quiz_datas.each do |quiz_data|
       quiz_data.each do |question|
+        next if question['entry_type'] == 'quiz_group'
         if !found_question_ids[question[:id]]
           columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
           columns << question[:points_possible]
-          columns2 << ''
-          columns2 << ''
           found_question_ids[question[:id]] = true
         end
       end
@@ -753,9 +751,6 @@ class Quiz < ActiveRecord::Base
     columns << 'n correct'
     columns << 'n incorrect'
     columns << 'score'
-    columns2 << ''
-    columns2 << ''
-    columns2 << ''
     rows = []
     submissions.each do |submission|
       row = []
@@ -768,7 +763,12 @@ class Quiz < ActiveRecord::Base
         id = id.to_i
         answer = submission.submission_data.detect{|a| a[:question_id] == id }
         question = submission.quiz_data.detect{|q| q[:id] == id}
-        next unless question
+        unless question
+          # if this submission didn't answer this question, fill in with blanks
+          row << ''
+          row << ''
+          next
+        end
         answer_item = question && question[:answers].detect{|a| a[:id].to_s == answer[:text] }
         answer_item ||= answer
         if question[:question_type] == 'fill_in_multiple_blanks_question'
@@ -807,8 +807,8 @@ class Quiz < ActiveRecord::Base
     FasterCSV.generate do |csv|
       columns.each_with_index do |val, idx|
         r = []
-        r << columns[idx]
-        r << columns2[idx]
+        r << val
+        r << ''
         rows.each do |row|
           r << row[idx]
         end
