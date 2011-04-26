@@ -19,27 +19,27 @@ module CC
   module WebResources
     def add_course_files
       course_folder = Folder.root_folders(@course).first
-      hidden_locked_files = {:hidden_folders=>[], :locked_folders=>[], :hidden_files=>[], :locked_files=>[]}
-      
+      files_with_metadata = { :folders => [], :files => [] }
+
       zipper = ContentZipper.new
       zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER]) do |file, folder_names|
         if file.is_a? Folder
           dir = File.join(folder_names[1..-1])
-          hidden_locked_files[:hidden_folders] << dir if file.hidden? 
-          hidden_locked_files[:locked_folders] << dir if file.locked 
+          files_with_metadata[:folders] << [ file, dir ] if file.hidden? || file.locked
           next
         end
 
         path = File.join(folder_names, file.filename)
         migration_id = CCHelper.create_key(file)
-        hidden_locked_files[:hidden_files] << migration_id if file.hidden?
+        if file.hidden? || file.locked || file.unencoded_filename != file.display_name
+          files_with_metadata[:files] << [ file, migration_id ]
+        end
         @resources.resource(
                 "type" => CCHelper::WEBCONTENT,
                 :identifier => migration_id,
                 :href => path
         ) do |res|
           if file.locked
-            hidden_locked_files[:locked_files] << migration_id
             res.metadata do |meta_node|
               meta_node.lom :lom do |lom_node|
                 lom_node.lom :educational do |edu_node|
@@ -55,8 +55,7 @@ module CC
         end
       end
       
-      add_meta_info_for_files(hidden_locked_files)
-      
+      add_meta_info_for_files(files_with_metadata)
     end
     
     def files_meta_path
@@ -64,7 +63,6 @@ module CC
     end
     
     def add_meta_info_for_files(files)
-      
       files_file = File.new(File.join(@canvas_resource_dir, CCHelper::FILES_META), 'w')
       rel_path = files_meta_path
       document = Builder::XmlMarkup.new(:target=>files_file, :indent=>2)
@@ -75,31 +73,25 @@ module CC
           "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
           "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |root_node|
-        if !files[:hidden_folders].empty?
-          root_node.hidden_folders do |folders_node|
-            files[:hidden_folders].each do |folder|
-              folders_node.folder folder
+        if !files[:folders].empty?
+          root_node.folders do |folders_node|
+            files[:folders].each do |folder, path|
+              folders_node.folder(:path => path) do |folder_node|
+                folder_node.locked "true" if folder.locked
+                folder_node.hidden "true" if folder.hidden?
+              end
             end
           end
         end
-        if !files[:locked_folders].empty?
-          root_node.locked_folders do |folders_node|
-            files[:locked_folders].each do |folder|
-              folders_node.folder folder
-            end
-          end
-        end
-        if !files[:hidden_files].empty?
-          root_node.hidden_files do |folders_node|
-            files[:hidden_files].each do |file|
-              folders_node.attachment_identifierref file
-            end
-          end
-        end
-        if !files[:locked_files].empty?
-          root_node.locked_files do |folders_node|
-            files[:locked_files].each do |file|
-              folders_node.attachment_identifierref file
+        
+        if !files[:files].empty?
+          root_node.files do |files_node|
+            files[:files].each do |file, migration_id|
+              files_node.file(:identifier => migration_id) do |file_node|
+                file_node.locked "true" if file.locked
+                file_node.hidden "true" if file.hidden?
+                file_node.display_name file.display_name if file.display_name != file.unencoded_filename
+              end
             end
           end
         end

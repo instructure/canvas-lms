@@ -31,41 +31,33 @@ module CC::Importer
 
         file_map[file['migration_id']] = file
       end
-      
-      convert_locked_hidden_files(file_map)
-      
+
+      convert_file_metadata(file_map)
+
       file_map
     end
     
-    def convert_locked_hidden_files(file_map)
+    def convert_file_metadata(file_map)
       doc = open_file_xml File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, FILES_META)
-      
-      
-      if hidden_folders = doc.at_css('hidden_folders')
+
+      if folders = doc.at_css('folders')
         @course[:hidden_folders] = []
-        hidden_folders.css('folder').each do |folder|
-          @course[:hidden_folders] << folder.text
-        end
-      end
-      if locked_folders = doc.at_css('locked_folders')
         @course[:locked_folders] = []
-        locked_folders.css('folder').each do |folder|
-          @course[:locked_folders] << folder.text
+        folders.css('folder').each do |folder|
+          @course[:hidden_folders] << folder['path'] if get_bool_val(folder, 'hidden', false)
+          @course[:locked_folders] << folder['path'] if get_bool_val(folder, 'locked', false)
         end
       end
-      if hidden_files = doc.at_css('hidden_files')
-        hidden_files.css('attachment_identifierref').each do |id|
-          id = id.text
+
+      if files = doc.at_css('files')
+        files.css('file').each do |file|
+          id = file['identifier']
           if file_map[id]
-            file_map[id][:hidden] = true
-          end
-        end
-      end
-      if hidden_files = doc.at_css('locked_files')
-        hidden_files.css('attachment_identifierref').each do |id|
-          id = id.text
-          if file_map[id]
-            file_map[id][:locked] = true
+            file_map[id][:hidden] = true if get_bool_val(file, 'hidden', false)
+            file_map[id][:locked] = true if get_bool_val(file, 'locked', false)
+            if display_name = file.at_css("display_name")
+              file_map[id][:display_name] = display_name.text
+            end
           end
         end
       end

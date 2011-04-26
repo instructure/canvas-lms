@@ -139,6 +139,7 @@ class Attachment < ActiveRecord::Base
       item.migration_id = hash[:migration_id]
       item.locked = true if hash[:locked]
       item.file_state = 'hidden' if hash[:hidden]
+      item.display_name = hash[:display_name] if hash[:display_name]
       item.save_without_broadcasting!
     end
     item
