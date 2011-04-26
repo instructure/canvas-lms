@@ -22,13 +22,18 @@ module CC::Importer
     include RubricsConverter
     include ModuleConverter
     
-    def settings_doc(file)
-      open_file_xml File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, file)
+    def settings_doc(file, html = false)
+      path = File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, file)
+      if html
+        open_file path
+      else
+        open_file_xml path
+      end
     end
     
     def convert_all_course_settings
       @course[:course] = convert_course_settings(settings_doc(COURSE_SETTINGS))
-      @course[:course][:syllabus_body] = convert_syllabus(settings_doc(SYLLABUS))
+      @course[:course][:syllabus_body] = convert_syllabus(settings_doc(SYLLABUS, true))
       @course[:assignment_groups] = convert_assignment_groups(settings_doc(ASSIGNMENT_GROUPS))
       @course[:external_tools] = convert_external_tools(settings_doc(EXTERNAL_TOOLS))
       @course[:external_feeds] = convert_external_feeds(settings_doc(EXTERNAL_FEEDS))
