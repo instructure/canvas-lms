@@ -46,7 +46,7 @@ class ContentImportsController < ApplicationController
           params[:migration_settings][:question_bank_name] = params[:new_question_bank_name]
         end
 
-        if params[:content_migration_id]
+        if !params[:content_migration_id].blank?
           @migration = ContentMigration.for_context(@context).find_by_id(params[:content_migration_id])
         end
         @migration ||= ContentMigration.new
