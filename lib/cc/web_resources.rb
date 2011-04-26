@@ -29,7 +29,7 @@ module CC
           next
         end
 
-        path = File.join(folder_names, file.filename)
+        path = File.join(folder_names, file.unencoded_filename)
         migration_id = CCHelper.create_key(file)
         if file.hidden? || file.locked || file.unencoded_filename != file.display_name
           files_with_metadata[:files] << [ file, migration_id ]

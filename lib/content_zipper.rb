@@ -282,8 +282,8 @@ class ContentZipper
     folder.file_attachments.scoped(:conditions => "file_state IN ('available', 'hidden')").select{|a| !@user || a.grants_right?(@user, nil, :download)}.each do |attachment|
       callback.call(attachment, folder_names) if callback
       @context = folder.context
-      @logger.debug("  found attachment: #{attachment.filename}")
-      path = folder_names.empty? ? attachment.filename : File.join(folder_names, attachment.filename)
+      @logger.debug("  found attachment: #{attachment.unencoded_filename}")
+      path = folder_names.empty? ? attachment.filename : File.join(folder_names, attachment.unencoded_filename)
       if add_attachment_to_zip(attachment, zipfile, path)
         @files_added = true
       end
