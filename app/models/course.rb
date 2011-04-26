@@ -1176,7 +1176,6 @@ class Course < ActiveRecord::Base
     @imported_migration_items = []
 
     # These only need to be processed once
-    import_settings_from_migration(data); migration.fast_update_progress(0.5)
     Attachment.skip_media_object_creation do
       process_migration_files(data, migration); migration.fast_update_progress(10)
       Attachment.process_migration(data, migration); migration.fast_update_progress(20)
@@ -1185,6 +1184,10 @@ class Course < ActiveRecord::Base
       # we have the media_ids that we need later.
       MediaObject.add_media_files(mo_attachments, true) unless mo_attachments.blank?
     end
+    
+    # needs to happen after the files are processed, so that they are available in the syllabus
+    import_settings_from_migration(data); migration.fast_update_progress(21)
+    
     migration.fast_update_progress(30)
     question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
     Group.process_migration(data, migration); migration.fast_update_progress(36)
