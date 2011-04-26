@@ -339,7 +339,7 @@ describe "Common Cartridge importing" do
     mod2.save!
     
     asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
-    tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment'})
+    tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
     c_reqs = []
     c_reqs << {:type => 'min_score', :min_score => 5, :id => tag.id}
     page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
@@ -390,6 +390,7 @@ describe "Common Cartridge importing" do
     tag = mod1_2.content_tags.first
     tag.content_id.should == asmnt2.id
     tag.content_type.should == 'Assignment'
+    tag.indent.should == 1
     cr1 = mod1_2.completion_requirements.find {|cr| cr[:id] == tag.id}
     cr1[:type].should == 'min_score'
     cr1[:min_score].should == 5

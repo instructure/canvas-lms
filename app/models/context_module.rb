@@ -723,7 +723,7 @@ class ContextModule < ActiveRecord::Base
     existing_item ||= content_tags.new(:context => context)
     context.imported_migration_items << existing_item if context.imported_migration_items && existing_item.new_record?
     existing_item.migration_id = hash[:migration_id]
-    hash[:indents] = [hash[:indents] || 0, level].max
+    hash[:indent] = [hash[:indent] || 0, level].max
     if hash[:linked_resource_type] =~ /wiki_type|wikipage/i
       wiki = self.context.wiki.wiki_pages.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
       if wiki
@@ -731,7 +731,7 @@ class ContextModule < ActiveRecord::Base
           :title => hash[:title] || hash[:linked_resource_title],
           :type => 'wiki_page',
           :id => wiki.id,
-          :indent => hash[:indents].to_i
+          :indent => hash[:indent].to_i
         }, existing_item)
       end
     elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
@@ -747,7 +747,7 @@ class ContextModule < ActiveRecord::Base
           :title => title,
           :type => 'attachment',
           :id => file.id,
-          :indent => hash[:indents].to_i
+          :indent => hash[:indent].to_i
         }, existing_item)
       end
     elsif hash[:linked_resource_type] =~ /assignment|project/i
@@ -758,7 +758,7 @@ class ContextModule < ActiveRecord::Base
           :title => hash[:title] || hash[:linked_resource_title],
           :type => 'assignment',
           :id => ass.id,
-          :indent => hash[:indents].to_i
+          :indent => hash[:indent].to_i
         }, existing_item)
       end
     elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
@@ -766,7 +766,7 @@ class ContextModule < ActiveRecord::Base
       item = self.add_item({
         :title => hash[:title] || hash[:linked_resource_title],
         :type => 'context_module_sub_header',
-        :indent => hash[:indents].to_i
+        :indent => hash[:indent].to_i
       }, existing_item)
     elsif hash[:linked_resource_type] =~ /url/i
       # external url
@@ -774,7 +774,7 @@ class ContextModule < ActiveRecord::Base
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
           :type => 'external_url',
-          :indent => hash[:indents].to_i,
+          :indent => hash[:indent].to_i,
           :url => hash['url']
         }, existing_item)
       end
@@ -784,7 +784,7 @@ class ContextModule < ActiveRecord::Base
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
           :type => 'context_external_tool',
-          :indent => hash[:indents].to_i,
+          :indent => hash[:indent].to_i,
           :url => hash['url']
         }, existing_item)
       end
@@ -794,7 +794,7 @@ class ContextModule < ActiveRecord::Base
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title],
           :type => 'quiz',
-          :indent => hash[:indents].to_i,
+          :indent => hash[:indent].to_i,
           :id => quiz.id
         }, existing_item)
       end
@@ -804,7 +804,7 @@ class ContextModule < ActiveRecord::Base
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title],
           :type => 'discussion_topic',
-          :indent => hash[:indents].to_i,
+          :indent => hash[:indent].to_i,
           :id => topic.id
         }, existing_item)
       end
