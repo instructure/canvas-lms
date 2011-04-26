@@ -28,6 +28,7 @@ describe ScribdAPI do
     Scribd::API.instance.stub!(:key=).and_return(true)
     Scribd::API.instance.stub!(:secret=).and_return(true)
     Scribd::User.stub!(:login).and_return(true)
+    ScribdAPI.stub!(:upload).and_return { |a,b| ScribdAPI.instance.upload(a,b) }
   end
   
   it "should offer the same instance every time" do
