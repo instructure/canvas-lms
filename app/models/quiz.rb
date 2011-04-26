@@ -127,7 +127,7 @@ class Quiz < ActiveRecord::Base
   end
   
   def set_unpublished_question_count
-    entries = self.root_entries
+    entries = self.root_entries(true)
     cnt = 0
     entries.each do |e|
       if e[:question_points]
@@ -1113,17 +1113,6 @@ class Quiz < ActiveRecord::Base
     end
     
     item.save!
-    if hash[:questions] && (!item.question_count || item.question_count == 0)
-      count = 0
-      hash[:questions].each do |q|
-        if q['pick_count']
-          count += q['pick_count'].to_i rescue 1
-        else
-          count += 1
-        end
-      end
-      Quiz.update_all({:question_count=>count, :unpublished_question_count=>count}, "id=#{item.id}")
-    end
 
     if item.quiz_questions.count == 0 && question_data
       hash[:questions] ||= []
@@ -1154,10 +1143,11 @@ class Quiz < ActiveRecord::Base
         end
       end
     end
-    
+
     if hash[:assignment] && hash[:available]
       assignment = Assignment.import_from_migration(hash[:assignment], context)
       item.assignment = assignment
+      item.generate_quiz_data
       item.workflow_state = 'available'
       item.published_at = Time.now
     elsif !item.assignment && grading = hash[:grading]
@@ -1171,7 +1161,8 @@ class Quiz < ActiveRecord::Base
         item.assignment_group_id = g.id
       end
     end
-    
+
+    item.reload
     item.save
 
     context.imported_migration_items << item if context.imported_migration_items
