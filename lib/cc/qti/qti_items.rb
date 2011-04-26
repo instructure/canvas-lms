@@ -106,8 +106,7 @@ module CC
           
           item_node.presentation do |pres_node|
             pres_node.material do |mat_node|
-              #todo missing word badness...
-              html = CCHelper.html_content(question['question_text'] || '', @course, @manifest.exporter.user)
+              html = CCHelper.html_content("<div>#{question['question_text']}</div>" || '', @course, @manifest.exporter.user)
               mat_node.mattext html, :texttype=>'text/html'
             end
             presentation_options(pres_node, question)
