@@ -34,9 +34,9 @@ shared_examples_for "cross-listing selenium tests" do
     driver.find_element(:css, "#course_autocomplete_name").text.should eql("Course ID \"-1\" not authorized for cross-listing")
     
     form.find_element(:css, "#course_id").click
+    form.find_element(:css, "#course_id").clear
     form.find_element(:css, "#course_id").send_keys([:control, 'a'], other_course.id.to_s)
     driver.find_element(:css, "#course_autocomplete_id_lookup").click
-    form.find_element(:css, "#course_autocomplete_name").text.should eql("Confirming Course ID \"#{other_course.id}\"...")
     keep_trying { driver.find_element(:css, "#course_autocomplete_name").text != "Confirming Course ID \"#{other_course.id}\"..." }
     driver.find_element(:css, "#course_autocomplete_name").text.should eql(other_course.name)
     form.find_element(:css, "#course_autocomplete_id").value.should eql(other_course.id.to_s)
