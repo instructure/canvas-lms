@@ -131,7 +131,7 @@
       </ul>
     </div>
     <div id="copy_events_list">
-      <h3><%= check_box :copy, :all_calendar_events, :class => "copy_all" %><%= label :copy, :all_calendar_events, image_tag('due_date_icon.png') + " 5Events" %></h3>
+      <h3><%= check_box :copy, :all_calendar_events, :class => "copy_all" %><%= label :copy, :all_calendar_events, image_tag('due_date_icon.png') + " Calendar Events" %></h3>
       <ul class="unstyled_list asset_list">
         <li class="event" style="display: none;">
           <input type="checkbox" value="1" name="copy[events][id]" id="copy_events_id"/>
@@ -301,7 +301,7 @@ $(document).ready(function() {
       for(var idx in data.calendar_events) {
         var event = data.calendar_events[idx];
         var $event = $("#copy_events_list .event:first").clone(true);
-        populateItem($event, event.migration_id, event.title, 'copy[calendar_events]');
+        populateItem($event, event.migration_id, event.title, 'copy[events]');
         $("#copy_events_list ul").append($event);
       }
     }

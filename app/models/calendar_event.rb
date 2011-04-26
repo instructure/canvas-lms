@@ -262,12 +262,18 @@ class CalendarEvent < ActiveRecord::Base
       description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/discussion_topics/#{topic.id}'>See #{topic.title}</a></p>" if topic
     end
     item.description = description
-    start_timestamp = hash[:start_date].to_i rescue 0
-    end_timestamp = hash[:end_date].to_i rescue 0
-    item.start_at = Time.at(start_timestamp / 1000) if start_timestamp > 0
-    item.end_at = Time.at(end_timestamp / 1000) if end_timestamp > 0
+    
+    hash[:start_at] ||= hash[:start_date]
+    hash[:end_at] ||= hash[:end_date]
+    item.start_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) unless hash[:start_at].nil?
+    item.end_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) unless hash[:end_at].nil?
+    
     item.save_without_broadcasting!
-    context.imported_migration_items << item
+    context.imported_migration_items << item if context.imported_migration_items
+    if hash[:all_day]
+      item.all_day = hash[:all_day]
+      item.save
+    end
     item
   end
 

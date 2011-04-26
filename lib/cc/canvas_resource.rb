@@ -23,6 +23,7 @@ module CC
     include GradingStandards
     include LearningOutcomes
     include Rubrics
+    include Events
 
     def add_canvas_non_cc_data
       migration_id = create_key(@course)
@@ -42,6 +43,7 @@ module CC
       resources << create_rubrics
       resources << create_external_tools
       resources << files_meta_path
+      resources << create_events
       
       @resources.resource(
               :identifier => migration_id,

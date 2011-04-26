@@ -609,5 +609,49 @@ describe "Common Cartridge importing" do
     a.points_possible.should == assignment.points_possible
     a.discussion_topic.should == dt_2
   end
+  
+  it "should import calendar events" do
+    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    cal = @copy_from.calendar_events.new
+    cal.title = "Calendar event"
+    cal.description = body_with_link % @copy_from.id
+    cal.start_at = 1.week.from_now
+    cal.save!
+    cal.all_day = true
+    cal.save!
+    cal2 = @copy_from.calendar_events.new
+    cal2.title = "Stupid events"
+    cal2.start_at = 5.minutes.from_now
+    cal2.end_at = 10.minutes.from_now
+    cal2.all_day = false
+    cal2.save!
+    
+    #export to xml
+    builder = Builder::XmlMarkup.new(:indent=>2)
+    @resource.create_events(builder)
+    #convert to json
+    doc = Nokogiri::XML(builder.target!)
+    hash = @converter.convert_events(doc)
+    #import json into new course
+    hash[0] = hash[0].with_indifferent_access
+    hash[1] = hash[1].with_indifferent_access
+    CalendarEvent.process_migration({'calendar_events'=>hash}, @migration)
+    @copy_to.save!
+    
+    @copy_to.calendar_events.count.should == 2
+    cal_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal))
+    cal_2.title.should == cal.title
+    cal_2.start_at.to_i.should == cal.start_at.to_i
+    cal_2.end_at.to_i.should == cal.end_at.to_i
+    cal_2.all_day.should == true
+    cal_2.all_day_date.should == cal.all_day_date
+    cal_2.description = body_with_link % @copy_to.id
+    
+    cal2_2 = @copy_to.calendar_events.find_by_migration_id(CC::CCHelper.create_key(cal2))
+    cal2_2.title.should == cal2.title
+    cal2_2.start_at.to_i.should == cal2.start_at.to_i
+    cal2_2.end_at.to_i.should == cal2.end_at.to_i
+    cal2_2.description.should == ''
+  end
 
 end

@@ -32,6 +32,7 @@ require_dependency 'cc/module_meta'
 require_dependency 'cc/learning_outcomes'
 require_dependency "cc/canvas_resource"
 require_dependency "cc/assignment_resources"
+require_dependency "cc/events"
 require_dependency "cc/topic_resources"
 require_dependency "cc/web_resources"
 require_dependency "cc/web_links"

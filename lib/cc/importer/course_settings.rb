@@ -41,6 +41,7 @@ module CC::Importer
       @course[:learning_outcomes] = convert_learning_outcomes(settings_doc(LEARNING_OUTCOMES))
       @course[:modules] = convert_modules(settings_doc(MODULE_META))
       @course[:rubrics] = convert_rubrics(settings_doc(RUBRICS))
+      @course[:calendar_events] = convert_events(settings_doc(EVENTS))
     end
 
     def convert_course_settings(doc)
@@ -147,6 +148,24 @@ module CC::Importer
       end
 
       standards
+    end
+
+    def convert_events(doc)
+      events = []
+      return events unless doc
+      doc.css('event').each do |node|
+        event = {}
+        event['migration_id'] = node['identifier']
+        event['title'] = get_node_val(node, 'title')
+        event['description'] = get_node_val(node, 'description')
+        event['start_at'] = get_time_val(node, 'start_at')
+        event['end_at'] = get_time_val(node, 'end_at')
+        event['all_day_date'] = get_time_val(node, 'all_day_date')
+        event['all_day'] = get_bool_val(node, 'all_day', false)
+        events << event
+      end
+
+      events
     end
 
   end
