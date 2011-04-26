@@ -47,7 +47,9 @@ module Canvas
       end
 
       def self.enqueue(content_migration)
-        Delayed::Job.enqueue(new(content_migration.id), :priority => Delayed::LOW_PRIORITY)
+        Delayed::Job.enqueue(new(content_migration.id),
+                             :priority => Delayed::LOW_PRIORITY,
+                             :max_attempts => 1)
       end
     end
   end

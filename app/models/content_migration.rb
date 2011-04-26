@@ -219,7 +219,7 @@ class ContentMigration < ActiveRecord::Base
       clear_migration_data
     end
   end
-  handle_asynchronously :import_content, :priority => Delayed::LOW_PRIORITY
+  handle_asynchronously :import_content, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
   
   named_scope :for_context, lambda{|context|
     {:conditions => {:context_id => context.id, :context_type => context.class.to_s} }
