@@ -141,7 +141,7 @@
           </div>
         </fieldset>
 
-        <fieldset id="account_settings_global_includes_settings" style="display:none;">
+        <fieldset id="account_settings_global_includes_settings" style="<%= hidden unless @account.settings[:global_includes] %>">
           <legend>Global JavaScript and CSS Includes</legend>
           <p style="font-size: 0.9em;">These files will be included on all page loads for your account</p>
           <% f.fields_for :settings do |settings| %>
