@@ -1,18 +1,18 @@
 <tr>
-  <td><%= h delayed_job.id %></td>
-  <td><%= h delayed_job.attempts %></td>
+  <td><%= delayed_job.id %></td>
+  <td><%= delayed_job.attempts %> / <%= delayed_job.max_attempts || Delayed::Worker.max_attempts %></td>
   <td>
-    <div style="max-height: 100px; max-width: 300px; overflow: hidden;"><%= h delayed_job.handler %></div>
+    <%= delayed_job.tag %>
   </td>
   <td>
-    <div style="max-height: 100px; max-width: 200px; overflow: hidden;"><%= h delayed_job.last_error %></div>
+    <div style="max-height: 100px; max-width: 200px; overflow: hidden;"><%= delayed_job.last_error %></div>
   </td>
-  <td><%= h delayed_job.priority %></td>
-  <td><%= h delayed_job.queue %></td>
-  <td><%= h delayed_job.run_at %></td>
-  <td><%= h delayed_job.locked_at %></td>
-  <td><%= h delayed_job.failed_at %></td>
-  <td><%= h delayed_job.locked_by %></td>
+  <td><%= delayed_job.priority %></td>
+  <td><%= delayed_job.queue %></td>
+  <td><%= delayed_job.run_at %></td>
+  <td><%= delayed_job.locked_at %></td>
+  <td><%= delayed_job.failed_at %></td>
+  <td><%= delayed_job.locked_by %></td>
   <td>
     <%= link_to 'Show', delayed_job_path(delayed_job) %>
     <br>

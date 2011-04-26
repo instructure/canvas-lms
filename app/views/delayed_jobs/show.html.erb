@@ -8,47 +8,55 @@
 
 <p>
   <strong>Id:</strong>
-  <%=h @delayed_job.id %>
+  <%= @delayed_job.id %>
 </p>
 <p>
   <strong>Priority:</strong>
-  <%=h @delayed_job.priority %>
+  <%= @delayed_job.priority %>
 </p>
 <p>
   <strong>Attempts:</strong>
-  <%=h @delayed_job.attempts %>
+  <%= @delayed_job.attempts %>
+</p>
+<p>
+  <strong>Max Attempts:</strong>
+  <%= @delayed_job.max_attempts || Delayed::Worker.max_attempts %>
+</p>
+<p>
+  <strong>Tag:</strong>
+  <%= @delayed_job.tag %>
 </p>
 <p>
   <strong>Handler:</strong>
   <pre>
-  <%=h @delayed_job.handler %>
+  <%= @delayed_job.handler %>
   </pre>
 </p>
 <p>
   <strong>Last Error:</strong>
   <pre>
-  <%=h @delayed_job.last_error %>
+  <%= @delayed_job.last_error %>
   </pre>
 </p>
 <p>
   <strong>Queue:</strong>
-  <%=h @delayed_job.queue %>
+  <%= @delayed_job.queue %>
 </p>
 <p>
   <strong>Run At:</strong>
-  <%=h @delayed_job.run_at %>
+  <%= @delayed_job.run_at %>
 </p>
 <p>
   <strong>Locked At:</strong>
-  <%=h @delayed_job.locked_at %>
+  <%= @delayed_job.locked_at %>
 </p>
 <p>
   <strong>Failed At:</strong>
-  <%=h @delayed_job.failed_at %>
+  <%= @delayed_job.failed_at %>
 </p>
 <p>
   <strong>Locked By:</strong>
-  <%=h @delayed_job.locked_by %>
+  <%= @delayed_job.locked_by %>
 </p>
 
 <p>

@@ -52,7 +52,13 @@ module Delayed
 
       def payload_object=(object)
         self['handler'] = object.to_yaml
-        self['tag'] = object.tag if object.respond_to?(:tag)
+        self['tag'] = if object.respond_to?(:tag)
+          object.tag
+        elsif object.is_a?(Module)
+          "#{object}.perform"
+        else
+          "#{object.class}#perform"
+        end
       end
       
       # Moved into its own method so that new_relic can trace it.
