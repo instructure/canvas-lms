@@ -85,7 +85,7 @@ module CC
         end
         node.item(
                 :ident => question['migration_id'],
-                :title => question['name']
+                :title => question['name'].presence || question['question_name']
         ) do |item_node|
           item_node.itemmetadata do |meta_node|
             meta_node.qtimetadata do |qm_node|
