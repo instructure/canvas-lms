@@ -26,6 +26,7 @@ class CreateDelayedJobs < ActiveRecord::Migration
       table.string   :locked_by
 
       table.string   :tag
+      table.integer :max_attempts
 
       table.timestamps
     end

@@ -25,6 +25,7 @@ ActiveRecord::Schema.define do
     table.string   :locked_by
     table.datetime :failed_at
     table.string   :tag
+    table.integer  :max_attempts
     table.timestamps
   end
 

@@ -172,7 +172,7 @@ module Delayed
     # Uses an exponential scale depending on the number of failed attempts.
     def reschedule(job, error = nil, time = nil)
       job.attempts += 1
-      if job.attempts >= self.class.max_attempts
+      if job.attempts >= (job.max_attempts || self.class.max_attempts)
         job.failed_at = Delayed::Job.db_time_now
         if self.class.on_max_failures
           destroy_job = self.class.on_max_failures.call(job, error)
