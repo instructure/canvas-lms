@@ -372,7 +372,7 @@ class QuizzesController < ApplicationController
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
       params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
       if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey' #'new' && params[:quiz][:assignment_group_id]
-        @assignment_group = @context.assignment_groups.active.find_by_id(params[:quiz].delete(:assignment_group_id))
+        @assignment_group = @context.assignment_groups.active.find_by_id(params[:quiz].delete(:assignment_group_id)) if params[:quiz][:assignment_group_id].present?
         @assignment_group ||= @context.assignment_groups.first
         # The code to build an assignment for a quiz used to be here, but it's
         # been moved to the model quiz.rb instead.  See Quiz:build_assignment.
