@@ -28,8 +28,7 @@ shared_examples_for "cross-listing selenium tests" do
     form.find_element(:css, ".submit_button").attribute(:disabled).should eql("true")
     form.should_not be_nil
     form.find_element(:css, "#course_id").click
-    form.find_element(:css, "#course_id").send_keys("-1")
-    driver.find_element(:css, "#course_autocomplete_id_lookup").click
+    form.find_element(:css, "#course_id").send_keys("-1\n")
     keep_trying { driver.find_element(:css, "#course_autocomplete_name").text != "Confirming Course ID \"-1\"..." }
     driver.find_element(:css, "#course_autocomplete_name").text.should eql("Course ID \"-1\" not authorized for cross-listing")
     
