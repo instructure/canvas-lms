@@ -276,17 +276,6 @@ class CalendarEvent < ActiveRecord::Base
     end
     item
   end
-
-  def self.find_or_create_for_new_context(new_context, old_context, old_id)
-    res = new_context.calendar_events.active.find_by_cloned_item_id(old_context.calendar_events.find_by_id(old_id).cloned_item_id || 0) rescue nil
-    res = nil if res && !res.cloned_item_id
-    if !res
-      old = old_context.calendar_events.active.find_by_id(old_id)
-      res = old.clone_for(new_context) if old
-      res.save if res
-    end
-    res
-  end
   
   def self.max_visible_calendars
     10

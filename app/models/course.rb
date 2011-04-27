@@ -1034,6 +1034,18 @@ class Course < ActiveRecord::Base
   def turnitin_enabled?
     !!self.turnitin_settings
   end
+
+  def self.find_or_create_for_new_context(obj_class, new_context, old_context, old_id)
+    association_name = obj_class.table_name
+    old_item = old_context.send(association_name).find_by_id(old_id)
+    res = new_context.send(association_name).active.find_by_cloned_item_id(old_item.cloned_item_id) if old_item
+    if !res
+      old_item = old_context.send(association_name).active.find_by_id(old_id)
+      res = old_item.clone_for(new_context) if old_item
+      res.save if res
+    end
+    res
+  end
   
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
     return html unless from_context
@@ -1058,7 +1070,8 @@ class Course < ActiveRecord::Base
         'files' => Attachment,
         'conferences' => WebConference,
         'quizzes' => Quiz,
-        'groups' => Group
+        'groups' => Group,
+        'modules' => ContextModule
       }.each do |type, obj_class|
         sub_regex = Regexp.new("#{type}/(\\d+)[^\\s]*$")
         is_sub_item ||= sub_spot.match(sub_regex)
@@ -1076,7 +1089,7 @@ class Course < ActiveRecord::Base
             end
           end
           if !new_id && allow_migrate_content && to_context != from_context
-            new_obj = obj_class.find_or_create_for_new_context(to_context, from_context, item[1]) rescue nil
+            new_obj = self.find_or_create_for_new_context(obj_class, to_context, from_context, item[1])
             new_id ||= new_obj.id if new_obj
           end
           if !limit_migrations_to_listed_types || new_id

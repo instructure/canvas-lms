@@ -609,17 +609,6 @@ class Attachment < ActiveRecord::Base
       "application/x-shockwave-flash" => "flash"
     }[content_type] || "file"
   end
-  
-  def self.find_or_create_for_new_context(new_context, old_context, old_id)
-    res = new_context.attachments.active.find_by_cloned_item_id(old_context.attachments.find_by_id(old_id).cloned_item_id || 0) rescue nil
-    res = nil if res && !res.cloned_item_id
-    if !res
-      old = old_context.attachments.active.find_by_id(old_id)
-      res = old.clone_for(new_context) if old
-      res.save if res
-    end
-    res
-  end
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) } #admins.include? user }
