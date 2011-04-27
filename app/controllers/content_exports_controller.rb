@@ -32,7 +32,7 @@ class ContentExportsController < ApplicationController
   
   def show
     if authorized_action(@context, @current_user, :manage)
-      if export = @context.content_exports.find_by_id(params[:id])
+      if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
         render_export(export)
       else
         render :json => {:errors => {:base => "Export does not exist"}}.to_json, :status => :bad_request
@@ -65,7 +65,7 @@ class ContentExportsController < ApplicationController
   
   def destroy
     if authorized_action(@context, @current_user, :manage)
-      if export = @context.content_exports.find_by_id(params[:id])
+      if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
         export.destroy
         render :json => {:success=>'true'}.to_json
       else

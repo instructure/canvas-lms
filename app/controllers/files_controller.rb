@@ -42,7 +42,7 @@ class FilesController < ApplicationController
   
   def check_file_access_flags
     if params[:user_id] && params[:ts] && params[:verifier]
-      user = User.find_by_id(params[:user_id])
+      user = User.find_by_id(params[:user_id]) if params[:user_id].present?
       if user && user.valid_access_verifier?(params[:ts], params[:verifier])
         # attachment.rb checks for this session attribute when determining 
         # permissions, but it should be ignored by the rest of the models' 
@@ -264,7 +264,7 @@ class FilesController < ApplicationController
     path = params[:file_path]
 
     #if the relative path matches the given file id use that file
-    if @attachment = @context.attachments.find_by_id(params[:file_id])
+    if params[:file_id].present? && @attachment = @context.attachments.find_by_id(params[:file_id])
       if @attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path)
         params[:id] = params[:file_id]
       else
@@ -412,7 +412,9 @@ class FilesController < ApplicationController
       @attachment.file_state = 'deleted'
       @attachment.workflow_state = workflow_state
       if @context.respond_to?(:folders)
-        @folder = @context.folders.active.find_by_id(params[:attachment][:folder_id])
+        if params[:attachment][:folder_id].present?
+          @folder = @context.folders.active.find_by_id(params[:attachment][:folder_id])
+        end
         @folder ||= Folder.unfiled_folder(@context)
         @attachment.folder_id = @folder.id
       end
@@ -494,7 +496,9 @@ class FilesController < ApplicationController
   end
   
   def s3_success
-    @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
+    if params[:id].present?
+      @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
+    end
     details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
     if @attachment && details
       unless @attachment.workflow_state == 'unattached_temporary'
@@ -527,15 +531,19 @@ class FilesController < ApplicationController
   # POST /files
   # POST /files.xml
   def create
-    @folder = @context.folders.active.find_by_id(params[:attachment].delete(:folder_id))
+    if (folder_id = params[:attachment].delete(:folder_id)) && folder_id.present?
+      @folder = @context.folders.active.find_by_id(folder_id)
+    end
     @folder ||= Folder.unfiled_folder(@context)
     params[:attachment][:uploaded_data] ||= params[:attachment_uploaded_data]
     params[:attachment][:uploaded_data] ||= params[:file] 
     params[:attachment][:user] = @current_user
     params[:attachment].delete :context_id
     params[:attachment].delete :context_type
-    @attachment = @context.attachments.find_by_id_and_workflow_state(params[:attachment].delete(:unattached_attachment_id), 'unattached')
-    @attachment ||= @context.attachments.new #(params[:attachment])
+    if (unattached_attachment_id = params[:attachment].delete(:unattached_attachment_id)) && unattached_attachment_id.present?
+      @attachment = @context.attachments.find_by_id_and_workflow_state(unattached_attachment_id, 'unattached')
+    end
+    @attachment ||= @context.attachments.new
     if authorized_action(@attachment, @current_user, :create)
       get_quota
       return if quota_exceeded(named_context_url(@context, :context_files_url))
@@ -645,7 +653,7 @@ class FilesController < ApplicationController
   def image_thumbnail
     cancel_cache_buster
     url = Rails.cache.fetch(['thumbnail_url', params[:uuid]].cache_key, :expires_in => 30.minutes) do
-      attachment = Attachment.find_by_id_and_uuid(params[:id], params[:uuid])
+      attachment = Attachment.find_by_id_and_uuid(params[:id], params[:uuid]) if params[:id].present?
       url = attachment.thumbnail_url rescue nil
       url ||= '/images/no_pic.gif'
       url

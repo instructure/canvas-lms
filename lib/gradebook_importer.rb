@@ -76,7 +76,7 @@ class GradebookImporter
     
     row.map do |name_and_id|
       title, id = Assignment.title_and_id(name_and_id)
-      assignment = @context.assignments.active.gradeable.find_by_id(id) if id
+      assignment = @context.assignments.active.gradeable.find_by_id(id) if id.present?
       assignment ||= @context.assignments.active.gradeable.find_by_title(name_and_id) #backward compat
       assignment ||= Assignment.new(:title => title || name_and_id)
       assignment.original_id = assignment.id
@@ -94,7 +94,8 @@ class GradebookImporter
   def process_student(row)
     unsorted_name = to_unsorted_name(row[0])
     student_id = row[1] # the second column in the csv should have the student_id for each row
-    student = @context.students.find_by_id(student_id) || @context.students.find_by_name(unsorted_name)
+    student = @context.students.find_by_id(student_id) if student_id.present?
+    student ||= @context.students.find_by_name(unsorted_name) if unsorted_name.present?
     student ||= User.new(:name => unsorted_name)
     student.original_id = student.id
     student.id ||= NegativeId.generate

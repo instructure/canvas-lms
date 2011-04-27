@@ -60,7 +60,7 @@ class RubricAssociation < ActiveRecord::Base
     return @context if a_type == @context.class.to_s && a_id == @context.id
     klass = ValidAssociationModels[a_type]
     return nil unless klass
-    klass.find_by_id(a_id) # authorization is checked in the calling method
+    klass.find_by_id(a_id) if a_id.present? # authorization is checked in the calling method
   end
 
   set_broadcast_policy do |p|
@@ -205,7 +205,9 @@ class RubricAssociation < ActiveRecord::Base
   def self.generate_with_invitees(current_user, rubric, context, params, invitees=nil)
     raise "context required" unless context
     association_object = params.delete :association
-    association = RubricAssociation.find_by_id(params.delete(:id))
+    if (association_id = params.delete(:id)) && association_id.present?
+      association = RubricAssociation.find_by_id(association_id)
+    end
     association = nil unless association && association.context == context && association.association == association_object
     raise "association required" unless association || association_object
     # Update/create the association -- this is what ties the rubric to an entity

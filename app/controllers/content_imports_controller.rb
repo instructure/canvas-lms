@@ -46,7 +46,7 @@ class ContentImportsController < ApplicationController
           params[:migration_settings][:question_bank_name] = params[:new_question_bank_name]
         end
 
-        if !params[:content_migration_id].blank?
+        if params[:content_migration_id].present?
           @migration = ContentMigration.for_context(@context).find_by_id(params[:content_migration_id])
         end
         @migration ||= ContentMigration.new
@@ -138,7 +138,7 @@ class ContentImportsController < ApplicationController
           course_id = params[:copy][:autocomplete_course_id] if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
           @copy_context = @possible_courses.find{|c| c.id == course_id.to_i } if course_id
           if !@copy_context
-            @copy_context ||= Course.find_by_id(course_id)
+            @copy_context ||= Course.find_by_id(course_id) if course_id.present?
             @copy_context = nil if @copy_context && !@copy_context.grants_rights?(@current_user, session, :manage)
           end
         end

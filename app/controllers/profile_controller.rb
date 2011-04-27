@@ -129,7 +129,7 @@ class ProfileController < ApplicationController
     respond_to do |format|
       if @user.update_attributes(params[:user])
         pseudonymed = false
-        if params[:default_email_id]
+        if params[:default_email_id].present?
           @user.communication_channels.each_with_index{|cc, idx| cc.insert_at(idx + 1) }
           @email_channel = @user.communication_channels.find_by_id(params[:default_email_id])
           @email_channel.move_to_top if @email_channel
@@ -156,7 +156,7 @@ class ProfileController < ApplicationController
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
         end
-        if params[:default_communication_channel_id]
+        if params[:default_communication_channel_id].present?
           cc = @user.communication_channels.each_with_index{|cc, idx| cc.insert_at(idx + 1) }
           cc = @user.communication_channels.find_by_id_and_path_type(params[:default_communication_channel_id], 'email')
           cc.insert_at(1) if cc

@@ -333,7 +333,9 @@ class QuizzesController < ApplicationController
       params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
       if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey'
         params[:quiz][:assignment_group_id] ||= @context.assignment_groups.first.id
-        @assignment_group = @context.assignment_groups.active.find_by_id(params[:quiz].delete(:assignment_group_id))
+        if (assignment_group_id = params[:quiz].delete(:assignment_group_id)) && assignment_group_id.present?
+          @assignment_group = @context.assignment_groups.active.find_by_id(assignment_group_id)
+        end
         if @assignment_group
           @assignment = @context.assignments.build(:title => params[:quiz][:title], :due_at => params[:quiz][:lock_at], :submission_types => 'online_quiz')
           @assignment.assignment_group = @assignment_group
@@ -372,7 +374,9 @@ class QuizzesController < ApplicationController
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
       params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
       if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey' #'new' && params[:quiz][:assignment_group_id]
-        @assignment_group = @context.assignment_groups.active.find_by_id(params[:quiz].delete(:assignment_group_id)) if params[:quiz][:assignment_group_id].present?
+        if (assignment_group_id = params[:quiz].delete(:assignment_group_id)) && assignment_group_id.present?
+          @assignment_group = @context.assignment_groups.active.find_by_id(assignment_group_id)
+        end
         @assignment_group ||= @context.assignment_groups.first
         # The code to build an assignment for a quiz used to be here, but it's
         # been moved to the model quiz.rb instead.  See Quiz:build_assignment.

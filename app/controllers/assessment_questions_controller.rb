@@ -24,7 +24,7 @@ class AssessmentQuestionsController < ApplicationController
       params[:assessment_question][:form_question_data] ||= params[:question]
       question_bank_id = params[:assessment_question].delete(:assessment_question_bank_id)
       @question = @context.assessment_questions.build(params[:assessment_question])
-      if question_bank_id
+      if question_bank_id.present?
         @bank = @context.assessment_question_banks.active.find_by_id(question_bank_id)
         @question.assessment_question_bank = @bank
       end

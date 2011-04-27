@@ -58,7 +58,7 @@ class CommunicationChannelsController < ApplicationController
   def confirm
     id = params[:communication_channel_id]
     nonce = params[:nonce]
-    cc = @current_user.communication_channels.find_by_id_and_confirmation_code(id, nonce)
+    cc = @current_user.communication_channels.find_by_id_and_confirmation_code(id, nonce) if id.present?
     # cc = nil if cc && cc.confirmation_code != nonce
     if cc
       @communication_channel = cc
@@ -102,7 +102,9 @@ class CommunicationChannelsController < ApplicationController
   end
   
   def merge
-    @cc = CommunicationChannel.find_by_id_and_confirmation_code_and_path_type(params[:communication_channel_id], params[:code], 'email')
+    @cc = if params[:communication_channel_id].present?
+      CommunicationChannel.find_by_id_and_confirmation_code_and_path_type(params[:communication_channel_id], params[:code], 'email')
+    end
     if @cc.user_id == @current_user.id
       flash[:notice] = "You have already claimed that email address"
       redirect_to profile_url
@@ -141,7 +143,7 @@ class CommunicationChannelsController < ApplicationController
   end
 
   def destroy
-    @cc = @current_user.communication_channels.find_by_id(params[:id])
+    @cc = @current_user.communication_channels.find_by_id(params[:id]) if params[:id]
     if !@cc || @cc.destroy
       render :json => @cc.to_json
     else

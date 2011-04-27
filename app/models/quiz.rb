@@ -431,7 +431,7 @@ class Quiz < ActiveRecord::Base
     @submission_questions.each do |q|
       if q[:pick_count] #QuizGroup
         if q[:assessment_question_bank_id]
-          bank = AssessmentQuestionBank.find_by_id(q[:assessment_question_bank_id])
+          bank = AssessmentQuestionBank.find_by_id(q[:assessment_question_bank_id]) if q[:assessment_question_bank_id].present?
           if bank
             questions = bank.select_for_submission(q[:pick_count])
             questions = questions.map{|aq| aq.data}

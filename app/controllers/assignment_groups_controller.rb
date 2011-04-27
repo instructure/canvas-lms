@@ -91,7 +91,7 @@ class AssignmentGroupsController < ApplicationController
       ids = []
       order.each_index do |idx|
         id = order[idx]
-        group = @context.assignment_groups.active.find_by_id(id)
+        group = @context.assignment_groups.active.find_by_id(id) if id.present?
         if group
           group.move_to_bottom
           ids << group.id

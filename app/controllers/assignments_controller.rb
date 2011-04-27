@@ -141,7 +141,7 @@ class AssignmentsController < ApplicationController
   def remind_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
-      @request = AssessmentRequest.find_by_id(params[:id])
+      @request = AssessmentRequest.find_by_id(params[:id]) if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.send_reminder!
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
@@ -157,7 +157,7 @@ class AssignmentsController < ApplicationController
   def delete_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
-      @request = AssessmentRequest.find_by_id(params[:id])
+      @request = AssessmentRequest.find_by_id(params[:id]) if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.destroy
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
@@ -209,7 +209,7 @@ class AssignmentsController < ApplicationController
       return
     end
     @assignment ||= @context.assignments.build
-    if params[:model_key] && session["assignment_#{params[:model_key]}"]
+    if params[:model_key] && session["assignment_#{params[:model_key]}"].present?
       @assignment = @context.assignments.find_by_id(session["assignment_#{params[:model_key]}"])
     else
       @assignment.title = params[:title]
@@ -232,7 +232,7 @@ class AssignmentsController < ApplicationController
   def create
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
-    if params[:model_key] && session["assignment_#{params[:model_key]}"]
+    if params[:model_key] && session["assignment_#{params[:model_key]}"].present?
       @assignment = @context.assignments.find_by_id(session["assignment_#{params[:model_key]}"])
       @assignment.attributes = params[:assignment] if @assignment
     end

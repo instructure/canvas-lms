@@ -34,7 +34,7 @@ class InfoController < ApplicationController
   def avatar_image_url
     cancel_cache_buster
     url = Rails.cache.fetch(['avatar_img', params[:user_id]].cache_key, :expires_in => 30.minutes) do
-      user = User.find_by_id(params[:user_id])
+      user = User.find_by_id(params[:user_id]) if params[:user_id].present?
       if user && service_enabled?(:avatars)
         url = user.avatar_url(nil, @domain_root_account && @domain_root_account.settings[:avatars])
       end
@@ -71,7 +71,8 @@ class InfoController < ApplicationController
   
   def record_error
     error = params[:error] || {}
-    if @current_user && params[:feedback_type] == 'teacher' && params[:course_id] && @course = @current_user.courses.find_by_id(params[:course_id])
+    if @current_user && params[:feedback_type] == 'teacher' && params[:course_id].present? && 
+        @course = @current_user.courses.find_by_id(params[:course_id])
       return if record_error_for_teacher
     end
     # error = {:error => error} unless error.is_a?(Hash)
@@ -79,8 +80,8 @@ class InfoController < ApplicationController
     error[:user_agent] = request.headers['User-Agent']
     begin
       report_id = error.delete(:id)
-      @report = ErrorReport.find_by_id(report_id) if report_id
-      @report ||= ErrorReport.find_by_id(session[:last_error_id])
+      @report = ErrorReport.find_by_id(report_id) if report_id.present?
+      @report ||= ErrorReport.find_by_id(session[:last_error_id]) if session[:last_error_id].present?
       @report ||= ErrorReport.create()
       @report.user = @current_user
       @report.account ||= @domain_root_account

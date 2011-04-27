@@ -32,7 +32,7 @@ class FacebookController < ApplicationController
   end
 
   def authorize_user
-    @oauth_request ||= OauthRequest.find_by_id(params[:oauth_request_id]) if params[:oauth_request_id]
+    @oauth_request ||= OauthRequest.find_by_id(params[:oauth_request_id]) if params[:oauth_request_id].present?
     if @oauth_request && @oauth_request.original_host_with_port != request.host_with_port
       @original_host_with_port = @oauth_request.original_host_with_port
       redirect_to install_url

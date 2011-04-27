@@ -115,7 +115,7 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       order = params[:order].split(",")
       order.each do |id|
-        category = @portfolio.eportfolio_categories.find_by_id(id)
+        category = @portfolio.eportfolio_categories.find_by_id(id) if id.present?
         category.move_to_bottom if category
       end
       respond_to do |format|
@@ -130,7 +130,7 @@ class EportfoliosController < ApplicationController
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_category_id])
       order = params[:order].split(",")
       order.each do |id|
-        entry = @category.eportfolio_entries.find_by_id(id)
+        entry = @category.eportfolio_entries.find_by_id(id) if id.present?
         entry.move_to_bottom if entry
       end
       respond_to do |format|

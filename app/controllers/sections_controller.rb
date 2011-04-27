@@ -40,7 +40,7 @@ class SectionsController < ApplicationController
     @section = @context.course_sections.find(params[:section_id])
     course_id = params[:new_course_id]
     # cross-listing should only be allowed within the same root account
-    @new_course = @section.root_account.all_courses.find_by_id(course_id)
+    @new_course = @section.root_account.all_courses.find_by_id(course_id) if course_id.present?
     @new_course ||= @section.root_account.all_courses.find_by_sis_source_id(course_id)
     allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage_admin_users)
     res = {:allowed => !!allowed}
@@ -56,7 +56,7 @@ class SectionsController < ApplicationController
   def crosslist
     @section = @context.course_sections.find(params[:section_id])
     course_id = params[:new_course_id]
-    @new_course = Course.find_by_id(course_id)
+    @new_course = Course.find_by_id(course_id) if course_id.present?
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage_admin_users)
       @section.crosslist_to_course @new_course
       respond_to do |format|

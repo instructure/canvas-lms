@@ -236,7 +236,9 @@ class OutcomesController < ApplicationController
   
   def create
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome_group = @context.learning_outcome_groups.find_by_id(params[:learning_outcome_group_id])
+      if params[:learning_outcome_group_id].present?
+        @outcome_group = @context.learning_outcome_groups.find_by_id(params[:learning_outcome_group_id])
+      end
       @outcome_group ||= LearningOutcomeGroup.default_for(@context)
       @outcome = @context.created_learning_outcomes.build(params[:learning_outcome])
       respond_to do |format|
@@ -274,8 +276,8 @@ class OutcomesController < ApplicationController
   
   def destroy
     if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome = @context.learning_outcomes.find_by_id(params[:id])
-      @outcome ||= @context.learning_outcome_tags.find_by_learning_outcome_id(params[:id])
+      @outcome = @context.learning_outcomes.find_by_id(params[:id]) if params[:id].present?
+      @outcome ||= @context.learning_outcome_tags.find_by_learning_outcome_id(params[:id]) if params[:id].present?
       respond_to do |format|
         if @outcome
           if @outcome.context_code == @context.asset_string

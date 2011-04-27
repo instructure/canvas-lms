@@ -220,7 +220,7 @@ class Rubric < ActiveRecord::Base
       criterion[:id] = unique_item_id(criterion_data[:id])
       ratings = []
       points = 0
-      if criterion_data[:learning_outcome_id]
+      if criterion_data[:learning_outcome_id].present?
         outcome = LearningOutcome.find_by_id(criterion_data[:learning_outcome_id])
         if outcome
           @outcomes_changed = true

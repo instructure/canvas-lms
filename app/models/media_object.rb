@@ -116,7 +116,7 @@ class MediaObject < ActiveRecord::Base
   def self.build_media_objects(data, root_account_id)
     root_account = Account.find_by_id(root_account_id)
     data[:entries].each do |entry|
-      attachment = Attachment.find_by_id(entry[:originalId])
+      attachment = Attachment.find_by_id(entry[:originalId]) if entry[:originalId].present?
       mo = MediaObject.find_or_initialize_by_media_id(entry[:entryId])
       mo.root_account ||= root_account || Account.default
       mo.title ||= entry[:name]

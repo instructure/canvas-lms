@@ -614,7 +614,9 @@ class Account < ActiveRecord::Base
 
     account = @special_accounts[special_account_type]
     return account if account
-    account = Account.find_by_id(Setting.get("#{special_account_type}_account_id", nil))
+    if (account_id = Setting.get("#{special_account_type}_account_id", nil)) && account_id.present?
+      account = Account.find_by_id(account_id)
+    end
     return @special_accounts[special_account_type] = account if account
     account = Account.create!(:name => default_account_name)
     Setting.set("#{special_account_type}_account_id", account.id)
@@ -685,7 +687,9 @@ class Account < ActiveRecord::Base
   memoize :sub_account_count
   
   def current_sis_batch
-    self.sis_batches.find_by_id(self.read_attribute(:current_sis_batch_id))
+    if (current_sis_batch_id = self.read_attribute(:current_sis_batch_id)) && current_sis_batch_id.present?
+      self.sis_batches.find_by_id(current_sis_batch_id)
+    end
   end
   
   def turnitin_settings

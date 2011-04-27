@@ -48,7 +48,7 @@ class UsersController < ApplicationController
   end
   
   def grades
-    @user = User.find_by_id(params[:user_id])
+    @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
       @current_enrollments = @user.current_enrollments
@@ -362,7 +362,7 @@ class UsersController < ApplicationController
   
   def registered
     @pseudonym_session.destroy if @pseudonym_session
-    @pseudonym = Pseudonym.find_by_id(flash[:pseudonym_id])
+    @pseudonym = Pseudonym.find_by_id(flash[:pseudonym_id]) if flash[:pseudonym_id].present?
     if flash[:user_id] && (@user = User.find(flash[:user_id]))
       @email_address = @pseudonym && @pseudonym.communication_channel && @pseudonym.communication_channel.path
       @email_address ||= @user.email
@@ -506,9 +506,10 @@ class UsersController < ApplicationController
   
   def admin_merge
     @user = User.find(params[:user_id])
-    @pending_other_user = User.find_by_id(params[:pending_user_id] || session[:pending_user_id])
+    pending_user_id = params[:pending_user_id] || session[:pending_user_id]
+    @pending_other_user = User.find_by_id(pending_user_id) if pending_user_id.present?
     @pending_other_user = nil if @pending_other_user == @user
-    @other_user = User.find_by_id(params[:new_user_id])
+    @other_user = User.find_by_id(params[:new_user_id]) if params[:new_user_id].present?
     if authorized_action(@user, @current_user, :manage_logins)
       if @user && (params[:clear] || !@pending_other_user)
         session[:pending_user_id] = @user.id

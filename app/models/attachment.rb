@@ -640,16 +640,18 @@ class Attachment < ActiveRecord::Base
     given { |user, session| self.context_type == 'Submission' && self.context.grant_rights?(user, session, :comment) }
     set { can :create }
     
-    given { |user, session| 
-        u = session && User.find_by_id(session['file_access_user_id'])
-        u && self.cached_context_grants_right?(u, session, :read) &&
+    given { |user, session|
+        session && session['file_access_user_id'].present? &&
+        (u = User.find_by_id(session['file_access_user_id'])) &&
+        self.cached_context_grants_right?(u, session, :read) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     set { can :read }
     
-    given { |user, session| 
-        u = session && User.find_by_id(session['file_access_user_id'])
-        u && self.cached_context_grants_right?(u, session, :read) && 
+    given { |user, session|
+        session && session['file_access_user_id'].present? &&
+        (u = User.find_by_id(session['file_access_user_id'])) &&
+        self.cached_context_grants_right?(u, session, :read) &&
         (self.cached_context_grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }

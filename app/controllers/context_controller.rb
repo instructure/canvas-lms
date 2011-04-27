@@ -134,7 +134,7 @@ class ContextController < ApplicationController
             if data && data['root_account_id'] && data['context_code']
               context = Context.find_by_asset_string(data['context_code'])
               context = nil unless context.respond_to?(:is_a_context?) && context.is_a_context?
-              user = User.find_by_id(data['puser_id'] && data['puser_id'].split("_").first)
+              user = User.find_by_id(data['puser_id'].split("_").first) if data['puser_id'].present?
               mo.context ||= context
               mo.user ||= user
               mo.save!
@@ -167,7 +167,7 @@ class ContextController < ApplicationController
     @headers = false
     @show_left_side = false
     @padless = true
-    if params[:user_id] && params[:ts] && params[:verifier]
+    if params[:user_id].present? && params[:ts] && params[:verifier]
       @user = User.find_by_id(params[:user_id])
       @user = nil unless @user && @user.valid_access_verifier?(params[:ts], params[:verifier])
     end
@@ -196,7 +196,7 @@ class ContextController < ApplicationController
   end
   
   def inbox_item
-    @item = @current_user.inbox_items.find_by_id(params[:id])
+    @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
     if !@item
       flash[:error] = "The message you were trying to view has been removed"
       redirect_to inbox_url
@@ -237,7 +237,7 @@ class ContextController < ApplicationController
   end
   
   def destroy_inbox_item
-    @item = @current_user.inbox_items.find_by_id(params[:id])
+    @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
     @asset = @item && @item.asset
     @item && @item.destroy
     render :json => @item.to_json

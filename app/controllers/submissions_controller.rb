@@ -75,7 +75,7 @@ class SubmissionsController < ApplicationController
         elsif params[:download] 
           @attachment = @submission.attachment if @submission.attachment_id == params[:download].to_i
           @attachment ||= Attachment.find_by_id(@submission.submission_history.map(&:attachment_id).find{|a| a == params[:download].to_i })
-          @attachment ||= @submission.attachments.find_by_id(params[:download])
+          @attachment ||= @submission.attachments.find_by_id(params[:download]) if params[:download].present?
           @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
           @attachment ||= @submission.attachment if @submission.attachment_id == params[:download].to_i
           @attachment ||= Attachment.find(0)

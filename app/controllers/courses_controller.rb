@@ -746,7 +746,9 @@ class CoursesController < ApplicationController
       if account.grants_right?(@current_user, session, :manage_courses)
         args = params[:course].slice(:name, :start_at, :conclude_at)
         root_account = account.root_account || account
-        args[:enrollment_term] = root_account.enrollment_terms.find_by_id(params[:course][:enrollment_term_id])
+        args[:enrollment_term] = if params[:course][:enrollment_term_id].present?
+          root_account.enrollment_terms.find_by_id(params[:course][:enrollment_term_id])
+        end
       end
       args[:enrollment_term] ||= @context.enrollment_term
       args[:abstract_course] = @context.abstract_course

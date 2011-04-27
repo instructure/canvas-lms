@@ -136,7 +136,7 @@ class FoldersController < ApplicationController
       if !@folder.parent_folder_id || !@context.folders.find_by_id(@folder.parent_folder_id)
         @folder.parent_folder_id = Folder.unfiled_folder(@context).id
       end
-      if source_folder_id && (source_folder = Folder.find_by_id(source_folder_id)) && source_folder.grants_right?(@current_user, session, :read)
+      if source_folder_id.present? && (source_folder = Folder.find_by_id(source_folder_id)) && source_folder.grants_right?(@current_user, session, :read)
         @folder = source_folder.clone_for(@context, @folder, {:everything => true})
       end
       respond_to do |format|

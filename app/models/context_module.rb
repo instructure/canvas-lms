@@ -50,7 +50,7 @@ class ContextModule < ActiveRecord::Base
     prereqs = []
     (self.prerequisites || []).each do |pre|
       if pre[:type] == 'context_module'
-        position = ContextModule.module_positions(self.context)[pre[:id].to_i] || 0 #self.context.context_modules.active.find_by_id(pre[:id])
+        position = ContextModule.module_positions(self.context)[pre[:id].to_i] || 0
         prereqs << pre if position && position < (self.position || 0)
       else
         prereqs << pre
@@ -367,7 +367,7 @@ class ContextModule < ActiveRecord::Base
       if pre[:type] == 'context_module'
         prog = user.module_progression_for(pre[:id])
         if !prog
-          prereq = self.context.context_modules.active.find_by_id(pre[:id]) if !prog
+          prereq = self.context.context_modules.active.find_by_id(pre[:id]) if !prog && pre[:id].present?
           prog = prereq.evaluate_for(user, true) if prereq
         end
         prog.completed? rescue false
@@ -506,7 +506,7 @@ class ContextModule < ActiveRecord::Base
         if progression.unlocked? || progression.started?
           orig_reqs = (progression.requirements_met || []).map{|r| "#{r[:id]}_#{r[:type]}" }.sort
           completes = (self.completion_requirements || []).map do |req|
-            tag = tags.detect{|t| t.id == req[:id].to_i} #ContentTag.find_by_id(req[:id])
+            tag = tags.detect{|t| t.id == req[:id].to_i}
             if !tag
               res = true
             elsif ['min_score', 'max_score', 'must_submit'].include?(req[:type]) && !tag.scoreable?
@@ -618,7 +618,7 @@ class ContextModule < ActiveRecord::Base
       if req[:type] == 'context_module'
         id = context.merge_mapped_id("context_module_#{req[:id]}")
         if !id
-          cm = self.context.context_modules.find_by_id(req[:id])
+          cm = self.context.context_modules.find_by_id(req[:id]) if req[:id].present?
           clone_id = cm.cloned_item_id if cm
           obj = ContextModule.find_by_cloned_item_id_and_context_id_and_context_type(clone_id, context.id, context.class.to_s) if clone_id
           id = obj.id if obj
@@ -718,7 +718,7 @@ class ContextModule < ActiveRecord::Base
     hash[:migration_id] ||= hash[:linked_resource_id] 
     hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
     item = nil
-    existing_item = content_tags.find_by_id(hash[:id])
+    existing_item = content_tags.find_by_id(hash[:id]) if hash[:id].present?
     existing_item ||= content_tags.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
     existing_item ||= content_tags.new(:context => context)
     context.imported_migration_items << existing_item if context.imported_migration_items && existing_item.new_record?

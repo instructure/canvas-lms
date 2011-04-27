@@ -69,7 +69,7 @@ module CC
         c_node.ignore_for_scoring criterion[:ignore_for_scoring] unless criterion[:ignore_for_scoring].nil?
         c_node.description criterion[:description]
         c_node.long_description criterion[:long_description] unless criterion[:long_description].blank?
-        if criterion[:learning_outcome_id]
+        if criterion[:learning_outcome_id].present?
           if lo = @course.learning_outcomes.find_by_id(criterion[:learning_outcome_id])
             c_node.learning_outcome_identifierref CCHelper.create_key(lo)
           end

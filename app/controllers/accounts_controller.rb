@@ -136,7 +136,7 @@ class AccountsController < ApplicationController
   def confirm_delete_user
     if authorized_action(@account, @current_user, :manage_admin_users)
       @context = @account
-      @user = @account.all_users.find_by_id(params[:user_id])
+      @user = @account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
       if !@user
         flash[:error] = "No user found with that id"
         redirect_to account_url(@account)

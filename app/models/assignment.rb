@@ -210,7 +210,7 @@ class Assignment < ActiveRecord::Base
   attr_accessor :updated_submissions
   def update_submissions_later
     if @old_assignment_group_id != self.assignment_group_id
-      AssignmentGroup.find_by_id(@old_assignment_group_id).touch rescue nil
+      AssignmentGroup.find_by_id(@old_assignment_group_id).try(:touch) if @old_assignment_group_id.present?
     end
     self.assignment_group.touch if self.assignment_group
     if @notify_graded_students_of_grading
@@ -624,7 +624,7 @@ class Assignment < ActiveRecord::Base
   end
   
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.find_by_id(user) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :read) }
     set { can :read and can :read_own_submission }
     
     given { |user, session| self.submittable_type? && 
@@ -639,10 +639,10 @@ class Assignment < ActiveRecord::Base
     }
     set { can :update_content }
     
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#self.context.admins.find_by_id(user) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
     set { can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files }
     
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#self.context.admins.find_by_id(user) }
+    given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
     set { can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files }
   end
 
