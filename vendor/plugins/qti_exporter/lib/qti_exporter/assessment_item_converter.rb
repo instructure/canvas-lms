@@ -57,9 +57,9 @@ class AssessmentItemConverter
       @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
       # The colons are replaced with dashes in the conversion from QTI 1.2
       @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier').gsub(/:/, '-')
-      if text = @doc.at_css('itemBody div:first-child') || text = @doc.at_css('itemBody p:first-child')
-        @question[:question_text] = text.inner_html
-      elsif text = @doc.at_css('itemBody div') || text = @doc.at_css('itemBody p')
+      if text = @doc.at_css('itemBody div.html')
+        @question[:question_text] = Nokogiri::HTML::DocumentFragment.parse(text.text).inner_html.strip
+      elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
         @question[:question_text] = text.inner_html
       elsif @doc.at_css('itemBody')
         if text = @doc.at_css('itemBody').children.find{|c|c.text.strip != ''}
@@ -268,7 +268,7 @@ class AssessmentItemConverter
     feedback_hash = {}
     @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
       id = feedback['identifier']
-      text = clear_html(feedback.at_css('p').text.gsub(/\s+/, " ")).strip
+      text = clear_html((feedback.at_css('p') || feedback.at_css('div')).text.gsub(/\s+/, " ")).strip
       feedback_hash[id] = text
 
       if @question[:feedback_id] == id

@@ -110,7 +110,7 @@ class AssociateInteraction < AssessmentItemConverter
           match = {}
           @question[:matches] << match
           migration_id = r_if.at_css('match baseValue').text
-          match[:text] = @doc.at_css("simpleChoice[identifier=#{migration_id}] p").text
+          match[:text] = clear_html((@doc.at_css("simpleChoice[identifier=#{migration_id}] p") || @doc.at_css("simpleChoice[identifier=#{migration_id}] div")).text)
           match[:match_id] = unique_local_id
           answer[:match_id] = match[:match_id]
           answer.delete :migration_id
@@ -212,8 +212,10 @@ class AssociateInteraction < AssessmentItemConverter
 
   def extract_answer!(answer, node)
     answer[:text] = clear_html node.text.strip
-    node = sanitize_html!(node)
-    if (sanitized = node.inner_html.strip) != answer[:text]
+    sanitized = node.at_css('div.html') ?
+      Nokogiri::HTML::DocumentFragment.parse(node.text).inner_html.strip :
+      sanitize_html!(node).inner_html.strip
+    if sanitized && sanitized != answer[:text]
       answer[:html] = sanitized
     end
   end
