@@ -21,15 +21,16 @@ module CC
       include CC::CCHelper
       include QTIItems
 
-      def initialize(manifest, resources_node)
+      def initialize(manifest, resources_node, html_exporter)
         @manifest = manifest
         @resources_node = resources_node
         @course = manifest.course
         @export_dir = @manifest.export_dir
+        @html_exporter = html_exporter
       end
 
-      def self.generate_qti(manifest, resources_node)
-        qti = QTI::QTIGenerator.new(manifest, resources_node)
+      def self.generate_qti(*args)
+        qti = QTI::QTIGenerator.new(*args)
         qti.generate
       end
 
@@ -108,7 +109,7 @@ module CC
                         "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
         ) do |q_node|
           q_node.title quiz.title
-          q_node.description CCHelper.html_content(quiz.description || '', @course, @manifest.exporter.user)
+          q_node.description @html_exporter.html_content(quiz.description || '', @course, @manifest.exporter.user)
           q_node.lock_at ims_datetime(quiz.lock_at) if quiz.lock_at
           q_node.unlock_at ims_datetime(quiz.unlock_at) if quiz.unlock_at
           q_node.due_at ims_datetime(quiz.due_at) if quiz.due_at

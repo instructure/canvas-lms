@@ -105,12 +105,12 @@ module CC
       rel_path
     end
 
-    def add_media_objects
+    def add_media_objects(media_objects)
       return unless Kaltura::ClientV3.config
       client = Kaltura::ClientV3.new
       client.startSession(Kaltura::SessionType::ADMIN)
 
-      @course.media_objects.active.find_all do |obj|
+      media_objects.each do |obj|
         next if @added_attachment_ids.include?(obj.attachment_id)
         migration_id = CCHelper.create_key(obj)
         info = CCHelper.media_object_info(obj, client)

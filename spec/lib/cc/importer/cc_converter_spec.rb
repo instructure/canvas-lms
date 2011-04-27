@@ -429,7 +429,7 @@ describe "Common Cartridge importing" do
 
     #export to html file
     migration_id = CC::CCHelper.create_key(page)
-    exported_html = CC::CCHelper.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
+    exported_html = CC::CCHelper::HtmlContentExporter.new.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
     #convert to json
     doc = Nokogiri::XML(exported_html)
     hash = @converter.convert_wiki(doc, 'some-page')
@@ -465,7 +465,7 @@ describe "Common Cartridge importing" do
     
     #export to html file
     migration_id = CC::CCHelper.create_key(page)
-    exported_html = CC::CCHelper.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
+    exported_html = CC::CCHelper::HtmlContentExporter.new.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
     #convert to json
     doc = Nokogiri::XML(exported_html)
     hash = @converter.convert_wiki(doc, 'some-page')
@@ -503,7 +503,7 @@ describe "Common Cartridge importing" do
     migration_id = CC::CCHelper.create_key(asmnt)
     builder = Builder::XmlMarkup.new(:indent=>2)
     builder.assignment("identifier" => migration_id) {|a|CC::AssignmentResources.create_assignment(a, asmnt)}
-    html = CC::CCHelper.html_page(asmnt.description, "Assignment: " + asmnt.title, @copy_from, @from_teacher)
+    html = CC::CCHelper::HtmlContentExporter.new.html_page(asmnt.description, "Assignment: " + asmnt.title, @copy_from, @from_teacher)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
     html_doc = Nokogiri::XML(html)

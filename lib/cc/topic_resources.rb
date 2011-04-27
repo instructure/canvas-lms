@@ -72,7 +72,7 @@ module CC
     
     def create_cc_topic(doc, topic)
       doc.title topic.title
-      html = CCHelper.html_content(topic.message || '', @course, @manifest.exporter.user)
+      html = @html_exporter.html_content(topic.message || '', @course, @manifest.exporter.user)
       doc.text(html, :texttype=>'text/html')
       if topic.attachment
         doc.attachments do |atts|

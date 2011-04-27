@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'set'
+
 module CC
   class Resource
     include CCHelper
@@ -33,6 +35,7 @@ module CC
       @export_dir = @manifest.export_dir
       @resources = nil
       @zip_file = manifest.zip_file
+      @html_exporter = CCHelper::HtmlContentExporter.new
     end
     
     def self.create_resources(manifest, manifest_node)
@@ -52,10 +55,11 @@ module CC
         add_topics
         add_web_links
         set_progress(40)
+        QTI::QTIGenerator.generate_qti(@manifest, resources, @html_exporter)
+        set_progress(60)
+        # these need to go last, to gather up all the references to the files
         add_course_files
-        add_media_objects
-        set_progress(70)
-        QTI::QTIGenerator.generate_qti(@manifest, resources)
+        add_media_objects(@html_exporter.used_media_objects)
         set_progress(90)
         create_basic_lti_links
       end
