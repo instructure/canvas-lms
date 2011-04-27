@@ -1,5 +1,21 @@
+YAML.add_ruby_type("object:Module") do |type, val|
+  val.constantize
+end
+
 YAML.add_ruby_type("object:Class") do |type, val|
   val.constantize
+end
+
+class Module
+  def to_yaml(opts = {})
+    YAML.quick_emit(self.object_id, opts) do |out|
+      out.scalar(taguri, name)
+    end
+  end
+
+  def load_for_delayed_job(arg)
+    self
+  end
 end
 
 class Class

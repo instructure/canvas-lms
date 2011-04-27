@@ -4,6 +4,16 @@ class StoryReader
   def read(story)
     "Epilog: #{story.tell}"
   end
+
+  def self.reverse(str)
+    str.reverse
+  end
+end
+
+module MyReverser
+  def self.reverse(str)
+    str.reverse
+  end
 end
 
 describe Delayed::PerformableMethod do
@@ -28,6 +38,16 @@ describe Delayed::PerformableMethod do
   it "should allow class methods to be called on ActiveRecord models" do
     p = Delayed::PerformableMethod.new(Story, :count, [])
     lambda { p.send(:load, p.object) }.should_not raise_error
+  end
+
+  it "should allow class methods to be called" do
+    p = Delayed::PerformableMethod.new(StoryReader, :reverse, ["ohai"])
+    lambda { p.send(:perform).should == "iaho" }.should_not raise_error
+  end
+
+  it "should allow module methods to be called" do
+    p = Delayed::PerformableMethod.new(MyReverser, :reverse, ["ohai"])
+    lambda { p.send(:perform).should == "iaho" }.should_not raise_error
   end
   
   it "should store arguments as native YAML if they are active record objects" do
