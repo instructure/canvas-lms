@@ -23,7 +23,7 @@ class DelayedJobsController < ApplicationController
   
   def index
     total_count = Delayed::Job.count
-    @delayed_jobs = Delayed::Job.all.paginate(:page => params[:page], :per_page => 30, :total_entries => total_count)
+    @delayed_jobs = Delayed::Job.paginate(:page => params[:page], :per_page => 30, :total_entries => total_count, :order => 'id DESC')
     @running_now = Delayed::Job.find(:all, :conditions => "locked_by IS NOT NULL AND locked_by != '' AND locked_by != 'on hold'")
     @counts = {}
     @counts[:healthy_waiting] = Delayed::Job.count(:all, :conditions => "attempts = 0 AND run_at < '#{1.second.from_now.to_s(:db)}' AND (locked_by IS NULL or locked_by = '')")
