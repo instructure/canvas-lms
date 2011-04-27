@@ -1437,26 +1437,37 @@
       }
       $list.empty();
       for (var option in options.options) {
-        $("<div class='option ui-state-default minimal' style='cursor: pointer; padding: 2px 5px; overflow: hidden; white-space: nowrap;'>" +
-          "   <span tabindex='-1'>" + option.replace(/_/g, " ") + "</span>" +
-          "</div>").appendTo($list).bind({
-          mouseenter: function() {
-            $(this).parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
-            $(this).addClass('ui-state-hover').removeClass('minimal');
-          }, 
-          mouseleave: function() {
-            $(this).parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
-          },
-          mousedown: function(event) {
-            event.preventDefault();
-            $(this).parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
-            $(this).addClass('ui-state-active').removeClass('minimal');
-          },
-          mouseup: function() {
-            $(this).parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
-          },
-          click: options.options[option]
-        });
+        if(typeof(options.options[option]) == "function") {
+          $("<div class='option ui-state-default minimal' style='cursor: pointer; padding: 2px 5px; overflow: hidden; white-space: nowrap;'>" +
+            "   <span tabindex='-1'>" + option.replace(/_/g, " ") + "</span>" +
+            "</div>").appendTo($list).bind({
+            mouseenter: function() {
+              $(this).parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
+              $(this).addClass('ui-state-hover').removeClass('minimal');
+            },
+            mouseleave: function() {
+              $(this).parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
+            },
+            mousedown: function(event) {
+              event.preventDefault();
+              $(this).parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
+              $(this).addClass('ui-state-active').removeClass('minimal');
+            },
+            mouseup: function() {
+              $(this).parent().find("div.option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
+            },
+            click: options.options[option]
+          });
+        } else if(options.options[option] == null || typeof(options.options[option]) == "undefined") {
+          $("<div class='option ui-state-disabled minimal' style='cursor: pointer; padding: 2px 5px;
+ overflow: hidden; white-space: nowrap;'>" +
+            "   <span tabindex='-1'>" + option.replace(/_/g, " ") + "</span>" +
+            "</div>").appendTo($list).bind({
+            mousedown: function(event) {
+              event.preventDefault();
+            }
+          });
+        }
       }
       var offset = this.offset(),
           height = this.outerHeight(),
