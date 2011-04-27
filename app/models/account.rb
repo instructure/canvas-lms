@@ -188,6 +188,10 @@ class Account < ActiveRecord::Base
     self.read_attribute(:settings) || self.write_attribute(:settings, {})
   end
   
+  def domain
+    HostUrl.context_host(self)
+  end
+  
   def sub_accounts_as_options(indent=0)
     res = [[("&nbsp;&nbsp;" * indent).html_safe + self.name, self.id]]
     self.sub_accounts.each do |account|

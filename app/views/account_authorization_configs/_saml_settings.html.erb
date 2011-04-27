@@ -56,11 +56,13 @@
           </span>
         </td>
       </tr>
-      <% if @account_config.saml_authentication? %>
       <tr>
-        <td colspan="2"><%= link_to("Click here to see the service provider identity XML for instructure.", :saml_meta_data) %></td>
+        <td colspan="2">
+          <span class="auth_info">
+            <%= link_to("Click here to see the service provider identity XML for this account.", :saml_meta_data) %>
+          </span>
+        </td>
       </tr>
-      <% end %>
     </table>
 <% end %>
 </div>
