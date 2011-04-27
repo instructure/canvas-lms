@@ -58,6 +58,7 @@ module CCHelper
   SYLLABUS = "syllabus.html"
   WEB_RESOURCES_FOLDER = 'web_resources'
   WIKI_FOLDER = 'wiki_content'
+  MEDIA_OBJECTS_FOLDER = 'media_objects'
   
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)
@@ -168,7 +169,7 @@ module CCHelper
       obj = MediaObject.find_by_media_id(media_id)
       if obj && obj.context == course && migration_id = CCHelper.create_key(obj)
         info = media_object_info(obj)
-        anchor['href'] = File.join(WEB_CONTENT_TOKEN, 'media_objects', info[:filename])
+        anchor['href'] = File.join(WEB_CONTENT_TOKEN, MEDIA_OBJECTS_FOLDER, info[:filename])
       end
     end
 

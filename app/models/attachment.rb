@@ -745,12 +745,12 @@ class Attachment < ActiveRecord::Base
   alias_method :destroy!, :destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
-  def destroy
+  def destroy(delete_media_object = true)
     return if self.new_record?
     self.file_state = 'deleted' #destroy
     self.deleted_at = Time.now
     ContentTag.delete_for(self)
-    MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:attachment_id => self.id}) if self.id
+    MediaObject.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:attachment_id => self.id}) if self.id && delete_media_object
     save!
   end
   

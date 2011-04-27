@@ -20,6 +20,8 @@ class Folder < ActiveRecord::Base
   include Workflow
   attr_accessible :name, :full_name, :parent_folder, :workflow_state, :lock_at, :unlock_at, :locked, :hidden, :context
 
+  ROOT_FOLDER_NAME = "course files"
+
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
   belongs_to :parent_folder, :class_name => "Folder"
@@ -213,8 +215,8 @@ class Folder < ActiveRecord::Base
     root_folders = []
     root_folders = context.folders.active.find_all_by_parent_folder_id(nil)
     if context.is_a? Course
-      if root_folders.select{|f| f.name == "course files" }.empty?
-        root_folders << context.folders.create(:name => "course files", :full_name => "course files", :workflow_state => "visible")
+      if root_folders.select{|f| f.name == ROOT_FOLDER_NAME }.empty?
+        root_folders << context.folders.create(:name => ROOT_FOLDER_NAME, :full_name => ROOT_FOLDER_NAME, :workflow_state => "visible")
       end
     elsif context.is_a? User
       if root_folders.select{|f| f.name == "my files" }.empty?

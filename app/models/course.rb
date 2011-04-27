@@ -1179,15 +1179,18 @@ class Course < ActiveRecord::Base
     Attachment.skip_media_object_creation do
       process_migration_files(data, migration); migration.fast_update_progress(10)
       Attachment.process_migration(data, migration); migration.fast_update_progress(20)
-      mo_attachments = self.attachments.all(:conditions => "media_entry_id is not null")
+      mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
       # we'll wait synchronously for the media objects to be uploaded, so that
       # we have the media_ids that we need later.
-      MediaObject.add_media_files(mo_attachments, true) unless mo_attachments.blank?
+      unless mo_attachments.blank?
+        MediaObject.add_media_files(mo_attachments, true)
+        remove_temporary_import_attachments(mo_attachments)
+      end
     end
-    
+
     # needs to happen after the files are processed, so that they are available in the syllabus
     import_settings_from_migration(data); migration.fast_update_progress(21)
-    
+
     migration.fast_update_progress(30)
     question_data = AssessmentQuestion.process_migration(data, migration); migration.fast_update_progress(35)
     Group.process_migration(data, migration); migration.fast_update_progress(36)
@@ -1260,6 +1263,20 @@ class Course < ActiveRecord::Base
     atts -= Canvas::MigratorHelper::COURSE_NO_COPY_ATTS
     settings.slice(*atts.map(&:to_s)).each do |key, val|
       self.send("#{key}=", val)
+    end
+  end
+
+  def remove_temporary_import_attachments(mo_attachments)
+    # attachments in /media_objects were created on export, soley to
+    # download and include a media object in the export. now that they've
+    # been sent to kaltura, we can remove them.
+    to_remove = mo_attachments.find_all { |a| a.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/') }
+    to_remove.each do |a|
+      a.destroy(false)
+    end
+    folder = to_remove.last.folder
+    if folder && folder.file_attachments.active.count == 0 && folder.active_sub_folders.count == 0
+      folder.destroy
     end
   end
   

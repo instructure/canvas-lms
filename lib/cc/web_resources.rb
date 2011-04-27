@@ -15,11 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'set'
+
 module CC
   module WebResources
     def add_course_files
       course_folder = Folder.root_folders(@course).first
       files_with_metadata = { :folders => [], :files => [] }
+      @added_attachment_ids = Set.new
 
       zipper = ContentZipper.new
       zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER]) do |file, folder_names|
@@ -29,6 +32,7 @@ module CC
           next
         end
 
+        @added_attachment_ids << file.id
         path = File.join(folder_names, file.unencoded_filename)
         migration_id = CCHelper.create_key(file)
         if file.hidden? || file.locked || file.unencoded_filename != file.display_name
@@ -107,12 +111,13 @@ module CC
       client.startSession(Kaltura::SessionType::ADMIN)
 
       @course.media_objects.active.find_all do |obj|
+        next if @added_attachment_ids.include?(obj.attachment_id)
         migration_id = CCHelper.create_key(obj)
         info = CCHelper.media_object_info(obj, client)
         next unless info[:asset]
         url = client.flavorAssetGetDownloadUrl(info[:asset][:id])
 
-        path = base_path = File.join(CCHelper::WEB_RESOURCES_FOLDER, 'media_objects', info[:filename])
+        path = base_path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
 
         remote_stream = open(url)
         @zip_file.get_output_stream(path) do |stream|
