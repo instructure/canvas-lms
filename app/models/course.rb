@@ -1366,7 +1366,7 @@ class Course < ActiveRecord::Base
     to_remove.each do |a|
       a.destroy(false)
     end
-    folder = to_remove.last.folder
+    folder = to_remove.last.folder if to_remove.last
     if folder && folder.file_attachments.active.count == 0 && folder.active_sub_folders.count == 0
       folder.destroy
     end
