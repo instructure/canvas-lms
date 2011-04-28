@@ -19,22 +19,18 @@ class QtiExporter < Canvas::Migrator
   end
 
   def export
-    unzip_archive(false)
+    unzip_archive
 
-    begin
-      if QtiExporter.is_qti_2(File.join(@unzipped_file_path, MANIFEST_FILE))
-        @dest_dir_2_1 = @unzipped_file_path
-        @converted = true
-      else
-        run_qti_converter
-      end
-
-      @course[:assessment_questions] = convert_questions
-      @course[:assessments] = convert_assessments(@course[:assessment_questions])
-      @course[:file_map] = convert_files
-    ensure
-      delete_archive
+    if QtiExporter.is_qti_2(File.join(@unzipped_file_path, MANIFEST_FILE))
+      @dest_dir_2_1 = @unzipped_file_path
+      @converted = true
+    else
+      run_qti_converter
     end
+
+    @course[:assessment_questions] = convert_questions
+    @course[:assessments] = convert_assessments(@course[:assessment_questions])
+    @course[:file_map] = convert_files
 
     if settings[:apply_respondus_settings_file]
       apply_respondus_settings
@@ -134,7 +130,7 @@ class QtiExporter < Canvas::Migrator
     unless @files.empty?
       # move the original archive to all_files.zip and it can be processed
       # during the import to grab attachments
-      FileUtils.move(@archive_file_path, File.join(@base_export_dir, Canvas::MigratorHelper::ALL_FILES_ZIP))
+      move_archive_to(File.join(@base_export_dir, Canvas::MigratorHelper::ALL_FILES_ZIP))
     end
     @files
   end

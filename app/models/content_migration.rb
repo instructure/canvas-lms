@@ -214,14 +214,15 @@ class ContentMigration < ActiveRecord::Base
   def import_content
     self.workflow_state = :importing
     self.save
-    
+
     begin
       @exported_data_zip = download_exported_data
       @zip_file = Zip::ZipFile.open(@exported_data_zip.path)
+      @exported_data_zip.close
       data = JSON.parse(@zip_file.read('course_export.json'))
       data = data.with_indifferent_access if data.is_a? Hash
       data['all_files_export'] ||= {}
-      
+
       if @zip_file.find_entry('all_files.zip')
         # the file importer needs an actual file to process
         all_files_path = create_all_files_path(@exported_data_zip.path)
@@ -230,9 +231,9 @@ class ContentMigration < ActiveRecord::Base
       else
         data['all_files_export']['file_path'] = nil
       end
-      
+
       @zip_file.close
-      
+
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
       self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
     rescue => e
@@ -260,23 +261,9 @@ class ContentMigration < ActiveRecord::Base
   def download_exported_data
     raise "No exported data to import" unless self.exported_attachment
     config = Setting.from_config('external_migration')
-    if config && config[:data_folder]
-      @exported_data_zip = Tempfile.new("migration_#{self.id}_", config[:data_folder])
-    else
-      @exported_data_zip = Tempfile.new("migration_#{self.id}_")
-    end
-    
-    if Attachment.local_storage?
-      @exported_data_zip.write File.read(self.exported_attachment.full_filename)
-    elsif Attachment.s3_storage?
-      att = self.exported_attachment
-      require 'aws/s3'
-      AWS::S3::S3Object.stream(att.full_filename, att.bucket_name) do |chunk|
-        @exported_data_zip.write chunk
-      end
-    end
-    
-    @exported_data_zip.close
+    @exported_data_zip = self.exported_attachment.open(
+      :need_local_file => true,
+      :temp_folder => config[:data_folder])
     @exported_data_zip
   end
   
@@ -285,17 +272,8 @@ class ContentMigration < ActiveRecord::Base
   end
   
   def clear_migration_data
-    begin
-      @zip_file.close if @zip_file
-      @zip_file = nil
-      if @exported_data_zip
-        all_files_path = create_all_files_path(@exported_data_zip.path)
-        FileUtils::rm_rf(all_files_path) if File.exists?(all_files_path)
-        @exported_data_zip.unlink
-      end
-    rescue
-      Rails.logger.warn "Couldn't delete files for content_migration #{self.id}"
-    end
+    @zip_file.close if @zip_file
+    @zip_file = nil
   end
 
   def fast_update_progress(val)

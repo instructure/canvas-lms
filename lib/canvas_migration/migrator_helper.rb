@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require 'tmpdir'
+require 'shellwords'
 module Canvas::MigratorHelper
   include Canvas::Migration
 
@@ -45,7 +46,7 @@ module Canvas::MigratorHelper
   end
 
   def self.unzip_command(zip_file, dest_dir)
-    "unzip -qo #{zip_file.gsub(/ /, "\\ ")} -d #{dest_dir.gsub(/ /, "\\ ")} 2>&1"
+    "unzip -qo #{Shellwords.escape(zip_file)} -d #{Shellwords.escape(dest_dir)} 2>&1"
   end
 
   def add_error(type, message, object=nil, e=nil)

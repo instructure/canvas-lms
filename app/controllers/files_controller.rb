@@ -302,22 +302,15 @@ class FilesController < ApplicationController
     if authorized_action(@attachment, @current_user, :update)
       # The files page lets you edit text content inline by firing off a json
       # request to get the data.
-      if Attachment.local_storage?
-        @headers = false if @files_domain
-        str = File.read(@attachment.full_filename)
-        render :json => {:body => str}.to_json
-      else
-        require 'aws/s3'
-        str = ""
-        io = StringIO.new
-        AWS::S3::S3Object.stream(@attachment.full_filename, @attachment.bucket_name) do |chunk|
-          io.write chunk
-        end
-        io.close_write
-        io.rewind
-        str = io.read
-        render :json => {:body => str}.to_json
+      # Protect ourselves against reading huge files into memory -- if the
+      # attachment is too big, don't return it.
+      if @attachment.size > Setting.get_cached('attachment_json_response_max_size', 1.megabyte.to_s).to_i
+        render :json => { :error => 'The file is too large to edit' }.to_json
+        return
       end
+
+      stream = @attachment.open
+      render :json => { :body => stream.read }.to_json
      end
   end
   

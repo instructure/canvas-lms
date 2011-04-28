@@ -409,7 +409,49 @@ class Attachment < ActiveRecord::Base
         :thumbnail_class => Thumbnail
     )
   end
-  
+
+  # Returns an IO-like object containing the contents of the attachment file.
+  # Any resources are guaranteed to be cleaned up when the object is garbage
+  # collected (for instance, using the Tempfile class). Calling close on the
+  # object may clean up things faster.
+  #
+  # By default, this method will stream the file as it is read, if it's stored
+  # remotely and streaming is possible.  If opts[:need_local_file] is true,
+  # then a local Tempfile will be created if necessary and the IO object
+  # returned will always respond_to :path and :rewind, and have the right file
+  # extension.
+  #
+  # Be warned! If local storage is used, a File handle to the actual file will
+  # be returned, not a Tempfile handle. So don't rm the file's .path or
+  # anything crazy like that. If you need to test whether you can move the file
+  # at .path, or if you need to copy it, check if the file is_a?(Tempfile) (and
+  # pass :need_local_file => true of course).
+  #
+  # If opts[:temp_folder] is given, and a local temporary file is created, this
+  # path will be used instead of the default system temporary path. It'll be
+  # created if necessary.
+  def open(opts = {})
+    if Attachment.local_storage?
+      File.open(self.full_filename, 'rb')
+    else
+      # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
+      # natively support streaming the response, except when a block is given.
+      # so without Fibers, there's not a great way to return an IO-like object
+      # that streams the response. A separate thread, I guess. Bleck. Need to
+      # investigate other options.
+      if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
+        FileUtils.mkdir_p(opts[:temp_folder])
+      end
+      tempfile = Tempfile.new(["attachment_#{self.id}", self.extension],
+                              opts[:temp_folder].presence || Dir::tmpdir)
+      AWS::S3::S3Object.stream(self.full_filename, self.bucket_name) do |chunk|
+        tempfile.write(chunk)
+      end
+      tempfile.rewind
+      tempfile
+    end
+  end
+
   # you should be able to pass an optional width, height, and page_number/video_seconds to this method
   # can't handle arbitrary thumbnails for our attachment_fu thumbnails on s3 though, we could handle a couple *predefined* sizes though
   def thumbnail_url(options={})

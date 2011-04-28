@@ -108,33 +108,21 @@ class SisBatch < ActiveRecord::Base
   def process_instructure_csv_zip
     require 'sis'
     download_zip
-    importer = SIS::SisCsv.process(self.account, :files => [ @temp_file.path ], :batch => self)
+    importer = SIS::SisCsv.process(self.account, :files => [ @data_file.path ], :batch => self)
     finish importer.finished
   end
 
   def download_zip
-    @temp_file = Tempfile.new("sis_data")
     if self.data[:file_path]
-      @temp_file.write File.read(self.data[:file_path])
-      if self.data[:file_path] =~ /(\.[^\.]*)\z/
-        add_extension($1)
-      end
-    elsif Attachment.local_storage?
-      @temp_file.write File.read(self.attachment.full_filename)
-      add_extension(self.attachment.extension)
+      @data_file = File.open(self.data[:file_path], 'rb')
     else
-      require 'aws/s3'
-      AWS::S3::S3Object.stream(self.attachment.full_filename, self.attachment.bucket_name) do |chunk|
-        @temp_file.write chunk
-      end
-      add_extension(self.attachment.extension)
+      @data_file = self.attachment.open(:need_local_file => true)
     end
-    @temp_file
+    @data_file
   end
 
   def finish(import_finished)
-    @temp_file.close
-    File.delete(@temp_file.path) rescue nil
+    @data_file.close
     if import_finished
       self.workflow_state = :imported
       self.progress = 100
@@ -151,12 +139,4 @@ class SisBatch < ActiveRecord::Base
   def messages?
     (self.processing_errors && self.processing_errors.length > 0) || (self.processing_warnings && self.processing_warnings.length > 0)
   end
-
-  def add_extension(ext)
-    @temp_file.close
-    new_path = @temp_file.path + ext
-      File.rename(@temp_file.path, new_path)
-      @temp_file = File.new(new_path)
-  end
-  
 end

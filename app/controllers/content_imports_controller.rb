@@ -88,16 +88,11 @@ class ContentImportsController < ApplicationController
       
       if request.xhr?
         if @content_migration && @content_migration.overview_attachment
-          if Attachment.local_storage?
-            send_file(@content_migration.overview_attachment.full_filename, :type => @content_migration.overview_attachment.content_type, :disposition => 'attachment')
-          else
-            #The overview.json file is on amazon, proxy it
-            handle = open(@content_migration.overview_attachment.cacheable_s3_url)
-            send_data(handle.read, :type=>:json, :disposition => 'inline')
-          end
+          stream = @content_migration.overview_attachment.open()
+          send_file_or_data(stream, :type => :json, :disposition => 'inline')
         else
           logger.error "There was no overview.json file for this content_migration."
-          render :text => {:success=>false}
+          render :text => {:success=>false}.to_json
         end
       end
     end

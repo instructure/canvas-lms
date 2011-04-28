@@ -16,12 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'open-uri'
+
 class Canvas::Migrator
   include Canvas::MigratorHelper
   SCRAPE_ALL_HASH = { 'course_outline' => true, 'announcements' => true, 'assignments' => true, 'goals' => true, 'rubrics' => true, 'web_links' => true, 'learning_modules' => true, 'calendar_events' => true, 'calendar_start' => nil, 'calendar_end' => nil, 'discussions' => true, 'assessments' => true, 'question_bank' => true, 'all_files' => true, 'groups' => true, 'assignment_groups' => true, 'tasks' => true, 'wikis' => true }
 
   attr_accessor :course, :unzipped_file_path, :extra_settings, :total_error_count
-  attr_reader :base_export_dir, :unzipped_file_path, :manifest, :import_objects, :settings
+  attr_reader :base_export_dir, :manifest, :import_objects, :settings
 
   def initialize(settings, migration_type)
     @settings = settings
@@ -31,13 +33,12 @@ class Canvas::Migrator
     @errors = []
     @course = {:file_map=>{}, :wikis=>[]}.with_indifferent_access
     @course[:name] = @settings[:course_name]
-    
+
     return if settings[:testing]
-    
+
     download_archive
-    @archive_file_path = @settings[:export_archive_path]
-    raise "The #{migration_type} archive zip wasn't at the specified location: #{@archive_file_path}." if @archive_file_path.nil? or !File.exists?(@archive_file_path)
-    @unzipped_file_path = File.join(File.dirname(@archive_file_path), "#{migration_type}_#{File.basename(@archive_file_path, '.zip')}")
+    config = Setting.from_config('external_migration')
+    @unzipped_file_path = Dir.mktmpdir(migration_type.to_s, config[:data_folder].presence)
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
     @course[:export_folder_path] = File.expand_path(@base_export_dir)
     make_export_dir
@@ -47,7 +48,7 @@ class Canvas::Migrator
     raise "Migrator.export should have been overwritten by a sub-class"
   end
 
-  def unzip_archive(do_delete_archive = true)
+  def unzip_archive
     begin
       command = Canvas::MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
       logger.debug "Running unzip command: #{command}"
@@ -63,8 +64,6 @@ class Canvas::Migrator
     rescue => e
       message = "Error unzipping archive file: #{e.message}"
       add_error "qti", message, nil, e
-    ensure
-      delete_archive if do_delete_archive
     end
 
     false
@@ -74,11 +73,6 @@ class Canvas::Migrator
     delete_file(@unzipped_file_path)
   end
 
-  def delete_archive
-    delete_file(@archive_file_path)
-    @archive_file = nil
-  end
-  
   def delete_file(file)
     if File.exists?(file)
       begin
@@ -93,39 +87,31 @@ class Canvas::Migrator
     File.join(@unzipped_file_path, file_name) if file_name
   end
 
+  def move_archive_to(full_path)
+    if @archive_file.is_a?(Tempfile)
+      FileUtils.move(@archive_file.path, full_path)
+    else
+      FileUtils.copy(@archive_file.path, full_path)
+    end
+  end
+
   protected
-  
+
   def download_archive
     config = Setting.from_config('external_migration')
-    if config && config[:data_folder]
-      temp_file = Tempfile.new("migration", config[:data_folder])
-    else
-      temp_file = Tempfile.new("migration")
-    end
     if @settings[:export_archive_path]
-      FileUtils.copy_stream(File.open(@settings[:export_archive_path], 'rb'), temp_file)
-    elsif @settings[:course_archive_download_url] and @settings[:course_archive_download_url] != ""
-      uri = URI(@settings[:course_archive_download_url])
-      Net::HTTP.get_response(uri) do |res|
-        res.read_body do |chunk|
-          temp_file << chunk
-        end
-      end
-    elsif @settings[:attachment_id] && Attachment.local_storage?
+      @archive_file = File.open(@settings[:export_archive_path], 'rb')
+    elsif @settings[:course_archive_download_url].present?
+      # open-uri downloads the http response to a tempfile
+      @archive_file = open(@settings[:course_archive_download_url])
+    elsif @settings[:attachment_id]
       att = Attachment.find(@settings[:attachment_id])
-      FileUtils.copy_stream(File.open(att.full_filename, 'rb'), temp_file)
-    elsif @settings[:attachment_id] && Attachment.s3_storage?
-      att = Attachment.find(@settings[:attachment_id])
-      require 'aws/s3'
-      AWS::S3::S3Object.stream(att.full_filename, att.bucket_name) do |chunk|
-        temp_file.write chunk
-      end
+      @archive_file = att.open(:temp_folder => config[:data_folder],
+                               :need_local_file => true)
     else
       raise "No migration file found"
     end
-    
-    temp_file.close
-    @archive_file = temp_file # so that the tempfile doesn't get gc'd underneath us
-    @settings[:export_archive_path] = temp_file.path
+
+    @archive_file_path = @archive_file.path
   end
 end
