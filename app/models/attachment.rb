@@ -324,6 +324,10 @@ class Attachment < ActiveRecord::Base
     ns = Attachment.domain_namespace
     ns ||= self.context.root_account.file_namespace rescue nil
     ns ||= self.context.account.file_namespace rescue nil
+    if Rails.env.development? && Attachment.local_storage?
+      ns ||= ""
+      ns = "_localstorage_/#{ns}"
+    end
     ns = nil if ns && ns.empty?
     ns
   end
