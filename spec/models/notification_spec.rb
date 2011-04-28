@@ -53,7 +53,7 @@ describe Notification do
       u2 = create_user_with_cc(:name => "user 2")
       u2.communication_channels.create(:path => "user2@example.com")
       @a = Assignment.create
-      messages = @notification.create_message(@a, u1, u2)
+      messages = @notification.create_message(@a, [u1, u2])
       messages.length.should eql(2)
       messages.map(&:to).should be_include('dashboard')
     end

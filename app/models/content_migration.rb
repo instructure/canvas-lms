@@ -85,6 +85,14 @@ class ContentMigration < ActiveRecord::Base
     }
   end
 
+  # the stream item context is decided by calling asset.context(user), i guess
+  # to differentiate from the normal asset.context() call that may not give us
+  # the context we want. in this case, they're one and the same.
+  alias_method :original_context, :context
+  def context(user = nil)
+    self.original_context
+  end
+
   def migration_settings
     read_attribute(:migration_settings) || write_attribute(:migration_settings,{}.with_indifferent_access)
   end
@@ -152,7 +160,24 @@ class ContentMigration < ActiveRecord::Base
       migration_settings['migration_type'].titleize
     end
   end
-  
+
+  # add a non-fatal error/warning to the import. user_message is what will be
+  # displayed to the end user. exception_or_info can be either an Exception
+  # object or any other information on the error.
+  def add_warning(user_message, exception_or_info)
+    migration_settings[:warnings] ||= []
+    if exception_or_info.is_a?(Exception)
+      info = [exception_or_info.to_s, exception_or_info.backtrace]
+    else
+      info = exception_or_info
+    end
+    migration_settings[:warnings] << [user_message, info]
+  end
+
+  def warnings
+    (migration_settings[:warnings] || []).map(&:first)
+  end
+
   def export_content
     plugin = Canvas::Plugin.find(migration_settings['migration_type'])
     if plugin

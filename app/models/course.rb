@@ -1275,8 +1275,7 @@ class Course < ActiveRecord::Base
       # we'll wait synchronously for the media objects to be uploaded, so that
       # we have the media_ids that we need later.
       unless mo_attachments.blank?
-        MediaObject.add_media_files(mo_attachments, true)
-        remove_temporary_import_attachments(mo_attachments)
+        import_media_objects_and_attachments(mo_attachments, migration)
       end
     end
 
@@ -1358,7 +1357,8 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def remove_temporary_import_attachments(mo_attachments)
+  def import_media_objects_and_attachments(mo_attachments, migration)
+    MediaObject.add_media_files(mo_attachments, true)
     # attachments in /media_objects were created on export, soley to
     # download and include a media object in the export. now that they've
     # been sent to kaltura, we can remove them.
@@ -1370,6 +1370,8 @@ class Course < ActiveRecord::Base
     if folder && folder.file_attachments.active.count == 0 && folder.active_sub_folders.count == 0
       folder.destroy
     end
+  rescue Exception => e
+    migration.add_warning("There was an error importing Kaltura media objects. Some or all of your media was not imported.", e)
   end
   
   def backup_to_json

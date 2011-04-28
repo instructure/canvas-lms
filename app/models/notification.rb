@@ -45,7 +45,9 @@ class Notification < ActiveRecord::Base
     "Rubric Association Created", 
     "Assignment Submitted Late", 
     "Group Assignment Submitted Late",
-    "Show In Feed"
+    "Show In Feed",
+    "Migration Import Finished",
+    "Migration Import Failed",
   ].freeze
   
   has_many :messages
