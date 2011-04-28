@@ -823,7 +823,7 @@ class Course < ActiveRecord::Base
     return "unpublished" unless statuses.size > 0
     # to fake a course-level grade publishing status, we look at all possible
     # enrollments, and return statuses if we find any, in this order.
-    ["error", "unpublished", "pending", "publishing", "published"].each do |status|
+    ["error", "unpublished", "pending", "publishing", "published", "unpublishable"].each do |status|
       return status if statuses.has_key?(status)
     end
     return "error"
@@ -842,7 +842,18 @@ class Course < ActiveRecord::Base
                                         :last_publish_attempt_at => last_publish_attempt_at
 
     send_later_if_production(:send_final_grades_to_endpoint, publishing_user)
-    send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if settings[:success_timeout].present? && settings[:wait_for_success]
+    send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if settings[:success_timeout].present? && settings[:wait_for_success] && Rails.env.production?
+  end
+
+  def self.valid_grade_export_types
+    @valid_grade_export_types ||= {
+        "instructure_csv" => {
+            :name => "Instructure formatted CSV",
+            :callback => lambda { |course, enrollments, publishing_pseudonym|
+                course.generate_grade_publishing_csv_output(enrollments, publishing_pseudonym)
+            }
+          }
+      }
   end
 
   def send_final_grades_to_endpoint(publishing_user)
@@ -854,35 +865,46 @@ class Course < ActiveRecord::Base
     raise "endpoint undefined" if settings[:publish_endpoint].nil? || settings[:publish_endpoint].empty?
 
     enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
-    enrollment_ids = []
 
     publishing_pseudonym = publishing_user.pseudonyms.active.find_by_account_id(self.root_account_id, :order => "sis_user_id DESC")
+    
+    errors = []
+    posts_to_make = []
+    ignored_enrollment_ids = []
 
+    if Course.valid_grade_export_types.has_key?(settings[:format_type])
+      callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
+      posts_to_make, ignored_enrollments_ids = callback.call(self, enrollments,
+          publishing_pseudonym)
+    end
+
+    Enrollment.update ignored_enrollment_ids, [{ :grade_publishing_status => "unpublishable" }] * ignored_enrollment_ids.size
+
+    posts_to_make.each do |enrollment_ids, res, mime_type|
+      begin
+        SSLCommon.post_data(settings[:publish_endpoint], res, mime_type)
+        Enrollment.update enrollment_ids, [{ :grade_publishing_status => (settings[:wait_for_success] == "yes" ? "publishing" : "published") }] * enrollment_ids.size
+      rescue => e
+        errors << e
+        Enrollment.update enrollment_ids, [{ :grade_publishing_status => "error" }] * enrollment_ids.size
+      end
+    end
+    
+    raise errors[0] if errors.size > 0
+  end
+  
+  def generate_grade_publishing_csv_output(enrollments, publishing_pseudonym)
+    enrollment_ids = []
     res = FasterCSV.generate do |csv|
-
       csv << ["publisher_id", "publisher_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "grade"]
-
       enrollments.each do |enrollment|
         enrollment_ids << enrollment.id
         enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).each do |user_pseudonym|
           csv << [publishing_pseudonym.try(:id), publishing_pseudonym.try(:sis_user_id), enrollment.course_section.id, enrollment.course_section.sis_source_id, user_pseudonym.id, user_pseudonym.sis_user_id, enrollment.id, enrollment.workflow_state, enrollment.computed_final_grade]
         end
       end
-
     end
-
-    publish_status = "error"
-    error = nil
-    begin
-      SSLCommon.post_data(settings[:publish_endpoint], res, 'text/csv')
-      publish_status = (settings[:wait_for_success] == "yes" ? "publishing" : "published")
-    rescue => e
-      error = e
-    end
-
-    Enrollment.update enrollment_ids, [{ :grade_publishing_status => publish_status }] * enrollment_ids.size
-    
-    raise error unless error.nil?
+    return [[enrollment_ids, res, "text/csv"]], []
   end
 
   def expire_pending_grade_publishing_statuses(last_publish_attempt_at)

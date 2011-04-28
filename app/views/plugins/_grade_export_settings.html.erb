@@ -1,16 +1,20 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td><%= f.label :enabled, "Enabled:" %></td>
-      <td><%= f.check_box :enabled, {}, 'true', 'false' %></td>
+      <td colspan=2><%= f.check_box :enabled, {}, 'true', 'false' %>
+      <%= f.label :enabled, "Enabled:" %></td>
+    </tr>
+    <tr>
+      <td><%= f.label :format_type, "Output format type:" %></td>
+      <td><%= f.select :format_type, Course.valid_grade_export_types.keys.map{|k| [Course.valid_grade_export_types[k][:name], k]}, {} %>
     </tr>
     <tr>
       <td><%= f.label :publish_endpoint, "Endpoint to publish to:" %></td>
       <td><%= f.text_field :publish_endpoint %></td>
     </tr>
     <tr>
-      <td><%= f.label :wait_for_success, "Wait for success notifications:" %></td>
-      <td><%= f.check_box :wait_for_success, {}, 'yes', 'no' %></td>
+      <td colspan=2><%= f.check_box :wait_for_success, {}, 'yes', 'no' %>
+      <%= f.label :wait_for_success, "Wait for success notifications:" %></td>
     </tr>
     <tr>
       <td><%= f.label :success_timeout, "Success notification timeout (in seconds):" %></td>

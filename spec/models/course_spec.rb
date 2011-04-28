@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'socket'
 
 describe Course do
   before(:each) do
@@ -456,6 +457,7 @@ describe Course, "backup" do
     end
   end
 end
+
 def course_to_backup
   @course = course
   group = @course.assignment_groups.create!(:name => "Some Assignment Group")
@@ -465,4 +467,55 @@ def course_to_backup
   topic = @course.discussion_topics.create!(:title => "Some Discussion")
   topic.discussion_entries.create!(:message => "just a test")
   @course
+end
+
+describe Course, 'grade_publishing' do
+  before(:each) do
+    @course = Course.new
+  end
+  
+  after(:each) do
+    Course.valid_grade_export_types.delete("test_export")
+    PluginSetting.settings_for_plugin('grade_export')[:format_type] = "instructure_csv"
+    PluginSetting.settings_for_plugin('grade_export')[:enabled] = "false"
+    PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = ""
+  end
+
+  it 'should pass a quick sanity check' do
+    user = User.new
+    Course.valid_grade_export_types["test_export"] = {
+        :name => "test export",
+        :callback => lambda {|course, enrollments, publishing_pseudonym|
+          course.should == @course
+          publishing_pseudonym.should == nil
+          return [[[], "test-jt-data\r\n\r\n", "application/jtmimetype"]], []
+        }}
+    PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
+    PluginSetting.settings_for_plugin('grade_export')[:format_type] = "test_export"
+    
+    server = TCPServer.open(0)
+    port = server.addr[1]
+    PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{port}/endpoint"
+    post_lines = []
+    server_thread = Thread.new(server, post_lines) { |server, post_lines|
+      client = server.accept
+      loop do
+        line = client.readline
+        post_lines << line.strip unless line =~ /^Host: localhost:/
+        break if line =~ /test-jt-data/
+      end
+      client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
+      client.close
+      server.close
+    }
+    @course.publish_final_grades(user)
+    server_thread.join
+    post_lines.should == [
+        "POST /endpoint HTTP/1.1",
+        "Accept: */*",
+        "Content-Type: application/jtmimetype",
+        "Content-Length: 16",
+        "",
+        "test-jt-data"]
+  end
 end

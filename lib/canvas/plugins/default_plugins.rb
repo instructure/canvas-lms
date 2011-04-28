@@ -62,6 +62,7 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   }
 }
 Canvas::Plugin.register('grade_export', :sis, {
+  :name => "Grade Export",
   :description => 'Grade Export for SIS',
   :website => 'http://www.instructure.com',
   :author => 'Instructure',
@@ -71,5 +72,6 @@ Canvas::Plugin.register('grade_export', :sis, {
   :settings => { :enabled => "false",
                  :publish_endpoint => "",
                  :wait_for_success => "no",
-                 :success_timeout => "600" }
+                 :success_timeout => "600",
+                 :format_type => "instructure_csv" }
 })
