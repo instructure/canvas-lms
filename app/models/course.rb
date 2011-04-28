@@ -856,7 +856,7 @@ class Course < ActiveRecord::Base
     enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
     enrollment_ids = []
 
-    publishing_pseudonym = publishing_user.pseudonyms.active.find_all_by_account_id(self.root_account_id, :order => "sis_source_id DESC").first
+    publishing_pseudonym = publishing_user.pseudonyms.active.find_all_by_account_id(self.root_account_id, :order => "sis_user_id DESC").first
 
     res = FasterCSV.generate do |csv|
 
@@ -865,7 +865,7 @@ class Course < ActiveRecord::Base
       enrollments.each do |enrollment|
         enrollment_ids << enrollment.id
         enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).each do |user_pseudonym|
-          csv << [publishing_pseudonym.try(:id), publishing_pseudonym.try(:sis_source_id), enrollment.course_section.id, enrollment.course_section.sis_source_id, user_pseudonym.id, user_pseudonym.sis_source_id, enrollment.id, enrollment.workflow_state, enrollment.computed_final_grade]
+          csv << [publishing_pseudonym.try(:id), publishing_pseudonym.try(:sis_user_id), enrollment.course_section.id, enrollment.course_section.sis_source_id, user_pseudonym.id, user_pseudonym.sis_user_id, enrollment.id, enrollment.workflow_state, enrollment.computed_final_grade]
         end
       end
 

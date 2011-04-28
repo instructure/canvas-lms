@@ -47,8 +47,14 @@
           </td>
           <% if current_user_is_site_admin? %>
             <td>
+              <% if pseudonym && pseudonym.sis_user_id %>
+                SIS User ID:
+                <%= pseudonym.sis_user_id %>
+              <% end %>
+            </td>
+            <td>
               <% if pseudonym && pseudonym.sis_source_id %>
-                SIS ID:
+                SIS Login ID:
                 <%= pseudonym.sis_source_id %>
               <% end %>
             </td>
