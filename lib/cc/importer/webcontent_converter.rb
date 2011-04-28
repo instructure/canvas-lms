@@ -38,7 +38,9 @@ module CC::Importer
     end
     
     def convert_file_metadata(file_map)
-      doc = open_file_xml File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, FILES_META)
+      path = File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, FILES_META)
+      return unless File.exists? path
+      doc = open_file_xml path
 
       if folders = doc.at_css('folders')
         @course[:hidden_folders] = []
