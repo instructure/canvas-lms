@@ -128,6 +128,9 @@ class ImportedHtmlConverter
       end
     end
     node['href'] = replace_relative_file_url(rel_path, context, course_path)
+    node.delete('class')
+    node.delete('id')
+    node.delete('style')
   end
   
   def self.relative_url?(url)
