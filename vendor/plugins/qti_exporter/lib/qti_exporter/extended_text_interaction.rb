@@ -7,12 +7,12 @@ class ExtendedTextInteraction < AssessmentItemConverter
   end
 
   def parse_question_data
+    process_response_conditions
     if !@short_answer
-      @short_answer = @doc.at_css('setOutcomeValue[identifier=SCORE]') || @doc.at_css('setOutcomeValue[identifier$=SCORE]') || @doc.at_css('setOutcomeValue[identifier^=SCORE]')
+      @short_answer = @question[:answers].present?
     end
     if @short_answer
       @question[:question_type] ||= "short_answer_question"
-      process_response_conditions
       attach_feedback_values(@question[:answers])
     else
       @question[:question_type] ||= "essay_question"
