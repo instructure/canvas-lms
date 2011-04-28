@@ -103,7 +103,7 @@ class Canvas::Migrator
       temp_file = Tempfile.new("migration")
     end
     if @settings[:export_archive_path]
-      temp_file.write File.read(@settings[:export_archive_path])
+      FileUtils.copy_stream(File.open(@settings[:export_archive_path], 'rb'), temp_file)
     elsif @settings[:course_archive_download_url] and @settings[:course_archive_download_url] != ""
       uri = URI(@settings[:course_archive_download_url])
       Net::HTTP.get_response(uri) do |res|
@@ -113,7 +113,7 @@ class Canvas::Migrator
       end
     elsif @settings[:attachment_id] && Attachment.local_storage?
       att = Attachment.find(@settings[:attachment_id])
-      temp_file.write File.read(att.full_filename)
+      FileUtils.copy_stream(File.open(att.full_filename, 'rb'), temp_file)
     elsif @settings[:attachment_id] && Attachment.s3_storage?
       att = Attachment.find(@settings[:attachment_id])
       require 'aws/s3'
