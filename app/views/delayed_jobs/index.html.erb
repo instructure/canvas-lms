@@ -68,7 +68,22 @@
 </table>
 
 <table>
-    <% form_for @current_user, :url => '/delayed_jobs/hold'  do |f| %>
+  <% form_for @current_user, :url => '/delayed_jobs', :html => { :method => :get }  do |f| %>
+    <tr>
+      <td>
+        <input type="text" name="method_name" value="<%= @method_name %>" style="width: 250px;"/>
+        <input type="radio" name="status" value="any" <%= 'checked' if @status.blank? || @status == 'any' %> />any
+        <input type="radio" name="status" value="running" <%= 'checked' if @status == 'running' %> />running
+        <input type="radio" name="status" value="on_hold" <%= 'checked' if @status == 'on_hold' %> />on hold
+        <input type="radio" name="status" value="failed" <%= 'checked' if @status == 'failed' %> />failed
+      </td>
+      <td>
+        <button type="submit" class="button">Search</button>
+      </td>
+      <td>Example: update_associated_content_tags</td>
+    </tr>
+  <% end %>
+  <% form_for @current_user, :url => '/delayed_jobs/hold'  do |f| %>
     <tr>
       <td>
         <input type="text" name="method_name" value="" style="width: 250px;"/>
@@ -76,7 +91,6 @@
       <td>
         <button type="submit" class="button">Hold all with this method name</button>
       </td>
-      <td>Example: update_associated_content_tags</td>
     </tr>
   <% end %>
   <% form_for @current_user, :url => '/delayed_jobs/queue'  do |f| %>

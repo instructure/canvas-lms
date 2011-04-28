@@ -21,9 +21,23 @@ class DelayedJobsController < ApplicationController
   ON_HOLD_COUNT = 50
   POPULAR_TAG_COUNTS = 5
   
+  def add_condition(conditions, condition, *args)
+    conditions ||= [ '' ]
+    conditions[0] << ' AND ' unless conditions[0].empty?
+    conditions[0] << condition
+    conditions + args
+  end
+
   def index
     total_count = Delayed::Job.count
-    @delayed_jobs = Delayed::Job.paginate(:page => params[:page], :per_page => 30, :total_entries => total_count, :order => 'id DESC')
+    @method_name = params[:method_name].strip rescue ""
+    @status = params[:status]
+    conditions = self.add_condition(conditions, 'handler LIKE ?', "%method: :#{@method_name}%") if @method_name != ""
+    conditions = self.add_condition(conditions, "locked_by IS NOT NULL AND locked_by != '' AND locked_by != 'on hold'") if @status == 'running'
+    conditions = self.add_condition(conditions, "locked_by IS NOT NULL AND locked_by = 'on hold'") if @status == 'on_hold'
+    conditions = self.add_condition(conditions, "attempts > 0 AND (locked_by IS NULL OR locked_by='')") if @status == 'failed'
+
+    @delayed_jobs = Delayed::Job.paginate(:page => params[:page], :per_page => 30, :total_entries => total_count, :order => 'id DESC', :conditions => conditions)
     @running_now = Delayed::Job.find(:all, :conditions => "locked_by IS NOT NULL AND locked_by != '' AND locked_by != 'on hold'")
     @counts = {}
     @counts[:healthy_waiting] = Delayed::Job.count(:all, :conditions => "attempts = 0 AND run_at < '#{1.second.from_now.to_s(:db)}' AND (locked_by IS NULL or locked_by = '')")
