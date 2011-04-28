@@ -217,7 +217,7 @@ class Account < ActiveRecord::Base
   
   def fast_all_users(limit=nil)
     @cached_fast_all_users ||= {}
-    @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select => "users.id, name")
+    @cached_fast_all_users[limit] ||= self.all_users(limit).active.order_by_sortable_name.scoped(:select => "users.id, users.name")
   end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)

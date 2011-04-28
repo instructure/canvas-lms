@@ -14,6 +14,21 @@
     <a href="<%= context_url(@context, :context_avatars_url) %>" class="button button-sidebar-wide"><%= image_tag "image_icon.gif", :alt => '' %> Manage Profile Pictures</a>
   </div>
 
+  <% if @enrollment_terms.size > 1 %>
+    <h2>Choose Term</h2>
+    <div class="rs-margin-lr rs-margin-bottom">
+      <label for="enrollment_term">Show users with enrollments in the term:</label><br />
+      <% form_tag({}, :method => :get) do %>
+        <select id="enrollment_term_id" name="enrollment_term_id">
+          <option value=''>--</option>
+          <%= options_from_collection_for_select(@enrollment_terms,
+                                                 :id, :name,
+                                                 params[:enrollment_term_id].to_i) %>
+        </select>
+      <% end %>
+    </div>
+  <% end %>
+
   <%= render :partial => 'shared/accounts_right_side_shared' %>
   <%= render :partial => 'accounts/add_course_or_user', :locals => {:hide_add_course => true} %>
 <% end %>
@@ -36,3 +51,11 @@
 </ul>
 
 <%= will_paginate(@users, :style=>"margin-top: 1em;") %>
+
+<% js_block do %>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('#enrollment_term_id').change(function() { $(this).closest('form').submit(); });
+  });
+</script>
+<% end %>

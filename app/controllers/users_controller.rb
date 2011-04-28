@@ -138,6 +138,8 @@ class UsersController < ApplicationController
       @query = (params[:user] && params[:user][:name]) || params[:query]
       if @context && @context.is_a?(Account) && @query
         @users = @context.users_name_like(@query)
+      elsif params[:enrollment_term_id].present? && @root_account == @context
+        @users = @context.fast_all_users.scoped(:joins => :courses, :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]])
       else
         @users = @context.fast_all_users
       end
@@ -148,6 +150,10 @@ class UsersController < ApplicationController
             redirect_to(named_context_url(@context, :context_user_url, @users.first))
           }
         else
+          @enrollment_terms = []
+          if @root_account == @context
+            @enrollment_terms = @context.enrollment_terms.active
+          end
           format.html
         end
         format.json  {
