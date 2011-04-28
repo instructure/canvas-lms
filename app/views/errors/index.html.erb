@@ -2,10 +2,19 @@
   content_for :page_title, "Error Reports"
   add_crumb "Error Reports"
 %>
+
+<% form_for @current_user, :url => '/error_reports', :html => { :method => :get }  do |f| %>
+  Message contains
+  <input type="text" name="message" value="<%= @message %>" style="width: 250px;"/>
+  <button type="submit" class="button">Search</button>
+<% end %>
+
+<%= will_paginate(@reports) %>
 <% @reports.each do |report| %>
   <div style="margin-bottom: 20px;">
     <h3><%= h(report.message) %></h3>
       <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
+      <%= report.created_at %><br />
       <%= h(report.url) %><br/>
       <% if report.user_id %>
         <%= link_to report.user.try(:name), user_url(report.user_id) %>

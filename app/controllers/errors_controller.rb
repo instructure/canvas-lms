@@ -19,10 +19,16 @@
 class ErrorsController < ApplicationController
   before_filter :require_user, :require_site_admin
   def index
-    @reports = ErrorReport.find(:all, :order => 'created_at DESC', :include => :user, :limit => 25, :offset => params[:start] || 0)
+    total_count = ErrorReport.count
+    conditions = ["message NOT LIKE ?", 'No route matches %']
+    @message = params[:message]
+    conditions = ["message LIKE ?", '%' + @message + '%'] if @message.present?
+    @reports = ErrorReport.paginate(:page => params[:page], :per_page => 25, :total_entries => total_count, :order => 'id DESC',
+      :conditions => conditions)
   end
   def show
-    @reports = [ErrorReport.find(params[:id])]
+    @reports = WillPaginate::Collection.new(1, 1, 1)
+    @reports.replace([ErrorReport.find(params[:id])])
     render :action => 'index'
   end
 end
