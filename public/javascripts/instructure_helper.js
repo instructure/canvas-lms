@@ -377,7 +377,17 @@
       }, options.binary === false);
     });
   };
-  
+
+  $.httpSuccess = function(r) {
+    try {
+      return !r.status && location.protocol == "file:" ||
+        ( r.status >= 200 && r.status < 300 ) || r.status == 304 ||
+        jQuery.browser.safari && r.status == undefined;
+    } catch(e){}
+
+    return false;
+  };
+
   $.sendFormAsBinary = function(options, not_binary) {
     var body = options.body;
     var url = options.url;
