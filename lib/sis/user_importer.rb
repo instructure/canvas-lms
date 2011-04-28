@@ -56,38 +56,48 @@ module SIS
 
         update_progress
 
-        # First we look in the account for a user that already has this login id,
-        # then we check globally for any user with the supplied email address.
-        user = @root_account.find_user_by_unique_id(row['login_id']) ||
-                User.find_by_email(row['email']) ||
-                User.new
+        pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, row['user_id'])
+        pseudo_by_login = Pseudonym.find_by_unique_id_and_account_id(row['login_id'], @root_account.id)
+        pseudo ||= pseudo_by_login || Pseudonym.find_by_unique_id_and_account_id(row['email'], @root_account.id)
+        
+        if pseudo
+          if pseudo.sis_user_id.present? && pseudo.sis_user_id != row['user_id']
+            add_warning(csv, "user #{pseudo.sis_user_id} has already claimed #{row['user_id']}'s requested login information, skipping")
+            @sis.counts[:users] += 1
+            next
+          end
+          if !pseudo_by_login.nil? && pseudo.unique_id != row['login_id']
+            add_warning(csv, "user #{pseudo_by_login.sis_user_id} has already claimed #{row['user_id']}'s requested login information, skipping")
+            @sis.counts[:users] += 1
+            next
+          end
 
-        update_account_association = user.new_record?
+          user = pseudo.user
+          user.name = user.sis_name = "#{row['first_name']} #{row['last_name']}" if user.sis_name && user.sis_name == user.name
+          update_account_association = (pseudo.account_id != @root_account.id)
 
-        # Only update their name if it's a new record or it's an old one and it hasn't
-        # been changed since the last SIS update (meaning, the user hasn't changed it
-        # themselves.)
-        if user.new_record? || (user.sis_name && user.sis_name == user.name)
+        else
+          user = User.new
           user.name = user.sis_name = "#{row['first_name']} #{row['last_name']}"
+          update_account_association = true
         end
 
         if row['status']=~ /active/i
           user.workflow_state = 'registered'
-        elsif  row['status']=~ /deleted/i
+        elsif row['status']=~ /deleted/i
           user.workflow_state = 'deleted'
           enrolls = user.enrollments.find_all_by_root_account_id(@root_account.id).map(&:id)
           Enrollment.update_all({:workflow_state => 'deleted'}, :id => enrolls)
         end
+        
         user.creation_sis_batch_id = @batch.id if @batch
         user.save_without_broadcasting
 
-        pseudo = user.pseudonyms.find_by_unique_id(row['login_id'])
         pseudo ||= Pseudonym.new
         pseudo.user_id = user.id
         pseudo.unique_id = row['login_id']
         pseudo.sis_source_id = row['login_id']
         pseudo.sis_user_id = row['user_id']
-        update_account_association = true if pseudo.account_id != @root_account.id
         pseudo.account_id = @root_account.id
         pseudo.workflow_state = row['status']=~ /active/i ? 'active' : 'deleted'
         pseudo.sis_batch_id = @batch.id if @batch
@@ -99,16 +109,20 @@ module SIS
 
         comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(row['email'], 'active', 'email')
         if !comm and row['status']=~ /active/i
-          comm = CommunicationChannel.new
-          comm.user_id = user.id
-          comm.path = row['email']
-          comm.pseudonym_id = pseudo.id
-          comm.workflow_state = 'active'
-          comm.do_delayed_jobs_immediately = true
-          comm.save_without_broadcasting
+          begin
+            comm = CommunicationChannel.new
+            comm.user_id = user.id
+            comm.path = row['email']
+            comm.pseudonym_id = pseudo.id
+            comm.workflow_state = 'active'
+            comm.do_delayed_jobs_immediately = true
+            comm.save_without_broadcasting
 
-          pseudo.communication_channel_id = comm.id
-          pseudo.save_without_broadcasting
+            pseudo.communication_channel_id = comm.id
+            pseudo.save_without_broadcasting
+          rescue => e
+            add_warning(csv, "Failed adding communication channel #{row['email']} to user #{row['login_id']}")
+          end
         end
         
         user.update_account_associations if update_account_association

@@ -247,7 +247,8 @@ describe SIS::SisCsv do
       errors.should == ['Non-identical duplicate user rows for user_1']
     end
     
-    it "should use a user account even if it already has a user_id" do
+    it "should not allow a secondary user account with the same login id." do
+      p_count = Pseudonym.count
       process_csv_data(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active"
@@ -256,31 +257,126 @@ describe SIS::SisCsv do
       user.pseudonyms.count.should == 1
       user.pseudonyms.find_by_unique_id('user1').sis_user_id.should == 'user_1'
       
-      process_csv_data(
+      importer = process_csv_data(
         "user_id,login_id,first_name,last_name,email,status",
         "user_2,user1,User,Uno,user@example.com,active"
       )
-      user = User.find_by_email('user@example.com')
-      user.pseudonyms.count.should == 1
-      user.pseudonyms.find_by_unique_id('user1').sis_user_id.should == 'user_2'
-    end
-    
-    it "should use a user account even if the login_id changes" do
-      process_csv_data(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user@example.com,active"
-      )
+      importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
       user = User.find_by_email('user@example.com')
       user.pseudonyms.count.should == 1
       user.pseudonyms.find_by_unique_id('user1').sis_user_id.should == 'user_1'
-      
+      Pseudonym.count.should == (p_count + 1)
+    end
+    
+    it "should not allow a secondary user account to change its login id to some other registered login id" do
       process_csv_data(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_2,user2,User,Uno,user@example.com,active"
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,active"
       )
-      user = User.find_by_email('user@example.com')
-      user.pseudonyms.count.should == 2
-      user.pseudonyms.find_by_unique_id('user2').sis_user_id.should == 'user_2'
+      
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_2,user1,User,Dos,user2@example.com,active",
+        "user_1,user3,User,Uno,user1@example.com,active"
+      )
+      importer.warnings.map{|r|r.last}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").unique_id.should == "user3"
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_2").unique_id.should == "user2"
+    end
+    
+    it "should allow a secondary user account to change its login id to some other registered login id if the other changes it first" do
+      process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,active"
+      )
+     
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user3,User,Uno,user1@example.com,active",
+        "user_2,user1,User,Dos,user2@example.com,active"
+      )
+      importer.warnings.should == []
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").unique_id.should == "user3"
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_2").unique_id.should == "user1"
+    end
+    
+    it "should add two users with different user_ids, login_ids, but the same email" do
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active",
+        "user_2,user2,User,Dos,user@example.com,active"
+      )
+      importer.errors.should == []
+      importer.warnings.should == []
+      user1 = Pseudonym.find_by_unique_id('user1').user
+      user2 = Pseudonym.find_by_unique_id('user2').user
+      user1.should_not == user2
+      user1.last_name.should == "Uno"
+      user2.last_name.should == "Dos"
+      user1.pseudonyms.count.should == 1
+      user2.pseudonyms.count.should == 1
+      user1.pseudonyms.first.communication_channel_id.should_not be_nil
+      user2.pseudonyms.first.communication_channel_id.should be_nil
+    end
+    
+    it "should not add a user with the same login id as another user" do
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user1,User,Dos,user2@example.com,active"
+      )
+      importer.errors.should == []
+      importer.warnings.map{|x| x[1]}.should == ["user user_1 has already claimed user_2's requested login information, skipping"]
+      Pseudonym.find_by_unique_id('user1').should_not be_nil
+      Pseudonym.find_by_unique_id('user2').should be_nil
+    end
+    
+    it "should use an existing pseudonym if it wasn't imported from sis and has the same login id" do
+      u = User.create!
+      u.register!
+      p_count = Pseudonym.count
+      p = u.pseudonyms.create!(:unique_id => "user2", :path => "user2", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
+      Pseudonym.find_by_unique_id('user1').should be_nil
+      Pseudonym.find_by_unique_id('user2').should_not be_nil
+      p.sis_user_id.should be_nil
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,active"
+      )
+      p.reload
+      importer.errors.should == []
+      importer.warnings.should == []
+      Pseudonym.find_by_unique_id('user1').should_not be_nil
+      Pseudonym.find_by_unique_id('user2').should_not be_nil
+      Pseudonym.count.should == (p_count + 2)
+      p.sis_user_id.should == "user_2"
+    end
+    
+    it "should use an existing pseudonym if it wasn't imported from sis and has the same email address" do
+      u = User.create!
+      u.register!
+      p_count = Pseudonym.count
+      p = u.pseudonyms.create!(:unique_id => "user2@example.com", :path => "user2@example.com", :password => "validpassword", :password_confirmation => "validpassword", :account => @account)
+      Pseudonym.find_by_unique_id('user1').should be_nil
+      Pseudonym.find_by_unique_id('user2').should be_nil
+      Pseudonym.find_by_unique_id('user2@example.com').should_not be_nil
+      p.sis_user_id.should be_nil
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,active"
+      )
+      p.reload
+      importer.errors.should == []
+      importer.warnings.should == []
+      Pseudonym.find_by_unique_id('user1').should_not be_nil
+      Pseudonym.find_by_unique_id('user2').should_not be_nil
+      Pseudonym.find_by_unique_id('user2@example.com').should be_nil
+      Pseudonym.count.should == (p_count + 2)
+      p.sis_user_id.should == "user_2"
     end
     
   end
