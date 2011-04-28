@@ -40,6 +40,10 @@ function updatePublishingStatus(requestInProgress) {
       setTimeout(checkup, 5000);
     }
     $publish_grades_link.addClass("disabled");
+  } else if (sisPublishStatus == 'unpublished') {
+    $publish_grades_error.hide();
+    $publish_grades_link.html("Publish grades to SIS");
+    $publish_grades_link.removeClass("disabled");
   } else {
     $publish_grades_error.show();
     $publish_grades_link.html("Republish grades to SIS");

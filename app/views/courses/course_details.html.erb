@@ -21,7 +21,7 @@
   observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]} #@context.detailed_enrollments.select{|e| e.type == 'ObserverEnrollment' && e.active_or_pending?}.sort_by{|e| e.user.sortable_name rescue "a" }
   has_multiple_sections = @context.course_sections.active.count > 1
 
-  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled];
+  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true'
 %>
 <% content_for :right_side do %>
 
