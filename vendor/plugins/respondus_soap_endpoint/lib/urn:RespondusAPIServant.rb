@@ -452,6 +452,8 @@ Implemented for: Canvas LMS}]
       :migration_type => 'qti_exporter',
       :apply_respondus_settings_file => (itemType != 'qdb'),
       :skip_import_notification => true,
+      :files_import_allow_rename => true,
+      :files_import_root_path => "imported qti files",
     }
 
     if item

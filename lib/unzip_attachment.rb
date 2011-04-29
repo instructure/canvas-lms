@@ -48,6 +48,8 @@ class UnzipAttachment
     @tick_callback = opts[:callback]
     @valid_paths = opts[:valid_paths]
     @logger ||= opts[:logger]
+    @rename_files = !!opts[:rename_files]
+    @migration_id_map = opts[:migration_id_map] || {}
 
     raise ArgumentError, "Must provide a course." unless self.course and self.course.is_a?(Course)
     raise ArgumentError, "Must provide a filename." unless self.filename
@@ -136,11 +138,14 @@ class UnzipAttachment
         # This is where the attachment actually happens.  See file_in_context.rb
         attachment = nil
         begin
-          attachment = FileInContext.attach(self.course, path, display_name(entry.name), folder, File.split(entry.name).last)
+          attachment = FileInContext.attach(self.course, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
         rescue
-          attachment = FileInContext.attach(self.course, path, display_name(entry.name), folder, File.split(entry.name).last)
+          attachment = FileInContext.attach(self.course, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
         end
         id_positions[attachment.id] = path_positions[entry.name]
+        if migration_id = @migration_id_map[entry.name]
+          attachment.update_attribute(:migration_id, migration_id)
+        end
         @attachments << attachment if attachment
       rescue => e
         @logger.warn "Couldn't unzip archived file #{path}: #{e.message}" if @logger

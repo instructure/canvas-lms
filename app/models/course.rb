@@ -1225,7 +1225,7 @@ class Course < ActiveRecord::Base
     params = migration.migration_settings[:migration_ids_to_import]
     valid_paths = []
     (data['file_map'] || {}).each do |id, file|
-      if !migration.context.attachments.detect { |f| f.migration_id == file['migration_id'] }
+      if !migration.context.attachments.detect { |f| f.migration_id == file['migration_id'] } || migration.migration_settings[:files_import_allow_rename]
         path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
         self.attachment_path_id_lookup[path] = file['migration_id']
         if params[:copy][:files]
@@ -1248,7 +1248,20 @@ class Course < ActiveRecord::Base
           migration.fast_update_progress((current.to_f/total) * 20.0)
         end
       end
-      unzipper = UnzipAttachment.new(:course => migration.context, :filename => data['all_files_export']['file_path'], :valid_paths => valid_paths, :callback => callback, :logger => logger)
+      unzip_opts = {
+        :course => migration.context,
+        :filename => data['all_files_export']['file_path'],
+        :valid_paths => valid_paths,
+        :callback => callback,
+        :logger => logger,
+        :rename_files => migration.migration_settings[:files_import_allow_rename],
+        :migration_id_map => self.attachment_path_id_lookup,
+      }
+      if root_path = migration.migration_settings[:files_import_root_path]
+        unzip_opts[:root_directory] = Folder.assert_path(
+          root_path, migration.context)
+      end
+      unzipper = UnzipAttachment.new(unzip_opts)
       migration.fast_update_progress(1.0)
       unzipper.process
     end

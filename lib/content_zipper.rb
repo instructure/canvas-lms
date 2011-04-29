@@ -304,17 +304,7 @@ class ContentZipper
     # we allow duplicate filenames in the same folder. it's a bit silly, but we
     # have to handle it here or people might not get all their files zipped up.
     @files_in_zip ||= Set.new
-    if @files_in_zip.include?(filename)
-      dir = File.dirname(filename)
-      dir = dir == "." ? "" : "#{dir}/"
-      extname = File.extname(filename)
-      basename = File.basename(filename, extname)
-      addition = 1
-      while @files_in_zip.include?(new_name = "#{dir}#{basename}-#{addition}#{extname}")
-        addition += 1
-      end
-      filename = new_name
-    end
+    filename = Attachment.make_unique_filename(filename, @files_in_zip)
     @files_in_zip << filename
 
     if Attachment.s3_storage?

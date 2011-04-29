@@ -982,4 +982,28 @@ class Attachment < ActiveRecord::Base
       attachment.resubmit_to_scribd!
     end
   end
+
+  # returns filename, if it's already unique, or returns a modified version of
+  # filename that makes it unique. you can either pass existing_files as string
+  # filenames, in which case it'll test against those, or a block that'll be
+  # called repeatedly with a filename until it returns true.
+  def self.make_unique_filename(filename, existing_files = [], &block)
+    unless block
+      block = proc { |fname| !existing_files.include?(fname) }
+    end
+
+    return filename if block.call(filename)
+
+    new_name = filename
+    addition = 1
+    dir = File.dirname(filename)
+    dir = dir == "." ? "" : "#{dir}/"
+    extname = File.extname(filename)
+    basename = File.basename(filename, extname)
+
+    until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
+      addition += 1
+    end
+    new_name
+  end
 end

@@ -39,18 +39,21 @@ class FileInContext
       end
     end
     
-    def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil)
+    def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil, allow_rename = false)
       display_name ||= File.split(filename).last
       uploaded_data = ActionController::TestUploadedFile.new(filename, Attachment.mimetype(filename))
 
-      # This code will delete any file in the folder that had the same name...
-      context.attachments.active.find_all_by_folder_id(folder.id).select{|a| a.filename == explicit_filename }.each{|a| destroy_file(a) } if folder && explicit_filename
+      if folder && allow_rename
+        # find a unique filename in the folder by appending numbers to the end
+        # total race condition here, by the way
+        atts = context.attachments.active.find_all_by_folder_id(folder.id)
+        explicit_filename = Attachment.make_unique_filename(explicit_filename) { |fname| !atts.any? { |a| a.filename == fname } }
+        display_name = Attachment.make_unique_filename(display_name) { |fname| !atts.any? { |a| a.display_name == fname } }
+      elsif folder && explicit_filename
+        # This code will delete any file in the folder that had the same name...
+        context.attachments.active.find_all_by_folder_id(folder.id).select{|a| a.filename == explicit_filename }.each{|a| destroy_file(a) }
+      end
 
-      # _and_display_name(
-        # folder.id,
-        # display_name
-      # ).try(:destroy) if folder && folder.id && display_name
-      
       @attachment = context.attachments.build(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
       @attachment.write_attribute(:filename, explicit_filename) if explicit_filename
       @attachment.context = context
