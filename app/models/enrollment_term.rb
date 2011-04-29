@@ -24,6 +24,7 @@ class EnrollmentTerm < ActiveRecord::Base
   belongs_to :root_account, :class_name => 'Account'
   has_many :enrollment_dates_overrides
   has_many :courses
+  has_many :course_sections
   validates_length_of :sis_data, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   
   def set_overrides(context, params)
@@ -38,6 +39,15 @@ class EnrollmentTerm < ActiveRecord::Base
       override.save
       override
     end
+  end
+  
+  def users_count
+    Enrollment.active.count(
+      :select => "enrollments.user_id", 
+      :distinct => true,
+      :joins => :course_section,
+      :conditions => ['enrollments.course_section_id = course_sections.id AND course_sections.enrollment_term_id = ?', id]
+    )
   end
   
   workflow do

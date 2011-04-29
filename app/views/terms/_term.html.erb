@@ -5,7 +5,8 @@
       <span class="name"><%= term.name rescue nbsp %></span>
     </div>
     <div class="show_term" style="font-size: 0.8em;">
-      <%= pluralize(term.courses.count, "Course") rescue nil %>
+      <%= term && pluralize(term.courses.active.count, "Course") %><br/>
+      <%= term && pluralize(term.users_count, "User") %>
     </div>
     <% form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
       <div class="edit_term">
