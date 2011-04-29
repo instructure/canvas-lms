@@ -40,7 +40,7 @@ module SIS
         user_ids[user_id] = true
         add_error(csv, "No user_id given for a user") if row['user_id'].blank?
         add_error(csv, "No login_id given for user #{user_id}") if row['login_id'].blank?
-        add_error(csv, "No email given for user #{user_id}") if row['email'].blank?
+#        add_error(csv, "No email given for user #{user_id}") if row['email'].blank?
         add_error(csv, "Improper status for user #{user_id}") unless row['status'] =~ /active|deleted/i
       end
     end
@@ -58,7 +58,8 @@ module SIS
 
         pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, row['user_id'])
         pseudo_by_login = Pseudonym.find_by_unique_id_and_account_id(row['login_id'], @root_account.id)
-        pseudo ||= pseudo_by_login || Pseudonym.find_by_unique_id_and_account_id(row['email'], @root_account.id)
+        pseudo ||= pseudo_by_login
+        pseudo ||= Pseudonym.find_by_unique_id_and_account_id(row['email'], @root_account.id) if row['email'].present?
         
         if pseudo
           if pseudo.sis_user_id.present? && pseudo.sis_user_id != row['user_id']
@@ -107,21 +108,23 @@ module SIS
         end
         pseudo.save_without_broadcasting
 
-        comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(row['email'], 'active', 'email')
-        if !comm and row['status']=~ /active/i
-          begin
-            comm = CommunicationChannel.new
-            comm.user_id = user.id
-            comm.path = row['email']
-            comm.pseudonym_id = pseudo.id
-            comm.workflow_state = 'active'
-            comm.do_delayed_jobs_immediately = true
-            comm.save_without_broadcasting
+        if row['email'].present?
+          comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(row['email'], 'active', 'email')
+          if !comm and row['status']=~ /active/i
+            begin
+              comm = CommunicationChannel.new
+              comm.user_id = user.id
+              comm.path = row['email']
+              comm.pseudonym_id = pseudo.id
+              comm.workflow_state = 'active'
+              comm.do_delayed_jobs_immediately = true
+              comm.save_without_broadcasting
 
-            pseudo.communication_channel_id = comm.id
-            pseudo.save_without_broadcasting
-          rescue => e
-            add_warning(csv, "Failed adding communication channel #{row['email']} to user #{row['login_id']}")
+              pseudo.communication_channel_id = comm.id
+              pseudo.save_without_broadcasting
+            rescue => e
+              add_warning(csv, "Failed adding communication channel #{row['email']} to user #{row['login_id']}")
+            end
           end
         end
         
