@@ -19,11 +19,10 @@
 class ErrorsController < ApplicationController
   before_filter :require_user, :require_site_admin
   def index
-    total_count = ErrorReport.count
     conditions = ["message NOT LIKE ?", 'No route matches %']
     @message = params[:message]
     conditions = ["message LIKE ?", '%' + @message + '%'] if @message.present?
-    @reports = ErrorReport.paginate(:page => params[:page], :per_page => 25, :total_entries => total_count, :order => 'id DESC',
+    @reports = ErrorReport.paginate(:page => params[:page], :per_page => 25, :order => 'id DESC',
       :conditions => conditions)
   end
   def show
