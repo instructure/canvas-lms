@@ -107,7 +107,7 @@ module AngelExpected
                   :points_possible=>1,
                   :answers=>[],
                   :question_name=>"",
-                  :question_type=>"short_answer_question",
+                  :question_type=>"essay_question",
                   :migration_id=>"f6129250-3baf-4128-8c81-efc5d495eef1",
                   :question_text=>
                           "Explain what happens when a course meets expectations and when a course does not meet expectations."}
