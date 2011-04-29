@@ -76,7 +76,7 @@
       <%- cache([@current_user, 'home-menu']) do -%>
       <li class="menu-item">
         <%# if any of these have anything in them, then we should show a dropdown on the 'home' menu item  %>
-        <%- if [ @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid_course_id]),
+        <%- if [ @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]),
                 @current_user.accounts,
                 @current_user.cached_current_group_memberships,
                 @current_user.enrollments.ended ].any?{ |e| e.respond_to?(:count) && e.count > 0 }  -%>
@@ -89,7 +89,7 @@
               <% 
                 max_to_show = 8 # Need to keep this low for users with limited screen real estate
                 coalesced_enrollments = []
-                @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid_course_id]).each do |e|
+                @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).each do |e|
                   coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] } if !e.course
                   existing_enrollment_info = coalesced_enrollments.find { |en|
                     # coalesce together enrollments for the same course and the same state
