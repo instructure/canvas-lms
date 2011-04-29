@@ -452,7 +452,9 @@
       setTimeout(function() {
         var recordVars = {
           host:INST.kalturaSettings.domain,
+          rtmpHost:"rtmp://" + INST.kalturaSettings.domain,
           kshowId:"-1",
+          autopreview:false,
           pid:INST.kalturaSettings.partner_id,
           subpid:INST.kalturaSettings.subpartner_id,
           uid:$dialog.data('uid') || "ANONYMOUS",
