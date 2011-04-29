@@ -504,7 +504,7 @@ class WikiPage < ActiveRecord::Base
       return nil if topic_count == 0
     elsif hash[:title] and hash[:text]
       #it's an actual wiki page
-      item.title = hash[:title]
+      item.title = hash[:title].presence || item.url.presence || "unnamed page"
       item.body = ImportedHtmlConverter.convert(hash[:text] || "", context)
     else
       allow_save = false
