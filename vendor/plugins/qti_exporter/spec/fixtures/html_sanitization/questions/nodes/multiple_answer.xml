@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _153009_1
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Multiple Answer
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 10.0
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: minnumber attribute no no longer supported on render_*
+Warning: flow_label is no longer supported in version 2, ignoring
+Warning: replacing bad NMTOKEN "21c52601c6b545b39aab43c56749c2eb" with "RESPONSE_21c52601c6b545b39aab43c56749c2eb"
+Warning: replacing bad NMTOKEN "2095979784cd45c9bcec8d303225ae16" with "RESPONSE_2095979784cd45c9bcec8d303225ae16"
+Warning: replacing bad NMTOKEN "08f1bd768b044f47881067ab7fcabac6" with "RESPONSE_08f1bd768b044f47881067ab7fcabac6"
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "correct"
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+	-->
+
+<assessmentItem
+        xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+        identifier="_153009_1"
+        title=""
+        adaptive="false"
+        timeDependent="false">
+  <instructureMetadata>
+    <instructureField name="max_score" value="10.0"/>
+    <instructureField name="bb_question_type" value="Multiple Answer"/>
+  </instructureMetadata>
+  <responseDeclaration identifier="response" cardinality="multiple"
+                       baseType="identifier"/>
+  <outcomeDeclaration identifier="FEEDBACK" cardinality="multiple"
+                      baseType="identifier"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0.0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <itemBody>
+    <div class="QUESTION_BLOCK">
+      <p class="FORMATTED_TEXT_BLOCK">The answers are house and garage.</p>
+    </div>
+    <div class="RESPONSE_BLOCK">
+      <choiceInteraction responseIdentifier="response" shuffle="false"
+                         maxChoices="1">
+        <simpleChoice identifier="RESPONSE_21c52601c6b545b39aab43c56749c2eb"
+                      fixed="true">
+          <p class="FORMATTED_TEXT_BLOCK"><b>house</b>
+          
+          
+          
+          
+          
+          
+          
+          
+          </p>
+        </simpleChoice>
+        <simpleChoice identifier="RESPONSE_2095979784cd45c9bcec8d303225ae16"
+                      fixed="true">
+          <p class="FORMATTED_TEXT_BLOCK"><script>garage</script></p>
+        </simpleChoice>
+        <simpleChoice identifier="RESPONSE_08f1bd768b044f47881067ab7fcabac6"
+                      fixed="true">
+          <p class="FORMATTED_TEXT_BLOCK">barn</p>
+        </simpleChoice>
+        <simpleChoice identifier="dc9f2f878ce64fddbe762721e26fa11c"
+                      fixed="true">
+          <p class="FORMATTED_TEXT_BLOCK">pond</p>
+        </simpleChoice>
+      </choiceInteraction>
+    </div>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf>
+        <and>
+          <member>
+            <baseValue baseType="identifier">
+              RESPONSE_21c52601c6b545b39aab43c56749c2eb
+            </baseValue>
+            <variable identifier="response"/>
+          </member>
+          <member>
+            <baseValue baseType="identifier">
+              RESPONSE_2095979784cd45c9bcec8d303225ae16
+            </baseValue>
+            <variable identifier="response"/>
+          </member>
+          <not>
+            <member>
+              <baseValue baseType="identifier">
+                RESPONSE_08f1bd768b044f47881067ab7fcabac6
+              </baseValue>
+              <variable identifier="response"/>
+            </member>
+          </not>
+          <not>
+            <member>
+              <baseValue baseType="identifier">
+                dc9f2f878ce64fddbe762721e26fa11c
+              </baseValue>
+              <variable identifier="response"/>
+            </member>
+          </not>
+        </and>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">SCORE.max</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">correct</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+      <responseElseIf>
+        <baseValue baseType="boolean">true</baseValue>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">0.0</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">incorrect</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseElseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <gt>
+          <variable identifier="SCORE"/>
+          <baseValue baseType="float">10.0</baseValue>
+        </gt>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">10.0</baseValue>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="correct">
+    <div class="flow_1">
+      <p class="FORMATTED_TEXT_BLOCK">right</p>
+    </div>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="incorrect">
+    <div class="flow_1">
+      <p class="FORMATTED_TEXT_BLOCK">wrong</p>
+    </div>
+  </modalFeedback>
+</assessmentItem>

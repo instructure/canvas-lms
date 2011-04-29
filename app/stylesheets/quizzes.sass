@@ -303,6 +303,13 @@ fieldset.question, fieldset.display_question
             :background-repeat no-repeat
             :background-image url(/images/comment_top.png)
 
+        .answer_input
+          :vertical-align top
+        .answer_label
+          :padding-left 0.5em
+        .answer_label > label > *:first-child, .answer_label > label + *
+          :margin-top 0
+
         &.unspecified_answer
           .answer_comment_holder
             :border-color #abd

@@ -58,12 +58,12 @@ class AssessmentItemConverter
       # The colons are replaced with dashes in the conversion from QTI 1.2
       @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier').gsub(/:/, '-')
       if text = @doc.at_css('itemBody div.html')
-        @question[:question_text] = Nokogiri::HTML::DocumentFragment.parse(text.text).inner_html.strip
+        @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text)).inner_html.strip
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
-        @question[:question_text] = text.inner_html
+        @question[:question_text] = sanitize_html!(text).inner_html.strip
       elsif @doc.at_css('itemBody')
         if text = @doc.at_css('itemBody').children.find{|c|c.text.strip != ''}
-          @question[:question_text] = text.text.strip
+          @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text)).inner_html.strip
         end
       end
       parse_instructure_metadata
@@ -172,12 +172,13 @@ class AssessmentItemConverter
     text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
   end
 
-  def sanitize_html!(node)
+  def sanitize_html!(node, remove_extraneous_nodes=false)
     # root may not be an html element, so we just sanitize its children so we
     # don't blow away the whole thing
     node.children.each do |child|
-      Sanitize.clean_node!(child, Sanitize::Config::RELAXED)
+      Sanitize.clean_node!(child, Instructure::SanitizeField::SANITIZE)
     end
+    return node unless remove_extraneous_nodes
 
     while true
       node.children.each do |child|
@@ -189,7 +190,7 @@ class AssessmentItemConverter
         break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
         child.remove
       end
-      break unless node.children.size == 1 && node.child.element?
+      break unless node.children.size == 1 && ['p', 'div', 'span'].include?(node.child.name)
       node = node.child
     end
     node

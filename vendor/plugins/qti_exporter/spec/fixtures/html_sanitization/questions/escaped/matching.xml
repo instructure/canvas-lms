@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qmd_itemtype now replaced by qtiMetadata.interactionType in manifest
+Warning: qtimetadata vocabulary is ignored
+Unmapped metadata field: respondusapi_qtype=matchingComplex
+Converting proprietary Blackboard metadata field respondusapi_qpoints = 1.00
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1083_RL Resp Condition 1"
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1083_RL Resp Condition 2"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1083_RL Resp Condition 3"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1083_RL Resp Condition 4"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1083_RL Resp Condition 5"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1089_RL Resp Condition 1"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1089_RL Resp Condition 2"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1089_RL Resp Condition 3"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1089_RL Resp Condition 4"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1089_RL Resp Condition 5"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1090_RL Resp Condition 1"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1090_RL Resp Condition 2"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1090_RL Resp Condition 3"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1090_RL Resp Condition 4"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1090_RL Resp Condition 5"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1091_RL Resp Condition 1"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1091_RL Resp Condition 2"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1091_RL Resp Condition 3"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1091_RL Resp Condition 4"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1091_RL Resp Condition 5"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1092_RL Resp Condition 1"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1092_RL Resp Condition 2"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1092_RL Resp Condition 3"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1092_RL Resp Condition 4"
+Warning: titles on respconditions no longer supported, ignored "Matching QUE_1092_RL Resp Condition 5"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="QUE_1082"
+ title="Matching"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="max_score" value="1.00" />
+<instructureField name="question_type" value="Matching" />
+</instructureMetadata>
+<responseDeclaration identifier="QUE_1083_RL" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="QUE_1089_RL" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="QUE_1090_RL" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="QUE_1091_RL" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="QUE_1092_RL" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="QUE_SCORE" cardinality="single" baseType="float">
+<defaultValue><value>0</value></defaultValue></outcomeDeclaration>
+<outcomeDeclaration identifier="RESPONDUS_CORRECT" cardinality="single" baseType="integer">
+<defaultValue><value>0</value></defaultValue></outcomeDeclaration>
+<outcomeDeclaration identifier="RESPONDUS_INCORRECT" cardinality="single" baseType="integer">
+<defaultValue><value>0</value></defaultValue></outcomeDeclaration>
+<itemBody>
+<div class="html">The Matching question type requires students to match items from two columns or lists.&lt;br&gt;
+&lt;b&gt;&amp;nbsp;&lt;/b&gt;&lt;br&gt;
+&lt;b&gt;Question:&lt;/b&gt; Select the country in which the following cities are located. &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; </div>
+<choiceInteraction responseIdentifier="QUE_1083_RL" shuffle="true" maxChoices="1">
+<prompt><div class="html">&lt;i&gt;London&lt;/i&gt;</div></prompt>
+<simpleChoice identifier="QUE_1084_A1" fixed="true">
+<div class="html">Great Britain</div></simpleChoice>
+<simpleChoice identifier="QUE_1085_A2" fixed="true">
+<div class="html">France</div></simpleChoice>
+<simpleChoice identifier="QUE_1086_A3" fixed="true">
+<div class="html">United States</div></simpleChoice>
+<simpleChoice identifier="QUE_1087_A4" fixed="true">
+<div class="html">Canada</div></simpleChoice>
+<simpleChoice identifier="QUE_1088_A5" fixed="true">
+<div class="html">Australia</div></simpleChoice>
+</choiceInteraction>
+<choiceInteraction responseIdentifier="QUE_1089_RL" shuffle="true" maxChoices="1">
+<prompt><div class="html">&lt;b&gt;Paris</div></prompt>
+<simpleChoice identifier="QUE_1084_A1" fixed="true">
+<div class="html">Great Britain</div></simpleChoice>
+<simpleChoice identifier="QUE_1085_A2" fixed="true">
+<div class="html">France</div></simpleChoice>
+<simpleChoice identifier="QUE_1086_A3" fixed="true">
+<div class="html">United States</div></simpleChoice>
+<simpleChoice identifier="QUE_1087_A4" fixed="true">
+<div class="html">Canada</div></simpleChoice>
+<simpleChoice identifier="QUE_1088_A5" fixed="true">
+<div class="html">Australia</div></simpleChoice>
+</choiceInteraction>
+<choiceInteraction responseIdentifier="QUE_1090_RL" shuffle="true" maxChoices="1">
+<prompt><div class="html">&lt;script&gt;New York&lt;/script&gt;</div></prompt>
+<simpleChoice identifier="QUE_1084_A1" fixed="true">
+<div class="html">Great Britain</div></simpleChoice>
+<simpleChoice identifier="QUE_1085_A2" fixed="true">
+<div class="html">France</div></simpleChoice>
+<simpleChoice identifier="QUE_1086_A3" fixed="true">
+<div class="html">United States</div></simpleChoice>
+<simpleChoice identifier="QUE_1087_A4" fixed="true">
+<div class="html">Canada</div></simpleChoice>
+<simpleChoice identifier="QUE_1088_A5" fixed="true">
+<div class="html">Australia</div></simpleChoice>
+</choiceInteraction>
+<choiceInteraction responseIdentifier="QUE_1091_RL" shuffle="true" maxChoices="1">
+<prompt><div class="html">Toronto</div></prompt>
+<simpleChoice identifier="QUE_1084_A1" fixed="true">
+<div class="html">Great Britain</div></simpleChoice>
+<simpleChoice identifier="QUE_1085_A2" fixed="true">
+<div class="html">France</div></simpleChoice>
+<simpleChoice identifier="QUE_1086_A3" fixed="true">
+<div class="html">United States</div></simpleChoice>
+<simpleChoice identifier="QUE_1087_A4" fixed="true">
+<div class="html">Canada</div></simpleChoice>
+<simpleChoice identifier="QUE_1088_A5" fixed="true">
+<div class="html">Australia</div></simpleChoice>
+</choiceInteraction>
+<choiceInteraction responseIdentifier="QUE_1092_RL" shuffle="true" maxChoices="1">
+<prompt><div class="html">Sydney</div></prompt>
+<simpleChoice identifier="QUE_1084_A1" fixed="true">
+<div class="html">Great Britain</div></simpleChoice>
+<simpleChoice identifier="QUE_1085_A2" fixed="true">
+<div class="html">France</div></simpleChoice>
+<simpleChoice identifier="QUE_1086_A3" fixed="true">
+<div class="html">United States</div></simpleChoice>
+<simpleChoice identifier="QUE_1087_A4" fixed="true">
+<div class="html">Canada</div></simpleChoice>
+<simpleChoice identifier="QUE_1088_A5" fixed="true">
+<div class="html">Australia</div></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="QUE_1083_RL"/><baseValue baseType="identifier">QUE_1084_A1</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_CORRECT"><sum><variable identifier="RESPONDUS_CORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="QUE_1083_RL"/><baseValue baseType="identifier">QUE_1085_A2</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1083_RL"/><baseValue baseType="identifier">QUE_1086_A3</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1083_RL"/><baseValue baseType="identifier">QUE_1087_A4</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1083_RL"/><baseValue baseType="identifier">QUE_1088_A5</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1089_RL"/><baseValue baseType="identifier">QUE_1084_A1</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1089_RL"/><baseValue baseType="identifier">QUE_1085_A2</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_CORRECT"><sum><variable identifier="RESPONDUS_CORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1089_RL"/><baseValue baseType="identifier">QUE_1086_A3</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1089_RL"/><baseValue baseType="identifier">QUE_1087_A4</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1089_RL"/><baseValue baseType="identifier">QUE_1088_A5</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1090_RL"/><baseValue baseType="identifier">QUE_1084_A1</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1090_RL"/><baseValue baseType="identifier">QUE_1085_A2</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1090_RL"/><baseValue baseType="identifier">QUE_1086_A3</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_CORRECT"><sum><variable identifier="RESPONDUS_CORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1090_RL"/><baseValue baseType="identifier">QUE_1087_A4</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1090_RL"/><baseValue baseType="identifier">QUE_1088_A5</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1091_RL"/><baseValue baseType="identifier">QUE_1084_A1</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1091_RL"/><baseValue baseType="identifier">QUE_1085_A2</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1091_RL"/><baseValue baseType="identifier">QUE_1086_A3</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1091_RL"/><baseValue baseType="identifier">QUE_1087_A4</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_CORRECT"><sum><variable identifier="RESPONDUS_CORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1091_RL"/><baseValue baseType="identifier">QUE_1088_A5</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1092_RL"/><baseValue baseType="identifier">QUE_1084_A1</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1092_RL"/><baseValue baseType="identifier">QUE_1085_A2</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1092_RL"/><baseValue baseType="identifier">QUE_1086_A3</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1092_RL"/><baseValue baseType="identifier">QUE_1087_A4</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><sum><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1092_RL"/><baseValue baseType="identifier">QUE_1088_A5</baseValue></match>
+<setOutcomeValue identifier="RESPONDUS_CORRECT"><sum><variable identifier="RESPONDUS_CORRECT"/><baseValue baseType="integer">1</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><and><baseValue baseType="boolean">true</baseValue><not><baseValue baseType="boolean">true</baseValue></not></and>
+<setOutcomeValue identifier="QUE_SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="QUE_SCORE"><sum><variable identifier="QUE_SCORE"/><baseValue baseType="float">Respondus_Correct</baseValue></sum></setOutcomeValue>
+<setOutcomeValue identifier="QUE_SCORE"><divide><variable identifier="QUE_SCORE"/><baseValue baseType="float">5</baseValue></divide></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="RESPONDUS_INCORRECT"/><baseValue baseType="integer">5</baseValue></gt>
+<setOutcomeValue identifier="RESPONDUS_INCORRECT"><baseValue baseType="integer">5</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="RESPONDUS_CORRECT"/><baseValue baseType="integer">5</baseValue></gt>
+<setOutcomeValue identifier="RESPONDUS_CORRECT"><baseValue baseType="integer">5</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="QUE_SCORE"/><baseValue baseType="float">100.0</baseValue></gt>
+<setOutcomeValue identifier="QUE_SCORE"><baseValue baseType="float">100.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+</assessmentItem>

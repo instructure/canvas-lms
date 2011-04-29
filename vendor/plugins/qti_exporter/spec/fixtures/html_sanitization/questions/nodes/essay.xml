@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _153002_1
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Essay
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 23.0
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: prompt style on render_fib no longer supported, converted to style class
+Warning: minimum response no longer supported, ignoring minnumber="0"
+Warning: maxchars on render_fib no longer strictly enforced.
+Warning: charset attribute no longer supported: ignored charset="us-ascii"
+Warning: converting rows x columns to expectedLength only
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "correct"
+Warning: empty condition replaced with null operator
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Warning: solution material is being replaced by div with class="solution"
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="_153002_1"
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="max_score" value="23.0" />
+<instructureField name="bb_question_type" value="Essay" />
+</instructureMetadata>
+<responseDeclaration identifier="response" cardinality="single" baseType="string"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+<defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
+<itemBody>
+<div class="QUESTION_BLOCK">
+<p class="FORMATTED_TEXT_BLOCK">Who likes to use Blackboard? <script>alert('not me')</script></p></div>
+<div class="RESPONSE_BLOCK">
+<extendedTextInteraction responseIdentifier="response" class="Box" expectedLength="1016"/></div>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><null/>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">SCORE.max</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0.0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">23.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">23.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK"></p></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK"></p></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="solution">
+<div class="solution">
+<p>Nobody.</p></div></modalFeedback>
+</assessmentItem>

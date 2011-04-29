@@ -188,7 +188,8 @@ class AssessmentQuestion < ActiveRecord::Base
     question[:neutral_comments] = check_length(qdata[:neutral_comments], 'neutral comments', 5.kilobyte)
     question[:question_type] = qdata[:question_type] || previous_data[:question_type] || "text_only_question"
     question[:question_name] = qdata[:question_name] || qdata[:name] || previous_data[:question_name] || "Question"
-    question[:question_name] = "Question" if question[:question_name].blank?
+    question[:question_name] = "Question" if question[:question_name].strip.blank?
+    question[:name] = question[:question_name]
     question[:question_text] = sanitize(check_length(qdata[:question_text] || previous_data[:question_text] || "Question text", 'question text'))
     min_size = 1.kilobyte
     question[:answers] = []
@@ -200,7 +201,7 @@ class AssessmentQuestion < ActiveRecord::Base
       answers.each do |key, answer|
         found_correct = true if answer[:answer_weight].to_i == 100
         a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
-        a[:html] = answer[:answer_html] if answer[:answer_html].present?
+        a[:html] = sanitize(answer[:answer_html]) if answer[:answer_html].present?
         question[:answers] << a
       end
       question[:answers][0][:weight] = 100 unless found_correct
@@ -236,7 +237,7 @@ class AssessmentQuestion < ActiveRecord::Base
     elsif question[:question_type] == "matching_question"
       answers.each do |key, answer|
         a = {:text => check_length(answer[:answer_match_left], 'answer match', min_size), :left => check_length(answer[:answer_match_left], 'answer match', min_size), :right => check_length(answer[:answer_match_right], 'answer match', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size)}
-        a[:left_html] = a[:html] = answer[:answer_match_left_html] if answer[:answer_match_left_html].present?
+        a[:left_html] = a[:html] = sanitize(answer[:answer_match_left_html]) if answer[:answer_match_left_html].present?
         a[:match_id] = unique_local_id(answer[:match_id].to_i)
         a[:id] = unique_local_id(answer[:id].to_i)
         question[:answers] << a
@@ -333,7 +334,7 @@ class AssessmentQuestion < ActiveRecord::Base
       answers.each do |key, answer|
         found_correct = true if answer[:answer_weight].to_i == 100
         a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
-        a[:html] = answer[:answer_html] if answer[:answer_html].present?
+        a[:html] = sanitize(answer[:answer_html]) if answer[:answer_html].present?
         question[:answers] << a
       end
       question[:answers][0][:weight] = 100 unless found_correct

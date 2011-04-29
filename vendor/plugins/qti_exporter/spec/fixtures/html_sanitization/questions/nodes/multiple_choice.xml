@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _153010_1
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Multiple Choice
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 10.0
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: minnumber attribute no no longer supported on render_*
+Warning: flow_label is no longer supported in version 2, ignoring
+Warning: replacing bad NMTOKEN "595202876ccd425a9b4fe9e8e257292d" with "RESPONSE_595202876ccd425a9b4fe9e8e257292d"
+Warning: replacing bad NMTOKEN "29b3b04b609c4a7abbf882e9b89b26ea" with "RESPONSE_29b3b04b609c4a7abbf882e9b89b26ea"
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: titles on respconditions no longer supported, ignored "correct"
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Warning: test of undeclared response replaced with Null operator
+Warning: replacing bad NMTOKEN "595202876ccd425a9b4fe9e8e257292d" with "FEEDBACK_595202876ccd425a9b4fe9e8e257292d"
+Warning: replacing bad NMTOKEN "29b3b04b609c4a7abbf882e9b89b26ea" with "FEEDBACK_29b3b04b609c4a7abbf882e9b89b26ea"
+Warning: solution material is being replaced by div with class="solution"
+	-->
+
+<assessmentItem
+        xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
+        identifier="_153010_1"
+        title=""
+        adaptive="false"
+        timeDependent="false">
+  <instructureMetadata>
+    <instructureField name="max_score" value="10.0"/>
+    <instructureField name="bb_question_type" value="Multiple Choice"/>
+  </instructureMetadata>
+  <responseDeclaration identifier="response" cardinality="single"
+                       baseType="identifier"/>
+  <outcomeDeclaration identifier="FEEDBACK" cardinality="multiple"
+                      baseType="identifier"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0.0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <itemBody>
+    <div class="QUESTION_BLOCK"><p class="FORMATTED_TEXT_BLOCK">The answer is nose.</p></div>
+    <div class="RESPONSE_BLOCK">
+      <choiceInteraction responseIdentifier="response" shuffle="false"
+                         maxChoices="1">
+        <simpleChoice identifier="RESPONSE_595202876ccd425a9b4fe9e8e257292d"
+                      fixed="true">
+          <p class="FORMATTED_TEXT_BLOCK"><script>nose</script></p>
+        </simpleChoice>
+        <simpleChoice identifier="RESPONSE_29b3b04b609c4a7abbf882e9b89b26ea"
+                      fixed="true">
+          <p class="FORMATTED_TEXT_BLOCK">ear
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          </p>
+        </simpleChoice>
+        <simpleChoice identifier="aa35aa6b600844e1b42fd493cb0f0da7"
+                      fixed="true">
+          <p class="FORMATTED_TEXT_BLOCK"><b>eye</b></p>
+        </simpleChoice>
+        <simpleChoice identifier="b83b61f6356a410892de7f9c4a99b669"
+                      fixed="true">
+          <p class="FORMATTED_TEXT_BLOCK">mouth</p>
+        </simpleChoice>
+      </choiceInteraction>
+    </div>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf>
+        <match>
+          <variable identifier="response"/>
+          <baseValue baseType="identifier">
+            RESPONSE_595202876ccd425a9b4fe9e8e257292d
+          </baseValue>
+        </match>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">SCORE.max</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">correct</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseIf>
+      <responseElseIf>
+        <baseValue baseType="boolean">true</baseValue>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">0.0</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">incorrect</baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseElseIf>
+      <responseElseIf>
+        <match>
+          <null/>
+          <baseValue baseType="identifier"></baseValue>
+        </match>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">10</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">
+              FEEDBACK_595202876ccd425a9b4fe9e8e257292d
+            </baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseElseIf>
+      <responseElseIf>
+        <match>
+          <null/>
+          <baseValue baseType="identifier"></baseValue>
+        </match>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">0</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">
+              FEEDBACK_29b3b04b609c4a7abbf882e9b89b26ea
+            </baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseElseIf>
+      <responseElseIf>
+        <match>
+          <null/>
+          <baseValue baseType="identifier"></baseValue>
+        </match>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">0</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">aa35aa6b600844e1b42fd493cb0f0da7
+            </baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseElseIf>
+      <responseElseIf>
+        <match>
+          <null/>
+          <baseValue baseType="identifier"></baseValue>
+        </match>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">0</baseValue>
+        </setOutcomeValue>
+        <setOutcomeValue identifier="FEEDBACK">
+          <multiple>
+            <variable identifier="FEEDBACK"/>
+            <baseValue baseType="identifier">b83b61f6356a410892de7f9c4a99b669
+            </baseValue>
+          </multiple>
+        </setOutcomeValue>
+      </responseElseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf>
+        <gt>
+          <variable identifier="SCORE"/>
+          <baseValue baseType="float">10.0</baseValue>
+        </gt>
+        <setOutcomeValue identifier="SCORE">
+          <baseValue baseType="float">10.0</baseValue>
+        </setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="correct">
+    <div class="flow_1">
+      <p class="FORMATTED_TEXT_BLOCK">right</p>
+    </div>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="incorrect">
+    <div class="flow_1">
+      <p class="FORMATTED_TEXT_BLOCK">wrong</p>
+    </div>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="FEEDBACK_595202876ccd425a9b4fe9e8e257292d">
+    <div class="solution">
+      <div class="flow_1">
+        <p class="FORMATTED_TEXT_BLOCK"></p>
+      </div>
+    </div>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="FEEDBACK_29b3b04b609c4a7abbf882e9b89b26ea">
+    <div class="solution">
+      <div class="flow_1">
+        <p class="FORMATTED_TEXT_BLOCK"></p>
+      </div>
+    </div>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="aa35aa6b600844e1b42fd493cb0f0da7">
+    <div class="solution">
+      <div class="flow_1">
+        <p class="FORMATTED_TEXT_BLOCK"></p>
+      </div>
+    </div>
+  </modalFeedback>
+  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
+                 identifier="b83b61f6356a410892de7f9c4a99b669">
+    <div class="solution">
+      <div class="flow_1">
+        <p class="FORMATTED_TEXT_BLOCK"></p>
+      </div>
+    </div>
+  </modalFeedback>
+</assessmentItem>

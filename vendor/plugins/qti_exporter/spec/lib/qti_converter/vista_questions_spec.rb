@@ -395,7 +395,7 @@ module VistaExpected
                  :answers=>[{:weight=>100, :text=>"B, C", :migration_id=>"MC0"}],
                  :points_possible=>1,
                  :question_name=>"Combination",
-                 :question_text=>"This should just be a multiple answer. B and C are correct<br></br>\nA. wrong 1<br></br>\nB. right 1<br></br>\nC. right 2<br></br>\nD. wrong 2<br></br>\nE. wrong 3<br></br>\n",
+                 :question_text=>"This should just be a multiple answer. B and C are correct<br></br>\nA. wrong 1<br></br>\nB. right 1<br></br>\nC. right 2<br></br>\nD. wrong 2<br></br>\nE. wrong 3<br></br>",
                  :incorrect_comments=>"",
                  :question_type=>"multiple_choice_question"}
 

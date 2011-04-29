@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qtimetadata vocabulary is ignored
+Unmapped metadata field: respondusapi_qtype=multipleChoice
+Converting proprietary Blackboard metadata field respondusapi_qpoints = 1.00
+Warning: case-insensitive comparison of identifiers not supported in version 2
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="QUE_1044"
+ title="Multimedia"
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="max_score" value="1.00" />
+</instructureMetadata>
+<responseDeclaration identifier="QUE_1045_RL" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="QUE_SCORE" cardinality="single" baseType="integer">
+<defaultValue><value>0</value></defaultValue></outcomeDeclaration>
+<itemBody>
+<div class="html">Respondus makes it easy to add media content and other files to question wording, answer categories and feedback. You can upload files from your computer or embed files from other websites, without needing to write (or view) HTML. Respondus also includes a &amp;quot;one-click&amp;quot; feature that will resize graphics and convert images to JPEG format. &lt;br&gt;
+&lt;br&gt;
+Adding an image or other file stored on your computer is easy. Select the Media Wizard &lt;span style=&quot; color:#000000;&quot;&gt;&lt;img src=&quot;image0014c114649.jpg&quot; alt=&quot;&quot;/&gt;&lt;/span&gt; from the Respondus tool bar and select &amp;ldquo;Upload a media file from my computer.&amp;rdquo; Then choose where the file is located. &lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Question: &lt;/b&gt;Which image below is the button for the Media Wizard? </div>
+<choiceInteraction responseIdentifier="QUE_1045_RL" shuffle="false" maxChoices="1">
+<simpleChoice identifier="QUE_1046_A1" fixed="true">
+<div class="html">&amp;nbsp;&lt;img src=&quot;image0014c114649.jpg&quot; alt=&quot;&quot;/&gt;</div></simpleChoice>
+<simpleChoice identifier="QUE_1047_A2" fixed="true">
+<div class="html">&lt;script&gt;&lt;/script&gt;</div></simpleChoice>
+<simpleChoice identifier="QUE_1048_A3" fixed="true">
+<div class="html">&lt;br&gt;&lt;br&gt;&lt;img src=&quot;image0034c114649.jpg&quot; alt=&quot;&quot;/&gt;&lt;br&gt;&lt;br&gt;</div></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="QUE_1045_RL"/><baseValue baseType="identifier">QUE_1046_A1</baseValue></match>
+<setOutcomeValue identifier="QUE_SCORE"><baseValue baseType="integer">1</baseValue></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="QUE_1045_RL"/><baseValue baseType="identifier">QUE_1047_A2</baseValue></match>
+<setOutcomeValue identifier="QUE_SCORE"><sum><variable identifier="QUE_SCORE"/><baseValue baseType="integer">0</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="QUE_1045_RL"/><baseValue baseType="identifier">QUE_1048_A3</baseValue></match>
+<setOutcomeValue identifier="QUE_SCORE"><sum><variable identifier="QUE_SCORE"/><baseValue baseType="integer">0</baseValue></sum></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+</responseProcessing>
+</assessmentItem>

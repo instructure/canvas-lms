@@ -9,6 +9,7 @@ unless defined? BASE_FIXTURE_DIR
   ANGEL_FIXTURE_DIR = BASE_FIXTURE_DIR + 'angel/'
   CENGAGE_FIXTURE_DIR = BASE_FIXTURE_DIR + 'cengage/'
   D2L_FIXTURE_DIR = BASE_FIXTURE_DIR + 'd2l/'
+  HTML_SANITIZATION_FIXTURE_DIR = BASE_FIXTURE_DIR + 'html_sanitization/'
 end
 require 'qti_exporter'
 require 'pp'
@@ -92,3 +93,8 @@ end
 def d2l_question_dir
   File.join(D2L_FIXTURE_DIR, "questions")
 end
+
+def html_sanitization_question_dir(type)
+  File.join(HTML_SANITIZATION_FIXTURE_DIR, "questions", type)
+end
+

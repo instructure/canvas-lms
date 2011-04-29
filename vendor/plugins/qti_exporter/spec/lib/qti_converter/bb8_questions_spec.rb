@@ -225,7 +225,7 @@ module BB8Expected
                 :points_possible=>10.0,
                 :question_type=>"true_false_question",
                 :question_name=>"",
-                :question_text=>"\n      <p class=\"FORMATTED_TEXT_BLOCK\">I am wearing a black hat.&lt;br /&gt;</p>\n    ",
+                :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">I am wearing a black hat.&lt;br /&gt;</p>",
                 :migration_id=>"_153015_1"}
 
   # removed ids on the answers
@@ -247,7 +247,7 @@ module BB8Expected
                      :points_possible=>10.0,
                      :question_type=>"multiple_answers_question",
                      :question_name=>"",
-                     :question_text=>"\n      <p class=\"FORMATTED_TEXT_BLOCK\">The answers are house and garage.&lt;br /&gt;</p>\n    ",
+                     :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">The answers are house and garage.&lt;br /&gt;</p>",
                      :migration_id=>"_153009_1"}
 
   ESSAY = {:example_solution=>"Nobody.",
@@ -256,7 +256,7 @@ module BB8Expected
            :correct_comments=>"",
            :points_possible=>23.0,
            :question_name=>"",
-           :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">Who likes to use Blackboard?&lt;br /&gt;</p>",
+           :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Who likes to use Blackboard?&lt;br /&gt;</p>",
            :incorrect_comments=>"",
            :question_type=>"essay_question"}
 
@@ -268,7 +268,7 @@ module BB8Expected
                      :points_possible=>10.0,
                      :question_type=>"essay_question",
                      :question_name=>"",
-                     :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">We all live in what?&lt;br /&gt;</p>"}
+                     :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">We all live in what?&lt;br /&gt;</p>"}
 
   # removed ids on the answers
   MATCHING = {:answers=>
@@ -281,7 +281,7 @@ module BB8Expected
               :points_possible=>10.0,
               :question_type=>"matching_question",
               :question_name=>"",
-              :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">Match these.&lt;br /&gt;</p>",
+              :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Match these.&lt;br /&gt;</p>",
               :migration_id=>"_153008_1",
               :matches=>
                       [{:text=>"right 1"},
@@ -313,10 +313,10 @@ module BB8Expected
             :question_type=>"multiple_choice_question",
             :question_name=>"",
             :migration_id=>"_153011_1",
-            :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">You love Blackboard&lt;br /&gt;</p>",
+            :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">You love Blackboard&lt;br /&gt;</p>",
             :correct_comments=>"right? "}
 
-  FILL_IN_THE_BLANK = {:question_text=>"\n      <p class=\"FORMATTED_TEXT_BLOCK\">The answer is 'purple'.&lt;br /&gt;</p>\n    ",
+  FILL_IN_THE_BLANK = {:question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">The answer is 'purple'.&lt;br /&gt;</p>",
                        :answers=>
                                [{:text=>"purple", :comments=>"", :weight=>100},
                                 {:text=>"violet", :comments=>"", :weight=>100}],
@@ -334,7 +334,7 @@ module BB8Expected
                                 :migration_id=>"yes_no_false",
                                 :weight=>100}],
                       :migration_id=>"_153126_1",
-                      :question_text=>"\n      <p class=\"FORMATTED_TEXT_BLOCK\">Either or question with yes/no</p>\n    ",
+                      :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Either or question with yes/no</p>",
                       :correct_comments=>"right answer",
                       :incorrect_comments=>"Wrong answer",
                       :points_possible=>10.0,
@@ -348,7 +348,7 @@ module BB8Expected
                                         :migration_id=>"agree_disagree_false"}],
                               :question_name=>"",
                               :migration_id=>"_153127_1",
-                              :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">Either or question with agree/disagree.</p>",
+                              :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Either or question with agree/disagree.</p>",
                               :correct_comments=>"correct answer",
                               :incorrect_comments=>"wrong answer",
                               :points_possible=>10.0}
@@ -361,7 +361,7 @@ module BB8Expected
                                     :migration_id=>"true_false_false"}],
                           :question_name=>"",
                           :migration_id=>"_153128_1",
-                          :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">Either/or question with true/false options</p>",
+                          :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Either/or question with true/false options</p>",
                           :correct_comments=>"r",
                           :incorrect_comments=>"w",
                           :points_possible=>10.0}
@@ -374,7 +374,7 @@ module BB8Expected
                                     {:text=>"wrong", :weight=>0, :migration_id=>"right_wrong_false"}],
                            :question_name=>"",
                            :migration_id=>"_153001_1",
-                           :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">A duck is either a bird or a plane.&lt;br /&gt;</p>",
+                           :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">A duck is either a bird or a plane.&lt;br /&gt;</p>",
                            :correct_comments=>"right",
                            :incorrect_comments=>"wrong",
                            :points_possible=>7.0}
@@ -387,12 +387,12 @@ module BB8Expected
                    :question_type=>"File Upload",
                    :question_name=>"",
                    :migration_id=>"_153003_1",
-                   :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">File response question. I don't know what this is.&lt;br /&gt;</p>"}
+                   :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">File response question. I don't know what this is.&lt;br /&gt;</p>"}
 
   HOT_SPOT = {:answers=>[],
               :question_name=>"",
               :migration_id=>"_153006_1",
-              :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">Where are the nuts?&lt;br /&gt;</p>",
+              :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Where are the nuts?&lt;br /&gt;</p>",
               :correct_comments=>"",
               :incorrect_comments=>"",
               :unsupported=>true,
@@ -403,7 +403,7 @@ module BB8Expected
                :question_type=>"Quiz Bowl",
                :question_name=>"",
                :migration_id=>"_153013_1",
-               :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">Yellow</p>",
+               :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Yellow</p>",
                :correct_comments=>"",
                :incorrect_comments=>"",
                :unsupported=>true,
@@ -442,7 +442,7 @@ module BB8Expected
           :question_type=>"multiple_dropdowns_question",
           :question_name=>"",
           :migration_id=>"_153007_1",
-          :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">The quick [brown] fox [jumped] over the [fence].&lt;br /&gt;</p>",
+          :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">The quick [brown] fox [jumped] over the [fence].&lt;br /&gt;</p>",
           :correct_comments=>"right"
   }
 
@@ -456,7 +456,7 @@ module BB8Expected
            :points_possible=>10.0,
            :question_type=>"matching_question",
            :question_name=>"",
-           :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">It is in numerical order.&lt;br /&gt;</p>",
+           :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">It is in numerical order.&lt;br /&gt;</p>",
            :migration_id=>"_153012_1",
            :matches=>
                    [{:text=>"b"},
@@ -484,7 +484,7 @@ module BB8Expected
                        :migration_id=>"_152999_1",
                        :unit_value=>"cm",
                        :question_text=>
-                               "\n<p class=\"FORMATTED_TEXT_BLOCK\">What is 10 - [x]?&lt;br/&gt;</p>",
+                               "<p class=\"FORMATTED_TEXT_BLOCK\">What is 10 - [x]?&lt;br/&gt;</p>",
                        :imported_formula=>
                                "<math><apply><minus/><cn>10</cn><ci>x</ci></apply></math>",
                        :correct_comments=>"You got it right!",
@@ -589,7 +589,7 @@ module BB8Expected
                         :answer_tolerance=>0.1,
                         :migration_id=>"_153086_1",
                         :question_text=>
-                                "\n<p class=\"FORMATTED_TEXT_BLOCK\">Based on her excellent\n performance as a district sales manager, Maria receives a\n sizable bonus at work. Since her generous salary is more\n than enough to provide for the needs of her family, she\n decides to use the bonus to buy a bond as an investment.\n The par value of the bond that Maria would like to\n purchase is $[F] thousand. The bond pays [r]% interest,\n compounded semiannually (with payment on January 1 and\n July 1) and matures on July 1, 20[Y]. Maria wants a return\n of [i]%, compounded semiannually. How much would she be\n willing to pay for the bond if she buys it [n] days after\n the July 2010 interest anniversary? Give your answer in\n the format of a quoted bond price, as a percentage of par\n to three decimal places -- like you would see in the Wall\n Street Journal. Use the formula discussed in class -- and\n from the book, NOT the HP 12c bond feature. (Write only\n the digits, to three decimal palces, e.g. 114.451 and no\n $, commas, formulas, etc.)</p>",
+                                "<p class=\"FORMATTED_TEXT_BLOCK\">Based on her excellent\n performance as a district sales manager, Maria receives a\n sizable bonus at work. Since her generous salary is more\n than enough to provide for the needs of her family, she\n decides to use the bonus to buy a bond as an investment.\n The par value of the bond that Maria would like to\n purchase is $[F] thousand. The bond pays [r]% interest,\n compounded semiannually (with payment on January 1 and\n July 1) and matures on July 1, 20[Y]. Maria wants a return\n of [i]%, compounded semiannually. How much would she be\n willing to pay for the bond if she buys it [n] days after\n the July 2010 interest anniversary? Give your answer in\n the format of a quoted bond price, as a percentage of par\n to three decimal places -- like you would see in the Wall\n Street Journal. Use the formula discussed in class -- and\n from the book, NOT the HP 12c bond feature. (Write only\n the digits, to three decimal palces, e.g. 114.451 and no\n $, commas, formulas, etc.)</p>",
                         :imported_formula=>
                                 "<math><apply><times/><apply><power/><apply><times/><cn>10</cn><ci>F</ci></apply><apply><minus/><cn>1</cn></apply></apply><apply><plus/><apply><times/><cn>1000</cn><ci>F</ci><ci>r</ci><apply><power/><ci>i</ci><apply><minus/><cn>1</cn></apply></apply><apply><minus/><cn>1</cn><apply><power/><apply><plus/><cn>1</cn><apply><divide/><ci>i</ci><cn>200</cn></apply></apply><apply><minus/><apply><times/><cn>2</cn><apply><minus/><ci>Y</ci><cn>10</cn></apply></apply></apply></apply></apply></apply><apply><times/><cn>1000</cn><ci>F</ci><apply><power/><apply><plus/><cn>1</cn><apply><divide/><ci>i</ci><cn>200</cn></apply></apply><apply><minus/><apply><times/><cn>2</cn><apply><minus/><ci>Y</ci><cn>10</cn></apply></apply></apply></apply></apply></apply><apply><plus/><cn>1</cn><apply><times/><apply><divide/><ci>i</ci><cn>100</cn></apply><apply><divide/><ci>n</ci><cn>360</cn></apply></apply></apply></apply></math>",
                         :correct_comments=>"Right answer.",
@@ -609,7 +609,7 @@ module BB8Expected
                                   :exact=>4.0,
                                   :comments=>"",
                                   :weight=>100}],
-                        :question_text=>"\n<p class=\"FORMATTED_TEXT_BLOCK\">What is 10 - 6?&lt;br /&gt;</p>",
+                        :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">What is 10 - 6?&lt;br /&gt;</p>",
                         :question_bank_name=>"Pool 1",
                         :correct_comments=>"Right.",
                         :incorrect_comments=>"Left",

@@ -37,16 +37,6 @@ class QuizQuestion < ActiveRecord::Base
         self.position = self.quiz.root_entries_max_position + 1
       end
     end
-    if self.question_data.is_a?(Hash) 
-      if self.question_data[:question_name].try(:strip).blank?
-        self.question_data[:question_name] = "Question"
-      end
-      self.question_data[:name] = self.question_data[:question_name]
-    end
-    if self.question_data && self.question_data[:question_text]
-      config = Instructure::SanitizeField::SANITIZE
-      self.question_data[:question_text] = Sanitize.clean(self.question_data[:question_text], config)
-    end
   end
   protected :infer_defaults
   
