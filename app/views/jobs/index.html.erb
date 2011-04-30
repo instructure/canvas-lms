@@ -1,0 +1,165 @@
+<% content_for :page_title do %>Jobs CP<% end %>
+<% content_for :stylesheets do %>
+<style type="text/css">
+  #content {
+    position: relative;
+    padding: 10px;
+  }
+  span.has-failed-attempts {
+    color: orange;
+  }
+  span.has-failed-max-attempts {
+    color: red;
+  }
+  dl#job-attributes dt {
+    float:left;
+    clear:left;
+  }
+  dl#job-attributes dd {
+    padding-left: 2em;
+    float:left;
+  }
+  #show-job {
+    margin-left: 25px;
+    width: 450px;
+    float:left;
+  }
+  #show-job dt {
+    font-weight: bold;
+  }
+  h2 {
+    font-size: 16px;
+  }
+  div.grid {
+    border: 2px solid #ccc;
+    margin-bottom: 10px;
+  }
+  #tags-wrapper h2 { float:left; }
+  #tags-flavor {
+    float:right;
+  }
+  #jobs-grid { float:left; margin-top: 6px; }
+  .slick-row.ui-state-active {
+    color: black;
+    font-weight: normal;
+  }
+  .slick-row.ui-state-active .slick-cell {
+    background-color: #ddd;
+  }
+  .show-field-wrapper { display: none; }
+  textarea.show-field { width: 850px; height: 630px; }
+  .unloaded-id { color: #aaa; }
+</style>
+<% end %>
+<% @show_left_side = false %>
+
+<% jammit_css :slickgrid %>
+<% jammit_js :slickgrid, :jobs %>
+
+<div id="running-wrapper" style="float:left">
+  <h2>Running Jobs</h2>
+  <div id="running-grid" style="width:600px; height:250px;" class='grid'>
+  </div>
+</div>
+<div id="tags-wrapper" style="float:right">
+  <h2>Popular Tags</h2>
+  <select id="tags-flavor">
+    <%= options_for_select([["All", 'all'],
+                            ["Current", 'current'],
+                            ["Future", 'future'],
+                            ["Failed", 'failed']], @flavor) %>
+  </select>
+  <div id="tags-grid" style="clear:both; width:250px; height:250px" class='grid'>
+  </div>
+</div>
+<div style="clear:both">
+  <h2>Jobs List</h2>
+  <select id="jobs-flavor">
+    <%= options_for_select([["All", 'all'],
+                            ["Current", 'current'],
+                            ["Future", 'future'],
+                            ["Failed", 'failed']], @flavor) %>
+  </select>
+  <button id='jobs-refresh'>refresh</button>
+  <input type='search' results='15' placeholder='Search Jobs' autosave='canvas-jobs-search' id='jobs-search' name='q' />
+  Total: <span id='jobs-total'><%= @jobs_count %></span>
+  <button id='select-all-jobs'>select all</button>
+  With Selection:
+  <button id='hold-jobs'>hold</button>
+  <button id='un-hold-jobs'>un-hold</button>
+  <button id='delete-jobs'>delete</button>
+  <div id="jobs-grid" style="width:650px; height:300px;" class='grid'>
+  </div>
+<div id="show-job">
+  <h2>Selected Job</h2>
+  <h3>id: <span id="job-id" class="show-field">&nbsp;</span></h3>
+  <h4>tag: <span id='job-tag' class='show-field'>&nbsp;</span></h4>
+  <table id='job-attributes' cellspacing="0">
+    <tr>
+      <td width="150">Priority:</td>
+      <td id="job-priority" class="show-field">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Attempts:</td>
+      <td id="job-attempts" class="show-field">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Max Attempts:</td>
+      <td id="job-max_attempts" class="show-field">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Run At:</td>
+      <td id="job-run_at" class="show-field">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Failed At:</td>
+      <td id="job-failed_at" class="show-field">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Handler:</td>
+      <td><a href='#' id='job-handler-show'>(show)</a>
+        <div id='job-handler-wrapper' class='show-field-wrapper'><textarea id='job-handler' class='show-field'></textarea></div>
+      </td>
+    </tr>
+    <tr>
+      <td>Last Error:</td>
+      <td><a href='#' id='job-last_error-show'>(show)</a>
+        <div id='job-last_error-wrapper' class='show-field-wrapper'><textarea id='job-last_error' class='show-field'></textarea></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</div>
+
+<% js_block do
+jobs_data = @jobs.all(:limit => 100)
+jobs_data.length.upto(@jobs_count - 1) { jobs_data << {} }
+jobs_opts = {
+  :data => jobs_data,
+  :max_attempts => Delayed::Worker.max_attempts,
+  :rows => @jobs_count,
+  :flavor => @flavor,
+  :url => jobs_url(:only => :jobs),
+  :batch_update_url => batch_update_jobs_url,
+  :on_hold_attempt_count => Delayed::Job::ON_HOLD_COUNT,
+}
+running_opts = jobs_opts.merge({
+  :data => @running.all,
+  :url => jobs_url(:only => :running),
+  :refresh_rate => 2.seconds * 1000,
+})
+tags_opts = {
+  :data => @tags,
+  :url => jobs_url(:only => :tags),
+  :refresh_rate => 10.seconds * 1000,
+  :flavor => @flavor,
+}
+%>
+<script type="text/javascript">
+$(document).ready(function() {
+  window.jobs = new Jobs(<%= raw jobs_opts.to_json(:include_root => false) %>).init();
+  window.running = new Workers(<%= raw running_opts.to_json(:include_root => false) %>).init();
+  window.tags = new Tags(<%= raw tags_opts.to_json %>).init();
+});
+</script>
+<% end %>

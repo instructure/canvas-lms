@@ -628,7 +628,9 @@ ActionController::Routing::Routes.draw do |map|
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
     end
   end
-  
+
+  map.resources :jobs, :only => %w(index), :collection => %w[batch_update]
+
   Jammit::Routes.draw(map)
 
   # API routes

@@ -28,6 +28,20 @@ module Delayed
         cattr_accessor :use_row_locking
         self.use_row_locking = false
 
+        named_scope :current, lambda {
+          { :conditions => ["run_at <= ? AND failed_at IS NULL", db_time_now] }
+        }
+
+        named_scope :future, lambda {
+          { :conditions => ["run_at > ? AND failed_at IS NULL", db_time_now] }
+        }
+
+        named_scope :failed, :conditions => ["failed_at IS NOT NULL"]
+
+        named_scope :not_running, :conditions => ["locked_at is NULL"]
+
+        named_scope :running, :conditions => ["locked_at is NOT NULL and locked_by <> 'on hold'"]
+
         named_scope :ready_to_run, lambda {|worker_name, max_run_time|
           {:conditions => ['(run_at <= ? AND (locked_at IS NULL OR locked_at < ?) OR locked_by = ?) AND failed_at IS NULL', db_time_now, db_time_now - max_run_time, worker_name]}
         }
@@ -39,10 +53,12 @@ module Delayed
         end
 
         def self.get_and_lock_next_available(worker_name,
-                                             max_run_time = Worker.max_run_time,
-                                             queue = nil)
+                                             max_run_time,
+                                             queue = nil,
+                                             min_priority = nil,
+                                             max_priority = nil)
           if self.use_row_locking
-            scope = self.all_available(worker_name, max_run_time, queue)
+            scope = self.all_available(worker_name, max_run_time, queue, min_priority, max_priority)
 
             ::ActiveRecord::Base.silence do
               # it'd be a big win to do this in a DB function and avoid the extra
@@ -57,7 +73,7 @@ module Delayed
               end
             end
           else
-            job = find_available(worker_name, 5, max_run_time, queue).detect do |job|
+            job = find_available(worker_name, 5, max_run_time, queue, min_priority, max_priority).detect do |job|
               if job.lock_exclusively!(max_run_time, worker_name)
                 true
               else
@@ -69,18 +85,22 @@ module Delayed
         end
 
         def self.find_available(worker_name,
-                                limit = 5,
-                                max_run_time = Worker.max_run_time,
-                                queue = nil)
-          all_available(worker_name, max_run_time, queue).all(:limit => limit)
+                                limit,
+                                max_run_time,
+                                queue = nil,
+                                min_priority = nil,
+                                max_priority = nil)
+          all_available(worker_name, max_run_time, queue, min_priority, max_priority).all(:limit => limit)
         end
 
         def self.all_available(worker_name,
-                               max_run_time = Worker.max_run_time,
-                               queue = nil)
+                               max_run_time,
+                               queue = nil,
+                               min_priority = nil,
+                               max_priority = nil)
           scope = self.ready_to_run(worker_name, max_run_time)
-          scope = scope.scoped(:conditions => ['priority >= ?', Worker.min_priority]) if Worker.min_priority
-          scope = scope.scoped(:conditions => ['priority <= ?', Worker.max_priority]) if Worker.max_priority
+          scope = scope.scoped(:conditions => ['priority >= ?', min_priority]) if min_priority
+          scope = scope.scoped(:conditions => ['priority <= ?', max_priority]) if max_priority
           scope = scope.scoped(:conditions => ['queue = ?', queue]) if queue
           scope = scope.scoped(:conditions => ['queue is null']) unless queue
           scope.by_priority
