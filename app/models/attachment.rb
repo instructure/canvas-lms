@@ -363,7 +363,7 @@ class Attachment < ActiveRecord::Base
   end
   
   def self.s3_storage?
-    file_store_config['storage'] == 's3' && s3_config || (RAILS_ENV == "test" && (Setting.get("file_storage_test_override", nil) rescue nil) == "s3")
+    (RAILS_ENV == "test" && Setting.get("file_storage_test_override", nil) || file_store_config['storage']) == 's3' && s3_config
   end
   
   def self.local_storage?

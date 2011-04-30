@@ -6,6 +6,20 @@ TEST_FILE_UUIDS = { "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
                     "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
                     "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779" }
 
+def get_file(filename)
+  data = TEST_FILE_UUIDS[filename]
+  if SELENIUM_CONFIG.empty?
+    @file = Tempfile.new(filename.split(/(?=\.)/))
+    @file.write data
+    @file.close
+    fullpath = @file.path
+    filename = File.basename(@file.path)
+  else
+    fullpath = "C:\\testfiles\\#{filename}"
+  end
+  [filename, fullpath, data]
+end
+
 shared_examples_for "file uploads selenium tests" do
   it_should_behave_like "forked server selenium tests"
   
@@ -29,7 +43,9 @@ shared_examples_for "file uploads selenium tests" do
 
     first_time = true    
     # try with three files. the first two are identical, so our md5-based single-instance-storing on s3 should not break.
-    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |filename|
+    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |orig_filename|
+      filename, fullpath, data = get_file(orig_filename)
+
       # go to our new course's discussion page
       get "/courses/#{e.course_id}/discussion_topics"
 
@@ -51,7 +67,7 @@ shared_examples_for "file uploads selenium tests" do
 
       # upload the file
       driver.find_element(:css, '.upload_new_file_link').click
-      driver.find_element(:id, 'attachment_uploaded_data').send_keys("C:\\testfiles\\#{filename}")
+      driver.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
       driver.find_element(:css, '#sidebar_upload_file_form button').click
       keep_trying { driver.execute_script("return $('#tree1 .leaf:contains(#{filename})').length") > 0 }
       
@@ -62,7 +78,7 @@ shared_examples_for "file uploads selenium tests" do
       # check out the file content, make sure it's good
       get "/courses/#{e.course_id}/files/#{Attachment.last.id}/download?wrap=1"
       driver.switch_to.frame('file_content')
-      driver.page_source.should match TEST_FILE_UUIDS[filename]
+      driver.page_source.should match data
       driver.switch_to.default_content
     end
   end
@@ -87,13 +103,15 @@ shared_examples_for "file uploads selenium tests" do
     login_as( "student@example.com", "asdfasdf" )
     
     # and attempt some assignment submissions
-    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |filename|
+    ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |orig_filename|
+      filename, fullpath, data = get_file(orig_filename)
+
       # go to our new assignment page
       get "/courses/#{c.id}/assignments/#{a.id}"
 
       driver.execute_script("$('.submit_assignment_link').click();")
       keep_trying { driver.execute_script("return $('div#submit_assignment')[0].style.display") != "none" }
-      driver.find_element(:name, 'attachments[0][uploaded_data]').send_keys("C:\\testfiles\\#{filename}")
+      driver.find_element(:name, 'attachments[0][uploaded_data]').send_keys(fullpath)
       driver.find_element(:css, '#submit_online_upload_form #submit_file_button').click
       keep_trying { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
       link = driver.find_element(:css, "div.details a.forward")
@@ -104,7 +122,7 @@ shared_examples_for "file uploads selenium tests" do
       wait_for_dom_ready
       driver.switch_to.frame('preview_frame')
       driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click
-      keep_trying { driver.page_source =~ /#{Regexp.quote(TEST_FILE_UUIDS[filename])}/ }
+      keep_trying { driver.page_source =~ /#{Regexp.quote(data)}/ }
       driver.switch_to.default_content
     end
   end
