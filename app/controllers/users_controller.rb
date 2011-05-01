@@ -139,7 +139,7 @@ class UsersController < ApplicationController
       if @context && @context.is_a?(Account) && @query
         @users = @context.users_name_like(@query)
       elsif params[:enrollment_term_id].present? && @root_account == @context
-        @users = @context.fast_all_users.scoped(:joins => :courses, :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]])
+        @users = @context.fast_all_users.scoped(:joins => :courses, :conditions => ["courses.enrollment_term_id = ?", params[:enrollment_term_id]], :group => 'users.id, users.name, users.sortable_name')
       else
         @users = @context.fast_all_users
       end
