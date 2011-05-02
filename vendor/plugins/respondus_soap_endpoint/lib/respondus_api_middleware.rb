@@ -17,6 +17,17 @@ class RespondusAPIMiddleware
   # in processes where this API isn't going to get used, since we don't use
   # soap4r or REXML or any of those anywhere else.
   def self.do_setup
+    # an issue with load orders causes us to load the ruby-provided soap4r on
+    # some systems, rather than the soap4r gem that we specified (1.5.8). This
+    # code ensures that our gem is on the front of the load order, before the
+    # system ruby load path.
+    # see http://code.google.com/p/phusion-passenger/issues/detail?id=133
+    soap_gem_path_idx = $LOAD_PATH.index { |p| p =~ /\/soap4r-[\d.]+\/lib/ }
+    if soap_gem_path_idx
+      soap_gem_path = $LOAD_PATH.delete_at(soap_gem_path_idx)
+      $LOAD_PATH.unshift(soap_gem_path)
+    end
+
     remove_method :call # we'll just use soap4r-middleware's
     Bundler.require 'respondus_soap_endpoint'
     include Soap4r::Middleware
