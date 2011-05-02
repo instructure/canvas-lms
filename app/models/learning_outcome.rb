@@ -127,7 +127,7 @@ class LearningOutcome < ActiveRecord::Base
   end
   
   def artifacts_count_for_tied_context
-    codes = [@tied_context]
+    codes = [@tied_context.asset_string]
     if @tied_context.is_a?(Account)
       if @tied_context == context
         codes = "all"
