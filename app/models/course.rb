@@ -1324,19 +1324,20 @@ class Course < ActiveRecord::Base
     #Adjust dates
     if bool_res(params[:copy][:shift_dates])
       shift_options = (bool_res(params[:copy][:shift_dates]) rescue false) ? params[:copy] : {}
+      shift_options = shift_date_options(self, shift_options)
       @imported_migration_items.each do |event|
         if event.is_a?(Assignment)
-          event.due_at = shift_date(self, event.due_at, shift_options)
-          event.lock_at = shift_date(self, event.lock_at, shift_options)
-          event.unlock_at = shift_date(self, event.unlock_at, shift_options)
-          event.peer_reviews_due_at = shift_date(self, event.peer_reviews_due_at, shift_options)
+          event.due_at = shift_date(event.due_at, shift_options)
+          event.lock_at = shift_date(event.lock_at, shift_options)
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
+          event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
           event.save_without_broadcasting!
         elsif event.is_a?(DiscussionTopic)
-          event.delayed_post_at = shift_date(self, event.delayed_post_at, shift_options)
+          event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
           event.save_without_broadcasting!
         elsif event.is_a?(CalendarEvent)
-          event.start_at = shift_date(self, event.start_at, shift_options)
-          event.end_at = shift_date(self, event.end_at, shift_options)
+          event.start_at = shift_date(event.start_at, shift_options)
+          event.end_at = shift_date(event.end_at, shift_options)
           event.save_without_broadcasting!
         end
       end
@@ -1611,27 +1612,28 @@ class Course < ActiveRecord::Base
     if !to_shift_dates.empty? && bool_res(options[:shift_dates])
       log_merge_result("Moving events to new dates")
       shift_options = (bool_res(options[:shift_dates]) rescue false) ? options : {}
+      shift_options = shift_date_options(course, shift_options)
       to_shift_dates.uniq.each do |event|
         course_import.tick(100) if course_import
         if event.is_a?(Assignment)
-          event.due_at = shift_date(course, event.due_at, shift_options)
-          event.lock_at = shift_date(course, event.lock_at, shift_options)
-          event.unlock_at = shift_date(course, event.unlock_at, shift_options)
-          event.peer_reviews_due_at = shift_date(course, event.peer_reviews_due_at, shift_options)
+          event.due_at = shift_date(event.due_at, shift_options)
+          event.lock_at = shift_date(event.lock_at, shift_options)
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
+          event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
         elsif event.is_a?(DiscussionTopic)
-          event.delayed_post_at = shift_date(course, event.delayed_post_at, shift_options)
+          event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
           log_merge_result("The Topic \"#{event.title}\" won't be posted until #{event.delayed_post_at.to_s}")
         elsif event.is_a?(CalendarEvent)
-          event.start_at = shift_date(course, event.start_at, shift_options)
-          event.end_at = shift_date(course, event.end_at, shift_options)
+          event.start_at = shift_date(event.start_at, shift_options)
+          event.end_at = shift_date(event.end_at, shift_options)
         elsif event.is_a?(Quiz)
-          event.due_at = shift_date(course, event.due_at, shift_options)
-          event.lock_at = shift_date(course, event.lock_at, shift_options)
-          event.unlock_at = shift_date(course, event.unlock_at, shift_options)
+          event.due_at = shift_date(event.due_at, shift_options)
+          event.lock_at = shift_date(event.lock_at, shift_options)
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
         elsif event.is_a?(ContextModule)
-          event.unlock_at = shift_date(course, event.unlock_at, shift_options)
-          event.start_at = shift_date(course, event.start_at, shift_options)
-          event.end_at = shift_date(course, event.end_at, shift_options)
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
+          event.start_at = shift_date(event.start_at, shift_options)
+          event.end_at = shift_date(event.end_at, shift_options)
         end
         event.respond_to?(:save_without_broadcasting!) ? event.save_without_broadcasting! : event.save!
       end
@@ -1687,15 +1689,25 @@ class Course < ActiveRecord::Base
     end
   end
   
-  def shift_date(course, time, options={})
+  def shift_date_options(course, options={})
+    result = {}
+    result[:old_start_date] = Date.parse(options[:old_start_date]) rescue course.real_start_date
+    result[:old_end_date] = Date.parse(options[:old_end_date]) rescue course.real_end_date
+    result[:new_start_date] = Date.parse(options[:new_start_date]) rescue self.real_start_date
+    result[:new_end_date] = Date.parse(options[:new_end_date]) rescue self.real_end_date
+    result[:day_substitions] = options[:day_substitions]
+    result
+  end
+
+  def shift_date(time, options={})
     return nil unless time
     time = ActiveSupport::TimeWithZone.new(time.utc, Time.zone)
     old_date = time.to_date
     new_date = old_date.clone
-    old_start_date = Date.parse(options[:old_start_date]) rescue course.real_start_date
-    old_end_date = Date.parse(options[:old_end_date]) rescue course.real_end_date
-    new_start_date = Date.parse(options[:new_start_date]) rescue self.real_start_date
-    new_end_date = Date.parse(options[:new_end_date]) rescue self.real_end_date
+    old_start_date = options[:old_start_date]
+    old_end_date = options[:old_end_date]
+    new_start_date = options[:new_start_date]
+    new_end_date = options[:new_end_date]
     return time unless old_start_date && old_end_date && new_start_date && new_end_date
     old_full_diff = old_end_date - old_start_date
     old_event_diff = old_date - old_start_date
