@@ -428,6 +428,7 @@ class Quiz < ActiveRecord::Base
       @submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
     end
     
+    non_shuffled_questions = ["true_false_question", "matching_question"]
     @submission_questions.each do |q|
       if q[:pick_count] #QuizGroup
         if q[:assessment_question_bank_id]
