@@ -106,7 +106,7 @@ class SubmissionsController < ApplicationController
         return
       end
       @group = @assignment.context.groups.active.for_category(@assignment.group_category).to_a.find{|g| g.users.include?(@current_user)} if @assignment.group_category
-      attachment_ids = (params[:submission][:attachment_ids] || "").split(",")
+      attachment_ids = (params[:submission][:attachment_ids] || "").split(",").select(&:present?)
       params[:submission][:attachments] = []
       attachment_ids.each do |id|
         params[:submission][:attachments] << @current_user.attachments.active.find_by_id(id) if @current_user
