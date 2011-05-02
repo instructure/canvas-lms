@@ -159,7 +159,7 @@ class AssessmentItemConverter
       elsif id =~ /solution/i
         @question[:example_solution] = feedback
       elsif id =~ /general|all/i
-        @question[:general_comments] = feedback
+        @question[:neutral_comments] = feedback
       elsif id =~ /feedback_(\d*)_fb/i
         if answer = @question[:answers].find{|a|a[:migration_id]== "RESPONSE_#{$1}"}
           answer[:comments] = feedback

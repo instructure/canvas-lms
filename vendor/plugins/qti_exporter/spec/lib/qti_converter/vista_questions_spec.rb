@@ -284,11 +284,11 @@ module VistaExpected
                        :question_text=>"What is 10 - ?",
                        :incorrect_comments=>"",
                        :formulas=>[],
-                       :general_comments=>"General Feedback.",
+                       :neutral_comments=>"General Feedback.",
                        :question_type=>"calculated_question",
                        :variables=>[{:scale=>0, :min=>-10, :max=>10, :name=>"x"}]}
 
-  CALCULATED_COMPLEX = {:general_comments=>"Right answer.",
+  CALCULATED_COMPLEX = {:neutral_comments=>"Right answer.",
                         :question_type=>"calculated_question",
                         :imported_formula=>
                                 "(10*[F])**(-1) * (1000*[F]*[r]*[i]**(-1) * (1-(1 ([i]/200))**(-2*([Y]-10)))   1000*[F]*(1 ([i]/200))**(-2*([Y]-10))) * (1 ([i]/100)*([n]/360))",

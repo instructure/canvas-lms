@@ -131,7 +131,7 @@ module CanvasExpected
                       :incorrect_comments=>"",
                       :question_type=>"multiple_answers_question"}
 
-  ESSAY = {:general_comments=>"You're wrong.",
+  ESSAY = {:neutral_comments=>"You're wrong.",
            :question_type=>"essay_question",
            :correct_comments=>"",
            :question_name=>"essay",

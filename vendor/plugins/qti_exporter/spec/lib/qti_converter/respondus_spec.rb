@@ -102,7 +102,7 @@ module RespondusExpected
                            {:comments=>"", :text=>"abs(2)", :weight=>100}],
                   :incorrect_comments=>"",
                   :points_possible=>1,
-                  :general_comments=>"The answer was \"2\". Or \"two\". Or I would even take \"abs(2)\"",
+                  :neutral_comments=>"The answer was \"2\". Or \"two\". Or I would even take \"abs(2)\"",
                   :question_type=>"short_answer_question",
                   :question_text=>"The absolute value of (-2) is __________"
           }
@@ -115,7 +115,7 @@ module RespondusExpected
                   :answers=>[],
                   :incorrect_comments=>"",
                   :points_possible=>1,
-                  :general_comments=>"You should have typed something coherent and meaningful into the essay box.",
+                  :neutral_comments=>"You should have typed something coherent and meaningful into the essay box.",
                   :question_type=>"essay_question",
                   :question_text=>"Please type your essay question answer in the box below."
           }
@@ -137,7 +137,7 @@ module RespondusExpected
                            {:right=>"D", :comments=>"", :text=>"d"}],
                   :incorrect_comments=>"",
                   :points_possible=>1,
-                  :general_comments=> "This should have been fairly straightforward, if you know the alphabet at all.",
+                  :neutral_comments=> "This should have been fairly straightforward, if you know the alphabet at all.",
                   :question_type=>"matching_question",
                   :question_text=>"Match each lowercase letter with its capitalized letter"
           }
@@ -164,7 +164,7 @@ module RespondusExpected
                                    :weight=>0}],
                   :incorrect_comments=>"",
                   :points_possible=>1,
-                  :general_comments=>
+                  :neutral_comments=>
                           "\"Alabaster\" and \"architecture\" both start with an \"A\".",
                   :question_type=>"multiple_answers_question",
                   :question_text=>"Select all the words that start with an \"A\"."}
@@ -192,7 +192,7 @@ module RespondusExpected
                                    :weight=>0}],
                   :incorrect_comments=>"",
                   :points_possible=>1,
-                  :general_comments=>
+                  :neutral_comments=>
                           "the words \"fox\" and \"clocks\" rhyme with \"box\". I know, that was a tricky one because \"clocks\" doesn't end in \"ox\" like \"box\" and \"fox\" do.",
                   :question_type=>"multiple_answers_question",
                   :question_text=>"Select all answers that rhyme with \"box\"."}
@@ -220,14 +220,14 @@ module RespondusExpected
                                    :weight=>0}],
                   :incorrect_comments=>"No, that's not \"C\", that's \"A\"",
                   :points_possible=>1,
-                  :general_comments=>
+                  :neutral_comments=>
                           "Well, the correct answer should have been \"C\". If you didn't put that, you're wrong.",
                   :question_type=>"multiple_choice_question",
                   :question_text=>"Please select the answer \"C\""}
 
   TRUE_FALSE =
           {
-                  :general_comments=> "Like I said, the correct answer should have been \"false\". If you didn't select \"false\" you deserve to be called an idiot.",
+                  :neutral_comments=> "Like I said, the correct answer should have been \"false\". If you didn't select \"false\" you deserve to be called an idiot.",
                   :answers=>
                           [{:comments=>"No, the correct answer is \"false\"",
                                    :text=>"True",
