@@ -29,6 +29,7 @@ module Delayed
           options[:priority] ||= self.default_priority
           options[:payload_object] = object
           options[:queue] ||= Delayed::Worker.queue
+          options[:max_attempts] ||= Delayed::Worker.max_attempts
           self.create(options)
         end
       end
