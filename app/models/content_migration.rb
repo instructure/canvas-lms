@@ -156,8 +156,10 @@ class ContentMigration < ActiveRecord::Base
   def plugin_type
     if plugin = Canvas::Plugin.find(migration_settings['migration_type'])
       plugin.settings['select_text'] || plugin.name
-    else
+    elsif migration_settings['migration_type']
       migration_settings['migration_type'].titleize
+    else
+      'Unknown'
     end
   end
 
