@@ -47,6 +47,13 @@ class ProfileController < ApplicationController
   def communication
     @user = @current_user
     @user = User.find(params[:id]) if params[:id]
+
+    if @user.communication_channel.blank?
+      flash[:error] = "Please define at least one email address or other way to be contacted before setting notification preferences."
+      redirect_to profile_url
+      return
+    end
+
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active
     @channels = @user.communication_channels.unretired
