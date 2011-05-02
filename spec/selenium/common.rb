@@ -156,11 +156,11 @@ shared_examples_for "all selenium tests" do
   end
   
   def find_with_jquery(selector)
-    driver.execute_script("return $('#{selector.gsub(/'/, '\\\'')}')[0];")
+    driver.execute_script("return $('#{selector.gsub(/'/, '\\\\\'')}')[0];")
   end
   
   def find_all_with_jquery(selector)
-    driver.execute_script("return $('#{selector.gsub(/'/, '\\\'')}').toArray();")
+    driver.execute_script("return $('#{selector.gsub(/'/, '\\\\\'')}').toArray();")
   end
   
   # pass in an Element pointing to the textarea that is tinified.
