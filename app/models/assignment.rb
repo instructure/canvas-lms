@@ -1481,6 +1481,7 @@ class Assignment < ActiveRecord::Base
     # Takes an array of hashes and groups them by their :user entry.  All
     # hashes must have a user entry. 
     def partition_for_user(list)
+      return [] if list.empty?
       index = list.first[:user]
       found, remainder = list.partition { |e| e[:user] == index }
       if remainder.empty?
