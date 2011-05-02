@@ -221,11 +221,14 @@ class User < ActiveRecord::Base
     #      User -> Enrollment -> Course -> Account
     #   Through pseudonyms:
     #      User -> Pseudonym -> Account
+    #   Through account_users
+    #      User -> AccountUser -> Account
     starting_points = []
     self.enrollments.find(:all, :include => {:course_section => [:course, :course_account_associations], :course => :course_account_associations}).each do |enrollment|
       starting_points << enrollment.course << enrollment.course_section.try(:course) << enrollment.course_section.try(:nonxlist_course)
     end
     starting_points += self.pseudonym_accounts.reload
+    starting_points += account_users.map(&:account)
     
     # For each Course and Account, make sure an association exists.
     starting_points.compact.each do |entity|

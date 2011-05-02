@@ -22,7 +22,8 @@ describe UsersController do
 
   it "should filter account users by term" do
     a = Account.default
-    a.add_user(user(:active_all => true))
+    u = user(:active_all => true)
+    a.add_user(u)
     user_session(@user)
     t1 = a.default_enrollment_term
     t2 = a.enrollment_terms.create!(:name => 'Term 2')
@@ -39,7 +40,7 @@ describe UsersController do
     User.update_account_associations(User.all.map(&:id))
 
     get 'index', :account_id => a.id
-    assigns[:users].map(&:id).sort.should == [e1.user, c1.teachers.first, e2.user, c2.teachers.first, c3.teachers.first].map(&:id).sort
+    assigns[:users].map(&:id).sort.should == [u, e1.user, c1.teachers.first, e2.user, c2.teachers.first, c3.teachers.first].map(&:id).sort
 
     get 'index', :account_id => a.id, :enrollment_term_id => t1.id
     assigns[:users].map(&:id).sort.should == [e1.user, c1.teachers.first, c3.teachers.first].map(&:id).sort # 1 student, enrolled twice, and 2 teachers

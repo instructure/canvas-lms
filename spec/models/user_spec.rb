@@ -126,6 +126,16 @@ describe User do
     user.associated_accounts[0].should eql(account1)
     user.associated_accounts[1].should eql(account2)
   end
+
+  it "should update account associations when a user is associated to an account just by account_users" do
+    account = account_model
+    @user = User.create
+    account.add_user(@user)
+
+    @user.reload
+    @user.associated_accounts.length.should eql(1)
+    @user.associated_accounts.first.should eql(account)
+  end
   
   it "should populate dashboard_messages" do
     Notification.create(:name => "Assignment Created")

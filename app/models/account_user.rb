@@ -23,8 +23,23 @@ class AccountUser < ActiveRecord::Base
   has_many :all_account_courses, :class_name => 'Course', :foreign_key => 'root_account_id', :primary_key => 'account_id'
   has_a_broadcast_policy
   before_save :infer_defaults
+  before_save :set_update_account_associations_if_changed
   after_save :touch_user
-  
+  after_save :update_account_associations_if_changed
+
+  def set_update_account_associations_if_changed
+    @should_update_account_associations = (self.account_id_changed? || self.user_id_changed?) && !self.user_id.nil?
+    true
+  end
+
+  def update_account_associations_if_changed
+    send_later_if_production(:update_account_associations) if @should_update_account_associations
+  end
+
+  def update_account_associations
+    self.user.update_account_associations if self.user
+  end
+
   def infer_defaults
     self.membership_type ||= 'AccountAdmin'
   end
