@@ -886,7 +886,6 @@ class Course < ActiveRecord::Base
   end
 
   def expire_pending_grade_publishing_statuses(last_publish_attempt_at)
-    puts "#{last_publish_attempt_at}"
     self.student_enrollments.scoped(:conditions => ["grade_publishing_status IN ('pending', 'publishing') AND last_publish_attempt_at = ?",
       last_publish_attempt_at]).update_all :grade_publishing_status => 'error'
   end
@@ -1339,6 +1338,11 @@ class Course < ActiveRecord::Base
           event.start_at = shift_date(event.start_at, shift_options)
           event.end_at = shift_date(event.end_at, shift_options)
           event.save_without_broadcasting!
+        elsif event.is_a?(Quiz)
+          event.due_at = shift_date(event.due_at, shift_options)
+          event.lock_at = shift_date(event.lock_at, shift_options)
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
+          event.save!
         end
       end
     end

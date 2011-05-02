@@ -1402,6 +1402,10 @@ class Assignment < ActiveRecord::Base
       end
     end
     
+    # Associating with a rubric or a quiz might cause item to get saved, no longer indicating
+    # that it is a new record.  We need to know that below, where we add to the list of
+    # imported items
+    new_record = item.new_record?
     if hash[:rubric_migration_id]
       rubric = context.rubrics.find_by_migration_id(hash[:rubric_migration_id])
       rubric.associate_with(item, context, :purpose => 'grading') if rubric
@@ -1438,7 +1442,7 @@ class Assignment < ActiveRecord::Base
       item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
     end
 
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+    context.imported_migration_items << item if context.imported_migration_items && new_record
     item.save_without_broadcasting!
     
     if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
