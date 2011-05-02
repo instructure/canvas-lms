@@ -1641,7 +1641,12 @@ class Course < ActiveRecord::Base
         end
         event.respond_to?(:save_without_broadcasting!) ? event.save_without_broadcasting! : event.save!
       end
+      self.start_at ||= shift_options[:new_start_date]
+      self.conclude_at ||= shift_options[:new_end_date]
     end
+
+    self.save
+
     if course_import
       course_import.added_item_codes = added_items.map{|i| i.asset_string }
       course_import.log = merge_results
@@ -1653,17 +1658,16 @@ class Course < ActiveRecord::Base
   end
 
   def self.clonable_attributes
-    [:name, :course_code, :group_weighting_scheme, :start_at, :conclude_at, 
-    :grading_standard_id, :is_public, :publish_grades_immediately, 
-    :allow_student_wiki_edits, :allow_student_assignment_edits, 
-    :hashtag, :show_public_context_messages, :syllabus_body, 
-    :hidden_tabs, :allow_student_forum_attachments, 
-    :default_wiki_editing_roles, :allow_student_organized_groups, 
-    :default_view, :show_all_discussion_entries, :open_enrollment, 
-    :storage_quota, :tab_configuration, :allow_wiki_comments, 
-    :turnitin_comments, :self_enrollment, :license, :indexed]
+    [ :group_weighting_scheme, :grading_standard_id, :is_public,
+      :publish_grades_immediately, :allow_student_wiki_edits,
+      :allow_student_assignment_edits, :hashtag, :show_public_context_messages,
+      :syllabus_body, :hidden_tabs, :allow_student_forum_attachments,
+      :default_wiki_editing_roles, :allow_student_organized_groups,
+      :default_view, :show_all_discussion_entries, :open_enrollment,
+      :storage_quota, :tab_configuration, :allow_wiki_comments,
+      :turnitin_comments, :self_enrollment, :license, :indexed ]
   end
-  
+
   def clone_for(account, opts={})
     new_course = Course.new
     root_account = account.root_account || account
