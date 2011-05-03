@@ -37,10 +37,10 @@ describe "Respondus SOAP API", :type => :integration do
 
   before(:each) do
     setting = PluginSetting.find_or_create_by_name('qti_exporter')
-    setting.settings = Canvas::Plugin.find('qti_exporter').default_settings.merge({:enabled => true})
+    setting.settings = Canvas::Plugin.find('qti_exporter').default_settings.merge({:enabled => 'true'})
     setting.save!
     setting = PluginSetting.find_or_create_by_name('respondus_soap_endpoint')
-    setting.settings = {:enabled => true}
+    setting.settings = {:enabled => 'true'}
     setting.save!
     user_with_pseudonym :active_user => true,
       :username => "nobody@example.com",

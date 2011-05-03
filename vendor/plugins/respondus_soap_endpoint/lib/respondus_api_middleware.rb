@@ -5,7 +5,7 @@ class RespondusAPIMiddleware
 
   def self.plugin_enabled?
     plugin = Canvas::Plugin.find(:respondus_soap_endpoint)
-    plugin.settings[:enabled]
+    plugin.settings[:enabled] == 'true'
   end
 
   # The first time a call to this API is made, and the plugin is enabled, we
