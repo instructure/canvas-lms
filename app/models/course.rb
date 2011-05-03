@@ -686,10 +686,10 @@ class Course < ActiveRecord::Base
     given { |user, session| (self.available? || self.created? || self.claimed? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
     set { can :read and can :manage and can :manage_content and can :impersonate_as_context_member and can :update and can :delete and can :read_reports and can :read_groups and can :create_user_notes and can :read_user_notes and can :delete_user_notes }
     
-    given { |user| self.prior_enrollments.map(&:user_id).include?(user && user.id) }
+    given { |user| !self.deleted? && self.prior_enrollments.map(&:user_id).include?(user && user.id) }
     set { can :read}
     
-    given { |user| self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user && user.id) }
+    given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user && user.id) }
     set { can :read and can :read_grades}
     
     given { |user, session| session && session["role_course_#{self.id}"] }
