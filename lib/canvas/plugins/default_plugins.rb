@@ -7,7 +7,7 @@ Canvas::Plugin.register('kaltura', nil, {
   :website => 'http://corp.kaltura.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :version => 1.0,
+  :version => '1.0.0',
   :settings_partial => 'plugins/kaltura_settings',
   :validator => 'KalturaValidator'
 })
@@ -16,7 +16,7 @@ Canvas::Plugin.register('dim_dim', :web_conferencing, {
   :website => 'http://www.dimdim.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :version => 1.0,
+  :version => '1.0.0',
   :settings_partial => 'plugins/dim_dim_settings'
 })
 Canvas::Plugin.register('wimba', :web_conferencing, {
@@ -24,7 +24,7 @@ Canvas::Plugin.register('wimba', :web_conferencing, {
   :website => 'http://www.wimba.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :version => 1.0,
+  :version => '1.0.0',
   :settings_partial => 'plugins/wimba_settings',
   :settings => {:timezone => 'Eastern Time (US & Canada)'},
   :validator => 'WimbaValidator',
@@ -35,7 +35,7 @@ Canvas::Plugin.register('error_reporting', :error_reporting, {
   :website => 'http://www.instructure.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :version => 1.0,
+  :version => '1.0.0',
   :settings_partial => 'plugins/error_reporting_settings'
 })
 Canvas::Plugin.register('big_blue_button', :web_conferencing, {
@@ -43,7 +43,7 @@ Canvas::Plugin.register('big_blue_button', :web_conferencing, {
   :website => 'http://bigbluebutton.org',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :version => 1.0,
+  :version => '1.0.0',
   :settings_partial => 'plugins/big_blue_button_settings',
   :validator => 'BigBlueButtonValidator',
   :encrypted_settings => [:secret]
@@ -52,6 +52,7 @@ require_dependency 'cc/importer/cc_worker'
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :name => 'Common Cartridge Importer',
   :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
   :description => 'This enables converting a canvas CC export to the intermediary json format to be imported',
   :version => '1.0.0',
   :settings => {
@@ -65,7 +66,7 @@ Canvas::Plugin.register('grade_export', :sis, {
   :website => 'http://www.instructure.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :version => 1.0,
+  :version => '1.0.0',
   :settings_partial => 'plugins/grade_export_settings',
   :settings => { :enabled => "false",
                  :publish_endpoint => "",
