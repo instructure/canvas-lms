@@ -38,8 +38,6 @@ class Enrollment < ActiveRecord::Base
   after_save :touch_user
   before_save :update_user_account_associations_if_necessary
 
-  attr_accessor :skip_updating_user_account_associations
-
   trigger.after(:insert).where("NEW.workflow_state = 'active'") do
     <<-SQL
     UPDATE assignments
@@ -141,9 +139,7 @@ class Enrollment < ActiveRecord::Base
   end
   
   def update_user_account_associations_if_necessary
-    if !@skip_updating_user_account_associations && should_update_user_account_association?
-      self.user.send_later(:update_account_associations)
-    end
+    self.user.update_account_associations_later if should_update_user_account_association?
   end
   protected :update_user_account_associations_if_necessary
 

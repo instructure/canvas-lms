@@ -117,7 +117,7 @@ class AccountsController < ApplicationController
           @pseudonym.assert_communication_channel(true)
           message_sent = notify && new_login
           @pseudonym.send_registration_notification! if notify && (new_login || @user.pre_registered?)
-          @user.send_later(:update_account_associations)
+          @user.update_account_associations_later
           @user.reload
           data = OpenObject.new(:user => @user, :pseudonym => @pseudonym, :channel => @user.communication_channel, :new_login => new_login, :new_user => new_user, :message_sent => message_sent)
           respond_to do |format|

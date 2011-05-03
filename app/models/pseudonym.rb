@@ -79,7 +79,7 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def update_account_associations_if_account_changed
-    update_user_account_associations if @should_update_user_account_associations
+    self.user.update_account_associations_later if self.user && @should_update_user_account_associations
   end
   
   def send_registration_notification!
@@ -100,10 +100,6 @@ class Pseudonym < ActiveRecord::Base
     else
       first(:conditions => ["LOWER(#{quoted_table_name}.unique_id) = ?", unique_id.mb_chars.downcase])
     end
-  end
-  
-  def update_user_account_associations
-    self.user.send_later_if_production(:update_account_associations) if self.user
   end
   
   def set_password_changed

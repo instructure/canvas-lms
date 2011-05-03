@@ -193,6 +193,20 @@ class User < ActiveRecord::Base
   end
   memoize :page_views_by_day
   
+  def self.skip_updating_user_account_associations(&block)
+    @skip_updating_user_account_associations = true
+    block.call
+  ensure
+    @skip_updating_user_account_associations = false
+  end
+  def self.skip_updating_user_account_associations?
+    !!@skip_updating_user_account_associations
+  end
+  
+  def update_account_associations_later
+    self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_user_account_associations?
+  end
+  
   def self.update_account_associations(all_user_ids)
     all_user_ids.uniq.compact.each_slice(100) do |user_ids|
       User.find_all_by_id(user_ids).each do |user|
