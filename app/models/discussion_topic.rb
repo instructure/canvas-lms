@@ -302,7 +302,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
   
   def initialize_last_reply_at
-    self.posted_at = Time.now
+    self.posted_at ||= Time.now
     self.last_reply_at = Time.now
   end
 

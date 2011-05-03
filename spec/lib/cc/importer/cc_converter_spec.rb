@@ -538,7 +538,8 @@ describe "Common Cartridge importing" do
     dt.title = "Topic"
     dt.message = body_with_link % @copy_from.id
     dt.delayed_post_at = 1.week.from_now
-    dt.posted_at = 1.day.ago
+    orig_posted_at = 1.day.ago
+    dt.posted_at = orig_posted_at
     dt.save!
     
     #export to xml
@@ -559,7 +560,7 @@ describe "Common Cartridge importing" do
     dt_2.title.should == dt.title
     dt_2.message.should == body_with_link % @copy_to.id
     dt_2.delayed_post_at.to_i.should == dt.delayed_post_at.to_i
-    dt_2.posted_at.to_i.should == dt.posted_at.to_i
+    dt_2.posted_at.to_i.should == orig_posted_at.to_i
     dt_2.type.should == dt.type
   end
   
