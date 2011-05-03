@@ -107,7 +107,7 @@ class AssignmentGroupsController < ApplicationController
     @group = @context.assignment_groups.find(params[:assignment_group_id])
     if authorized_action(@group, @current_user, :update)
       order = params[:order].split(',').map{|id| id.to_i }
-      group_ids = ([@group.id] + order.empty? ? [] : @context.assignments.find_all_by_id(order).map(&:assignment_group_id)).uniq.compact
+      group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.find_all_by_id(order).map(&:assignment_group_id))).uniq.compact
       Assignment.update_all("assignment_group_id=#{@group.id}", :id => order, :context_id => @context.id, :context_type => @context.class.to_s)
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
       AssignmentGroup.update_all({:updated_at => Time.now}, {:id => group_ids})
