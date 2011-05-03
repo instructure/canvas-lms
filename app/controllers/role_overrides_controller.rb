@@ -21,9 +21,14 @@ class RoleOverridesController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      @role_types = RoleOverride.enrollment_types
-      @role_types = RoleOverride.account_membership_types(@context) if @context.is_a?(Account) && params[:account_roles]
       @managing_account_roles = @context.is_a?(Account) && (params[:account_roles] || @context.site_admin?)
+
+      if @managing_account_roles
+        @role_types = RoleOverride.account_membership_types(@context)
+      else
+        @role_types = RoleOverride.enrollment_types
+      end
+
       respond_to do |format|
         format.html
       end
