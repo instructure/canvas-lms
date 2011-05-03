@@ -58,12 +58,12 @@ class AssessmentItemConverter
       # The colons are replaced with dashes in the conversion from QTI 1.2
       @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier').gsub(/:/, '-')
       if text = @doc.at_css('itemBody div.html')
-        @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text)).inner_html.strip
+        @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text))
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
-        @question[:question_text] = sanitize_html!(text).inner_html.strip
+        @question[:question_text] = sanitize_html!(text)
       elsif @doc.at_css('itemBody')
         if text = @doc.at_css('itemBody').children.find{|c|c.text.strip != ''}
-          @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text)).inner_html.strip
+          @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text))
         end
       end
       parse_instructure_metadata
@@ -178,22 +178,25 @@ class AssessmentItemConverter
     node.children.each do |child|
       Sanitize.clean_node!(child, Instructure::SanitizeField::SANITIZE)
     end
-    return node unless remove_extraneous_nodes
 
-    while true
-      node.children.each do |child|
-        break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
-        child.remove
+    if remove_extraneous_nodes
+      while true
+        node.children.each do |child|
+          break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+          child.remove
+        end
+  
+        node.children.reverse.each do |child|
+          break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+          child.remove
+        end
+        break unless node.children.size == 1 && ['p', 'div', 'span'].include?(node.child.name)
+        node = node.child
       end
-
-      node.children.reverse.each do |child|
-        break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
-        child.remove
-      end
-      break unless node.children.size == 1 && ['p', 'div', 'span'].include?(node.child.name)
-      node = node.child
     end
-    node
+    text = node.inner_html.strip
+    # Clear WebCT-specific relative paths
+    text.gsub(%r{/webct/RelativeResourceManager/Template/}, '')
   end
 
   def self.create_instructure_question(opts)

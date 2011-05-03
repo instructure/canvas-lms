@@ -62,7 +62,7 @@ class ChoiceInteraction < AssessmentItemConverter
           answer[:comments] = feedback.text.strip
         else
           answer[:text] = clear_html(choice.text).strip.gsub(/\s+/, " ")
-          sanitized = sanitize_html!(choice.at_css('div.html') ? Nokogiri::HTML::DocumentFragment.parse(choice.text) : choice, true).inner_html.strip
+          sanitized = sanitize_html!(choice.at_css('div.html') ? Nokogiri::HTML::DocumentFragment.parse(choice.text) : choice, true)
           if sanitized.present? && sanitized != CGI::escapeHTML(answer[:text])
             answer[:html] = sanitized
           end
