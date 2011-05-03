@@ -33,7 +33,7 @@ class PageViewsController < ApplicationController
         format.html #index.html.erb
         format.csv { 
           send_data(
-            @user.page_views.scoped(:limit=>params[:report_count] || 300).to_csv, 
+            @user.page_views.scoped(:limit=>params[:report_count] || 300).to_a.to_csv, 
             :type => "text/csv", 
             :filename => "Pageviews For #{@user.name.to_s.gsub(/ /, "_")}.csv", 
             :disposition => "attachment"
