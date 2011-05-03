@@ -221,7 +221,9 @@ var contextGroups = {
     })
     
     // -1 means to load page 1, but only if there aren't any other pages loaded (for switching between tabs)
-    contextGroups.loadUnassignedMembersPage($category.find(".group_blank"), -1);
+    if ($category.length) {
+      contextGroups.loadUnassignedMembersPage($category.find(".group_blank"), -1);
+    }
   },
   
   addGroupToSidebar: function(group) {
