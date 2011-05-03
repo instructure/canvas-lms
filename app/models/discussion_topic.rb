@@ -474,6 +474,7 @@ class DiscussionTopic < ActiveRecord::Base
     to_import = migration.to_import 'announcements'
     announcements.each do |event|
       if event['migration_id'] && (!to_import || to_import[event['migration_id']])
+        event[:type] = 'announcement'
         import_from_migration(event, migration.context)
       end
     end
