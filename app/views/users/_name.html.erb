@@ -3,7 +3,7 @@
   managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :manage_admin_users) }
   can_manage_admin_users = managed_accounts
   account ||= managed_accounts.first
-  root_account = account.root_account || account
+  root_account = account.root_account || account if account
   can_manage_user_logins = @user.associated_root_accounts.active.any?{|a| can_do(a, @current_user, :manage_user_logins) } 
 %>
 <% jammit_js :user_name %>
