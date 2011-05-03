@@ -5,6 +5,12 @@ production:
     max_priority: 10
   - queue: canvas_queue
     workers: 4
+    
+  # warning: don't set the worker pool size to be greater than 1 if you want
+  #   sis imports to be processed serially
+  - queue: sis_imports
+    workers: 1
+    
   - periodic: config/periodic_jobs.rb
   max_run_time: 28800
 
