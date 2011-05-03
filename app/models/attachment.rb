@@ -401,11 +401,6 @@ class Attachment < ActiveRecord::Base
     end
     
     def bucket_name; "no-bucket"; end
-    
-    def after_attachment_saved
-      # No point in submitting to scribd since there's not a reliable
-      # URL to provide for referencing
-    end
   else
     has_attachment(
         :storage => :s3, 
@@ -806,7 +801,12 @@ class Attachment < ActiveRecord::Base
     if self.pending_upload? and self.scribdable? and self.filename and ScribdAPI.enabled?
       ScribdAPI.instance.set_user(self.scribd_account)
       begin
-        self.write_attribute(:scribd_doc, ScribdAPI.upload(self.authenticated_s3_url(:expires_in => 1.year), self.after_extension || self.scribd_mime_type.extension))
+        upload_path = if Attachment.local_storage?
+                 self.full_filename
+               else
+                 self.authenticated_s3_url(:expires_in => 1.year)
+               end
+        self.write_attribute(:scribd_doc, ScribdAPI.upload(upload_path, self.after_extension || self.scribd_mime_type.extension))
         self.cached_scribd_thumbnail = self.scribd_doc.thumbnail
         self.workflow_state = 'processing'
       rescue => e
