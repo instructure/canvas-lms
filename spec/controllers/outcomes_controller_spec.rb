@@ -19,6 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe OutcomesController do
+  def course_outcome
+    @outcome_group ||= LearningOutcomeGroup.default_for(@course)
+    @outcome = @course.created_learning_outcomes.create
+    @outcome_group.add_item(@outcome)
+  end
+
   describe "GET 'index'" do
     it "should require authorization" do
       course_with_student(:active_all => true)
@@ -39,6 +45,44 @@ describe OutcomesController do
       get 'index', :course_id => @course.id
       response.should be_success
     end
+  end
+
+  describe "GET 'show'" do
+    it "should require authorization" do
+      course_with_student(:active_all => true)
+      course_outcome
+      get 'show', :course_id => @course.id, :id => @outcome.id
+      assert_unauthorized
+    end
     
+    it "should not allow students to view outcomes" do
+      course_with_student_logged_in(:active_all => true)
+      course_outcome
+      get 'show', :course_id => @course.id, :id => @outcome.id
+      assert_unauthorized
+    end
+    
+    it "should assign variables" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_outcome
+      get 'show', :course_id => @course.id, :id => @outcome.id
+      response.should be_success
+    end
+  end
+
+  describe "GET 'detail'" do
+    it "should require authorization" do
+      course_with_student(:active_all => true)
+      course_outcome
+      get 'details', :course_id => @course.id, :outcome_id => @outcome.id
+      assert_unauthorized
+    end
+    
+    it "should assign variables" do
+      course_with_student_logged_in(:active_all => true)
+      course_outcome
+      get 'details', :course_id => @course.id, :outcome_id => @outcome.id
+      response.should be_success
+    end
   end
 end

@@ -238,7 +238,7 @@ $(document).ready(function() {
       } else {
         var $link = $(this);
         $link.text("loading details...");
-        var url = $outcome.find("a.short_description").attr('href');
+        var url = $outcome.find("a.show_details_link").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $link.text("show details");
           outcomes.updateOutcome(data.learning_outcome, $outcome);

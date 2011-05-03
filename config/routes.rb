@@ -213,6 +213,7 @@ ActionController::Routing::Routes.draw do |map|
       outcome.remove_alignment 'alignments/:id', :controller => 'outcomes', :action => 'remove_alignment', :conditions => {:method => :delete}
       outcome.results 'results', :controller => 'outcomes', :action => 'outcome_results'
       outcome.result 'results/:id', :controller => 'outcomes', :action => 'outcome_result'
+      outcome.details 'details', :controller => 'outcomes', :action => 'details'
     end
     course.resources :outcome_groups, :only => %w(create update destroy) do |group|
       group.reorder 'reorder', :controller => 'outcome_groups', :action => 'reorder'

@@ -22,7 +22,7 @@
     </div>
   </div>
   <div class="body">
-    <a href="#" class="show_details_link">show details</a>
+    <a href="<%= context_url(@context, :context_outcome_details_url, outcome ? outcome.id : "{{ id }}") %>" class="show_details_link">show details</a>
     <a href="#" class="hide_details_link">hide details</a>
     <div class="user_content description">&nbsp;</div>
     <textarea style="display: none;" class="description"></textarea>

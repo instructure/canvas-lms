@@ -43,20 +43,17 @@ class OutcomesController < ApplicationController
       @tags = @outcome.content_tags.active.for_context(@context)
       add_crumb(@outcome.short_description, named_context_url(@context, :context_outcome_url, @outcome.id))
       @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
-      respond_to do |format|
-        format.html
-        if params[:results]
-          format.json { render :json => @results.to_json }
-        else
-          format.json { 
-            @outcome.tie_to(@context)
-            render :json => @outcome.to_json(:methods => :artifacts_count_for_tied_context)
-          }
-        end
-      end
     end
   end
-  
+
+  def details
+    @outcome = @context.learning_outcomes.find(params[:outcome_id])
+    if authorized_action(@context, @current_user, :read)
+      @outcome.tie_to(@context)
+      render :json => @outcome.to_json(:methods => :artifacts_count_for_tied_context)
+    end
+  end
+
   def outcome_results
     @outcome = @context.learning_outcomes.find(params[:outcome_id])
     if authorized_action(@context, @current_user, :read)
