@@ -17,7 +17,6 @@
 #
 
 def notification_model(opts={})
-  Notification.find(:all).each{|n| n.destroy }
   @notification = Notification.create!(notification_valid_attributes.merge(opts))
 end
 

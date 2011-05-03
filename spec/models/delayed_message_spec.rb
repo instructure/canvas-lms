@@ -111,4 +111,19 @@ describe DelayedMessage do
       @delayed_message.state.should eql(:sent)
     end
   end
+
+  it "should use the user's main account domain for links" do
+    Canvas::MessageHelper.create_notification('Summary', 'Summaries', 0, '', 'Summaries')
+    account = Account.create!(:name => 'new acct')
+    user = user_with_pseudonym(:account => account)
+    user.pseudonym.update_attribute(:account, account)
+    user.pseudonym.account.should == account
+    HostUrl.should_receive(:context_host).with(user.pseudonym.account).at_least(:once).and_return("dm.dummy.test.host")
+    HostUrl.should_receive(:default_host).any_number_of_times.and_return("test.host")
+    dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
+    DelayedMessage.summarize([dm])
+    message = Message.last
+    message.body.to_s.should_not match(%r{http://test.host/})
+    message.body.to_s.should match(%r{http://dm.dummy.test.host/})
+  end
 end

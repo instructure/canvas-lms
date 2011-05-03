@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.default_host %>
+  http://<%= HostUrl.context_host(user.pseudonym.try(:account)) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -25,4 +25,4 @@
 
 
 You can change your notification settings by visiting the following page:
-http://<%= HostUrl.default_host %>/profile/communication
+http://<%= HostUrl.context_host(user.pseudonym.try(:account))  %>/profile/communication
