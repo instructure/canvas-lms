@@ -681,12 +681,17 @@ var anonymousAssignment = false;
 
     jsonReady: function(){
       //this runs after the request to get the jsonData comes back
-      $("#speed_grader_loading").hide();
-      $("#gradebook_header, #full_width_container").show();
-
+      
       mergeStudentsAndSubmission();
-      initDropdown();
-      EG.handleFragementChange();
+      if (!jsonData.studentsWithSubmissions.length) {
+        alert("Sorry, there are either no active students in the course or none are gradable by you.")
+        window.history.back();
+      } else {
+        $("#speed_grader_loading").hide();
+        $("#gradebook_header, #full_width_container").show();
+        initDropdown();
+        EG.handleFragementChange();
+      }
     },
 
     skipRelativeToCurrentIndex: function(offset){
