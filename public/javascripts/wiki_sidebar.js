@@ -242,7 +242,7 @@
                   ++batchCount;
                 }
 
-                setTimeout(processBatch, 50);
+                setTimeout(function() { processBatch(false); }, 50);
               };
 
               var addBatch = function() {
