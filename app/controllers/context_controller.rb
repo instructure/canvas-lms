@@ -327,16 +327,19 @@ class ContextController < ApplicationController
     when 'sentbox'
       @messages_view = :sentbox
       @messages = @current_user.sentbox_context_messages
+      context_messages = @messages
       @messages_view_header = "Sent Messages"
       @per_page = 10
     when 'inbox'
       @messages_view = :inbox
       @messages = @current_user.inbox_context_messages
+      context_messages = @messages
       @messages_view_header = "Received Messages"
       @per_page = 10
     else # default view
       @messages_view = :action_items
       @messages = @current_user.inbox_items.active
+      context_messages = @current_user.context_messages
       @messages_view_header = "Inbox"
       @per_page = 15
     end
@@ -345,7 +348,7 @@ class ContextController < ApplicationController
       @included_message = nil unless @included_message.grants_right?(@current_user, session, :read)
     end
     if params[:message_id]
-      @message = @current_user.inbox_context_messages.find(params[:message_id])
+      @message = context_messages.find(params[:message_id])
     end
     @messages = @messages.paginate(:page => params[:page], :per_page => @per_page)
     @past_message_contexts = @messages.once_per(&:context_code).map(&:context).compact.uniq rescue []
