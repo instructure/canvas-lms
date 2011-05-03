@@ -350,8 +350,8 @@
       
       $("#media_upload_feedback_text").html("");
       $("#media_upload_feedback").css('visibility', 'hidden');
-      if (file.bytesTotal > (INST.kalturaSettings.max_file_size_bytes || 104857600)) {
-        $("#media_upload_feedback_text").html("<b>This file is too large.</b> The maximum size is " + (INST.kalturaSettings.max_file_size_bytes || 104857600) / 1048576 + "MB.");
+      if (file.bytesTotal > INST.kalturaSettings.max_file_size_bytes) {
+        $("#media_upload_feedback_text").html("<b>This file is too large.</b> The maximum size is " + INST.kalturaSettings.max_file_size_bytes / 1048576 + "MB.");
         $("#media_upload_feedback").css('visibility', 'visible');
         $("#media_upload_submit").hide();
         return;
@@ -464,7 +464,7 @@
           licenseType:"CC-0.1",
           showUi:"true",
           useCamera:"false",
-          maxFileSize: (INST.kalturaSettings.max_file_size_bytes || 104857600) / 1048576,
+          maxFileSize: INST.kalturaSettings.max_file_size_bytes / 1048576,
           maxUploads: 1,
           partnerData: $.mediaComment.partnerData(),
           partner_data: $.mediaComment.partnerData(),
@@ -499,7 +499,7 @@
         ks:ks,
         thumbOffset:"1",
         licenseType:"CC-0.1",
-        maxFileSize: (INST.kalturaSettings.max_file_size_bytes || 104857600) / 1048576,
+        maxFileSize: INST.kalturaSettings.max_file_size_bytes / 1048576,
         maxUploads: 1,
         uiConfId: INST.kalturaSettings.upload_ui_conf,
         jsDelegate: "$.mediaComment.audio_delegate"

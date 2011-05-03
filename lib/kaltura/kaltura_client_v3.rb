@@ -44,13 +44,17 @@ module Kaltura
       @host ||= "www.kaltura.com"
       @endpoint ||= "/api_v3"
     end
-    
+
     def self.config
       res = Canvas::Plugin.find(:kaltura).try(:settings)
-      res = nil unless res && res['partner_id'] && res['subpartner_id']		
+      return nil unless res && res['partner_id'] && res['subpartner_id']		
+
+      # default settings
+      res['max_file_size_bytes'] = 500.megabytes unless res['max_file_size_bytes'].to_i > 0
+
       res
     end
-    
+
     def startSession(type = SessionType::USER, userId = nil)
       partnerId = @partnerId
       secret = type == SessionType::USER ? @user_secret : @secret
