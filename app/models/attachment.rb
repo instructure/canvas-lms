@@ -295,10 +295,10 @@ class Attachment < ActiveRecord::Base
 
     if !self.scribd_mime_type_id
       @@mime_ids ||= {}
-      @@mime_ids[self.after_extension] ||= ScribdMimeType.find_by_extension(self.after_extension).try(:id)
+      @@mime_ids[self.after_extension] ||= self.after_extension && ScribdMimeType.find_by_extension(self.after_extension).try(:id)
       self.scribd_mime_type_id = @@mime_ids[self.after_extension]
       if !self.scribd_mime_type_id
-        @@mime_ids[self.content_type] ||= ScribdMimeType.find_by_name(self.content_type).try(:id)
+        @@mime_ids[self.content_type] ||= self.content_type && ScribdMimeType.find_by_name(self.content_type).try(:id)
         self.scribd_mime_type_id = @@mime_ids[self.content_type]
       end
     end

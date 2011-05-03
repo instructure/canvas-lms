@@ -20,6 +20,11 @@ config.action_mailer.raise_delivery_errors = true
 # they hit.
 Canvas.protected_attribute_error = :raise
 
+# Raise an exception on finder type mismatch or nil arguments. Helps us catch
+# these bugs before they hit.
+Canvas.dynamic_finder_nil_arguments_error = :raise
+Canvas.dynamic_finder_type_cast_error = :raise
+
 SslRequirement.ssl_host = "localhost:3000"
 SslRequirement.standard_host = "localhost:3000"
 SslRequirement.disable_ssl_check = true

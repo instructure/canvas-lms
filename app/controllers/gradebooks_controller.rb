@@ -100,7 +100,7 @@ class GradebooksController < ApplicationController
   protected :submissions_json
 
   def attendance
-    @enrollment = @context.all_student_enrollments.find_by_user_id(params[:user_id])
+    @enrollment = @context.all_student_enrollments.find_by_user_id(params[:user_id]) if params[:user_id].present?
     @enrollment ||= @context.all_student_enrollments.find_by_user_id(@current_user.id) if !@context.grants_right?(@current_user, session, :manage_grades)
     add_crumb 'Attendance'
     if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)

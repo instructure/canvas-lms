@@ -128,6 +128,7 @@ class ContextMessage < ActiveRecord::Base
     sender = self.context_message_participants.find_by_user_id_and_participation_type(self.user_id, 'sender')
     sender ||= self.context_message_participants.create(:user_id => self.user_id, :participation_type => 'sender')
     recipient_users = self.context.users.select{|u| (self.recipients || []).include?(u.id) }
+    return if recipient_users.empty?
     participants_hash = {}
     self.context_message_participants.find_all_by_user_id(recipient_users.map(&:id)).each do |participant|
       participants_hash[participant.user_id] = true

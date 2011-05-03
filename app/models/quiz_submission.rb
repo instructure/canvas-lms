@@ -90,7 +90,7 @@ class QuizSubmission < ActiveRecord::Base
   def track_outcomes(attempt)
     return unless user_id
     question_ids = (self.quiz_data || []).map{|q| q[:assessment_question_id] }.compact.uniq
-    questions = AssessmentQuestion.find_all_by_id(question_ids).compact
+    questions = question_ids.empty? ? [] : AssessmentQuestion.find_all_by_id(question_ids).compact
     bank_ids = questions.map(&:assessment_question_bank_id).uniq
     tagged_bank_ids = (bank_ids.empty? ? [] : ContentTag.outcome_tags_for_banks(bank_ids).scoped(:select => 'content_id')).map(&:content_id).uniq
     if !tagged_bank_ids.empty?

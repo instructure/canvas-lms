@@ -105,8 +105,9 @@ class ContentImportsController < ApplicationController
   
   def migrate_content_execute
     if authorized_action(@context, @current_user, :manage)
-      @content_migration = ContentMigration.find_by_context_id_and_context_type_and_id(@context.id, @context.class.to_s, params[:id] || params[:copy][:content_migration_id]) rescue nil
-      @content_migration ||= ContentMigration.find_all_by_context_id_and_context_type(@context.id, @context.class.to_s).last
+      migration_id = params[:id] || params[:copy] && params[:copy][:content_migration_id]
+      @content_migration = ContentMigration.find_by_context_id_and_context_type_and_id(@context.id, @context.class.to_s, migration_id) if migration_id.present?
+      @content_migration ||= ContentMigration.find_by_context_id_and_context_type(@context.id, @context.class.to_s, :order => "id DESC")
       if request.method == :post
         @content_migration.migration_settings[:migration_ids_to_import] = params
         @content_migration.save

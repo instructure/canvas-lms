@@ -563,12 +563,12 @@ class DiscussionTopic < ActiveRecord::Base
     end
     media_object_ids = media_object_ids.uniq.compact
     attachment_ids = attachment_ids.uniq.compact
-    attachments = context.attachments.active.find_all_by_id(attachment_ids).compact
+    attachments = attachment_ids.empty? ? [] : context.attachments.active.find_all_by_id(attachment_ids).compact
     attachments = attachments.select{|a| a.content_type && a.content_type.match(/(video|audio)/) }
     attachments.each do |attachment|
       attachment.podcast_associated_asset = messages_hash[attachment.id]
     end
-    media_objects = MediaObject.find_all_by_media_id(media_object_ids)
+    media_objects = media_object_ids.empty? ? [] : MediaObject.find_all_by_media_id(media_object_ids)
     media_objects += media_object_ids.map{|id| MediaObject.new(:media_id => id) }
     media_objects = media_objects.once_per(&:media_id)
     media_objects = media_objects.map do |media_object|

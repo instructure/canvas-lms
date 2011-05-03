@@ -25,6 +25,11 @@ config.action_mailer.delivery_method = :test
 # they hit.
 Canvas.protected_attribute_error = :raise
 
+# Raise an exception on finder type mismatch or nil arguments. Helps us catch
+# these bugs before they hit.
+Canvas.dynamic_finder_nil_arguments_error = :raise
+Canvas.dynamic_finder_type_cast_error = :raise
+
 # Inject our Rails 2.3.x broken cookie fix. See the whole sordid tale
 # here:
 # https://rails.lighthouseapp.com/projects/8994/tickets/4743-session-cookie-breaks-if-used-with-custom-cookie-in-rails-238

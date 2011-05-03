@@ -81,7 +81,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   def select_for_submission(count)
     ids = ActiveRecord::Base.connection.select_all("SELECT id FROM assessment_questions WHERE workflow_state != 'deleted' AND assessment_question_bank_id = #{self.id}")
     ids = ids.sort_by{rand}[0...count].map{|i|i['id']}
-    AssessmentQuestion.find_all_by_id(ids)
+    ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids)
   end
   
   def outcomes=(hash)

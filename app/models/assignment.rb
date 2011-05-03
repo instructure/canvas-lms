@@ -836,7 +836,7 @@ class Assignment < ActiveRecord::Base
     raise "No submission found for that student" unless submission
     group, students = group_students(original_student)
     opts[:unique_key] = Time.now.to_s
-    opts[:author] ||= opts[:commenter] || User.find_by_id(opts[:user_id])
+    opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by_id(opts[:user_id])
     opts[:anonymous] = opts[:author] != original_student && self.anonymous_peer_reviews && !self.grants_right?(opts[:author], nil, :grade)
     
     if opts[:comment] && opts[:assessment_request]
@@ -1502,7 +1502,7 @@ class Assignment < ActiveRecord::Base
       attachment_id = nil if filename.match(/\A\._/)
       user_id = split_filename[-2].to_i
       user = User.find_by_id(user_id)
-      attachment = Attachment.find_by_id(attachment_id) rescue nil
+      attachment = attachment_id && Attachment.find_by_id(attachment_id)
       submission = Submission.find_by_user_id_and_assignment_id(user_id, self.id)
       if !attachment || !submission
         @ignored_files << filename

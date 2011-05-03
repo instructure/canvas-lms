@@ -269,8 +269,10 @@ class ApplicationController < ActionController::Base
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
-        courses = courses.find_all_by_id(only_contexts.select { |c| c.first == "Course" }.map(&:last))
-        groups = groups.find_all_by_id(only_contexts.select { |c| c.first == "Group" }.map(&:last)) if include_groups
+        course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
+        courses = course_ids.empty? ? [] : courses.find_all_by_id(course_ids)
+        group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
+        groups = group_ids.empty? ? [] : groups.find_all_by_id(group_ids) if include_groups
       end
       @contexts.concat courses
       @contexts.concat groups
@@ -410,7 +412,7 @@ class ApplicationController < ActionController::Base
     @context = nil
     @problem = nil
     if pieces[0] == "enrollment"
-      @enrollment = Enrollment.find_by_uuid(pieces[1])
+      @enrollment = Enrollment.find_by_uuid(pieces[1]) if pieces[1]
       @context_type = "Course"
       if !@enrollment
         @problem = "The verification code does not match any currently enrolled user."
@@ -420,7 +422,7 @@ class ApplicationController < ActionController::Base
       @context = @enrollment.course unless @problem
       @current_user = @enrollment.user unless @problem
     elsif pieces[0] == 'group_membership'
-      @membership = GroupMembership.find_by_uuid(pieces[1])
+      @membership = GroupMembership.find_by_uuid(pieces[1]) if pieces[1]
       @context_type = "Group"
       if !@membership
         @problem = "The verification code does not match any currently enrolled user."
@@ -433,7 +435,7 @@ class ApplicationController < ActionController::Base
       @context_type = pieces[0].classify
       if Context::ContextTypes.const_defined?(@context_type)
         @context_class = Context::ContextTypes.const_get(@context_type)
-        @context = @context_class.find_by_uuid(pieces[1])
+        @context = @context_class.find_by_uuid(pieces[1]) if pieces[1]
       end
       if !@context
         @problem = "The verification code is invalid."

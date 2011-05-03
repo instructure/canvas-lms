@@ -81,7 +81,7 @@ class ContextModule < ActiveRecord::Base
     original_position ||= self.position || 0
     positions = ContextModule.module_positions(self.context).to_a.sort_by{|a| a[1] }
     downstream_ids = positions.select{|a| a[1] > (self.position || 0)}.map{|a| a[0] }
-    downstreams = self.context.context_modules.active.find_all_by_id(downstream_ids)
+    downstreams = downstream_ids.empty? ? [] : self.context.context_modules.active.find_all_by_id(downstream_ids)
     downstreams.each {|m| m.save_without_touching_context }
   end
   

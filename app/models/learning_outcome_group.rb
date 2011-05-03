@@ -51,8 +51,10 @@ class LearningOutcomeGroup < ActiveRecord::Base
     tags.each{|t| positions[t.content_asset_string] = t.position }
     ids_to_find = tags.select{|t| t.content_type == 'LearningOutcome'}.map(&:content_id)
     ids_to_find = (ids_to_find & outcome_ids) unless outcome_ids.empty?
-    objects = LearningOutcome.active.find_all_by_id(ids_to_find).compact
-    objects += LearningOutcomeGroup.active.find_all_by_id(tags.select{|t| t.content_type == 'LearningOutcomeGroup'}.map(&:content_id)).compact
+    group_ids_to_find = tags.select{|t| t.content_type == 'LearningOutcomeGroup'}.map(&:content_id)
+    objects = []
+    objects += LearningOutcome.active.find_all_by_id(ids_to_find).compact unless ids_to_find.empty?
+    objects += LearningOutcomeGroup.active.find_all_by_id(group_ids_to_find).compact unless group_ids_to_find.empty?
     if self.learning_outcome_group_id == nil
       all_tags = all_tags_for_context
       codes = all_tags.map(&:content_asset_string).uniq
@@ -137,8 +139,10 @@ class LearningOutcomeGroup < ActiveRecord::Base
       tag.associated_asset = self
       tag.save!
       group = tag.content
-      outcomes = LearningOutcome.find_all_by_id(item.content_tags.select{|t| t.content_type == 'LearningOutcome'}.map(&:content_id))
-      outcomes.each{|o| group.add_item(o) if !opts[:only] || opts[:only][o.id] == "1"  }
+      outcome_ids = item.content_tags.select{|t| t.content_type == 'LearningOutcome'}.map(&:content_id)
+      unless outcome_ids.empty?
+        LearningOutcome.find_all_by_id(outcome_ids).each{|o| group.add_item(o) if !opts[:only] || opts[:only][o.id] == "1"  }
+      end
       tag
     end
   end

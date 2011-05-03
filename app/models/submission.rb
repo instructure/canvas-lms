@@ -297,8 +297,9 @@ class Submission < ActiveRecord::Base
     ids.uniq!
     existing_associations = associations.select{|a| ids.include?(a.attachment_id) }
     (associations - existing_associations).each{|a| a.destroy }
-    associated_ids = ids.select{|id| association_ids.include?(id) }
-    attachments = Attachment.find_all_by_id(ids - associated_ids)
+    unassociated_ids = ids.reject{|id| association_ids.include?(id) }
+    return if unassociated_ids.empty?
+    attachments = Attachment.find_all_by_id(unassociated_ids)
     attachments.each do |a|
       if((a.context_type == 'User' && a.context_id == user_id) ||
           (a.context_type == 'Group' && a.context_id == group_id) ||
@@ -306,9 +307,6 @@ class Submission < ActiveRecord::Base
         self.attachment_associations.find_or_create_by_attachment_id(a.id)
       end
     end
-    (ids - associated_ids).each{|id| 
-      self.attachment_associations.find_or_create_by_attachment_id(id) 
-    }
   end
   
   def set_context_code
@@ -406,6 +404,7 @@ class Submission < ActiveRecord::Base
   def versioned_attachments
     ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
     ids << self.attachment_id if self.attachment_id
+    return [] if ids.empty?
     Attachment.find_all_by_id(ids).select{|a|
       (a.context_type == 'User' && a.context_id == user_id) || 
       (a.context_type == 'Group' && a.context_id == group_id) ||

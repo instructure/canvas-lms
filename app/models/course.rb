@@ -502,7 +502,7 @@ class Course < ActiveRecord::Base
   belongs_to :account
   
   def wiki
-    res = Wiki.find_by_id(self.wiki_id)
+    res = self.wiki_id && Wiki.find_by_id(self.wiki_id)
     unless res
       res = WikiNamespace.default_for_context(self).wiki
       self.wiki_id = res.id if res
@@ -856,7 +856,7 @@ class Course < ActiveRecord::Base
     enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
     enrollment_ids = []
 
-    publishing_pseudonym = publishing_user.pseudonyms.active.find_all_by_account_id(self.root_account_id, :order => "sis_user_id DESC").first
+    publishing_pseudonym = publishing_user.pseudonyms.active.find_by_account_id(self.root_account_id, :order => "sis_user_id DESC")
 
     res = FasterCSV.generate do |csv|
 

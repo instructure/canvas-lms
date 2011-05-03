@@ -66,7 +66,7 @@ class Group < ActiveRecord::Base
   adheres_to_policy
   
   def wiki
-    res = Wiki.find_by_id(self.wiki_id)
+    res = self.wiki_id && Wiki.find_by_id(self.wiki_id)
     unless res
       res = WikiNamespace.default_for_context(self).wiki
       self.wiki_id = res.id if res

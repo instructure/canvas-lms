@@ -480,7 +480,7 @@ class UsersController < ApplicationController
   end
   
   def merge
-    @user_about_to_go_away = User.find_by_uuid(session[:merge_user_uuid])
+    @user_about_to_go_away = User.find_by_uuid(session[:merge_user_uuid]) if session[:merge_user_uuid].present?
     @user_about_to_go_away = nil unless @user_about_to_go_away.id == params[:user_id].to_i
     
     if params[:new_user_uuid] && @true_user = User.find_by_uuid(params[:new_user_uuid])
@@ -533,7 +533,7 @@ class UsersController < ApplicationController
   end
   
   def confirm_merge
-    @user = User.find_by_uuid(session[:merge_user_uuid])
+    @user = User.find_by_uuid(session[:merge_user_uuid]) if session[:merge_user_uuid].present?
     @user = nil unless @user && @user.id == session[:merge_user_id]
     if @user && @user != @current_user
       render :action => 'confirm_merge'

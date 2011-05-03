@@ -59,7 +59,8 @@ class QuizzesController < ApplicationController
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
           add_crumb("Statistics", named_context_url(@context, :context_quiz_statistics_url, @quiz))
           @statistics = @quiz.statistics(params[:all_versions] == '1')
-          @submitted_users = User.find_all_by_id(@quiz.quiz_submissions.select{|s| !s.settings_only? }.map(&:user_id)).compact.uniq.sort_by(&:last_name_first)
+          user_ids = @quiz.quiz_submissions.select{|s| !s.settings_only? }.map(&:user_id)
+          @submitted_users = user_ids.empty? ? [] : User.find_all_by_id(user_ids).compact.uniq.sort_by(&:last_name_first)
         }
         format.csv {
           send_data(
@@ -80,8 +81,10 @@ class QuizzesController < ApplicationController
       student_ids = @context.students.map{|s| s.id }
       @banks_hash = {}
       bank_ids = @quiz.quiz_groups.map(&:assessment_question_bank_id)
-      AssessmentQuestionBank.active.find_all_by_id(bank_ids).compact.each do |bank|
-        @banks_hash[bank.id] = bank
+      unless bank_ids.empty?
+        AssessmentQuestionBank.active.find_all_by_id(bank_ids).compact.each do |bank|
+          @banks_hash[bank.id] = bank
+        end
       end
       if @has_student_submissions = @quiz.has_student_submissions?
         flash[:notice] = "Keep in mind, some students have already taken or started taking this quiz"
