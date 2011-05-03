@@ -117,8 +117,8 @@ class InfoController < ApplicationController
     ActiveRecord::Base.connection.select_value("SELECT now();")
     
     respond_to do |format|
-      format.html { render :text => 'ok' }
-      format.json { render :json => { :status => 'ok' } }
+      format.html { render :text => 'canvas ok' }
+      format.json { render :json => { :status => 'canvas ok' } }
     end
   end
 end
