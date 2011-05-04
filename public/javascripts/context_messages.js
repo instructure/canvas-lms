@@ -320,6 +320,7 @@ $(document).ready(function() {
   $(".new_message_link").click(function(event) {
     event.preventDefault();
     $("#send_message .context_message").remove();
+    messages.resetFormData($("#send_message .send_message_form"));
     $("#current_message_context").change();
     $("#send_message").show()
     $("html,body").scrollTo($("#send_message"));
@@ -371,6 +372,7 @@ $(document).ready(function() {
     $(".new_message_link:first").click();
     $("#current_message_context").val(context_code).change();
     var $form = $(".send_message_form:visible:first");
+    messages.resetFormData($form);
     if($("#current_message_context").val() != context_code) {
       $form.find(".cancel_button").click();
       alert("You don't have permissions to create messages for that context");
