@@ -29,6 +29,10 @@ module Api::V1::Assignment
 
   hash['submission_types'] = assignment.submission_types.split(',')
 
+  if assignment.quiz
+    hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
+  end
+
   if assignment.rubric_association
     hash['use_rubric_for_grading'] =
       !!assignment.rubric_association.use_for_grading
