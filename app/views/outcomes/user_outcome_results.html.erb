@@ -104,10 +104,11 @@
         <% end %>
       </td>
       <td class="avg_percent">
-        <% if results.empty? %>
+        <% results_with_percent = results.select { |r| r.percent.present? }
+           if results_with_percent.empty? %>
            - 
         <% else %>
-          <%= results.map(&:percent).sum.to_f * 100.0 / results.length.to_f %>%
+          <%= results_with_percent.map(&:percent).sum.to_f * 100.0 / results.length.to_f %>%
         <% end %>
       </td>
     </tr>
