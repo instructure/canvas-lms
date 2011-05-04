@@ -70,6 +70,11 @@
                   <%= settings.label :prevent_course_renaming_by_teachers, "Don't let teachers rename their courses" %>
                   </td>
                 </tr>
+                <tr>
+                  <td colspan="2"><%= settings.check_box :allow_sending_scores_in_emails, :checked => @account.settings[:allow_sending_scores_in_emails] != false %>
+                  <%= settings.label :allow_sending_scores_in_emails, "Students can opt-in to receiving scores in email notifications" %>
+                  </td>
+                </tr>
               <% end %>
             <% end %>
           </table>

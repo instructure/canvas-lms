@@ -25,4 +25,19 @@ describe 'submission_grade_changed.email' do
     @object = @submission
     generate_message(:submission_grade_changed, :email, @object)
   end
+  
+  it "should only include the score if opted in" do
+    submission_model
+    @assignment.update_attribute(:points_possible, 10)
+    @submission.update_attribute(:score, 5)
+    @object = @submission
+    message = generate_message(:submission_grade_changed, :summary, @object)
+    message.body.should_not match(/score:/)
+    
+    user = message.user
+    user.preferences[:send_scores_in_emails] = true
+    user.save!
+    message = generate_message(:submission_grade_changed, :summary, @object, user)
+    message.body.should match(/score:/)
+  end
 end

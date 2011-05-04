@@ -80,7 +80,7 @@ $(document).ready(function() {
     var $button = $(this);
     //$("html,body").scrollTo({top: $(".notification_preferences").offset().top});
     $(".notification_preferences").loadingImage();
-    var data = {};
+    var data = $(".notification_preferences").getFormData();
     $(".notification_preferences tr.preference").each(function() {
       var params = $(this).getTemplateData({textValues: ['category_slug', 'channel_id']});
       var frequency = 'immediately';

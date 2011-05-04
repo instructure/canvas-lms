@@ -102,6 +102,7 @@ class Account < ActiveRecord::Base
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true
   add_setting :students_can_create_courses, :boolean => true, :root_only => true
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true
+  add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :support_url, :root_only => true
   add_setting :self_enrollment
   add_setting :equella_endpoint

@@ -987,6 +987,11 @@ class User < ActiveRecord::Base
     read_attribute(:preferences) || write_attribute(:preferences, {})
   end
   
+  def send_scores_in_emails?
+    preferences[:send_scores_in_emails] == true
+  end
+  
+  
   def close_notification(id)
     preferences[:closed_notifications] ||= []
     preferences[:closed_notifications] << id.to_i

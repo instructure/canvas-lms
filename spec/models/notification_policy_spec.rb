@@ -51,15 +51,6 @@ describe NotificationPolicy do
     m.should_not be_nil
   end
   
-  # it "should not send messages immediately if the policy is set to daily" do
-  #   policy_setup
-  #   @assignment.unpublish!
-  #   @cc = @student.communication_channels.create(:path => "secondary@example.com", :workflow_state => "active")
-  #   @policy = NotificationPolicy.create(:user => @student, :notification => @notif, :communication_channel => @cc, :frequency => "daily")
-  #   @assignment.publish!
-  #   @assignment.messages_sent.should_not be_include("Assignment Graded")
-  # end
-  
   it "should prevent message dispatches if set to 'never' on triggered policies" do
     policy_setup
     @assignment.unpublish!

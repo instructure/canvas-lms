@@ -40,6 +40,7 @@ class ProfileController < ApplicationController
   end
   
   def update_communication
+    params[:root_account] = @domain_root_account
     @policies = NotificationPolicy.setup_for(@current_user, params)
     render :json => @policies.to_json
   end

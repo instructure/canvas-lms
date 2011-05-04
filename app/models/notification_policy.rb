@@ -111,7 +111,10 @@ class NotificationPolicy < ActiveRecord::Base
   
   def self.setup_for(user, params)
     @user = user
-    @user.update_attributes(params[:user]) if params[:user]
+    user.preferences[:send_scores_in_emails] = params[:root_account] && 
+        params[:root_account].settings[:allow_sending_scores_in_emails] != false && 
+        params[:user] && params[:user][:send_scores_in_emails] == '1'
+    @user.update_attributes(params[:user])
     @old_policies = @user.notification_policies
     @channels = @user.communication_channels
     categories = Notification.dashboard_categories
