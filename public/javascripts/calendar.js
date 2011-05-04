@@ -208,7 +208,6 @@
         }));
       }
       action = $.replaceTags(action, 'id', data.id);
-      console.log($day);
       var day_code = null;
       if($day.hasClass('mini_calendar_day')) {
         day_code = ($day.find(".day_number").attr('title') || '');
@@ -562,12 +561,15 @@
     }
     if(!$event || $event.length === 0) {
       $event = $event_blank.clone(true);
-      details_url = $.replaceTags(details_url, 'id', event.id)
+      details_url = $.replaceTags(details_url, 'id', event.id);
       $event.find(".title").attr('href', details_url);
       $event.toggleClass('assignment', !!data.assignment);
       if(batch !== true) {
         $event.draggable(eventDraggable);
       }
+    } else if($event.find(".title").attr('href') === '#') {
+      details_url = $.replaceTags(details_url, 'id', event.id);
+      $event.find(".title").attr('href', details_url);
     }
     $event.fillTemplateData({
       data: {
