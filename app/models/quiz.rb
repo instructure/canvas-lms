@@ -65,7 +65,7 @@ class Quiz < ActiveRecord::Base
     self.show_correct_answers = true if self.show_correct_answers == nil
     self.allowed_attempts = 1 if self.allowed_attempts == nil
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
-    self.due_at ||= [[self.lock_at, self.due_at].compact.min, self.unlock_at].compact.max
+    self.due_at ||= self.lock_at if self.lock_at.present?
     self.ip_filter = nil if self.ip_filter && self.ip_filter.strip.empty?
     if !self.available? && self.quiz_type != 'survey' && self.quiz_type != 'graded_survey'
       self.points_possible = self.current_points_possible
