@@ -333,7 +333,7 @@ module Technoweenie # :nodoc:
         if self.is_a?(Attachment)
           return nil if file_data.nil? || (file_data.respond_to?(:size) && file_data.size == 0)
           # glean information from the file handle
-          self.content_type = detect_mimetype(file_data) rescue 'unknown/unknown'
+          self.content_type = detect_mimetype(file_data)
           self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
           file_from_path = true
           unless file_data.respond_to?(:path) && file_data.path.present?
@@ -397,17 +397,12 @@ module Technoweenie # :nodoc:
       end
 
       def detect_mimetype(file_data)
-        if file_data && file_data.respond_to?(:content_type) && (!file_data.content_type || file_data.content_type.strip == "application/octet-stream")
+        if file_data && file_data.respond_to?(:content_type) && (file_data.content_type.blank? || file_data.content_type.strip == "application/octet-stream")
           res = nil
-          res = File.mime_type?(file_data.original_filename) if !res || res == 'unknown/unknown'
-          res = File.mime_type?(file_data) if !res || res == 'unknown/unknown'
-          res = "text/plain" if !file_data.responds_to?(:path) && res == 'unknown/unknown'
-          # if res == 'unknown/unknown'
-            # require 'mime/types'
-            # res = MIME::Types.type_for(file_data.original_filename)[0].to_s
-          # end
-          res
-          # return File.mime_typMIME::Types.type_for(file_data.original_filename)[0].to_s
+          res ||= File.mime_type?(file_data.original_filename) if file_data.respond_to?(:original_filename)
+          res ||= File.mime_type?(file_data)
+          res ||= "text/plain" if !file_data.respond_to?(:path)
+          res || 'unknown/unknown'
         elsif file_data.respond_to?(:content_type)
           return file_data.content_type
         else
