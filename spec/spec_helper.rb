@@ -80,6 +80,12 @@ Spec::Runner.configure do |config|
     @course
   end
 
+  def account_admin_user(opts={})
+    user(opts)
+    @user.account_users.create(:account => opts[:account] || Account.default)
+    @user
+  end
+
   def user(opts={})
     @user = User.create!
     @user.register! if opts[:active_user] || opts[:active_all]
