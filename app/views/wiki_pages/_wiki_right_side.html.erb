@@ -53,7 +53,7 @@
   </div>
 
 <% if can_do(@page, @current_user, :update_content) || (can_do(@page, @current_user, :delete) && @page.url != 'front-page') || can_do(@namespace, @current_user, :create_page)  %>
-  <div class="rs-margin-lr">
+  <div class="rs-margin-lr <%= "rs-margin-bottom" if course_home %>">
     <hr />
   <% if can_do(@page, @current_user, :update_content)%>
     <%= link_to image_tag('edit.png') + " Edit this Page", "#edit", :class => "edit_link button button-sidebar-wide" %>
