@@ -103,7 +103,7 @@ class CountsReport
 
   # override to determine which accounts to report stats on
   def each_account(&block)
-    Account.find_all_by_parent_account_id(nil).each(&block)
+    Account.root_accounts.each(&block)
   end
 
   def save_counts
