@@ -40,7 +40,7 @@ describe User do
   it "should be able to assert a name" do
     @user = User.create
     @user.assert_name(nil)
-    @user.name.should eql('User') #be_nil
+    @user.name.should eql('User')
     @user.assert_name('david')
     @user.name.should eql('david')
     @user.assert_name('bill')
@@ -145,6 +145,37 @@ describe User do
     @a.workflow_state = "available"
     @a.save
     StreamItem.for_user(@user).should_not be_empty
+  end
+  
+  it "should be able to remove itself from a root account" do
+    account1 = Account.create
+    account2 = Account.create
+    user = User.create
+    user.register!
+    p1 = user.pseudonyms.create(:unique_id => "user1")
+    p2 = user.pseudonyms.create(:unique_id => "user2")
+    p1.account = account1
+    p2.account = account2
+    p1.save!
+    p2.save!
+    account1.add_user(user)
+    account2.add_user(user)
+    course1 = account1.courses.create
+    course2 = account2.courses.create
+    course1.offer!
+    course2.offer!
+    enrollment1 = course1.enroll_student(user)
+    enrollment2 = course2.enroll_student(user)
+    enrollment1.workflow_state = 'active'
+    enrollment2.workflow_state = 'active'
+    enrollment1.save!
+    enrollment2.save!
+    user.associated_account_ids.include?(account1.id).should be_true
+    user.associated_account_ids.include?(account2.id).should be_true
+    user.remove_from_root_account(account2)
+    user.reload
+    user.associated_account_ids.include?(account1.id).should be_true
+    user.associated_account_ids.include?(account2.id).should be_false
   end
   
   context "move_to_user" do

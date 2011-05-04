@@ -238,11 +238,11 @@ class User < ActiveRecord::Base
     #   Through account_users
     #      User -> AccountUser -> Account
     starting_points = []
-    self.enrollments.find(:all, :include => {:course_section => [:course, :course_account_associations], :course => :course_account_associations}).each do |enrollment|
+    self.enrollments.find(:all, :conditions => "workflow_state != 'deleted'", :include => {:course_section => [:course, :course_account_associations], :course => :course_account_associations}).each do |enrollment|
       starting_points << enrollment.course << enrollment.course_section.try(:course) << enrollment.course_section.try(:nonxlist_course)
     end
-    starting_points += self.pseudonym_accounts.reload
-    starting_points += account_users.map(&:account)
+    starting_points += self.pseudonyms.reload.active.map(&:account)
+    starting_points += self.account_users.reload.map(&:account)
     
     # For each Course and Account, make sure an association exists.
     starting_points.compact.each do |entity|
@@ -560,6 +560,9 @@ class User < ActiveRecord::Base
   def remove_from_root_account(account)
     self.enrollments.find_all_by_root_account_id(account.id).each(&:destroy)
     self.pseudonyms.active.find_all_by_account_id(account.id).each(&:destroy)
+    self.account_users.find_all_by_account_id(account.id).each(&:destroy)
+    self.save
+    self.update_account_associations
   end
   
   def move_to_user(new_user)
