@@ -436,6 +436,8 @@ Implemented for: Canvas LMS}]
     'qdb' => /^assessment_question_bank_/,
   }
 
+  ATTACHMENT_FOLDER_NAME = 'imported qti files'
+
   def do_import(item, itemType, uploadType, fileName, fileData)
     unless %w(quiz qdb).include?(itemType)
       raise OtherError, "Invalid item type"
@@ -448,12 +450,17 @@ Implemented for: Canvas LMS}]
     course = Course.find_by_id(selection_state.first)
     raise(OtherError, 'Item type incompatible with selection state') unless course
 
+    # Make sure that the image import folder is hidden by default
+    Folder.assert_path(ATTACHMENT_FOLDER_NAME, course) do |folder|
+      folder.hidden = true
+    end
+
     settings = {
       :migration_type => 'qti_exporter',
       :apply_respondus_settings_file => (itemType != 'qdb'),
       :skip_import_notification => true,
       :files_import_allow_rename => true,
-      :files_import_root_path => "imported qti files",
+      :files_import_root_path => ATTACHMENT_FOLDER_NAME,
     }
 
     if item

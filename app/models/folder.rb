@@ -234,6 +234,8 @@ class Folder < ActiveRecord::Base
     file_attachments
   end
   
+  # if a block is given, it'll be called with each new folder created by this
+  # method before the folder is saved
   def self.assert_path(path, context)
     @@path_lookups ||= {}
     key = [context.asset_string, path].join('//')
@@ -250,6 +252,7 @@ class Folder < ActiveRecord::Base
       current_folder = sub_folder
       if current_folder.new_record?
         current_folder.context = context
+        yield current_folder if block_given?
         current_folder.save!
       end
       @@path_lookups[[context.asset_string, current_folder.full_name].join('//')] ||= current_folder
