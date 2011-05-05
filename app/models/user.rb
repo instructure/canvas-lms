@@ -299,7 +299,9 @@ class User < ActiveRecord::Base
   end
 
   def assign_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    # DON'T use ||=, because that will cause an immediate save to the db if it
+    # doesn't already exist
+    self.uuid = AutoHandle.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
   
