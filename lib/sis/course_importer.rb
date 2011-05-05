@@ -79,6 +79,13 @@ module SIS
           course.workflow_state = 'completed'
         end
         
+        begin
+          course.start_at = DateTime.parse(row['start_date']) unless row['start_date'].blank?
+          course.conclude_at = DateTime.parse(row['end_date']) unless row['end_date'].blank?
+        rescue
+          add_warning(csv, "Bad date format for course #{row['course_id']}")
+        end
+        
         course.save_without_broadcasting!
         @sis.counts[:courses] += 1
       end
