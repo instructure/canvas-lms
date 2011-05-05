@@ -94,7 +94,7 @@ class SisImportsApiController < ApplicationController
       end
       batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj)
       batch.process
-      render :json => batch.to_json(:include => :sis_batch_log_entries)
+      render :json => batch.api_json
     end
   end
 
@@ -106,7 +106,7 @@ class SisImportsApiController < ApplicationController
       @batch = SisBatch.find(params[:id])
       raise "Sis Import not found" unless @batch
       raise "Batch does not match account" unless @batch.account.id == @account.id
-      render :json => @batch.to_json(:include => :sis_batch_log_entries)
+      render :json => @batch.api_json
     end
   end
 

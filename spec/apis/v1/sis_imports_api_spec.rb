@@ -39,26 +39,18 @@ describe SisImportsApiController, :type => :integration do
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv') })
 
-    json.has_key?("sis_batch").should be_true
-    json["sis_batch"].has_key?("created_at").should be_true
-    json["sis_batch"].delete("created_at")
-    json["sis_batch"].has_key?("updated_at").should be_true
-    json["sis_batch"].delete("updated_at")
-    json["sis_batch"].has_key?("ended_at").should be_true
-    json["sis_batch"].delete("ended_at")
+    json.has_key?("created_at").should be_true
+    json.delete("created_at")
+    json.has_key?("updated_at").should be_true
+    json.delete("updated_at")
+    json.has_key?("ended_at").should be_true
+    json.delete("ended_at")
     batch = SisBatch.last
-    json.should == { "sis_batch" =>
-        { "data" => { "import_type"=>"instructure_csv"},
-          "processing_errors" => nil,
-          "attachment_id" => Attachment.last.id,
-          "processing_warnings" => nil,
-          "account_id" => @account.id,
-          "batch_id" => nil,
+    json.should == {
+          "data" => { "import_type"=>"instructure_csv"},
           "progress" => 0,
           "id" => batch.id,
-          "sis_batch_log_entries" => [],
-          "errored_attempts" => nil,
-          "workflow_state"=>"created" }}
+          "workflow_state"=>"created" }
 
     SisBatch.count.should == @batch_count + 1
     batch.process_without_send_later
@@ -68,15 +60,15 @@ describe SisImportsApiController, :type => :integration do
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
           { :controller => 'sis_imports_api', :action => 'show', :format => 'json',
             :account_id => @account.id.to_s, :id => batch.id.to_s })
-    json.has_key?("sis_batch").should be_true
-    json["sis_batch"].has_key?("created_at").should be_true
-    json["sis_batch"].delete("created_at")
-    json["sis_batch"].has_key?("updated_at").should be_true
-    json["sis_batch"].delete("updated_at")
-    json["sis_batch"].has_key?("ended_at").should be_true
-    json["sis_batch"].delete("ended_at")
-    json.should == { "sis_batch" => 
-        { "data" => { "import_type" => "instructure_csv",
+    json.should be_true
+    json.has_key?("created_at").should be_true
+    json.delete("created_at")
+    json.has_key?("updated_at").should be_true
+    json.delete("updated_at")
+    json.has_key?("ended_at").should be_true
+    json.delete("ended_at")
+    json.should == { 
+          "data" => { "import_type" => "instructure_csv",
                       "counts" => { "courses" => 0,
                                     "sections" => 0,
                                     "accounts" => 0,
@@ -85,16 +77,9 @@ describe SisImportsApiController, :type => :integration do
                                     "users" => 1,
                                     "xlists" => 0,
                                     "terms" => 0}},
-          "processing_errors" => [],
-          "attachment_id" => Attachment.last.id,
-          "processing_warnings" => [],
-          "account_id" => @account.id,
-          "batch_id" => nil,
           "progress" => 100,
           "id" => batch.id,
-          "sis_batch_log_entries" => [],
-          "errored_attempts" => nil,
-          "workflow_state"=>"imported" }}
+          "workflow_state"=>"imported" }
   end
 
 end

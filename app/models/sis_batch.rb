@@ -134,9 +134,27 @@ class SisBatch < ActiveRecord::Base
     self.ended_at = Time.now
     self.save
   end
+
+  def api_json
+    data = {
+      "created_at" => self.created_at,
+      "ended_at" => self.ended_at,
+      "updated_at" => self.updated_at,
+      "progress" => self.progress,
+      "id" => self.id,
+      "workflow_state" => self.workflow_state,
+      "data" => self.data
+    }
+    data["processing_errors"] = self.processing_errors if self.processing_errors.present?
+    data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
+    data["sis_batch_log_entries"] = self.sis_batch_log_entries if self.sis_batch_log_entries.present?
+    return data.to_json
+  end
+
   private
   
   def messages?
     (self.processing_errors && self.processing_errors.length > 0) || (self.processing_warnings && self.processing_warnings.length > 0)
   end
+  
 end
