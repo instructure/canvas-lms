@@ -315,7 +315,7 @@ class FilesController < ApplicationController
   end
   
   def send_attachment(attachment)
-    if params[:inline] && attachment.content_type && (attachment.content_type.match(/\Atext/) || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code')
+    if params[:inline] && attachment.content_type && (attachment.content_type.match(/\Atext/) || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code' || attachment.mime_class == 'image')
       send_stored_file(attachment)
     elsif attachment.inline_content? && !@context.is_a?(AssessmentQuestion)
       if params[:file_path] || !params[:wrap]

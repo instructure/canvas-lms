@@ -69,18 +69,21 @@ class SubmissionsController < ApplicationController
           else
             format.html { render :action => "show_preview" }
           end
-        elsif params[:download] && params[:comment_id]
-          @attachment = @submission.submission_comments.find(params[:comment_id]).attachments.find{|a| a.id == params[:download].to_i }
-          format.html { redirect_to @attachment.cacheable_s3_url }
-        elsif params[:download] 
-          @attachment = @submission.attachment if @submission.attachment_id == params[:download].to_i
-          prior_attachment_id = @submission.submission_history.map(&:attachment_id).find{|a| a == params[:download].to_i }
-          @attachment ||= Attachment.find_by_id(prior_attachment_id) if prior_attachment_id
-          @attachment ||= @submission.attachments.find_by_id(params[:download]) if params[:download].present?
-          @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
-          @attachment ||= @submission.attachment if @submission.attachment_id == params[:download].to_i
-          @attachment ||= Attachment.find(0)
-          format.html { redirect_to @attachment.cacheable_s3_url }
+        elsif params[:download]
+          if params[:comment_id]
+            @attachment = @submission.submission_comments.find(params[:comment_id]).attachments.find{|a| a.id == params[:download].to_i }
+          else
+            @attachment = @submission.attachment if @submission.attachment_id == params[:download].to_i
+            prior_attachment_id = @submission.submission_history.map(&:attachment_id).find{|a| a == params[:download].to_i }
+            @attachment ||= Attachment.find_by_id(prior_attachment_id) if prior_attachment_id
+            @attachment ||= @submission.attachments.find_by_id(params[:download]) if params[:download].present?
+            @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
+            @attachment ||= @submission.attachment if @submission.attachment_id == params[:download].to_i
+          end
+          raise ActiveRecord::RecordNotFound unless @attachment
+          format.html {
+            redirect_to(named_context_url(@attachment.context, :context_file_download_url, @attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
+          }
           json_handled = true
           format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
         else

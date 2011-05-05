@@ -72,8 +72,8 @@
           <div id="submission_files_list">
             <div id="submission_file_hidden"  class="submission-file" style='display:none;'>
               <a class="turnitin_similarity_score" href="#" title="Turnitin similarity score -- more details"><span class="similarity_score">10</span>%</a>
-              <a class="submission-file-download" title="Download this file" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}} ") %>">Download File</a>
-              <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}} ") %>" title="Preview this File">???</a>
+              <a class="submission-file-download" title="Download this file" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}") %>">Download File</a>
+              <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="Preview this File">???</a>
             </div>
           </div>
         </div>
