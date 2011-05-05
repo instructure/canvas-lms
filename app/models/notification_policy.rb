@@ -114,6 +114,7 @@ class NotificationPolicy < ActiveRecord::Base
     user.preferences[:send_scores_in_emails] = params[:root_account] && 
         params[:root_account].settings[:allow_sending_scores_in_emails] != false && 
         params[:user] && params[:user][:send_scores_in_emails] == '1'
+    params[:user].delete :send_scores_in_emails
     @user.update_attributes(params[:user])
     @old_policies = @user.notification_policies
     @channels = @user.communication_channels
