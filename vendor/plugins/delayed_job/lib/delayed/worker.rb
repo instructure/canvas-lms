@@ -1,6 +1,8 @@
 require 'timeout'
 
 module Delayed
+  class TimeoutError < RuntimeError; end
+
   class WorkerBase
     cattr_accessor :logger
     attr_reader :config
@@ -157,7 +159,7 @@ module Delayed
     def run(job, start_time = Time.now)
       procline "run: #{job.name}:#{start_time.to_i}"
       runtime = Benchmark.realtime do
-        Timeout.timeout(self.class.max_run_time.to_i) { job.invoke_job }
+        Timeout.timeout(self.class.max_run_time.to_i, Delayed::TimeoutError) { job.invoke_job }
         job.destroy
       end
       # TODO: warn if runtime > max_run_time ?
