@@ -221,8 +221,10 @@ module Instructure #:nodoc:
         # This is called before_save
         def set_broadcast_flags
           @broadcasted = false
-          self.just_created = self.new_record?
-          self.prior_version = generate_prior_version
+          unless @skip_broadcasts
+            self.just_created = self.new_record?
+            self.prior_version = generate_prior_version
+          end
         end
         
         def generate_prior_version
