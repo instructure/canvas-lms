@@ -314,77 +314,52 @@ describe FilesController do
     end
     
     it "should create file placeholder (in local mode)" do
-      class Attachment
-        class <<self
-          alias :old_s3_storage? :s3_storage?
-          alias :old_local_storage? :local_storage?
-        end
-        def self.s3_storage?; false; end
-        def self.local_storage?; true; end
-      end
-      begin
-        Attachment.local_storage?.should eql(true)
-        Attachment.s3_storage?.should eql(false)
-        course_with_teacher_logged_in(:active_all => true)
-        post 'create_pending', {:attachment => {
-          :context_code => @course.asset_string,
-          :filename => "bob.txt"
-        }}
-        response.should be_success
-        assigns[:attachment].should_not be_nil
-        assigns[:attachment].id.should_not be_nil
-        json = JSON.parse(response.body) rescue nil
-        json.should_not be_nil
-        json['id'].should eql(assigns[:attachment].id)
-        json['upload_url'].should_not be_nil
-        json['upload_params'].should_not be_nil
-        json['upload_params'].should_not be_empty
-        json['remote_url'].should eql(false)
-      ensure
-        class Attachment
-          class <<self
-            alias :s3_storage? :old_s3_storage?
-            alias :local_storage? :old_local_storage?
-          end
-        end
-      end
+      Attachment.stub!(:s3_storage?).and_return(false)
+      Attachment.stub!(:local_storage?).and_return(true)
+      Attachment.local_storage?.should eql(true)
+      Attachment.s3_storage?.should eql(false)
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :filename => "bob.txt"
+      }}
+      response.should be_success
+      assigns[:attachment].should_not be_nil
+      assigns[:attachment].id.should_not be_nil
+      json = JSON.parse(response.body) rescue nil
+      json.should_not be_nil
+      json['id'].should eql(assigns[:attachment].id)
+      json['upload_url'].should_not be_nil
+      json['upload_params'].should_not be_nil
+      json['upload_params'].should_not be_empty
+      json['remote_url'].should eql(false)
     end
     
     it "should create file placeholder (in s3 mode)" do
-      class Attachment
-        class <<self
-          alias :old_s3_storage? :s3_storage?
-          alias :old_local_storage? :local_storage?
-        end
-        def self.s3_storage?; true; end
-        def self.local_storage?; false; end
-      end
-      begin
-        Attachment.s3_storage?.should eql(true)
-        Attachment.local_storage?.should eql(false)
-        course_with_teacher_logged_in(:active_all => true)
-        post 'create_pending', {:attachment => {
-          :context_code => @course.asset_string,
-          :filename => "bob.txt"
-        }}
-        response.should be_success
-        assigns[:attachment].should_not be_nil
-        assigns[:attachment].id.should_not be_nil
-        json = JSON.parse(response.body) rescue nil
-        json.should_not be_nil
-        json['id'].should eql(assigns[:attachment].id)
-        json['upload_url'].should_not be_nil
-        json['upload_params'].should_not be_nil
-        json['upload_params'].should_not be_empty
-        json['remote_url'].should eql(true)
-      ensure
-        class Attachment
-          class <<self
-            alias :s3_storage? :old_s3_storage?
-            alias :local_storage? :old_local_storage?
-          end
-        end
-      end
+      Attachment.stub!(:s3_storage?).and_return(true)
+      Attachment.stub!(:local_storage?).and_return(false)
+      conn = mock(AWS::S3::Connection)
+      AWS::S3::Base.stub!(:connection).and_return(conn)
+      conn.stub!(:access_key_id).and_return('stub_id')
+      conn.stub!(:secret_access_key).and_return('stub_key')
+
+      Attachment.s3_storage?.should eql(true)
+      Attachment.local_storage?.should eql(false)
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :filename => "bob.txt"
+      }}
+      response.should be_success
+      assigns[:attachment].should_not be_nil
+      assigns[:attachment].id.should_not be_nil
+      json = JSON.parse(response.body) rescue nil
+      json.should_not be_nil
+      json['id'].should eql(assigns[:attachment].id)
+      json['upload_url'].should_not be_nil
+      json['upload_params'].should be_present
+      json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
+      json['remote_url'].should eql(true)
     end
   end
   

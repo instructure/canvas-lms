@@ -379,18 +379,20 @@ class Attachment < ActiveRecord::Base
   def downloadable?
     !!(self.authenticated_s3_url rescue false)
   end
-  
+
+  # Haaay... you're changing stuff here? Don't forget about the Thumbnail model
+  # too, it cares about local vs s3 storage.
   if local_storage?
     has_attachment(
-        :path_prefix => (file_store_config['path_prefix'] || 'tmp/files'), 
+        :path_prefix => (file_store_config['path_prefix'] || 'tmp/files'),
         :thumbnails => { :thumb => '200x50' }, 
-        :thumbnail_class => Thumbnail
+        :thumbnail_class => 'Thumbnail'
     )
     def authenticated_s3_url(*args)
       return root_attachment.authenticated_s3_url(*args) if root_attachment
       "http://#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
     end
-    
+
     alias_method :attachment_fu_filename=, :filename=
     def filename=(val)
       if self.new_record?
@@ -399,14 +401,14 @@ class Attachment < ActiveRecord::Base
         self.attachment_fu_filename = val
       end
     end
-    
+
     def bucket_name; "no-bucket"; end
   else
     has_attachment(
         :storage => :s3, 
         :s3_access => :private, 
         :thumbnails => { :thumb => '200x50' }, 
-        :thumbnail_class => Thumbnail
+        :thumbnail_class => 'Thumbnail'
     )
   end
 

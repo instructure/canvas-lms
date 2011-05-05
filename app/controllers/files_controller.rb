@@ -20,7 +20,7 @@ CONTENT_LENGTH_RANGE = 50*1024*1024
 S3_EXPIRATION_TIME = 30.minutes
 
 class FilesController < ApplicationController
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show, :image_thumbnail,:create_pending,:s3_success]
+  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:create_pending,:s3_success]
   before_filter :check_file_access_flags, :only => :show_relative
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
 
@@ -653,7 +653,19 @@ class FilesController < ApplicationController
     end
     redirect_to url
   end
-  
+
+  # when using local storage, the image_thumbnail action redirects here rather
+  # than to a s3 url
+  def show_thumbnail
+    if Attachment.local_storage?
+      thumbnail = Thumbnail.find_by_id_and_uuid(params[:id], params[:uuid]) if params[:id].present?
+      raise ActiveRecord::RecordNotFound unless thumbnail
+      send_file thumbnail.full_filename, :content_type => thumbnail.content_type
+    else
+      image_thumbnail
+    end
+  end
+
   def public_feed
     return unless get_feed_context
     feed = Atom::Feed.new do |f|
