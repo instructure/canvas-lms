@@ -32,7 +32,6 @@ class CommunicationChannel < ActiveRecord::Base
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   before_validation :validate_unique_path
-  after_create :setup_default_notification_policies
   after_save :remove_other_paths
   
   acts_as_list :scope => :user_id
@@ -42,17 +41,6 @@ class CommunicationChannel < ActiveRecord::Base
   attr_reader :request_password
   attr_reader :send_confirmation
   attr_accessor :do_delayed_jobs_immediately
-
-  def setup_default_notification_policies
-    if self.user.try(:communication_channels).try(:length) == 1 && self.user.try(:notification_policies).try(:empty?)
-      if @do_delayed_jobs_immediately
-        NotificationPolicy.defaults_for(self.user)
-      else
-        NotificationPolicy.send_later(:defaults_for, self.user)
-      end
-    end
-  end
-  protected :setup_default_notification_policies
   
   def remove_other_paths
     if @state_was != 'active' && self.active? && self.path_type == 'email'
