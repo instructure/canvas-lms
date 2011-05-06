@@ -66,6 +66,10 @@ module SIS
         end
         
         if row['status'] =~ /\Aactive\z/i
+
+          course.workflow_state = 'created' if course.workflow_state == 'deleted'
+          course.save_without_broadcasting!
+
           if section.course.id == course.id
             @sis.counts[:xlists] += 1
             next
