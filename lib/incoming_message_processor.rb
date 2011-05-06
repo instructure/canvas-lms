@@ -61,12 +61,13 @@ class IncomingMessageProcessor
     message = Message.create!(
       :to => from,
       :from => HostUrl.outgoing_email_address,
-      :subject => "Message Reply Failed: #{subject}",
-      :body => %{The message titled "#{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+      :subject => I18n.t('lib.incoming_message_processor.failure_message.subject', "Message Reply Failed: %{subject}", :subject => subject),
+      :body => I18n.t('lib.incoming_message_processor.failure_message.body', <<-BODY, :subject => subject),
+The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
 Thank you,
 Canvas Support
-      },
+      BODY
       :delay_for => 0,
       :context => nil,
       :path_type => 'email',

@@ -18,7 +18,7 @@
 
 class ConferencesController < ApplicationController
   before_filter :require_context
-  add_crumb("Conferences") { |c| c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url) }
+  add_crumb(lambda{ t '#crumbs.conferences', "Conferences"}) { |c| c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url) }
   before_filter { |c| c.active_tab = "conferences" }
   before_filter :require_config
   
@@ -97,7 +97,7 @@ class ConferencesController < ApplicationController
     get_conference
     if authorized_action(@conference, @current_user, :join)
       unless @conference.valid_config?
-        flash[:error] = "This type of conference is no longer enabled for this Canvas site"
+        flash[:error] = t(:type_disabled_error, "This type of conference is no longer enabled for this Canvas site")
         redirect_to named_context_url(@context, :context_conferences_url)
         return
       end
@@ -108,11 +108,11 @@ class ConferencesController < ApplicationController
         if url = @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, :include_host => true))
           redirect_to url
         else
-          flash[:error] = "There was an error joining the conference"
+          flash[:error] = t(:general_error, "There was an error joining the conference")
           redirect_to named_context_url(@context, :context_url)
         end
       else
-        flash[:notice] = "That conference is not currently active"
+        flash[:notice] = t(:inactive_error, "That conference is not currently active")
         redirect_to named_context_url(@context, :context_url)
       end
     end
@@ -145,7 +145,7 @@ class ConferencesController < ApplicationController
 
   def require_config
     unless WebConference.config
-      flash[:error] = "Web conferencing has not been enabled for this Canvas site"
+      flash[:error] = t('#conferences.disabled_error', "Web conferencing has not been enabled for this Canvas site")
       redirect_to named_context_url(@context, :context_url)
     end
   end

@@ -20,6 +20,7 @@ javascripts:
     - public/javascripts/jquery.inst_tree.js
     - public/javascripts/jquery.store.js
     - public/javascripts/jquery.scrollTo.js
+    - public/javascripts/i18n.js
     - public/javascripts/scribd.view.js
     - public/javascripts/swfobject/swfobject.js
     - public/javascripts/reminders.js
@@ -198,6 +199,8 @@ javascripts:
     - public/javascripts/plugins.js
   content_exports:
     - public/javascripts/content_exports.js
+  conferences:
+    - public/javascripts/conferences.js
 
 stylesheets:
   common:

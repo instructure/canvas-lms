@@ -1,59 +1,61 @@
-<% content_for :page_title do %>Web Conference: <%=h @conference.title %><% end %>
+<% content_for :page_title do %><%= t :page_title, "Web Conference: %{conference_name}", :conference_name => @conference.title %><% end %>
+
+<% jammit_js :conferences %>
 
 <% if can_do(@conference, @current_user, :update) && !@conference.finished? %>
   <% content_for :right_side do %>
     <div class="rs-margin-all">
       <div id="sidebar_content">
         <p>
-          <%= link_to(image_tag("edit.png", :alt => "") + " Edit Conference ", context_url(@context, :context_conferences_url) + "#conference_#{@conference.id}", :class => "button button-sidebar-wide") %>
+          <%= link_to(image_tag("edit.png", :alt => "") + " " + t(:edit_link, "Edit Conference"), context_url(@context, :context_conferences_url) + "#conference_#{@conference.id}", :class => "button button-sidebar-wide") %>
         </p>
       </div>
     </div>
   <% end %>
 <% end %>
 
-<h2>Conference Details</h2>
+<h2><%= t :conference_details, "Conference Details" %></h2>
 
 <fieldset>
-  <legend>Basic Info</legend>
+  <legend><%= t :basic_info, "Basic Info" %></legend>
   <table class="formtable">
     <tr>
-      <th>Name:</th>
+      <th><%= before_label :name, "Name" %></th>
       <td><%=h @conference.title %></td>
     </tr>
     <% unless WebConference.conference_types.length > 1 -%>
     <tr>
-      <th>Type:</th>
+      <th><%= before_label :type, "Type" %></th>
       <td><%=h @conference.conference_type %></td>
     </tr>
     <% end -%>
     <% if can_do(@conference, @current_user, :update) %>
-    <% @conference.user_settings.each do |key, value| %>
-    <tr>
-      <th><%=h key.to_s.humanize %>:</th>
-      <td><%=h @conference.friendly_setting(value) %></td>
-    </tr>
+      <% @conference.user_settings.each do |key, value| %>
+      <tr>
+        <th><%=h before_label(@conference.setting_name(key)) %></th>
+        <td><%=h @conference.friendly_setting(value) %></td>
+      </tr>
+      <% end %>
     <% end %>
-    <% end %>
     <tr>
-      <th>Duration:</th>
-      <td><% if @conference.long_running? %>N/A, long-running<% else %><%= @conference.duration %> minutes<% end %></td>
+      <th><%= before_label :duration, "Duration" %></th>
+      <td><% if @conference.long_running? %><%= t :duration_long_running, "N/A, long-running" %><% else %><%= t :minute, "minute", :count => @conference.duration %><% end %></td>
     </tr>
     <tr>
-      <th>Status:</th>
+      <th><%= before_label :status, "Status" %></th>
       <td>
       <% if @conference.available? %>
-        Hasn't started yet
+        <%= t 'status.new', "Hasn't started yet" %>
       <% elsif @conference.active? %>
-        Started <%= time_string(@conference.started_at) %>
+        <%= t 'status.started', "Started %{time}", :time => time_string(@conference.started_at) %>
       <% elsif @conference.finished? %>
-        Finished <%= datetime_string(@conference.ended_at) %> (<%= pluralize((@conference.running_time / 60).to_i, 'minute') %>)
+        <%= t 'status.finished', "Finished %{date_and_time} (%{duration})", :date_and_time => datetime_string(@conference.ended_at), :duration => t(:minute, "minute", :count => (@conference.running_time / 60)) %>
       <% end %>
       </td>
     </tr>
     <% unless @conference.description.blank? -%>
     <tr>
-      <th>Description:</th>
+      <th><%= before_label :description, "Description" %></th>
       <td><%= @conference.description %></td>
     </tr>
     <% end -%>
@@ -62,17 +64,17 @@
 
 <% unless @conference.external_urls.empty? %>
 <fieldset>
-  <legend>External Links</legend>
+  <legend><%= t :external_links, "External Links" %></legend>
   <ul>
   <% @conference.external_urls.each do |key, url_info| %>
-    <li><%= link_to(url_info[:text], context_url(@context, :context_conference_url, @conference.id) + "?external_url=#{key}", :name => key, :class => "external_url") %></li>
+    <li><%= link_to(@conference.external_urls_link_text(key), context_url(@context, :context_conference_url, @conference.id) + "?external_url=#{key}", :name => @conference.external_urls_name(key), :class => "external_url") %></li>
   <% end %>
   </ul>
 </fieldset>
 <% end %>
 
 <fieldset>
-  <legend>Members</legend>
+  <legend><%= t 'labels.members', "Members" %></legend>
   <ul>
     <% @conference.users.each do |user| %>
       <li>
@@ -86,11 +88,11 @@
   <div class="base_links">
     <% txt = nil
       if @conference.available?
-        txt = "Start it now" if can_do(@conference, @current_user, :initiate)
+        txt = t('buttons.start', "Start it now") if can_do(@conference, @current_user, :initiate)
       elsif @conference.active?
-        txt = "Join it now" if can_do(@conference, @current_user, :join)
+        txt = t('buttons.join', "Join it now") if can_do(@conference, @current_user, :join)
       elsif @conference.finished? && @conference.restartable?
-        txt = "Re-start it now" if can_do(@conference, @current_user, :initiate)
+        txt = t('buttons.restart', "Re-start it now") if can_do(@conference, @current_user, :initiate)
       end 
     %>
     <% if txt %>
@@ -99,49 +101,8 @@
     </a>
     <% end %>
     <% if can_do(@conference, @current_user, :close) %>
-    <a href="<%= context_url(@context, :context_conference_close_url, @conference.id) %>" class="button close_conference_link">End it now</a>
+    <a href="<%= context_url(@context, :context_conference_close_url, @conference.id) %>" class="button close_conference_link"><%= t('buttons.end', "End it now") %></a>
     <% end %>
   </div>
 </div>
 
-<% js_block do %>
-  <script>
-  $(document).ready(function() {
-    $(".external_url").click(function(e) {
-      e.preventDefault();
-      var loading_text = 'Loading, please wait...';
-      var $self = $(this);
-      var link_text = $self.text();
-      if (link_text == loading_text) {
-        return;
-      }
-      $self.text(loading_text);
-      $.ajaxJSON($self.attr('href'), 'GET', {}, function(data) {
-        $self.text(link_text);
-        if (data.length == 0) {
-          $.flashError("Sorry, it looks like there aren't any " + $self.attr('name') + " pages for this conference yet.");
-        } else if (data.length > 1) {
-          $box = $(document.createElement('DIV'));
-          $box.append("<p>There are multiple " + $self.attr('name') + " pages available for this conference. Please select one:</p>");
-          for (var i = 0; i < data.length; i++) {
-            $a = $("<a />", {href: data[i].url || $self.attr('href') + '&url_id=' + data[i].id, target: '_blank'});
-            $a.text(data[i].name);
-            $box.append($a).append("<br>");
-          }
-          $box.dialog('close').dialog({
-            autoOpen: false,
-            width: 425,
-            minWidth: 425,
-            minHeight: 215,
-            resizable: true,
-            height: "auto",
-            title: $self.text()
-          }).dialog('open');
-        } else {
-          window.open(data[0].url);
-        }
-      });
-    });
-  });
-  </script>
-<% end %>

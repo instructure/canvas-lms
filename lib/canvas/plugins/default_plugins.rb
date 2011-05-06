@@ -66,7 +66,8 @@ Canvas::Plugin.register('kaltura', nil, {
   :validator => 'KalturaValidator'
 })
 Canvas::Plugin.register('dim_dim', :web_conferencing, {
-  :description => 'DimDim web conferencing support',
+  :name => lambda{ t :name, "DimDim" },
+  :description => lambda{ t :description, "DimDim web conferencing support" },
   :website => 'http://www.dimdim.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -74,7 +75,8 @@ Canvas::Plugin.register('dim_dim', :web_conferencing, {
   :settings_partial => 'plugins/dim_dim_settings'
 })
 Canvas::Plugin.register('wimba', :web_conferencing, {
-  :description => 'Wimba web conferencing support',
+  :name => lambda{ t :name, "Wimba" },
+  :description => lambda{ t :description, "Wimba web conferencing support" },
   :website => 'http://www.wimba.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -93,7 +95,8 @@ Canvas::Plugin.register('error_reporting', :error_reporting, {
   :settings_partial => 'plugins/error_reporting_settings'
 })
 Canvas::Plugin.register('big_blue_button', :web_conferencing, {
-  :description => 'Big Blue Button web conferencing support',
+  :name => lambda{ t :name, "Big Blue Button" },
+  :description => lambda{ t :description, "Big Blue Button web conferencing support" },
   :website => 'http://bigbluebutton.org',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',

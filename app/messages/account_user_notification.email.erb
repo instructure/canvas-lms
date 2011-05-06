@@ -3,10 +3,9 @@
 <% end %>
 
 <% define_content :subject do %>
-  Account Admin Notification
+  <%= t :subject, "Account Admin Notification" %>
 <% end %>
 
-You've been added as an <%= asset.readable_type %> to the account <%= asset.account.name %> at <%= HostUrl.context_host(asset.account) %>
+<%= t('#messages.account_user_registration.email.added_message', "You've been added as an %{role_type} to the account %{account} at %{website}.", :role_type => asset.readable_type, :account => asset.account.name, :website => HostUrl.context_host(asset.account)) %>
 
-Visit the account page here:
-<%= content :link %>
+<%= t(:url_info, "Visit the account page here:\n%{url}", :url => content(:link)) %>

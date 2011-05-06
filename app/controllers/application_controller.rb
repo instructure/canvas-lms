@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
   
   attr_accessor :active_tab
   
+  before_filter :set_locale
   add_crumb "home", :root_path, :class => "home"
   helper :all
   filter_parameter_logging :password
@@ -41,6 +42,11 @@ class ApplicationController < ActionController::Base
 
   protected
   
+  def set_locale
+    # if params[:locale] is nil then I18n.default_locale will be used
+    I18n.locale = params[:locale] && I18n.available_locales.include?(params[:locale].to_sym) ? params[:locale] : nil
+  end
+
   def init_body_classes_and_active_tab
     @body_classes = []
     active_tab = nil

@@ -8,7 +8,7 @@ gem 'builder',        '2.1.2'
 gem 'compass',        '0.10.5'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
-gem 'erubis',         '2.6.6'
+gem 'erubis',         '2.7.0'
 gem 'fastercsv',      '1.5.3'
 gem 'hairtrigger',    '0.1.11'
 gem 'haml',           '3.0.22'
@@ -30,6 +30,7 @@ gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
 gem 'rake',           '0.8.7'
 gem 'ratom',          '0.6.7',  :require => "atom"
+gem 'rdiscount',      '1.6.8'
 gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'

@@ -59,7 +59,7 @@ class ScribdAPI
       Scribd::Document.upload(:file => filename, :type => filetype, :access => 'private')
     else
       ErrorReport.log_error(:default, {
-        :message => "tried to uploada scribd doc that does not have a filetype, that should never happen.",
+        :message => "tried to upload a scribd doc that does not have a filetype, that should never happen.",
         :url => filename,
       })
     end

@@ -22,6 +22,9 @@ describe TextHelper do
 
   class TestClassForMixins
     extend TextHelper
+    def self.t(*args)
+      I18n.t(*args)
+    end
   end
 
   def th
@@ -30,9 +33,42 @@ describe TextHelper do
 
   context "datetime_string" do
 
+    it "should just give the start if no end is provided" do
+      datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
+      th.datetime_string(datetime).should == "Jan  1 at 12pm"
+    end
+
+    it "should omit the time if shorten_midnight is true and it's (due) at midnight" do
+      datetime = Time.zone.now.midnight
+      th.datetime_string(datetime, :event, nil, true).should == th.date_string(datetime, :no_words)
+      datetime -= 1.minute
+      th.datetime_string(datetime, :due_date, nil, true).should == th.date_string(datetime, :no_words)
+    end
+
+    it "should ignore end if the type is due_date" do
+      datetime = Time.zone.parse("#{Time.now.year}-01-01 12:00:00")
+      expected = "Jan  1 by 12pm"
+      th.datetime_string(datetime, :due_date).should == expected
+      th.datetime_string(datetime, :due_date, datetime + 1.hour).should == expected
+    end
+
+    it "should give a multi-day range if start and end are on different days" do
+      start_datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
+      end_datetime = start_datetime + 2.days
+      th.datetime_string(start_datetime, :event, end_datetime).should ==
+        "Jan  1 at 12pm to Jan  3 at 12pm"
+    end
+
+    it "should give a same-day range if start and end are on the same day" do
+      start_datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
+      end_datetime = start_datetime.advance(:hours => 1)
+      th.datetime_string(start_datetime, :event, end_datetime).should ==
+        "Jan  1 from 12pm to  1pm"
+    end
+
     it "should include the year if the current year isn't the same" do
-      today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone)
-      nextyear = today + 1.year
+      today = Time.zone.now
+      nextyear = today.advance(:years => 1)
       datestring = th.datetime_string nextyear
       datestring.split[2].to_i.should == nextyear.year
       th.datetime_string(today).split.size.should == (datestring.split.size - 1)
@@ -40,25 +76,50 @@ describe TextHelper do
 
   end
 
+  context "time_string" do
+
+    it "should be formatted properly" do
+      time = Time.zone.now
+      time += 1.minutes if time.min == 0
+      th.time_string(time).should == I18n.l(time, :format => :tiny)
+    end
+
+    it "should omit the minutes if it's on the hour" do
+      time = Time.zone.now
+      time -= time.min.minutes
+      th.time_string(time).should == I18n.l(time, :format => :tiny_on_the_hour)
+    end
+
+  end
+
   context "date_string" do
 
     it "should include the year if the current year isn't the same" do
-      today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone)
+      today = Time.zone.now
       # cause we don't want to deal with day-of-the-week stuff, offset 8 days
       if today.year == (today + 8.days).year
         today += 8.days
       else
         today -= 8.days
       end
-      nextyear = today + 1.year
+      nextyear = today.advance(:years => 1)
       datestring = th.date_string nextyear
       datestring.split[2].to_i.should == nextyear.year
       th.date_string(today).split.size.should == (datestring.split.size - 1)
     end
 
+    it "should say the Yesterday/Today/Tomorrow if it's yesterday/today/tomorrow" do
+      today = Time.zone.now
+      tommorrow = today + 1.day
+      yesterday = today - 1.day
+      th.date_string(today).should == "Today"
+      th.date_string(tommorrow).should == "Tomorrow"
+      th.date_string(yesterday).should == "Yesterday"
+    end
+
     it "should not say the day of the week if it's exactly a few years away" do
-      aday = ActiveSupport::TimeWithZone.new(Time.now, Time.zone) + 2.days
-      nextyear = aday + 1.year
+      aday = Time.zone.now + 2.days
+      nextyear = aday.advance(:years => 1)
       th.date_string(aday).should == aday.strftime("%A")
       th.date_string(nextyear).should_not == nextyear.strftime("%A")
       # in fact,
@@ -108,4 +169,47 @@ describe TextHelper do
     end
   end
 
+  context "markdown" do
+    context "safety" do
+      it "should escape Strings correctly" do
+        str = "`a` **b** _c_ ![d](e)\n# f\n + g\n - h"
+        expected = "\\`a\\` \\*\\*b\\*\\* \\_c\\_ \\!\\[d\\]\\(e\\)\n\\# f\n \\+ g\n \\- h"
+        (escaped = th.markdown_escape(str)).should == expected
+        th.markdown_escape(escaped).should == expected
+      end
+    end
+    context "i18n" do
+      it "should automatically escape Strings" do
+        th.mt(:foo, "We **don't** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h").
+          should == "We <strong>don't</strong> trust the following input: `a` **b** _c_ ![d](e) # f + g - h"
+      end
+  
+      it "should not escape MarkdownSafeBuffers" do
+        th.mt(:foo, "We **do** trust the following input: %{input}", :input => th.markdown_safe("`a` **b** _c_ ![d](e)\n# f\n + g\n - h")).
+          should == <<-HTML.strip
+<p>We <strong>do</strong> trust the following input: <code>a</code> <strong>b</strong> <em>c</em> <img src="e" alt="d" /></p>
+
+<h1>f</h1>
+
+<ul>
+<li>g</li>
+<li>h</li>
+</ul>
+        HTML
+      end
+
+      it "should inlinify single paragraphs by default" do
+        th.mt(:foo, "**this** is a test").
+          should == "<strong>this</strong> is a test"
+
+        th.mt(:foo, "**this** is another test\n\nwhat will happen?").
+          should == "<p><strong>this</strong> is another test</p>\n\n<p>what will happen?</p>"
+      end
+  
+      it "should not inlinify single paragraphs if :inlinify => :never" do
+        th.mt(:foo, "**one** more test", :inlinify => :never).
+          should == "<p><strong>one</strong> more test</p>"
+      end
+    end
+  end
 end

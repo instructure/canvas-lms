@@ -45,10 +45,6 @@ module Canvas
       }.with_indifferent_access
     end
     
-    def name
-      @meta[:name]
-    end
-    
     def default_settings
       @meta[:settings]
     end
@@ -67,20 +63,12 @@ module Canvas
       @meta[:encrypted_settings]
     end
 
-    def description
-      @meta[:description]
-    end
-    
-    def website
-      @meta[:website]
-    end
-    
-    def author
-      @meta[:author]
-    end
-    
-    def author_website
-      @meta[:author_website]
+    [:name, :description, :website, :author, :author_website].each do |method|
+      class_eval <<-METHOD
+        def #{method}
+          @meta[:#{method}].is_a?(Proc) ? instance_eval(&@meta[:#{method}]) : @meta[:#{method}] || ''
+        end
+      METHOD
     end
     
     def validator
@@ -103,7 +91,13 @@ module Canvas
     def base
       @meta[:base]
     end
-    
+
+    def translate(key, default, options={})
+      key = "canvas.plugins.#{@id}.#{key}" unless key =~ /\A#/
+      I18n.translate(key, default, options)
+    end
+    alias :t :translate
+
     # Let the plugin do any validations necessary.
     # If the plugin has defined a validator, call
     # the :validate method on that validator.  If it

@@ -1,12 +1,12 @@
-<% content_for :page_title do %>Plugin Settings: <%=h @plugin.name %><% end %>
+<% content_for :page_title do %><%= t :page_title, "Plugin Settings: %{plugin}", :plugin => @plugin.name %><% end %>
 <% 
   jammit_css :plugins
   jammit_js :plugins
-  add_crumb('Plugins', plugins_path)
+  add_crumb(t('#crumbs.plugins', "Plugins"), plugins_path)
   add_crumb(@plugin.name)
 %>  
 
-<h2>Plugin Settings: <%=h @plugin.name %></h2>
+<h2><%= t :page_title, "Plugin Settings: %{plugin}", :plugin => @plugin.name %></h2>
 
 <%= render :partial => "settings_header" %>
 
@@ -22,8 +22,8 @@
         <%= partial %>
     </div>
     <div class='button-container'>
-      <button type="submit" class="button save_button">Apply</button>
-      <%=link_to("Return to plugins list", plugins_path,:class => 'button button-secondary')%>
+      <button type="submit" class="button save_button"><%= t '#buttons.apply', "Apply" %></button>
+      <%=link_to(t(:back_to_list, "Return to plugins list"), plugins_path,:class => 'button button-secondary')%>
     </div>
   <% end %>
 </div>

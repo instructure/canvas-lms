@@ -1,25 +1,16 @@
-<% p = case asset
-       when Pseudonym
-         asset
-       when AccountUser
-         asset.user.pseudonym
-       else
-         asset.pseudonym
-       end %>
 <% define_content :link do %>
-  <% cc = asset.user.communication_channel %>http://<%= HostUrl.context_host(asset.account) %>/pseudonyms/<%= p.id %>/register/<%= cc.confirmation_code %>
+  http://<%= HostUrl.context_host(asset.account) %>/pseudonyms/<%= asset.user.pseudonym.id %>/register/<%= asset.user.communication_channel.confirmation_code %>
 <% end %>
 
 <% define_content :subject do %>
-  Canvas Account Admin Invitation
+  <%= t :subject, "Canvas Account Admin Invitation" %>
 <% end %>
 
-You've been added as an <%= asset.readable_type %> to the account <%= asset.account.name %> at <%= HostUrl.context_host(asset.account) %>.  
+<%= t(:added_message, "You've been added as an %{role_type} to the account %{account} at %{website}.", :role_type => asset.readable_type, :account => asset.account.name, :website => HostUrl.context_host(asset.account)) %>
 
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
-Name: <%= asset.user.name %>
-Email: <%= asset.user.email %>
-<% if email != login %>Username: <%= asset.user.pseudonym.unique_id rescue "none" %><% end %>
+<%= t(:name_info, "Name: %{name}", :name => asset.user.name) %>
+<%= t(:email_info, "Email: %{email}", :email => email) %>
+<% if email != login %><%= t(:username_info, "Username: %{username}", :username => login) %><% end %>
 
-You'll need register with Canvas before you can participate as an account admin.  You can finish the registration process here:
-<%= content :link %>
+<%= t(:url_info, "You'll need to register with Canvas before you can participate as an account admin.  You can finish the registration process here:\n%{url}", :url => content(:link)) %>
