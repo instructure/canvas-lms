@@ -8,7 +8,7 @@ TEST_FILE_UUIDS = { "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
 
 def get_file(filename)
   data = TEST_FILE_UUIDS[filename]
-  if SELENIUM_CONFIG.empty?
+  if !SELENIUM_CONFIG[:host_and_port]
     @file = Tempfile.new(filename.split(/(?=\.)/))
     @file.write data
     @file.close
