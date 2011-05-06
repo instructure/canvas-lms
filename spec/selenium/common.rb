@@ -31,8 +31,13 @@ MAX_SERVER_START_TIME = 30
 
 module SeleniumTestsHelperMethods
   def setup_selenium
-    if SELENIUM_CONFIG.empty?
-      driver = Selenium::WebDriver.for :firefox
+    if !SELENIUM_CONFIG[:host_and_port]
+      browser = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
+      options = {}
+      if SELENIUM_CONFIG[:firefox_profile].present? && browser == :firefox
+        options[:profile] = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
+      end
+      driver = Selenium::WebDriver.for(browser, options)
     else
       driver = Selenium::WebDriver.for(
         :remote, 
@@ -41,6 +46,7 @@ module SeleniumTestsHelperMethods
       )
     end
     driver.get(app_host)
+    driver.manage.timeouts.implicit_wait = 3
     driver
   end
   
