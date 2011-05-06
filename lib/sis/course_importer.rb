@@ -52,9 +52,9 @@ module SIS
         course = nil
         course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id'])
         course ||= Course.new
-        course.enrollment_term_id = term.id if term
-        course.root_account_id = @root_account.id
-        course.account_id = (account || @root_account).id
+        course.enrollment_term = term if term
+        course.root_account = @root_account
+        course.account = account || @root_account
         
         # only update the name/short_name on new records, and ones that haven't been changed
         # since the last sis import

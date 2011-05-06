@@ -393,13 +393,19 @@ class Course < ActiveRecord::Base
     @group_weighting_scheme_changed = self.group_weighting_scheme_changed?
     self.indexed = nil unless self.is_public
     if self.account_id && self.account_id_changed?
-      a = Account.find_by_id(self.account_id)
+      # This is a bit tricky.  Basically, it ensures a is the current account;
+      # if account is not loaded, it will not double load (because it's
+      # already cached). If it's already loaded, and correct, it again will
+      # only use the cache.  If it's already loaded and the wrong one, it will
+      # force reload
+      a = self.account(self.account && self.account.id != self.account_id)
       self.root_account_id = a.root_account_id if a
       self.root_account_id ||= a.id if a
-      self.root_account = Account.find_by_id(self.root_account_id) if self.root_account && self.root_account.id != self.root_account_id
+      # Ditto
+      self.root_account(self.root_account && self.root_account.id != self.root_account_id)
     end
     if self.root_account_id && self.root_account_id_changed?
-      a = Account.find_by_id(self.account_id)
+      a = self.account(self.account && self.account.id != self.account_id)
       self.account_id = nil if self.account_id && self.account_id != self.root_account_id && a && a.root_account_id != self.root_account_id
       self.account_id ||= self.root_account_id
     end
