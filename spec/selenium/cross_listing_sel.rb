@@ -34,8 +34,7 @@ shared_examples_for "cross-listing selenium tests" do
     
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").clear
-    form.find_element(:css, "#course_id").send_keys([:control, 'a'], other_course.id.to_s)
-    driver.find_element(:css, "#course_autocomplete_id_lookup").click
+    form.find_element(:css, "#course_id").send_keys([:control, 'a'], other_course.id.to_s, "\n")
     keep_trying { driver.find_element(:css, "#course_autocomplete_name").text != "Confirming Course ID \"#{other_course.id}\"..." }
     driver.find_element(:css, "#course_autocomplete_name").text.should eql(other_course.name)
     form.find_element(:css, "#course_autocomplete_id").value.should eql(other_course.id.to_s)
