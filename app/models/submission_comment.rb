@@ -104,18 +104,18 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment
     p.to { [submission.user] - [author] }
     p.whenever {|record|
-      record.just_created && 
-      record.submission.assignment && (!record.submission.assignment.context.admins.include?(author) || record.submission.assignment.published?) && 
+      record.just_created &&
+      record.submission.assignment &&
+      (!record.submission.assignment.context.admins.include?(author) || record.submission.assignment.published?) &&
       (record.created_at - record.submission.created_at rescue 0) > 30
     }
 
-    # Too noisy?
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.admins_in_charge_of(author_id) - [author] }
     p.whenever {|record|
-      record.just_created && 
-      record.submission.user_id == record.author_id && record.submission.submitted_at && 
-      (record.created_at - record.submission.submitted_at rescue 0) > 30
+      record.just_created &&
+      record.submission.user_id == record.author_id &&
+      (!record.submission.submitted_at || ((record.created_at - record.submission.submitted_at rescue 0) > 30))
     }
   end
   

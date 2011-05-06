@@ -50,12 +50,9 @@ describe SubmissionComment do
     Notification.create(:name => 'Submission Comment')
     @comment = @submission.add_comment(:author => te.user, :comment => "some comment")
     @comment.messages_sent.should_not be_include('Submission Comment')
-    
-    # @comment.save!
-    # @comment.messages_sent.should be_nil
   end
   
-  it "should dispatch notification on create if assignment is not published" do
+  it "should dispatch notification on create if assignment is published" do
     assignment_model
     @assignment.workflow_state = 'published'
     @assignment.save
@@ -68,9 +65,20 @@ describe SubmissionComment do
     Notification.create(:name => 'Submission Comment')
     @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
     @comment.messages_sent.should be_include('Submission Comment')
-    
-    # @comment.save!
-    # @comment.messages_sent.should be_nil
+  end
+  
+  it "should dispatch notification on create to teachers even if submission not submitted yet" do
+    assignment_model
+    @assignment.workflow_state = 'published'
+    @assignment.save
+    @course.offer
+    @course.enroll_teacher(user)
+    se = @course.enroll_student(user)
+    @submission = @assignment.find_or_create_submission(se.user)
+    @submission.save
+    Notification.create(:name => 'Submission Comment For Teacher')
+    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
+    @comment.messages_sent.should be_include('Submission Comment For Teacher')
   end
   
   it "should respond to attachments" do
