@@ -197,6 +197,7 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :delete)
       if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
         @context.workflow_state = 'deleted'
+        @context.sis_source_id = nil
         @context.save
         flash[:notice] = "Course successfully deleted"
       else
