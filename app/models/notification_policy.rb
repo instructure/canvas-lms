@@ -83,18 +83,7 @@ class NotificationPolicy < ActiveRecord::Base
     puts e.to_s
     false
   end
-  
-  def self.defaults_for(user)
-    return unless user && user.email
-    email_channel = user.email_channel
-    existing_ids = user.notification_policies.map{|np| np.notification_id}
-    Notification.transaction do
-      Notification.all.each do |notification|
-        user.notification_policies.create(:broadcast => true, :communication_channel => email_channel, :notification => notification, :frequency => notification.default_frequency) unless existing_ids.include?(notification.id)
-      end
-    end
-  end
-  
+
   def self.refresh_for(user)
     categories = Notification.dashboard_categories
     policies = user.notification_policies.to_a
