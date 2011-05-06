@@ -502,8 +502,9 @@ class Account < ActiveRecord::Base
   end
   
   def default_enrollment_term
+    return @default_enrollment_term if @default_enrollment_term
     unless self.root_account_id
-      self.enrollment_terms.active.find_or_create_by_name("Default Term")
+      @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name("Default Term")
     end
   end
   

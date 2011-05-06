@@ -243,7 +243,7 @@ class Course < ActiveRecord::Base
           end
           to_delete.delete(key)
         else
-          associations_hash[key] = self.course_account_associations.create(:account_id => account.id, :depth => idx, :course_section_id => section.id)
+          associations_hash[key] = self.course_account_associations.create(:account => account, :depth => idx, :course_section => section)
           did_an_update = true
         end
       end
@@ -1069,7 +1069,10 @@ class Course < ActiveRecord::Base
   end
   
   def default_section
-    self.course_sections.active.find_or_create_by_default_section(true) #name("Default Course Section")
+    self.course_sections.active.find_or_create_by_default_section(true) do |section|
+      section.course = self
+      section.root_account = self.root_account
+    end
   end
   
   def assert_section
