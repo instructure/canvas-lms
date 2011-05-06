@@ -70,7 +70,7 @@ class CourseSection < ActiveRecord::Base
       self.section_code = self.name
       self.long_section_code = self.name
     end
-    self.enrollment_term ||= self.root_account.default_enrollment_term
+    self.enrollment_term = self.root_account.default_enrollment_term if self.enrollment_term_id.nil?
   end
   
   def defined_by_sis?

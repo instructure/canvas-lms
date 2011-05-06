@@ -59,7 +59,9 @@ module SIS
         section ||= course.course_sections.find_by_sis_source_id(row['section_id'])
         section ||= course.course_sections.find_by_name(name)
         section ||= course.course_sections.new
-        section.root_account_id = @root_account.id
+        section.root_account = @root_account
+        # this is an easy way to load up the cache with data we already have
+        section.course = course if course.try(:id) == section.course_id
         
         section.account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
         
@@ -69,10 +71,10 @@ module SIS
         end
         
         # update the course id if necessary
-        if section.course != course
-          if section.nonxlist_course
+        if section.course_id != course.id
+          if section.nonxlist_course_id
             # this section is crosslisted
-            if section.nonxlist_course != course
+            if section.nonxlist_course_id != course.id
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
               section.uncrosslist
