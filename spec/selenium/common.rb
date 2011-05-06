@@ -87,6 +87,7 @@ module SeleniumTestsHelperMethods
       base = File.expand_path(File.dirname(__FILE__))
       STDOUT.reopen(File.open("/dev/null", "w"))
       STDERR.reopen(File.open("#{base}/../../log/test-server.log", "a"))
+      ENV['SELENIUM_WEBRICK_SERVER'] = '1'
       exec("#{base}/../../script/server", "-p", SERVER_PORT.to_s, "-e", Rails.env)
     end
     for i in 0..MAX_SERVER_START_TIME

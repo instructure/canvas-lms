@@ -131,6 +131,9 @@ end
 
 describe "file uploads Windows-Firefox-Local-Tests" do
   it_should_behave_like "file uploads selenium tests"
+  prepend_before(:each) {
+    Setting.set("file_storage_test_override", "local")
+  }
   prepend_before(:all) {
     Setting.set("file_storage_test_override", "local")
   }
@@ -138,6 +141,9 @@ end
 
 describe "file uploads Windows-Firefox-S3-Tests" do
   it_should_behave_like "file uploads selenium tests"
+  prepend_before(:each) {
+    Setting.set("file_storage_test_override", "s3")
+  }
   prepend_before(:all) {
     Setting.set("file_storage_test_override", "s3")
   }
