@@ -510,18 +510,27 @@ describe SIS::SisCsv do
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active",
         "A001,,Humanities 2,active",
-        ",,Humanities 3,active",
-        "A002,A000,English,inactive",
-        "A003,A001,,active"
-      )
+        ",,Humanities 3,active")
+
+      errors = importer.errors.map { |r| r.last }
+      warnings = importer.warnings.map { |r| r.last }
+      errors.should == ["Duplicate account id A001",
+                        "No account_id given for an account"]
+      warnings.should == []
+
+      importer = process_csv_data(
+        "account_id,parent_account_id,name,status",
+        "A002,A001,English,active",
+        "A003,,English,inactive",
+        "A004,,,active")
       Account.count.should == before_count
 
       errors = importer.errors.map { |r| r.last }
-      errors.should == ["Duplicate account id A001",
-                        "No account_id given for an account",
-                        "Improper status \"inactive\" for account A002",
-                        "Non-listed parent account referenced in csv for account A002",
-                        "No name given for account A003"]
+      warnings = importer.warnings.map { |r| r.last }
+      errors.should == []
+      warnings.should == ["Parent account didn't exist for A002",
+                          "Improper status \"inactive\" for account A003, skipping",
+                          "No name given for account A004, skipping"]
     end
     
     it 'should create accounts' do
@@ -552,6 +561,49 @@ describe SIS::SisCsv do
       a3.parent_account_id.should == a2.id
       a3.root_account_id.should == @account.id
       a3.name.should == 'English Literature'
+    end
+
+    it 'should update the hierarchies of existing accounts' do
+      before_count = Account.count
+      importer = process_csv_data(
+        "account_id,parent_account_id,name,status",
+        "A001,,Humanities,active",
+        "A002,,English,deleted",
+        "A003,,English Literature,active",
+        "A004,,Awesomeness,active"
+      )
+      importer.warnings.should == []
+      importer.errors.should == []
+      Account.count.should == before_count + 4
+      
+      ['A001', 'A002', 'A003', 'A004'].each do |id|
+        Account.find_by_sis_source_id(id).parent_account.should == @account
+      end
+      Account.find_by_sis_source_id('A002').workflow_state.should == "deleted"
+      Account.find_by_sis_source_id('A003').name.should == "English Literature"
+
+      importer = process_csv_data(
+        "account_id,parent_account_id,name,status",
+        "A002,A001,,",
+        "A003,A002,,",
+        "A004,A002,,"
+      )
+      importer.warnings.should == []
+      importer.errors.should == []
+      Account.count.should == before_count + 4
+
+      a1 = Account.find_by_sis_source_id('A001')
+      a2 = Account.find_by_sis_source_id('A002')
+      a3 = Account.find_by_sis_source_id('A003')
+      a4 = Account.find_by_sis_source_id('A004')
+      a1.parent_account.should == @account
+      a2.parent_account.should == a1
+      a3.parent_account.should == a2
+      a4.parent_account.should == a2
+
+      Account.find_by_sis_source_id('A002').workflow_state.should == "deleted"
+      Account.find_by_sis_source_id('A003').name.should == "English Literature"
+      
     end
   end
   
