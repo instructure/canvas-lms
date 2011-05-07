@@ -46,9 +46,5 @@ config.after_initialize do
   ActionController::Dispatcher.middleware.insert_before(ActionController::Base.session_store, RackRailsCookieHeaderHack)
 end
 
-# Rails can't correctly set :protocol => 'https' as part of a controller spec,
-# so we just turn the ssl check off.
-SslRequirement.disable_ssl_check = true
-
 # eval <env>-local.rb if it exists
 Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }

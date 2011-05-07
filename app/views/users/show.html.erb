@@ -115,7 +115,7 @@
 <% if page_views_enabled? && @page_views.total_pages < 5 %>
 <% js_block do %>
   <!--Load the GOOGLE AJAX API-->
-  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="//www.google.com/jsapi"></script>
 
   <script type="text/javascript">
     var pageViewData = <%= raw(@user.page_view_data.to_json) rescue '{}' %>;

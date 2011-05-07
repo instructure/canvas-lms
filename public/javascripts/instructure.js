@@ -296,10 +296,10 @@ jQuery(function($) {
             id = $.youTubeID(href || "");
         if($link.hasClass('inline_disabled')) {
         } else if(id) {
-          var $after = $('<a href="'+ href +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(http://img.youtube.com/vi/' + id + '/2.jpg)"/></a>')
+          var $after = $('<a href="'+ href +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + id + '/2.jpg)"/></a>')
             .click(function(event) {
               event.preventDefault();
-              var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='http://www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='http://www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>Minimize Video</a></span>");
+              var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>Minimize Video</a></span>");
               $video.find(".hide_youtube_embed_link").click(function(event) {
                 event.preventDefault();
                 $video.remove();

@@ -97,7 +97,7 @@ module ApplicationHelper
       height ||= css_size(params['height'])
       height ||= css_size(styles['height'])
       height ||= '300px'
-      url = "http://#{HostUrl.file_host(@domain_root_account || Account.default)}"
+      url = "//#{HostUrl.file_host(@domain_root_account || Account.default)}"
       ts, sig = @current_user && @current_user.access_verifier
       url += "/object_snippet/#{context_code}/#{asset_string}/#{idx}"
       url += "?user_id=#{(@current_user ? @current_user.id : nil)}&ts=#{ts}&verifier=#{sig}"
@@ -406,7 +406,7 @@ module ApplicationHelper
     if uri
       query = Rack::Utils.parse_query(uri.query)
       if uri.host == 'www.youtube.com' && uri.path == '/watch' && query['v'].present?
-        src = "http://www.youtube.com/embed/#{query['v']}"
+        src = "//www.youtube.com/embed/#{query['v']}"
         html_options.merge!({:title => 'Youtube video player', :width => 640, :height => 480, :frameborder => 0, :allowfullscreen => 'allowfullscreen'})
       end
     end

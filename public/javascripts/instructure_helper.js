@@ -3103,7 +3103,7 @@
     return !!(href && href.length && !href.match(/^(mailto\:|javascript\:)/) && element.hostname && getTld(element.hostname) != locationTld);
   };
   
-  INST.youTubeRegEx = /^http:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/;
+  INST.youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/;
   $.youTubeID = function(path) {
     var match = path.match(INST.youTubeRegEx);
     if(match && match[match.length - 1]) {

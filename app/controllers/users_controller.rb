@@ -21,7 +21,6 @@ class UsersController < ApplicationController
   include Twitter
   include LinkedIn
   include DeliciousDiigo
-  ssl_required :create, :new
   before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard]
   before_filter :require_open_registration, :only => [:new, :create]
   

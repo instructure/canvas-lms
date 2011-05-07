@@ -416,7 +416,7 @@ class FilesController < ApplicationController
 
       if Attachment.s3_storage?
         res = {
-          :upload_url => "http://#{@attachment.bucket_name}.s3.amazonaws.com/",
+          :upload_url => "#{request.ssl? ? "https" : "http"}://#{@attachment.bucket_name}.s3.amazonaws.com/",
           :remote_url => true,
           :file_param => 'file',
           :success_url => s3_success_url(@attachment.id, :uuid => @attachment.uuid),

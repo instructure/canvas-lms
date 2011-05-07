@@ -17,7 +17,6 @@
 #
 
 class InfoController < ApplicationController
-  ssl_allowed :record_error, :health_check
   skip_before_filter :verify_authenticity_token, :only => :record_error
   skip_before_filter :load_account, :only => :health_check
   skip_before_filter :load_user, :only => :health_check

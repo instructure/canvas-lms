@@ -18,8 +18,6 @@
 
 class PseudonymSessionsController < ApplicationController
   protect_from_forgery :except => [:create, :destroy, :saml_consume]
-  ssl_required :create, :new
-  ssl_allowed :saml_consume, :saml_logout
   
   def new
     if @current_user && !params[:re_login]
