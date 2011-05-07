@@ -121,7 +121,8 @@ class CourseSection < ActiveRecord::Base
     if (self.nonxlist_course.course_sections.active.count == 0 ||
         (self.nonxlist_course.course_sections.active.count == 1 &&
          self.nonxlist_course.course_sections.active.first.enrollments.count == 0)) &&
-       self.nonxlist_course.workflow_state == "created"
+       (self.nonxlist_course.workflow_state == "created" ||
+        self.nonxlist_course.workflow_state == "claimed")
       self.nonxlist_course.workflow_state = "deleted"
       self.nonxlist_course.save!
     end

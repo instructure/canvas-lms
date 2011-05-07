@@ -798,6 +798,27 @@ describe SIS::SisCsv do
       xlist_course.workflow_state.should == "claimed"
     end
       
+    it 'should mark the original course deleted if it is made empty due to crosslisting' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active",
+        "C002,TC 101,Test Course 101,,,active"
+      )
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
+        "S002,C002,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
+        "S003,C002,Sec3,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
+      )
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,active",
+        "X001,S002,active"
+      )
+      @account.courses.find_by_sis_source_id("C002").workflow_state.should_not == "deleted"
+      @account.courses.find_by_sis_source_id("C001").workflow_state.should == "deleted"
+    end
+      
     it 'should work with xlists with an xlist course defined' do
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
