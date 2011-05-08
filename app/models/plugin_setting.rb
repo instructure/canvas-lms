@@ -90,9 +90,13 @@ class PluginSetting < ActiveRecord::Base
       end
     end
   end
-
+  
+  def enabled?
+    read_attribute(:disabled) != true
+  end
+  
   def self.settings_for_plugin(name, plugin=nil)
-    if (plugin_setting = PluginSetting.find_by_name(name.to_s)) && plugin_setting.valid_settings? 
+    if (plugin_setting = PluginSetting.find_by_name(name.to_s)) && plugin_setting.valid_settings? && plugin_setting.enabled?
       plugin_setting.plugin = plugin
       settings = plugin_setting.settings
     else

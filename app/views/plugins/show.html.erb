@@ -12,9 +12,13 @@
 
 <div id="settings">
   <% form_for(@plugin_setting, :url => plugin_path(@plugin.id), :html => {:method => :put}) do |f| %>
-      <% partial = render :partial => @plugin.settings_partial, :locals => {:settings => (@plugin_setting.settings || {}).merge(params[:settings] || {})} %>
-      <%= f.error_messages if !@error_messages_handled %>
-    <div class="box tabular">
+    <div style="margin-bottom: 15px; margin-top: -10px;">
+      <%= f.check_box :disabled, :class => "disabled_checkbox" %>
+      <%= f.label :disabled, "Disable this Plugin" %>
+    </div>
+    <% partial = render :partial => @plugin.settings_partial, :locals => {:settings => (@plugin_setting.settings || {}).merge(params[:settings] || {})} %>
+    <%= f.error_messages if !@error_messages_handled %>
+    <div class="box tabular plugin_settings">
         <%= partial %>
     </div>
     <div class='button-container'>
