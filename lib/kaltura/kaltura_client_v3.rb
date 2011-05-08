@@ -205,7 +205,7 @@ module Kaltura
     def assetSwfUrl(assetId)
       config = Kaltura::ClientV3.config
       return nil unless config
-      "http://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
+      "//#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
     end
 
     private
