@@ -1,0 +1,86 @@
+<% if @user %>
+  <div style="float: right; margin-right: 5px;">
+    <fb:bookmark></fb:bookmark>
+  </div>
+  <h2><%= image_tag "favicon_large.png", :style => 'vertical-align: middle;' %> Canvas Messages</h2>
+  <div style="float: left; padding: 0 5px 5px;"><fb:profile-pic uid='<%= @facebook_user_id %>'/></div>
+  <div style="float: right; text-align: right; padding-left: 10px; margin-right: 5px;">
+    <a href="<%= facebook_settings_url %>" class="button">Notification Settings</a>
+  </div>
+  <span style="font-size: 1.5em;">Welcome back, <%= @user.name %>!</span>
+  <div style="clear: left; margin-bottom: 5px;"></div>
+  <% if @messages.blank? %>
+    <b>You're all set up!</b>
+    <% if @user.notification_policies.any?{|p| p.communication_channel.path_type == 'facebook' } %>
+      As things happen in the course you'll start seeing notifications show
+      up here letting you know about things happening in your Canvas account.
+    <% else %>
+      After you <a href="http://apps.facebook.com/<%= Facebooker.facebooker_config['canvas_page_name'] %>/settings">configured your notification preferences</a>
+      you should start to see notifications show up here letting you know
+      about things happening in your Canvas account.
+    <% end %>
+    You can see the number of new Canvas notifications from your 
+    Facebook home page if you bookmark this 
+    application.<br/><br/>
+    <div style="clear: right;"></div>
+  <% else %>
+    Below you can see a list of your most recent notifications from Canvas.  
+    You can see the number of new Canvas notifications from your 
+    Facebook home page if you bookmark this 
+    application.<br/><br/>
+    <div style="clear: right; margin-bottom: 10px;"></div>
+    <% if @messages.blank? %>
+        No messages to show.  Visit your classes at 
+        <%= raw @domains.map {|domain| link_to(domain, "http://#{domain}") }.join(", ") %>
+      
+    <% elsif @user %>
+      <div id="messages">
+        <%= render :partial => "message", :collection => @messages[0,25] %>
+      </div>
+      More information at 
+      <%= raw @domains.map {|domain| link_to(domain, "http://#{domain}") }.join(", ") %>
+    <% end %>
+  <% end %>
+
+<% else %>
+  <h2><%= image_tag "favicon_large.png", :style => 'vertical-align: middle;' %> Welcome to Instructure Canvas</h2>
+  Welcome to a new breed of online learning software, courtesy of Instructure. 
+  We're here to make it easy for you to use the web to improve learning. Our interface 
+  is simple, clean and open, and we work with the tools you and your students 
+  are already using -- tools like Facebook -- to provide a more open, collaborative
+  learning experience.  We roll it all up into one powerful, open package that does more 
+  than just tracks assignments. It encourages interaction and fosters learning.
+  <div style="text-align: right;">
+    <a href="http://www.instructure.com">Learn More at instructure.com</a>
+  </div>
+  <div style="clear: left;"></div>
+      <p>
+        The Canvas Facebook app is here to give you easier access to the interactions
+        going on inside your courses.  You can set it to send you notifications when your
+        assignments are graded, when due dates change, etc.  Your private data will still stay
+        private at Canvas.
+      </p>
+      <p>
+        To install the Canvas Facebook app, go to your profile page in Canvas and 
+        click the Facebook button to connect your account to Facebook.
+      </p>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $("#messages").delegate('.delete_link', 'click', function(event) {
+    event.preventDefault();
+    var $message = $(this).parents(".facebook_message");
+    $message.confirmDelete({
+      noMessage: true,
+      url: $(this).attr('rel'),
+      success: function() {
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
+      }
+    });
+  });
+});
+</script>
+<% end %>

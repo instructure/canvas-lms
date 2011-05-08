@@ -2,6 +2,15 @@ Dir.glob('lib/canvas/plugins/validators/*').each do |file|
   require_dependency file
 end
 
+Canvas::Plugin.register('facebook', nil, {
+  :description => 'Canvas Facebook application',
+  :website => 'http://www.facebook.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/facebook_settings',
+  :validator => 'FacebookValidator'
+})
 Canvas::Plugin.register('kaltura', nil, {
   :description => 'Kaltura video/audio recording and playback',
   :website => 'http://corp.kaltura.com',

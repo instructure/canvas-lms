@@ -1,0 +1,69 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          You will need to create a <a href="http://www.facebook.com/developers">new app on facebook.com</a>.
+          Set the following configuration options to ensure your Facebook app
+          works correctly:
+          <ul>
+            <li><b>Web Site -- Site URL:</b> set to https://&lt; domain &gt;/</li> 
+            <li><b>Web Site -- Site Domain:</b> domain of your main Canvas site.  This must match the Site URL setting</li> 
+            <li><b>Facebook Integration -- Canvas Page:</b> make a note of whatever you choose and enter in the form below</li>
+            <li><b>Facebook Integration -- Canvas URL:</b> set to https://&lt; domain &gt;/facebook</li>
+            <li>Make sure <b>Advanced -- OAuth 2.0 for Canvas</b> is enabled</li>
+            <li>After you save your app, make a note of the App ID, API Key and App Secret</li>
+          </ul>
+          
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" class="sub">
+        <h3>Domain Settings</h3>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :app_id, "App ID:" %></td>
+      <td>
+        <%= f.text_field :app_id %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :api_key, "API Key:" %></td>
+      <td>
+        <%= f.text_field :api_key %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :secret, "App Secret:" %></td>
+      <td>
+        <%= f.text_field :secret %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :canvas_name, "Canvas Name:" %></td>
+      <td>
+        <%= f.text_field :canvas_name %>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :disable_ssl %>
+        <%= f.label :disable_ssl, "Disable SSL" %>
+        <div class="hint">Use only for local testing</div>
+      </td>
+    </tr>
+  </table>
+<% end %>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(".facebook_setup_link").click(function(event) {
+    event.preventDefault();
+    $("#facebook_setup").slideToggle();
+  });
+});
+</script>
+<% end %>

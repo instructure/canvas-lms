@@ -16,5 +16,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module FacebookHelper
+module Canvas::Plugins::Validators::FacebookValidator
+  def self.validate(settings, plugin_setting)
+    if settings.map(&:last).all?(&:blank?)
+      {}
+    else
+      if settings.map(&:last).any?(&:blank?)
+        plugin_setting.errors.add_to_base('All fields are required')
+        false
+      else
+        res = Facebook.config_check(settings)
+        if res
+          plugin_setting.errors.add_to_base(res)
+          false
+        else
+          settings[:disable_ssl] = ['1', true, 'true'].include?(settings[:disable_ssl])
+          settings.slice(:app_id, :api_key, :secret, :disable_ssl, :canvas_name)
+        end
+      end
+    end
+  end
 end

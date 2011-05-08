@@ -113,7 +113,7 @@ describe CoursesController do
       @enrollment = @course.enroll_user(@user)
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @enrollment.uuid
       response.should be_redirect
-      response.should redirect_to(registration_confirmation_url(@pseudonym.id, :nonce => @pseudonym.communication_channel.confirmation_code, :enrollment => @enrollment.uuid))
+      response.should redirect_to(registration_confirmation_url(@pseudonym.id, @pseudonym.communication_channel.confirmation_code, :enrollment => @enrollment.uuid))
       assigns[:pending_enrollment].should eql(@enrollment)
       assigns[:pending_enrollment].should be_invited
     end
