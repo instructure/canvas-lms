@@ -1,0 +1,34 @@
+<div id="notification_types" style="margin-top: 10px;">  
+  <p style="font-size: 1.2em;">
+  
+  <h2><%= image_tag "favicon_large.png", :style => 'vertical-align: middle;' %> Canvas Notification Settings</h2>
+  <div style="margin-bottom: 10px;">
+    <a href="<%= facebook_url %>" class="button"><%= image_tag "back.png" %> Back to Messages</a>
+  </div>
+  Notifications from Canvas
+  can automatically be sent over to your Facebook account.  Below you'll see the types of
+  notifications you can have sent.  You can change your notification preferences at any time,
+  either here or in Canvas.</p>
+  <div id="notification_types_holder">
+    <% if @user %>
+      <%= render :partial => "notification_policies" %>
+    <% else %>
+      Before you can configure the Canvas Facebook App you 
+      need to link it to your Canvas login.  Please click "Welcome"
+      for more information.
+    <% end %>
+  </div>
+</div>
+<% js_block do %>
+<script>
+$(document).ready(function() {
+  $(".settings_link,.cancel_button").click(function(event) {
+    event.preventDefault();
+    $("#notification_types_form,#notification_types_list").toggle();
+  });
+  $("#notification_types_form").submit(function() {
+    $(this).find("button").attr('disabled', true).text("Upadating Preferences...");
+  });
+});
+</script>
+<% end %>

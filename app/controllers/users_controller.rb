@@ -25,6 +25,10 @@ class UsersController < ApplicationController
   before_filter :require_open_registration, :only => [:new, :create]
   
   def oauth
+    if !feature_and_service_enabled?(params[:service])
+      flash[:error] = "#{(params[:service] || "that service").titleize} has not been enabled"
+      return
+    end
     if params[:service] == "google_docs"
       session[:google_docs_authorization_return_to] = params[:return_to] || dashboard_url(:only_path => false)
       redirect_to google_docs_request_token_url(session[:google_docs_authorization_return_to])
@@ -34,7 +38,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "linked_in"
       session[:linked_in_authorization_return_to] = params[:return_to] || dashboard_url(:only_path => false)
       redirect_to linked_in_request_token_url(session[:linked_in_authorization_return_to])
-    elsif params[:service] == "facebook" && Facebooker.facebooker_config
+    elsif params[:service] == "facebook"
       oauth_request = OauthRequest.create(
         :service => 'facebook',
         :secret => AutoHandle.generate("fb", 10),
@@ -42,7 +46,7 @@ class UsersController < ApplicationController
         :user => @current_user,
         :original_host_with_port => request.host_with_port
       )
-      redirect_to "http://apps.facebook.com/#{Facebooker.facebooker_config['canvas_page_name']}/?fb_key=#{oauth_request.secret}"
+      redirect_to Facebook.authorize_url(oauth_request)
     end
   end
   
@@ -84,7 +88,13 @@ class UsersController < ApplicationController
   end
   
   def oauth_success
-    oauth_request = OauthRequest.find_by_token_and_service(params[:oauth_token], params[:service])
+    oauth_request = nil
+    if params[:oauth_token]
+      oauth_request = OauthRequest.find_by_token_and_service(params[:oauth_token], params[:service])
+    elsif params[:state] && params[:service] == 'facebook'
+      oauth_request = OauthRequest.find_by_id(Facebook.oauth_request_id(params[:state]))
+    end
+    
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
       flash[:error] = "OAuth Request failed.  Couldn't find valid request"
       redirect_to (@current_user ? profile_url : root_url)
@@ -92,7 +102,15 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-      if params[:service] == "google_docs"
+      if params[:service] == "facebook"
+        service = Facebook.authorize_success(@current_user, params[:access_token])
+        if service
+          flash[:notice] = "Facebook account successfully added!"
+        else
+          flash[:error] = "Facebook authorization failed."
+        end
+        return_to(oauth_request.return_url, profile_url)
+      elsif params[:service] == "google_docs"
         begin
           google_docs_get_access_token(oauth_request)
           doc_list = google_doc_list

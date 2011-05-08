@@ -37,13 +37,13 @@
     <% end %>
   </table>  
   <div style="text-align: right;">
-    <a clicktohide='notification_types_list' clicktoshow='notification_types_form'> Change Settings</a>
+    <a href="#" class="button settings_link">Change Settings</a>
   </div>
 </div>
-<form id="notification_types_form" style="display: none;">
+<form id="notification_types_form" action="<%= facebook_notification_preferences_url %>" method="post" style="display: none;">
   <div id="notification_types_loading" style="text-align: center; margin: 5px 0; font-size: 1.2em; display: none;">
     Updating Preferences...<br/>
-    <img src="http://<%= HostUrl.default_host %>/images/ajax-loader-bar.gif"/>
+    <%= image_tag "ajax-loader-bar.gif", :alt => "loading..." %>
   </div>
   <table style="margin: 10px auto; border-collapse: collapse;">
     <thead>
@@ -79,7 +79,7 @@
     <% end %>
   </table>  
   <div style="text-align: right;">
-    <input type="submit" class="inputbutton inputsubmit action" clickrewriteurl='<%= facebook_host %>/facebook/notification_preferences' clickrewriteform='notification_types_form' clickrewriteid='notification_types_holder' clicktoshow='notification_types_loading' value="Update Preferences"/>
-    or <a clicktohide='notification_types_form' clicktoshow='notification_types_list'>Cancel</a>
+    <button type="submit" class="button">Update Preferences</button>
+    <a href="#" class="button button-secondary cancel_button">Cancel</a>
   </div>
 </form>

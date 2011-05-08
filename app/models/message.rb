@@ -399,34 +399,9 @@ class Message < ActiveRecord::Base
     end
     
     def deliver_via_facebook
-      @@facebooker_session ||= Facebooker::Session.create
-      user = Facebooker::User.new((self.to.to_i.to_s rescue "0"), @@facebooker_session)
-      res = user.dashboard_increment_count rescue nil
-      # TODO: now that we're just incrementing the dashboard count, check
-      # the possible return values...
-      # Forcing skip of this code until I can find out what happens when you're
-      # throttled.  We shouldn't delete facebook membership data just because of
-      # throttling...
-      if false #&& (!res || res == "")
-        logger.info("cannot send notification to facebook user #{self.to}, deleting policies")
-        # If nothing returned, this is not a subscribed user id, so the channel should probably
-        # be disabled.  I'm sure Facebook will get mad if we keep sending notifications to
-        # users who have uninstalled the app.
-        ErrorLogging.log_error(:default, {
-          :message => "Failure response from Facebook, deleting policies and channel",
-          :to => self.to,
-          :object => self.inspect.to_s
-        })
-        self.errored_dispatch
-        cc = CommunicationChannel.find_by_path_and_path_type(self.to, 'facebook')
-        cc.destroy if cc
-        UserService.find_by_user_id_and_service(cc.user_id, 'facebook').destroy rescue nil
-        policies = NotificationPolicy.find_all_by_communication_channel_id_and_notification_id(self.communication_channel_id, self.notification_id)
-        policies.each{|p| p.destroy }
-      else
-        complete_dispatch
-        true
-      end
+      facebook_user_id = self.to.to_i.to_s
+      service = self.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
+      Facebook.dashboard_increment_count(service) if service && service.token
     end
     
     def deliver_via_sms

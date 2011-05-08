@@ -223,6 +223,8 @@ stylesheets:
     - public/stylesheets/compiled/g_syllabus.css
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/print.css
+  facebook:
+    - public/stylesheets/compiled/facebook.css
   speed_grader:
     - public/stylesheets/static/ui.selectmenu.css
     - public/stylesheets/compiled/speed_grader.css

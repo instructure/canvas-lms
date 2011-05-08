@@ -847,7 +847,7 @@ class ApplicationController < ActionController::Base
       elsif feature == :twitter
         !!Twitter.config
       elsif feature == :facebook
-        !!(YAML.load_file(Rails.root + "config/facebooker.yml")[Rails.env] rescue nil)
+        !!Facebook.config
       elsif feature == :linked_in
         !!LinkedIn.config
       elsif feature == :google_docs

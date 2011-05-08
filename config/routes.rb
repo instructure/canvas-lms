@@ -608,6 +608,10 @@ ActionController::Routing::Routes.draw do |map|
   map.health_check "health_check", :controller => 'info', :action => 'health_check'
   
   map.facebook "facebook", :controller => "facebook", :action => "index"
+  map.facebook_hide_message "facebook/message/:id", :controller => "facebook", :action => "hide_message"
+  map.facebook_settings "facebook/settings", :controller => "facebook", :action => "settings"
+  map.facebook_notification_preferences "facebook/notification_preferences", :controller => "facebook", :action => "notification_preferences"
+  
   map.resources :interaction_tests, :collection => {:next => :get, :register => :get, :groups => :post}
   
   map.resources :delayed_jobs, :member => {:update => :put, :queue => :put, :hold => :put}, :collection => {:hold => :put, :queue => :put}
@@ -656,10 +660,6 @@ ActionController::Routing::Routes.draw do |map|
                         :only => %w(show create)
     end
   end
-
-  # TODO: look at the FacebookController actions in more detail, sort out the
-  # actual routes needed.
-  map.connect 'facebook/:action', :controller => 'facebook'
 
   # See how all your routes lay out with "rake routes"
 end
