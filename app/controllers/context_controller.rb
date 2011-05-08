@@ -91,7 +91,7 @@ class ContextController < ApplicationController
     mo.viewed! if mo
     config = Kaltura::ClientV3.config
     if config
-      redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id])
+      redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id], request.ssl? ? "https" : "http")
     else
       render :text => "Media Objects not configured"
     end

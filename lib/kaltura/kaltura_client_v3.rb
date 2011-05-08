@@ -202,10 +202,10 @@ module Kaltura
       return result.content
     end
     
-    def assetSwfUrl(assetId)
+    def assetSwfUrl(assetId, protocol = "http")
       config = Kaltura::ClientV3.config
       return nil unless config
-      "//#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
+      "#{protocol}://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
     end
 
     private
