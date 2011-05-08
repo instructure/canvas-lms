@@ -413,8 +413,8 @@
       $dialog.dialog('close').dialog({
         autoOpen: false,
         title: "Record/Upload Media Comment",
-        width: 530,
-        height: 440,
+        width: 560,
+        height: 460,
         modal: (opts.modal == false ? false : true)
       }).dialog('open');
       $dialog.dialog('option', 'close', function() {
@@ -451,7 +451,7 @@
       var temporaryName = $.trim($("#identity .user_name").text()) + " " + (new Date()).toISOString();
       setTimeout(function() {
         var recordVars = {
-          host:INST.kalturaSettings.domain,
+          host:location.protocol + "//" + INST.kalturaSettings.domain,
           rtmpHost:"rtmp://" + INST.kalturaSettings.domain,
           kshowId:"-1",
           pid:INST.kalturaSettings.partner_id,
@@ -463,7 +463,7 @@
           thumbOffset:"1",
           licenseType:"CC-0.1",
           showUi:"true",
-          useCamera:"false",
+          useCamera:"0",
           maxFileSize: INST.kalturaSettings.max_file_size_bytes / 1048576,
           maxUploads: 1,
           partnerData: $.mediaComment.partnerData(),
@@ -481,11 +481,12 @@
           "wmode": "opaque"
         }
         $("#audio_record").html("Flash required for recording audio.")
-        swfobject.embedSWF("/media_record/KRecordAudio.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
+        swfobject.embedSWF("/media_record/KRecord.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
 
-        var params = $.extend({}, params, {name: 'KRecordVideo'})
+        var params = $.extend({}, params, {name: 'KRecordVideo'});
+        var recordVars = $.extend({}, recordVars, {useCamera: '1'});
         $("#video_record").html("Flash required for recording video.")
-        swfobject.embedSWF("/media_record/KRecordVideo.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
+        swfobject.embedSWF("/media_record/KRecord.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
         // give the dialog time to initialize or the recorder will
         // render funky in ie
       }, INST.browser.ie ? 500 : 10);
@@ -607,7 +608,8 @@
       $div.dialog('close').dialog({
         autoOpen: false,
         title: "Record/Upload Media Comment",
-        width: 450,
+        resizable: false,
+        width: 470,
         height: 300
       }).dialog('open');
       $.ajaxJSON('/dashboard/comment_session', 'GET', {}, function(data) {
@@ -719,7 +721,7 @@ function beforeAddEntry() {
     if($.mediaComment.lastAddAttemptId == attemptId) {
       $(document).triggerHandler('media_recording_error');
     }
-  }, 300000);
+  }, 30000);
   $("#audio_record_holder_message,#video_record_holder_message").addClass('saving');
 }
 function addEntryFail() {

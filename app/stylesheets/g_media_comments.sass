@@ -24,14 +24,14 @@
     width: 600px
     height: 600px
     z-index: 9999
-    background-color: #888
+    background-color: #666666
     position: absolute
     display: none
     .recorder_message
       color: #eee
       font-size: 1.5em
       opacity: 1.0
-      margin: 100px 20px
+      margin: 120px 55px
       width: 300px
       text-align: center
     &.saving
@@ -78,7 +78,10 @@ div#audio_upload,div#video_upload
   height: 300px
   overflow: hidden
   position: relative
-  border: 2px solid #888
+  border: 0
+  background: #fff url(/images/ajax-loader-medium-444.gif) no-repeat 10px 10px
+  +box-shadow( rgba(0,0,0,1.0), 0, 0, 10px)
+  margin: 10px
 
 #audio_record,#video_record 
   border: 0px solid #888
