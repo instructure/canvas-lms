@@ -27,7 +27,7 @@ class Assignment < ActiveRecord::Base
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
     :assignment_group, :unlock_at, :lock_at, :group_category,
-    :peer_review_count, :peer_reviews_due_at, :grading_standard_id,
+    :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :set_custom_field_values, :context, :position, :allowed_extensions
