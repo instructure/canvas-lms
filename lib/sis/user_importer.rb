@@ -100,7 +100,7 @@ module SIS
           pseudo.unique_id = row['login_id']
           pseudo.sis_source_id = row['login_id']
           pseudo.sis_user_id = row['user_id']
-          pseudo.account_id = @root_account.id
+          pseudo.account = @root_account
           pseudo.workflow_state = row['status']=~ /active/i ? 'active' : 'deleted'
           pseudo.sis_batch_id = @batch.id if @batch
           if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated) 
