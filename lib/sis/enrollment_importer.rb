@@ -164,7 +164,7 @@ module SIS
       end
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
-      Course.update_all({:updated_at => Time.now}, {:id => courses_to_touch_ids})
+      Course.update_all({:updated_at => Time.now}, {:id => courses_to_touch_ids.to_a})
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
       User.update_account_associations(update_account_association_user_ids.to_a)
