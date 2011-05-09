@@ -197,6 +197,41 @@ describe GradeCalculator do
       @user.enrollments.first.computed_final_score.should eql(90.0)
     end
     
+    it "should properly handle submissions with no score" do
+      course_with_student
+      @group = @course.assignment_groups.create!(:name => "group2", :group_weight => 50)
+      @assignment_1 = @group.assignments.build(:title => "some assignments", :points_possible => 10)
+      @assignment_1.context = @course
+      @assignment_1.save!
+      @assignment_2 = @group.assignments.build(:title => "some assignments", :points_possible => 4)
+      @assignment_2.context = @course
+      @assignment_2.save!
+      @group2 = @course.assignment_groups.create!(:name => "assignments", :group_weight => 40)
+      @assignment2_1 = @group2.assignments.build(:title => "some assignments", :points_possible => 40)
+      @assignment2_1.context = @course
+      @assignment2_1.save!
+      
+      @assignment_1.grade_student(@user, :grade => nil)
+      @assignment_2.grade_student(@user, :grade => "1")
+      @assignment2_1.grade_student(@user, :grade => "40")
+      
+      
+      @course.group_weighting_scheme = "percent"
+      @course.save!
+      @user.reload
+      
+      @user.enrollments.first.computed_current_score.should eql(52.5)
+      @user.enrollments.first.computed_final_score.should eql(43.6)
+      
+      @course.group_weighting_scheme = nil
+      @course.save!
+      @user.reload
+      
+      @user.enrollments.first.computed_current_score.should eql(93.2)
+      @user.enrollments.first.computed_final_score.should eql(75.9)
+      
+    end
+    
   end
   
 end
