@@ -87,9 +87,13 @@ class GradeCalculator
       end
       
       # Sort the submissions that have a grade by score (to easily drop lowest/highest grades)
-      sorted_assignment_submissions = assignment_submissions.select { |hash| hash[:submission] && hash[:submission].score }
+      if ignore_ungraded
+        sorted_assignment_submissions = assignment_submissions.select { |hash| hash[:submission] && hash[:submission].score }
+      else
+        sorted_assignment_submissions = assignment_submissions.select { |hash| hash[:submission] }
+      end
       sorted_assignment_submissions = sorted_assignment_submissions.sort_by do |hash|
-        val = ((hash[:submission].score / hash[:assignment].points_possible) rescue 999999)
+        val = (((hash[:submission].score || 0)/ hash[:assignment].points_possible) rescue 999999)
         val.to_f.finite? ? val : 999999
       end
       
