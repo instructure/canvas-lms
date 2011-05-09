@@ -821,8 +821,13 @@ class ApplicationController < ActionController::Base
   def safe_domain_file_url(attachment, host=nil)
     res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
     ts, sig = @current_user && @current_user.access_verifier
-    res += named_context_url(@context, :context_file_url, attachment.id)
-    res += '/' + URI.escape(attachment.full_display_path)
+    if @context
+      res += named_context_url(@context, :context_file_url, attachment)
+      res += '/' + URI.escape(attachment.full_display_path)
+    else
+      res += file_download_url(attachment, :only_path => true)
+    end
+
     # add parameters so that the other domain can create a session that 
     # will authorize file access but not full app access.  We need this in 
     # case there are relative URLs in the file that point to other pieces 

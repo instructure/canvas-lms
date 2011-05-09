@@ -20,7 +20,7 @@ def submission_model(opts={})
   assignment_model
   @student = opts[:user] || User.create!(:name => "new student")
   @enrollment = @course.enroll_student(@student)
-  @submission = @assignment.submit_homework(@student, :url => "some url")
+  @submission = @assignment.submit_homework(@student, :url => "http://www.instructure.com/")
 end
 
 def assignment_valid_attributes

@@ -27,7 +27,9 @@ ActionController::Routing::Routes.draw do |map|
   # callback urls for oauth authorization processes
   map.oauth "oauth", :controller => "users", :action => "oauth"
   map.oauth_success "oauth_success", :controller => "users", :action => "oauth_success"
-  map.resources :files
+  map.resources :files do |file|
+    file.download 'download', :controller => 'files', :action => 'show', :download => '1'
+  end
 
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404. I'm not sure we ever actually want
@@ -244,7 +246,7 @@ ActionController::Routing::Routes.draw do |map|
     course.sis_publish_status 'details/sis_publish', :controller => 'courses', :action => 'sis_publish_status', :conditions => {:method => :get}
     course.publish_to_sis 'details/sis_publish', :controller => 'courses', :action => 'publish_to_sis', :conditions => {:method => :post}
   end
-  
+
   map.resources :rubrics do |rubric|
     rubric.resources :rubric_assessments, :as => 'assessments'
   end
