@@ -36,3 +36,10 @@ def valid_attachment_attributes(opts={})
     :filename => 'unknown.loser'
   }
 end
+
+def stub_png_data
+  sio = StringIO.new("ohai")
+  sio.stub!(:original_filename).and_return('test.png')
+  sio.stub!(:content_type).and_return('image/png')
+  sio
+end

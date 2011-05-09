@@ -224,6 +224,29 @@ describe FilesController do
       @module.reload
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
     end
+
+    context "should support Submission as a context" do
+      before(:each) do
+        course_with_teacher_logged_in(:active_all => true)
+        submission_model
+        @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
+        @submission.save!
+      end
+
+      it "with safefiles" do
+        HostUrl.stub!(:file_host).and_return('files-test.host')
+        get 'show', :file_id => @submission.attachment.id, :download => '1', :inline => '1', :verifier => @submission.attachment.uuid
+        response.should be_redirect
+        response['Location'].should match(%r"http://files-test.host/files/#{@submission.attachment.id}?")
+      end
+
+      it "without safefiles" do
+        HostUrl.stub!(:file_host).and_return('test.host')
+        get 'show', :file_id => @submission.attachment.id, :download => '1', :inline => '1', :verifier => @submission.attachment.uuid
+        response.should be_success
+        response.content_type.should == 'image/png'
+      end
+    end
   end
   
   describe "GET 'new'" do

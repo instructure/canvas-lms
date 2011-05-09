@@ -20,8 +20,8 @@ CONTENT_LENGTH_RANGE = 50*1024*1024
 S3_EXPIRATION_TIME = 30.minutes
 
 class FilesController < ApplicationController
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:create_pending,:s3_success]
-  before_filter :check_file_access_flags, :only => :show_relative
+  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:create_pending,:s3_success,:show]
+  before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
 
   before_filter { |c| c.active_tab = "files" }
@@ -183,7 +183,14 @@ class FilesController < ApplicationController
   
   def show
     params[:id] ||= params[:file_id]
-    @attachment = @context.attachments.find(params[:id])
+    get_context
+    if @context && !@context.is_a?(User)
+      @attachment = @context.attachments.find(params[:id])
+    else
+      @attachment = Attachment.find(params[:id])
+      @context = nil
+      @skip_crumb = true
+    end
     params[:download] ||= params[:preview]
     @context = UserProfile.new(@context) if @context == @current_user
     add_crumb("Files", named_context_url(@context, :context_files_url)) unless @skip_crumb

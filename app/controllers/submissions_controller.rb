@@ -78,11 +78,14 @@ class SubmissionsController < ApplicationController
             @attachment ||= Attachment.find_by_id(prior_attachment_id) if prior_attachment_id
             @attachment ||= @submission.attachments.find_by_id(params[:download]) if params[:download].present?
             @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
-            @attachment ||= @submission.attachment if @submission.attachment_id == params[:download].to_i
           end
           raise ActiveRecord::RecordNotFound unless @attachment
           format.html {
-            redirect_to(named_context_url(@attachment.context, :context_file_download_url, @attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
+            if @attachment.context == @submission
+            redirect_to(file_download_url(@attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
+            else
+              redirect_to(named_context_url(@attachment.context, :context_file_download_url, @attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
+            end
           }
           json_handled = true
           format.json { render :json => @attachment.to_json(:permissions => {:user => @current_user}) }
