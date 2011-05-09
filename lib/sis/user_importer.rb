@@ -49,6 +49,9 @@ module SIS
     # user_id,login_id,first_name,last_name,email,status
     def process(csv)
       start = Time.now
+      users_to_set_sis_batch_ids = []
+      pseudos_to_set_sis_batch_ids = []
+
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         logger.debug("Processing User #{row.inspect}")
 
@@ -92,8 +95,12 @@ module SIS
             Enrollment.update_all({:workflow_state => 'deleted'}, :id => enrolls)
           end
 
-          user.creation_sis_batch_id = @batch.id if @batch
-          user.save_without_broadcasting
+          if user.changed?
+            user.creation_sis_batch_id = @batch.id if @batch
+            user.save_without_broadcasting
+          elsif @batch
+            users_to_set_sis_batch_ids << user.id
+          end
 
           pseudo ||= Pseudonym.new
           pseudo.user_id = user.id
@@ -102,12 +109,10 @@ module SIS
           pseudo.sis_user_id = row['user_id']
           pseudo.account = @root_account
           pseudo.workflow_state = row['status']=~ /active/i ? 'active' : 'deleted'
-          pseudo.sis_batch_id = @batch.id if @batch
-          if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated) 
+          if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated)
             pseudo.password = row['password']
             pseudo.password_confirmation = row['password']
           end
-          pseudo.save_without_broadcasting
 
           if row['email'].present?
             comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(row['email'], 'active', 'email')
@@ -122,11 +127,16 @@ module SIS
                 comm.save_without_broadcasting
 
                 pseudo.communication_channel_id = comm.id
-                pseudo.save_without_broadcasting
               rescue => e
                 add_warning(csv, "Failed adding communication channel #{row['email']} to user #{row['login_id']}")
               end
             end
+          end
+          if pseudo.changed?
+            pseudo.sis_batch_id = @batch.id if @batch
+            pseudo.save_without_broadcasting
+          elsif @batch
+            pseudos_to_set_sis_batch_ids << pseudo.id
           end
 
           user.update_account_associations if update_account_association
@@ -134,6 +144,8 @@ module SIS
 
         @sis.counts[:users] += 1
       end
+      User.update_all({:creation_sis_batch_id => @batch.id}, {:id => users_to_set_sis_batch_ids}) if @batch && !users_to_set_sis_batch_ids.empty?
+      Pseudonym.update_all({:sis_batch_id => @batch.id}, {:id => pseudos_to_set_sis_batch_ids}) if @batch && !pseudos_to_set_sis_batch_ids.empty?
       logger.debug("Users took #{Time.now - start} seconds")
     end
   end
