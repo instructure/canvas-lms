@@ -123,13 +123,23 @@ class Course < ActiveRecord::Base
   
   has_a_broadcast_policy
   
+  def self.skip_updating_account_associations(&block)
+    @skip_updating_account_associations = true
+    block.call
+  ensure
+    @skip_updating_account_associations = false
+  end
+  def self.skip_updating_account_associations?
+    !!@skip_updating_account_associations
+  end
+
   def set_update_account_associations_if_changed
     @should_update_account_associations = self.root_account_id_changed? || self.account_id_changed?
     true
   end
   
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations
+    send_later_if_production(:update_account_associations) if @should_update_account_associations && !self.class.skip_updating_account_associations?
   end
   
   def module_based?

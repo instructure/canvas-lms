@@ -42,52 +42,60 @@ module SIS
       start = Time.now
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         update_progress
-        logger.debug("Processing Course #{row.inspect}")
-        if row['account_id']
-          account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
-        else
-          account = nil
-        end
-        term = @root_account.enrollment_terms.find_by_sis_source_id(row['term_id'])
-        course = nil
-        course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id'])
-        course ||= Course.new
-        course.enrollment_term = term if term
-        course.root_account = @root_account
-        course.account = account || @root_account
         
-        # only update the name/short_name on new records, and ones that haven't been changed
-        # since the last sis import
-        if course.new_record? || (course.sis_course_code && course.sis_course_code == course.short_name)
-          course.short_name = course.sis_course_code = row['short_name']
-        end
-        if course.new_record? || (course.sis_name && course.sis_name == course.name)
-          course.name = course.sis_name = row['long_name']
-        end
-        
-        course.sis_source_id = row['course_id']
-        course.sis_batch_id = @batch.id if @batch
-        if row['status'] =~ /active/i
-          if course.workflow_state == 'completed'
-            course.workflow_state = 'available'
-          elsif course.workflow_state != 'available'
-            course.workflow_state = 'claimed'
+        Course.skip_updating_account_associations do
+          update_account_association = false
+
+          logger.debug("Processing Course #{row.inspect}")
+          if row['account_id']
+            account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
+          else
+            account = nil
           end
-        elsif  row['status'] =~ /deleted/i
-          course.workflow_state = 'deleted'
-        elsif  row['status'] =~ /completed/i
-          course.workflow_state = 'completed'
-        end
+          term = @root_account.enrollment_terms.find_by_sis_source_id(row['term_id'])
+          course = nil
+          course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id'])
+          course ||= Course.new
+          course.enrollment_term = term if term
+          course.root_account = @root_account
+          course.account = account || @root_account
+
+          update_account_association = course.account_id_changed? || course.root_account_id_changed?
         
-        begin
-          course.start_at = DateTime.parse(row['start_date']) unless row['start_date'].blank?
-          course.conclude_at = DateTime.parse(row['end_date']) unless row['end_date'].blank?
-        rescue
-          add_warning(csv, "Bad date format for course #{row['course_id']}")
+          # only update the name/short_name on new records, and ones that haven't been changed
+          # since the last sis import
+          if course.new_record? || (course.sis_course_code && course.sis_course_code == course.short_name)
+            course.short_name = course.sis_course_code = row['short_name']
+          end
+          if course.new_record? || (course.sis_name && course.sis_name == course.name)
+            course.name = course.sis_name = row['long_name']
+          end
+          course.sis_source_id = row['course_id']
+          course.sis_batch_id = @batch.id if @batch
+          if row['status'] =~ /active/i
+            if course.workflow_state == 'completed'
+              course.workflow_state = 'available'
+            elsif course.workflow_state != 'available'
+              course.workflow_state = 'claimed'
+            end
+          elsif  row['status'] =~ /deleted/i
+            course.workflow_state = 'deleted'
+          elsif  row['status'] =~ /completed/i
+            course.workflow_state = 'completed'
+          end
+
+          begin
+            course.start_at = DateTime.parse(row['start_date']) unless row['start_date'].blank?
+            course.conclude_at = DateTime.parse(row['end_date']) unless row['end_date'].blank?
+          rescue
+            add_warning(csv, "Bad date format for course #{row['course_id']}")
+          end
+
+          course.save_without_broadcasting!
+          @sis.counts[:courses] += 1
+
+          course.update_account_associations if update_account_association
         end
-        
-        course.save_without_broadcasting!
-        @sis.counts[:courses] += 1
       end
       logger.debug("Courses took #{Time.now - start} seconds")
     end
