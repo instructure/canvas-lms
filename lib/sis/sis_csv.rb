@@ -24,25 +24,27 @@ module SIS
     attr_accessor :verify, :root_account, :batch, :errors, :warnings, :finished, :counts
     
     IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
+
+    # The order of this array is important:
+    #  * Account must be imported before Term and Course
+    #  * Course must be imported before Section
+    #  * Course and Section must be imported before Xlist
+    #  * Course, Section, and User must be imported before Enrollment
+    IMPORTERS = [:account, :term, :course, :section, :xlist, :user, :enrollment, :grade_publishing_results]
     
     def initialize(root_account, opts = {})
       opts = opts.with_indifferent_access
       @root_account = root_account
 
-      @user_csvs = []
-      @account_csvs = []
-      @term_csvs = []
-      @section_csvs = []
-      @course_csvs = []
-      @enrollment_csvs = []
-      @xlist_csvs = []
-      @grade_publishing_results_csvs = []
+      @csvs = {}
+      IMPORTERS.each { |importer| @csvs[importer] = [] }
       
       @files = opts[:files] || []
       @batch = opts[:batch]
       @logger = opts[:logger]
-      @counts = {:accounts=>0,:terms=>0,:courses=>0,:sections=>0,:users=>0,:enrollments=>0,:xlists=>0,:grade_publishing_results=>0}
-      
+      @counts = {}
+      IMPORTERS.each { |importer| @counts[importer.to_s.pluralize.to_sym] = 0 }
+
       @total_rows = 1
       @current_row = 0
       
@@ -81,49 +83,26 @@ module SIS
         end
       end
 
-      [ @course_csvs, @user_csvs, @enrollment_csvs, @grade_publishing_results_csvs, @section_csvs, @xlist_csvs, @term_csvs, @account_csvs ].flatten.each do |csv|
+      @csvs.values.flatten.each do |csv|
         @total_rows += (%x{wc -l '#{csv[:fullpath]}'}.split.first.to_i rescue 0)
       end
       
       @verify = {}
-      
-      course_importer = CourseImporter.new(self)
-      @course_csvs.each {|csv| course_importer.verify(csv, @verify) }
-      
-      user_importer = UserImporter.new(self)
-      @user_csvs.each {|csv| user_importer.verify(csv, @verify) }
-      @verify[:user_rows] = nil
-      
-      enrollment_importer = EnrollmentImporter.new(self)
-      @enrollment_csvs.each {|csv| enrollment_importer.verify(csv, @verify) }
-      
-      account_importer = AccountImporter.new(self)
-      @account_csvs.each {|csv| account_importer.verify(csv, @verify) }
-      
-      term_importer = TermImporter.new(self)
-      @term_csvs.each {|csv| term_importer.verify(csv, @verify) }
-      
-      section_importer = SectionImporter.new(self)
-      @section_csvs.each {|csv| section_importer.verify(csv, @verify) }
 
-      xlist_importer = CrossListImporter.new(self)
-      @xlist_csvs.each {|csv| xlist_importer.verify(csv, @verify) }
-
-      grade_publishing_results_importer = GradePublishingResultsImporter.new(self)
-      @grade_publishing_results_csvs.each {|csv| grade_publishing_results_importer.verify(csv, @verify) }
+      importers = {}
+      IMPORTERS.each do |importer|
+        importers[importer] = SIS.const_get(importer.to_s.camelcase + 'Importer').new(self)
+        @csvs[importer].each { |csv| importers[importer].verify(csv, @verify) }
+        @verify[:user_rows] = nil if importer == :user
+      end
 
       @verify = nil
       return unless @errors.empty?
 
-      @user_csvs.each {|csv| user_importer.process(csv) }
-      @account_csvs.each {|csv| account_importer.process(csv) }
-      @term_csvs.each {|csv| term_importer.process(csv) }
-      @course_csvs.each {|csv| course_importer.process(csv) }
-      @section_csvs.each {|csv| section_importer.process(csv) }
-      @enrollment_csvs.each {|csv| enrollment_importer.process(csv) }
-      @xlist_csvs.each {|csv| xlist_importer.process(csv) }
-      @grade_publishing_results_csvs.each {|csv| grade_publishing_results_importer.process(csv) }
-      
+      IMPORTERS.each do |importer|
+        @csvs[importer].each {|csv| importers[importer].process(csv) }
+      end
+
       @finished = true
     rescue => e
       if @batch
@@ -205,25 +184,15 @@ module SIS
       csv = { :base => base, :file => file, :fullpath => File.join(base, file) }
       if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
         FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
-          if EnrollmentImporter.is_enrollment_csv?(row)
-            @enrollment_csvs << csv
-          elsif CourseImporter.is_course_csv?(row)
-            @course_csvs << csv
-          elsif UserImporter.is_user_csv?(row)
-            @user_csvs << csv
-          elsif AccountImporter.is_account_csv?(row)
-            @account_csvs << csv
-          elsif TermImporter.is_term_csv?(row)
-            @term_csvs << csv
-          elsif SectionImporter.is_section_csv?(row)
-            @section_csvs << csv
-          elsif CrossListImporter.is_xlist_csv?(row)
-            @xlist_csvs << csv
-          elsif GradePublishingResultsImporter.is_grade_publishing_results_csv?(row)
-            @grade_publishing_results_csvs << csv
-          else
-            add_error(csv, "Couldn't find Canvas CSV import headers")
+          importer = IMPORTERS.index do |importer|
+            if SIS.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)
+              @csvs[importer] << csv
+              true
+            else
+              false
+            end
           end
+          add_error(csv, "Couldn't find Canvas CSV import headers") if importer.nil?
           break
         end
       elsif !File.directory?(csv[:fullpath]) && !(csv[:fullpath] =~ IGNORE_FILES)
