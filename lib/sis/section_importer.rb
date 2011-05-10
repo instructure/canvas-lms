@@ -58,7 +58,6 @@ module SIS
         name = row['name']
         section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
         section ||= course.course_sections.find_by_sis_source_id(row['section_id'])
-        section ||= course.course_sections.find_by_name(name)
         section ||= course.course_sections.new
         section.root_account = @root_account
         # this is an easy way to load up the cache with data we already have
