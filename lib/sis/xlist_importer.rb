@@ -17,7 +17,7 @@
 #
 
 module SIS
-  class CrossListImporter < SisImporter
+  class XlistImporter < SisImporter
     
     def self.is_xlist_csv?(row)
       row.header?('xlist_course_id') && row.header?('section_id')
