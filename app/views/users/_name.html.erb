@@ -23,7 +23,7 @@
           <th>Profile Picture:</th>
           <td>
             <span class="avatar_image">
-              <img src="<%= @user.avatar_url(50, @domain_root_account && @domain_root_account.settings[:avatars], "http://#{request.host_with_port}/images/dotted_pic.png") %>"/>
+              <img src="<%= @user.avatar_url(50, @domain_root_account && @domain_root_account.settings[:avatars], "#{request.protocol}#{request.host_with_port}/images/dotted_pic.png") %>"/>
             </span>
             <% if can_do(@user, @current_user, :remove_avatar) %>
               <a href="<%= update_avatar_image_url(@user.id) %>" class="remove_avatar_picture_link">Remove avatar picture</a>
