@@ -284,7 +284,7 @@ class FilesController < ApplicationController
       @attachments = @context.attachments.active.to_a
       @attachment  = @attachments.find { |a| a.matches_full_display_path?(path) }
       @attachment  ||= @attachments.find { |a| a.matches_full_path?(path) }
-      Attachment.find(0) if !@attachment
+      raise ActiveRecord::RecordNotFound if !@attachment
       params[:id] = @attachment ? @attachment.id : nil
     end
 
