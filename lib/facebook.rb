@@ -38,7 +38,7 @@ module Facebook
   end
   
   def self.authorize_url(oauth_request)
-    callback_url = "#{protocol}://#{HostUrl.default_host}/facebook_success.html"
+    callback_url = "#{protocol}://#{config['canvas_domain']}/facebook_success.html"
     state = Canvas::Security.encrypt_password(oauth_request.id.to_s, 'facebook_oauth_request').join('.')
     "https://www.facebook.com/dialog/oauth?client_id=#{config['app_id']}&redirect_uri=#{CGI.escape(callback_url)}&response_type=token&scope=offline_access&state=#{CGI.escape(state)}"
   end
@@ -61,8 +61,7 @@ module Facebook
   end
   
   def self.config_check(settings)
-    settings = {'app_id' => '197367153633354', 'disable_ssl' => nil, 'secret' => '0fa6651da7ae873ed054df56d9559bcc'}
-    url = "https://graph.facebook.com/oauth/access_token?client_id=#{settings['app_id']}&redirect_uri=http#{settings['disable_ssl'] ? '' : 's'}://#{HostUrl.default_host}&client_secret=#{settings['secret']}&code=wrong&format=json"
+    url = "https://graph.facebook.com/oauth/access_token?client_id=#{settings['app_id']}&redirect_uri=http#{settings['disable_ssl'] ? '' : 's'}://#{settings['canvas_domain']}&client_secret=#{settings['secret']}&code=wrong&format=json"
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
