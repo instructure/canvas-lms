@@ -118,14 +118,16 @@ module SIS
             comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(row['email'], 'active', 'email')
             if !comm and row['status']=~ /active/i
               begin
-                comm = CommunicationChannel.new
-                comm.user_id = user.id
+                comm = pseudo.sis_communication_channel || CommunicationChannel.new
+                if comm.new_record?
+                  comm.user_id = user.id
+                  comm.pseudonym_id = pseudo.id
+                  pseudo.sis_communication_channel = comm
+                end
                 comm.path = row['email']
-                comm.pseudonym_id = pseudo.id
                 comm.workflow_state = 'active'
                 comm.do_delayed_jobs_immediately = true
-                comm.save_without_broadcasting
-
+                comm.save_without_broadcasting if comm.changed?
                 pseudo.communication_channel_id = comm.id
               rescue => e
                 add_warning(csv, "Failed adding communication channel #{row['email']} to user #{row['login_id']}")
