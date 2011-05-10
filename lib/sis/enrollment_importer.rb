@@ -64,6 +64,7 @@ module SIS
       start = Time.now
       update_account_association_user_ids = Set.new
       courses_to_touch_ids = Set.new
+      enrollments_to_update_sis_batch_ids = []
 
       Enrollment.skip_callback(:belongs_to_touch_after_save_or_destroy_for_course) do
         FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
@@ -111,7 +112,6 @@ module SIS
               enrollment.root_account = @root_account
             end
             enrollment.user = user
-            enrollment.sis_batch_id = @batch.id if @batch
             enrollment.sis_source_id = [row['course_id'], row['user_id'], row['role'], section.name].compact.join(":")
 
             enrollment.course = course
@@ -156,15 +156,21 @@ module SIS
 
             courses_to_touch_ids.add(enrollment.course)
             update_account_association_user_ids.add(user.id) if enrollment.should_update_user_account_association?
-            enrollment.save_without_broadcasting
+            if enrollment.changed?
+              enrollment.sis_batch_id = @batch.id if @batch
+              enrollment.save_without_broadcasting
+            elsif @batch
+              enrollments_to_update_sis_batch_ids << enrollment.id
+            end
           end
         
           @sis.counts[:enrollments] += 1
         end
       end
+      Enrollment.update_all({:sis_batch_id => @batch.id}, {:id => enrollments_to_update_sis_batch_ids}) if @batch && !enrollments_to_update_sis_batch_ids.empty?
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
-      Course.update_all({:updated_at => Time.now}, {:id => courses_to_touch_ids.to_a})
+      Course.update_all({:updated_at => Time.now}, {:id => courses_to_touch_ids.to_a}) unless courses_to_touch_ids.empty?
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason
       # to update their account associations on each one.
       User.update_account_associations(update_account_association_user_ids.to_a)
