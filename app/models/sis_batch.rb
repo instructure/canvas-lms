@@ -49,11 +49,13 @@ class SisBatch < ActiveRecord::Base
     batch.data = {:import_type => import_type}
     batch.save
 
+    Attachment.skip_scribd_submits(true)
     att = Attachment.new
     att.context = batch
     att.uploaded_data = attachment
     att.display_name = "sis_upload_#{batch.id}.zip"
     att.save
+    Attachment.skip_scribd_submits(false)
     batch.attachment = att
     batch.save
 
@@ -90,7 +92,7 @@ class SisBatch < ActiveRecord::Base
     self.workflow_state = "failed"
     self.save
   end
-  handle_asynchronously :process, :strand => proc { |sis_batch| "sis_batch:account:#{sis_batch.account_id}" }
+  handle_asynchronously :process, :strand => proc { |sis_batch| "sis_batch:account:#{sis_batch.account_id}" }, :priority => Delayed::LOW_PRIORITY
 
   named_scope :needs_processing, lambda{
     {:conditions => ["sis_batches.workflow_state = 'needs_processing'"], :order => :created_at}
@@ -122,7 +124,8 @@ class SisBatch < ActiveRecord::Base
   end
 
   def finish(import_finished)
-    @data_file.close
+    @data_file.close if @data_file
+    @data_file = nil
     if import_finished
       self.workflow_state = :imported
       self.progress = 100
