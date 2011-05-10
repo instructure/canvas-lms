@@ -20,9 +20,11 @@ class ErrorReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
   serialize :http_env
-  
+  # misc key/value pairs with more details on the error
+  serialize :data, Hash
+
   before_save :guess_email
-  
+
   define_callbacks :on_send_to_external
 
   def send_to_external

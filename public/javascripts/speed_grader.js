@@ -880,8 +880,8 @@ var anonymousAssignment = false;
         $submission_late_notice.showIf(dueAt && submittedAt && (submittedAt.minute_timestamp > dueAt.minute_timestamp) );
       } catch(e) {
         INST.log_error({
-          'Msg': "SG_submissions_" + (e.message || e.description || ""),
-          'Line': e.lineNumber || ''
+          'message': "SG_submissions_" + (e.message || e.description || ""),
+          'line': e.lineNumber || ''
         });
         throw e;
       }

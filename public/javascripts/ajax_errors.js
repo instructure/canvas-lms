@@ -17,23 +17,21 @@
  */
 
 var iTest;
+INST.errorURL = '/record_js_error';
 INST.log_error = function(params) {
-  if(INST.errorURL) {
-    var username = "";
-    try {
-      username = $("#identity .user_name").text();
-    } catch(e) { }
-    var txt = "";
-    params['Platform'] = params['Platform'] || navigator.platform;
-    params['UserAgent'] = params['UserAgent'] || navigator.userAgent;
-    params['Page'] = params['Page'] || location.href;
-    params['URL'] = params['URL'] || location.href;
-    params['UserName'] = params['UserName'] || username;
-    for(var idx in params) {
-      txt = txt + "&" + idx + "=" + escape(params[idx]);
-    }
-    $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" +INST.errorURL + txt.substring(0, 2000) + "' />");
+  params = params || {};
+  var username = "";
+  try {
+    username = $("#identity .user_name").text();
+  } catch(e) { }
+  var txt = "?";
+  params.url = params.url || location.href;
+  params.platform = params.platform || navigator.platform;
+  params.user_name = username;
+  for(var idx in params) {
+    txt = txt + 'error[' + idx + "]=" + escape(params[idx]) + "&";
   }
+  $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" + INST.errorURL + txt.substring(0, 2000) + "' />");
 }
 window.onerror = function (msg, url, line) {
   var ignoredErrors = ["webkitSafeEl"];
@@ -42,20 +40,7 @@ window.onerror = function (msg, url, line) {
       return true;
     }
   }
-  var username = "";
-  try {
-    username = $("#identity .user_name").text();
-  } catch(e) { }
-  if(INST.errorURL) {
-    var txt = "&URL="        + escape(url) +
-              "&Line="       + line + 
-              "&Platform="   + escape(navigator.platform) +
-              "&UserAgent="  + escape(navigator.userAgent) +
-              "&Page="       + escape(location.href) + 
-              "&UserName="   + escape(username) + 
-              "&Msg="        + escape(msg);
-    $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" +INST.errorURL + txt.substring(0, 2000) + "' />");
-  }
+  INST.log_error({ message: msg, line: line, url: url });
   if(INST.environment == "production") {
     return true;
   }

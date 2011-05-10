@@ -70,17 +70,14 @@ class InfoController < ApplicationController
   
   def record_error
     error = params[:error] || {}
-    if @current_user && params[:feedback_type] == 'teacher' && params[:course_id].present? && 
-        @course = @current_user.courses.find_by_id(params[:course_id])
+    if @current_user && params[:feedback_type] == 'teacher' && params[:course_id].present? && @course = @current_user.courses.find_by_id(params[:course_id])
       return if record_error_for_teacher
     end
-    # error = {:error => error} unless error.is_a?(Hash)
-    error[:user] = @current_user if @current_user
     error[:user_agent] = request.headers['User-Agent']
     begin
       report_id = error.delete(:id)
       @report = ErrorReport.find_by_id(report_id) if report_id.present?
-      @report ||= ErrorReport.find_by_id(session[:last_error_id]) if session[:last_error_id].present?
+      @report ||= ErrorReport.find_by_id(session.delete(:last_error_id)) if session[:last_error_id].present?
       @report ||= ErrorReport.create()
       @report.user = @current_user
       @report.account ||= @domain_root_account
@@ -91,6 +88,8 @@ class InfoController < ApplicationController
       @report.backtrace = backtrace
       @report.http_env ||= ErrorReport.useful_http_env_stuff_from_request(request)
       @report.request_context_id = $request_context_id
+      @report.data = {}
+      error.each { |k,v| @report.data[k.to_s] = v if !ErrorReport.column_names.include?(k.to_s) }
       @report.update_attributes(error.delete_if{|k,v| !ErrorReport.column_names.include?(k.to_s)})
       @report.send_later(:send_to_external)
     rescue => e
@@ -110,11 +109,17 @@ class InfoController < ApplicationController
       format.json { render :json => {:logged => true, :id => @report.id}.to_json }
     end
   end
-  
+
+  def record_js_error
+    params[:error] ||= {}
+    params[:error][:javascript] = 'true'
+    record_error
+  end
+
   def health_check
     # This action should perform checks on various subsystems, and raise an exception on failure.
     ActiveRecord::Base.connection.select_value("SELECT now();")
-    
+
     respond_to do |format|
       format.html { render :text => 'canvas ok' }
       format.json { render :json => { :status => 'canvas ok' } }

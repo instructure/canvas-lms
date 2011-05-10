@@ -12,15 +12,18 @@
 <%= will_paginate(@reports) %>
 <% @reports.each do |report| %>
   <div style="margin-bottom: 20px;">
-    <h3><%= h(report.message) %></h3>
+    <h3><%= report.message %></h3>
       <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
       <%= report.created_at %><br />
-      <%= h(report.url) %><br/>
+      <%= report.url %><br/>
       <% if report.user_id %>
         <%= link_to report.user.try(:name), user_url(report.user_id) %>
       <% end %>
+      <% (report.data || {}).each do |k,v| %>
+        <br><%= k %>: <%= v %>
+      <% end %>
       <pre style="font-size: 0.8em; margin-left: 20px; height: 150px; overflow: auto;">
-        <%= h(report.backtrace) %>
+        <%= report.backtrace %>
       </pre>
     </div>
   </div>

@@ -385,7 +385,6 @@ module ApplicationHelper
       :disableGooglePreviews  => !service_enabled?(:google_docs_previews), 
       :disableScribdPreviews  => !feature_enabled?(:scribd),
       :logPageViews           => !@body_class_no_headers,
-      :errorURL               => ErrorLogging.javascript_error_url
     }.each do |key,value|
       # dont worry about keys that are nil or false because in javascript: if (INST.featureThatIsUndefined ) { //won't happen }
       global_inst_object[key] = value if value
