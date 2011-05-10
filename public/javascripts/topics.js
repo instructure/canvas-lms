@@ -171,8 +171,8 @@ var topics = {};
       $form.find(".topic_content_new").editorBox('destroy');
     } catch(e) {
       INST.log_error({
-        'Msg': e.message || e.description || "",
-        'Line': e.lineNumber || ''
+        'message': e.message || e.description || "",
+        'line': e.lineNumber || ''
       });
     }
     $form.hide();

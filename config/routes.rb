@@ -603,6 +603,7 @@ ActionController::Routing::Routes.draw do |map|
   #   end
 
   map.errors "errors", :controller => "info", :action => "record_error", :conditions => {:method => :post}
+  map.record_js_error 'record_js_error', :controller => 'info', :action => 'record_js_error', :conditions => { :method => :get }
   map.resources :errors, :as => :error_reports, :only => [:show, :index]
   
   map.health_check "health_check", :controller => 'info', :action => 'health_check'

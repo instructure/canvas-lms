@@ -22,25 +22,17 @@ class ErrorLogging
     @instance ||= new
     @instance.log_error(type, hash)
   end
-  
-  def self.javascript_error_url
-    nil
-  end
-  
-  def self.ajax_error_url
-    nil
-  end
-  
+
   attr_accessor :type
   attr_accessor :hash
   define_callbacks :record_error
-  
+
   def log_error(type, hash)
     @type = type
     @hash = hash
     run_callbacks :record_error
   end
-  
+
   def self.log_exception(type, e, opts)
     message = opts[:message] || e.to_s
     url = opts[:url] || ""

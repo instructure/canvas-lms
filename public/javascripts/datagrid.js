@@ -186,7 +186,7 @@ var datagrid = {};
           }
         } catch(e) {
           INST.log_error({
-            'Msg': e.toString()
+            'message': e.toString()
           });
         }
       };
