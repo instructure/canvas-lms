@@ -320,6 +320,26 @@ describe SIS::SisCsv do
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.last_name.should == "Uno-Dos"
     end
     
+    it "should allow a user to update emails specifically" do
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active"
+      )
+      importer.warnings.should == []
+      importer.errors.should == []
+      
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user1@example.com"
+     
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user2@example.com,active"
+      )
+      importer.warnings.should == []
+      importer.errors.should == []
+
+      Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
+    end
+    
     it "should add two users with different user_ids, login_ids, but the same email" do
       importer = process_csv_data(
         "user_id,login_id,first_name,last_name,email,status",
