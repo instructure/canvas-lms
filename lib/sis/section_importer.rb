@@ -44,6 +44,7 @@ module SIS
     # section_id,course_id,name,status,start_date,end_date
     def process(csv)
       start = Time.now
+      sections_to_update_sis_batch_ids = []
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         update_progress
         logger.debug("Processing Section #{row.inspect}")
@@ -61,9 +62,9 @@ module SIS
         section ||= course.course_sections.new
         section.root_account = @root_account
         # this is an easy way to load up the cache with data we already have
-        section.course = course if course.try(:id) == section.course_id
+        section.course = course if course.id == section.course_id
         
-        section.account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
+        section.account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) unless section.account_id
         
         # only update the name on new records, and ones that haven't been changed since the last sis import
         if section.new_record? || (section.sis_name && section.sis_name == section.name)
@@ -85,9 +86,8 @@ module SIS
             section.move_to_course course
           end
         end
-        
+
         section.sis_source_id = row['section_id']
-        section.sis_batch_id = @batch.id if @batch
         if row['status'] =~ /active/i
           section.workflow_state = 'active'
         elsif row['status'] =~ /deleted/i
@@ -104,10 +104,16 @@ module SIS
         rescue
           add_warning(csv, "Bad date format for section #{row['section_id']}")
         end
-        
-        section.save
+
+        if section.changed?
+          section.sis_batch_id = @batch.id if @batch
+          section.save
+        elsif @batch
+          sections_to_update_sis_batch_ids << section
+        end
         @sis.counts[:sections] += 1
       end
+      CourseSection.update_all({:sis_batch_id => @batch.id}, {:id => sections_to_update_sis_batch_ids}) if @batch && !sections_to_update_sis_batch_ids.empty?
       logger.debug("Sections took #{Time.now - start} seconds")
     end
   end
