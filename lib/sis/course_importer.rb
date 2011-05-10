@@ -40,6 +40,7 @@ module SIS
     # course_id,short_name,long_name,account_id,term_id,status
     def process(csv)
       start = Time.now
+      courses_to_update_sis_batch_id = []
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         update_progress
         
@@ -71,7 +72,6 @@ module SIS
             course.name = course.sis_name = row['long_name']
           end
           course.sis_source_id = row['course_id']
-          course.sis_batch_id = @batch.id if @batch
           if row['status'] =~ /active/i
             if course.workflow_state == 'completed'
               course.workflow_state = 'available'
@@ -91,12 +91,18 @@ module SIS
             add_warning(csv, "Bad date format for course #{row['course_id']}")
           end
 
-          course.save_without_broadcasting!
+          if course.changed?
+            course.sis_batch_id = @batch.id if @batch
+            course.save_without_broadcasting!
+          elsif @batch
+            courses_to_update_sis_batch_id << @batch.id
+          end
           @sis.counts[:courses] += 1
 
           course.update_account_associations if update_account_association
         end
       end
+      Course.update_all({:sis_batch_id => @batch.id}, {:id => courses_to_update_sis_batch_id}) if @batch && !courses_to_update_sis_batch_id.empty?
       logger.debug("Courses took #{Time.now - start} seconds")
     end
     
