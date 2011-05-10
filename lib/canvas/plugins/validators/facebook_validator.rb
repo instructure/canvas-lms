@@ -31,7 +31,7 @@ module Canvas::Plugins::Validators::FacebookValidator
           false
         else
           settings[:disable_ssl] = ['1', true, 'true'].include?(settings[:disable_ssl])
-          settings.slice(:app_id, :api_key, :secret, :disable_ssl, :canvas_name)
+          settings.slice(:app_id, :api_key, :secret, :disable_ssl, :canvas_name, :canvas_domain)
         end
       end
     end
