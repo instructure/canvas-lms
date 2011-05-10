@@ -40,6 +40,13 @@ window.onerror = function (msg, url, line) {
       return true;
     }
   }
+  // we're going to ignore errors generated from javascript that isn't served from canvas.
+  // this prevents a whole ton of errors about not being able to load google
+  // analytics because of firewall rules, etc.
+  if (!url.match(window.location.hostname)) {
+    return true;
+  }
+
   INST.log_error({ message: msg, line: line, url: url });
   if(INST.environment == "production") {
     return true;
