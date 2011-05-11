@@ -115,6 +115,12 @@ class ErrorReport < ActiveRecord::Base
     self.email
   end
 
+  # delete old error reports before a given date
+  # returns the number of destroyed error reports
+  def self.destroy_error_reports(before_date)
+    self.delete_all(['updated_at < ?', before_date])
+  end
+
   def self.useful_http_env_stuff_from_request(request)
     request.env.slice( *["HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING", "HTTP_COOKIE", "HTTP_HOST", "HTTP_REFERER", 
                          "HTTP_USER_AGENT", "PATH_INFO", "QUERY_STRING", "REMOTE_ADDR", "REMOTE_HOST", 
