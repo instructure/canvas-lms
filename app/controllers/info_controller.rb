@@ -106,9 +106,10 @@ class InfoController < ApplicationController
   end
 
   def record_js_error
-    params[:error] ||= {}
-    params[:error][:category] = 'javascript'
-    record_error
+    error = params[:error]
+    error[:backtrace] = error[:url]
+    ErrorReport.log_error('javascript', error)
+    render :nothing => true
   end
 
   def health_check
