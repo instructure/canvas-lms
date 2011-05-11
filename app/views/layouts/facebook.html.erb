@@ -17,10 +17,10 @@
 
   <%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
   <%= render_js_blocks %>
-  <script src="http://connect.facebook.net/en_US/all.js"></script>
+  <script src="https://connect.facebook.net/en_US/all.js"></script>
   <script>
     FB.init({
-      appId  : '197367153633354',
+      appId  : <%= Facebook.config['app_id'] %>,
       status : true, // check login status
       cookie : true, // enable cookies to allow the server to access the session
       xfbml  : true  // parse XFBML
