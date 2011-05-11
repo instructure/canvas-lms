@@ -63,3 +63,11 @@ if PageView.page_view_method == :cache
                                      { :priority => Delayed::LOW_PRIORITY })
   end
 end
+
+scheduler.cron '35 */1 * * *' do
+  cutoff = Setting.get('error_reports_retain_for', 3.months.to_s).to_i
+  if cutoff > 0
+    ErrorReport.send_later_enqueue_args(:destroy_error_reports, { :priority => Delayed::LOW_PRIORITY }, cutoff.ago)
+  end
+end
+
