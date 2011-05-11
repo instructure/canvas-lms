@@ -221,6 +221,14 @@ class UserService < ActiveRecord::Base
     end
   end
   
+  def service_access_link
+    if service == 'facebook' && Facebook.config && Facebook.config['canvas_name']
+      "https://apps.facebook.com/#{Facebook.config['canvas_name']}"
+    else
+      service_user_link
+    end
+  end
+  
   def service_user_link
     case service
       when 'google_docs'
