@@ -6,14 +6,18 @@
 <% form_for @current_user, :url => '/error_reports', :html => { :method => :get }  do |f| %>
   Message contains
   <input type="text" name="message" value="<%= @message %>" style="width: 250px;"/>
+  <select name="category">
+    <%= options_for_select(([['- All Categories -', nil]] + ErrorReport.all(:select => 'DISTINCT category').map(&:category)).compact, params[:category]) %>
+  </select>
   <button type="submit" class="button">Search</button>
 <% end %>
 
 <%= will_paginate(@reports) %>
 <% @reports.each do |report| %>
   <div style="margin-bottom: 20px;">
-    <h3><%= report.message %></h3>
+    <h3><%= truncate(report.message, :length => 80) %></h3>
       <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
+      category: <%= report.category || 'default' %><br/>
       <%= report.created_at %><br />
       <%= report.url %><br/>
       <% if report.user_id %>

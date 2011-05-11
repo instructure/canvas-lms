@@ -63,14 +63,12 @@ module SendToInbox
         end
       end
     rescue => e
-      ErrorLogging.log_error(:default, {
+      ErrorReport.log_exception(:default, e, {
         :message => "SendToInbox failure",
-        :caught_message => e.to_s,
-        :backtrace => e.backtrace.join("<br/>\n")
       }) if ENV['RAILS_ENV'] == 'production'
       nil
     end
-    
+
     def inbox_item_recipient_ids
       @inbox_item_recipient_ids
     end

@@ -106,7 +106,7 @@ module SIS
       @finished = true
     rescue => e
       if @batch
-        error_report = ErrorReport.create(
+        error_report = ErrorReport.log_exception(:default, e,
           :backtrace => e.backtrace,
           :message => "Importing CSV for account: #{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id if @batch}: #{e.to_s}",
           :during_tests => false

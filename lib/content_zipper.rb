@@ -60,12 +60,8 @@ class ContentZipper
       when Folder: zip_base_folder(attachment, attachment.context)
       end
     rescue => e
-      ErrorLogging.log_error(:default, {
+      ErrorReport.log_exception(:default, e, {
         :message => "Content zipping failed",
-        :error_type => (e.inspect rescue ''),
-        :exception_message => (e.message rescue ''),
-        :failure_status => (e.to_s rescue ''),
-        :backtrace => (e.backtrace rescue '')
       })
       @logger.debug(e.to_s)
       @logger.debug(e.backtrace.join('\n'))

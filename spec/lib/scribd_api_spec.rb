@@ -59,7 +59,7 @@ describe ScribdAPI do
   
   it "should only upload if the file actually exists" do
     Scribd::API.should_not_receive(:upload)
-    ErrorLogging.should_receive(:log_error).and_return(true)
+    ErrorReport.should_receive(:log_error).and_return(true)
     ScribdAPI.upload('not_a_file')
   end
 end

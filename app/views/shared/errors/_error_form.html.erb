@@ -2,7 +2,7 @@
   visible ||= false
  %>
 <form id="submit_error_form" style="<%= hidden unless visible %>" action="<%= errors_path %>" method="POST">
-  <%= hidden_field :error, :error_type, :value => '404' %>
+  <%= hidden_field :error, :category, :value => '404' %>
   <%= hidden_field :error, :id, :value => (@error ? @error.id : "none") %>
   <%= hidden_field :error, :url, :value => (request.url rescue "") %>
   <div style="width: 100%; margin: 0px auto;">

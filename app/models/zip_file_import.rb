@@ -38,7 +38,7 @@ class ZipFileImport < Tableless
         :filename => zip_file.path
       )
     rescue => e
-      @error = ErrorReport.create(:backtrace => e.backtrace, :message => e.to_s)
+      @error = ErrorReport.log_exception(:default, e)
       self.errors.add :zip_file, "Unexpected Error (#{@error.id}) while processing zipped files"
       return false
     end

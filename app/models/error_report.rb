@@ -30,7 +30,64 @@ class ErrorReport < ActiveRecord::Base
   def send_to_external
     run_callbacks(:on_send_to_external)
   end
-    
+
+  class Reporter
+    include ActiveSupport::Callbacks
+    define_callbacks :on_log_error
+
+    attr_reader :opts, :exception
+
+    def log_error(category, opts)
+      opts[:category] = category.to_s
+      @opts = opts
+      run_callbacks :on_log_error
+      create_error_report(opts)
+    end
+
+    def log_exception(category, exception, opts)
+      category ||= exception.class.name
+      opts[:message] ||= exception.to_s
+      opts[:backtrace] = exception.backtrace.try(:join, "\n")
+      opts[:exception_message] = exception.to_s
+      @exception = exception
+      log_error(category, opts)
+    end
+
+    def create_error_report(opts)
+      report = ErrorReport.new
+      report.assign_data(opts)
+      report.save
+      report
+    # rescue
+      # we're really hosed here
+    end
+  end
+
+  # returns the new error report
+  def self.log_error(category, opts = {})
+    Reporter.new.log_error(category, opts)
+  # rescue
+  end
+
+  # returns the new error report
+  def self.log_exception(category, exception, opts = {})
+    Reporter.new.log_exception(category, exception, opts)
+  # rescue
+  end
+
+  # assigns data attributes to the column if there's a column with that name,
+  # otherwise goes into the general data hash
+  def assign_data(data = {})
+    self.data ||= {}
+    data.each do |k,v|
+      if respond_to?(:"#{k}=")
+        self.send(:"#{k}=", v)
+      else
+        self.data[k.to_s] = v
+      end
+    end
+  end
+
   def backtrace=(val)
     if !val || val.length < self.class.maximum_text_length
       write_attribute(:backtrace, val)
@@ -57,14 +114,7 @@ class ErrorReport < ActiveRecord::Base
     end
     self.email
   end
-  
-  def error_type=(val)
-    if val == "404"
-      self.backtrace ||= ""
-      self.backtrace += "404 ERROR for: #{self.url}"
-    end
-  end
-  
+
   def self.useful_http_env_stuff_from_request(request)
     request.env.slice( *["HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING", "HTTP_COOKIE", "HTTP_HOST", "HTTP_REFERER", 
                          "HTTP_USER_AGENT", "PATH_INFO", "QUERY_STRING", "REMOTE_ADDR", "REMOTE_HOST", 

@@ -169,7 +169,7 @@ class MediaObject < ActiveRecord::Base
       if(attempt < 10)
         send_at((5 * attempt).minutes.from_now, :retrieve_details_ensure_codecs, attempt + 1)
       else
-        ErrorLogging.log_error(:default, {
+        ErrorReport.log_error(:default, {
           :message => "Kaltura flavor retrieval failed",
           :object => self.inspect.to_s,
         })

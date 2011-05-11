@@ -132,12 +132,8 @@ class PseudonymSessionsController < ApplicationController
         channel = @pseudonym.ldap_channel_to_possibly_merge(params[:pseudonym_session][:password]) rescue nil
         session[:channel_conflict] = channel if channel && @pseudonym.login_path_to_ignore != channel.path
       rescue => e
-        ErrorLogging.log_error(:default, {
+        ErrorReport.log_exception(:default, e, {
           :message => "LDAP email merge, unexpected error",
-          :error_type => (e.inspect rescue ''),
-          :exception_message => (e.message rescue ''),
-          :failure_status => (e.to_s rescue ''),
-          :backtrace => (e.backtrace rescue '')
         })
       end
     end

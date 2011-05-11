@@ -376,16 +376,12 @@ class Message < ActiveRecord::Base
       end
       if res
         complete_dispatch
-      elsif @exception 
+      elsif @exception
         if !@exception.is_a?(Timeout::Error)
-          ErrorLogging.log_error(:default, {
+          ErrorReport.log_exception(:default, @exception, {
             :message => "Message delivery failed",
             :to => self.to,
             :object => self.inspect.to_s,
-            :error_type => (@exception.inspect rescue ''),
-            :exception_message => (@exception.message rescue ''),
-            :failure_status => (@exception.to_s rescue ''),
-            :backtrace => (@exception.backtrace rescue '')
           })
         end
         self.errored_dispatch
