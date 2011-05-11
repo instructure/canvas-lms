@@ -123,11 +123,6 @@ class FacebookController < ApplicationController
       @service = UserService.find_by_service_and_service_user_id('facebook', @facebook_user_id)
       @user = @service && @service.user
       session[:facebook_user_id] = @facebook_user_id
-      return true
-    else
-      flash[:error] = "Cannot find matching Facebook user"
-      redirect_to dashboard_url
-      return false
     end
   end
 end
