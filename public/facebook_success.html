@@ -5,7 +5,7 @@
 (function() {
   var parentWindow = window.parent;
   var chunks = location.search.substring(1).split(/&/);
-  chunks.concat(location.hash.substring(1).split(/&/));
+  chunks = chunks.concat(location.hash.substring(1).split(/&/));
   var params = {};
   for(var idx in chunks) {
     if(chunks[idx]) {
