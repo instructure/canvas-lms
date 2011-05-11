@@ -402,6 +402,7 @@ class Message < ActiveRecord::Base
       facebook_user_id = self.to.to_i.to_s
       service = self.user.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
       Facebook.dashboard_increment_count(service) if service && service.token
+      complete_dispatch
     end
     
     def deliver_via_sms
