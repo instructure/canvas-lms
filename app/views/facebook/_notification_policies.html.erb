@@ -18,19 +18,19 @@
         <td style="padding-right: 50px;"><%= category.category %> Alerts</td>
         <td style="text-align: center;">
           <% if policy && policy.frequency == 'immediately' %>
-            <img src='http://<%= HostUrl.default_host %>/images/checked.png'/>
+            <%= image_tag "checked.png" %>
           <% end %>
         </td><td>
           <% if policy && policy.frequency == 'daily' %>
-            <img src='http://<%= HostUrl.default_host %>/images/checked.png'/>
+            <%= image_tag "checked.png" %>
           <% end %>
         </td><td>
           <% if policy && policy.frequency == 'weekly' %>
-            <img src='http://<%= HostUrl.default_host %>/images/checked.png'/>
+            <%= image_tag "checked.png" %>
           <% end %>
         </td><td>
           <% if !policy || policy.frequency == 'never' %>
-            <img src='http://<%= HostUrl.default_host %>/images/checked.png'/>
+            <%= image_tag "checked.png" %>
           <% end %>
         </td>
       </tr>
