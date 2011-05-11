@@ -27,6 +27,7 @@ INST.log_error = function(params) {
   var txt = "?";
   params.url = params.url || location.href;
   params.platform = params.platform || navigator.platform;
+  params.action = params.action || location.href;
   params.user_name = username;
   for(var idx in params) {
     txt = txt + 'error[' + idx + "]=" + escape(params[idx]) + "&";
