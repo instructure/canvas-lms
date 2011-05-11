@@ -116,13 +116,11 @@ class ExternalFeedAggregator
       feed.increment(:consecutive_failures)
       feed.increment(:failures)
       feed.update_attribute(:refresh_at, Time.now.utc + (FAILURE_WAIT_SECONDS))
-      ErrorLogging.log_error(:default, {
+      ErrorReport.log_exception(:default, e, {
         :message => "External Feed aggregation failed",
-        :url => feed.url,
-        :id => feed.id,
+        :feed_url => feed.url,
+        :feed_id => feed.id,
         :user_id => feed.user_id,
-        :exception_message => (e.to_s rescue ''),
-        :backtrace => (e.backtrace rescue '')
       })
     end
   end

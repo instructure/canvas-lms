@@ -79,29 +79,24 @@ class InfoController < ApplicationController
       @report = ErrorReport.find_by_id(report_id) if report_id.present?
       @report ||= ErrorReport.find_by_id(session.delete(:last_error_id)) if session[:last_error_id].present?
       @report ||= ErrorReport.create()
+      error.delete(:category) if @report.category.present?
       @report.user = @current_user
       @report.account ||= @domain_root_account
-      @report.error_type = params[:error][:error_type] rescue nil
       backtrace = params[:error].delete(:backtrace) rescue nil
       backtrace ||= ""
       backtrace += "\n\n-----------------------------------------\n\n" + @report.backtrace if @report.backtrace
       @report.backtrace = backtrace
       @report.http_env ||= ErrorReport.useful_http_env_stuff_from_request(request)
       @report.request_context_id = $request_context_id
-      @report.data = {}
-      error.each { |k,v| @report.data[k.to_s] = v if !ErrorReport.column_names.include?(k.to_s) }
-      @report.update_attributes(error.delete_if{|k,v| !ErrorReport.column_names.include?(k.to_s)})
+      @report.assign_data(error)
+      @report.save
       @report.send_later(:send_to_external)
     rescue => e
       @exception = e
-      ErrorLogging.log_error(:default, {
+      ErrorReport.log_exception(:default, e,
         :message => "Error Report Creation failed",
-        :exception_message => (@exception.message rescue ''),
-        :backtrace => (@exception.backtrace rescue ''),
-        :user_message => (error[:comments] rescue ''),
         :user_email => (error[:email] rescue ''),
-        :user_id => (error[:user].id rescue '')
-      })
+        :user_id => (error[:user].id rescue ''))
     end
     respond_to do |format|
       flash[:notice] = "Thanks for your help!  We'll get right on this"
@@ -112,7 +107,7 @@ class InfoController < ApplicationController
 
   def record_js_error
     params[:error] ||= {}
-    params[:error][:javascript] = 'true'
+    params[:error][:category] = 'javascript'
     record_error
   end
 

@@ -54,9 +54,8 @@ class TwitterUserPoller
           retry_after = $1
           @logger.info("throttled!  Retry after: #{retry_after}")
         else
-          ErrorLogging.log_error(:processing, {
+          ErrorReport.log_exception(:processing, e, {
             :message => e.to_s,
-            :backtrace => (e.backtrace rescue "none"),
             :url => (request.url rescue "none")
           })
           @logger.info("unexpected error: #{e.to_s} #{e.backtrace.join "\n"}")

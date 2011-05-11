@@ -603,17 +603,19 @@ class ApplicationController < ActionController::Base
       @status_code = interpret_status(response_code)
       @status = @status_code
       @status = 'AUT' if exception.is_a?(ActionController::InvalidAuthenticityToken)
-      backtrace = exception.backtrace.to_s
-      backtrace += "\nREFERRER: #{request.referrer}"
-      @error = ErrorReport.create( :backtrace => exception.backtrace, 
-                                   :message => exception.to_s, 
-                                   :url => request.url, 
-                                   :user => @current_user, 
-                                   :user_agent => request.headers['User-Agent'], 
-                                   :http_env => ErrorReport.useful_http_env_stuff_from_request(request), 
-                                   :request_context_id => $request_context_id,
-                                   :account => @domain_root_account,
-                                   :request_method => request.method )
+      type = 'default'
+      type = '404' if @status == '404 Not Found' && Rails.env == "production"
+
+      @error = ErrorReport.log_exception(type, exception, {
+        :url => request.url,
+        :user => @current_user,
+        :user_agent => request.headers['User-Agent'],
+        :request_context_id => $request_context_id,
+        :account => @domain_root_account,
+        :request_method => request.method,
+        :format => request.format,
+      }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
+
       @headers = nil
       session[:last_error_id] = @error.id rescue nil
       if request.xhr? || request.format == :text
@@ -624,39 +626,12 @@ class ApplicationController < ActionController::Base
           :layout => 'application', :status => @status, :locals => {:error => @error, :exception => exception, :status => @status}
       end
     rescue => e
+      # error generating the error page? failsafe.
       render_optional_error_file response_code_for_rescue(exception)
-      ErrorLogging.log_error(:default, {
-        "message" => "rendered error page failed unexpectedly",
-        "method" => (request.method rescue "none"),
-        'referrer' => (request.referrer rescue 'none'),
-        'format' => (request.format rescue 'none'),
-        'xhr' => (request.xhr? rescue false),
-        'user_id' => (@current_user ? @current_user.id : ''),
-        "error_id" => (@error ? @error.id : ""),
-        "backtrace" => (e.backtrace.join("<br/>\n") rescue "none"),
-        "caught_message" => (e.to_s rescue "none"),
-        "url" => (request.url rescue "none")
-      }) rescue nil
-    end
-    begin
-      type = :default
-      type = :not_found if @status == '404 Not Found' && Rails.env == "production"
-      ErrorLogging.log_error(type, {
-        "status" => (interpret_status(response_code) rescue "none"),
-        "message" => (exception.to_s rescue "none"),
-        "method" => (request.method rescue "none"),
-        'referrer' => request.referrer, 
-        'format' => request.format,
-        'xhr' => request.xhr?,
-        'user_id' => (@current_user ? @current_user.id : ''),
-        "error_id" => (@error ? @error.id : ""),
-        "backtrace" => (exception.backtrace.join("<br/>\n") rescue "none"),
-        "url" => (request.url rescue "none")
-      })
-    rescue
+      ErrorReport.log_exception(:default, e)
     end
   end
-  
+
   def local_request?
     false
   end

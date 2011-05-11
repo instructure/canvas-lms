@@ -112,7 +112,7 @@ module LinkedIn
         @service.destroy if @service
         @linked_in_service.destroy if @linked_in_service
       end
-      ErrorLogging.log_error(:processing, {
+      ErrorReport.log_error(:processing, {
         :backtrace => "Retrieving linked_in list for #{@linked_in_service.inspect}",
         :response => response.inspect,
         :body => response.body,

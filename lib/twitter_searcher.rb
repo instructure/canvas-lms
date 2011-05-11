@@ -57,9 +57,8 @@ class TwitterSearcher
           hashtag.update_attributes(:refresh_at => Time.now.utc + (results.empty? ? REFRESH_INTERVAL_EMPTY : REFRESH_INTERVAL) )
           @logger.info('results successfully added')
         rescue => e
-          ErrorLogging.log_error(:processing, {
+          ErrorReport.log_exception(:processing, e, {
             :message => e.to_s,
-            :backtrace => (e.backtrace rescue "none"),
             :url => (request.url rescue "none")
           })
           @logger.info("** unexpected error: #{e.to_s}")

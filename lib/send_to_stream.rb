@@ -60,10 +60,8 @@ module SendToStream
       generate_stream_items(stream_recipients) if stream_recipients
     rescue => e
       if ENV['RAILS_ENV'] == 'production'
-        ErrorLogging.log_error(:default, {
+        ErrorReport.log_exception(:default, e, {
           :message => "SendToStream failure",
-          :caught_message => e.to_s,
-          :backtrace => e.backtrace.join("<br/>\n")
         })
       else
         raise
@@ -91,10 +89,8 @@ module SendToStream
         true
       end
     rescue => e
-      ErrorLogging.log_error(:default, {
+      ErrorReport.log_exception(:default, e, {
         :message => "SendToStream failure",
-        :caught_message => e.to_s,
-        :backtrace => e.backtrace.join("<br/>\n")
       }) if ENV['RAILS_ENV'] == 'production'
       true
     end

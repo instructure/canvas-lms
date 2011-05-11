@@ -19,11 +19,19 @@
 class ErrorsController < ApplicationController
   before_filter :require_user, :require_site_admin
   def index
-    conditions = ["message NOT LIKE ?", 'No route matches %']
+    @reports = ErrorReport
+
     @message = params[:message]
-    conditions = ["message LIKE ?", '%' + @message + '%'] if @message.present?
-    @reports = ErrorReport.paginate(:page => params[:page], :per_page => 25, :order => 'id DESC',
-      :conditions => conditions)
+    if @message.present?
+      @reports = @reports.scoped(:conditions => ["message LIKE ?", '%' + @message + '%'])
+    elsif params[:category].blank?
+      @reports = @reports.scoped(:conditions => ["message NOT LIKE ?", 'No route matches %'])
+    end
+    if params[:category].present?
+      @reports = @reports.scoped(:conditions => { :category => params[:category] })
+    end
+
+    @reports = @reports.paginate(:page => params[:page], :per_page => 25, :order => 'id DESC')
   end
   def show
     @reports = WillPaginate::Collection.new(1, 1, 1)

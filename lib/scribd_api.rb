@@ -58,10 +58,9 @@ class ScribdAPI
       # MAKE SURE THAT THIS IS PRIVATE, that would suck bad if anything ever got sent as not private
       Scribd::Document.upload(:file => filename, :type => filetype, :access => 'private')
     else
-      ErrorLogging.log_error(:default, {
+      ErrorReport.log_error(:default, {
         :message => "tried to uploada scribd doc that does not have a filetype, that should never happen.",
         :url => filename,
-        :filetype => filetype
       })
     end
   end

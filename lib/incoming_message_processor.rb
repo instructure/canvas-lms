@@ -47,7 +47,8 @@ class IncomingMessageProcessor
             IncomingMessageProcessor.ndr(message.from.first, message.subject)
           end
         rescue => e
-          ErrorLogging.log_exception(:default, e, :message => "Incoming Message Failed", :params => {:from => message.from.first, :to => message.to} )
+          ErrorReport.log_exception(:default, e, :from => message.from.first,
+                                                 :to => message.to)
         end
       end
       default do

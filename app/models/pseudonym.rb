@@ -364,15 +364,11 @@ class Pseudonym < ActiveRecord::Base
     end
     nil
   rescue => e
-    ErrorLogging.log_error(:default, {
+    ErrorReport.log_exception(:default, e, {
       :message => "LDAP email conflict",
       :user => self.unique_id,
       :object => self.inspect.to_s,
       :email => (res[:email] rescue ''),
-      :error_type => (e.inspect rescue ''),
-      :exception_message => (e.message rescue ''),
-      :failure_status => (e.to_s rescue ''),
-      :backtrace => (e.backtrace rescue '')
     })
     nil
   end
@@ -381,31 +377,19 @@ class Pseudonym < ActiveRecord::Base
   def valid_ldap_credentials?(password_plaintext)
     # try to authenticate against the LDAP server
     res = ldap_bind_result(password_plaintext)
-    if !res
-      ErrorLogging.log_error(:ldap, {
-        :message => "LDAP authentication failure",
-        :user => self.unique_id,
-        :object => self.inspect.to_s,
-        :unique_id => self.unique_id
-      })
-    else
+    if res
       @ldap_result = res[0]
     end
     !!res
   rescue => e
-    ErrorLogging.log_error(:ldap, {
+    ErrorReport.log_exception(:ldap, e, {
       :message => "LDAP authentication error",
-      :user => self.unique_id,
       :object => self.inspect.to_s,
-      :error_type => (e.inspect rescue ''),
       :unique_id => self.unique_id,
-      :exception_message => (e.message rescue ''),
-      :failure_status => (e.to_s rescue ''),
-      :backtrace => (e.backtrace rescue '')
     })
     nil
   end
-  
+
   # To get the communication_channel for free, call this with :path => 'somepath@example.com' 
   def assert_communication_channel(merge=false)
     if self.path

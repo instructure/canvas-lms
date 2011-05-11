@@ -52,11 +52,7 @@ module Canvas::AccountReports
       end
     rescue => e
       account_report.logger.error e
-      er = ErrorReport.create!(
-              :backtrace => e.backtrace.to_s,
-              :message => e.to_s,
-              :user_id => account_report.user.id
-      )
+      er = ErrorReport.log_exception(:default, e, :user => account_report.user)
       self.message_recipient(account_report, "Generating the report, #{account_report.report_type.to_s.titleize}, failed.  Please report the following error code to your system administrator: ErrorReport:#{er.id}")
     end
   end

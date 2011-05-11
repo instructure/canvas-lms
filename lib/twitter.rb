@@ -96,7 +96,7 @@ module Twitter
         @service.destroy if @service
         @twitter_service.destroy if @twitter_service
       end
-      ErrorLogging.log_error(:processing, {
+      ErrorReport.log_error(:processing, {
         :backtrace => "Retrieving twitter list for #{@twitter_service.inspect}",
         :response => response.inspect,
         :body => response.body,
