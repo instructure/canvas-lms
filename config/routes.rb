@@ -534,6 +534,7 @@ ActionController::Routing::Routes.draw do |map|
     dashboard.resources :rubrics, :as => :assessments
     dashboard.comment_session "comment_session", :controller => "users", :action => "kaltura_session"
     dashboard.ignore_item 'ignore_item/:asset_string/:purpose', :controller => 'users', :action => 'ignore_item', :conditions => {:method => :delete}
+    dashboard.ignore_stream_item 'ignore_stream_item/:id', :controller => 'users', :action => 'ignore_stream_item', :conditions => {:method => :delete}
   end
   map.dashboard_ignore_channel 'dashboard/ignore_path', :controller => "users", :action => "ignore_channel", :conditions => {:method => :post}
 

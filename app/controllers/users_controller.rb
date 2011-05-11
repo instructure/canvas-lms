@@ -223,6 +223,11 @@ class UsersController < ApplicationController
     @current_user.ignore_item!(params[:asset_string], params[:purpose], params[:permanent] == '1')
     render :json => @current_user.to_json
   end
+
+  def ignore_stream_item
+    StreamItemInstance.update_all({ :hidden => true }, { :stream_item_id => params[:id], :user_id => @current_user.id })
+    render :json => { :hidden => true }
+  end
   
   def close_notification
     @current_user.close_notification(params[:id])

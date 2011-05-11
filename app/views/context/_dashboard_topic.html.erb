@@ -3,6 +3,7 @@
 <% post_date = ([topic] + topic.try_rescue(:root_discussion_entries) || []).compact.last.created_at %>
 <% if !topic || can_do(topic, @current_user, :read) %>
 <div style="<%= hidden unless topic %>" class="<%= is_announcement || topic.try_rescue(:type) == 'Announcement' || topic.try_rescue(:is_announcement) ? 'announcement' : 'discussion_topic' %> message_<%= contextless ? "blank" : context_code %> communication_message">
+  <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <div class="header">
     <div class="header_title">
       <%= image_tag "announcement.png", :class => "header_icon announcement_header_icon", :alt => "announcement", :title => "Announcement", :style => "width: 20px;" %>

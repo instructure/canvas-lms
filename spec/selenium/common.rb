@@ -121,7 +121,7 @@ shared_examples_for "all selenium tests" do
   attr_reader :selenium_driver
   alias_method :driver, :selenium_driver
   
-  def login_as(username, password)
+  def login_as(username = "nobody@example.com", password = "asdfasdf")
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
     
@@ -130,7 +130,8 @@ shared_examples_for "all selenium tests" do
     password_element.send_keys(password)
     password_element.submit
   end
-  
+  alias_method :login, :login_as
+
   def wait_for_dom_ready
     driver.execute_script <<-JS
       window.seleniumDOMIsReady = false; 

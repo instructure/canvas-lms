@@ -808,9 +808,9 @@ jQuery(function($) {
     $(this).closest("li").slideUp().parents("ul").children(":hidden").slideDown().first().find(":tabbable:first").focus();
     return false;
   });
-  $(".to-do-list").delegate('.disable_item_link', 'click', function(event) {
+  $(".to-do-list, #topic_list").delegate('.disable_item_link', 'click', function(event) {
     event.preventDefault();
-    var $item = $(this).parents("li");
+    var $item = $(this).parents("li, div.topic_message");
     var url = $(this).attr('href');
     function remove(delete_url) {
       $item.confirmDelete({

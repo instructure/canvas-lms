@@ -1,5 +1,6 @@
 <% conference = dashboard_conference; show_context ||= false %>
 <div style="<%= hidden unless conference %>" class="communication_message message_<%= conference.try_rescue(:context_code) || "no_context" %> <%= 'show_context_communication_message' if show_context %>">
+  <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <div class="header">
     <div class="header_title">
       <%= image_tag "conference.png", :alt => 'web_conference', :title => "Web Conference", :class => "header_icon", :style => "width: 20px;" %>

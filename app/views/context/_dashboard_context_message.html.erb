@@ -7,6 +7,7 @@
    post_date = ([message] + (message.try_rescue(:sub_messages) || [])).compact.last.try_rescue(:created_at)
 %>
 <div class="communication_message context_message message_<%= message.try_rescue(:context_code) || "no_context" %> <%= 'show_context_communication_message' if show_context %>" style="<%= hidden unless message %>" id="context_message_<%= message ? message.id : "blank" %>">
+  <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <% if !brief && message %><a name="message_<%= message.id %>"></a><% end %>
   <div class="header">
     <% if !brief %>

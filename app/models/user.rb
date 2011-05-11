@@ -1309,8 +1309,10 @@ class User < ActiveRecord::Base
     opts[:start_at] ||= 2.weeks.ago
     opts[:fallback_start_at] = opts[:start_at]
   
-    # dont make the query do an stream_items.context_code IN ('course_20033','course_20237','course_20247' ...) if they dont pass any contexts, just assume it wants any context code.
-    items = stream_items_simple
+    items = stream_items_simple.scoped(:conditions => { 'stream_item_instances.hidden' => false })
+    # dont make the query do an stream_items.context_code IN
+    # ('course_20033','course_20237','course_20247' ...) if they dont pass any
+    # contexts, just assume it wants any context code.
     if opts[:contexts]
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
