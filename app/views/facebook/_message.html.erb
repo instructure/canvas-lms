@@ -1,7 +1,7 @@
 <div class="facebook_message">
   <div class="header">
     <div class="left_links">
-      <img src="http://<%= HostUrl.default_host %>/images/<%= "#{slugify(message.try_rescue(:notification_category)) || 'notification'}_icon.png" %>" class="header_icon" alt="notification" />
+      <%= image_tag "#{slugify(message.try_rescue(:notification_category)) || 'notification'}_icon.png", :class => "header_icon", :alt => "notification" %>
       <a href="<%= message.try_rescue(:url) %>" target="_top"><%= message.try_rescue(:subject) %></a>
       <div class="context_name">
         <span><%= cached_context_short_name(message.try_rescue(:context_code)) %></span>
