@@ -13,6 +13,10 @@
   <div id="fb-root">
     <%= yield %>
   </div>
+  
+  <script>
+    var INST = <%= raw(inst_env.to_json) %>;
+  </script>
   <%= include_javascripts :common %>
 
   <%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
