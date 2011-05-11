@@ -98,6 +98,7 @@ class CourseSection < ActiveRecord::Base
     self.course = course
     root_account_change = (self.root_account != course.root_account)
     self.root_account = course.root_account if root_account_change
+    self.default_section = (course.course_sections.active.size == 0)
     self.save!
     user_ids = self.enrollments.map(&:user_id).uniq
     if root_account_change
