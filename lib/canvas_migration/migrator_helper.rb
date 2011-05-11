@@ -32,9 +32,7 @@ module Canvas::MigratorHelper
   def self.get_utc_time_from_timestamp(timestamp)
     # timestamp can be either a time string in the format "2011-04-30T00:00:00-06:00",
     # or an integer epoch * 1000
-    if timestamp.to_s.match(/[^0-9.]/)
-      Time.parse(timestamp.to_s)
-    else
+    if timestamp.to_s.match(/^-?[0-9.]+$/)
       timestamp = timestamp.to_i/ 1000 rescue 0
       t = nil
       if timestamp > 0
@@ -42,6 +40,8 @@ module Canvas::MigratorHelper
         t = Time.utc(t.year, t.month, t.day, t.hour, t.min, t.sec)
       end
       t
+    else
+      Time.parse(timestamp.to_s)
     end
   end
 
