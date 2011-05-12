@@ -113,7 +113,7 @@ class PseudonymSessionsController < ApplicationController
     @pseudonym = @pseudonym_session && @pseudonym_session.record
     # If the user's account has been deleted, feel free to share that information
     if @pseudonym && (!@pseudonym.user || @pseudonym.user.unavailable?)
-      flash[:error] = "That user account has been deleted.  Please contact your system adminitrator to have your account re-activated."
+      flash[:error] = "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
       redirect_to login_url
       return
     end
