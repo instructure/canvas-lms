@@ -1,0 +1,39 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+# A couple of notes of discussion from the code review for when this inevitably
+# gets used elsewhere:
+#  * instance_method will raise an exception if the method doesn't exist; this
+#    is _probably_ what you want.
+#  * Manipulating after_save_callback_chain etc. may be more performant than
+#    redefining methods. That doesn't matter for this use case.  Also, it
+#    might not work with Rails 3 (which has built in support for this type
+#    of thing), but this way definitely will
+class ActiveRecord::Base
+  def self.skip_callback(callback, &block)
+    method = instance_method(callback)
+    remove_method(callback)
+    define_method(callback){ true }
+    begin
+      yield
+    ensure
+      remove_method(callback)
+      define_method(callback, method)
+    end
+  end
+end

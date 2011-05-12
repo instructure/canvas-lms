@@ -17,30 +17,7 @@
 #
 
 require "set"
-
-# From http://integrumtech.com/2007/12/skipping-activerecord-callback-methods/
-
-# A couple of notes of discussion from the code review for when this inevitably
-# gets used elsewhere:
-#  * instance_method will raise an exception if the method doesn't exist; this
-#    is _probably_ what you want.
-#  * Manipulating after_save_callback_chain etc. may be more performant than
-#    redefining methods. That doesn't matter for this use case.  Also, it
-#    might not work with Rails 3 (which has built in support for this type
-#    of thing), but this way definitely will
-class ActiveRecord::Base
-  def self.skip_callback(callback, &block)
-    method = instance_method(callback)
-    remove_method(callback)
-    define_method(callback){ true }
-    begin
-      yield
-    ensure
-      remove_method(callback)
-      define_method(callback, method)
-    end
-  end
-end
+require "skip_callback"
 
 module SIS
   class EnrollmentImporter < SisImporter

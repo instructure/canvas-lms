@@ -93,8 +93,8 @@ class CourseSection < ActiveRecord::Base
     self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account, :abstract_course => self.abstract_course)
   end
   
-  def move_to_course(course)
-    return self if self.course == course
+  def move_to_course(course, delay_jobs = true)
+    return self if self.course_id == course.id
     self.course = course
     root_account_change = (self.root_account != course.root_account)
     self.root_account = course.root_account if root_account_change
@@ -103,22 +103,24 @@ class CourseSection < ActiveRecord::Base
     user_ids = self.enrollments.map(&:user_id).uniq
     if root_account_change
       self.enrollments.update_all :course_id => course.id, :root_account_id => self.root_account.id
-      User.send_later_if_production(:update_account_associations, user_ids)
+      User.send_later_if_production(:update_account_associations, user_ids) if delay_jobs
+      User.update_account_associations(user_ids) unless delay_jobs
     else
       self.enrollments.update_all :course_id => course.id
     end
-    Enrollment.send_later(:recompute_final_score, user_ids, course.id)
+    Enrollment.send_later(:recompute_final_score, user_ids, course.id) if delay_jobs
+    Enrollment.recompute_final_score(user_ids, course.id) unless delay_jobs
     self
   end
   
-  def crosslist_to_course(course)
+  def crosslist_to_course(course, delay_jobs = true)
     return self if self.course == course
     unless self.nonxlist_course
       self.nonxlist_course = self.course 
       self.account = self.course.account
       self.save!
     end
-    self.move_to_course(course)
+    self.move_to_course(course, delay_jobs)
     if (self.nonxlist_course.course_sections.active.count == 0 ||
         (self.nonxlist_course.course_sections.active.count == 1 &&
          self.nonxlist_course.course_sections.active.first.enrollments.count == 0)) &&
@@ -129,13 +131,13 @@ class CourseSection < ActiveRecord::Base
     end
   end
   
-  def uncrosslist
+  def uncrosslist(delay_jobs = true)
     return unless self.nonxlist_course
     if self.nonxlist_course.workflow_state == "deleted"
       self.nonxlist_course.workflow_state = "created"
       self.nonxlist_course.save!
     end
-    self.move_to_course(self.nonxlist_course)
+    self.move_to_course(self.nonxlist_course, delay_jobs)
     self.nonxlist_course = nil
     self.account = nil
     self.save!

@@ -69,7 +69,7 @@ module SIS
         if section.new_record? || (section.sis_name && section.sis_name == section.name)
           section.name = section.sis_name = row['name']
         end
-        
+
         # update the course id if necessary
         if section.course_id != course.id
           if section.nonxlist_course_id
@@ -77,12 +77,12 @@ module SIS
             if section.nonxlist_course_id != course.id
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
-              section.uncrosslist
-              section.move_to_course course
+              section.uncrosslist(false)
+              section.move_to_course(course, false)
             end
           else
             # this section isn't crosslisted and lives on the wrong course. move
-            section.move_to_course course
+            section.move_to_course(course, false)
           end
         end
 
