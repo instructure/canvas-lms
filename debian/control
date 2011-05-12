@@ -1,0 +1,22 @@
+Source: canvas-lms
+Maintainer: JT Olds <jt@instructure.com>
+Section: non-free/misc
+Priority: extra
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.1
+Homepage: http://www.instructure.com/
+Vcs-Git: ssh://gerrit.instructure.com:29418/canvas-lms.git
+Vcs-Browser: https://gerrit.instructure.com/gitweb?p=canvas-lms.git;a=summary
+
+Package: canvas-lms
+Architecture: all
+Section: non-free/misc
+Priority: extra
+Depends: ${misc:Depends}, zlib1g-dev, libxml2-dev, libmysqlclient-dev,
+ libxslt1-dev, libsqlite3-dev, imagemagick, ruby-enterprise | ruby1.8,
+ libreadline5, ruby-enterprise | rake, ruby-enterprise | rubygems (>= 1.3.6),
+ ruby-enterprise | ruby1.8-dev, ruby-enterprise | libopenssl-ruby,
+ ruby-enterprise | irb, git-core, libpq-dev
+Suggests: default-jre-headless
+Description: Instructure Canvas LMS
+ This is the professional version of Instructure's Canvas LMS.

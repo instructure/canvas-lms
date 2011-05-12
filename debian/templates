@@ -1,0 +1,371 @@
+Template: canvas-lms/domain
+Type: string
+Description: Please enter the domain that will host Canvas.
+ This is the part of the URL that represents your server. If you expect users
+ to visit Canvas by navigating to http://canvas.example.com/, canvas.example.com
+ is the domain you should enter here.
+
+Template: canvas-lms/file-domain
+Type: string
+Description: Please enter the domain that will host Canvas files.
+ When a user uploads a file to Canvas, it is expected that that user (and
+ potentially others) may retrieve the file again. However, if the file has
+ malicious intent or otherwise unsafe instructions, your other users are put at
+ risk if that file is not served from a different domain name than the main
+ Canvas install.
+ .
+ Simply making a separate domain name from which to host files helps browsers
+ detect this situation and preserve the secure web environment Instructure has
+ endeavored to create.
+ .
+ This value should be a domain name that is simply a DNS alias or an Apache
+ virtual host that references the same Rails application. If you expect users
+ to visit Canvas by navigating to http://canvas.example.com/, then this value
+ should be something like canvas-files.example.com, or files.canvas.example.com,
+ or something similar.
+ .
+ If you don't mind about the security concern, you can just make this the same
+ as the previous domain value.
+
+Template: canvas-lms/mail/type
+Type: select
+Choices: sendmail, smtp
+Default: smtp
+Description: How is outgoing mail sent from Canvas?
+ smtp will require an outgoing mail server to be configured.
+ .
+ sendmail simply assumes this machine has a valid outgoing sendmail
+ configuration, and will take no additional configuration.
+
+Template: canvas-lms/smtp/address
+Type: string
+Description: What is the hostname of the outgoing mail SMTP server?
+
+Template: canvas-lms/smtp/port
+Type: string
+Default: 25
+Description: What port on the outgoing mail SMTP server should Canvas use to connect?
+
+Template: canvas-lms/smtp/use-auth
+Type: select
+Choices: yes, no
+Default: no
+Description: Use authentication with the SMTP server?
+
+Template: canvas-lms/smtp/username
+Type: string
+Description: What is the SMTP username?
+
+Template: canvas-lms/smtp/password
+Type: password
+Description: What is the SMTP password?
+
+Template: canvas-lms/smtp/starttls-auto
+Type: select
+Choices: yes, no
+Default: no
+Description: Should the automatic TLS feature be enabled?
+ If enabled, you will need to make sure your mail server's SSL certificate is
+ correct, among other things, and Canvas will try and use TLS automatically.
+
+Template: canvas-lms/smtp/auth-style
+Type: select
+Choices: plain, login, cram_md5
+Default: plain
+Description: What SMTP authentication style should Canvas use?
+
+Template: canvas-lms/mail/domain
+Type: string
+Description: Outgoing email domain.
+
+Template: canvas-lms/mail/outgoing-address
+Type: string
+Description: What is the outgoing email address?
+ This is the address from which Canvas will send email to registered users.
+
+Template: canvas-lms/file-storage
+Type: select
+Choices: local, s3
+Default: local
+Description: What service should Canvas use to store submissions, attachments, and other file data?
+ If you select 'local' you will be prompted for a file storage path on this
+ filesystem.
+ .
+ If you select 's3' you will be prompted for your Amazon S3 bucket credentials.
+
+Template: canvas-lms/local/path
+Type: string
+Default: tmp/files
+Description: Where should files be stored locally?
+ Relative paths are relative to /var/rails/canvas-lms
+
+Template: canvas-lms/s3/bucket-name
+Type: string
+Description: What is the Amazon S3 bucket name?
+
+Template: canvas-lms/s3/access-key-id
+Type: string
+Description: What is the Amazon S3 access key id?
+
+Template: canvas-lms/s3/secret-access-key
+Type: string
+Description: What is the Amazon S3 secret access key?
+
+Template: canvas-lms/db/adapter
+Type: select
+Choices: mysql, postgresql
+Default: mysql
+Description: What SQL adapter should Canvas use?
+
+Template: canvas-lms/db/database
+Type: string
+Default: canvas_db
+Description: What is the name of the database to connect to?
+ If this database doesn't already exist, you'll need to create it, along with
+ a user that has access to this database. For MySQL, you can do that by running
+ the following commands:
+ .
+ create database canvas_db;
+ create user 'canvas_user'@'<hostname>' identified by '<password>';
+ grant all privileges on canvas_db.* to 'canvas_user'@'<hostname>' with grant option;
+ .
+ For PostgreSQL, the following slightly different commands should be used:
+ .
+ create database canvas_db;
+ create user canvas_user password '<password>';
+ grant all on database canvas_db to canvas_user;
+ .
+ Note that you'll need to replace <hostname> with the host running Canvas (this
+ is 'localhost' if your SQL server is running on the same server). You'll also,
+ of course, want to change <password>.
+
+Template: canvas-lms/db/host
+Type: string
+Default: localhost
+Description: What is the hostname of the SQL server?
+ 'localhost' means the SQL server is running on the same box. If you have
+ installed your SQL server on another box, make sure it can accept network
+ connections from all boxes running Canvas.
+
+Template: canvas-lms/db/username
+Type: string
+Default: canvas_user
+Description: What is the database username?
+
+Template: canvas-lms/db/password
+Type: password
+Description: What is the database password? (blank means no password)
+
+Template: canvas-lms/db/queue-uses-same-db
+Type: select
+Choices: yes, no
+Default: yes
+Description: Does the job queue use the same database information?
+ If yes, the database information you have already provided will be used to set
+ up the job queue as well.
+ .
+ If no, a separate database will be assumed for automated job queues, and you
+ will be prompted for database set up information.
+
+Template: canvas-lms/db/queue-adapter
+Type: select
+Choices: mysql, postgresql
+Default: mysql
+Description: What SQL adapter should Canvas use for the job queue?
+
+Template: canvas-lms/db/queue-database
+Type: string
+Default: canvas_queue_db
+Description: What is the name of the database to connect to for the job queue?
+ If this database doesn't already exist, you'll need to create it, along with
+ a user that has access to this database. For MySQL, you can do that by running
+ the following commands:
+ .
+ create database canvas_queue_db;
+ grant all privileges on canvas_queue_db.* to 'canvas_user'@'<hostname>' with grant option;
+ .
+ For PostgreSQL, the following slightly different commands should be used:
+ .
+ create database canvas_queue_db;
+ grant all on database canvas_queue_db to canvas_user;
+ .
+ Note that this assumes you've already created an appropriate canvas_user
+ account.
+
+Template: canvas-lms/db/queue-host
+Type: string
+Default: localhost
+Description: What is the hostname of the SQL server for the job queue?
+ 'localhost' means the SQL server is running on the same box. If you have
+ installed your SQL server on another box, make sure it can accept network
+ connections from all boxes running Canvas.
+
+Template: canvas-lms/db/queue-username
+Type: string
+Default: canvas_user
+Description: What is the job queue database username?
+
+Template: canvas-lms/db/queue-password
+Type: password
+Description: What is the job queue database password? (blank means no password)
+
+Template: canvas-lms/admin-email
+Type: string
+Description: What is the email address of the main administrator account?
+ This email address will be used both for administrative contact purposes from
+ the site, and will be the first account created.
+ .
+ After your Canvas set up is complete, you will log in with this email address
+ as your username.
+
+Template: canvas-lms/admin-password
+Type: password
+Description: What password do you want for the main administrator account?
+
+Template: canvas-lms/admin-password-confirm
+Type: password
+Description: Please confirm your main administrator account's password.
+
+Template: canvas-lms/collect-stats
+Type: select
+Choices: opt_in, anonymized, opt_out
+Default: opt_in
+Description: Do you want to participate in Instructure's statistics collection?
+ To help our developers better serve you, Instructure would like to collect some
+ usage data about your Canvas installation.
+ .
+ opt_in means that the requested aggregate usage data about your Canvas
+ installation will be sent.
+ .
+ anonymized means that only anonymous and unidentifiable usage data about your
+ Canvas installation will be sent.
+ .
+ opt_out means daily reports are never sent elsewhere.
+
+Template: canvas-lms/default-account-name
+Type: string
+Default: Default Account
+Description: What do you want to call the name of the default account in Canvas?
+ This value is what will be displayed in Canvas' user interface as the root
+ account holding all courses, subaccounts, sections, etc. This is probably the
+ name of your school or institution.
+
+Template: canvas-lms/ssl/cert
+Type: string
+Default: /etc/ssl/certs/ssl-cert-snakeoil.pem
+Description: Where is your SSL Certificate file?
+ The default value assumes you have installed the ssl-cert package.
+ .
+ This option is only used in generating a sample Apache configuration file.
+
+Template: canvas-lms/ssl/certkey
+Type: string
+Default: /etc/ssl/private/ssl-cert-snakeoil.key
+Description: Where is your SSL Certificate Key file?
+ The default value assumes you have installed the ssl-cert package.
+ .
+ This option is only used in generating a sample Apache configuration file.
+
+Template: canvas-lms/notice/unknown-file-storage
+Type: note
+Description: File storage selection unknown, defaulting to local storage at tmp/files.
+
+Template: canvas-lms/notice/unknown-mail-type
+Type: note
+Description: Mail type selection unknown, defaulting to sendmail.
+
+Template: canvas-lms/title/main
+Type: title
+Description: Instructure's Canvas LMS
+
+Template: canvas-lms/title/db
+Type: title
+Description: Instructure's Canvas LMS - Database
+
+Template: canvas-lms/title/queue-db
+Type: title
+Description: Instructure's Canvas LMS - Job Queue
+
+Template: canvas-lms/title/file-storage
+Type: title
+Description: Instructure's Canvas LMS - File Storage
+
+Template: canvas-lms/title/mail
+Type: title
+Description: Instructure's Canvas LMS - Outgoing Mail
+
+Template: canvas-lms/notice/daemon
+Type: note
+Description: Canvas Automated Jobs
+ For Canvas to work properly, there must be exactly one automated jobs daemon
+ running for every main Canvas database/job queue database pair.
+ .
+ You can choose to make this computer be the automated job server by editing
+ /etc/default/canvas-lms and setting DAEMON_ENABLED to 1.
+ .
+ Then you should restart the daemon process so it finds out it is enabled by
+ running /etc/init.d/canvas-lms restart
+
+Template: canvas-lms/notice/apache
+Type: note
+Description: Canvas Apache configuration
+ Enough information was gathered during this wizard to create a sample Apache
+ configuration file at /etc/apache2/sites-available/canvas-lms. There is a
+ reasonable chance that the file generated will just work, and if so, you can
+ enable it by running 'a2ensite canvas-lms'.
+
+Template: canvas-lms/notice/apache-skipped
+Type: note
+Description: Canvas Apache configuration skipped!
+ There was already a configuration file found at
+ /etc/apache2/sites-available/canvas-lms, so no configuration file was written
+ by this configuration process. If you would like to generate this file, please
+ remove the existing file and run dpkg-reconfigure canvas-lms
+
+Template: canvas-lms/notice/db-init
+Type: note
+Description: IMPORTANT: You must initialize your Canvas database!
+ If the database credentials and information you provided have not been set up
+ yet, you must set those up before Canvas will work (i.e., create the
+ database(s) and user(s) that Canvas will use).
+ .
+ Additionally, Canvas requires that these databases are prepopulated. Once you
+ feel the rest of your Canvas environment has been set up properly, please (as
+ root, or with sudo) run:
+ .
+ /var/rails/canvas-lms/script/initialize-db
+ .
+ Canvas will fail to work properly until you run this command. If you have
+ changed settings here, you may want to rerun this command again.
+ .
+ This command needs to only be run once per Canvas installation after each
+ upgrade/reconfiguration/install. If you have one database but 5 nodes, you only
+ need to run this command on one node after upgrading all 5.
+
+Template: canvas-lms/notice/security
+Type: note
+Description: IMPORTANT: You must synchronize config/security.yml across nodes!
+ If you are running multiple Canvas instances accessing the same database, then
+ you must be sure to sync the /var/rails/canvas-lms/config/security.yml file
+ before use.
+ .
+ This file is used to encrypt and protect private data, and must match across
+ all of your Canvas nodes. This installation wizard has generated one for you,
+ but before you do anything else you need to make sure that all of your nodes
+ have the same security key.
+
+Template: canvas-lms/notice/thanks
+Type: note
+Description: Thanks!
+ Assuming the rest of the installation process goes according to plan, Canvas is
+ all configured and should be ready for your perusal soon.
+ .
+ If you have any configuration changes you need to make, you can always restart
+ this wizard by running:
+ .
+ dpkg-reconfigure canvas-lms
+
+Template: canvas-lms/notice/bad-password
+Type: note
+Description: Password mismatch or otherwise bad password
+ Please try again.

@@ -1,0 +1,139 @@
+#!/bin/sh -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+db_settitle canvas-lms/title/main
+
+# db_input high canvas-lms/collect-stats || true
+db_input high canvas-lms/default-account-name || true
+db_beginblock
+db_input high canvas-lms/domain || true
+db_input high canvas-lms/file-domain || true
+db_endblock
+
+db_input high canvas-lms/admin-email || true
+db_get canvas-lms/admin-password
+db_set canvas-lms/admin-password-confirm "$RET"
+while true; do
+  db_beginblock
+  set +e
+  db_input high canvas-lms/admin-password
+  if [ "$?" = "30" ]; then
+    set -e
+    break
+  fi
+  db_input high canvas-lms/admin-password-confirm
+  if [ "$?" = "30" ]; then
+    set -e
+    break
+  fi
+  set -e
+  db_endblock
+  db_go
+  db_get canvas-lms/admin-password
+  password="$RET"
+  db_get canvas-lms/admin-password-confirm
+  if [ "$password" = "$RET" ]; then
+    break
+  fi
+  db_fset canvas-lms/notice/bad-password seen false
+  db_input high canvas-lms/notice/bad-password || true
+done
+
+db_settitle canvas-lms/title/db
+
+db_beginblock
+db_input high canvas-lms/db/adapter || true
+db_input high canvas-lms/db/host || true
+db_input high canvas-lms/db/database || true
+db_input high canvas-lms/db/username || true
+db_input high canvas-lms/db/password || true
+db_input high canvas-lms/db/queue-uses-same-db || true
+db_endblock
+db_go
+db_get canvas-lms/db/queue-uses-same-db
+if ! [ "$RET" = "yes" ]; then
+  db_settitle canvas-lms/title/queue-db
+  db_beginblock
+  db_input high canvas-lms/db/queue-adapter || true
+  db_input high canvas-lms/db/queue-host || true
+  db_input high canvas-lms/db/queue-database || true
+  db_input high canvas-lms/db/queue-username || true
+  db_input high canvas-lms/db/queue-password || true
+  db_endblock
+fi
+
+db_go
+db_settitle canvas-lms/title/file-storage
+
+db_input high canvas-lms/file-storage || true
+db_go
+db_get canvas-lms/file-storage
+if [ "$RET" = "local" ]; then
+  db_input high canvas-lms/local/path || true
+elif [ "$RET" = "s3" ]; then
+  db_beginblock
+  db_input high canvas-lms/s3/bucket-name || true
+  db_input high canvas-lms/s3/access-key-id || true
+  db_input high canvas-lms/s3/secret-access-key || true
+  db_endblock
+else
+  db_input high canvas-lms/notice/unknown-file-storage || true
+  db_set canvas-lms/file-storage local || true
+  db_set canvas-lms/local/path tmp/files || true
+fi
+
+db_go
+db_settitle canvas-lms/title/mail
+
+db_input high canvas-lms/mail/outgoing-address || true
+db_input high canvas-lms/mail/type || true
+db_go
+db_get canvas-lms/mail/outgoing-address
+db_set canvas-lms/mail/domain $(echo "$RET" | sed 's/^.*@\([^@]*\)$/\1/')
+db_get canvas-lms/mail/type
+if [ "$RET" = "smtp" ]; then
+  db_beginblock
+  db_input high canvas-lms/smtp/address || true
+  db_input high canvas-lms/smtp/port || true
+  db_input high canvas-lms/smtp/use-auth || true
+  db_endblock
+  db_go
+  db_get canvas-lms/smtp/use-auth
+  if [ "$RET" = "yes" ]; then
+    db_beginblock
+    db_input high canvas-lms/smtp/username || true
+    db_input high canvas-lms/smtp/password || true
+    db_input high canvas-lms/smtp/auth-style || true
+    db_input high canvas-lms/smtp/starttls-auto || true
+    db_endblock
+  fi
+elif ! [ "$RET" = "sendmail" ]; then
+  db_input high canvas-lms/notice/unknown-mail-type || true
+  db_set canvas-lms/mail/type sendmail || true
+fi
+
+db_go
+db_settitle canvas-lms/title/main
+
+if ! [ -e /etc/apache2/sites-available/canvas-lms ]; then
+  db_beginblock
+  db_input high canvas-lms/ssl/cert || true
+  db_input high canvas-lms/ssl/certkey || true
+  db_endblock
+  db_input high canvas-lms/notice/apache || true
+else
+  db_fget canvas-lms/notice/apache seen
+  db_fset canvas-lms/notice/apache-skipped seen "$RET"
+  db_input high canvas-lms/notice/apache-skipped || true
+fi
+
+# notices
+db_input high canvas-lms/notice/security || true
+db_fset canvas-lms/notice/db-init seen false
+db_input high canvas-lms/notice/db-init || true
+db_input high canvas-lms/notice/daemon || true
+db_input high canvas-lms/notice/thanks || true
+
+db_go

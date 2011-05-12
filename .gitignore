@@ -49,3 +49,10 @@ public/assets/*
 doc/api/*
 doc/plugins/*
 .yardoc/*
+debian/canvas-lms.postinst.debhelper
+debian/canvas-lms.postrm.debhelper
+debian/canvas-lms.prerm.debhelper
+debian/canvas-lms.debhelper.log
+debian/canvas-lms.substvars
+debian/canvas-lms/*
+debian/files

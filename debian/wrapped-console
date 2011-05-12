@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+PATH=/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+APPROOT=/var/rails/canvas-lms
+HOME=/var/lib/canvas-lms
+
+[ -f "$APPROOT/config/environment.rb" ] || exit 0
+
+# switch to app root
+cd $APPROOT
+
+# set up config
+if [ -e "config/GEM_HOME" ]; then
+  export GEM_HOME=$(cat config/GEM_HOME)
+fi
+
+if ! [ "$(id -u)" == "0" ]; then
+  echo must be run either via sudo or root
+  exit 1
+fi
+
+exec su $(stat -c %U "$APPROOT/config/environment.rb") -c "/usr/bin/env \
+PATH=\"$PATH\" \
+HOME=\"$HOME\" \
+RAILS_ENV=production \
+script/console"
+
+exit 1

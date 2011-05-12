@@ -1,0 +1,722 @@
+canvas-lms (1.1-27) professional; urgency=low
+
+  * [6f69ae8] bumping changelog
+  * [034ee9c] don't load unassigned members when it doesn't exist
+  * [974615e] override default prerm script
+  * [f2df61a] fix file sidebar loading in firefox, fixes #4467
+  * [6260f57] set kaltura default max file size to 500mb
+  * [84467a4] return 'canvas ok' in health check
+  * [6057f56] fix links to inbox to messages you sent fixes #4468
+
+ -- JT Olds <jt@instructure.com>  Tue, 03 May 2011 17:46:24 -0600
+
+canvas-lms (1.1-26) professional; urgency=low
+
+  * [ceb3fa0] fix licensing on workflow library
+  * [bf5ed46] fix licensing on workflow library
+  * [39588b1] include account_users in user_account_associations.  fixes
+    #4451
+  * [2cb69ae] use user host url for summary message links, fixes #4455
+  * [f407d5b] enable full scribd support for local storage
+  * [5cf114b] make plugins version display consistent
+  * [7ba5d5e] revoke access from prior users to deleted courses fixes
+    #4460
+  * [7beaf4d] fix update_account_associations job getting created for
+    every imported user
+  * [0ec46a5] make sure announcements are imported as announcements
+  * [841557e] bumping changelog
+
+ -- JT Olds <jt@instructure.com>  Tue, 03 May 2011 15:02:19 -0600
+
+canvas-lms (1.1-25) professional; urgency=low
+
+  * [821e43c] bump changelog
+  * [6d22627] cast columns in dynamic finders, warn on all-nil argument
+    lists
+  * [7ddebce] defend against nil account when showing user fixes #4428
+  * [853e980] only show active terms on the course settings page
+  * [4cc32f8] serialize sis batch processing
+
+ -- JT Olds <jt@instructure.com>  Tue, 03 May 2011 11:51:59 -0600
+
+canvas-lms (0.1-24) professional; urgency=low
+
+  * [cdc2f43] sanitize question/answer html on import too, added specs
+  * [4130674] happy angel specs
+  * [f64023f] qti importer was referencing general_comments, not
+    neutral_comments
+  * [e523560] bumping changelog
+  * [3fb2902] fix assignment file upload bug, closes #4426
+  * [596c1ef] prevent loading notification preferences without any
+    communication channels
+  * [8a9dfaa] no more geometric series for shift_date fixes #4224
+  * [5b88179] fix outcomes#show json response in course context, fixes
+    #4430
+  * [07d8e90] fix date shifting for export/import
+  * [7a6632e] make sure non_shuffled_questions is defined in the method
+    it is used
+  * [f7c7690] don't try to get plugin name if no migration_type is set
+  * [28f7856] fix single-quote escaping
+  * [b9cbe69] allow non-delayed posts to become delayed fixes #4446
+  * [62e8443] don't copy course name/code and fix start/end dates
+  * [a35295b] don't break if partition_for_user is passed an empty list
+  * [453fe81] push soap4r library to the front of the load path
+  * [133cc23] spaces are nice
+
+ -- Zach Wily <zach@instructure.com>  Mon, 02 May 2011 21:29:24 -0600
+
+canvas-lms (0.1-23) professional; urgency=low
+
+  * [ff2175e] bumping changelog
+  * [576f6c0] escape backslashes
+  * [404de4d] use .delegate instead of .bind for header link hovers
+  * [f72caba] only list each user once when filtering account users by
+    term, refs #4400
+  * [8178f69] revert "disable autopreview; switch to open source video
+    widget"
+
+ -- JT Olds <jt@instructure.com>  Mon, 02 May 2011 08:44:36 -0600
+
+canvas-lms (0.1-22) professional; urgency=low
+
+  * [518b1ce] bumping changelog
+  * [6494750] don't just automatically bounce the job server
+  * [fac14ac] make sure imported wiki pages have a title
+
+ -- JT Olds <jt@instructure.com>  Fri, 29 Apr 2011 17:02:20 -0600
+
+canvas-lms (0.1-21) professional; urgency=low
+
+  * [8bb3cd5] bumping changelog
+  * [c8d4b6a] let paginate figure out how many entries there are
+  * [dac5bdf] handle repeated qti imports of the same filename better,
+    closes #4411
+  * [a489a89] fix resubmit_to_scribd
+  * [6f8c59b] fix looking up enrollments
+  * [03fae4c] banner does *not* have email addresses we can
+    deterministically figure out for every user
+
+ -- JT Olds <jt@instructure.com>  Fri, 29 Apr 2011 16:11:12 -0600
+
+canvas-lms (0.1-20) professional; urgency=low
+
+  * [2ae36e1] bumping changelog
+  * [ae5c055] handle escaped html in qti v2p1, closes #4380
+  * [a443d3c] allow a description or description partial for account
+    reports
+  * [05b49e7] make delayed_jobs totally awesome
+  * [93d3651] fix for grade publishing ui
+  * [6d9f679] sis_user_id is actually the user_id field from users.csv
+  * [8cdf466] make error_reports more awesome
+  * [c0b6bce] decide between qti short/essay question by if there are
+    defined answers
+  * [43dcad7] send canvas ids with basic lti for "public" integrations
+  * [2515dbc] fix in-line file editing in the file browser
+  * [cee38eb] filter users by enrollment term in account section, closes
+    #4400
+  * [aae2b5f] don't try to parse non-existent files
+  * [6f7e015] force a different file namespace in development and
+    localstorage mode
+  * [38e8304] make kaltura errors on import non-fatal, closes #4395
+  * [276a906] handle bulk media upload failures on import more
+    gracefully, refs #4395
+  * [71dc9e9] show user count per term
+  * [67b16bb] don't recursively chown
+  * [4c6c905] be more paranoid when looking up users for sis
+  * [f58bfcd] kaltura: specify rtmp url; disable autopreview; switch to
+    open source video widget
+
+ -- JT Olds <jt@instructure.com>  Fri, 29 Apr 2011 10:20:20 -0600
+
+canvas-lms (0.1-19) professional; urgency=low
+
+  * [d9a75cc] bumping changelog
+  * [c1ae78e] fix calling module methods in a delayed job
+    PerformableMethod
+  * [47601e1] copy/import module links correctly.  fixes #4312
+  * [4457002] sis grade publishing backend
+  * [61ebf0e] sis grade publishing ui
+  * [d5c439b] grade publishing results importer
+  * [bb30d35] disable ui button by setting its function to nil
+  * [814c692] fix nil error for removing unneeded media objects
+  * [b710eef] don't load the import zip into memory during import
+    initialization
+  * [186fd84] only export media objects that are used in RTE fields by
+    the export
+  * [b918e7e] Revert "disable ui button by setting its function to nil"
+  * [d80c8f6] order delayed jobs by id on delayed job console, for
+    sanity
+
+ -- JT Olds <jt@instructure.com>  Thu, 28 Apr 2011 11:09:43 -0600
+
+canvas-lms (0.1-18) professional; urgency=low
+
+  * [798ab60] bumping changelog
+  * [25d491e] fix quiz statistics csv for quizzes with question groups,
+    fixes #4310
+  * [17faa31] add become link to user pages for site_admins
+  * [0944035] use the unencoded filename for content zipper and
+    exporting
+  * [3e3407b] fix intermittent scribd spec failures
+  * [6ea2a88] make cross-listing selenium spec more robust
+  * [04451fe] add basic instructions to authentication config page
+  * [440c174] another find_by_id nil
+  * [23e71e6] remove attachments created on import soley for media
+    object import
+  * [20092fb] fix more find_by_id cases where we could pass in an empty
+    string
+  * [9fb5a5d] global css/js wasn't being shown on account settings
+
+ -- JT Olds <jt@instructure.com>  Wed, 27 Apr 2011 10:52:38 -0600
+
+canvas-lms (0.1-17) professional; urgency=low
+
+  * [3067520] bumping changelog
+  * [1be1012] delayed jobs UI tweaks, refs #4311
+  * [4a869c6] set max_attempts to 1 for import/export jobs, closes #4311
+  * [961657a] add calendar events to export/import
+  * [33a59ed] updated the xsd for calendar events and files/folders
+  * [499a993] don't pass an empty string to find_by_id
+
+ -- JT Olds <jt@instructure.com>  Tue, 26 Apr 2011 16:25:27 -0600
+
+canvas-lms (0.1-16) professional; urgency=low
+
+  * [2921b7e] bumping changelog
+  * [6eec8d4] correctly handle /file_contents/ urls when exporting;
+    fixed #4335
+  * [7a482e0] anchor link searches on exports so we link correctly;
+    fixes #4337
+  * [cfc40c4] don't use URI.parse for S3 file downloading; fixes #4336
+  * [b323c7a] don't use course code as a regex; fixes #4344
+  * [6b46bf6] import canvas cartridge qti
+  * [48346a5] basic wimba archiving support, closes #4263
+  * [6ae6488] fix downloading S3 files in content zipper
+  * [516d3a4] export/import kaltura media content with cc
+    exports/imports, closes #4256
+  * [58d5b4e] fix bug causing media objects to be uploaded twice on
+    import, refs #4256
+  * [3f4d342] fix the progress bar on the kaltura upload widget
+  * [39b28dc] check for files that are too big in kaltura uploader
+  * [8b6b912] fix importing external url module items; fixes #4330
+  * [090eaf6] fix sub-item importing for some content imports
+  * [3137446] export/import question banks
+  * [4e47be2] allow old quizzes to import unpublished
+  * [206aed8] allow import/export without kaltura configured
+  * [5d371a6] don't show lockdown browser download url if it's been
+    deleted
+  * [9f31146] ldb settings in respondus api, closes #4358
+  * [f5c9ce9] preserve extra file url params across import/export,
+    closes #4321
+  * [eca24c7] ignore all errors adding page views to redis queue
+  * [d104ac8] fix import filenames that have been escaped going through
+    nokogiri, refs #4321
+  * [65cfe2a] force wiki pages to have the same url on import as on
+    export, closes #4331
+  * [98e68f9] export/import modules links. closes #4313
+  * [3beb896] interface for manual crosslisting
+  * [894f6c4] copy file/folder lock status on export/import
+  * [40eba04] export all files with filename instead of display name
+  * [0ce2a5c] read cc syllabus on import as html, not xml, fixes #4371
+  * [9de2e9b] export quiz question names, closes #4374
+  * [0416648] fix cross-listing selenium test
+  * [e10c1cc] fix indenting of imported modules; fixes #4375
+  * [b03ea46] build quiz data on import, and reload to catch question
+    additions
+  * [4f0af3d] import course settings after files; fixes #4377
+  * [d8a300e] make sure quizzes with multiple <p> get imported correctly
+  * [520de78] handle migrating file display names if they are different;
+    fixes #4378
+  * [63bd738] fix time settings imported from respondus client
+  * [a693f31] add support for per-job max attempts, refs #4311
+
+ -- JT Olds <jt@instructure.com>  Tue, 26 Apr 2011 11:52:11 -0600
+
+canvas-lms (0.1-15) professional; urgency=low
+
+  * [a6bfd14] bumping changelog
+  * [13370f4] mathquill integration, closes #3116, #4250
+  * [d824af1] update user account associations with non-cross listed
+    courses too
+  * [6558843] change qti converter to use xml parser
+  * [3911ab3] update account associations while creating users
+  * [06e89cd] do default notification policy setup synchronously during
+    SIS import
+  * [2f3756f] optimize account association setup when saving enrollments
+  * [e66b32b] update jquery to 1.5.2
+  * [045183e] don't send notification on respondus api qti import
+  * [0d4e3a9] enable google previews of attachments; fixes: #4060
+  * [7fe7264] add 'name' to safe fields for html sanitization
+  * [11fb072] fix formSuggestions selecting then immediately
+    unselecting, fixes #4327
+  * [eabe70d] dont just say "file uploads for" when no upload fixes
+    #4071
+  * [4d4564f] tweak lockdown browser popup behavior
+  * [a42a6e3] fix LearningOutcomeGroup#root_learning_outcome_group
+    association
+  * [0edbecd] showing sis id for everyone, deleting courses emptied due
+    to crosslisting
+  * [dca9d43] jammit complains about this comma
+
+ -- JT Olds <jt@instructure.com>  Fri, 22 Apr 2011 17:15:29 -0600
+
+canvas-lms (0.1-14) professional; urgency=low
+
+  * [274aac4] starting common cartridge exporting
+  * [8aebf51] export wikis in common cartridge
+  * [89ca588] add common cartridge assignment exporting
+  * [bc80f97] separate syllabus from course settings
+  * [7af70f6] add discussion topics to common cartridge export
+  * [71d5f7b] enhance content zipper to export sub-folder as well
+  * [0d53e88] added web resources to common cartridge export
+  * [10e6bf6] added context modules to common cartridge export
+  * [a66b103] added external feeds to common cartridge export
+  * [e696df9] added grading standards and assignment groups to common
+    cartridge
+  * [f529ee2] added learning outcomes to common cartridge export
+  * [c26578b] added rubrics to common cartridge export
+  * [6eee4a6] started qti export for common cartridge
+  * [e0eed5a] finished common cartridge-specific qti exporting
+  * [1b1eb97] added basic lti links to common cartridge export
+  * [5b84177] export more quiz question types to qti
+  * [53fc924] finished export qti
+  * [fc4cc9f] added ui for course exports
+  * [76470f7] a few changes for common cartridge validation
+  * [1a78b6f] bumping changelog
+  * [ccf5c79] require lockdown browser on a quiz if enabled, don't check
+    account settings
+  * [ce08151] add the ability to set options on AR.find_cached methods
+  * [9c0448c] fix uploading files to eportfolios; fixes #4273
+  * [a0c02b4] don't include the submission body in submission stream
+    items
+  * [edc2870] fix typo
+  * [6927106] don't create 2 assignments when cloning a quiz; fixes
+    #4274
+  * [9823cbe] make the sis verification step check for global section id
+    uniqueness
+  * [2f858ae] update sis import documentation
+  * [cfe4b5f] moved common cartridge folder up a level
+  * [bb8bc24] start canvas cartridge importing
+  * [84c048e] importing more canvas export types
+  * [6177193] importing more canvas export objects
+  * [cf69088] fixes to make importing a canvas cartridge from ui work
+  * [c06affd] fix regex typo and hide the course export option
+  * [326bd14] added wikis and assignments importing for canvas cartridge
+  * [9c058e3] import canvas cartridge discussion topics
+  * [c9b8a23] import files for canvas cartridges
+  * [52b1c9d] fix some loading issues in dev mode with content import
+    stuff
+  * [2882b73] fix some learning outcome group infinite loop
+    possibilities
+  * [f4c2a81] always use course section and course when building account
+    associations; fixes #4277
+  * [2b9ea82] put the sumissiontoview in a try/catch
+  * [3f1499e] fix quiz settings not showing actual scoring_policy value
+  * [b8dabef] allow configuring some dj worker options in the yml
+  * [187a02f] fix kaltura recorder to work in ie, fixes #4280
+  * [e329c28] properly set @is_delegated so ?canvas_login=1 works
+  * [9a93fd4] try to find attachment id for relative urls on import
+  * [8c0651a] gracefully handle bad decrypt of plugin_settings
+  * [6ade1ba] delicious integration fix
+  * [793cd72] don't monkey patch attachment_fu when we have so many
+    local mods already
+  * [35d5a40] add brief description to external tools
+  * [35a5168] fix local storage with StringIO attachment uploads
+  * [d898232] add a rake canvas:check_syntax task to check for js errors
+  * [88fe989] support quiz settings in respondus api, closes #4238
+  * [68ec8d8] add file support to QTI imports, closes #3202
+  * [f122fa7] adding ldb requirement for viewing quiz results
+  * [a3d2a6e] optionally show download url for lockdown browser
+  * [fa71caf] fix creating new pages in context module screen, fixes
+    #4304
+  * [48e130d] fix adding/deleting assignment rubric on quiz page, fixes
+    #4303
+  * [4c2c170] show that the lockdown browser is required on quiz page
+  * [95e75cd] don't cache google docs tokens if they don't exist, fixes
+    #4309
+  * [c1fa293] fix adding/deleting assignment rubric on quiz edit page as
+    well, fixes #4303
+  * [d8a7183] more precise caching of assignment lists, and expire every
+    hour
+  * [8c2d97f] allow html answers for multiple-choice/multiple-answers,
+    closes #4206
+  * [3980f26] fix mismatched date times on assignment details page
+  * [4a66482] workaround for kaltura urls and itunes podcast feeds, refs
+    #4320
+  * [3596138] look up the entire filename when converting URLs on import
+  * [f5149ad] sis import feedback fixes
+  * [6e8acdf] when creating a new crosslist course, prepopulate course
+    data with existing section's course
+  * [b8e7f55] things aren't working right immediately after a fresh
+    db:migrate
+  * [9038054] don't treat 'unlimited' placeholder value as an ip filter,
+    refs #4238
+  * [33854cb] renaming last_course to nonxlist_course and changing
+    crosslisting semantics
+
+ -- JT Olds <jt@instructure.com>  Thu, 21 Apr 2011 15:48:12 -0600
+
+canvas-lms (0.1-13) professional; urgency=low
+
+  * [af02e87] bumping changelog
+  * [0657c48] adding link to sis csv format docs
+  * [eaaf378] assignments getting deleted on change to submission_types
+  * [a57614c] be sure to skip submissions for skipped assignments; fixes
+    #4163
+  * [28dfe1d] migration process for moving to new kaltura instance
+  * [f34dbd9] on email responses, just look up the user from the message
+    being responded to
+  * [9c05709] fix capitalization in email footer
+  * [1e4fb46] background scribd resubmission
+  * [fe727ad] don't respond to messages with an unrecognized To: address
+  * [9479a49] fix local storage with StringIO attachment uploads
+  * [a92fea1] don't return a deleted pseudonym for users
+  * [3e7997d] new kaltura recorder
+  * [de4df5c] support question banks in respondus imports, closes #4237
+  * [e849494] dont show click to test a different score tooltip fixes
+    #4056
+  * [d3ff9cf] show artifact details on learning outcome results page
+  * [2d7e77a] create video media comments on submissions and in
+    speedgrader
+  * [df3d4c6] use something more secure than UUID for our unique tokens;
+    fixes #4264
+  * [6f25bc4] chrome 10 does not support speech-to-text
+  * [1639eca] replace quiz support in respondus api, closes #4177
+  * [86f61ef] ui and db migration to add voice comment to contextmessage
+  * [6ba1e76] support question banks in respondus api, closes #4239
+  * [6ec333f] xlist sis importing tests with fixes
+
+ -- JT Olds <jt@instructure.com>  Fri, 15 Apr 2011 15:43:29 -0600
+
+canvas-lms (0.1-12) professional; urgency=low
+
+  * [825f981] bumping changelog
+  * [c3729fe] Soup up grade_summary.  Closes #3863.
+  * [b4761cc] only set auto-flushing on the logger if the logger
+    supports it
+  * [fae961c] fixing PhusionPassenger::Utils::RewindableInput issue
+
+ -- JT Olds <jt@instructure.com>  Wed, 13 Apr 2011 15:32:19 -0600
+
+canvas-lms (0.1-11) professional; urgency=low
+
+  * [c47a8fc] enqueue delayed notifications at low priority
+  * [4335a88] allow arbitrarily long certificate fingerprint
+  * [72ccab9] editing file content was broken
+  * [97828b6] bumping changelog
+  * [fc0bf53] fix quiz cloning when the quiz has a link to itself
+  * [126fa38] don't include the errors object on json/xml unauthorized
+    responses
+  * [337b13b] refactor assignment#assign_peer_reviews
+  * [d95bd6a] deleting a user from an account sometimes deletes them
+    from everything
+  * [e4d88c5] optimize gradebook_json
+  * [502e843] touch the submission when adding a peer review, fixes
+    #4155
+  * [f5aba0f] improve assign_peer_reviews logic
+  * [76255c2] new hairtrigger gem (now with rake db:schema:dump support)
+  * [4f4d041] add slickgrid 1.4.3 and assets sections, refs #4104
+  * [a43e1d4] don't send delayed posted topics to stream prematurely;
+    fixes #4175
+  * [3fdf4d7] let teacher always update quiz submissions; fixes #4176
+  * [2b30507] was loading a custom stylesheet if it was set to ""
+  * [c6b7a45] string validations/fixes, closes #4154. wiki fixes, closes
+    #3973, #4168
+  * [65a91de] fix grading previous versions of in-progress quizzes; refs
+    #4176
+  * [f814dea] fix grading previous versions of in-progress quizzes,
+    again; refs #4176
+  * [b17c00a] set "from_name" to user's name for private messages
+  * [3441941] quiz statistics revamp
+  * [785d301] don't return submissions for un-enrolled students in the
+    api
+  * [339f591] UI for viewing details of a specific error report
+  * [886e87d] adding notice about security.yml, making db-init notice
+    display each time
+  * [f3cee78] encryption_key validation, closes #4202
+  * [63fa775] don't force tables to have grey borders
+  * [ce00409] BigBlueButton integration, refs #3319
+  * [c82ba7b] make inlined content fill the view
+  * [1c5f710] clear out the message box after a message is sent; fixes
+    #4196
+  * [b9ba2fb] don't allow sis_import page to load if it isn't enabled
+  * [63bad32] Handle incoming mails. Closes #4016.
+  * [44403d1] send kaltura requests through canvas
+  * [b1a9f2a] minor avatar fixes
+  * [3cf3946] api for retrieving submissions by student, refs #4156
+  * [3456f07] don't create 2 question banks when hitting enter; fixes
+    #4105
+  * [3b62117] show the SpeedGrader link on all assignments; fixes #4173
+  * [8c1f894] improve js htmlEscape performance and add htmlEscapeValues
+    helper
+  * [b3e8d3b] fix the mass assignment error raising option
+  * [37b6049] api call for getting course sections, optionally with
+    students
+  * [6283c3a] Delegate to CAS for auth.  Closes #4130
+  * [902cf8c] remove rack bug patch, it's been fixed in rack 1.1.2
+  * [40cff6f] sis import api
+  * [6fdea80] gradebook importer: handle "Points Possible" row being
+    anywhere; #fixed #4162
+  * [5ee8313] added index page for external course migrations
+  * [ab071e0] fix capitalization in speedgrader
+  * [a448e3e] resize speedgrader on iThing/android orientationChange
+  * [0d3ada1] don't assume i'm editing a student user, fixes #3918
+  * [163ef11] wait to init wikiSidbar files and images tabs till clicked
+  * [d4431fe] add sis id to UI for courses, sections, pseudonyms
+  * [56cdc28] fix grade calculations if an assignment group has 0 points
+    possible
+  * [bb76753] Fix updating observer stats from AJAX. Fixes #3020.
+  * [bb84334] Add modules to links list in wiki sidebar.  Closes #3824.
+  * [7746b8b] Don't use AJAX to delete a topic from its own page.
+  * [bff458f] don't destroy the quiz_submission in take_quiz, fixes
+    #4243
+  * [9bcdd60] don't depend on Enrollment#type in the courses api, fixes
+    #4244
+  * [def8e1d] disabling gradebook xml output instead of just failing
+  * [8824282] added grade_matches_current_submission to submission api
+    response
+  * [3a171d2] renaming final_grade to final_score in relevant places.
+    adding computed_final_grade
+
+ -- JT Olds <jt@instructure.com>  Wed, 13 Apr 2011 10:08:49 -0600
+
+canvas-lms (0.1-10) professional; urgency=low
+
+  * [9022c87] bumping changelog
+  * [dc0d205] make sure to get the right section on sis import
+  * [eeb3770] properly support attachments > 2GB, another string -> text
+    fix
+  * [e17e8fc] allowing multiple environment configuration extension
+    files
+  * [5892093] improve delayed jobs logging
+
+ -- JT Olds <jt@instructure.com>  Wed, 30 Mar 2011 16:44:02 -0600
+
+canvas-lms (0.1-9) professional; urgency=low
+
+  * [bb79e97] bumping changelog
+  * [dda6ff7] whoops, i actually want this to return
+  * [5058e00] use the redis-store gem rather than the github repo
+  * [0078485] "Submission Details" link in gradebook should link to
+    speed grader
+  * [5e9f3ea] option to require initial post before seeing replies
+  * [ed48d0a] generate the recipient list for context messages
+    synchronously; fixes #4140
+  * [9d62c0c] change some columns from string -> text, refs #4136
+  * [e93e5fd] convert json string time to a Time object in page view
+    update
+  * [52ce635] link quiz group to question bank in UI
+
+ -- JT Olds <jt@instructure.com>  Wed, 30 Mar 2011 14:04:14 -0600
+
+canvas-lms (0.1-8) professional; urgency=low
+
+  * [95dba5b] bumping changelog
+  * [4560d1f] forgot executable bit
+
+ -- JT Olds <jt@instructure.com>  Tue, 29 Mar 2011 16:11:40 -0600
+
+canvas-lms (0.1-7) professional; urgency=low
+
+  * [83317c1] bumping changelog
+  * [2352bb9] new rspec-rails (and rspec) to fix sporadic failures
+  * [54c30ce] clean up connection resetting in delayed jobs, fixes #4138
+  * [bace2a9] link to calendar correctly from course details; fixes
+    #4110
+  * [1b1d607] fix score display on quiz moderation; fixes #4003
+  * [45d38fb] fix displaying matching question distractors; fixes #3902
+  * [5a6b048] order assignments in the wiki sidebar
+  * [ae72018] syntax warnings found in development mode
+  * [0b9860f] make open enrollment configurable on root account
+  * [da288ac] turnitin icons not showing dialog in gradebook
+  * [e4ab8c8] clean up calendar anchor
+  * [ea66fb1] include needs_grading_count in assignments api json, if
+    authorized
+  * [42dcbb4] order gems in Gemfile alphabetically
+  * [b1cb930] optionally include needs_grading_count in the courses api
+  * [38ff217] fix missing submissions on gradebook showing only section
+  * [a16217d] adding yui-compressor
+
+ -- JT Olds <jt@instructure.com>  Tue, 29 Mar 2011 15:48:00 -0600
+
+canvas-lms (0.1-6) professional; urgency=low
+
+  * [f2c754d] bumping changelog
+  * [3f7057e] randomize multipart boundary
+  * [471267d] rework some mysql-specific stuff, closes #4090
+  * [76bfff3] topic podcasts
+  * [aa9821c] consolidate course permissions cache, use in grants_right
+  * [ee1c19f] rewrite has_rights in terms of grants_rights
+  * [65dad2a] add comment that i forgot to add a while back
+  * [e0ee703] remove debugger statement
+  * [58aa885] provide preview_url in submissions api response, closes
+    #3957
+  * [c14f66f] correctly truncate text that contains MB chars, fixes
+    #4135
+  * [10040d2] giving deb package users easy access to script/console
+
+ -- JT Olds <jt@instructure.com>  Tue, 29 Mar 2011 10:14:35 -0600
+
+canvas-lms (0.1-5) professional; urgency=low
+
+  * [5a89699] bumping changelog
+  * [84f589c] better ie detection
+  * [bc4bcc8] upgrade tiny
+  * [22aadd9] hairtrigger bump, new migration. fixes postgres trigger
+    bug
+  * [dbfdd06] remove the hidden course_role divs and db lookup
+  * [7dd66b0] remove the varying limits on assignments_needing_grading
+  * [ec92342] fix for lock icons disappearing fixes: #3911
+  * [b7f1d5a] align question banks to outcomes
+  * [d00f705] catch early clicks on "#" links
+  * [97a28cd] add position to the communication_channel indexes
+  * [9935c42] allow initial data load to be configurable from the
+    environment
+
+ -- JT Olds <jt@instructure.com>  Fri, 25 Mar 2011 18:05:04 -0600
+
+canvas-lms (0.1-4) professional; urgency=low
+
+  * [7f2d368] fix the allowed_extensions with the improved upload flow
+  * [bc8fcc3] deb for postgres support
+  * [399e650] get rid of 'show all' link on right side, add 'less' link
+  * [9d131ea] basic lti support
+  * [6edaee8] adding new package dependencies
+  * [54ab76f] fix typo in migration script
+  * [45f54e3] update our preinitializer.rb
+  * [9a49627] add drag-to-desktop, speech, and shake-for-next to
+    speedgrader
+  * [b69f92a] matching questions not showing correct answer
+  * [6bb11cb] default to 2 instead of 1 for multiple attempts quiz
+    setting
+  * [adcf3be] adding back unuseful groups
+  * [2998f1d] remove the layout when taking a locked-down quiz, closes
+    #3129
+  * [46ab167] log a dummy page view when logging rather than db'ing,
+    refs #4052
+  * [f9e08ea] teach the api how to download discussion topic assignment
+    attachments
+  * [d20eede] move default error reporting to a plugin
+  * [53e5832] when quizzes have lots of questions, the points possible
+    is wrong
+  * [49eea5b] run bundler as the user who runs canvas
+  * [7c9f32e] fixing homedir setting
+  * [1221a95] temporarily removing redis from packaging branch
+  * [b1adc54] use latest hairtrigger gem for nicer model class loading
+  * [78eeabe] support writing page views to a redis queue, closes #4052
+  * [e4169cd] gradebook not correctly remembering pass/fail grades
+  * [361c4b5] enable private messaging within groups
+  * [f5bac09] sub-accounts couldn't get to sub-accounts page
+  * [23d2221] installing bundles to vendor/bundle
+
+ -- JT Olds <jt@instructure.com>  Fri, 25 Mar 2011 11:00:18 -0600
+
+canvas-lms (0.1-3) professional; urgency=low
+
+  * [4ea607c] postgres support and misc bugfixes, fixes #3574, #3943
+  * [c2a0157] a couple base migration tweaks to facilitate mysql -> pg
+  * [18c7d64] refactor lockdown browser plugin api to take controller,
+    refs #3129
+  * [4049e4f] new deb for testing updates
+  * [040a430] fix rendering of wiki page version content and right side
+    box
+  * [63d0999] assignments.needs_grading_count counter to speed things
+    up, closes #3945
+  * [65e402b] support redis for session store, refs #4051
+  * [b84eb10] fix jammit and actually install daemon
+
+ -- JT Olds <jt@instructure.com>  Wed, 23 Mar 2011 15:43:01 -0600
+
+canvas-lms (0.1-2) professional; urgency=low
+
+  * [49c7c56] stubbing out the respondus soap api endpoint, refs #3760
+  * [e12c234] adding more structure to the respondus soap endpoint, refs
+    #3760
+  * [1cb7464] move account loading into the middleware
+  * [ec56f6a] respondus validate_auth soap api method, refs #3760
+  * [a427c96] respondus api for listing and selecting items, refs #3760
+  * [9caa2c4] respondus qti publishserveritem support, refs #3760
+  * [3d245a8] switch to the C ext json gem
+  * [464ce2f] remove errant db column in the initial migration
+  * [69ce189] redirect external server output correctly
+  * [2a5976b] don't let question names be blank
+  * [a71ae89] support for specifying the session store in
+    config/session_store.yml
+  * [187141f] editing api doc set up tutorial url
+  * [401aace] gitignore config/*.yml rather than individual yml file
+    names
+  * [3612932] clean up session expiry support, refs #4051
+  * [fa861a5] setting to log page views rather than store them to the
+    db, refs #4052
+  * [4295e88] include timestamps in pageview csv output; fixes #4048
+  * [85c4f6d] make viewed_user_ids on context_messages bigger
+  * [204d916] don't send messages to the stream just because it was read
+    by somebody
+  * [ac2c7ef] optimize object allocation in RoleOverride
+  * [39954fd] don't try to show avatars when they are not enabled; fixes
+    #3966
+  * [d91eebf] module progressions for files not working
+  * [a78dad8] start quiz building selenium tests
+  * [cc9a948] don't show module navigation in headless view
+  * [cdd7bee] make the root "/" url dashboard, rather than login
+  * [0973bdf] remove publishing grades option, fixes #3974
+  * [6bfc240] fix selenium test server
+  * [93ab982] make rubric on discussion topics page editable
+  * [e1a2012] lazy load rubric editor/viewer for topics/quizzes
+  * [4e02571] hover data for To Do items
+  * [cae8b41] warn when deleting a quiz that has submissions; fixes
+    #4043
+  * [769503e] 'next' button on modules not working for items
+  * [a41c747] fix assignments_needing_grading partial now barfing on
+    /courses/N page
+  * [794ae08] fix indicate() js method when no options are passed in,
+    fixes #4065
+  * [8c32041] allow but don't require ssl in the API for now, for
+    backwards compat
+  * [8ec40fe] strip hash from the return_to url before adding a new one
+  * [6dc1733] don't show 'you must be logged in' for root path login
+    redirect
+  * [3cf7b59] new canvas sis import docs
+  * [5eb776a] fix breadcrumb on dashboard
+  * [e0bdaf3] ignore link in To Do stopped working
+  * [8c2b31e] manually touch the user model when updating preferences
+  * [a368abd] turnitin comments for next revision
+  * [5b3aeef] require login for calendar page
+  * [e65e970] allow html in certain flash messages
+  * [f6d1ff5] keep equation question formulas in the right order
+  * [741074a] fix user files page
+  * [3eff06a] don't show reports tab if there are no reports
+  * [dadd68f] web conferences not getting correct config
+  * [ddf37a8] web conference configs not getting correct domain
+  * [5eed6f8] fix creating web conferences
+  * [da5183f] add stream_item_instances index to optimize deletes
+  * [eceb118] fix spacing of pseudonym confirmation screen in chrome
+  * [5f38766] fix some module import problems
+  * [ca28c1c] sometimes points possible didnt get put in the module
+    dialog
+  * [2c57fb8] equella check causing error if no @domain_root_account
+  * [196d914] fix editing/deleting questions in question banks; fixes
+    #4080
+  * [e823872] missing summary icon for facebook app, fixes #4082
+  * [10578ce] html safe facebook flash notices, fixes #4081
+  * [988ca1a] try to fix a css issue with submission to show select
+  * [50e6ad1] request logging in the respondus API, refs #3760
+  * [96696a2] finishing up respondus quiz upload support, refs #3760
+  * [23dfd54] add created_at to the page_views index on account_id
+  * [a8cc2c5] student grades page showing zero for total
+  * [f0388d8] empty turnitin comments causing page render error
+  * [8651c9a] link to troubleshooting wiki page for rails console
+  * [4e90835] support running spec_canvas specs from bundler-required
+    gemfiles too
+  * [ac5ad3f] add infrastructure for supporting lockdown browser
+    plugins, refs #3129
+  * [c86958d] fix for broken find_or_create_by_ in rails 2.3.11
+  * [f7d63ee] escaping unintended newline
+
+ -- JT Olds <jt@instructure.com>  Tue, 22 Mar 2011 17:54:12 -0600
+
+canvas-lms (0.1-1) professional; urgency=low
+
+  * Initial packaging.
+
+ -- JT Olds <jt@instructure.com>  Tue, 08 Mar 2011 10:51:39 -0700

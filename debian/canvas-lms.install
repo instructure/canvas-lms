@@ -1,0 +1,11 @@
+app/* var/rails/canvas-lms/app/
+db/* var/rails/canvas-lms/db/
+Gemfile var/rails/canvas-lms/
+Rakefile var/rails/canvas-lms/
+lib/* var/rails/canvas-lms/lib/
+public/* var/rails/canvas-lms/public/
+script/* var/rails/canvas-lms/script/
+vendor/* var/rails/canvas-lms/vendor/
+config/* var/rails/canvas-lms/config/
+debian/initialize-db var/rails/canvas-lms/script/
+debian/wrapped-console var/rails/canvas-lms/script/

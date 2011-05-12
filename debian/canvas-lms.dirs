@@ -1,0 +1,6 @@
+var/rails/canvas-lms/log
+var/rails/canvas-lms/tmp/pids
+var/rails/canvas-lms/public/assets
+var/rails/canvas-lms/public/stylesheets/compiled
+var/rails/canvas-lms/.bundle
+var/rails/canvas-lms/vendor/bundle

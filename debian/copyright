@@ -1,0 +1,302 @@
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
+Name: canvas-lms
+Maintainer: Instructure, Inc. <packaging@instructure.com>
+Source: https://gerrit.instructure.com/gitweb?p=canvas-lms.git;a=summary
+Disclaimer: This package is not part of the Debian GNU/Linux distribution due to
+            its commercially-licensed nature.
+
+Copyright: 2011, Instructure, Inc. <info@instructure.com>
+License: INST-COMM
+
+Files: vendor/plugins/acts_as_list/*
+Copyright: 2007, David Heinemeier Hansson
+License: MIT
+
+Files: vendor/plugins/attachment_fu/*
+Copyright: 2009, Rick Olson
+License: MIT
+
+Files: vendor/plugins/crummy/*
+Copyright: 2008, Zach Inglis
+License: MIT
+
+Files: vendor/plugins/delayed_job/*
+Copyright: 2005, Tobias Luetke
+License: MIT
+
+Files: vendor/plugins/mimetype_fu/*
+Copyright: 2008, Matt Aimonetti
+License: MIT
+
+Files: vendor/plugins/rails_xss/*
+Copyright: 2009, Koziarski Software Ltd
+License: MIT
+
+Files: vendor/plugins/simply_versioned/*
+Copyright: 2007, Matt Mower
+License: MIT
+
+Files: vendor/plugins/ssl_requirement/*
+Copyright: 2005, David Heinemeier Hansson
+License: MIT
+
+Files: vendor/plugins/stringex/*
+Copyright: 2008, Lucky Sneaks
+License: MIT
+
+Files: lib/color.rb
+Copyright: 2007, McClain Looney
+License: MIT
+
+Files: lib/workflow.rb
+Copyright: 2007-2008, Ryan Allen, FlashDen Pty Ltd
+           2008-2009, Vodafone
+License: MIT
+
+Files: public/javascripts/date.js
+Copyright: 2006-2008, Coolite Inc.
+License: MIT
+
+Files: public/javascripts/g.raphael/*, public/javascripts/raphael.js
+Copyright: 2009, Dmitry Baranovskiy
+License: MIT
+
+Files: public/javascripts/jquery-1.4.js
+Copyright: 2010, John Resig
+           2010, The Dojo Foundation
+License: MIT
+
+Files: public/javascripts/jquery.autocomplete.js
+Copyright: 2010, Tomas Kirda
+License: MIT-NO-ATTRIBUTION
+
+Files: public/javascripts/jquery.ba-hashchange.js,
+       public/javascripts/jquery.ba-throttle-debounce.js
+Copyright: 2010, "Cowboy" Ben Alman
+License: MIT
+
+Files: public/javascripts/jquery.cookie.js
+Copyright: 2006, Klaus Hartl
+License: MIT
+
+Files: public/javascripts/jquery.elastic.js
+Copyright: 2009, Jan Jarfalk
+License: MIT
+
+Files: public/javascripts/jquery.getScrollbarWidth.js
+Copyright: 2008, Brandon Aaron
+License: MIT
+
+Files: public/javascripts/jquery.google-analytics.js
+Copyright: 2008-2009, Christian Hellsten
+License: MIT
+
+Files: public/javascripts/jquery.metadata.js
+Copyright: 2006, John Resig, Yehuda Katz, Joern Zaefferer, Paul McLanahan
+License: MIT
+
+Files: public/javascripts/jquery.pageless.js
+Copyright: 2008-2010, Jean-Sebastien Ney
+License: MIT
+
+Files: public/javascripts/jquery.scrollTo.js
+Copyright: 2007-2009, Ariel Flesler
+License: MIT
+
+Files: public/javascripts/jquery.store.js
+Copyright: 2010, Marcus Westin
+License: MIT
+
+Files: public/javascripts/jquery-ui-1.8.js, public/stylesheets/static/jquery-ui-theme.css
+Copyright: 2010, AUTHORS.txt (http://jqueryui.com/about)
+License: MIT
+
+Files: public/javascripts/facebooker.js
+Copyright: 2007, Chad Fowler
+License: MIT
+
+Files: public/javascripts/calcCmd.js
+Copyright: 2010, Brian Whitmer
+License: MIT
+
+Files: public/javascripts/firebugx.js
+Copyright: 2007, Parakey Inc.
+License: BSD
+
+Files: public/javascripts/html5.js
+Copyright: 2009, Remy Sharp
+           2009, Jonathan Neal
+License: MIT
+
+Files: public/javascripts/json2.js
+Copyright: Public Domain
+License: Public Domain
+
+Files: public/javascripts/scribd.view.js
+Copyright: 2008, Scribd
+License: SCRIBD
+
+Files: public/javascripts/swfupload.js, public/flash/swf_upload/*
+Copyright: 2006-2007, Lars Huring, Olov Nilzen, Mammon Media
+           2007-2008, Jake Roberts
+License: MIT
+
+Files: public/javascripts/swfobject/*
+Copyright: 2009, SWFObject 2 team (http://code.google.com/p/swfobject/)
+License: MIT
+
+Files: public/javascripts/ui.selectmenu.js
+Copyright: 2009, AUTHORS.txt (http://jqueryui.com/about)
+License: MIT
+
+Files: public/javascripts/underscore.js
+Copyright: 2009, Jeremy Ashkenas, DocumentCloud Inc.
+License: MIT
+
+Files: public/javascripts/slickgrid-googlecode/*
+Copyright: 2010, Michael Leibman
+License: MIT
+
+Files: public/javascripts/tinymce/*
+Copyright: 2009, Moxiecode Systems AB
+License: LGPL-2.1
+
+Files: public/javascripts/tinymce/jscripts/tiny_mce/plugins/instructure*
+Copyright: 2011, Instructure, Inc.
+License: INST-COMM
+
+Files: public/flash/uploadify/*
+Copyright: 2009, Ronnie Garcia, Travis Nickels
+License: MIT
+
+Files: public/flash/uploadify/jquery-1.3.2.min.js
+Copyright: 2009, John Resig
+License: MIT
+
+Files: public/flash/uploadify/swfobject.js
+Copyright: 2009, SWFObject 2 team (http://code.google.com/p/swfobject/)
+License: MIT
+
+License: INST-COMM
+ This program is released under the Instructure Commercial license. Instructure
+ retains all rights and privileges afforded by copyright to this program, and
+ any usage must be explicitly permitted by an existing commercial agreement.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ 
+License: MIT
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ 
+License: MIT-NO-ATTRIBUTION
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+  
+License: BSD
+ Redistribution and use of this software in source and binary forms, with or
+ without modification, are permitted provided that the following conditions are
+ met:
+ .
+  * Redistributions of source code must retain the above
+    copyright notice, this list of conditions and the
+    following disclaimer.
+ .
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the
+    following disclaimer in the documentation and/or other
+    materials provided with the distribution.
+ .
+  * Neither the name of Parakey Inc. nor the names of its
+    contributors may be used to endorse or promote products
+    derived from this software without specific prior
+    written permission of Parakey Inc.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: SCRIBD
+ On Thu, Jan 27, 2011 at 4:50 PM, Jared Friedman <[redacted]> wrote:
+ > Hi JT,
+ > Very exciting for us that you're using our product in such a significant
+ > way!  We're very happy to have Instructure as a user.
+ > As for view.js, that's a great point about it not having a license.  From
+ > our perspective, please feel free to bundle, include, sell, modify, minify,
+ > or turn into a word soup any part of the file that we wrote.  I can't speak
+ > for the portions of the file that are adapted from Adobe's source code, but
+ > it is my understanding that Adobe has effectively granted permission for
+ > their use.
+ > Best of luck with Canvas.
+ > Jared
+ > Jared Friedman | CTO and Cofounder | Scribd, Inc. | [redacted] | We're
+ > hiring great engineers!
+ >
+ >
+ > On Thu, Jan 27, 2011 at 10:03 AM, JT Olds <[redacted]> wrote:
+ >>
+ >> Hello,
+ >>
+ >> As you may know, Instructure's LMS product Canvas makes heavy use of
+ >> Scribd. Thanks for your service!
+ >>
+ >> We are prepping to launch an open source product that integrates with
+ >> Scribd and we would love to bundle the Scribd Javascript API file as
+ >> well (http://www.scribd.com/javascripts/view.js). However, there is no
+ >> license provided with the file, and in fact, there is both copyright
+ >> information ascribed to Scribd, and Adobe (for Flash version
+ >> detection), inside the file.
+ >>
+ >> As the copyright holder of the majority of the file, would you
+ >> consider releasing a Scribd Javascript API file under a GPL-compatible
+ >> open source license? This could be MIT, BSD, LGPL, etc.
+ >>
+ >> Because we want to provide the best user experience for both ours and
+ >> Scribd's potential customers, we want to make sure our Javascript
+ >> loads as fast as possible by bundling it with our minified Javascript
+ >> packages, but we are unable to do so as we don't own the copyright.
+ >>
+ >> Thanks!
+ >>
+ >> -JT
+ >> Instructure, Inc.
+

@@ -1,0 +1,43 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:		canvas_init
+# Required-Start: 	$local_fs $remote_fs $network $syslog
+# Required-Stop:
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description:	Start/stop Canvas background jobs
+### END INIT INFO
+
+set -e
+
+PATH=/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+DESC=canvas-lms
+NAME=canvas-lms
+SCRIPTNAME=/etc/init.d/$NAME
+APPROOT=/var/rails/canvas-lms
+DAEMON_ENABLED=0
+HOME=/var/lib/canvas-lms
+
+[ -r "/etc/default/$NAME" ] && . /etc/default/$NAME
+
+[ "$DAEMON_ENABLED" == "1" ] || exit 0
+[ -f "$APPROOT/config/environment.rb" ] || exit 0
+[ -x "$APPROOT/script/delayed_job" ] || exit 0
+
+# drop privs if necessary
+if [ "$(id -u)" == "0" ]; then
+  exec su $(stat -c %U "$APPROOT/config/environment.rb") -c "/bin/bash $0 $@"
+  exit 1;
+fi
+
+# switch to app root
+cd $APPROOT
+
+# set up config
+if [ -e "config/GEM_HOME" ]; then
+  export GEM_HOME=$(cat config/GEM_HOME)
+fi
+export RAILS_ENV=production
+
+# run delayed jobs
+exec script/delayed_job $@

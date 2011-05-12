@@ -1,0 +1,42 @@
+#!/bin/bash
+
+BASEDIR=/var/rails/canvas-lms
+
+if [ -e "/usr/share/debconf/confmodule" ]; then
+  . /usr/share/debconf/confmodule
+fi
+
+function cleanup {
+  for config in amazon_s3 database delayed_jobs domain file_store \
+      outgoing_mail security; do
+    rm -f $BASEDIR/config/$config.yml
+  done
+  for generated_file_dir in public/assets log tmp \
+      public/stylesheets/compiled vendor/bundle .bundle; do
+    rm -rf $BASEDIR/$generated_file_dir/*
+  done
+  rm -f /etc/apache2/sites-available/canvas-lms
+  rm -f $BASEDIR/Gemfile.lock
+  rm -f $BASEDIR/db/schema.rb
+  if [ -e "/usr/share/debconf/confmodule" ]; then
+    db_purge
+  fi
+}
+
+case "$1" in
+  purge)
+    update-rc.d -f canvas-lms remove
+    cleanup
+  ;;
+  remove|disappear|"")
+    update-rc.d -f canvas-lms remove
+  ;;
+  upgrade|failed-upgrade|abort-install|abort-upgrade)
+  ;;
+  *)
+    echo "postrm called with unknown argument '$1'" >&2
+    exit 1
+  ;;
+esac
+
+exit 0
