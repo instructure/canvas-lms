@@ -68,7 +68,7 @@ class CoursesController < ApplicationController
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
           course = course_enrollments.first.course
           hash << course.as_json(
-            :include_root => false, :only => %w(id name course_code))
+            :include_root => false, :only => %w(id name course_code sis_source_id))
           hash.last['enrollments'] = course_enrollments.map { |e| { :type => e.readable_type.downcase } }
           if include_grading && course_enrollments.any? { |e| e.participating_admin? }
             hash.last['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
@@ -132,6 +132,7 @@ class CoursesController < ApplicationController
   end
 
   STUDENT_API_FIELDS = %w(id name)
+  STUDENT_API_METHODS = %w(sis_user_id)
 
   # @API
   # Returns the list of sections for this course.
@@ -166,7 +167,12 @@ class CoursesController < ApplicationController
         res = section.as_json(:include_root => false,
                               :only => %w(id name))
         if include_students
-          res['students'] = section.enrollments.all(:conditions => "type = 'StudentEnrollment'").map { |e| e.user.as_json(:include_root => false, :only => STUDENT_API_FIELDS) }
+          res['students'] = section.enrollments.
+            scoped(:include => { :user => :pseudonym }).
+            all(:conditions => "type = 'StudentEnrollment'").
+            map { |e| e.user.as_json(:include_root => false,
+                                     :only => STUDENT_API_FIELDS,
+                                     :methods => STUDENT_API_METHODS) }
         end
         res
       end
@@ -180,15 +186,18 @@ class CoursesController < ApplicationController
   #
   # @response_field id The unique identifier for the student.
   # @response_field name The full student name.
+  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
   #
   # @example_response
-  #   [ { 'id': 1, 'name': 'first student' },
-  #     { 'id': 2, 'name': 'second student' } ]
+  #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null },
+  #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis' } ]
   def students
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      render :json => @context.students.to_json(:include_root => false,
-                                                :only => STUDENT_API_FIELDS)
+      render :json => @context.students.scoped(:include => :pseudonym).
+        to_json(:include_root => false,
+                :only => STUDENT_API_FIELDS,
+                :methods => STUDENT_API_METHODS)
     end
   end
 

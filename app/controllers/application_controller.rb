@@ -200,7 +200,8 @@ class ApplicationController < ActionController::Base
   def get_context
     unless @context
       if params[:course_id]
-        @context = Course.find(params[:course_id])
+        @context = api_request? ?
+          Api.find(Course, params[:course_id]) : Course.find(params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && session[:enrollment_uuid_course_id] == @context.id
@@ -680,7 +681,7 @@ class ApplicationController < ActionController::Base
   end
 
   def api_request?
-    !!request.path.match(/\A\/api\//)
+    @api_request ||= !!request.path.match(/\A\/api\//)
   end
 
   def session_loaded?

@@ -1474,4 +1474,8 @@ class User < ActiveRecord::Base
   TAB_FILES = 2
   TAB_EPORTFOLIOS = 3
   TAB_HOME = 4
+
+  def sis_user_id
+    pseudonym.try(:sis_user_id)
+  end
 end
