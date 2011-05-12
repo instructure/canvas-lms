@@ -1,3 +1,142 @@
+canvas-lms (1.1-28) professional; urgency=low
+
+  * [c4d2ea5] remove ssl_requirement; refs #3761
+  * [3059f0e] access scribd over ssl on https pages; refs #3761
+  * [ce0e068] use resource_domain for kaltura thumbnails; refs #3761
+  * [9077560] make urls protocol-relative for ssl; refs #3761
+  * [e3eac25] allow posted_at to be set explicitly for discussions
+  * [337dbd5] disable ui button by setting its function to nil
+  * [d6dd066] increase limit of content_migrations.migration_settings to
+    500kb
+  * [37c68fc] fix error reordering assignments
+  * [664b730] show account admin roles for site admin permissions, fixes
+    #4465
+  * [dadbdb5] fix check for disabled respondus soap api plugin
+  * [4aa735c] ability to run file upload specs using local driver
+  * [8b78ba0] let students see outcome details, closes #4469
+  * [49ced0d] use a better link for collaboration invitations fixes
+    #4452
+  * [3d416e6] fix pageviews to_csv, fixes #4470
+  * [c24b95d] handle if there are no visible students in the speedGrader
+  * [9545c16] don't force a due date for any quiz that has lock or
+    unlock dates
+  * [c03ddce] fix points tooltip not showing up for students; fixes
+    #4493
+  * [1131f32] provide anonymous_submissions flag in assignments api,
+    closes #4392
+  * [8f4e068] use named scope to avoid postgres warning
+  * [d1b4583] link to calendar event page instead of calendar on
+    syllabus
+  * [e8c3410] opt-in for grades in emails
+  * [b53c8ca] Attachment#open method
+  * [249cb74] filter out results without percentage, fixes #4490
+  * [0c2a6b9] fix mimetype detection
+  * [488ada2] initially blank the form on new messages and replies,
+    fixes #7043
+  * [528e4aa] let teachers see hidden files, fixes #4489
+  * [f71b0b4] reword peer reviews to be more clear
+  * [24749e3] fix user root account removal. fixes #4458
+  * [35deefe] don't try to mass-assign send_scores_in_emails
+  * [2a0b0a6] skip expensive copy if we're going to skip the broadcast
+    anyway
+  * [5438cda] avoid an extra db write for every user and enrollment
+    created
+  * [9b166d0] restricting the amount of data the sis batch api calls
+    return
+  * [d0f166b] set root account correctly when creating sub-accounts;
+    fixes #4439
+  * [6bec072] thumbnail support when using local storage, closes #4500
+  * [55d4708] preview files inline in speedgrader with local storage,
+    fixes #4492
+  * [020a92d] make "imported qti files" folder hidden by default, closes
+    #4440
+  * [b2fdda2] switch to a custom timeout exception class for delayed job
+    timeouts
+  * [550965f] ensure the login_id credential checks allow a user to
+    update information
+  * [9ab40ec] course start and end dates. refs #4398
+  * [128fc92] give plugins a way to inject alternate grade export
+    formats
+  * [85bfaa7] support setting a profile for running firefox selenium
+    tests
+  * [3cfac10] fix cross-listing selenium spec (we don't support updating
+    on blur)
+  * [f382b24] course deleted in the ui should not come back through sis.
+    fixes #4520
+  * [7505e1d] avoid force-reloading data from the database if possible
+  * [f7c1477] some more strategic caching and passing on actual objects
+    rather than just ids
+  * [4ae436f] fix file upload selenium tests
+  * [6b403d6] fix local detection for file uploads tests
+  * [3d116c6] send teacher notifications of submission comments before
+    assignment is submitted; fixes #4516
+  * [6774962] audio/video recorders in one swf file
+  * [76357e1] use protocol-relative link when redirecting to kaltura
+    media file
+  * [8722989] specify the protocol for a media object redirect
+  * [e24bdd5] fix for plugin spec setup (model loaded before db is
+    initialized)
+  * [bfa8703] update course account associations synchronously during
+    import
+  * [7125e38] strategic cache use refs #3752
+  * [6f7058d] touch courses en-masse
+  * [ce595b1] update_all needs an array, not a set
+  * [e6167be] allow peer_reviews_assign_at to be mass-assigned
+  * [41b1e4a] remove webct-specific relative paths in quiz questions
+  * [08de6e8] handle submissions with no score correctly in grade calc
+  * [3e447a5] lazy create initial notification policies
+  * [2d25cf3] "full details" link not working for newly created events
+  * [525a214] set account object not just id to avoid later lookup in
+    Pseudonym#validate_unique_id
+  * [cd5a20d] user import optimizations refs #3752
+  * [632136b] specify explicit protocol for generated safe_domain urls
+  * [f75bcdc] submission web snapshots with local storage, fixes #4531
+  * [1228a02] whitespace issue on course wiki homepage, fixes #4482
+  * [63cc706] set protocol correctly for dotted pic
+  * [55709b7] avoid saving unchanged sections, and batch updating
+    sis_source_id
+  * [2f712a9] don't lookup sections by name
+  * [0bbd56c] avoid saving unchanged enrollments, and batch updating
+    sis_source_id
+  * [0111dd9] avoid saving unchanged courses, and batch updating
+    sis_source_id
+  * [f8d9147] undelete courses that are crosslisted to. fixes #4519
+  * [0b0fc2f] enable account hierarchy modifications via the sis
+    interface. refs #4521
+  * [193fe52] refactor csv importer for less copy/paste
+  * [ec63e76] raise RecordNotFound instead of Attachment.find(0)
+  * [d7513b6] update facebook integration to oauth 2
+  * [7e24dcf] more configuration for facebook apps
+  * [07ebfa7] fix facebook_success.html hash parsing
+  * [d456cb6] missing student_message_icon.png
+  * [5f5e942] fix for facebook dashboard increment
+  * [0b27a8d] get rid of hard-coded app secret
+  * [03a5425] minor fixes for facebook layout file
+  * [dcb7beb] use image_tag in facebook message view
+  * [e02c997] define INST variable in facebook erb layout
+  * [8a32b7d] mark message as sent when sending to facebook
+  * [d0e2d82] create error report locally on javascript errors, refs
+    #4487
+  * [3a7cdde] facebook app link handling
+  * [cce83ca] ignore js errors from javascripts in other domains, refs
+    #4487
+  * [eb4b82c] make sure a course made sectionless due to crosslisting
+    gets marked deleted. fixes #4518
+  * [50c790d] update existing sis communication channel instead of
+    creating new ones. fixes #4538
+  * [819b49d] don't return duplicate courses from fast_all_courses,
+    fixes #4485
+  * [7b257f1] generate an error report for all errors, not just some of
+    them
+  * [39dde0a] allow negative timestamps on content import
+  * [3decc11] delete old error reports periodically, refs #4487
+  * [36588d1] tweaks to javascript error logging, refs #4487
+  * [05875d3] fix inline files shown too high, make prettier
+  * [9fd0661] pulling debian packaging stuff only from
+    private/packaging-old
+
+ -- JT Olds <jt@instructure.com>  Thu, 12 May 2011 14:29:23 -0600
+
 canvas-lms (1.1-27) professional; urgency=low
 
   * [6f69ae8] bumping changelog
