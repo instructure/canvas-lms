@@ -21,7 +21,7 @@ require 'zip/zip'
 
 module SIS
   class SisCsv
-    attr_accessor :verify, :root_account, :batch, :errors, :warnings, :finished, :counts
+    attr_accessor :verify, :root_account, :batch, :errors, :warnings, :finished, :counts, :updates_every
     
     IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
 
@@ -51,6 +51,7 @@ module SIS
 
       @total_rows = 1
       @current_row = 0
+      @rows_since_progress_update = 0
       
       @progress_multiplier = opts[:progress_multiplier] || 1
       @progress_offset = opts[:progress_offset] || 0
@@ -119,6 +120,11 @@ module SIS
       @verify = nil
       return unless @errors.empty?
 
+      # calculate how often we should update progress to get 1% resolution
+      # but don't leave us hanging for more than 500 rows at a time
+      # and don't do it more often than we have work to do
+      @updates_every = [ [ @total_rows / @parallelism / 100, 500 ].min, 10 ].max
+
       if (@parallelism > 1)
         # re-balance the CSVs
         @batch.data[:importers] = {}
@@ -186,21 +192,25 @@ module SIS
       @warnings << [ csv ? csv[:file] : "", message ]
     end
     
-    def update_progress
-      @current_row += 1
+    def update_progress(count = 1)
+      @current_row += count
       return unless @batch
 
-      if @parallelism > 1 && @current_row % 25 == 0
-        SisBatch.transaction do
-          @batch.reload(:select => 'data, progress', :lock => true)
-          @current_row += @batch.data[:current_row] if @batch.data[:current_row]
-          @batch.data[:current_row] = @current_row
-          @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
-          @batch.save
-          @current_row = 0
+      @rows_since_progress_update += count
+      if @rows_since_progress_update >= @updates_every
+        if @parallelism > 1
+          SisBatch.transaction do
+            @batch.reload(:select => 'data, progress', :lock => true)
+            @current_row += @batch.data[:current_row] if @batch.data[:current_row]
+            @batch.data[:current_row] = @current_row
+            @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
+            @batch.save
+            @current_row = 0
+            @rows_since_progress_update = 0
+          end
+        else
+          @batch.fast_update_progress( (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100)
         end
-      else
-        @batch.fast_update_progress( (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100) if @current_row % 10 == 0
       end
 
       if @current_row.to_i % @pause_every == 0
