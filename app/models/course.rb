@@ -1285,7 +1285,7 @@ class Course < ActiveRecord::Base
         current += 1
         if (current - last) > 10
           last = current
-          migration.fast_update_progress((current.to_f/total) * 20.0)
+          migration.fast_update_progress((current.to_f/total) * 18.0)
         end
       end
       unzip_opts = {
@@ -1322,7 +1322,7 @@ class Course < ActiveRecord::Base
 
     # These only need to be processed once
     Attachment.skip_media_object_creation do
-      process_migration_files(data, migration); migration.fast_update_progress(10)
+      process_migration_files(data, migration); migration.fast_update_progress(18)
       Attachment.process_migration(data, migration); migration.fast_update_progress(20)
       mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
       # we'll wait synchronously for the media objects to be uploaded, so that

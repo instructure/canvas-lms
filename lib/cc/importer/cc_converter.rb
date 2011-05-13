@@ -30,6 +30,7 @@ module CC::Importer
     # settings will use these keys: :course_name, :base_download_dir
     def initialize(settings)
       super(settings, "cc")
+      @course = @course.with_indifferent_access
     end
 
     # exports the package into the intermediary json

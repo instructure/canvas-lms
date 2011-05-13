@@ -168,6 +168,11 @@ describe "Converting Blackboard 8 qti" do
     a.quiz.should == BB8Expected::ASSESSMENT
   end
 
+  it "should grab multiple html divs" do
+    manifest_node=get_manifest_node('with_image', :interaction_type => 'choiceInteraction', :bb_question_type => 'Multiple Choice')
+    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
+    hash[:question_text].should == "San Jose, purple on this map, is an example of a ___________ culture region.\n<br/>\n<img src=\"Picture3.jpg\" alt=\"Picture3.jpg\">"
+  end
 
 end
 
