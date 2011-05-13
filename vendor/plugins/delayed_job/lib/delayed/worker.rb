@@ -41,6 +41,10 @@ class Worker
     @name ||= "#{Socket.gethostname rescue "X"}:#{Process.pid}"
   end
 
+  def set_process_name(new_name)
+    $0 = "delayed:#{new_name}"
+  end
+
   def exit?
     @exit || parent_exited?
   end
@@ -99,11 +103,13 @@ class Worker
         end
       end
     else
+      set_process_name("wait:#{@queue}:#{min_priority || 0}:#{max_priority || 'max'}")
       sleep(sleep_delay)
     end
   end
 
   def perform(job)
+    set_process_name("run:#{job.id}:#{job.name}")
     start_time = Time.now
     say_job(job, "Processing #{log_job(job, :long)}", :info)
     runtime = Benchmark.realtime do

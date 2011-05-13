@@ -65,6 +65,7 @@ class Pool
     tail_rails_log unless @daemon
 
     say "Started job master", :info
+    $0 = "delayed_jobs_pool"
     read_config(options[:config_file])
     spawn_all_workers
     say "Workers spawned"
