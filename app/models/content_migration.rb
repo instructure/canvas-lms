@@ -51,6 +51,7 @@ class ContentMigration < ActiveRecord::Base
           'web_links' => false,
           'wikis' => false
   }
+  attr_accessible :context, :migration_settings, :user
 
   workflow do
     state :created

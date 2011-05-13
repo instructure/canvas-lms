@@ -18,7 +18,7 @@
 
 class QuizSubmission < ActiveRecord::Base
   include Workflow
-  attr_accessible :submission_data
+  attr_accessible :quiz, :user, :temporary_user_code, :submission_data
   attr_readonly :quiz_id, :user_id
   validates_presence_of :quiz_id
   
@@ -187,7 +187,7 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def snapshot!(params)
-    QuizSubmissionSnapshot.create(:quiz_submission_id => self.id, :attempt => self.attempt, :data => params)
+    QuizSubmissionSnapshot.create(:quiz_submission => self, :attempt => self.attempt, :data => params)
   end
   
   def questions_as_object

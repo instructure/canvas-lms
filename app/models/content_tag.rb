@@ -33,6 +33,8 @@ class ContentTag < ActiveRecord::Base
   after_save :enforce_unique_in_modules
   after_save :touch_context_module
   after_save :touch_context_if_learning_outcome
+
+  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url
   
   adheres_to_policy
   
@@ -226,9 +228,11 @@ class ContentTag < ActiveRecord::Base
     attempts = 0
     begin
       if association.is_a?(Quiz)
-        result = LearningOutcomeResult.find_or_create_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id_and_associated_asset_type_and_associated_asset_id(self.learning_outcome_id, user.id, association.id, association_type, self.id, 'AssessmentQuestion', assessment_question.id)
+        result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id_and_associated_asset_type_and_associated_asset_id(self.learning_outcome_id, user.id, association.id, association_type, self.id, 'AssessmentQuestion', assessment_question.id)
+        result ||= LearningOutcomeResult.create(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self, :associated_asset => assessment_question)
       else
-        result = LearningOutcomeResult.find_or_create_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
+        result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
+        result ||= LearningOutcomeResult.create(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self)
       end
     rescue => e
       attempts += 1

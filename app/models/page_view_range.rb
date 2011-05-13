@@ -20,6 +20,8 @@ class PageViewRange < ActiveRecord::Base
   include Workflow
   belongs_to :context, :polymorphic => true
   serialize :data
+
+  attr_accessible :context, :start_at, :end_at
   
   workflow do
     state :needs_re_summarization
@@ -57,7 +59,8 @@ class PageViewRange < ActiveRecord::Base
     account = context.parent_account if context.respond_to?(:parent_account)
     account = context.account if context.respond_to?(:account)
     if account
-      range = PageViewRange.find_or_create_by_context_id_and_context_type_and_start_at_and_end_at(account.id, account.class.to_s, start_at.utc, end_at.utc)
+      range = PageViewRange.find_by_context_id_and_context_type_and_start_at_and_end_at(account.id, account.class.to_s, start_at.utc, end_at.utc)
+      range ||= PageViewRange.create(:context => account, :start_at => start_at.utc, :end_at => end_at.utc)
       range.mark_for_review
     end
     self
@@ -70,7 +73,8 @@ class PageViewRange < ActiveRecord::Base
     account = context.parent_account if context.respond_to?(:parent_account)
     account = context.account if context.respond_to?(:account)
     if account
-      range = PageViewRange.find_or_create_by_context_id_and_context_type_and_start_at_and_end_at(account.id, account.class.to_s, start_at.utc, end_at.utc)
+      range = PageViewRange.find_by_context_id_and_context_type_and_start_at_and_end_at(account.id, account.class.to_s, start_at.utc, end_at.utc)
+      range ||= PageViewRange.create(:context => account, :start_at => start_at.utc, :end_at => end_at.utc)
       range.mark_for_review
     end
   end
@@ -97,7 +101,8 @@ class PageViewRange < ActiveRecord::Base
     @hash_data[:user_agents] ||= {}
     @hash_data[:user_agents][view.user_agent] ||= 0
     @hash_data[:user_agents][view.user_agent] += 1
-    view.update_attributes(:summarized => true)
+    view.summarized = true
+    view.save
   end
   
   named_scope :for_review, lambda{

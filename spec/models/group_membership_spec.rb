@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe GroupMembership do
   
   it "should ensure a mutually exclusive relationship" do
-    @gm = GroupMembership.new(valid_group_membership_attributes)
+    @gm = factory_with_protected_attributes(GroupMembership, valid_group_membership_attributes, false)
     @gm.should_receive(:ensure_mutually_exclusive_membership)
     @gm.save!
   end
@@ -29,7 +29,7 @@ describe GroupMembership do
 end
 
 def group_membership_model(opts={})
-  @group_membership = GroupMembership.create!(valid_group_membership_attributes.merge(opts))
+  @group_membership = factory_with_protected_attributes(GroupMembership, valid_group_membership_attributes.merge(opts))
 end
 
 def valid_group_membership_attributes

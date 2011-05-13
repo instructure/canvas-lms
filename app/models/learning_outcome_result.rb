@@ -26,6 +26,8 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   simply_versioned
   before_save :infer_defaults
+
+  attr_accessible :learning_outcome, :user, :association, :content_tag, :associated_asset
   
   def infer_defaults
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil

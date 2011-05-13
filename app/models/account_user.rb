@@ -26,6 +26,7 @@ class AccountUser < ActiveRecord::Base
   before_save :set_update_account_associations_if_changed
   after_save :touch_user
   after_save :update_account_associations_if_changed
+  attr_accessible :account, :user, :membership_type
 
   def set_update_account_associations_if_changed
     @should_update_account_associations = (self.account_id_changed? || self.user_id_changed?) && !self.user_id.nil?

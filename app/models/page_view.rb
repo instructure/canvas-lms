@@ -35,6 +35,8 @@ class PageView < ActiveRecord::Base
   
   attr_accessor :generated_by_hand
   attr_accessor :is_update
+
+  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent
   
   def ensure_account
     self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
@@ -90,11 +92,13 @@ class PageView < ActiveRecord::Base
     self.save
     hour_start = ActiveSupport::TimeWithZone.new(Time.utc(self.created_at.year, self.created_at.month, self.created_at.day, self.created_at.hour), Time.zone).utc
     hour_end = hour_start + (60*60)
-    range = PageViewRange.find_or_create_by_context_id_and_context_type_and_start_at_and_end_at(self.context_id, self.context_type, hour_start, hour_end)
+    range = PageViewRange.find_by_context_id_and_context_type_and_start_at_and_end_at(self.context_id, self.context_type, hour_start, hour_end)
+    range ||= PageViewRange.create(:context => self.context, :start_at => hour_start, :end_at => hour_end)
     range.re_summarize
     day_start = Time.utc(self.created_at.year, self.created_at.month, self.created_at.day)
     day_end = day_start + 1.day
-    range = PageViewRange.find_or_create_by_context_id_and_context_type_and_start_at_and_end_at(self.context_id, self.context_type, day_start, day_end)
+    range = PageViewRange.find_by_context_id_and_context_type_and_start_at_and_end_at(self.context_id, self.context_type, day_start, day_end)
+    range ||= PageViewRange.create(:context => self.context, :start_at => day_start, :end_at => day_end)
     range.re_summarize
   end
 

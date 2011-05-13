@@ -27,6 +27,8 @@ class Message < ActiveRecord::Base
   belongs_to :user
   belongs_to :asset_context, :polymorphic => true
 
+  attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type, :from_name, :sent_at, :notification, :user, :communication_channel, :notification_name
+
   after_save :stage_message
   before_save :move_messages_for_deleted_users
   before_save :infer_defaults

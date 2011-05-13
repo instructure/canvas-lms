@@ -20,6 +20,7 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
   has_many :page_views
+  attr_accessible :api_key
   
   before_create :generate_api_key
   

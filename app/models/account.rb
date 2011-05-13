@@ -18,7 +18,7 @@
 
 class Account < ActiveRecord::Base
   include Context
-  attr_accessible :name, :parent_account_id, :turnitin_account_id,
+  attr_accessible :name, :turnitin_account_id,
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :storage_quota, :ip_filters
@@ -524,7 +524,8 @@ class Account < ActiveRecord::Base
       user = data[:user]
     end
     if user
-      account_user = self.account_users.find_or_initialize_by_user_id(user.id)
+      account_user = self.account_users.find_by_user_id(user.id)
+      account_users ||= self.account_users.build(:user => user)
       account_user.membership_type = membership_type
       account_user.save
       if data[:new]
@@ -541,7 +542,8 @@ class Account < ActiveRecord::Base
   def add_user(user, membership_type = nil)
     return nil unless user && user.is_a?(User)
     membership_type ||= 'AccountAdmin'
-    self.account_users.find_or_create_by_user_id_and_membership_type(user.id, membership_type) rescue nil
+    au = self.account_users.find_by_user_id_and_membership_type(user.id, membership_type)
+    au ||= self.account_users.create(:user => user, :membership_type => membership_type)
   end
   
   def context_code
@@ -617,7 +619,8 @@ class Account < ActiveRecord::Base
       # be good to create some sort of of memoize_if_safe method, that only
       # memoizes when we're caching classes and not in test mode? I dunno. But
       # this stinks.
-      return @special_accounts[special_account_type] = Account.find_or_create_by_parent_account_id_and_name(nil, default_account_name)
+      @special_accounts[special_account_type] = Account.find_by_parent_account_id_and_name(nil, default_account_name)
+      return @special_accounts[special_account_type] ||= Account.create(:parent_account => nil, :name => default_account_name)
     end
 
     account = @special_accounts[special_account_type]

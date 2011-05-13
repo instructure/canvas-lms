@@ -126,7 +126,11 @@ class ContextMessage < ActiveRecord::Base
   
   def record_participants
     sender = self.context_message_participants.find_by_user_id_and_participation_type(self.user_id, 'sender')
-    sender ||= self.context_message_participants.create(:user_id => self.user_id, :participation_type => 'sender')
+    unless sender
+      sender = self.context_message_participants.new(:participation_type => 'sender')
+      sender.user_id = self.user_id
+      sender.save
+    end
     recipient_users = self.context.users.select{|u| (self.recipients || []).include?(u.id) }
     return if recipient_users.empty?
     participants_hash = {}

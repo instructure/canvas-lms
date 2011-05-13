@@ -42,7 +42,8 @@ class LearningOutcome < ActiveRecord::Base
   end
   
   def align(asset, context, opts={})
-    tag = self.content_tags.find_or_create_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
+    tag = self.content_tags.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
+    tag ||= self.content_tags.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
     mastery_type = opts[:mastery_type]
     if mastery_type == 'points'
       mastery_type = 'points_mastery'

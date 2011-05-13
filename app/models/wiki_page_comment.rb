@@ -23,6 +23,8 @@ class WikiPageComment < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   adheres_to_policy
   after_create :update_wiki_page_comments_count
+
+  attr_accessible :comments, :user_name
   
   def update_wiki_page_comments_count
     WikiPage.update_all({:wiki_page_comments_count => self.wiki_page.wiki_page_comments.count}, {:id => self.wiki_page_id})

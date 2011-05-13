@@ -26,7 +26,8 @@ class ExternalFeedEntry < ActiveRecord::Base
   before_save :infer_defaults
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
-  
+
+  attr_accessible :title, :message, :source_name, :source_url, :posted_at, :start_at, :end_at, :user, :url, :uuid, :author_name, :author_url, :author_email, :asset
   
   def infer_defaults
     self.uuid ||= Digest::MD5.hexdigest("#{title || rand.to_s}#{posted_at.strftime('%Y-%m-%d') rescue 'no-time'}")

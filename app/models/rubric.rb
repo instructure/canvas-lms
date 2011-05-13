@@ -120,7 +120,9 @@ class Rubric < ActiveRecord::Base
     missing_ids = ids.select{|id| !tag_outcome_ids.include?(id) }
     tags_to_delete = tags.select{|t| !ids.include?(t.learning_outcome_id) }
     missing_ids.each do |id|
-      self.learning_outcome_tags.create!(:learning_outcome_id => id, :context => self.context, :tag_type => 'learning_outcome')
+      lot = self.learning_outcome_tags.build(:context => self.context, :tag_type => 'learning_outcome')
+      lot.learning_outcome_id = id
+      lot.save!
     end
     tags_to_delete.each{|t| t.destroy }
     true

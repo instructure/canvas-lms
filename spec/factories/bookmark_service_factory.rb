@@ -17,7 +17,7 @@
 #
 
 def bookmark_service_model(opts={})
-  @bookmark_service = BookmarkService.create!(valid_bookmark_service_attributes.merge(opts))
+  @bookmark_service = factory_with_protected_attributes(BookmarkService, valid_bookmark_service_attributes.merge(opts))
 end
 
 def valid_bookmark_service_attributes

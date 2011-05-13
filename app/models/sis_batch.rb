@@ -27,6 +27,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :batch_mode_term, :class_name => 'EnrollmentTerm'
 
   attr_accessor :zip_path
+  attr_accessible
   
   def self.max_attempts
     5

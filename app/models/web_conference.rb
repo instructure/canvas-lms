@@ -144,7 +144,8 @@ class WebConference < ActiveRecord::Base
 
   def add_user(user, type)
     return unless user
-    p = self.web_conference_participants.find_or_initialize_by_web_conference_id_and_user_id(self.id, user.id)
+    p = self.web_conference_participants.find_by_web_conference_id_and_user_id(self.id, user.id)
+    p ||= self.web_conference_participants.build(:web_conference => self, :user => user)
     p.participation_type = type unless type == 'attendee' && p.participation_type == 'initiator'
     (@new_participants ||= []) << user if p.new_record?
     # Once anyone starts attending the conference, mark it as started.

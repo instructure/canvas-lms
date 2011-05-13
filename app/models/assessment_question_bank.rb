@@ -103,7 +103,9 @@ class AssessmentQuestionBank < ActiveRecord::Base
     end
     tags_to_delete = tags.select{|t| !ids.include?(t.learning_outcome_id) }
     missing_ids.each do |id|
-      self.learning_outcome_tags.create!(:learning_outcome_id => id.to_i, :context => self.context, :tag_type => 'learning_outcome', :mastery_score => hash[id].to_f)
+      lot = self.learning_outcome_tags.build(:context => self.context, :tag_type => 'learning_outcome', :mastery_score => hash[id].to_f)
+      lot.learning_outcome_id = id.to_i
+      lot.save!
     end
     tags_to_delete.each{|t| t.destroy }
     true

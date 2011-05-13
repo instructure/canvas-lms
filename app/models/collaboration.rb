@@ -49,7 +49,12 @@ class Collaboration < ActiveRecord::Base
   end
   
   def include_author_as_collaborator
-    Collaborator.find_or_create_by_user_id_and_collaboration_id(self.user_id, self.id)
+    c = Collaborator.find_by_user_id_and_collaboration_id(self.user_id, self.id)
+    unless c
+      c = Collaborator.new(:collaboration => self)
+      c.user_id = self.user_id
+      c.save
+    end
   end
   
   alias_method :destroy!, :destroy

@@ -21,6 +21,8 @@ class RoleOverride < ActiveRecord::Base
   has_many :children, :class_name => "Role", :foreign_key => "parent_id"
   belongs_to :parent, :class_name => "Role"
   before_save :default_values
+
+  attr_accessible :context, :permission, :enrollment_type, :enabled
   
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil

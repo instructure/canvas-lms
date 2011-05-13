@@ -88,7 +88,8 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :manage_admin_users)
       @root_account = @account.root_account || @account
       params[:pseudonym][:unique_id] ||= params[:pseudonym][:path]
-      @pseudonym = Pseudonym.find_or_initialize_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @root_account.id)
+      @pseudonym = Pseudonym.find_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @root_account.id)
+      @pseudonym ||= Pseudonym.new(:unique_id => params[:pseudonym][:unique_id], :account => @root_account)
       new_login = @pseudonym.new_record?
       if !@pseudonym.new_record?
         user = @pseudonym.user

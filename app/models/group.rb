@@ -179,9 +179,12 @@ class Group < ActiveRecord::Base
     return nil if !user
     res = nil
     Group.transaction do
-      res = self.group_memberships.find_or_initialize_by_user_id(user.id)
-      res.workflow_state = 'invited' if res.new_record?
-      res.save
+      res = self.group_memberships.find_by_user_id(user.id)
+      unless res
+        res = self.group_memberships.build(:user => user)
+        res.workflow_state = 'invited'
+        res.save
+      end
     end
     res
   end
@@ -190,9 +193,12 @@ class Group < ActiveRecord::Base
     return nil if !user
     res = nil
     Group.transaction do
-      res = self.group_memberships.find_or_initialize_by_user_id(user.id)
-      res.workflow_state = 'requested' if res.new_record?
-      res.save
+      res = self.group_memberships.find_by_user_id(user.id)
+      unless res
+        res = self.group_memberships.build(:user => user)
+        res.workflow_state = 'requested'
+        res.save
+      end
     end
     res
   end

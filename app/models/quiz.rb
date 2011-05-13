@@ -393,16 +393,17 @@ class Quiz < ActiveRecord::Base
     s = nil
     state ||= 'untaken'
     attempts = 0
-    user_id = user.is_a?(User) ? user.id : user
     begin
       if temporary || !user.is_a?(User)
         user_code = "#{user.to_s}"
         user_code = "user_#{user.id}" if user.is_a?(User)
-        s = QuizSubmission.find_or_initialize_by_quiz_id_and_temporary_user_code(self.id, user_code)
+        s = QuizSubmission.find_by_quiz_id_and_temporary_user_code(self.id, user_code)
+        s ||= QuizSubmission.new(:quiz => self, :temporary_user_code => user_code)
         s.workflow_state ||= state
         s.save
       else
-        s = QuizSubmission.find_or_initialize_by_quiz_id_and_user_id(self.id, user_id)
+        s = QuizSubmission.find_by_quiz_id_and_user_id(self.id, user.id)
+        s ||= QuizSubmission.new(:quiz => self, :user => user)
         s.workflow_state ||= state
         s.save
       end

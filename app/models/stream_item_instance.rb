@@ -20,6 +20,8 @@ class StreamItemInstance < ActiveRecord::Base
   belongs_to :user
   belongs_to :stream_item
 
+  attr_accessible :user_id
+
   before_save :set_context_code
   def set_context_code
     self.context_code = stream_item && stream_item.context_code

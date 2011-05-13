@@ -111,7 +111,9 @@ class RubricAssociation < ActiveRecord::Base
       tags_to_update = tags.select{|t| rubric_outcome_ids.include?(t.learning_outcome_id) }
       ContentTag.update_all({:rubric_association_id => self.id}, {:id => tags_to_update.map(&:id)})
       ids_to_add.each do |id|
-        assignment.learning_outcome_tags.create(:context => assignment.context, :learning_outcome_id => id, :rubric_association_id => self.id, :tag_type => 'learning_outcome')
+        lot = assignment.learning_outcome_tags.build(:context => assignment.context, :rubric_association => self, :tag_type => 'learning_outcome')
+        lot.learning_outcome_id = id
+        lot.save
       end
     end
   end
@@ -158,7 +160,8 @@ class RubricAssociation < ActiveRecord::Base
   
   def invite_assessor(assessee, assessor, asset, invite=false)
     # Invitations should be unique per asset, user and assessor
-    assessment_request = self.assessment_requests.find_or_initialize_by_user_id_and_assessor_id(assessee.id, assessor.id)
+    assessment_request = self.assessment_requests.find_by_user_id_and_assessor_id(assessee.id, assessor.id)
+    assessment_request ||= self.assessment_requests.build(:user => assessee, :assessor => assessor)
     assessment_request.workflow_state = "assigned" if assessment_request.new_record?
     assessment_request.asset = asset
     invite ? assessment_request.send_invitation! : assessment_request.save!
@@ -166,7 +169,8 @@ class RubricAssociation < ActiveRecord::Base
   end
   
   def remind_user(assessee)
-    assessment_request = self.assessment_requests.find_or_initialize_by_user_id(assessee.id)
+    assessment_request = self.assessment_requests.find_by_user_id(assessee.id)
+    assessment_request ||= self.assessment_requests.build(:user => assessee)
     assessment_request.send_reminder! if assessment_request.assigned?
     assessment_request
   end

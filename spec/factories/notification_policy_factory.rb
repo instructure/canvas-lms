@@ -17,7 +17,8 @@
 #
 
 def notification_policy_model(opts={})
-  @notification_policy = NotificationPolicy.create!(notification_policy_valid_attributes.merge(opts))
+  @notification_policy = factory_with_protected_attributes(NotificationPolicy,
+    notification_policy_valid_attributes.merge(opts))
 end
 
 def notification_policy_valid_attributes
