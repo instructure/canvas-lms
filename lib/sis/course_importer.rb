@@ -48,18 +48,16 @@ module SIS
           update_account_association = false
 
           logger.debug("Processing Course #{row.inspect}")
-          if row['account_id']
-            account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
-          else
-            account = nil
-          end
           term = @root_account.enrollment_terms.find_by_sis_source_id(row['term_id'])
-          course = nil
           course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id'])
           course ||= Course.new
           course.enrollment_term = term if term
           course.root_account = @root_account
-          course.account = account || @root_account
+          if row['account_id'].present?
+            account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
+            course.account = account if account
+          end
+          course.account ||= @root_account
 
           update_account_association = course.account_id_changed? || course.root_account_id_changed?
         
@@ -78,9 +76,9 @@ module SIS
             elsif course.workflow_state != 'available'
               course.workflow_state = 'claimed'
             end
-          elsif  row['status'] =~ /deleted/i
+          elsif row['status'] =~ /deleted/i
             course.workflow_state = 'deleted'
-          elsif  row['status'] =~ /completed/i
+          elsif row['status'] =~ /completed/i
             course.workflow_state = 'completed'
           end
 

@@ -76,6 +76,33 @@ describe SIS::SisCsv do
       course.name.should eql("Test Course 101")
     end
     
+    it "shouldn't blow away the account id if it's already set" do
+      process_csv_data(
+        "account_id,parent_account_id,name,status",
+        "A001,,Humanities,active"
+      )
+      account = @account.sub_accounts.find_by_sis_source_id("A001")
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+      )
+      course = @account.courses.find_by_sis_source_id("test_1")
+      course.account.should == @account
+      account.should_not == @account
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,A001,,active"
+      )
+      course.reload
+      course.account.should == account
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+      )
+      course.reload
+      course.account.should == account
+    end
+    
     it "should rename courses that have not had their name manually changed" do
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
