@@ -253,6 +253,23 @@ jQuery(function($) {
         $this.find("img").css('maxWidth', Math.min($content.width(), $this.width()));
         $this.data('unenhanced_content_html', $this.html());
       })
+      .find(".enhanceable_content").show()
+        .filter(".dialog").each(function(){
+          var $dialog = $(this);
+          $dialog.hide();
+          $dialog.closest(".user_content").find("a[href='#" + $dialog.attr('id') + "']").click(function(event) {
+            event.preventDefault();
+            $dialog.dialog();
+          });
+        }).end()
+        .filter(".draggable").draggable().end()
+        .filter(".resizable").resizable().end()
+        .filter(".sortable").sortable().end()
+        .filter(".accordion").accordion().end()
+        .filter(".tabs").each(function() {
+          $(this).tabs();
+        }).end()
+      .end()
       .find("a:not(.not_external, .external):external").each(function(){
         $(this)
           .not(":has(img)")
