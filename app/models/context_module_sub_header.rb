@@ -17,5 +17,5 @@
 #
 
 class ContextModuleSubHeader < Tableless
-  
+  column :id, :integer, 0
 end
