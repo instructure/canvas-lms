@@ -57,8 +57,12 @@ class AssessmentItemConverter
       @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
       # The colons are replaced with dashes in the conversion from QTI 1.2
       @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier').gsub(/:/, '-')
-      if text = @doc.at_css('itemBody div.html')
-        @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text))
+      if @doc.at_css('itemBody div.html')
+        @question[:question_text] = ''
+        @doc.css('itemBody > div.html').each_with_index do |text, i|
+          @question[:question_text] += "\n<br/>\n" if i > 0
+          @question[:question_text] += sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text))
+        end
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
         @question[:question_text] = sanitize_html!(text)
       elsif @doc.at_css('itemBody')

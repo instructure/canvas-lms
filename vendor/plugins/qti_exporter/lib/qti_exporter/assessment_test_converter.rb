@@ -1,7 +1,6 @@
 module Qti
 class AssessmentTestConverter
   include Canvas::XMLHelper
-  TEST_FILE = "/home/bracken/projects/QTIMigrationTool/assessments/out/assessmentTests/assmnt_URN-X-WEBCT-VISTA_V2-790EA1350A1A681DE0440003BA07D9B4.xml"
   DEFAULT_POINTS_POSSIBLE = 1
 
   attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :quiz
