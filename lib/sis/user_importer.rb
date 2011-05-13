@@ -68,12 +68,10 @@ module SIS
           if pseudo
             if pseudo.sis_user_id.present? && pseudo.sis_user_id != row['user_id']
               add_warning(csv, "user #{pseudo.sis_user_id} has already claimed #{row['user_id']}'s requested login information, skipping")
-              @sis.counts[:users] += 1
               next
             end
             if !pseudo_by_login.nil? && pseudo.unique_id != row['login_id']
               add_warning(csv, "user #{pseudo_by_login.sis_user_id} has already claimed #{row['user_id']}'s requested login information, skipping")
-              @sis.counts[:users] += 1
               next
             end
 
