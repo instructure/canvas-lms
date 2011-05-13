@@ -28,12 +28,13 @@ class Worker
 
   def initialize(parent_pid, options = {})
     @parent_pid = parent_pid
-    @config = options
     @exit = false
+    @config = options
     @queue = options[:queue] || self.class.queue
     @min_priority = options[:min_priority]
     @max_priority = options[:max_priority]
-    @sleep_delay = Setting.get('delayed_jobs_sleep_delay', '1.0').to_f
+    @max_job_count = options[:worker_max_job_count].to_i
+    @max_memory_usage = options[:worker_max_memory_usage].to_i
   end
 
   def name
@@ -49,7 +50,10 @@ class Worker
   end
 
   def start
-    say "Starting job worker", :info
+    say "Starting worker", :info
+    @job_count = 0
+    # need to do this here, since we're avoiding db calls in the master process pre-fork
+    @sleep_delay = Setting.get('delayed_jobs_sleep_delay', '1.0').to_f
 
     trap('INT') { say 'Exiting'; @exit = true }
 
@@ -57,6 +61,8 @@ class Worker
       run
       break if exit?
     end
+
+    say "Stopping worker", :info
   ensure
     Delayed::Job.clear_locks!(name)
   end
@@ -76,6 +82,22 @@ class Worker
 
     if job
       perform(job)
+
+      @job_count += 1
+      if @max_job_count > 0 && @job_count >= @max_job_count
+        say "Max job count of #{@max_job_count} exceeded, dying"
+        @exit = true
+      end
+
+      if @max_memory_usage > 0
+        memory = Canvas.sample_memory
+        if memory > @max_memory_usage
+          say "Memory usage of #{memory} exceeds max of #{@max_memory_usage}, dying"
+          @exit = true
+        else
+          say "Memory usage: #{memory}"
+        end
+      end
     else
       sleep(sleep_delay)
     end
@@ -114,6 +136,7 @@ class Worker
       if destroy_job
         say "destroying #{job.name} because of #{job.attempts} consecutive failures.", :info
         job.destroy
+        return
       end
     end
 

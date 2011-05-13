@@ -97,7 +97,7 @@ class Pool
 
     @config[:workers].each do |worker_config|
       worker_config = worker_config.with_indifferent_access
-      (worker_config[:workers] || 1).times { spawn_worker(worker_config) }
+      (worker_config[:workers] || 1).times { spawn_worker(@config.merge(worker_config)) }
     end
   end
 
