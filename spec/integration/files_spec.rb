@@ -12,7 +12,7 @@ describe FilesController do
 
     it "with safefiles" do
       HostUrl.stub!(:file_host).and_return('files-test.host')
-      get "http://test.host/files/#{@submission.attachment.id}/download?inline=1&verifier=#{@submission.attachment.uuid}"
+      get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
       response.should be_redirect
       uri = URI.parse response['Location']
       qs = Rack::Utils.parse_nested_query(uri.query)
@@ -21,14 +21,14 @@ describe FilesController do
       @me.valid_access_verifier?(qs['ts'], qs['sf_verifier']).should be_true
       qs['verifier'].should == @submission.attachment.uuid
 
-      get "http://files-test.host#{uri.path}", qs.merge(:file_id => @submission.attachment.id, :download => '1', :host => 'files-test.host')
+      get response['Location']
       response.should be_success
       response.content_type.should == 'image/png'
     end
 
     it "without safefiles" do
       HostUrl.stub!(:file_host).and_return('test.host')
-      get "http://test.host/files/#{@submission.attachment.id}/download?inline=1&verifier=#{@submission.attachment.uuid}"
+      get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
       response.should be_success
       response.content_type.should == 'image/png'
     end
