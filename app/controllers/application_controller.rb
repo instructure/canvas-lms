@@ -793,7 +793,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :calendar_url_for, :files_url_for
   
-  def safe_domain_file_url(attachment, host=nil)
+  def safe_domain_file_url(attachment, host=nil, verifier = nil) # TODO: generalize this
     res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
     ts, sig = @current_user && @current_user.access_verifier
     if @context
@@ -807,7 +807,10 @@ class ApplicationController < ActionController::Base
     # will authorize file access but not full app access.  We need this in 
     # case there are relative URLs in the file that point to other pieces 
     # of content.
-    res += "?user_id=#{(@current_user ? @current_user.id : nil)}&ts=#{ts}&verifier=#{sig}"
+    res += "?user_id=#{(@current_user ? @current_user.id : nil)}&ts=#{ts}&sf_verifier=#{sig}"
+    if verifier.present?
+      res += "&verifier=#{verifier}"
+    end
     res
   end
   helper_method :safe_domain_file_url
