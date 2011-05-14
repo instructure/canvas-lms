@@ -47,7 +47,7 @@ var pageViewData = <%= raw @account.page_view_data.to_json %>;
 <% end %>
 <% js_block do %>
   <!--Load the GOOGLE AJAX API-->
-  <script type="text/javascript" src="<%= request.protocol %>www.google.com/jsapi"></script>
+  <script type="text/javascript" src="//www.google.com/jsapi"></script>
 
   <script type="text/javascript">
     google.load('visualization', '1', {'packages':['annotatedtimeline']});

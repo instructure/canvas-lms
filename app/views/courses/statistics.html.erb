@@ -163,7 +163,7 @@
 
 <% js_block do %>
   <!--Load the GOOGLE AJAX API-->
-  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="//www.google.com/jsapi"></script>
 
   <script type="text/javascript">
     var pageViewData = <%= raw @context.page_view_data(:dates => [1.month.ago, 1.second.ago]).to_json %>;
