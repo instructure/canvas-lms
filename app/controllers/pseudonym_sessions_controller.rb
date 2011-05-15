@@ -36,7 +36,13 @@ class PseudonymSessionsController < ApplicationController
     @is_cas = @domain_root_account.cas_authentication? && @is_delegated
     @is_saml = @domain_root_account.saml_authentication? && @is_delegated
     if @is_cas && !params[:no_auto]
-      if params[:ticket]
+      if session[:exit_frame]
+        session[:exit_frame] = nil
+        render :template => 'shared/exit_frame', :layout => false, :locals => {
+          :url => login_url(params)
+        }
+        return
+      elsif params[:ticket]
         # handle the callback from CAS
         logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
         st = CASClient::ServiceTicket.new(params[:ticket], login_url)
@@ -77,7 +83,12 @@ class PseudonymSessionsController < ApplicationController
 
       # initial session; redirect to CAS
       reset_session
-      redirect_to(cas_client.add_service_to_login_url(login_url))
+      if @domain_root_account.account_authorization_config.log_in_url.present?
+        session[:exit_frame] = true
+        redirect_to(@domain_root_account.account_authorization_config.log_in_url)
+      else
+        redirect_to(cas_client.add_service_to_login_url(login_url))
+      end
     elsif @is_saml && !params[:no_auto]
       reset_session
       settings = @domain_root_account.account_authorization_config.saml_settings

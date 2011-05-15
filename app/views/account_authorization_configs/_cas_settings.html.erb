@@ -21,6 +21,16 @@
         </td>
       </tr>
       <tr>
+        <td><%= f.label :log_in_url, "Alternate Login URL:" %></td>
+        <td class="nobr">
+          <%= f.text_field :log_in_url, :class => "auth_form", :style => "width: 450px;" %>
+          <span class="auth_info log_in_url"><%= @account_config.log_in_url %></span>
+          <span class="auth_form" style="font-size: smaller;">
+            <br>An alternate URL for logging into CAS. You probably should not set this.
+          </span>
+        </td>
+      </tr>
+      <tr>
         <td colspan="4">
           <span class="auth_form">
             <button type="submit" class="button">Save Authentication Settings</button>
