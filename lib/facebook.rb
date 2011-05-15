@@ -60,6 +60,10 @@ module Facebook
     @service
   end
   
+  def self.app_url
+    "http://apps.facebook.com/#{ self.config['canvas_name'] }"
+  end
+  
   def self.config_check(settings)
     url = "https://graph.facebook.com/oauth/access_token?client_id=#{settings['app_id']}&redirect_uri=http#{settings['disable_ssl'] ? '' : 's'}://#{settings['canvas_domain']}&client_secret=#{settings['secret']}&code=wrong&format=json"
     uri = URI.parse(url)
