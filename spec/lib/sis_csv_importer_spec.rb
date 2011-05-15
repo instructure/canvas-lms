@@ -1056,7 +1056,6 @@ describe SIS::SisCsv do
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
       s1.course.should eql(xlist_course)
-      s1.account.should eql(course.account)
       s1.crosslisted?.should be_true
       s1.name.should == "Sec1"
       process_csv_data(
@@ -1069,7 +1068,6 @@ describe SIS::SisCsv do
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
       s1.course.should eql(xlist_course)
-      s1.account.should eql(course.account)
       s1.crosslisted?.should be_true
       s1.name.should == "Sec2"
     end
