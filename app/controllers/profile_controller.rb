@@ -82,13 +82,7 @@ class ProfileController < ApplicationController
     @pics = []
     @user = @current_user
     if feature_enabled?(:facebook) && facebook = @user.facebook
-      fsession = Facebooker::Session.create
-      facebook_user = fsession.users([facebook.service_user_id])[0]
-      @pics << {
-        :url => facebook_user.pic,
-        :type => 'facebook',
-        :alt => 'facebook pic'
-      }
+      # TODO: add facebook picture if enabled
     end
     if feature_enabled?(:twitter) && twitter = @user.user_services.for_service('twitter').first
       url = URI.parse("http://twitter.com/users/show.json?user_id=#{twitter.service_user_id}")

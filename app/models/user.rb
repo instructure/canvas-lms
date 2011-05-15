@@ -792,10 +792,7 @@ class User < ActiveRecord::Base
   def update_avatar_image(force_reload=false)
     if !self.avatar_image_url || force_reload
       if self.avatar_image_source == 'facebook'
-        session = Facebooker::Session.create
-        facebook_user = session.users([user.facebook.service_user_id])[0]
-        self.avatar_image_url = facebook_user.pic rescue self.avatar_image_url
-        self.avatar_image_updated_at = Time.now
+        # TODO: support this
       elsif self.avatar_image_source == 'twitter'
         twitter = self.user_services.for_service('twitter').first rescue nil
         if twitter
@@ -827,12 +824,7 @@ class User < ActiveRecord::Base
     return false if avatar_state == :locked
     val ||= {}
     if val['type'] == 'facebook'
-      session = Facebooker::Session.create
-      facebook_user = session.users([self.facebook.service_user_id])[0]
-      self.avatar_image_url = facebook_user.pic rescue self.avatar_image_url
-      self.avatar_image_source = 'facebook'
-      self.avatar_image_updated_at = Time.now
-      self.avatar_state = 'submitted'
+      # TODO: support this
     elsif val['type'] == 'gravatar'
       self.avatar_image_source = 'gravatar'
       self.avatar_image_url = nil
