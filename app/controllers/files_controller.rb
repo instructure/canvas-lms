@@ -41,9 +41,9 @@ class FilesController < ApplicationController
   end
   
   def check_file_access_flags
-    if params[:user_id] && params[:ts] && params[:verifier]
+    if params[:user_id] && params[:ts] && params[:sf_verifier]
       user = User.find_by_id(params[:user_id]) if params[:user_id].present?
-      if user && user.valid_access_verifier?(params[:ts], params[:verifier])
+      if user && user.valid_access_verifier?(params[:ts], params[:sf_verifier])
         # attachment.rb checks for this session attribute when determining 
         # permissions, but it should be ignored by the rest of the models' 
         # permission checks
@@ -342,7 +342,7 @@ class FilesController < ApplicationController
     attachment.context_module_action(@current_user, :read) if @current_user && !params[:preview]
     log_asset_access(@attachment, "files", "files") unless params[:preview]
     if safer_domain_available?
-      redirect_to safe_domain_file_url(attachment, @safer_domain_host)
+      redirect_to safe_domain_file_url(attachment, @safer_domain_host, params[:verifier])
     elsif Attachment.local_storage?
       @headers = false if @files_domain
       send_file(attachment.full_filename, :type => attachment.content_type, :disposition => (inline ? 'inline' : 'attachment'))

@@ -785,7 +785,7 @@ class Account < ActiveRecord::Base
       :facebook => {
         :name => "Facebook", 
         :description => "",
-        :expose_to_ui => !!(YAML.load_file(Rails.root + "config/facebooker.yml")[Rails.env] rescue nil)
+        :expose_to_ui => !!Facebook.config
       },
       :skype => {
         :name => "Skype", 

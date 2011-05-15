@@ -81,8 +81,8 @@ class SubmissionsController < ApplicationController
           end
           raise ActiveRecord::RecordNotFound unless @attachment
           format.html {
-            if @attachment.context == @submission
-            redirect_to(file_download_url(@attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
+            if @attachment.context == @submission || @attachment.context == @assignment
+              redirect_to(file_download_url(@attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
             else
               redirect_to(named_context_url(@attachment.context, :context_file_download_url, @attachment, :verifier => @attachment.uuid, :inline => params[:inline]))
             end
