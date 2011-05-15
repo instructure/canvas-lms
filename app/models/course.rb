@@ -233,16 +233,10 @@ class Course < ActiveRecord::Base
     
     did_an_update = false
     
-    # Courses are tied to accounts directly and through cross-listed sections.
-    initial_entities = [self] + self.course_sections.active.find(:all, :include => { :abstract_course => :department })
+    # Courses are tied to accounts directly and through sections
+    initial_entities = [self] + self.course_sections.active.find(:all)
     initial_entities.each do |entity|
-      accounts = if entity.account
-                   entity.account.account_chain
-                 elsif entity.abstract_course && entity.abstract_course.department
-                   entity.abstract_course.department.account_chain
-                 else
-                   [ ]
-                 end
+      accounts = entity.account ? entity.account.account_chain : []
       section = (entity.is_a?(Course) ? entity.default_section : entity)
       accounts.each_with_index do |account, idx|
         key = [account.id, section.id]

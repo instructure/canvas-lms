@@ -309,8 +309,8 @@ class Account < ActiveRecord::Base
       account = account.parent_account
       res << account
     end
-    res << self.root_account
-    res.uniq.compact
+    res << self.root_account unless res.include?(self.root_account)
+    res.compact
   end
   
   def all_page_views
