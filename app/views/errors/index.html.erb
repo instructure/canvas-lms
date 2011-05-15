@@ -15,8 +15,8 @@
 <%= will_paginate(@reports) %>
 <% @reports.each do |report| %>
   <div style="margin-bottom: 20px;">
-    <h3><%= truncate(report.message, :length => 80) %></h3>
-      <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
+    <h3><%= link_to "##{report.id}", error_url(report) %> <%= truncate(report.message, :length => 80) %></h3>
+    <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
       category: <%= report.category || 'default' %><br/>
       <%= report.created_at %><br />
       <%= report.url %><br/>
@@ -26,7 +26,7 @@
       <% (report.data || {}).each do |k,v| %>
         <br><%= k %>: <%= v %>
       <% end %>
-      <pre style="font-size: 0.8em; margin-left: 20px; height: 150px; overflow: auto;">
+      <pre style="font-size: 0.8em; margin-left: 20px; <%= "max-height: 150px;" if @reports.length > 1 %> overflow: auto;">
         <%= report.backtrace %>
       </pre>
     </div>
