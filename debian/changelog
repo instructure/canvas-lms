@@ -1,3 +1,19 @@
+canvas-lms (1.1-29) professional; urgency=low
+
+  * [21259ea] manually bumping changelog
+  * [37c19d5] add redirecting to SSL to the default apache config
+  * [5234f86] load google jsapi with protocol relative url; fixes #4536
+  * [1271aff] fix safefiles accessing the user context for submission
+    attachments
+  * [062c053] purge remaining traces of Facebooker
+  * [6ab8d2c] fix downloading attachments on submission comments
+  * [9500a3c] add nofollow to links that bots are commonly retrieving
+    that they shouldn't
+  * [34af641] add link to error report listing
+  * [afddc9b] add redirecting to SSL to the default apache config
+
+ -- JT Olds <jt@instructure.com>  Sun, 15 May 2011 12:10:20 -0600
+
 canvas-lms (1.1-28) professional; urgency=low
 
   * [c4d2ea5] remove ssl_requirement; refs #3761
