@@ -46,10 +46,14 @@
   }
   
   function initForm(){
+    // we need to temporarily show the form so that the layout will be computed correctly.
+    // this all happens within 1 event loop, so it doesn't cause a flash of content.
+    $("#wiki_edit_view_main").show();
     $("#wiki_page_body").editorBox({
       fullHeight: true,
       elementToLeaveInViewport: $("#below_editor")
     });
+    $("#wiki_edit_view_main").hide();
     $('#wiki_edit_view_main #cancel_editing').click(function(event){
       event.preventDefault();
       toggleView();
