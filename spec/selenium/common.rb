@@ -27,7 +27,7 @@ SERVER_PORT = SELENIUM_CONFIG[:app_port] || 3002
 APP_HOST = "#{SERVER_IP}:#{SERVER_PORT}"
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 60
-MAX_SERVER_START_TIME = 30
+MAX_SERVER_START_TIME = 60
 
 module SeleniumTestsHelperMethods
   def setup_selenium
@@ -90,13 +90,6 @@ module SeleniumTestsHelperMethods
       ENV['SELENIUM_WEBRICK_SERVER'] = '1'
       exec("#{base}/../../script/server", "-p", SERVER_PORT.to_s, "-e", Rails.env)
     end
-    for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
-      break if s
-      sleep 1
-    end
-    raise "Failed starting script/server" unless s
-    s.close
     closed = false
     shutdown = lambda do
       unless closed
@@ -110,6 +103,13 @@ module SeleniumTestsHelperMethods
       end
     end
     at_exit { shutdown.call }
+    for i in 0..MAX_SERVER_START_TIME
+      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
+      break if s
+      sleep 1
+    end
+    raise "Failed starting script/server" unless s
+    s.close
     return shutdown
   end
 end

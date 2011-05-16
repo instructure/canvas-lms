@@ -283,7 +283,10 @@
         <% elsif can_do(@submission, @current_user, :read_grade) %>
           <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.score %></span> 
         <% end %>
-        out of <%= @submission.assignment.points_possible %><br/>
+        <% if @submission.assignment.points_possible %>
+          out of <%= @submission.assignment.points_possible %>
+        <% end %>
+        <br/>
         
         <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) && turnitin_score[:similarity_score] %>
