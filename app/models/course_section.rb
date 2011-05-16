@@ -137,20 +137,12 @@ class CourseSection < ActiveRecord::Base
       self.save!
     end
     self.move_to_course(course, delay_jobs)
-    if (self.nonxlist_course.course_sections.active.count == 0 ||
-        (self.nonxlist_course.course_sections.active.count == 1 &&
-         self.nonxlist_course.course_sections.active.first.enrollments.count == 0)) &&
-       (self.nonxlist_course.workflow_state == "created" ||
-        self.nonxlist_course.workflow_state == "claimed")
-      self.nonxlist_course.workflow_state = "deleted"
-      self.nonxlist_course.save!
-    end
   end
   
   def uncrosslist(delay_jobs = true)
     return unless self.nonxlist_course
     if self.nonxlist_course.workflow_state == "deleted"
-      self.nonxlist_course.workflow_state = "created"
+      self.nonxlist_course.workflow_state = "claimed"
       self.nonxlist_course.save!
     end
     self.move_to_course(self.nonxlist_course, delay_jobs)

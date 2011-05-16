@@ -990,7 +990,7 @@ describe SIS::SisCsv do
         "X002,S005,active"
       )
       @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
-      @account.courses.find_by_sis_source_id("C002").deleted?.should be_true
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
       @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
       @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
       @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 101"

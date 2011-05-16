@@ -39,23 +39,6 @@ describe AccountsController do
     @course2.update_account_associations
   end
 
-  describe "GET 'index'" do
-    it "shouldn't show duplicates of courses" do
-      cross_listed_course
-      get 'show', :id => @account1.id
-      assigns[:courses].should == [@course1]
-    end
-  end
-
-  describe "GET 'courses'" do
-    it "shouldn't show duplicates of courses" do
-      cross_listed_course
-      get 'courses', :account_id => @account1.id, :query => @course1.name
-      assigns[:courses].should == [@course1]
-      response.should be_redirect
-    end
-  end
-
   describe "SIS imports" do
     it "should set batch mode and term if given" do
       course_with_teacher_logged_in(:active_all => true)

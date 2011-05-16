@@ -137,7 +137,7 @@ describe CourseSection, "moving to new course" do
     cs.nonxlist_course.should eql(course1)
     e.root_account.should eql(account2)
     cs.crosslisted?.should be_true
-    course1.workflow_state.should == 'deleted'
+    course1.workflow_state.should == 'created'
     course2.workflow_state.should == 'created'
     course3.workflow_state.should == 'created'
       
@@ -155,7 +155,7 @@ describe CourseSection, "moving to new course" do
     cs.nonxlist_course.should eql(course1)
     e.root_account.should eql(account3)
     cs.crosslisted?.should be_true
-    course1.workflow_state.should == 'deleted'
+    course1.workflow_state.should == 'created'
     course2.workflow_state.should == 'created'
     course3.workflow_state.should == 'created'
       
