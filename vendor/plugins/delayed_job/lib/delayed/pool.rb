@@ -107,7 +107,8 @@ class Pool
       return # backwards compat
     else
       queue = worker_config[:queue] || Delayed::Worker.queue
-      worker = Delayed::Worker.new(Process.pid, worker_config)
+      worker_config[:parent_pid] = Process.pid
+      worker = Delayed::Worker.new(worker_config)
     end
 
     pid = fork do

@@ -26,15 +26,20 @@ class Worker
   end
   cattr_reader :on_max_failures
 
-  def initialize(parent_pid, options = {})
-    @parent_pid = parent_pid
+  def initialize(options = {})
     @exit = false
     @config = options
+    @parent_pid = options[:parent_pid]
     @queue = options[:queue] || self.class.queue
     @min_priority = options[:min_priority]
     @max_priority = options[:max_priority]
     @max_job_count = options[:worker_max_job_count].to_i
     @max_memory_usage = options[:worker_max_memory_usage].to_i
+    @job_count = 0
+  end
+
+  def name=(name)
+    @name = name
   end
 
   def name
@@ -50,14 +55,11 @@ class Worker
   end
 
   def parent_exited?
-    @parent_pid != Process.ppid
+    @parent_pid && @parent_pid != Process.ppid
   end
 
   def start
     say "Starting worker", :info
-    @job_count = 0
-    # need to do this here, since we're avoiding db calls in the master process pre-fork
-    @sleep_delay = Setting.get('delayed_jobs_sleep_delay', '1.0').to_f
 
     trap('INT') { say 'Exiting'; @exit = true }
 
@@ -71,9 +73,10 @@ class Worker
     Delayed::Job.clear_locks!(name)
   end
 
-  protected
-
   def run
+    # need to do this here, since we're avoiding db calls in the master process pre-fork
+    @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '1.0').to_f
+
     job = nil
     Rails.logger.silence do
       job = Delayed::Job.get_and_lock_next_available(
@@ -110,7 +113,6 @@ class Worker
 
   def perform(job)
     set_process_name("run:#{job.id}:#{job.name}")
-    start_time = Time.now
     say_job(job, "Processing #{log_job(job, :long)}", :info)
     runtime = Benchmark.realtime do
       Timeout.timeout(self.class.max_run_time.to_i, Delayed::TimeoutError) { job.invoke_job }

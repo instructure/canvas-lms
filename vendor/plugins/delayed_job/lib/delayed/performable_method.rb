@@ -1,15 +1,11 @@
 module Delayed
   class PerformableMethod < Struct.new(:object, :method, :args)
-    attr_accessor :tag
-
     def initialize(object, method, args = [])
       raise NoMethodError, "undefined method `#{method}' for #{object.inspect}" unless object.respond_to?(method)
 
       self.object = object
       self.args   = args
       self.method = method.to_sym
-
-      self.tag = display_name
     end
 
     def display_name
@@ -19,6 +15,7 @@ module Delayed
         "#{object.class}##{method}"
       end
     end
+    alias_method :tag, :display_name
 
     def perform
       object.send(method, *args)

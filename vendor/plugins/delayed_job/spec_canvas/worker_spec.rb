@@ -1,4 +1,4 @@
-require 'spec_helper'
+require File.expand_path("../spec_helper", __FILE__)
 
 describe Delayed::Worker do
   def job_create(opts = {})
@@ -9,37 +9,19 @@ describe Delayed::Worker do
   end
 
   before(:each) do
-    # Make sure backend is set to active record
-    Delayed::Worker.backend = :active_record
-    
     @worker = worker_create
-
     Delayed::Job.delete_all
-    
     SimpleJob.runs = 0
+    Delayed::Worker.on_max_failures = nil
   end
-  
-  describe "backend=" do
-    it "should set the Delayed::Job constant to the backend" do
-      @clazz = Class.new
-      Delayed::Worker.backend = @clazz
-      Delayed::Job.should == @clazz
-    end
-    
-    it "should set backend with a symbol" do
-      Delayed::Worker.backend = Class.new
-      Delayed::Worker.backend = :active_record
-      Delayed::Worker.backend.should == Delayed::Backend::ActiveRecord::Job
-    end
-  end
-  
+
   describe "running a job" do
     it "should fail after Worker.max_run_time" do
       begin
         old_max_run_time = Delayed::Worker.max_run_time
         Delayed::Worker.max_run_time = 1.second
         @job = Delayed::Job.create :payload_object => LongRunningJob.new
-        @worker.run(@job)
+        @worker.perform(@job)
         @job.reload.last_error.should =~ /expired/
         @job.attempts.should == 1
       ensure
@@ -58,7 +40,7 @@ describe Delayed::Worker do
 
       job_create(:priority => -10)
       job_create(:priority => 0)
-      @worker.start(true)
+      @worker.run
 
       SimpleJob.runs.should == 1
     end
@@ -69,7 +51,7 @@ describe Delayed::Worker do
       job_create(:priority => 10)
       job_create(:priority => 0)
 
-      @worker.start(true)
+      @worker.run
 
       SimpleJob.runs.should == 1
     end
@@ -82,40 +64,38 @@ describe Delayed::Worker do
     
     it "should not run jobs locked by another worker" do
       job_create(:locked_by => 'other_worker', :locked_at => (Delayed::Job.db_time_now - 1.minutes))
-      lambda { @worker.start(true) }.should_not change { SimpleJob.runs }
+      lambda { @worker.run }.should_not change { SimpleJob.runs }
     end
     
     it "should run open jobs" do
       job_create
-      lambda { @worker.start(true) }.should change { SimpleJob.runs }.from(0).to(1)
+      lambda { @worker.run }.should change { SimpleJob.runs }.from(0).to(1)
     end
     
     it "should run expired jobs" do
       expired_time = Delayed::Job.db_time_now - (1.minutes + Delayed::Worker.max_run_time)
       job_create(:locked_by => 'other_worker', :locked_at => expired_time)
-      lambda { @worker.start(true) }.should change { SimpleJob.runs }.from(0).to(1)
+      lambda { @worker.run }.should change { SimpleJob.runs }.from(0).to(1)
     end
     
     it "should run own jobs" do
       job_create(:locked_by => @worker.name, :locked_at => (Delayed::Job.db_time_now - 1.minutes))
-      lambda { @worker.start(true) }.should change { SimpleJob.runs }.from(0).to(1)
+      lambda { @worker.run }.should change { SimpleJob.runs }.from(0).to(1)
     end
   end
   
   describe "failed jobs" do
     before do
       # reset defaults
-      Delayed::Worker.destroy_failed_jobs = true
       Delayed::Worker.max_attempts = 25
-
       @job = Delayed::Job.enqueue ErrorJob.new
     end
 
     it "should record last_error when destroy_failed_jobs = false, max_attempts = 1" do
-      Delayed::Worker.destroy_failed_jobs = false
-      Delayed::Worker.max_attempts = 1
+      Delayed::Worker.on_max_failures = proc { false }
+      @job.update_attribute(:max_attempts, 1)
       @job.lock_exclusively!(Delayed::Worker.max_run_time, @worker.name).should == true
-      @worker.run(@job)
+      @worker.perform(@job)
       @job.reload
       @job.last_error.should =~ /did not work/
       @job.last_error.should =~ /worker_spec.rb/
@@ -132,7 +112,7 @@ describe Delayed::Worker do
     end
     
     it "should re-schedule jobs after failing" do
-      @worker.run(@job)
+      @worker.perform(@job)
       @job.reload
       @job.last_error.should =~ /did not work/
       @job.last_error.should =~ /sample_jobs.rb:8:in `perform'/
@@ -148,10 +128,6 @@ describe Delayed::Worker do
     end
     
     context "and we want to destroy jobs" do
-      before do
-        Delayed::Worker.destroy_failed_jobs = true
-      end
-      
       it "should be destroyed if it failed more than Worker.max_attempts times" do
         @job.should_receive(:destroy)
         Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
@@ -172,9 +148,13 @@ describe Delayed::Worker do
     
     context "and we don't want to destroy jobs" do
       before do
-        Delayed::Worker.destroy_failed_jobs = false
+        Delayed::Worker.on_max_failures = proc { false }
       end
-      
+
+      after do
+        Delayed::Worker.on_max_failures = nil
+      end
+
       it "should be failed if it failed more than Worker.max_attempts times" do
         @job.reload.failed_at.should == nil
         Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
@@ -190,7 +170,6 @@ describe Delayed::Worker do
 
     context "and we give an on_max_failures callback" do
       it "should not be destroyed if it failed max_attempts times and cb is false" do
-        Delayed::Worker.destroy_failed_jobs = true
         Delayed::Worker.on_max_failures = proc do |job, ex|
           job.should == @job
           false
@@ -200,7 +179,6 @@ describe Delayed::Worker do
       end
 
       it "should be destroyed if it failed max_attempts times and cb is true" do
-        Delayed::Worker.destroy_failed_jobs = true
         Delayed::Worker.on_max_failures = proc do |job, ex|
           job.should == @job
           true
@@ -223,14 +201,14 @@ describe Delayed::Worker do
     it "should only work off jobs assigned to themselves" do
       worker = worker_create(:queue=>'queue1')
       SimpleJob.runs.should == 0
-      worker.start(true)
+      worker.run
       SimpleJob.runs.should == 1
       
       SimpleJob.runs = 0
 
       worker = worker_create(:queue=>'queue2')
       SimpleJob.runs.should == 0
-      worker.start(true)
+      worker.run
       SimpleJob.runs.should == 1
     end
 
@@ -238,14 +216,14 @@ describe Delayed::Worker do
       worker = worker_create(:queue=>'queue3')
 
       SimpleJob.runs.should == 0
-      worker.start(true)
+      worker.run
       SimpleJob.runs.should == 0
     end
 
     it "should run non-named queue jobs when the queue has no name set" do
       worker = worker_create(:queue=>nil)
       SimpleJob.runs.should == 0
-      worker.start(true)
+      worker.run
       SimpleJob.runs.should == 1
     end
     
