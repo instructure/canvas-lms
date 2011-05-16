@@ -54,7 +54,7 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('Hi, this is a multiple choice question.')
     end
     
-    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers = find_all_with_jquery('.question_holder:visible:first .form_answers > .answer')
     answers.length.should eql(4)
     replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
     replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
@@ -98,7 +98,7 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('This is not a true/false question.')
     end
     
-    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers = find_all_with_jquery('.question_holder:visible:eq(1) .form_answers > .answer')
     answers.length.should eql(2)
     answers[1].find_element(:css, ".select_answer_link").click # false - get it?
     answers[1].find_element(:css, ".comment_focus").click
@@ -129,15 +129,15 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('This is a fill in the _________ question.')
     end
     
-    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
     answers.length.should eql(2)
     question.find_element(:css, ".add_answer_link").click
     question.find_element(:css, ".add_answer_link").click
-    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
     answers.length.should eql(4)
     answers[3].find_element(:css, ".delete_answer_link").click
     answers[2].find_element(:css, ".delete_answer_link").click
-    answers = question.find_elements(:css, "div.form_answers > div.answer")
+    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
     answers.length.should eql(2)
     replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
     replace_content(answers[1].find_element(:css, ".short_answer input"), "Blank")
