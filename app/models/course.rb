@@ -59,7 +59,7 @@ class Course < ActiveRecord::Base
   has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
   has_many :learning_outcome_groups, :as => :context
   has_many :course_account_associations
-  has_many :associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
+  has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
   has_many :users, :through => :enrollments, :source => :user
   has_many :groups, :as => :context
   has_many :active_groups, :as => :context, :class_name => 'Group', :conditions => ['groups.workflow_state != ?', 'deleted']
@@ -125,10 +125,16 @@ class Course < ActiveRecord::Base
   has_a_broadcast_policy
   
   def self.skip_updating_account_associations(&block)
-    @skip_updating_account_associations = true
-    block.call
-  ensure
-    @skip_updating_account_associations = false
+    if @skip_updating_account_assocations
+      block.call
+    else
+      begin
+        @skip_updating_account_associations = true
+        block.call
+      ensure
+        @skip_updating_account_associations = false
+      end
+    end
   end
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
@@ -236,21 +242,23 @@ class Course < ActiveRecord::Base
     
     # Courses are tied to accounts directly and through sections and crosslisted courses
     all_sections = self.course_sections.active.find(:all)
-    initial_entities = [self] + all_sections + all_sections.map(&:nonxlist_course).compact
-    initial_entities.each do |entity|
-      accounts = entity.account ? entity.account.account_chain : []
-      section = (entity.is_a?(Course) ? entity.default_section : entity)
-      accounts.each_with_index do |account, idx|
-        key = [account.id, section.id]
-        if associations_hash[key]
-          unless associations_hash[key].depth == idx
-            associations_hash[key].update_attributes(:depth => idx)
+    initial_entities = ([self] + all_sections + all_sections.map(&:nonxlist_course)).compact.uniq
+    Course.skip_updating_account_associations do
+      initial_entities.each do |entity|
+        accounts = entity.account ? entity.account.account_chain : []
+        section = (entity.is_a?(Course) ? entity.default_section : entity)
+        accounts.each_with_index do |account, idx|
+          key = [account.id, section.id]
+          if associations_hash[key]
+            unless associations_hash[key].depth == idx
+              associations_hash[key].update_attributes(:depth => idx)
+              did_an_update = true
+            end
+            to_delete.delete(key)
+          else
+            associations_hash[key] = self.course_account_associations.create(:account => account, :depth => idx, :course_section => section)
             did_an_update = true
           end
-          to_delete.delete(key)
-        else
-          associations_hash[key] = self.course_account_associations.create(:account => account, :depth => idx, :course_section => section)
-          did_an_update = true
         end
       end
     end
@@ -261,6 +269,10 @@ class Course < ActiveRecord::Base
     end
     
     true
+  end
+  
+  def associated_accounts
+    self.non_unique_associated_accounts.uniq
   end
   
   # objects returned from this query will give you an additional attribute "page_views_count" that you can use, so:

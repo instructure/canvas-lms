@@ -47,70 +47,81 @@ module SIS
       sections_to_update_sis_batch_ids = []
       FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
         update_progress
-        logger.debug("Processing Section #{row.inspect}")
         
-        course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id'])
-        unless course
-          add_warning(csv,"Section #{row['section_id']} references course #{row['course_id']} which doesn't exist")
-          next
-        end
-        
-        name = row['name']
-        section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
-        section ||= course.course_sections.find_by_sis_source_id(row['section_id'])
-        section ||= course.course_sections.new
-        section.root_account = @root_account
-        # this is an easy way to load up the cache with data we already have
-        section.course = course if course.id == section.course_id
-        
-        section.account = row['account_id'].present? ? Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) : nil
-        
-        # only update the name on new records, and ones that haven't been changed since the last sis import
-        if section.new_record? || (section.sis_name && section.sis_name == section.name)
-          section.name = section.sis_name = row['name']
-        end
+        Course.skip_updating_account_associations do
+          logger.debug("Processing Section #{row.inspect}")
+          courses_to_update_associations = [].to_set
+          
+          course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id'])
+          unless course
+            add_warning(csv,"Section #{row['section_id']} references course #{row['course_id']} which doesn't exist")
+            next
+          end
+          
+          name = row['name']
+          section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
+          section ||= course.course_sections.find_by_sis_source_id(row['section_id'])
+          section ||= course.course_sections.new
+          section.root_account = @root_account
+          # this is an easy way to load up the cache with data we already have
+          section.course = course if course.id == section.course_id
+          
+          section.account = row['account_id'].present? ? Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) : nil
+          courses_to_update_associations.add section.course if section.account_id_changed?
+          
+          # only update the name on new records, and ones that haven't been changed since the last sis import
+          if section.new_record? || (section.sis_name && section.sis_name == section.name)
+            section.name = section.sis_name = row['name']
+          end
 
-        # update the course id if necessary
-        if section.course_id != course.id
-          if section.nonxlist_course_id
-            # this section is crosslisted
-            if section.nonxlist_course_id != course.id
-              # but the course id we were given didn't match the crosslist info
-              # we have, so, uncrosslist and move
-              section.uncrosslist(false)
+          # update the course id if necessary
+          if section.course_id != course.id
+            if section.nonxlist_course_id
+              # this section is crosslisted
+              if section.nonxlist_course_id != course.id
+                # but the course id we were given didn't match the crosslist info
+                # we have, so, uncrosslist and move
+                courses_to_update_associations.add section.course
+                section.uncrosslist(false)
+                section.move_to_course(course, false)
+              end
+            else
+              # this section isn't crosslisted and lives on the wrong course. move
+              courses_to_update_associations.add section.course
               section.move_to_course(course, false)
             end
-          else
-            # this section isn't crosslisted and lives on the wrong course. move
-            section.move_to_course(course, false)
           end
-        end
+          
+          courses_to_update_associations.add section.course
 
-        section.sis_source_id = row['section_id']
-        if row['status'] =~ /active/i
-          section.workflow_state = 'active'
-        elsif row['status'] =~ /deleted/i
-          section.workflow_state = 'deleted'
-        end
-        
-        begin
-          unless row['start_date'].blank?
-            section.start_at = DateTime.parse(row['start_date'])
+          section.sis_source_id = row['section_id']
+          if row['status'] =~ /active/i
+            section.workflow_state = 'active'
+          elsif row['status'] =~ /deleted/i
+            section.workflow_state = 'deleted'
           end
-          unless row['end_date'].blank?
-            section.end_at = DateTime.parse(row['end_date'])
+          
+          begin
+            unless row['start_date'].blank?
+              section.start_at = DateTime.parse(row['start_date'])
+            end
+            unless row['end_date'].blank?
+              section.end_at = DateTime.parse(row['end_date'])
+            end
+          rescue
+            add_warning(csv, "Bad date format for section #{row['section_id']}")
           end
-        rescue
-          add_warning(csv, "Bad date format for section #{row['section_id']}")
-        end
 
-        if section.changed?
-          section.sis_batch_id = @batch.id if @batch
-          section.save
-        elsif @batch
-          sections_to_update_sis_batch_ids << section
+          if section.changed?
+            section.sis_batch_id = @batch.id if @batch
+            section.save
+          elsif @batch
+            sections_to_update_sis_batch_ids << section
+          end
+          
+          courses_to_update_associations.map(&:update_account_associations)
+          @sis.counts[:sections] += 1
         end
-        @sis.counts[:sections] += 1
       end
       CourseSection.update_all({:sis_batch_id => @batch.id}, {:id => sections_to_update_sis_batch_ids}) if @batch && !sections_to_update_sis_batch_ids.empty?
       logger.debug("Sections took #{Time.now - start} seconds")

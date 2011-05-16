@@ -178,4 +178,26 @@ describe CourseSection, "moving to new course" do
     course3.workflow_state.should == 'created'
   end
   
+  it 'should update course account associations on save' do
+    account1 = Account.create!(:name => "1")
+    account2 = Account.create!(:name => "2")
+    course1 = account1.courses.create!
+    course2 = account2.courses.create!
+    cs1 = course1.course_sections.create!
+    cs2 = course2.course_sections.create!
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    cs1.account = account2
+    cs1.save
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id, account2.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    cs1.account = nil
+    cs1.save
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    cs1.crosslist_to_course(course2)
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).sort.should == [account1.id, account2.id].sort
+  end
+  
 end

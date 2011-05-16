@@ -42,71 +42,82 @@ module SIS
         FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
           update_progress
           logger.debug("Processing CrossListing #{row.inspect}")
+          
+          Course.skip_updating_account_associations do
+            courses_to_update_associations = [].to_set
+            
+            section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
+            unless section
+              add_warning(csv, "A cross-listing referenced a non-existent section #{row['section_id']}")
+              next
+            end
 
-          section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
-          unless section
-            add_warning(csv, "A cross-listing referenced a non-existent section #{row['section_id']}")
-            next
+            # reduce database hits if possible (csv sorted by xlist_course_id will be faster)
+            unless course && course.sis_source_id == row['xlist_course_id']
+              course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['xlist_course_id'])
+              if !course && row['status'] =~ /\Aactive\z/i
+                # no course with this crosslist id found, make a new course,
+                # using the section's current course as a template
+                course = Course.new
+                course.root_account = @root_account
+                course.account_id = section.course.account_id
+                course.name = course.sis_name = section.course.name
+                course.short_name = course.sis_course_code = section.course.short_name
+                course.sis_source_id = row['xlist_course_id']
+                course.enrollment_term_id = section.course.enrollment_term_id
+                course.sis_batch_id = @batch.id if @batch
+                course.workflow_state = section.course.workflow_state
+                Course.skip_updating_account_associations { course.save_without_broadcasting! }
+                course.update_account_associations
+              end
+            end
+
+            if row['status'] =~ /\Aactive\z/i
+
+              if course.workflow_state == 'deleted'
+                course.workflow_state = 'created'
+                course.save_without_broadcasting!
+                course.update_enrolled_users
+                courses_to_update_associations.add course
+              end
+
+              if section.course_id == course.id
+                courses_to_update_associations.map(&:update_account_associations)
+                @sis.counts[:xlists] += 1
+                next
+              end
+
+              begin
+                courses_to_update_associations.add section.course
+                courses_to_update_associations.add course
+                section.crosslist_to_course(course, false)
+              rescue => e
+                add_warning(csv, "An active cross-listing failed: #{e}")
+                next
+              end
+
+            elsif row['status'] =~ /\Adeleted\z/i
+              if course && section.course_id != course.id
+                @sis.counts[:xlists] += 1
+                next
+              end
+
+              begin
+                courses_to_update_associations.add section.course
+                section.uncrosslist(false)
+                courses_to_update_associations.add section.course
+              rescue => e
+                add_warning(csv, "A deleted cross-listing failed: #{e}")
+                next
+              end
+
+            else
+              add_error(csv, "Improper status #{row['status']} for a cross-listing")
+            end
+
+            courses_to_update_associations.map(&:update_account_associations)
+            @sis.counts[:xlists] += 1
           end
-
-          # reduce database hits if possible (csv sorted by xlist_course_id will be faster)
-          unless course && course.sis_source_id == row['xlist_course_id']
-            course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['xlist_course_id'])
-            if !course && row['status'] =~ /\Aactive\z/i
-              # no course with this crosslist id found, make a new course,
-              # using the section's current course as a template
-              course = Course.new
-              course.root_account = @root_account
-              course.account_id = section.course.account_id
-              course.name = course.sis_name = section.course.name
-              course.short_name = course.sis_course_code = section.course.short_name
-              course.sis_source_id = row['xlist_course_id']
-              course.enrollment_term_id = section.course.enrollment_term_id
-              course.sis_batch_id = @batch.id if @batch
-              course.workflow_state = section.course.workflow_state
-              Course.skip_updating_account_associations { course.save_without_broadcasting! }
-              course.update_account_associations
-            end
-          end
-
-          if row['status'] =~ /\Aactive\z/i
-
-            if course.workflow_state == 'deleted'
-              course.workflow_state = 'created'
-              course.save_without_broadcasting!
-              course.update_enrolled_users
-            end
-
-            if section.course_id == course.id
-              @sis.counts[:xlists] += 1
-              next
-            end
-
-            begin
-              section.crosslist_to_course(course, false)
-            rescue => e
-              add_warning(csv, "An active cross-listing failed: #{e}")
-              next
-            end
-
-          elsif row['status'] =~ /\Adeleted\z/i
-            if course && section.course_id != course.id
-              @sis.counts[:xlists] += 1
-              next
-            end
-
-            begin
-              section.uncrosslist(false)
-            rescue => e
-              add_warning(csv, "A deleted cross-listing failed: #{e}")
-              next
-            end
-
-          else
-            add_error(csv, "Improper status #{row['status']} for a cross-listing")
-          end
-
-          @sis.counts[:xlists] += 1
         end
       end
     end

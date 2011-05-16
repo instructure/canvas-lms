@@ -36,6 +36,9 @@ class CourseSection < ActiveRecord::Base
   before_validation :infer_defaults
   validates_presence_of :course_id
   
+  before_save :set_update_account_associations_if_changed
+  after_save :update_account_associations_if_changed
+
   set_policy do
     given {|user, session| self.cached_course_grants_right?(user, session, :manage_admin_users) }
     set { can :read and can :create and can :update and can :delete }
@@ -43,7 +46,21 @@ class CourseSection < ActiveRecord::Base
     given {|user, session| self.enrollments.find_by_user_id(user.id) }
     set { can :read }
   end
+
+  def set_update_account_associations_if_changed
+    @should_update_account_associations = self.account_id_changed? || self.course_id_changed? || self.nonxlist_course_id_changed?
+    true
+  end
   
+  def update_account_associations_if_changed
+    send_later_if_production(:update_account_associations) if @should_update_account_associations && !Course.skip_updating_account_associations?
+  end
+  
+  def update_account_associations
+    self.course.try(:update_account_associations)
+    self.nonxlist_course.try(:update_account_associations)
+  end
+
   def section_code
     self.name ||= read_attribute(:section_code)
   end
