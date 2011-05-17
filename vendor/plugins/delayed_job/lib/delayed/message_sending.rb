@@ -5,6 +5,16 @@ module Delayed
     end
 
     def send_later_enqueue_args(method, enqueue_args = {}, *args)
+      # support procs/methods as enqueue arguments
+      duped = false
+      enqueue_args.each do |k,v|
+        if v.respond_to?(:call)
+          enqueue_args = enqueue_args.dup unless duped
+          duped = true
+          enqueue_args[k] = v.call(self)
+        end
+      end
+
       Delayed::Job.enqueue(Delayed::PerformableMethod.new(self, method.to_sym, args), enqueue_args)
     end
 
