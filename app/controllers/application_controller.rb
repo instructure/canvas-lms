@@ -909,4 +909,10 @@ class ApplicationController < ActionController::Base
       send_data(io, opts)
     end
   end
+  
+  def verified_file_download_url(attachment, *opts)
+    file_download_url(attachment, :verifier => attachment.uuid, *opts)
+  end
+  helper_method :verified_file_download_url
+  
 end

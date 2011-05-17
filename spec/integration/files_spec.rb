@@ -33,4 +33,25 @@ describe FilesController do
       response.content_type.should == 'image/png'
     end
   end
+  
+  context "should support ContextMessage as a context" do
+    before(:each) do
+      course_with_teacher_logged_in(:active_all => true)
+      @me = @user
+      context_message_model(:course => @course, :recipient => @me)
+      @attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
+      @attachment.context = @context_message
+      @attachment.save
+    end
+
+    it "directly from message" do
+      HostUrl.stub!(:file_host).and_return('test.host')
+      get "http://test.host/courses/#{@course.id}/messages/#{@context_message.id}/files/#{@attachment.id}"
+      response.should be_redirect
+      
+      get response['Location']
+      response.should be_success
+      response.content_type.should == 'image/png'
+    end
+  end
 end
