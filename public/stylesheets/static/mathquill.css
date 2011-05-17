@@ -8,15 +8,6 @@
  * 
  */
 
-@font-face {
-  font-family: Symbola;
-  src: url(font/Symbola.eot);
-  src: local("Symbola Regular"), local("Symbola"),
-    url(font/Symbola.ttf) format("truetype"),
-    url(font/Symbola.otf) format("opentype"),
-    url(font/Symbola.svg#webfont7MzkO3xs) format("svg");
-}
-
 .mathquill-editable, .mathquill-embedded-latex .mathquill-editable {
   display: -moz-inline-box;
   display: inline-block;
