@@ -265,7 +265,7 @@ class ContextController < ApplicationController
     if authorized_action(@message, @current_user, :read)
       @attachment = @message.attachments.find(params[:id])
       begin
-        redirect_to @attachment.cacheable_s3_url
+        redirect_to verified_file_download_url(@attachment)
       rescue => e
         @not_found_message = "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
         render :template => 'shared/errors/404_message', :status => :bad_request
