@@ -68,6 +68,7 @@ class Pool
     $0 = "delayed_jobs_pool"
     read_config(options[:config_file])
     spawn_all_workers
+    spawn_periodic_auditor
     say "Workers spawned"
     join
     say "Shutting down"
@@ -113,9 +114,33 @@ class Pool
 
     pid = fork do
       Delayed::Job.connection.reconnect!
+      Delayed::Periodic.load_periodic_jobs_config
       worker.start
     end
     workers[pid] = worker
+  end
+
+  def spawn_periodic_auditor
+    @periodic_thread = Thread.new do
+      # schedule the initial audit immediately on startup
+      schedule_periodic_audit
+      # initial sleep is randomized, for some staggering in the audit calls
+      # since job processors are usually all restarted at the same time
+      sleep(rand(15 * 60))
+      loop do
+        schedule_periodic_audit
+        sleep(15 * 60)
+      end
+    end
+  end
+
+  def schedule_periodic_audit
+    pid = fork do
+      # we want to avoid db connections in the main pool process
+      $0 = "delayed_periodic_audit_scheduler"
+      Delayed::Periodic.audit_queue
+    end
+    workers[pid] = :periodic_audit
   end
 
   def join
@@ -123,8 +148,12 @@ class Pool
       child = Process.wait
       if child
         worker = workers.delete(child)
-        say "child exited: #{child}, restarting", :info
-        spawn_worker(worker.config)
+        if worker.is_a?(Symbol)
+          say "ran auditor: #{worker}"
+        else
+          say "child exited: #{child}, restarting", :info
+          spawn_worker(worker.config)
+        end
       end
     end
   end

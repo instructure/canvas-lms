@@ -295,4 +295,77 @@ shared_examples_for 'a backend' do
       @backend.get_and_lock_next_available('w3', 60).should == nil
     end
   end
+
+  context "periodic jobs" do
+    before(:each) do
+      Delayed::Periodic.scheduled = {}
+      Delayed::Periodic.cron('my SimpleJob', '*/5 * * * * *') do
+        @backend.enqueue(SimpleJob.new)
+      end
+    end
+
+    it "should schedule jobs if they aren't scheduled yet" do
+      @backend.count.should == 0
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 1
+      job = @backend.first
+      job.tag.should == 'periodic: my SimpleJob'
+      job.payload_object.should == Delayed::Periodic.scheduled['my SimpleJob']
+      job.run_at.should >= @backend.db_time_now
+      job.run_at.should <= @backend.db_time_now + 6.minutes
+    end
+
+    it "should schedule jobs if there are only failed jobs on the queue" do
+      @backend.count.should == 0
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 1
+      job = @backend.first
+      job.update_attribute :failed_at, @backend.db_time_now
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 2
+    end
+
+    it "should not schedule jobs that are already scheduled" do
+      @backend.count.should == 0
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 1
+      job = @backend.first
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 1
+      job.should == @backend.first
+    end
+
+    it "should aduit on the auditor strand" do
+      Delayed::Periodic.audit_queue
+      @backend.count.should == 1
+      @backend.first.strand.should == Delayed::Periodic::STRAND
+    end
+
+    it "should only schedule an audit if none is scheduled" do
+      Delayed::Periodic.audit_queue
+      @backend.count.should == 1
+      Delayed::Periodic.audit_queue
+      @backend.count.should == 1
+    end
+
+    it "should schedule the next job run after performing" do
+      Delayed::Periodic.perform_audit!
+      job = @backend.first
+      job.invoke_job
+      job.destroy
+
+      @backend.count.should == 2
+      job = @backend.first(:order => 'run_at asc')
+      job.tag.should == 'SimpleJob#perform'
+
+      next_scheduled = @backend.last(:order => 'run_at asc')
+      next_scheduled.tag.should == 'periodic: my SimpleJob'
+      next_scheduled.payload_object.should be_is_a(Delayed::Periodic)
+      next_scheduled.run_at.should >= Time.now
+    end
+
+    it "should reject duplicate named jobs" do
+      proc { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.should raise_error(ArgumentError)
+    end
+  end
 end

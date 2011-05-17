@@ -101,7 +101,7 @@ class Jobs extends FlavorGrid
       job = @data[rows[0]] || {}
       $('#show-job .show-field').each (idx, field) =>
         field_name = field.id.replace("job-", '')
-        $(field).text(job[field_name])
+        $(field).text(job[field_name] || '')
     this
 
   selectAll: () ->

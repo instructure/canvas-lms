@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Fri, 13 May 2011 18:37:45 GMT from
+/* DO NOT MODIFY. This file was compiled Tue, 17 May 2011 16:59:00 GMT from
  * /Users/bpalmer/Programming/canvas/app/coffeescripts/jobs.coffee
  */
 
@@ -164,7 +164,7 @@
         return $('#show-job .show-field').each(__bind(function(idx, field) {
           var field_name;
           field_name = field.id.replace("job-", '');
-          return $(field).text(job[field_name]);
+          return $(field).text(job[field_name] || '');
         }, this));
       }, this);
       return this;
