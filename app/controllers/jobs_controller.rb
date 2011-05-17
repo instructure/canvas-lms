@@ -71,7 +71,7 @@ class JobsController < ApplicationController
     end
 
     if params[:q].present?
-      @jobs = @jobs.scoped(:conditions => ["handler like ? OR id = ?", "%#{params[:q]}%", params[:q].to_i])
+      @jobs = @jobs.scoped(:conditions => ["#{ActiveRecord::Base.wildcard('tag', params[:q])} OR id = ?", params[:q].to_i])
     end
 
     if params[:job_ids].present?
