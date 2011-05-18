@@ -711,7 +711,7 @@ class ApplicationController < ActionController::Base
       :url => page_name.to_url
     )
     @page.current_namespace = @namespace
-    @page.body = "Welcome to your new #{@context.class.to_s.downcase} wiki!" if page_name == "front-page" && @page.new_record?
+    @page.body = "Welcome to your new #{@context.class.base_ar_class.to_s.downcase} wiki!" if page_name == "front-page" && @page.new_record?
   end
   
   def context_wiki_page_url
