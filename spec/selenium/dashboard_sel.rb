@@ -8,25 +8,6 @@ shared_examples_for "dashboard selenium tests" do
     user_with_pseudonym(:user => @user)
   end
 
-  it "should serve embed tags from a safefiles iframe" do
-    factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => <<-MESSAGE)
-<p>flash:</p>
-<p><object width="425" height="350" data="/javascripts/swfobject/test.swf" type="application/x-shockwave-flash"><param name="wmode" value="transparent" /><param name="src" value="/javascripts/swfobject/test.swf" /></object></p>
-MESSAGE
-    login
-    get "/"
-    uri = nil
-    name = driver.find_elements(:class_name, "user_content_iframe").first.attribute('name')
-    driver.switch_to.frame(name)
-    keep_trying {
-      driver.current_url.should match("/object_snippet")
-    }
-    html = Nokogiri::HTML(driver.page_source)
-    obj = html.at_css('object')
-    obj.should_not be_nil
-    obj['data'].should == '/javascripts/swfobject/test.swf'
-  end
-
   def test_hiding(url)
     factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => "announcement")
     items = @user.stream_item_instances
@@ -60,6 +41,6 @@ MESSAGE
   end
 end
 
-describe "cross-listing Windows-Firefox-Tests" do
+describe "dashboard Windows-Firefox-Tests" do
   it_should_behave_like "dashboard selenium tests"
 end

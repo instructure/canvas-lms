@@ -223,7 +223,11 @@ class ContextController < ApplicationController
         end
       end
       format.json do
-        json_params = {:include => [:attachments, :users], :methods => :formatted_body}
+        json_params = {
+          :include => [:attachments, :users],
+          :methods => :formatted_body,
+          :user_content => %w(formatted_body),
+        }
         if @asset.is_a?(ContextMessage) && @asset.protect_recipients && !@asset.cached_context_grants_right?(@current_user, session, :manage_students)
           json_params[:include] = [:attachments]
           json_params[:exclude] = [:recipients]

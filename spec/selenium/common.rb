@@ -153,7 +153,8 @@ shared_examples_for "all selenium tests" do
     60.times do |i|
       puts "trying #{SECONDS_UNTIL_GIVING_UP - i}" if i > SECONDS_UNTIL_COUNTDOWN
       if i < SECONDS_UNTIL_GIVING_UP - 2
-        break if (yield rescue false)
+        val = (yield rescue false)
+        break(val) if val
       elsif i == SECONDS_UNTIL_GIVING_UP - 1
         yield
       else
