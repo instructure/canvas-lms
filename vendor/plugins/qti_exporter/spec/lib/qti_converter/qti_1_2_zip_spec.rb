@@ -15,7 +15,7 @@ describe "QTI 1.2 zip with id prepender value" do
   end
 
   it "should convert the assessments" do
-    @exporter.course[:assessments].should == QTI_EXPORT_ASSESSMENT.with_indifferent_access
+    @exporter.course[:assessments].should == QTI_EXPORT_ASSESSMENT
   end
 
   it "should convert the questions" do

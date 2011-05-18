@@ -25,7 +25,7 @@ http://<%= HostUrl.context_host(asset.context) %>/inbox/<%= InboxItem.find_by_as
 <% unless asset.all_attachments.empty? %>
 Attached Files:
 <% asset.all_attachments.each do |attachment| %>
-<%= attachment.display_name %> - <%= attachment.readable_size %>
+<%= attachment.display_name %> - <%= attachment.readable_size %> 
 http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context_type.downcase.pluralize %>/<%= asset.context_id %>/messages/<%= asset.id %>/files/<%= attachment.id %>
 
 <% end %>

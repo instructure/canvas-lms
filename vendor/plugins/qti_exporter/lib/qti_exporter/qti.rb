@@ -53,8 +53,9 @@ module Qti
     attachments
   end
 
-  def self.get_conversion_command(out_dir, manifest_file)
-    "\"#{@migration_executable}\" --ucvars --nogui --overwrite --cpout=#{out_dir.gsub(/ /, "\\ ")} #{manifest_file.gsub(/ /, "\\ ")} 2>&1"
+  def self.get_conversion_command(out_dir, manifest_file, file_path_prepend = nil)
+    prepend = file_path_prepend ? "--pathprepend=\"#{file_path_prepend}\" " : ""
+    "\"#{@migration_executable}\" #{prepend}--ucvars --nogui --overwrite --cpout=#{out_dir.gsub(/ /, "\\ ")} #{manifest_file.gsub(/ /, "\\ ")} 2>&1"
   end
 
 end

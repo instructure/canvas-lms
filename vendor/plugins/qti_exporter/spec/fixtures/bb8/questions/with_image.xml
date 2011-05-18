@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _503556_1
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Pool
+Converting proprietary Blackboard metadata field bbmd_questiontype = Multiple Choice
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 0.0
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: minnumber attribute no no longer supported on render_*
+Warning: flow_label is no longer supported in version 2, ignoring
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: titles on respconditions no longer supported, ignored "correct"
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+Warning: test of undeclared response replaced with Null operator
+Warning: solution material is being replaced by div with class="solution"
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="_503556_1"
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="max_score" value="0.0" />
+<instructureField name="bb_question_type" value="Multiple Choice" />
+</instructureMetadata>
+<responseDeclaration identifier="response" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+<defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
+<itemBody>
+<div class="html">San Jose, purple on this map, is an example of a ___________ culture region.</div>
+<div class="html">&lt;img src=&quot;Picture3.jpg&quot; alt=&quot;Picture3.jpg&quot;/&gt;</div>
+<choiceInteraction responseIdentifier="response" shuffle="true" maxChoices="1">
+<simpleChoice identifier="EC000D406E2311DDCDFAEF472759EA4A" fixed="true">
+<div class="html">formal</div></simpleChoice>
+<simpleChoice identifier="EC000D416E2311DDCDFAEF472759EA4A" fixed="true">
+<div class="html">official</div></simpleChoice>
+<simpleChoice identifier="EC000D426E2311DDCDFAEF472759EA4A" fixed="true">
+<div class="html">vernacular</div></simpleChoice>
+<simpleChoice identifier="EC000D436E2311DDCDFAEF472759EA4A" fixed="true">
+<div class="html">functional</div></simpleChoice>
+</choiceInteraction>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="response"/><baseValue baseType="identifier">EC000D436E2311DDCDFAEF472759EA4A</baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">SCORE.max</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0.0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><null/><baseValue baseType="identifier"></baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">EC000D406E2311DDCDFAEF472759EA4A</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><null/><baseValue baseType="identifier"></baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">EC000D416E2311DDCDFAEF472759EA4A</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><null/><baseValue baseType="identifier"></baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">EC000D426E2311DDCDFAEF472759EA4A</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><null/><baseValue baseType="identifier"></baseValue></match>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">EC000D436E2311DDCDFAEF472759EA4A</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct">
+<div class="html"></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect">
+<div class="html"></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="EC000D406E2311DDCDFAEF472759EA4A">
+<div class="solution">
+<div class="html"></div></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="EC000D416E2311DDCDFAEF472759EA4A">
+<div class="solution">
+<div class="html"></div></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="EC000D426E2311DDCDFAEF472759EA4A">
+<div class="solution">
+<div class="html"></div></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="EC000D436E2311DDCDFAEF472759EA4A">
+<div class="solution">
+<div class="html"></div></div></modalFeedback>
+</assessmentItem>

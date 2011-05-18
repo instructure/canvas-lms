@@ -19,10 +19,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe OutcomesController do
-  def course_outcome
-    @outcome_group ||= LearningOutcomeGroup.default_for(@course)
-    @outcome = @course.created_learning_outcomes.create
+  def context_outcome(context)
+    @outcome_group ||= LearningOutcomeGroup.default_for(context)
+    @outcome = context.created_learning_outcomes.create
     @outcome_group.add_item(@outcome)
+  end
+  
+  def course_outcome
+    context_outcome(@course)
+  end
+  
+  def account_outcome
+    context_outcome(@account)
   end
 
   describe "GET 'index'" do
@@ -44,6 +52,14 @@ describe OutcomesController do
       course_with_student_logged_in(:active_all => true)
       get 'index', :course_id => @course.id
       response.should be_success
+    end
+    
+    it "should work in accounts" do
+      @account = Account.default
+      account_admin_user
+      user_session(@user)
+      account_outcome
+      get 'index', :account_id => @account.id
     end
   end
 
@@ -83,6 +99,14 @@ describe OutcomesController do
       course_outcome
       get 'details', :course_id => @course.id, :outcome_id => @outcome.id
       response.should be_success
+    end
+    
+    it "should work in accounts" do
+      @account = Account.default
+      account_admin_user
+      user_session(@user)
+      account_outcome
+      get 'details', :account_id => @account.id, :outcome_id => @outcome.id
     end
   end
 end
