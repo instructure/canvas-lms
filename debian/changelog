@@ -1,3 +1,16 @@
+canvas-lms (1.1-30) professional; urgency=low
+
+  * [fe4b359] manually bumping changelog
+  * [be337cb] handle extra image html in qti data
+  * [c7dee1a] add an alternate login url for CAS
+  * [1d9041a] make flash message box not invisibly cover identity
+  * [d536b0f] fix the tinymce button layout problem on wiki pages
+  * [af0bddd] fix account-level outcomes; fixes #4604
+  * [6040777] fix downloading attachments to messages and local file
+    storage
+
+ -- JT Olds <jt@instructure.com>  Wed, 18 May 2011 10:02:26 -0600
+
 canvas-lms (1.1-29) professional; urgency=low
 
   * [21259ea] manually bumping changelog
