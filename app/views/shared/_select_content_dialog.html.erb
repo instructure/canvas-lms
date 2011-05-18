@@ -142,7 +142,7 @@
                 <% folders = @context.active_folders_detailed %>
                 <% root_folders = folders.select{|f| f.parent_folder_id == nil} %>
                 <select name="attachment[folder_id]" id="attachment_folder_id">
-                  <%= render :partial => 'shared/folder_option', :collection => root_folders, :locals => {:folders => folders} %>
+                  <%= folders_as_options(root_folders, folders) %>
                 </select>
               </td>
             </tr>

@@ -416,4 +416,16 @@ module ApplicationHelper
   def tomorrow_at_midnight
     1.day.from_now.to_date.to_time
   end
+  
+  # you supply all_folders as an optimization, so we don't have to do db lookups
+  # on every call
+  def folders_as_options(folders, all_folders, selected_folder_id = nil, options_so_far = nil, indent = 0)
+    options_so_far ||= []
+    folders.each do |folder|
+      options_so_far << %{<option value="#{folder.id}" #{'selected' if selected_folder_id == folder.id}>#{"&nbsp;" * indent}#{"- " if indent > 0}#{html_escape folder.name}</option>}
+      child_folders = all_folders.select {|f| f.parent_folder_id == folder.id }
+      folders_as_options(child_folders, all_folders, selected_folder_id, options_so_far, indent + 3)
+    end
+    indent == 0 ? raw(options_so_far.join("\n")) : nil
+  end
 end
