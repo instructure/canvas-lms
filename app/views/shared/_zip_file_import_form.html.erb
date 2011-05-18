@@ -12,7 +12,7 @@
   <div id="upload_to" style="margin: 10px 0;">
     Upload to:
     <select name="folder_id">
-      <%= render :partial => 'shared/folder_option', :collection => Folder.root_folders(@context), :locals => {:folders => @context.folders.active, :selected_folder_id => params[:folder_id].to_i} %>
+      <%= folders_as_options(Folder.root_folders(@context), @context.folders.active, params[:folder_id].to_i) %>
     </select>
     <%= hidden_field_tag 'return_to', qti_or_content_link %>
   </div>
