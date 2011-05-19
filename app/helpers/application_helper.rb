@@ -417,15 +417,22 @@ module ApplicationHelper
     1.day.from_now.to_date.to_time
   end
   
-  # you supply all_folders as an optimization, so we don't have to do db lookups
-  # on every call
-  def folders_as_options(folders, all_folders, selected_folder_id = nil, options_so_far = nil, indent = 0)
-    options_so_far ||= []
+  # you should supply :all_folders to avoid a db lookup on every iteration
+  def folders_as_options(folders, opts = {})
+    opts[:indent_width] ||= 3
+    opts[:depth] ||= 0
+    opts[:options_so_far] ||= []
     folders.each do |folder|
-      options_so_far << %{<option value="#{folder.id}" #{'selected' if selected_folder_id == folder.id}>#{"&nbsp;" * indent}#{"- " if indent > 0}#{html_escape folder.name}</option>}
-      child_folders = all_folders.select {|f| f.parent_folder_id == folder.id }
-      folders_as_options(child_folders, all_folders, selected_folder_id, options_so_far, indent + 3)
+      opts[:options_so_far] << %{<option value="#{folder.id}" #{'selected' if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>}
+      child_folders = if opts[:all_folders]
+                        opts[:all_folders].select {|f| f.parent_folder_id == folder.id }
+                      else
+                        folder.active_sub_folders
+                      end
+      if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
+        folders_as_options(child_folders, opts.merge({:depth => opts[:depth] + 1}))
+      end
     end
-    indent == 0 ? raw(options_so_far.join("\n")) : nil
+    opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
   end
 end
