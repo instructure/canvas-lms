@@ -121,6 +121,8 @@ class Pool
   end
 
   def spawn_periodic_auditor
+    return if @config[:disable_periodic_jobs]
+
     @periodic_thread = Thread.new do
       # schedule the initial audit immediately on startup
       schedule_periodic_audit
