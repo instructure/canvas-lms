@@ -97,6 +97,8 @@ ActionController::Routing::Routes.draw do |map|
     course.import_content 'imports/content', :controller => 'content_imports', :action => 'content'
     course.import_copy 'imports/copy', :controller => 'content_imports', :action => 'copy_course', :conditions => {:method => :get}
     course.import_migrate 'imports/migrate', :controller => 'content_imports', :action => 'migrate_content'
+    course.import_upload 'imports/upload', :controller => 'content_imports', :action => 'migrate_content_upload'
+    course.import_s3_success 'imports/s3_success', :controller => 'content_imports', :action => 'migrate_content_s3_success'
     course.import_copy_content 'imports/copy', :controller => 'content_imports', :action => 'copy_course_content', :conditions => {:method => :post}
     course.import_migrate_choose 'imports/migrate/:id', :controller => 'content_imports', :action => 'migrate_content_choose'
     course.import_migrate_execute 'imports/migrate/:id/execute', :controller => 'content_imports', :action => 'migrate_content_execute'

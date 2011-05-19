@@ -20,6 +20,7 @@ class ContentImportsController < ApplicationController
   before_filter :require_context
   add_crumb("Content Imports") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
   before_filter { |c| c.active_tab = "home" }
+  prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
   
   def intro
     if authorized_action(@context, @current_user, :update)
@@ -57,14 +58,27 @@ class ContentImportsController < ApplicationController
           if params[:export_file_enabled] == '1'
             att = Attachment.new
             att.context = @migration
-            att.uploaded_data = params[:export_file]
+            att.workflow_state = 'unattached_temporary'
+            att.filename = params[:attachment][:filename]
+            att.file_state = 'deleted'
+            att.content_type = Attachment.mimetype(att.filename)
             att.save
             @migration.attachment = att
+            @migration.save
+            upload_params = att.ajax_upload_params(
+              @current_pseudonym,
+              named_context_url(@context, :context_import_upload_url, :id => @migration.id),
+              named_context_url(@context, :context_import_s3_success_url, :id => @migration.id,
+                                          :uuid => att.uuid, :include_host => true),
+              :max_size => 5.gigabytes,
+              :file_param => :export_file,
+              :ssl => request.ssl?)
+            render :json => upload_params
+          else
+            render :json => {}
           end
-          @migration.export_content
-          render :text => @migration.to_json
         else
-          render :text => @migration.errors.to_json, :status => :bad_request
+          render :json => @migration.errors, :status => :bad_request
         end
       else
         @plugins = Canvas::Plugin.all_for_tag(:export_system)
@@ -74,7 +88,26 @@ class ContentImportsController < ApplicationController
       end
     end
   end
-  
+
+  def migrate_content_upload
+    load_migration_and_attachment do
+      if Attachment.local_storage? && params[:export_file]
+        @attachment.uploaded_data = params[:export_file]
+        @attachment.save
+        @migration.export_content
+      end
+    end
+  end
+
+  def migrate_content_s3_success
+    load_migration_and_attachment do
+      if Attachment.s3_storage? && details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
+        @attachment.process_s3_details!(details)
+        @migration.export_content
+      end
+    end
+  end
+
   def migrate_content_choose
     if authorized_action(@context, @current_user, :manage)
       @content_migration = ContentMigration.for_context(@context).find(params[:id]) #)_all_by_context_id_and_context_type(@context.id, @context.class.to_s).last
@@ -187,6 +220,22 @@ class ContentImportsController < ApplicationController
       @running = ContentMigration.running.find_all_by_context_id(@context.id)
       @waiting = ContentMigration.waiting.find_all_by_context_id(@context.id)
       @failed = ContentMigration.failed.find_all_by_context_id(@context.id)
+    end
+  end
+
+  private
+
+  def load_migration_and_attachment
+    if authorized_action(@context, @current_user, :manage)
+      @migration = ContentMigration.for_context(@context).find(params[:id])
+      @attachment = @migration.attachment
+      if block_given?
+        if @attachment && yield
+          render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?])
+        else
+          render_for_text "", :status => :bad_request
+        end
+      end
     end
   end
 end
