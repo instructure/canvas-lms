@@ -5,16 +5,14 @@ production:
     max_priority: 10
   - queue: canvas_queue
     workers: 4
-    
-  # warning: don't set the worker pool size to be greater than 1 if you want
-  #   sis imports to be processed serially
-  - queue: sis_imports
-    workers: 1
-    
-  - periodic: config/periodic_jobs.rb
   max_run_time: 28800
+  # if set, workers will process this many jobs and then die, causing the pool
+  # to spawn another worker. this can help return memory to the OS.
+  # worker_max_job_count: 20
+  # if set, workers will die and re-spawn of they exceed this memory usage
+  # threshold. they will only die between jobs, not during a job.
+  # worker_max_memory_usage: 1073741824
 
 default:
   workers:
   - queue: canvas_queue
-  - periodic: config/periodic_jobs.rb

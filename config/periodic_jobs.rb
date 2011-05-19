@@ -17,33 +17,33 @@ if ActionController::Base.session_store == ActiveRecord::SessionStore
   expire_after = (Setting.from_config("session_store") || {})[:expire_after]
   expire_after ||= 1.day
 
-  scheduler.cron '*/5 * * * *' do
+  Delayed::Periodic.cron 'ActiveRecord::SessionStore::Session.delete_all', '*/5 * * * *' do
     ActiveRecord::SessionStore::Session.delete_all(['updated_at < ?', expire_after.ago])
   end
 end
 
-scheduler.cron '*/30 * * * *' do
+Delayed::Periodic.cron 'ExternalFeedAggregator.process', '*/30 * * * *' do
   ExternalFeedAggregator.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
 end
 
-scheduler.cron '*/15 * * * *' do
+Delayed::Periodic.cron 'SummaryMessageConsolidator.process', '*/15 * * * *' do
   SummaryMessageConsolidator.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
 end
 
-scheduler.cron '*/5 * * * *' do
+Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * * * *' do
   Attachment.send_later_enqueue_args(:process_scribd_conversion_statuses, { :priority => Delayed::LOW_PRIORITY })
 end
 
-scheduler.cron '*/15 * * * *' do
+Delayed::Periodic.cron 'Twitter processing', '*/15 * * * *' do
   TwitterSearcher.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
   TwitterUserPoller.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
 end
 
-scheduler.cron '0 11 * * *' do
+Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * *' do
   Reporting::CountsReport.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
 end
 
-scheduler.cron '45 11 * * *' do
+Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
   # we pass false for the touch_users argument, on the assumption that these
   # stream items that we delete aren't visible on the user's dashboard anymore
   # anyway, so there's no need to invalidate all the caches.
@@ -51,20 +51,20 @@ scheduler.cron '45 11 * * *' do
 end
 
 if Mailman.config.poll_interval == 0 && Mailman.config.ignore_stdin == true
-  scheduler.cron '*/1 * * * *' do
+  Delayed::Periodic.cron 'IncomingMessageProcessor.process', '*/1 * * * *' do
     IncomingMessageProcessor.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
   end
 end
 
 if PageView.page_view_method == :cache
   # periodically pull new page views off the cache and insert them into the db
-  scheduler.cron '*/5 * * * *' do
+  Delayed::Periodic.cron 'PageView.process_cache_queue', '*/5 * * * *' do
     PageView.send_later_enqueue_args(:process_cache_queue,
                                      { :priority => Delayed::LOW_PRIORITY })
   end
 end
 
-scheduler.cron '35 */1 * * *' do
+Delayed::Periodic.cron 'ErrorReport.destroy_error_reports', '35 */1 * * *' do
   cutoff = Setting.get('error_reports_retain_for', 3.months.to_s).to_i
   if cutoff > 0
     ErrorReport.send_later_enqueue_args(:destroy_error_reports, { :priority => Delayed::LOW_PRIORITY }, cutoff.ago)

@@ -31,6 +31,7 @@ shared_examples_for 'a backend' do
   end
 
   it "should use the default priority when enqueuing items" do
+    @backend.default_priority = 0
     @job = @backend.enqueue SimpleJob.new
     @job.priority.should == 0
     @backend.default_priority = 10
@@ -58,25 +59,21 @@ shared_examples_for 'a backend' do
 
   it "should try to load the class when it is unknown at the time of the deserialization" do
     job = @backend.new :handler => "--- !ruby/object:JobThatDoesNotExist {}"
-    job.should_receive(:attempt_to_load).with('JobThatDoesNotExist').and_return(true)
     lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
   end
 
   it "should try include the namespace when loading unknown objects" do
     job = @backend.new :handler => "--- !ruby/object:Delayed::JobThatDoesNotExist {}"
-    job.should_receive(:attempt_to_load).with('Delayed::JobThatDoesNotExist').and_return(true)
     lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
   end
 
   it "should also try to load structs when they are unknown (raises TypeError)" do
     job = @backend.new :handler => "--- !ruby/struct:JobThatDoesNotExist {}"
-    job.should_receive(:attempt_to_load).with('JobThatDoesNotExist').and_return(true)
     lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
   end
 
   it "should try include the namespace when loading unknown structs" do
     job = @backend.new :handler => "--- !ruby/struct:Delayed::JobThatDoesNotExist {}"
-    job.should_receive(:attempt_to_load).with('Delayed::JobThatDoesNotExist').and_return(true)
     lambda { job.payload_object.perform }.should raise_error(Delayed::Backend::DeserializationError)
   end
   
@@ -146,9 +143,11 @@ shared_examples_for 'a backend' do
 
     it "should be able to get exclusive access again when the worker name is the same" do
       @job.lock_exclusively!(5.minutes, 'worker1').should be_true
+      @job.update_attribute(:locked_at, 1.minute.ago)
       @job.lock_exclusively!(5.minutes, 'worker1').should be_true
+      @job.update_attribute(:locked_at, 1.minute.ago)
       @job.lock_exclusively!(5.minutes, 'worker1').should be_true
-    end                                        
+    end
   end
   
   context "when another worker has worked on a task since the job was found to be available, it" do
@@ -186,14 +185,9 @@ shared_examples_for 'a backend' do
   end
   
   context "worker prioritization" do
-    before(:each) do
-      Delayed::Worker.max_priority = nil
-      Delayed::Worker.min_priority = nil
-    end
-
     it "should fetch jobs ordered by priority" do
-      10.times { @backend.enqueue SimpleJob.new, :priority => rand(10) }
-      jobs = @backend.find_available('worker', 10)
+      10.times { create_job :priority => rand(10) }
+      jobs = @backend.find_available('worker', 10, 10)
       jobs.size.should == 10
       jobs.each_cons(2) do |a, b| 
         a.priority.should <= b.priority
@@ -228,5 +222,150 @@ shared_examples_for 'a backend' do
       @job.locked_at.should be_nil
     end
   end
-  
+
+  context "strands" do
+    it "should run strand jobs in strict order" do
+      job1 = create_job(:strand => 'myjobs')
+      job2 = create_job(:strand => 'myjobs')
+      @backend.get_and_lock_next_available('w1', 60).should == job1
+      @backend.get_and_lock_next_available('w2', 60).should == nil
+      job1.destroy
+      # update time since the failed lock pushed it forward
+      job2.update_attribute(:run_at, 1.minute.ago)
+      @backend.get_and_lock_next_available('w3', 60).should == job2
+      @backend.get_and_lock_next_available('w4', 60).should == nil
+    end
+
+    it "should fail to lock if an earlier job gets locked" do
+      job1 = create_job(:strand => 'myjobs')
+      job2 = create_job(:strand => 'myjobs')
+      @backend.find_available('w1', 2, 60).should == [job1, job2]
+      @backend.find_available('w2', 2, 60).should == [job1, job2]
+
+      # job1 gets locked by w1
+      job1.lock_exclusively!(60, 'w1').should == true
+
+      # w2 tries to lock job1, fails
+      job1.lock_exclusively!(60, 'w2').should == false
+      # normally w2 would now be able to lock job2, but strands prevent it
+      job2.lock_exclusively!(60, 'w2').should == false
+
+      # now job1 is done
+      job1.destroy
+      # update time since the failed lock pushed it forward
+      job2.update_attribute(:run_at, 1.minute.ago)
+      job2.lock_exclusively!(60, 'w2').should == true
+    end
+
+    it "should keep strand jobs in order as they are rescheduled" do
+      job1 = create_job(:strand => 'myjobs')
+      job2 = create_job(:strand => 'myjobs')
+      job3 = create_job(:strand => 'myjobs')
+      @backend.get_and_lock_next_available('w1', 60).should == job1
+      @backend.find_available('w2', 1, 60).should == [job2]
+      job2.reload.lock_exclusively!(60, 'w2').should be_false
+      # job2 just got rescheduled, but not job3. make sure that job2 still runs first.
+      job1.destroy
+      # fake out the current time since the job got rescheduled for the future
+      @backend.stub!(:db_time_now).and_return(5.minutes.from_now)
+      @backend.get_and_lock_next_available('w1', 60).should == job2
+    end
+
+    it "should allow to run the next job if a failed job is present" do
+      job1 = create_job(:strand => 'myjobs')
+      job2 = create_job(:strand => 'myjobs')
+      job1.update_attribute(:failed_at, Time.now)
+      @backend.find_available('w1', 2, 60).should == [job2]
+      job2.lock_exclusively!(60, 'w1').should == true
+    end
+
+    it "should not interfere with jobs with no strand" do
+      job1 = create_job(:strand => nil)
+      job2 = create_job(:strand => 'myjobs')
+      @backend.get_and_lock_next_available('w1', 60).should == job1
+      @backend.get_and_lock_next_available('w2', 60).should == job2
+      @backend.get_and_lock_next_available('w3', 60).should == nil
+    end
+
+    it "should not interfere with jobs in other strands" do
+      job1 = create_job(:strand => 'strand1')
+      job2 = create_job(:strand => 'strand2')
+      @backend.get_and_lock_next_available('w1', 60).should == job1
+      @backend.get_and_lock_next_available('w2', 60).should == job2
+      @backend.get_and_lock_next_available('w3', 60).should == nil
+    end
+  end
+
+  context "periodic jobs" do
+    before(:each) do
+      Delayed::Periodic.scheduled = {}
+      Delayed::Periodic.cron('my SimpleJob', '*/5 * * * * *') do
+        @backend.enqueue(SimpleJob.new)
+      end
+    end
+
+    it "should schedule jobs if they aren't scheduled yet" do
+      @backend.count.should == 0
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 1
+      job = @backend.first
+      job.tag.should == 'periodic: my SimpleJob'
+      job.payload_object.should == Delayed::Periodic.scheduled['my SimpleJob']
+      job.run_at.should >= @backend.db_time_now
+      job.run_at.should <= @backend.db_time_now + 6.minutes
+    end
+
+    it "should schedule jobs if there are only failed jobs on the queue" do
+      @backend.count.should == 0
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 1
+      job = @backend.first
+      job.update_attribute :failed_at, @backend.db_time_now
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 2
+    end
+
+    it "should not schedule jobs that are already scheduled" do
+      @backend.count.should == 0
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 1
+      job = @backend.first
+      Delayed::Periodic.perform_audit!
+      @backend.count.should == 1
+      job.should == @backend.first
+    end
+
+    it "should aduit on the auditor strand" do
+      Delayed::Periodic.audit_queue
+      @backend.count.should == 1
+      @backend.first.strand.should == Delayed::Periodic::STRAND
+    end
+
+    it "should only schedule an audit if none is scheduled" do
+      Delayed::Periodic.audit_queue
+      @backend.count.should == 1
+      Delayed::Periodic.audit_queue
+      @backend.count.should == 1
+    end
+
+    it "should schedule the next job run after performing" do
+      Delayed::Periodic.perform_audit!
+      job = @backend.first
+      job.invoke_job
+      job.destroy
+
+      @backend.count.should == 2
+      job = @backend.first(:order => 'run_at asc')
+      job.tag.should == 'SimpleJob#perform'
+
+      next_scheduled = @backend.last(:order => 'run_at asc')
+      next_scheduled.tag.should == 'periodic: my SimpleJob'
+      next_scheduled.payload_object.should be_is_a(Delayed::Periodic)
+      next_scheduled.run_at.should >= Time.now
+    end
+
+    it "should reject duplicate named jobs" do
+      proc { Delayed::Periodic.cron('my SimpleJob', '*/15 * * * * *') {} }.should raise_error(ArgumentError)
+    end
+  end
 end

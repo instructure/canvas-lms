@@ -1,20 +1,4 @@
-require 'spec_helper'
-
-class StoryReader
-  def read(story)
-    "Epilog: #{story.tell}"
-  end
-
-  def self.reverse(str)
-    str.reverse
-  end
-end
-
-module MyReverser
-  def self.reverse(str)
-    str.reverse
-  end
-end
+require File.expand_path("../spec_helper", __FILE__)
 
 describe Delayed::PerformableMethod do
   
@@ -36,8 +20,9 @@ describe Delayed::PerformableMethod do
   end
   
   it "should allow class methods to be called on ActiveRecord models" do
+    Story.create!(:text => 'Once upon a...')
     p = Delayed::PerformableMethod.new(Story, :count, [])
-    lambda { p.send(:load, p.object) }.should_not raise_error
+    lambda { p.send(:perform).should == 1 }.should_not raise_error
   end
 
   it "should allow class methods to be called" do

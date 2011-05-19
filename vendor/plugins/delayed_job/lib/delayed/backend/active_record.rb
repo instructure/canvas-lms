@@ -28,6 +28,20 @@ module Delayed
         cattr_accessor :use_row_locking
         self.use_row_locking = false
 
+        named_scope :current, lambda {
+          { :conditions => ["run_at <= ? AND failed_at IS NULL", db_time_now] }
+        }
+
+        named_scope :future, lambda {
+          { :conditions => ["run_at > ? AND failed_at IS NULL", db_time_now] }
+        }
+
+        named_scope :failed, :conditions => ["failed_at IS NOT NULL"]
+
+        named_scope :not_running, :conditions => ["locked_at is NULL"]
+
+        named_scope :running, :conditions => ["locked_at is NOT NULL and locked_by <> 'on hold'"]
+
         named_scope :ready_to_run, lambda {|worker_name, max_run_time|
           {:conditions => ['(run_at <= ? AND (locked_at IS NULL OR locked_at < ?) OR locked_by = ?) AND failed_at IS NULL', db_time_now, db_time_now - max_run_time, worker_name]}
         }
@@ -39,10 +53,12 @@ module Delayed
         end
 
         def self.get_and_lock_next_available(worker_name,
-                                             max_run_time = Worker.max_run_time,
-                                             queue = nil)
+                                             max_run_time,
+                                             queue = nil,
+                                             min_priority = nil,
+                                             max_priority = nil)
           if self.use_row_locking
-            scope = self.all_available(worker_name, max_run_time, queue)
+            scope = self.all_available(worker_name, max_run_time, queue, min_priority, max_priority)
 
             ::ActiveRecord::Base.silence do
               # it'd be a big win to do this in a DB function and avoid the extra
@@ -57,30 +73,30 @@ module Delayed
               end
             end
           else
-            job = find_available(worker_name, 5, max_run_time, queue).detect do |job|
-              if job.lock_exclusively!(max_run_time, worker_name)
-                true
-              else
-                false
-              end
+            job = find_available(worker_name, 5, max_run_time, queue, min_priority, max_priority).detect do |job|
+              job.lock_exclusively!(max_run_time, worker_name)
             end
             job
           end
         end
 
         def self.find_available(worker_name,
-                                limit = 5,
-                                max_run_time = Worker.max_run_time,
-                                queue = nil)
-          all_available(worker_name, max_run_time, queue).all(:limit => limit)
+                                limit,
+                                max_run_time,
+                                queue = nil,
+                                min_priority = nil,
+                                max_priority = nil)
+          all_available(worker_name, max_run_time, queue, min_priority, max_priority).all(:limit => limit)
         end
 
         def self.all_available(worker_name,
-                               max_run_time = Worker.max_run_time,
-                               queue = nil)
+                               max_run_time,
+                               queue = nil,
+                               min_priority = nil,
+                               max_priority = nil)
           scope = self.ready_to_run(worker_name, max_run_time)
-          scope = scope.scoped(:conditions => ['priority >= ?', Worker.min_priority]) if Worker.min_priority
-          scope = scope.scoped(:conditions => ['priority <= ?', Worker.max_priority]) if Worker.max_priority
+          scope = scope.scoped(:conditions => ['priority >= ?', min_priority]) if min_priority
+          scope = scope.scoped(:conditions => ['priority <= ?', max_priority]) if max_priority
           scope = scope.scoped(:conditions => ['queue = ?', queue]) if queue
           scope = scope.scoped(:conditions => ['queue is null']) unless queue
           scope.by_priority
@@ -105,6 +121,19 @@ module Delayed
             # we'll fix things up here.
             changed_attributes['locked_at'] = now
             changed_attributes['locked_by'] = worker
+
+            # if this job is part of a strand, make sure no earlier jobs in the
+            # strand are running.
+            if self.strand.present?
+              count = self.class.count(:conditions => ["strand = ? AND id < ? and failed_at is null", self.strand, self.id])
+              if count > 0
+                self.locked_at = self.locked_by = nil
+                self.run_at = now.advance(:seconds => Setting.get_cached('delayed_jobs_strand_sleep_time', '60').to_i)
+                self.save
+                return false
+              end
+            end
+
             return true
           else
             return false
@@ -115,13 +144,7 @@ module Delayed
         # Note: This does not ping the DB to get the time, so all your clients
         # must have syncronized clocks.
         def self.db_time_now
-          if Time.zone
-            Time.zone.now
-          elsif ::ActiveRecord::Base.default_timezone == :utc
-            Time.now.utc
-          else
-            Time.now
-          end
+          Time.now.in_time_zone
         end
 
       end

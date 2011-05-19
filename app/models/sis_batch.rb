@@ -90,7 +90,7 @@ class SisBatch < ActiveRecord::Base
     self.workflow_state = "failed"
     self.save
   end
-  handle_asynchronously_with_queue :process, 'sis_imports'
+  handle_asynchronously :process, :strand => proc { |sis_batch| "sis_batch:account:#{sis_batch.account_id}" }
 
   named_scope :needs_processing, lambda{
     {:conditions => ["sis_batches.workflow_state = 'needs_processing'"], :order => :created_at}
