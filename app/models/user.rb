@@ -104,6 +104,7 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
+  has_many :conversations, :class_name => 'ConversationParticipant', :include => :conversation, :conditions => "last_message_at IS NOT NULL", :order => "last_message_at DESC" # i.e. exclude any where the user has deleted all the messages
 
   named_scope :of_account, lambda { |account|
     {
@@ -1477,5 +1478,55 @@ class User < ActiveRecord::Base
 
   def sis_user_id
     pseudonym.try(:sis_user_id)
+  end
+
+  def initiate_conversation(user_ids, private = nil)
+    private = user_ids.size == 1 if private.nil?
+    Conversation.initiate([self.id] + user_ids, private).conversation_participants.find_by_user_id(self.id)
+  end
+
+  def messageable_users(options = {})
+    course_ids = courses.active.map(&:id)
+    group_ids = groups.active.map(&:id)
+
+    if options[:context] && options[:context] =~ /\Acourse_(\d+)\z/
+      course_ids &= [$1.to_i]
+      group_ids = []
+    elsif options[:context] && options[:context] =~ /\Agroup_(\d+)\z/
+      group_ids &= [$1.to_i]
+      course_ids = []
+    end
+    return [] unless course_ids.present? || group_ids.present?
+
+    user_condition_sql = "users.id <> #{self.id}"
+    user_condition_sql << " AND users.id IN (#{options[:ids].join(', ')})" if options[:ids]
+    user_condition_sql << " AND #{wildcard('users.name', options[:search])}" if options[:search]
+    user_sql = []
+
+    user_sql << <<-SQL if course_ids.present?
+      SELECT users.id, users.name, users.sortable_name, course_id, null as group_id
+      FROM users, enrollments, courses
+      WHERE course_id IN (#{course_ids.join(',')}) AND users.id = user_id AND courses.id = course_id
+        AND #{self.class.reflections[:current_enrollments].options[:conditions]}
+        AND #{user_condition_sql}
+    SQL
+
+    user_sql << <<-SQL if group_ids.present?
+      SELECT users.id, users.name, users.sortable_name, null, group_id
+      FROM users, group_memberships
+      WHERE group_id IN (#{group_ids.join(',')}) AND users.id = user_id
+        AND #{user_condition_sql}
+    SQL
+
+    User.find_by_sql <<-SQL
+      SELECT id, name, sortable_name,
+        #{connection.func(:group_concat, :course_id)} AS courses,
+        #{connection.func(:group_concat, :group_id)} AS groups
+      FROM (
+        #{user_sql.join(' UNION ')}
+      ) users
+      GROUP BY #{connection.group_by('id', 'name', 'sortable_name')}
+      ORDER BY sortable_name
+    SQL
   end
 end

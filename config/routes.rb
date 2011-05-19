@@ -8,6 +8,19 @@ ActionController::Routing::Routes.draw do |map|
   map.destroy_inbox_item 'inbox/:id', :controller => 'context', :action => 'destroy_inbox_item', :conditions => {:method => :delete}
   map.inbox_item 'inbox/:id', :controller => 'context', :action => 'inbox_item'
   map.context_message_reply 'messages/:id/reply', :controller => 'context', :action => 'context_message_reply'
+
+  map.messages_unread 'messages/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
+  map.messages_archived 'messages/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
+  map.messages_find_recipients 'messages/find_recipients', :controller => 'conversations', :action => 'find_recipients'
+  map.resources :conversations, :as => :messages, :only => [:index, :show, :update, :create, :destroy] do |conversation|
+    conversation.add_recipients 'add_recipients', :controller => 'conversations', :action => 'add_recipients', :conditions => {:method => :post}
+    conversation.add_message 'add_message', :controller => 'conversations', :action => 'add_message', :conditions => {:method => :post}
+    conversation.remove_messages 'remove_messages', :controller => 'conversations', :action => 'remove_messages', :conditions => {:method => :post}
+    conversation.archive 'archive', :controller => 'conversations', :action => 'workflow_event', :event => 'archive', :conditions => {:method => :post}
+    conversation.unarchive 'unarchive', :controller => 'conversations', :action => 'workflow_event', :event => 'unarchive', :conditions => {:method => :post}
+    conversation.mark_as_read 'mark_as_read', :controller => 'conversations', :action => 'workflow_event', :event => 'mark_as_read', :conditions => {:method => :post}
+    conversation.mark_as_unread 'mark_as_unread', :controller => 'conversations', :action => 'workflow_event', :event => 'mark_as_unread', :conditions => {:method => :post}
+  end
   
   # So, this will look like:
   # http://instructure.com/pseudonyms/3/register/5R32s9iqwLK75Jbbj0
