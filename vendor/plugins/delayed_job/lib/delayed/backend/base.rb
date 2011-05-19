@@ -122,8 +122,17 @@ module Delayed
 
     private
 
+      ParseObjectFromYaml = /\!ruby\/\w+\:([^\s]+)/
+
       def deserialize(source)
-        handler = YAML.load(source)
+        handler = nil
+        begin
+          handler = YAML.load(source)
+        rescue TypeError
+          attempt_to_load_from_source(source)
+          handler = YAML.load(source)
+        end
+
         return handler if handler.respond_to?(:perform)
 
         raise DeserializationError,
@@ -131,6 +140,12 @@ module Delayed
       rescue TypeError, LoadError, NameError => e
         raise DeserializationError,
           "Job failed to load: #{e.message}. Try to manually require the required file."
+      end
+
+      def attempt_to_load_from_source(source)
+        if md = ParseObjectFromYaml.match(source)
+          md[1].constantize
+        end
       end
 
     protected
