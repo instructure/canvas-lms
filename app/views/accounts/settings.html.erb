@@ -25,7 +25,9 @@
 
 <div id="account_settings_tabs" style="display:none;">
   <ul>
+    <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-settings">Settings</a></li>
+    <% end %>
     <li><a href="#tab-users" id="tab-users-link">Admins</a></li>
     <% if !@account.parent_account %>
       <li><a href="#tab-alerts" id="tab-alerts-link">Alerts</a></li>
@@ -33,10 +35,12 @@
     <% if !@available_reports.blank? %>
       <li><a href="#tab-reports" id="tab-reports-link">Reports</a></li>
     <% end %>
-    <li><a href="#tab-tools" id="tab-tols-link">External Tools</a></li>
-  </ul>
-  <div id="tab-settings">
     <% if can_do(@context, @current_user, :manage_account_settings) %>
+      <li><a href="#tab-tools" id="tab-tols-link">External Tools</a></li>
+    <% end %>
+  </ul>
+  <% if can_do(@context, @current_user, :manage_account_settings) %>
+    <div id="tab-settings">
       <% form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings"} do |f| %>
         <fieldset id="account_settings" class="">
           <legend> Account Settings </legend>
@@ -276,10 +280,8 @@
           <button type="submit" class="button">Update Settings</button>
         </div>
       <% end %>
-    <% else %>
-      You don't have permission to edit these settings
-    <% end %>
-  </div>
+    </div>
+  <% end %>
   <div id="tab-users">
     <h2>Account Admins</h2>
     <ul class="admins_list">
@@ -415,8 +417,10 @@
       <% end %>
     </div>
   <% end %>
-  <div id="tab-tools">
-    <h2>External Tools</h2>
-    <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
-  </div>
+  <% if can_do(@context, @current_user, :manage_account_settings) %>
+      <div id="tab-tools">
+        <h2>External Tools</h2>
+        <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
+      </div>
+  <% end %>
 </div>

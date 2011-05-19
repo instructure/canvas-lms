@@ -26,7 +26,7 @@ class AccountsController < ApplicationController
   
   def show
     return redirect_to account_settings_url(@account) if @account.site_admin?
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :read)
       load_course_right_side
       @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show)
       build_course_stats
@@ -34,7 +34,7 @@ class AccountsController < ApplicationController
   end
   
   def update
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_account_settings)
       respond_to do |format|
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
@@ -65,8 +65,9 @@ class AccountsController < ApplicationController
   end
   
   def settings
-    if authorized_action(@account, @current_user, :manage)
-      if @available_reports = AccountReport.available_reports(@account)
+    if authorized_action(@account, @current_user, :read)
+      @available_reports = AccountReport.available_reports(@account) if @account.grants_right?(@current_user, @session, :read_reports)
+      if @available_reports
         @last_reports = {}
         @available_reports.keys.each do |report|
           @last_reports[report] = @account.account_reports.last_of_type(report).first
@@ -170,7 +171,7 @@ class AccountsController < ApplicationController
   end
   
   def turnitin_confirmation 
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_account_settings)
       turnitin = Turnitin::Client.new(params[:id], params[:shared_secret])
       render :json => {:success => turnitin.testSettings}.to_json
     end
@@ -186,7 +187,7 @@ class AccountsController < ApplicationController
   protected :load_course_right_side
   
   def statistics
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :read)
       add_crumb("Statistics", statistics_account_url(@account))
       @recently_started_courses = @account.all_courses.recently_started
       @recently_ended_courses = @account.all_courses.recently_ended
@@ -199,7 +200,7 @@ class AccountsController < ApplicationController
   end
   
   def statistics_graph
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :read)
       @items = ReportSnapshot.get_account_detail_over_time('counts_progressive_detailed', @account.id, params[:attribute])
       respond_to do |format|
         format.json { render :json => @items.to_json }
@@ -222,7 +223,7 @@ class AccountsController < ApplicationController
   end
   
   def statistics_page_views
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :read)
       start_at = Date.parse(params[:start_at]) rescue nil
       start_at ||= 1.month.ago.to_date
       end_at = Date.parse(params[:end_at]) rescue nil
@@ -261,7 +262,7 @@ class AccountsController < ApplicationController
   end
   
   def sis_import
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_account_settings)
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || @account.root_account_id
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.scoped(:order=>'created_at DESC', :limit=>1).first
@@ -276,7 +277,7 @@ class AccountsController < ApplicationController
     raise "SIS imports can only be executed on root accounts" if @account.root_account_id
     raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
 
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_account_settings)
       ActiveRecord::Base.transaction do
         if !@account.current_sis_batch || !@account.current_sis_batch.importing?
           batch = SisBatch.create_with_attachment(@account, params[:import_type], params[:attachment])
@@ -297,7 +298,7 @@ class AccountsController < ApplicationController
   end
   
   def courses
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :read)
       load_course_right_side
       @courses = []
       @query = (params[:course] && params[:course][:name]) || params[:query]
@@ -366,7 +367,7 @@ class AccountsController < ApplicationController
   end
   
   def run_report
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :read_reports)
       student_report = AccountReport.new(:user=>@current_user, :account=>@account, :report_type=>params[:report_type])
       student_report.workflow_state = :running
       student_report.progress = 0

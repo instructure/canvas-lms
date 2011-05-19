@@ -149,7 +149,7 @@ class UsersController < ApplicationController
   
   def index
     get_context
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account || @account
       @users = []
       @query = (params[:user] && params[:user][:name]) || params[:query]

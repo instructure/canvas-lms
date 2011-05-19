@@ -868,6 +868,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_account_management(on_root_account = false)
+    if (@context.root_account != nil && on_root_account) || !@context.is_a?(Account)
+      redirect_to named_context_url(@context, :context_url)
+      return false
+    else
+      return false unless authorized_action(@context, @current_user, :manage_account_settings)
+    end
+  end
+
+  def require_root_account_management
+    require_account_management(true)
+  end
+
   # This before_filter can be used to limit access to only site admins.
   # This checks if the user is an admin of the 'Site Admin' account, and has the
   # site_admin permission.
