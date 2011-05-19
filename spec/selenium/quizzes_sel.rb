@@ -169,6 +169,31 @@ shared_examples_for "quiz selenium tests" do
     
     
   end
+
+  it "message students who... should do something" do
+    username = "nobody@example.com"
+    password = "asdfasdf"
+    u = user_with_pseudonym :active_user => true,
+                            :username => username,
+                            :password => password
+    u.save!
+    e = course_with_teacher :active_course => true,
+                            :user => u,
+                            :active_enrollment => true
+    e.save!
+    q = e.course.quizzes.build(:title => "My Quiz", :description => "Sup")
+    q.generate_quiz_data
+    q.published_at = Time.now
+    q.workflow_state = 'available'
+    q.save!
+    login_as(username, password)
+
+    get "/courses/#{e.course_id}/quizzes/#{q.id}"
+
+    driver.find_element(:partial_link_text, "Message Students Who...").click
+    dialog = find_all_with_jquery("#message_students_dialog:visible")
+    dialog.length.should eql(1)
+  end
 end
 
 describe "quiz Windows-Firefox-Tests" do
