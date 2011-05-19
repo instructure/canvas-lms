@@ -1121,6 +1121,8 @@ class Assignment < ActiveRecord::Base
   }
   named_scope :undated, :conditions => {:due_at => nil}
   
+  named_scope :only_graded, :conditions => "submission_types != 'not_graded'"
+  
   named_scope :with_just_calendar_attributes, lambda {
     { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id'] - ['cloned_item_id', 'migration_id']).join(", ") }
   }

@@ -22,7 +22,7 @@ class GradeCalculator
     @course_id = course_id
     @course = Course.find(course_id)
     @groups = @course.assignment_groups.active
-    @assignments = @course.assignments.active
+    @assignments = @course.assignments.active.only_graded
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = []
     @final_updates = []
