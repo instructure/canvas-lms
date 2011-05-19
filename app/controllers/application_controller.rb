@@ -909,10 +909,17 @@ class ApplicationController < ActionController::Base
       send_data(io, opts)
     end
   end
-  
+
   def verified_file_download_url(attachment, *opts)
     file_download_url(attachment, :verifier => attachment.uuid, *opts)
   end
   helper_method :verified_file_download_url
-  
+
+  def user_content(str, cache_key = nil)
+    return nil unless str
+    return str.html_safe unless str.match(/object|embed/)
+
+    UserContent.escape(str)
+  end
+  helper_method :user_content
 end

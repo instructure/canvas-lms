@@ -51,7 +51,7 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), entry_context.asset_string) %></div>
     <div class="course_id" style="display: none;"><%= entry_context.id if entry_context && entry_context.is_a?(Course) %></div>
-    <div class="message user_content"><%= user_content(entry.try_rescue(:message), entry_context.asset_string, entry.try_rescue(:asset_string)) || nbsp %></div>
+    <div class="message user_content"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>
     <div class="link_box">
       <div class="attachment_data" style="<%= hidden unless entry && entry.attachment %>; float: left;">

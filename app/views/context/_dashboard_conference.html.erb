@@ -16,7 +16,7 @@
   <div class="content">
     <div class="course_id" style="display: none;"><%= conference.context_id if conference && conference.context_type == 'Course' %></div>
     <div class="message user_content">
-      <%= user_content(conference.try_rescue(:description), conference.try_rescue(:context_code), conference.try_rescue(:asset_string)) || nbsp %>
+      <%= user_content(conference.try_rescue(:description)) || nbsp %>
     </div>
     <div class="links">
       <div style="float: left;">Last viewed <span class="time_ago_date"><%= datetime_string(conference.try_rescue(:updated_at)) %></span></div>

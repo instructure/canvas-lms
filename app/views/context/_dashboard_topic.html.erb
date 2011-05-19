@@ -20,9 +20,9 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((topic.try_rescue(:user_id)), context_code) %></div>
     <% if topic && topic.message && topic.message.length > 250 %>
-    <div class="message_short user_content"><%= truncate_html(user_content(topic.try_rescue(:message), context_code, topic.try_rescue(:asset_string)) || nbsp, :max_length => 250, :link => link_to("more", "#{context_prefix(context_code)}/discussion_topics/#{topic ? topic.id : '{{ id }}'}", :class => "read_more_link")) %></div>
+    <div class="message_short user_content"><%= truncate_html(user_content(topic.try_rescue(:message)) || nbsp, :max_length => 250, :link => link_to("more", "#{context_prefix(context_code)}/discussion_topics/#{topic ? topic.id : '{{ id }}'}", :class => "read_more_link")) %></div>
     <% end %>
-    <div class="message user_content" style="<%= hidden if topic && topic.message && topic.message.length > 250 %>"><%= user_content(topic.try_rescue(:message), context_code, topic.try_rescue(:asset_string)) || nbsp %></div>
+    <div class="message user_content" style="<%= hidden if topic && topic.message && topic.message.length > 250 %>"><%= user_content(topic.try_rescue(:message)) || nbsp %></div>
     <% if topic && !topic.root_discussion_entries.empty? %>
       <div class="original_post_date">
         posted 

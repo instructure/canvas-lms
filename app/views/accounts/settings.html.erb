@@ -335,7 +335,7 @@
               <%= link_to(context_user_name(@account, notification.user_id), user_path(notification.user_id)) %>
             </div>
             <div class="message user_content">
-              <%= user_content(notification.message, @account.asset_string, notification.asset_string) %>
+              <%= user_content(notification.message) %>
             </div>
           </li>
         <% end %>

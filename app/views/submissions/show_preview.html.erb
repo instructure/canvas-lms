@@ -61,7 +61,7 @@
     </select>
   </div>
   <div id="submission_preview" class="paper user_content">
-    <%= user_content(@submission.body, @context.asset_string, @submission.asset_string) %>
+    <%= user_content(@submission.body) %>
   </div>
 <% elsif @submission.submission_type == "online_upload" %>
   <div class="centered-block">

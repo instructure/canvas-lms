@@ -315,6 +315,10 @@ jQuery(function($) {
         }
       });
     $(".user_content.unenhanced").removeClass('unenhanced').addClass('enhanced');
+
+    setTimeout(function() {
+      $(".user_content form.user_content_post_form:not(.submitted)").submit().addClass('submitted');
+    }, 10);
   };
   if ($.filePreviewsEnabled()) {
     $("a.scribd_file_preview_link").live('click', function(event) {

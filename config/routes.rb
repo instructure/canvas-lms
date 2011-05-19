@@ -618,7 +618,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :interaction_tests, :collection => {:next => :get, :register => :get, :groups => :post}
   
   map.resources :delayed_jobs, :member => {:update => :put, :queue => :put, :hold => :put}, :collection => {:hold => :put, :queue => :put}
-  map.object_snippet 'object_snippet/:context_code/:asset_string/:key', :controller => 'context', :action => 'context_object'
+  map.object_snippet 'object_snippet', :controller => 'context', :action => 'object_snippet', :conditions => { :method => :post }
   map.saml_consume "saml_consume", :controller => "pseudonym_sessions", :action => "saml_consume" 
   map.saml_logout "saml_logout", :controller => "pseudonym_sessions", :action => "saml_logout" 
   map.saml_meta_data "saml_meta_data", :controller => 'accounts', :action => 'saml_meta_data'
