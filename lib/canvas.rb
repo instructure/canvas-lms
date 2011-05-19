@@ -35,4 +35,21 @@ module Canvas
     Bundler.require 'redis'
     @redis = ::Redis::Factory.create(redis_settings)
   end
+
+  # `sample` reports KB, not B
+  if File.directory?("/proc")
+    # linux w/ proc fs
+    LINUX_PAGE_SIZE = (size = `getconf PAGESIZE`.to_i; size > 0 ? size : 4096)
+    def self.sample_memory
+      s = File.read("/proc/#{Process.pid}/statm").to_i rescue 0
+      s * LINUX_PAGE_SIZE / 1024
+    end
+  else
+    # generic unix solution
+    def self.sample_memory
+      # hmm this is actually resident set size, doesn't include swapped-to-disk
+      # memory.
+      `ps -o rss= -p #{Process.pid}`.to_i
+    end
+  end
 end

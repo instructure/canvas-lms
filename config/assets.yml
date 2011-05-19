@@ -66,6 +66,8 @@ javascripts:
   gradebook_history:
     - public/javascripts/jquery.metadata.js 
     - public/javascripts/gradebook-history.js
+  jobs:
+    - public/javascripts/jobs.js
   profile:
     - public/javascripts/profile.js
   topics:
