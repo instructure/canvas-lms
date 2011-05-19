@@ -108,6 +108,16 @@ Spec::Runner.configure do |config|
 
   def course_with_student(opts={})
     course(opts)
+    student_in_course(opts)
+  end
+
+  def course_with_student_logged_in(opts={})
+    course_with_student(opts)
+    user_session(@user)    
+  end
+
+  def student_in_course(opts={})
+    @course ||= opts[:course] || course(opts)
     @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
     if opts[:active_enrollment] || opts[:active_all]
@@ -116,11 +126,6 @@ Spec::Runner.configure do |config|
     end
     @course.reload
     @enrollment
-  end
-
-  def course_with_student_logged_in(opts={})
-    course_with_student(opts)
-    user_session(@user)    
   end
 
   def course_with_teacher(opts={})

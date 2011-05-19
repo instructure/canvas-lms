@@ -58,6 +58,7 @@ class ConferencesController < ApplicationController
           members.uniq.each do |u|
             @conference.add_invitee(u)
           end
+          @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json { render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session}) }
         else
@@ -80,6 +81,7 @@ class ConferencesController < ApplicationController
           members.uniq.each do |u|
             @conference.add_invitee(u)
           end
+          @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json { render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session}) }
         else
