@@ -202,9 +202,8 @@ Spec::Runner.configure do |config|
   end
 
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
-    return ar_klass.create!(attrs) if ar_klass.accessible_attributes.nil?
-    obj = ar_klass.new(attrs.reject { |k,v| !ar_klass.accessible_attributes.include?(k) })
-    attrs.each { |k,v| obj.send("#{k}=", attrs[k]) unless ar_klass.accessible_attributes.include?(k) }
+    obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
+    attrs.each { |k,v| obj.send("#{k}=", attrs[k]) }
     obj.save! if do_save
     obj
   end
