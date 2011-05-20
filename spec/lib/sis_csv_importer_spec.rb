@@ -834,7 +834,7 @@ describe SIS::SisCsv do
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       
@@ -919,7 +919,7 @@ describe SIS::SisCsv do
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       
@@ -999,7 +999,7 @@ describe SIS::SisCsv do
         s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
         s1.should_not be_nil
         s1.nonxlist_course.should eql(course)
-        s1.account.should eql(course.account)
+        s1.account.should be_nil
       end
     end
 
@@ -1024,7 +1024,7 @@ describe SIS::SisCsv do
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
 
       3.times do 
         importer = process_csv_data(
@@ -1065,7 +1065,7 @@ describe SIS::SisCsv do
         s1.should_not be_nil
         s1.nonxlist_course.should eql(course)
         s1.course.should eql(xlist_course)
-        s1.account.should eql(course.account)
+        s1.account.should be_nil
         s1.crosslisted?.should be_true
       end
       importer = process_csv_data(
@@ -1164,7 +1164,7 @@ describe SIS::SisCsv do
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course1)
       s1.course.should eql(xlist_course)
-      s1.account.should eql(course1.account)
+      s1.account.should be_nil
       s1.crosslisted?.should be_true
       process_csv_data(
         "section_id,course_id,name,start_date,end_date,status",

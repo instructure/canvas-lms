@@ -117,7 +117,6 @@ class CourseSection < ActiveRecord::Base
     return self if self.course == course
     unless self.nonxlist_course
       self.nonxlist_course = self.course 
-      self.account = self.course.account
       self.save!
     end
     self.move_to_course(course, delay_jobs)
@@ -139,7 +138,6 @@ class CourseSection < ActiveRecord::Base
     end
     self.move_to_course(self.nonxlist_course, delay_jobs)
     self.nonxlist_course = nil
-    self.account = nil
     self.save!
   end
   

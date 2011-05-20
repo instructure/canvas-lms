@@ -234,8 +234,9 @@ class Course < ActiveRecord::Base
     
     did_an_update = false
     
-    # Courses are tied to accounts directly and through sections
-    initial_entities = [self] + self.course_sections.active.find(:all)
+    # Courses are tied to accounts directly and through sections and crosslisted courses
+    all_sections = self.course_sections.active.find(:all)
+    initial_entities = [self] + all_sections + all_sections.map(&:nonxlist_course).compact
     initial_entities.each do |entity|
       accounts = entity.account ? entity.account.account_chain : []
       section = (entity.is_a?(Course) ? entity.default_section : entity)
