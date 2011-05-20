@@ -70,7 +70,7 @@ module SIS
       @parallelism = 1 if @parallelism < 1
       @parallelism = 1 unless @batch
       @minimum_rows_for_parallel = settings[:minimum_rows_for_parallel].to_i
-      @minimum_rows_for_parallel = 1000 if @parallelism < 1
+      @minimum_rows_for_parallel = 1000 if @minimum_rows_for_parallel < 1
       @parallel_queue = settings[:queue_for_parallel_jobs]
       @parallel_queue = nil if @parallel_queue.blank?
       update_pause_vars
@@ -256,7 +256,7 @@ module SIS
       end
       # logger doesn't serialize well
       @logger = nil
-      @csvs[importer].each { |csv| self.send_later_if_production_enqueue_args(:run_single_importer, { :queue => @queue, :priority => Delayed::LOW_PRIORITY }, importer, csv) }
+      @csvs[importer].each { |csv| self.send_later_enqueue_args(:run_single_importer, { :queue => @queue, :priority => Delayed::LOW_PRIORITY }, importer, csv) }
     end
 
 
@@ -285,6 +285,7 @@ module SIS
     end
 
     def finish
+      @batch.finish(true)
       @finished = true
     end
 
