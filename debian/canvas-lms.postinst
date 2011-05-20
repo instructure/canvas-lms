@@ -195,6 +195,15 @@ function fix_ownership {
   chown $USERNAME $HOMEDIR
 }
 
+function database_exclusion {
+  db_get "canvas-lms/db/adapter" || exit 1
+  if [ "$RET" == "mysql" ]; then
+    echo "postgres"
+  elif [ "$RET" == "postgresql" ]; then
+    echo "mysql"
+  fi
+}
+
 function setup_gems {
   echo "setting up canvas gems..."
   PATH=$LOCALPATH HOME=$HOMEDIR gem install bundler --no-ri --no-rdoc
@@ -204,7 +213,7 @@ function setup_gems {
     PATH=\"$LOCALPATH\" \
     HOME=\"$HOMEDIR\" \
     /usr/bin/env \
-    bundle install --path $BASEDIR/vendor/bundle"
+    bundle install --path $BASEDIR/vendor/bundle --without test development $(database_exclusion)"
   chown -R root vendor/bundle .bundle
   popd
 }
