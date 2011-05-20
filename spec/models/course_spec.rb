@@ -641,6 +641,7 @@ describe Course, 'grade_publishing' do
       client.close
       server.close
     }
+    @course.grading_standard_id = 0
     @course.publish_final_grades(user)
     server_thread.join
     post_lines.should == [

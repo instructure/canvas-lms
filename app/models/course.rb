@@ -888,6 +888,7 @@ class Course < ActiveRecord::Base
 
     settings = PluginSetting.settings_for_plugin('grade_export')
     raise "final grade publishing disabled" unless settings[:enabled] == "true"
+    raise "no grading standard supplied" unless self.grading_standard_id
     raise "endpoint undefined" if settings[:publish_endpoint].nil? || settings[:publish_endpoint].empty?
 
     enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
@@ -900,8 +901,14 @@ class Course < ActiveRecord::Base
 
     if Course.valid_grade_export_types.has_key?(settings[:format_type])
       callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
-      posts_to_make, ignored_enrollments_ids = callback.call(self, enrollments,
-          publishing_pseudonym)
+      begin
+        posts_to_make, ignored_enrollment_ids = callback.call(self, enrollments,
+            publishing_pseudonym)
+      rescue
+        Enrollment.update enrollments.map(&:id),
+            [{ :grade_publishing_status => "error" }] * enrollments.size
+        raise
+      end
     end
 
     Enrollment.update ignored_enrollment_ids, [{ :grade_publishing_status => "unpublishable" }] * ignored_enrollment_ids.size
