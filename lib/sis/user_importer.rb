@@ -123,6 +123,7 @@ module SIS
                   pseudo.password = row['password']
                   pseudo.password_confirmation = row['password']
                 end
+                pseudo.sis_ssha = row['ssha_password'] if !row['ssha_password'].blank?
 
                 if row['email'].present?
                   comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(row['email'], 'active', 'email')

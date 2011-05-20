@@ -19,7 +19,7 @@
 class User < ActiveRecord::Base
   include Context
 
-  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image
+  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails
   attr_accessor :original_id
   
   before_save :infer_defaults

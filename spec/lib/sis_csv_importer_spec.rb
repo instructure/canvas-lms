@@ -199,27 +199,47 @@ describe SIS::SisCsv do
     
     it "should set passwords and not overwrite current passwords" do
       process_csv_data(
-        "user_id,login_id,password,first_name,last_name,email,status",
-        "user_1,user1,badpassword,User,Uno 2,user@example.com,active"     
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,badpassword,User,Uno 2,user@example.com,active,",
+        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}Y2FiODZkZDYyNjE3MTA4OTFlOGNiNTZlZTM2MjU2OTFhNzVkZjM0NHNhbHRzYWx0"
       )
-      user = User.find_by_email('user@example.com')
-      p = user.pseudonyms.first
-      p.valid_password?('badpassword').should be_true
+      user1 = User.find_by_email('user@example.com')
+      p = user1.pseudonyms.first
+      p.valid_arbitrary_credentials?('badpassword').should be_true
       
       p.password = 'lessbadpassword'
       p.password_confirmation = 'lessbadpassword'
       p.save
-      
+
+      user2 = User.find_by_email('user2@example.com')
+      p = user2.pseudonyms.first
+      p.valid_arbitrary_credentials?('password').should be_true
+
+      p.password = 'newpassword'
+      p.password_confirmation = 'newpassword'
+      p.save
+
+      p.valid_arbitrary_credentials?('password').should be_false
+      p.valid_arbitrary_credentials?('newpassword').should be_true
+
       process_csv_data(
-        "user_id,login_id,password,first_name,last_name,email,status",
-        "user_1,user1,badpassword2,User,Uno 2,user@example.com,active"     
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,badpassword2,User,Uno 2,user@example.com,active",
+        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}ZDg1ZmJhMjNmZWU0ZmFiMmYzYTJhNTMxNzZiNjcyZWFhMzE0ZTQzMXNhbHR5"
       )
       
-      user.reload
-      p = user.pseudonyms.first
-      p.valid_password?('badpassword').should be_false
-      p.valid_password?('badpassword2').should be_false
-      p.valid_password?('lessbadpassword').should be_true
+      user1.reload
+      p = user1.pseudonyms.first
+      p.valid_arbitrary_credentials?('badpassword').should be_false
+      p.valid_arbitrary_credentials?('badpassword2').should be_false
+      p.valid_arbitrary_credentials?('lessbadpassword').should be_true
+
+      user2.reload
+      p = user2.pseudonyms.first
+      p.valid_arbitrary_credentials?('password').should be_false
+      p.valid_arbitrary_credentials?('changedpassword').should be_false
+      p.valid_arbitrary_credentials?('newpassword').should be_true
+      p.valid_ssha?('changedpassword').should be_true
     end
     
     it "should warn for duplicate rows" do
