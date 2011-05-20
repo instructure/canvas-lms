@@ -226,7 +226,25 @@ describe FilesController do
     end
 
   end
-  
+
+  describe "GET 'show_relative'" do
+    it "should find files by relative path" do
+      course_with_teacher_logged_in(:active_all => true)
+      file_in_a_module
+      get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
+      response.should be_redirect
+      get "show_relative", :course_id => @course.id, :file_path => @file.full_path
+      response.should be_redirect
+    end
+
+    it "should fail if the file path doesn't match" do
+      course_with_teacher_logged_in(:active_all => true)
+      file_in_a_module
+      proc { get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
+      proc { get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
   describe "GET 'new'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)

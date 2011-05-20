@@ -278,12 +278,16 @@ class FilesController < ApplicationController
 
     if !@attachment
       #The relative path is for a different file, try to find it
-      @attachments = @context.attachments.active.to_a
-      @attachment  = @attachments.find { |a| a.matches_full_display_path?(path) }
-      @attachment  ||= @attachments.find { |a| a.matches_full_path?(path) }
-      raise ActiveRecord::RecordNotFound if !@attachment
-      params[:id] = @attachment ? @attachment.id : nil
+      @context.attachments.active.find_each(:batch_size => 500) do |a|
+        if a.matches_full_display_path?(path) || a.matches_full_path?(path)
+          @attachment = a
+          break
+        end
+      end
     end
+
+    raise ActiveRecord::RecordNotFound if !@attachment
+    params[:id] = @attachment.id
 
     params[:download] = '1'
     show
