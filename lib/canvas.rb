@@ -33,7 +33,18 @@ module Canvas
     redis_settings = Setting.from_config('redis')
     raise("Redis is not enabled for this install") if redis_settings.blank?
     Bundler.require 'redis'
-    @redis = ::Redis::Factory.create(redis_settings)
+    if redis_settings.is_a?(Array)
+      redis_settings = { :servers => redis_settings }
+    end
+    @redis = ::Redis::Factory.create(redis_settings[:servers])
+    if redis_settings[:database].present?
+      @redis.select(redis_settings[:database])
+    end
+    @redis
+  end
+
+  def self.redis_enabled?
+    @redis_enabled ||= Setting.from_config('redis').present?
   end
 
   # `sample` reports KB, not B

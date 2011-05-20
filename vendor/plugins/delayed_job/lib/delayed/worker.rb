@@ -119,6 +119,7 @@ class Worker
     say_job(job, "Processing #{log_job(job, :long)}", :info)
     runtime = Benchmark.realtime do
       Timeout.timeout(self.class.max_run_time.to_i, Delayed::TimeoutError) { job.invoke_job }
+      Delayed::Stats.job_complete(job, self)
       Rails.logger.silence do
         job.destroy
       end

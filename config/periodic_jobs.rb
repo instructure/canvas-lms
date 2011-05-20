@@ -71,3 +71,9 @@ Delayed::Periodic.cron 'ErrorReport.destroy_error_reports', '35 */1 * * *' do
   end
 end
 
+if Delayed::Stats.enabled?
+  Delayed::Periodic.cron 'Delayed::Stats.cleanup', '0 11 * * *' do
+    Delayed::Stats.send_later_enqueue_args(:cleanup, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1)
+  end
+end
+
