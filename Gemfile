@@ -49,13 +49,16 @@ group :postgres do
   gem 'pg',           '0.10.1'
 end
 
+group :sqlite do
+  gem 'sqlite3-ruby', '1.3.2'
+end
+
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.1'
   gem 'rspec-rails',  '1.3.3'
   gem 'selenium-webdriver', '0.1.3'
-  gem 'sqlite3-ruby', '1.3.2'
   gem 'webrat',       '0.7.2'
   gem 'yard',         '0.6.3'
 end
