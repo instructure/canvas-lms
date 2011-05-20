@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# THREAD_UNSAFE
-$request_context_id = ""
 
 class RequestContextGenerator
   def initialize(app)
@@ -25,9 +23,20 @@ class RequestContextGenerator
   end
 
   def call(env)
-    $request_context_id = UUIDSingleton.instance.generate
+    # This is a crummy way to plumb this data through to the logger
+    request_id = UUIDSingleton.instance.generate
+    session_id = CGI::Cookie::parse(env['HTTP_COOKIE'])['_normandy_session'][0] rescue nil
+    Thread.current[:context] = {
+      :request_id => request_id,
+      :session_id => session_id
+    }
+    
     status, headers, body = @app.call(env)
-    headers['X-Request-Context-Id'] = $request_context_id
+    headers['X-Request-Context-Id'] = request_id
     [ status, headers, body ]
+  end
+
+  def self.request_id
+    Thread.current[:context].try(:[], :request_id)
   end
 end

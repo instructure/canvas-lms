@@ -495,7 +495,7 @@ class ApplicationController < ActionController::Base
     @page_view.created_at = Time.now
     @page_view.updated_at = Time.now
     @page_before_render = Time.now.utc
-    @page_view.id = $request_context_id
+    @page_view.id = RequestContextGenerator.request_id
   end
   
   def generate_new_page_view
@@ -611,7 +611,7 @@ class ApplicationController < ActionController::Base
         :url => request.url,
         :user => @current_user,
         :user_agent => request.headers['User-Agent'],
-        :request_context_id => $request_context_id,
+        :request_context_id => RequestContextGenerator.request_id,
         :account => @domain_root_account,
         :request_method => request.method,
         :format => request.format,

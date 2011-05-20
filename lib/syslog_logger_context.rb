@@ -18,7 +18,8 @@
 
 class SyslogLogger
   def message_with_context(message)
-    "[#{$request_context_id}] #{message && message.strip}"
+    context = Thread.current[:context] || {}
+    "[#{context[:session_id] || "-"} #{context[:request_id] || "-"}] #{message && message.strip}"
   end
   
   def add_with_adding_context(severity, message = nil, progname = nil, &block)
