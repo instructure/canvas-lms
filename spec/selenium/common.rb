@@ -19,7 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
-include Socket::Constants
 require File.expand_path(File.dirname(__FILE__) + '/server')
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
@@ -55,26 +54,7 @@ module SeleniumTestsHelperMethods
     "http://#{APP_HOST}"
   end
 
-  def self.wait_for_port(port, tries = 60)
-    while tries > 0
-      tries -= 1
-      socket = Socket.new(AF_INET, SOCK_STREAM, 0)
-      sockaddr = Socket.pack_sockaddr_in(port, '0.0.0.0')
-      begin
-        socket.bind(sockaddr)
-        socket.close
-        return port
-      rescue Errno::EADDRINUSE => e
-        sleep 1
-      end
-    end
-    
-    raise "The port #{port} is not ready!"
-  end
-
   def self.start_in_process_webrick_server
-    wait_for_port(SERVER_PORT)
-    
     HostUrl.default_host = APP_HOST
     HostUrl.file_host = APP_HOST
     server = SpecFriendlyWEBrickServer
@@ -96,8 +76,6 @@ module SeleniumTestsHelperMethods
   end
   
   def self.start_forked_webrick_server
-    wait_for_port(SERVER_PORT)
-    
     domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
     domain_conf = YAML.load_file(domain_conf_path)
     old_domain = domain_conf[Rails.env]["domain"]
