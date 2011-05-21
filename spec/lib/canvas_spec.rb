@@ -22,12 +22,9 @@ describe Canvas do
   describe "sampling methods" do
     it "should sample the cpu on linux" do
       if File.directory?("/proc")
-        sample1 = Canvas.sample_cpu_time
-        100.times { User.all.count } # use some user cycles
-        sample2 = Canvas.sample_cpu_time
-        
-        (sample2[0] - sample1[0]).should be > 0.0
-        # (sample2[1] - sample1[1]).should be > 0.0
+        sample = Canvas.sample_cpu_time
+        sample[0].should be > 0.0
+        sample[1].should be > 0.0
       end
     end
   end
