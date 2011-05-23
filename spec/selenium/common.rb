@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
+require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
@@ -117,6 +118,7 @@ end
 shared_examples_for "all selenium tests" do
 
   include SeleniumTestsHelperMethods
+  include CustomSeleniumRspecMatchers
 
   attr_reader :selenium_driver
   alias_method :driver, :selenium_driver
