@@ -38,7 +38,7 @@ class SisImportsApiController < ApplicationController
   # There are two ways to post SIS import data - either via a multipart/form-data
   # form-field-style attachment, or via a non-multipart raw post request. For the
   # latter to work, you must provide a suitable Content-Type header.
-  # 
+  #
   # @argument import_type Choose the data format for reading SIS data. With a
   #   standard Canvas install, this option can only be 'instructure_csv',
   #   and if unprovided, will be assumed to be so. Can be part of the query string.
@@ -57,6 +57,11 @@ class SisImportsApiController < ApplicationController
   #   inferred from the Content-Type, falling back to zip-file format if all
   #   else fails.
   #
+  # @argument batch_mode ["1"] If set, this SIS import will be run in batch mode, deleting any data previously imported via SIS that is not present in this latest import.  See the PDF document for details.
+  #
+  # @argument batch_mode_term_id Limit deletions to only this term, if batch
+  #   mode is enabled.
+  #
   #   Examples:
   #     curl -H 'Content-Type: application/octet-stream' --data-binary @<filename>.zip -u '<username>:<password>' \ 
   #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv&extension=zip'
@@ -64,6 +69,8 @@ class SisImportsApiController < ApplicationController
   #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv'
   #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv -u '<username>:<password>' \ 
   #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv'
+  #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv -u '<username>:<password>' \ 
+  #         'http://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?api_key=<key>&import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
   def create
     if authorized_action(@account, @current_user, :manage)
       params[:import_type] ||= 'instructure_csv'
@@ -93,6 +100,16 @@ class SisImportsApiController < ApplicationController
         end
       end
       batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj)
+
+      if params[:batch_mode] == '1'
+        batch.batch_mode = true
+        if params[:batch_mode_term_id].present?
+          batch.batch_mode_term = Api.find(@account.enrollment_terms.active,
+                                           params[:batch_mode_term_id])
+        end
+        batch.save!
+      end
+
       batch.process
       render :json => batch.api_json
     end
