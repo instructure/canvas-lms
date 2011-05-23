@@ -18,7 +18,7 @@
 
 def assignment_model(opts={})
   course_model(:reusable => true)
-  @assignment = @course.assignments.create!(assignment_valid_attributes.merge(opts))
+  @assignment = factory_with_protected_attributes(@course.assignments, assignment_valid_attributes.merge(opts))
   @assignment.context.should eql(@course) rescue false
   @a = @assignment
   @c = @course

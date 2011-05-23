@@ -336,9 +336,15 @@ class Account < ActiveRecord::Base
   
   def page_views_by_hour(*args)
     dates = (!args.empty? && args) || [1.year.ago, Time.now ]
+    group = case PageView.connection.adapter_name
+    when "SQLite"
+      "strftime('%H', created_at)"
+    else
+      "extract(hour from created_at)"
+    end
     PageView.count(
-      :group => "hour(created_at)", 
-      :order => "hour(created_at)",
+      :group => group,
+      :order => group,
       :conditions => {
         :account_id, self_and_all_sub_accounts,
         :created_at, (dates.first)..(dates.last)
@@ -435,7 +441,7 @@ class Account < ActiveRecord::Base
   end
   
   def self_and_all_sub_accounts
-    @self_and_all_sub_accounts ||= ActiveRecord::Base.connection.send(:select, "SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id] #(self.all_accounts + [self]).map &:id
+    @self_and_all_sub_accounts ||= ActiveRecord::Base.connection.select_all("SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id] #(self.all_accounts + [self]).map &:id
   end
   
   def abstract_courses

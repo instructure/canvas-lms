@@ -416,4 +416,23 @@ module ApplicationHelper
   def tomorrow_at_midnight
     1.day.from_now.to_date.to_time
   end
+  
+  # you should supply :all_folders to avoid a db lookup on every iteration
+  def folders_as_options(folders, opts = {})
+    opts[:indent_width] ||= 3
+    opts[:depth] ||= 0
+    opts[:options_so_far] ||= []
+    folders.each do |folder|
+      opts[:options_so_far] << %{<option value="#{folder.id}" #{'selected' if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>}
+      child_folders = if opts[:all_folders]
+                        opts[:all_folders].select {|f| f.parent_folder_id == folder.id }
+                      else
+                        folder.active_sub_folders
+                      end
+      if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
+        folders_as_options(child_folders, opts.merge({:depth => opts[:depth] + 1}))
+      end
+    end
+    opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
+  end
 end
