@@ -192,7 +192,6 @@ class WebConference < ActiveRecord::Base
     infer_conference_settings
     self.conference_type ||= config && config[:conference_type]
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
-    self.duration ||= 30
     self.user_ids ||= (self.user_id || "").to_s
     self.added_user_ids ||= ""
     self.title ||= "#{self.context.name} Web Conference"
@@ -217,11 +216,16 @@ class WebConference < ActiveRecord::Base
   end
   
   def restartable?
-    self.end_at && Time.now <= self.end_at
+    end_at && Time.now <= end_at && !long_running?
   end
-  
+
+  def long_running?
+    duration.nil?
+  end
+
+  DEFAULT_DURATION = 60
   def duration_in_seconds
-    ((self.duration || 60) * 60)
+    duration ? duration * 60 : nil
   end
   
   def running_time
@@ -234,7 +238,7 @@ class WebConference < ActiveRecord::Base
   
   def restart
     self.start_at ||= Time.now
-    self.end_at ||= self.start_at + self.duration_in_seconds
+    self.end_at ||= self.start_at + self.duration_in_seconds if self.duration
     self.started_at ||= self.start_at
     self.ended_at = nil
     self.save
@@ -242,7 +246,7 @@ class WebConference < ActiveRecord::Base
   
   def active?(force_check=false)
     if !force_check
-      return true if self.start_at && self.end_at && Time.now > self.start_at && Time.now < self.end_at
+      return true if self.start_at && (self.end_at.nil? || self.end_at && Time.now > self.start_at && Time.now < self.end_at)
       return true if self.ended_at && Time.now < self.ended_at
       return false if self.ended_at && Time.now > self.ended_at
       return @conference_active if @conference_active
@@ -250,7 +254,7 @@ class WebConference < ActiveRecord::Base
     @conference_active = (conference_status == :active)
     # If somehow the end_at didn't get set, set the end date
     # based on the start time and duration
-    if @conference_active && !self.end_at
+    if @conference_active && !self.end_at && !long_running?
       self.start_at ||= Time.now
       self.end_at = [self.start_at, Time.now].compact.min + self.duration_in_seconds
       self.save
@@ -265,12 +269,16 @@ class WebConference < ActiveRecord::Base
     # If the conference is no longer in use and its end_at has passed,
     # consider it ended
     elsif @conference_active == false && self.started_at && self.end_at && self.end_at < Time.now && !self.ended_at
-      self.ended_at = Time.now
-      self.start_at ||= self.started_at
-      self.end_at ||= self.ended_at
-      self.save
+      close
     end
     @conference_active
+  end
+
+  def close
+    self.ended_at = Time.now
+    self.start_at ||= started_at
+    self.end_at ||= ended_at
+    save
   end
   
   def presenter_key
@@ -331,7 +339,13 @@ class WebConference < ActiveRecord::Base
     set { can :initiate }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_content) }
-    set { can :read and can :join and can :initiate and can :create and can :delete and can :update }
+    set { can :read and can :join and can :initiate and can :create and can :delete }
+    
+    given { |user, session| cached_context_grants_right?(user, session, :manage_content) && !finished? }
+    set { can :update }
+    
+    given { |user, session| cached_context_grants_right?(user, session, :manage_content) && long_running? && active? }
+    set { can :close }
   end
   
   def config

@@ -37,16 +37,16 @@ describe WebConference do
 
   context "broken_plugin" do
     it "should return false on valid_config? if no matching config" do
-      WebConference.new.valid_config?.should be_false
+      WebConference.new.should_not be_valid_config
       conf = WebConference.new
       conf.conference_type = 'bad_type'
-      conf.valid_config?.should be_false
+      conf.should_not be_valid_config
     end
 
     it "should return false on valid_config? if plugin subclass is broken/missing" do
       conf = WebConference.new
       conf.conference_type = "broken_plugin"
-      conf.valid_config?.should be_false
+      conf.should_not be_valid_config
     end
   end
 
@@ -70,8 +70,8 @@ describe WebConference do
     end
     
     it "should confirm valid config" do
-      DimDimConference.new.valid_config?.should be_true
-      DimDimConference.new(:conference_type => "DimDim").valid_config?.should be_true
+      DimDimConference.new.should be_valid_config
+      DimDimConference.new(:conference_type => "DimDim").should be_valid_config
     end
   end
 
@@ -105,8 +105,8 @@ describe WebConference do
     end
 
     it "should confirm valid config" do
-      BigBlueButtonConference.new.valid_config?.should be_true
-      BigBlueButtonConference.new(:conference_type => "BigBlueButton").valid_config?.should be_true
+      BigBlueButtonConference.new.should be_valid_config
+      BigBlueButtonConference.new(:conference_type => "BigBlueButton").should be_valid_config
     end
   end
 
@@ -136,7 +136,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stub!(:email).and_return(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
       conference.start_at.should be_nil
       conference.end_at.should be_nil
       conference.started_at.should be_nil
@@ -147,7 +147,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stub!(:email).and_return(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
       conference.add_attendee(@user)
       conference.start_at.should_not be_nil
       conference.end_at.should eql(conference.start_at + conference.duration_in_seconds)
@@ -159,22 +159,22 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stub!(:email).and_return(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
       conference.add_attendee(@user)
       conference.stub!(:conference_status).and_return(:active)
-      conference.ended_at.should eql(nil)
-      conference.active?.should eql(true)
-      conference.ended_at.should eql(nil)
+      conference.ended_at.should be_nil
+      conference.should be_active
+      conference.ended_at.should be_nil
     end
     
     it "should not set ended_at if the conference is no longer active but end_at has not passed" do
       user_model
       email = "email@email.com"
       @user.stub!(:email).and_return(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
       conference.add_attendee(@user)
       conference.stub!(:conference_status).and_return(:closed)
-      conference.ended_at.should eql(nil)
+      conference.ended_at.should be_nil
       conference.active?(true).should eql(false)
       conference.ended_at.should be_nil
     end
@@ -183,13 +183,13 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stub!(:email).and_return(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
       conference.add_attendee(@user)
       conference.stub!(:conference_status).and_return(:closed)
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
       conference.save!
-      conference.ended_at.should eql(nil)
+      conference.ended_at.should be_nil
       conference.active?(true).should eql(false)
       conference.ended_at.should_not be_nil
       conference.ended_at.should < Time.now
@@ -199,10 +199,10 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stub!(:email).and_return(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
       conference.add_attendee(@user)
       conference.stub!(:conference_status).and_return(:active)
-      conference.ended_at.should eql(nil)
+      conference.ended_at.should be_nil
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
       conference.save!
@@ -216,25 +216,38 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stub!(:email).and_return(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
       conference.add_attendee(@user)
       conference.stub!(:conference_status).and_return(:active)
-      conference.finished?.should eql(false)
-      conference.restartable?.should eql(true)
+      conference.should_not be_finished
+      conference.should be_restartable
     end
     
     it "should not be restartable if end_at has passed" do
       user_model
       email = "email@email.com"
       @user.stub!(:email).and_return(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60)
       conference.add_attendee(@user)
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
       conference.save!
       conference.stub!(:conference_status).and_return(:active)
-      conference.finished?.should eql(true)
-      conference.restartable?.should eql(false)
+      conference.should be_finished
+      conference.should_not be_restartable
+    end
+
+    it "should not be restartable if it's long running" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = DimDimConference.create!(:title => "my conference", :user => @user)
+      conference.add_attendee(@user)
+      conference.start_at = 30.minutes.ago
+      conference.close
+      conference.stub!(:conference_status).and_return(:active)
+      conference.should be_finished
+      conference.should_not be_restartable
     end
   end
 end

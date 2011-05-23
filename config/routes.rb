@@ -168,6 +168,7 @@ ActionController::Routing::Routes.draw do |map|
     course.named_wiki_page 'wiki/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
     course.resources :conferences do |conference|
       conference.join "join", :controller => "conferences", :action => "join"
+      conference.close "close", :controller => "conferences", :action => "close"
     end
     
     course.resources :question_banks do |bank|
