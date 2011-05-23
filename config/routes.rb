@@ -48,6 +48,7 @@ ActionController::Routing::Routes.draw do |map|
     course.self_unenrollment 'self_unenrollment/:self_unenrollment', :controller => 'courses', :action => 'self_unenrollment'
     course.restore 'restore', :controller => 'courses', :action => 'restore'
     course.backup 'backup', :controller => 'courses', :action => 'backup'
+    course.unconclude 'unconclude', :controller => 'courses', :action => 'unconclude'
     course.students 'students', :controller => 'courses', :action => 'students'
     course.resources :role_overrides, :only => [:index, :create]
     course.enrollment_invitation 'enrollment_invitation', :controller => 'courses', :action => 'enrollment_invitation'

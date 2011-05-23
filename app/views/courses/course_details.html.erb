@@ -32,7 +32,14 @@
     <% end %>
     
     <% if can_do(@context, @current_user, :update) %>
+      <% if @context.completed? %>
+        <% form_tag context_url(@context, :context_unconclude_url) do %>
+          <button class="button button-sidebar-wide" type="submit"><%= image_tag "add.png" %>Un-Conclude Course</button>
+        <% end %>
+        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'delete') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %>Permanently Delete this Course</a>
+      <% else %>
         <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %>End this Course</a>
+      <% end %>
         <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Copy this Course</a>
         <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Import Content into this Course</a>
         <!--<a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Export this Course</a>-->

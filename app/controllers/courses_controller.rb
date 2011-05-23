@@ -131,6 +131,15 @@ class CoursesController < ApplicationController
     end
   end
 
+  def unconclude
+    get_context
+    if authorized_action(@context, @current_user, :update)
+      @context.unconclude
+      flash[:notice] = "Course un-concluded"
+      redirect_to(named_context_url(@context, :context_url))
+    end
+  end
+
   STUDENT_API_FIELDS = %w(id name)
   STUDENT_API_METHODS = %w(sis_user_id)
 

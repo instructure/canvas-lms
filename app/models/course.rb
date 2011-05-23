@@ -531,6 +531,10 @@ class Course < ActiveRecord::Base
   def do_complete
     self.conclude_at ||= Time.now
   end
+
+  def do_unconclude
+    self.conclude_at = nil
+  end
   
   def do_offer
     self.start_at ||= Time.now
@@ -567,7 +571,9 @@ class Course < ActiveRecord::Base
     end
 
     state :aborted
-    state :completed
+    state :completed do
+      event :unconclude, :transitions_to => :available
+    end
     state :deleted
   end
   
