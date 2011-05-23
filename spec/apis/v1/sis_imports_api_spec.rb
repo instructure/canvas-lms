@@ -112,4 +112,42 @@ describe SisImportsApiController, :type => :integration do
     batch.batch_mode_term.should == term
   end
 
+  it "should allow raw post without charset" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s,
+            :import_type => 'instructure_csv' },
+          {},
+          { 'content-type' => 'text/csv' })
+    batch = SisBatch.last
+    batch.attachment.filename.should == "sis_import.csv"
+    batch.attachment.content_type.should == "text/csv"
+  end
+
+  it "should handle raw post content-types with attributes" do
+    json = api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s,
+            :import_type => 'instructure_csv' },
+          {},
+          { 'content-type' => 'text/csv; charset=utf-8' })
+    batch = SisBatch.last
+    batch.attachment.filename.should == "sis_import.csv"
+    batch.attachment.content_type.should == "text/csv"
+  end
+
+  it "should reject non-utf-8 encodings on content-type" do
+    json = raw_api_call(:post,
+          "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
+          { :controller => 'sis_imports_api', :action => 'create',
+            :format => 'json', :account_id => @account.id.to_s,
+            :import_type => 'instructure_csv' },
+          {},
+          { 'content-type' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
+    response.status.should match(/400/)
+    SisBatch.count.should == 0
+  end
+
 end

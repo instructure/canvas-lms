@@ -90,13 +90,20 @@ class SisImportsApiController < ApplicationController
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
                                 Attachment.mimetype("sis_import.#{params[:extension]}"))
         else
+          env = request.env.dup
+          env['CONTENT_TYPE'] = env["ORIGINAL_CONTENT_TYPE"]
+          # copy of request with original content type restored
+          request2 = Rack::Request.new(env)
+          charset = request2.media_type_params['charset']
+          if charset.present? && charset.downcase != 'utf-8'
+            return render :json => { :error => "Invalid content type, UTF-8 required" }, :status => 400
+          end
           params[:extension] ||= {"application/zip" => "zip",
                                   "text/xml" => "xml",
                                   "text/plain" => "csv",
-                                  "text/csv" => "csv"}[
-                                  request.env['ORIGINAL_CONTENT_TYPE']] || "zip"
+                                  "text/csv" => "csv"}[request2.media_type] || "zip"
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
-                                request.env['ORIGINAL_CONTENT_TYPE'])
+                                request2.media_type)
         end
       end
       batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj)
