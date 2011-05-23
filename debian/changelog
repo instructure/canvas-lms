@@ -1,3 +1,16 @@
+canvas-lms (1.1-31) professional; urgency=low
+
+  * [f739510] manually bumping changelog
+  * [e1ecff3] replace recursive partial call with a helper instead
+  * [fcf3a38] limit depth of folder structure on module content picker
+  * [d27a6c2] sqlite compatibility in finding subaccounts
+  * [189b2e1] fix page view stats database compatibility
+  * [c9f6d0a] move sqlite out of the test group to its own
+  * [91fbd18] rendering assignment discussions in group context, fixes
+    #4634
+
+ -- JT Olds <jt@instructure.com>  Mon, 23 May 2011 15:32:31 -0600
+
 canvas-lms (1.1-30) professional; urgency=low
 
   * [fe4b359] manually bumping changelog
