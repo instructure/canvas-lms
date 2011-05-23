@@ -59,7 +59,7 @@ describe SisBatch do
 
       # sections are keyed off what term their course is in
       @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => 'old')
-      @s2 = factory_with_protected_attributes(@c2.course_sections, :name => "don't delete me")
+      @s2 = factory_with_protected_attributes(@c2.course_sections, :name => "don't delete me", :sis_source_id => 'my_section')
       @s3 = factory_with_protected_attributes(@c3.course_sections, :name => "delete me if terms", :sis_batch_id => 'old')
       @s4 = factory_with_protected_attributes(@c2.course_sections, :name => "delete me", :sis_batch_id => 'old') # c2 won't be deleted, but this section should still be
 
@@ -68,7 +68,7 @@ describe SisBatch do
       @e2 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user)
       @e3 = factory_with_protected_attributes(@c3.enrollments, :workflow_state => 'active', :user => user, :sis_batch_id => 'old')
       @e4 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user, :sis_batch_id => 'old') # c2 won't be deleted, but this enrollment should still be
-      @e5 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user_with_pseudonym, :sis_batch_id => 'old') # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
+      @e5 = factory_with_protected_attributes(@c2.enrollments, :workflow_state => 'active', :user => user_with_pseudonym, :sis_batch_id => 'old', :course_section => @s2) # c2 won't be deleted, and this enrollment sticks around because it's specified in the new csv
       @e5.user.pseudonym.update_attribute(:sis_user_id, 'my_user')
       @e5.user.pseudonym.update_attribute(:account_id, @account.id)
 
@@ -76,10 +76,10 @@ describe SisBatch do
         [
 %{course_id,short_name,long_name,account_id,term_id,status
 test_1,TC 101,Test Course 101,,,active},
-%{course_id,user_id,role,status
-test_1,user_1,student,active
-my_course,user_2,student,active
-my_course,my_user,student,active},
+%{course_id,user_id,role,status,section_id
+test_1,user_1,student,active,
+my_course,user_2,student,active,
+my_course,my_user,student,active,my_section},
 %{section_id,course_id,name,status
 s2,test_1,section2,active},
         ],
