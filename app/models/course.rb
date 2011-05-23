@@ -706,13 +706,7 @@ class Course < ActiveRecord::Base
     given { |user, session| session && session["role_course_#{self.id}"] }
     set { can :read }
     
-    given { |user, session| user && AccountUser.for_user_and_account?(user, self.account_id) && (!session || !session["role_course_#{self.id}"]) rescue false }
-    set { can :update and can :manage and can :manage_content and can :impersonate_as_context_member and can :delete and can :create and can :read and can :read_groups }
-    
-    given { |user, session| user && AccountUser.for_user_and_account?(user, self.root_account_id) && (!session || !session["role_course_#{self.id}"]) rescue false } #self.root_account.users.include?(user) rescue false }
-    set { can :update and can :manage and can :manage_content and can :impersonate_as_context_member and can :delete and can :create and can :read and can :read_groups }
-    
-    given { |user, session| user && Account.site_admin_user?(user) && (!session || !session["role_course_#{self.id}"]) rescue false }
+    given { |user, session| user && account.grants_right?(user, session, :manage) && (!session || !session["role_course_#{self.id}"]) rescue false }
     set { can :update and can :manage and can :manage_content and can :impersonate_as_context_member and can :delete and can :create and can :read and can :read_groups }
   end
   

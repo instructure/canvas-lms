@@ -42,6 +42,15 @@ describe Course do
     @course.save!
     @course.uuid.should_not be_nil
   end
+
+  it "should follow account chain when looking for generic permissions from AccountUsers" do
+    account = Account.create!
+    sub_account = Account.create!(:parent_account => account)
+    sub_sub_account = Account.create!(:parent_account => sub_account)
+    user = account_admin_user(:account => sub_account)
+    course = Course.create!(:account => sub_sub_account)
+    course.grants_right?(user, nil, :manage).should be_true
+  end
 end
 
 describe Course, "account" do
