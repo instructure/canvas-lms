@@ -101,7 +101,7 @@
           <% end %>
         <% end %>
         <% if can_do(@topic.assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
-          <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
+          <a href="#" rel="<%= context_url(@assignment.context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
         <% end %>
       </div>
     <% end %>
@@ -120,7 +120,7 @@
 <% end %>
 <% if @assignment %>
   <% if can_do(@assignment, @current_user, :update) %>
-    <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
+    <a href="<%= context_url(@assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
   <% end %>
 <% end %>
 <% if (@topic && @topic.context_module_tag && @topic.context_module_tag.context_module) || (@topic.for_assignment? && @topic.assignment.context_module_tag && @topic.assignment.context_module_tag.context_module) %>
