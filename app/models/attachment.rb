@@ -356,7 +356,7 @@ class Attachment < ActiveRecord::Base
     after_attachment_saved
   end
 
-  CONTENT_LENGTH_RANGE = 50.megabytes
+  CONTENT_LENGTH_RANGE = 10.gigabytes
   S3_EXPIRATION_TIME = 30.minutes
 
   def ajax_upload_params(pseudonym, local_upload_url, s3_success_url, options = {})
