@@ -75,7 +75,6 @@ class FoldersController < ApplicationController
       else
         respond_to do |format|
           if @attachment.zipped?
-            format.json { render :json => @attachment.to_json(:methods => :readable_size) }
             if Attachment.s3_storage?
               format.html { redirect_to @attachment.cacheable_s3_url }
               format.zip { redirect_to @attachment.cacheable_s3_url }
@@ -83,11 +82,12 @@ class FoldersController < ApplicationController
               format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
               format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
             end
+            format.json { render :json => @attachment.to_json(:methods => :readable_size) }
           else
             flash[:notice] = "File zipping still in process..."
-            format.json { render :json => @attachment.to_json }
             format.html { redirect_to named_context_url(@context, :context_folder_url, @folder.id) }
             format.zip { redirect_to named_context_url(@context, :context_folder_url, @folder.id) }
+            format.json { render :json => @attachment.to_json }
           end
         end
       end

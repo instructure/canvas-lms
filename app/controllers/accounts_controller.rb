@@ -163,8 +163,8 @@ class AccountsController < ApplicationController
       end
       respond_to do |format|
         flash[:notice] = "#{@user.name} successfully deleted" if @user
-        format.json { render :json => @user.to_json }
         format.html { redirect_to account_url(@account) }
+        format.json { render :json => @user.to_json }
       end
     end
   end

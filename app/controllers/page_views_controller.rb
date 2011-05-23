@@ -28,9 +28,9 @@ class PageViewsController < ApplicationController
     if authorized_action(@user, @current_user, :view_statistics)
       @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC'
       respond_to do |format|
-        format.js  { render :partial => @page_views }
-        format.json  { render :partial => @page_views }
-        format.html #index.html.erb
+        format.html
+        format.js { render :partial => @page_views }
+        format.json { render :partial => @page_views }
         format.csv { 
           send_data(
             @user.page_views.scoped(:limit=>params[:report_count] || 300).to_a.to_csv, 
