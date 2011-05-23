@@ -687,7 +687,7 @@ class CoursesController < ApplicationController
     can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_remove
       respond_to do |format|
-        if !@enrollment.defined_by_sis? && @enrollment.destroy
+        if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
           format.json { render :json => @enrollment.to_json }
         else
           format.json { render :json => @enrollment.to_json, :status => :bad_request }
