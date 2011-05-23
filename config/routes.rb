@@ -63,6 +63,7 @@ ActionController::Routing::Routes.draw do |map|
     course.roster_message 'messages/:id', :controller => 'context', :action => 'read_roster_message', :conditions => {:method => :put}
     course.roster_message_attachment 'messages/:message_id/files/:id', :controller => 'context', :action => 'roster_message_attachment'
     course.unenroll 'unenroll/:id', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
+    course.move_enrollment 'move_enrollment/:id', :controller => 'courses', :action => 'move_enrollment', :conditions => {:method => :post}
     course.formatted_unenroll 'unenroll/:id.:format', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
     course.limit_user_grading 'limit_user_grading/:id', :controller => 'courses', :action => 'limit_user', :conditions => {:method => :post}
     course.conclude_user_enrollment 'conclude_user/:id', :controller => 'courses', :action => 'conclude_user', :conditions => {:method => :delete}

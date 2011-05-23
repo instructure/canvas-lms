@@ -736,6 +736,26 @@ class CoursesController < ApplicationController
       render :json => enrollment.to_json(:methods => :associated_user_name)
     end
   end
+
+  def move_enrollment
+    get_context
+    @enrollment = @context.enrollments.find(params[:id])
+    can_move = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
+    can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
+    if can_move
+      respond_to do |format|
+        if @enrollment.defined_by_sis?
+          return format.json { render :json => @enrollment.to_json, :status => :bad_request }
+        end
+        @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
+        @enrollment.save!
+
+        format.json { render :json => @enrollment.to_json }
+      end
+    else
+      authorized_action(@context, @current_user, :permission_fail)
+    end
+  end
   
   def copy
     get_context

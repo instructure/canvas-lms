@@ -8,7 +8,10 @@
 <% end %>>
   <span class="links" style="<%= hidden if enrollment && (enrollment.user == @current_user || (@current_enrollment && @current_enrollment.type != 'TeacherEnrollment')) %>">
     <% if show_information_link %>
-    <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
+      <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
+      <% if [StudentEnrollment, Observable].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users) %>
+        <a href="#" class="edit_section_link no-hover"><%= image_tag "edit.png" %></a>
+      <% end %>
     <% end %>
     <% if enrollment && enrollment.defined_by_sis? %>
       <a href="<%= context_url(@context, :context_unenroll_url, (enrollment.try_rescue(:id) || "{{ id }}" ) ) %>" class="unenroll_user_link cant_unenroll no-hover" title="Can't Remove User from Course"><%= image_tag "delete_circle_gray.png" %></a>
@@ -34,6 +37,13 @@
     <% enrollments.each do |enrollment| %>
       <% if enrollment && enrollment.course_section %>
         <div class="section"><%= enrollment.course_section.display_name %></div>
+        <% form_tag course_move_enrollment_url(@context, enrollment.id), {:class => "enrollment_course_section_form", :style => "display: none;"} do  %>
+          <select title="Course Section" name="course_section_id" id="course_section_id">
+            <% @context.course_sections.active.each do |section| %>
+              <option value="<%= section.id %>" class="option_for_section_<%= section.id %>" <%= "selected=selected" if enrollment.course_section_id==section.id %>><%= section.display_name %></option>
+            <% end %>
+          </select>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>
