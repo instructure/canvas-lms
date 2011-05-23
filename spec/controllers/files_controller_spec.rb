@@ -51,6 +51,21 @@ describe FilesController do
     @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
   end
   
+  def file_with_path(path)
+    components = path.split('/')
+    folder = nil
+    while components.size > 1
+      component = components.shift
+      folder = @course.folders.find_by_name(component)
+      folder ||= @course.folders.create!(:name => component, :workflow_state => "visible", :parent_folder => folder)
+    end
+    filename = components.shift
+    @file = folder.active_file_attachments.build(:filename => filename, :uploaded_data => io)
+    @file.context = @course
+    @file.save!
+    @file
+  end
+  
   describe "GET 'quota'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -230,11 +245,24 @@ describe FilesController do
   describe "GET 'show_relative'" do
     it "should find files by relative path" do
       course_with_teacher_logged_in(:active_all => true)
+      
       file_in_a_module
       get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
       response.should be_redirect
       get "show_relative", :course_id => @course.id, :file_path => @file.full_path
       response.should be_redirect
+      
+      def test_path(path)
+        file_with_path(path)
+        get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
+        response.should be_redirect
+        get "show_relative", :course_id => @course.id, :file_path => @file.full_path
+        response.should be_redirect
+      end
+      
+      test_path("course files/unfiled/test1.txt")
+      test_path("course files/blah")
+      test_path("course files/a/b/c%20dude/d/e/f.gif")
     end
 
     it "should fail if the file path doesn't match" do

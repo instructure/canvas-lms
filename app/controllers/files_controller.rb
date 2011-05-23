@@ -277,11 +277,13 @@ class FilesController < ApplicationController
     end
 
     if !@attachment
-      #The relative path is for a different file, try to find it
-      @context.attachments.active.find_each(:batch_size => 500) do |a|
-        if a.matches_full_display_path?(path) || a.matches_full_path?(path)
-          @attachment = a
-          break
+      # The relative path is for a different file, try to find it
+      components = path.split('/')
+      component = components.shift
+      @context.folders.active.find_all_by_parent_folder_id(nil).each do |folder|
+        if folder.name == component
+          @attachment = folder.find_attachment_with_components(components.dup)
+          break if @attachment
         end
       end
     end

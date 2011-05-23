@@ -1044,6 +1044,13 @@ class Attachment < ActiveRecord::Base
     fd_path == path || URI.unescape(fd_path) == path || fd_path.downcase == path.downcase || URI.unescape(fd_path).downcase == path.downcase
   end
 
+  def matches_filename?(match)
+    filename == match || display_name == match ||
+      URI.unescape(filename) == match || URI.unescape(display_name) == match ||
+      filename.downcase == match.downcase || display_name.downcase == match.downcase ||
+      URI.unescape(filename).downcase == match.downcase || URI.unescape(display_name).downcase == match.downcase
+  end
+
   def protect_for(user)
     @cant_preview_scribd_doc = !self.grants_right?(user, nil, :download)
   end

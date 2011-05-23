@@ -282,6 +282,21 @@ class Folder < ActiveRecord::Base
     end
   end
 
+  def find_attachment_with_components(components)
+    component = components.shift
+    if components.empty?
+      # find the attachment
+      return visible_file_attachments.to_a.find {|a| a.matches_filename?(component) }
+    else
+      # find a subfolder and recurse (yes, we can have multiple sub-folders w/ the same name)
+      active_sub_folders.find_all_by_name(component).each do |folder|
+        a = folder.find_attachment_with_components(components.dup)
+        return a if a
+      end
+    end
+    nil
+  end
+
   def locked?
     self.locked ||
     (self.lock_at && Time.now > self.lock_at) ||
