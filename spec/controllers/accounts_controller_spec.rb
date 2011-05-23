@@ -55,4 +55,25 @@ describe AccountsController do
       response.should be_redirect
     end
   end
+
+  describe "SIS imports" do
+    it "should set batch mode and term if given" do
+      course_with_teacher_logged_in(:active_all => true)
+      @account = account
+      @account.update_attribute(:allow_sis_import, true)
+      @account.add_user(@user)
+      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1'
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.batch_mode.should be_true
+      batch.batch_mode_term.should be_nil
+      batch.destroy
+
+      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1', :batch_mode_term_id => @account.enrollment_terms.first.id
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.batch_mode.should be_true
+      batch.batch_mode_term.should == @account.enrollment_terms.first
+    end
+  end
 end

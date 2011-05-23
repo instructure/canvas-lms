@@ -266,6 +266,7 @@ class AccountsController < ApplicationController
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || @account.root_account_id
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.scoped(:order=>'created_at DESC', :limit=>1).first
+      @terms = @account.enrollment_terms.active
       respond_to do |format|
         format.html
         format.json { render :json => @current_batch.to_json(:include => :sis_batch_log_entries) }
@@ -281,6 +282,15 @@ class AccountsController < ApplicationController
       ActiveRecord::Base.transaction do
         if !@account.current_sis_batch || !@account.current_sis_batch.importing?
           batch = SisBatch.create_with_attachment(@account, params[:import_type], params[:attachment])
+
+          if params[:batch_mode].to_i > 0
+            batch.batch_mode = true
+            if params[:batch_mode_term_id].present?
+              batch.batch_mode_term = @account.enrollment_terms.active.find(params[:batch_mode_term_id])
+            end
+            batch.save!
+          end
+
           @account.current_sis_batch_id = batch.id
           @account.save
           batch.process
