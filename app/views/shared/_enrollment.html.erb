@@ -17,14 +17,17 @@
         cant_unenroll = ""
         unenroll_image = "delete_circle.png"
       end
+      allowedbypermissions = ([StudentEnrollment, ObserverEnrollment].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users))
     %>
     <% if show_information_link %>
       <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
-      <% if !lockedbysis && ([StudentEnrollment, ObserverEnrollment].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users)) %>
+      <% if !lockedbysis && allowedbypermissions %>
         <a href="#" class="edit_section_link no-hover"><%= image_tag "edit.png" %></a>
       <% end %>
     <% end %>
-    <a href="<%= context_url(@context, :context_unenroll_url, (enrollment.try_rescue(:id) || "{{ id }}" ) ) %>" class="unenroll_user_link <%= cant_unenroll %> no-hover" title="Remove User from Course"><%= image_tag unenroll_image %></a>
+    <% if allowedbypermissions %>
+      <a href="<%= context_url(@context, :context_unenroll_url, (enrollment.try_rescue(:id) || "{{ id }}" ) ) %>" class="unenroll_user_link <%= cant_unenroll %> no-hover" title="Remove User from Course"><%= image_tag unenroll_image %></a>
+    <% end %>
     <a href="<%= re_send_confirmation_url( enrollment.try_rescue(:user_id) || "{{ user_id }}", enrollment.try_rescue(:user).try_rescue(:communication_channel).try_rescue(:id) || "{{ communication_channel_id }}", :enrollment_id => enrollment.try_rescue(:id) || "{{ id }}" ) rescue "#" %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
   </span>
   <a href="<%= context_url(@context, :context_user_url, enrollment.try_rescue(:user_id) || "{{ user_id }}") %>" class="name"><%= enrollment.try_rescue(:user).try_rescue(:last_name_first) %></a>
