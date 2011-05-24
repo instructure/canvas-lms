@@ -66,7 +66,8 @@ module SIS
                 course.sis_source_id = row['xlist_course_id']
                 course.enrollment_term_id = section.course.enrollment_term_id
                 course.sis_batch_id = @batch.id if @batch
-                course.workflow_state = section.course.workflow_state
+                course.workflow_state = 'claimed'
+                course.template_course = section.course
                 Course.skip_updating_account_associations { course.save_without_broadcasting! }
                 course.update_account_associations
               end
@@ -74,8 +75,8 @@ module SIS
 
             if row['status'] =~ /\Aactive\z/i
 
-              if course.workflow_state == 'deleted'
-                course.workflow_state = 'created'
+              if course.deleted?
+                course.workflow_state = 'claimed'
                 course.save_without_broadcasting!
                 course.update_enrolled_users
                 courses_to_update_associations.add course

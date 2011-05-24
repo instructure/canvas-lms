@@ -966,27 +966,59 @@ describe SIS::SisCsv do
       xlist_course.workflow_state.should == "claimed"
     end
       
-    it 'should mark the original course deleted if it is made empty due to crosslisting' do
+    it 'should preserve data into copied xlist courses' do
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active",
-        "C002,TC 101,Test Course 101,,,active"
+        "C002,TC 102,Test Course 102,,,active"
       )
       process_csv_data(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
-        "S002,C002,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
-        "S003,C002,Sec3,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
+        "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
+        "S003,C001,Sec3,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
+        "S004,C002,Sec4,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
+        "S005,C002,Sec5,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
       )
+      @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
       process_csv_data(
         "xlist_course_id,section_id,status",
         "X001,S001,active",
-        "X001,S002,active"
+        "X001,S002,active",
+        "X002,S004,active",
+        "X002,S005,active"
       )
-      @account.courses.find_by_sis_source_id("C002").workflow_state.should_not == "deleted"
-      @account.courses.find_by_sis_source_id("C001").workflow_state.should == "deleted"
+      @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_true
+      @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 101"
+      @account.courses.find_by_sis_source_id("X002").name.should == "Test Course 102"
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 103,Test Course 103,,,active",
+        "C002,TC 104,Test Course 104,,,active"
+      )
+      @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 103"
+      @account.courses.find_by_sis_source_id("X002").name.should == "Test Course 104"
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,deleted",
+        "X001,S002,deleted",
+        "X002,S004,deleted",
+        "X002,S005,deleted"
+      )
+      @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
     end
-      
+    
     it 'should work with xlists with an xlist course defined' do
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
@@ -1499,6 +1531,31 @@ describe SIS::SisCsv do
         Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
       end
       
+      it 'should get account associations updated when the template course is updated' do
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+        )
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S001,active"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).should == [@account.id]
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "C001,TC 101,Test Course 101,A004,,active"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "C001,TC 101,Test Course 101,A001,,active"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+      end
+    
     end
   end
 end
