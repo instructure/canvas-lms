@@ -140,8 +140,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  STUDENT_API_FIELDS = %w(id name)
-  STUDENT_API_METHODS = %w(sis_user_id)
+  include Api::V1::User
 
   # @API
   # Returns the list of sections for this course.
@@ -176,12 +175,14 @@ class CoursesController < ApplicationController
         res = section.as_json(:include_root => false,
                               :only => %w(id name))
         if include_students
-          res['students'] = section.enrollments.
-            scoped(:include => { :user => :pseudonym }).
-            all(:conditions => "type = 'StudentEnrollment'").
-            map { |e| e.user.as_json(:include_root => false,
-                                     :only => STUDENT_API_FIELDS,
-                                     :methods => STUDENT_API_METHODS) }
+          proxy = section.enrollments
+          if user_json_is_admin?
+            proxy = proxy.scoped(:include => { :user => :pseudonym })
+          else
+            proxy = proxy.scoped(:include => :user)
+          end
+          res['students'] = proxy.all(:conditions => "type = 'StudentEnrollment'").
+            map { |e| user_json(e.user) }
         end
         res
       end
@@ -203,10 +204,11 @@ class CoursesController < ApplicationController
   def students
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      render :json => @context.students.scoped(:include => :pseudonym).
-        to_json(:include_root => false,
-                :only => STUDENT_API_FIELDS,
-                :methods => STUDENT_API_METHODS)
+      proxy = @context.students
+      if user_json_is_admin?
+        proxy = proxy.scoped(:include => :pseudonym)
+      end
+      render :json => proxy.map { |u| user_json(u) }
     end
   end
 
