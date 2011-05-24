@@ -11,6 +11,15 @@ Canvas::Plugin.register('facebook', nil, {
   :settings_partial => 'plugins/facebook_settings',
   :validator => 'FacebookValidator'
 })
+Canvas::Plugin.register('linked_in', nil, {
+  :description => 'LinkedIn integration',
+  :website => 'http://www.linkedin.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/linked_in_settings',
+  :validator => 'LinkedInValidator'
+})
 Canvas::Plugin.register('twitter', nil, {
   :description => 'Twitter notifications',
   :website => 'http://www.twitter.com',
