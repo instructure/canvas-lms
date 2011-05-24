@@ -9,7 +9,7 @@
   <span class="links" style="<%= hidden if enrollment && (enrollment.user == @current_user || (@current_enrollment && @current_enrollment.type != 'TeacherEnrollment')) %>">
     <% if show_information_link %>
       <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
-      <% if [StudentEnrollment, Observable].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users) %>
+      <% if [StudentEnrollment, ObserverEnrollment].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users) %>
         <a href="#" class="edit_section_link no-hover"><%= image_tag "edit.png" %></a>
       <% end %>
     <% end %>
