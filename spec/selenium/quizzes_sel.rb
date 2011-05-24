@@ -3,6 +3,28 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "quiz selenium tests" do
   it_should_behave_like "in-process server selenium tests"
   
+  it "should not show 'Missing Word' option in question types dropdown" do
+    username = "nobody@example.com"
+    password = "asdfasdf"
+    u = user_with_pseudonym :active_user => true,
+                            :username => username,
+                            :password => password
+    u.save!
+    e = course_with_teacher :active_course => true,
+                            :user => u,
+                            :active_enrollment => true
+    e.save!
+    login_as(username, password)
+    
+    get "/courses/#{e.course_id}/quizzes/new"
+    
+    driver.find_elements(:css, "#question_form_template option.missing_word").length.should == 1
+
+    driver.find_element(:css, ".add_question .add_question_link").click
+    keep_trying{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    driver.find_elements(:css, "#questions .question_holder option.missing_word").length.should == 0
+  end
+  
   it "should create a quiz with every question type" do
     username = "nobody@example.com"
     password = "asdfasdf"
@@ -36,7 +58,6 @@ shared_examples_for "quiz selenium tests" do
       el.clear
       el.send_keys(value)
     end
-    
     
     #### Multiple Choice Question
     
