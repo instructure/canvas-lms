@@ -72,9 +72,22 @@ class ScribdAPI
     self.api.user = uuid
   end
   
+  def self.config_check(settings)
+    scribd = ScribdAPI.new
+    scribd.api.key = settings['api_key']
+    scribd.api.secret = settings['secret_key']
+    begin
+      Scribd::Document.find(0)
+    rescue Scribd::ResponseError => e
+      return "Configuration check failed, please check your settings" if e.code == '401'
+    end
+    nil
+  end
+  
   def self.config
     # Return existing value, even if nil, as long as it's defined
     return @config if defined?(@config)
+    @config ||= Canvas::Plugin.find(:scribd).try(:settings)
     @config ||= (YAML.load_file(RAILS_ROOT + "/config/scribd.yml")[RAILS_ENV] rescue nil)
   end
   

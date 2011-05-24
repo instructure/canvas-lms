@@ -1,0 +1,25 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          You will need to <a href="http://www.scribd.com/developers">sign up for a Scribd API Account</a>.
+          Make a note of your API key and API secret.  These are available from
+          "Settings -> API" in your profile after creation.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :api_key, "API key:" %></td>
+      <td>
+        <%= f.text_field :api_key %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :secret_key, "API secret:" %></td>
+      <td>
+        <%= f.text_field :secret_key %>
+      </td>
+    </tr>
+  </table>
+<% end %>

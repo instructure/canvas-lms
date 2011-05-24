@@ -29,6 +29,15 @@ Canvas::Plugin.register('twitter', nil, {
   :settings_partial => 'plugins/twitter_settings',
   :validator => 'TwitterValidator'
 })
+Canvas::Plugin.register('scribd', nil, {
+  :description => 'Scribd document previews',
+  :website => 'http://www.scribd.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/scribd_settings',
+  :validator => 'ScribdValidator'
+})
 Canvas::Plugin.register('etherpad', nil, {
   :description => 'EtherPad document sharing',
   :website => 'http://www.etherpad.org',
