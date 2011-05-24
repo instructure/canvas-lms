@@ -7,16 +7,10 @@
   title="<%= enrollment.user.name %>: <%= enrollment.user.email %>"
 <% end %>>
   <span class="links" style="<%= hidden if enrollment && (enrollment.user == @current_user || (@current_enrollment && @current_enrollment.type != 'TeacherEnrollment')) %>">
-    <% if show_information_link %>
-      <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
-      <% if [StudentEnrollment, ObserverEnrollment].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users) %>
-        <a href="#" class="edit_section_link no-hover"><%= image_tag "edit.png" %></a>
-      <% end %>
-    <% end %>
     <%
-      notunenrollable = enrollment && enrollment.defined_by_sis?
-      notunenrollable &&= !@context.account.grants_right?(@current_user, session, :manage_account_settings)
-      if notunenrollable
+      lockedbysis = enrollment && enrollment.defined_by_sis?
+      lockedbysis &&= !@context.account.grants_right?(@current_user, session, :manage_account_settings)
+      if lockedbysis
         cant_unenroll = "cant_unenroll"
         unenroll_image = "delete_circle_gray.png"
       else
@@ -24,6 +18,12 @@
         unenroll_image = "delete_circle.png"
       end
     %>
+    <% if show_information_link %>
+      <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
+      <% if !lockedbysis && ([StudentEnrollment, ObserverEnrollment].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users)) %>
+        <a href="#" class="edit_section_link no-hover"><%= image_tag "edit.png" %></a>
+      <% end %>
+    <% end %>
     <a href="<%= context_url(@context, :context_unenroll_url, (enrollment.try_rescue(:id) || "{{ id }}" ) ) %>" class="unenroll_user_link <%= cant_unenroll %> no-hover" title="Remove User from Course"><%= image_tag unenroll_image %></a>
     <a href="<%= re_send_confirmation_url( enrollment.try_rescue(:user_id) || "{{ user_id }}", enrollment.try_rescue(:user).try_rescue(:communication_channel).try_rescue(:id) || "{{ communication_channel_id }}", :enrollment_id => enrollment.try_rescue(:id) || "{{ id }}" ) rescue "#" %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
   </span>
@@ -44,12 +44,14 @@
     <% enrollments.each do |enrollment| %>
       <% if enrollment && enrollment.course_section %>
         <div class="section"><%= enrollment.course_section.display_name %></div>
-        <% form_tag course_move_enrollment_url(@context, enrollment.id), {:class => "enrollment_course_section_form", :style => "display: none;"} do  %>
-          <select title="Course Section" name="course_section_id" id="course_section_id">
-            <% @context.course_sections.active.each do |section| %>
-              <option value="<%= section.id %>" class="option_for_section_<%= section.id %>" <%= "selected=selected" if enrollment.course_section_id==section.id %>><%= section.display_name %></option>
-            <% end %>
-          </select>
+        <% unless lockedbysis %>
+          <% form_tag course_move_enrollment_url(@context, enrollment.id), {:class => "enrollment_course_section_form", :style => "display: none;"} do  %>
+            <select title="Course Section" name="course_section_id" id="course_section_id">
+              <% @context.course_sections.active.each do |section| %>
+                <option value="<%= section.id %>" class="option_for_section_<%= section.id %>" <%= "selected=selected" if enrollment.course_section_id==section.id %>><%= section.display_name %></option>
+              <% end %>
+            </select>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

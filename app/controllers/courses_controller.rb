@@ -753,7 +753,7 @@ class CoursesController < ApplicationController
     can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_move
       respond_to do |format|
-        if @enrollment.defined_by_sis?
+        if @enrollment.defined_by_sis? &&! @context.grants_right?(@current_user, session, :manage_account_settings)
           return format.json { render :json => @enrollment.to_json, :status => :bad_request }
         end
         @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
