@@ -1242,7 +1242,7 @@ var quiz = {};
       $displayQuestion.show();
       $("html,body").scrollTo({top: $displayQuestion.offset().top - 10, left: 0});
       if(isNew) {
-        $displayQuestion.remove();
+        $displayQuestion.parent().remove();
         quiz.updateDisplayComments();
       }
       quiz.updateDisplayComments();

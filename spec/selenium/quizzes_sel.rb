@@ -3,6 +3,29 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "quiz selenium tests" do
   it_should_behave_like "in-process server selenium tests"
   
+  it "should correctly hide form when cancelling quiz edit" do
+    username = "nobody@example.com"
+    password = "asdfasdf"
+    u = user_with_pseudonym :active_user => true,
+                            :username => username,
+                            :password => password
+    u.save!
+    e = course_with_teacher :active_course => true,
+                            :user => u,
+                            :active_enrollment => true
+    e.save!
+    login_as(username, password)
+    
+    get "/courses/#{e.course_id}/quizzes/new"
+
+    driver.find_element(:css, ".add_question .add_question_link").click
+    keep_trying{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    holder = driver.find_element(:css, "#questions .question_holder")
+    holder.should be_displayed
+    holder.find_element(:css, ".cancel_link").click
+    driver.find_elements(:css, "#questions .question_holder").length.should == 0
+  end
+  
   it "should not show 'Missing Word' option in question types dropdown" do
     username = "nobody@example.com"
     password = "asdfasdf"
