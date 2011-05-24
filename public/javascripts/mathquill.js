@@ -479,7 +479,9 @@ function addToolbar(root, jQ) {
     $(this.href.replace(/.*#/, '#')).addClass('mathquill-tab-pane-selected');
   });
   jQ.find('.mathquill-tab-bar li:first-child a').mouseenter();
-  jQ.find('a.mathquill-rendered-math').click(function(){
+  jQ.find('a.mathquill-rendered-math').mousedown(function(e) {
+    e.stopPropagation();
+  }).click(function(){
     root.cursor.writeLatex(this.title, true);
     jQ.focus();
   });
@@ -2135,16 +2137,18 @@ _.seek = function(target, pageX, pageY) {
 };
 _.resolveNonItalicizedFunctions = function() {
   var node = this.prev;
+  var raw = node ? node.latex().replace(/ $/, '') : null;
   var count = 0;
-  var functions = ['ln', 'lg', 'log', 'span', 'proj', 'det', 'dim', 'min', 'max', 'mod', 'lcm', 'gcd', 'gcf', 'hcf', 'lim', 'sin', 'sinh', 'asin', 'arcsin', 'asinh', 'arcsinh', 'cos', 'cosh', 'acos', 'arccos', 'acosh', 'arccosh', 'tan', 'tanh', 'atan', 'arctan', 'atanh', 'arctanh', 'sec', 'sech', 'asec', 'arcsec', 'asech', 'arcsech', 'cosec', 'cosech', 'acosec', 'arccosec', 'acosech', 'arccosech', 'csc', 'csch', 'acsc', 'arccsc', 'acsch', 'arccsch', 'cotan', 'cotanh', 'acotan', 'arccotan', 'acotanh', 'arccotanh', 'cot', 'coth', 'acot', 'arccot', 'acoth', 'arccoth'];
+  var functions = {ln: 1, lg: 1, log: 1, span: 1, proj: 1, det: 1, dim: 1, min: 1, max: 1, mod: 1, lcm: 1, gcd: 1, gcf: 1, hcf: 1, lim: 1, sin: 1, sinh: 1, asin: 1, arcsin: 1, asinh: 1, arcsinh: 1, cos: 1, cosh: 1, acos: 1, arccos: 1, acosh: 1, arccosh: 1, tan: 1, tanh: 1, atan: 1, arctan: 1, atanh: 1, arctanh: 1, sec: 1, sech: 1, asec: 1, arcsec: 1, asech: 1, arcsech: 1, cosec: 1, cosech: 1, acosec: 1, arccosec: 1, acosech: 1, arccosech: 1, csc: 1, csch: 1, acsc: 1, arccsc: 1, acsch: 1, arccsch: 1, cotan: 1, cotanh: 1, acotan: 1, arccotan: 1, acotanh: 1, arccotanh: 1, cot: 1, coth: 1, acot: 1, arccot: 1, acoth: 1, arccoth: 1}
   var latex = '';
-  while (node && node.latex()) {
-    var raw = node.latex().replace(/ $/, '');
+  while (node && raw) {
     var single_char = raw.match(/^[a-z]$/);
-    if (single_char || latex && raw[0] == '\\' && $.inArray(raw.substring(1), functions) >= 0 && $.inArray((raw + latex).substring(1), functions) >= 0) {
+    if (single_char || latex && raw[0] == '\\' && functions[raw.substring(1)] && functions[(raw + latex).substring(1)]) {
       count++;
       latex = raw.replace(/\\/, '') + latex;
-      if (!single_char || (!node.prev || !node.prev.latex().match(/^[a-z]$/)) && $.inArray(latex, functions) >= 0) {
+      node = node.prev;
+      raw = node ? node.latex().replace(/ $/, '') : null;
+      if (!single_char || (!node || !raw.match(/^[a-z]$/)) && functions[latex]) {
         for(var i = 0; i < count; i++) {
           this.selectLeft();
         }
@@ -2155,7 +2159,6 @@ _.resolveNonItalicizedFunctions = function() {
     else {
       return;
     }
-    node = node.prev;
   }
 };
 _.writeLatex = function(latex, noMoveCursor) {
