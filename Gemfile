@@ -30,6 +30,7 @@ gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
 gem 'rake',           '0.8.7'
 gem 'ratom',          '0.6.7',  :require => "atom"
+gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
 gem 'ruby-saml-mod',  '0.1.0'

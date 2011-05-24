@@ -932,7 +932,7 @@ class ApplicationController < ActionController::Base
 
   def user_content(str, cache_key = nil)
     return nil unless str
-    return str.html_safe unless str.match(/object|embed/)
+    return str.html_safe unless str.match(/object|embed|equation_image/)
 
     UserContent.escape(str)
   end
