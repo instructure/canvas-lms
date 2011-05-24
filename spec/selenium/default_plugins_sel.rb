@@ -141,6 +141,32 @@ shared_examples_for "plugins selenium tests" do
     settings[:api_key].should == 'asdf'
     settings[:secret_key].should == 'asdf'
   end
+  
+  it "should allow configuring tinychat plugin" do
+    settings = Canvas::Plugin.find(:tinychat).try(:settings)
+    settings.should be_nil
+    
+    Tinychat.stub(:config_check).and_return("Bad check")
+    get "/plugins/tinychat"
+    
+    driver.find_element(:css, "#settings_api_key").send_keys("asdf")
+    driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
+    driver.find_element(:css, "button.save_button").click
+    
+    keep_trying{ driver.find_element(:css, "#flash_error_message").displayed? }
+    driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
+    
+    Tinychat.stub(:config_check).and_return(nil)
+    driver.find_element(:css, "button.save_button").click
+    
+    keep_trying{ driver.find_element(:css, "#flash_notice_message").displayed? }
+    driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
+    
+    settings = Canvas::Plugin.find(:tinychat).try(:settings)
+    settings.should_not be_nil
+    settings[:api_key].should == 'asdf'
+    settings[:secret_key].should == 'asdf'
+  end
 end
 
 describe "plugins Windows-Firefox-Tests" do

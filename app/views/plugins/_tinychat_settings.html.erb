@@ -1,0 +1,24 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          You will need to register a <a href="http://tinychat.com/developer/dashboard">new app on Tinychat</a>.
+          Make a note of your app's Public Key and Secret Key values.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :api_key, "Public Key:" %></td>
+      <td>
+        <%= f.text_field :api_key %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :secret_key, "Secret Key:" %></td>
+      <td>
+        <%= f.text_field :secret_key %>
+      </td>
+    </tr>
+  </table>
+<% end %>

@@ -102,6 +102,15 @@ Canvas::Plugin.register('big_blue_button', :web_conferencing, {
   :validator => 'BigBlueButtonValidator',
   :encrypted_settings => [:secret]
 })
+Canvas::Plugin.register('tinychat', nil, {
+  :description => 'Tinychat chat room',
+  :website => 'http://www.tinychat.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/tinychat_settings',
+  :validator => 'TinychatValidator'
+})
 require_dependency 'cc/importer/cc_worker'
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :name => 'Common Cartridge Importer',
