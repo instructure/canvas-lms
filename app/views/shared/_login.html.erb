@@ -84,7 +84,8 @@ $(document).ready(function() {
             <div style="float: left;">
               <%= f.check_box :remember_me %><%= f.label :remember_me, "Stay logged in" %>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <a href="#" class="forgot_password_link">I don't know my password</a>
+              <% url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || "#" %>
+              <%= link_to "I don't know my password", url, :class => (url != '#' ? "not_external" : "forgot_password_link"), :id => "login_forgot_password" %>
             </div>
             <button type="submit" class="button">Login</button> 
           </div>

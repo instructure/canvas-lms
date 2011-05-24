@@ -72,10 +72,18 @@
         </td>
       </tr>
       <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :login_handle_name, "Login label:" %></td>
+        <td style="vertical-align: top; width: 10%;"><%= f.label :login_handle_name, "Login Label:" %></td>
         <td style="width: 40%; vertical-align: top;" class="nobr">
           <%= f.text_field :login_handle_name, :class => "auth_form", :style => "width: 300px;", :placeholder => AccountAuthorizationConfig.default_login_handle_name %>
           <span class="auth_info auth_login_handle_name"><%= @account_config.login_handle_name || AccountAuthorizationConfig.default_login_handle_name %></span>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top; width: 10%; white-space: nowrap;"><%= f.label :change_password_url, "Forgot Password URL:" %></td>
+        <td style="width: 40%; vertical-align: top;" class="nobr">
+          <%= f.text_field :change_password_url, :class => "auth_form", :style => "width: 300px;" %>
+          <div style="font-size: 0.8em;"><span class="auth_form">Leave blank for default Canvas behavior</span></div>
+          <span class="auth_info auth_forgot_password_url"><%= @account_config.change_password_url || "None specified" %></span>
         </td>
       </tr>
       <tr>

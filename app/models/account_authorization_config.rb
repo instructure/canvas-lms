@@ -47,6 +47,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     filter
   end
   
+  def change_password_url
+    read_attribute(:change_password_url).blank? ? nil : read_attribute(:change_password_url)
+  end
+  
   def ldap_filter=(new_filter)
     self.auth_filter = new_filter
   end

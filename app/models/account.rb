@@ -585,6 +585,10 @@ class Account < ActiveRecord::Base
   def delegated_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
   end
+  
+  def forgot_password_external_url
+    account_authorization_config.try(:change_password_url)
+  end
 
   def cas_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.cas_authentication?)

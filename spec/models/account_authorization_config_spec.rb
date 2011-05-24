@@ -27,6 +27,13 @@ describe AccountAuthorizationConfig do
     @account_config.auth_filter.should eql("(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))")
   end
   
+  it "should replace empty string with nil" do
+    @account = Account.new
+    config = @account.build_account_authorization_config
+    config.change_password_url = ""
+    config.change_password_url.should be_nil
+  end
+  
   context "password" do
     it "should decrypt the password to the original value" do
       c = AccountAuthorizationConfig.new
