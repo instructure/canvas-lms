@@ -20,6 +20,24 @@ Canvas::Plugin.register('twitter', nil, {
   :settings_partial => 'plugins/twitter_settings',
   :validator => 'TwitterValidator'
 })
+Canvas::Plugin.register('etherpad', nil, {
+  :description => 'EtherPad document sharing',
+  :website => 'http://www.etherpad.org',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/etherpad_settings',
+  :validator => 'EtherpadValidator'
+})
+Canvas::Plugin.register('google_docs', nil, {
+  :description => 'Google Docs document sharing',
+  :website => 'http://docs.google.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/google_docs_settings',
+  :validator => 'GoogleDocsValidator'
+})
 Canvas::Plugin.register('kaltura', nil, {
   :description => 'Kaltura video/audio recording and playback',
   :website => 'http://corp.kaltura.com',
