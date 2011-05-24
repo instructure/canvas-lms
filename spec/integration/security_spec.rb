@@ -101,11 +101,32 @@ describe "security" do
       "pseudonym_session[remember_me]" => "1",
       "redirect_to_ssl" => "1"
     assert_response 302
-    response['Set-Cookie'].each do |cookie|
-      if cookie =~ /\Apseudonym_credentials=/ || cookie =~ /\A_normandy_session=/
-        cookie.should match(/; *HttpOnly/)
-      end
-    end
+    c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
+    c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+    c1.should match(/; *HttpOnly/)
+    c2.should match(/; *HttpOnly/)
+    c1.should_not match(/; *secure/)
+    c2.should_not match(/; *secure/)
+  end
+
+  it "should make both session-related cookies secure only if configured" do
+    ActionController::Base.session_options[:secure] = true
+    u = user_with_pseudonym :active_user => true,
+                            :username => "nobody@example.com",
+                            :password => "asdfasdf"
+    u.save!
+
+    https!
+
+    post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+      "pseudonym_session[password]" => "asdfasdf",
+      "pseudonym_session[remember_me]" => "1",
+      "redirect_to_ssl" => "1"
+    assert_response 302
+    c1 = response['Set-Cookie'].grep(/\Apseudonym_credentials=/).first
+    c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
+    c1.should match(/; *secure/)
+    c2.should match(/; *secure/)
   end
 
   class Basic
