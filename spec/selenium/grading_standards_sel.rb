@@ -22,7 +22,10 @@ shared_examples_for "grading standards selenium tests" do
     standard.should_not be_nil
     standard.attribute(:class).should match(/editing/)
     standard.find_elements(:css, ".delete_row_link").select(&:displayed?).each_with_index do |link, i|
-      link.click if i % 2 == 1
+      if i % 2 == 1
+        link.click
+        keep_trying { !link.displayed? }
+      end
     end
     standard.find_element(:css, "input.scheme_name").send_keys("New Standard")
     standard.find_element(:css, ".save_button").click
