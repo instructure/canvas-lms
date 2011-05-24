@@ -21,7 +21,7 @@
     %>
     <% if show_information_link %>
       <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
-      <% if !lockedbysis && allowedbypermissions %>
+      <% if !lockedbysis && allowedbypermissions  && show_section && enrollments%>
         <a href="#" class="edit_section_link no-hover"><%= image_tag "edit.png" %></a>
       <% end %>
     <% end %>
