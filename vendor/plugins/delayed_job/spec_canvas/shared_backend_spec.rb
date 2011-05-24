@@ -361,7 +361,7 @@ shared_examples_for 'a backend' do
       next_scheduled = @backend.last(:order => 'run_at asc')
       next_scheduled.tag.should == 'periodic: my SimpleJob'
       next_scheduled.payload_object.should be_is_a(Delayed::Periodic)
-      next_scheduled.run_at.should >= Time.now
+      next_scheduled.run_at.utc.to_i.should >= Time.now.utc.to_i
     end
 
     it "should reject duplicate named jobs" do
