@@ -134,6 +134,18 @@ shared_examples_for "all selenium tests" do
   end
   alias_method :login, :login_as
 
+  def course_with_teacher_logged_in(opts={})
+    user_with_pseudonym({:active_user => true}.merge(opts))
+    course_with_teacher({:user => @user, :active_course => true}.merge(opts))
+    login_as(@pseudonym.unique_id, @pseudonym.password)
+  end
+
+  def course_with_student_logged_in(opts={})
+    user_with_pseudonym({:active_user => true}.merge(opts))
+    course_with_student({:user => @user, :active_course => true}.merge(opts))
+    login_as(@pseudonym.unique_id, @pseudonym.password)
+  end
+
   def wait_for_dom_ready
     (driver.execute_script "return $").should_not be_nil
     driver.execute_script <<-JS
