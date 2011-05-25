@@ -20,30 +20,39 @@ module Canvas
     class CCWorker < Struct.new(:migration_id)
 
       def perform
-        cm = ContentMigration.find migration_id
-        settings = cm.migration_settings.clone
-        settings[:content_migration_id] = migration_id
-        settings[:user_id] = cm.user_id
-        settings[:attachment_id] = cm.attachment.id rescue nil
+        cm = ContentMigration.find_by_id migration_id
+        begin
+          settings = cm.migration_settings.clone
+          settings[:content_migration_id] = migration_id
+          settings[:user_id] = cm.user_id
+          settings[:attachment_id] = cm.attachment.id rescue nil
 
-        converter = CC::Importer::CCConverter.new(settings)
-        course = converter.export
-        export_folder_path = course[:export_folder_path]
-        overview_file_path = course[:overview_file_path]
+          converter = CC::Importer::CCConverter.new(settings)
+          course = converter.export
+          export_folder_path = course[:export_folder_path]
+          overview_file_path = course[:overview_file_path]
 
-        if overview_file_path
-          file = File.new(overview_file_path)
-          Canvas::MigrationWorker::upload_overview_file(file, cm)
+          if overview_file_path
+            file = File.new(overview_file_path)
+            Canvas::MigrationWorker::upload_overview_file(file, cm)
+          end
+          if export_folder_path
+            Canvas::MigrationWorker::upload_exported_data(export_folder_path, cm)
+            Canvas::MigrationWorker::clear_exported_data(export_folder_path)
+          end
+
+          cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}
+          cm.workflow_state = :exported
+          cm.progress = 0
+          cm.save
+        rescue => e
+          report = ErrorReport.log_exception(:content_migration, e)
+          if cm
+            cm.workflow_state = :failed
+            cm.migration_settings[:last_error] = "ErrorReport:#{report.id}"
+            cm.save
+          end
         end
-        if export_folder_path
-          Canvas::MigrationWorker::upload_exported_data(export_folder_path, cm)
-          Canvas::MigrationWorker::clear_exported_data(export_folder_path)
-        end
-
-        cm.migration_settings[:migration_ids_to_import] = {:copy=>{:assessment_questions=>true}}
-        cm.workflow_state = :exported
-        cm.progress = 0
-        cm.save
       end
 
       def self.enqueue(content_migration)

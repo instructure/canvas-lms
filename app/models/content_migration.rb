@@ -195,6 +195,7 @@ class ContentMigration < ActiveRecord::Base
         self.workflow_state = 'failed'
         message = "The migration plugin #{migration_settings['migration_type']} doesn't have a worker."
         migration_settings[:last_error] = message
+        ErrorReport.log_exception(:content_migration, $!)
         logger.error message
         self.save
       end
@@ -240,6 +241,7 @@ class ContentMigration < ActiveRecord::Base
       self.workflow_state = :failed
       message = "#{e.to_s}: #{e.backtrace.join("\n")}"
       migration_settings[:last_error] = message
+      ErrorReport.log_exception(:content_migration, e)
       logger.error message
       self.save
       raise e
