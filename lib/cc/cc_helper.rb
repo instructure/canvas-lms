@@ -104,10 +104,12 @@ module CCHelper
 
   require 'set'
   class HtmlContentExporter
-    attr_reader :used_media_objects
+    attr_reader :used_media_objects, :media_object_flavor, :media_object_infos
 
-    def initialize
+    def initialize(opts = {})
+      @media_object_flavor = opts[:media_object_flavor]
       @used_media_objects = Set.new
+      @media_object_infos = {}
     end
 
     def html_page(html, title, course, user, id = nil)
@@ -177,7 +179,8 @@ module CCHelper
         obj = course.media_objects.find_by_media_id(media_id)
         if obj && obj.context == course && migration_id = CCHelper.create_key(obj)
           @used_media_objects << obj
-          info = CCHelper.media_object_info(obj)
+          info = CCHelper.media_object_info(obj, nil, media_object_flavor)
+          @media_object_infos[obj.id] = info
           anchor['href'] = File.join(WEB_CONTENT_TOKEN, MEDIA_OBJECTS_FOLDER, info[:filename])
         end
       end
@@ -186,12 +189,18 @@ module CCHelper
     end
   end
 
-  def self.media_object_info(obj, client = nil)
+  def self.media_object_info(obj, client = nil, flavor = nil)
     unless client
       client = Kaltura::ClientV3.new
       client.startSession(Kaltura::SessionType::ADMIN)
     end
-    asset = client.flavorAssetGetOriginalAsset(obj.media_id)
+    if flavor
+      assets = client.flavorAssetGetByEntryId(obj.media_id)
+      asset = assets.sort_by { |f| f[:size].to_i }.reverse.find { |f| f[:containerFormat] == flavor }
+      asset ||= assets.first
+    else
+      asset = client.flavorAssetGetOriginalAsset(obj.media_id)
+    end
     # we use the media_id as the export filename, since it is guaranteed to
     # be unique
     filename = "#{obj.media_id}.#{asset[:fileExt]}" if asset

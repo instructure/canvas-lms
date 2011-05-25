@@ -105,16 +105,16 @@ module CC
       rel_path
     end
 
-    def add_media_objects(media_objects)
+    def add_media_objects(html_content_exporter)
       return unless Kaltura::ClientV3.config
       client = Kaltura::ClientV3.new
       client.startSession(Kaltura::SessionType::ADMIN)
 
-      media_objects.each do |obj|
+      html_content_exporter.used_media_objects.each do |obj|
         next if @added_attachment_ids.include?(obj.attachment_id)
         migration_id = CCHelper.create_key(obj)
-        info = CCHelper.media_object_info(obj, client)
-        next unless info[:asset]
+        info = html_content_exporter.media_object_infos[obj.id]
+        next unless info && info[:asset]
         url = client.flavorAssetGetDownloadUrl(info[:asset][:id])
 
         path = base_path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
