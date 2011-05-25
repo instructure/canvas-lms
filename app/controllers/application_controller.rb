@@ -619,7 +619,7 @@ class ApplicationController < ActionController::Base
       # double-count it as multiple views when it's really just a single view.
       if @current_user && @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
         @access = AssetUserAccess.find_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
-        @access ||= AssetUserAccess.create(:user => @current_user, :asset_code => @accessed_asset[:code])
+        @access ||= AssetUserAccess.new(:user => @current_user, :asset_code => @accessed_asset[:code])
         @accessed_asset[:level] ||= 'view'
         if @accessed_asset[:level] == 'view'
           @access.view_score ||= 0

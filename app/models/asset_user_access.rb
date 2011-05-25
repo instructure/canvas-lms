@@ -114,6 +114,17 @@ class AssetUserAccess < ActiveRecord::Base
     end
   end
   
+  def display_name
+    # repair existing AssetUserAccesses that have bad display_names
+    if read_attribute(:display_name) == asset_code
+      better_display_name = asset_display_name
+      if better_display_name != asset_code
+        update_attribute(:display_name, better_display_name)
+      end
+    end
+    read_attribute(:display_name)
+  end
+  
   def asset_display_name
     if self.asset.respond_to?(:title) && !self.asset.title.nil?
       asset.title
@@ -132,6 +143,7 @@ class AssetUserAccess < ActiveRecord::Base
     if self.asset_code && self.asset_code.match(/\:/)
       split = self.asset_code.split(/\:/)
       if split[1] == self.context_code
+        # TODO: i18n
         "#{self.context_type} #{split[0].titleize}"
       else
         self.display_name
@@ -145,10 +157,14 @@ class AssetUserAccess < ActiveRecord::Base
   def asset
     asset_code, general = self.asset_code.split(":").reverse
     code_split = asset_code.split("_")
-    asset = Context.find_asset_by_asset_string(asset_code)
+    asset = Context.find_asset_by_asset_string(asset_code, context)
     asset
   end
   memoize :asset
+  
+  def asset_class_name
+    self.asset.class.name.underscore if self.asset
+  end
   
   def self.infer_asset(code)
     asset_code, general = code.split(":").reverse

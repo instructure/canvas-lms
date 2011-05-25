@@ -35,6 +35,25 @@
   white-space: nowrap;
   font-size: 0.8em;
 }
+#usage_report .type_icon {
+  display: inline-block;
+  background: url(/images/blank.png) no-repeat left 50%;
+}
+#usage_report .wiki_page .type_icon {
+  background: url(/images/file.png) no-repeat left 50%;
+}  
+#usage_report .attachment .type_icon {
+  background-image: url(/images/file_download.png);
+}
+#usage_report .discussion_topic .type_icon {
+  background-image: url(/images/word_bubble.png);
+}
+#usage_report .assignment .type_icon {
+  background-image: url(/images/assignment.png);
+}
+#usage_report .quiz .type_icon {
+  background-image: url(/images/quiz.png);
+}
 </style>
 <% end %>
 <div id="usage_report">
@@ -49,15 +68,21 @@
   </thead>
   <tbody>
     <% @accesses.each do |access| %>
-      <tr class="access">
-        <td class="readable_name"><%= access.readable_name %></td>
+      <tr class="access <%= access.asset_class_name %>">
+        <td class="name_holder">
+          <span class="type_icon" title="<%= access.asset.class if access.asset %>"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
+          <span class="readable_name"><%= access.readable_name %></span>
+        </td>
         <td class="view_score"><%= access.view_score %></td>
         <td class="participate_score"><%= access.participate_score %></td>
         <td class="last_viewed time_ago_date"><%= datetime_string(access.updated_at) %></td>
       </tr>
     <% end %>
     <tr class="access blank" style="display: none;">
-      <td class="display_name">&nbsp;</td>
+      <td class="name_holder">
+        <span class="type_icon"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
+        <span class="readable_name">&nbsp;</span>
+      </td>
       <td class="view_score">&nbsp;</td>
       <td class="participate_score">&nbsp;</td>
       <td class="last_viewed time_ago_date">&nbsp;</td>
@@ -85,6 +110,7 @@
             for(var idx in data) {
               var $access = $("#usage_report .access.blank:first").clone(true).removeClass('blank');
               var access = data[idx].asset_user_access;
+              $access.addClass(access.asset_class_name);
               access.readable_name = access.readable_name || access.display_name || access.asset_code;
               access.last_viewed = $.parseFromISO(access.updated_at).datetime_formatted;
               $access.fillTemplateData({data: access});
