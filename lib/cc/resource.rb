@@ -35,7 +35,9 @@ module CC
       @export_dir = @manifest.export_dir
       @resources = nil
       @zip_file = manifest.zip_file
-      @html_exporter = CCHelper::HtmlContentExporter.new
+      # if set to "flash video", this'll export the smaller, post-conversion
+      # flv files rather than the larger original files.
+      @html_exporter = CCHelper::HtmlContentExporter.new(:media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
     end
     
     def self.create_resources(manifest, manifest_node)
@@ -59,7 +61,7 @@ module CC
         set_progress(60)
         # these need to go last, to gather up all the references to the files
         add_course_files
-        add_media_objects(@html_exporter.used_media_objects)
+        add_media_objects(@html_exporter)
         set_progress(90)
         create_basic_lti_links
       end
