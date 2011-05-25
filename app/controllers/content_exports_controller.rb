@@ -81,6 +81,7 @@ class ContentExportsController < ApplicationController
     end
     
     if File.exists?(file)
+      cancel_cache_buster
       send_file(file, :type => 'text/xml', :disposition => 'inline')
     else
       render :template => 'shared/errors/404_message', :status => :bad_request

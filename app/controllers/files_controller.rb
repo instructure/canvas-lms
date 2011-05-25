@@ -345,11 +345,13 @@ class FilesController < ApplicationController
       redirect_to safe_domain_file_url(attachment, @safer_domain_host, params[:verifier])
     elsif Attachment.local_storage?
       @headers = false if @files_domain
+      cancel_cache_buster
       send_file(attachment.full_filename, :type => attachment.content_type, :disposition => (inline ? 'inline' : 'attachment'))
     elsif redirect_to_s3
       redirect_to attachment.cacheable_s3_url
     else
       require 'aws/s3'
+      cancel_cache_buster
       send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
       render :status => 200, :text => Proc.new { |response, output|
         AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
@@ -665,6 +667,7 @@ class FilesController < ApplicationController
   # than to a s3 url
   def show_thumbnail
     if Attachment.local_storage?
+      cancel_cache_buster
       thumbnail = Thumbnail.find_by_id_and_uuid(params[:id], params[:uuid]) if params[:id].present?
       raise ActiveRecord::RecordNotFound unless thumbnail
       send_file thumbnail.full_filename, :content_type => thumbnail.content_type

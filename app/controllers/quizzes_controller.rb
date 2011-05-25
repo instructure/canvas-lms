@@ -63,6 +63,7 @@ class QuizzesController < ApplicationController
           @submitted_users = user_ids.empty? ? [] : User.find_all_by_id(user_ids).compact.uniq.sort_by(&:last_name_first)
         }
         format.csv {
+          cancel_cache_buster
           send_data(
             @quiz.statistics_csv(:include_all_versions => params[:all_versions] == '1', :anonymous => !@quiz.graded? && @quiz.anonymous_submissions), 
             :type => "text/csv", 
