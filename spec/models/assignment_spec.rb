@@ -1036,10 +1036,12 @@ describe Assignment do
     it "should clone for another course" do
       course_with_teacher
       @assignment = @course.assignments.create!(:title => "some assignment")
+      @assignment.update_attribute(:needs_grading_count, 5)
       course
       @new_assignment = @assignment.clone_for(@course)
       @new_assignment.context.should_not eql(@assignment.context)
       @new_assignment.title.should eql(@assignment.title)
+      @new_assignment.needs_grading_count.should == 0
     end
   end
 end
