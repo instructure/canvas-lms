@@ -286,6 +286,7 @@ class SubmissionsController < ApplicationController
             format.html { redirect_to @attachment.cacheable_s3_url }
             format.zip { redirect_to @attachment.cacheable_s3_url }
           else
+            cancel_cache_buster
             format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
             format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
           end

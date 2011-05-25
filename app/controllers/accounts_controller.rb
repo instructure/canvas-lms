@@ -210,6 +210,7 @@ class AccountsController < ApplicationController
               csv << [item[0]/1000, item[1]]
             end
           end
+          cancel_cache_buster
           send_data(
             res, 
             :type => "text/csv", 

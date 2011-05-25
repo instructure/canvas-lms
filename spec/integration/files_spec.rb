@@ -31,6 +31,8 @@ describe FilesController do
       get "http://test.host/files/#{@submission.attachment.id}/download?inline=1&verifier=#{@submission.attachment.uuid}"
       response.should be_success
       response.content_type.should == 'image/png'
+      response['Pragma'].should be_nil
+      response['Cache-Control'].should_not match(/no-cache/)
     end
   end
   

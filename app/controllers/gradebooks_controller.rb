@@ -167,9 +167,8 @@ class GradebooksController < ApplicationController
         else
           format.html { render :action => "show" }
         end
-        format.csv { 
-          headers["Pragma"] = "no-cache"
-          headers["Cache-Control"] = "no-cache"
+        format.csv {
+          cancel_cache_buster
           send_data(
             @context.gradebook_to_csv, 
             :type => "text/csv", 
