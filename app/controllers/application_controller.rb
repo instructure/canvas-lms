@@ -916,6 +916,7 @@ class ApplicationController < ActionController::Base
   # calls send_file if the io has a local file, or send_data otherwise
   # make sure to rewind the io first, if necessary
   def send_file_or_data(io, opts = {})
+    cancel_cache_buster
     if io.respond_to?(:path) && io.path.present? && File.file?(io.path)
       send_file(io.path, opts)
     else

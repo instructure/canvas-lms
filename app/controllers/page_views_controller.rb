@@ -31,7 +31,8 @@ class PageViewsController < ApplicationController
         format.html
         format.js { render :partial => @page_views }
         format.json { render :partial => @page_views }
-        format.csv { 
+        format.csv {
+          cancel_cache_buster
           send_data(
             @user.page_views.scoped(:limit=>params[:report_count] || 300).to_a.to_csv, 
             :type => "text/csv", 
