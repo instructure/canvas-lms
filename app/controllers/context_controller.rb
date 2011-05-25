@@ -336,7 +336,7 @@ class ContextController < ApplicationController
       @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent.paginate(:page => params[:page], :per_page => 50)
       respond_to do |format|
         format.html
-        format.json { render :json => @accesses.to_json(:methods => [:readable_name]) }
+        format.json { render :json => @accesses.to_json(:methods => [:readable_name, :asset_class_name]) }
       end
     end
   end
