@@ -62,6 +62,17 @@
         <% end %>
       </ul>
     <% end %>
+    <% if @copy_context.learning_outcomes.active.length > 0 %>
+      <h3><%= check_box :copy, :all_outcomes, :class => "copy_all", :checked => true %><%= label :copy, :all_modules,image_tag('flagged_question_dim.png') + " Learning Outcomes for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list root_asset_list">
+        <% @copy_context.learning_outcomes.active.each do |mod| %>
+          <li>
+            <%= check_box :copy, mod.asset_string.to_sym %>
+            <%= label :copy, mod.asset_string.to_sym, mod.short_description %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
     <% if @copy_context.quizzes.active.length > 0 %>
       <h3><%= check_box :copy, :all_quizzes, :class => "copy_all", :checked => true %><%= label :copy, :all_quizzes, image_tag('quiz.png') + " Quizzes for #{@copy_context.name}" %></h3>
       <ul class="unstyled_list root_asset_list">

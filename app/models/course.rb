@@ -1658,12 +1658,27 @@ class Course < ActiveRecord::Base
       end
     end
     
+    orig_root = LearningOutcomeGroup.default_for(course)
+    new_root = LearningOutcomeGroup.default_for(self)
+    orig_root.sorted_content.each do |item|
+      course_import.tick(85) if course_import
+      use_outcome = lambda {|lo| bool_res(options[:everything] ) || bool_res(options[:all_outcomes] ) || bool_res(options[lo.asset_string.to_sym] ) }
+      if item.is_a? LearningOutcome
+        next unless use_outcome[item]
+        lo = item.clone_for(self, new_root)
+        added_items << lo
+      else
+        f = item.clone_for(self, new_root, use_outcome)
+        added_items << f if f
+      end
+    end
+    
     # Groups could be created by objects with attached assignments as well. (like quizzes/topics)
     # So don't delete the placeholder until everything has been cloned
     delete_placeholder.destroy if delete_placeholder && self.assignment_groups.length > 1
     
     @to_migrate_links.uniq.each do |obj|
-      course_import.tick(85) if course_import
+      course_import.tick(90) if course_import
       if obj.is_a?(Assignment)
         obj.description = migrate_content_links(obj.description, course)
       elsif obj.is_a?(CalendarEvent)

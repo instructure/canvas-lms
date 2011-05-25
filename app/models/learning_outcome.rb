@@ -138,6 +138,18 @@ class LearningOutcome < ActiveRecord::Base
     self.learning_outcome_results.for_context_codes(codes).count
   end
   
+  def clone_for(context, parent)
+    lo = context.learning_outcomes.new
+    lo.context = context
+    lo.short_description = self.short_description
+    lo.description = self.description
+    lo.data = self.data
+    lo.save
+    parent.add_item(lo)
+    
+    lo
+  end
+  
   def self.available_in_context(context, ids=[])
     account_contexts = context.associated_accounts rescue []
     codes = account_contexts.map(&:asset_string)
