@@ -75,7 +75,8 @@ class ContentImportsController < ApplicationController
               :ssl => request.ssl?)
             render :json => upload_params
           else
-            render :json => {}
+            @migration.export_content
+            render :text => @migration.to_json
           end
         else
           render :json => @migration.errors, :status => :bad_request

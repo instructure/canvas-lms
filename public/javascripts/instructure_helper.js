@@ -150,6 +150,9 @@
           doUploadFile = options.fileUpload.call($form, formData);
         } catch(e) { error = e; }
       }
+      if(doUploadFile && options.fileUploadOptions) {
+        $.extend(options, options.fileUploadOptions);
+      }
       if($form.attr('action')) {
         action = $form.attr('action');
       }

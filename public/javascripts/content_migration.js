@@ -92,23 +92,27 @@ $(function(){
 
   $("#migration_form").formSubmit({
     fileUpload: function() {
-      return $migration_form.hasClass('file_upload');
+      return $export_file_enabled.val() == '1';
     },
-    preparedFileUpload: true,
-    singleFile: true,
-    object_name: 'migration_settings',
-    context_code: $("#current_context_code").text(),
-    upload_only: true,
-    uploadDataUrl: $migration_form.attr('action'),
-    postFormData: true,
+    fileUploadOptions: {
+      preparedFileUpload: true,
+      singleFile: true,
+      object_name: 'migration_settings',
+      context_code: $("#current_context_code").text(),
+      upload_only: true,
+      uploadDataUrl: $migration_form.attr('action'),
+      postFormData: true
+    },
     processData: function(data) {
-      if(!$(this).hasClass('file_upload')){
+      if($export_file_enabled.val() != '1'){
         data['export_file'] = null;
       }
       return data;
     },
     beforeSubmit: function(data) {
-      $(this).find(".submit_button").attr('disabled', true).text("Uploading Course Export...");
+      if($export_file_enabled.val() == '1'){
+        $(this).find(".submit_button").attr('disabled', true).text("Uploading Course Export...");
+      }
     },
     success: function(data) {
       $(this).find(".submit_button").attr('disabled', false).text("Import Course");
@@ -116,7 +120,9 @@ $(function(){
       $("#file_uploaded").slideDown();
     },
     error: function(data) {
-      $(this).find(".submit_button").attr('disabled', false).text("Upload Failed, please try again");
+      if($export_file_enabled.val() == '1'){
+        $(this).find(".submit_button").attr('disabled', false).text("Upload Failed, please try again");
+      }
       $(this).formErrors(data);
     }
   });
