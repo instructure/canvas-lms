@@ -1,3 +1,10 @@
+canvas-lms (1.1-32) professional; urgency=low
+
+  * [cae8d98] manually bumping changelog
+  * [8bc8f21] pin the rake version to 0.8.7
+
+ -- JT Olds <jt@instructure.com>  Wed, 25 May 2011 09:55:55 -0600
+
 canvas-lms (1.1-31) professional; urgency=low
 
   * [f739510] manually bumping changelog
