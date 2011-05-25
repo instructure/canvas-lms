@@ -390,6 +390,8 @@
          description = details[:description]
          description_partial = details[:description_partial]
          description_partial = report + '_description' if description_partial == true
+         parameters_partial = details[:parameters_partial]
+         parameters_partial = report + '_parameters' if parameters_partial == true
          last_run = @last_reports[report]
       %>
         <div id="<%= report %>" style="margin-bottom: 10px;">
@@ -411,6 +413,9 @@
           <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
             <input type="hidden" name="report_type" value="<%= report %>" />
             <span class="running_report_message" style="<%= hidden %>">The report is running. You'll receive an email when it is done.</span>
+            <div class="report_parameters">
+              <%= render :partial => parameters_partial if parameters_partial %>
+            </div>
             <a href="#" id="run_<%= report %>" class="run_report_link">Run this report now</a><br/>
           </form>
         </div>
