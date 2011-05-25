@@ -123,7 +123,7 @@
       mode : "exact",
       elements: id,
       theme : "advanced",
-      plugins: "contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_record,instructure_equella,media,paste,table,inlinepopups",
+      plugins: "instructure_contextmenu,instructure_links,instructure_embed,instructure_equation,instructure_record,instructure_equella,media,paste,table,inlinepopups",
       dialog_type: 'modal',
       relative_urls: false,
       remove_script_host: true,
