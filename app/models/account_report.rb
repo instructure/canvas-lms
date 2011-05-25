@@ -23,6 +23,8 @@ class AccountReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
 
+  serialize :parameters
+
   workflow do
     state :created
     state :running

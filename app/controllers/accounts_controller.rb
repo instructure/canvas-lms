@@ -379,7 +379,7 @@ class AccountsController < ApplicationController
   
   def run_report
     if authorized_action(@context, @current_user, :read_reports)
-      student_report = AccountReport.new(:user=>@current_user, :account=>@account, :report_type=>params[:report_type])
+      student_report = AccountReport.new(:user=>@current_user, :account=>@account, :report_type=>params[:report_type], :parameters=>params[:parameters])
       student_report.workflow_state = :running
       student_report.progress = 0
       student_report.save

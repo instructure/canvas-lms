@@ -120,6 +120,7 @@ $(document).ready(function() {
       resetForm: true,
       beforeSubmit: function(data) {
           $(this).find('.run_report_link').hide();
+          $(this).find('.report_parameters').hide();
           $(this).find('.running_report_message').show();
           return true;
       },
