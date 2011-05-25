@@ -1,3 +1,10 @@
+canvas-lms (1.1-33) professional; urgency=low
+
+  * [f679594] new deb: canvas-lms_1.1-32 professional
+  * [ac8544f] don't send cache headers when showing files; fixes #4654
+
+ -- JT Olds <jt@instructure.com>  Wed, 25 May 2011 10:12:08 -0600
+
 canvas-lms (1.1-32) professional; urgency=low
 
   * [cae8d98] manually bumping changelog
