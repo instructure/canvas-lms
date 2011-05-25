@@ -152,6 +152,12 @@ Spec::Runner.configure do |config|
   def group_with_user(opts={})
     group(opts)
     user(opts)
+    @group.participating_users << @user
+  end
+
+  def group_with_user_logged_in(opts={})
+    group_with_user(opts)
+    user_session(@user)
   end
 
   def user_session(user, pseudonym=nil)
