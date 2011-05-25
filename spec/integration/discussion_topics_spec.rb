@@ -21,10 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "discussion_topics" do
 
   it "should show assignment group discussions without errors" do
-    course_with_teacher_logged_in(:active_all => true)
-    
+    course_with_student_logged_in(:active_all => true)
+
     @group = CourseAssignedGroup.create(:name => "Project Group", :category => "Project Group", :context => @course)
-    
+    @group.users << @user
+
     assignment = @course.assignments.build :automatic_peer_reviews => 0,
                                            :grade_group_students_individually => 0,
                                            :grading_type => "points",
@@ -37,17 +38,23 @@ describe "discussion_topics" do
     assignment.content_being_saved_by(@user)
     assignment.infer_due_at
     assignment.save
-    
+
     root_topic = DiscussionTopic.find_by_assignment_id(assignment.id)
     topic = @group.discussion_topics.find_or_initialize_by_root_topic_id(root_topic.id)
     topic.message = root_topic.message
     topic.title = root_topic.title
     topic.assignment_id = root_topic.assignment_id
     topic.user_id = root_topic.user_id
+    topic.require_initial_post = true
     topic.save
 
     get "/groups/#{@group.id}/discussion_topics/#{topic.id}"
-    
+    response.should be_success
+
+    post "/groups/#{@group.id}/discussion_entries", :discussion_entry => { :discussion_topic_id => topic.id, :message => "frist!!1" }
+    response.should be_redirect
+
+    get "/groups/#{@group.id}/discussion_topics/#{topic.id}"
     response.should be_success
   end
 end

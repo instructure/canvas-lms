@@ -96,7 +96,7 @@ class DiscussionTopicsController < ApplicationController
       if @topic.require_initial_post || (@topic.root_topic && @topic.root_topic.require_initial_post)
         user_ids = []
         user_ids << @current_user.id if @current_user
-        user_ids << @context_enrollment.associated_user_id if @context_enrollment && @context_enrollment.associated_user_id
+        user_ids << @context_enrollment.associated_user_id if @context_enrollment && @context_enrollment.respond_to?(:associated_user_id) && @context_enrollment.associated_user_id
         unless @entries.detect{|e| user_ids.include?(e.user_id) } || @topic.grants_right?(@current_user, session, :update)
           @initial_post_required = true
         end
