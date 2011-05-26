@@ -60,6 +60,9 @@ module SIS
                   count += 1
                   remaining_in_transaction -= 1
 
+                  course = nil
+                  section = nil
+
                   pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, row['user_id'])
                   user = pseudo.user rescue nil
                   course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, row['course_id']) unless row['course_id'].blank?
