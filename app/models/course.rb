@@ -348,7 +348,7 @@ class Course < ActiveRecord::Base
     term ? {:conditions => ['courses.enrollment_term_id = ?', term.id]} : {}
   }
   named_scope :active_first, lambda {
-    {:order => "CASE WHEN workflow_state='available' THEN 0 ELSE 1 END, name"}
+    {:order => "CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, name"}
   }
   named_scope :limit, lambda {|limit|
     {:limit => limit }
