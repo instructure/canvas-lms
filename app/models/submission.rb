@@ -109,6 +109,15 @@ class Submission < ActiveRecord::Base
       SQL
     end
   end
+  trigger.after(:insert) do |t|
+    t.where('#{Submission.needs_grading_conditions("NEW")}') do
+      <<-SQL
+      UPDATE assignments
+      SET needs_grading_count = needs_grading_count + 1
+      WHERE id = NEW.assignment_id;
+      SQL
+    end
+  end
   
   attr_reader :suppress_broadcast
   attr_reader :group_broadcast_submission
@@ -117,7 +126,7 @@ class Submission < ActiveRecord::Base
   
   has_a_broadcast_policy
 
-  simply_versioned
+  simply_versioned :explicit => true
   
   set_policy do
     given {|user| user && user.id == self.user_id }

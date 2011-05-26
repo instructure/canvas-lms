@@ -49,7 +49,8 @@ describe 'Models' do
         ActiveRecord::SessionStore::Session,
         Delayed::Backend::ActiveRecord::Job,
         Version,
-        Story
+        Story,
+        Woozel
       ]
     (ignore_classes << AddThumbnailUuid::Thumbnail) rescue nil
     (ignore_classes << CustomField) rescue nil

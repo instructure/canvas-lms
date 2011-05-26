@@ -873,7 +873,7 @@ class Assignment < ActiveRecord::Base
     homeworks = []
     ts = Time.now.to_s
     students.each do |student|
-      homework = self.find_or_create_submission(student)
+      homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
       homework.grade_matches_current_submission = homework.score ? false : true
       homework.attributes = opts.merge({
         :attachment => nil,
@@ -884,7 +884,7 @@ class Assignment < ActiveRecord::Base
       })
       homework.submitted_at = Time.now
 
-      homework.with_versioning(true) do
+      homework.with_versioning(:explicit => true) do
         group ? homework.save_without_broadcast : homework.save
       end
       context_module_action(student, :submitted)

@@ -29,7 +29,9 @@ describe SubmissionsApiController, :type => :integration do
     end
     sub.workflow_state = 'submitted'
     yield(sub) if block_given?
-    update_with_protected_attributes!(sub, { :submitted_at => Time.at(@submit_homework_time), :created_at => Time.at(@submit_homework_time) }.merge(opts))
+    sub.with_versioning(:explicit => true) do
+      update_with_protected_attributes!(sub, { :submitted_at => Time.at(@submit_homework_time), :created_at => Time.at(@submit_homework_time) }.merge(opts))
+    end
     sub.versions(true).each { |v| Version.update_all({ :created_at => v.model.created_at }, { :id => v.id }) }
     sub
   end

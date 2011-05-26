@@ -36,6 +36,7 @@ describe Assignment do
     @assignment.submissions.size.should eql(1)
     @submission = @assignment.submissions.first
     @submission.user_id.should eql(@user.id)
+    @submission.versions.length.should eql(1)
   end
   
   it "should be able to grade a submission" do
@@ -49,6 +50,7 @@ describe Assignment do
     @submission.should eql(s[0])
     @submission.score.should eql(10.0)
     @submission.user_id.should eql(@user.id)
+    @submission.versions.length.should eql(1)
   end
 
   it "should update needs_grading_count when submissions transition state" do
@@ -96,12 +98,18 @@ describe Assignment do
     s2 = @a.grade_student(@user, :grade => "10")
     s.reload
     s.should eql(s2[0])
+    # there should only be one version, even though the grade changed
+    s.versions.length.should eql(1)
     s2[0].state.should eql(:graded)
   end
   
-  it "should be versioned" do
-    assignment_model
-    @a.should be_respond_to(:versions)
+  it "should create a new version for each submission" do
+    setup_assignment_without_submission
+    @a.submit_homework(@user)
+    @a.submit_homework(@user)
+    @a.submit_homework(@user)
+    @a.reload
+    @a.submissions.first.versions.length.should eql(3)
   end
 
   describe "infer_due_at" do
