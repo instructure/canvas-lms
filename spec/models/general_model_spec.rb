@@ -49,7 +49,8 @@ describe 'Models' do
         ActiveRecord::Base,
         ActiveRecord::SessionStore::Session,
         Delayed::Backend::ActiveRecord::Job,
-        Version
+        Version,
+        Story
       ]
     (ignore_classes << AddThumbnailUuid::Thumbnail) rescue nil
     (ignore_classes << CustomField) rescue nil
