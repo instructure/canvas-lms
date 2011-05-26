@@ -36,12 +36,104 @@ describe SIS::SisCsv do
     importer
   end
   
+  def process_csv_data_cleanly(*lines)
+    importer = process_csv_data(*lines)
+    importer.errors.should == []
+    importer.warnings.should == []
+  end
+  
   it "should error files with unknown headers" do
     importer = process_csv_data(
       "course_id,randomness,smelly",
       "test_1,TC 101,Test Course 101,,,active"
     )
     importer.errors.first.last.should == "Couldn't find Canvas CSV import headers"
+  end
+  
+  it "should work for a mass import" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "U001,user1,User,One,user1@example.com,active",
+      "U002,user2,User,Two,user2@example.com,active",
+      "U003,user3,User,Three,user3@example.com,active",
+      "U004,user4,User,Four,user4@example.com,active",
+      "U005,user5,User,Five,user5@example.com,active",
+      "U006,user6,User,Six,user6@example.com,active",
+      "U007,user7,User,Seven,user7@example.com,active",
+      "U008,user8,User,Eight,user8@example.com,active",
+      "U009,user9,User,Nine,user9@example.com,active",
+      "U010,user10,User,Ten,user10@example.com,active",
+      "U011,user11,User,Eleven,user11@example.com,deleted"
+    )
+    process_csv_data_cleanly(
+      "term_id,name,status,start_date,end_date",
+      "T001,Term 1,active,,",
+      "T002,Term 2,active,,",
+      "T003,Term 3,active,,"
+    )
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,C001,Test Course 1,,T001,active",
+      "C002,C002,Test Course 2,,T001,deleted",
+      "C003,C003,Test Course 3,,T002,deleted",
+      "C004,C004,Test Course 4,,T002,deleted",
+      "C005,C005,Test Course 5,,T003,active",
+      "C006,C006,Test Course 6,,T003,active",
+      "C007,C007,Test Course 7,,T003,active",
+      "C008,C008,Test Course 8,,T003,active",
+      "C009,C009,Test Course 9,,T003,active",
+      "C001S,C001S,Test search Course 1,,T001,active",
+      "C002S,C002S,Test search Course 2,,T001,deleted",
+      "C003S,C003S,Test search Course 3,,T002,deleted",
+      "C004S,C004S,Test search Course 4,,T002,deleted",
+      "C005S,C005S,Test search Course 5,,T003,active",
+      "C006S,C006S,Test search Course 6,,T003,active",
+      "C007S,C007S,Test search Course 7,,T003,active",
+      "C008S,C008S,Test search Course 8,,T003,active",
+      "C009S,C009S,Test search Course 9,,T003,active"
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status",
+      "S001,C001,Sec1,,,active",
+      "S002,C002,Sec2,,,active",
+      "S003,C003,Sec3,,,active",
+      "S004,C004,Sec4,,,active",
+      "S005,C005,Sec5,,,active",
+      "S006,C006,Sec6,,,active",
+      "S007,C007,Sec7,,,deleted",
+      "S008,C001,Sec8,,,deleted",
+      "S009,C008,Sec9,,,active",
+      "S001S,C001S,Sec1,,,active",
+      "S002S,C002S,Sec2,,,active",
+      "S003S,C003S,Sec3,,,active",
+      "S004S,C004S,Sec4,,,active",
+      "S005S,C005S,Sec5,,,active",
+      "S006S,C006S,Sec6,,,active",
+      "S007S,C007S,Sec7,,,deleted",
+      "S008S,C001S,Sec8,,,deleted",
+      "S009S,C008S,Sec9,,,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      ",U001,student,S001,active,",
+      ",U002,student,S002,active,",
+      ",U003,student,S003,active,",
+      ",U004,student,S004,active,",
+      ",U005,student,S005,active,",
+      ",U006,student,S006,deleted,",
+      ",U007,student,S007,active,",
+      ",U008,student,S008,active,",
+      ",U009,student,S005,deleted,",
+      ",U001,student,S001S,active,",
+      ",U002,student,S002S,active,",
+      ",U003,student,S003S,active,",
+      ",U004,student,S004S,active,",
+      ",U005,student,S005S,active,",
+      ",U006,student,S006S,deleted,",
+      ",U007,student,S007S,active,",
+      ",U008,student,S008S,active,",
+      ",U009,student,S005S,deleted,"
+    )
   end
   
   context "course importing" do
