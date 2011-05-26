@@ -389,6 +389,8 @@ describe Quiz do
       new_q.title.should eql(q.title)
       new_q.quiz_groups.length.should eql(q.quiz_groups.length)
       new_q.quiz_questions.length.should eql(q.quiz_questions.length)
+      new_q.quiz_questions.first.question_data[:id].should be_nil
+      new_q.quiz_questions.first.data[:id].should == new_q.quiz_questions.first.id
     end
     
     it "should set the related assignment's group correctly" do
