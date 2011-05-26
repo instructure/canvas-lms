@@ -34,7 +34,7 @@ class QuizSubmission < ActiveRecord::Base
 
   adheres_to_policy
   
-  simply_versioned
+  simply_versioned :automatic => false
 
   workflow do
     state :untaken do
@@ -380,7 +380,8 @@ class QuizSubmission < ActiveRecord::Base
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]
-    raise "Can't update submission scores unless it's completed" if !self.completed? && version == versions.current
+    # note that self may not match versions.current, because we only save a new version on actual submit
+    raise "Can't update submission scores unless it's completed" if !self.completed? && !params[:submission_version_number]
     
     data = version.model.submission_data || []
     res = []
