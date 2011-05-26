@@ -111,7 +111,7 @@ class GroupsController < ApplicationController
       end
       @groups = []
       count.times do |idx|
-        @groups << CourseAssignedGroup.create(:name => "#{name.singularize} #{idx + 1}", :category => name, :max_membership => limit, :context => @context)
+        @groups << Group.create(:name => "#{name.singularize} #{idx + 1}", :category => name, :max_membership => limit, :context => @context)
       end
       if params[:category][:split_groups] == "1"
         @students = @context.students.sort_by{|s| rand}
@@ -137,7 +137,6 @@ class GroupsController < ApplicationController
     @group = @context
     if authorized_action(@group, @current_user, :manage)
       @membership = @group.add_user(User.find(params[:user_id]))
-      @membership.accept! if false # if @current_user manages the course and this is a CourseAssignedGroup
       @group.touch
       render :json => @membership.to_json
     end

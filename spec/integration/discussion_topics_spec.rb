@@ -23,7 +23,7 @@ describe "discussion_topics" do
   it "should show assignment group discussions without errors" do
     course_with_student_logged_in(:active_all => true)
 
-    @group = CourseAssignedGroup.create(:name => "Project Group", :category => "Project Group", :context => @course)
+    @group = Group.create(:name => "Project Group", :category => "Project Group", :context => @course)
     @group.users << @user
 
     assignment = @course.assignments.build :automatic_peer_reviews => 0,
