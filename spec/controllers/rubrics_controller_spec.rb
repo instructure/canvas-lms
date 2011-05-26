@@ -219,5 +219,37 @@ describe RubricsController do
       response.should be_success
       assigns[:rubric].should be_deleted
     end
+    it "should delete the rubric if the rubric is only associated with a course" do
+      course_with_teacher_logged_in :active_all => true
+      Account.site_admin.add_user(@user, 'AccountAdmin')
+      Account.default.add_user(@user, 'AccountAdmin')
+
+      @rubric = Rubric.create!(:user => @user, :context => @course)
+      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark)
+      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
+
+      delete 'destroy', :course_id => @course.id, :id => @rubric.id
+      response.should be_success
+      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == []
+      @rubric.reload
+      @rubric.deleted?.should be_true
+    end
+    it "should delete the rubric association even if the rubric doesn't belong to a course" do
+      course_with_teacher_logged_in :active_all => true
+      Account.site_admin.add_user(@user, 'AccountAdmin')
+      Account.default.add_user(@user, 'AccountAdmin')
+      @user.reload
+
+      @rubric = Rubric.create!(:user => @user, :context => Account.default)
+      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark)
+      RubricAssociation.create!(:rubric => @rubric, :context => Account.default, :purpose => :bookmark)
+      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
+      
+      delete 'destroy', :course_id => @course.id, :id => @rubric.id
+      response.should be_success
+      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == []
+      @rubric.reload
+      @rubric.deleted?.should be_false
+    end
   end
 end
