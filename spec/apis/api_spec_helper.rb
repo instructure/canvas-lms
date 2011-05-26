@@ -37,13 +37,19 @@ end
 
 # like api_call, but don't assume success and a json response.
 def raw_api_call(method, path, params, body_params = {}, headers = {})
-  params_from_with_nesting(method, path).should == params
+  params_from_with_nesting(method, path).should == params.except(:api_key, :access_token)
 
-  if method.to_s != 'get' && !params[:api_key]
+  if method.to_s != 'get' && !params.key?(:api_key)
     key = DeveloperKey.new
     key.generate_api_key
     key.save!
     params[:api_key] = key.api_key
+  end
+
+  if !params.key?(:access_token)
+    token = @user.access_tokens.first
+    token ||= @user.access_tokens.create!(:purpose => 'test')
+    params[:access_token] = token.token
   end
 
   __send__(method, path, params.reject { |k,v| %w(controller action).include?(k.to_s) }.merge(body_params), headers)

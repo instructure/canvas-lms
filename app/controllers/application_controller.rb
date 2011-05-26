@@ -679,6 +679,7 @@ class ApplicationController < ActionController::Base
         raise(ActionController::InvalidAuthenticityToken) unless form_authenticity_token == form_authenticity_param
       end
     end
+    Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
   def api_request?

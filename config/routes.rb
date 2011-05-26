@@ -506,6 +506,7 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
+    profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'
     profile.user_service "user_services/:id", :controller => "users", :action => "delete_user_service", :conditions => {:method => :delete}
     profile.create_user_service "user_services", :controller => "users", :action => "create_user_service", :conditions => {:method => :post}

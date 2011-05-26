@@ -14,6 +14,50 @@ Additional response formats may be added in the future.
 Authentication
 --------------
 
+### Access Tokens
+
+You can use access tokens to authenticate as any user in the system.
+Currently access tokens must be created by the user and then given to
+the third party for use.  Access tokens can be generated from the user's
+profile page.
+
+Note that all requests will need the
+"access_token" query parameter set, not just the first request.
+Most API calls will only return data that is visible to the
+authenticated user.  For example, to list the courses that
+your user is enrolled in as a teacher:
+
+    $ curl https://canvas.instructure.com/api/v1/courses.json?access_token=USER_PROVIDED_ACCESS_TOKEN | jsonpretty
+    [
+      {
+        "name": "First Course",
+        "id": 123456,
+        "course_code": "Course-1",
+        "enrollments": [
+          {
+            "type": "teacher"
+          },
+          {
+            "type": "ta"
+          }
+        ]
+      },
+      {
+        "name": "Second Course",
+        "id": 54321,
+        "course_code": "Course-2",
+        "enrollments": [
+          {
+            "type": "teacher"
+          }
+        ]
+      }
+    ]
+
+### HTTP Basic Auth
+
+*This authentication approach is deprecated*
+
 You can use HTTP Basic Auth to authenticate with any username/password
 combination. Note that all requests will need the Authentication header,
 not just the first request. Most API calls will only return data that is

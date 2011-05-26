@@ -50,23 +50,35 @@ module AuthenticationMethods
   end
 
   def load_user
-    @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
-    key = @pseudonym_session.send(:session_credentials)[1] rescue nil
-    if key
-      @current_pseudonym = Pseudonym.find_cached(['_pseudonym_lookup', key].cache_key) do
-        @pseudonym_session && @pseudonym_session.record
+    if params[:access_token] && api_request?
+      @access_token = AccessToken.find_by_token(params[:access_token])
+      @developer_key = @access_token.try(:developer_key)
+      if !@access_token.try(:usable?)
+        render :json => {:errors => "Invalid access token"}, :status => :bad_request
+        return false
       end
-    elsif @policy_pseudonym_id
-      @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
+      @access_token.used!
+      @current_user = @access_token.user
+      @current_pseudonym = @current_user.pseudonym
     else
-      @current_pseudonym = @pseudonym_session && @pseudonym_session.record
+      @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
+      key = @pseudonym_session.send(:session_credentials)[1] rescue nil
+      if key
+        @current_pseudonym = Pseudonym.find_cached(['_pseudonym_lookup', key].cache_key) do
+          @pseudonym_session && @pseudonym_session.record
+        end
+      elsif @policy_pseudonym_id
+        @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
+      else
+        @current_pseudonym = @pseudonym_session && @pseudonym_session.record
+      end
+      if params[:login_success] == '1' && !@current_pseudonym
+        # they just logged in successfully, but we can't find the pseudonym now?
+        # sounds like somebody hates cookies.
+        return redirect_to(login_url(:needs_cookies => '1'))
+      end
+      @current_user = @current_pseudonym && @current_pseudonym.user
     end
-    if params[:login_success] == '1' && !@current_pseudonym
-      # they just logged in successfully, but we can't find the pseudonym now?
-      # sounds like somebody hates cookies.
-      return redirect_to(login_url(:needs_cookies => '1'))
-    end
-    @current_user = @current_pseudonym && @current_pseudonym.user
     if @current_user && @current_user.unavailable?
       @current_pseudonym = nil
       @current_user = nil 

@@ -22,7 +22,7 @@ describe AssignmentGroupsController, :type => :integration do
   it "should sort the returned list of assignment groups" do
     # the API returns the assignments sorted by
     # assignment_groups.position
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     group1 = @course.assignment_groups.create!(:name => 'group1')
     group1.update_attribute(:position, 10)
     group2 = @course.assignment_groups.create!(:name => 'group2')
@@ -55,7 +55,7 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should include full assignment jsonification when specified" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     group1 = @course.assignment_groups.create!(:name => 'group1')
     group1.update_attribute(:position, 10)
     group2 = @course.assignment_groups.create!(:name => 'group2')
@@ -157,7 +157,7 @@ describe AssignmentGroupsController, :type => :integration do
   end
 
   it "should exclude deleted assignments" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     group1 = @course.assignment_groups.create!(:name => 'group1')
     group1.update_attribute(:position, 10)
 
