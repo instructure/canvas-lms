@@ -59,5 +59,10 @@ class HostUrl
     def default_host=(val)
       @@default_host = val
     end
+    
+    def is_file_host?(domain)
+      safer_host = file_host(Account.default)
+      safer_host != default_host && domain == safer_host
+    end
   end
 end

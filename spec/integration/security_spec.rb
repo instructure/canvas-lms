@@ -189,6 +189,15 @@ describe "security" do
     end
   end
 
+  it "should not allow logins to safefiles domains" do
+    HostUrl.stub!(:file_host).and_return('files-test.host')
+    HostUrl.stub!(:default_host).and_return('test.host')
+    get "http://files-test.host/login"
+    response.should be_redirect
+    uri = URI.parse response['Location']
+    uri.host.should == 'test.host'
+  end
+
   class Basic
     extend ActionController::HttpAuthentication::Basic
   end

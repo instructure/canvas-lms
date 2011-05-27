@@ -18,7 +18,8 @@
 
 class PseudonymSessionsController < ApplicationController
   protect_from_forgery :except => [:create, :destroy, :saml_consume]
-  
+  before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
+
   def new
     if @current_user && !params[:re_login]
       redirect_to dashboard_url
@@ -293,5 +294,12 @@ class PseudonymSessionsController < ApplicationController
       config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
       @cas_client = CASClient::Client.new(config)
   end
-  
+
+  def forbid_on_files_domain
+    if HostUrl.is_file_host?(request.host)
+      reset_session
+      return redirect_to dashboard_url(:host => HostUrl.default_host)
+    end
+    true
+  end
 end
