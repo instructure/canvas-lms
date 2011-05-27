@@ -42,7 +42,7 @@
         <td class="time_zone"><%= @user.time_zone || "None" %></td>
       </tr>
       <% if can_manage_admin_users || (!@enrollments.any?(&:admin?) && !@user.creation_sis_batch_id && can_do(@context, @current_user, :manage_students)) %>
-        <td colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">
+        <td class="links" colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">
           <a href="#" class="edit_user_link">Edit</a>
           <% if current_user_is_site_admin?(:become_user) %>
             |
