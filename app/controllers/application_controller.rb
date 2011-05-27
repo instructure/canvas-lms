@@ -904,9 +904,14 @@ class ApplicationController < ActionController::Base
   # This checks if the user is an admin of the 'Site Admin' account, and has the
   # specified permission.
   def current_user_is_site_admin?(permission = :site_admin)
-    Account.site_admin.grants_right?(@current_user, session, permission)
+    user_is_site_admin?(@current_user)
   end
   helper_method :current_user_is_site_admin?
+
+  def user_is_site_admin?(user, permission = :site_admin)
+    Account.site_admin.grants_right?(user, session, permission)
+  end
+  helper_method :user_is_site_admin?
 
   def page_views_enabled?
     PageView.page_views_enabled?

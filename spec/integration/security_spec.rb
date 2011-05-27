@@ -127,6 +127,66 @@ describe "security" do
     c2 = response['Set-Cookie'].grep(/\A_normandy_session=/).first
     c1.should match(/; *secure/)
     c2.should match(/; *secure/)
+    ActionController::Base.session_options[:secure] = nil
+  end
+
+  describe "user masquerading" do
+    before(:each) do
+      course_with_teacher
+      @teacher = @user
+
+      student_in_course
+      @student = @user
+      user_with_pseudonym :user => @student, :username => 'student@example.com', :password => 'password'
+
+      account_admin_user :account => Account.site_admin
+      @admin = @user
+      user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
+    end
+
+    it "should require confirmation for becoming a user" do
+      user_session(@admin, @admin.pseudonyms.first)
+
+      get "/?become_user_id=#{@student.id}"
+      assert_response 302
+      response.location.should match "/users/#{@student.id}/masquerade$"
+      session[:masquerade_return_to].should == "/"
+      session[:become_user_id].should be_nil
+      assigns['current_user'].id.should == @admin.id
+      assigns['real_current_user'].should be_nil
+
+      follow_redirect!
+      assert_response 200
+      path.should == "/users/#{@student.id}/masquerade"
+      session[:become_user_id].should be_nil
+      assigns['current_user'].id.should == @admin.id
+      assigns['real_current_user'].should be_nil
+
+      post "/users/#{@student.id}/masquerade"
+      assert_response 302
+      session[:become_user_id].should == @student.id.to_s
+
+      get "/"
+      assert_response 200
+      session[:become_user_id].should == @student.id.to_s
+      assigns['current_user'].id.should == @student.id
+      assigns['real_current_user'].id.should == @admin.id
+    end
+
+    it "should not allow non-admins to become other people" do
+      user_session(@student, @student.pseudonyms.first)
+
+      get "/?become_user_id=#{@teacher.id}"
+      assert_response 200
+      session[:become_user_id].should be_nil
+      assigns['current_user'].id.should == @student.id
+      assigns['real_current_user'].should be_nil
+
+      post "/users/#{@teacher.id}/masquerade"
+      assert_response 401
+      assigns['current_user'].id.should == @student.id
+      session[:become_user_id].should be_nil
+    end
   end
 
   class Basic

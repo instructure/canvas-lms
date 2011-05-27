@@ -21,7 +21,7 @@ class UsersController < ApplicationController
   include Twitter
   include LinkedIn
   include DeliciousDiigo
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade]
   before_filter :require_open_registration, :only => [:new, :create]
   
   def oauth
@@ -183,6 +183,25 @@ class UsersController < ApplicationController
           }.to_json
         }
       end
+    end
+  end
+
+  def masquerade
+    if user_is_site_admin?(@real_current_user || @current_user, :become_user)
+      @user = User.find_by_id(params[:user_id])
+      if request.post?
+        if @user == @real_current_user
+          session[:become_user_id] = nil
+        else
+          session[:become_user_id] = params[:user_id]
+        end
+        return_url = session[:masquerade_return_to]
+        session[:masquerade_return_to] = nil
+        return return_to(return_url, dashboard_url)
+      end
+      return
+    else
+      render_unauthorized_action
     end
   end
 

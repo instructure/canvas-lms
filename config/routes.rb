@@ -459,6 +459,7 @@ ActionController::Routing::Routes.draw do |map|
   map.image_search 'search/images', :controller => 'users', :action => 'image_search'
   map.search_rubrics 'search/rubrics', :controller => "search", :action => "rubrics"
   map.resources :users do |user|
+    user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'
     user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
