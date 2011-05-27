@@ -107,7 +107,7 @@ $(document).ready(function() {
       $(this).find("button").attr('disabled', false)
         .filter(".submit_button").text("Add User");
       var user = data.user.user || data.user;
-      var message = "<a href='/users/" + user.id + "'>" + user.name + "</a> successfully " + (data.new_user ? "added!" : "updated!");
+      var message = "<a href='/users/" + user.id + "'>" + $.htmlEscape(user.name) + "</a> successfully " + (data.new_user ? "added!" : "updated!");
       if(data.message_sent) {
         message = message + " They should receive an email confirmation shortly.";
       }

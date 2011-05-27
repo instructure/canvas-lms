@@ -133,14 +133,14 @@ var gradebook = (function(){
         .attr('role', 'grid')
         .prepend(function(){
           var topRowHtml = $("#datagrid_top .assignment_title").map(function(){
-            return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).text() + "</div>";
+            return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).html() + "</div>";
           }).get().join("");
           return "<div class='hidden-readable' role='row'><div role='columnheader' tabindex='-1'>Student Name</div>" + topRowHtml +"</div>";
         })
         .find(".row")
           .attr("role", "row")
           .prepend(function(index){
-            return "<div id='th_" + $studentNames.eq(index).parents(".student_header").attr('id') + "' tabindex='-1' class='ui-helper-hidden-accessible' role='rowheader'>" + $studentNames.eq(index).text() +"</div>";
+            return "<div id='th_" + $studentNames.eq(index).parents(".student_header").attr('id') + "' tabindex='-1' class='ui-helper-hidden-accessible' role='rowheader'>" + $studentNames.eq(index).html() + "</div>";
           });
       $grid.find(".data_cell").attr({
         "role": "gridcell",
@@ -200,7 +200,7 @@ var gradebook = (function(){
               showTooltip('This submission is dropped for grading purposes');
             } else if(datagrid.columns[grid.cell.column].hidden) {
               var name = objectData(datagrid.cells['0,' + grid.cell.column]).title;
-              showTooltip(name + "<br/><span style='font-size: 0.9em;'>Click to expand</span>", true)
+              showTooltip($.htmlEscape(name) + "<br/><span style='font-size: 0.9em;'>Click to expand</span>", true)
             }
           } else if(event && event.originalEvent && event.originalEvent.type && !event.originalEvent.type.match(/mouse/)) {
             grid.cell.find(".grade").focus().css('outline', 0);
@@ -545,8 +545,8 @@ var gradebook = (function(){
           datagrid.toggleColumn(datagrid.position($cell).column);
         };
         if($td.hasClass('group_total')) {
-          var type = $td.find(".assignment_title").html();
-          options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> Hide All ' + type] = function() {
+          var type = $td.find(".assignment_title").text();
+          options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> ' + $.htmlEscape('Hide All ' + type)] = function() {
             var check_id = objectData($td).assignment_group_id;
             $(".outer_assignment_name").each(function() {
               var assignment = objectData($(this));
@@ -1488,7 +1488,7 @@ var gradebook = (function(){
               $type.append($link);
             }
             $type.append($("#submission_" + submission.submission_type + "_image").clone().removeAttr('id'));
-            $type.append(" <a href='" + attachment_url + "'>Download " + attachment.display_name + "</a><br/>");
+            $type.append(" <a href='" + attachment_url + "'>" + $.htmlEscape("Download " + attachment.display_name) + "</a><br/>");
           }
         }
       } else if(submission.submission_type == "online_text_entry") {

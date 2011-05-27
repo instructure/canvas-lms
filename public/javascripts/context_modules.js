@@ -695,7 +695,7 @@ $(document).ready(function() {
       progressionData.workflow_state = progressionData.workflow_state || "locked";
       progressionData.name = $(this).getTemplateData({textValues: ['name']}).name;
       $dialog.find("." + progressionData.workflow_state + "_list").show()
-        .find("ul").show().append("<li>" + progressionData.name + "</li>");
+        .find("ul").show().append($("<li />").text(progressionData.name));
     });
     $("#module_progression_dialog").dialog('close').dialog({
       autoOpen: false,
