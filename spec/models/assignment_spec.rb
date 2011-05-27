@@ -1052,6 +1052,33 @@ describe Assignment do
       @new_assignment.needs_grading_count.should == 0
     end
   end
+  
+  context "modules" do
+    it "should be locked when part of a locked module" do
+      course :active_all => true
+      student_in_course
+      ag = @course.assignment_groups.create!
+      a1 = ag.assignments.create!(:context => course)
+      a1.locked_for?(@user).should be_false
+      
+      m = @course.context_modules.create!
+      ct = ContentTag.new
+      ct.content_id = a1.id
+      ct.content_type = 'Assignment'
+      ct.context_id = course.id
+      ct.context_type = 'Course'
+      ct.title = "Assignment"
+      ct.tag_type = "context_module"
+      ct.context_module_id = m.id
+      ct.context_code = "course_#{@course.id}"
+      ct.save!
+      
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      a1.locked_for?(@user).should be_true
+    end
+  end
 end
 
 def setup_assignment_with_group

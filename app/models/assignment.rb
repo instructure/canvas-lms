@@ -595,7 +595,7 @@ class Assignment < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
       elsif (self.lock_at && self.lock_at <= Time.now)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
-      elsif (self.could_be_locked && self.context_module_tag && !self.context_module_tag.available_for?(user, opts[:deep_check_if_needed]))
+      elsif (self.could_be_locked && self.context_module_tag && self.context_module_tag.locked_for?(user, opts[:deep_check_if_needed]))
         locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
       end
       locked

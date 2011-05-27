@@ -123,6 +123,13 @@ class ContextModule < ActiveRecord::Base
     set { can :read }
   end
   
+  def locked_for?(user, tag=nil, deep_check=false)
+    return false if self.grants_right?(user, nil, :update)
+    available = self.available_for?(user, tag, deep_check)
+    return true unless available
+    self.to_be_unlocked
+  end
+  
   def available_for?(user, tag=nil, deep_check=false)
     return true if !self.to_be_unlocked && (!self.prerequisites || self.prerequisites.empty?) && !self.require_sequential_progress
     return true if self.grants_right?(user, nil, :update)

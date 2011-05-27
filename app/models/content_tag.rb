@@ -170,8 +170,12 @@ class ContentTag < ActiveRecord::Base
     self.save
   end
   
+  def locked_for?(user, deep_check=false)
+    self.context_module.locked_for?(user, self, deep_check)
+  end
+  
   def available_for?(user, deep_check=false)
-    self.context_module.available_for?(user, self, deep_check) rescue true
+    self.context_module.available_for?(user, self, deep_check)
   end
   
   def self.update_for(asset)
