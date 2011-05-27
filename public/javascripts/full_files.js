@@ -129,7 +129,7 @@ var fileStructureData = [];
                 error: function(data) { }
               });
               var $dialog = $("<div/>");
-              $dialog.append("Extracting <b>" + file.name + "</b><br/>to " + folder.name + "...");
+              $dialog.append("Extracting <b>" + $.htmlEscape(file.name) + "</b><br/>to " + $.htmlEscape(folder.name) + "...");
               $dialog.append("<div class='progress'/>");
               var $progress = $dialog.find(".progress");
               $progress.css('margin', '10px');

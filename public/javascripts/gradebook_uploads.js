@@ -224,7 +224,7 @@ var GradebookUploader = {
         });
 
         $.each(possibilitiesToMergeWith[thing], function() {
-          $('<option value="' + this.id + '" >' + (this.name || this.title) + '</option>').appendTo($select);
+          $('<option value="' + this.id + '" >' + $.htmlEscape(this.name || this.title) + '</option>').appendTo($select);
         });
 
         $.each(needingReview[thing], function(i, record){
