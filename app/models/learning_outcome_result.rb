@@ -56,8 +56,8 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
   
   def save_to_version(attempt)
-    current_version = self.versions.current.model
-    if current_version.attempt && attempt < current_version.attempt
+    current_version = self.versions.current.try(:model)
+    if current_version.try(:attempt) && attempt < current_version.attempt
       versions = self.versions.sort_by(&:created_at).reverse.select{|v| v.model.attempt == attempt}
       if !versions.empty?
         versions.each do |version|

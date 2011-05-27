@@ -41,7 +41,7 @@ class RubricAssessment < ActiveRecord::Base
   
   def track_outcomes
     outcome_ids = (self.data || []).map{|r| r[:learning_outcome_id] }.compact.uniq
-    send_later(:update_outcomes_for_assessment, outcome_ids) unless outcome_ids.empty?
+    send_later_if_production(:update_outcomes_for_assessment, outcome_ids) unless outcome_ids.empty?
   end
   
   def update_outcomes_for_assessment(outcome_ids=[])

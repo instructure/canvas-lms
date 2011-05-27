@@ -306,11 +306,6 @@ class RubricAssociation < ActiveRecord::Base
       assessment.comments = params[:comments] if params[:comments]
 
       assessment.save
-      if self.association.is_a?(Assignment)
-        self.association.learning_outcome_tags.each do |tag|
-          tag.create_outcome_result(opts[:user], self.association, assessment)
-        end
-      end
       assessment_to_return = assessment if assessment.artifact == opts[:artifact]
     end
     assessment_to_return

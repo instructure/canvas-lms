@@ -226,17 +226,12 @@ class ContentTag < ActiveRecord::Base
     association_type = association.class.to_s
     result = nil
     attempts = 0
-    begin
-      if association.is_a?(Quiz)
-        result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id_and_associated_asset_type_and_associated_asset_id(self.learning_outcome_id, user.id, association.id, association_type, self.id, 'AssessmentQuestion', assessment_question.id)
-        result ||= LearningOutcomeResult.create(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self, :associated_asset => assessment_question)
-      else
-        result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
-        result ||= LearningOutcomeResult.create(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self)
-      end
-    rescue => e
-      attempts += 1
-      retry if attempts < 3
+    if association.is_a?(Quiz)
+      result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id_and_associated_asset_type_and_associated_asset_id(self.learning_outcome_id, user.id, association.id, association_type, self.id, 'AssessmentQuestion', assessment_question.id)
+      result ||= LearningOutcomeResult.new(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self, :associated_asset => assessment_question)
+    else
+      result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
+      result ||= LearningOutcomeResult.new(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self)
     end
     result.context = self.context
     if artifact
