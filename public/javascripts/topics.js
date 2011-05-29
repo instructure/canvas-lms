@@ -165,6 +165,9 @@ var topics = {};
   }
   function hideTopicForm(andTopicIfNew) {
     var $form = $(".add_topic_form_new");
+    if ($form.length == 0) {
+      return;
+    }
     $form.hideErrors();
     var $topic = $form.parents(".topic");
     try {
