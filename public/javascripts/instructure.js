@@ -847,7 +847,7 @@ jQuery(function($) {
     $('<h1 class="ui-helper-hidden-accessible" />').text(document.title).prependTo('#content');
   }
   if(!$('h2').length && $('#breadcrumbs li:last').text().length ) {
-    var $h2 = $('<h2 class="ui-helper-hidden-accessible" />'.text($('#breadcrumbs li:last').text())),
+    var $h2 = $('<h2 class="ui-helper-hidden-accessible" />').text($('#breadcrumbs li:last').text()),
         $h1 = $('#content h1');
     $h1.length ? 
       $h1.after($h2) : 
