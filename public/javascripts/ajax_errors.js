@@ -18,6 +18,7 @@
 
 var iTest;
 INST.errorURL = '/record_js_error';
+INST.errorCount = 0;
 INST.log_error = function(params) {
   params = params || {};
   var username = "";
@@ -32,6 +33,7 @@ INST.log_error = function(params) {
   for(var idx in params) {
     txt = txt + 'error[' + idx + "]=" + escape(params[idx]) + "&";
   }
+  INST.errorCount += 1;
   $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" + INST.errorURL + txt.substring(0, 2000) + "' />");
 }
 window.onerror = function (msg, url, line) {
