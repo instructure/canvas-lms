@@ -58,7 +58,7 @@
               close: function() {
                 $box.find("iframe").attr('src', 'about:blank');
               },
-              title: "Embed content from Equella",
+              title: "Embed content from Equella"
             })
             .bind('equella_ready', function(event, data) {
               var clickedEditor = $box.data('editor') || ed;
