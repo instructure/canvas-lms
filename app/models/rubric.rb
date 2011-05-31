@@ -188,7 +188,7 @@ class Rubric < ActiveRecord::Base
   end
   
   def update_criteria(params)
-    self.save if self.new_record?
+    self.without_versioning(&:save) if self.new_record?
     data = generate_criteria(params)
     self.update_assessments_for_new_criteria(data.criteria)
     self.hide_score_total = params[:hide_score_total] if self.hide_score_total == nil || (self.association_count || 0) < 2
