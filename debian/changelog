@@ -1,3 +1,108 @@
+canvas-lms (1.1-34) professional; urgency=low
+
+  * [+4c9f027] fix spelling of parameter
+  * [+cc81de2] better support for disabling plugins
+  * [+97662bf] clean up spec
+  * [+773a9bb] cleaning up course_account_association updates
+  * [+08ab2a6] always reset section account on sis import
+  * [+79c9d21] get rid of a useless image
+  * [+fc4c57f] fixing spelling for flash error message.
+  * [+ace3975] support sis ids in the canvas apis, closes #4386
+  * [+cfae736] don't increment successful user counts on failures
+  * [+0af7cce] don't reset the account id if the course already has one and one wasn't provided
+  * [+ffefcc6] fix selenium test that was throwing errors
+  * [+12329cc] avoid several sub-jobs during sis import refs #3752
+  * [+8d76be0] hiding stream items on the dashboard, closes #4387
+  * [+a09cba4] remove duplicate css rule that confuses IE
+  * [+92fd2d5] fix default wiki page content
+  * [+38bb6cc] set some default content for imported topics with no content
+  * [+02be112] don't use 'not graded' assignments when calculating grades
+  * [+b27b035] scale equella iframe to fill modal window
+  * [+26032f2] new jobs admin area
+  * [+5287a2f] always set job max_attempts
+  * [+241fdf1] remove old delayed_jobs admin area
+  * [+304be40] sample_memory method
+  * [+8647791] configurable max jobs/max memory limits for job workers, refs #4226
+  * [+2622b1b] useful job worker process renaming, refs #4226
+  * [+417f62c] add strand support to delayed jobs, refs #4226, closes #4415
+  * [+da2c6b9] improved periodic jobs support, refs #4226
+  * [+0e0066f] add barista and coffeescript initializer
+  * [+0bde99c] improve job searching in the ui, refs #4226
+  * [+65c8c32] process sis batches using account-specific strands, closes #4415
+  * [+68a1e6d] Merge branch 'delayed_jobs'
+  * [+8da5e4e] don't display 'out of' when we don't need to. fixes #4580
+  * [+935ab6f] Merge "Merge branch 'delayed_jobs'"
+  * [+84e520c] fix "message students who".  fixes #4596
+  * [+2025f70] handle loading job performers that yaml doesn't autoload
+  * [+6a77616] allow disabling periodic jobs
+  * [+d87c33d] modify user_content strategy, fixes #3676
+  * [+b66081c] call user_content on fields returned via json to be displayed, refs #3669
+  * [+3c425c0] wait for the server port to become available
+  * [+cfedec1] parallelize sis imports
+  * [+21f636c] use transactions for user and enrollment imports
+  * [+432a7fd] send web conference invitiation notifications, refs #4513
+  * [+91507fd] add sample_cpu_time
+  * [+019a9aa] fixed an equation editor bug
+  * [+70e984b] grading standards improvements
+  * [+99344bc] dont resize elastic textarea on every keyup in IE. fixes: #3991
+  * [+1ae0229] fix tiny resizer
+  * [+dc76ed6] add the session id to syslog lines
+  * [+da05c9a] make the cpu sampling spec more robust
+  * [+9823200] Revert "wait for the server port to become available"
+  * [+4299d86] fixups for distributed sis imports
+  * [+b60e645] import and support ssha passwords from sis. fixes #4573
+  * [+8833165] direct-to-s3 quiz and course content imports, fixes #4356
+  * [+45557e1] change default max upload size (for S3) to 10GB
+  * [+04d36dc] support batch mode for sis imports, refs #4397
+  * [+bee62d4] ask account for course permissions fixes #4488
+  * [+39966c9] submission zip downloads in ie were getting json response, fixes #4631
+  * [+de6fd2d] sort permissions when displaying them fixes #4178
+  * [+e506af3] make sure all format.html blocks come before format.json
+  * [+4a171f1] load context attachments in batches in show_relative, refs #3382
+  * [+59f71fb] fix up account level permissions fixes #4478
+  * [+0af3ad5] add sis batch mode to sis import ui, refs #4397
+  * [+ab99a9f] add sis batch mode to sis import api, closes #4397
+  * [+55b17fb] dropdown for quickly moving a student to a different section
+  * [+c8117ed] fix typo in section switcher
+  * [+632c6dd] allow account admins to manually unenroll sis-enrolled users
+  * [+38ed1ce] look up attachments by relative path by walking the heirarchy; refs #3382
+  * [+de4007d] don't show missing word question type
+  * [+3080f36] more robust sis batch mode spec, refs #4397
+  * [+23cc3e8] fixed deprecation notice when including content with content tags
+  * [+9ac6706] don't keep track of account_id for crosslisting purposes.
+  * [+cb21b51] latest hairtrigger, fixes schemadump problem
+  * [+6422260] unconclude course in the ui, closes #3631
+  * [+96627d4] call to_s on syslog logger messages
+  * [+8add064] don't error on incomplete calc quiz question export, fixes #4643
+  * [+ac9fa20] upgrade webdriver so find_elements works in ff4
+  * [+13f70f4] add a have_class matcher for selenium tests
+  * [+77f121a] another test for assignment discussions in group context
+  * [+f110492] handle content-type with attributes in sis import api
+  * [+919b613] reword peer review access message; fixes #4640
+  * [+d43f064] support secure (ssl-only) cookies, closes #4585
+  * [+846cd7c] make grading standards selenium test more robust
+  * [+7275e0d] sis enrollments are not moveable - unless you're an admin
+  * [+e67fcee] don't show remove enrollment link unless you have permission to it
+  * [+fb92ff6] include course details js in section view
+  * [+51ade64] more intensive selenium tests for inline editing of enrollments
+  * [+d9fdcc1] only include user sis id in api responses for site admins
+  * [+6eaccda] don't clone assignments.needs_grading_count, fixes #4669
+  * [+45d6fd5] fix non-file upload content imports
+  * [+80307b6] expire the mini calendar cache at the top of every hour, fixes #4204
+  * [+7f40054] allow reports to have parameters.  refs #4315
+  * [+43097ea] cancel link takes two clicks for new quiz questions
+  * [+dcc90ae] optionally export a different kaltura asset flavor
+  * [+8bb971d] displaying group, assignment, post-first discussions. fixes #4683
+  * [+de5c80a] give students full wiki privileges within groups, closes #4611
+  * [+0a9980d] make jquery.ui.dialog escape titles by default, fixes gh issues #19 and #20
+  * [+bab8158] attr_accessible AccountReports#parameters
+  * [+017756a] enrollment importer fix
+  * [+397412a] fix html escaping issues in the gradebook and elsewhere, fixes gh issues #18 and #21
+  * [+ed8ea6b] add confirmation to become_user_id operations; fixes #4689
+  * [+8b9400d] fix typo in accessibility code
+
+ -- JT Olds <jt@instructure.com>  Tue, 31 May 2011 14:48:03 -0600
+
 canvas-lms (1.1-33) professional; urgency=low
 
   * [f679594] new deb: canvas-lms_1.1-32 professional
