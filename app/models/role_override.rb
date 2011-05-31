@@ -487,6 +487,12 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
+      :manage_sis => {
+        :label => "Import and manage SIS data",
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+      },
     }.freeze
   def self.permissions
     PERMISSIONS

@@ -81,9 +81,19 @@ Spec::Runner.configure do |config|
     @course
   end
 
+  def account_admin_user_with_role_changes(opts={})
+    account = opts[:account] || Account.default
+    if opts[:role_changes]
+      opts[:role_changes].each_pair do |permission, enabled|
+        account.role_overrides.create(:permission => permission, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
+      end
+    end
+    account_admin_user(opts)
+  end
+
   def account_admin_user(opts={})
     user(opts)
-    @user.account_users.create(:account => opts[:account] || Account.default)
+    @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
     @user
   end
 

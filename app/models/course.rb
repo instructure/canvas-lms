@@ -120,6 +120,7 @@ class Course < ActiveRecord::Base
   before_save :update_enrollments_later
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
+  before_validation :verify_unique_sis_source_id
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
@@ -155,6 +156,15 @@ class Course < ActiveRecord::Base
     Rails.cache.fetch(['module_based_course', self].cache_key) do
       self.context_modules.active.any?{|m| m.completion_requirements && !m.completion_requirements.empty? }
     end
+  end
+  
+  def verify_unique_sis_source_id
+    return true unless self.sis_source_id
+    existing_course = self.root_account.all_courses.find_by_sis_source_id(self.sis_source_id)
+    return true if !existing_course || existing_course.id == self.id 
+    
+    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    false
   end
   
   def public_license?

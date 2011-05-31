@@ -1,4 +1,3 @@
-<% jammit_js :course_details %>
 <% content_for :page_title do %><%= @section.name %><% end %>
 
 <% content_for :right_side do %>
@@ -13,7 +12,7 @@
         <a href="#" class="button button-sidebar-wide crosslist_link"><%= image_tag "move.png" %> Cross-List this Section</a>
       <% end %>
     <% end %>
-    <a href="<%= context_url(@context, :context_details_url) %>" class="button button-sidebar-wide edit_section_link"><%= image_tag "back.png" %> Back to Course Settings</a>
+    <a href="<%= context_url(@context, :context_details_url) %>" class="button button-sidebar-wide"><%= image_tag "back.png" %> Back to Course Settings</a>
   </div>
 <% end %>
 
@@ -99,6 +98,20 @@ h3 .tally {
     <td><%= f.label :name, "Section Name:" %></td>
     <td><%= f.text_field :name %></td>
   </tr>
+  <% if @section.sis_source_id || can_do(@context.root_account, @current_user, :manage_sis) %>
+    <tr>
+      <td><%= f.label :sis_source_id, "SIS ID:" %></td>
+      <td>
+        <span class="course_form">
+          <% if can_do(@context.root_account, @current_user, :manage_sis) %>
+            <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => "SIS ID", :value => @section.sis_source_id %>
+          <% else %>
+            <%= @section.sis_source_id %>
+          <% end %>
+        </span>
+      </td>
+    </tr>
+  <% end %>
   <tr>
     <td><%= f.label :start_at, "Starts:" %></td>
     <td><%= f.text_field :start_at, :class => "datetime_field", :value => datetime_string(@section.start_at), :style => 'width: 120px;' %></td>
@@ -113,6 +126,7 @@ h3 .tally {
       <%= f.label :restrict_enrollments_to_section_dates, "Users can only access the course between these dates" %>
       <div style="font-size: 0.8em; padding-left: 25px;">
         This will override any term or course date settings.
+      </div>
     </td>
   </tr>
   <tr>
@@ -125,13 +139,13 @@ h3 .tally {
   </tr>
 </table>
 <% end %>
-<h2><%= @section.name %></h2>
+<h2 id="section_name"><%= @section.name %></h2>
 <div style="margin-bottom: 20px;">
   <div>
     <%= pluralize((@current_enrollments + @completed_enrollments).length, 'Enrollment') %>
   </div>
-  <% if @section && @section.sis_source_id %>
-    <div>SIS ID: <%= @section.sis_source_id %></div>
+  <% if @section && ( @section.sis_source_id || can_do(@context.root_account, @current_user, :manage_sis))%>
+    <div>SIS ID: <span class="sis_source_id"><%= @section.sis_source_id %></span></div>
   <% end %>
   <% if @section.start_at || @section.end_at %>
     <div>

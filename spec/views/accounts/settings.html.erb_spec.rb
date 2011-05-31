@@ -19,38 +19,36 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "courses/course_details.html.erb" do
+describe "accounts/settings.html.erb" do
   describe "sis_source_id edit box" do
     before do
-      course_with_teacher(:active_all => true)
-      @course.sis_source_id = "so_special_sis_id"
-      @course.workflow_state = 'claimed'
-      @course.save
-      assigns[:context] = @course
-    end
-
-    it "should not show to teacher" do
-      view_context(@course, @user)
-      assigns[:current_user] = @user
-      render
-      response.should have_tag("span.sis_source_id", @course.sis_source_id)
-      response.should_not have_tag("input#course_sis_source_id")
+      @account = Account.default
+      @account.sis_source_id = "so_special_sis_id"
+      @account.save
+      
+      assigns[:context] = @account
+      assigns[:account] = @account
+      assigns[:account_users] = []
+      assigns[:root_account] = @account
+      assigns[:associated_courses_count] = 0
+      assigns[:account_notifications] = []
     end
 
     it "should show to sis admin" do
-      admin = account_admin_user(:account => @course.root_account)
-      view_context(@course, admin)
+      admin = account_admin_user
+      view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should have_tag("input#course_sis_source_id")
+      response.should have_tag("input#account_sis_source_id")
     end
 
     it "should not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => {'manage_sis' => false}, :membership_type => "NoSissy")
-      view_context(@course, admin)
+      admin = account_admin_user_with_role_changes(:role_changes => {'manage_sis' => false})
+      view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should_not have_tag("input#course_sis_source_id")
+      response.should have_tag("span.sis_source_id", @account.sis_source_id)
+      response.should_not have_tag("input#account_sis_source_id")
     end
   end
 end

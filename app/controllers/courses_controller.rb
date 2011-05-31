@@ -837,6 +837,15 @@ class CoursesController < ApplicationController
           params[:course].delete :course_code
         end
       end
+      if sis_id = params[:course].delete(:sis_source_id)
+        if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
+          if sis_id == ''
+            @course.sis_source_id = nil
+          else
+            @course.sis_source_id = sis_id
+          end
+        end
+      end
       @course.send(params[:course].delete(:event)) if params[:course][:event]
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles

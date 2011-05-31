@@ -5,6 +5,11 @@
       <span class="name"><%= term.name rescue nbsp %></span>
     </div>
     <div class="show_term" style="font-size: 0.8em;">
+      <% if term && (term.sis_source_id || can_do(term.root_account, @current_user, :manage_sis)) %>
+        <div style="font-size: 0.8em;">
+          SIS ID: <span class="sis_source_id"><%= term.sis_source_id %></span> 
+        </div>
+      <% end %>
       <%= term && pluralize(term.courses.active.count, "Course") %><br/>
       <%= term && pluralize(term.users_count, "User") %>
     </div>
@@ -12,6 +17,11 @@
       <div class="edit_term">
         <%= f.text_field :name %>
       </div>
+      <% if term && can_do(@root_account, @current_user, :manage_sis) %>
+        <div class="edit_term" style="font-size: 0.8em;">
+          SIS ID: <%= f.text_field :sis_source_id %>
+        </div>
+      <% end %>
       <div class="edit_term" style="margin-top: 10px;">
         <button class="button submit_button" type="submit"><%= term ? "Update Term" : "Add Term" %></button>
         <button class="button button-secondary cancel_button" type="button">Cancel</button>

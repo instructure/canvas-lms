@@ -73,6 +73,7 @@ class Account < ActiveRecord::Base
   has_many :error_reports
   has_many :account_notifications
 
+  before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
   before_save :set_update_account_associations_if_changed
   after_save :update_account_associations_if_changed
@@ -160,6 +161,21 @@ class Account < ActiveRecord::Base
     self.uuid ||= AutoHandle.generate_securish_uuid
   end
   
+  def verify_unique_sis_source_id
+    return true unless self.sis_source_id
+    root = self.root_account || self
+    existing_account = Account.find_by_root_account_id_and_sis_source_id(root.id, self.sis_source_id)
+    
+    if self.root_account?
+      return true if !existing_account
+    elsif root.sis_source_id != self.sis_source_id
+      return true if !existing_account || existing_account.id == self.id
+    end
+    
+    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    false
+  end
+  
   def set_update_account_associations_if_changed
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
     self.root_account_id ||= self.parent_account_id
@@ -192,6 +208,10 @@ class Account < ActiveRecord::Base
   
   def domain
     HostUrl.context_host(self)
+  end
+  
+  def root_account?
+    !self.root_account_id
   end
   
   def sub_accounts_as_options(indent=0)
@@ -770,7 +790,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
       tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id && manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil? && manage_settings
-      tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.allow_sis_import && manage_settings
+      tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
     end
     tabs << { :id => TAB_SETTINGS, :label => "Settings", :href => :account_settings_path }
     tabs

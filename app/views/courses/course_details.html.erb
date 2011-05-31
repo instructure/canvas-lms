@@ -137,7 +137,7 @@
                 <td><b> #san-fransisco-university-biology-100</b></td>
               </tr><tr>
                 <td>much better:</td>
-                <td><b> #usu-bio100</b></td>
+                <td><b> #sfu-bio100</b></td>
               </tr></table>
               </p>
               <div class="button-container">
@@ -147,10 +147,19 @@
           </span>
           </td>
         <% end %>
-      <% if @context.sis_source_id %>
+      <% if @context.sis_source_id || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
           <td><%= f.label :sis_source_id, "SIS ID:" %></td>
-          <td><%= @context.sis_source_id %></td>
+          <td>
+            <span class="course_form">
+              <% if can_do(@context.root_account, @current_user, :manage_sis) %>
+                <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => "SIS ID", :value => @context.sis_source_id %>
+              <% else %>
+                <%= @context.sis_source_id %>
+              <% end %>
+            </span>
+            <span class="course_info sis_source_id"><%= @context.sis_source_id %></span>
+          </td>
       <% end %>
       <% if current_user_is_site_admin? %>
         </tr><tr>

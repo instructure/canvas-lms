@@ -33,7 +33,7 @@ class CourseSection < ActiveRecord::Base
   has_many :course_account_associations
   
   adheres_to_policy
-  before_validation :infer_defaults
+  before_validation :infer_defaults, :verify_unique_sis_source_id
   validates_presence_of :course_id
   
   before_save :set_update_account_associations_if_changed
@@ -61,6 +61,15 @@ class CourseSection < ActiveRecord::Base
     self.nonxlist_course.try(:update_account_associations)
   end
 
+  def verify_unique_sis_source_id
+    return true unless self.sis_source_id
+    existing_section = CourseSection.find_by_root_account_id_and_sis_source_id(self.root_account_id, self.sis_source_id)
+    return true if !existing_section || existing_section.id == self.id 
+    
+    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    false
+  end
+  
   def section_code
     self.name ||= read_attribute(:section_code)
   end

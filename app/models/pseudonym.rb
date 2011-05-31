@@ -34,7 +34,7 @@ class Pseudonym < ActiveRecord::Base
   before_destroy :retire_channels
   
   before_save :set_password_changed
-  before_validation :infer_defaults
+  before_validation :infer_defaults, :verify_unique_sis_user_id
   before_save :assert_communication_channel
   before_save :set_update_account_associations_if_account_changed
   after_save :update_passwords_on_related_pseudonyms
@@ -182,6 +182,15 @@ class Pseudonym < ActiveRecord::Base
       end
     end
     true
+  end
+  
+  def verify_unique_sis_user_id
+    return true unless self.sis_user_id
+    existing_pseudo = Pseudonym.find_by_account_id_and_sis_user_id(self.account_id, self.sis_user_id)
+    return true if !existing_pseudo || existing_pseudo.id == self.id 
+    
+    self.errors.add(:sis_user_id, "SIS ID \"#{self.sis_user_id}\" is already in use")
+    false
   end
 
   def assert_user(params={}, &block)
