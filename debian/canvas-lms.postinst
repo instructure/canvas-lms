@@ -118,7 +118,6 @@ function make_delayed_jobs_yml {
 }
 
 function make_apache_config {
-  if [ -e /etc/apache2/sites-available/canvas-lms ]; then return; fi
   mkdir -p /etc/apache2/sites-available
 
   echo -en "<VirtualHost *:80>
@@ -157,7 +156,11 @@ function make_apache_config {
     Options -MultiViews
   </Directory>
 </VirtualHost>
-" > /etc/apache2/sites-available/canvas-lms
+" > /etc/apache2/sites-available/canvas-lms.template
+
+  if ! [ -e /etc/apache2/sites-available/canvas-lms ]; then
+    cp /etc/apache2/sites-available/canvas-lms.template /etc/apache2/sites-available/canvas-lms
+  fi
 }
 
 function make_security_yml {
