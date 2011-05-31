@@ -69,13 +69,16 @@ class Worker
     end
 
     say "Stopping worker", :info
+  rescue => e
+    Rails.logger.fatal("Child process died: #{e.inspect}") rescue nil
+    ErrorReport.log_exception(:delayed_jobs, e) rescue nil
   ensure
     Delayed::Job.clear_locks!(name)
   end
 
   def run
     # need to do this here, since we're avoiding db calls in the master process pre-fork
-    @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '1.0').to_f
+    @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '5.0').to_f
 
     job = nil
     Rails.logger.silence do
@@ -142,7 +145,7 @@ class Worker
         destroy_job = self.class.on_max_failures.call(job, error)
       end
       if destroy_job
-        say "destroying #{job.name} because of #{job.attempts} consecutive failures.", :info
+        say_job(job, "destroying job because of #{job.attempts} failures", :info)
         job.destroy
         return
       end
