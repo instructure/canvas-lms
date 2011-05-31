@@ -97,11 +97,15 @@ table.gradebook_table,.datagrid .content
 
       &.final_grade
         :background-color #ddd
+        :min-width 80px
         &.related
           :background-color #ccc
         &.selected
           :background-color #bbb
-      .score
+        .letter_grade
+          float: right
+          padding-right: 5px
+      .score,.letter_grade
         color: #888
         font-size: 0.9em
         padding-left: 5px

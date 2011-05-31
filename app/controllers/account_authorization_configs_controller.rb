@@ -17,7 +17,7 @@
 #
 
 class AccountAuthorizationConfigsController < ApplicationController
-  before_filter :require_context, :require_account_management
+  before_filter :require_context, :require_root_account_management
 
   def show
     @account_config = @account.account_authorization_config
@@ -48,17 +48,5 @@ class AccountAuthorizationConfigsController < ApplicationController
     @account_config = @account.account_authorization_config
     @account_config.destroy
     redirect_to :account_account_authorization_config
-  end
-
-  protected
-
-  def require_account_management
-    @account = @context
-    if @context.root_account != nil || !@context.is_a?(Account)
-      redirect_to named_context_url(@context, :context_url)
-      return false
-    else
-      return false unless authorized_action(@context, @current_user, :manage)
-    end
   end
 end

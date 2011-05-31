@@ -18,6 +18,26 @@
 
 class GradingStandardsController < ApplicationController
   before_filter :require_context
+  add_crumb("Grading Schemes") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
+  before_filter { |c| c.active_tab = "grading_standards" }
+  
+  def default_data
+    render :json => GradingStandard.default_grading_standard.to_json
+  end
+  
+  def index
+    if authorized_action(@context, @current_user, :manage_grades)
+      respond_to do |format|
+        format.html {
+          @standards = GradingStandard.sorted_standards_for(@context)
+        }
+        format.json {
+          @standards = GradingStandard.sorted_standards_for(@context, :user => @current_user, :include_parents => true)
+          render :json => @standards.to_json(:methods => [:display_name, :context_code])
+        }
+      end
+    end
+  end
   
   def create
     if authorized_action(@context, @current_user, :manage_grades)
@@ -39,6 +59,19 @@ class GradingStandardsController < ApplicationController
       @standard.user = @current_user
       respond_to do |format|
         if @standard.update_attributes(params[:grading_standard])
+          format.json{ render :json => @standard.to_json }
+        else
+          format.json{ render :json => @standard.errors.to_json, :status => :bad_request }
+        end
+      end
+    end
+  end
+  
+  def destroy
+    @standard = @context.grading_standards.find(params[:id])
+    if authorized_action(@context, @current_user, :manage_grades)
+      respond_to do |format|
+        if @standard.destroy
           format.json{ render :json => @standard.to_json }
         else
           format.json{ render :json => @standard.errors.to_json, :status => :bad_request }

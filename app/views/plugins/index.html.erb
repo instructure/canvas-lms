@@ -20,10 +20,16 @@
     </tr>
     <% @plugins.each do |plugin| %>
       <tr class="<%= cycle('odd', 'even') %>">
-        <td class='name'><span class="name"><%= h plugin.name %></span></td>
+        <td class='name'>
+          <% if plugin.has_settings_partial? %>
+            <a class="name" href="<%= plugin_path(plugin.id) %>"><%= h plugin.name %></a>
+          <% else %>
+            <span class="name"><%= h plugin.name %></span>
+          <% end %>
+        </td>
         <td class='description'><%= content_tag('span', h(plugin.description), :class => 'description') unless plugin.description.blank? %></td>
         <td class='tag'><%= h plugin.tag %></td>
-        <td class='website'><%= content_tag('span', link_to(h(plugin.website), plugin.website), :class => 'url') unless plugin.website.blank? %></td>
+        <td class='website'><%= content_tag('span', link_to(image_tag('link.png'), plugin.website), :class => 'url') unless plugin.website.blank? %></td>
         <td class="author"><%= plugin.author_website.blank? ? h(plugin.author) : link_to(h(plugin.author), plugin.author_website) %></td>
         <td class="version"><%= h plugin.version %></td>
         <td class="configure"><%= link_to("Configure", plugin_path(plugin.id)) if plugin.has_settings_partial? %></td>

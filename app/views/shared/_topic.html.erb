@@ -61,7 +61,7 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((topic.user_id rescue nil), @context.asset_string) %></div>
     <div class="course_id" style="display: none;"><%= topic_context.id if topic_context && topic_context.is_a?(Course) %></div>
-    <div class="message user_content"><%= topic && user_content(topic.message, topic.context_code, topic.asset_string) %></div>
+    <div class="message user_content"><%= topic && user_content(topic.message) %></div>
     <textarea class="message_html" style="display: none;"><%= h(topic.try_rescue(:message)) %></textarea>
     <div class="notes" style="font-size: 0.8em; float: left;">
       <% if @context.respond_to?(:assignments) %>

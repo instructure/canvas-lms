@@ -48,6 +48,7 @@ ActionController::Routing::Routes.draw do |map|
     course.self_unenrollment 'self_unenrollment/:self_unenrollment', :controller => 'courses', :action => 'self_unenrollment'
     course.restore 'restore', :controller => 'courses', :action => 'restore'
     course.backup 'backup', :controller => 'courses', :action => 'backup'
+    course.unconclude 'unconclude', :controller => 'courses', :action => 'unconclude'
     course.students 'students', :controller => 'courses', :action => 'students'
     course.resources :role_overrides, :only => [:index, :create]
     course.enrollment_invitation 'enrollment_invitation', :controller => 'courses', :action => 'enrollment_invitation'
@@ -63,6 +64,7 @@ ActionController::Routing::Routes.draw do |map|
     course.roster_message 'messages/:id', :controller => 'context', :action => 'read_roster_message', :conditions => {:method => :put}
     course.roster_message_attachment 'messages/:message_id/files/:id', :controller => 'context', :action => 'roster_message_attachment'
     course.unenroll 'unenroll/:id', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
+    course.move_enrollment 'move_enrollment/:id', :controller => 'courses', :action => 'move_enrollment', :conditions => {:method => :post}
     course.formatted_unenroll 'unenroll/:id.:format', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
     course.limit_user_grading 'limit_user_grading/:id', :controller => 'courses', :action => 'limit_user', :conditions => {:method => :post}
     course.conclude_user_enrollment 'conclude_user/:id', :controller => 'courses', :action => 'conclude_user', :conditions => {:method => :delete}
@@ -97,6 +99,8 @@ ActionController::Routing::Routes.draw do |map|
     course.import_content 'imports/content', :controller => 'content_imports', :action => 'content'
     course.import_copy 'imports/copy', :controller => 'content_imports', :action => 'copy_course', :conditions => {:method => :get}
     course.import_migrate 'imports/migrate', :controller => 'content_imports', :action => 'migrate_content'
+    course.import_upload 'imports/upload', :controller => 'content_imports', :action => 'migrate_content_upload'
+    course.import_s3_success 'imports/s3_success', :controller => 'content_imports', :action => 'migrate_content_s3_success'
     course.import_copy_content 'imports/copy', :controller => 'content_imports', :action => 'copy_course_content', :conditions => {:method => :post}
     course.import_migrate_choose 'imports/migrate/:id', :controller => 'content_imports', :action => 'migrate_content_choose'
     course.import_migrate_execute 'imports/migrate/:id/execute', :controller => 'content_imports', :action => 'migrate_content_execute'
@@ -105,7 +109,6 @@ ActionController::Routing::Routes.draw do |map|
     course.resource :gradebook_upload
     course.resources :notifications, :only => [:index, :destroy, :update], :collection => {:clear => :post}
     course.grades "grades", :controller => 'gradebooks', :action => 'grade_summary', :id => nil
-    course.grading_standards "grading_standards", :controller => 'gradebooks', :action => 'grading_standards', :conditions => {:method => :get}
     course.grading_rubrics "grading_rubrics", :controller => 'gradebooks', :action => 'grading_rubrics'
     course.student_grades "grades/:id", :controller => 'gradebooks', :action => 'grade_summary'
     course.resources :announcements
@@ -133,7 +136,7 @@ ActionController::Routing::Routes.draw do |map|
       assignment.remind_peer_review "peer_reviews/:id", :controller => 'assignments', :action => 'remind_peer_review', :conditions => {:method => :post}
       assignment.assign_peer_review "peer_reviews/users/:reviewer_id", :controller => 'assignments', :action => 'assign_peer_review', :conditions => {:method => :post}
     end
-    course.resources :grading_standards, :only => %w(create update)
+    course.resources :grading_standards, :only => %w(index create update destroy)
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
@@ -370,6 +373,8 @@ ActionController::Routing::Routes.draw do |map|
     account.add_account_user 'account_users', :controller => 'accounts', :action => 'add_account_user', :conditions => {:method => :post}
     account.remove_account_user 'account_users/:id', :controller => 'accounts', :action => 'remove_account_user', :conditions => {:method => :delete}
     
+    account.resources :grading_standards, :only => %w(index create update destroy)
+
     account.statistics 'statistics', :controller => 'accounts', :action => 'statistics'
     account.statistics_page_views 'statistics/page_views', :controller => 'accounts', :action => 'statistics_page_views'
     account.statistics_graph 'statistics/over_time/:attribute', :controller => 'accounts', :action => 'statistics_graph'
@@ -454,6 +459,7 @@ ActionController::Routing::Routes.draw do |map|
   map.image_search 'search/images', :controller => 'users', :action => 'image_search'
   map.search_rubrics 'search/rubrics', :controller => "search", :action => "rubrics"
   map.resources :users do |user|
+    user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'
     user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
@@ -535,6 +541,7 @@ ActionController::Routing::Routes.draw do |map|
     dashboard.resources :rubrics, :as => :assessments
     dashboard.comment_session "comment_session", :controller => "users", :action => "kaltura_session"
     dashboard.ignore_item 'ignore_item/:asset_string/:purpose', :controller => 'users', :action => 'ignore_item', :conditions => {:method => :delete}
+    dashboard.ignore_stream_item 'ignore_stream_item/:id', :controller => 'users', :action => 'ignore_stream_item', :conditions => {:method => :delete}
   end
   map.dashboard_ignore_channel 'dashboard/ignore_path', :controller => "users", :action => "ignore_channel", :conditions => {:method => :post}
 
@@ -617,7 +624,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :interaction_tests, :collection => {:next => :get, :register => :get, :groups => :post}
   
   map.resources :delayed_jobs, :member => {:update => :put, :queue => :put, :hold => :put}, :collection => {:hold => :put, :queue => :put}
-  map.object_snippet 'object_snippet/:context_code/:asset_string/:key', :controller => 'context', :action => 'context_object'
+  map.object_snippet 'object_snippet', :controller => 'context', :action => 'object_snippet', :conditions => { :method => :post }
   map.saml_consume "saml_consume", :controller => "pseudonym_sessions", :action => "saml_consume" 
   map.saml_logout "saml_logout", :controller => "pseudonym_sessions", :action => "saml_logout" 
   map.saml_meta_data "saml_meta_data", :controller => 'accounts', :action => 'saml_meta_data'
@@ -629,7 +636,9 @@ ActionController::Routing::Routes.draw do |map|
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
     end
   end
-  
+
+  map.resources :jobs, :only => %w(index), :collection => %w[batch_update]
+
   Jammit::Routes.draw(map)
 
   # API routes

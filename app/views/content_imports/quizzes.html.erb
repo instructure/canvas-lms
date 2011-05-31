@@ -62,6 +62,7 @@
 <% js_block do %>
 <script>
 $(document).ready(function() {
+  $qti_file_import_form = $("#qti_file_import_form");
   $("#export_file_input").change(function() {
     if($(this).val().match(/\.zip$/i)) {
       $("#qti_file_import_form .submit_button").text("Import Quiz").attr('disabled', false);
@@ -79,6 +80,13 @@ $(document).ready(function() {
 
   $("#qti_file_import_form").formSubmit({
     fileUpload: true,
+    preparedFileUpload: true,
+    singleFile: true,
+    object_name: 'migration_settings',
+    context_code: $("#current_context_code").text(),
+    upload_only: true,
+    uploadDataUrl: $qti_file_import_form.attr('action'),
+    postFormData: true,
     beforeSubmit: function(data) {
       $(this).find(".submit_button").attr('disabled', true).text("Uploading QTI File...");
     },
@@ -87,10 +95,10 @@ $(document).ready(function() {
       $("#file_uploaded").slideDown();
     },
     error: function(data) {
+      $(this).find(".submit_button").attr('disabled', false).text("Upload Failed, please try again");
       $(this).formErrors(data);
     }
   });
-
 });
 </script>
 <% end %>

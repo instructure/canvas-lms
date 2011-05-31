@@ -246,6 +246,9 @@ $(document).ready(function() {
   $("#move_course_dialog").delegate('.cancel_button', 'click', function() {
     $("#move_course_dialog").dialog('close');
   });
+  $course_form.find(".grading_standard_checkbox").change(function() {
+    $course_form.find(".grading_standard_link").showIf($(this).attr('checked'));
+  }).change();
   $course_form.formSubmit({
     processData: function(data) {
       data['course[hashtag]'] = (data['course[hashtag]'] || "").replace(/\s/g, "_").replace(/#/g, "");
@@ -259,7 +262,7 @@ $(document).ready(function() {
     },
     beforeSubmit: function(data) {
       $(this).loadingImage().removeClass('editing');
-      $(this).find(".readable_license,.account_name,.term_name").text("...");
+      $(this).find(".readable_license,.account_name,.term_name,.grading_scheme_set").text("...");
       $(this).find(".quota").text(data['course[storage_quota]']);
       $(".course_form_more_options").hide();
     },
@@ -270,6 +273,7 @@ $(document).ready(function() {
       course.conclude_at = $.parseFromISO(course.conclude_at).datetime_formatted;
       course.is_public = course.is_public ? 'Public' : 'Private';
       course.indexed = course.indexed ? "Included in public course index" : "";
+      course.grading_scheme_set = course.grading_standard_title || (course.grading_standard_id ? "Currently Set" : "Not Set");
       course.restrict_dates = course.restrict_enrollments_to_course_dates ? "Users can only access the course between these dates" : "These dates will not affect course availability";
       $("#course_form .public_options").showIf(course.is_public);
       $("#course_form .self_enrollment_message").css('display', course.self_enrollment ? '' : 'none');
@@ -358,6 +362,25 @@ $(document).ready(function() {
       .dialog({ autoOpen: false, title: "Enrollment Details" })
       .dialog('open');
     return false;
+  });
+  $('.user_list .edit_section_link').click(function(event) {
+    event.preventDefault();
+    var $this = $(this);
+    $user = $this.closest('.user');
+    $user.find('.section').toggle();
+    $user.find('.enrollment_course_section_form').toggle();
+  });
+  $('.user_list .enrollment_course_section_form #course_section_id').change(function (event) {
+    var form = $(this).parent('form');
+    var $this = $(this)
+    var section = form.prev('.section')
+    $.ajaxJSON(form.attr('action'), 'POST', form.getFormData(), function(data) {
+      section.html($this.find('option[value="' + $this.val() + '"]').html());
+      section.toggle();
+      form.toggle();
+    }, function(data) {
+      $.flashError("Something went wrong moving the user to the new section. Please try again later.");
+    });
   });
   
   $enrollment_dialog.find(".re_send_invitation_link").click(function(event) {

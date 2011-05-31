@@ -17,7 +17,7 @@
 #
 
 class TermsController < ApplicationController
-  before_filter :require_context, :require_account_management
+  before_filter :require_context, :require_root_account_management
   def index
     @context.default_enrollment_term
     @terms = @context.enrollment_terms.active.sort_by{|t| t.start_at || t.created_at }.reverse
@@ -49,16 +49,5 @@ class TermsController < ApplicationController
     @term = @context.enrollment_terms.find(params[:id])
     @term.destroy
     render :json => @term.to_json
-  end
-
-  protected
-
-  def require_account_management
-    if @context.root_account != nil || !@context.is_a?(Account)
-      redirect_to named_context_url(@context, :context_url)
-      return false
-    else
-      return false unless authorized_action(@context, @current_user, :manage)
-    end
   end
 end

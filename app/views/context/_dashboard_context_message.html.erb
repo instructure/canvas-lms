@@ -7,6 +7,7 @@
    post_date = ([message] + (message.try_rescue(:sub_messages) || [])).compact.last.try_rescue(:created_at)
 %>
 <div class="communication_message context_message message_<%= message.try_rescue(:context_code) || "no_context" %> <%= 'show_context_communication_message' if show_context %>" style="<%= hidden unless message %>" id="context_message_<%= message ? message.id : "blank" %>">
+  <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <% if !brief && message %><a name="message_<%= message.id %>"></a><% end %>
   <div class="header">
     <% if !brief %>
@@ -40,7 +41,7 @@
   </div>
   <div class="content">
     <div class="course_id" style="display: none;"><%= message.try_rescue(:context_id) %></div>
-    <div class="message user_content formatted_body"><%= user_content(message.try_rescue(:formatted_body), message.try_rescue(:context_code), message.try_rescue(:asset_string)) || nbsp %></div>
+    <div class="message user_content formatted_body"><%= user_content(message.try_rescue(:formatted_body)) || nbsp %></div>
     <div class="attachments_list" style="margin-top: 5px; <%= hidden unless message && !message.attachments.empty? %>">
       <% (message.try_rescue(:attachments) || []).select{|a| a }.each do |attachment| %>
         <div class="attachment">

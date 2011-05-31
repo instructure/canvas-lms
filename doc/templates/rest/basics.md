@@ -88,3 +88,13 @@ request, for example:
 
 If you have trouble getting your Rails console to start, please see the
 Rails console section on our <a href="https://github.com/instructure/canvas-lms/wiki/Troubleshooting">Troubleshooting wiki page</a>.
+
+Object IDs
+----------
+
+Throughout the API, objects are referenced by internal ids. You can also
+reference objects by sis id, for object types that have a sis id, by
+prepending the sis id with "sis:". For instance, to retrieve the list of
+assignments for a course with sis\_source\_id of 'A1234':
+
+    /api/v1/courses/sis:A1234/assignments.json

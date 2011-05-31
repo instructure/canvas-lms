@@ -18,10 +18,13 @@
 
 class AccountReport < ActiveRecord::Base
   include Workflow
+  attr_accessible :user, :account, :report_type, :parameters
   attr_accessor :messaging_mailbox
   belongs_to :account
   belongs_to :user
   belongs_to :attachment
+
+  serialize :parameters
 
   workflow do
     state :created

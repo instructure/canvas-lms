@@ -40,7 +40,7 @@
   <div class="content">
     <div class="inner_content">
       <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar(context_message.try_rescue(:user_id), context.asset_string) %></div>
-      <div class="message user_content formatted_body"><%= user_content(context_message.try_rescue(:formatted_body), context.asset_string, context_message.try_rescue(:asset_string)) || nbsp %></div>
+      <div class="message user_content formatted_body"><%= user_content(context_message.try_rescue(:formatted_body)) || nbsp %></div>
       <div class="media_comment user_content">
         <a href="#" class="instructure_inline_media_comment audio_playback no-underline"><span class="media_comment_id" style="display: none;"><%= context_message.try_rescue(:media_comment_id) %></span>&nbsp;</a>
       </div>

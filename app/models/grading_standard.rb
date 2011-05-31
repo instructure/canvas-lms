@@ -17,6 +17,7 @@
 #
 
 class GradingStandard < ActiveRecord::Base
+  include Workflow
   attr_accessible :title, :standard_data
   belongs_to :context, :polymorphic => true
   belongs_to :user
@@ -26,6 +27,13 @@ class GradingStandard < ActiveRecord::Base
   before_save :update_usage_count
   
   adheres_to_policy
+  
+  workflow do
+    state :active
+    state :deleted
+  end
+  
+  named_scope :active, :conditions => ['grading_standards.workflow_state != ?', 'deleted']
   
   def update_usage_count
     self.usage_count = self.assignments.active.length
@@ -52,16 +60,35 @@ class GradingStandard < ActiveRecord::Base
     res
   end
   
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save
+  end
+  
   def grading_scheme
     res = {}
-    begin
-      self.data.sort_by{|i| i[1]}.reverse.each do |i|
-        res[i[0].to_s] = i[1].to_f
-      end
-    rescue
-      res = GradingStandard.default_grading_scheme
+    self.data.sort_by{|i| i[1]}.reverse.each do |i|
+      res[i[0].to_s] = i[1].to_f
     end
     res
+  end
+  
+  def self.standards_for(context, options={})
+    user = options[:user]
+    context_codes = [context.asset_string]
+    if user
+      context_codes += ([user] + user.management_contexts).uniq.map(&:asset_string)
+    end
+    if options[:include_parents]
+      context_codes += Account.all_accounts_for(context).map(&:asset_string)
+    end
+    standards = GradingStandard.active.find_all_by_context_code(context_codes.uniq)
+    standards.uniq
+  end
+  
+  def self.sorted_standards_for(context, options={})
+    standards_for(context, options).sort_by{|s| [(s.usage_count || 0) > 3 ? 'a' : 'b', (s.title.downcase rescue "zzzzz")]}
   end
   
   def standard_data=(params={})
@@ -92,20 +119,6 @@ class GradingStandard < ActiveRecord::Base
       "D-" => 0.63,
       "F" => 0.6
     }
-    # grades = {
-      # "A" => 1.0,
-      # "A-" => 0.925,
-      # "B+" => 0.825,
-      # "B" => 0.75,
-      # "B-" => 0.675,
-      # "C+" => 0.575,
-      # "C" => 0.50,
-      # "C-" => 0.425,
-      # "D+" => 0.325,
-      # "D" => 0.25,
-      # "D-" => 0.175,
-      # "F" => 0.0
-    # }
   end
   
   def self.process_migration(data, migration)

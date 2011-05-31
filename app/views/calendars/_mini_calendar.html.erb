@@ -1,4 +1,5 @@
-<% cache(['mini_calendar_render', current.to_s, first_day.to_s].cache_key) do %>
+<%# cache expires at the top of the next hour %>
+<% cache(['mini_calendar_render', current.to_s, first_day.to_s].cache_key, :expires_in => (3600 - (Time.now.to_i % 3600)).seconds.from_now) do %>
 <div class="mini_month" aria-hidden="true">
   <div class="mini-cal-header">
     <a href="#" class="prev_month_link"><%= image_tag "arrow_left.png" %></a>

@@ -200,7 +200,8 @@ class ApplicationController < ActionController::Base
   def get_context
     unless @context
       if params[:course_id]
-        @context = Course.find(params[:course_id])
+        @context = api_request? ?
+          Api.find(Course, params[:course_id]) : Course.find(params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && session[:enrollment_uuid_course_id] == @context.id
@@ -494,7 +495,7 @@ class ApplicationController < ActionController::Base
     @page_view.created_at = Time.now
     @page_view.updated_at = Time.now
     @page_before_render = Time.now.utc
-    @page_view.id = $request_context_id
+    @page_view.id = RequestContextGenerator.request_id
   end
   
   def generate_new_page_view
@@ -610,7 +611,7 @@ class ApplicationController < ActionController::Base
         :url => request.url,
         :user => @current_user,
         :user_agent => request.headers['User-Agent'],
-        :request_context_id => $request_context_id,
+        :request_context_id => RequestContextGenerator.request_id,
         :account => @domain_root_account,
         :request_method => request.method,
         :format => request.format,
@@ -680,7 +681,7 @@ class ApplicationController < ActionController::Base
   end
 
   def api_request?
-    !!request.path.match(/\A\/api\//)
+    @api_request ||= !!request.path.match(/\A\/api\//)
   end
 
   def session_loaded?
@@ -710,7 +711,7 @@ class ApplicationController < ActionController::Base
       :url => page_name.to_url
     )
     @page.current_namespace = @namespace
-    @page.body = "Welcome to your new #{@context.class.to_s.downcase} wiki!" if page_name == "front-page" && @page.new_record?
+    @page.body = "Welcome to your new #{@context.class.base_ar_class.to_s.downcase} wiki!" if page_name == "front-page" && @page.new_record?
   end
   
   def context_wiki_page_url
@@ -867,6 +868,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_account_management(on_root_account = false)
+    if (@context.root_account != nil && on_root_account) || !@context.is_a?(Account)
+      redirect_to named_context_url(@context, :context_url)
+      return false
+    else
+      return false unless authorized_action(@context, @current_user, :manage_account_settings)
+    end
+  end
+
+  def require_root_account_management
+    require_account_management(true)
+  end
+
   # This before_filter can be used to limit access to only site admins.
   # This checks if the user is an admin of the 'Site Admin' account, and has the
   # site_admin permission.
@@ -890,9 +904,14 @@ class ApplicationController < ActionController::Base
   # This checks if the user is an admin of the 'Site Admin' account, and has the
   # specified permission.
   def current_user_is_site_admin?(permission = :site_admin)
-    Account.site_admin.grants_right?(@current_user, session, permission)
+    user_is_site_admin?(@current_user)
   end
   helper_method :current_user_is_site_admin?
+
+  def user_is_site_admin?(user, permission = :site_admin)
+    Account.site_admin.grants_right?(user, session, permission)
+  end
+  helper_method :user_is_site_admin?
 
   def page_views_enabled?
     PageView.page_views_enabled?
@@ -909,10 +928,17 @@ class ApplicationController < ActionController::Base
       send_data(io, opts)
     end
   end
-  
+
   def verified_file_download_url(attachment, *opts)
     file_download_url(attachment, :verifier => attachment.uuid, *opts)
   end
   helper_method :verified_file_download_url
-  
+
+  def user_content(str, cache_key = nil)
+    return nil unless str
+    return str.html_safe unless str.match(/object|embed/)
+
+    UserContent.escape(str)
+  end
+  helper_method :user_content
 end

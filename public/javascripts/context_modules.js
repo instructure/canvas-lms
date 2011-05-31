@@ -695,7 +695,7 @@ $(document).ready(function() {
       progressionData.workflow_state = progressionData.workflow_state || "locked";
       progressionData.name = $(this).getTemplateData({textValues: ['name']}).name;
       $dialog.find("." + progressionData.workflow_state + "_list").show()
-        .find("ul").show().append("<li>" + progressionData.name + "</li>");
+        .find("ul").show().append($("<li />").text(progressionData.name));
     });
     $("#module_progression_dialog").dialog('close').dialog({
       autoOpen: false,
@@ -876,11 +876,15 @@ modules.initModuleManagement = function() {
     var $option = $(this).parents(".completion_criterion_option");
     $option.find(".min_score_box").showIf($(this).val() == 'min_score');
     var id = $option.find(".id").val();
-    $option.find(".points_possible").text(
-      $("#context_module_item_" + id + " .points_possible").text() ||
-      // for some reason the previous did not have anything in it sometimes (noticed when you are dealing with a newly added module)
-      $("#context_module_item_" + id + " .points_possible_block").text()
-    );
+    var points_possible = $.trim($("#context_module_item_" + id + " .points_possible").text()) ||
+        // for some reason the previous did not have anything in it sometimes (noticed when you are dealing with a newly added module)
+        $.trim($("#context_module_item_" + id + " .points_possible_block").text());
+    if(points_possible.length > 0) {
+      $option.find(".points_possible").text(points_possible);
+      $option.find(".points_possible_parent").show();
+    } else {
+      $option.find(".points_possible_parent").hide();
+    }
   });
   $("#add_context_module_form .delete_criterion_link").click(function(event) {
     event.preventDefault();

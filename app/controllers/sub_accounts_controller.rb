@@ -75,16 +75,6 @@ class SubAccountsController < ApplicationController
 
   protected
 
-  def require_account_management
-    @account = @context
-    if !@context.is_a?(Account)
-      redirect_to named_context_url(@context, :context_url)
-      return false
-    else
-      return false unless authorized_action(@context, @current_user, :manage)
-    end
-  end
-
   # Finds the sub-account in the current @account context, or raises
   # RecordNotFound.
   def subaccount_or_self(account_id)

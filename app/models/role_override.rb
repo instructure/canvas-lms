@@ -318,7 +318,8 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [
           'AccountAdmin'
-        ]
+        ],
+        :account_only => true
       },
       :manage_account_settings => {
         :label => "Manage account-level settings",
@@ -328,7 +329,8 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [
           'AccountAdmin'
-        ]
+        ],
+        :account_only => true
       },
       :manage_groups => {
         :label => "Manage (create / edit / delete) groups",
@@ -460,7 +462,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_alerts => {
         :label => "Manage account user alerts",
-        :account_only => :true,
+        :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },

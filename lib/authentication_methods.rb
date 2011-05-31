@@ -73,15 +73,16 @@ module AuthenticationMethods
     end
 
     if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) } && Account.site_admin.grants_right?(@current_user, session, :become_user)
+      request_become_user_id = nil
       if params[:become_user_id]
-        session[:become_user_id] = params[:become_user_id]
+        request_become_user_id = params[:become_user_id]
       elsif params.keys.include?('me')
-        session[:become_user_id] = nil
+        request_become_user_id = nil
       elsif params.keys.include?('become_teacher')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         teacher = course.teachers.first if course
         if teacher
-          session[:become_user_id] = teacher.id
+          request_become_user_id = teacher.id
         else
           flash[:error] = "No teacher found"
         end
@@ -89,17 +90,24 @@ module AuthenticationMethods
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         student = course.students.first if course
         if student
-          session[:become_user_id] = student.id
+          request_become_user_id = student.id
         else
           flash[:error] = "No student found"
         end
       end
+      
+      if request_become_user_id != session[:become_user_id]
+        params_without_become = params.dup
+        params_without_become.delete_if {|k,v| [ 'become_user_id', 'become_teacher', 'become_student', 'me' ].include? k }
+        params_without_become[:only_path] = true
+        session[:masquerade_return_to] = url_for(params_without_become)
+        return redirect_to user_masquerade_url(request_become_user_id || @current_user.id)
+      end
     end
 
-    params[:as_user_id] ||= session[:become_user_id]
-    if params[:as_user_id] && Account.site_admin.grants_right?(@current_user, session, :become_user)
+    if session[:become_user_id] && Account.site_admin.grants_right?(@current_user, session, :become_user)
       @real_current_user = @current_user
-      @current_user = User.find(params[:as_user_id]) rescue @current_user
+      @current_user = User.find(session[:become_user_id]) rescue @current_user
       if @current_user.id != @real_current_user.id && Account.site_admin_user?(@current_user)
         # we can't let even site admins impersonate other site admins, since
         # they may have different permissions.

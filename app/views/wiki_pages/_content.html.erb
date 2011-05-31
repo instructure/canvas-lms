@@ -61,7 +61,7 @@
     </div>
   <% end %>
   <div id="wiki_body" class="user_content" style="<%= hidden if @page.deleted? %>">
-    <%= user_content(@page.body, @context.asset_string, @page.asset_string) %>
+    <%= user_content(@page.body) %>
   </div>
   <% end %>
 </div>

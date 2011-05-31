@@ -28,36 +28,54 @@
           alert("Equella is not properly configured for this account, please notify your system administrator.");
           return;
         }
-        if($box.length == 0) {
-          $box = $("<div/>");
-          $box.attr('id', 'equella_dialog').hide();
-          $box.html("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div><iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 350px; border: 0;' src='about:blank' borderstyle='0'/>");
-          $("body").append($box);
-          $box.dialog({
-            autoOpen: false,
-            width: 'auto',
-            resizable: false,
-            close: function() {
-              $box.find("iframe").attr('src', 'about:blank');
-            },
-            title: "Embed content from Equella",
-          });
-          $box.bind('equella_ready', function(event, data) {
-            var clickedEditor = $box.data('editor') || ed;
-            var selectedContent = ed.selection.getContent();
-            if(selectedContent) { // selected content
-              ed.execCommand('mceInsertLink', false, {title: data.name, href: data.url, 'class': 'equella_content_link'});
-            } else { // no selected content
-              var $link = $("<div><a/></div>");
-              $link.find("a")
-                .attr('title', data.name)
-                .attr('href', data.url)
-                .attr('class', 'equella_content_link')
-                .text(data.name)
-              ed.execCommand('mceInsertContent', false, $link.html());
-            }
-            $("#equella_dialog").dialog('close');
-          });
+        if(!$box.length) {
+          $box = $('<div id="equella_dialog" style="padding: 0; overflow-y: hidden;"/>')
+            .hide()
+            .html("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>" +
+                  "<iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 550px; border: 0;' src='about:blank' borderstyle='0'/>")
+            .appendTo('body')
+            .dialog({
+              autoOpen: false,
+              width: 'auto',
+              resizable: true,
+              resizeStart: function(){
+                $(this).find('iframe').each(function(){
+                  $('<div class="fix_for_resizing_over_iframe" style="background: #fff;"></div>')
+                    .css({
+                      width: this.offsetWidth+"px", height: this.offsetHeight+"px",
+                      position: "absolute", opacity: "0.001", zIndex: 10000000
+                    })
+                    .css($(this).offset())
+                    .appendTo("body");
+                });
+              },
+              resizeStop: function(){
+                $(".fix_for_resizing_over_iframe").remove();
+              },
+              resize: function(){
+                $(this).find('iframe').add('.fix_for_resizing_over_iframe').height($(this).height()).width($(this).width());
+              },
+              close: function() {
+                $box.find("iframe").attr('src', 'about:blank');
+              },
+              title: "Embed content from Equella",
+            })
+            .bind('equella_ready', function(event, data) {
+              var clickedEditor = $box.data('editor') || ed;
+              var selectedContent = ed.selection.getContent();
+              if(selectedContent) { // selected content
+                ed.execCommand('mceInsertLink', false, {title: data.name, href: data.url, 'class': 'equella_content_link'});
+              } else { // no selected content
+                var $link = $("<div><a/></div>");
+                $link.find("a")
+                  .attr('title', data.name)
+                  .attr('href', data.url)
+                  .attr('class', 'equella_content_link')
+                  .text(data.name)
+                ed.execCommand('mceInsertContent', false, $link.html());
+              }
+              $("#equella_dialog").dialog('close');
+            });
         }
         var teaser = $("#equella_teaser").html();
         $box.find(".teaser").hide();

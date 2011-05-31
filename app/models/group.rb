@@ -262,7 +262,8 @@ class Group < ActiveRecord::Base
       can :send_messages and can :create_conferences and
       can :create_collaborations and can :read_roster and
       can :manage_calendar and
-      can :update and can :delete and can :create }
+      can :update and can :delete and can :create and
+      can :manage_wiki }
     
     given { |user| user && self.invited_users.include?(user) }
     set { can :read }

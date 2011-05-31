@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
+require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
@@ -27,7 +28,7 @@ SERVER_PORT = SELENIUM_CONFIG[:app_port] || 3002
 APP_HOST = "#{SERVER_IP}:#{SERVER_PORT}"
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 60
-MAX_SERVER_START_TIME = 30
+MAX_SERVER_START_TIME = 60
 
 module SeleniumTestsHelperMethods
   def setup_selenium
@@ -90,13 +91,6 @@ module SeleniumTestsHelperMethods
       ENV['SELENIUM_WEBRICK_SERVER'] = '1'
       exec("#{base}/../../script/server", "-p", SERVER_PORT.to_s, "-e", Rails.env)
     end
-    for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
-      break if s
-      sleep 1
-    end
-    raise "Failed starting script/server" unless s
-    s.close
     closed = false
     shutdown = lambda do
       unless closed
@@ -110,6 +104,13 @@ module SeleniumTestsHelperMethods
       end
     end
     at_exit { shutdown.call }
+    for i in 0..MAX_SERVER_START_TIME
+      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
+      break if s
+      sleep 1
+    end
+    raise "Failed starting script/server" unless s
+    s.close
     return shutdown
   end
 end
@@ -117,11 +118,12 @@ end
 shared_examples_for "all selenium tests" do
 
   include SeleniumTestsHelperMethods
+  include CustomSeleniumRspecMatchers
 
   attr_reader :selenium_driver
   alias_method :driver, :selenium_driver
   
-  def login_as(username, password)
+  def login_as(username = "nobody@example.com", password = "asdfasdf")
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
     
@@ -130,8 +132,22 @@ shared_examples_for "all selenium tests" do
     password_element.send_keys(password)
     password_element.submit
   end
-  
+  alias_method :login, :login_as
+
+  def course_with_teacher_logged_in(opts={})
+    user_with_pseudonym({:active_user => true}.merge(opts))
+    course_with_teacher({:user => @user, :active_course => true}.merge(opts))
+    login_as(@pseudonym.unique_id, @pseudonym.password)
+  end
+
+  def course_with_student_logged_in(opts={})
+    user_with_pseudonym({:active_user => true}.merge(opts))
+    course_with_student({:user => @user, :active_course => true}.merge(opts))
+    login_as(@pseudonym.unique_id, @pseudonym.password)
+  end
+
   def wait_for_dom_ready
+    (driver.execute_script "return $").should_not be_nil
     driver.execute_script <<-JS
       window.seleniumDOMIsReady = false; 
       $(function(){ 
@@ -149,10 +165,11 @@ shared_examples_for "all selenium tests" do
   end
   
   def keep_trying
-    60.times do |i|
+    SECONDS_UNTIL_GIVING_UP.times do |i|
       puts "trying #{SECONDS_UNTIL_GIVING_UP - i}" if i > SECONDS_UNTIL_COUNTDOWN
       if i < SECONDS_UNTIL_GIVING_UP - 2
-        break if (yield rescue false)
+        val = (yield rescue false)
+        break(val) if val
       elsif i == SECONDS_UNTIL_GIVING_UP - 1
         yield
       else
@@ -196,6 +213,15 @@ shared_examples_for "all selenium tests" do
   def get(link)
     driver.get(app_host + link)
     wait_for_dom_ready
+  end
+  
+  def make_full_screen
+    driver.execute_script <<-JS
+      if (window.screen) {
+        window.moveTo(0, 0);
+        window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+      }
+    JS
   end
 
   self.use_transactional_fixtures = false

@@ -283,7 +283,10 @@
         <% elsif can_do(@submission, @current_user, :read_grade) %>
           <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.score %></span> 
         <% end %>
-        out of <%= @submission.assignment.points_possible %><br/>
+        <% if @submission.assignment.points_possible %>
+          out of <%= @submission.assignment.points_possible %>
+        <% end %>
+        <br/>
         
         <% if @submission.turnitin_data && (@submission.current_submission_graded? || can_do(@context, @current_user, :manage_grades)) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) && turnitin_score[:similarity_score] %>
@@ -367,7 +370,7 @@
           <button type="button" class="button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
           <div class="comment_list" style="padding: 10px; clear:right;">
             <% unless can_do(@submission, @current_user, :read_grade) %>
-              <i>You do not have full access to this submission, so you will only see comments written by you.</i><br/><br/>
+              <i>As a peer reviewing student, you will only see comments written by you.</i><br/><br/>
             <% end %>
             <% @submission.submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>

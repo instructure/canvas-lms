@@ -17,10 +17,10 @@
 #
 
 class ContextController < ApplicationController
-  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :context_message_reply, :media_object_redirect, :media_object_inline]
+  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :context_message_reply, :media_object_redirect, :media_object_inline, :object_snippet]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image]
-  protect_from_forgery :except => [:kaltura_notifications]
-  
+  protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
+
   def create_roster_message
     get_context
     if authorized_action(@context, @current_user, :send_messages)
@@ -159,30 +159,31 @@ class ContextController < ApplicationController
     logger.warn(e.backtrace.join("\n"))
     render :text => "failure"
   end
-  
-  def context_object
-    @context = Context.find_by_asset_string(params[:context_code])
-    @asset = @context.find_asset(params[:asset_string])
-    @asset = @context if params[:asset_string] == params[:context_code]
-    @headers = false
-    @show_left_side = false
-    @padless = true
-    if params[:user_id].present? && params[:ts] && params[:verifier]
-      @user = User.find_by_id(params[:user_id])
-      @user = nil unless @user && @user.valid_access_verifier?(params[:ts], params[:verifier])
+
+  # safely render object and embed tags as part of user content, by using a
+  # iframe pointing to the separate files domain that doesn't contain a user's
+  # session. see lib/user_content.rb and the user_content calls throughout the
+  # views.
+  def object_snippet
+    @snippet = params[:object_data] || ""
+    hmac = Canvas::Security.hmac_sha1(@snippet)
+
+    if hmac != params[:s]
+      return render :nothing => true, :status => 400
     end
-    raise ActiveRecord::RecordNotFound.new("Invalid context snippet url") unless @asset && @context
-    if authorized_action(@asset, @user, :read)
-      html = @asset.description rescue nil
-      html ||= @asset.body rescue nil
-      html ||= @asset.message rescue nil
-      html ||= @asset.syllabus_body rescue nil
-      dom = Nokogiri::HTML::DocumentFragment.parse(html)
-      @snippet = dom.css("object,embed")[params[:key].to_i]
-      raise ActiveRecord::RecordNotFound.new("Invalid context snippet url") unless @snippet
-    end
+
+    # http://blogs.msdn.com/b/ieinternals/archive/2011/01/31/controlling-the-internet-explorer-xss-filter-with-the-x-xss-protection-http-header.aspx
+    # recent versions of IE and Webkit have added client-side XSS prevention
+    # measures. if data that includes potentially dangerous strings like
+    # "<script..." or "<object..." is sent to the server and then that exact
+    # same string is rendered in the html response, the browser will refuse to
+    # render that part of the content. this header tells the browser that we're
+    # doing it on purpose, so skip the XSS detection.
+    response['X-XSS-Protection'] = '0'
+    @snippet = Base64.decode64(@snippet)
+    render :layout => false
   end
-  
+
   def context_message_reply
     @message = ContextMessage.find(params[:id])
     if authorized_action(@message, @current_user, :read)
@@ -222,7 +223,11 @@ class ContextController < ApplicationController
         end
       end
       format.json do
-        json_params = {:include => [:attachments, :users], :methods => :formatted_body}
+        json_params = {
+          :include => [:attachments, :users],
+          :methods => :formatted_body,
+          :user_content => %w(formatted_body),
+        }
         if @asset.is_a?(ContextMessage) && @asset.protect_recipients && !@asset.cached_context_grants_right?(@current_user, session, :manage_students)
           json_params[:include] = [:attachments]
           json_params[:exclude] = [:recipients]

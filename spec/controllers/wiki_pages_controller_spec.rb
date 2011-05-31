@@ -155,6 +155,15 @@ describe WikiPagesController do
       assigns[:page].should_not be_new_record
       assigns[:page].title.should eql("Some Great Page")
     end
+    
+    it "should allow users to create a page" do
+      group_with_user_logged_in(:active_all => true)
+      post 'create', :group_id => @group.id, :wiki_page => {:title => "Some Great Page"}
+      response.should be_redirect
+      assigns[:page].should_not be_nil
+      assigns[:page].should_not be_new_record
+      assigns[:page].title.should eql("Some Great Page")
+    end
   end
   
   describe "PUT 'update'" do
@@ -174,6 +183,21 @@ describe WikiPagesController do
       page = assigns[:page]
       
       put 'update', :course_id => @course.id, :id => page.url, :wiki_page => {:title => "New Name"}
+      response.should be_redirect
+      assigns[:page].should_not be_nil
+      assigns[:page].title.should eql("New Name")
+    end
+    
+    it "should allow users to update a page" do
+      group_with_user_logged_in(:active_all => true)
+      @group.wiki.wiki_pages.create!(:title => 'Test')
+      put 'update', :group_id => @group.id, :id => @group.wiki.wiki_pages.first.url, :wiki_page => {:title => "Some Great Page"}
+      response.should be_redirect
+      assigns[:page].should_not be_nil
+      assigns[:page].title.should eql("Some Great Page")
+      page = assigns[:page]
+      
+      put 'update', :group_id => @group.id, :id => page.url, :wiki_page => {:title => "New Name"}
       response.should be_redirect
       assigns[:page].should_not be_nil
       assigns[:page].title.should eql("New Name")
@@ -207,6 +231,17 @@ describe WikiPagesController do
       assigns[:page].should eql(page)
       assigns[:page].should be_deleted #frozen
       @course.wiki.wiki_pages.should be_include(page)
+    end
+    
+    it "should allow users to delete a page" do
+      group_with_user_logged_in(:active_all => true)
+      page = @group.wiki.wiki_pages.create(:title => "a page")
+      page.save!
+      delete 'destroy', :group_id => @group.id, :id => page.url
+      response.should be_redirect
+      assigns[:page].should eql(page)
+      assigns[:page].should be_deleted #frozen
+      @group.wiki.wiki_pages.should be_include(page)
     end
   end
   

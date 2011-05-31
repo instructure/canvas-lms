@@ -140,13 +140,13 @@ class ProfileController < ApplicationController
           change_password = params[:pseudonym].delete :change_password
           old_password = params[:pseudonym].delete :old_password
           pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id]) if params[:pseudonym][:password_id] && change_password
-          if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_password?(old_password)
+          if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             pseudonymed = true
             flash[:error] = "Invalid old password for the login #{pseudonym_to_update.unique_id}"
             format.html { redirect_to profile_url }
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
-          if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_password?(old_password)
+          if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             params[:pseudonym].delete :password
             params[:pseudonym].delete :password_confirmation
           end

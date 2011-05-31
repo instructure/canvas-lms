@@ -61,6 +61,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_one :account_authorization_config
   has_many :account_reports
+  has_many :grading_standards, :as => :context
   
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :learning_outcomes, :as => :context
@@ -309,8 +310,8 @@ class Account < ActiveRecord::Base
       account = account.parent_account
       res << account
     end
-    res << self.root_account
-    res.uniq.compact
+    res << self.root_account unless res.include?(self.root_account)
+    res.compact
   end
   
   def all_page_views
@@ -471,21 +472,18 @@ class Account < ActiveRecord::Base
       given {|user, session| self.parent_account && self.parent_account.grants_right?(user, session, permission) }
       set { can permission }
 
-      given {|user, session| !site_admin? && Account.site_admin_user?(user) }
+      given {|user, session| !site_admin? && Account.site_admin.grants_right?(user, session, permission) }
       set { can permission }
     end
 
     given { |user| self.active? && self.users.include?(user) }
-    set { can :read and can :read_roster and can :manage and can :update and can :delete }
-    
-    given { |user| self.root_account && self.root_account.grants_right?(user, nil, :manage) }
-    set { can :read and can :read_roster and can :manage and can :update and can :delete }
-    
+    set { can :read and can :manage and can :update and can :delete }
+
     given { |user| self.parent_account && self.parent_account.grants_right?(user, nil, :manage) }
-    set { can :read and can :read_roster and can :manage and can :update and can :delete }
-    
-    given { |user| !site_admin? && Account.site_admin_user?(user) }
-    set { can :read and can :read_roster and can :manage and can :update and can :delete }
+    set { can :read and can :manage and can :update and can :delete }
+
+    given { |user| !site_admin? && Account.site_admin_user?(user, :manage) }
+    set { can :read and can :manage and can :update and can :delete }
   end
 
   alias_method :destroy!, :destroy
@@ -747,26 +745,29 @@ class Account < ActiveRecord::Base
   TAB_SETTINGS = 9
   TAB_FACULTY_JOURNAL = 10
   TAB_SIS_IMPORT = 11
+  TAB_GRADING_STANDARDS = 12
   
   def tabs_available(user=nil, opts={})
+    manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
       tabs = [
         { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
       ]
     else
-      tabs = [
-        { :id => TAB_COURSES, :label => "Courses", :href => :account_path },
-        { :id => TAB_USERS, :label => "Users", :href => :account_users_path },
-        { :id => TAB_STATISTICS, :label => "Statistics", :href => :statistics_account_path },
-        { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
-        { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path },
-        { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path },
-        { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path },
-      ]
+      tabs = [ { :id => TAB_COURSES, :label => "Courses", :href => :account_path } ]
+      tabs << { :id => TAB_USERS, :label => "Users", :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
+      tabs << { :id => TAB_STATISTICS, :label => "Statistics", :href => :statistics_account_path }
+      tabs << { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      if user && self.grants_right?(user, nil, :manage_outcomes)
+        tabs << { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path }
+        tabs << { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path }
+      end
+      tabs << { :id => TAB_GRADING_STANDARDS, :label => "Grading Schemes", :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
+      tabs << { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
-      tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id
-      tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil?
-      tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.allow_sis_import
+      tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id && manage_settings
+      tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil? && manage_settings
+      tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.allow_sis_import && manage_settings
     end
     tabs << { :id => TAB_SETTINGS, :label => "Settings", :href => :account_settings_path }
     tabs
@@ -901,6 +902,16 @@ class Account < ActiveRecord::Base
       self.allowed_services_hash.empty?
     else
       self.allowed_services_hash.has_key?(service)
+    end
+  end
+  
+  def self.all_accounts_for(context)
+    if context.respond_to?(:account)
+      context.account.account_chain
+    elsif context.respond_to?(:parent_account)
+      context.account_chain
+    else
+      []
     end
   end
   

@@ -53,9 +53,9 @@ class Pseudonym < ActiveRecord::Base
 
   def require_password?
     # Change from auth_logic: don't require a password just because new_record?
-    # is true. just check if the pw has changed or cryped_password_field is
+    # is true. just check if the pw has changed or crypted_password_field is
     # blank.
-    password_changed? || send(crypted_password_field).blank?
+    password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?)
   end
 
   acts_as_list :scope => :user_id
@@ -275,13 +275,11 @@ class Pseudonym < ActiveRecord::Base
     return false if self.deleted?
     require 'net/ldap'
     account = self.account || Account.default
-    if account && account.ldap_authentication?
-      res = nil
-      res = valid_ldap_credentials?(plaintext_password)
-      res ||= valid_password?(plaintext_password)
-    else
-      valid_password?(plaintext_password)
-    end
+    res = false
+    res ||= valid_ldap_credentials?(plaintext_password) if account && account.ldap_authentication?
+    # Only check SIS if they haven't changed their password
+    res ||= valid_ssha?(plaintext_password) if password_auto_generated?
+    res ||= valid_password?(plaintext_password)
   end
   
   def generate_temporary_password
@@ -314,9 +312,9 @@ class Pseudonym < ActiveRecord::Base
   def valid_ssha?(plaintext_password)
     return false unless plaintext_password && self.sis_ssha
     decoded = Base64::decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))
-    digest = decoded[0,20]
-    salt = decoded[20,8]
-    digested_password = Digest::SHA1.digest(plaintext_password + salt)
+    digest = decoded[0,40]
+    salt = decoded[40..-1]
+    digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack('H*').first
     digest == digested_password
   end
   
