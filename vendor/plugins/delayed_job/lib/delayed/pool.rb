@@ -184,8 +184,8 @@ class Pool
     File.open(pid_file, 'wb') { |f| f.write(Process.pid.to_s) }
 
     # if we blow up so badly that we can't syslog the error, it has to go to
-    # log/delayed_jobs.log
-    last_ditch_logfile = expand_rails_path("log/delayed_jobs.log")
+    # log/delayed_job.log
+    last_ditch_logfile = expand_rails_path("log/delayed_job.log")
     STDIN.reopen("/dev/null")
     STDOUT.reopen(last_ditch_logfile, 'a')
     STDERR.reopen(STDOUT)
