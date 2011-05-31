@@ -23,7 +23,7 @@ class AssessmentQuestion < ActiveRecord::Base
   has_many :attachments, :as => :context
   belongs_to :context, :polymorphic => true
   belongs_to :assessment_question_bank, :touch => true
-  simply_versioned
+  simply_versioned :automatic => false
   adheres_to_policy
   acts_as_list :scope => :assessment_question_bank_id
   before_save :infer_defaults
