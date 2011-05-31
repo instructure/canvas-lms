@@ -905,21 +905,20 @@ class Course < ActiveRecord::Base
         posts_to_make, ignored_enrollment_ids = callback.call(self, enrollments,
             publishing_pseudonym)
       rescue
-        Enrollment.update enrollments.map(&:id),
-            [{ :grade_publishing_status => "error" }] * enrollments.size
+        Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollments.map(&:id) })
         raise
       end
     end
 
-    Enrollment.update ignored_enrollment_ids, [{ :grade_publishing_status => "unpublishable" }] * ignored_enrollment_ids.size
+    Enrollment.update_all({ :grade_publishing_status => "unpublishable" }, { :id => ignored_enrollment_ids })
 
     posts_to_make.each do |enrollment_ids, res, mime_type|
       begin
         SSLCommon.post_data(settings[:publish_endpoint], res, mime_type)
-        Enrollment.update enrollment_ids, [{ :grade_publishing_status => (settings[:wait_for_success] == "yes" ? "publishing" : "published") }] * enrollment_ids.size
+        Enrollment.update_all({ :grade_publishing_status => (settings[:wait_for_success] == "yes" ? "publishing" : "published") }, { :id => enrollment_ids })
       rescue => e
         errors << e
-        Enrollment.update enrollment_ids, [{ :grade_publishing_status => "error" }] * enrollment_ids.size
+        Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollment_ids })
       end
     end
     
