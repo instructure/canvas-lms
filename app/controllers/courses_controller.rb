@@ -68,7 +68,7 @@ class CoursesController < ApplicationController
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
           course = course_enrollments.first.course
           hash << course.as_json(
-            :include_root => false, :only => %w(id name course_code))
+            :include_root => false, :only => %w(id name course_code sis_source_id))
           hash.last['enrollments'] = course_enrollments.map { |e| { :type => e.readable_type.downcase } }
           if include_grading && course_enrollments.any? { |e| e.participating_admin? }
             hash.last['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
@@ -131,7 +131,16 @@ class CoursesController < ApplicationController
     end
   end
 
-  STUDENT_API_FIELDS = %w(id name)
+  def unconclude
+    get_context
+    if authorized_action(@context, @current_user, :update)
+      @context.unconclude
+      flash[:notice] = "Course un-concluded"
+      redirect_to(named_context_url(@context, :context_url))
+    end
+  end
+
+  include Api::V1::User
 
   # @API
   # Returns the list of sections for this course.
@@ -166,7 +175,14 @@ class CoursesController < ApplicationController
         res = section.as_json(:include_root => false,
                               :only => %w(id name))
         if include_students
-          res['students'] = section.enrollments.all(:conditions => "type = 'StudentEnrollment'").map { |e| e.user.as_json(:include_root => false, :only => STUDENT_API_FIELDS) }
+          proxy = section.enrollments
+          if user_json_is_admin?
+            proxy = proxy.scoped(:include => { :user => :pseudonym })
+          else
+            proxy = proxy.scoped(:include => :user)
+          end
+          res['students'] = proxy.all(:conditions => "type = 'StudentEnrollment'").
+            map { |e| user_json(e.user) }
         end
         res
       end
@@ -180,15 +196,19 @@ class CoursesController < ApplicationController
   #
   # @response_field id The unique identifier for the student.
   # @response_field name The full student name.
+  # @response_field sis_user_id The SIS id for the user's primary pseudonym.
   #
   # @example_response
-  #   [ { 'id': 1, 'name': 'first student' },
-  #     { 'id': 2, 'name': 'second student' } ]
+  #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null },
+  #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis' } ]
   def students
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      render :json => @context.students.to_json(:include_root => false,
-                                                :only => STUDENT_API_FIELDS)
+      proxy = @context.students
+      if user_json_is_admin?
+        proxy = proxy.scoped(:include => :pseudonym)
+      end
+      render :json => proxy.map { |u| user_json(u) }
     end
   end
 
@@ -678,7 +698,7 @@ class CoursesController < ApplicationController
     can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_remove
       respond_to do |format|
-        if !@enrollment.defined_by_sis? && @enrollment.destroy
+        if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
           format.json { render :json => @enrollment.to_json }
         else
           format.json { render :json => @enrollment.to_json, :status => :bad_request }
@@ -727,6 +747,26 @@ class CoursesController < ApplicationController
       render :json => enrollment.to_json(:methods => :associated_user_name)
     end
   end
+
+  def move_enrollment
+    get_context
+    @enrollment = @context.enrollments.find(params[:id])
+    can_move = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
+    can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
+    if can_move
+      respond_to do |format|
+        if @enrollment.defined_by_sis? &&! @context.grants_right?(@current_user, session, :manage_account_settings)
+          return format.json { render :json => @enrollment.to_json, :status => :bad_request }
+        end
+        @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
+        @enrollment.save!
+
+        format.json { render :json => @enrollment.to_json }
+      end
+    else
+      authorized_action(@context, @current_user, :permission_fail)
+    end
+  end
   
   def copy
     get_context
@@ -773,6 +813,10 @@ class CoursesController < ApplicationController
       if root_account_id && current_user_is_site_admin?
         @course.root_account = Account.root_accounts.find(root_account_id)
       end
+      standard_id = params[:course].delete :grading_standard_id
+      if standard_id && @course.grants_right?(@current_user, session, :manage_grades)
+        @course.grading_standard = GradingStandard.standards_for(@course, @current_user).detect{|s| s.id == standard_id.to_i }
+      end
       if @course.root_account.grants_right?(@current_user, session, :manage)
         if params[:course][:account_id]
           account = Account.find(params[:course].delete(:account_id))
@@ -804,7 +848,7 @@ class CoursesController < ApplicationController
           flash[:notice] = 'Course was successfully updated.'
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
           format.xml  { head :ok }
-          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name]), :status => :ok }
+          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.xml  { render :xml => @course.errors.to_xml }

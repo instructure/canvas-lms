@@ -24,12 +24,13 @@ class Course < ActiveRecord::Base
   include Workflow
   include EnrollmentDateRestrictions
 
-  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :abstract_course, :root_account, :storage_quota, :restrict_enrollments_to_course_dates
+  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :abstract_course, :root_account, :storage_quota, :restrict_enrollments_to_course_dates, :grading_standard, :grading_standard_enabled
 
   serialize :tab_configuration
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :abstract_course
   belongs_to :enrollment_term
+  belongs_to :grading_standard
   
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
@@ -63,7 +64,7 @@ class Course < ActiveRecord::Base
   has_many :groups, :as => :context
   has_many :active_groups, :as => :context, :class_name => 'Group', :conditions => ['groups.workflow_state != ?', 'deleted']
   has_many :assignment_groups, :as => :context, :dependent => :destroy, :order => 'assignment_groups.position, assignment_groups.name'
-  has_many :assignments, :as => :context, :dependent => :destroy
+  has_many :assignments, :as => :context, :dependent => :destroy, :order => 'assignments.created_at'
   has_many :calendar_events, :as => :context, :conditions => ['calendar_events.workflow_state != ?', 'cancelled'], :dependent => :destroy
   has_many :submissions, :through => :assignments, :order => 'submissions.updated_at DESC', :include => :quiz_submission, :dependent => :destroy
   has_many :discussion_topics, :as => :context, :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user, :dependent => :destroy, :order => 'discussion_topics.position DESC, discussion_topics.created_at DESC'
@@ -233,16 +234,11 @@ class Course < ActiveRecord::Base
     
     did_an_update = false
     
-    # Courses are tied to accounts directly and through cross-listed sections.
-    initial_entities = [self] + self.course_sections.active.find(:all, :include => { :abstract_course => :department })
+    # Courses are tied to accounts directly and through sections and crosslisted courses
+    all_sections = self.course_sections.active.find(:all)
+    initial_entities = [self] + all_sections + all_sections.map(&:nonxlist_course).compact
     initial_entities.each do |entity|
-      accounts = if entity.account
-                   entity.account.account_chain
-                 elsif entity.abstract_course && entity.abstract_course.department
-                   entity.abstract_course.department.account_chain
-                 else
-                   [ ]
-                 end
+      accounts = entity.account ? entity.account.account_chain : []
       section = (entity.is_a?(Course) ? entity.default_section : entity)
       accounts.each_with_index do |account, idx|
         key = [account.id, section.id]
@@ -535,6 +531,10 @@ class Course < ActiveRecord::Base
   def do_complete
     self.conclude_at ||= Time.now
   end
+
+  def do_unconclude
+    self.conclude_at = nil
+  end
   
   def do_offer
     self.start_at ||= Time.now
@@ -571,7 +571,9 @@ class Course < ActiveRecord::Base
     end
 
     state :aborted
-    state :completed
+    state :completed do
+      event :unconclude, :transitions_to => :available
+    end
     state :deleted
   end
   
@@ -711,13 +713,7 @@ class Course < ActiveRecord::Base
     given { |user, session| session && session["role_course_#{self.id}"] }
     set { can :read }
     
-    given { |user, session| user && AccountUser.for_user_and_account?(user, self.account_id) && (!session || !session["role_course_#{self.id}"]) rescue false }
-    set { can :update and can :manage and can :manage_content and can :impersonate_as_context_member and can :delete and can :create and can :read and can :read_groups }
-    
-    given { |user, session| user && AccountUser.for_user_and_account?(user, self.root_account_id) && (!session || !session["role_course_#{self.id}"]) rescue false } #self.root_account.users.include?(user) rescue false }
-    set { can :update and can :manage and can :manage_content and can :impersonate_as_context_member and can :delete and can :create and can :read and can :read_groups }
-    
-    given { |user, session| user && Account.site_admin_user?(user) && (!session || !session["role_course_#{self.id}"]) rescue false }
+    given { |user, session| user && account.grants_right?(user, session, :manage) && (!session || !session["role_course_#{self.id}"]) rescue false }
     set { can :update and can :manage and can :manage_content and can :impersonate_as_context_member and can :delete and can :create and can :read and can :read_groups }
   end
   
@@ -941,12 +937,14 @@ class Course < ActiveRecord::Base
       row = ["Student", "ID", "Section"]
       row.concat(assignments.map{|a| single ? [a.title_with_id, 'Comments'] : a.title_with_id})
       row.concat(["Current Score", "Final Score"])
+      row.concat(["Final Grade"]) if self.grading_standard_id
       csv << row.flatten
       
       #Second Row
       row = ["    Points Possible", "", ""]
       row.concat(assignments.map{|a| single ? [a.points_possible, ''] : a.points_possible})
       row.concat(["(read only)", "(read only)"])
+      row.concat(["(read only)"]) if self.grading_standard_id
       csv << row.flatten
       
       student_enrollments.each do |student_enrollment|
@@ -962,9 +960,26 @@ class Course < ActiveRecord::Base
         row = [student.last_name_first, student.id, student_section]
         row.concat(student_submissions)
         row.concat([student_enrollment.computed_current_score, student_enrollment.computed_final_score])
+        if self.grading_standard_id
+          row.concat([score_to_grade(student_enrollment.computed_final_score)])
+        end
         csv << row.flatten
       end
     end
+  end
+  
+  def grading_standard_title
+    if self.grading_standard_id
+      self.grading_standard.try(:title) || "Default Grading Scheme"
+    else
+      nil
+    end
+  end
+  
+  def score_to_grade(score)
+    return "" unless self.grading_standard_id && score
+    scheme = self.grading_standard.try(:data) || GradingStandard.default_grading_standard
+    scheme.min_by {|s| score <= s[1] * 100 ? s[1] : Float::MAX }[0]
   end
 
   def participants
@@ -1000,6 +1015,18 @@ class Course < ActiveRecord::Base
   
   def resubmission_for(asset_string)
     admins.each{|u| u.ignored_item_changed!(asset_string, 'grading') }
+  end
+  
+  def grading_standard_enabled
+    !!self.grading_standard_id
+  end
+  
+  def grading_standard_enabled=(val)
+    if val == false || val == '0' || val == 'false' || val == 'off'
+      self.grading_standard = nil
+    else
+      self.grading_standard_id ||= 0
+    end
   end
   
   def gradebook_json

@@ -1,5 +1,6 @@
 <% message = dashboard_notification; show_context ||= false %>
 <div style="<%= hidden unless message %>" class="communication_message message_<%= message.try_rescue(:context_code) %> <%= 'show_context_communication_message' if show_context %> dashboard_notification">
+  <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <div class="header">
     <div class="header_title">
       <%= image_tag "#{slugify(message.try_rescue(:notification_category)) || 'notification'}_icon.png", :alt => 'notification', :title => message.try_rescue(:notification_name), :class => "header_icon", :style => "padding: 7px 2px 2px;" %>

@@ -1,259 +1,177 @@
-require 'timeout'
-
 module Delayed
-  class TimeoutError < RuntimeError; end
 
-  class WorkerBase
-    cattr_accessor :logger
-    attr_reader :config
+class TimeoutError < RuntimeError; end
 
-    self.logger = if defined?(Merb::Logger)
-      Merb.logger
-    elsif defined?(RAILS_DEFAULT_LOGGER)
-      RAILS_DEFAULT_LOGGER
+class Worker
+
+  Settings = [ :max_run_time, :max_attempts ]
+  cattr_accessor :queue, *Settings
+
+  self.max_attempts = 15
+  self.max_run_time = 4.hours
+  self.queue = "canvas_queue"
+
+  attr_reader :config, :queue, :min_priority, :max_priority, :sleep_delay
+
+  # Callback to fire when a delayed job fails max_attempts times. If this
+  # callback is defined, then the value of destroy_failed_jobs is ignored, and
+  # the job is destroyed if this block returns true.
+  #
+  # This allows for destroying "uninteresting" failures, while keeping around
+  # interesting failures to be investigated later.
+  #
+  # The block is called with args(job, last_exception)
+  def self.on_max_failures=(block)
+    @@on_max_failures = block
+  end
+  cattr_reader :on_max_failures
+
+  def initialize(options = {})
+    @exit = false
+    @config = options
+    @parent_pid = options[:parent_pid]
+    @queue = options[:queue] || self.class.queue
+    @min_priority = options[:min_priority]
+    @max_priority = options[:max_priority]
+    @max_job_count = options[:worker_max_job_count].to_i
+    @max_memory_usage = options[:worker_max_memory_usage].to_i
+    @job_count = 0
+  end
+
+  def name=(name)
+    @name = name
+  end
+
+  def name
+    @name ||= "#{Socket.gethostname rescue "X"}:#{Process.pid}"
+  end
+
+  def set_process_name(new_name)
+    $0 = "delayed:#{new_name}"
+  end
+
+  def exit?
+    @exit || parent_exited?
+  end
+
+  def parent_exited?
+    @parent_pid && @parent_pid != Process.ppid
+  end
+
+  def start
+    say "Starting worker", :info
+
+    trap('INT') { say 'Exiting'; @exit = true }
+
+    loop do
+      run
+      break if exit?
     end
 
-    def initialize(options={})
-      @config = options
+    say "Stopping worker", :info
+  ensure
+    Delayed::Job.clear_locks!(name)
+  end
+
+  def run
+    # need to do this here, since we're avoiding db calls in the master process pre-fork
+    @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '1.0').to_f
+
+    job = nil
+    Rails.logger.silence do
+      job = Delayed::Job.get_and_lock_next_available(
+        name,
+        self.class.max_run_time,
+        queue,
+        min_priority,
+        max_priority)
     end
 
-    def exit?
-      @exit
-    end
+    if job
+      perform(job)
 
-    def worker_type_string
-      ""
-    end
+      @job_count += 1
+      if @max_job_count > 0 && @job_count >= @max_job_count
+        say "Max job count of #{@max_job_count} exceeded, dying"
+        @exit = true
+      end
 
-    def say(text, level = Logger::INFO)
-      puts text unless @quiet
-      logger.add level, "#{Time.now.strftime('%FT%T%z')}: #{text}" if logger
-    end
-
-    def procline(string)
-      $0 = "#{worker_type_string}:#{string}"
-      say "* (#{Process.pid}) #{string}"
+      if @max_memory_usage > 0
+        memory = Canvas.sample_memory
+        if memory > @max_memory_usage
+          say "Memory usage of #{memory} exceeds max of #{@max_memory_usage}, dying"
+          @exit = true
+        else
+          say "Memory usage: #{memory}"
+        end
+      end
+    else
+      set_process_name("wait:#{@queue}:#{min_priority || 0}:#{max_priority || 'max'}")
+      sleep(sleep_delay)
     end
   end
 
-  class Worker < WorkerBase
-    Settings = [ :max_attempts, :max_run_time, :sleep_delay, ]
-    cattr_accessor *Settings
-    cattr_accessor :min_priority, :max_priority, :queue, :cant_fork
-    self.sleep_delay = 5
-    self.max_attempts = 25
-    self.max_run_time = 4.hours
-    self.queue = nil
-
-    attr_reader :config
-
-    # By default failed jobs are destroyed after too many attempts. If you want to keep them around
-    # (perhaps to inspect the reason for the failure), set this to false.
-    cattr_accessor :destroy_failed_jobs
-    self.destroy_failed_jobs = true
-    
-    # name_prefix is ignored if name is set directly
-    attr_accessor :name_prefix, :queue
-    
-    cattr_reader :backend
-    
-    def self.backend=(backend)
-      if backend.is_a? Symbol
-        require "delayed/backend/#{backend}"
-        backend = "Delayed::Backend::#{backend.to_s.classify}::Job".constantize
-      end
-      @@backend = backend
-      silence_warnings { ::Delayed.const_set(:Job, backend) }
-    end
-
-    # Callback to fire when a delayed job fails max_attempts times. If this
-    # callback is defined, then the value of destroy_failed_jobs is ignored, and
-    # the job is destroyed if this block returns true.
-    #
-    # This allows for destroying "uninteresting" failures, while keeping around
-    # interesting failures to be investigated later.
-    #
-    # The block is called with args(job, last_exception)
-    def self.on_max_failures=(block)
-      @@on_max_failures = block
-    end
-    cattr_reader :on_max_failures
-
-    def initialize(options={})
-      super
-      @quiet = options[:quiet]
-      @queue = options[:queue] || self.class.queue
-      self.class.min_priority = options[:min_priority] if options.has_key?(:min_priority)
-      self.class.max_priority = options[:max_priority] if options.has_key?(:max_priority)
-      @already_retried = false
-    end
-
-    # Every worker has a unique name which by default is the pid of the process. There are some
-    # advantages to overriding this with something which survives worker retarts:  Workers can#
-    # safely resume working on tasks which are locked by themselves. The worker will assume that
-    # it crashed before.
-    def name
-      return @name unless @name.nil?
-      "#{@name_prefix}host:#{Socket.gethostname} pid:#{Process.pid}" rescue "#{@name_prefix}pid:#{Process.pid}"
-    end
-
-    # Sets the name of the worker.
-    # Setting the name to nil will reset the default worker name
-    def name=(val)
-      @name = val
-    end
-
-    def priority_string
-      min_priority = self.class.min_priority || 0
-      max_priority = self.class.max_priority
-      "#{min_priority}:#{max_priority || "max"}"
-    end
-
-    def start(exit_when_queues_empty = false)
-      enable_gc_optimizations
-      @exit = false
-
-      say "*** Starting job worker #{name}"
-
-      trap('TERM') { say 'Exiting...'; @exit = true }
-      trap('INT')  { say 'Exiting...'; @exit = true }
-
-      waiting = false # avoid logging "waiting for queue" over and over
-
-      loop do
-        job = Delayed::Job.get_and_lock_next_available(name,
-                                                       self.class.max_run_time,
-                                                       @queue)
-        if job
-          waiting = false
-          start_time = Time.now
-          unless self.class.cant_fork
-            @child = fork do
-              run(job, start_time)
-            end
-            procline "watch: #{@child}:#{start_time.to_i}"
-            Process.wait
-            # establish a new connection to the job queue, since when the child
-            # exits it disconnects the parent as well.
-            # the parent shouldn't ever access any table but delayed_jobs, so
-            # we don't have to worry about other connections here.
-            Delayed::Job.connection.reconnect!
-          else
-            run(job, start_time)
-          end
-        elsif exit_when_queues_empty
-          break
-        else
-          procline("wait:#{@queue}:#{priority_string}") unless waiting
-          waiting = true
-          sleep(@@sleep_delay)
-        end
-
-        break if exit?
-      end
-
-    ensure
-      Delayed::Job.clear_locks!(name)
-    end
-
-    def run(job, start_time = Time.now)
-      procline "run: #{job.name}:#{start_time.to_i}"
-      runtime = Benchmark.realtime do
-        Timeout.timeout(self.class.max_run_time.to_i, Delayed::TimeoutError) { job.invoke_job }
+  def perform(job)
+    set_process_name("run:#{job.id}:#{job.name}")
+    say_job(job, "Processing #{log_job(job, :long)}", :info)
+    runtime = Benchmark.realtime do
+      Timeout.timeout(self.class.max_run_time.to_i, Delayed::TimeoutError) { job.invoke_job }
+      Rails.logger.silence do
         job.destroy
       end
-      # TODO: warn if runtime > max_run_time ?
-      say "* [JOB] #{name} completed after %.4f" % runtime
-      return true  # did work
-    rescue Exception => e
-      handle_failed_job(job, e)
-      return false  # work failed
     end
-
-    # Reschedule the job in the future (when a job fails).
-    # Uses an exponential scale depending on the number of failed attempts.
-    def reschedule(job, error = nil, time = nil)
-      job.attempts += 1
-      if job.attempts >= (job.max_attempts || self.class.max_attempts)
-        job.failed_at = Delayed::Job.db_time_now
-        if self.class.on_max_failures
-          destroy_job = self.class.on_max_failures.call(job, error)
-        else
-          destroy_job = self.class.destroy_failed_jobs
-        end
-        if destroy_job
-          say "* [JOB] PERMANENTLY removing #{job.name} because of #{job.attempts} consecutive failures.", Logger::INFO
-          job.destroy
-          return
-        end
-      end
-
-      # still reschedule even if the job has failed max_attempts times -- maybe
-      # somebody will increase max_attempts later
-      time ||= job.reschedule_at
-      job.run_at = time
-      job.unlock
-      job.save!
-    end
-
-    # Enables GC Optimizations if you're running REE.
-    # http://www.rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
-    def enable_gc_optimizations
-      if GC.respond_to?(:copy_on_write_friendly=)
-        GC.copy_on_write_friendly = true
-      end
-    end
-
-  protected
-    
-    def handle_failed_job(job, error)
-      job.last_error = error.message + "\n" + error.backtrace.join("\n")
-      say "* [JOB] #{name} failed with #{error.class.name}: #{error.message} - #{job.attempts} failed attempts", Logger::ERROR
-      reschedule(job, error)
-    end
-
-    def worker_type_string
-      "delayed"
-    end
-
+    say_job(job, "Completed #{log_job(job)} %.0fms" % (runtime * 1000), :info)
+  rescue Exception => e
+    handle_failed_job(job, e)
   end
 
-  class PeriodicWorker < WorkerBase
+  def handle_failed_job(job, error)
+    job.last_error = error.message + "\n" + error.backtrace.join("\n")
+    say_job(job, "Failed with #{error.class} [#{error.message}] (#{job.attempts} attempts)", :error)
+    reschedule(job, error)
+  end
 
-    def initialize(config)
-      super
-      @frequency = 0.33
-    end
-
-    def start
-      @exit = false
-
-      say "*** Starting period job scheduler"
-
-      trap('TERM') { say 'Exiting...'; @exit = true }
-      trap('INT')  { say 'Exiting...'; @exit = true }
-
-      # defer requiring this so that it's not required if the user doesn't want it
-      require 'rufus/scheduler'
-      scheduler = Rufus::Scheduler.start_new
-      eval(IO.read(@config[:periodic]), binding)
-
-      procline "running"
-
-      while !exit?
-        sleep @frequency
+  # Reschedule the job in the future (when a job fails).
+  # Uses an exponential scale depending on the number of failed attempts.
+  def reschedule(job, error = nil, time = nil)
+    job.attempts += 1
+    if job.attempts >= (job.max_attempts || self.class.max_attempts)
+      job.failed_at = Delayed::Job.db_time_now
+      destroy_job = true
+      if self.class.on_max_failures
+        destroy_job = self.class.on_max_failures.call(job, error)
       end
-
-      scheduler.all_jobs.each do |id, job|
-        job.unschedule
+      if destroy_job
+        say "destroying #{job.name} because of #{job.attempts} consecutive failures.", :info
+        job.destroy
+        return
       end
     end
 
-    protected
+    # still reschedule even if the job has failed max_attempts times -- maybe
+    # somebody will increase max_attempts later
+    time ||= job.reschedule_at
+    job.run_at = time
+    job.unlock
+    job.save!
+  end
 
-    def worker_type_string
-      "periodic"
+  def say(msg, level = :debug)
+    Rails.logger.send(level, "[#{Process.pid}]W #{msg}")
+  end
+
+  def say_job(job, msg, level = :debug)
+    say("job_id:#{job.id} #{msg}", level)
+  end
+
+  def log_job(job, format = :short)
+    case format
+    when :long
+      "#{job.full_name} #{ job.to_json(:include_root => false, :only => %w(priority attempts created_at max_attempts)) }"
+    else
+      job.full_name
     end
   end
 
+end
 end

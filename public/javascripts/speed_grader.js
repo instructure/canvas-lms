@@ -1111,9 +1111,8 @@ var anonymousAssignment = false;
         EG.showDiscussion();
         EG.resizeFullHeight();
         $add_a_comment_textarea.val("");
-        // HACK, HACK, HACK
         // this is really weird but in webkit if you do $add_a_comment_textarea.val("").trigger('keyup') it will not let you
-        // type it the textarea after you do that.  but I put it in a setTimeout it works.  so this is a HACK for webkit,
+        // type it the textarea after you do that.  but I put it in a setTimeout it works.  so this is a hack for webkit,
         // but it still works in all other browsers.
         setTimeout(function(){ $add_a_comment_textarea.trigger('keyup'); }, 0);
 

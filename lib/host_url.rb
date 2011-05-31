@@ -39,11 +39,9 @@ class HostUrl
       @@file_host ||= nil
       return @@file_host if @@file_host
       res = nil
-      unless Rails.env.development?
-        @@domain_config ||= File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].with_indifferent_access
-        res = @@file_host = @@domain_config[:files_domain] if @@domain_config && @@domain_config.has_key?(:files_domain)
-        Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res
-      end
+      @@domain_config ||= File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].with_indifferent_access
+      res = @@file_host = @@domain_config[:files_domain] if @@domain_config && @@domain_config.has_key?(:files_domain)
+      Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res || !Rails.env.production?
       res ||= @@file_host = default_host
     end
 

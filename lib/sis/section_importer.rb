@@ -63,13 +63,13 @@ module SIS
         # this is an easy way to load up the cache with data we already have
         section.course = course if course.id == section.course_id
         
-        section.account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) unless section.account_id
+        section.account = row['account_id'].present? ? Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) : nil
         
         # only update the name on new records, and ones that haven't been changed since the last sis import
         if section.new_record? || (section.sis_name && section.sis_name == section.name)
           section.name = section.sis_name = row['name']
         end
-        
+
         # update the course id if necessary
         if section.course_id != course.id
           if section.nonxlist_course_id
@@ -77,12 +77,12 @@ module SIS
             if section.nonxlist_course_id != course.id
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
-              section.uncrosslist
-              section.move_to_course course
+              section.uncrosslist(false)
+              section.move_to_course(course, false)
             end
           else
             # this section isn't crosslisted and lives on the wrong course. move
-            section.move_to_course course
+            section.move_to_course(course, false)
           end
         end
 

@@ -19,7 +19,7 @@
 class User < ActiveRecord::Base
   include Context
 
-  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image
+  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails
   attr_accessor :original_id
   
   before_save :infer_defaults
@@ -955,13 +955,6 @@ class User < ActiveRecord::Base
   # Import stuff
   attr_accessor :comparison, :prior, :focus
   
-  def sorted_grading_standards
-    standards = self.grading_standards
-    context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
-    standards += GradingStandard.find_all_by_context_code(context_codes)
-    standards.uniq.sort_by{|s| [(s.usage_count || 0) > 3 ? 'a' : 'b', (s.title.downcase rescue "zzzzz")]}
-  end 
-  
   def sorted_rubrics
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active
@@ -1309,8 +1302,10 @@ class User < ActiveRecord::Base
     opts[:start_at] ||= 2.weeks.ago
     opts[:fallback_start_at] = opts[:start_at]
   
-    # dont make the query do an stream_items.context_code IN ('course_20033','course_20237','course_20247' ...) if they dont pass any contexts, just assume it wants any context code.
-    items = stream_items_simple
+    items = stream_items_simple.scoped(:conditions => { 'stream_item_instances.hidden' => false })
+    # dont make the query do an stream_items.context_code IN
+    # ('course_20033','course_20237','course_20247' ...) if they dont pass any
+    # contexts, just assume it wants any context code.
     if opts[:contexts]
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
@@ -1474,4 +1469,8 @@ class User < ActiveRecord::Base
   TAB_FILES = 2
   TAB_EPORTFOLIOS = 3
   TAB_HOME = 4
+
+  def sis_user_id
+    pseudonym.try(:sis_user_id)
+  end
 end

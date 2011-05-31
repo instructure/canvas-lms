@@ -68,7 +68,7 @@ describe PseudonymsController do
     it "should send password-change email for a registered user" do
       user_with_pseudonym
       get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
-      response.should be_success
+      response.should be_redirect
       assigns[:ccs].should include(@cc)
       assigns[:ccs].detect{|cc| cc == @cc}.messages_sent.should_not be_nil
     end

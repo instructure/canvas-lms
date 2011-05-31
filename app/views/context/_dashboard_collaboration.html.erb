@@ -1,5 +1,6 @@
 <% collab = dashboard_collaboration; show_context ||= false %>
 <div style="<%= hidden unless collab %>" class="communication_message message_<%= collab.try_rescue(:context_code) || "no_context" %> <%= 'show_context_communication_message' if show_context %>">
+  <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <div class="header">
     <div class="header_title">
       <%= image_tag "#{collab.try_rescue(:style_class) || 'collaboration'}_icon.ico", :alt => collab.try_rescue(:collaboration_type), :title => collab.try_rescue(:service_name), :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
@@ -15,7 +16,7 @@
   <div class="content">
     <div class="course_id" style="display: none;"><%= collab.context_id if collab && collab.context_type == "Course" %></div>
     <div class="message user_content">
-      <%= user_content(collab.try_rescue(:description), collab.try_rescue(:context_code), collab.try_rescue(:asset_string)) || nbsp %>
+      <%= user_content(collab.try_rescue(:description)) || nbsp %>
     </div>
     <div class="links">
       <div style="float: left; display: none;">Last viewed <span class="time_ago_date"><%= datetime_string(collab.try_rescue(:updated_at)) %></span></div>

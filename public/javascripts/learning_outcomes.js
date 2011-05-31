@@ -96,7 +96,8 @@ var outcomes = {
     }
     var data = $outcome.getTemplateData({textValues: ['short_description', 'description', 'mastery_points']});
     
-    // HACK!!! the OR here is because of a wierdness in chrome where .val() is an empty string but .html() is the actuall imputed html that we want
+    // the OR here is because of a wierdness in chrome where .val() is an 
+    // empty string but .html() is the actual imputed html that we want
     data.description = $outcome.find("textarea.description").val() || $outcome.find("textarea.description").html();
     $form.fillFormData(data, {object_name: 'learning_outcome'});
     $form.find("#outcome_include_rubric_example").attr('checked', true).change();

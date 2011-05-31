@@ -34,7 +34,8 @@ class PluginsController < ApplicationController
 
   def update
     if find_plugin_setting
-      @plugin_setting.posted_settings = params[:settings]
+      @plugin_setting.disabled = params[:plugin_setting][:disabled] if params[:plugin_setting] && params[:plugin_setting][:disabled]
+      @plugin_setting.posted_settings = params[:settings] unless @plugin_setting.disabled
       if @plugin_setting.save
         flash[:notice] = "Plugin settings successfully updated."
         redirect_to plugin_path(@plugin.id)

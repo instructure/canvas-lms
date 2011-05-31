@@ -25,6 +25,10 @@ $(document).ready(function(event) {
       $("#batch_check").hide();
       $("#import_log_holder").hide();
   });
+
+  $("#batch_mode").change(function(event) {
+    $("#batch_mode_term_id").showIf($(this).attr('checked'));
+  }).change();
   
   function createMessageHtml(batch){
     var output = "";

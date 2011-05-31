@@ -288,7 +288,15 @@ end
 class ActiveRecord::Serialization::Serializer
   def serializable_record
     hash = {}.tap do |serializable_record|
-      serializable_names.each { |name| serializable_record[name] = @record.send(name) }
+      user_content_fields = options[:user_content] || []
+      serializable_names.each do |name|
+        val = @record.send(name)
+        if val.present? && user_content_fields.include?(name.to_s)
+          val = UserContent.escape(val)
+        end
+        serializable_record[name] = val
+      end
+
       add_includes do |association, records, opts|
         if records.is_a?(Enumerable)
           serializable_record[association] = records.compact.collect { |r| self.class.new(r, opts).serializable_record }

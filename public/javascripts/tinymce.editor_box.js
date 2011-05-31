@@ -202,33 +202,38 @@
           }
           if (!options.unresizable) {
             var iframe = $("#"+id+"_ifr"),
-                table = $("#"+id+"_tbl"),
+                $containerSpan = iframe.closest('.mceEditor'),
                 iframeOffsetTop,
                 keepMeFromMousingOverIframe,
+                oldOverflow,
                 minHeight = (options.minHeight || 200),
                 helper = $('<div class="editor_box_resizer" unselectable="on"><div class="ui-icon ui-icon-grip-diagonal-se" unselectable="on"></div></div>')
             .appendTo(iframe.parent())
             .draggable({
               axis: 'y',
+              // Workaround-Instructure: This is a custom behavior added to jqueryUI draggable to make it work in this specific scenerio.
+              // look for instructureHackToNotAutoSizeTop in jquery-ui-1.8.js to see how it is used.
+              instructureHackToNotAutoSizeTop: true,
               containment: [0, iframe.offset().top + minHeight , 9999999, 9999999],
               start: function(){
+                oldOverflow = $containerSpan.css('overflow');
+                $containerSpan.css('overflow', 'hidden');
                 iframeOffsetTop = iframe.offset().top;
                 // I dont know if absolutely necessary but, do this just in case the top offset of the iframe got changed
                 // between initializion and when we started dragging
                 // (ex: some extra content got added before this element so it caused it to move down)
                 helper.draggable('option', 'containment', [0, iframeOffsetTop + minHeight , 9999999, 9999999]);
-                table.css('height', '');
-                keepMeFromMousingOverIframe = $('<div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;"></div>').appendTo('body');
+                keepMeFromMousingOverIframe = $('<div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;"></div>').appendTo(helper.parent());
               },
               drag: function(event, ui) {
+                helper.removeAttr('style');
                 iframe.height(ui.offset.top - iframeOffsetTop);
-                helper.css('top', '');
               },
               stop: function(event, ui){
                 keepMeFromMousingOverIframe.remove();
+                $containerSpan.css('overflow', oldOverflow);
+                helper.removeAttr('style');
                 iframe.height(ui.offset.top - iframeOffsetTop);
-                table.css('height', '');
-                helper.css('top', '');
               }
             });
           }

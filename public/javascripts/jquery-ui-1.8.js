@@ -1142,9 +1142,10 @@ $.widget("ui.draggable", $.ui.mouse, {
 		}
 
 		if(!this.options.axis || this.options.axis != "y") this.helper[0].style.left = this.position.left+'px';
-		if(!this.options.axis || this.options.axis != "x") this.helper[0].style.top = this.position.top+'px';
+    // Workaround-Instructure: this is a custom behavior added to jqueryUI draggable to make it work for resizing tiny.
+    // look for instructureHackToNotAutoSizeTop in tinymce.editor_box.js to see where it is used.
+    if(!this.options.axis || this.options.axis != "x" && !this.options.instructureHackToNotAutoSizeTop) this.helper[0].style.top = this.position.top+'px';
 		if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
-
 		return false;
 	},
 
@@ -5919,8 +5920,13 @@ $.widget("ui.dialog", {
 			uiDialogTitle = $('<span></span>')
 				.addClass('ui-dialog-title')
 				.attr('id', titleId)
-				.html(title)
 				.prependTo(uiDialogTitlebar);
+
+		if (title.jquery ) {
+			uiDialogTitle.append(title);
+		} else {
+			uiDialogTitle.text(title);
+		}
 
 		//handling of deprecated beforeclose (vs beforeClose) option
 		//Ticket #4669 http://dev.jqueryui.com/ticket/4669
@@ -6367,8 +6373,12 @@ $.widget("ui.dialog", {
 				}
 				break;
 			case "title":
-				// convert whatever was passed in o a string, for html() to not throw up
-				$(".ui-dialog-title", self.uiDialogTitlebar).html("" + (value || '&#160;'));
+				if ( value.jquery ) {
+					$(".ui-dialog-title", self.uiDialogTitlebar).html('').append(value);
+				} else {
+					// convert whatever was passed in to a string, for text() not to throw up
+					$(".ui-dialog-title", self.uiDialogTitlebar).text("" + (value || '&#160;'));
+				}
 				break;
 		}
 

@@ -26,10 +26,19 @@
             <option value="<%= type %>"<% if data[:default] %> selected<% end %>><%= data[:name] %></option>
           <% end %>
         </select>
-  
-        <div id="batch_check" style="<%= hidden %>">
-          <input type="checkbox" name="batch" value="1" id="batch_update"/>
-          <label for="batch_update">This is a full batch update</label>
+
+        <br><br>
+        <div id="batch_check">
+          <input type="checkbox" name="batch_mode" value="1" id="batch_mode"/>
+          <label for="batch_mode">This is a full batch update</label>
+          <br>
+          <select id="batch_mode_term_id" name="batch_mode_term_id">
+            <option value=''>- All Terms -</option>
+            <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
+          </select>
+          <p class='instruction'>
+            If selected, previous SIS imported data for the selected term will be deleted.<br>See the documentation for details.
+          </p>
         </div>
       </div>
       <div style="float: left; margin-left: 5px;">

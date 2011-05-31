@@ -145,7 +145,7 @@
         </tr>
       </thead>
       <tbody>
-        <% permissions = RoleOverride.permissions.select{|k, p| @managing_account_roles || !p[:account_only] } %>
+        <% permissions = RoleOverride.permissions.select{|k, p| @managing_account_roles || !p[:account_only] }.to_a.sort { |a, b| a.last[:label] <=> b.last[:label] } %>
         <% if @managing_account_roles && @context == Account.site_admin -%>
         <tr class='ui-widget-header'>
           <td>Site Admin Permissions</td>

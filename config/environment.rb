@@ -28,18 +28,22 @@ Rails::Initializer.run do |config|
 
   # Force all environments to use the same logger level
   # (by default production uses :info, the others :debug)
-  # config.log_level = :debug
+  # config.log_level = :info
 
   # Make Time.zone default to the specified zone, and make Active Record store time values
   # in the database in UTC, and return them converted to the specified local zone.
   # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
   config.time_zone = 'UTC'
 
-  memcache_servers = (YAML.load_file(RAILS_ROOT + "/config/memcache.yml")[RAILS_ENV] || []) rescue []
+  memcache_servers = (YAML.load_file(Rails.root+"config/memcache.yml")[Rails.env] || []) rescue []
   if memcache_servers.empty?
     config.cache_store = :nil_store
   else
     config.cache_store = :mem_cache_store, *memcache_servers
+  end
+
+  if ENV['RUNNING_AS_DAEMON'] == 'true'
+    config.log_path = Rails.root+'log/delayed_jobs.log'
   end
 
   # Use SQL instead of Active Record's schema dumper when creating the test database.

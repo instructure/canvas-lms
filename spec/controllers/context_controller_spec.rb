@@ -96,6 +96,24 @@ describe ContextController do
       flash[:notice].should match(/That page has been disabled/)
       Tinychat.instance_variable_set('@config', nil)
     end
-    
+  end
+
+  describe "POST 'object_snippet'" do
+    before(:each) do
+      @obj = "<object data='test'></object>"
+      @data = Base64.encode64(@obj)
+      @hmac = Canvas::Security.hmac_sha1(@data)
+    end
+
+    it "should require a valid HMAC" do
+      post 'object_snippet', :object_data => @data, :s => 'DENIED'
+      response.status.should == '400 Bad Request'
+    end
+
+    it "should render given a correct HMAC" do
+      post 'object_snippet', :object_data => @data, :s => @hmac
+      response.should be_success
+      response['X-XSS-Protection'].should == '0'
+    end
   end
 end

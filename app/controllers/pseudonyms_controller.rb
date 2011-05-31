@@ -53,9 +53,9 @@ class PseudonymsController < ApplicationController
       @ccs.each do |cc|
         cc.forgot_password!
       end
+      format.html { redirect_to(login_url) }
       format.json { render :json => {:requested => true}.to_json }
       format.js { render :json => {:requested => true}.to_json }
-      format.html { redirect_to(login_url) }
     end
   end
   

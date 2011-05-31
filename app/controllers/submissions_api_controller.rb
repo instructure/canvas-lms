@@ -52,7 +52,7 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
   def for_students
     if authorized_action(@context, @current_user, :manage_grades)
-      student_ids = Array(params[:student_ids]).map(&:to_i)
+      student_ids = map_user_ids(params[:student_ids])
       raise ActiveRecord::RecordNotFound if student_ids.blank?
 
       assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
@@ -83,6 +83,7 @@ class SubmissionsApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
+      params[:id] = map_user_ids([params[:id]]).first
       @submission = @assignment.submissions.find_by_user_id(params[:id]) or raise ActiveRecord::RecordNotFound
 
       includes = Array(params[:include])
@@ -146,7 +147,7 @@ class SubmissionsApiController < ApplicationController
   def update
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @user = @context.students_visible_to(@current_user).find(params[:id])
+      @user = Api.find(@context.students_visible_to(@current_user), params[:id]) { |sis_id| User.first(:include => :pseudonym, :conditions => { 'pseudonyms.sis_user_id' => sis_id }) } || raise(ActiveRecord::RecordNotFound)
 
       submission = {}
       if params[:submission].is_a?(Hash)
@@ -302,6 +303,14 @@ class SubmissionsApiController < ApplicationController
                                          :type => "mp4",
                                          :redirect => "1"),
     }
+  end
+
+  def map_user_ids(user_ids)
+    Api.map_ids(user_ids) { |sis_id|
+      User.first(:include => :pseudonym,
+                 :select => 'user.id',
+                 :conditions => { 'pseudonyms.sis_user_id' => sis_id }).try(:id)
+    }.compact
   end
 
 end

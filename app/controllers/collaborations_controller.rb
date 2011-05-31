@@ -101,8 +101,8 @@ class CollaborationsController < ApplicationController
       @collaboration.collaboration_users = collaborators
       respond_to do |format|
         if @collaboration.save
-          format.json { render :json => @collaboration.to_json(:methods => [:collaborator_ids], :permissions => {:user => @current_user, :session => session}) }
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
+          format.json { render :json => @collaboration.to_json(:methods => [:collaborator_ids], :permissions => {:user => @current_user, :session => session}) }
         else
           flash[:error] = "Collaboration update failed"
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }

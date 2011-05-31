@@ -1,7 +1,3 @@
-Delayed::Worker.destroy_failed_jobs = false
-Delayed::Worker.max_attempts = 15
-Delayed::Worker.queue = "canvas_queue"
-
 module Delayed
   HIGH_PRIORITY = 0
   NORMAL_PRIORITY = 10
@@ -21,7 +17,7 @@ end
 # We don't want to keep around max_attempts failed jobs that failed because the
 # underlying AR object was destroyed.
 Delayed::Worker.on_max_failures = proc do |job, err|
-  if err.is_a?(Delayed::PerformableMethod::LoadError)
+  if err.is_a?(Delayed::Backend::RecordNotFound)
     return true
   end
 

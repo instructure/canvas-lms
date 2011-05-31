@@ -504,10 +504,10 @@ class DiscussionTopic < ActiveRecord::Base
     else
       item ||= context.discussion_topics.new
     end
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record? if context.respond_to?(:imported_migration_items)
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
+    item.message = "No message" if item.message.blank?
     item.posted_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
     item.delayed_post_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
     item.delayed_post_at ||= Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]

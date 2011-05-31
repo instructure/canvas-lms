@@ -10,6 +10,6 @@
     <div class="clear"></div>
   </div>
   <div class="formatted_body user_content">
-    <%= user_content(comment.try_rescue(:formatted_body), @context.asset_string, comment.asset_string) %>
+    <%= user_content(comment.try_rescue(:formatted_body)) %>
   </div>
 </div>

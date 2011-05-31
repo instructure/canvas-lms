@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe PluginSetting do
   before(:all) do
-    Canvas::Plugin.register('plugin_setting_test', nil, {:encrypted_settings => [:foo]})
+    Canvas::Plugin.register('plugin_setting_test', nil, {:encrypted_settings => [:foo], :settings => {:bar => 'asdf'}} )
   end
 
   it "should encrypt/decrypt transparently" do
@@ -40,5 +40,32 @@ describe PluginSetting do
     s.reload
     s.valid_settings?.should be_false
     s.settings.should eql({:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid", :foo => PluginSetting::DUMMY_STRING})
+  end
+  
+  it "should return default content if no setting is set" do
+    settings = PluginSetting.settings_for_plugin("plugin_setting_test")
+    settings.should_not be_nil
+    settings[:bar].should == "asdf"
+  end
+  
+  it "should return updated content if created" do
+    s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
+    s.send(:create_without_callbacks).should be_true
+    settings = PluginSetting.settings_for_plugin("plugin_setting_test")
+    settings.should_not be_nil
+    settings[:bar].should == "qwerty"
+  end
+  
+  it "should return default content if the setting is disabled" do
+    s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
+    s.send(:create_without_callbacks).should be_true
+    settings = PluginSetting.settings_for_plugin("plugin_setting_test")
+    settings.should_not be_nil
+    settings[:bar].should == "qwerty"
+    
+    s.update_attribute(:disabled, true)
+    settings = PluginSetting.settings_for_plugin("plugin_setting_test")
+    settings.should_not be_nil
+    settings[:bar].should == "asdf"
   end
 end

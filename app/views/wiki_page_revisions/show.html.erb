@@ -36,6 +36,6 @@
     <h3>Saved: <span title="<%= datetime_string(@revision.model.updated_at) %>"><%= time_ago_in_words @revision.model.updated_at %> ago</span> by <%= @revision.model.user_name %></h3>
   </div>
   <div id="wiki_body">
-    <%= user_content(@revision.model.body, @context.asset_string, @revision.model.asset_string) %>
+    <%= user_content(@revision.model.body) %>
   </div>
 </div>

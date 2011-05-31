@@ -74,7 +74,12 @@ class CalendarsController < ApplicationController
     end
     @events ||= []
     @undated_events ||= []
-    @events.concat(@undated_events).send("to_#{request.format.to_sym.to_s}")
+    args = []
+    format = request.format.to_sym.to_s
+    if format == 'json'
+      args << { :user_content => %w(description) }
+    end
+    @events.concat(@undated_events).send("to_#{format}", *args)
   end
   protected :build_calendar_events
   

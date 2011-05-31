@@ -126,7 +126,7 @@
     <% end %>
     <% if @quiz.description && !@quiz.description.empty? %>
       <h3>Instructions:</h3>
-      <div class="description user_content"><%= user_content(@quiz.description, @context.asset_string, @quiz.asset_string) %></div>
+      <div class="description user_content"><%= user_content(@quiz.description) %></div>
     <% end %>
   <% end %>
   <% if can_do(@quiz, @current_user, :update) %>
@@ -184,7 +184,7 @@
   <% end %>
   <% if !@locked || @locked_reason[:lock_at] %>
     <h3>Instructions:</h3>
-    <div class="description user_content"><%= user_content(@quiz.description, @context.asset_string, @quiz.asset_string) %></div>
+    <div class="description user_content"><%= user_content(@quiz.description) %></div>
   <% end %>
   <% if !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
     <%= render :partial => "quiz_details" %>

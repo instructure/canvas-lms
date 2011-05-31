@@ -133,7 +133,7 @@ describe CourseSection, "moving to new course" do
     course1.course_sections.find_by_id(cs.id).should be_nil
     course2.course_sections.find_by_id(cs.id).should_not be_nil
     course3.course_sections.find_by_id(cs.id).should be_nil
-    cs.account.should eql(account1)
+    cs.account.should be_nil
     cs.nonxlist_course.should eql(course1)
     e.root_account.should eql(account2)
     cs.crosslisted?.should be_true
@@ -151,7 +151,7 @@ describe CourseSection, "moving to new course" do
     course1.course_sections.find_by_id(cs.id).should be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
     course3.course_sections.find_by_id(cs.id).should_not be_nil
-    cs.account.should eql(account1)
+    cs.account.should be_nil
     cs.nonxlist_course.should eql(course1)
     e.root_account.should eql(account3)
     cs.crosslisted?.should be_true

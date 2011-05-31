@@ -1,3 +1,4 @@
+<% grading_standard_list ||= false %>
 <% data = grading_standard.data rescue GradingStandard.default_grading_standard %>
 <div class="grading_standard" id="grading_standard_<%= grading_standard ? grading_standard.id : 'blank' %>">
   <div class="display_grading_standard">
@@ -5,16 +6,23 @@
       <thead>
         <tr>
           <th colspan="4" class="standard_title">
-            <div style="float: right;" class="displaying">
-              <a href="#" class="find_grading_standard_link no-hover" title="Find Existing Grading Scheme"><%= image_tag "find.png", :alt => "Find" %></a>
-              <a href="#" title="Edit Grading Scheme" class="edit_grading_standard_link no-hover <%= 'read_only' unless can_do(grading_standard, @current_user, :update) %>"><%= image_tag "edit.png" %></a>
+            <div style="float: right;" class="displaying links">
+              <% if !grading_standard_list %>
+                <a href="#" class="find_grading_standard_link no-hover" title="Find Existing Grading Scheme"><%= image_tag "find.png", :alt => "Find" %></a>
+              <% end %>
+                <a href="#" title="Edit Grading Scheme" class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && !can_do(grading_standard, @current_user, :update) %>"><%= image_tag "edit.png" %></a>
+              <% if grading_standard_list %>
+                <a href="#" title="Delete Grading Scheme" class="delete_grading_standard_link no-hover"><%= image_tag "delete.png" %></a>
+              <% else %>
+                <a href="#" title="Remove Grading Scheme" class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>"><%= image_tag "delete_circle.png" %></a>
+              <% end %>
             </div>
             <div class="displaying title">
               <%= grading_standard.title rescue nbsp %>
             </div>
             <div class="editing_box">
               Scheme Name: 
-              <input type="text" name="grading_standard[title]" value="<%= grading_standard.title rescue "" %>" style="width: 100px;"/>
+              <input type="text" name="grading_standard[title]" class="scheme_name" value="<%= grading_standard.title rescue "" %>" style="width: 100px;"/>
             </div>
           </th>
         </tr>
@@ -27,7 +35,7 @@
         </tr>
       </thead>
     </table>
-    <div style="max-height: 175px; overflow: auto; padding-bottom: 10px;">
+    <div class="data_holder">
     <table style="width: 100%; margin-bottom: 20px;" class="grading_standard_data">
       <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
         <td colspan="4">
@@ -104,6 +112,11 @@
       </tr>
     </table>
     </div>
+    <% unless grading_standard_list %>
+      <div class="displaying" style="text-align: right;">
+        <a href="<%= context_url(@context, :context_grading_standards_url) %>">manage grading schemes</a>
+      </div>
+    <% end %>
     <div class="editing_box button-container">
       <button type="button" class="save_button button">Save</button>
       <button type="button" class="cancel_button button-secondary">Cancel</button>
@@ -142,18 +155,18 @@
                 <div class="clear"></div>
               </div>
               <div class="clear"></div>
+              <div style="margin-left: 30px;" class="details">
+                <table style="font-size: 0.8em;">
+                  <tr class="details_row blank" style="display: none;">
+                    <td class="name" style="padding-right: 20px;">&nbsp;</td>
+                    <td style="padding: 2px 5px;"><span class="value">&nbsp;</span>%</td>
+                    <td style="padding: 2px 5px;">to</td>
+                    <td style="padding: 2px 5px;"><span class="next_value">&nbsp;</span>%</td>
+                  </tr>
+                </table>
+              </div>
+              <button type="button" class="button select_grading_standard_link">Use This Grading Standard</button>
             </div>
-            <div style="margin-left: 30px;" class="details">
-              <table style="font-size: 0.8em;">
-                <tr class="details_row blank" style="display: none;">
-                  <td class="name" style="padding-right: 20px;">&nbsp;</td>
-                  <td><span class="value">&nbsp;</span>%</td>
-                  <td style="padding: 2px 5px;">to</td>
-                  <td><span class="next_value">&nbsp;</span>%</td>
-                </tr>
-              </table>
-            </div>
-            <button type="button" class="button select_grading_standard_link">Use This Grading Standard</button>
           </div>
         </td>
       </tr>
@@ -161,4 +174,7 @@
     <div style="margin-top: 5px; text-align: right"><a href="#" class="cancel_find_grading_standard_link">Cancel</a></div>
   </div>
   <a href="<%= context_url(((grading_standard.context || @context) rescue @context), :context_grading_standard_url, grading_standard ? grading_standard.id : "{{ id }}") rescue "#" %>" style="display: none;" class="update_grading_standard_url">&nbsp;</a>
+  <% unless grading_standard_list %>
+    <textarea id="default_grading_standard_data" style="display: none;"><%= GradingStandard.default_grading_standard.to_json %></textarea>
+  <% end %>
 </div>

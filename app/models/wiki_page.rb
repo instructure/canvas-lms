@@ -224,9 +224,6 @@ class WikiPage < ActiveRecord::Base
     set { can :read }
 
     given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
-    set { can :read }
-    
-    given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
     set { can :read and can :update_content and can :create }
     
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :manage) }

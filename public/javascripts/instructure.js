@@ -315,6 +315,10 @@ jQuery(function($) {
         }
       });
     $(".user_content.unenhanced").removeClass('unenhanced').addClass('enhanced');
+
+    setTimeout(function() {
+      $(".user_content form.user_content_post_form:not(.submitted)").submit().addClass('submitted');
+    }, 10);
   };
   if ($.filePreviewsEnabled()) {
     $("a.scribd_file_preview_link").live('click', function(event) {
@@ -808,9 +812,9 @@ jQuery(function($) {
     $(this).closest("li").slideUp().parents("ul").children(":hidden").slideDown().first().find(":tabbable:first").focus();
     return false;
   });
-  $(".to-do-list").delegate('.disable_item_link', 'click', function(event) {
+  $(".to-do-list, #topic_list").delegate('.disable_item_link', 'click', function(event) {
     event.preventDefault();
-    var $item = $(this).parents("li");
+    var $item = $(this).parents("li, div.topic_message");
     var url = $(this).attr('href');
     function remove(delete_url) {
       $item.confirmDelete({
@@ -840,10 +844,10 @@ jQuery(function($) {
   });
   // if there is not a h1 or h2 on the page, then stick one in there for accessibility.
   if (!$('h1').length) {
-    $('<h1 class="ui-helper-hidden-accessible">' + document.title + '</h1>').prependTo('#content');
+    $('<h1 class="ui-helper-hidden-accessible" />').text(document.title).prependTo('#content');
   }
   if(!$('h2').length && $('#breadcrumbs li:last').text().length ) {
-    var $h2 = $('<h2 class="ui-helper-hidden-accessible">' + $('#breadcrumbs li:last').text() + '</h2>'),
+    var $h2 = $('<h2 class="ui-helper-hidden-accessible" />').text($('#breadcrumbs li:last').text()),
         $h1 = $('#content h1');
     $h1.length ? 
       $h1.after($h2) : 

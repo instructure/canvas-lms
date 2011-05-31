@@ -281,7 +281,8 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should return all submissions for a student" do
     student1 = user(:active_all => true)
-    student2 = user(:active_all => true)
+    student2 = user_with_pseudonym(:active_all => true)
+    student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
 
     course_with_teacher_logged_in(:active_all => true)
 
@@ -321,6 +322,17 @@ describe SubmissionsApiController, :type => :integration do
 
     json.size.should == 2
     json.all? { |submission| submission['assignment_id'].should == a1.id }.should be_true
+
+    # by sis id!
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [student1.to_param, 'sis:my-student-id'],
+            :assignment_ids => [a1.to_param] })
+
+    json.size.should == 2
+    json.all? { |submission| submission['assignment_id'].should == a1.id }.should be_true
   end
 
   it "should allow grading an uncreated submission" do
@@ -334,6 +346,28 @@ describe SubmissionsApiController, :type => :integration do
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => a1.id.to_s, :id => student.id.to_s },
+          { :submission => { :posted_grade => 'B' } })
+
+    Submission.count.should == 1
+    @submission = Submission.first
+
+    json['grade'].should == 'B'
+    json['score'].should == 12.9
+  end
+
+  it "should allow posting grade by sis id" do
+    student = user_with_pseudonym(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    @course.enroll_student(student).accept!
+    @course.update_attribute(:sis_source_id, "my-course-id")
+    student.pseudonym.update_attribute(:sis_user_id, "my-user-id")
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+
+    json = api_call(:put,
+          "/api/v1/courses/sis:my-course-id/assignments/#{a1.id}/submissions/sis:my-user-id.json",
+          { :controller => 'submissions_api', :action => 'update',
+            :format => 'json', :course_id => 'sis:my-course-id',
+            :assignment_id => a1.id.to_s, :id => 'sis:my-user-id' },
           { :submission => { :posted_grade => 'B' } })
 
     Submission.count.should == 1

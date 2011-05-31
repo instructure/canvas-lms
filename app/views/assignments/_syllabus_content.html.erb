@@ -8,7 +8,7 @@
   <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link">Jump to Today</a></div>
 <% end %>
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
-  <%= user_content(@context.syllabus_body, @context.asset_string, @context.asset_string) %>
+  <%= user_content(@context.syllabus_body) %>
 </div>
 <div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
   <p>The syllabus page shows a table-oriented view of the course schedule, and the basics of

@@ -108,6 +108,16 @@ Spec::Runner.configure do |config|
 
   def course_with_student(opts={})
     course(opts)
+    student_in_course(opts)
+  end
+
+  def course_with_student_logged_in(opts={})
+    course_with_student(opts)
+    user_session(@user)    
+  end
+
+  def student_in_course(opts={})
+    @course ||= opts[:course] || course(opts)
     @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
     if opts[:active_enrollment] || opts[:active_all]
@@ -116,11 +126,6 @@ Spec::Runner.configure do |config|
     end
     @course.reload
     @enrollment
-  end
-
-  def course_with_student_logged_in(opts={})
-    course_with_student(opts)
-    user_session(@user)    
   end
 
   def course_with_teacher(opts={})
@@ -147,6 +152,12 @@ Spec::Runner.configure do |config|
   def group_with_user(opts={})
     group(opts)
     user(opts)
+    @group.participating_users << @user
+  end
+
+  def group_with_user_logged_in(opts={})
+    group_with_user(opts)
+    user_session(@user)
   end
 
   def user_session(user, pseudonym=nil)
@@ -197,9 +208,8 @@ Spec::Runner.configure do |config|
   end
 
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
-    return ar_klass.create!(attrs) if ar_klass.accessible_attributes.nil?
-    obj = ar_klass.new(attrs.reject { |k,v| !ar_klass.accessible_attributes.include?(k) })
-    attrs.each { |k,v| obj.send("#{k}=", attrs[k]) unless ar_klass.accessible_attributes.include?(k) }
+    obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
+    attrs.each { |k,v| obj.send("#{k}=", attrs[k]) }
     obj.save! if do_save
     obj
   end

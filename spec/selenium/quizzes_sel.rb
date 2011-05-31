@@ -3,6 +3,51 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "quiz selenium tests" do
   it_should_behave_like "in-process server selenium tests"
   
+  it "should correctly hide form when cancelling quiz edit" do
+    username = "nobody@example.com"
+    password = "asdfasdf"
+    u = user_with_pseudonym :active_user => true,
+                            :username => username,
+                            :password => password
+    u.save!
+    e = course_with_teacher :active_course => true,
+                            :user => u,
+                            :active_enrollment => true
+    e.save!
+    login_as(username, password)
+    
+    get "/courses/#{e.course_id}/quizzes/new"
+
+    driver.find_element(:css, ".add_question .add_question_link").click
+    keep_trying{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    holder = driver.find_element(:css, "#questions .question_holder")
+    holder.should be_displayed
+    holder.find_element(:css, ".cancel_link").click
+    driver.find_elements(:css, "#questions .question_holder").length.should == 0
+  end
+  
+  it "should not show 'Missing Word' option in question types dropdown" do
+    username = "nobody@example.com"
+    password = "asdfasdf"
+    u = user_with_pseudonym :active_user => true,
+                            :username => username,
+                            :password => password
+    u.save!
+    e = course_with_teacher :active_course => true,
+                            :user => u,
+                            :active_enrollment => true
+    e.save!
+    login_as(username, password)
+    
+    get "/courses/#{e.course_id}/quizzes/new"
+    
+    driver.find_elements(:css, "#question_form_template option.missing_word").length.should == 1
+
+    driver.find_element(:css, ".add_question .add_question_link").click
+    keep_trying{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    driver.find_elements(:css, "#questions .question_holder option.missing_word").length.should == 0
+  end
+  
   it "should create a quiz with every question type" do
     username = "nobody@example.com"
     password = "asdfasdf"
@@ -37,7 +82,6 @@ shared_examples_for "quiz selenium tests" do
       el.send_keys(value)
     end
     
-    
     #### Multiple Choice Question
     
     new_question_link.click
@@ -54,7 +98,7 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('Hi, this is a multiple choice question.')
     end
     
-    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers = find_all_with_jquery('.question_holder:visible:first .form_answers > .answer')
     answers.length.should eql(4)
     replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
     replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
@@ -98,7 +142,7 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('This is not a true/false question.')
     end
     
-    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers = find_all_with_jquery('.question_holder:visible:eq(1) .form_answers > .answer')
     answers.length.should eql(2)
     answers[1].find_element(:css, ".select_answer_link").click # false - get it?
     answers[1].find_element(:css, ".comment_focus").click
@@ -129,15 +173,15 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('This is a fill in the _________ question.')
     end
     
-    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
     answers.length.should eql(2)
     question.find_element(:css, ".add_answer_link").click
     question.find_element(:css, ".add_answer_link").click
-    answers = question.find_elements(:css, ".form_answers > .answer")
+    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
     answers.length.should eql(4)
     answers[3].find_element(:css, ".delete_answer_link").click
     answers[2].find_element(:css, ".delete_answer_link").click
-    answers = question.find_elements(:css, "div.form_answers > div.answer")
+    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
     answers.length.should eql(2)
     replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
     replace_content(answers[1].find_element(:css, ".short_answer input"), "Blank")
@@ -168,6 +212,31 @@ shared_examples_for "quiz selenium tests" do
     #### Text (no answer)
     
     
+  end
+
+  it "message students who... should do something" do
+    username = "nobody@example.com"
+    password = "asdfasdf"
+    u = user_with_pseudonym :active_user => true,
+                            :username => username,
+                            :password => password
+    u.save!
+    e = course_with_teacher :active_course => true,
+                            :user => u,
+                            :active_enrollment => true
+    e.save!
+    q = e.course.quizzes.build(:title => "My Quiz", :description => "Sup")
+    q.generate_quiz_data
+    q.published_at = Time.now
+    q.workflow_state = 'available'
+    q.save!
+    login_as(username, password)
+
+    get "/courses/#{e.course_id}/quizzes/#{q.id}"
+
+    driver.find_element(:partial_link_text, "Message Students Who...").click
+    dialog = find_all_with_jquery("#message_students_dialog:visible")
+    dialog.length.should eql(1)
   end
 end
 

@@ -3,6 +3,7 @@
 <% show_context ||= false %>
 <% post_date = ([latest_date] + comments.map(&:created_at)).max %>
 <div style="<%= hidden unless dashboard_submission %>" class="communication_message message_<%= context_code || 'blank' %> <%= 'show_context_communication_message' if show_context %>">
+  <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <div class="header">
     <div class="post_date time_ago_date"><%= datetime_string(post_date) || nbsp %></div>
     <%= image_tag "grading_icon.png", :class => "header_icon", :alt => "submission", :title => "Assignment Submission", :style => "padding: 7px 2px 2px 2px;" %>

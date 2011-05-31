@@ -84,3 +84,15 @@ Canvas::Plugin.register('grade_export', :sis, {
                  :success_timeout => "600",
                  :format_type => "instructure_csv" }
 })
+Canvas::Plugin.register('sis_import', :sis, {
+  :name => 'SIS Import',
+  :description => 'Import SIS Data',
+  :website => 'http://www.instructure.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/sis_import_settings',
+  :settings => { :parallelism => 1,
+                 :minimum_rows_for_parallel => 1000,
+                 :queue_for_parallel_jobs => nil }
+})

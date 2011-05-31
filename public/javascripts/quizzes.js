@@ -1142,6 +1142,7 @@ var quiz = {};
       
       $formQuestion.addClass('selectable');
       $form.find(".answer_selection_type").change().show();
+      if(question.question_type != 'missing_word_question') { $form.find("option.missing_word").remove(); }
       if($question.hasClass('missing_word_question') || question.question_type == 'missing_word_question') {
         question = $question.getTemplateData({textValues: ['text_before_answers', 'text_after_answers']});
         answer_data = $question.find(".original_question_text").getFormData();
@@ -1241,7 +1242,7 @@ var quiz = {};
       $displayQuestion.show();
       $("html,body").scrollTo({top: $displayQuestion.offset().top - 10, left: 0});
       if(isNew) {
-        $displayQuestion.remove();
+        $displayQuestion.parent().remove();
         quiz.updateDisplayComments();
       }
       quiz.updateDisplayComments();
@@ -1325,6 +1326,7 @@ var quiz = {};
       $form.attr('action', $("#quiz_urls .add_question_url,#bank_urls .add_question_url").attr('href'))
         .attr('method', 'POST')
         .find(".submit_button").html("Create Question");
+      $form.find("option.missing_word").remove();
       $question.find(".question_type").change();
       $("html,body").scrollTo({top: $question.offset().top - 10, left: 0});
       $question.find(":input:first").focus().select();
@@ -2152,7 +2154,7 @@ var quiz = {};
           });
         }
       });
-    }).delegate(".cancel_button", 'click', function(event) {
+    }).delegate(".group_edit.cancel_button", 'click', function(event) {
       if($(this).closest('.group_top').length == 0) { return; }
       var $top = $(this).parents(".group_top");
       $top.removeClass('editing'); 

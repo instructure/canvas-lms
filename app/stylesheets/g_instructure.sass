@@ -865,11 +865,22 @@ ul.group_list
         display: block
         float: right
         +opacity(.7)
+  a.disable_item_link
+    visibility: hidden
+    float: right
+    margin-right: 6px
+
 .communication_message_hover
   div.header
     .link_box
       a
         +opacity(0.5)
+  a.disable_item_link
+    visibility: visible
+    +opacity(0.5)
+    &:hover
+      +opacity(1.0)
+
 .brief_communication_message
   div.header 
     .link_box
@@ -1173,6 +1184,7 @@ body > #ui-datepicker-div
       margin-right: 2px
 
 .editor_box_resizer
+  position: relative
   height: 1px
   width: 100%
   border-bottom: 1px solid #ccc
@@ -1417,4 +1429,6 @@ h2.h-margin-top,h3.h-margin-top
       background-color: #c3decf
     img
       vertical-align: middle
-  
+
+form.user_content_post_form
+  display: none

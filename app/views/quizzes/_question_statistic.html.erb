@@ -17,7 +17,7 @@
           </div>
           <div class="question_attempts"><%= pluralize(question[:responses], 'attempt') %></div>
           <div class="question_text user_content">
-            <%= user_content(question[:question_text], @context.try(:asset_string), @quiz.try(:asset_string)) %>
+            <%= user_content(question[:question_text]) %>
           </div>
           <div class="question_details">
              <% if in_group %>
@@ -104,7 +104,7 @@
                   <% question[:essay_responses].reverse.each do |response| %>
                         <div class="essay_answer" style="padding-bottom: 5px;">
                           <div class="user_content">
-                            <%= user_content(response[:text], @context.try(:asset_string), @quiz.try(:asset_string)) %>
+                            <%= user_content(response[:text]) %>
                           </div>
                           <% if @quiz.graded? %>
                             <div class="user_name" style="text-align: right; font-style: italic;">

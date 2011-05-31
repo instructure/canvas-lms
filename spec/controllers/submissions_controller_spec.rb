@@ -106,7 +106,28 @@ describe SubmissionsController do
       assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("doc.doc")
       assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("xls.xls")
     end
-    
+  end
+
+  describe "GET zip" do
+    it "should zip and download" do
+      course_with_teacher_logged_in(:active_all => true)
+      @teacher = @user
+      student_in_course
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@user)
+
+      get 'index', :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1', :format => 'json'
+      response.should be_success
+
+      a = Attachment.last
+      a.update_attribute('workflow_state', 'zipped')
+      a.stub!('full_filename').and_return(File.expand_path(__FILE__)) # just need a valid file
+      a.stub!('content_type').and_return('test/file')
+      Attachment.stub!(:instantiate).and_return(a)
+
+      get 'index', { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }, 'HTTP_ACCEPT' => '*/*'
+      response.should be_success
+      response['content-type'].should == 'test/file'
+    end
   end
 end
-  

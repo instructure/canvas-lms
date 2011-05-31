@@ -36,12 +36,104 @@ describe SIS::SisCsv do
     importer
   end
   
+  def process_csv_data_cleanly(*lines)
+    importer = process_csv_data(*lines)
+    importer.errors.should == []
+    importer.warnings.should == []
+  end
+  
   it "should error files with unknown headers" do
     importer = process_csv_data(
       "course_id,randomness,smelly",
       "test_1,TC 101,Test Course 101,,,active"
     )
     importer.errors.first.last.should == "Couldn't find Canvas CSV import headers"
+  end
+  
+  it "should work for a mass import" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "U001,user1,User,One,user1@example.com,active",
+      "U002,user2,User,Two,user2@example.com,active",
+      "U003,user3,User,Three,user3@example.com,active",
+      "U004,user4,User,Four,user4@example.com,active",
+      "U005,user5,User,Five,user5@example.com,active",
+      "U006,user6,User,Six,user6@example.com,active",
+      "U007,user7,User,Seven,user7@example.com,active",
+      "U008,user8,User,Eight,user8@example.com,active",
+      "U009,user9,User,Nine,user9@example.com,active",
+      "U010,user10,User,Ten,user10@example.com,active",
+      "U011,user11,User,Eleven,user11@example.com,deleted"
+    )
+    process_csv_data_cleanly(
+      "term_id,name,status,start_date,end_date",
+      "T001,Term 1,active,,",
+      "T002,Term 2,active,,",
+      "T003,Term 3,active,,"
+    )
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,C001,Test Course 1,,T001,active",
+      "C002,C002,Test Course 2,,T001,deleted",
+      "C003,C003,Test Course 3,,T002,deleted",
+      "C004,C004,Test Course 4,,T002,deleted",
+      "C005,C005,Test Course 5,,T003,active",
+      "C006,C006,Test Course 6,,T003,active",
+      "C007,C007,Test Course 7,,T003,active",
+      "C008,C008,Test Course 8,,T003,active",
+      "C009,C009,Test Course 9,,T003,active",
+      "C001S,C001S,Test search Course 1,,T001,active",
+      "C002S,C002S,Test search Course 2,,T001,deleted",
+      "C003S,C003S,Test search Course 3,,T002,deleted",
+      "C004S,C004S,Test search Course 4,,T002,deleted",
+      "C005S,C005S,Test search Course 5,,T003,active",
+      "C006S,C006S,Test search Course 6,,T003,active",
+      "C007S,C007S,Test search Course 7,,T003,active",
+      "C008S,C008S,Test search Course 8,,T003,active",
+      "C009S,C009S,Test search Course 9,,T003,active"
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status",
+      "S001,C001,Sec1,,,active",
+      "S002,C002,Sec2,,,active",
+      "S003,C003,Sec3,,,active",
+      "S004,C004,Sec4,,,active",
+      "S005,C005,Sec5,,,active",
+      "S006,C006,Sec6,,,active",
+      "S007,C007,Sec7,,,deleted",
+      "S008,C001,Sec8,,,deleted",
+      "S009,C008,Sec9,,,active",
+      "S001S,C001S,Sec1,,,active",
+      "S002S,C002S,Sec2,,,active",
+      "S003S,C003S,Sec3,,,active",
+      "S004S,C004S,Sec4,,,active",
+      "S005S,C005S,Sec5,,,active",
+      "S006S,C006S,Sec6,,,active",
+      "S007S,C007S,Sec7,,,deleted",
+      "S008S,C001S,Sec8,,,deleted",
+      "S009S,C008S,Sec9,,,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      ",U001,student,S001,active,",
+      ",U002,student,S002,active,",
+      ",U003,student,S003,active,",
+      ",U004,student,S004,active,",
+      ",U005,student,S005,active,",
+      ",U006,student,S006,deleted,",
+      ",U007,student,S007,active,",
+      ",U008,student,S008,active,",
+      ",U009,student,S005,deleted,",
+      ",U001,student,S001S,active,",
+      ",U002,student,S002S,active,",
+      ",U003,student,S003S,active,",
+      ",U004,student,S004S,active,",
+      ",U005,student,S005S,active,",
+      ",U006,student,S006S,deleted,",
+      ",U007,student,S007S,active,",
+      ",U008,student,S008S,active,",
+      ",U009,student,S005S,deleted,"
+    )
   end
   
   context "course importing" do
@@ -74,6 +166,33 @@ describe SIS::SisCsv do
       course = @account.courses.find_by_sis_source_id("test_1")
       course.course_code.should eql("TC 101")
       course.name.should eql("Test Course 101")
+    end
+    
+    it "shouldn't blow away the account id if it's already set" do
+      process_csv_data(
+        "account_id,parent_account_id,name,status",
+        "A001,,Humanities,active"
+      )
+      account = @account.sub_accounts.find_by_sis_source_id("A001")
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+      )
+      course = @account.courses.find_by_sis_source_id("test_1")
+      course.account.should == @account
+      account.should_not == @account
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,A001,,active"
+      )
+      course.reload
+      course.account.should == account
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active"
+      )
+      course.reload
+      course.account.should == account
     end
     
     it "should rename courses that have not had their name manually changed" do
@@ -172,27 +291,47 @@ describe SIS::SisCsv do
     
     it "should set passwords and not overwrite current passwords" do
       process_csv_data(
-        "user_id,login_id,password,first_name,last_name,email,status",
-        "user_1,user1,badpassword,User,Uno 2,user@example.com,active"     
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,badpassword,User,Uno 2,user@example.com,active,",
+        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}Y2FiODZkZDYyNjE3MTA4OTFlOGNiNTZlZTM2MjU2OTFhNzVkZjM0NHNhbHRzYWx0"
       )
-      user = User.find_by_email('user@example.com')
-      p = user.pseudonyms.first
-      p.valid_password?('badpassword').should be_true
+      user1 = User.find_by_email('user@example.com')
+      p = user1.pseudonyms.first
+      p.valid_arbitrary_credentials?('badpassword').should be_true
       
       p.password = 'lessbadpassword'
       p.password_confirmation = 'lessbadpassword'
       p.save
-      
+
+      user2 = User.find_by_email('user2@example.com')
+      p = user2.pseudonyms.first
+      p.valid_arbitrary_credentials?('password').should be_true
+
+      p.password = 'newpassword'
+      p.password_confirmation = 'newpassword'
+      p.save
+
+      p.valid_arbitrary_credentials?('password').should be_false
+      p.valid_arbitrary_credentials?('newpassword').should be_true
+
       process_csv_data(
-        "user_id,login_id,password,first_name,last_name,email,status",
-        "user_1,user1,badpassword2,User,Uno 2,user@example.com,active"     
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,badpassword2,User,Uno 2,user@example.com,active",
+        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}ZDg1ZmJhMjNmZWU0ZmFiMmYzYTJhNTMxNzZiNjcyZWFhMzE0ZTQzMXNhbHR5"
       )
       
-      user.reload
-      p = user.pseudonyms.first
-      p.valid_password?('badpassword').should be_false
-      p.valid_password?('badpassword2').should be_false
-      p.valid_password?('lessbadpassword').should be_true
+      user1.reload
+      p = user1.pseudonyms.first
+      p.valid_arbitrary_credentials?('badpassword').should be_false
+      p.valid_arbitrary_credentials?('badpassword2').should be_false
+      p.valid_arbitrary_credentials?('lessbadpassword').should be_true
+
+      user2.reload
+      p = user2.pseudonyms.first
+      p.valid_arbitrary_credentials?('password').should be_false
+      p.valid_arbitrary_credentials?('changedpassword').should be_false
+      p.valid_arbitrary_credentials?('newpassword').should be_true
+      p.valid_ssha?('changedpassword').should be_true
     end
     
     it "should warn for duplicate rows" do
@@ -787,7 +926,7 @@ describe SIS::SisCsv do
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       
@@ -872,7 +1011,7 @@ describe SIS::SisCsv do
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       
@@ -952,7 +1091,7 @@ describe SIS::SisCsv do
         s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
         s1.should_not be_nil
         s1.nonxlist_course.should eql(course)
-        s1.account.should eql(course.account)
+        s1.account.should be_nil
       end
     end
 
@@ -977,7 +1116,7 @@ describe SIS::SisCsv do
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
 
       3.times do 
         importer = process_csv_data(
@@ -1018,7 +1157,7 @@ describe SIS::SisCsv do
         s1.should_not be_nil
         s1.nonxlist_course.should eql(course)
         s1.course.should eql(xlist_course)
-        s1.account.should eql(course.account)
+        s1.account.should be_nil
         s1.crosslisted?.should be_true
       end
       importer = process_csv_data(
@@ -1056,7 +1195,6 @@ describe SIS::SisCsv do
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
       s1.course.should eql(xlist_course)
-      s1.account.should eql(course.account)
       s1.crosslisted?.should be_true
       s1.name.should == "Sec1"
       process_csv_data(
@@ -1069,7 +1207,6 @@ describe SIS::SisCsv do
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
       s1.course.should eql(xlist_course)
-      s1.account.should eql(course.account)
       s1.crosslisted?.should be_true
       s1.name.should == "Sec2"
     end
@@ -1119,7 +1256,7 @@ describe SIS::SisCsv do
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course1)
       s1.course.should eql(xlist_course)
-      s1.account.should eql(course1.account)
+      s1.account.should be_nil
       s1.crosslisted?.should be_true
       process_csv_data(
         "section_id,course_id,name,start_date,end_date,status",

@@ -1121,6 +1121,8 @@ class Assignment < ActiveRecord::Base
   }
   named_scope :undated, :conditions => {:due_at => nil}
   
+  named_scope :only_graded, :conditions => "submission_types != 'not_graded'"
+  
   named_scope :with_just_calendar_attributes, lambda {
     { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id'] - ['cloned_item_id', 'migration_id']).join(", ") }
   }
@@ -1270,7 +1272,9 @@ class Assignment < ActiveRecord::Base
     
   end
   protected :readable_submission_type
-  
+
+  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :reminders_created_for_due_at, :publishing_reminder_sent, :previously_published, :needs_grading_count]
+
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={}) #migrate=true)
     options[:migrate] = true if options[:migrate] == nil
@@ -1283,7 +1287,7 @@ class Assignment < ActiveRecord::Base
     return existing if existing && !options[:overwrite]
     dup ||= Assignment.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :reminders_created_for_due_at, :publishing_reminder_sent, :previously_published].include?(k.to_sym) }.each do |key, val|
+    self.attributes.delete_if{|k,v| CLONE_FOR_EXCLUDE_ATTRIBUTES.include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
 

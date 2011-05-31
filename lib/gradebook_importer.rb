@@ -70,7 +70,7 @@ class GradebookImporter
     end
     
     row.shift(@student_columns)
-    while row.last =~ /Current Score|Final Score/
+    while row.last =~ /Current Score|Final Score|Final Grade/
       row.pop
     end
     

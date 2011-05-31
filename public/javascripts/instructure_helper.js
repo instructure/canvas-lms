@@ -150,6 +150,9 @@
           doUploadFile = options.fileUpload.call($form, formData);
         } catch(e) { error = e; }
       }
+      if(doUploadFile && options.fileUploadOptions) {
+        $.extend(options, options.fileUploadOptions);
+      }
       if($form.attr('action')) {
         action = $form.attr('action');
       }
@@ -174,6 +177,8 @@
           folder_id: $.isFunction(options.folder_id) ? (options.folder_id.call($form)) : options.folder_id,
           file_elements: $form.find("input[type='file']"),
           url: (options.upload_only ? null : action),
+          uploadDataUrl: options.uploadDataUrl,
+          formData: options.postFormData ? formData : null,
           success: options.success,
           error: options.error
         });
@@ -1906,7 +1911,7 @@
       }
     }
     var uploadFile = function(parameters, file) {
-      $.ajaxJSON("/files/pending", 'POST', parameters, function(data) {
+      $.ajaxJSON(options.uploadDataUrl || "/files/pending", 'POST', parameters, function(data) {
         try {
         if(data && data.upload_url) {
           var post_params = data.upload_params;
@@ -1935,12 +1940,12 @@
     var next = function() {
       var item = list.shift();
       if(item) {
-        uploadFile.call($this, {
+        uploadFile.call($this, $.extend({
           'attachment[folder_id]': options.folder_id,
           'attachment[intent]': options.intent,
           'attachment[filename]': item.name,
           'attachment[context_code]': options.context_code
-        }, item);
+        }, options.formData || {}), item);
       } else {
         ready.call($this);
       }
