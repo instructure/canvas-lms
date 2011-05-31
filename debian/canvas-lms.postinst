@@ -126,7 +126,7 @@ function make_apache_config {
   ServerAdmin $(get_config canvas-lms/admin-email)
   DocumentRoot /var/rails/canvas-lms/public
   RewriteEngine On
-  RewriteCond %{X-Forwarded-Proto} !=https
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
   RewriteCond %{REQUEST_URI} !^/health_check
   RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L]  
   ErrorLog /var/log/apache2/canvas_errors.log
