@@ -43,7 +43,7 @@ Rails::Initializer.run do |config|
   end
 
   if ENV['RUNNING_AS_DAEMON'] == 'true'
-    config.log_path = Rails.root+'log/delayed_jobs.log'
+    config.log_path = Rails.root+'log/delayed_job.log'
   end
 
   # Use SQL instead of Active Record's schema dumper when creating the test database.
