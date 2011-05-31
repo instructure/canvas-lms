@@ -238,6 +238,22 @@ shared_examples_for "quiz selenium tests" do
     dialog = find_all_with_jquery("#message_students_dialog:visible")
     dialog.length.should eql(1)
   end
+
+  it "should tally up question bank question points" do
+    course_with_teacher_logged_in
+    quiz = @course.quizzes.create!(:title => "My Quiz")
+    bank = AssessmentQuestionBank.create!(:context => @course)
+    3.times { bank.assessment_questions << assessment_question_model }
+    harder = bank.assessment_questions.last
+    harder.question_data[:points_possible] = 15
+    harder.save!
+    get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+    find_questions_link = driver.find_element(:link, "Find Questions")
+    find_questions_link.click
+    driver.find_element(:link, "Select All").click
+    find_with_jquery("div#find_question_dialog button.submit_button").click
+    keep_trying { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
+  end
 end
 
 describe "quiz Windows-Firefox-Tests" do
