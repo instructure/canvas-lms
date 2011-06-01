@@ -108,6 +108,24 @@ describe WebConference do
       BigBlueButtonConference.new.should be_valid_config
       BigBlueButtonConference.new(:conference_type => "BigBlueButton").should be_valid_config
     end
+
+    it "should recreate the conference if it's been empty for too long" do
+      user_model
+      email = "email@email.com"
+      @user.stub!(:email).and_return(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user)
+      conference.should_receive(:send_request).with(:isMeetingRunning, anything).and_return({:running => 'false'}, {:running => 'true'}, {:running => 'false'})
+      conference.should_receive(:send_request).with(:create, anything).twice.and_return(true)
+
+      conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+      # second one doesn't trigger another create call
+      conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+
+      WebConference.update_all({:updated_at => Time.now - 1.day}, {:id => conference.id})
+      conference.reload
+
+      conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+    end
   end
 
   context "user settings" do
