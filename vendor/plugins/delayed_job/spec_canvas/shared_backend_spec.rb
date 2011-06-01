@@ -102,11 +102,6 @@ shared_examples_for 'a backend' do
       @job = create_job(:locked_by => 'worker', :locked_at => @backend.db_time_now - 2.minutes)
       @backend.find_available('worker', 5, 1.minute).should include(@job)
     end
-    
-    it "should find own jobs" do
-      @job = create_job(:locked_by => 'worker', :locked_at => (@backend.db_time_now - 1.minutes))
-      @backend.find_available('worker', 5, 4.hours).should include(@job)
-    end
   end
   
   context "when another worker is already performing an task, it" do

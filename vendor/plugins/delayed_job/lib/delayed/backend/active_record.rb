@@ -42,8 +42,11 @@ module Delayed
 
         named_scope :running, :conditions => ["locked_at is NOT NULL and locked_by <> 'on hold'"]
 
+        # this query could be a bit more efficient if we didn't check for the
+        # locked_at/max_run_time condition, and instead had a periodic job to
+        # unlock and reschedule jobs that are stuck due to a dead worker.
         named_scope :ready_to_run, lambda {|worker_name, max_run_time|
-          {:conditions => ['(run_at <= ? AND (locked_at IS NULL OR locked_at < ?) OR locked_by = ?) AND failed_at IS NULL', db_time_now, db_time_now - max_run_time, worker_name]}
+          {:conditions => ['(run_at <= ? AND (locked_at IS NULL OR locked_at < ?)) AND failed_at IS NULL', db_time_now, db_time_now - max_run_time]}
         }
         named_scope :by_priority, :order => 'priority ASC, run_at ASC'
 
