@@ -143,7 +143,9 @@ $(document).ready(function() {
         id: 'channel_' + channel.id,
         hrefValues: ['user_id', 'pseudonym_id', 'channel_id']
       });
-      $channel.addClass('pseudonym_' + channel.pseudonym.id);
+      if (channel.pseudonym) {
+        $channel.addClass('pseudonym_' + channel.pseudonym.id);
+      }
       $channel.find(".path").triggerHandler('click');
     },
     error: function(data, $channel) {

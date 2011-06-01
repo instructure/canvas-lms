@@ -3134,7 +3134,7 @@
   var storage_user_id;
   function getUser() {
     if ( !storage_user_id ) {
-      storage_user_id = $("#identity .user_id").text();
+      storage_user_id = $.trim($("#identity .user_id").text());
     }
     return storage_user_id;
   };

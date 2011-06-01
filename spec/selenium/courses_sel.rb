@@ -3,6 +3,21 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "course selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  it "should properly hide the wizard and remember its hidden state" do
+    course_with_teacher_logged_in
+
+    get "/getting_started?fresh=1"
+    driver.find_element(:css, ".save_button").click
+    wizard_box = driver.find_element(:id, "wizard_box")
+    keep_trying { wizard_box.displayed? }
+    wizard_box.find_element(:css, ".close_wizard_link").click
+
+    driver.navigate.refresh
+    sleep 1 # we need to give the wizard a chance to pop up
+    wizard_box = driver.find_element(:id, "wizard_box")
+    wizard_box.displayed?.should be_false
+  end
+
   it "should allow moving a student to a different section" do
     c = course :active_course => true
     users = {:plain => {}, :sis => {}}
