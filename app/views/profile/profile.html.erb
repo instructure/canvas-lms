@@ -88,11 +88,7 @@
   <tr>
     <td><%= f.label :name, "Full Name:" %></td>
     <td><span class="full_name display_data"><%=h @user.name %></span>
-      <% if @user.creation_unique_id %>
-        <span class="edit_data"><%= @user.name %> (can't change)</span>
-      <% else %>
-        <%= f.text_field :name, :class => "edit_data" %>
-      <% end %>
+      <%= f.text_field :name, :class => "edit_data" %>
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/>This name will be used by teachers for grading.</span>
   </tr>
   <tr>
