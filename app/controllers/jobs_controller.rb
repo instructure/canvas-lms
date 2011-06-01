@@ -1,6 +1,7 @@
 class JobsController < ApplicationController
   before_filter :require_site_admin
   POPULAR_TAG_COUNTS = 10
+  LIMIT = 100
 
   def index
     if params[:id].present?
@@ -26,8 +27,8 @@ class JobsController < ApplicationController
           result[:tags] = tags(@jobs)
         when 'jobs'
           result[:jobs] = @jobs.all(
-            :limit => params[:limit] || 100,
-            :offset => params[:offset].presence)
+            :limit => params[:limit] || LIMIT,
+            :offset => params[:offset].try(:to_i))
           result[:total] = @jobs.count
         end
         render :json => result.to_json(:include_root => false)

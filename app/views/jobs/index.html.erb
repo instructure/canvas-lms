@@ -133,7 +133,7 @@
 </div>
 
 <% js_block do
-jobs_data = @jobs.all(:limit => 100)
+jobs_data = @jobs.all(:limit => JobsController::LIMIT)
 jobs_data.length.upto(@jobs_count - 1) { jobs_data << {} }
 jobs_opts = {
   :data => jobs_data,
@@ -143,6 +143,7 @@ jobs_opts = {
   :url => jobs_url(:only => :jobs),
   :batch_update_url => batch_update_jobs_url,
   :on_hold_attempt_count => Delayed::Job::ON_HOLD_COUNT,
+  :limit => JobsController::LIMIT,
 }
 running_opts = jobs_opts.merge({
   :data => @running.all,

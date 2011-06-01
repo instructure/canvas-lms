@@ -12,6 +12,7 @@ class FlavorGrid
     @$element.queue () =>
       $.ajaxJSON @options.url, "GET", { flavor: @options.flavor, q: @query }, (data) =>
         @data.length = 0
+        @loading = {}
         @data.push item for item in data[@type_name]
         if data.total && data.total > @data.length
           @data.push({}) for i in [@data.length ... data.total]
@@ -32,7 +33,7 @@ class FlavorGrid
 
   init: () ->
     @columns = @build_columns()
-
+    @loading = {}
     @grid = new Slick.Grid(@grid_name, @data, @columns, @grid_options())
     this
 
@@ -60,8 +61,25 @@ class Jobs extends FlavorGrid
     out_of = if d == 'hold' then '' else "/ #{max}"
     "<span class='#{klass}'>#{d}#{out_of}</span>"
 
+  load: (row) =>
+    @$element.queue () =>
+      row = row - (row % @options.limit)
+      if @loading[row]
+        @$element.dequeue()
+        return
+      @loading[row] = true
+      $.ajaxJSON @options.url, "GET", { flavor: @options.flavor, q: @query, offset: row }, (data) =>
+        @data[row ... row + data.jobs.length] = data.jobs
+        @grid.removeAllRows()
+        @grid.render()
+        @$element.dequeue()
+
   id_formatter: (r,c,d) =>
-    @data[r].id || "<span class='unloaded-id'>-</span>"
+    if @data[r].id
+      @data[r].id
+    else
+      @load(r)
+      "<span class='unloaded-id'>-</span>"
 
   build_columns: () ->
     [
