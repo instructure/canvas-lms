@@ -40,7 +40,7 @@ Delayed::Periodic.cron 'Twitter processing', '*/15 * * * *' do
 end
 
 Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * *' do
-  Reporting::CountsReport.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
+  Reporting::CountsReport.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 })
 end
 
 Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
