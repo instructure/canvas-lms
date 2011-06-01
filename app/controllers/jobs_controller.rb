@@ -3,6 +3,11 @@ class JobsController < ApplicationController
   POPULAR_TAG_COUNTS = 10
 
   def index
+    if params[:id].present?
+      params[:q] = params[:id]
+      params[:flavor] = 'all'
+    end
+
     jobs_scope
 
     respond_to do |format|

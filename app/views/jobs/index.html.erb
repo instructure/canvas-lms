@@ -81,7 +81,7 @@
                             ["Failed", 'failed']], @flavor) %>
   </select>
   <button id='jobs-refresh'>refresh</button>
-  <input type='search' results='15' placeholder='Search Jobs' autosave='canvas-jobs-search' id='jobs-search' name='q' />
+  <input type='search' results='15' placeholder='Search Jobs' autosave='canvas-jobs-search' id='jobs-search' name='q' value="<%= params[:id].presence %>" />
   Total: <span id='jobs-total'><%= @jobs_count %></span>
   <button id='select-all-jobs'>select all</button>
   With Selection:
@@ -92,7 +92,7 @@
   </div>
 <div id="show-job">
   <h2>Selected Job</h2>
-  <h3>id: <span id="job-id" class="show-field">&nbsp;</span></h3>
+  <h3>id: <a href="#" id="job-id-link"><span id="job-id" class="show-field">&nbsp;</span></a></h3>
   <h4>tag: <span id='job-tag' class='show-field'>&nbsp;</span></h4>
   <h4>strand: <span id='job-strand' class='show-field'>&nbsp;</span></h4>
   <table id='job-attributes' cellspacing="0">

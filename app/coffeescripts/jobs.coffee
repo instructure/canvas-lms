@@ -102,6 +102,10 @@ class Jobs extends FlavorGrid
       $('#show-job .show-field').each (idx, field) =>
         field_name = field.id.replace("job-", '')
         $(field).text(job[field_name] || '')
+      $('#job-id-link').attr('href', "/jobs?id=#{job.id}")
+    if @data.length == 1 && @type_name == 'jobs'
+      @grid.setSelectedRows [0]
+      @grid.onSelectedRowsChanged()
     this
 
   selectAll: () ->

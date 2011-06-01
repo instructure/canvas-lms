@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Tue, 17 May 2011 16:59:00 GMT from
+/* DO NOT MODIFY. This file was compiled Wed, 01 Jun 2011 20:45:00 GMT from
  * /Users/bpalmer/Programming/canvas/app/coffeescripts/jobs.coffee
  */
 
@@ -161,12 +161,17 @@
         rows = this.grid.getSelectedRows();
         row = (rows != null ? rows.length : void 0) === 1 ? rows[0] : -1;
         job = this.data[rows[0]] || {};
-        return $('#show-job .show-field').each(__bind(function(idx, field) {
+        $('#show-job .show-field').each(__bind(function(idx, field) {
           var field_name;
           field_name = field.id.replace("job-", '');
           return $(field).text(job[field_name] || '');
         }, this));
+        return $('#job-id-link').attr('href', "/jobs?id=" + job.id);
       }, this);
+      if (this.data.length === 1 && this.type_name === 'jobs') {
+        this.grid.setSelectedRows([0]);
+        this.grid.onSelectedRowsChanged();
+      }
       return this;
     };
     Jobs.prototype.selectAll = function() {
