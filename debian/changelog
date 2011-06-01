@@ -1,3 +1,17 @@
+canvas-lms (1.1-35) professional; urgency=low
+
+  * [+3eb6690] remove trailing comma from equella plugin js
+  * [+76ee7a9] delayed jobs post-refactor cleanup
+  * [+2cd9fde] fix a js error when adding email addresses
+  * [+d3bdd37] fix js error when closing the course wizard in ie7
+  * [+02c740d] fix another instance of job log file path changed, and log mailman to rails log
+  * [+16e7700] don't record a js error when creating a new discussion topic
+  * [+c89cb52] remove trailing comma from equation editor plugin js
+  * [+77bc023] show entire error report message when only viewing one
+  * [+bb3fd1c] delete error reports based on creation date
+
+ -- Zach Wily <zach@instructure.com>  Tue, 31 May 2011 21:30:04 -0600
+
 canvas-lms (1.1-34) professional; urgency=low
 
   * [+4c9f027] fix spelling of parameter
