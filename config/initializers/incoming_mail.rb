@@ -11,4 +11,5 @@ Rails.configuration.to_prepare do
   # which then reloads the rails configuration (and gets an error because we
   # try to remove a method that's already there
   Mailman.config.rails_root = 'nil'
+  Mailman.config.logger = Rails.logger
 end

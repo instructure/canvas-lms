@@ -94,7 +94,7 @@
           minHeight: 300,
           resizable: true,
           height: "auto",
-          title: "Embed Math Equation",
+          title: "Embed Math Equation"
         }).dialog('open');
 
         // needs to be visible for some computed styles to work when we write

@@ -15,7 +15,15 @@
 <%= will_paginate(@reports) %>
 <% @reports.each do |report| %>
   <div style="margin-bottom: 20px;">
-    <h3><%= link_to "##{report.id}", error_url(report) %> <%= truncate(report.message, :length => 80) %></h3>
+    <h3>
+      <%= link_to "##{report.id}", error_url(report) %>
+      <% if @reports.length > 1 %>
+        <%= truncate(report.message, :length => 80) %>
+      <% else %>
+        <%= report.message %>
+      <% end %>
+    </h3>
+
     <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
       category: <%= report.category || 'default' %><br/>
       <%= report.created_at %><br />
