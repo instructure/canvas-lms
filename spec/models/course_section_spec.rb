@@ -189,7 +189,7 @@ describe CourseSection, "moving to new course" do
     CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
     cs1.account = account2
     cs1.save
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id, account2.id]
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).sort.should == [account1.id, account2.id].sort
     CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
     cs1.account = nil
     cs1.save
