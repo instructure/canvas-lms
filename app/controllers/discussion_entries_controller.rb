@@ -50,6 +50,7 @@ class DiscussionEntriesController < ApplicationController
         if @entry.save
           @entry.update_topic
           log_asset_access(@topic, 'topics', 'topics', 'participate')
+          @entry.context_module_action
           if params[:attachment] && params[:attachment][:uploaded_data] && params[:attachment][:uploaded_data].size > 0 && @entry.grants_right?(@current_user, session, :attach)
             @attachment = @context.attachments.create(params[:attachment])
             @entry.attachment = @attachment
