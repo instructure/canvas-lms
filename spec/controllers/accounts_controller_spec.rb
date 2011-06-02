@@ -59,4 +59,12 @@ describe AccountsController do
       batch.batch_mode_term.should == @account.enrollment_terms.first
     end
   end
+
+  it "should redirect to CAS if CAS is enabled" do
+    account = account_with_cas({:account => Account.default})
+    config = { :cas_base_url => account.account_authorization_config.auth_base }
+    cas_client = CASClient::Client.new(config)
+    get 'show', :id => account.id
+    response.should redirect_to(cas_client.add_service_to_login_url(login_url))
+  end
 end

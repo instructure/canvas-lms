@@ -156,6 +156,7 @@ class ApplicationController < ActionController::Base
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html { 
         store_location if request.get?
+        return if !@current_user && initiate_delegated_login
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }

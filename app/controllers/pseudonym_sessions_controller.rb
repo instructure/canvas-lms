@@ -81,19 +81,9 @@ class PseudonymSessionsController < ApplicationController
         end
       end
 
-      # initial session; redirect to CAS
-      reset_session
-      if @domain_root_account.account_authorization_config.log_in_url.present?
-        session[:exit_frame] = true
-        redirect_to(@domain_root_account.account_authorization_config.log_in_url)
-      else
-        redirect_to(cas_client.add_service_to_login_url(login_url))
-      end
+      initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
-      reset_session
-      settings = @domain_root_account.account_authorization_config.saml_settings
-      request = Onelogin::Saml::AuthRequest.create(settings)
-      redirect_to(request)
+      initiate_saml_login
     else
       render :action => "new"
     end
@@ -208,7 +198,7 @@ class PseudonymSessionsController < ApplicationController
     flash[:notice] = "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
-      session[:return_to] = nil      
+      session[:return_to] = nil
       if @domain_root_account.delegated_authentication?
         format.html { redirect_to login_url(:no_auto=>'true') }
       else
