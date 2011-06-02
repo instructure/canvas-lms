@@ -46,7 +46,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {})
     params[:api_key] = key.api_key
   end
 
-  if !params.key?(:access_token)
+  if !params.key?(:access_token) && @user
     token = @user.access_tokens.first
     token ||= @user.access_tokens.create!(:purpose => 'test')
     params[:access_token] = token.token
