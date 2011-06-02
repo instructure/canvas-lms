@@ -45,9 +45,15 @@ Rails::Initializer.run do |config|
   log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
   if log_config && log_config["logger"] == "syslog"
     require 'syslog_wrapper'
+    log_config["app_ident"] ||= "canvas-lms"
+    log_config["daemon_ident"] ||= "canvas-lms-daemon"
+    facilities = 0
+    (log_config["facilities"] || []).each do |facility|
+      facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
+    end
     config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(
-        if ENV['RUNNING_AS_DAEMON'] == 'true'; 'canvas-lms-daemon'
-        else; 'canvas-lms'; end)
+        if ENV['RUNNING_AS_DAEMON'] == 'true'; log_config["daemon_ident"]
+        else; log_config["app_ident"]; end)
   else
     if ENV['RUNNING_AS_DAEMON'] == 'true'
       config.log_path = Rails.root+'log/delayed_job.log'
