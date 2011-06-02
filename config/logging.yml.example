@@ -1,0 +1,9 @@
+development:
+  logger: rails
+
+test:
+  logger: rails
+
+production:
+  logger: rails
+#  logger: syslog

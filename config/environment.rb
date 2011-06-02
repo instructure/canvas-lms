@@ -41,11 +41,19 @@ Rails::Initializer.run do |config|
   else
     config.cache_store = :mem_cache_store, *memcache_servers
   end
-
-  if ENV['RUNNING_AS_DAEMON'] == 'true'
-    config.log_path = Rails.root+'log/delayed_job.log'
+  
+  log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
+  if log_config && log_config["logger"] == "syslog"
+    require 'syslog_wrapper'
+    config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(
+        if ENV['RUNNING_AS_DAEMON'] == 'true'; 'canvas-lms-daemon'
+        else; 'canvas-lms'; end)
+  else
+    if ENV['RUNNING_AS_DAEMON'] == 'true'
+      config.log_path = Rails.root+'log/delayed_job.log'
+    end
   end
-
+  
   # Use SQL instead of Active Record's schema dumper when creating the test database.
   # This is necessary if your schema can't be completely dumped by the schema dumper,
   # like if you have constraints or database-specific column types
