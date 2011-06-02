@@ -278,7 +278,7 @@ class Group < ActiveRecord::Base
     set { can :create }
     
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
-    set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum }
+    set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum and can :manage_wiki and can :manage_files }
     
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     set { can :read and can :read_roster }

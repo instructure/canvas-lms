@@ -128,5 +128,18 @@ describe Group do
     # end
     
   end
+
+  it "should grant manage permissions for associated objects to group managers" do
+    e = course_with_teacher
+    course = e.context
+    teacher = e.user
+    group = course.groups.create
+    course.grants_right?(teacher, nil, :manage_groups).should be_true
+    group.grants_right?(teacher, nil, :manage_wiki).should be_true
+    group.grants_right?(teacher, nil, :manage_files).should be_true
+    WikiNamespace.default_for_context(group).grants_right?(teacher, nil, :update_page).should be_true
+    attachment = group.attachments.build
+    attachment.grants_right?(teacher, nil, :create).should be_true
+  end
   
 end
