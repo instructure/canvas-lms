@@ -26,7 +26,8 @@
       doc = win.document,
       localStorageName = 'localStorage',
       globalStorageName = 'globalStorage',
-      storage;
+      storage,
+      rInvalidIeChars = /(\s|\/)/g;
 
     api.set = function(key, value) {};
     api.get = function(key) {};
@@ -69,6 +70,13 @@
           args.unshift(storage);
           // See http://msdn.microsoft.com/en-us/library/ms531081(v=VS.85).aspx
           // and http://msdn.microsoft.com/en-us/library/ms531424(v=VS.85).aspx
+          
+          // workaroud for an IE bug that does not allow slashes or whitespace in userData keys
+          if (args[1] && args[1].match && args[1].match(rInvalidIeChars)) {
+            // get rid of whitespace and invalid charicters
+            args[1] = args[1].replace(rInvalidIeChars, '');
+          }
+          
           doc.body.appendChild(storage);
           storage.addBehavior('#default#userData');
           storage.load(localStorageName);
