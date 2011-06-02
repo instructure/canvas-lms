@@ -142,25 +142,22 @@ class SisBatch < ActiveRecord::Base
   end
 
   def remove_previous_imports
-    # delete courses that weren't in this batch, and only in the selected term if applicable
-    scope = self.account.courses.active
-    scope = scope.for_term(self.batch_mode_term) if self.batch_mode_term
+    # delete courses that weren't in this batch, in the selected term
+    scope = self.account.courses.active.for_term(self.batch_mode_term)
     scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id.to_s]).find_each do |course|
       course.destroy
     end
 
-    # delete sections who weren't in this batch, and only whose course
-    # was in the selected term if applicable
+    # delete sections who weren't in this batch, whose course was in the selected term
     scope = CourseSection.scoped(:conditions => ["course_sections.workflow_state = ? and course_sections.root_account_id = ? and course_sections.sis_batch_id is not null and course_sections.sis_batch_id <> ?", 'active', self.account.id, self.id.to_s])
-    scope = scope.scoped(:include => :course, :select => "course_sections.*", :conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id]) if self.batch_mode_term
+    scope = scope.scoped(:include => :course, :select => "course_sections.*", :conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
     scope.find_each do |section|
       section.destroy
     end
 
-    # delete enrollments for courses that weren't in this batch, in the
-    # selected term if applicable
+    # delete enrollments for courses that weren't in this batch, in the selected term
     scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id.to_s])
-    scope = scope.scoped(:conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id]) if self.batch_mode_term
+    scope = scope.scoped(:conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
     scope.find_each do |enrollment|
       enrollment.destroy
     end

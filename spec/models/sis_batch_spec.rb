@@ -46,7 +46,7 @@ describe SisBatch do
   end
 
   describe "batch mode" do
-    def do_batch(use_term)
+    it "should remove only from the specific term if it is given" do
       @term1 = @account.enrollment_terms.first
       @term2 = @account.enrollment_terms.create!(:name => 'term2')
 
@@ -84,15 +84,11 @@ my_course,my_user,student,active,my_section},
 s2,test_1,section2,active},
         ],
         :batch_mode => true,
-        :batch_mode_term => (use_term ? @term1 : nil))
+        :batch_mode_term => @term1)
 
       @c1.reload.should be_deleted
       @c2.reload.should be_available
-      if use_term
-        @c3.reload.should be_available
-      else
-        @c3.reload.should be_deleted
-      end
+      @c3.reload.should be_available
       @c4 = @account.reload.courses.find_by_course_code('TC 101')
       @c4.should_not be_nil
       @c4.sis_batch_id.should == @batch.id.to_s
@@ -100,32 +96,16 @@ s2,test_1,section2,active},
 
       @s1.reload.should be_deleted
       @s2.reload.should be_active
-      if use_term
-        @s3.reload.should be_active
-      else
-        @s3.reload.should be_deleted
-      end
+      @s3.reload.should be_active
       @s4.reload.should be_deleted
       @s5 = @c4.course_sections.find_by_sis_source_id('s2')
       @s5.should_not be_nil
 
       @e1.reload.should be_deleted
       @e2.reload.should be_active
-      if use_term
-        @e3.reload.should be_active
-      else
-        @e3.reload.should be_deleted
-      end
+      @e3.reload.should be_active
       @e4.reload.should be_deleted
       @e5.reload.should be_active
-    end
-
-    it "should remove across all terms if no term given" do
-      do_batch(false)
-    end
-
-    it "should remove only from the specific term if it is given" do
-      do_batch(true)
     end
 
     it "shouldn't do batch mode removals if not in batch mode" do
