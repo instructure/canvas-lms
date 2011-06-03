@@ -61,13 +61,13 @@ class AssessmentItemConverter
         @question[:question_text] = ''
         @doc.css('itemBody > div.html').each_with_index do |text, i|
           @question[:question_text] += "\n<br/>\n" if i > 0
-          @question[:question_text] += sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text))
+          @question[:question_text] += sanitize_html_string(text.text)
         end
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
         @question[:question_text] = sanitize_html!(text)
       elsif @doc.at_css('itemBody')
         if text = @doc.at_css('itemBody').children.find{|c|c.text.strip != ''}
-          @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text))
+          @question[:question_text] = sanitize_html_string(text.text)
         end
       end
       parse_instructure_metadata
@@ -174,6 +174,10 @@ class AssessmentItemConverter
   
   def clear_html(text)
     text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
+  end
+  
+  def sanitize_html_string(string, remove_extraneous_nodes=false)
+    sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(string), remove_extraneous_nodes)
   end
 
   def sanitize_html!(node, remove_extraneous_nodes=false)

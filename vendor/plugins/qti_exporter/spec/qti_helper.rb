@@ -14,6 +14,15 @@ end
 require 'qti_exporter'
 require 'pp'
 
+def get_question_hash(dir, name, delete_answer_ids=true)
+  File.open(File.join(dir, '%s.xml' % name), 'r') do |file|
+    questions, assessments = Qti.convert_xml(file.read)
+    hash = questions.first
+    hash[:answers].each {|a|a.delete(:id)} if delete_answer_ids
+    hash
+  end
+end
+
 def get_manifest_node(question, opts={})
   manifest_node = {'identifier'=>nil, 'href'=>"#{question}.xml"}
   manifest_node.stub!(:at_css).and_return(nil)

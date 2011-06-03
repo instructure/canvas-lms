@@ -122,17 +122,17 @@ class AssociateInteraction < AssessmentItemConverter
 
   def get_all_matches_from_body
     if matches = @doc.at_css('div.RIGHT_MATCH_BLOCK')
-      matches.css('p').each do |m|
+      matches.css('div').each do |m|
         match = {}
         @question[:matches] << match
-        match[:text] = clear_html m.text.strip
+        match[:text] = sanitize_html_string(m.text.strip, true)
         match[:match_id] = unique_local_id
       end
     end
   end
   
   def get_all_answers_from_body
-    @doc.css('div.RESPONSE_BLOCK p').each_with_index do |a, i|
+    @doc.css('div.RESPONSE_BLOCK div').each_with_index do |a, i|
       answer = {}
       @question[:answers] << answer
       extract_answer!(answer, a)

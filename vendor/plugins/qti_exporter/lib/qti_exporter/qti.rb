@@ -39,6 +39,29 @@ module Qti
     end
     assessments
   end
+  
+  def self.convert_xml(xml)
+    assessments = nil
+    questions = nil
+    Dir.mktmpdir do |dirname|
+      xml_file = File.join(dirname, 'qti.xml')
+      File.open(xml_file, 'w'){|f| f << xml }
+      
+      # convert to 2.1
+      dest_dir_2_1 = File.join(dirname, "qti_2_1")
+      command = Qti.get_conversion_command(dest_dir_2_1, dirname)
+      `#{command}`
+  
+      if $?.exitstatus == 0
+        manifest = File.join(dest_dir_2_1, "imsmanifest.xml")
+        questions = convert_questions(manifest)
+        assessments = convert_assessments(manifest)
+      else
+        raise "Error running python qti converter"
+      end
+    end
+    [questions, assessments]
+  end
 
   def self.convert_files(manifest_path)
     attachments = []
