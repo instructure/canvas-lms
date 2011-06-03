@@ -141,5 +141,20 @@ describe Group do
     attachment = group.attachments.build
     attachment.grants_right?(teacher, nil, :create).should be_true
   end
-  
+
+  describe "root account" do
+    it "should get the root account assigned" do
+      e = course_with_teacher
+      group = @course.groups.create!
+      group.account.should == Account.default
+      group.root_account.should == Account.default
+
+      new_root_acct = account_model
+      new_sub_acct = new_root_acct.sub_accounts.create!(:name => 'sub acct')
+      group.account = new_sub_acct
+      group.save!
+      group.account.should == new_sub_acct
+      group.root_account.should == new_root_acct
+    end
+  end
 end

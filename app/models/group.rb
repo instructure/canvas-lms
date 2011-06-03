@@ -29,6 +29,7 @@ class Group < ActiveRecord::Base
   has_many :invited_users, :source => :user, :through => :invited_group_memberships
   belongs_to :context, :polymorphic => true
   belongs_to :account
+  belongs_to :root_account, :class_name => "Account"
 
   has_many :calendar_events, :as => :context, :dependent => :destroy
   has_many :discussion_topics, :as => :context, :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user, :dependent => :destroy, :order => 'discussion_topics.position DESC, discussion_topics.created_at DESC'
@@ -257,6 +258,17 @@ class Group < ActiveRecord::Base
     end
   end
   private :ensure_defaults
+
+  # update root account when account changes
+  def account=(new_account)
+    self.account_id = new_account.id
+  end
+  def account_id=(new_account_id)
+    write_attribute(:account_id, new_account_id)
+    if self.account_id_changed?
+      self.root_account = self.account(true).try(:root_account) || self.account
+    end
+  end
 
   # if you modify this set_policy block, note that we've denormalized this
   # permission check for efficiency -- see User#cached_contexts
