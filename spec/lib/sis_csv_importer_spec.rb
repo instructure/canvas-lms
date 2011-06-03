@@ -134,6 +134,12 @@ describe SIS::SisCsv do
       ",U008,student,S008S,active,",
       ",U009,student,S005S,deleted,"
     )
+    process_csv_data_cleanly(
+      "group_id,name,account_id,status",
+      "G001,Group 1,,available",
+      "G002,Group 2,,deleted",
+      "G003,Group 3,,closed"
+    )
   end
   
   context "course importing" do
@@ -1556,6 +1562,114 @@ describe SIS::SisCsv do
         Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
       end
     
+    end
+  end
+
+  describe "group importing" do
+    it "should detect bad content" do
+      importer = process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,A001,Group 1,available",
+        "G001,A001,Group 2,available",
+        "G002,A001,Group 1,blerged",
+        "G003,A001,,available",
+        ",A001,G1,available")
+      importer.errors.map(&:last).should ==
+        ["Duplicate group id G001",
+          "No group_id given for a group"]
+      importer = process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,A001,Group 1,available",
+        "G002,,Group 1,blerged",
+        "G003,,,available")
+      importer.warnings.map(&:last).should ==
+        ["Parent account didn't exist for A001",
+         "Improper status \"blerged\" for group G002, skipping",
+         "No name given for group G003, skipping"]
+    end
+
+    it "should create groups" do
+      account_model
+      @sub = @account.all_accounts.create!(:name => 'sub')
+      @sub.update_attribute('sis_source_id', 'A002')
+      process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,,Group 1,available",
+        "G002,A002,Group 2,deleted")
+      groups = Group.all(:order => :id)
+      groups.map(&:account_id).should == [@account.id, @sub.id]
+      groups.map(&:sis_source_id).should == %w(G001 G002)
+      groups.map(&:name).should == ["Group 1", "Group 2"]
+      groups.map(&:workflow_state).should == %w(available deleted)
+    end
+
+    it "should update group attributes" do
+      @sub = @account.sub_accounts.create!(:name => 'sub')
+      @sub.update_attribute('sis_source_id', 'A002')
+      process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,,Group 1,available",
+        "G002,,Group 2,available")
+      Group.count.should == 2
+      Group.find_by_sis_source_id('G001').update_attribute(:name, 'Group 1-1')
+      process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,,Group 1-b,available",
+        "G002,A002,Group 2-b,deleted")
+      # group 1's name won't change because it was manually changed
+      groups = Group.all(:order => :id)
+      groups.map(&:name).should == ["Group 1-1", "Group 2-b"]
+      groups.map(&:root_account).should == [@account, @account]
+      groups.map(&:workflow_state).should == %w(available deleted)
+      groups.map(&:account).should == [@account, @sub]
+    end
+  end
+
+  describe "group membership importing" do
+    before do
+      group_model(:context => @account, :sis_source_id => "G001")
+      @user1 = user_with_pseudonym(:username => 'u1@example.com')
+      @user1.pseudonym.update_attribute(:sis_user_id, 'U001')
+      @user1.pseudonym.update_attribute(:account, @account)
+      @user2 = user_with_pseudonym(:username => 'u2@example.com')
+      @user2.pseudonym.update_attribute(:sis_user_id, 'U002')
+      @user2.pseudonym.update_attribute(:account, @account)
+      @user3 = user_with_pseudonym(:username => 'u3@example.com')
+      @user3.pseudonym.update_attribute(:sis_user_id, 'U003')
+      @user3.pseudonym.update_attribute(:account, @account)
+    end
+
+    it "should detect bad content" do
+      importer = process_csv_data(
+        "group_id,user_id,status",
+        ",U001,accepted",
+        "G001,,accepted",
+        "G001,U001,bogus")
+      GroupMembership.count.should == 0
+      importer.errors.map(&:last).should ==
+        ["No group_id given for a group user",
+         "No user_id given for a group user",
+         "Improper status \"bogus\" for a group user"]
+    end
+
+    it "should add users to groups" do
+      process_csv_data_cleanly(
+        "group_id,user_id,status",
+        "G001,U001,accepted",
+        "G001,U003,deleted")
+      ms = GroupMembership.all(:order => :id)
+      ms.map(&:user_id).should == [@user1.id, @user3.id]
+      ms.map(&:group_id).should == [@group.id, @group.id]
+      ms.map(&:workflow_state).should == %w(accepted deleted)
+
+      process_csv_data_cleanly(
+        "group_id,user_id,status",
+        "G001,U001,deleted",
+        "G001,U003,deleted")
+      ms = GroupMembership.all(:order => :id)
+      ms.map(&:user_id).should == [@user1.id, @user3.id]
+      ms.map(&:group_id).should == [@group.id, @group.id]
+      ms.map(&:workflow_state).should == %w(deleted deleted)
     end
   end
 end
