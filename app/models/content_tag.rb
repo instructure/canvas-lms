@@ -49,7 +49,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   named_scope :active, lambda{
-    {:conditions => ['workflow_state != ?', 'deleted'] }
+    {:conditions => ['content_tags.workflow_state != ?', 'deleted'] }
   }
   
   def touch_context_module
