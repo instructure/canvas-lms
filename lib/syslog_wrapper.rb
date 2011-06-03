@@ -23,9 +23,11 @@ class SyslogWrapper
 
   attr_accessor :level, :datetime_format
 
-  # set to false to disable the silencer
-  cattr_accessor :silencer
-  self.silencer = true
+  @@silencer = true
+  def self.silencer; @@silencer; end
+  def silencer; @@silencer; end
+  def self.silencer=(obj); @@silencer = obj; end
+  def silencer=(obj); @@silencer = obj; end
 
   def silence(temporary_level = Logger::ERROR)
     if silencer
