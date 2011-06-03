@@ -35,14 +35,14 @@ Rails::Initializer.run do |config|
   # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
   config.time_zone = 'UTC'
 
-  memcache_servers = (YAML.load_file(Rails.root+"config/memcache.yml")[Rails.env] || []) rescue []
+  memcache_servers = File.exists?(Rails.root+"config/memcache.yml") ? (YAML.load_file(Rails.root+"config/memcache.yml")[RAILS_ENV] || []) : []
   if memcache_servers.empty?
     config.cache_store = :nil_store
   else
     config.cache_store = :mem_cache_store, *memcache_servers
   end
-  
-  log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
+
+  log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[RAILS_ENV]
   if log_config && log_config["logger"] == "syslog"
     require 'syslog_wrapper'
     log_config["app_ident"] ||= "canvas-lms"
@@ -59,7 +59,7 @@ Rails::Initializer.run do |config|
       config.log_path = Rails.root+'log/delayed_job.log'
     end
   end
-  
+
   # Use SQL instead of Active Record's schema dumper when creating the test database.
   # This is necessary if your schema can't be completely dumped by the schema dumper,
   # like if you have constraints or database-specific column types
