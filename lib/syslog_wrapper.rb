@@ -23,6 +23,23 @@ class SyslogWrapper
 
   attr_accessor :level, :datetime_format
 
+  # set to false to disable the silencer
+  cattr_accessor :silencer
+  self.silencer = true
+
+  def silence(temporary_level = Logger::ERROR)
+    if silencer
+      begin
+        old_logger_level, @level = @level, temporary_level
+        yield self
+      ensure
+        @level = old_logger_level
+      end
+    else
+      yield self
+    end
+  end
+
   # facility is a logical-or-ed collection of the following constants in Syslog
   #   LOG_AUTHPRIV - security or authorization messages which should be kept private
   #   LOG_CONSOLE - system console message
