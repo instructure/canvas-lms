@@ -2953,14 +2953,12 @@
             }
             $("<div class='bookmark'/>")
               .appendTo($dialog.find(".results"))
-              .append($("<a class='bookmark_link' style='font-weight: bold;'/>", {
-                href: data[idx].url,
-                text: data[idx].short_title,
-                title: data[idx].title
-              }))
-              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>", {
-                text: data[idx].description || "No description"
-              }));
+              .append($('<a class="bookmark_link" style="font-weight: bold;"/>').attr({
+                  href: data[idx].url,
+                  title: data[idx].title
+                }).text(data[idx].short_title)
+              )
+              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>").text(data[idx].description || "No description"));
           }
         }, function() {
           $dialog.find(".results").empty()
