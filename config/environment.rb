@@ -51,9 +51,8 @@ Rails::Initializer.run do |config|
     (log_config["facilities"] || []).each do |facility|
       facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
     end
-    config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(
-        if ENV['RUNNING_AS_DAEMON'] == 'true'; log_config["daemon_ident"]
-        else; log_config["app_ident"]; end)
+    ident = ENV['RUNNING_AS_DAEMON'] == 'true' ? log_config["daemon_ident"] : log_config["app_ident"]
+    config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(ident, facilities)
   else
     if ENV['RUNNING_AS_DAEMON'] == 'true'
       config.log_path = Rails.root+'log/delayed_job.log'

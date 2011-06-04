@@ -60,12 +60,12 @@ class SyslogWrapper
   # example: SyslogWrapper.new("canvas", Syslog::LOG_USER, :include_pid => true)
   def initialize(ident, facility=0, options={})
     unless $syslog
-      options = 0
-      options |= Syslog::LOG_CONS if options[:bail_to_console]
-      options |= Syslog::LOG_NDELAY if options[:ndelay]
-      options |= Syslog::LOG_PERROR if options[:perror]
-      options |= Syslog::LOG_PID if options[:include_pid]
-      $syslog = Syslog.open(ident, options, facility)
+      flags = 0
+      flags |= Syslog::LOG_CONS if options[:bail_to_console]
+      flags |= Syslog::LOG_NDELAY if options[:ndelay]
+      flags |= Syslog::LOG_PERROR if options[:perror]
+      flags |= Syslog::LOG_PID if options[:include_pid]
+      $syslog = Syslog.open(ident, flags, facility)
     end
     @level = 0
     @skip_thread_context = options[:skip_thread_context]
