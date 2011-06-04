@@ -314,7 +314,7 @@ class Course < ActiveRecord::Base
     {:limit => limit }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => wildcard('courses.name', name) }
+    { :conditions => wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name) }
   }
   named_scope :needs_account, lambda{|account, limit|
     {:conditions => {:account_id => nil, :root_account_id => account.id}, :limit => limit }

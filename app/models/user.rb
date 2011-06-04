@@ -130,7 +130,7 @@ class User < ActiveRecord::Base
     {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{ActiveRecord::Base.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => wildcard('users.name', name) }
+    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", ActiveRecord::Base.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
   }
   named_scope :active, lambda {
     { :conditions => ["users.workflow_state != ?", 'deleted'] }
