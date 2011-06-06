@@ -130,8 +130,9 @@ ActiveRecord::Base.class_eval do
       key = key.to_s
       unless key.sub!(/\A#/, '')
         scopes = self_and_descendants_from_active_record.map{ |klass| klass.name.underscore }.reverse
+        orig_key = key
         key = "#{scopes.shift}.#{key}"
-        default = scopes.map{ |scope| "#{scope}.#{key}"} + Array(default)
+        default = scopes.map{ |scope| "#{scope}.#{orig_key}".to_sym} + Array(default)
       end
       I18n.translate(key, default, options)
     end
