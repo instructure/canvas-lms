@@ -4,19 +4,9 @@ shared_examples_for "grading standards selenium tests" do
   it_should_behave_like "in-process server selenium tests"
   
   it "should allow creating/deleting grading standards" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    login_as(username, password)
+    course_with_teacher_logged_in
 
-    get "/courses/#{e.course_id}/grading_standards"
+    get "/courses/#{@course.id}/grading_standards"
     driver.find_element(:css, ".add_standard_link").click
     standard = driver.find_element(:css, "#grading_standard_new")
     standard.should_not be_nil
@@ -41,22 +31,12 @@ shared_examples_for "grading standards selenium tests" do
   end
   
   it "should allow setting a grading standard for an assignment" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    login_as(username, password)
+    course_with_teacher_logged_in
     
     @assignment = @course.assignments.create!(:title => "new assignment")
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
 
-    get "/courses/#{e.course_id}/assignments/#{@assignment.id}"
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     driver.find_element(:css, ".edit_full_assignment_link").click
     form = driver.find_element(:css, "#edit_assignment_form")
     form.find_element(:css, ".more_options_link").click
@@ -88,21 +68,11 @@ shared_examples_for "grading standards selenium tests" do
   end
   
   it "should allow setting a grading standard for a course" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    login_as(username, password)
-    
+    course_with_teacher_logged_in
+
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
 
-    get "/courses/#{e.course_id}/details"
+    get "/courses/#{@course.id}/details"
     driver.find_element(:css, ".edit_course_link").click
     form = driver.find_element(:css, "#course_form")
     form.find_element(:css, "#course_grading_standard_enabled").click

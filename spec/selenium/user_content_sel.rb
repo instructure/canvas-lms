@@ -4,13 +4,11 @@ shared_examples_for "user_content selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   before(:each) do
-    course_with_student(:active_all => true)
-    user_with_pseudonym(:user => @user)
+    course_with_student_logged_in(:active_all => true)
   end
 
   it "should serve embed tags from a safefiles iframe" do
     factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => message_body)
-    login
     get "/"
     uri = nil
     name = driver.find_elements(:class_name, "user_content_iframe").first.attribute('name')
@@ -26,7 +24,6 @@ shared_examples_for "user_content selenium tests" do
 
   it "should iframe calendar json requests" do
     e = factory_with_protected_attributes(CalendarEvent, :context => @course, :title => "super fun party", :description => message_body, :start_at => 5.minutes.ago, :end_at => 5.minutes.from_now)
-    login
     get "/calendar"
     driver.find_elements(:class_name, "user_content_iframe").size.should == 0
     event_el = keep_trying { driver.find_element(:id, "event_calendar_event_#{e.id}") }

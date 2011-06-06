@@ -3,21 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "Wiki pages and Tiny WYSIWYG editor" do
   # it_should_behave_like "forked server selenium tests"
   it_should_behave_like "in-process server selenium tests"
-  
+
   before(:all) do
-    @username = "nobody@example.com"
-    @password = "asdfasdf"
-    foobar = "asdfasdf"
-    @u = user_with_pseudonym :active_user => true,
-                            :username => @username,
-                            :password => @password
-    @u.save!
-    @e = course_with_teacher :active_course => true,
-                            :user => @u,
-                            :active_enrollment => true
-    @e.save!
-    login_as(@username, @password)
-    get "/courses/#{@e.course_id}/wiki"
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/wiki"
   end
   
   it "should not load the files or images until you click on the appropriate tabs in the wikiSidebar" do
