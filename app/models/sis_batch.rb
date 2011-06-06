@@ -143,7 +143,7 @@ class SisBatch < ActiveRecord::Base
 
   def remove_previous_imports
     # delete courses that weren't in this batch, in the selected term
-    scope = self.account.courses.active.for_term(self.batch_mode_term)
+    scope = Course.active.for_term(self.batch_mode_term).scoped(:conditions => ["courses.root_account_id = ?", self.account.id])
     scope.scoped(:conditions => ["sis_batch_id is not null and sis_batch_id <> ?", self.id.to_s]).find_each do |course|
       course.destroy
     end
@@ -156,7 +156,7 @@ class SisBatch < ActiveRecord::Base
     end
 
     # delete enrollments for courses that weren't in this batch, in the selected term
-    scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id.to_s])
+    scope = Enrollment.active.scoped(:include => :course, :select => "enrollments.*", :conditions => ["courses.root_account_id = ? and enrollments.sis_batch_id is not null and enrollments.sis_batch_id <> ?", self.account.id, self.id.to_s])
     scope = scope.scoped(:conditions => ["courses.enrollment_term_id = ?", self.batch_mode_term.id])
     scope.find_each do |enrollment|
       enrollment.destroy
