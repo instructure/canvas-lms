@@ -449,3 +449,10 @@ I18n.scope.prototype = {
 I18n.scope.prototype.t = I18n.scope.prototype.translate;
 I18n.scope.prototype.l = I18n.scope.prototype.localize;
 I18n.scope.prototype.p = I18n.scope.prototype.pluralize;
+
+
+if (I18n.translations) {
+  $.extend(true, I18n.translations, {en: {}});
+} else {
+  I18n.translations = {en: {}};
+}
