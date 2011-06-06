@@ -48,10 +48,11 @@ describe SisBatch do
 
   describe "batch mode" do
     it "should remove only from the specific term if it is given" do
+      @subacct = @account.sub_accounts.create(:name => 'sub1')
       @term1 = @account.enrollment_terms.first
       @term2 = @account.enrollment_terms.create!(:name => 'term2')
 
-      @c1 = factory_with_protected_attributes(@account.courses, :name => "delete me", :enrollment_term => @term1, :sis_batch_id => "previous")
+      @c1 = factory_with_protected_attributes(@subacct.courses, :name => "delete me", :enrollment_term => @term1, :sis_batch_id => "previous")
       @c1.offer!
       @c2 = factory_with_protected_attributes(@account.courses, :name => "don't delete me", :enrollment_term => @term1, :sis_source_id => 'my_course', :root_account => @account)
       @c2.offer!
