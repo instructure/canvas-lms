@@ -225,11 +225,11 @@ shared_examples_for "all selenium tests" do
   end
 
   self.use_transactional_fixtures = false
-  
+
   append_after(:each) do
-    ALL_MODELS.each &:delete_all
+    ALL_MODELS.each { |m| truncate_table(m) }
   end
-  
+
   append_before(:all) do
     @selenium_driver = setup_selenium
   end

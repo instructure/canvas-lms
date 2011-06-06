@@ -30,16 +30,25 @@ ALL_MODELS = Dir.glob(File.expand_path(File.dirname(__FILE__) + '/../app/models'
   eval(model) rescue nil
 }.find_all{|x| x.respond_to? :delete_all and x.count >= 0 rescue false}
 
-# wipe out the test db, in case some non-transactional tests crapped out before
-# cleaning up after themselves
-ALL_MODELS.each &:delete_all
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition.
 module Spec::DSL::Main
   remove_method :context
 end
+
+def truncate_table(model)
+  case model.connection.adapter_name
+  when "SQLite"
+    model.delete_all
+  else
+    model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
+  end
+end
+
+# wipe out the test db, in case some non-transactional tests crapped out before
+# cleaning up after themselves
+ALL_MODELS.each { |m| truncate_table(m) }
 
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
