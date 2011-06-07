@@ -35,7 +35,7 @@ Rails::Initializer.run do |config|
   # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
   config.time_zone = 'UTC'
 
-  memcache_servers = (YAML.load_file(Rails.root+"config/memcache.yml")[Rails.env] || []) rescue []
+  memcache_servers = File.exists?(Rails.root+"config/memcache.yml") ? (YAML.load_file(Rails.root+"config/memcache.yml")[RAILS_ENV] || []) : []
   if memcache_servers.empty?
     config.cache_store = :nil_store
   else
