@@ -20,13 +20,12 @@ class CourseSection < ActiveRecord::Base
   include Workflow
   include EnrollmentDateRestrictions
   
-  attr_protected :sis_source_id, :sis_batch_id, :course_id, :abstract_course_id,
+  attr_protected :sis_source_id, :sis_batch_id, :course_id,
       :root_account_id, :enrollment_term_id, :sis_cross_listed_section_id, :sis_cross_listed_section_sis_batch_id
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :sis_cross_listed_section
-  belongs_to :abstract_course
   belongs_to :enrollment_term
   belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
@@ -75,11 +74,10 @@ class CourseSection < ActiveRecord::Base
   end
   
   def infer_defaults
-    self.root_account_id ||= (self.course.root_account_id rescue nil) || (self.abstract_course.root_account_id rescue nil) || Account.default.id
+    self.root_account_id ||= (self.course.root_account_id rescue nil) || Account.default.id
     self.assert_course unless self.course
     raise "Course required" unless self.course
-    self.root_account_id = self.course.root_account_id || (self.abstract_course.root_account_id rescue nil) || Account.default.id
-    self.abstract_course_id ||= self.course.abstract_course_id
+    self.root_account_id = self.course.root_account_id || Account.default.id
     # This is messy, and I hate it.
     # The SIS import actually gives us three names for a section
     #   and I don't know which one is best, or which one to show.
@@ -116,7 +114,7 @@ class CourseSection < ActiveRecord::Base
   end
   
   def assert_course
-    self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account, :abstract_course => self.abstract_course)
+    self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account)
   end
   
   def move_to_course(course, delay_jobs = true)

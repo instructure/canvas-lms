@@ -40,9 +40,6 @@ class Account < ActiveRecord::Base
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :learning_outcomes, :as => :context
   has_many :sis_batches
-  has_many :department_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'department_id'
-  has_many :college_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'college_id'
-  has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :authorization_codes, :dependent => :destroy
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user
@@ -463,16 +460,6 @@ class Account < ActiveRecord::Base
   
   def self_and_all_sub_accounts
     @self_and_all_sub_accounts ||= ActiveRecord::Base.connection.select_all("SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id] #(self.all_accounts + [self]).map &:id
-  end
-  
-  def abstract_courses
-    if self.is_a?(Department)
-      self.department_abstract_courses
-    elsif self.is_a?(College)
-      self.college_abstract_courses
-    else
-      self.root_abstract_courses
-    end
   end
   
   def default_time_zone

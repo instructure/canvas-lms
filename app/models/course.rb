@@ -24,11 +24,10 @@ class Course < ActiveRecord::Base
   include Workflow
   include EnrollmentDateRestrictions
 
-  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :abstract_course, :root_account, :storage_quota, :restrict_enrollments_to_course_dates, :grading_standard, :grading_standard_enabled
+  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :root_account, :storage_quota, :restrict_enrollments_to_course_dates, :grading_standard, :grading_standard_enabled
 
   serialize :tab_configuration
   belongs_to :root_account, :class_name => 'Account'
-  belongs_to :abstract_course
   belongs_to :enrollment_term
   belongs_to :grading_standard
   belongs_to :template_course, :class_name => 'Course'
@@ -445,8 +444,6 @@ class Course < ActiveRecord::Base
     self.enrollment_term = nil if self.enrollment_term && self.enrollment_term.root_account_id != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
     self.publish_grades_immediately = true if self.publish_grades_immediately == nil
-    self.abstract_course_id ||= self.course_sections.active.map(&:abstract_course_id).compact.first
-    self.abstract_course_id ||= AbstractCourse.create!(:root_account => self.root_account, :course_code => self.course_code, :name => self.name).id
     self.allow_student_wiki_edits = (self.default_wiki_editing_roles || "").split(',').include?('students')
     true
   end
@@ -1792,7 +1789,6 @@ class Course < ActiveRecord::Base
     new_course.account_id = account.id
     new_course.root_account_id = root_account.id
     new_course.enrollment_term_id = opts[:enrollment_term_id]
-    new_course.abstract_course_id = self.abstract_course_id
     new_course.save!
     if opts[:copy_content]
       new_course.send_later(:merge_into_course, self, :everything => true)
