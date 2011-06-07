@@ -56,7 +56,7 @@ class PseudonymSessionsController < ApplicationController
         end
         if st.is_valid?
           @pseudonym = nil
-          @pseudonym = Pseudonym.find_by_unique_id_and_workflow_state(st.response.user, 'active')
+          @pseudonym = Pseudonym.active.custom_find_by_unique_id(st.response.user)
           if @pseudonym
             # Successful login and we have a user
             PseudonymSession.create!(@pseudonym, false)
@@ -237,7 +237,7 @@ class PseudonymSessionsController < ApplicationController
       if response.is_valid?
         if response.success_status?
           @pseudonym = nil
-          @pseudonym = Pseudonym.find_by_unique_id_and_workflow_state(response.name_id, 'active')
+          @pseudonym = Pseudonym.active.custom_find_by_unique_id(response.name_id)
 
           if @pseudonym
             # We have to reset the session again here -- it's possible to do a
