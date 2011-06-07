@@ -7,11 +7,11 @@ class AccountNotificationsController < ApplicationController
     @notification.user = @current_user
     respond_to do |format|
       if @notification.save
-        flash[:notice] = "Alert successfully created"
+        flash[:notice] = t(:alert_created_notice, "Alert successfully created")
         format.html { redirect_to account_settings_path(@account, :anchor => 'tab-alerts') }
         format.json { render :json => @notification.to_json }
       else
-        flash[:error] = "Alert creation failed"
+        flash[:error] = t(:alert_creation_failed_notice, "Alert creation failed")
         format.html { redirect_to account_settings_path(@account, :anchor => 'tab-alerts') }
         format.json { render :json => @notification.errors.to_json, :status => :bad_request }
       end
@@ -22,7 +22,7 @@ class AccountNotificationsController < ApplicationController
     @notification = @account.account_notifications.find(params[:id])
     @notification.destroy
     respond_to do |format|
-      flash[:message] = "Alert successfully deleted"
+      flash[:message] = t(:alert_deleted_notice, "Alert successfully deleted")
       format.html { redirect_to account_settings_path(@account) }
       format.json { render :json => @notification.to_json }
     end
@@ -32,7 +32,7 @@ class AccountNotificationsController < ApplicationController
   def require_account_admin
     get_context
     if !@account || @account.parent_account_id
-      flash[:notice] = "You cannot create alerts for that account"
+      flash[:notice] = t(:permission_denied_notice, "You cannot create alerts for that account")
       redirect_to account_settings_path(params[:account_id])
       return false
     end
