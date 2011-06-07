@@ -18,6 +18,28 @@
 
 class AbstractCourse < ActiveRecord::Base
 
-  attr_protected
+  include Workflow
+
+  attr_accessible :name, :account, :short_name, :enrollment_term
+  
+  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :account
+  belongs_to :enrollment_term
+  has_many :courses
+
+  workflow do
+    state :active
+    state :deleted
+  end
+  
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    save!
+  end
+  
+  named_scope :active, lambda {
+    { :conditions => ['abstract_courses.workflow_state != ?', 'deleted'] }
+  }
   
 end

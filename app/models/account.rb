@@ -40,6 +40,8 @@ class Account < ActiveRecord::Base
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :learning_outcomes, :as => :context
   has_many :sis_batches
+  has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
+  has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :authorization_codes, :dependent => :destroy
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user

@@ -791,6 +791,7 @@ class CoursesController < ApplicationController
         end
       end
       args[:enrollment_term] ||= @context.enrollment_term
+      args[:abstract_course] = @context.abstract_course
       args[:account] = account
       @course = @context.account.courses.new
       @context.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
