@@ -272,6 +272,7 @@ class GroupsController < ApplicationController
       @groups = @user_groups
     end
     @categories = @categories.sort_by{|c| c == Group.student_organized_category ? 'zzzzzzz' : c }
+    @groups = @groups.sort_by{ |g| [(g.name || '').downcase, g.created_at]  }
     
     if authorized_action(@context, @current_user, :read_roster)
       respond_to do |format|
