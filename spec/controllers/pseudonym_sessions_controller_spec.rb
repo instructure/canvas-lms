@@ -95,4 +95,20 @@ describe PseudonymSessionsController do
     get 'new', :ticket => 'ST-abcd'
     response.should render_template('shared/exit_frame')
   end
+
+  it "should login case insensitively" do
+    account = account_with_cas({:account => Account.default})
+    user = user_with_pseudonym({:active_all => true})
+
+    get 'new'
+    response.should redirect_to(controller.cas_client.add_service_to_login_url(login_url))
+
+    controller.cas_client.should_receive(:validate_service_ticket).and_return { |st|
+      st.response = CASClient::ValidationResponse.new("yes\n#{user.pseudonyms.first.unique_id.capitalize}\n")
+    }
+
+    get 'new', :ticket => 'ST-abcd'
+    response.should redirect_to(dashboard_url)
+    session[:cas_login].should == true
+  end
 end
