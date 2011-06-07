@@ -73,10 +73,14 @@ module Delayed
               end
             end
           else
-            job = find_available(worker_name, 5, max_run_time, queue, min_priority, max_priority).detect do |job|
-              job.lock_exclusively!(max_run_time, worker_name)
+            loop do
+              jobs = find_available(worker_name, 5, max_run_time, queue, min_priority, max_priority)
+              return nil if jobs.empty?
+              job = jobs.detect do |job|
+                job.lock_exclusively!(max_run_time, worker_name)
+              end
+              return job if job
             end
-            job
           end
         end
 
