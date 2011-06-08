@@ -35,7 +35,7 @@ describe "/shared/_login" do
   
   it "should use external forgot password mechanism if specified" do
     @account = Account.default
-    config = @account.build_account_authorization_config
+    config = @account.account_authorization_configs.build
     config.auth_type = 'ldap'
     config.change_password_url = "http://www.instructure.com"
     config.save!
@@ -48,7 +48,7 @@ describe "/shared/_login" do
   
   it "should use default forgot password mechanism if external mechanism specified but it's a canvas_login request" do
     @account = Account.default
-    config = @account.build_account_authorization_config
+    config = @account.account_authorization_configs.build
     config.auth_type = 'ldap'
     config.change_password_url = "http://www.instructure.com"
     config.save!

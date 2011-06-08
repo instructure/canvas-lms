@@ -25,13 +25,13 @@ shared_examples_for "plugins selenium tests" do
     driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_error_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
     Twitter.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_notice_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
     
     settings = Canvas::Plugin.find(:twitter).try(:settings)
@@ -49,13 +49,13 @@ shared_examples_for "plugins selenium tests" do
     driver.find_element(:css, "#settings_domain").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_error_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
     driver.find_element(:css, "#settings_name").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_notice_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
     
     settings = Canvas::Plugin.find(:etherpad).try(:settings)
@@ -75,13 +75,13 @@ shared_examples_for "plugins selenium tests" do
     driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_error_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
     GoogleDocs.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_notice_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
     
     settings = Canvas::Plugin.find(:google_docs).try(:settings)
@@ -101,13 +101,13 @@ shared_examples_for "plugins selenium tests" do
     driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_error_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
     LinkedIn.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_notice_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
     
     settings = Canvas::Plugin.find(:linked_in).try(:settings)
@@ -127,13 +127,13 @@ shared_examples_for "plugins selenium tests" do
     driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_error_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
     ScribdAPI.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_notice_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
     
     settings = Canvas::Plugin.find(:scribd).try(:settings)
@@ -153,13 +153,13 @@ shared_examples_for "plugins selenium tests" do
     driver.find_element(:css, "#settings_secret_key").send_keys("asdf")
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_error_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_error_message").displayed? }
     driver.find_element(:css, "#flash_error_message").text.should match(/There was an error/)
     
     Tinychat.stub(:config_check).and_return(nil)
     driver.find_element(:css, "button.save_button").click
     
-    keep_trying{ driver.find_element(:css, "#flash_notice_message").displayed? }
+    keep_trying_until{ driver.find_element(:css, "#flash_notice_message").displayed? }
     driver.find_element(:css, "#flash_notice_message").text.should match(/successfully updated/)
     
     settings = Canvas::Plugin.find(:tinychat).try(:settings)

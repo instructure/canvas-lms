@@ -19,34 +19,45 @@
 class AccountAuthorizationConfigsController < ApplicationController
   before_filter :require_context, :require_root_account_management
 
-  def show
-    @account_config = @account.account_authorization_config
-    @account_config ||= @account.build_account_authorization_config
+  def index
+    @account_configs = @account.account_authorization_configs.to_a
+    while @account_configs.length < 2
+      @account_configs << @account.account_authorization_configs.new
+    end
     @saml_identifiers = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
-    @accounts = []
   end
 
-  def create
-    @account_config = @account.build_account_authorization_config(params[:account_authorization_config])
-    if @account_config.save
-      render :json => @account_config.to_json
-    else
-      render :json => @account_config.errors.to_json
+  def update_all
+    account_configs_to_delete = @account.account_authorization_configs.to_a.dup
+    account_configs = {}
+    params[:account_authorization_config].sort {|a,b| a[0] <=> b[0] }.each do |idx, data|
+      id = data.delete :id
+      disabled = data.delete :disabled
+      next if disabled == '1'
+
+      result = if id.to_i == 0
+        account_config = @account.account_authorization_configs.build(data)
+        account_config.save
+      else
+        account_config = @account.account_authorization_configs.find(id)
+        account_configs_to_delete.delete(account_config)
+        account_config.update_attributes(data)
+      end
+
+      if result
+        account_configs[account_config.id] = account_config
+      else
+        return render :json => account_config.errors.to_json
+      end
     end
+    account_configs_to_delete.map(&:destroy)
+    render :json => account_configs.to_json
   end
 
-  def update
-    @account_config = @account.account_authorization_config
-    if @account_config.update_attributes(params[:account_authorization_config])
-      render :json => @account_config.to_json
-    else
-      render :json => @@account_config.errors.to_json
+  def destroy_all
+    @account.account_authorization_configs.each do |c|
+      c.destroy
     end
-  end
-
-  def destroy
-    @account_config = @account.account_authorization_config
-    @account_config.destroy
-    redirect_to :account_account_authorization_config
+    redirect_to :account_account_authorization_configs
   end
 end

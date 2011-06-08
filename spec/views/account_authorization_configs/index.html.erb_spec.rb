@@ -19,14 +19,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "account_authorization_configs/show" do
+describe "account_authorization_configs/index" do
   it "should list the auth ips" do
     Setting.set('account_authorization_config_ip_addresses', "192.168.0.1,192.168.0.2")
     assigns[:context] = assigns[:account] = Account.default
-    assigns[:account_config] = Account.default.build_account_authorization_config
+    assigns[:account_configs] = [ Account.default.account_authorization_configs.build,
+                                  Account.default.account_authorization_configs.build ]
     assigns[:current_user] = user_model
     assigns[:saml_identifiers] = []
-    render 'account_authorization_configs/show'
+    render 'account_authorization_configs/index'
     response.body.should match("192.168.0.1\n192.168.0.2")
   end
 end

@@ -64,7 +64,7 @@ Spec::Runner.configure do |config|
     config.auth_type = "cas"
     config.auth_base = cas_url
     config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
-    account.account_authorization_config = config
+    account.account_authorization_configs << config
     account
   end
 

@@ -59,7 +59,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_one :account_authorization_config
+  has_many :account_authorization_configs, :order => 'id'
   has_many :account_reports
   has_many :grading_standards, :as => :context
   
@@ -455,6 +455,13 @@ class Account < ActiveRecord::Base
     result = account_users.any?{|e| e.has_permission_to?(permission) }
   end
   
+  def account_authorization_config
+    # We support multiple auth configs per account, but several places we assume there is only one.
+    # This is for compatibility with those areas. TODO: migrate everything to supporting multiple
+    # auth configs
+    self.account_authorization_configs.first
+  end
+  
   def login_handle_name
     self.account_authorization_config && self.account_authorization_config.login_handle_name ? 
       self.account_authorization_config.login_handle_name :
@@ -793,7 +800,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
       tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id && manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil? && manage_settings
+      tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
       tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
     end
     tabs << { :id => TAB_SETTINGS, :label => "Settings", :href => :account_settings_path }
