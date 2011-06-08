@@ -133,19 +133,8 @@ module Turnitin
       object_ids = []
       if submission.submission_type == 'online_upload'
         attachments = submission.attachments.select{|a| a.turnitinable? }
-        data = StringIO.new()
         attachments.each do |a|
-          res = nil
-          Tempfile.open(a.display_name) do |tempfile|
-            file = File.open(tempfile.path, 'wb')
-            AWS::S3::S3Object.stream(a.full_filename, a.bucket_name) do |chunk|
-             file.write chunk
-            end
-            file.close
-            file = File.open(tempfile.path, 'rb')
-            res = sendRequest(:submit_paper, '2', :post => true, :utp => '1', :ptl => a.display_name, :pdata => file, :ptype => "2", :user => student, :course => course, :assignment => assignment, :tem => email(course))
-            file.close
-          end
+          res = sendRequest(:submit_paper, '2', :post => true, :utp => '1', :ptl => a.display_name, :pdata => a.open(), :ptype => "2", :user => student, :course => course, :assignment => assignment, :tem => email(course))
           object_id = res.css("objectID")[0].content rescue nil
           if object_id
             submission.turnitin_data[a.asset_string] = {:object_id => object_id}
