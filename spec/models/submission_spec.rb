@@ -21,17 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Submission do
   before(:each) do
     @user = factory_with_protected_attributes(User, :name => "some student", :workflow_state => "registered")
-    # @user = mock_model(User)
-    # @user.stub!(:id).and_return(1)
     @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
     @context.enroll_student(@user)
-    # @context = mock("context")
-    # @context.stub!(:students).and_return([@user])
     @assignment = @context.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
     @assignment.save
-    # @assignment = mock_model(Assignment)
-    # @assignment.stub!(:context).and_return(@context)
     @valid_attributes = {
       :assignment_id => @assignment.id,
       :user_id => @user.id,
@@ -199,7 +193,6 @@ describe Submission do
       s.errors.first.to_s.should match(/not a valid URL/)
     end
   end
-  
 end
 
 def submission_spec_model(opts={})
