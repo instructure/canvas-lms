@@ -324,6 +324,12 @@ module TextHelper
     res && res.html_safe
   end
 
+  def self.make_subject_reply_to(subject)
+    blank_re = I18n.t('#subject_reply_to', "Re: %{subject}", :subject => '')
+    return subject if subject.starts_with?(blank_re)
+    I18n.t('#subject_reply_to', "Re: %{subject}", :subject => subject)
+  end
+
   class MarkdownSafeBuffer < String; end
   # use this to flag interpolated parameters as markdown-safe (see
   # mt below) so they get eval'ed rather than escaped, e.g.

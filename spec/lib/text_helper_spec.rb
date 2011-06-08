@@ -169,6 +169,11 @@ describe TextHelper do
     end
   end
 
+  it "should insert reply to into subject" do
+    TextHelper.make_subject_reply_to('ohai').should == 'Re: ohai'
+    TextHelper.make_subject_reply_to('Re: ohai').should == 'Re: ohai'
+  end
+
   context "markdown" do
     context "safety" do
       it "should escape Strings correctly" do
