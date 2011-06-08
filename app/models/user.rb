@@ -1410,10 +1410,14 @@ class User < ActiveRecord::Base
     Array(self.cached_contexts).map(&:asset_string)
   end
   
-  def courses_name_like(query="")
-    Course.manageable_by_user(self.id).name_like(query).limit(50)
+  def manageable_courses
+    Course.manageable_by_user(self.id)
   end
-  memoize :courses_name_like
+
+  def manageable_courses_name_like(query="")
+    self.manageable_courses.name_like(query).limit(50)
+  end
+  memoize :manageable_courses_name_like
   
   def last_completed_module
     self.context_module_progressions.select{|p| p.completed? }.sort_by{|p| p.completed_at || p.created_at }.last.context_module rescue nil

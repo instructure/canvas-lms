@@ -326,10 +326,16 @@ class Course < ActiveRecord::Base
     {:order => 'updated_at', :limit => limit }
   }
   named_scope :manageable_by_user, lambda{|user_id|
-    {
-      :joins => {:teacher_enrollments => {}, :course_account_associations => :account_users},
-      :conditions => ["enrollments.user_id = ? OR account_users.user_id = ?", user_id, user_id],
-      :select => "DISTINCT courses.id, courses.name"
+    { :select => 'DISTINCT courses.*',
+      :joins => "INNER JOIN (
+         SELECT caa.course_id, au.user_id FROM course_account_associations AS caa
+         INNER JOIN accounts AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
+         INNER JOIN account_users AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
+       UNION SELECT courses.id AS course_id, e.user_id FROM courses
+         INNER JOIN enrollments AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
+           AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment')
+         WHERE courses.workflow_state NOT IN ('aborted', 'deleted')) as course_users
+       ON course_users.course_id = courses.id"
     }
   }
   named_scope :not_deleted, {:conditions => ['workflow_state != ?', 'deleted']}
