@@ -291,6 +291,17 @@ shared_examples_for 'a backend' do
     end
   end
 
+  context "on hold" do
+    it "should hold/unhold jobs" do
+      job1 = create_job()
+      job1.hold!
+      @backend.get_and_lock_next_available('w1', 60).should be_nil
+
+      job1.unhold!
+      @backend.get_and_lock_next_available('w1', 60).should == job1
+    end
+  end
+
   context "periodic jobs" do
     before(:each) do
       Delayed::Periodic.scheduled = {}
