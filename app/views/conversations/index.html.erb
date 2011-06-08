@@ -1,0 +1,100 @@
+<% content_for :page_title, t(:page_title, "Messages") %>
+
+<% jammit_js :messages %>
+<% jammit_css :messages %>
+
+<div id="actions">
+  <ul class="buttons">
+    <% unless @disallow_messages %>
+    <li><a href="#" id="action_compose_message" title="<%= t('titles.compose_new_message', 'Write a new message') %>" style="background-image: url(/images/messages/compose-icon-sprite.png)"><%= t('links.compose_new_message', 'New Message') %></a></li>
+    <% end %>
+  </ul>
+  <ul class="menus">
+    <li><a href="#" id="menu_views" class="<%= @scope %>"><%= @view_name %></a>
+      <span></span>
+      <div>
+        <ul class="first">
+          <li><b><%= t(:inbox_view, "VIEW") %></b></li>
+        </ul>
+        <ul class="last">
+          <li class="<%= 'checked' if @scope == :inbox %>"><%= link_to t('inbox_views.inbox', "Inbox"), conversations_url %></li>
+          <li class="<%= 'checked' if @scope == :unread %>"><%= link_to t('inbox_views.unread_messages', "Unread"), messages_unread_url %></li>
+          <li class="<%= 'checked' if @scope == :archived %>"><%= link_to t('inbox_views.archived_messages', "Archived"), messages_archived_url %></li>
+        </ul>
+      </div>
+    </li>
+    <li><a href="#" id="menu_actions" class="disabled"><%= t(:inbox_actions_description, "Actions") %></a>
+      <span></span>
+      <div>
+        <ul>
+          <li><%= link_to t('inbox_actions.mark_as_unread', "Mark as Unread"), conversation_mark_as_unread_url('{{ id }}'), :id => :action_mark_as_unread %></li>
+          <li><%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_mark_as_read_url('{{ id }}'), :id => :action_mark_as_read %></li>
+          <li><%= link_to t('inbox_actions.mark_all_as_read', "Mark All as Read"), messages_mark_all_as_read_url, :id => :action_mark_all_as_read %></li>
+          <li><%= link_to t('inbox_actions.forward', "Forward..."), {}, :id => :action_forward %></li>
+        </ul>
+        <ul>
+          <li><%= link_to t('inbox_actions.add_people', "Add People..."), conversation_add_recipients_url('{{ id }}'), :id => :action_add_recipients %></li>
+          <li><%= link_to t('inbox_actions.unsubscribe', "Unsubscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 0}), :id => :action_unsubscribe %></li>
+          <li><%= link_to t('inbox_actions.subscribe', "Subscribe"), conversation_url('{{ id }}', :conversation => {:subscribed => 1}), :id => :action_subscribe %></li>
+        </ul>
+        <ul>
+          <li><%= link_to t('inbox_actions.archive', "Archive"), conversation_archive_url('{{ id }}'), :id => :action_archive %></li>
+          <li><%= link_to t('inbox_actions.unarchive', "Unarchive"), conversation_unarchive_url('{{ id }}'), :id => :action_unarchive %></li>
+          <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_remove_messages_url('{{ id }}'), :id => :action_delete %></li>
+          <li><%= link_to t('inbox_actions.delete', "Delete"), conversation_url('{{ id }}'), :id => :action_delete_all %></li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+</div>
+<div id="inbox">
+  <div id="inbox_content">
+    <div id="conversations">
+      <ul class="messages">
+      </ul>
+      <p id="no_messages" style="<%= hidden %>">
+        <%= @no_messages %>
+      </p>
+    </div>
+    <div id="messages">
+      <% form_tag conversations_url, :id => 'create_message_form' do %>
+        <ul class="messages">
+          <li>
+            <span class="audience"><%= t('headings.new_message', 'New Message') %></span>
+          </li>
+        </ul>
+        <table>
+          <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients %></td></tr>
+          <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
+        </table>
+        <div style="text-align:right">
+          <button type="submit" class="button"><%= t('buttons.send_message', 'Send') %></button>
+        </div>
+      <% end %>
+      <ul class="messages">
+      </ul>
+    </div>
+  </div>
+</div>
+<ul style="display:none">
+  <li id="conversation_blank">
+    <span class="audience"></span>
+    <span class="date"></span>
+    <p></p>
+    <a href="<%= conversation_url('{{ id }}') %>" add_url="<%= conversation_add_message_url('{{ id }}') %>"><%= t :read_more, "more..." %></a>
+  </li>
+  <li id="message_blank">
+    <b class="audience"></b>
+    <span class="date"></span>
+    <p></p>
+  </li>
+</ul>
+
+
+<% js_block do %>
+  <script type="text/javascript">
+    MessageInbox.user_cache = <%= raw({@current_user.id => {:id => @current_user.id, :name => @current_user.short_name, :html_name => h(@current_user.short_name), :avatar => avatar_url_for_user(@current_user)}}.to_json) %>;
+    MessageInbox.contexts = <%= raw @contexts.to_json %>;
+    MessageInbox.initial_conversations = <%= raw @conversations.to_json %>;
+  </script>
+<% end %>

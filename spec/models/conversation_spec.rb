@@ -62,7 +62,7 @@ describe Conversation do
       convo = new_guy.conversations.first
       convo.unread?.should be_true
       convo.messages.size.should == 2 # the test message plus a "user was added" message
-      convo.participants.size.should == 3
+      convo.participants.size.should == 2 # doesn't include user, just the other people
     end
 
     it "should not re-add existing participants to group conversations" do

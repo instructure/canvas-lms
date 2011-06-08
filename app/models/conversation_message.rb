@@ -18,6 +18,11 @@
 
 class ConversationMessage < ActiveRecord::Base
   belongs_to :conversation
+  belongs_to :author, :class_name => 'User'
   has_many :conversation_message_participants
+  has_many :attachments, :as => :context
+  has_many :media_objects, :as => :context
   attr_accessible
+
+  validates_length_of :body, :maximum => maximum_text_length
 end

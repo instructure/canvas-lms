@@ -1,0 +1,262 @@
+@import environment.sass
+#inbox
+  margin: 0 -1em -1em
+  background: #ebebeb
+  overflow: hidden
+#inbox_content
+  border-right: 1px solid #ddd
+  background: #fff
+  width: 50%
+#actions
+  background: #4a4b4d url(/images/messages/actions-bg.png) repeat-x top left
+  margin: -1em -1em 0 -1em
+  padding: 0
+  height: 53px
+  ul, li
+    margin: 0
+    padding: 0
+    list-style: none
+  .buttons
+    margin: 16px 0 0 13px
+    float: left
+    a
+      background-position: 0 0
+      width: 26px
+      height: 26px
+      overflow: hidden
+      display: block
+      text-indent: -1000em
+    a:hover
+      background-position: -26px 0
+    a.active
+      background-position: -52px 0
+    
+  border-bottom: 1px solid #898989
+  .menus
+    font-size: 0.9em
+    float: right
+    margin-right: 16px
+    > li
+      float: left
+      position: relative
+      z-index: 3
+      margin: 14px 8px 0 0
+      > a
+        display: block
+        background-color: transparent !important
+        background-image: url(/images/messages/button-sprite.png) !important
+        border: none !important
+        color: #525252
+        width: 124px
+        height: 28px
+        text-indent: 18px
+        line-height: 28px
+        font-size: 12px
+        text-decoration: none
+        font-weight: bold
+        text-shadow: 0px 1px 1px #fff
+      > a.disabled
+        background-position: 0 0 !important
+        color: #bbb
+      div
+        display: none
+    > li:hover
+      > a
+        background-position: 0 -28px
+    > li.selected
+      > a
+        text-shadow: 0px 1px 1px #ddd
+        background-position: 0 -56px
+      > span
+        display: block
+        position: absolute
+        background: transparent url(/images/messages/menu-top.png) 0 0 no-repeat
+        width: 20px
+        height: 11px
+        left: 50px
+        top: 24px
+        z-index: 1
+      div
+        left: 50%
+        cursor: default
+        top: 34px
+        position: absolute
+        display: block
+        background-color: #e6e7e9
+        border: 1px solid #b0afaf
+        +border-radius(10px)
+        +box-shadow( rgba(0,0,0,0.1), 0, 0, 6px, 3px)
+        padding: 8px 0
+        ul
+          border-bottom: 1px solid #d4d5d7
+          border-top: 1px solid #f2f2f3
+          margin: 0 1px
+          padding: 4px 0
+        ul.first
+          border-top: none
+        ul.last
+          border-bottom: none
+        li.checked
+          background: transparent url(/images/messages/menu-checked.png) 7px 6px no-repeat
+        li
+          margin: 0 -1px
+          padding: 0
+          color: #7d7d7d
+          a, b
+            padding: 2px 22px 2px 22px
+            white-space: pre
+            font-weight: bold
+            text-shadow: 0px 1px 1px #f0f1f2
+            display: block
+          a
+            text-decoration: none
+            color: #525252
+          a:hover
+            background: #05a5e9
+            color: #fff
+            text-shadow: 0px 1px 1px #0276aa
+      
+ul.messages
+  background-color: #fff
+  list-style: none
+  margin: 0
+  padding: 0
+  li
+    font-size: 0.9em
+    margin: 0
+    padding: 13px 18px 13px 86px
+    border-top: 1px solid #fff
+    border-bottom: 1px solid #ddd
+    position: relative
+    a
+      display: none
+    p
+      margin: 0
+      min-height: 30px
+    img.avatar
+      width: 50px
+      height: 50px
+      position: absolute
+      left: 18px
+      top: 13px
+    span.date
+      color: #2571bd
+      position: absolute
+      right: 18px
+      top: 13px
+      font-size: 1.1em
+    span.others
+      cursor: pointer
+      color: #2571bd
+      ul
+        cursor: auto
+        z-index: 4
+        background: #fff
+        border: 1px solid #ddd
+        padding: 0.5em
+        display: none
+        position: absolute
+        max-height: 120px
+        overflow: auto
+        list-style: none
+        +border-radius(10px)
+        +box-shadow( rgba(0,0,0,0.1), 0, 3px, 6px, 0)
+        li
+          padding: 0 1em
+          border: none
+          color: #000
+  li.selected
+    background: #f4fbff url(/images/messages/selected.png) repeat-x 0 0
+  li.selected.inactive
+    background: #f2f3f3 url(/images/messages/selected-inactive.png) repeat-x 0 0
+  .audience
+    color: #222
+    font-size: 1.2em
+    text-decoration: none
+    em
+      padding-left: 0.25em
+      font-size: 0.7em
+      color: #777
+      font-weight: bold
+      font-style: normal
+
+#messages
+  width: 100%
+  float: left
+  margin: 0 -101% 6px 0
+  padding: 0 0 6px 1px
+  overflow: hidden
+  > ul
+    border-left: 1px solid #ddd
+    display: none
+    position: relative
+    z-index: 1
+    padding: 6px 0 0 0
+    margin: 0 0 -6px -1px
+    .audience
+      color: #636363
+#conversations
+  background: #fff
+  margin: 0 -1px 0 0
+  padding: 0
+  width: 100%
+  border-right: 1px solid #ddd
+  position: relative
+  z-index: 2
+  float: left
+  min-height: 370px
+  +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
+  #no_messages
+    margin: 2em 1em
+    text-align: center
+  ul.messages
+    > li
+      color: #636363
+      .audience
+        color: #222
+      i.flag_last_author:before
+        content: "⇽"
+    > li.unread
+      color: #000
+      a.audience
+        font-weight: bold
+        color: #2571bd
+    > li:hover
+      cursor: pointer
+#message_blank
+  display: none
+#create_message_form
+  display: none
+  position: relative
+  z-index: 2
+  background: #fff
+  margin: 0
+  padding: 1em
+  border-bottom: 1px solid #ddd
+  ul.messages
+    display: block
+    border: 0
+    padding: 0
+    margin: 0
+    > li
+      padding: 0
+      border: 0
+  +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
+  table
+    margin-top: 0.5em
+    width: 100%
+    padding: 0
+    border-collapse: collapse
+    td, th
+      vertical-align: top
+    td
+      width: 100%
+      padding: 0 1.5em 0 4px
+    th
+      text-align: right
+      padding: 0 4px 0 1.5em
+      color: #2571bd
+  input
+    width: 100%
+  textarea
+    width: 100%

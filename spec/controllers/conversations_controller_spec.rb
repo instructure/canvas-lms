@@ -45,7 +45,7 @@ describe ConversationsController do
 
       get 'index'
       response.should be_success
-      assigns[:conversations].should == @user.conversations
+      assigns[:conversations].map{|c|c[:id]}.should == @user.conversations.map(&:id)
     end
   end
 
@@ -102,9 +102,9 @@ describe ConversationsController do
       enrollment = @course.enroll_student(new_user)
       enrollment.workflow_state = 'active'
       enrollment.save
-      post 'add_recipients', :conversation_id => @conversation.id, :users => [new_user.id]
+      post 'add_recipients', :conversation_id => @conversation.id, :users => [new_user.id.to_s]
       response.should be_success
-      @conversation.participants.size.should == 4
+      @conversation.participants.size.should == 3 # doesn't include @user
     end
   end
 
@@ -113,7 +113,7 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       message = conversation.add_message('another')
 
-      post 'remove_messages', :conversation_id => @conversation.id, :remove => [message.id]
+      post 'remove_messages', :conversation_id => @conversation.id, :remove => [message.id.to_s]
       response.should be_success
       @conversation.messages.size.should == 1
     end

@@ -1501,6 +1501,9 @@ class User < ActiveRecord::Base
     Conversation.initiate([self.id] + user_ids, private).conversation_participants.find_by_user_id(self.id)
   end
 
+  
+  MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source']
+  MESSAGEABLE_USER_COLUMN_SQL = "users." + (MESSAGEABLE_USER_COLUMNS.join(", users."))
   def messageable_users(options = {})
     course_ids = courses.active.map(&:id)
     group_ids = groups.active.map(&:id)
@@ -1512,15 +1515,15 @@ class User < ActiveRecord::Base
       group_ids &= [$1.to_i]
       course_ids = []
     end
-    return [] unless course_ids.present? || group_ids.present?
+    return [] if course_ids.empty? && group_ids.empty? && !options[:ids]
 
     user_condition_sql = "users.id <> #{self.id}"
     user_condition_sql << " AND users.id IN (#{options[:ids].join(', ')})" if options[:ids]
-    user_condition_sql << " AND #{wildcard('users.name', options[:search])}" if options[:search]
+    user_condition_sql << " AND #{wildcard('users.name', 'users.short_name', options[:search])}" if options[:search]
     user_sql = []
 
     user_sql << <<-SQL if course_ids.present?
-      SELECT users.id, users.name, users.sortable_name, course_id, null as group_id
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, null AS group_id
       FROM users, enrollments, courses
       WHERE course_id IN (#{course_ids.join(',')}) AND users.id = user_id AND courses.id = course_id
         AND #{self.class.reflections[:current_enrollments].options[:conditions]}
@@ -1528,22 +1531,32 @@ class User < ActiveRecord::Base
     SQL
 
     user_sql << <<-SQL if group_ids.present?
-      SELECT users.id, users.name, users.sortable_name, null, group_id
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, group_id
       FROM users, group_memberships
       WHERE group_id IN (#{group_ids.join(',')}) AND users.id = user_id
         AND #{user_condition_sql}
     SQL
 
-    User.find_by_sql <<-SQL
-      SELECT id, name, sortable_name,
-        #{connection.func(:group_concat, :course_id)} AS courses,
-        #{connection.func(:group_concat, :group_id)} AS groups
+    user_sql << <<-SQL if options[:ids]
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+      FROM users
+      WHERE #{user_condition_sql}
+    SQL
+
+    users = User.find_by_sql(<<-SQL)
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL},
+        #{connection.func(:group_concat, :course_id)} AS common_course_ids,
+        #{connection.func(:group_concat, :group_id)} AS common_group_ids
       FROM (
         #{user_sql.join(' UNION ')}
       ) users
-      GROUP BY #{connection.group_by('id', 'name', 'sortable_name')}
-      ORDER BY sortable_name
+      GROUP BY #{connection.group_by(*MESSAGEABLE_USER_COLUMNS)}
+      ORDER BY short_name
     SQL
+    users.each do |user|
+      user.common_course_ids = user.common_course_ids.to_s.split(",").map(&:to_i)
+      user.common_group_ids = user.common_group_ids.to_s.split(",").map(&:to_i)
+    end
   end
 
   # association with dynamic, filtered join condition for submissions.

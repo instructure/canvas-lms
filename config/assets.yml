@@ -214,6 +214,9 @@ javascripts:
   conferences:
     - public/javascripts/conferences.js
     - public/javascripts/translations/conferences.js
+  messages:
+    - public/javascripts/compiled/messages.js
+    - public/javascripts/jquery.elastic.js
 
 stylesheets:
   common:
@@ -312,3 +315,5 @@ stylesheets:
     - public/stylesheets/compiled/external_tools.css
   select_content_dialog:
     - public/stylesheets/compiled/select_content_dialog.css
+  messages:
+    - public/stylesheets/compiled/messages.css
