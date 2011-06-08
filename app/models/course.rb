@@ -1664,6 +1664,10 @@ class Course < ActiveRecord::Base
       wiki_namespace.wiki.wiki_pages.each do |page|
         course_import.tick(70) if course_import
         if bool_res(options[:everything] ) || bool_res(options[:all_wiki_pages] ) || bool_res(options[page.asset_string.to_sym] )
+          if page.title.blank?
+            next if page.body.blank?
+            page.title = "Unnamed Page"
+          end
           new_page = page.clone_for(self, nil, :migrate => false, :old_context => course)
           added_items << new_page
           new_page.wiki_id = self.wiki.id
