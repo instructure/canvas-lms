@@ -18,7 +18,7 @@ shared_examples_for "equation editor selenium tests" do
 
     def save_question_and_wait(question)
       question.find_element(:css, "button[type='submit']").click
-      keep_trying { question.find_element(:css, ".loading_image_holder").nil? rescue true }
+      keep_trying_until { question.find_element(:css, ".loading_image_holder").nil? rescue true }
     end
     
     new_question_link = driver.find_element(:link, "New Question")

@@ -395,7 +395,9 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :announcements
     account.resources :assignments
     account.resources :submissions
-    account.resource :account_authorization_config
+    account.resources :account_authorization_configs
+    account.update_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'update_all', :conditions => {:method => :put}
+    account.remove_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'destroy_all', :conditions => {:method => :delete}
     account.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end

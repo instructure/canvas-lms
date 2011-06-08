@@ -328,9 +328,13 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def ldap_bind_result(password_plaintext)
-    ldap = self.account.account_authorization_config.ldap_connection
-    filter = self.account.account_authorization_config.ldap_filter(self.unique_id)
-    ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
+    self.account.account_authorization_configs.each do |config|
+      ldap = config.ldap_connection
+      filter = config.ldap_filter(self.unique_id)
+      res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
+      return res if res
+    end
+    nil
   end
   
   def ldap_channel_to_possibly_merge(password_plaintext)

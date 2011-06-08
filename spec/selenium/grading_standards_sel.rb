@@ -14,12 +14,12 @@ shared_examples_for "grading standards selenium tests" do
     standard.find_elements(:css, ".delete_row_link").select(&:displayed?).each_with_index do |link, i|
       if i % 2 == 1
         link.click
-        keep_trying { !link.displayed? }
+        keep_trying_until { !link.displayed? }
       end
     end
     standard.find_element(:css, "input.scheme_name").send_keys("New Standard")
     standard.find_element(:css, ".save_button").click
-    keep_trying { !standard.attribute(:class).match(/editing/) }
+    keep_trying_until { !standard.attribute(:class).match(/editing/) }
     standard.find_elements(:css, ".grading_standard_row").select(&:displayed?).length.should eql(6)
     standard.find_element(:css, ".standard_title .title").text.should eql("New Standard")
     
@@ -27,7 +27,7 @@ shared_examples_for "grading standards selenium tests" do
     standard.find_element(:css, ".delete_grading_standard_link").click
     driver.switch_to.alert.accept
     driver.switch_to.default_content
-    keep_trying { !(driver.find_element(:css, "##{id}") rescue nil) }
+    keep_trying_until { !(driver.find_element(:css, "##{id}") rescue nil) }
   end
   
   it "should allow setting a grading standard for an assignment" do
@@ -49,7 +49,7 @@ shared_examples_for "grading standards selenium tests" do
     dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map{|e| e.find_element(:css, ".name").text }.should eql(["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"])
     
     dialog.find_element(:css, ".find_grading_standard_link").click
-    keep_trying { driver.find_element(:css, ".find_grading_standard").attribute(:class).match(/loaded/) }
+    keep_trying_until { driver.find_element(:css, ".find_grading_standard").attribute(:class).match(/loaded/) }
     dialog.find_element(:css, ".find_grading_standard").displayed?.should be_true
     dialog.find_element(:css, ".display_grading_standard").displayed?.should be_false
     dialog.find_element(:css, ".cancel_find_grading_standard_link").click
@@ -86,7 +86,7 @@ shared_examples_for "grading standards selenium tests" do
     dialog.find_elements(:css, ".grading_standard_row").select(&:displayed?).map{|e| e.find_element(:css, ".name").text }.should eql(["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"])
     
     dialog.find_element(:css, ".find_grading_standard_link").click
-    keep_trying { driver.find_element(:css, ".find_grading_standard").attribute(:class).match(/loaded/) }
+    keep_trying_until { driver.find_element(:css, ".find_grading_standard").attribute(:class).match(/loaded/) }
     dialog.find_elements(:css, ".grading_standard_select .title")[-1].text.should eql(@standard.title)
     dialog.find_elements(:css, ".grading_standard_select")[-1].click
     dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}").displayed?.should be_true
@@ -99,7 +99,7 @@ shared_examples_for "grading standards selenium tests" do
     dialog.find_element(:css, ".remove_grading_standard_link").click
     driver.switch_to.alert.accept
     driver.switch_to.default_content
-    keep_trying { !dialog.displayed? }
+    keep_trying_until { !dialog.displayed? }
     
     form.find_element(:css, "#course_grading_standard_enabled").attribute(:checked).should be_nil
   end

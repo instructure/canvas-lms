@@ -9,7 +9,7 @@ shared_examples_for "quiz selenium tests" do
     get "/courses/#{@course.id}/quizzes/new"
 
     driver.find_element(:css, ".add_question .add_question_link").click
-    keep_trying{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    keep_trying_until{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
     holder = driver.find_element(:css, "#questions .question_holder")
     holder.should be_displayed
     holder.find_element(:css, ".cancel_link").click
@@ -24,7 +24,7 @@ shared_examples_for "quiz selenium tests" do
     driver.find_elements(:css, "#question_form_template option.missing_word").length.should == 1
 
     driver.find_element(:css, ".add_question .add_question_link").click
-    keep_trying{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    keep_trying_until{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
     driver.find_elements(:css, "#questions .question_holder option.missing_word").length.should == 0
   end
   
@@ -44,7 +44,7 @@ shared_examples_for "quiz selenium tests" do
     
     def save_question_and_wait(question)
       question.find_element(:css, "button[type='submit']").click
-      keep_trying { question.find_element(:css, ".loading_image_holder").nil? rescue true }
+      keep_trying_until { question.find_element(:css, ".loading_image_holder").nil? rescue true }
     end
     
     def replace_content(el, value)
@@ -212,7 +212,7 @@ shared_examples_for "quiz selenium tests" do
     find_questions_link.click
     driver.find_element(:link, "Select All").click
     find_with_jquery("div#find_question_dialog button.submit_button").click
-    keep_trying { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
+    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
 end
 

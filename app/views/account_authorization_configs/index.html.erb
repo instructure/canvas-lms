@@ -12,9 +12,9 @@
 
 <% content_for :right_side do %>
     <div class="rs-margin-lr rs-margin-top">
-        <%  has_auth = !@account_config.auth_type.nil? %>
+        <%  has_auth = !@account_configs.first.auth_type.nil? %>
         <a href="#" class="edit_auth_link button button-sidebar-wide" style="<%= hidden unless has_auth %>"><%= image_tag "edit.png" %>Edit Details</a>
-        <%= link_to image_tag("delete.png") + 'Remove Authentication', context_url(@account, :context_account_authorization_config_url, @account.id), :confirm => 'Are you sure? Users may not be able to log in if this is removed.', :method => :delete, :class=>"delete_auth_link button button-sidebar-wide", :style => "#{ hidden unless has_auth}" %>
+        <%= link_to image_tag("delete.png") + 'Remove Authentication', context_url(@account, :context_remove_all_authorization_configs_url), :confirm => 'Are you sure? Users may not be able to log in if this is removed.', :method => :delete, :class=>"delete_auth_link button button-sidebar-wide", :style => "#{ hidden unless has_auth}" %>
         <div class="add_auth_div" style="<%= hidden if has_auth %>">
           <span class="add">Add an identity provider to this account:</span><br/>
           <%= select("", "", [[:CAS, 'cas'], [:LDAP, 'ldap'], [:SAML, 'saml']],{:include_blank=>"Choose an authentication service"}, :id => "add_auth_select") %>
@@ -29,7 +29,7 @@
   the user must have a login identifier that is both linked to this account and 
   that matches the unique identifier returned by the IdP. To see a user's current
   logins, see the "Login Information" section on the user's profile page. (Found
-  by searching for the user on the "Users" tab)<br/> 
+  by searching for the user on the "Users" tab.)<br/> 
   For example, here is your profile page: 
   <%= link_to(@current_user.last_name_first_or_unnamed, context_url(@account, :context_user_url, @current_user)) %>
 </p>
@@ -55,7 +55,7 @@
 <%= render :partial => "cas_settings" %>
 <%= render :partial => "ldap_settings" %>
 <%= render :partial => "saml_settings" %>
-<% unless @account_config.auth_type %>
+<% unless @account_configs.first.auth_type %>
     <div id="no_auth">This account does not currently integrate with an identity provider.</div>
 <% end %>
 
@@ -78,6 +78,9 @@
     }
     #cas_div.active, #ldap_div.active, #saml_div.active {
         display: block;
+    }
+    #auth_form .ldap_secondary {
+      margin-top: 15px;
     }
 </style>
 
@@ -120,18 +123,26 @@
       
       $(this).formSubmit({
         beforeSubmit: function() {
-          $(this).loadingImage().removeClass('editing');
+         $(this).loadingImage();
         },
         success: function(data) {
-          $(this).loadingImage('remove');
-          var aac = data.account_authorization_config;
-          $("#auth_form").fillTemplateData({data: aac});
-          $(".edit_auth_link").show();
-          $(".delete_auth_link").show();
-          $(".add_auth_div").hide();
-          new_type = null;
+          window.location.reload();
         }
       });
+  });
+  
+  $(".add_secondary_ldap_link").click(function(event) {
+    event.preventDefault();
+    $(".ldap_secondary").show();
+    $("#secondary_ldap_config_disabled").val("0");
+    $(this).hide();
+  });
+  
+  $(".remove_secondary_ldap_link").click(function(event) {
+    event.preventDefault();
+    $(".ldap_secondary").hide();
+    $("#secondary_ldap_config_disabled").val("1");
+    $(".add_secondary_ldap_link").show();
   });
   
 </script>

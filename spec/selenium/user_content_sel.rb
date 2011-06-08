@@ -13,7 +13,7 @@ shared_examples_for "user_content selenium tests" do
     uri = nil
     name = driver.find_elements(:class_name, "user_content_iframe").first.attribute('name')
     driver.switch_to.frame(name)
-    keep_trying {
+    keep_trying_until {
       driver.current_url.should match("/object_snippet")
     }
     html = Nokogiri::HTML(driver.page_source)
@@ -26,11 +26,11 @@ shared_examples_for "user_content selenium tests" do
     e = factory_with_protected_attributes(CalendarEvent, :context => @course, :title => "super fun party", :description => message_body, :start_at => 5.minutes.ago, :end_at => 5.minutes.from_now)
     get "/calendar"
     driver.find_elements(:class_name, "user_content_iframe").size.should == 0
-    event_el = keep_trying { driver.find_element(:id, "event_calendar_event_#{e.id}") }
+    event_el = keep_trying_until { driver.find_element(:id, "event_calendar_event_#{e.id}") }
     event_el.find_element(:tag_name, 'a').click
-    name = keep_trying { driver.find_elements(:class_name, "user_content_iframe").first.attribute('name') }
+    name = keep_trying_until { driver.find_elements(:class_name, "user_content_iframe").first.attribute('name') }
     driver.switch_to.frame(name)
-    keep_trying {
+    keep_trying_until {
       driver.current_url.should match("/object_snippet")
     }
     html = Nokogiri::HTML(driver.page_source)

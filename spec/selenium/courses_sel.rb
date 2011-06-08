@@ -9,7 +9,7 @@ shared_examples_for "course selenium tests" do
     get "/getting_started?fresh=1"
     driver.find_element(:css, ".save_button").click
     wizard_box = driver.find_element(:id, "wizard_box")
-    keep_trying { wizard_box.displayed? }
+    keep_trying_until { wizard_box.displayed? }
     wizard_box.find_element(:css, ".close_wizard_link").click
 
     driver.navigate.refresh
@@ -99,7 +99,7 @@ shared_examples_for "course selenium tests" do
               section_dropdown.displayed?.should be_true
               section_dropdown.find_element(:css, "option[value=\"#{section.id.to_s}\"]").select
 
-              keep_trying { !section_dropdown.displayed? }
+              keep_trying_until { !section_dropdown.displayed? }
 
               enrollment.reload
               enrollment.course_section_id.should == section.id

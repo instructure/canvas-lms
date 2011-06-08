@@ -1,8 +1,11 @@
+<% @account_config = @account_configs.first %>
 <% form_id = @account_config.saml_authentication? ? 'auth_form' : 'saml_form' %>
 <% active = @account_config.saml_authentication? ? 'class="active"' : '' %>
 <div id="saml_div" <%= raw active %>>
-<% form_for @account_config, :url => context_url(@account, :context_account_authorization_config_url, @account.id), :html => {:id => form_id, :class=>"auth_type saml_form"} do |f| %>
-    <input type="hidden" name="account_authorization_config[auth_type]" value="<%= @account_config.auth_type || 'saml' %>"/>
+<% form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class => "auth_type saml_form") do %>
+  <% fields_for @account_config, :index => 0 do |f| %>
+    <%= f.hidden_field :auth_type, :value => 'saml' %>
+    <%= f.hidden_field :id %>
     <table class="formtable" style="margin-left: 20px;">
       <tr>
         <td><%= f.label :auth_type, "Type:" %></td>
@@ -64,5 +67,6 @@
         </td>
       </tr>
     </table>
+  <% end %>
 <% end %>
 </div>

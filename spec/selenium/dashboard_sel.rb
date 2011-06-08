@@ -19,7 +19,7 @@ shared_examples_for "dashboard selenium tests" do
     # hover() event but it only works on Windows so far
     driver.execute_script("$('div.communication_message.announcement .disable_item_link').css('visibility', 'visible')")
     driver.find_element(:css, "div.communication_message.announcement .disable_item_link").click
-    keep_trying { find_all_with_jquery("div.communication_message.announcement").size.should == 0 }
+    keep_trying_until { find_all_with_jquery("div.communication_message.announcement").size.should == 0 }
 
     # should still be gone on reload
     get url

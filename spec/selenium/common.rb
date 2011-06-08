@@ -159,6 +159,19 @@ shared_examples_for "all selenium tests" do
     course_with_student({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
   end
 
+  def course_with_admin_logged_in(opts={})
+    account_admin_user({:active_user => true}.merge(opts))
+    user_logged_in({:user => @user}.merge(opts))
+    course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+  end
+
+  def expect_new_page_load
+    driver.execute_script("INST.still_on_old_page = true;")
+    yield
+    keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
+    wait_for_dom_ready
+  end
+
   def wait_for_dom_ready
     (driver.execute_script "return $").should_not be_nil
     driver.execute_script <<-JS
@@ -177,7 +190,7 @@ shared_examples_for "all selenium tests" do
     end
   end
   
-  def keep_trying(seconds = SECONDS_UNTIL_GIVING_UP)
+  def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
     seconds.times do |i|
       puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN
       if i < seconds - 2
@@ -205,7 +218,7 @@ shared_examples_for "all selenium tests" do
     # TODO: Better to wait for an event from tiny?
     parent = element.find_element(:xpath, '..')
     tiny_frame = nil
-    keep_trying {
+    keep_trying_until {
       begin
         tiny_frame = parent.find_element(:css, 'iframe')
       rescue => e
