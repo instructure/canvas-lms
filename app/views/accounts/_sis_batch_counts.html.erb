@@ -1,14 +1,14 @@
 <% counts = sis_batch_counts.data[:counts] %>
 <ul>
-  <li>Imported Items
+  <li><%= t(:imported_items_title, "Imported Items") %>
     <ul>
-      <li>Accounts: <%= counts[:accounts] %></li>
-      <li>Terms: <%= counts[:terms] %></li>
-      <li>Courses: <%= counts[:courses] %></li>
-      <li>Sections: <%= counts[:sections] %></li>
-      <li>Users: <%= counts[:users] %></li>
-      <li>Enrollments: <%= counts[:enrollments] %></li>
-      <li>Crosslists: <%= counts[:xlists] %></li>
+      <li><%= before_label(t(:accounts_label, "Accounts")) %> <%= counts[:accounts] %></li>
+      <li><%= before_label(t(:terms_label, "Terms")) %> <%= counts[:terms] %></li>
+      <li><%= before_label(t(:courses_label, "Courses")) %> <%= counts[:courses] %></li>
+      <li><%= before_label(t(:sections_label, "Sections")) %> <%= counts[:sections] %></li>
+      <li><%= before_label(t(:users_label, "Users")) %> <%= counts[:users] %></li>
+      <li><%= before_label(t(:enrollments_label, "Enrollments")) %> <%= counts[:enrollments] %></li>
+      <li><%= before_label(t(:crosslists_label, "Crosslists")) %> <%= counts[:xlists] %></li>
     </ul>
   </li>
 </ul>

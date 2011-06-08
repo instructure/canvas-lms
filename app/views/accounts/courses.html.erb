@@ -1,14 +1,14 @@
 <% 
   @active_tab = "courses"
-  add_crumb "Courses", account_courses_path(@account)
-  add_crumb "Search results for \"#{@query}\""
+  add_crumb t(:courses_crumb, "Courses"), account_courses_path(@account)
+  add_crumb t(:search_results_crumb, "Search results for \"%{query}\"", :query => @query)
 %>
-<% content_for :page_title do %>Course Search results for "<%= h @query %>" <% end %>
+<% content_for :page_title do %><%= t(:page_title, "Course Search results for \"%{query}\"", :query => @query) %><% end %>
 <% content_for :right_side do %>
   <%= render :partial => 'courses_right_side' %>
 <% end %>
-<h2>Course Search Results for "<%= h @query %>"</h2>
-<%= "No Results Found" if @courses.empty? %>
+<h2><%= t(:title, "Course Search Results for \"%{query}\"", :query => @query) %></h2>
+<%= t(:no_results_message, "No Results Found") if @courses.empty? %>
 <ul class='courses' style="list-style-type: none;">
   <%= render :partial => "course", :collection => @courses %>
   <%= render :partial => "course", :object => nil %>

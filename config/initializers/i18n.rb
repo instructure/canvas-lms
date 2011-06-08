@@ -21,6 +21,10 @@ ActionView::Helpers::FormHelper.module_eval do
   end
 
   def label_with_symbol_translation(object_name, method, text = nil, options = {})
+    if text.is_a?(Hash)
+      options = text
+      text = nil
+    end
     text = method if text.nil? && method.is_a?(Symbol)
     if text.is_a?(Symbol)
       text = 'labels.#{text}' unless text.to_s =~ /\A#/

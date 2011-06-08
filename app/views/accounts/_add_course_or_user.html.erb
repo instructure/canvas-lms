@@ -1,41 +1,41 @@
 <% hide_add_course ||= false; hide_add_user ||= false %>
 <div class="rs-margin-all">
   <% if !hide_add_course && can_do(@account, @current_user, :manage_courses) %>
-    <a href="#" class="add_course_link button button-sidebar-wide"><%= image_tag "add.png" %> Add a New Course</a>
+    <a href="#" class="add_course_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t(:add_course_link, "Add a New Course") %></a>
   <% end %>
   <% if !hide_add_user && can_do(@account, @current_user, :manage_admin_users) %>
-    <a href="#" class="add_user_link button button-sidebar-wide"><%= image_tag "add.png" %> Add a New User</a>
+    <a href="#" class="add_user_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t(:add_user_link, "Add a New User") %></a>
   <% end %>
 </div>
 
 <div style="display: none;">
   <div id="current_enrollment_term_id"><%= @term && @term.id %></div>
   <div id="add_user_dialog">
-    <h2>Add a New User</h2>
+    <h2><%= t(:add_user_title, "Add a New User") %></h2>
     <% form_for :user, :url => account_add_user_url(@account), :html => {:id => "add_user_form"} do |f| %>
     <input type="hidden" name="root_account_id" value="<%= @root_account.id %>"/>
     <table class="formtable">
       <tr>
-        <td><%= f.label :name, "Full Name:" %></td>
+        <td><%= f.blabel :name, :en => "Full Name" %></td>
         <td>
           <%= f.text_field :name %>
           <div style="font-size: 0.8em; color: #888;">This name will be used by teachers for grading.</div>
         </td>
       <tr>
-        <td><%= f.label :short_name, "Display Name:" %></td>
+        <td><%= f.blabel :short_name, :en => "Display Name" %></td>
         <td>
           <%= f.text_field :short_name %>
-          <div style="font-size: 0.8em; color: #888;">People will see this name in discussions, messages and comments.</div>
+          <div style="font-size: 0.8em; color: #888;"><%= t(:display_name_help, "People will see this name in discussions, messages and comments.") %></div>
         </td>
       </tr>
       <% if @root_account.login_handle_name != "Email" %>
       <tr>
-        <td><%= label :pseudonym, :path, "Email:" %></td>
+        <td><%= blabel :pseudonym, :path, :en => "Email" %></td>
         <td><%= text_field :pseudonym, :path %></td>
       </tr>
       <% end %>
       <tr>
-        <td><%= label :pseudonym, :unique_id, @root_account.login_handle_name + ":" %></td>
+        <td><%= blabel :pseudonym, :unique_id, @root_account.login_handle_name %></td>
         <td><%= text_field :pseudonym, :unique_id %></td>
       </tr>
       <tr>
@@ -47,8 +47,8 @@
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button type="submit" class="button submit_button">Add User</button>
-            <button type="button" class="button button-secondary cancel_button">Cancel</button>
+            <button type="submit" class="button submit_button"><%= t(:add_user_button, "Add User") %></button>
+            <button type="button" class="button button-secondary cancel_button"><%= t("#buttons.cancel", "Cancel") %></button>
           </div>
         </td>
       </tr>
@@ -56,18 +56,18 @@
     <% end %>
   </div>
   <div id="add_course_dialog">
-    <h2>Add a New Course</h2>
+    <h2><%= t(:add_course_title, "Add a New Course") %></h2>
     <% form_for :course, :url => courses_url, :html => {:id => "add_course_form"} do |f| %>
     <input type="hidden" name="account_id" value="<%= @account.id %>"/>
     <table class="formtable">
       <tr>
-        <td><%= f.label :name, "Course Name:" %></td>
+        <td><%= f.blabel :name, :en => "Course Name" %></td>
         <td><%= f.text_field :name, :style => "width: 200px;" %></td>
       </tr><tr>
-        <td><%= f.label :course_code, "Reference Code:" %></td>
+        <td><%= f.blabel :course_code, :en => "Reference Code" %></td>
         <td><%= f.text_field :course_code, :style => "width: 100px;" %></td>
       </tr><tr>
-        <td><%= f.label :account_id, "Department" %></td>
+        <td><%= f.blabel :account_id, :en => "Department" %></td>
         <td><%= f.select :account_id, @account.sub_accounts_as_options, :selected => @term && @term.id %></td>
       </tr><tr>
         <td><%= f.label :enrollment_term_id %></td>
@@ -75,8 +75,8 @@
       </tr><tr>
         <td colspan="2">
           <div class="button-container">
-            <button type="submit" class="button submit_button">Add Course</button>
-            <button type="button" class="button button-secondary cancel_button">Cancel</button>
+            <button type="submit" class="button submit_button"><%= t(:add_course_button, "Add Course") %></button>
+            <button type="button" class="button button-secondary cancel_button"><%= t("#buttons.cancel", "Cancel") %></button>
           </div>
         </td>
     </table>
@@ -86,85 +86,98 @@
 
 <% js_block do %>
 <script>
-$(document).ready(function() {
-  $(".add_user_link").click(function(event) {
-    event.preventDefault();
-    $("#add_user_form :text").val("");
-    $("#add_user_dialog").dialog('close').dialog({
-      autoOpen: false,
-      title: "Add a New User",
-      width: 500
-    }).dialog('open');
-    $("#add_user_form :text:visible:first").focus().select();
-  });
-  $("#add_user_form").formSubmit({
-    required: ['user[name]'],
-    beforeSubmit: function(data) {
-      $(this).find("button").attr('disabled', true)
-        .filter(".submit_button").text("Adding User...");
-    },
-    success: function(data) {
-      $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text("Add User");
-      var user = data.user.user || data.user;
-      var message = "<a href='/users/" + user.id + "'>" + $.htmlEscape(user.name) + "</a> successfully " + (data.new_user ? "added!" : "updated!");
-      if(data.message_sent) {
-        message = message + " They should receive an email confirmation shortly.";
+I18n.scoped("accounts", function(I18n) {
+  $(document).ready(function() {
+    $(".add_user_link").click(function(event) {
+      event.preventDefault();
+      $("#add_user_form :text").val("");
+      $("#add_user_dialog").dialog('close').dialog({
+        autoOpen: false,
+        title: I18n.t('add_user_dialog_title', "Add a New User"),
+        width: 500
+      }).dialog('open');
+      $("#add_user_form :text:visible:first").focus().select();
+    });
+    $("#add_user_form").formSubmit({
+      required: ['user[name]'],
+      beforeSubmit: function(data) {
+        $(this).find("button").attr('disabled', true)
+          .filter(".submit_button").text(I18n.t('adding_user_message', "Adding User..."));
+      },
+      success: function(data) {
+        $(this).find("button").attr('disabled', false)
+          .filter(".submit_button").text(I18n.t('add_user_button', "Add User"));
+        var user = data.user.user || data.user;
+        var link = "<a href='/users/" + user.id + "'>" + $.htmlEscape(user.name) + "</a>"
+        var message = '';
+        if(data.new_user) {
+            if(data.message_sent) {
+                message = I18n.t('user_added_message_sent_message', '{{user}} successfully added! They should receive an email confirmation shortly.', {user: link});
+            } else {
+                message = I18n.t('user_added_message', '{{user}} successfully added!', {user: link});
+            }
+        } else {
+            if(data.message_sent) {
+                message = I18n.t('user_updated_message_sent_message', '{{user}} successfully updated! They should receive an email confirmation shortly.', {user: link});
+            } else {
+                message = I18n.t('user_updated_message', '{{user}} successfully updated!', {user: link});
+            }
+        }
+        $.flashMessage(message);
+        $("#add_user_dialog").dialog('close');
+      },
+      error: function(data) {
+        $(this).find("button").attr('disabled', false)
+          .filter(".submit_button").text(I18n.t('user_add_failed_message', "Adding User Failed, please try again"));
       }
-      $.flashMessage(message);
+    });
+    $("#add_user_dialog .cancel_button").click(function() {
       $("#add_user_dialog").dialog('close');
-    },
-    error: function(data) {
-      $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text("Adding User Failed, please try again");
-    }
-  });
-  $("#add_user_dialog .cancel_button").click(function() {
-    $("#add_user_dialog").dialog('close');
-  });
-  $(".add_course_link").click(function(event) {
-    event.preventDefault();
-    $("#add_course_form :text").val("");
-    $("#add_course_dialog").dialog('close').dialog({
-      title: "Add a New Course",
-      autoOpen: false,
-      width: 500
-    }).dialog('open');
-    $("#add_course_form :text:visible:first").focus().select();
-  });
-  $("#add_course_form").formSubmit({
-    required: ['course[name]', 'course[course_code]'],
-    beforeSubmit: function(data) {
-      $(this).find("button").attr('disabled', true)
-        .filter(".submit_button").text("Adding Course...");
-    },
-    success: function(data) {
-      $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text("Add Course");
-      var course = data.course;
-      if(course.enrollment_term_id == parseInt($("#current_enrollment_term_id").text(), 10)) {
-        var $course = $("#course_blank").clone(true);
-        var course_data = {id: course.id};
-        $course.find("a.name").text(course.name);
-        $course.fillTemplateData({
-          data: course_data,
-          hrefValues: ['id'],
-          id: 'course_' + course.id
-        });
-        $course.find(".unpublished_icon").show();
-        $("ul.courses").prepend($course);
-        $course.slideDown();
+    });
+    $(".add_course_link").click(function(event) {
+      event.preventDefault();
+      $("#add_course_form :text").val("");
+      $("#add_course_dialog").dialog('close').dialog({
+        title: I18n.t('add_course_dialog_title', "Add a New Course"),
+        autoOpen: false,
+        width: 500
+      }).dialog('open');
+      $("#add_course_form :text:visible:first").focus().select();
+    });
+    $("#add_course_form").formSubmit({
+      required: ['course[name]', 'course[course_code]'],
+      beforeSubmit: function(data) {
+        $(this).find("button").attr('disabled', true)
+          .filter(".submit_button").text(I18n.t('adding_course_message', "Adding Course..."));
+      },
+      success: function(data) {
+        $(this).find("button").attr('disabled', false)
+          .filter(".submit_button").text(I18n.t('add_course_button', "Add Course"));
+        var course = data.course;
+        if(course.enrollment_term_id == parseInt($("#current_enrollment_term_id").text(), 10)) {
+          var $course = $("#course_blank").clone(true);
+          var course_data = {id: course.id};
+          $course.find("a.name").text(course.name);
+          $course.fillTemplateData({
+            data: course_data,
+            hrefValues: ['id'],
+            id: 'course_' + course.id
+          });
+          $course.find(".unpublished_icon").show();
+          $("ul.courses").prepend($course);
+          $course.slideDown();
+        }
+        $.flashMessage(I18n.t('course_added_message', "{{course}} successfully added!", {course: course.name}));
+        $("#add_course_dialog").dialog('close');
+      },
+      error: function(data) {
+        $(this).find("button").attr('disabled', false)
+          .filter(".submit_button").text(I18n.t('course_add_failed_message', "Adding Course Failed, please try again"));
       }
-      $.flashMessage(course.name + " successfully added!");
+    });
+    $("#add_course_dialog .cancel_button").click(function() {
       $("#add_course_dialog").dialog('close');
-    },
-    error: function(data) {
-      $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text("Adding Course Failed, please try again");
-    }
-  });
-  $("#add_course_dialog .cancel_button").click(function() {
-    $("#add_course_dialog").dialog('close');
+    });
   });
 });
 </script>

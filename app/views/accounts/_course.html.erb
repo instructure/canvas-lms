@@ -5,7 +5,7 @@
   <div class="course <%= 'unpublished' if course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) %>">
     <div class="name">
       <a href="<%= course_path(course ? course.id : "{{ id }}") %>" class="name"><%= (course && (course.name || course.section)) || nbsp %></a>
-      <%= image_tag "hammer.png", :title => "This course hasn't been published yet", :alt => "Unpublished", :class => "unpublished_icon", :style => (course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) ? "" : "display: none;") %>
+      <%= image_tag "hammer.png", :title => t(:course_unpublished_title, "This course hasn't been published yet"), :alt => t(:course_unpublished_tooltip, "Unpublished"), :class => "unpublished_icon", :style => (course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) ? "" : "display: none;") %>
     </div>
     <% if course %>
     <div class="details ellipsis">
@@ -14,20 +14,20 @@
           <span style="padding-right: 30px;"><%= course.course_code %></span>
         <% end %>
         <% if course.respond_to?(:sis_source_id) && course.sis_source_id %>
-          SIS ID: <%= course.sis_source_id %>
+          <%= before_label(t(:sis_id_label, "SIS ID")) %> <%= course.sis_source_id %>
         <% end %>
       </div>
-      <% teacher_string = teacher_names[0,2].join(',') %>
-      <% teacher_string += ", #{teacher_names[2..-1].length} more" if teacher_names.length > 2 %>
-      <span style="display: inline-block; min-width: 80px;"><%= pluralize(student_count || 0, 'Student') %></span>
-      Teachers: <%= teacher_names.blank? ? 'none' : teacher_string %>
+      <% teacher_names_new = teacher_names[0, 2] %>
+      <% teacher_names_new << t(:more_count, { :other => '%{count}' }, :count => teacher_names.length - 2) if teacher_names.length > 2 %>
+      <span style="display: inline-block; min-width: 80px;"><%= t(:student_count, { :one => "1 Student", :other => "%{count} Students" }, :count => student_count || 0) %></span>
+      <%= before_label(t(:teachers_label, "Teachers")) %> <%= teacher_names.blank? ? t(:none, 'none') : teacher_names_new.to_sentence %>
     </div>
     <% end %>
     <div class="info">
       <span class="links">
-        <%= link_to "Settings", course_details_path(course ? course : "{{ id }}") %> | 
-        <%= link_to "Statistics", course_statistics_path(course ? course : "{{ id }}") %> |
-        <%= link_to "Homepage", course_path(course ? course : "{{ id }}") %>
+        <%= link_to t(:settings_link, "Settings"), course_details_path(course ? course : "{{ id }}") %> |
+        <%= link_to t(:statistics_link, "Statistics"), course_statistics_path(course ? course : "{{ id }}") %> |
+        <%= link_to t(:homepage_link, "Homepage"), course_path(course ? course : "{{ id }}") %>
       </span>
     </div>
   </div>
