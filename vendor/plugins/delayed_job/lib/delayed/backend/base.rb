@@ -104,9 +104,9 @@ module Delayed
 
       def hold!
         self.locked_by = 'on hold'
-        self.locked_at = db_time_now
+        self.locked_at = self.class.db_time_now
         self.attempts = ON_HOLD_COUNT
-        self.failed_at = db_time_now
+        self.failed_at = self.class.db_time_now
         self.save!
       end
 
@@ -114,7 +114,7 @@ module Delayed
         self.locked_by = nil
         self.locked_at = nil
         self.attempts = 0
-        self.run_at = db_time_now
+        self.run_at = self.class.db_time_now
         self.failed_at = nil
         self.last_error = nil
         self.save!
