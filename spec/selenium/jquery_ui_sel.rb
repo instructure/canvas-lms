@@ -25,6 +25,25 @@ describe "jquery ui selenium tests" do
     JS
   end
 
+  it "should use a non-breaking space for empty titles" do
+    driver.execute_script(<<-JS).should == "\302\240"
+      return $('<div id="jqueryui_test">hello</div>')
+        .dialog()
+        .parent('.ui-dialog')
+        .find('.ui-dialog-title')
+        .text();
+    JS
+
+    driver.execute_script(<<-JS).should == "\302\240"
+      return $('#jqueryui_test')
+        .dialog('option', 'title', 'foo')
+        .dialog('option', 'title', '')
+        .parent('.ui-dialog')
+        .find('.ui-dialog-title')
+        .text();
+    JS
+  end
+
   it "should html-escape explicit string dialog titles" do
     title = "<b>this</b> is the title"
     driver.execute_script(<<-JS).should == title
