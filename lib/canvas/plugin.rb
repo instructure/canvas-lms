@@ -66,11 +66,19 @@ module Canvas
     [:name, :description, :website, :author, :author_website].each do |method|
       class_eval <<-METHOD
         def #{method}
-          @meta[:#{method}].is_a?(Proc) ? instance_eval(&@meta[:#{method}]) : @meta[:#{method}] || ''
+          t_if_proc(@meta[:#{method}]) || ''
         end
       METHOD
     end
-    
+
+    def setting(name)
+      t_if_proc(settings[name])
+    end
+
+    def t_if_proc(attribute)
+      attribute.is_a?(Proc) ? instance_eval(&attribute) : attribute
+    end
+
     def validator
       @meta[:validator]
     end
