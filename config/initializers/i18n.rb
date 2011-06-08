@@ -163,6 +163,11 @@ ActiveRecord::Base.class_eval do
       I18n.translate(key, default, options)
     end
     alias :t :translate
+
+    def before_label(text_or_key, default_value = nil)
+      text_or_key = t('labels.' + text_or_key.to_s, default_value) if text_or_key.is_a?(Symbol)
+      t("before_label_wrapper", "%{text}:", :text => text_or_key)
+    end
   end
 end
 
