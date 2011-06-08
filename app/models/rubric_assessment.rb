@@ -137,7 +137,7 @@ class RubricAssessment < ActiveRecord::Base
       students = self.rubric_association.association.group_students(self.user).last
       submissions = students.map do |student|
         submission = self.rubric_association.association.find_asset_for_assessment(self.rubric_association, student.id).first
-        {:submission => submission, :rubric_assessments => submission.rubric_assessments}
+        {:submission => submission, :rubric_assessments => submission.rubric_assessments.map{|ra| ra.as_json(:methods => :assessor_name)}}
       end
     else
       []
