@@ -192,7 +192,7 @@
       <%= t 'descriptions.copy_from', "To copy content from another course to this one, you'll first need to select the
       course you want to copy from.  Then you can specify what exactly you want copied over." %>
     </p>
-    <% if @current_user.courses.length < 2 %>
+    <% if @possible_courses.empty? %>
       <p><%= t 'warnings.no_other_courses', "You don't have access to any additional courses." %></p>
     <% else %>
       <% form_tag context_url(@context, :context_import_copy_url), :method => :get do %>
@@ -200,7 +200,7 @@
           <tr>
             <td><label for="course_autocomplete_id_lookup"><%= before_label :search_for_course, "Search for Course" %></label></td>
             <td>
-              <a href="<%= context_url(@current_user, :context_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
+              <a href="<%= context_url(@current_user, :context_manageable_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
               <input type="hidden" name="copy[course_id]" id="course_autocomplete_id"/>
               <input type="text" id="course_autocomplete_id_lookup" style="width: 250px;"/>
             </td>

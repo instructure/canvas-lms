@@ -218,12 +218,12 @@ class UsersController < ApplicationController
     @is_default_account = @current_user.pseudonyms.active.map(&:account_id).include?(Account.default.id)
   end
 
-  def courses
+  def manageable_courses
     get_context
     if authorized_action(@context, @current_user, :manage)
       @courses = []
       @query = (params[:course] && params[:course][:name]) || params[:query]
-      @courses = @context.courses_name_like(@query) if @context && @query
+      @courses = @context.manageable_courses_name_like(@query) if @context && @query
       respond_to do |format|
         format.json  {
           cancel_cache_buster

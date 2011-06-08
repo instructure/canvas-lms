@@ -495,7 +495,7 @@ ActionController::Routing::Routes.draw do |map|
     user.merge 'merge', :controller => 'users', :action => 'merge', :conditions => {:method => :post}
     user.grades 'grades', :controller => 'users', :action => 'grades'
     user.resources :user_notes
-    user.courses 'courses', :controller => 'users', :action => 'courses'
+    user.manageable_courses 'manageable_courses', :controller => 'users', :action => 'manageable_courses'
     user.outcomes 'outcomes', :controller => 'outcomes', :action => 'user_outcome_results'
     user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|

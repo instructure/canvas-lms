@@ -159,10 +159,7 @@ class ContentImportsController < ApplicationController
         end
       else
         if request.format != :json
-          @possible_courses = (@current_user.available_courses + @context.course_sections.active.map(&:nonxlist_course)).compact.select{|c| c.grants_right?(@current_user, session, :manage) }
-          @possible_courses += @domain_root_account.all_courses if @domain_root_account.grants_right?(@current_user, session, :manage)
-          @possible_courses -= [@context]
-          @possible_courses = @possible_courses.compact.uniq
+          @possible_courses = @current_user.manageable_courses - [@context]
           course_id = params[:copy] && params[:copy][:course_id].to_i
           course_id = params[:copy][:autocomplete_course_id] if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
           @copy_context = @possible_courses.find{|c| c.id == course_id.to_i } if course_id
