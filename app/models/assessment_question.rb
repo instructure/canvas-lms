@@ -48,7 +48,7 @@ class AssessmentQuestion < ActiveRecord::Base
     self.question_data ||= {}
     if self.question_data.is_a?(Hash)
       if self.question_data[:question_name].try(:strip).blank?
-        self.question_data[:question_name] = "Question"
+        self.question_data[:question_name] = t :default_question_name, "Question"
       end
       self.question_data[:name] = self.question_data[:question_name]
     end
@@ -98,7 +98,7 @@ class AssessmentQuestion < ActiveRecord::Base
   def data
     res = self.question_data || {}
     res[:assessment_question_id] = self.id
-    res[:question_name] = "Question" if res[:question_name].blank?
+    res[:question_name] = t :default_question_name, "Question" if res[:question_name].blank?
     # TODO: there's a potential id conflict here, where if a quiz
     # has some questions manually created and some pulled from a
     # bank, it's possible that a manual question's id could match
