@@ -32,7 +32,7 @@ class Announcement < DiscussionTopic
   validates_presence_of :message
   
   def infer_content
-    self.title ||= "No Title"
+    self.title ||= t(:no_title, "No Title")
   end
   protected :infer_content
   
