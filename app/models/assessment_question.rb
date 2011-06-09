@@ -187,10 +187,10 @@ class AssessmentQuestion < ActiveRecord::Base
     question[:incorrect_comments] = check_length(qdata[:incorrect_comments] || previous_data[:incorrect_comments] || "", 'incorrect comments', 5.kilobyte)
     question[:neutral_comments] = check_length(qdata[:neutral_comments], 'neutral comments', 5.kilobyte)
     question[:question_type] = qdata[:question_type] || previous_data[:question_type] || "text_only_question"
-    question[:question_name] = qdata[:question_name] || qdata[:name] || previous_data[:question_name] || "Question"
-    question[:question_name] = "Question" if question[:question_name].strip.blank?
+    question[:question_name] = qdata[:question_name] || qdata[:name] || previous_data[:question_name] || t(:default_question_name, "Question")
+    question[:question_name] = t(:default_question_name, "Question") if question[:question_name].strip.blank?
     question[:name] = question[:question_name]
-    question[:question_text] = sanitize(check_length(qdata[:question_text] || previous_data[:question_text] || "Question text", 'question text'))
+    question[:question_text] = sanitize(check_length(qdata[:question_text] || previous_data[:question_text] || t(:default_question_text, "Question text"), 'question text'))
     min_size = 1.kilobyte
     question[:answers] = []
     reset_local_ids
