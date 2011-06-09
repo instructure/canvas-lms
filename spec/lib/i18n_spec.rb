@@ -45,5 +45,17 @@ describe I18n do
       translation.html_safe?.should be_true
       translation.should eql("If you create an &lt;input&gt; tag, you will see <input>")
     end
+
+    it "should apply :wrapper" do
+      translation = I18n.t(:foo, "This is *important*", :wrapper => '<em class="super-important">\1</em>')
+      translation.html_safe?.should be_true
+      translation.should == %{This is <em class="super-important">important</em>}
+    end
+
+    it "should apply :wrappers" do
+      translation = I18n.t(:foo, 'User *%{firstname}* #%{lastname}#', :wrapper => { '*' => '<span class="firstname">\1</span>', '#' => '<span class="lastname">\1</span>' }, :firstname => "User", :lastname => "Amp&Name")
+      translation.html_safe?.should be_true
+      translation.should == %{User <span class="firstname">User</span> <span class="lastname">Amp&amp;Name</span>}
+    end
   end
 end

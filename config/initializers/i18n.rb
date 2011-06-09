@@ -92,10 +92,32 @@ I18n.class_eval do
       else
         default
       end
-      translate_without_default_and_count_magic(key.to_s.sub(/\A#/, ''), options)
+
+      result = translate_without_default_and_count_magic(key.to_s.sub(/\A#/, ''), options)
+
+      # it's assumed that if you're using any wrappers, you're going
+      # for html output. so the result will be escaped before being
+      # wrapped, then the output tagged as html safe.
+      if wrapper = options[:wrapper]
+        result = I18n.apply_wrappers(result, wrapper)
+      end
+
+      result
     end
     alias_method_chain :translate, :default_and_count_magic
     alias :t :translate
+  end
+
+  WRAPPER_REGEXES = {}
+
+  def self.apply_wrappers(string, wrappers)
+    string = ERB::Util.h(string) unless string.html_safe?
+    wrappers = { '*' => wrappers } unless wrappers.is_a?(Hash)
+    wrappers.each do |sym, replace|
+      regex = (WRAPPER_REGEXES[sym] ||= %r{#{Regexp.escape(sym)}([^#{Regexp.escape(sym)}]*)#{Regexp.escape(sym)}})
+      string = string.sub(regex, replace)
+    end
+    string.html_safe
   end
 end
 
