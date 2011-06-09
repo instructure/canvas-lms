@@ -58,4 +58,27 @@ describe I18n do
       translation.should == %{User <span class="firstname">User</span> <span class="lastname">Amp&amp;Name</span>}
     end
   end
+
+  context "pluralization" do
+    it "should accept hashes for the default value" do
+      I18n.t(:foo, {:one => "1 thing", :other => "%{count} things"}, :count => 1).
+        should == "1 thing"
+      I18n.t(:foo, {:one => "1 thing", :other => "%{count} things"}, :count => 2).
+        should == "2 things"
+    end
+
+    it "should pluralize single-word default values" do
+      I18n.t(:foo, "thing", :count => 1).
+        should == "1 thing"
+      I18n.t(:foo, "thing", :count => 2).
+        should == "2 things"
+    end
+
+    it "should not pluralize multi-word default values" do
+      I18n.t(:foo, "thing count: %{count}", :count => 1).
+        should == "thing count: 1"
+      I18n.t(:foo, "thing count: %{count}", :count => 2).
+        should == "thing count: 2"
+    end
+  end
 end
