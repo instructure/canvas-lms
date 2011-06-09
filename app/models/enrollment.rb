@@ -211,19 +211,22 @@ class Enrollment < ActiveRecord::Base
     self.root_account_id = self.course_section.root_account_id rescue nil
   end
   
+  def course_name
+    self.course.name || t(:default_course_name, "Course")
+  end
+
   def short_name(length=nil)
     return @short_name if @short_name
     @short_name = self.course_section.display_name if self.course_section && self.root_account && self.root_account.show_section_name_as_course_name
-    @short_name ||= self.course.name
-    @short_name ||= "Course"
+    @short_name ||= self.course_name
     @short_name = @short_name[0..length] if length
     @short_name
   end
   
   def long_name
     return @long_name if @long_name
-    @long_name = self.course.name || "Course"
-    @long_name += ", #{self.course_section.display_name}" if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course.name
+    @long_name = self.course_name
+    @long_name = t(:with_section, "%{course_name}, %{section_name}", :course_name => @long_name, :section_name => self.course_section.display_name) if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course.name
     @long_name
   end
   
@@ -343,11 +346,11 @@ class Enrollment < ActiveRecord::Base
   end
   
   def email
-    self.user.email rescue "No Email"
+    self.user.email rescue t(:default_email, "No Email")
   end
   
   def user_name
-    read_attribute(:user_name) || self.user.name rescue "Unknown User"
+    read_attribute(:user_name) || self.user.name rescue t(:default_user_name, "Unknown User")
   end
   
   def context
@@ -424,7 +427,7 @@ class Enrollment < ActiveRecord::Base
   
   def to_atom
     Atom::Entry.new do |entry|
-      entry.title     = "#{self.user.name} in #{self.course.name}"
+      entry.title     = t(:title, "%{user_name} in %{course_name}", :user_name => self.user_name, :course_name => self.course_name)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.links    << Atom::Link.new(:rel => 'alternate', 
