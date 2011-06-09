@@ -226,7 +226,7 @@ describe User do
     user3 = User.create! :name => "longname1", :short_name => "shortname3"
     user3.register!
     
-    User.name_like("longname1").map(&:id).should == [user1.id, user3.id]
+    User.name_like("longname1").map(&:id).sort.should == [user1.id, user3.id].sort
     User.name_like("shortname2").map(&:id).should == [user2.id]
     User.name_like("sisid1").map(&:id).should == [user1.id]
     User.name_like("uniqueid2").map(&:id).should == [user2.id]
