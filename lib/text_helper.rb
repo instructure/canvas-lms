@@ -146,15 +146,13 @@ module TextHelper
   end
   
   def force_zone(time)
-    time_zone ||= @time_zone || Time.zone
-    res = ActiveSupport::TimeWithZone.new(time.utc, time_zone) rescue nil
-    res || time
+    (time.in_time_zone(@time_zone || Time.zone) rescue nil) || time
   end
 
   def date_string(start_date, style=:normal)
     return nil unless start_date
     start_date = start_date.in_time_zone.to_date rescue start_date.to_date
-    today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
+    today = Time.zone.now.to_date
     if style != :long
       if style != :no_words
         string = nil
