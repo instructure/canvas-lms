@@ -25,8 +25,6 @@ class AssessmentQuestionBank < ActiveRecord::Base
   has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_many :quiz_groups
   before_save :infer_defaults
-  DEFAULT_IMPORTED_TITLE = 'Imported Questions'
-  DEFAULT_UNFILED_TITLE = 'Unfiled Questions'
   adheres_to_policy
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   
@@ -43,8 +41,16 @@ class AssessmentQuestionBank < ActiveRecord::Base
     set { can :read }
   end
 
+  def self.default_imported_title
+    t :default_imported_title, 'Imported Questions'
+  end
+
+  def self.default_unfiled_title
+    t :default_unfiled_title, 'Unfiled Questions'
+  end
+
   def self.unfiled_for_context(context)
-    context.assessment_question_banks.find_by_title_and_workflow_state(DEFAULT_UNFILED_TITLE, 'active') || context.assessment_question_banks.create(:title => DEFAULT_UNFILED_TITLE) rescue nil
+    context.assessment_question_banks.find_by_title_and_workflow_state(default_unfiled_title, 'active') || context.assessment_question_banks.create(:title => default_unfiled_title) rescue nil
   end
   
   def cached_context_short_name
@@ -62,7 +68,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
   
   def infer_defaults
-    self.title = "No Name - #{self.context.name}" if !self.title || self.title.empty?
+    self.title = t(:default_title, "No Name - %{course}", :course => self.context.name) if self.title.blank?
   end
   
   def bookmark_for(user, do_bookmark=true)

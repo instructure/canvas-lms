@@ -27,7 +27,7 @@ class QuestionBanksController < ApplicationController
     end
     if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
       if !@unfiled_questions.empty?
-        @bank = @context.assessment_question_banks.find_or_create_by_title_and_workflow_state(AssessmentQuestionBank::DEFAULT_UNFILED_TITLE, 'active')
+        @bank = @context.assessment_question_banks.find_or_create_by_title_and_workflow_state(AssessmentQuestionBank.default_unfiled_title, 'active')
         AssessmentQuestion.update_all(['assessment_question_bank_id=?, position=id', @bank.id], {:context_type => @context.class.to_s, :context_id => @context.id, :assessment_question_bank_id => nil})
       end
       @question_banks = @context.assessment_question_banks.active.include_questions.sort_by{|b| b.title || "zzz" }

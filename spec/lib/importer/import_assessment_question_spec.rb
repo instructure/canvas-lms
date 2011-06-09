@@ -71,7 +71,7 @@ def test_question_import(hash_name, system, question_type=nil)
   db_aq.migration_id.should == q[:migration_id]
   db_aq.name == q[:question_name]
 
-  bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(context.class.to_s, context.id, AssessmentQuestionBank::DEFAULT_IMPORTED_TITLE, nil)
+  bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(context.class.to_s, context.id, AssessmentQuestionBank.default_imported_title, nil)
   bank_aq = bank.assessment_questions.first
   bank_aq.id.should == db_aq.id
 end

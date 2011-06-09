@@ -138,7 +138,7 @@ class AssessmentQuestion < ActiveRecord::Base
     # based on the quiz_question to begin with
     elsif !self.new_record? && question.assessment_question_id == self.id && question.created_at && self.created_at < question.created_at + 5.minutes && self.created_at > question.created_at + 30.seconds
       false
-    elsif self.assessment_question_bank && self.assessment_question_bank.title != AssessmentQuestionBank::DEFAULT_UNFILED_TITLE
+    elsif self.assessment_question_bank && self.assessment_question_bank.title != AssessmentQuestionBank.default_unfiled_title
       false
     elsif self.new_record? || (quiz_questions.count <= 1 && question.assessment_question_id == self.id)
       true
@@ -433,7 +433,7 @@ class AssessmentQuestion < ActiveRecord::Base
         question[:question_bank_name] = nil if question[:question_bank_name] == ''
         question[:question_bank_name] ||= bank_map[question[:migration_id]]
         question[:question_bank_name] ||= migration.question_bank_name
-        question[:question_bank_name] ||= AssessmentQuestionBank::DEFAULT_IMPORTED_TITLE
+        question[:question_bank_name] ||= AssessmentQuestionBank.default_imported_title
         hash_id = "#{question[:question_bank_id]}_#{question[:question_bank_name]}"
         if !banks[hash_id]
             unless bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(migration.context.class.to_s, migration.context.id, question[:question_bank_name], question[:question_bank_id])
@@ -457,7 +457,7 @@ class AssessmentQuestion < ActiveRecord::Base
     hash = hash.with_indifferent_access
     if !bank
       hash[:question_bank_name] = nil if hash[:question_bank_name] == ''
-      hash[:question_bank_name] ||= AssessmentQuestionBank::DEFAULT_IMPORTED_TITLE
+      hash[:question_bank_name] ||= AssessmentQuestionBank::default_imported_title
       unless bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(context.class.to_s, context.id, hash[:question_bank_name], hash[:question_bank_id])
         bank ||= context.assessment_question_banks.new
         bank.title = hash[:question_bank_name]
