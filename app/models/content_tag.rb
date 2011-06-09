@@ -333,7 +333,7 @@ class ContentTag < ActiveRecord::Base
       context.map_merge(self.content, content)
       dup.content = content
     end
-    context.log_merge_result(t :merge_result, "Tag \"%{tag_title}\" created", :tag_title => self.title)
+    context.log_merge_result("Tag \"#{self.title}\" created")
     dup.updated_at = Time.now
     dup.clone_updated = true
     dup
