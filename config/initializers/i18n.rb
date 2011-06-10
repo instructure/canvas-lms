@@ -8,6 +8,14 @@ Gem.loaded_specs.values.each do |spec|
   I18n.load_path += Dir[File.join(translations_path, '**', '*.{rb,yml}')]
 end
 
+module I18nUtilities
+  def before_label(text_or_key, default_value = nil)
+    text_or_key = t('labels.' + text_or_key.to_s, default_value) if default_value
+    t("before_label_wrapper", "%{text}:", :text => text_or_key)
+  end
+end
+
+ActionView::Base.send(:include, I18nUtilities)
 ActionView::Helpers::FormHelper.module_eval do
   # a convenience method to put the ":" after the label text (or do whatever
   # the selected locale dictates)
@@ -34,11 +42,6 @@ ActionView::Helpers::FormHelper.module_eval do
     label_without_symbol_translation(object_name, method, text, options)
   end
   alias_method_chain :label, :symbol_translation
-
-  def before_label(text_or_key, default_value = nil)
-    text_or_key = t('labels.' + text_or_key.to_s, default_value) if text_or_key.is_a?(Symbol)
-    t("before_label_wrapper", "%{text}:", :text => text_or_key)
-  end
 end
 
 ActionView::Helpers::FormBuilder.class_eval do
@@ -144,6 +147,8 @@ ActionController::Base.class_eval do
 end
 
 ActiveRecord::Base.class_eval do
+  extend I18nUtilities
+
   def translate(key, default, options = {})
     self.class.translate(key, default, options)
   end
@@ -163,11 +168,6 @@ ActiveRecord::Base.class_eval do
       I18n.translate(key, default, options)
     end
     alias :t :translate
-
-    def before_label(text_or_key, default_value = nil)
-      text_or_key = t('labels.' + text_or_key.to_s, default_value) if text_or_key.is_a?(Symbol)
-      t("before_label_wrapper", "%{text}:", :text => text_or_key)
-    end
   end
 end
 
