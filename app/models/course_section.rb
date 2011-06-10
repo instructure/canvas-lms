@@ -137,12 +137,18 @@ class CourseSection < ActiveRecord::Base
     self
   end
   
-  def crosslist_to_course(course, delay_jobs = true)
+  def crosslist_to_course(course, delay_jobs = true, make_sticky = true)
     return self if self.course == course
+    save_needed = false
     unless self.nonxlist_course
-      self.nonxlist_course = self.course 
-      self.save!
+      self.nonxlist_course = self.course
+      save_needed = true
     end
+    if !self.sticky_xlist && make_sticky
+      self.sticky_xlist = true
+      save_needed = true
+    end
+    self.save! if save_needed
     self.move_to_course(course, delay_jobs)
   end
   
@@ -154,6 +160,7 @@ class CourseSection < ActiveRecord::Base
     end
     self.move_to_course(self.nonxlist_course, delay_jobs)
     self.nonxlist_course = nil
+    self.sticky_xlist = false
     self.save!
   end
   
