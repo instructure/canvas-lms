@@ -234,6 +234,20 @@ describe SIS::SisCsv do
       course.course_code.should eql("SUCKERS 101")
       course.name.should eql("Haha my course lol")
     end
+
+    it 'should override term dates if the start or end dates are set' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "test1,TC 101,Test Course 1,,,active,,",
+        "test2,TC 102,Test Course 2,,,active,,2011-05-14 00:00:00",
+        "test3,TC 103,Test Course 3,,,active,2011-04-14 00:00:00,",
+        "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      @account.courses.find_by_sis_source_id("test1").restrict_enrollments_to_course_dates.should be_false
+      @account.courses.find_by_sis_source_id("test2").restrict_enrollments_to_course_dates.should be_true
+      @account.courses.find_by_sis_source_id("test3").restrict_enrollments_to_course_dates.should be_true
+      @account.courses.find_by_sis_source_id("test4").restrict_enrollments_to_course_dates.should be_true
+    end
   end
   
   context "user importing" do
@@ -872,6 +886,25 @@ describe SIS::SisCsv do
                                                   "Section S003 references course C002 which doesn't exist"]
     end
     
+    it 'should override term dates if the start or end dates are set' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "test1,TC 101,Test Course 1,,,active,,"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      process_csv_data(
+        "section_id,course_id,name,status,start_date,end_date",
+        "sec1,test1,Test Course 1,active,,",
+        "sec2,test1,Test Course 2,active,,2011-05-14 00:00:00",
+        "sec3,test1,Test Course 3,active,2011-04-14 00:00:00,",
+        "sec4,test1,Test Course 4,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      course = @account.courses.find_by_sis_source_id('test1')
+      course.course_sections.find_by_sis_source_id("sec1").restrict_enrollments_to_section_dates.should be_false
+      course.course_sections.find_by_sis_source_id("sec2").restrict_enrollments_to_section_dates.should be_true
+      course.course_sections.find_by_sis_source_id("sec3").restrict_enrollments_to_section_dates.should be_true
+      course.course_sections.find_by_sis_source_id("sec4").restrict_enrollments_to_section_dates.should be_true
+    end
+
     it 'should verify xlist files' do
       importer = process_csv_data(
         "xlist_course_id,section_id,status",
