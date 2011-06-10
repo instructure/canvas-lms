@@ -257,7 +257,7 @@ shared_examples_for 'a backend' do
       job2 = create_job(:strand => 'myjobs')
       job3 = create_job(:strand => 'myjobs')
       @backend.get_and_lock_next_available('w1', 60).should == job1
-      @backend.find_available('w2', 1, 60).should == []
+      @backend.find_available('w2', 1, 60).should == [job2]
       job2.reload.lock_exclusively!(60, 'w2').should be_false
       # job2 just got rescheduled, but not job3. make sure that job2 still runs first.
       job1.destroy
@@ -289,33 +289,6 @@ shared_examples_for 'a backend' do
       @backend.get_and_lock_next_available('w2', 60).should == job2
       @backend.get_and_lock_next_available('w3', 60).should == nil
     end
-
-    it "should not fail to find a job because of strand jobs waiting" do
-      run_at = 5.seconds.ago
-      10.times { create_job(:strand => 'strand1', :run_at => run_at) }
-      outside = create_job()
-      strand1 = @backend.get_and_lock_next_available('w1', 60)
-      strand1.strand.should == 'strand1'
-      @backend.get_and_lock_next_available('w2', 60).should == outside
-    end
-
-    it "should move run_at forward if a previous job requires it" do
-      job1 = create_job(:strand => 'myjobs')
-      job2 = create_job(:strand => 'myjobs')
-      job2.update_attribute(:run_at, 2.hours.ago)
-      @backend.get_and_lock_next_available('w1', 60).should == job1
-      @backend.get_and_lock_next_available('w2', 60).should be_nil
-      job2.reload.run_at.should > job1.run_at
-    end
-
-    it "should move run_at forward to the immediately previous job" do
-      job1 = create_job(:strand => 'myjobs', :run_at => Time.now - 5 - 20)
-      10.times { |i| create_job(:strand => 'myjobs', :run_at => Time.now - 5 - i) }
-      future_job = create_job(:strand => 'myjobs', :run_at => 1.hour.from_now + 60)
-      after_job = create_job(:strand => 'myjobs', :run_at => Time.now)
-      after_job.lock_exclusively!(60, 'w1').should be_false
-      after_job.reload.run_at.should > 1.hour.from_now
-    end
   end
 
   context "on hold" do
@@ -344,7 +317,7 @@ shared_examples_for 'a backend' do
       job = @backend.first
       job.tag.should == 'periodic: my SimpleJob'
       job.payload_object.should == Delayed::Periodic.scheduled['my SimpleJob']
-      job.run_at.to_i.should >= @backend.db_time_now.to_i
+      job.run_at.should >= @backend.db_time_now
       job.run_at.should <= @backend.db_time_now + 6.minutes
     end
 

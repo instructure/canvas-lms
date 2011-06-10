@@ -22,6 +22,12 @@ module Delayed
         cattr_accessor :default_priority
         self.default_priority = 0
 
+        # if true, we'll use the more efficient 'select ... for update' form
+        # rather than selecting 5 rows and trying to lock each one in turn.
+        # there's some deadlock issues with this right now though.
+        cattr_accessor :use_row_locking
+        self.use_row_locking = false
+
         named_scope :current, lambda {
           { :conditions => ["run_at <= ? AND failed_at IS NULL", db_time_now] }
         }
@@ -42,12 +48,7 @@ module Delayed
         named_scope :ready_to_run, lambda {|worker_name, max_run_time|
           {:conditions => ['(run_at <= ? AND (locked_at IS NULL OR locked_at < ?)) AND failed_at IS NULL', db_time_now, db_time_now - max_run_time]}
         }
-        named_scope :strand_ready, { :conditions => ["strand IS NULL or strand NOT IN (SELECT strand FROM #{table_name} WHERE locked_at IS NOT NULL AND locked_by <> 'on hold' AND strand IS NOT NULL)"] }
-        # we have to order by id, because if a bunch of jobs on the same strand
-        # have the exact same run_at time, we could otherwise end up always
-        # getting back the subsequent jobs and never the first initial job that
-        # needs to run
-        named_scope :by_priority, :order => 'priority ASC, run_at ASC, id ASC'
+        named_scope :by_priority, :order => 'priority ASC, run_at ASC'
 
         # When a worker is exiting, make sure we don't have any locked jobs.
         def self.clear_locks!(worker_name)
@@ -59,13 +60,30 @@ module Delayed
                                              queue = nil,
                                              min_priority = nil,
                                              max_priority = nil)
-          loop do
-            jobs = find_available(worker_name, 5, max_run_time, queue, min_priority, max_priority)
-            return nil if jobs.empty?
-            job = jobs.detect do |job|
-              job.lock_exclusively!(max_run_time, worker_name)
+          if self.use_row_locking
+            scope = self.all_available(worker_name, max_run_time, queue, min_priority, max_priority)
+
+            ::ActiveRecord::Base.silence do
+              # it'd be a big win to do this in a DB function and avoid the extra
+              # round trip.
+              transaction do
+                job = scope.find(:first, :lock => true)
+                if job
+                  job.update_attributes(:locked_at => db_time_now,
+                                        :locked_by => worker_name)
+                end
+                job
+              end
             end
-            return job if job
+          else
+            loop do
+              jobs = find_available(worker_name, 5, max_run_time, queue, min_priority, max_priority)
+              return nil if jobs.empty?
+              job = jobs.detect do |job|
+                job.lock_exclusively!(max_run_time, worker_name)
+              end
+              return job if job
+            end
           end
         end
 
@@ -88,7 +106,7 @@ module Delayed
           scope = scope.scoped(:conditions => ['priority <= ?', max_priority]) if max_priority
           scope = scope.scoped(:conditions => ['queue = ?', queue]) if queue
           scope = scope.scoped(:conditions => ['queue is null']) unless queue
-          scope.strand_ready.by_priority
+          scope.by_priority
         end
 
         # Lock this job for this worker.
@@ -114,12 +132,10 @@ module Delayed
             # if this job is part of a strand, make sure no earlier jobs in the
             # strand are running.
             if self.strand.present?
-              blocking_job = self.class.first(:conditions => ["strand = ? AND id < ? and failed_at is null", self.strand, self.id], :order => 'run_at desc')
-              if blocking_job
+              count = self.class.count(:conditions => ["strand = ? AND id < ? and failed_at is null", self.strand, self.id])
+              if count > 0
                 self.locked_at = self.locked_by = nil
-                if self.run_at < blocking_job.run_at
-                  self.run_at = blocking_job.run_at.advance(:seconds => 1)
-                end
+                self.run_at = now.advance(:seconds => Setting.get_cached('delayed_jobs_strand_sleep_time', '60').to_i)
                 self.save
                 return false
               end
