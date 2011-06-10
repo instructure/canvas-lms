@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('email_lists', function(I18n) {
+
 (function($) {
 
   var $email_lists_processed_person_template = $("#email_lists_processed_person_template").removeAttr('id').detach(),
@@ -170,20 +172,14 @@
         if (emailList.errored_addresses && emailList.errored_addresses.length) {
           $user_emails_with_errors
             .appendTo($email_lists_processed_people)
-            .find('.addresses_count')
-              .html(emailList.addresses.length)
-              .end()
-            .find('.errors_count')
-              .html(emailList.errored_addresses.length);
+            .find('.message_content')
+              .html(I18n.t("email_parsing_errors", { one: "There was 1 error parsing that list of emails.", other: "There were %{count} errors parsing that list of emails."}, {count:emailList.errored_addresses.length}) + " " + I18n.t("invalid_emails_notice", "There may be some that were invalid, and you might need to go back and fix any errors.") + " " + I18n.t("users_to_add", { one: "If you proceed as is, 1 user will be added.", other: "If you proceed as is, %{count} users will be added." }, {count: emailList.addresses.length}));
         }
         if (emailList.duplicates && emailList.duplicates.length) {
           $user_emails_duplicates_found
             .appendTo($email_lists_processed_people)
-            .find('.duplicate_count')
-              .html(emailList.duplicates.length)
-              .end()
-            .find('.duplicates_plurality')
-              .html(emailList.duplicates.length > 1 ? 'es': '');
+            .find('.message_content')
+              .html(I18n.t("duplicate_emails", { one: "1 duplicate address found, duplicates have been removed.", other: "%{count} duplicate addresses found, duplicates have been removed."}, {count:emailList.duplicates.length}))
         }
 
         $.each(emailList.addresses, function(){
@@ -260,3 +256,5 @@
   $(INST.EmailLists.init);
   
 })(jQuery, INST);
+
+});

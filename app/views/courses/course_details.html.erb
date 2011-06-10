@@ -487,46 +487,7 @@
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
         If you invite a teacher and they accept, you will give up administrative priveleges for this course.
       </div>
-      <div id="email_list_boxes">
-        <a id="email_lists_path" style="display:none;" href="<%= url_for email_lists_path(:format => :json) %>"></a>  
-        <div id="user_emails_textarea_container" style="z-index: 2;">
-          <span style="font-size: 0.8em;">Copy and paste a list of email addresses to add users to this course.</span>
-          <textarea name="user_emails" class="user_emails"></textarea>
-        </div>
-        <div id="user_emails_parsed" style="z-index: 1; display:none;">
-          <div class="ui-helper-reset ui-widget-content ui-corner-all" id="email_lists_processed_people">
-            <div id="user_emails_duplicates_found" class="ui-widget">
-              <div class="ui-state-highlight ui-corner-all"> 
-                <p>
-                  <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
-                  <strong>Notice:</strong> <strong class='duplicate_count'>???</strong> duplicate address<span class="duplicates_plurality">es</span> found, duplicates have been removed.
-                </p>
-              </div>
-            </div>
-            <div id="user_emails_no_valid_emails" class="ui-widget">
-              <div class="ui-state-highlight ui-corner-all"> 
-                <p><span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
-                <strong>Sorry,</strong> it does not seem as if there were any valid email addresses typed in, please go back and try again.</p>
-              </div>
-            </div>
-            <div id="user_emails_with_errors" class="ui-widget">
-              <div class="ui-state-highlight ui-corner-all"> 
-                <p>
-                  <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-alert"></span>
-                  <strong>Alert:</strong> There were <strong class="errors_count">???</strong> errors parsing that list of emails. There may be some that 
-                  were invalid, you might need to go back and fix any errors.  If you proceed as is, <strong class="addresses_count">???</strong>
-                  users will be added.
-                </p>
-              </div>
-            </div>
-
-            <div class="person ui-helper-reset ui-state-default ui-corner-all" id="email_lists_processed_person_template" style="display:none;">
-              <div class="name">Last, First</div>
-              <div class="address">user@domain.com</div>
-            </div>      
-          </div>
-        </div>
-      </div>
+      <%= render :partial => 'shared/email_lists' %>
       <% unless @context.available? %>
       <div style="font-size: 0.8em;">
         <i>Since the course hasn't been published, students and TA's will be added, but won't be
