@@ -26,7 +26,7 @@ describe "concluded/unconcluded" do
   it "should let the teacher edit the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
     
-    keep_trying{driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed?}
+    keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
     entry.find_element(:css, ".grade").should be_displayed
     sleep 1
@@ -39,7 +39,7 @@ describe "concluded/unconcluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
     
-    keep_trying{driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed?}
+    keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
     entry.find_element(:css, ".grade").should be_displayed
     sleep 1
@@ -50,14 +50,14 @@ describe "concluded/unconcluded" do
   it "should let the teacher add comments to the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
     
-    keep_trying{driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed?}
+    keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
 
     driver.execute_script("$('#submission_#{@student.id}_#{@assignment.id} .grade').mouseover();")
     sleep 0.5
     entry.send_keys('i')
 
-    keep_trying{driver.find_element(:css, "#submission_information").displayed? }
+    keep_trying_until { driver.find_element(:css, "#submission_information").displayed? }
     driver.find_element(:css, "#submission_information .add_comment").should be_displayed
     driver.find_element(:css, "#submission_information .save_buttons").should be_displayed
   end
@@ -66,14 +66,14 @@ describe "concluded/unconcluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
     
-    keep_trying{driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed?}
+    keep_trying_until { driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id} .grade").displayed? }
     entry = driver.find_element(:css, "#submission_#{@student.id}_#{@assignment.id}")
 
     driver.execute_script("$('#submission_#{@student.id}_#{@assignment.id} .grade').mouseover();")
     sleep 0.5
     entry.send_keys('i')
 
-    keep_trying{driver.find_element(:css, "#submission_information").displayed? }
+    keep_trying_until { driver.find_element(:css, "#submission_information").displayed? }
     driver.find_element(:css, "#submission_information .add_comment").should_not be_displayed
     driver.find_element(:css, "#submission_information .save_buttons").should_not be_displayed
   end
