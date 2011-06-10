@@ -178,3 +178,15 @@ ActionMailer::Base.class_eval do
   end
   alias :t :translate
 end
+
+ActiveSupport::CoreExtensions::Array::Conversions.class_eval do
+  def to_sentence_with_simple_or(options = {})
+    if options == :or
+      to_sentence_without_simple_or(:two_words_connector => I18n.t('support.array.or.two_words_connector', ' or '),
+                                    :last_word_connector => I18n.t('support.array.or.last_word_connector', ', or '))
+    else
+      to_sentence_without_simple_or(options)
+    end
+  end
+  alias_method_chain :to_sentence, :simple_or
+end
