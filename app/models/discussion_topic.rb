@@ -64,7 +64,7 @@ class DiscussionTopic < ActiveRecord::Base
   
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
-    self.title ||= "No Title"
+    self.title ||= t :default_title, "No Title"
     @content_changed = self.message_changed? || self.title_changed?
     if self.assignment_id != self.assignment_id_was
       @old_assignment_id = self.assignment_id_was
@@ -347,9 +347,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
   
   def to_atom(opts={})
-    prefix = self.is_announcement ? "Announcement" : "Discussion"
+    prefix = [self.is_announcement ? t('#titles.announcement', "Announcement") : t('#titles.discussion', "Discussion")]
+    prefix << self.context.name if opts[:include_context]
     Atom::Entry.new do |entry|
-      entry.title     = "#{prefix}#{", " + self.context.name if opts[:include_context]}: #{self.title}"
+      entry.title     = [before_label(prefix.to_sentence), self.title].join(" ")
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/discussion_topics/#{self.feed_code}"
@@ -391,7 +392,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
-    self.user.name rescue "User Name"
+    self.user.name rescue t :default_user_name, "User Name"
   end
   
   def locked_for?(user=nil, opts={})
@@ -504,10 +505,10 @@ class DiscussionTopic < ActiveRecord::Base
     else
       item ||= context.discussion_topics.new
     end
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record? if context.respond_to?(:imported_migration_items)
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
+    item.message = t(:empty_message, "No message") if item.message.blank?
     item.posted_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
     item.delayed_post_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
     item.delayed_post_at ||= Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
@@ -596,7 +597,7 @@ class DiscussionTopic < ActiveRecord::Base
       asset = elem.podcast_associated_asset
       next unless asset
       item = RSS::Rss::Channel::Item.new
-      item.title = (asset.title rescue "") + ": " + elem.name
+      item.title = before_label((asset.title rescue "")) + elem.name
       link = nil
       if asset.is_a?(DiscussionTopic)
         link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.id}"

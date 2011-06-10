@@ -29,7 +29,7 @@
           <% if @topic_agglomerated && entry %>
             <a href="<%= context_url(entry_context, :context_discussion_topic_url, entry ? entry.discussion_topic_id : '{{ topic_id }}') %>" style="font-weight: bold;"><%= entry.context.name %></a>
           <% end %>
-          <a title="Author's name" href="<%= context_url(entry_context, :context_user_url, user_id) %>" class="user_name"><%= context_user_name(@context, entry && entry.user_id) %></a>
+          <a title="<%= t :authors_name, "Author's name" %>" href="<%= context_url(entry_context, :context_user_url, user_id) %>" class="user_name"><%= context_user_name(@context, entry && entry.user_id) %></a>
         <% end %>
       </div>
       <div class="teaser_message"></div>
@@ -37,25 +37,25 @@
       <div class="link_box">
         <span class="links">
           <% if !@topic_agglomerated && (!entry || !entry.new_record?) %>
-            <a href="<%= context_url(entry_context, :new_context_discussion_entry_url) %>" class="add_entry_link disabled_link atr-reply">Reply to this Message</a>
-            <a href="<%= context_url(entry_context, :edit_context_discussion_entry_url, entry_id) %>" class="edit_entry_link disabled_link atr-edit">Edit this Message</a>
-            <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry_id) %>" class="delete_entry_link disabled_link atr-delete">Delete this Message</a>
+            <a href="<%= context_url(entry_context, :new_context_discussion_entry_url) %>" class="add_entry_link disabled_link atr-reply"><%= t :reply_to_message, "Reply to this Message" %></a>
+            <a href="<%= context_url(entry_context, :edit_context_discussion_entry_url, entry_id) %>" class="edit_entry_link disabled_link atr-edit"><%= t :edit_message, "Edit this Message" %></a>
+            <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry_id) %>" class="delete_entry_link disabled_link atr-delete"><%= t :delete_message, "Delete this Message" %></a>
           <% end %>
         </span>
       </div>
       <% end %>
-      <div class="post_date time_ago_date"><%= entry.try_rescue(:created_at).try_rescue(:strftime, "%b %d at %I:%M%p") || "Date Created" %></div>
+      <div class="post_date time_ago_date"><%= entry.try_rescue(:created_at).tap{|time| time && datetime_string(time)} %></div>
       <div class="clear"></div>
     <% end %>
   </div>
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), entry_context.asset_string) %></div>
     <div class="course_id" style="display: none;"><%= entry_context.id if entry_context && entry_context.is_a?(Course) %></div>
-    <div class="message user_content"><%= user_content(entry.try_rescue(:message), entry_context.asset_string, entry.try_rescue(:asset_string)) || nbsp %></div>
+    <div class="message user_content"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>
     <div class="link_box">
       <div class="attachment_data" style="<%= hidden unless entry && entry.attachment %>; float: left;">
-        Attached File: <a href="<%= context_url(entry_context, :context_file_download_url, entry && entry.attachment ? entry.attachment_id : "{{ attachment_id }}") %>" class="attachment_name"><%= entry.try_rescue(:attachment).try_rescue(:display_name) || nbsp %></a>
+        <%= before_label :attached_file, "Attached File" %> <a href="<%= context_url(entry_context, :context_file_download_url, entry && entry.attachment ? entry.attachment_id : "{{ attachment_id }}") %>" class="attachment_name"><%= entry.try_rescue(:attachment).try_rescue(:display_name) || nbsp %></a>
         <a href="<%= context_url(entry_context, :context_file_download_url, "{{ attachment_id }}") %>" class="entry_attachment_url" style="display: none;">&nbsp;</a>
       </div>
       <div class="clear"></div>
@@ -68,7 +68,7 @@
         <% if entries.length > 3 %>
           <div class="communication_sub_message">
             <div class="content behavior_content">
-              <a href="#" class="show_sub_messages_link">Show <%= pluralize(entries.length - 2, "More Entry") %></a>
+              <a href="#" class="show_sub_messages_link"><%= t :show_more_entries, { :one => "Show 1 More Entry", :other => "Show %{count} More Entries" }, :count => (entries.length - 2) %></a>
             </div>
           </div>
         <% end %>
@@ -78,12 +78,12 @@
       <% end %>
       <% if entry && entry.editor_id && entry.editor_id != entry.user_id %>
         <div style="font-size: 0.8em;">
-          This comment was edited by <%= link_to(context_user_name(entry_context, entry.editor_id), context_url(entry_context, :context_user_url, entry.editor_id)) %>.
+          <%= t :edited_comment, "This comment was edited by %{user}.", :user => link_to(context_user_name(entry_context, entry.editor_id), context_url(entry_context, :context_user_url, entry.editor_id)) %>
         </div>
       <% end %>
       <div class="communication_sub_message reply_message <%= 'lonely_behavior_message' if entries.empty? %>" style="display: none;">
         <div class="content behavior_content">
-          <a href="#" class="add_entry_link textarea">Make a Side Comment...</a>
+          <a href="#" class="add_entry_link textarea"><%= t :make_side_comment, "Make a Side Comment..." %></a>
         </div>
       </div>
       <%= render :partial => 'discussion_topics/sub_entry', :object => nil, :locals => {:parent_entry => entry || topic} %>

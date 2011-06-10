@@ -21,7 +21,7 @@ class UsersController < ApplicationController
   include Twitter
   include LinkedIn
   include DeliciousDiigo
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade]
   before_filter :require_open_registration, :only => [:new, :create]
   
   def oauth
@@ -149,7 +149,7 @@ class UsersController < ApplicationController
   
   def index
     get_context
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :read_roster)
       @root_account = @context.root_account || @account
       @users = []
       @query = (params[:user] && params[:user][:name]) || params[:query]
@@ -183,6 +183,25 @@ class UsersController < ApplicationController
           }.to_json
         }
       end
+    end
+  end
+
+  def masquerade
+    if user_is_site_admin?(@real_current_user || @current_user, :become_user)
+      @user = User.find_by_id(params[:user_id])
+      if request.post?
+        if @user == @real_current_user
+          session[:become_user_id] = nil
+        else
+          session[:become_user_id] = params[:user_id]
+        end
+        return_url = session[:masquerade_return_to]
+        session[:masquerade_return_to] = nil
+        return return_to(return_url, dashboard_url)
+      end
+      return
+    else
+      render_unauthorized_action
     end
   end
 
@@ -222,6 +241,11 @@ class UsersController < ApplicationController
   def ignore_item
     @current_user.ignore_item!(params[:asset_string], params[:purpose], params[:permanent] == '1')
     render :json => @current_user.to_json
+  end
+
+  def ignore_stream_item
+    StreamItemInstance.update_all({ :hidden => true }, { :stream_item_id => params[:id], :user_id => @current_user.id })
+    render :json => { :hidden => true }
   end
   
   def close_notification
@@ -318,7 +342,8 @@ class UsersController < ApplicationController
   end
 
   def create
-    @pseudonym = Pseudonym.find_or_initialize_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @domain_root_account.id)
+    @pseudonym = Pseudonym.find_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @domain_root_account.id)
+    @pseudonym ||= Pseudonym.new(:unique_id => params[:pseudonym][:unique_id], :account => @domain_root_account)
     @pseudonym.save_without_session_maintenance if @pseudonym.new_record?
     @active_cc = CommunicationChannel.find_by_path_and_path_type_and_workflow_state(params[:pseudonym][:unique_id], 'email', 'active')
     @any_cc = CommunicationChannel.find_by_path_and_path_type(params[:pseudonym][:unique_id], 'email') unless @active_cc

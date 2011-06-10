@@ -20,11 +20,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe CoursesController, :type => :integration do
   before do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @me = @user
     @course1 = @course
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'my-course-sis')
+    @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
   it "should return course list" do
@@ -70,7 +72,44 @@ describe CoursesController, :type => :integration do
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.should == api_json_response([first_user, new_user],
-        :only => %w(id name), :methods => %w(sis_user_id))
+        :only => %w(id name))
+  end
+
+  it "should not include user sis id for non-admins" do
+    first_user = @user
+    new_user = User.create!(:name => 'Zombo')
+    @course2.enroll_student(new_user).accept!
+
+    @user = @me
+    json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
+            { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
+    json.map { |u| u['sis_user_id'] }.should == [nil, nil]
+  end
+
+  it "should include user sis id if account admin" do
+    @course2.account.add_user(@me)
+    first_user = @user
+    new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
+    @course2.enroll_student(new_user).accept!
+    new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+
+    @user = @me
+    json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
+            { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
+    json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
+  end
+
+  it "should include user sis id if site admin" do
+    Account.site_admin.add_user(@me)
+    first_user = @user
+    new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
+    @course2.enroll_student(new_user).accept!
+    new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+
+    @user = @me
+    json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
+            { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
+    json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
   end
 
   it "should return the list of sections for the course" do
@@ -83,8 +122,8 @@ describe CoursesController, :type => :integration do
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
             { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
     json.size.should == 2
-    json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => %w(id name), :methods => %w(sis_user_id))
-    json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => %w(id name), :methods => %w(sis_user_id))
+    json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => %w(id name))
+    json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => %w(id name))
   end
 
   it "should allow specifying course sis id" do
@@ -96,7 +135,7 @@ describe CoursesController, :type => :integration do
     json = api_call(:get, "/api/v1/courses/sis:my-course-sis/students.json",
             { :controller => 'courses', :action => 'students', :course_id => 'sis:my-course-sis', :format => 'json' })
     json.should == api_json_response([first_user, new_user],
-        :only => %w(id name), :methods => %w(sis_user_id))
+        :only => %w(id name))
   end
 
   it "should return the needs_grading_count for all assignments" do

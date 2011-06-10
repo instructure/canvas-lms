@@ -19,7 +19,7 @@
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
   
-  add_crumb("Discussions", :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
+  add_crumb(lambda { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
   before_filter { |c| c.active_tab = "discussions" }  
 
   def index
@@ -42,7 +42,7 @@ class DiscussionTopicsController < ApplicationController
     if authorized_action(@context, @current_user, :moderate_forum)
       @topics = @context.discussion_topics
       @topics.first.update_order(params[:order].split(",").map{|id| id.to_i}.reverse) unless @topics.empty?
-      flash[:notice] = "Topics successfully reordered"
+      flash[:notice] = t :reordered_topics_notice, "Topics successfully reordered"
       redirect_to named_context_url(@context, :context_discussion_topics_url)
     end
   end
@@ -66,7 +66,7 @@ class DiscussionTopicsController < ApplicationController
     @context.assert_assignment_group rescue nil
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
     if @topic.deleted?
-      flash[:notice] = "That topic has been deleted"
+      flash[:notice] = t :deleted_topic_notice, "That topic has been deleted"
       redirect_to named_context_url(@context, :context_discussion_topics_url)
       return
     end
@@ -88,7 +88,7 @@ class DiscussionTopicsController < ApplicationController
           @topics = @topic.child_topics.to_a
           @topics = @topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
           @group_entry = @topic.discussion_entries.build(:message => render_to_string(:partial => 'group_assignment_discussion_entry'))
-          @group_entry.new_record_header = "Group Discussion"
+          @group_entry.new_record_header = t '#titles.group_discussion', "Group Discussion"
           @topic_uneditable = true
           @entries = [@group_entry]
         end
@@ -96,7 +96,7 @@ class DiscussionTopicsController < ApplicationController
       if @topic.require_initial_post || (@topic.root_topic && @topic.root_topic.require_initial_post)
         user_ids = []
         user_ids << @current_user.id if @current_user
-        user_ids << @context_enrollment.associated_user_id if @context_enrollment && @context_enrollment.associated_user_id
+        user_ids << @context_enrollment.associated_user_id if @context_enrollment && @context_enrollment.respond_to?(:associated_user_id) && @context_enrollment.associated_user_id
         unless @entries.detect{|e| user_ids.include?(e.user_id) } || @topic.grants_right?(@current_user, session, :update)
           @initial_post_required = true
         end
@@ -105,7 +105,7 @@ class DiscussionTopicsController < ApplicationController
       log_asset_access(@topic, 'topics', 'topics')
       respond_to do |format|
         if @topic.deleted?
-          flash[:notice] = "That topic has been deleted"
+          flash[:notice] = t :deleted_topic_notice, "That topic has been deleted"
           format.html { redirect_to named_context_url(@context, :discussion_topics_url) }
         elsif @topics && @topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
           format.html { redirect_to named_context_url(@topics[0].context, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) }
@@ -187,7 +187,7 @@ class DiscussionTopicsController < ApplicationController
             @topic.attachment = @attachment
             @topic.save
           end
-          flash[:notice] = 'Topic was successfully created.'
+          flash[:notice] = t :topic_created_notice, 'Topic was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic) }
           format.xml  { head :created, :location => named_context_url(@context, :context_discussion_topic_url, @topic) }
           format.json  { render :json => @topic.to_json(:include => [:assignment,:attachment], :methods => :user_name, :permissions => {:user => @current_user, :session => session}), :status => :created }
@@ -241,7 +241,7 @@ class DiscussionTopicsController < ApplicationController
             @topic.attachment = @attachment
             @topic.save
           end
-          flash[:notice] = 'Topic was successfully updated.'
+          flash[:notice] = t :topic_updated_notice, 'Topic was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic) }
           format.xml  { head :ok }
           format.json  { render :json => @topic.to_json(:include => [:assignment, :attachment], :methods => :user_name, :permissions => {:user => @current_user, :session => session}), :status => :ok }
@@ -271,7 +271,7 @@ class DiscussionTopicsController < ApplicationController
   def public_feed
     return unless get_feed_context
     feed = Atom::Feed.new do |f|
-      f.title = "#{@context.name} Discussion Feed"
+      f.title = t :discussion_feed_title, "%{title} Discussion Feed", :title => @context.name
       f.links << Atom::Link.new(:href => named_context_url(@context, :context_discussion_topics_url))
       f.updated = Time.now
       f.id = named_context_url(@context, :context_discussion_topics_url)

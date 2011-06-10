@@ -38,6 +38,8 @@ class Enrollment < ActiveRecord::Base
   after_save :touch_user
   before_save :update_user_account_associations_if_necessary
 
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :invitation_email
+
   trigger.after(:insert).where("NEW.workflow_state = 'active'") do
     <<-SQL
     UPDATE assignments
@@ -402,7 +404,7 @@ class Enrollment < ActiveRecord::Base
   end
   
   def computed_final_grade
-    return "TODO"
+    self.course.score_to_grade(self.computed_final_score)
   end
 
   def self.students(opts={})
@@ -441,7 +443,10 @@ class Enrollment < ActiveRecord::Base
     given {|user, session| self.course.grants_right?(user, session, :manage_students) && self.user.show_user_services }
     set { can :read and can :read_services }
     
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :manage_grades) }#admins.include? user }
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :manage_grades) }
+    set { can :read and can :read_grades }
+    
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :read_as_admin) }
     set { can :read and can :read_grades }
     
     given { |user| !!Enrollment.active.find_by_user_id_and_associated_user_id(user.id, self.user_id) }

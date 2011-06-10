@@ -25,6 +25,7 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :enrollment_dates_overrides
   has_many :courses
   has_many :course_sections
+  before_validation :verify_unique_sis_source_id
   validates_length_of :sis_data, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   
   def set_overrides(context, params)
@@ -39,6 +40,15 @@ class EnrollmentTerm < ActiveRecord::Base
       override.save
       override
     end
+  end
+  
+  def verify_unique_sis_source_id
+    return true unless self.sis_source_id
+    existing_term = self.root_account.enrollment_terms.find_by_sis_source_id(self.sis_source_id)
+    return true if !existing_term || existing_term.id == self.id 
+    
+    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    false
   end
   
   def users_count

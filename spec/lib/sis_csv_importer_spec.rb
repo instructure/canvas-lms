@@ -36,12 +36,110 @@ describe SIS::SisCsv do
     importer
   end
   
+  def process_csv_data_cleanly(*lines)
+    importer = process_csv_data(*lines)
+    importer.errors.should == []
+    importer.warnings.should == []
+  end
+  
   it "should error files with unknown headers" do
     importer = process_csv_data(
       "course_id,randomness,smelly",
       "test_1,TC 101,Test Course 101,,,active"
     )
     importer.errors.first.last.should == "Couldn't find Canvas CSV import headers"
+  end
+  
+  it "should work for a mass import" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "U001,user1,User,One,user1@example.com,active",
+      "U002,user2,User,Two,user2@example.com,active",
+      "U003,user3,User,Three,user3@example.com,active",
+      "U004,user4,User,Four,user4@example.com,active",
+      "U005,user5,User,Five,user5@example.com,active",
+      "U006,user6,User,Six,user6@example.com,active",
+      "U007,user7,User,Seven,user7@example.com,active",
+      "U008,user8,User,Eight,user8@example.com,active",
+      "U009,user9,User,Nine,user9@example.com,active",
+      "U010,user10,User,Ten,user10@example.com,active",
+      "U011,user11,User,Eleven,user11@example.com,deleted"
+    )
+    process_csv_data_cleanly(
+      "term_id,name,status,start_date,end_date",
+      "T001,Term 1,active,,",
+      "T002,Term 2,active,,",
+      "T003,Term 3,active,,"
+    )
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,C001,Test Course 1,,T001,active",
+      "C002,C002,Test Course 2,,T001,deleted",
+      "C003,C003,Test Course 3,,T002,deleted",
+      "C004,C004,Test Course 4,,T002,deleted",
+      "C005,C005,Test Course 5,,T003,active",
+      "C006,C006,Test Course 6,,T003,active",
+      "C007,C007,Test Course 7,,T003,active",
+      "C008,C008,Test Course 8,,T003,active",
+      "C009,C009,Test Course 9,,T003,active",
+      "C001S,C001S,Test search Course 1,,T001,active",
+      "C002S,C002S,Test search Course 2,,T001,deleted",
+      "C003S,C003S,Test search Course 3,,T002,deleted",
+      "C004S,C004S,Test search Course 4,,T002,deleted",
+      "C005S,C005S,Test search Course 5,,T003,active",
+      "C006S,C006S,Test search Course 6,,T003,active",
+      "C007S,C007S,Test search Course 7,,T003,active",
+      "C008S,C008S,Test search Course 8,,T003,active",
+      "C009S,C009S,Test search Course 9,,T003,active"
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status",
+      "S001,C001,Sec1,,,active",
+      "S002,C002,Sec2,,,active",
+      "S003,C003,Sec3,,,active",
+      "S004,C004,Sec4,,,active",
+      "S005,C005,Sec5,,,active",
+      "S006,C006,Sec6,,,active",
+      "S007,C007,Sec7,,,deleted",
+      "S008,C001,Sec8,,,deleted",
+      "S009,C008,Sec9,,,active",
+      "S001S,C001S,Sec1,,,active",
+      "S002S,C002S,Sec2,,,active",
+      "S003S,C003S,Sec3,,,active",
+      "S004S,C004S,Sec4,,,active",
+      "S005S,C005S,Sec5,,,active",
+      "S006S,C006S,Sec6,,,active",
+      "S007S,C007S,Sec7,,,deleted",
+      "S008S,C001S,Sec8,,,deleted",
+      "S009S,C008S,Sec9,,,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      ",U001,student,S001,active,",
+      ",U002,student,S002,active,",
+      ",U003,student,S003,active,",
+      ",U004,student,S004,active,",
+      ",U005,student,S005,active,",
+      ",U006,student,S006,deleted,",
+      ",U007,student,S007,active,",
+      ",U008,student,S008,active,",
+      ",U009,student,S005,deleted,",
+      ",U001,student,S001S,active,",
+      ",U002,student,S002S,active,",
+      ",U003,student,S003S,active,",
+      ",U004,student,S004S,active,",
+      ",U005,student,S005S,active,",
+      ",U006,student,S006S,deleted,",
+      ",U007,student,S007S,active,",
+      ",U008,student,S008S,active,",
+      ",U009,student,S005S,deleted,"
+    )
+    process_csv_data_cleanly(
+      "group_id,name,account_id,status",
+      "G001,Group 1,,available",
+      "G002,Group 2,,deleted",
+      "G003,Group 3,,closed"
+    )
   end
   
   context "course importing" do
@@ -74,6 +172,7 @@ describe SIS::SisCsv do
       course = @account.courses.find_by_sis_source_id("test_1")
       course.course_code.should eql("TC 101")
       course.name.should eql("Test Course 101")
+      course.associated_accounts.map(&:id).sort.should == [@account.id]
     end
     
     it "shouldn't blow away the account id if it's already set" do
@@ -88,6 +187,7 @@ describe SIS::SisCsv do
       )
       course = @account.courses.find_by_sis_source_id("test_1")
       course.account.should == @account
+      course.associated_accounts.map(&:id).sort.should == [@account.id]
       account.should_not == @account
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
@@ -95,12 +195,14 @@ describe SIS::SisCsv do
       )
       course.reload
       course.account.should == account
+      course.associated_accounts.map(&:id).sort.should == [account.id, @account.id].sort
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active"
       )
       course.reload
       course.account.should == account
+      course.associated_accounts.map(&:id).sort.should == [account.id, @account.id].sort
     end
     
     it "should rename courses that have not had their name manually changed" do
@@ -199,27 +301,47 @@ describe SIS::SisCsv do
     
     it "should set passwords and not overwrite current passwords" do
       process_csv_data(
-        "user_id,login_id,password,first_name,last_name,email,status",
-        "user_1,user1,badpassword,User,Uno 2,user@example.com,active"     
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,badpassword,User,Uno 2,user@example.com,active,",
+        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}Y2FiODZkZDYyNjE3MTA4OTFlOGNiNTZlZTM2MjU2OTFhNzVkZjM0NHNhbHRzYWx0"
       )
-      user = User.find_by_email('user@example.com')
-      p = user.pseudonyms.first
-      p.valid_password?('badpassword').should be_true
+      user1 = User.find_by_email('user@example.com')
+      p = user1.pseudonyms.first
+      p.valid_arbitrary_credentials?('badpassword').should be_true
       
       p.password = 'lessbadpassword'
       p.password_confirmation = 'lessbadpassword'
       p.save
-      
+
+      user2 = User.find_by_email('user2@example.com')
+      p = user2.pseudonyms.first
+      p.valid_arbitrary_credentials?('password').should be_true
+
+      p.password = 'newpassword'
+      p.password_confirmation = 'newpassword'
+      p.save
+
+      p.valid_arbitrary_credentials?('password').should be_false
+      p.valid_arbitrary_credentials?('newpassword').should be_true
+
       process_csv_data(
-        "user_id,login_id,password,first_name,last_name,email,status",
-        "user_1,user1,badpassword2,User,Uno 2,user@example.com,active"     
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,badpassword2,User,Uno 2,user@example.com,active",
+        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}ZDg1ZmJhMjNmZWU0ZmFiMmYzYTJhNTMxNzZiNjcyZWFhMzE0ZTQzMXNhbHR5"
       )
       
-      user.reload
-      p = user.pseudonyms.first
-      p.valid_password?('badpassword').should be_false
-      p.valid_password?('badpassword2').should be_false
-      p.valid_password?('lessbadpassword').should be_true
+      user1.reload
+      p = user1.pseudonyms.first
+      p.valid_arbitrary_credentials?('badpassword').should be_false
+      p.valid_arbitrary_credentials?('badpassword2').should be_false
+      p.valid_arbitrary_credentials?('lessbadpassword').should be_true
+
+      user2.reload
+      p = user2.pseudonyms.first
+      p.valid_arbitrary_credentials?('password').should be_false
+      p.valid_arbitrary_credentials?('changedpassword').should be_false
+      p.valid_arbitrary_credentials?('newpassword').should be_true
+      p.valid_ssha?('changedpassword').should be_true
     end
     
     it "should warn for duplicate rows" do
@@ -799,6 +921,7 @@ describe SIS::SisCsv do
       s1.nonxlist_course.should be_nil
       s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+      course.associated_accounts.map(&:id).sort.should == [@account.id]
       @account.courses.find_by_sis_source_id("X001").should be_nil
       
       importer = process_csv_data(
@@ -810,11 +933,13 @@ describe SIS::SisCsv do
       importer.errors.should == []
       
       xlist_course = @account.courses.find_by_sis_source_id("X001")
+      xlist_course.associated_accounts.map(&:id).sort.should == [@account.id]
       course = @account.courses.find_by_sis_source_id("C001")
+      course.associated_accounts.map(&:id).sort.should == [@account.id]
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       
@@ -829,11 +954,13 @@ describe SIS::SisCsv do
       xlist_course = @account.courses.find_by_sis_source_id("X001")
       course = @account.courses.find_by_sis_source_id("C001")
       xlist_course.course_sections.find_by_sis_source_id("S001").should be_nil
+      xlist_course.associated_accounts.map(&:id).sort.should == [@account.id]
       s1 = course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should be_nil
       s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
+      course.associated_accounts.map(&:id).sort.should == [@account.id]
 
       xlist_course.name.should == "Test Course 101"
       xlist_course.sis_name.should == "Test Course 101"
@@ -845,27 +972,59 @@ describe SIS::SisCsv do
       xlist_course.workflow_state.should == "claimed"
     end
       
-    it 'should mark the original course deleted if it is made empty due to crosslisting' do
+    it 'should preserve data into copied xlist courses' do
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,,,active",
-        "C002,TC 101,Test Course 101,,,active"
+        "C002,TC 102,Test Course 102,,,active"
       )
       process_csv_data(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
-        "S002,C002,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
-        "S003,C002,Sec3,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
+        "S002,C001,Sec2,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
+        "S003,C001,Sec3,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
+        "S004,C002,Sec4,2012-12-05 00:00:00,2012-12-14 00:00:00,active",
+        "S005,C002,Sec5,2012-12-05 00:00:00,2012-12-14 00:00:00,active"
       )
+      @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
       process_csv_data(
         "xlist_course_id,section_id,status",
         "X001,S001,active",
-        "X001,S002,active"
+        "X001,S002,active",
+        "X002,S004,active",
+        "X002,S005,active"
       )
-      @account.courses.find_by_sis_source_id("C002").workflow_state.should_not == "deleted"
-      @account.courses.find_by_sis_source_id("C001").workflow_state.should == "deleted"
+      @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 101"
+      @account.courses.find_by_sis_source_id("X002").name.should == "Test Course 102"
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 103,Test Course 103,,,active",
+        "C002,TC 104,Test Course 104,,,active"
+      )
+      @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").name.should == "Test Course 103"
+      @account.courses.find_by_sis_source_id("X002").name.should == "Test Course 104"
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "X001,S001,deleted",
+        "X001,S002,deleted",
+        "X002,S004,deleted",
+        "X002,S005,deleted"
+      )
+      @account.courses.find_by_sis_source_id("C001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("C002").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X001").deleted?.should be_false
+      @account.courses.find_by_sis_source_id("X002").deleted?.should be_false
     end
-      
+    
     it 'should work with xlists with an xlist course defined' do
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
@@ -899,7 +1058,7 @@ describe SIS::SisCsv do
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
       course.course_sections.find_by_sis_source_id("S001").should be_nil
       course.course_sections.find_by_sis_source_id("S002").should_not be_nil
       
@@ -979,7 +1138,7 @@ describe SIS::SisCsv do
         s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
         s1.should_not be_nil
         s1.nonxlist_course.should eql(course)
-        s1.account.should eql(course.account)
+        s1.account.should be_nil
       end
     end
 
@@ -1004,7 +1163,7 @@ describe SIS::SisCsv do
       s1 = xlist_course.course_sections.find_by_sis_source_id("S001")
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course)
-      s1.account.should eql(course.account)
+      s1.account.should be_nil
 
       3.times do 
         importer = process_csv_data(
@@ -1045,7 +1204,7 @@ describe SIS::SisCsv do
         s1.should_not be_nil
         s1.nonxlist_course.should eql(course)
         s1.course.should eql(xlist_course)
-        s1.account.should eql(course.account)
+        s1.account.should be_nil
         s1.crosslisted?.should be_true
       end
       importer = process_csv_data(
@@ -1144,7 +1303,7 @@ describe SIS::SisCsv do
       s1.should_not be_nil
       s1.nonxlist_course.should eql(course1)
       s1.course.should eql(xlist_course)
-      s1.account.should eql(course1.account)
+      s1.account.should be_nil
       s1.crosslisted?.should be_true
       process_csv_data(
         "section_id,course_id,name,start_date,end_date,status",
@@ -1191,6 +1350,326 @@ describe SIS::SisCsv do
 
       @enrollment.reload
       @enrollment.grade_publishing_status.should == 'published'
+    end
+  end
+  
+  context 'account associations' do
+    before(:each) do
+      process_csv_data(
+        "account_id,parent_account_id,name,status",
+        "A001,,Humanities,active",
+        "A002,A001,English,active",
+        "A003,A002,English Literature,active",
+        "A004,,Awesomeness,active"
+      )
+    end
+    
+    context 'course' do
+      it 'should change course account associations when a course account changes' do
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "test_1,TC 101,Test Course 101,,,active"
+        )
+        Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).should == [@account.id]
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "test_1,TC 101,Test Course 101,A001,,active"
+        )
+        Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "test_1,TC 101,Test Course 101,A004,,active"
+        )
+        Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "test_1,TC 101,Test Course 101,A003,,active"
+        )
+        Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A003').id, Account.find_by_sis_source_id('A002').id, Account.find_by_sis_source_id('A001').id, @account.id].sort
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "test_1,TC 101,Test Course 101,A001,,active"
+        )
+        Course.find_by_sis_source_id("test_1").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+      end
+    end
+    
+    context 'section' do
+      before(:each) do
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "C001,TC 101,Test Course 101,,,active",
+          "C002,TC 101,Test Course 101,A001,,active",
+          "C003,TC 101,Test Course 101,A002,,active",
+          "C004,TC 101,Test Course 101,A003,,active",
+          "C005,TC 101,Test Course 101,A004,,active"
+        )
+      end
+      
+      it 'should change course account associations when a section account changes' do
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A001"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A001').id].sort
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
+      end
+    
+      it 'should change course account associations when a section is not crosslisted and the original section\'s course changes via sis' do
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
+        Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
+        Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
+      end
+
+      it 'should change course account associations when a section is crosslisted and the original section\'s course changes via sis' do
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
+        Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S001,active"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
+        Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
+        Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+      end
+    end
+    
+    context 'crosslist course' do
+      before(:each) do
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "C001,TC 101,Test Course 101,,,active",
+          "C002,TC 101,Test Course 101,A001,,active",
+          "C003,TC 101,Test Course 101,A002,,active",
+          "C004,TC 101,Test Course 101,A003,,active",
+          "C005,TC 101,Test Course 101,A004,,active"
+        )
+      end
+
+      it 'should have proper account associations when new' do
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        )
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S001,active"
+        )
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S001,deleted"
+        )
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+      end
+    
+      it 'should have proper account associations when being undeleted' do
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004",
+          "S002,C002,Sec2,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        )
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S001,active"
+        )
+        Course.find_by_sis_source_id("X001").deleted?.should be_false
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "X001,TC 101,Test Course 101,,,deleted"
+        )
+        Course.find_by_sis_source_id("X001").deleted?.should be_true
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S002,active"
+        )
+        Course.find_by_sis_source_id("X001").deleted?.should be_false
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
+      end
+      
+      it 'should have proper account associations when a section is added and then removed' do
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,A004"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
+        Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "C002,S001,active"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
+        Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, Account.find_by_sis_source_id('A004').id, @account.id].sort
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "C002,S001,deleted"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [@account.id, Account.find_by_sis_source_id('A004').id].sort
+        Course.find_by_sis_source_id("C002").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+      end
+      
+      it 'should get account associations updated when the template course is updated' do
+        process_csv_data(
+          "section_id,course_id,name,start_date,end_date,status,account_id",
+          "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+        )
+        process_csv_data(
+          "xlist_course_id,section_id,status",
+          "X001,S001,active"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).should == [@account.id]
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).should == [@account.id]
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "C001,TC 101,Test Course 101,A004,,active"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A004').id, @account.id].sort
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "C001,TC 101,Test Course 101,A001,,active"
+        )
+        Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+        Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
+      end
+    
+    end
+  end
+
+  describe "group importing" do
+    it "should detect bad content" do
+      importer = process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,A001,Group 1,available",
+        "G001,A001,Group 2,available",
+        "G002,A001,Group 1,blerged",
+        "G003,A001,,available",
+        ",A001,G1,available")
+      importer.errors.map(&:last).should ==
+        ["Duplicate group id G001",
+          "No group_id given for a group"]
+      importer = process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,A001,Group 1,available",
+        "G002,,Group 1,blerged",
+        "G003,,,available")
+      importer.warnings.map(&:last).should ==
+        ["Parent account didn't exist for A001",
+         "Improper status \"blerged\" for group G002, skipping",
+         "No name given for group G003, skipping"]
+    end
+
+    it "should create groups" do
+      account_model
+      @sub = @account.all_accounts.create!(:name => 'sub')
+      @sub.update_attribute('sis_source_id', 'A002')
+      process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,,Group 1,available",
+        "G002,A002,Group 2,deleted")
+      groups = Group.all(:order => :id)
+      groups.map(&:account_id).should == [@account.id, @sub.id]
+      groups.map(&:sis_source_id).should == %w(G001 G002)
+      groups.map(&:name).should == ["Group 1", "Group 2"]
+      groups.map(&:workflow_state).should == %w(available deleted)
+    end
+
+    it "should update group attributes" do
+      @sub = @account.sub_accounts.create!(:name => 'sub')
+      @sub.update_attribute('sis_source_id', 'A002')
+      process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,,Group 1,available",
+        "G002,,Group 2,available")
+      Group.count.should == 2
+      Group.find_by_sis_source_id('G001').update_attribute(:name, 'Group 1-1')
+      process_csv_data(
+        "group_id,account_id,name,status",
+        "G001,,Group 1-b,available",
+        "G002,A002,Group 2-b,deleted")
+      # group 1's name won't change because it was manually changed
+      groups = Group.all(:order => :id)
+      groups.map(&:name).should == ["Group 1-1", "Group 2-b"]
+      groups.map(&:root_account).should == [@account, @account]
+      groups.map(&:workflow_state).should == %w(available deleted)
+      groups.map(&:account).should == [@account, @sub]
+    end
+  end
+
+  describe "group membership importing" do
+    before do
+      group_model(:context => @account, :sis_source_id => "G001")
+      @user1 = user_with_pseudonym(:username => 'u1@example.com')
+      @user1.pseudonym.update_attribute(:sis_user_id, 'U001')
+      @user1.pseudonym.update_attribute(:account, @account)
+      @user2 = user_with_pseudonym(:username => 'u2@example.com')
+      @user2.pseudonym.update_attribute(:sis_user_id, 'U002')
+      @user2.pseudonym.update_attribute(:account, @account)
+      @user3 = user_with_pseudonym(:username => 'u3@example.com')
+      @user3.pseudonym.update_attribute(:sis_user_id, 'U003')
+      @user3.pseudonym.update_attribute(:account, @account)
+    end
+
+    it "should detect bad content" do
+      importer = process_csv_data(
+        "group_id,user_id,status",
+        ",U001,accepted",
+        "G001,,accepted",
+        "G001,U001,bogus")
+      GroupMembership.count.should == 0
+      importer.errors.map(&:last).should ==
+        ["No group_id given for a group user",
+         "No user_id given for a group user",
+         "Improper status \"bogus\" for a group user"]
+    end
+
+    it "should add users to groups" do
+      process_csv_data_cleanly(
+        "group_id,user_id,status",
+        "G001,U001,accepted",
+        "G001,U003,deleted")
+      ms = GroupMembership.all(:order => :id)
+      ms.map(&:user_id).should == [@user1.id, @user3.id]
+      ms.map(&:group_id).should == [@group.id, @group.id]
+      ms.map(&:workflow_state).should == %w(accepted deleted)
+
+      process_csv_data_cleanly(
+        "group_id,user_id,status",
+        "G001,U001,deleted",
+        "G001,U003,deleted")
+      ms = GroupMembership.all(:order => :id)
+      ms.map(&:user_id).should == [@user1.id, @user3.id]
+      ms.map(&:group_id).should == [@group.id, @group.id]
+      ms.map(&:workflow_state).should == %w(deleted deleted)
     end
   end
 end

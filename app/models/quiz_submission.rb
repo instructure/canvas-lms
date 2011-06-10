@@ -18,7 +18,7 @@
 
 class QuizSubmission < ActiveRecord::Base
   include Workflow
-  attr_accessible :submission_data
+  attr_accessible :quiz, :user, :temporary_user_code, :submission_data
   attr_readonly :quiz_id, :user_id
   validates_presence_of :quiz_id
   
@@ -34,7 +34,7 @@ class QuizSubmission < ActiveRecord::Base
 
   adheres_to_policy
   
-  simply_versioned
+  simply_versioned :automatic => false
 
   workflow do
     state :untaken do
@@ -60,7 +60,7 @@ class QuizSubmission < ActiveRecord::Base
     given {|user| user && user.id == self.user_id && self.untaken? }
     set { can :update }
     
-    given {|user, session| self.quiz.grants_right?(user, session, :manage) }
+    given {|user, session| self.quiz.grants_right?(user, session, :manage) || self.quiz.grants_right?(user, session, :review_grades) }
     set { can :read }
     
     given {|user, session| self.quiz.grants_right?(user, session, :manage) }
@@ -187,7 +187,7 @@ class QuizSubmission < ActiveRecord::Base
   end
   
   def snapshot!(params)
-    QuizSubmissionSnapshot.create(:quiz_submission_id => self.id, :attempt => self.attempt, :data => params)
+    QuizSubmissionSnapshot.create(:quiz_submission => self, :attempt => self.attempt, :data => params)
   end
   
   def questions_as_object
@@ -380,7 +380,8 @@ class QuizSubmission < ActiveRecord::Base
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]
-    raise "Can't update submission scores unless it's completed" if !self.completed? && version == versions.current
+    # note that self may not match versions.current, because we only save a new version on actual submit
+    raise "Can't update submission scores unless it's completed" if !self.completed? && !params[:submission_version_number]
     
     data = version.model.submission_data || []
     res = []

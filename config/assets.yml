@@ -20,6 +20,7 @@ javascripts:
     - public/javascripts/jquery.inst_tree.js
     - public/javascripts/jquery.store.js
     - public/javascripts/jquery.scrollTo.js
+    - public/javascripts/i18n.js
     - public/javascripts/scribd.view.js
     - public/javascripts/swfobject/swfobject.js
     - public/javascripts/reminders.js
@@ -66,6 +67,8 @@ javascripts:
   gradebook_history:
     - public/javascripts/jquery.metadata.js 
     - public/javascripts/gradebook-history.js
+  jobs:
+    - public/javascripts/jobs.js
   profile:
     - public/javascripts/profile.js
   topics:
@@ -102,6 +105,9 @@ javascripts:
     - public/javascripts/email_lists.js
     - public/javascripts/course_details.js
     - public/javascripts/external_tools.js
+    - public/javascripts/grading_standards.js
+  grading_standards:
+    - public/javascripts/grading_standards.js
   course:
     - public/javascripts/course.js
   section:
@@ -160,6 +166,7 @@ javascripts:
     - public/javascripts/aligned_outcomes.js
   full_assignment:
     - public/javascripts/full_assignment.js
+    - public/javascripts/grading_standards.js
   select_content_dialog:
     - public/javascripts/select_content_dialog.js
   rubric_assessment:
@@ -192,6 +199,8 @@ javascripts:
     - public/javascripts/plugins.js
   content_exports:
     - public/javascripts/content_exports.js
+  conferences:
+    - public/javascripts/conferences.js
 
 stylesheets:
   common:
@@ -223,6 +232,8 @@ stylesheets:
     - public/stylesheets/compiled/g_syllabus.css
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/print.css
+  profile:
+    - public/stylesheets/compiled/profile.css
   facebook:
     - public/stylesheets/compiled/facebook.css
   speed_grader:
@@ -238,6 +249,7 @@ stylesheets:
   course_details:
     - public/stylesheets/compiled/course_details.css
     - public/stylesheets/compiled/external_tools.css
+    - public/stylesheets/compiled/grading_standards.css
   full_files:
     - public/stylesheets/compiled/full_files.css
   datagrid:
@@ -254,7 +266,10 @@ stylesheets:
     - public/stylesheets/compiled/moderate_quiz.css
   full_assignment:
     - public/stylesheets/compiled/full_assignment.css
+    - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
+  grading_standards:
+    - public/stylesheets/compiled/grading_standards.css
   login:
     - public/stylesheets/compiled/login.css
   roster_user:

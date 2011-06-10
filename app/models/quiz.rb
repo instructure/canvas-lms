@@ -393,16 +393,17 @@ class Quiz < ActiveRecord::Base
     s = nil
     state ||= 'untaken'
     attempts = 0
-    user_id = user.is_a?(User) ? user.id : user
     begin
       if temporary || !user.is_a?(User)
         user_code = "#{user.to_s}"
         user_code = "user_#{user.id}" if user.is_a?(User)
-        s = QuizSubmission.find_or_initialize_by_quiz_id_and_temporary_user_code(self.id, user_code)
+        s = QuizSubmission.find_by_quiz_id_and_temporary_user_code(self.id, user_code)
+        s ||= QuizSubmission.new(:quiz => self, :temporary_user_code => user_code)
         s.workflow_state ||= state
         s.save
       else
-        s = QuizSubmission.find_or_initialize_by_quiz_id_and_user_id(self.id, user_id)
+        s = QuizSubmission.find_by_quiz_id_and_user_id(self.id, user.id)
+        s ||= QuizSubmission.new(:quiz => self, :user => user)
         s.workflow_state ||= state
         s.save
       end
@@ -474,7 +475,11 @@ class Quiz < ActiveRecord::Base
     submission.finished_at = nil
     submission.submission_data = {}
     submission.workflow_state = 'preview' if preview
-    submission.save
+    if preview || submission.untaken?
+      submission.save
+    else
+      submission.with_versioning(true, &:save!)
+    end
     submission
   end
   
@@ -859,7 +864,7 @@ class Quiz < ActiveRecord::Base
     stats[:submission_score_stdev] = score_counter.standard_deviation rescue 0
     stats[:submission_incorrect_count_average] = stats[:submission_count] > 0 ? stats[:submission_incorrect_tally].to_f / stats[:submission_count].to_f : 0
     stats[:submission_correct_count_average] = stats[:submission_count] > 0 ? stats[:submission_correct_tally].to_f / stats[:submission_count].to_f : 0
-    assessment_questions = AssessmentQuestion.find_all_by_id(question_ids).compact
+    assessment_questions = question_ids.empty? ? [] : AssessmentQuestion.find_all_by_id(question_ids).compact
     question_ids.uniq.each do |id|
       obj = questions.detect{|q| q[:answers] && q[:id] == id }
       if !obj && questions_hash[id]
@@ -1163,16 +1168,19 @@ class Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#admins.include? user }
-    set { can :manage and can :read and can :update and can :delete and can :create and can :submit }
+    set { can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#admins.include? user }
-    set { can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade }
+    set { can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade }
     
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
     set { can :submit }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
     set { can :read }
+
+    given { |user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
+    set { can :read_statistics and can :review_grades }
 
     given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }
     set { can :read and can :submit }

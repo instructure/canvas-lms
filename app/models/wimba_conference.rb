@@ -20,8 +20,10 @@ require 'net/http'
 require 'uri'
 
 class WimbaConference < WebConference
-  external_url :archive, :text => "View archive(s)",
-                         :restricted_to => lambda{ |conf| conf.active? || conf.finished? }
+  external_url :archive,
+               :name => lambda{ t('external_urls.archive', "Archive") },
+               :link_text => lambda{ t('external_urls.archive_link', "View archive(s)") },
+               :restricted_to => lambda{ |conf| conf.active? || conf.finished? }
 
   def archive_external_url(user, url_id)
     urls = []
@@ -174,7 +176,8 @@ class WimbaConference < WebConference
     send_request('createClass', {
       'target' => wimba_id,
       'longname' => title[0,50],
-      'preview' => '0' # we want the room open by default
+      'preview' => '0', # we want the room open by default
+      'auto_open_new_archives' => '1'
     }) or return nil
     save
     conference_key

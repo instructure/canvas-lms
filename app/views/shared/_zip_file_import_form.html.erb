@@ -1,29 +1,30 @@
 <div id="uploading_please_wait_dialog" title="Uploading, Please Wait." style="display:none;">
   <div id="uploading_progressbar"></div>
-  <p>Uploading and processing your zip file, if there are a lot of files in the zip file or it is very large, this may take a while.</p>
+  <p><%= t 'notices.uploading_progress_info', 'Uploading and processing your zip file, if there are a lot of files in the zip file or it is very large, this may take a while.' %></p>
 </div>
 <% form_for((@zfi || ZipFileImport.new), :url => context_url(@context, :context_zip_file_imports_url), :html => { :id => "zip_file_import_form", :multipart => true })  do |form| %>
   <input type="hidden" name="batch_id" value="<%= AutoHandle.generate(@current_user.asset_string, 10) %>" id="zip_import_batch_id"/>
   <%= form.error_messages %>
   <div>
     <input type="file" name="zip_file" id="zip_file"/><br/>
-    <span style="font-size: 0.8em; color: #a00; display: none;" id="zip_only_message">Please select a .zip file for uploading</span>
+    <span style="font-size: 0.8em; color: #a00; display: none;" id="zip_only_message"><%= t 'prompts.select_file', 'Please select a .zip file for uploading' %></span>
   </div>
   <div id="upload_to" style="margin: 10px 0;">
-    Upload to:
+    <%= before_label :upload_to, 'Upload to' %>
     <select name="folder_id">
-      <%= render :partial => 'shared/folder_option', :collection => Folder.root_folders(@context), :locals => {:folders => @context.folders.active, :selected_folder_id => params[:folder_id].to_i} %>
+      <%= folders_as_options(Folder.root_folders(@context), :all_folders => @context.folders.active, :selected_folder_id => params[:folder_id].to_i) %>
     </select>
     <%= hidden_field_tag 'return_to', qti_or_content_link %>
   </div>
   <div class="button-container">
-    <button type="submit" class="submit_button button big-button">Upload File</button>
-    <a class="cancel_button button button-secondary" href="#">Cancel</a>
+    <button type="submit" class="submit_button button big-button"><%= t 'buttons.upload_file', 'Upload File' %></button>
+    <a class="cancel_button button button-secondary" href="#"><%= t '#buttons.cancel', 'Cancel' %></a>
   </div>
   <a href="<%= context_url(@context, :import_status_context_zip_file_imports_url) %>" class="zip_file_import_status_url" style="display: none;">&nbsp;</a>
 <% end %>
 <% js_block do %>
 <script>
+I18n.scoped("zip_file_imports", function(I18n) {
   $(document).ready(function() {
     $("#zip_file_import_form #zip_file").change(function() {
       var val = $(this).val();
@@ -57,8 +58,9 @@
       $("#zip_file_import_form .errors").hide();
       var importFailed = function(errors) {
         var $div = $("<div class='errors' style='color: #a00; font-weight: bold;'/>");
-        $div.text("There were some errors extracting the zip file.  Please try again");
-        $.flashError("There were some errors extracting the zip file.  Please try again");
+        var error_message = I18n.t('errors.extracting_file', "There were some errors extracting the zip file.  Please try again");
+        $div.text(error_message);
+        $.flashError(error_message);
         $("#zip_import_batch_id").val($("#zip_import_batch_id").val() + "0");
         var $ul = $("<ul class='errors'/>");
         for(var idx in errors) {
@@ -78,13 +80,13 @@
             importFailed(data.errors);
           } else if(data && data.complete) {
             $("#uploading_progressbar").progressbar('value', 100);
-            $("#uploading_please_wait_dialog").prepend("Uploading complete!");
+            $("#uploading_please_wait_dialog").prepend(I18n.t('notices.uploading_complete', "Uploading complete!"));
             location.href = $("#return_to").val();
           } else if(hadSomeProgress && (!data || data.progress == null)) {
             pollImport.blankCount = pollImport.blankCount || 0;
             pollImport.blankCount++;
             if(pollImport.blankCount > 10) {
-              importFailed(["The server stopped returning a valid status"]);
+              importFailed([I18n.t('errors.server_status', "The server stopped returning a valid status")]);
             } else {
               setTimeout(pollImport, 2000);
             }
@@ -99,7 +101,7 @@
           pollImport.errorCount = pollImport.errorCount || 0;
           pollImport.errorCount++;
           if(pollImport.errorCount > 10) {
-            importFailed(["The server stopped responding to status requests"]);
+            importFailed([I18n.t('errors.server_stopped_responding', "The server stopped responding to status requests")]);
           } else {
             setTimeout(pollImport, 2000);
           }
@@ -108,5 +110,6 @@
       setTimeout(pollImport, 5000);
     });
   });
+});
 </script>
 <% end %>

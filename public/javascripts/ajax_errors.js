@@ -18,21 +18,34 @@
 
 var iTest;
 INST.errorURL = '/record_js_error';
+INST.errorCount = 0;
 INST.log_error = function(params) {
   params = params || {};
   var username = "";
   try {
-    username = $("#identity .user_name").text();
-  } catch(e) { }
+    username = $ && $.fn && $.fn.text && $("#identity .user_name").text();
+  } catch(e) {
+    //you can't try/catch inside window.onerror in firefox, so we really dont want to get here ever.
+  }
   var txt = "?";
   params.url = params.url || location.href;
   params.platform = params.platform || navigator.platform;
   params.action = params.action || location.href;
   params.user_name = username;
+  params.user_agent = navigator.userAgent;
+  params.parentPage = window.location;
   for(var idx in params) {
     txt = txt + 'error[' + idx + "]=" + escape(params[idx]) + "&";
   }
-  $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" + INST.errorURL + txt.substring(0, 2000) + "' />");
+  INST.errorCount += 1;
+  
+  // doing this old-school in case something happend where jquery is not loaded.
+  var img = document.createElement('img');
+  img.src = INST.errorURL + txt.substring(0, 2000);
+  img.style.position = 'absolute';
+  img.style.left = '-10000px';
+  img.style.top= 0;
+  document.body.appendChild(img);
 }
 window.onerror = function (msg, url, line) {
   var ignoredErrors = ["webkitSafeEl"];

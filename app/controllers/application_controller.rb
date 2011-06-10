@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
   
   attr_accessor :active_tab
   
+  before_filter :set_locale
   add_crumb "home", :root_path, :class => "home"
   helper :all
   filter_parameter_logging :password
@@ -41,6 +42,11 @@ class ApplicationController < ActionController::Base
 
   protected
   
+  def set_locale
+    # if params[:locale] is nil then I18n.default_locale will be used
+    I18n.locale = params[:locale] && I18n.available_locales.include?(params[:locale].to_sym) ? params[:locale] : nil
+  end
+
   def init_body_classes_and_active_tab
     @body_classes = []
     active_tab = nil
@@ -95,7 +101,15 @@ class ApplicationController < ActionController::Base
 
   def tab_enabled?(id)
     if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :include_hidden_unused => true).any?{|t| t[:id] == id }
-      flash[:notice] = "That page has been disabled for this #{@context.class.to_s.downcase}"
+      if @context.is_a?(Account)
+        flash[:notice] = t "notices.page_disabled_for_account", "That page has been disabled for this account"
+      elsif @context.is_a?(Course)
+        flash[:notice] = t "notices.page_disabled_for_course", "That page has been disabled for this course"
+      elsif @context.is_a?(Group)
+        flash[:notice] = t "notices.page_disabled_for_group", "That page has been disabled for this group"
+      else
+        flash[:notice] = t "notices.page_disabled", "That page has been disabled"
+      end
       redirect_to named_context_url(@context, :context_url)
       return false
     end
@@ -137,10 +151,10 @@ class ApplicationController < ActionController::Base
   
   def render_unauthorized_action(object=nil)
     object ||= User.new
-    object.errors.add_to_base("You are not authorized to perform this action")
+    object.errors.add_to_base(t "errors.unauthorized", "You are not authorized to perform this action")
     respond_to do |format|
       if !request.xhr?
-        flash[:notice] = "You are not authorized to perform this action"
+        flash[:notice] = t "errors.unauthorized", "You are not authorized to perform this action"
       end
       @show_left_side = false
       clear_crumbs
@@ -150,6 +164,7 @@ class ApplicationController < ActionController::Base
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html { 
         store_location if request.get?
+        return if !@current_user && initiate_delegated_login
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }
@@ -208,7 +223,7 @@ class ApplicationController < ActionController::Base
           session[:enrollment_uuid_count] ||= 0
           if session[:enrollment_uuid_count] > 4
             session[:enrollment_uuid_count] = 0
-            flash[:html_notice] = "You'll need to <a href='#{course_url(@context)}'>accept the enrollment invitation</a> before you can fully participate in this course."
+            flash[:html_notice] = mt "notices.need_to_accept_enrollment", "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
           end
           session[:enrollment_uuid_count] += 1
         end
@@ -387,11 +402,22 @@ class ApplicationController < ActionController::Base
     redirect ||= root_url
     get_quota
     if response.body.size + @quota_used > @quota
+      if @context.is_a?(Account)
+        error = t "errors.quota_exceeded_account", "Account storage quota exceeded"
+      elsif @context.is_a?(Course)
+        error = t "errors.quota_exceeded_course", "Course storage quota exceeded"
+      elsif @context.is_a?(Group)
+        error = t "errors.quota_exceeded_group", "Course storage quota exceeded"
+      elsif @context.is_a?(User)
+        error = t "errors.quota_exceeded_user", "Course storage quota exceeded"
+      else
+        error = t "errors.quota_exceeded", "Storage quota exceeded"
+      end
       respond_to do |format|
-        flash[:error] = 'Storage quota exceeded' unless request.format.to_s == "text/plain"
+        flash[:error] = error unless request.format.to_s == "text/plain"
         format.html {redirect_to redirect }
-        format.json {render :json => {:errors => {:base => "#{@context.class.to_s} storage quota exceeded"}}.to_json }
-        format.text {render :json => {:errors => {:base => "#{@context.class.to_s} storage quota exceeded"}}.to_json }
+        format.json {render :json => {:errors => {:base => error}}.to_json }
+        format.text {render :json => {:errors => {:base => error}}.to_json }
       end
       return true
     end
@@ -413,9 +439,9 @@ class ApplicationController < ActionController::Base
       @enrollment = Enrollment.find_by_uuid(pieces[1]) if pieces[1]
       @context_type = "Course"
       if !@enrollment
-        @problem = "The verification code does not match any currently enrolled user."
+        @problem = t "errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
       elsif @enrollment.course && !@enrollment.course.available?
-        @problem = "Feeds for this #{@context_type.downcase} cannot be access until it is published."
+        @problem = t "errors.feed_unpublished_course", "Feeds for this course cannot be accessed until it is published."
       end
       @context = @enrollment.course unless @problem
       @current_user = @enrollment.user unless @problem
@@ -423,9 +449,9 @@ class ApplicationController < ActionController::Base
       @membership = GroupMembership.find_by_uuid(pieces[1]) if pieces[1]
       @context_type = "Group"
       if !@membership
-        @problem = "The verification code does not match any currently enrolled user."
+        @problem = t "errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
       elsif @membership.group && !@membership.group.available?
-        @problem = "Feeds for this #{@context_type.downcase} cannot be access until it is published."
+        @problem = t "errors.feed_unpublished_group", "Feeds for this group cannot be accessed until it is published."
       end
       @context = @membership.group unless @problem
       @current_user = @membership.user unless @problem
@@ -436,16 +462,22 @@ class ApplicationController < ActionController::Base
         @context = @context_class.find_by_uuid(pieces[1]) if pieces[1]
       end
       if !@context
-        @problem = "The verification code is invalid."
+        @problem = t "errors.invalid_verification_code", "The verification code is invalid."
       elsif (!@context.is_public rescue false) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
-        @problem = "The matching #{@context_type.downcase} has gone private, so public feeds like this one will no longer be visible."
+        if @context_type == 'course'
+          @problem = t "errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
+        elsif @context_type == 'group'
+          @problem = t "errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
+        else
+          @problem = t "errors.feed_private", "The matching context has gone private, so public feeds like this one will no longer be visible."
+        end
       end
       @context = nil if @problem
       @current_user = @context if @context.is_a?(User)
     end
     if !@context || (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
-      @problem ||= "Invalid feed parameters." if (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
-      @problem ||= "Could not find feed."
+      @problem ||= t("errors.invalid_feed_parameters", "Invalid feed parameters.") if (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
+      @problem ||= t "errors.feed_not_found", "Could not find feed."
       @template_format = 'html'
       @template.template_format = 'html'
       render :text => @template.render(:file => "shared/unauthorized_feed", :layout => "layouts/application"), :status => :bad_request # :template => "shared/unauthorized_feed", :status => :bad_request
@@ -489,13 +521,13 @@ class ApplicationController < ActionController::Base
   end
   
   def generate_page_view
-    @page_view = PageView.new(:url => request.url[0,255], :user_id => @current_user.id, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'])
+    @page_view = PageView.new(:url => request.url[0,255], :user => @current_user, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'])
     @page_view.interaction_seconds = 5
     @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.method == :get)
     @page_view.created_at = Time.now
     @page_view.updated_at = Time.now
     @page_before_render = Time.now.utc
-    @page_view.id = $request_context_id
+    @page_view.id = RequestContextGenerator.request_id
   end
   
   def generate_new_page_view
@@ -551,7 +583,8 @@ class ApplicationController < ActionController::Base
       # it's not an update because if the page_view already existed, we don't want to 
       # double-count it as multiple views when it's really just a single view.
       if @current_user && @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-        @access = AssetUserAccess.find_or_create_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
+        @access = AssetUserAccess.find_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
+        @access ||= AssetUserAccess.create(:user => @current_user, :asset_code => @accessed_asset[:code])
         @accessed_asset[:level] ||= 'view'
         if @accessed_asset[:level] == 'view'
           @access.view_score ||= 0
@@ -611,7 +644,7 @@ class ApplicationController < ActionController::Base
         :url => request.url,
         :user => @current_user,
         :user_agent => request.headers['User-Agent'],
-        :request_context_id => $request_context_id,
+        :request_context_id => RequestContextGenerator.request_id,
         :account => @domain_root_account,
         :request_method => request.method,
         :format => request.format,
@@ -642,9 +675,9 @@ class ApplicationController < ActionController::Base
     session[:claimed_enrollment_uuids] ||= []
     session[:claimed_enrollment_uuids] << e.uuid
     session[:claimed_enrollment_uuids].uniq!
-    flash[:notice] = "This course is now claimed, and you've been registered as its first teacher."
+    flash[:notice] = t "notices.first_teacher", "This course is now claimed, and you've been registered as its first teacher."
     if !@current_user && state == :just_registered
-      flash[:notice] += "You should receive an email shortly to complete the registration process."
+      flash[:notice] = t "notices.first_teacher_with_email", "This course is now claimed, and you've been registered as its first teacher. You should receive an email shortly to complete the registration process."
     end
     session[:claimed_course_uuids] ||= []
     session[:claimed_course_uuids] << course.uuid
@@ -678,6 +711,7 @@ class ApplicationController < ActionController::Base
         raise(ActionController::InvalidAuthenticityToken) unless form_authenticity_token == form_authenticity_param
       end
     end
+    Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
   def api_request?
@@ -711,7 +745,10 @@ class ApplicationController < ActionController::Base
       :url => page_name.to_url
     )
     @page.current_namespace = @namespace
-    @page.body = "Welcome to your new #{@context.class.to_s.downcase} wiki!" if page_name == "front-page" && @page.new_record?
+    if page_name == "front-page" && @page.new_record?
+      @page.body = t "wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
+      @page.body = t "wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
+    end
   end
   
   def context_wiki_page_url
@@ -742,13 +779,13 @@ class ApplicationController < ActionController::Base
       @tool = ContextExternalTool.find_external_tool(tag.url, context)
       tag.context_module_action(@current_user, :read)
       if !@tool
-        flash[:error] = "Couldn't find valid settings for this this link"
+        flash[:error] = t "errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
         render :template => 'external_tools/tool_show'
       end
     else
-      flash[:error] = "Didn't recognize the item type for this tag"
+      flash[:error] = t "errors.invalid_tag_type", "Didn't recognize the item type for this tag"
       redirect_to named_context_url(context, error_redirect_symbol)
     end
   end
@@ -868,6 +905,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_account_management(on_root_account = false)
+    if (@context.root_account != nil && on_root_account) || !@context.is_a?(Account)
+      redirect_to named_context_url(@context, :context_url)
+      return false
+    else
+      return false unless authorized_action(@context, @current_user, :manage_account_settings)
+    end
+  end
+
+  def require_root_account_management
+    require_account_management(true)
+  end
+
   # This before_filter can be used to limit access to only site admins.
   # This checks if the user is an admin of the 'Site Admin' account, and has the
   # site_admin permission.
@@ -882,7 +932,7 @@ class ApplicationController < ActionController::Base
       @current_user = @real_current_user
     end
     unless current_user_is_site_admin?(permission)
-      flash[:error] = "You don't have permission to access that page"
+      flash[:error] = t "errors.unauthorized", "You don't have permission to access that page"
       redirect_to root_url
       return false
     end
@@ -891,9 +941,14 @@ class ApplicationController < ActionController::Base
   # This checks if the user is an admin of the 'Site Admin' account, and has the
   # specified permission.
   def current_user_is_site_admin?(permission = :site_admin)
-    Account.site_admin.grants_right?(@current_user, session, permission)
+    user_is_site_admin?(@current_user)
   end
   helper_method :current_user_is_site_admin?
+
+  def user_is_site_admin?(user, permission = :site_admin)
+    Account.site_admin.grants_right?(user, session, permission)
+  end
+  helper_method :user_is_site_admin?
 
   def page_views_enabled?
     PageView.page_views_enabled?
@@ -903,10 +958,24 @@ class ApplicationController < ActionController::Base
   # calls send_file if the io has a local file, or send_data otherwise
   # make sure to rewind the io first, if necessary
   def send_file_or_data(io, opts = {})
+    cancel_cache_buster
     if io.respond_to?(:path) && io.path.present? && File.file?(io.path)
       send_file(io.path, opts)
     else
       send_data(io, opts)
     end
   end
+
+  def verified_file_download_url(attachment, *opts)
+    file_download_url(attachment, :verifier => attachment.uuid, *opts)
+  end
+  helper_method :verified_file_download_url
+
+  def user_content(str, cache_key = nil)
+    return nil unless str
+    return str.html_safe unless str.match(/object|embed|equation_image/)
+
+    UserContent.escape(str)
+  end
+  helper_method :user_content
 end

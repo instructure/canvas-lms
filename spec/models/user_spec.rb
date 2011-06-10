@@ -177,6 +177,69 @@ describe User do
     user.associated_account_ids.include?(account1.id).should be_true
     user.associated_account_ids.include?(account2.id).should be_false
   end
+
+  it "should search by multiple fields" do
+    @account = Account.create!
+    user1 = User.create! :name => "longname1", :short_name => "shortname1"
+    user1.register!
+    user2 = User.create! :name => "longname2", :short_name => "shortname2"
+    user2.register!
+
+    User.name_like("longname1").map(&:id).should == [user1.id]
+    User.name_like("shortname2").map(&:id).should == [user2.id]
+    User.name_like("sisid1").map(&:id).should == []
+    User.name_like("uniqueid2").map(&:id).should == []
+
+    p1 = user1.pseudonyms.new :unique_id => "uniqueid1", :account => @account
+    p1.sis_user_id = "sisid1"
+    p1.save!
+    p2 = user2.pseudonyms.new :unique_id => "uniqueid2", :account => @account
+    p2.sis_user_id = "sisid2"
+    p2.save!
+
+    User.name_like("longname1").map(&:id).should == [user1.id]
+    User.name_like("shortname2").map(&:id).should == [user2.id]
+    User.name_like("sisid1").map(&:id).should == [user1.id]
+    User.name_like("uniqueid2").map(&:id).should == [user2.id]
+
+    p3 = user1.pseudonyms.new :unique_id => "uniqueid3", :account => @account
+    p3.sis_user_id = "sisid3"
+    p3.save!
+    
+    User.name_like("longname1").map(&:id).should == [user1.id]
+    User.name_like("shortname2").map(&:id).should == [user2.id]
+    User.name_like("sisid1").map(&:id).should == [user1.id]
+    User.name_like("uniqueid2").map(&:id).should == [user2.id]
+    User.name_like("uniqueid3").map(&:id).should == [user1.id]
+
+    p4 = user1.pseudonyms.new :unique_id => "uniqueid4", :account => @account
+    p4.sis_user_id = "sisid3 2"
+    p4.save!
+
+    User.name_like("longname1").map(&:id).should == [user1.id]
+    User.name_like("shortname2").map(&:id).should == [user2.id]
+    User.name_like("sisid1").map(&:id).should == [user1.id]
+    User.name_like("uniqueid2").map(&:id).should == [user2.id]
+    User.name_like("uniqueid3").map(&:id).should == [user1.id]
+    User.name_like("sisid3").map(&:id).should == [user1.id]
+
+    user3 = User.create! :name => "longname1", :short_name => "shortname3"
+    user3.register!
+    
+    User.name_like("longname1").map(&:id).sort.should == [user1.id, user3.id].sort
+    User.name_like("shortname2").map(&:id).should == [user2.id]
+    User.name_like("sisid1").map(&:id).should == [user1.id]
+    User.name_like("uniqueid2").map(&:id).should == [user2.id]
+    User.name_like("uniqueid3").map(&:id).should == [user1.id]
+    User.name_like("sisid3").map(&:id).should == [user1.id]
+
+    User.name_like("sisid3").map(&:id).should == [user1.id]
+    User.name_like("uniqueid4").map(&:id).should == [user1.id]
+    p4.destroy
+    User.name_like("sisid3").map(&:id).should == [user1.id]
+    User.name_like("uniqueid4").map(&:id).should == []
+
+  end
   
   context "move_to_user" do
     it "should delete the old user" do

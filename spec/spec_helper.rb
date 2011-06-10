@@ -30,16 +30,25 @@ ALL_MODELS = Dir.glob(File.expand_path(File.dirname(__FILE__) + '/../app/models'
   eval(model) rescue nil
 }.find_all{|x| x.respond_to? :delete_all and x.count >= 0 rescue false}
 
-# wipe out the test db, in case some non-transactional tests crapped out before
-# cleaning up after themselves
-ALL_MODELS.each &:delete_all
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition.
 module Spec::DSL::Main
   remove_method :context
 end
+
+def truncate_table(model)
+  case model.connection.adapter_name
+  when "SQLite"
+    model.delete_all
+  else
+    model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
+  end
+end
+
+# wipe out the test db, in case some non-transactional tests crapped out before
+# cleaning up after themselves
+ALL_MODELS.each { |m| truncate_table(m) }
 
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
@@ -64,7 +73,7 @@ Spec::Runner.configure do |config|
     config.auth_type = "cas"
     config.auth_base = cas_url
     config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
-    account.account_authorization_config = config
+    account.account_authorization_configs << config
     account
   end
 
@@ -81,9 +90,19 @@ Spec::Runner.configure do |config|
     @course
   end
 
+  def account_admin_user_with_role_changes(opts={})
+    account = opts[:account] || Account.default
+    if opts[:role_changes]
+      opts[:role_changes].each_pair do |permission, enabled|
+        account.role_overrides.create(:permission => permission, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
+      end
+    end
+    account_admin_user(opts)
+  end
+
   def account_admin_user(opts={})
     user(opts)
-    @user.account_users.create(:account => opts[:account] || Account.default)
+    @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
     @user
   end
 
@@ -108,6 +127,16 @@ Spec::Runner.configure do |config|
 
   def course_with_student(opts={})
     course(opts)
+    student_in_course(opts)
+  end
+
+  def course_with_student_logged_in(opts={})
+    course_with_student(opts)
+    user_session(@user)    
+  end
+
+  def student_in_course(opts={})
+    @course ||= opts[:course] || course(opts)
     @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
     if opts[:active_enrollment] || opts[:active_all]
@@ -118,14 +147,10 @@ Spec::Runner.configure do |config|
     @enrollment
   end
 
-  def course_with_student_logged_in(opts={})
-    course_with_student(opts)
-    user_session(@user)    
-  end
-
   def course_with_teacher(opts={})
     course(opts)
     @user = opts[:user] || user(opts)
+    @teacher = @user
     @enrollment = @course.enroll_teacher(@user)
     @enrollment.accept! if opts[:active_enrollment] || opts[:active_all]
     @enrollment
@@ -147,6 +172,12 @@ Spec::Runner.configure do |config|
   def group_with_user(opts={})
     group(opts)
     user(opts)
+    @group.participating_users << @user
+  end
+
+  def group_with_user_logged_in(opts={})
+    group_with_user(opts)
+    user_session(@user)
   end
 
   def user_session(user, pseudonym=nil)
@@ -197,9 +228,8 @@ Spec::Runner.configure do |config|
   end
 
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
-    return ar_klass.create!(attrs) if ar_klass.accessible_attributes.nil?
-    obj = ar_klass.new(attrs.reject { |k,v| !ar_klass.accessible_attributes.include?(k) })
-    attrs.each { |k,v| obj.send("#{k}=", attrs[k]) unless ar_klass.accessible_attributes.include?(k) }
+    obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
+    attrs.each { |k,v| obj.send("#{k}=", attrs[k]) }
     obj.save! if do_save
     obj
   end

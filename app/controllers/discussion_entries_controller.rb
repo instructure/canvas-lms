@@ -22,7 +22,7 @@ class DiscussionEntriesController < ApplicationController
   def show
     @entry = @context.discussion_entries.find(params[:id])
     if @entry.deleted?
-      flash[:notice] = "That entry has been deleted"
+      flash[:notice] = t :deleted_entry_notice, "That entry has been deleted"
       redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)
     end
     if authorized_action(@entry, @current_user, :read)
@@ -50,12 +50,13 @@ class DiscussionEntriesController < ApplicationController
         if @entry.save
           @entry.update_topic
           log_asset_access(@topic, 'topics', 'topics', 'participate')
+          @entry.context_module_action
           if params[:attachment] && params[:attachment][:uploaded_data] && params[:attachment][:uploaded_data].size > 0 && @entry.grants_right?(@current_user, session, :attach)
             @attachment = @context.attachments.create(params[:attachment])
             @entry.attachment = @attachment
             @entry.save
           end
-          flash[:notice] = 'Entry was successfully created.'
+          flash[:notice] = t :created_entry_notice, 'Entry was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id) }
           format.xml  { head :created, :location => named_context_url(@context, :context_discussion_topic_url, @topic.id) }
           format.json { render :json => @entry.to_json(:include => :attachment, :methods => :user_name, :permissions => {:user => @current_user, :session => session}), :status => :created }
@@ -92,7 +93,7 @@ class DiscussionEntriesController < ApplicationController
             @entry.attachment = @attachment
             @entry.save
           end
-          flash[:notice] = 'Entry was successfully updated.'
+          flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id) }
           format.xml  { head :ok }
           format.json { render :json => @entry.to_json(:include => :attachment, :methods => :user_name, :permissions => {:user => @current_user, :session => session}), :status => :ok }
@@ -124,7 +125,7 @@ class DiscussionEntriesController < ApplicationController
     return unless get_feed_context
     @topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
     if !@topic.podcast_enabled && request.format == :rss
-      @problem = "Podcasts have not been enabled for this topic."
+      @problem = t :disabled_podcasts_notice, "Podcasts have not been enabled for this topic."
       @template_format = 'html'
       @template.template_format = 'html'
       render :text => @template.render(:file => "shared/unauthorized_feed", :layout => "layouts/application"), :status => :bad_request # :template => "shared/unauthorized_feed", :status => :bad_request
@@ -146,7 +147,7 @@ class DiscussionEntriesController < ApplicationController
       respond_to do |format|
         format.atom {
           feed = Atom::Feed.new do |f|
-            f.title = "#{@topic.title} Posts Feed"
+            f.title = t :posts_feed_title, "%{title} Posts Feed", :title => @topic.title
             f.links << Atom::Link.new(:href => named_context_url(@context, :context_discussion_topic_url, @topic.id))
             f.updated = Time.now
             f.id = named_context_url(@context, :context_discussion_topic_url, @topic.id)
@@ -162,8 +163,8 @@ class DiscussionEntriesController < ApplicationController
           require 'rss/2.0'
           rss = RSS::Rss.new("2.0")
           channel = RSS::Rss::Channel.new
-          channel.title = "#{@topic.title} Posts Podcast Feed"
-          channel.description = "Any media files linked from or embedded within entries in the topic \"#{@topic.title}\" will appear in this feed."
+          channel.title = t :podcast_feed_title, "%{title} Posts Podcast Feed", :title => @topic.title
+          channel.description = t :podcast_description, "Any media files linked from or embedded within entries in the topic \"%{title}\" will appear in this feed.", :title => @topic.title
           channel.link = named_context_url(@context, :context_discussion_topic_url, @topic.id)
           channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
           elements = Announcement.podcast_elements(@entries, @context)

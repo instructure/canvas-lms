@@ -19,4 +19,5 @@
 class AttachmentAssociation < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :context, :polymorphic => true
+  attr_accessible :attachment, :context
 end

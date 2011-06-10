@@ -18,7 +18,7 @@
 
 class Account < ActiveRecord::Base
   include Context
-  attr_accessible :name, :parent_account_id, :turnitin_account_id,
+  attr_accessible :name, :turnitin_account_id,
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :storage_quota, :ip_filters
@@ -40,9 +40,6 @@ class Account < ActiveRecord::Base
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :learning_outcomes, :as => :context
   has_many :sis_batches
-  has_many :department_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'department_id'
-  has_many :college_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'college_id'
-  has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :authorization_codes, :dependent => :destroy
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user
@@ -59,8 +56,9 @@ class Account < ActiveRecord::Base
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_one :account_authorization_config
+  has_many :account_authorization_configs, :order => 'id'
   has_many :account_reports
+  has_many :grading_standards, :as => :context
   
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :learning_outcomes, :as => :context
@@ -72,6 +70,7 @@ class Account < ActiveRecord::Base
   has_many :error_reports
   has_many :account_notifications
 
+  before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
   before_save :set_update_account_associations_if_changed
   after_save :update_account_associations_if_changed
@@ -159,6 +158,21 @@ class Account < ActiveRecord::Base
     self.uuid ||= AutoHandle.generate_securish_uuid
   end
   
+  def verify_unique_sis_source_id
+    return true unless self.sis_source_id
+    root = self.root_account || self
+    existing_account = Account.find_by_root_account_id_and_sis_source_id(root.id, self.sis_source_id)
+    
+    if self.root_account?
+      return true if !existing_account
+    elsif root.sis_source_id != self.sis_source_id
+      return true if !existing_account || existing_account.id == self.id
+    end
+    
+    self.errors.add(:sis_source_id, t(:sis_id_in_use, "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
+    false
+  end
+  
   def set_update_account_associations_if_changed
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
     self.root_account_id ||= self.parent_account_id
@@ -191,6 +205,10 @@ class Account < ActiveRecord::Base
   
   def domain
     HostUrl.context_host(self)
+  end
+  
+  def root_account?
+    !self.root_account_id
   end
   
   def sub_accounts_as_options(indent=0)
@@ -336,9 +354,15 @@ class Account < ActiveRecord::Base
   
   def page_views_by_hour(*args)
     dates = (!args.empty? && args) || [1.year.ago, Time.now ]
+    group = case PageView.connection.adapter_name
+    when "SQLite"
+      "strftime('%H', created_at)"
+    else
+      "extract(hour from created_at)"
+    end
     PageView.count(
-      :group => "hour(created_at)", 
-      :order => "hour(created_at)",
+      :group => group,
+      :order => group,
       :conditions => {
         :account_id, self_and_all_sub_accounts,
         :created_at, (dates.first)..(dates.last)
@@ -428,6 +452,13 @@ class Account < ActiveRecord::Base
     result = account_users.any?{|e| e.has_permission_to?(permission) }
   end
   
+  def account_authorization_config
+    # We support multiple auth configs per account, but several places we assume there is only one.
+    # This is for compatibility with those areas. TODO: migrate everything to supporting multiple
+    # auth configs
+    self.account_authorization_configs.first
+  end
+  
   def login_handle_name
     self.account_authorization_config && self.account_authorization_config.login_handle_name ? 
       self.account_authorization_config.login_handle_name :
@@ -435,17 +466,7 @@ class Account < ActiveRecord::Base
   end
   
   def self_and_all_sub_accounts
-    @self_and_all_sub_accounts ||= ActiveRecord::Base.connection.send(:select, "SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id] #(self.all_accounts + [self]).map &:id
-  end
-  
-  def abstract_courses
-    if self.is_a?(Department)
-      self.department_abstract_courses
-    elsif self.is_a?(College)
-      self.college_abstract_courses
-    else
-      self.root_abstract_courses
-    end
+    @self_and_all_sub_accounts ||= ActiveRecord::Base.connection.select_all("SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id] #(self.all_accounts + [self]).map &:id
   end
   
   def default_time_zone
@@ -465,21 +486,18 @@ class Account < ActiveRecord::Base
       given {|user, session| self.parent_account && self.parent_account.grants_right?(user, session, permission) }
       set { can permission }
 
-      given {|user, session| !site_admin? && Account.site_admin_user?(user) }
+      given {|user, session| !site_admin? && Account.site_admin.grants_right?(user, session, permission) }
       set { can permission }
     end
 
     given { |user| self.active? && self.users.include?(user) }
-    set { can :read and can :read_roster and can :manage and can :update and can :delete }
-    
-    given { |user| self.root_account && self.root_account.grants_right?(user, nil, :manage) }
-    set { can :read and can :read_roster and can :manage and can :update and can :delete }
-    
+    set { can :read and can :manage and can :update and can :delete }
+
     given { |user| self.parent_account && self.parent_account.grants_right?(user, nil, :manage) }
-    set { can :read and can :read_roster and can :manage and can :update and can :delete }
-    
-    given { |user| !site_admin? && Account.site_admin_user?(user) }
-    set { can :read and can :read_roster and can :manage and can :update and can :delete }
+    set { can :read and can :manage and can :update and can :delete }
+
+    given { |user| !site_admin? && Account.site_admin_user?(user, :manage) }
+    set { can :read and can :manage and can :update and can :delete }
   end
 
   alias_method :destroy!, :destroy
@@ -520,7 +538,8 @@ class Account < ActiveRecord::Base
       user = data[:user]
     end
     if user
-      account_user = self.account_users.find_or_initialize_by_user_id(user.id)
+      account_user = self.account_users.find_by_user_id(user.id)
+      account_users ||= self.account_users.build(:user => user)
       account_user.membership_type = membership_type
       account_user.save
       if data[:new]
@@ -537,7 +556,8 @@ class Account < ActiveRecord::Base
   def add_user(user, membership_type = nil)
     return nil unless user && user.is_a?(User)
     membership_type ||= 'AccountAdmin'
-    self.account_users.find_or_create_by_user_id_and_membership_type(user.id, membership_type) rescue nil
+    au = self.account_users.find_by_user_id_and_membership_type(user.id, membership_type)
+    au ||= self.account_users.create(:user => user, :membership_type => membership_type)
   end
   
   def context_code
@@ -558,6 +578,10 @@ class Account < ActiveRecord::Base
 
   def delegated_authentication?
     !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
+  end
+  
+  def forgot_password_external_url
+    account_authorization_config.try(:change_password_url)
   end
 
   def cas_authentication?
@@ -613,7 +637,8 @@ class Account < ActiveRecord::Base
       # be good to create some sort of of memoize_if_safe method, that only
       # memoizes when we're caching classes and not in test mode? I dunno. But
       # this stinks.
-      return @special_accounts[special_account_type] = Account.find_or_create_by_parent_account_id_and_name(nil, default_account_name)
+      @special_accounts[special_account_type] = Account.find_by_parent_account_id_and_name(nil, default_account_name)
+      return @special_accounts[special_account_type] ||= Account.create(:parent_account => nil, :name => default_account_name)
     end
 
     account = @special_accounts[special_account_type]
@@ -709,7 +734,7 @@ class Account < ActiveRecord::Base
       self.turnitin_pledge
     else
       res = self.account.turnitin_pledge rescue nil
-      res ||= "This assignment submission is my own, original work"
+      res ||= t(:turnitin_pledge, "This assignment submission is my own, original work")
     end
   end
   
@@ -741,28 +766,31 @@ class Account < ActiveRecord::Base
   TAB_SETTINGS = 9
   TAB_FACULTY_JOURNAL = 10
   TAB_SIS_IMPORT = 11
+  TAB_GRADING_STANDARDS = 12
   
   def tabs_available(user=nil, opts={})
+    manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
       tabs = [
-        { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
+        { :id => TAB_PERMISSIONS, :label => t(:tab_permissions, "Permissions"), :href => :account_role_overrides_path },
       ]
     else
-      tabs = [
-        { :id => TAB_COURSES, :label => "Courses", :href => :account_path },
-        { :id => TAB_USERS, :label => "Users", :href => :account_users_path },
-        { :id => TAB_STATISTICS, :label => "Statistics", :href => :statistics_account_path },
-        { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
-        { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path },
-        { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path },
-        { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path },
-      ]
-      tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
-      tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id
-      tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_config_path } if self.parent_account_id.nil?
-      tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.allow_sis_import
+      tabs = [ { :id => TAB_COURSES, :label => t(:tab_courses, "Courses"), :href => :account_path } ]
+      tabs << { :id => TAB_USERS, :label => t(:tab_users, "Users"), :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
+      tabs << { :id => TAB_STATISTICS, :label => t(:tab_statistics, "Statistics"), :href => :statistics_account_path }
+      tabs << { :id => TAB_PERMISSIONS, :label => t(:tab_permissions, "Permissions"), :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      if user && self.grants_right?(user, nil, :manage_outcomes)
+        tabs << { :id => TAB_OUTCOMES, :label => t(:tab_outcomes, "Outcomes"), :href => :account_outcomes_path }
+        tabs << { :id => TAB_RUBRICS, :label => t(:tab_rubrics, "Rubrics"), :href => :account_rubrics_path }
+      end
+      tabs << { :id => TAB_GRADING_STANDARDS, :label => t(:tab_grading_standards, "Grading Schemes"), :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
+      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t(:tab_sub_accounts, "Sub-Accounts"), :href => :account_sub_accounts_path } if manage_settings
+      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t(:tab_faculty_journal, "Faculty Journal"), :href => :account_user_notes_path} if self.enable_user_notes
+      tabs << { :id => TAB_TERMS, :label => t(:tab_terms, "Terms"), :href => :account_terms_path } if !self.root_account_id && manage_settings
+      tabs << { :id => TAB_AUTHENTICATION, :label => t(:tab_authentication, "Authentication"), :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
+      tabs << { :id => TAB_SIS_IMPORT, :label => t(:tab_sis_import, "SIS Import"), :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
     end
-    tabs << { :id => TAB_SETTINGS, :label => "Settings", :href => :account_settings_path }
+    tabs << { :id => TAB_SETTINGS, :label => t(:tab_settings, "Settings"), :href => :account_settings_path }
     tabs
   end
 
@@ -895,6 +923,16 @@ class Account < ActiveRecord::Base
       self.allowed_services_hash.empty?
     else
       self.allowed_services_hash.has_key?(service)
+    end
+  end
+  
+  def self.all_accounts_for(context)
+    if context.respond_to?(:account)
+      context.account.account_chain
+    elsif context.respond_to?(:parent_account)
+      context.account_chain
+    else
+      []
     end
   end
   

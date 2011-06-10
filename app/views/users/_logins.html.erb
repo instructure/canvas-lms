@@ -12,6 +12,15 @@
         <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
           <th scope='row'>
             <b class='unique_id'><%= pseudonym && pseudonym.unique_id %></b>
+            <% if pseudonym && ((pseudonym.sis_user_id && pseudonym.account.membership_for_user(@current_user)) || can_do(pseudonym.account, @current_user, :manage_sis)) %>
+              <div style="font-size: 0.8em; padding-left: 20px;">
+                SIS ID: <span id="sis_user_id_<%= pseudonym.id %>" class="sis_user_id"><%= pseudonym.sis_user_id %></span> 
+              </div>
+              <div style="display:none" class="can_edit_sis_user_id"><%= can_do(pseudonym.account, @current_user, :manage_sis) %></div>
+              <div style="font-size: 0.8em; padding-left: 20px;">
+                SIS Login ID: <span id="sis_source_id_<%= pseudonym.id %>" class="sis_source_id"><%= pseudonym.sis_source_id %></span> 
+              </div>
+            <% end %>
           </th>
           <td class='account'>
             <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account_id : "{{ account_id }}"), :class => 'account_name') %>
@@ -45,20 +54,6 @@
               <% end %>
             <% end %>
           </td>
-          <% if current_user_is_site_admin? %>
-            <td>
-              <% if pseudonym && pseudonym.sis_user_id %>
-                SIS User ID:
-                <%= pseudonym.sis_user_id %>
-              <% end %>
-            </td>
-            <td>
-              <% if pseudonym && pseudonym.sis_source_id %>
-                SIS Login ID:
-                <%= pseudonym.sis_source_id %>
-              <% end %>
-            </td>
-          <% end %>
           <% if !pseudonym || can_do(pseudonym.account, @current_user, :manage_user_logins) %>
             <td class='links <%= 'passwordable' if (!pseudonym && can_only_select_current_account_which_is_passwordable) || can_change_pseudonym_password %>'>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link"><%= image_tag "edit.png" %></a>
@@ -83,6 +78,10 @@
       <tr>
         <td><%= f.label :unique_id, "Login:" %></td>
         <td><%= f.text_field :unique_id, :style => "width: 150px;" %></td>
+      </tr>
+      <tr style="display:none;" class="sis_user_id">
+        <td><%= f.label :sis_user_id, "SIS ID:" %></td>
+        <td><%= f.text_field :sis_user_id, :style => "width: 150px;" %></td>
       </tr>
       <% if can_do(Account.site_admin, @current_user, :manage_user_logins) %>
         <tr class="account_id">

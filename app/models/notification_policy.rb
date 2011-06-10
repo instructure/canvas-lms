@@ -23,6 +23,8 @@ class NotificationPolicy < ActiveRecord::Base
   belongs_to :communication_channel
   
   before_save :infer_frequency
+
+  attr_accessible :notification, :user, :communication_channel, :frequency, :notification_id, :user_id, :communication_channel_id
   
   # This is for choosing a policy for another context, so:
   # user.notification_policies.for(notification) or

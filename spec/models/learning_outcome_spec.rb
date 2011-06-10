@@ -219,6 +219,7 @@ describe LearningOutcome do
       @result.original_score.should eql(2.0)
       @result.original_possible.should eql(3.0)
       @result.mastery.should eql(nil)
+      @result.versions.length.should eql(1)
       n = @result.version_number
       @assessment = @a.assess({
         :user => @user,
@@ -233,6 +234,7 @@ describe LearningOutcome do
         }
       })
       @result.reload
+      @result.versions.length.should eql(2)
       @result.version_number.should > n
       @result.score.should eql(3.0)
       @result.possible.should eql(3.0)

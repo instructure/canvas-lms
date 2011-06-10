@@ -127,6 +127,7 @@ class CountsReport
     detailed_progressive[:generated_at] = @timestamp
     create_progressive_hashes(detailed_progressive[:totals], @overview[:totals])
     ExternalStatuses.possible_external_statuses.each do |status|
+      detailed_progressive[status.to_sym] ||= new_progressive_hash
       create_progressive_hashes(detailed_progressive[status.to_sym], @overview[status.to_sym])
     end
     @detailed.each do |k, v|
@@ -278,9 +279,6 @@ class CountsReport
       :totals => new_progressive_hash,
       :detailed => {}
     }
-    ExternalStatuses.possible_external_statuses.each do |status|
-      hash[status.to_sym] = new_progressive_hash
-    end
     hash
   end
 

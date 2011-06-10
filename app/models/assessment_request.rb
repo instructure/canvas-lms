@@ -74,7 +74,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
   
   def assessor_name
-    self.rubric_assessment.assessor_name rescue ((self.assessor.name rescue nil) || "Unknown")
+    self.rubric_assessment.assessor_name rescue ((self.assessor.name rescue nil) || t("#unknown", "Unknown"))
   end
   
   workflow do
@@ -87,7 +87,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
   
   def asset_title
-    (self.asset.assignment.title rescue self.asset.title) rescue "Unknown"
+    (self.asset.assignment.title rescue self.asset.title) rescue t("#unknown", "Unknown")
   end
   
   def comment_added(comment)
@@ -95,11 +95,11 @@ class AssessmentRequest < ActiveRecord::Base
   end
   
   def asset_user_name
-    self.asset.user.name rescue "Unknown"
+    self.asset.user.name rescue t("#unknown", "Unknown")
   end
   
   def asset_context_name
-    (self.asset.context.name rescue self.asset.assignment.context.name) rescue "Unknown"
+    (self.asset.context.name rescue self.asset.assignment.context.name) rescue t("#unknown", "Unknown")
   end
   
   def self.serialization_excludes; [:uuid]; end

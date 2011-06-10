@@ -20,4 +20,5 @@ class SisCrossListedSection < ActiveRecord::Base
   named_scope :account_sections, lambda{|account, *source_ids|
     {:conditions => {:root_account_id => account.id, :sis_source_id => source_ids}, :order => :sis_source_id }
   }
+  attr_accessible
 end

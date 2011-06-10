@@ -38,7 +38,7 @@ module EportfolioPage
     @show_left_side = true
     add_crumb(@portfolio.name, eportfolio_path(@portfolio))
     if @owner_view
-      add_crumb("Welcome to Your ePortfolio")
+      add_crumb(t('#crumbs.eportfolio_welcome', "Welcome to Your ePortfolio"))
     else
       add_crumb(@category.name, eportfolio_named_category_path(@portfolio.id, @category.slug))
       add_crumb(@page.name, eportfolio_named_category_entry_path(@portfolio.id, @category.slug, @page.slug))

@@ -47,7 +47,7 @@ class QuizQuestionsController < ApplicationController
     @bank = AssessmentQuestionBank.find(params[:assessment_question_bank_id])
     if authorized_action(@bank, @current_user, :read)
       @assessment_questions = @bank.assessment_questions.active.find_all_by_id(params[:assessment_questions_ids].split(",")).compact
-      @group = @quiz.quiz_groups.find_by_id(params[:quiz_group_id]) if params[:quiz_group_id].present?
+      @group = @quiz.quiz_groups.find_by_id(params[:quiz_group_id]) if params[:quiz_group_id].to_i > 0
       @questions = @quiz.add_assessment_questions(@assessment_questions, @group)
       render :json => @questions.to_json
     end

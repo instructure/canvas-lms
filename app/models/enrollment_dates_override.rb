@@ -21,4 +21,6 @@ class EnrollmentDatesOverride < ActiveRecord::Base
   
   belongs_to :context, :polymorphic => true
   belongs_to :enrollment_term
+
+  attr_accessible :enrollment_type, :enrollment_term, :start_at, :end_at
 end

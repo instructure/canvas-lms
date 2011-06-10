@@ -1,5 +1,6 @@
 plugin = Canvas::Plugin.register('registration_form_recaptcha', 'registration_form', {
-  :description => 'captcha plugin for the registration form',
+  :name => lambda{ t :name, "Registration form ReCAPTCHA" },
+  :description => lambda{ t :description, "CAPTCHA plugin for the registration form" },
   :website => 'http://www.instructure.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',

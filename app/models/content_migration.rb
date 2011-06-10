@@ -51,6 +51,7 @@ class ContentMigration < ActiveRecord::Base
           'web_links' => false,
           'wikis' => false
   }
+  attr_accessible :context, :migration_settings, :user
 
   workflow do
     state :created
@@ -155,11 +156,9 @@ class ContentMigration < ActiveRecord::Base
   
   def plugin_type
     if plugin = Canvas::Plugin.find(migration_settings['migration_type'])
-      plugin.settings['select_text'] || plugin.name
-    elsif migration_settings['migration_type']
-      migration_settings['migration_type'].titleize
+      plugin.setting('select_text') || plugin.name
     else
-      'Unknown'
+      t(:unknown, 'Unknown')
     end
   end
 
@@ -195,6 +194,7 @@ class ContentMigration < ActiveRecord::Base
         self.workflow_state = 'failed'
         message = "The migration plugin #{migration_settings['migration_type']} doesn't have a worker."
         migration_settings[:last_error] = message
+        ErrorReport.log_exception(:content_migration, $!)
         logger.error message
         self.save
       end
@@ -240,6 +240,7 @@ class ContentMigration < ActiveRecord::Base
       self.workflow_state = :failed
       message = "#{e.to_s}: #{e.backtrace.join("\n")}"
       migration_settings[:last_error] = message
+      ErrorReport.log_exception(:content_migration, e)
       logger.error message
       self.save
       raise e

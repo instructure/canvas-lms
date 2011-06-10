@@ -33,6 +33,8 @@ class ContentTag < ActiveRecord::Base
   after_save :enforce_unique_in_modules
   after_save :touch_context_module
   after_save :touch_context_if_learning_outcome
+
+  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url
   
   adheres_to_policy
   
@@ -47,7 +49,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   named_scope :active, lambda{
-    {:conditions => ['workflow_state != ?', 'deleted'] }
+    {:conditions => ['content_tags.workflow_state != ?', 'deleted'] }
   }
   
   def touch_context_module
@@ -67,7 +69,7 @@ class ContentTag < ActiveRecord::Base
     self.title ||= self.content.title rescue nil
     self.title ||= self.content.name rescue nil
     self.title ||= self.content.display_name rescue nil
-    self.title ||= "No title"
+    self.title ||= t(:no_title, "No title")
     self.comments ||= ""
     self.comments = "" if self.comments == "Comments"
     self.context_code = "#{self.context_type.to_s.underscore}_#{self.context_id}" rescue nil
@@ -168,8 +170,12 @@ class ContentTag < ActiveRecord::Base
     self.save
   end
   
+  def locked_for?(user, deep_check=false)
+    self.context_module.locked_for?(user, self, deep_check)
+  end
+  
   def available_for?(user, deep_check=false)
-    self.context_module.available_for?(user, self, deep_check) rescue true
+    self.context_module.available_for?(user, self, deep_check)
   end
   
   def self.update_for(asset)
@@ -224,15 +230,12 @@ class ContentTag < ActiveRecord::Base
     association_type = association.class.to_s
     result = nil
     attempts = 0
-    begin
-      if association.is_a?(Quiz)
-        result = LearningOutcomeResult.find_or_create_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id_and_associated_asset_type_and_associated_asset_id(self.learning_outcome_id, user.id, association.id, association_type, self.id, 'AssessmentQuestion', assessment_question.id)
-      else
-        result = LearningOutcomeResult.find_or_create_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
-      end
-    rescue => e
-      attempts += 1
-      retry if attempts < 3
+    if association.is_a?(Quiz)
+      result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id_and_associated_asset_type_and_associated_asset_id(self.learning_outcome_id, user.id, association.id, association_type, self.id, 'AssessmentQuestion', assessment_question.id)
+      result ||= LearningOutcomeResult.new(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self, :associated_asset => assessment_question)
+    else
+      result = LearningOutcomeResult.find_by_learning_outcome_id_and_user_id_and_association_id_and_association_type_and_content_tag_id(self.learning_outcome_id, user.id, association.id, association_type, self.id)
+      result ||= LearningOutcomeResult.new(:learning_outcome => self.learning_outcome, :user => user, :association => association, :content_tag => self)
     end
     result.context = self.context
     if artifact

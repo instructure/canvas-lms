@@ -16,7 +16,7 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((context_message.user_id rescue nil), @context.asset_string) %></div>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
-    <div class="message user_content"><%= user_content(context_message.body, @context.asset_string, context_message.asset_string) rescue nbsp %></div>
+    <div class="message user_content"><%= user_content(context_message.try(:body)) || nbsp %></div>
     <div class="clear"></div>
   </div>
   <div style="margin: 5px;">

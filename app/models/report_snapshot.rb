@@ -20,6 +20,8 @@ class ReportSnapshot < ActiveRecord::Base
   STATS_COLLECTION_URL = "https://stats.instructure.com/stats_collection"
   REPORT_TO_SEND = "counts_progressive_overview"
 
+  attr_accessible :report_type
+
   after_create :push_to_instructure_if_collection_enabled
 
   def self.report_value_over_time(report, key)

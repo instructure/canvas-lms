@@ -26,7 +26,7 @@ class AccountsController < ApplicationController
   
   def show
     return redirect_to account_settings_url(@account) if @account.site_admin?
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :read)
       load_course_right_side
       @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show)
       build_course_stats
@@ -34,7 +34,7 @@ class AccountsController < ApplicationController
   end
   
   def update
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_account_settings)
       respond_to do |format|
         enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
@@ -46,17 +46,26 @@ class AccountsController < ApplicationController
         end
         if current_user_is_site_admin?
           @account.enable_user_notes = enable_user_notes if enable_user_notes
-          @account.allow_sis_import = allow_sis_import if allow_sis_import
+          @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
           if params[:account][:settings]
             @account.settings[:admins_can_change_passwords] = !!params[:account][:settings][:admins_can_change_passwords]
             @account.settings[:global_includes] = !!params[:account][:settings][:global_includes]
+          end
+        end
+        if sis_id = params[:account].delete(:sis_source_id)
+          if sis_id != @account.sis_source_id && (@account.root_account || @account).grants_right?(@current_user, session, :manage_sis)
+            if sis_id == ''
+              @account.sis_source_id = nil
+            else
+              @account.sis_source_id = sis_id
+            end
           end
         end
         if @account.update_attributes(params[:account])
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account.to_json }
         else
-          flash[:error] = "Account settings update failed"
+          flash[:error] = t(:update_failed_notice, "Account settings update failed")
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account.errors.to_json, :status => :bad_request }
         end
@@ -65,8 +74,9 @@ class AccountsController < ApplicationController
   end
   
   def settings
-    if authorized_action(@account, @current_user, :manage)
-      if @available_reports = AccountReport.available_reports(@account)
+    if authorized_action(@account, @current_user, :read)
+      @available_reports = AccountReport.available_reports(@account) if @account.grants_right?(@current_user, @session, :read_reports)
+      if @available_reports
         @last_reports = {}
         @available_reports.keys.each do |report|
           @last_reports[report] = @account.account_reports.last_of_type(report).first
@@ -87,11 +97,12 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :manage_admin_users)
       @root_account = @account.root_account || @account
       params[:pseudonym][:unique_id] ||= params[:pseudonym][:path]
-      @pseudonym = Pseudonym.find_or_initialize_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @root_account.id)
+      @pseudonym = Pseudonym.find_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @root_account.id)
+      @pseudonym ||= Pseudonym.new(:unique_id => params[:pseudonym][:unique_id], :account => @root_account)
       new_login = @pseudonym.new_record?
       if !@pseudonym.new_record?
         user = @pseudonym.user
-        render :json => {:errors => {'pseudonym[unique_id]' => "The login specified is already in use by <a href='/users/#{user.id}'>#{user.name}</a>"}}.to_json, :status => :bad_request
+        render :json => {:errors => {'pseudonym[unique_id]' => mt(:login_in_use_notice, "The login specified is already in use by [%{username}](%{url})", :username => user.name, :url => "/users/#{user.id}")}}.to_json, :status => :bad_request
         return
       end
       notify = (params[:pseudonym].delete :send_confirmation) == '1'
@@ -125,10 +136,10 @@ class AccountsController < ApplicationController
           end
         else
           @user.destroy if @user.pseudonyms.select{|p| !p.new_record? }.empty?
-          render :json => {:errors => {:base => "Invalid login"}}.to_json, :status => :bad_request
+          render :json => {:errors => {:base => t(:invalid_login_message, "Invalid login")}}.to_json, :status => :bad_request
         end
       else
-        render :json => {:errors => {:base => "Invalid user"}}.to_json, :status => :bad_request
+        render :json => {:errors => {:base => t(:invalid_login_message, "Invalid user")}}.to_json, :status => :bad_request
       end
     end
   end
@@ -138,7 +149,7 @@ class AccountsController < ApplicationController
       @context = @account
       @user = @account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
       if !@user
-        flash[:error] = "No user found with that id"
+        flash[:error] = t(:no_user_message, "No user found with that id")
         redirect_to account_url(@account)
       end
     end
@@ -162,15 +173,15 @@ class AccountsController < ApplicationController
         @user && @user.destroy
       end
       respond_to do |format|
-        flash[:notice] = "#{@user.name} successfully deleted" if @user
-        format.json { render :json => @user.to_json }
+        flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name) if @user
         format.html { redirect_to account_url(@account) }
+        format.json { render :json => @user.to_json }
       end
     end
   end
   
   def turnitin_confirmation 
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_account_settings)
       turnitin = Turnitin::Client.new(params[:id], params[:shared_secret])
       render :json => {:success => turnitin.testSettings}.to_json
     end
@@ -186,8 +197,8 @@ class AccountsController < ApplicationController
   protected :load_course_right_side
   
   def statistics
-    if authorized_action(@account, @current_user, :manage)
-      add_crumb("Statistics", statistics_account_url(@account))
+    if authorized_action(@account, @current_user, :read)
+      add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
       @recently_started_courses = @account.all_courses.recently_started
       @recently_ended_courses = @account.all_courses.recently_ended
       @recently_logged_users = @account.all_users.recently_logged_in[0,25]
@@ -199,7 +210,7 @@ class AccountsController < ApplicationController
   end
   
   def statistics_graph
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :read)
       @items = ReportSnapshot.get_account_detail_over_time('counts_progressive_detailed', @account.id, params[:attribute])
       respond_to do |format|
         format.json { render :json => @items.to_json }
@@ -210,10 +221,11 @@ class AccountsController < ApplicationController
               csv << [item[0]/1000, item[1]]
             end
           end
+          cancel_cache_buster
           send_data(
             res, 
             :type => "text/csv", 
-            :filename => "#{params[:attribute].titleize} Report for #{@account.name}.csv", 
+            :filename => "#{params[:attribute].titleize} Report for #{@account.name}.csv",
             :disposition => "attachment"
           )
         }
@@ -222,7 +234,7 @@ class AccountsController < ApplicationController
   end
   
   def statistics_page_views
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :read)
       start_at = Date.parse(params[:start_at]) rescue nil
       start_at ||= 1.month.ago.to_date
       end_at = Date.parse(params[:end_at]) rescue nil
@@ -230,8 +242,8 @@ class AccountsController < ApplicationController
 
       @end_at = [[start_at, end_at].max, Date.today].min
       @start_at = [[start_at, end_at].min, Date.today].min
-      add_crumb("Statistics", statistics_account_url(@account))
-      add_crumb("Page Views")
+      add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
+      add_crumb(t(:crumb_page_views, "Page Views"))
     end
   end
   
@@ -261,10 +273,11 @@ class AccountsController < ApplicationController
   end
   
   def sis_import
-    if authorized_action(@account, @current_user, :manage)
-      return redirect_to account_settings_url(@account) if !@account.allow_sis_import || @account.root_account_id
+    if authorized_action(@account, @current_user, :manage_sis)
+      return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.scoped(:order=>'created_at DESC', :limit=>1).first
+      @terms = @account.enrollment_terms.active
       respond_to do |format|
         format.html
         format.json { render :json => @current_batch.to_json(:include => :sis_batch_log_entries) }
@@ -273,19 +286,28 @@ class AccountsController < ApplicationController
   end
 
   def sis_import_submit
-    raise "SIS imports can only be executed on root accounts" if @account.root_account_id
+    raise "SIS imports can only be executed on root accounts" unless @account.root_account?
     raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
 
-    if authorized_action(@account, @current_user, :manage)
+    if authorized_action(@account, @current_user, :manage_sis)
       ActiveRecord::Base.transaction do
         if !@account.current_sis_batch || !@account.current_sis_batch.importing?
           batch = SisBatch.create_with_attachment(@account, params[:import_type], params[:attachment])
+
+          if params[:batch_mode].to_i > 0
+            batch.batch_mode = true
+            if params[:batch_mode_term_id].present?
+              batch.batch_mode_term = @account.enrollment_terms.active.find(params[:batch_mode_term_id])
+            end
+            batch.save!
+          end
+
           @account.current_sis_batch_id = batch.id
           @account.save
           batch.process
           render :text => batch.to_json(:include => :sis_batch_log_entries)
         else
-          render :text => {:error=>true, :error_message=>"An SIS import is already in process.", :batch_in_progress=>true}.to_json
+          render :text => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true}.to_json
         end
       end
     end
@@ -297,7 +319,7 @@ class AccountsController < ApplicationController
   end
   
   def courses
-    if authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :read)
       load_course_right_side
       @courses = []
       @query = (params[:course] && params[:course][:name]) || params[:query]
@@ -348,7 +370,7 @@ class AccountsController < ApplicationController
       if res
         redirect_to account_settings_url(@context, :anchor => "tab-users")
       else
-        flash[:error] = "No user with that email address was found"
+        flash[:error] = t(:no_user_found_notice, "No user with that email address was found")
         redirect_to account_settings_url(@context, :anchor => "tab-users")
       end
     end
@@ -366,8 +388,8 @@ class AccountsController < ApplicationController
   end
   
   def run_report
-    if authorized_action(@context, @current_user, :manage)
-      student_report = AccountReport.new(:user=>@current_user, :account=>@account, :report_type=>params[:report_type])
+    if authorized_action(@context, @current_user, :read_reports)
+      student_report = AccountReport.new(:user=>@current_user, :account=>@account, :report_type=>params[:report_type], :parameters=>params[:parameters])
       student_report.workflow_state = :running
       student_report.progress = 0
       student_report.save

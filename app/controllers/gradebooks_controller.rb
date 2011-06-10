@@ -24,7 +24,7 @@ class GradebooksController < ApplicationController
 
   def grade_summary
     # do this as the very first thing, if the current user is a teacher in the course and they are not trying to view another user's grades, redirect them to the gradebook
-    if @context.grants_right?(@current_user, nil, :manage_grades) && !params[:id]
+    if (@context.grants_right?(@current_user, nil, :manage_grades) || @context.grants_right?(@current_user, nil, :read_as_admin)) && !params[:id]
       redirect_to named_context_url(@context, :context_gradebook_url)
       return
     end
@@ -61,11 +61,6 @@ class GradebooksController < ApplicationController
         end
       end
     end
-  end
-  
-  def grading_standards
-    @current_user_grading_standards = @current_user.sorted_grading_standards rescue []
-    render :json => @current_user_grading_standards.to_json(:methods => :display_name)
   end
   
   def grading_rubrics
@@ -131,7 +126,7 @@ class GradebooksController < ApplicationController
   # GET /gradebooks/1.json
   # GET /gradebooks/1.csv
   def show
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :read_as_admin])
       return submissions_json if params[:updated] && request.format == :json
       return gradebook_init_json if params[:init] && request.format == :json
       @context.require_assignment_group
@@ -167,9 +162,8 @@ class GradebooksController < ApplicationController
         else
           format.html { render :action => "show" }
         end
-        format.csv { 
-          headers["Pragma"] = "no-cache"
-          headers["Cache-Control"] = "no-cache"
+        format.csv {
+          cancel_cache_buster
           send_data(
             @context.gradebook_to_csv, 
             :type => "text/csv", 
@@ -298,7 +292,7 @@ class GradebooksController < ApplicationController
   end
   
   def speed_grader
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :read_as_admin])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       respond_to do |format|
         format.html {

@@ -485,13 +485,13 @@ module CC
             calc_node.answer_tolerance question['answer_tolerance']
             
             calc_node.formulas(:decimal_places=>question['formula_decimal_places']) do |forms_node|
-              question['formulas'].each do |f|
+              question['formulas'].try(:each) do |f|
                 forms_node.formula f['formula']
               end
             end
             
             calc_node.vars do |vars_node|
-              question['variables'].each do |var|
+              question['variables'].try(:each) do |var|
                 vars_node.var(:name=>var['name'], :scale=>var['scale']) do |var_node|
                   var_node.min var['min']
                   var_node.max var['max']
@@ -500,9 +500,9 @@ module CC
             end
             
             calc_node.var_sets do |sets_node|
-              question['answers'].each do |answer|
+              question['answers'].try(:each) do |answer|
                 sets_node.var_set(:ident=>answer['id']) do |set_node|
-                  answer['variables'].each do |var|
+                  answer['variables'].try(:each) do |var|
                     set_node.var(var['value'], :name=>var['name'])
                   end
                   set_node.answer answer[:answer]

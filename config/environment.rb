@@ -28,18 +28,35 @@ Rails::Initializer.run do |config|
 
   # Force all environments to use the same logger level
   # (by default production uses :info, the others :debug)
-  # config.log_level = :debug
+  # config.log_level = :info
 
   # Make Time.zone default to the specified zone, and make Active Record store time values
   # in the database in UTC, and return them converted to the specified local zone.
   # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
   config.time_zone = 'UTC'
 
-  memcache_servers = (YAML.load_file(RAILS_ROOT + "/config/memcache.yml")[RAILS_ENV] || []) rescue []
+  memcache_servers = File.exists?(Rails.root+"config/memcache.yml") ? (YAML.load_file(Rails.root+"config/memcache.yml")[RAILS_ENV] || []) : []
   if memcache_servers.empty?
     config.cache_store = :nil_store
   else
     config.cache_store = :mem_cache_store, *memcache_servers
+  end
+
+  log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[RAILS_ENV]
+  if log_config && log_config["logger"] == "syslog"
+    require 'syslog_wrapper'
+    log_config["app_ident"] ||= "canvas-lms"
+    log_config["daemon_ident"] ||= "canvas-lms-daemon"
+    facilities = 0
+    (log_config["facilities"] || []).each do |facility|
+      facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
+    end
+    ident = ENV['RUNNING_AS_DAEMON'] == 'true' ? log_config["daemon_ident"] : log_config["app_ident"]
+    config.logger = RAILS_DEFAULT_LOGGER = SyslogWrapper.new(ident, facilities)
+  else
+    if ENV['RUNNING_AS_DAEMON'] == 'true'
+      config.log_path = Rails.root+'log/delayed_job.log'
+    end
   end
 
   # Use SQL instead of Active Record's schema dumper when creating the test database.

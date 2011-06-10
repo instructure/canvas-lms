@@ -34,7 +34,7 @@ class Pseudonym < ActiveRecord::Base
   before_destroy :retire_channels
   
   before_save :set_password_changed
-  before_validation :infer_defaults
+  before_validation :infer_defaults, :verify_unique_sis_user_id
   before_save :assert_communication_channel
   before_save :set_update_account_associations_if_account_changed
   after_save :update_passwords_on_related_pseudonyms
@@ -53,9 +53,9 @@ class Pseudonym < ActiveRecord::Base
 
   def require_password?
     # Change from auth_logic: don't require a password just because new_record?
-    # is true. just check if the pw has changed or cryped_password_field is
+    # is true. just check if the pw has changed or crypted_password_field is
     # blank.
-    password_changed? || send(crypted_password_field).blank?
+    password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?)
   end
 
   acts_as_list :scope => :user_id
@@ -183,6 +183,15 @@ class Pseudonym < ActiveRecord::Base
     end
     true
   end
+  
+  def verify_unique_sis_user_id
+    return true unless self.sis_user_id
+    existing_pseudo = Pseudonym.find_by_account_id_and_sis_user_id(self.account_id, self.sis_user_id)
+    return true if !existing_pseudo || existing_pseudo.id == self.id 
+    
+    self.errors.add(:sis_user_id, "SIS ID \"#{self.sis_user_id}\" is already in use")
+    false
+  end
 
   def assert_user(params={}, &block)
     self.user ||= User.create!({:name => self.path}.merge(params), &block)
@@ -275,13 +284,11 @@ class Pseudonym < ActiveRecord::Base
     return false if self.deleted?
     require 'net/ldap'
     account = self.account || Account.default
-    if account && account.ldap_authentication?
-      res = nil
-      res = valid_ldap_credentials?(plaintext_password)
-      res ||= valid_password?(plaintext_password)
-    else
-      valid_password?(plaintext_password)
-    end
+    res = false
+    res ||= valid_ldap_credentials?(plaintext_password) if account && account.ldap_authentication?
+    # Only check SIS if they haven't changed their password
+    res ||= valid_ssha?(plaintext_password) if password_auto_generated?
+    res ||= valid_password?(plaintext_password)
   end
   
   def generate_temporary_password
@@ -314,16 +321,20 @@ class Pseudonym < ActiveRecord::Base
   def valid_ssha?(plaintext_password)
     return false unless plaintext_password && self.sis_ssha
     decoded = Base64::decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))
-    digest = decoded[0,20]
-    salt = decoded[20,8]
-    digested_password = Digest::SHA1.digest(plaintext_password + salt)
+    digest = decoded[0,40]
+    salt = decoded[40..-1]
+    digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack('H*').first
     digest == digested_password
   end
   
   def ldap_bind_result(password_plaintext)
-    ldap = self.account.account_authorization_config.ldap_connection
-    filter = self.account.account_authorization_config.ldap_filter(self.unique_id)
-    ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
+    self.account.account_authorization_configs.each do |config|
+      ldap = config.ldap_connection
+      filter = config.ldap_filter(self.unique_id)
+      res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
+      return res if res
+    end
+    nil
   end
   
   def ldap_channel_to_possibly_merge(password_plaintext)

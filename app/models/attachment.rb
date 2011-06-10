@@ -331,7 +331,104 @@ class Attachment < ActiveRecord::Base
     ns = nil if ns && ns.empty?
     ns
   end
-  
+
+  def process_s3_details!(details)
+    unless workflow_state == 'unattached_temporary'
+      self.workflow_state = nil
+      self.file_state = 'available'
+    end
+    self.md5 = (details['etag'] || "").gsub(/\"/, '')
+    self.content_type = details['content-type']
+    self.size = details['content-length']
+
+    if md5.present? && ns = infer_namespace
+      if existing_attachment = Attachment.find_all_by_md5_and_namespace(md5, ns).detect{|a| a.id != id && !a.root_attachment_id && a.content_type == content_type }
+        AWS::S3::S3Object.delete(full_filename, bucket_name) rescue nil
+        self.root_attachment = existing_attachment
+        write_attribute(:filename, nil)
+        clear_cached_urls
+      end
+    end
+
+    save!
+
+    # normally this would be called by attachment_fu after it had uploaded the file to S3.
+    after_attachment_saved
+  end
+
+  CONTENT_LENGTH_RANGE = 10.gigabytes
+  S3_EXPIRATION_TIME = 30.minutes
+
+  def ajax_upload_params(pseudonym, local_upload_url, s3_success_url, options = {})
+    if Attachment.s3_storage?
+      res = {
+        :upload_url => "#{options[:ssl] ? "https" : "http"}://#{bucket_name}.s3.amazonaws.com/",
+        :remote_url => true,
+        :file_param => 'file',
+        :success_url => s3_success_url,
+        :upload_params => {
+          'AWSAccessKeyId' => AWS::S3::Base.connection.access_key_id
+        }
+      }
+    elsif Attachment.local_storage?
+      res = {
+        :upload_url => local_upload_url,
+        :remote_url => false,
+        :file_param => options[:file_param] || 'attachment[uploaded_data]', #uploadify ignores this and uses 'file',
+        :upload_params => options[:upload_params] || {}
+      }
+    else
+      raise "Unknown storage system configured"
+    end
+
+    # Build the data that will be needed for the user to upload to s3
+    # without us being the middle-man
+    sanitized_filename = full_filename.gsub(/\+/, " ")
+    policy = {
+      'expiration' => (options[:expiration] || S3_EXPIRATION_TIME).from_now.utc.iso8601,
+      'conditions' => [
+        {'bucket' => bucket_name},
+        {'key' => sanitized_filename},
+        {'acl' => 'private'},
+        ['starts-with', '$Filename', ''],
+        ['starts-with', '$folder', ''],
+        ['content-length-range', 1, (options[:max_size] || CONTENT_LENGTH_RANGE)]
+      ]
+    }
+    extras = []
+    if options[:no_redirect]
+      extras << {'success_action_status' => '201'}
+    elsif res[:success_url]
+      extras << {'success_action_redirect' => res[:success_url]}
+    end
+    if content_type && content_type != "unknown/unknown"
+      extras << {'content-type' => content_type}
+    end
+    policy['conditions'] += extras
+    # flash won't send the session cookie, so for local uploads we put the user id in the signed
+    # policy so we can mock up the session for FilesController#create
+    policy['conditions'] << {'pseudonym_id' => pseudonym.id} if Attachment.local_storage?
+
+    policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
+    signature = Base64.encode64(
+      OpenSSL::HMAC.digest(
+        OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded
+      )
+    ).gsub(/\n/, '')
+
+    res[:id] = id
+    res[:upload_params].merge!({
+      'Filename' => '',
+      'folder' => '',
+      'key' => sanitized_filename,
+      'acl' => 'private',
+      'Policy' => policy_encoded,
+      'Signature' => signature,
+    })
+    extras.map(&:to_a).each{ |extra| res[:upload_params][extra.first.first] = extra.first.last }
+    res
+  end
+
   def unencoded_filename
     CGI::unescape(self.filename || "File")
   end
@@ -945,6 +1042,13 @@ class Attachment < ActiveRecord::Base
   def matches_full_display_path?(path)
     fd_path = full_display_path
     fd_path == path || URI.unescape(fd_path) == path || fd_path.downcase == path.downcase || URI.unescape(fd_path).downcase == path.downcase
+  end
+
+  def matches_filename?(match)
+    filename == match || display_name == match ||
+      URI.unescape(filename) == match || URI.unescape(display_name) == match ||
+      filename.downcase == match.downcase || display_name.downcase == match.downcase ||
+      URI.unescape(filename).downcase == match.downcase || URI.unescape(display_name).downcase == match.downcase
   end
 
   def protect_for(user)

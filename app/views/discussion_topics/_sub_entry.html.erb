@@ -2,7 +2,7 @@
 <div id="<%= "entry_#{entry.id}" if entry %>" style="<%= hidden unless entry %>" class="communication_sub_message <%= 'toggled_communication_sub_message' if hide_entry %> <%= 'blank' unless entry %>">
   <div class="header">
     <div class="header_title">
-      <a title="Author's name" href="<%= context_url(entry_context, :context_user_url, entry ? entry.user_id : nil) %>" class="user_name">
+      <a title="<%= t :authors_name, "Author's name" %>" href="<%= context_url(entry_context, :context_user_url, entry ? entry.user_id : nil) %>" class="user_name">
         <%= context_user_name(entry ? entry.context : nil, entry ? entry.user_id : nil) %>
       </a>
     </div>
@@ -15,7 +15,7 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar(entry.try_rescue(:user_id), entry_context.asset_string, 30) %></div>
     <div class="course_id" style="display: none;"><%= entry_context.id if entry_context && entry_context.is_a?(Course) %></div>
-    <div class="message user_content" style="<%= hidden unless entry %>"><%= user_content(entry.try_rescue(:message), entry_context.asset_string, entry.try_rescue(:asset_string)) || nbsp %></div>
+    <div class="message user_content" style="<%= hidden unless entry %>"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>
     <% if !entry %>
      <% form_for :discussion_entry, :url => context_url(entry_context, :context_discussion_entries_url), :html => {:class => "add_sub_message_form"} do |f| %>
@@ -23,8 +23,8 @@
         <%= f.hidden_field :parent_id, :value => parent_entry.id, :class => "parent_id" %>
         <%= f.text_area :message, :style => "height: 200px;", :class => "rich_text" %>
         <div class="button-container" style="padding-bottom: 5px;">
-          <button type="submit" class="button small-button submit_button">Post Message</button>
-          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+          <button type="submit" class="button small-button submit_button"><%= t :post_message, "Post Message" %></button>
+          <button type="button" class="button button-secondary cancel_button"><%= t "#buttons.cancel", "Cancel" %></button>
         </div>
       <% end %>
     <% end %>

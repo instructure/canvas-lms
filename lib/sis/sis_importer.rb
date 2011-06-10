@@ -44,8 +44,8 @@ module SIS
       @sis.add_warning(csv, message)
     end
     
-    def update_progress
-      @sis.update_progress
+    def update_progress(count = 1)
+      @sis.update_progress(count)
     end
   end
 end

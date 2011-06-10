@@ -47,6 +47,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     filter
   end
   
+  def change_password_url
+    read_attribute(:change_password_url).blank? ? nil : read_attribute(:change_password_url)
+  end
+  
   def ldap_filter=(new_filter)
     self.auth_filter = new_filter
   end
@@ -119,7 +123,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
   
   def self.default_login_handle_name
-    "Email"
+    t(:default_login_handle_name, "Email")
   end
   
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end

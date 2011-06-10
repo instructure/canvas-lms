@@ -3,13 +3,14 @@ source :rubygems
 gem 'rails',          '2.3.11'
 gem 'authlogic',      '2.1.3'
 gem 'aws-s3',         '0.6.2',  :require => 'aws/s3'
+gem 'barista',        '1.0.0'
 gem 'builder',        '2.1.2'
 gem 'compass',        '0.10.5'
 gem 'daemons',        '1.1.0'
 gem 'diff-lcs',       '1.1.2',  :require => 'diff/lcs'
-gem 'erubis',         '2.6.6'
+gem 'erubis',         '2.7.0'
 gem 'fastercsv',      '1.5.3'
-gem 'hairtrigger',    '0.1.6'
+gem 'hairtrigger',    '0.1.11'
 gem 'haml',           '3.0.22'
 gem 'hashery',        '1.3.0',  :require => 'hashery/dictionary'
 gem 'highline',       '1.6.1'
@@ -27,15 +28,17 @@ gem 'mini_magick',    '1.3.2'
 gem 'nokogiri',       '1.4.1'
 gem 'oauth',          '0.3.4'   # 0.3.6 breaks our integration with google docs
 gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param quoting bug
+gem 'rake',           '0.8.7'
 gem 'ratom',          '0.6.7',  :require => "atom"
+gem 'rdiscount',      '1.6.8'
+gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
 gem 'ruby-saml-mod',  '0.1.0'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
-gem 'rufus-scheduler','2.0.6'
 gem 'sanitize',       '1.2.1'
-gem 'uuid',           '2.3.1'
+gem 'uuid',           '2.3.2'
 gem 'will_paginate',  '2.3.15'
 gem 'xml-simple',     '1.0.12', :require => 'xmlsimple'
 # this is only needed by jammit, but we're pinning at 0.9.4 because 0.9.5 breaks
@@ -49,13 +52,16 @@ group :postgres do
   gem 'pg',           '0.10.1'
 end
 
+group :sqlite do
+  gem 'sqlite3-ruby', '1.3.2'
+end
+
 group :test do
   gem 'bluecloth',    '2.0.10' # for generating api docs
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.1'
   gem 'rspec-rails',  '1.3.3'
-  gem 'selenium-webdriver', '0.1.3'
-  gem 'sqlite3-ruby', '1.3.2'
+  gem 'selenium-webdriver', '0.2.0'
   gem 'webrat',       '0.7.2'
   gem 'yard',         '0.6.3'
 end

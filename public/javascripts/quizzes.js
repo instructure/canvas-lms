@@ -211,13 +211,13 @@ var quiz = {};
       }
       $.extend(question, question.question_data);
       var $question = makeQuestion(question);
-      quiz.updateDisplayQuestion($question.find(".question:first"), question, true);
       $("#unpublished_changes_message").slideDown();
       if($bottom) {
         $bottom.before($question);
       } else {
         $("#questions").append($question);
       }
+      quiz.updateDisplayQuestion($question.find(".question:first"), question, true);
     },
     updateDisplayQuestion: function($question, question, escaped) {
       $question.fillTemplateData({
@@ -235,6 +235,7 @@ var quiz = {};
       $question.find(".multiple_answer_sets_holder").css('display', 'none');
       $question.find(".variable_definitions_holder").css('display', 'none').find("tbody").empty();
       $question.find(".formulas_holder").css('display', 'none').find(".formulas_list").empty();
+      $question.find('.question_points').text(question.points_possible);
       var details = quiz.answerTypeDetails(question.question_type);
       var answer_type = details.answer_type, question_type = details.question_type, n_correct = details.n_correct;
       if(question.question_type == 'fill_in_multiple_blanks_question') {
@@ -1142,6 +1143,7 @@ var quiz = {};
       
       $formQuestion.addClass('selectable');
       $form.find(".answer_selection_type").change().show();
+      if(question.question_type != 'missing_word_question') { $form.find("option.missing_word").remove(); }
       if($question.hasClass('missing_word_question') || question.question_type == 'missing_word_question') {
         question = $question.getTemplateData({textValues: ['text_before_answers', 'text_after_answers']});
         answer_data = $question.find(".original_question_text").getFormData();
@@ -1241,7 +1243,7 @@ var quiz = {};
       $displayQuestion.show();
       $("html,body").scrollTo({top: $displayQuestion.offset().top - 10, left: 0});
       if(isNew) {
-        $displayQuestion.remove();
+        $displayQuestion.parent().remove();
         quiz.updateDisplayComments();
       }
       quiz.updateDisplayComments();
@@ -1325,6 +1327,7 @@ var quiz = {};
       $form.attr('action', $("#quiz_urls .add_question_url,#bank_urls .add_question_url").attr('href'))
         .attr('method', 'POST')
         .find(".submit_button").html("Create Question");
+      $form.find("option.missing_word").remove();
       $question.find(".question_type").change();
       $("html,body").scrollTo({top: $question.offset().top - 10, left: 0});
       $question.find(":input:first").focus().select();
@@ -1621,13 +1624,13 @@ var quiz = {};
           if(question) {
             quiz.addExistingQuestion(question.quiz_question);
             if(counter > 5) {
-              setTimeout(nextQuestion, 500);
+              setTimeout(nextQuestion, 50);
             } else {
               nextQuestion();
             }
           }
         }
-        setTimeout(nextQuestion, 100);
+        setTimeout(nextQuestion, 10);
         $findQuestionDialog.dialog('close');
       }, function(data) {
         $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text("Adding Questions Failed, please try again");
@@ -2152,7 +2155,7 @@ var quiz = {};
           });
         }
       });
-    }).delegate(".cancel_button", 'click', function(event) {
+    }).delegate(".group_edit.cancel_button", 'click', function(event) {
       if($(this).closest('.group_top').length == 0) { return; }
       var $top = $(this).parents(".group_top");
       $top.removeClass('editing'); 

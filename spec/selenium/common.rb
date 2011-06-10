@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
+require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
@@ -27,7 +28,7 @@ SERVER_PORT = SELENIUM_CONFIG[:app_port] || 3002
 APP_HOST = "#{SERVER_IP}:#{SERVER_PORT}"
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 60
-MAX_SERVER_START_TIME = 30
+MAX_SERVER_START_TIME = 60
 
 module SeleniumTestsHelperMethods
   def setup_selenium
@@ -45,7 +46,6 @@ module SeleniumTestsHelperMethods
         :desired_capabilities => (SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox)
       )
     end
-    driver.get(app_host)
     driver.manage.timeouts.implicit_wait = 3
     driver
   end
@@ -90,13 +90,6 @@ module SeleniumTestsHelperMethods
       ENV['SELENIUM_WEBRICK_SERVER'] = '1'
       exec("#{base}/../../script/server", "-p", SERVER_PORT.to_s, "-e", Rails.env)
     end
-    for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
-      break if s
-      sleep 1
-    end
-    raise "Failed starting script/server" unless s
-    s.close
     closed = false
     shutdown = lambda do
       unless closed
@@ -110,6 +103,13 @@ module SeleniumTestsHelperMethods
       end
     end
     at_exit { shutdown.call }
+    for i in 0..MAX_SERVER_START_TIME
+      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
+      break if s
+      sleep 1
+    end
+    raise "Failed starting script/server" unless s
+    s.close
     return shutdown
   end
 end
@@ -117,11 +117,12 @@ end
 shared_examples_for "all selenium tests" do
 
   include SeleniumTestsHelperMethods
+  include CustomSeleniumRspecMatchers
 
   attr_reader :selenium_driver
   alias_method :driver, :selenium_driver
   
-  def login_as(username, password)
+  def login_as(username = "nobody@example.com", password = "asdfasdf")
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
     
@@ -130,8 +131,49 @@ shared_examples_for "all selenium tests" do
     password_element.send_keys(password)
     password_element.submit
   end
-  
+  alias_method :login, :login_as
+
+  def create_session(pseudonym, real_login)
+    if real_login
+      login_as(pseudonym.unique_id, pseudonym.password)
+    else
+      @pseudonym_session = mock(PseudonymSession)
+      @pseudonym_session.stub!(:session_credentials).and_return([])
+      @pseudonym_session.stub!(:record).and_return { pseudonym.reload }
+      PseudonymSession.stub!(:find).and_return(@pseudonym_session)
+    end
+  end
+
+  def user_logged_in(opts={})
+    user_with_pseudonym({:active_user => true}.merge(opts))
+    create_session(@pseudonym, opts[:real_login])
+  end
+
+  def course_with_teacher_logged_in(opts={})
+    user_logged_in(opts)
+    course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+  end
+
+  def course_with_student_logged_in(opts={})
+    user_logged_in(opts)
+    course_with_student({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+  end
+
+  def course_with_admin_logged_in(opts={})
+    account_admin_user({:active_user => true}.merge(opts))
+    user_logged_in({:user => @user}.merge(opts))
+    course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+  end
+
+  def expect_new_page_load
+    driver.execute_script("INST.still_on_old_page = true;")
+    yield
+    keep_trying_until { driver.execute_script("return INST.still_on_old_page;") == nil }
+    wait_for_dom_ready
+  end
+
   def wait_for_dom_ready
+    (driver.execute_script "return $").should_not be_nil
     driver.execute_script <<-JS
       window.seleniumDOMIsReady = false; 
       $(function(){ 
@@ -148,12 +190,13 @@ shared_examples_for "all selenium tests" do
     end
   end
   
-  def keep_trying
-    60.times do |i|
-      puts "trying #{SECONDS_UNTIL_GIVING_UP - i}" if i > SECONDS_UNTIL_COUNTDOWN
-      if i < SECONDS_UNTIL_GIVING_UP - 2
-        break if (yield rescue false)
-      elsif i == SECONDS_UNTIL_GIVING_UP - 1
+  def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
+    seconds.times do |i|
+      puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN
+      if i < seconds - 2
+        val = (yield rescue false)
+        break(val) if val
+      elsif i == seconds - 1
         yield
       else
         raise
@@ -175,7 +218,7 @@ shared_examples_for "all selenium tests" do
     # TODO: Better to wait for an event from tiny?
     parent = element.find_element(:xpath, '..')
     tiny_frame = nil
-    keep_trying {
+    keep_trying_until {
       begin
         tiny_frame = parent.find_element(:css, 'iframe')
       rescue => e
@@ -197,13 +240,22 @@ shared_examples_for "all selenium tests" do
     driver.get(app_host + link)
     wait_for_dom_ready
   end
+  
+  def make_full_screen
+    driver.execute_script <<-JS
+      if (window.screen) {
+        window.moveTo(0, 0);
+        window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+      }
+    JS
+  end
 
   self.use_transactional_fixtures = false
-  
+
   append_after(:each) do
-    ALL_MODELS.each &:delete_all
+    ALL_MODELS.each { |m| truncate_table(m) }
   end
-  
+
   append_before(:all) do
     @selenium_driver = setup_selenium
   end

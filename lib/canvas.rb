@@ -33,6 +33,44 @@ module Canvas
     redis_settings = Setting.from_config('redis')
     raise("Redis is not enabled for this install") if redis_settings.blank?
     Bundler.require 'redis'
-    @redis = ::Redis::Factory.create(redis_settings)
+    if redis_settings.is_a?(Array)
+      redis_settings = { :servers => redis_settings }
+    end
+    @redis = ::Redis::Factory.create(redis_settings[:servers])
+    if redis_settings[:database].present?
+      @redis.select(redis_settings[:database])
+    end
+    @redis
+  end
+
+  def self.redis_enabled?
+    @redis_enabled ||= Setting.from_config('redis').present?
+  end
+
+  # `sample` reports KB, not B
+  if File.directory?("/proc")
+    # linux w/ proc fs
+    LINUX_PAGE_SIZE = (size = `getconf PAGESIZE`.to_i; size > 0 ? size : 4096)
+    LINUX_HZ = 100.0 # this isn't always true, but it usually is
+    def self.sample_memory
+      s = File.read("/proc/#{Process.pid}/statm").to_i rescue 0
+      s * LINUX_PAGE_SIZE / 1024
+    end
+    # returns [ utime, stime ], both in seconds
+    def self.sample_cpu_time
+      a = File.read("/proc/#{Process.pid}/stat").split(" ") rescue nil
+      [ a[13].to_f / LINUX_HZ, a[14].to_f / LINUX_HZ] if a && a.length >= 15
+    end
+  else
+    # generic unix solution
+    def self.sample_memory
+      # hmm this is actually resident set size, doesn't include swapped-to-disk
+      # memory.
+      `ps -o rss= -p #{Process.pid}`.to_i
+    end
+    def self.sample_cpu_time
+      # TODO: use ps to grab this
+      [ 0, 0 ]
+    end
   end
 end

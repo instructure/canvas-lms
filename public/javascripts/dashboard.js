@@ -112,7 +112,7 @@ $(function initDashbardJs(){
     for(var idx in notifications) {
       if(notifications[idx].length > 3) {
         var $template = $(notifications[idx][0]).clone();
-        $template.find(".content,.under_links").remove();
+        $template.find(".content,.under_links,.disable_item_link").remove();
         $template.find(".context_code").text("click to show these notifications in the stream");
         $template.find(".subject").attr('href', '#').text(notifications[idx].length + " " + idx);
         $template.data('items', notifications[idx]);

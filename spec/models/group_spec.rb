@@ -128,5 +128,33 @@ describe Group do
     # end
     
   end
-  
+
+  it "should grant manage permissions for associated objects to group managers" do
+    e = course_with_teacher
+    course = e.context
+    teacher = e.user
+    group = course.groups.create
+    course.grants_right?(teacher, nil, :manage_groups).should be_true
+    group.grants_right?(teacher, nil, :manage_wiki).should be_true
+    group.grants_right?(teacher, nil, :manage_files).should be_true
+    WikiNamespace.default_for_context(group).grants_right?(teacher, nil, :update_page).should be_true
+    attachment = group.attachments.build
+    attachment.grants_right?(teacher, nil, :create).should be_true
+  end
+
+  describe "root account" do
+    it "should get the root account assigned" do
+      e = course_with_teacher
+      group = @course.groups.create!
+      group.account.should == Account.default
+      group.root_account.should == Account.default
+
+      new_root_acct = account_model
+      new_sub_acct = new_root_acct.sub_accounts.create!(:name => 'sub acct')
+      group.account = new_sub_acct
+      group.save!
+      group.account.should == new_sub_acct
+      group.root_account.should == new_root_acct
+    end
+  end
 end

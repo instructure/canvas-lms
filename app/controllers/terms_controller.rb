@@ -17,8 +17,9 @@
 #
 
 class TermsController < ApplicationController
-  before_filter :require_context, :require_account_management
+  before_filter :require_context, :require_root_account_management
   def index
+    @root_account = @context.root_account || @context
     @context.default_enrollment_term
     @terms = @context.enrollment_terms.active.sort_by{|t| t.start_at || t.created_at }.reverse
   end
@@ -37,6 +38,16 @@ class TermsController < ApplicationController
   def update
     overrides = params[:enrollment_term].delete(:overrides) rescue nil
     @term = @context.enrollment_terms.active.find(params[:id])
+    root_account = @context.root_account || @context
+    if sis_id = params[:enrollment_term].delete(:sis_source_id)
+      if sis_id != @account.sis_source_id && root_account.grants_right?(@current_user, session, :manage_sis)
+        if sis_id == ''
+          @term.sis_source_id = nil
+        else
+          @term.sis_source_id = sis_id
+        end
+      end
+    end
     if @term.update_attributes(params[:enrollment_term])
       @term.set_overrides(@context, overrides)
       render :json => @term.to_json(:include => :enrollment_dates_overrides)
@@ -49,16 +60,5 @@ class TermsController < ApplicationController
     @term = @context.enrollment_terms.find(params[:id])
     @term.destroy
     render :json => @term.to_json
-  end
-
-  protected
-
-  def require_account_management
-    if @context.root_account != nil || !@context.is_a?(Account)
-      redirect_to named_context_url(@context, :context_url)
-      return false
-    else
-      return false unless authorized_action(@context, @current_user, :manage)
-    end
   end
 end

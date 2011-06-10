@@ -1,39 +1,50 @@
-<% add_crumb "SIS Import" %>
+<% add_crumb t(:sis_import_crumb, "SIS Import") %>
 <% @active_tab = "sis-import" %>
-<% content_for :page_title do %>SIS Import<% end %>
+<% content_for :page_title do %><%= t(:page_title, "SIS Import") %><% end %>
 
 <% content_for :page_header do %>
-    <h1>SIS Import</h1>
+    <h1><%= t(:page_header, "SIS Import") %></h1>
 <% end %>
 
 <div>
-  <h2>SIS Import</h2>
+  <h2><%= t(:title, "SIS Import") %></h2>
 
   <div class="sis_messages" style="<%= hidden %>">
     <div class="ui-state-error error_message"></div>
-    <%= link_to "Try import again", account_sis_import_path %>
+    <%= link_to t(:try_import_again_link, "Try import again"), account_sis_import_path %>
   </div>
   
   <div class="form" style="<%= hidden if @current_batch && @current_batch.importing? %>">
     <% form_tag account_sis_import_submit_path(@account.id), :multipart => true, :id => "sis_importer" do %>
-      <p class="instruction">Select the zip file that you want imported.<br/>
-      For a description of how to generate these zip files, <a href="/resources/CanvasSISImport.pdf">please see this documentation</a>.</p>
+      <p class="instruction"><%= mt(:select_file_instructions,
+                                    "Select the zip file that you want imported.  \n" +
+      "For a description of how to generate these zip files, [please see this documentation](%{uri}).",
+      :uri => "/resources/CanvasSISImport.pdf") %></p>
       <div style="float: left;">
         <input type="file" name="attachment" style="font-size: 1.2em;"/><br/>
-        <label for="import_type">Import type</label>
+        <label for="import_type"><%= before_label(t(:import_type_label, "Import type")) %></label>
         <select id="import_type" name="import_type">
           <% SisBatch.valid_import_types.each do |type, data| %>
             <option value="<%= type %>"<% if data[:default] %> selected<% end %>><%= data[:name] %></option>
           <% end %>
         </select>
-  
-        <div id="batch_check" style="<%= hidden %>">
-          <input type="checkbox" name="batch" value="1" id="batch_update"/>
-          <label for="batch_update">This is a full batch update</label>
+
+        <br><br>
+        <div id="batch_check">
+          <input type="checkbox" name="batch_mode" value="1" id="batch_mode"/>
+          <label for="batch_mode"><%= t(:batch_mode_label, "This is a full batch update") %></label>
+          <br>
+          <select id="batch_mode_term_id" name="batch_mode_term_id">
+            <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
+          </select>
+          <p class='instruction'>
+            <%= mt(:batch_import_instructions,
+            "If selected, previous SIS imported data for the selected term will be deleted.  \nSee the documentation for details.") %>
+          </p>
         </div>
       </div>
       <div style="float: left; margin-left: 5px;">
-        <button type="submit" class="submit_button button big-button">Process Data</button>
+        <button type="submit" class="submit_button button big-button"><%= t(:process_data_button, "Process Data") %></button>
       </div>
       <div class="clear"></div>
     <% end %>
@@ -41,29 +52,29 @@
   
   <div class="progress_bar_holder" style="<%= hidden unless @current_batch && @current_batch.importing? %> margin-top: 10px;">
       <div class="copy_progress"></div>
-      <div class="progress_message">The import process has started! This can take awhile if there is a lot to import. You can leave the page and come back.</div>
+      <div class="progress_message"><%= t(:import_started_message, "The import process has started! This can take awhile if there is a lot to import. You can leave the page and come back.") %></div>
   </div>
 
   <div id="import_log_holder" style="<%= hidden %>">
-    <h3>Import Progress Log</h3>
+    <h3><%= t(:import_log_title, "Import Progress Log") %></h3>
     <div id="import_log"></div>
   </div>
   
   <% if show_last_batch %>
     <div class="last_batch" style="margin-top: 20px;">
-      <h3>Last Batch</h3>
-      <p>Started: <%= datetime_string(@last_batch.created_at) %><br/>
+      <h3><%= t(:last_batch_title, "Last Batch") %></h3>
+      <p><%= t(:started_at_message, "Started: %{started_at}", :started_at => datetime_string(@last_batch.created_at)) %><br/>
         <% if @last_batch.workflow_state == 'imported' %>
-          All SIS data was successfully imported.
+          <%= t(:imported_message, "All SIS data was successfully imported.") %>
           <%= print_counts @last_batch %>
         <% elsif @last_batch.workflow_state == 'imported_with_messages' %>
-          The SIS data was imported but with these messages:    
+          <%= t(:imported_with_messages_message, "The SIS data was imported but with these messages:") %>
           <%= print_messages(@last_batch) %>
           <%= print_counts @last_batch %>
         <% elsif @last_batch.workflow_state == 'failed' %>
-          There was an error importing your SIS data. No records were imported. 
+          <%= t(:import_failed_message, "There was an error importing your SIS data. No records were imported.") %>
         <% elsif @last_batch.workflow_state == 'failed_with_messages' %>
-          No SIS records were imported. The import failed with these messages:
+          <%= t(:import_failed_with_messages_message, "No SIS records were imported. The import failed with these messages:") %>
           <%= print_messages(@last_batch) %>
         <% end %>
       </p>

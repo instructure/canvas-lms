@@ -19,8 +19,8 @@
 module ContentImportsHelper
   def question_banks_select_list
     question_banks = @context.assessment_question_banks.active.scoped(:select=>'title', :order=>'title').map(&:title)
-    question_banks.delete AssessmentQuestionBank::DEFAULT_IMPORTED_TITLE
-    question_banks.insert 0, AssessmentQuestionBank::DEFAULT_IMPORTED_TITLE
+    question_banks.delete AssessmentQuestionBank.default_imported_title
+    question_banks.insert 0, AssessmentQuestionBank.default_imported_title
     question_banks
   end
 

@@ -66,7 +66,7 @@ class DiscussionEntry < ActiveRecord::Base
       if user_id && user_id != self.user_id
         {
           :recipients => user_id,
-          :subject => "Re: #{self.discussion_topic.title}",
+          :subject => t("#email_reply_subject", "Re: %{subject}", :subject => self.discussion_topic.title),
           :html_body => self.message,
           :sender => self.user_id
         }
@@ -166,7 +166,7 @@ class DiscussionEntry < ActiveRecord::Base
   named_scope :active, :conditions => ['discussion_entries.workflow_state != ?', 'deleted']
   
   def user_name
-    self.user.name rescue "User Name"
+    self.user.name rescue t :default_user_name, "User Name"
   end
   
   def infer_parent_id
@@ -225,7 +225,13 @@ class DiscussionEntry < ActiveRecord::Base
 
   def to_atom(opts={})
     Atom::Entry.new do |entry|
-      entry.title     = "#{"Re: " if parent_id != 0}#{self.discussion_topic.title}#{", " + self.discussion_topic.context.name if opts[:include_context]}"
+      subject = [self.discussion_topic.title]
+      subject << self.discussion_topic.context.name if opts[:include_context]
+      if parent_id != 0
+        entry.title = t "#email_reply_subject", "Re: %{subject}", :subject => subject.to_sentence
+      else
+        entry.title = subject.to_sentence
+      end
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/discussion_entries/#{self.feed_code}"
@@ -248,7 +254,7 @@ class DiscussionEntry < ActiveRecord::Base
       attachment.folder_id = nil
       attachment.save_without_broadcasting!
       context.map_merge(self.attachment, attachment)
-      context.warn_merge_result("Added file \"#{attachment.folder.full_name}/#{attachment.display_name}\" which is needed for an entry in the topic \"#{self.discussion_topic.title}\"")
+      context.warn_merge_result(t :file_added_warning, "Added file \"%{file_path}\" which is needed for an entry in the topic \"%{discussion_topic_title}\"", :file_path => "%{attachment.folder.full_name}/#{attachment.display_name}", :discussion_topic_title => self.discussion_topic.title)
       dup.attachment_id = attachment.id
     end
     dup.message = context.migrate_content_links(self.message, self.context) if options[:migrate]
@@ -297,7 +303,7 @@ class DiscussionEntry < ActiveRecord::Base
   
   def context_module_action
     if self.discussion_topic && self.user
-      self.discussion_topic.context_module_action(self,user, :contributed)
+      self.discussion_topic.context_module_action(user, :contributed)
     end
   end
 end

@@ -12,7 +12,7 @@
     </div>
     <div class="text">
       <div class="teaser question_text user_content">
-        <%= user_content(hash_get(data, :question_text), @context.asset_string, question_teaser.try_rescue(:asset_string)) %>
+        <%= user_content(hash_get(data, :question_text)) %>
       </div>
     </div>
     <div class="bottom_links">

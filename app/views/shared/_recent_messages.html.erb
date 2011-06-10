@@ -34,23 +34,7 @@
   <% recent_messages.each_with_index do |topic, idx| %>
     <div class="topic_message <%= 'hidden_until_scroll' if idx > show_limit %>">
       <% cache(['dashboard_item_render', (@current_user.cache_key rescue 'nobody'), (topic.cache_key rescue 'no_content')].join('/')) do %>
-        <% case topic; when ContextMessage %>
-          <%= render :partial => "context/dashboard_context_message", :object => topic, :locals => {:brief => true} %>
-        <% when StreamItem %>
-          <% topic = topic.stream_data(@current_user.id) %>
-          <%= render :partial => "context/dashboard_stream_item", :object => topic %>
-        <% when Submission %>
-          <%= render :partial => 'context/dashboard_submission', :object => topic, :locals => {:brief => true} %>
-        <% when Message %>
-          <%= render :partial => 'context/dashboard_notification', :object => topic %>
-        <% when Collaboration %>
-          <%= render :partial => 'context/dashboard_collaboration', :object => topic %>
-        <% when WebConference %>
-          <%= render :partial => 'context/dashboard_conference', :object => topic %>
-        <% when Assignment %>
-        <% else %>
-          <%= render :partial => "context/dashboard_topic", :object => topic %>
-        <% end %>
+        <%= render :partial => "context/dashboard_stream_item", :object => topic %>
       <% end %>
     </div>
   <% end %>

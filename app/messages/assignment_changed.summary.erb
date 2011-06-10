@@ -3,5 +3,5 @@
 <% end %>
   
 <% define_content :subject do %>
-  Assignment Changed: <%= asset.title %>, <%= asset.context.name %>
+  <%= t :subject, "Assignment Changed: %{title}, %{course}", :title => asset.title, :course => asset.context.name %>
 <% end %>

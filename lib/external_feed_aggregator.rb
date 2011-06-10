@@ -42,7 +42,8 @@ class ExternalFeedAggregator
         require 'rss/2.0'
         rss = RSS::Parser.parse(body, false)
         raise "Invalid rss feed" unless rss
-        feed.update_attributes(:title => rss.channel.title)
+        feed.title = rss.channel.title
+        feed.save
         @logger.info("#{rss.items.length} rss items found")
         entries = feed.add_rss_entries(rss)
         @logger.info("#{entries.length} new entries added")
@@ -51,7 +52,8 @@ class ExternalFeedAggregator
         begin
           require 'atom'
           atom = Atom::Feed.load_feed(body)
-          feed.update_attributes(:title => atom.title)
+          feed.title = atom.title
+          feed.save
           @logger.info("#{atom.entries.length} atom entries found")
           entries = feed.add_atom_entries(atom)
           @logger.info("#{entries.length} new entries added")

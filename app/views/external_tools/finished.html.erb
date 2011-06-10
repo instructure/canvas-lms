@@ -1,14 +1,13 @@
 <div style="margin: 50px auto; width: 400px;">
   <% if params[:lti_errormsg] %>
-    <h2>Tool Failed to Load</h2>
-    There was a problem loading the specified tool.  Please contact your
-    administrator if these problems persist.
+    <h2><%= t :load_failure_title, "Tool Failed to Load" %></h2>
+    <%= t :load_failure_message, "There was a problem loading the specified tool. Please contact your administrator if these problems persist." %>
     <div class="error" style="color: #a40; margin-top: 20px;">
       <%= params[:lti_errormsg] %>
     </div>
   <% else %>
-    <h2>Tool Use Finished</h2>
-    You are free to navigate away from this page.
+    <h2><%= t :load_success_title, "Tool Use Finished" %></h2>
+    <%= t :load_success_message, "You are free to navigate away from this page." %>
     <div class="error" style="color: #a40; margin-top: 20px;">
       <%= params[:lti_msg] %>
     </div>

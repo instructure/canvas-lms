@@ -48,10 +48,8 @@
 
   tinymce.create('tinymce.plugins.InstructureEquation', {
     init : function(ed, url) {
-      var prevSelection;
       ed.addCommand('instructureEquation', function() {
         var nodes = $('<span>' + ed.selection.getContent() + '</span>');
-        prevSelection = ed.selection.getBookmark();
         var equation = getEquationText(nodes).replace(/^\s+|\s+$/g, '');
         if (!equation) {
           equation = "1 + 1";
@@ -76,13 +74,17 @@
             var $img = $(document.createElement('img'));
             $img.attr('src', url).attr('alt', text).attr('title', text).attr('class', 'equation_image');
             $div.append($img);
-            ed.selection.moveToBookmark(prevSelection);
+            $box.data('restore_caret')();
             $editor.editorBox('insert_code', $div.html());
             $box.dialog('close');
           });
           $box.attr('id', 'instructure_equation_prompt');
           $("body").append($box);
         }
+        var prevSelection = ed.selection.getBookmark();
+        $box.data('restore_caret', function() {
+          ed.selection.moveToBookmark(prevSelection);
+        });
 
         $box.data('editor', $editor);
         $box.dialog('close').dialog({
@@ -92,7 +94,7 @@
           minHeight: 300,
           resizable: true,
           height: "auto",
-          title: "Embed Math Equation",
+          title: "Embed Math Equation"
         }).dialog('open');
 
         // needs to be visible for some computed styles to work when we write

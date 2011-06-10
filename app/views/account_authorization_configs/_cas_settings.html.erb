@@ -1,11 +1,14 @@
+<% @account_config = @account_configs.first %>
 <% form_id = @account_config.cas_authentication? ? 'auth_form' : 'cas_form' %>
 <% active = @account_config.cas_authentication? ? 'class="active"' : '' %>
 <div id="cas_div" <%= raw active %>>
-<% form_for @account_config, :url => context_url(@account, :context_account_authorization_config_url, @account.id), :html => {:id => form_id, :class=>"auth_type cas_form"} do |f| %>
-    <input type="hidden" name="account_authorization_config[auth_type]" value="<%= @account_config.auth_type || 'cas' %>"/>
+<% form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class => "auth_type cas_form") do %>
+  <% fields_for @account_config, :index => 0 do |f| %>
+    <%= f.hidden_field :auth_type, :value => 'cas' %>
+    <%= f.hidden_field :id %>
     <table class="formtable" style="margin-left: 20px;">
       <tr>
-        <td><%= f.label :auth_type, "Type:" %></td>
+        <td><%= f.blabel :auth_type, :en => "Type:" %></td>
         <td>
           <span class="auth_form">
             <%= @account_config.auth_type || 'CAS' %>
@@ -14,30 +17,31 @@
         </td>
       </tr>
       <tr>
-        <td><%= f.label :auth_base, "CAS URL:" %></td>
+        <td><%= f.blabel :auth_base, :en => "CAS URL" %></td>
         <td class="nobr">
           <%= f.text_field :auth_base, :class => "auth_form", :style => "width: 450px;" %>
           <span class="auth_info auth_base"><%= @account_config.auth_base %></span>
         </td>
       </tr>
       <tr>
-        <td><%= f.label :log_in_url, "Alternate Login URL:" %></td>
+        <td><%= f.blabel :log_in_url, :en => "Alternate Login URL" %></td>
         <td class="nobr">
           <%= f.text_field :log_in_url, :class => "auth_form", :style => "width: 450px;" %>
           <span class="auth_info log_in_url"><%= @account_config.log_in_url %></span>
           <span class="auth_form" style="font-size: smaller;">
-            <br>An alternate URL for logging into CAS. You probably should not set this.
+            <br><%= t(:alternate_login_url_description, "An alternate URL for logging into CAS. You probably should not set this.") %>
           </span>
         </td>
       </tr>
       <tr>
         <td colspan="4">
           <span class="auth_form">
-            <button type="submit" class="button">Save Authentication Settings</button>
-            <button type="button" class="cancel_button button-secondary">Cancel</button>
+            <button type="submit" class="button"><%= t(:save_button, "Save Authentication Settings") %></button>
+            <button type="button" class="cancel_button button-secondary"><%= t("#buttons.cancel", "Cancel") %></button>
           </span>
         </td>
       </tr>
     </table>
+  <% end %>
 <% end %>
 </div>

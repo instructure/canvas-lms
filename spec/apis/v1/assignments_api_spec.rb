@@ -24,7 +24,7 @@ describe AssignmentsApiController, :type => :integration do
     it "should sort the returned list of assignments" do
       # the API returns the assignments sorted by
       # [assignment_groups.position, assignments.position]
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true)
       group1 = @course.assignment_groups.create!(:name => 'group1')
       group1.update_attribute(:position, 10)
       group2 = @course.assignment_groups.create!(:name => 'group2')
@@ -53,7 +53,7 @@ describe AssignmentsApiController, :type => :integration do
     it "should return the assignments list with API-formatted Rubric data" do
       # the API changes the structure of the data quite a bit, to hide
       # implementation details and ease API use.
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true)
       @group = @course.assignment_groups.create!({:name => "some group"})
       @assignment = @course.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
       @assignment.update_attribute(:submission_types, "online_upload,online_text_entry,online_url,media_recording")
@@ -105,7 +105,7 @@ describe AssignmentsApiController, :type => :integration do
     end
 
     it "should exclude deleted assignments in the list return" do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true)
       @context = @course
       @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model})
       @assignment.reload
@@ -121,7 +121,7 @@ describe AssignmentsApiController, :type => :integration do
   end
 
   it "should allow creating an assignment via the API" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @group = @course.assignment_groups.create!({:name => "some group"})
 
     # make sure we can assign a custom field during creation
@@ -156,7 +156,7 @@ describe AssignmentsApiController, :type => :integration do
   end
 
   it "should allow updating an assignment via the API" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @group = @course.assignment_groups.create!({:name => "some group"})
     @assignment = @course.assignments.create!(:title => "some assignment", :points_possible => 12)
 
@@ -192,7 +192,7 @@ describe AssignmentsApiController, :type => :integration do
   end
 
   it "should return the discussion topic url" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @context = @course
     @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model})
 

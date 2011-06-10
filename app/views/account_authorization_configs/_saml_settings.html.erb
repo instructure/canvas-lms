@@ -1,11 +1,14 @@
+<% @account_config = @account_configs.first %>
 <% form_id = @account_config.saml_authentication? ? 'auth_form' : 'saml_form' %>
 <% active = @account_config.saml_authentication? ? 'class="active"' : '' %>
 <div id="saml_div" <%= raw active %>>
-<% form_for @account_config, :url => context_url(@account, :context_account_authorization_config_url, @account.id), :html => {:id => form_id, :class=>"auth_type saml_form"} do |f| %>
-    <input type="hidden" name="account_authorization_config[auth_type]" value="<%= @account_config.auth_type || 'saml' %>"/>
+<% form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class => "auth_type saml_form") do %>
+  <% fields_for @account_config, :index => 0 do |f| %>
+    <%= f.hidden_field :auth_type, :value => 'saml' %>
+    <%= f.hidden_field :id %>
     <table class="formtable" style="margin-left: 20px;">
       <tr>
-        <td><%= f.label :auth_type, "Type:" %></td>
+        <td><%= f.blabel :auth_type, :en => "Type" %></td>
         <td>
           <span class="auth_form">
             <%= @account_config.auth_type || 'SAML' %>
@@ -14,35 +17,35 @@
         </td>
       </tr>
       <tr>
-        <td><%= f.label :log_in_url, "Log On URL:" %></td>
+        <td><%= f.blabel :log_in_url, :en => "Log On URL" %></td>
         <td class="nobr">
           <%= f.text_field :log_in_url, :class => "auth_form", :style => "width: 450px;" %>
           <span class="auth_info log_in_url"><%= @account_config.log_in_url %></span>
         </td>
       </tr>
       <tr>
-        <td><%= f.label :log_out_url, "Log Out URL:" %></td>
+        <td><%= f.blabel :log_out_url, :en => "Log Out URL" %></td>
         <td class="nobr">
           <%= f.text_field :log_out_url, :class => "auth_form", :style => "width: 450px;" %>
           <span class="auth_info log_out_url"><%= @account_config.log_out_url %></span>
         </td>
       </tr>
       <tr>
-        <td><%= f.label :change_password_url, "Change Password Link:" %></td>
+        <td><%= f.blabel :change_password_url, :en => "Change Password Link" %></td>
         <td class="nobr">
           <%= f.text_field :change_password_url, :class => "auth_form", :style => "width: 450px;" %>
           <span class="auth_info change_password_url"><%= @account_config.change_password_url %></span>
         </td>
       </tr>
       <tr>
-        <td><%= f.label :certificate_fingerprint, "Certificate Fingerprint:" %></td>
+        <td><%= f.blabel :certificate_fingerprint, :en => "Certificate Fingerprint" %></td>
         <td class="nobr">
           <%= f.text_field :certificate_fingerprint, :class => "auth_form", :style => "width: 450px;" %>
           <span class="auth_info certificate_fingerprint"><%= @account_config.certificate_fingerprint %></span>
         </td>
       </tr>
       <tr>
-        <td><%= f.label :identifier_format, "Identifier Format:" %></td>
+        <td><%= f.blabel :identifier_format, :en => "Identifier Format" %></td>
         <td class="nobr">
           <%= f.select :identifier_format, @saml_identifiers, {}, {:class => "auth_form"} %>
           <span class="auth_info identifier_format"><%= @account_config.identifier_format %></span>
@@ -51,18 +54,19 @@
       <tr>
         <td colspan="4">
           <span class="auth_form">
-            <button type="submit" class="button">Save Authentication Settings</button>
-            <button type="button" class="cancel_button button-secondary">Cancel</button>
+            <button type="submit" class="button"><%= t(:save_button, "Save Authentication Settings") %></button>
+            <button type="button" class="cancel_button button-secondary"><%= t("#buttons.cancel", "Cancel") %></button>
           </span>
         </td>
       </tr>
       <tr>
         <td colspan="2">
           <span class="auth_info">
-            <%= link_to("Click here to see the service provider identity XML for this account.", :saml_meta_data) %>
+            <%= link_to(t(:saml_meta_data_link, "Click here to see the service provider identity XML for this account."), :saml_meta_data) %>
           </span>
         </td>
       </tr>
     </table>
+  <% end %>
 <% end %>
 </div>

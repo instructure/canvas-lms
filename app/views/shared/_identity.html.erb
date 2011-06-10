@@ -8,6 +8,9 @@
     <% end %>
   <% else %>
     <li class="user_name"><%= link_to @current_user.short_name, profile_path %></li>
+    <% if @real_current_user && @real_current_user != @current_user %>
+      <li class="stop_masquerading"><%= link_to "[Stop Masquerading]", user_masquerade_url(@real_current_user.id), :method => :post %></li>
+    <% end %>
     <li class="first inbox"><a href="<%= inbox_path %>"><span>Inbox</span> 
     <% unread = @current_user.unread_inbox_items_count; if unread > 0 %>
       <b class="unread-messages-count"><%= unread %></b>

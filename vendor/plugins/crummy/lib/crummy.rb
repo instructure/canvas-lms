@@ -20,6 +20,7 @@ module Crummy
         before_filter(options) do |instance|
           url = yield instance if block_given?
           url = instance.send url if url.is_a? Symbol
+          name = instance.instance_eval(&name) if name.is_a? Proc
           name = instance.instance_variable_get("@#{name}") if name.is_a? Symbol
           record = instance.instance_variable_get("@#{name}") unless url or block_given?
           if record and record.respond_to? :to_param

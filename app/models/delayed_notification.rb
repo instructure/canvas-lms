@@ -20,6 +20,7 @@ class DelayedNotification < ActiveRecord::Base
   include Workflow
   belongs_to :asset, :polymorphic => true
   belongs_to :notification
+  attr_accessible :asset, :notification, :recipient_keys
   
   serialize :recipient_keys
   

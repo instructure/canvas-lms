@@ -33,4 +33,23 @@ describe "/discussion_topics/show" do
     render "discussion_topics/show"
     response.should have_tag("div#entry_list")
   end
+
+  it "should render in a group context" do
+    assignment_model(:submission_types => 'discussion_topic')
+    rubric_association_model(:association => @assignment, :purpose => 'grading')
+    group_model
+    view_context(@group, @user)
+    @topic = @assignment.discussion_topic
+    @entry = @topic.discussion_entries.create!(:message => "some message")
+    @topic.discussion_entries.create!(:message => "another message")
+    assigns[:topic] = @topic
+    assigns[:grouped_entries] = @topic.discussion_entries.group_by(&:parent_id)
+    assigns[:entries] = @topic.discussion_entries
+    assigns[:all_entries] = @topic.discussion_entries
+    assigns[:assignment] = @assignment
+    @topic.for_assignment?.should be_true
+    @topic.assignment.rubric_association.rubric.should_not be_nil
+    render "discussion_topics/show"
+    response.should have_tag("div#entry_list")
+  end
 end

@@ -3,11 +3,16 @@ module Delayed
     class DeserializationError < StandardError
     end
 
+    class RecordNotFound < DeserializationError
+    end
+
     module Base
+      ON_HOLD_COUNT = 50
+
       def self.included(base)
         base.extend ClassMethods
       end
-      
+
       module ClassMethods
         # Add a job to the queue
         # The first argument should be an object that respond_to?(:perform)
@@ -19,16 +24,15 @@ module Delayed
           unless object.respond_to?(:perform)
             raise ArgumentError, 'Cannot enqueue items which do not respond to perform'
           end
-    
+
           options = args.first || {}
           options[:priority] ||= self.default_priority
           options[:payload_object] = object
           options[:queue] ||= Delayed::Worker.queue
+          options[:max_attempts] ||= Delayed::Worker.max_attempts
           self.create(options)
         end
       end
-      
-      ParseObjectFromYaml = /\!ruby\/\w+\:([^\s]+)/
 
       def failed?
         failed_at
@@ -50,6 +54,15 @@ module Delayed
         end
       end
 
+      def full_name
+        obj = payload_object rescue nil
+        if obj && obj.respond_to?(:full_name)
+          obj.full_name
+        else
+          name
+        end
+      end
+
       def payload_object=(object)
         self['handler'] = object.to_yaml
         self['tag'] = if object.respond_to?(:tag)
@@ -60,12 +73,12 @@ module Delayed
           "#{object.class}#perform"
         end
       end
-      
+
       # Moved into its own method so that new_relic can trace it.
       def invoke_job
         payload_object.perform
       end
-      
+
       # Unlock this job (note: not saved to DB)
       def unlock
         self.locked_at    = nil
@@ -89,16 +102,34 @@ module Delayed
         new_time
       end
 
+      def hold!
+        self.locked_by = 'on hold'
+        self.locked_at = self.class.db_time_now
+        self.attempts = ON_HOLD_COUNT
+        self.failed_at = self.class.db_time_now
+        self.save!
+      end
+
+      def unhold!
+        self.locked_by = nil
+        self.locked_at = nil
+        self.attempts = 0
+        self.run_at = self.class.db_time_now
+        self.failed_at = nil
+        self.last_error = nil
+        self.save!
+      end
+
     private
 
-      def deserialize(source)
-        handler = YAML.load(source) rescue nil
+      ParseObjectFromYaml = /\!ruby\/\w+\:([^\s]+)/
 
-        unless handler.respond_to?(:perform)
-          if handler.nil? && source =~ ParseObjectFromYaml
-            handler_class = $1
-          end
-          attempt_to_load(handler_class || handler.class)
+      def deserialize(source)
+        handler = nil
+        begin
+          handler = YAML.load(source)
+        rescue TypeError
+          attempt_to_load_from_source(source)
           handler = YAML.load(source)
         end
 
@@ -111,10 +142,10 @@ module Delayed
           "Job failed to load: #{e.message}. Try to manually require the required file."
       end
 
-      # Constantize the object so that ActiveSupport can attempt
-      # its auto loading magic. Will raise LoadError if not successful.
-      def attempt_to_load(klass)
-         klass.constantize
+      def attempt_to_load_from_source(source)
+        if md = ParseObjectFromYaml.match(source)
+          md[1].constantize
+        end
       end
 
     protected
@@ -122,7 +153,7 @@ module Delayed
       def before_save
         self.run_at ||= self.class.db_time_now
       end
-    
+
     end
   end
 end

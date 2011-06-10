@@ -27,6 +27,8 @@ class ErrorReport < ActiveRecord::Base
 
   define_callbacks :on_send_to_external
 
+  attr_accessible
+
   def send_to_external
     run_callbacks(:on_send_to_external)
   end
@@ -118,7 +120,7 @@ class ErrorReport < ActiveRecord::Base
   # delete old error reports before a given date
   # returns the number of destroyed error reports
   def self.destroy_error_reports(before_date)
-    self.delete_all(['updated_at < ?', before_date])
+    self.delete_all(['created_at < ?', before_date])
   end
 
   def self.useful_http_env_stuff_from_request(request)

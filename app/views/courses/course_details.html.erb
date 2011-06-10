@@ -32,10 +32,17 @@
     <% end %>
     
     <% if can_do(@context, @current_user, :update) %>
+      <% if @context.completed? %>
+        <% form_tag context_url(@context, :context_unconclude_url) do %>
+          <button class="button button-sidebar-wide" type="submit"><%= image_tag "add.png" %>Un-Conclude Course</button>
+        <% end %>
+        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'delete') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %>Permanently Delete this Course</a>
+      <% else %>
         <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %>End this Course</a>
+      <% end %>
         <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Copy this Course</a>
         <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Import Content into this Course</a>
-        <!--<a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Export this Course</a>-->
+        <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Export this Course</a>
     <% end %>
     <table class="summary" style="margin-top: 20px;">
       <thead>
@@ -130,7 +137,7 @@
                 <td><b> #san-fransisco-university-biology-100</b></td>
               </tr><tr>
                 <td>much better:</td>
-                <td><b> #usu-bio100</b></td>
+                <td><b> #sfu-bio100</b></td>
               </tr></table>
               </p>
               <div class="button-container">
@@ -140,10 +147,19 @@
           </span>
           </td>
         <% end %>
-      <% if @context.sis_source_id %>
+      <% if @context.sis_source_id || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
           <td><%= f.label :sis_source_id, "SIS ID:" %></td>
-          <td><%= @context.sis_source_id %></td>
+          <td>
+            <span class="course_form">
+              <% if can_do(@context.root_account, @current_user, :manage_sis) %>
+                <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => "SIS ID", :value => @context.sis_source_id %>
+              <% else %>
+                <%= @context.sis_source_id %>
+              <% end %>
+            </span>
+            <span class="course_info sis_source_id"><%= @context.sis_source_id %></span>
+          </td>
       <% end %>
       <% if current_user_is_site_admin? %>
         </tr><tr>
@@ -233,7 +249,25 @@
           <span class="course_info turnitin_comments"><%= @context.turnitin_comments %></span>
         </td>
       <% end %>
-      </tr><tr>
+      </tr>
+      <tr>
+        <td style="width: 10%;">
+          Grading Scheme:
+        </td>
+        <td>
+          <span class="course_info grading_scheme_set">
+            <%= @context.grading_standard_id ? (@context.grading_standard_title || "Currently Set") : "Not Set" %>
+          </span>
+          <span class="course_form">
+            <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox" %>
+            <%= f.label :grading_standard_enabled, "Enable course grading scheme" %>
+            <div class="grading_standard_link" style="margin-left: 20px;">
+              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_id ? "view" : "set" %> grading scheme</a>
+            </div>
+          </span>
+        </td>
+      </tr>
+      <tr>
         <td style="vertical-align: top; width: 10%;"><%= f.label :license, "License:" %></td>
         <td colspan="3">
           <span class="course_form">
@@ -289,7 +323,7 @@
             can edit course wiki pages by default<br/>
             <div class="changed_default_wiki_editing_roles" style="display: none; padding-left: 20px; font-size: 0.8em;">
               <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
-              <label for="update_default_pages">Change pages currently editable by "<span><%= @context.readable_default_wiki_editing_roles %></span>" to "<span class="default_wiki_editing_roles_change">&nbsp;</span>".
+              <label for="update_default_pages">Change pages currently editable by "<span><%= @context.readable_default_wiki_editing_roles %></span>" to "<span class="default_wiki_editing_roles_change">&nbsp;</span>".</label>
             </div>
           </div>
         </td>
@@ -626,3 +660,9 @@
   var sisPublishStatus = "<%= @context.grade_publishing_status %>";
   var sisPublishEnabled = "<%= publishing_enabled %>";
 </script>
+<div id="edit_letter_grades_form" style="display: none;" data-context_code="<%= @context.asset_string %>">
+  <%= render :partial => "shared/grading_standard", :object => @context.grading_standard %>
+  <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_url) %>" style="display: none;" id="update_course_url">&nbsp;</a>
+</div>

@@ -19,7 +19,6 @@
 $(document).ready(function () {
   function loadStudents() {
     var students_hash = {};
-    var title = $("#quiz_title").text();
     $(".student_list .student").each(function(i) {
       var student = {};
       student.id = $(this).attr('data-id');
@@ -58,7 +57,8 @@ $(document).ready(function () {
   $(".message_students_link").click(function(event) {
     event.preventDefault();
     students = loadStudents();
-    
+    var title = $("#quiz_title").text();
+
     window.messageStudents({
       options: [
         {text: "Have taken the quiz"},

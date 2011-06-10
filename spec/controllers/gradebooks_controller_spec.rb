@@ -70,21 +70,26 @@ describe GradebooksController do
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       response.should render_template('grade_summary')
     end
-  end
-
-  describe "GET 'show'" do
-    before(:each) do
-      @assignments = [mock_model(Assignment)]
-      @assignment_sumbissions = [mock_model(Submission)]
-      @students = [mock_model(User)]
-      @course = mock_model(Course)
-      @course.should_receive(:submissions).and_return(@submissions)
-      @course.should_receive(:assignments).and_return(@assignments)
-      @course.should_receive(:students).and_return(@students)
-      Course.should_receive(:find).and_return(@course)
+    
+    it "should allow concluded teachers to see a student grades pages" do
+      course_with_teacher_logged_in(:active_all => true)
+      @enrollment.conclude
+      @student = user_model
+      @enrollment = @course.enroll_student(@student)
+      @enrollment.accept
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      response.should be_success
+      response.should render_template('grade_summary')
+    end
+  
+    it "should allow concluded students to see their grades pages" do
+      course_with_student_logged_in(:active_all => true)
+      @enrollment.conclude
+      get 'grade_summary', :course_id => @course.id, :id => @user.id
+      response.should render_template('grade_summary')
     end
   end
-  
+
   describe "POST 'update_submission'" do
     
     it "should have a route for update_submission" do
@@ -121,6 +126,15 @@ describe GradebooksController do
       assigns[:submissions][0].submission_comments[0].comment.should eql("some comment")
       assigns[:submissions][0].submission_comments[0].attachments.length.should eql(1)
       assigns[:submissions][0].submission_comments[0].attachments[0].display_name.should eql("doc.doc")
+    end
+    
+    it "should not allow updating submissions for concluded courses" do
+      course_with_teacher_logged_in(:active_all => true)
+      @enrollment.complete
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @student = @course.enroll_user(User.create!(:name => "some user"))
+      post 'update_submission', :course_id => @course.id, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
+      assert_unauthorized
     end
   end
   

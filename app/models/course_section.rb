@@ -20,22 +20,24 @@ class CourseSection < ActiveRecord::Base
   include Workflow
   include EnrollmentDateRestrictions
   
-  attr_protected :sis_source_id, :sis_batch_id, :course_id, :abstract_course_id,
+  attr_protected :sis_source_id, :sis_batch_id, :course_id,
       :root_account_id, :enrollment_term_id, :sis_cross_listed_section_id, :sis_cross_listed_section_sis_batch_id
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :sis_cross_listed_section
-  belongs_to :abstract_course
   belongs_to :enrollment_term
   belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :course_account_associations
   
   adheres_to_policy
-  before_validation :infer_defaults
+  before_validation :infer_defaults, :verify_unique_sis_source_id
   validates_presence_of :course_id
   
+  before_save :set_update_account_associations_if_changed
+  after_save :update_account_associations_if_changed
+
   set_policy do
     given {|user, session| self.cached_course_grants_right?(user, session, :manage_admin_users) }
     set { can :read and can :create and can :update and can :delete }
@@ -43,17 +45,39 @@ class CourseSection < ActiveRecord::Base
     given {|user, session| self.enrollments.find_by_user_id(user.id) }
     set { can :read }
   end
+
+  def set_update_account_associations_if_changed
+    @should_update_account_associations = self.account_id_changed? || self.course_id_changed? || self.nonxlist_course_id_changed?
+    true
+  end
+  
+  def update_account_associations_if_changed
+    send_later_if_production(:update_account_associations) if @should_update_account_associations && !Course.skip_updating_account_associations?
+  end
+  
+  def update_account_associations
+    self.course.try(:update_account_associations)
+    self.nonxlist_course.try(:update_account_associations)
+  end
+
+  def verify_unique_sis_source_id
+    return true unless self.sis_source_id
+    existing_section = CourseSection.find_by_root_account_id_and_sis_source_id(self.root_account_id, self.sis_source_id)
+    return true if !existing_section || existing_section.id == self.id 
+    
+    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    false
+  end
   
   def section_code
     self.name ||= read_attribute(:section_code)
   end
   
   def infer_defaults
-    self.root_account_id ||= (self.course.root_account_id rescue nil) || (self.abstract_course.root_account_id rescue nil) || Account.default.id
+    self.root_account_id ||= (self.course.root_account_id rescue nil) || Account.default.id
     self.assert_course unless self.course
     raise "Course required" unless self.course
-    self.root_account_id = self.course.root_account_id || (self.abstract_course.root_account_id rescue nil) || Account.default.id
-    self.abstract_course_id ||= self.course.abstract_course_id
+    self.root_account_id = self.course.root_account_id || Account.default.id
     # This is messy, and I hate it.
     # The SIS import actually gives us three names for a section
     #   and I don't know which one is best, or which one to show.
@@ -90,7 +114,7 @@ class CourseSection < ActiveRecord::Base
   end
   
   def assert_course
-    self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account, :abstract_course => self.abstract_course)
+    self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account)
   end
   
   def move_to_course(course, delay_jobs = true)
@@ -117,29 +141,19 @@ class CourseSection < ActiveRecord::Base
     return self if self.course == course
     unless self.nonxlist_course
       self.nonxlist_course = self.course 
-      self.account = self.course.account
       self.save!
     end
     self.move_to_course(course, delay_jobs)
-    if (self.nonxlist_course.course_sections.active.count == 0 ||
-        (self.nonxlist_course.course_sections.active.count == 1 &&
-         self.nonxlist_course.course_sections.active.first.enrollments.count == 0)) &&
-       (self.nonxlist_course.workflow_state == "created" ||
-        self.nonxlist_course.workflow_state == "claimed")
-      self.nonxlist_course.workflow_state = "deleted"
-      self.nonxlist_course.save!
-    end
   end
   
   def uncrosslist(delay_jobs = true)
     return unless self.nonxlist_course
     if self.nonxlist_course.workflow_state == "deleted"
-      self.nonxlist_course.workflow_state = "created"
+      self.nonxlist_course.workflow_state = "claimed"
       self.nonxlist_course.save!
     end
     self.move_to_course(self.nonxlist_course, delay_jobs)
     self.nonxlist_course = nil
-    self.account = nil
     self.save!
   end
   

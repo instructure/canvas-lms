@@ -91,12 +91,12 @@ class CommunicationChannelsController < ApplicationController
     respond_to do |format|
       if @cc
         @cc.send_merge_notification!
-        format.json { render :json => @cc.to_json }
         format.html
+        format.json { render :json => @cc.to_json }
       else
         flash[:error] = "Email address not found"
-        format.json { render :json => {:errors => {:base => "Email address not found"}} }
         format.html { redirect_to profile_url }
+        format.json { render :json => {:errors => {:base => "Email address not found"}} }
       end
     end
   end

@@ -40,7 +40,8 @@ class TwitterUserPoller
     count = 0
     
     while service = UserService.to_be_polled.for_service('twitter').first and (count += 1) < MAX_PER_PROCESS
-      service.update_attributes(:updated_at => Time.now.utc)
+      service.updated_at => Time.now.utc
+      service.save
       
       @logger.info("user found: #{service.service_user_name} retrieving tweets...")
       since_id = nil
@@ -61,7 +62,8 @@ class TwitterUserPoller
           @logger.info("unexpected error: #{e.to_s} #{e.backtrace.join "\n"}")
         end
         retry_after = [REFRESH_INTERVAL_EMPTY, retry_after].max
-        service.update_attributes(:refresh_at => Time.now.utc + retry_after + 1.minute)
+        service.refresh_at Time.now.utc + retry_after + 1.minute
+        service.save
       end
       
       if tweets
@@ -79,7 +81,8 @@ class TwitterUserPoller
           since_id ||= tweet['id'] if tweet['id']
         end
         service.last_result_id = since_id if since_id
-        service.update_attributes(:refresh_at => Time.now.utc + (since_id ? REFRESH_INTERVAL : REFRESH_INTERVAL_EMPTY))
+        service.refresh_at = Time.now.utc + (since_id ? REFRESH_INTERVAL : REFRESH_INTERVAL_EMPTY)
+        service.save
       end
     end
     

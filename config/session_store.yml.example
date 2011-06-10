@@ -1,6 +1,10 @@
 production:
   session_store: active_record_store
   expire_after: 86400 # 1 day in seconds
+  # uncomment this option if your canvas install is over HTTPS, and the cookies
+  # will be SSL-only
+  #
+  # secure: true
   #
   # for memcache, the list of servers will be read from config/memcache.yml (or
   # default to localhost:11211)

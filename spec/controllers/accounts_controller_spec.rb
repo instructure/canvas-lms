@@ -39,20 +39,32 @@ describe AccountsController do
     @course2.update_account_associations
   end
 
-  describe "GET 'index'" do
-    it "shouldn't show duplicates of courses" do
-      cross_listed_course
-      get 'show', :id => @account1.id
-      assigns[:courses].should == [@course1]
+  describe "SIS imports" do
+    it "should set batch mode and term if given" do
+      course_with_teacher_logged_in(:active_all => true)
+      @account = account
+      @account.update_attribute(:allow_sis_import, true)
+      @account.add_user(@user)
+      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1'
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.batch_mode.should be_true
+      batch.batch_mode_term.should be_nil
+      batch.destroy
+
+      post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1', :batch_mode_term_id => @account.enrollment_terms.first.id
+      batch = SisBatch.last
+      batch.should_not be_nil
+      batch.batch_mode.should be_true
+      batch.batch_mode_term.should == @account.enrollment_terms.first
     end
   end
 
-  describe "GET 'courses'" do
-    it "shouldn't show duplicates of courses" do
-      cross_listed_course
-      get 'courses', :account_id => @account1.id, :query => @course1.name
-      assigns[:courses].should == [@course1]
-      response.should be_redirect
-    end
+  it "should redirect to CAS if CAS is enabled" do
+    account = account_with_cas({:account => Account.default})
+    config = { :cas_base_url => account.account_authorization_config.auth_base }
+    cas_client = CASClient::Client.new(config)
+    get 'show', :id => account.id
+    response.should redirect_to(cas_client.add_service_to_login_url(login_url))
   end
 end

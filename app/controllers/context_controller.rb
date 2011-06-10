@@ -17,10 +17,10 @@
 #
 
 class ContextController < ApplicationController
-  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :context_message_reply, :media_object_redirect, :media_object_inline]
+  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :context_message_reply, :media_object_redirect, :media_object_inline, :object_snippet]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image]
-  protect_from_forgery :except => [:kaltura_notifications]
-  
+  protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
+
   def create_roster_message
     get_context
     if authorized_action(@context, @current_user, :send_messages)
@@ -93,7 +93,7 @@ class ContextController < ApplicationController
     if config
       redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id], request.ssl? ? "https" : "http")
     else
-      render :text => "Media Objects not configured"
+      render :text => t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
   
@@ -159,46 +159,47 @@ class ContextController < ApplicationController
     logger.warn(e.backtrace.join("\n"))
     render :text => "failure"
   end
-  
-  def context_object
-    @context = Context.find_by_asset_string(params[:context_code])
-    @asset = @context.find_asset(params[:asset_string])
-    @asset = @context if params[:asset_string] == params[:context_code]
-    @headers = false
-    @show_left_side = false
-    @padless = true
-    if params[:user_id].present? && params[:ts] && params[:verifier]
-      @user = User.find_by_id(params[:user_id])
-      @user = nil unless @user && @user.valid_access_verifier?(params[:ts], params[:verifier])
+
+  # safely render object and embed tags as part of user content, by using a
+  # iframe pointing to the separate files domain that doesn't contain a user's
+  # session. see lib/user_content.rb and the user_content calls throughout the
+  # views.
+  def object_snippet
+    @snippet = params[:object_data] || ""
+    hmac = Canvas::Security.hmac_sha1(@snippet)
+
+    if hmac != params[:s]
+      return render :nothing => true, :status => 400
     end
-    raise ActiveRecord::RecordNotFound.new("Invalid context snippet url") unless @asset && @context
-    if authorized_action(@asset, @user, :read)
-      html = @asset.description rescue nil
-      html ||= @asset.body rescue nil
-      html ||= @asset.message rescue nil
-      html ||= @asset.syllabus_body rescue nil
-      dom = Nokogiri::HTML::DocumentFragment.parse(html)
-      @snippet = dom.css("object,embed")[params[:key].to_i]
-      raise ActiveRecord::RecordNotFound.new("Invalid context snippet url") unless @snippet
-    end
+
+    # http://blogs.msdn.com/b/ieinternals/archive/2011/01/31/controlling-the-internet-explorer-xss-filter-with-the-x-xss-protection-http-header.aspx
+    # recent versions of IE and Webkit have added client-side XSS prevention
+    # measures. if data that includes potentially dangerous strings like
+    # "<script..." or "<object..." is sent to the server and then that exact
+    # same string is rendered in the html response, the browser will refuse to
+    # render that part of the content. this header tells the browser that we're
+    # doing it on purpose, so skip the XSS detection.
+    response['X-XSS-Protection'] = '0'
+    @snippet = Base64.decode64(@snippet)
+    render :layout => false
   end
-  
+
   def context_message_reply
     @message = ContextMessage.find(params[:id])
     if authorized_action(@message, @current_user, :read)
       hash = {
         :context_code => @message.context_code,
         :recipients => @message.user_id.to_s,
-        :subject => "Re: #{@message.subject.sub(/\ARe: /, "")}"
+        :subject => TextHelper.make_subject_reply_to(@message.subject),
       }
       redirect_to inbox_url(:reply_id => @message.id, :anchor => "reply" + hash.to_json)
     end
   end
-  
+
   def inbox_item
     @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
     if !@item
-      flash[:error] = "The message you were trying to view has been removed"
+      flash[:error] = t(:message_removed, "The message you were trying to view has been removed")
       redirect_to inbox_url
       return
     else
@@ -214,15 +215,19 @@ class ContextController < ApplicationController
         elsif @asset.is_a?(ContextMessage)
           redirect_to inbox_url(:message_id => @asset.id)
         elsif @asset.nil?
-          flash[:notice] = "This message has been deleted"
+          flash[:notice] = t(:message_deleted, "This message has been deleted")
           redirect_to inbox_url
         else
-          flash[:notice] = "Unknown item type, #{@asset.class.to_s}"
+          flash[:notice] = t(:bad_message, "This message could not be displayed")
           redirect_to inbox_url
         end
       end
       format.json do
-        json_params = {:include => [:attachments, :users], :methods => :formatted_body}
+        json_params = {
+          :include => [:attachments, :users],
+          :methods => :formatted_body,
+          :user_content => %w(formatted_body),
+        }
         if @asset.is_a?(ContextMessage) && @asset.protect_recipients && !@asset.cached_context_grants_right?(@current_user, session, :manage_students)
           json_params[:include] = [:attachments]
           json_params[:exclude] = [:recipients]
@@ -265,9 +270,9 @@ class ContextController < ApplicationController
     if authorized_action(@message, @current_user, :read)
       @attachment = @message.attachments.find(params[:id])
       begin
-        redirect_to @attachment.cacheable_s3_url
+        redirect_to verified_file_download_url(@attachment)
       rescue => e
-        @not_found_message = "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
+        @not_found_message = t(:roster_message_attachment_not_found, "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it.")
         render :template => 'shared/errors/404_message', :status => :bad_request
       end
     end
@@ -275,14 +280,14 @@ class ContextController < ApplicationController
   
   def chat
     if !Tinychat.config
-      flash[:error] = "Chat has not been enabled for this Canvas site"
+      flash[:error] = t(:chat_not_enabled, "Chat has not been enabled for this Canvas site")
       redirect_to named_context_url(@context, :context_url)
       return
     end
     if authorized_action(@context, @current_user, :read_roster)
       return unless tab_enabled?(@context.class::TAB_CHAT)
       
-      add_crumb("Chat", named_context_url(@context, :context_chat_url))
+      add_crumb(t('#crumbs.chat', "Chat"), named_context_url(@context, :context_chat_url))
       self.active_tab="chat"
       
       res = nil
@@ -322,25 +327,25 @@ class ContextController < ApplicationController
   
   def inbox
     add_crumb(@current_user.short_name, named_context_url(@current_user, :context_url))
-    add_crumb("Inbox", inbox_url)
+    add_crumb(t('#crumb.inbox', "Inbox"), inbox_url)
     case params[:view]
     when 'sentbox'
       @messages_view = :sentbox
       @messages = @current_user.sentbox_context_messages
       context_messages = @messages
-      @messages_view_header = "Sent Messages"
+      @messages_view_header = t(:sent_messages, "Sent Messages")
       @per_page = 10
     when 'inbox'
       @messages_view = :inbox
       @messages = @current_user.inbox_context_messages
       context_messages = @messages
-      @messages_view_header = "Received Messages"
+      @messages_view_header = t(:received_messages, "Received Messages")
       @per_page = 10
     else # default view
       @messages_view = :action_items
       @messages = @current_user.inbox_items.active
       context_messages = @current_user.context_messages
-      @messages_view_header = "Inbox"
+      @messages_view_header = t(:inbox, "Inbox")
       @per_page = 15
     end
     if params[:reply_id]
@@ -369,7 +374,7 @@ class ContextController < ApplicationController
   end
   
   def mark_inbox_as_read
-    flash[:notice] = "Inbox messages all marked as read"
+    flash[:notice] = t(:all_marked_read, "Inbox messages all marked as read")
     if @current_user
       InboxItem.update_all({:workflow_state => 'read'}, {:user_id => @current_user.id})
       User.update_all({:unread_inbox_items_count => (@current_user.inbox_items.unread.count rescue 0)}, {:id => @current_user.id})
@@ -426,15 +431,15 @@ class ContextController < ApplicationController
         if @context.visibility_limited_to_course_sections?(@current_user)
           user_ids = @students.map(&:id) + [@current_user.id]
         end
-        @primary_users = {'Students' => @students}
-        @secondary_users = {'Teachers & TA\'s' => @teachers}
+        @primary_users = {t('roster.students', 'Students') => @students}
+        @secondary_users = {t('roster.teachers', 'Teachers & TA\'s') => @teachers}
         @messages = @context.context_messages.find(:all, :order => 'created_at DESC', :include => [:attachments, :context], :limit => 25)
         @messages = @messages.select{|m| !(([m.user_id] + m.recipients || []) & user_ids).empty? }
       elsif @context.is_a?(Group)
         @users = @context.participating_users.find(:all, :order => 'sortable_name').uniq
-        @primary_users = {'Group Members' => @users}
+        @primary_users = {t('roster.group_members', 'Group Members') => @users}
         if @context.context && @context.context.is_a?(Course)
-          @secondary_users = {'Teachers & TA\'s' => @context.context.admins.find(:all, :order => 'sortable_name').uniq}
+          @secondary_users = {t('roster.teachers', 'Teachers & TA\'s') => @context.context.admins.find(:all, :order => 'sortable_name').uniq}
         end
         @messages = @context.context_messages.find(:all, :order => 'created_at DESC', :include => [:attachments, :context], :limit => 25)
       end
@@ -452,7 +457,7 @@ class ContextController < ApplicationController
   
   def prior_users
     get_context
-    if authorized_action(@context, @current_user, :manage_admin_users)
+    if authorized_action(@context, @current_user, [:manage_admin_users, :read_as_admin])
       @prior_memberships = @context.enrollments.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name] }
     end
   end
@@ -498,7 +503,11 @@ class ContextController < ApplicationController
       @enrollment ||= @membership
       @user = @context.users.find(params[:id]) rescue nil
       if !@user
-        flash[:error] = "That user does not exist or is not currently a member of this #{@context.class.to_s.downcase}"
+        if @context.is_a?(Course)
+          flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
+        elsif @context.is_a?(Group)
+          flash[:error] = t('no_user.group', "That user does not exist or is not currently a member of this group")
+        end
         redirect_to named_context_url(@context, :context_users_url)
         return
       end

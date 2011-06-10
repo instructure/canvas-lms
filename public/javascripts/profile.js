@@ -157,6 +157,122 @@ $(function() {
       message: "Are you sure you want to delete this login?"
     });
   });
+  $(".datetime_field").datetime_field();
+  $(".expires_field").bind('change keyup', function() {
+    $(this).closest("td").find(".hint").showIf(!$(this).val());
+  });
+  $(".delete_key_link").click(function(event) {
+    event.preventDefault();
+    $(this).closest(".access_token").confirmDelete({
+      url: $(this).attr('rel'),
+      message: "Are you sure you want to delete this access key?",
+      success: function() {
+        $(this).remove();
+        if(!$(".access_token:visible").length) {
+          $("#no_approved_integrations,#access_tokens_holder").toggle();
+        }
+      }
+    });
+  });
+  $("#add_access_token_dialog .cancel_button").click(function() {
+    $("#add_access_token_dialog").dialog('close');
+  });
+  $("#access_token_form").formSubmit({
+    object_name: 'access_token',
+    required: ['purpose'],
+    beforeSubmit: function() {
+      $(this).find("button").attr('disabled', true).filter(".submit_button").text("Generating Token...");
+    },
+    success: function(data) {
+      $(this).find("button").attr('disabled', false).filter(".submit_button").text("Generate Token");
+      $("#add_access_token_dialog").dialog('close');
+      $("#no_approved_integrations").hide()
+      $("#access_tokens_holder").show();
+      var $token = $(".access_token.blank:first").clone(true).removeClass('blank');
+      data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
+      data.expires = $.parseFromISO(data.expires_at).datetime_formatted || "never";
+      data.used = "--";
+      $token.fillTemplateData({
+        data: data,
+        hrefValues: ['id']
+      });
+      $token.data('token', data);
+      $("#access_tokens > tbody").append($token.show());
+      $token.find(".show_token_link").click();
+    },
+    error: function() {
+      $(this).find("button").attr('disabled', false).filter(".submit_button").text("Generating Token Failed");
+    }
+  });
+  $("#token_details_dialog .regenerate_token").click(function() {
+    var result = confirm("Are you sure you want to regenerate this token?  Anything using this token will have to be updated.");
+    if(!result) { return; }
+    
+    var $dialog = $("#token_details_dialog");
+    var $token = $dialog.data('token');
+    var url = $dialog.data('token_url');
+    var $button = $(this);
+    $button.text("Regenerating token...").attr('disabled', true);
+    $.ajaxJSON(url, 'PUT', {'access_token[regenerate]': '1'}, function(data) {
+      data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
+      data.expires = $.parseFromISO(data.expires_at).datetime_formatted || "never";
+      data.used = $.parseFromISO(data.last_used_at).datetime_formatted || "--";
+      data.visible_token = data.visible_token || "protected";
+      $dialog.fillTemplateData({data: data})
+        .find(".full_token_warning").showIf(data.visible_token.length > 10);
+      $token.data('token', data);
+      $button.text("Regenerate Token").attr('disabled', false);
+    }, function() {
+      $button.text("Regenerating Token Failed").attr('disabled', false);
+    });
+  });
+  $(".show_token_link").click(function(event) {
+    event.preventDefault();
+    var $dialog = $("#token_details_dialog");
+    var url = $(this).attr('rel');
+    $dialog.dialog('close').dialog({
+      autoOpen: false,
+      width: 600
+    }).dialog('open');
+    var $token = $(this).parents(".access_token");
+    $dialog.data('token', $token);
+    $dialog.find(".loading_message").show().end()
+      .find(".results,.error_loading_message").hide();
+    function tokenLoaded(token) {
+      $dialog.fillTemplateData({data: token});
+      $dialog.data('token_url', url);
+      $dialog.find(".refresh_token").showIf(token.visible_token && token.visible_token !== "protected")
+        .find(".regenerate_token").text("Regenerate Token").attr('disabled', false);
+      $dialog.find(".loading_message,.error_loading_message").hide().end()
+        .find(".results").show().end()
+        .find(".full_token_warning").showIf(token.visible_token.length > 10);
+    }
+    var token = $token.data('token');
+    if(token) {
+      tokenLoaded(token);
+    } else {
+      $.ajaxJSON(url, 'GET', {}, function(data) {
+        data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
+        data.expires = $.parseFromISO(data.expires_at).datetime_formatted || "never";
+        data.used = $.parseFromISO(data.last_used_at).datetime_formatted || "--";
+        data.visible_token = data.visible_token || "protected";
+        $token.data('token', data);
+        tokenLoaded(data);
+      }, function() {
+        $dialog.find(".error_loading_message").show().end()
+          .find(".results,.loading_message").hide();
+      });
+    }
+    
+  });
+  $(".add_access_token_link").click(function(event) {
+    event.preventDefault();
+    $("#access_token_form").find("button").attr('disabled', false).filter(".submit_button").text("Generate Token");
+    $("#add_access_token_dialog").find(":input").val("").end()
+    .dialog({
+      width: 500
+    });
+  });
   $(document).fragmentChange(function(event, hash) {
     var type = hash.substring(1);
     if(type.match(/^register/)) {

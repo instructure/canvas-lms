@@ -10,7 +10,7 @@
   </div>
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((submission_comment.author_id rescue nil), context.asset_string, 30) %></div>
-    <div class="message user_content formatted_body"><%= user_content(submission_comment.formatted_body, context.asset_string, submission_comment.asset_string) rescue nbsp %></div>
+    <div class="message user_content formatted_body"><%= user_content(submission_comment.try(:formatted_body)) || nbsp %></div>
     <div class="attachments_list" style="margin-top: 5px; <%= hidden unless submission_comment && !submission_comment.attachments.empty? %>">
       <% (submission_comment.attachments rescue []).each do |attachment| %>
         <div class="attachment">

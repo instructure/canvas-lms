@@ -84,6 +84,15 @@ class SectionsController < ApplicationController
     @section = @context.course_sections.find(params[:id])
     params[:course_section][:name]
     if authorized_action(@section, @current_user, :update)
+      if sis_id = params[:course_section].delete(:sis_source_id)
+        if sis_id != @section.sis_source_id && @section.root_account.grants_right?(@current_user, session, :manage_sis)
+          if sis_id == ''
+            @section.sis_source_id = nil
+          else
+            @section.sis_source_id = sis_id
+          end
+        end
+      end
       respond_to do |format|
         if @section.update_attributes(params[:course_section])
           flash[:notice] = "Section successfully updated!"

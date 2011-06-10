@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+var grading_scheme, readOnlyGradebook;
 var gradebook = (function(){
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
@@ -132,14 +133,14 @@ var gradebook = (function(){
         .attr('role', 'grid')
         .prepend(function(){
           var topRowHtml = $("#datagrid_top .assignment_title").map(function(){
-            return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).text() + "</div>";
+            return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).html() + "</div>";
           }).get().join("");
           return "<div class='hidden-readable' role='row'><div role='columnheader' tabindex='-1'>Student Name</div>" + topRowHtml +"</div>";
         })
         .find(".row")
           .attr("role", "row")
           .prepend(function(index){
-            return "<div id='th_" + $studentNames.eq(index).parents(".student_header").attr('id') + "' tabindex='-1' class='ui-helper-hidden-accessible' role='rowheader'>" + $studentNames.eq(index).text() +"</div>";
+            return "<div id='th_" + $studentNames.eq(index).parents(".student_header").attr('id') + "' tabindex='-1' class='ui-helper-hidden-accessible' role='rowheader'>" + $studentNames.eq(index).html() + "</div>";
           });
       $grid.find(".data_cell").attr({
         "role": "gridcell",
@@ -199,7 +200,7 @@ var gradebook = (function(){
               showTooltip('This submission is dropped for grading purposes');
             } else if(datagrid.columns[grid.cell.column].hidden) {
               var name = objectData(datagrid.cells['0,' + grid.cell.column]).title;
-              showTooltip(name + "<br/><span style='font-size: 0.9em;'>Click to expand</span>", true)
+              showTooltip($.htmlEscape(name) + "<br/><span style='font-size: 0.9em;'>Click to expand</span>", true)
             }
           } else if(event && event.originalEvent && event.originalEvent.type && !event.originalEvent.type.match(/mouse/)) {
             grid.cell.find(".grade").focus().css('outline', 0);
@@ -218,6 +219,10 @@ var gradebook = (function(){
           datagrid.focus($cell.row, $cell.column);
           grid.cell.data('from_click', false);
         }).bind('entry_focus', function(event, grid) {
+          if(readOnlyGradebook) { 
+            datagrid.blur();
+            return false; 
+          }
           var $obj = grid.cell.find(".table_entry"),
               $grade = $obj.find(".grade"),
               editable = true,
@@ -421,99 +426,101 @@ var gradebook = (function(){
             window.location.href = extendedGradebookURL;
           };
           if(object_data.submissions) {
-            options['<span class="ui-icon ui-icon-mail-closed">&nbsp;</span> Message Students Who...'] = function() {
-              var data = objectData($td),
-                  title = data.title,
-                  $submissions = $("#datagrid_data .assignment_" + data.id);
-              
-              var students_hash = {};
-              $("#datagrid_left .student_header").each(function(i) {
-                var student = {};
-                student.id = $(this).attr('id').substring(8);
-                student.name = $(this).find(".display_name").text();
-                students_hash[student.id] = student;
-              });
-              $submissions.each(function() {
-                var data = objectData($(this).parent());
-                if(students_hash[data.user_id]) {
-                  students_hash[data.user_id].score = data.score;
-                  students_hash[data.user_id].submitted_at = data.submitted_at;
-                  students_hash[data.user_id].graded_at = data.graded_at;
-                }
-              });
-              var students = [];
-              for(var idx in students_hash) {
-                students.push(students_hash[idx]);
-              }
-              
-              window.messageStudents({
-                options: [
-                  {text: "Haven't submitted yet"},
-                  {text: "Scored less than", cutoff: true},
-                  {text: "Scored more than", cutoff: true}
-                ],
-                title: title,
-                points_possible: data.points_possible,
-                students: students,
-                callback: function(selected, cutoff, students) {
-                  students = $.grep(students, function($student, idx) {
-                    var student = $student.user_data;
-                    if(selected == "Haven't submitted yet") {
-                      return !student.submitted_at;
-                    } else if(selected == "Scored less than") {
-                      return student.score != null && student.score !== "" && cutoff != null && student.score < cutoff;
-                    } else if(selected == "Scored more than") {
-                      return student.score != null && student.score !== "" && cutoff != null && student.score > cutoff;
-                    }
-                  });
-                  return $.map(students, function(student) { return student.user_data.id; });
-                }
-              });
-            };
-            options['<span class="ui-icon ui-icon-check">&nbsp;</span> Set Default Grade'] = function() {
-              var data = objectData($td),
-                  title = data.title;
-              
-              $default_grade_form.find(".assignment_title").text(title).end();
-              $default_grade_form.find(".assignment_id").val(data.assignment_id);
-              $default_grade_form.find(".out_of").showIf(data.points_possible || data.points_possible === '0');
-              $default_grade_form.find(".points_possible").text(data.points_possible);
-              var url = $.replaceTags($default_grade_form.find(".default_grade_url").attr('href'), 'id', data.id);
-              url = $update_submission_form.attr('action');
-              $default_grade_form.attr('action', url).attr('method', 'POST');
-              var $input = $box = $("#student_grading_" + data.id).clone();
-              if(!$box.hasClass('grading_value')) { $input = $box.find(".grading_value"); }
-              $input.attr('name', 'default_grade').show();
-              $default_grade_form.find(".grading_box_holder").empty().append($box);
-              $default_grade_form.dialog('close').dialog({
-                autoOpen: false,
-                width: 350,
-                height: "auto",
-                open: function() {
-                  $default_grade_form.find(".grading_box").focus();
-                }
-              }).dialog('open').dialog('option', 'title', "Default Grade for " + title);
-            };
-            if(columnData.grading_type != 'pass_fail' && columnData.points_possible) {
-              options['<span class="ui-icon ui-icon-check">&nbsp;</span> Curve Grades'] = function() {
+            if(!readOnlyGradebook) {
+              options['<span class="ui-icon ui-icon-mail-closed">&nbsp;</span> Message Students Who...'] = function() {
                 var data = objectData($td),
-                    title = data.title;    
-                $curve_grade_dialog
-                  .find(".assignment_title").text(title).end()
-                  .find(".assignment_id").val(data.assignment_id).end()
-                  .find(".out_of").showIf(data.points_possible || data.points_possible === '0').end()
-                  .find("#middle_score").val(parseInt((data.points_possible || 0) * 0.6, 10)).end()
-                  .find(".points_possible").text(data.points_possible).end()
-                  .dialog('close').dialog({
-                    autoOpen: false,
-                    width: 350,
-                    height: "auto",
-                    open: function() {
-                      gradebook.curve();
-                    }
-                  })
-                  .dialog('open').dialog('option', 'title', "Curve Grade for " + title);
+                    title = data.title,
+                    $submissions = $("#datagrid_data .assignment_" + data.id);
+                
+                var students_hash = {};
+                $("#datagrid_left .student_header").each(function(i) {
+                  var student = {};
+                  student.id = $(this).attr('id').substring(8);
+                  student.name = $(this).find(".display_name").text();
+                  students_hash[student.id] = student;
+                });
+                $submissions.each(function() {
+                  var data = objectData($(this).parent());
+                  if(students_hash[data.user_id]) {
+                    students_hash[data.user_id].score = data.score;
+                    students_hash[data.user_id].submitted_at = data.submitted_at;
+                    students_hash[data.user_id].graded_at = data.graded_at;
+                  }
+                });
+                var students = [];
+                for(var idx in students_hash) {
+                  students.push(students_hash[idx]);
+                }
+                
+                window.messageStudents({
+                  options: [
+                    {text: "Haven't submitted yet"},
+                    {text: "Scored less than", cutoff: true},
+                    {text: "Scored more than", cutoff: true}
+                  ],
+                  title: title,
+                  points_possible: data.points_possible,
+                  students: students,
+                  callback: function(selected, cutoff, students) {
+                    students = $.grep(students, function($student, idx) {
+                      var student = $student.user_data;
+                      if(selected == "Haven't submitted yet") {
+                        return !student.submitted_at;
+                      } else if(selected == "Scored less than") {
+                        return student.score != null && student.score !== "" && cutoff != null && student.score < cutoff;
+                      } else if(selected == "Scored more than") {
+                        return student.score != null && student.score !== "" && cutoff != null && student.score > cutoff;
+                      }
+                    });
+                    return $.map(students, function(student) { return student.user_data.id; });
+                  }
+                });
               };
+              options['<span class="ui-icon ui-icon-check">&nbsp;</span> Set Default Grade'] = function() {
+                var data = objectData($td),
+                    title = data.title;
+                
+                $default_grade_form.find(".assignment_title").text(title).end();
+                $default_grade_form.find(".assignment_id").val(data.assignment_id);
+                $default_grade_form.find(".out_of").showIf(data.points_possible || data.points_possible === '0');
+                $default_grade_form.find(".points_possible").text(data.points_possible);
+                var url = $.replaceTags($default_grade_form.find(".default_grade_url").attr('href'), 'id', data.id);
+                url = $update_submission_form.attr('action');
+                $default_grade_form.attr('action', url).attr('method', 'POST');
+                var $input = $box = $("#student_grading_" + data.id).clone();
+                if(!$box.hasClass('grading_value')) { $input = $box.find(".grading_value"); }
+                $input.attr('name', 'default_grade').show();
+                $default_grade_form.find(".grading_box_holder").empty().append($box);
+                $default_grade_form.dialog('close').dialog({
+                  autoOpen: false,
+                  width: 350,
+                  height: "auto",
+                  open: function() {
+                    $default_grade_form.find(".grading_box").focus();
+                  }
+                }).dialog('open').dialog('option', 'title', "Default Grade for " + title);
+              };
+              if(columnData.grading_type != 'pass_fail' && columnData.points_possible) {
+                options['<span class="ui-icon ui-icon-check">&nbsp;</span> Curve Grades'] = function() {
+                  var data = objectData($td),
+                      title = data.title;    
+                  $curve_grade_dialog
+                    .find(".assignment_title").text(title).end()
+                    .find(".assignment_id").val(data.assignment_id).end()
+                    .find(".out_of").showIf(data.points_possible || data.points_possible === '0').end()
+                    .find("#middle_score").val(parseInt((data.points_possible || 0) * 0.6, 10)).end()
+                    .find(".points_possible").text(data.points_possible).end()
+                    .dialog('close').dialog({
+                      autoOpen: false,
+                      width: 350,
+                      height: "auto",
+                      open: function() {
+                        gradebook.curve();
+                      }
+                    })
+                    .dialog('open').dialog('option', 'title', "Curve Grade for " + title);
+                };
+              }
             }
             var data = objectData($td);
             if(data.submission_types && data.submission_types.match(/(online_upload|online_text_entry|online_url)/)) {
@@ -526,7 +533,7 @@ var gradebook = (function(){
                 INST.downloadSubmissions(url);
               };
             }
-            if(data.submissions_downloads && data.submissions_downloads > 0) {
+            if(data.submissions_downloads && data.submissions_downloads > 0 && !readOnlyGradebook) {
               options['<span class="ui-icon ui-icon-arrowthickstop-1-n">&nbsp;</span> Re-Upload Submissions'] = function() {
                 var url = $("#re_upload_submissions_form").find(".re_upload_submissions_url").attr('href');
                 url = $.replaceTags(url, "assignment_id", data.assignment_id);
@@ -544,8 +551,8 @@ var gradebook = (function(){
           datagrid.toggleColumn(datagrid.position($cell).column);
         };
         if($td.hasClass('group_total')) {
-          var type = $td.find(".assignment_title").html();
-          options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> Hide All ' + type] = function() {
+          var type = $td.find(".assignment_title").text();
+          options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> ' + $.htmlEscape('Hide All ' + type)] = function() {
             var check_id = objectData($td).assignment_group_id;
             $(".outer_assignment_name").each(function() {
               var assignment = objectData($(this));
@@ -1487,7 +1494,7 @@ var gradebook = (function(){
               $type.append($link);
             }
             $type.append($("#submission_" + submission.submission_type + "_image").clone().removeAttr('id'));
-            $type.append(" <a href='" + attachment_url + "'>Download " + attachment.display_name + "</a><br/>");
+            $type.append(" <a href='" + attachment_url + "'>" + $.htmlEscape("Download " + attachment.display_name) + "</a><br/>");
           }
         }
       } else if(submission.submission_type == "online_text_entry") {
@@ -1546,8 +1553,13 @@ var gradebook = (function(){
       .find(".submission_details").empty().append($view).append($type).show().end()
       .find(".submission_comments").empty().end()
       .find(".comment_attachments").empty().end()
+      .find(".save_buttons,.add_comment").showIf(!readOnlyGradebook).end()
       .find(".group_comment").showIf(assignment && assignment.group_category).find(":checkbox").attr('checked', true).end().end();
 
+    if(readOnlyGradebook) {
+      $submission_information.find(".grade_entry").text(grade || "-");
+    }
+    
     submission.student_id = submission.user_id;
     submission.id = submission.id || "";
     var late = assignment.due_at && submission.submitted_at && Date.parse(assignment.due_at) < Date.parse(submission.submitted_at);
@@ -2002,11 +2014,20 @@ var gradebook = (function(){
     if(isNaN(finalGrade) || !isFinite(finalGrade)) {
       finalGrade = 0;
     }
+    var letterGrade = "";
+    if(grading_scheme) {
+      var letters = $.grep(grading_scheme, function(row, i) {
+        return finalGrade <= row[1] * 100 || i == 0;
+      });
+      var letter = letters[letters.length - 1];
+      letterGrade = letter[0];
+    }
     $("#submission_" + student_id + "_final-grade")
       .css('visibility', '')
       .attr('data-tip', gradebook.pointCalculations ? ('pts: ' + totalUserPoints + ' / ' + totalPointsPossible) : '')
       .find(".grade").text(finalGrade).end()
       .find(".score").hide().end()
+      .find(".letter_grade").showIf(grading_scheme).text(letterGrade).end()
       .find(".pct").text(' %').show();
   }
 

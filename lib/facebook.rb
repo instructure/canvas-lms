@@ -49,7 +49,8 @@ module Facebook
   end
   
   def self.authorize_success(user, token)
-    @service = UserService.find_or_initialize_by_user_id_and_service(user.id, 'facebook')
+    @service = UserService.find_by_user_id_and_service(user.id, 'facebook')
+    @service ||= UserService.new(:user => user, :service => 'facebook')
     @service.token = token
     data = send_graph_request('/me', :get, @service)
     return nil unless data

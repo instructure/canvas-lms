@@ -123,6 +123,13 @@ class ContextModule < ActiveRecord::Base
     set { can :read }
   end
   
+  def locked_for?(user, tag=nil, deep_check=false)
+    return false if self.grants_right?(user, nil, :update)
+    available = self.available_for?(user, tag, deep_check)
+    return true unless available
+    self.to_be_unlocked
+  end
+  
   def available_for?(user, tag=nil, deep_check=false)
     return true if !self.to_be_unlocked && (!self.prerequisites || self.prerequisites.empty?) && !self.require_sequential_progress
     return true if self.grants_right?(user, nil, :update)
@@ -239,19 +246,16 @@ class ContextModule < ActiveRecord::Base
     end
     if params[:type] == 'external_url'
       title = params[:title]
-      added_item ||= self.content_tags.build(
-        :context_id => self.context_id, 
-        :context_type => self.context_type
-      )
+      added_item ||= self.content_tags.build(:context => self.context)
       added_item.attributes = {
-        :content_id => 0, 
-        :content_type => 'ExternalUrl', 
-        :url => params[:url], 
+        :url => params[:url],
         :tag_type => 'context_module', 
         :title => title, 
         :indent => params[:indent], 
         :position => position
       }
+      added_item.content_id = 0
+      added_item.content_type = 'ExternalUrl'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'active'
@@ -259,14 +263,14 @@ class ContextModule < ActiveRecord::Base
       added_item
     elsif params[:type] == 'context_external_tool'
       title = params[:title]
-      added_item ||= self.content_tags.build(
-        :context_id => self.context_id, 
-        :context_type => self.context_type
-      )
+      added_item ||= self.content_tags.build(:context => self.context)
       tool = ContextExternalTool.find_external_tool(params[:url], self.context)
+      unless tool
+        tool = ContextExternalTool.new
+        tool.id = 0
+      end
       added_item.attributes = {
-        :content_id => tool ? tool.id : 0, 
-        :content_type => 'ContextExternalTool', 
+        :content => tool,
         :url => params[:url], 
         :tag_type => 'context_module', 
         :title => title, 
@@ -280,18 +284,15 @@ class ContextModule < ActiveRecord::Base
       added_item
     elsif params[:type] == 'context_module_sub_header'
       title = params[:title]
-      added_item ||= self.content_tags.build(
-        :context_id => self.context_id, 
-        :context_type => self.context_type
-      )
+      added_item ||= self.content_tags.build(:context => self.context)
       added_item.attributes = {
-        :content_id => 0, 
-        :content_type => 'ContextModuleSubHeader', 
-        :tag_type => 'context_module', 
+        :tag_type => 'context_module',
         :title => title, 
         :indent => params[:indent], 
         :position => position
       }
+      added_item.content_id = 0
+      added_item.content_type = 'ContextModuleSubHeader'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'active'
@@ -301,14 +302,10 @@ class ContextModule < ActiveRecord::Base
       return nil unless item
       added_item ||= ContentTag.find_by_content_id_and_content_type_and_context_id_and_context_type_and_tag_type(item.id, item.class.to_s, self.context_id, self.context_type, 'context_module')
       title = params[:title] || (item.title rescue item.name)
-      added_item ||= self.content_tags.build(
-        :context_id => self.context_id, 
-        :context_type => self.context_type
-      )
+      added_item ||= self.content_tags.build(:context => context)
       added_item.attributes = {
-        :content_id => item.id, 
-        :content_type => item.class.to_s, 
-        :tag_type => 'context_module', 
+        :content => item,
+        :tag_type => 'context_module',
         :title => title, 
         :indent => params[:indent], 
         :position => position

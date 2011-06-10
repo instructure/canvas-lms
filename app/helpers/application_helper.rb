@@ -65,48 +65,7 @@ module ApplicationHelper
       Context.find_by_asset_string(code).short_name rescue ""
     end
   end
-  
-  def css_size(val)
-    res = val.to_f
-    res = nil if res == 0
-    res = (res + 10).to_s + "px" if res && res.to_s == val
-    res
-  end
-  
-  def user_content(str, context_code, asset_string)
-    str ||= ""
-    return raw(str) unless str.match(/object|embed/)
-    raise "context_code and asset_string required" if !str.blank? && (!context_code || !asset_string)
-    return str if !context_code || !asset_string
-    html = Nokogiri::HTML::DocumentFragment.parse(str)
-    html.css('object,embed').each_with_index do |obj, idx|
-      styles = {}
-      params = {}
-      obj.css('param').each do |param|
-        params[param['key']] = param['value']
-      end
-      (obj['style'] || '').split(/\;/).each do |attr|
-        key, value = attr.split(/\:/).map(&:strip)
-        styles[key] = value
-      end
-      width = css_size(obj['width'])
-      width ||= css_size(params['width'])
-      width ||= css_size(styles['width'])
-      width ||= '400px'
-      height = css_size(obj['height'])
-      height ||= css_size(params['height'])
-      height ||= css_size(styles['height'])
-      height ||= '300px'
-      url = "//#{HostUrl.file_host(@domain_root_account || Account.default)}"
-      ts, sig = @current_user && @current_user.access_verifier
-      url += "/object_snippet/#{context_code}/#{asset_string}/#{idx}"
-      url += "?user_id=#{(@current_user ? @current_user.id : nil)}&ts=#{ts}&verifier=#{sig}"
-      child = Nokogiri::HTML::DocumentFragment.parse("<iframe class='user_content_iframe' src='#{url}' style='width: #{width}; height: #{height}' frameborder='0'></iframe>")
-      obj.replace(child)
-    end
-    raw(html.to_s)
-  end
-  
+
   def lock_explanation(hash, type, context=nil)
     res = "This #{type} "
     hash ||= {}
@@ -415,5 +374,24 @@ module ApplicationHelper
   # returns a time object at 00:00:00 tomorrow
   def tomorrow_at_midnight
     1.day.from_now.to_date.to_time
+  end
+  
+  # you should supply :all_folders to avoid a db lookup on every iteration
+  def folders_as_options(folders, opts = {})
+    opts[:indent_width] ||= 3
+    opts[:depth] ||= 0
+    opts[:options_so_far] ||= []
+    folders.each do |folder|
+      opts[:options_so_far] << %{<option value="#{folder.id}" #{'selected' if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>}
+      child_folders = if opts[:all_folders]
+                        opts[:all_folders].select {|f| f.parent_folder_id == folder.id }
+                      else
+                        folder.active_sub_folders
+                      end
+      if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
+        folders_as_options(child_folders, opts.merge({:depth => opts[:depth] + 1}))
+      end
+    end
+    opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
   end
 end

@@ -50,7 +50,9 @@ class OutcomesController < ApplicationController
     @outcome = @context.learning_outcomes.find(params[:outcome_id])
     if authorized_action(@context, @current_user, :read)
       @outcome.tie_to(@context)
-      render :json => @outcome.to_json(:methods => :artifacts_count_for_tied_context)
+      render :json => @outcome.to_json(
+        :methods => :artifacts_count_for_tied_context,
+        :user_content => %w(description))
     end
   end
 

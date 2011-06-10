@@ -50,61 +50,81 @@ module AuthenticationMethods
   end
 
   def load_user
-    @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
-    key = @pseudonym_session.send(:session_credentials)[1] rescue nil
-    if key
-      @current_pseudonym = Pseudonym.find_cached(['_pseudonym_lookup', key].cache_key) do
-        @pseudonym_session && @pseudonym_session.record
+    if params[:access_token] && api_request?
+      @access_token = AccessToken.find_by_token(params[:access_token])
+      @developer_key = @access_token.try(:developer_key)
+      if !@access_token.try(:usable?)
+        render :json => {:errors => "Invalid access token"}, :status => :bad_request
+        return false
       end
-    elsif @policy_pseudonym_id
-      @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
+      @access_token.used!
+      @current_user = @access_token.user
+      @current_pseudonym = @current_user.pseudonym
     else
-      @current_pseudonym = @pseudonym_session && @pseudonym_session.record
+      @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
+      key = @pseudonym_session.send(:session_credentials)[1] rescue nil
+      if key
+        @current_pseudonym = Pseudonym.find_cached(['_pseudonym_lookup', key].cache_key) do
+          @pseudonym_session && @pseudonym_session.record
+        end
+      elsif @policy_pseudonym_id
+        @current_pseudonym = Pseudonym.find_by_id(@policy_pseudonym_id)
+      else
+        @current_pseudonym = @pseudonym_session && @pseudonym_session.record
+      end
+      if params[:login_success] == '1' && !@current_pseudonym
+        # they just logged in successfully, but we can't find the pseudonym now?
+        # sounds like somebody hates cookies.
+        return redirect_to(login_url(:needs_cookies => '1'))
+      end
+      @current_user = @current_pseudonym && @current_pseudonym.user
     end
-    if params[:login_success] == '1' && !@current_pseudonym
-      # they just logged in successfully, but we can't find the pseudonym now?
-      # sounds like somebody hates cookies.
-      return redirect_to(login_url(:needs_cookies => '1'))
-    end
-    @current_user = @current_pseudonym && @current_pseudonym.user
     if @current_user && @current_user.unavailable?
       @current_pseudonym = nil
       @current_user = nil 
     end
 
     if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) } && Account.site_admin.grants_right?(@current_user, session, :become_user)
+      request_become_user_id = nil
       if params[:become_user_id]
-        session[:become_user_id] = params[:become_user_id]
+        request_become_user_id = params[:become_user_id]
       elsif params.keys.include?('me')
-        session[:become_user_id] = nil
+        request_become_user_id = nil
       elsif params.keys.include?('become_teacher')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         teacher = course.teachers.first if course
         if teacher
-          session[:become_user_id] = teacher.id
+          request_become_user_id = teacher.id
         else
-          flash[:error] = "No teacher found"
+          flash[:error] = I18n.t('lib.auth.errors.teacher_not_found', "No teacher found")
         end
       elsif params.keys.include?('become_student')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         student = course.students.first if course
         if student
-          session[:become_user_id] = student.id
+          request_become_user_id = student.id
         else
-          flash[:error] = "No student found"
+          flash[:error] = I18n.t('lib.auth.errors.student_not_found', "No student found")
         end
+      end
+      
+      if request_become_user_id != session[:become_user_id]
+        params_without_become = params.dup
+        params_without_become.delete_if {|k,v| [ 'become_user_id', 'become_teacher', 'become_student', 'me' ].include? k }
+        params_without_become[:only_path] = true
+        session[:masquerade_return_to] = url_for(params_without_become)
+        return redirect_to user_masquerade_url(request_become_user_id || @current_user.id)
       end
     end
 
-    params[:as_user_id] ||= session[:become_user_id]
-    if params[:as_user_id] && Account.site_admin.grants_right?(@current_user, session, :become_user)
+    if session[:become_user_id] && Account.site_admin.grants_right?(@current_user, session, :become_user)
       @real_current_user = @current_user
-      @current_user = User.find(params[:as_user_id]) rescue @current_user
+      @current_user = User.find(session[:become_user_id]) rescue @current_user
       if @current_user.id != @real_current_user.id && Account.site_admin_user?(@current_user)
         # we can't let even site admins impersonate other site admins, since
         # they may have different permissions.
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) attempting to impersonate another site admin (#{@current_user.name}). No dice."
-        flash.now[:error] = "You can't impersonate other site admins. Sorry."
+        flash.now[:error] = I18n.t('lib.auth.errors.admin_impersonation_disallowed', "You can't impersonate other site admins. Sorry.")
         @current_user = @real_current_user
       else
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
@@ -124,16 +144,16 @@ module AuthenticationMethods
       if !@current_user 
         respond_to do |format|
           store_location
-          flash[:notice] = "You must! be logged in to access this page"
+          flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page")
           format.html {redirect_to login_url}
-          format.json {render :json => {:errors => {:message => "You must be logged in to view this page"}}, :status => :unauthorized}
+          format.json {render :json => {:errors => {:message => I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page")}}, :status => :unauthorized}
         end
         return false;
       elsif !@context.users.include?(@current_user)
         respond_to do |format|
-          flash[:notice] = "You are not authorized to view this page"
+          flash[:notice] = I18n.t('lib.auth.errors.not_authorized', "You are not authorized to view this page")
           format.html {redirect_to "/"}
-          format.json {render :json => {:errors => {:message => "You are not authorized to view this page"}}, :status => :unauthorized}
+          format.json {render :json => {:errors => {:message => I18n.t('lib.auth.errors.not_authorized', "You are not authorized to view this page")}}, :status => :unauthorized}
         end
         return false
       end
@@ -152,11 +172,11 @@ module AuthenticationMethods
         else
           format.html {
             store_location
-            flash[:notice] = "You must be logged in to access this page" unless request.path == '/'
+            flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
             redirect_to login_url
           }
         end
-        format.json { render :json => {:errors => {:message => "user authorization required"}}.to_json, :status => :unauthorized}
+        format.json { render :json => {:errors => {:message => I18n.t('lib.auth.authentication_required', "user authorization required")}}.to_json, :status => :unauthorized}
       end
       return false
     end
@@ -184,6 +204,39 @@ module AuthenticationMethods
     keys.each { |k| saved[k] = session[k] }
     reset_session
     session.merge!(saved)
+  end
+
+  def initiate_delegated_login
+    is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
+    is_cas = @domain_root_account.cas_authentication? && is_delegated
+    is_saml = @domain_root_account.saml_authentication? && is_delegated
+    if is_cas
+      initiate_cas_login
+      return true
+    elsif is_saml
+      initiate_saml_login
+      return true
+    end
+    false
+  end
+
+  def initiate_cas_login(cas_client = nil)
+    reset_session_saving_keys(:return_to)
+    if @domain_root_account.account_authorization_config.log_in_url.present?
+      session[:exit_frame] = true
+      redirect_to(@domain_root_account.account_authorization_config.log_in_url)
+    else
+      config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
+      cas_client ||= CASClient::Client.new(config)
+      redirect_to(cas_client.add_service_to_login_url(login_url))
+    end
+  end
+
+  def initiate_saml_login
+    reset_session_saving_keys(:return_to)
+    settings = @domain_root_account.account_authorization_config.saml_settings
+    request = Onelogin::Saml::AuthRequest.create(settings)
+    redirect_to(request)
   end
 
 end

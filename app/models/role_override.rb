@@ -21,6 +21,8 @@ class RoleOverride < ActiveRecord::Base
   has_many :children, :class_name => "Role", :foreign_key => "parent_id"
   belongs_to :parent, :class_name => "Role"
   before_save :default_values
+
+  attr_accessible :context, :permission, :enrollment_type, :enabled
   
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
@@ -318,7 +320,8 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [
           'AccountAdmin'
-        ]
+        ],
+        :account_only => true
       },
       :manage_account_settings => {
         :label => "Manage account-level settings",
@@ -328,7 +331,8 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [
           'AccountAdmin'
-        ]
+        ],
+        :account_only => true
       },
       :manage_groups => {
         :label => "Manage (create / edit / delete) groups",
@@ -460,7 +464,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_alerts => {
         :label => "Manage account user alerts",
-        :account_only => :true,
+        :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
@@ -480,6 +484,12 @@ class RoleOverride < ActiveRecord::Base
       :manage_site_settings => {
         :label => "Manage site-wide and plugin settings",
         :account_only => :site_admin,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+      },
+      :manage_sis => {
+        :label => "Import and manage SIS data",
+        :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },

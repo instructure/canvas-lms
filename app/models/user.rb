@@ -19,7 +19,7 @@
 class User < ActiveRecord::Base
   include Context
 
-  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image
+  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails
   attr_accessor :original_id
   
   before_save :infer_defaults
@@ -45,6 +45,8 @@ class User < ActiveRecord::Base
   has_many :user_account_associations
   has_many :associated_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth'
   has_many :associated_root_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth', :conditions => 'accounts.parent_account_id IS NULL'
+  has_many :developer_keys
+  has_many :access_tokens, :include => :developer_key
   
   has_many :student_enrollments
   has_many :ta_enrollments
@@ -129,7 +131,7 @@ class User < ActiveRecord::Base
     {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{ActiveRecord::Base.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => wildcard('users.name', name) }
+    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", ActiveRecord::Base.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
   }
   named_scope :active, lambda {
     { :conditions => ["users.workflow_state != ?", 'deleted'] }
@@ -956,13 +958,6 @@ class User < ActiveRecord::Base
   # Import stuff
   attr_accessor :comparison, :prior, :focus
   
-  def sorted_grading_standards
-    standards = self.grading_standards
-    context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
-    standards += GradingStandard.find_all_by_context_code(context_codes)
-    standards.uniq.sort_by{|s| [(s.usage_count || 0) > 3 ? 'a' : 'b', (s.title.downcase rescue "zzzzz")]}
-  end 
-  
   def sorted_rubrics
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active
@@ -1310,8 +1305,10 @@ class User < ActiveRecord::Base
     opts[:start_at] ||= 2.weeks.ago
     opts[:fallback_start_at] = opts[:start_at]
   
-    # dont make the query do an stream_items.context_code IN ('course_20033','course_20237','course_20247' ...) if they dont pass any contexts, just assume it wants any context code.
-    items = stream_items_simple
+    items = stream_items_simple.scoped(:conditions => { 'stream_item_instances.hidden' => false })
+    # dont make the query do an stream_items.context_code IN
+    # ('course_20033','course_20237','course_20247' ...) if they dont pass any
+    # contexts, just assume it wants any context code.
     if opts[:contexts]
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with

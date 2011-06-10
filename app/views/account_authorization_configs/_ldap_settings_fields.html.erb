@@ -1,0 +1,62 @@
+<%= f.hidden_field :auth_type, :value => 'ldap' %>
+<%= f.hidden_field :id %>
+
+<tr>
+  <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_host, :en => "Host" %></td>
+  <td style="vertical-align: top;" class="nobr">
+    <%= f.text_field :auth_host, :class => "auth_form", :style => "width: 300px;" %>
+    <span class="auth_info auth_host"><%= @account_config.auth_host %></span>
+  </td>
+</tr>
+<tr>
+  <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_port, :en => "Port" %></td>
+  <td style="vertical-align: top;" class="nobr">
+    <%= f.text_field :auth_port, :class => "auth_form", :style => "width: 50px;" %>
+    <span class="auth_info auth_port"><%= @account_config.auth_port %></span>
+  </td>
+</tr>
+<tr>
+  <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_over_tls, :en => "Over TLS?" %></td>
+  <td style="vertical-align: top;" class="nobr">
+    <%= f.check_box :auth_over_tls, :class => "auth_form" %>
+    <span class="auth_info auth_over_tls"><%= @account_config.auth_over_tls %></span>
+  </td>
+</tr>
+<tr>
+  <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_base, :en => "Base" %></td>
+  <td colspan="3" style="vertical-align: top;" class="nobr">
+    <%= f.text_field :auth_base, :class => "auth_form", :style => "width: 300px;" %>
+    <span class="auth_info auth_base"><%= account_config.auth_base %></span>
+  </td>
+</tr>
+<tr>
+  <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_filter, :en => "Filter" %></td>
+  <td style="vertical-align: top;" class="nobr">
+    <%= f.text_field :auth_filter, :class => "auth_form", :style => "width: 300px;" %>
+    <span class="auth_info auth_filter"><%= account_config.ldap_filter %></span>
+    <span class="auth_form" style="font-size: smaller;">
+      <br>
+      <%= mt(:auth_filter_description,
+             "Use `{{login}}` as a placeholder for the username supplied by the user. For example: `(sAMAccountName={{login}}`)") %>
+    </span>
+  </td>
+</tr>
+<tr>
+  <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_username, :en => "Username" %></td>
+  <td style="vertical-align: top;" class="nobr">
+    <%= f.text_field :auth_username, :class => "auth_form", :style => "width: 300px;" %>
+    <span class="auth_info auth_username"><%= account_config.auth_username %></span>
+  </td>
+</tr>
+<tr>
+  <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_password, :en => "Password" %></td>
+  <td style=" vertical-align: top;" class="nobr">
+    <%= f.text_field :auth_password, :value => '', :class => "auth_form" %>
+    <span class="auth_info auth_password"><%= "********" if account_config.auth_crypted_password %></span>
+    <% if account_config.auth_crypted_password -%>
+      <span class="auth_form" style="font-size: smaller;">
+        <br><%= t(:auth_password_description, "Leave blank to continue using the current password.") %>
+      </span>
+    <% end %>
+  </td>
+</tr>

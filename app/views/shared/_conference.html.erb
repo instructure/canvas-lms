@@ -3,28 +3,27 @@
   <div class="header">
     <% if !brief %>
       <div class="link_box">
-        <% unless (conference.finished? rescue false) %>
-          <a href="<%= context_url(@context, :context_conference_url, conference ? conference.id : "{{ id }}") %>" style="<%= hidden unless can_do(conference, @current_user, :update) %>" class="edit_conference_link no-hover"><%= image_tag "edit.png", :title => "Edit Conference Details" %></a>
-        <% end %>
-        <a href="<%= context_url(@context, :context_conference_url, conference ? conference.id : "{{ id }}") %>" style="<%= hidden unless can_do(conference, @current_user, :delete) %>" class="delete_conference_link no-hover"><%= image_tag "delete.png", :title => "Delete Conference" %></a>
+        <a href="<%= context_url(@context, :context_conference_url, conference ? conference.id : "{{ id }}") %>" style="<%= hidden unless can_do(conference, @current_user, :update) %>" class="edit_conference_link no-hover"><%= image_tag "edit.png", :title => t('buttons.edit', 'Edit Conference Details') %></a>
+        <a href="<%= context_url(@context, :context_conference_url, conference ? conference.id : "{{ id }}") %>" style="<%= hidden unless can_do(conference, @current_user, :delete) %>" class="delete_conference_link no-hover"><%= image_tag "delete.png", :title => t('buttons.delete', 'Delete Conference') %></a>
       </div>
     <% end %>
-    <%= link_to((conference.title rescue ("#{@context.name} Conference" rescue "Conference")), context_url(@context, :context_conference_url, conference ? conference.id : "{{ id }}"), :class => "title") %>
+    <%= link_to((conference ? conference.title : @context.is_a?(Course) ? t(:course_conference, "Course Conference") : t(:group_conference, "Group Conference")), context_url(@context, :context_conference_url, conference ? conference.id : "{{ id }}"), :class => "title") %>
     <span style="font-size: 0.8em; padding-left: 10px;">
-      <%= "#{pluralize(conference.added_users.length, 'participant')}" if conference && conference.added_users.length > 0 %>
+      <%= t(:participant, "participant", :count => conference.added_users.length) if conference && conference.added_users.length > 0 %>
     </span>
     <div class="clear"></div>
   </div>
   <div class="content">
     <div class="status">
       <% if ((!conference || conference.available?) rescue false) %>
-        Hasn't started yet
+        <%= t '#conferences.show.status.new', "Hasn't started yet" %>
       <% elsif (conference.active? rescue false) %>
-        Started <%= time_string(conference.started_at) rescue "" %>
+        <%= t '#conferences.show.status.started', "Started %{time}", :time => time_string(conference.started_at) %>
       <% elsif (conference.finished? rescue true) %>
-        Finished <%= datetime_string(conference.ended_at) rescue "" %> (<%= pluralize((conference.running_time / 60).to_i, 'minute') %>)
+        <%= t '#conferences.show.status.finished', "Finished %{date_and_time} (%{duration})", :date_and_time => datetime_string(conference.ended_at), :duration => t('#conferences.show.minute', "minute", :count => (conference.running_time / 60)) %>
       <% end %>
-      <div style="display: none;" class="duration"><%= conference.duration.to_i rescue "60" %></div>
+      <div style="display: none;" class="long_running"><%= conference && conference.long_running? ? 1 : 0 %></div>
+      <div style="display: none;" class="duration"><%= conference ? conference.duration : WebConference::DEFAULT_DURATION %></div>
       <div style="display: none;" class="user_ids"><%= Array(conference.user_ids).join(",") rescue nbsp %></div>
       <div style="display: none;" class="conference_type"><%= conference && conference.conference_type %></div>
       <%- if conference && conference.user_settings -%>
@@ -40,13 +39,13 @@
   <div class="base_links">
     <% txt = nil
       if conference && conference.available?
-        txt = "Start it now" if can_do(conference, @current_user, :initiate)
+        txt = t('#conferences.show.buttons.start', "Start it now") if can_do(conference, @current_user, :initiate)
       elsif conference && conference.active?
-        txt = "Join it now" if can_do(conference, @current_user, :join)
-      elsif conference && conference.finished?
-        txt = "Re-start it now" if can_do(conference, @current_user, :initiate)
+        txt = t('#conferences.show.buttons.join', "Join it now") if can_do(conference, @current_user, :join)
+      elsif conference && conference.finished? && conference.restartable?
+        txt = t('#conferences.show.buttons.restart', "Re-start it now") if can_do(conference, @current_user, :initiate)
       elsif !conference
-        txt = "Start it now"
+        txt = t('#conferences.show.buttons.start', "Start it now")
       end 
     %>
     <% if txt %>
@@ -54,6 +53,7 @@
       <%= txt %>
     </a>
     <% end %>
+    <a href="<%= context_url(@context, :context_conference_close_url, conference ? conference.id : "{{ id }}") %>" class="button close_conference_link" style="<%= hidden unless can_do(conference, @current_user, :close) %>">End it now</a>
   </div>
   <div class="clear"></div>
 </div>

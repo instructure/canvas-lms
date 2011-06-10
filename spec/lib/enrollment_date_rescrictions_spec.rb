@@ -82,7 +82,7 @@ describe EnrollmentDateRestrictions do
       @term = @course.enrollment_term
       @term.should_not be_nil
       @term.save!
-      @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term_id => @term.id, :start_at => start_at, :end_at => end_at)
+      @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term, :start_at => start_at, :end_at => end_at)
       @course = Course.find(@course.id)
       @course.enrollment_dates_for(@enrollment).map(&:to_i).should eql([start_at, end_at].map(&:to_i))
 
@@ -187,7 +187,7 @@ describe EnrollmentDateRestrictions do
         @term = @course.enrollment_term
         @term.should_not be_nil
         @term.save!
-        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term_id => @term.id, :start_at => start_at, :end_at => end_at)
+        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term, :start_at => start_at, :end_at => end_at)
         @enrollment.workflow_state = 'inactive'
         @enrollment.save!
         @enrollment.state.should eql(:inactive)
@@ -299,7 +299,7 @@ describe EnrollmentDateRestrictions do
         @term = @course.enrollment_term
         @term.should_not be_nil
         @term.save!
-        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term_id => @term.id, :start_at => start_at, :end_at => end_at)
+        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term, :start_at => start_at, :end_at => end_at)
         @enrollment.workflow_state = 'active'
         @enrollment.save!
         @enrollment.state.should eql(:active)

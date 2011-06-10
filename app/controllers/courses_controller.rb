@@ -131,8 +131,16 @@ class CoursesController < ApplicationController
     end
   end
 
-  STUDENT_API_FIELDS = %w(id name)
-  STUDENT_API_METHODS = %w(sis_user_id)
+  def unconclude
+    get_context
+    if authorized_action(@context, @current_user, :update)
+      @context.unconclude
+      flash[:notice] = "Course un-concluded"
+      redirect_to(named_context_url(@context, :context_url))
+    end
+  end
+
+  include Api::V1::User
 
   # @API
   # Returns the list of sections for this course.
@@ -167,12 +175,14 @@ class CoursesController < ApplicationController
         res = section.as_json(:include_root => false,
                               :only => %w(id name))
         if include_students
-          res['students'] = section.enrollments.
-            scoped(:include => { :user => :pseudonym }).
-            all(:conditions => "type = 'StudentEnrollment'").
-            map { |e| e.user.as_json(:include_root => false,
-                                     :only => STUDENT_API_FIELDS,
-                                     :methods => STUDENT_API_METHODS) }
+          proxy = section.enrollments
+          if user_json_is_admin?
+            proxy = proxy.scoped(:include => { :user => :pseudonym })
+          else
+            proxy = proxy.scoped(:include => :user)
+          end
+          res['students'] = proxy.all(:conditions => "type = 'StudentEnrollment'").
+            map { |e| user_json(e.user) }
         end
         res
       end
@@ -194,10 +204,11 @@ class CoursesController < ApplicationController
   def students
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      render :json => @context.students.scoped(:include => :pseudonym).
-        to_json(:include_root => false,
-                :only => STUDENT_API_FIELDS,
-                :methods => STUDENT_API_METHODS)
+      proxy = @context.students
+      if user_json_is_admin?
+        proxy = proxy.scoped(:include => :pseudonym)
+      end
+      render :json => proxy.map { |u| user_json(u) }
     end
   end
 
@@ -687,7 +698,7 @@ class CoursesController < ApplicationController
     can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_remove
       respond_to do |format|
-        if !@enrollment.defined_by_sis? && @enrollment.destroy
+        if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
           format.json { render :json => @enrollment.to_json }
         else
           format.json { render :json => @enrollment.to_json, :status => :bad_request }
@@ -736,6 +747,26 @@ class CoursesController < ApplicationController
       render :json => enrollment.to_json(:methods => :associated_user_name)
     end
   end
+
+  def move_enrollment
+    get_context
+    @enrollment = @context.enrollments.find(params[:id])
+    can_move = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
+    can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
+    if can_move
+      respond_to do |format|
+        if @enrollment.defined_by_sis? &&! @context.grants_right?(@current_user, session, :manage_account_settings)
+          return format.json { render :json => @enrollment.to_json, :status => :bad_request }
+        end
+        @enrollment.course_section = @context.course_sections.find(params[:course_section_id])
+        @enrollment.save!
+
+        format.json { render :json => @enrollment.to_json }
+      end
+    else
+      authorized_action(@context, @current_user, :permission_fail)
+    end
+  end
   
   def copy
     get_context
@@ -761,7 +792,6 @@ class CoursesController < ApplicationController
         end
       end
       args[:enrollment_term] ||= @context.enrollment_term
-      args[:abstract_course] = @context.abstract_course
       args[:account] = account
       @course = @context.account.courses.new
       @context.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
@@ -781,6 +811,10 @@ class CoursesController < ApplicationController
       root_account_id = params[:course].delete :root_account_id
       if root_account_id && current_user_is_site_admin?
         @course.root_account = Account.root_accounts.find(root_account_id)
+      end
+      standard_id = params[:course].delete :grading_standard_id
+      if standard_id && @course.grants_right?(@current_user, session, :manage_grades)
+        @course.grading_standard = GradingStandard.standards_for(@course, @current_user).detect{|s| s.id == standard_id.to_i }
       end
       if @course.root_account.grants_right?(@current_user, session, :manage)
         if params[:course][:account_id]
@@ -802,6 +836,15 @@ class CoursesController < ApplicationController
           params[:course].delete :course_code
         end
       end
+      if sis_id = params[:course].delete(:sis_source_id)
+        if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
+          if sis_id == ''
+            @course.sis_source_id = nil
+          else
+            @course.sis_source_id = sis_id
+          end
+        end
+      end
       @course.send(params[:course].delete(:event)) if params[:course][:event]
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
@@ -813,7 +856,7 @@ class CoursesController < ApplicationController
           flash[:notice] = 'Course was successfully updated.'
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
           format.xml  { head :ok }
-          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name]), :status => :ok }
+          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.xml  { render :xml => @course.errors.to_xml }

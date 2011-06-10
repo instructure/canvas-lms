@@ -37,7 +37,6 @@ class BigBlueButtonConference < WebConference
       :moderatorPW => settings[:admin_key],
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com")
     }) or return nil
-    touch
     save
     conference_key
   end

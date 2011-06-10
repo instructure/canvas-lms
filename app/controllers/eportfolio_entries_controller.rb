@@ -110,7 +110,7 @@ class EportfolioEntriesController < ApplicationController
       @attachment = @portfolio.user.all_attachments.find_by_uuid(params[:attachment_id])
       # @entry.check_for_matching_attachment_id
       begin
-        redirect_to @attachment.cacheable_s3_url
+        redirect_to verified_file_download_url(@attachment)
       rescue
         raise "Not Found"
       end

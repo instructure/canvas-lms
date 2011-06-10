@@ -232,6 +232,24 @@ describe GradeCalculator do
       
     end
     
+    it "should properly calculate the grade when there are 'not graded' assignments with scores" do
+      course_with_student
+      @group = @course.assignment_groups.create!(:name => "some group")
+      @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 10)
+      @assignment.context = @course
+      @assignment.save!
+      @assignment2 = @group.assignments.build(:title => "Not graded assignment", :submission_types => 'not_graded')
+      @assignment2.context = @course
+      @assignment2.save!
+      @submission = @assignment.grade_student(@user, :grade => "9")
+      @submission2 = @assignment2.grade_student(@user, :grade => "1")
+      @course.save!
+      @user.reload
+      
+      @user.enrollments.first.computed_current_score.should eql(90.0)
+      @user.enrollments.first.computed_final_score.should eql(90.0)
+    end
+    
   end
   
 end

@@ -89,8 +89,8 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
-          <% cache([@context.wiki, '100_active_wiki_pages']) do  %>
-            <% @context.wiki.wiki_pages.active.scoped({:select => "id, title", :limit => 100}).each do |page| %>
+          <% cache([@context.wiki, '200_active_wiki_pages']) do  %>
+            <% @context.wiki.wiki_pages.active.scoped({:select => "id, title", :limit => 200}).each do |page| %>
               <% if page && !page.new_record? %>
                 <option value="<%= page.id %>"><%= page.title %></option>
               <% end %>
@@ -111,7 +111,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
-          <% @context.folders.active.scoped({:limit => 100}).sort_by{|f| f.full_name}.each do |folder| %>
+          <% @context.folders.active.scoped({:limit => 200}).sort_by{|f| f.full_name}.each do |folder| %>
             <optgroup label="<%= folder.full_name %>">
               <% 
               attachments = if @context.grants_right?(@current_user, session, :manage_files)
@@ -139,10 +139,10 @@
                 Folder: 
               </td><td>
                 <% Folder.root_folders(@context) %>
-                <% folders = @context.active_folders_detailed %>
+                <% folders = @context.active_folders_with_sub_folders %>
                 <% root_folders = folders.select{|f| f.parent_folder_id == nil} %>
                 <select name="attachment[folder_id]" id="attachment_folder_id">
-                  <%= render :partial => 'shared/folder_option', :collection => root_folders, :locals => {:folders => folders} %>
+                  <%= folders_as_options(root_folders, :all_folders => folders, :max_depth => 1) %>
                 </select>
               </td>
             </tr>
@@ -156,7 +156,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
-          <% @context.quizzes.active.scoped({:limit => 100}).each do |quiz| %>
+          <% @context.quizzes.active.scoped({:limit => 400}).each do |quiz| %>
             <option value="<%= quiz.id %>"><%= quiz.title %></option>
           <% end %>
           <option value="new">[ New Quiz] </option>
@@ -176,7 +176,7 @@
         <select class="module_item_select" multiple>
           <% @context.assignment_groups.active.include_active_assignments.each do |group| %>
             <optgroup label="<%= group.name %>">
-            <% group.active_assignments.no_graded_quizzes_or_topics.scoped({:limit => 100}).each do |assignment| %>
+            <% group.active_assignments.no_graded_quizzes_or_topics.scoped({:limit => 200}).each do |assignment| %>
               <option value="<%= assignment.id %>"><%= assignment.title %></option>
             <% end %>
             </optgroup>
@@ -196,7 +196,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
-          <% @context.discussion_topics.active.only_discussion_topics.scoped({:limit => 100}).each do |topic| %>
+          <% @context.discussion_topics.active.only_discussion_topics.scoped({:limit => 200}).each do |topic| %>
             <option value="<%= topic.id %>"><%= topic.title %></option>
           <% end %>
           <option value="new">[ New Topic] </option>

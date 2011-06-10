@@ -87,7 +87,7 @@ class InfoController < ApplicationController
       backtrace += "\n\n-----------------------------------------\n\n" + @report.backtrace if @report.backtrace
       @report.backtrace = backtrace
       @report.http_env ||= ErrorReport.useful_http_env_stuff_from_request(request)
-      @report.request_context_id = $request_context_id
+      @report.request_context_id = RequestContextGenerator.request_id
       @report.assign_data(error)
       @report.save
       @report.send_later(:send_to_external)
@@ -109,7 +109,8 @@ class InfoController < ApplicationController
     error = params[:error]
     error[:backtrace] = error[:url]
     ErrorReport.log_error('javascript', error)
-    render :nothing => true
+    # Render a 0x0 gif
+    render  :content_type =>'image/gif', :text => "GIF89a\001\000\001\000\200\377\000\377\377\377\000\000\000,\000\000\000\000\001\000\001\000\000\002\002D\001\000;"
   end
 
   def health_check

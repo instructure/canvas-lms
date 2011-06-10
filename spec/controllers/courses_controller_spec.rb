@@ -261,6 +261,21 @@ describe CoursesController do
       assigns[:course].state.should eql(:completed)
     end
   end
+
+  describe "POST unconclude" do
+    it "should unconclude the course" do
+      course_with_teacher_logged_in(:active_all => true)
+      delete 'destroy', :id => @course.id, :event => 'conclude'
+      response.should be_redirect
+      @course.reload.should be_completed
+      @course.conclude_at.should <= Time.now
+
+      post 'unconclude', :course_id => @course.id
+      response.should be_redirect
+      @course.reload.should be_available
+      @course.conclude_at.should be_nil
+    end
+  end
   
   # describe "GET 'public_feed'" do
     # it "should return success" do

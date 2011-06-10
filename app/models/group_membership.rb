@@ -22,6 +22,8 @@ class GroupMembership < ActiveRecord::Base
   
   belongs_to :group
   belongs_to :user
+
+  attr_accessible :group, :user
   
   before_save :ensure_mutually_exclusive_membership
   before_save :assign_uuid

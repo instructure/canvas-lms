@@ -2,25 +2,23 @@
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
-        <p>
-          You will need access to a <a href="http://wimba.com">Wimba</a> account.
-        </p>
+        <%= mt :description, "You will need access to a [Wimba](%{url}) account.", :url => "http://wimba.com" %>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :domain, "Domain:" %></td>
+      <td><%= f.blabel :domain, :en => "Domain" %></td>
       <td>
-        <%= f.text_field :domain %> (e.g. mycompany.wimba.com)
+        <%= f.text_field :domain %> <%= mt :domain_description, "(e.g. mycompany.wimba.com)" %>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :user, "Username:" %></td>
+      <td><%= f.blabel :user, :username, :en => "Username" %></td>
       <td>
         <%= f.text_field :user %>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :password, "Password:" %></td>
+      <td><%= f.blabel :password, :en => "Password" %></td>
       <td>
         <%= f.password_field :password, :autocomplete => false %>
       </td>

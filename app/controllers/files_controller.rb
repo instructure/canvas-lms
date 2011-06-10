@@ -16,9 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-CONTENT_LENGTH_RANGE = 50*1024*1024
-S3_EXPIRATION_TIME = 30.minutes
-
 class FilesController < ApplicationController
   before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:create_pending,:s3_success,:show]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
@@ -280,13 +277,19 @@ class FilesController < ApplicationController
     end
 
     if !@attachment
-      #The relative path is for a different file, try to find it
-      @attachments = @context.attachments.active.to_a
-      @attachment  = @attachments.find { |a| a.matches_full_display_path?(path) }
-      @attachment  ||= @attachments.find { |a| a.matches_full_path?(path) }
-      raise ActiveRecord::RecordNotFound if !@attachment
-      params[:id] = @attachment ? @attachment.id : nil
+      # The relative path is for a different file, try to find it
+      components = path.split('/')
+      component = components.shift
+      @context.folders.active.find_all_by_parent_folder_id(nil).each do |folder|
+        if folder.name == component
+          @attachment = folder.find_attachment_with_components(components.dup)
+          break if @attachment
+        end
+      end
     end
+
+    raise ActiveRecord::RecordNotFound if !@attachment
+    params[:id] = @attachment.id
 
     params[:download] = '1'
     show
@@ -345,11 +348,13 @@ class FilesController < ApplicationController
       redirect_to safe_domain_file_url(attachment, @safer_domain_host, params[:verifier])
     elsif Attachment.local_storage?
       @headers = false if @files_domain
+      cancel_cache_buster
       send_file(attachment.full_filename, :type => attachment.content_type, :disposition => (inline ? 'inline' : 'attachment'))
     elsif redirect_to_s3
       redirect_to attachment.cacheable_s3_url
     else
       require 'aws/s3'
+      cancel_cache_buster
       send_file_headers!( :length=>AWS::S3::S3Object.about(attachment.full_filename, attachment.bucket_name)["content-length"], :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type)
       render :status => 200, :text => Proc.new { |response, output|
         AWS::S3::S3Object.stream(attachment.full_filename, attachment.bucket_name) do |chunk|
@@ -421,76 +426,15 @@ class FilesController < ApplicationController
       @attachment.content_type = Attachment.mimetype(@attachment.filename)
       @attachment.save!
 
-      if Attachment.s3_storage?
-        res = {
-          :upload_url => "#{request.ssl? ? "https" : "http"}://#{@attachment.bucket_name}.s3.amazonaws.com/",
-          :remote_url => true,
-          :file_param => 'file',
-          :success_url => s3_success_url(@attachment.id, :uuid => @attachment.uuid),
-          :upload_params => {
-            'AWSAccessKeyId' => AWS::S3::Base.connection.access_key_id
-          }
-        }
-      elsif Attachment.local_storage?
-        res = {
-          :upload_url => named_context_url(@context, :context_files_url, :format => :text),
-          :remote_url => false,
-          :file_param => 'attachment[uploaded_data]', #uploadify ignores this and uses 'file',
-          :upload_params => {
-            'attachment[folder_id]' => params[:attachment][:folder_id] || '',
-            'attachment[unattached_attachment_id]' => @attachment.id
-          }
-        }
-      else
-        raise "Unknown storage system configured"
-      end
-
-      # Build the data that will be needed for the user to upload to s3
-      # without us being the middle-man
-      full_filename = @attachment.full_filename.gsub(/\+/, " ")
-      policy = {
-        'expiration' => S3_EXPIRATION_TIME.from_now.utc.iso8601,
-        'conditions' => [
-          {'bucket' => @attachment.bucket_name},
-          {'key' => full_filename},
-          {'acl' => 'private'},
-          ['starts-with', '$Filename', ''],
-          ['starts-with', '$folder', ''],
-          ['content-length-range', 1, CONTENT_LENGTH_RANGE]
-        ]
-      }
-      extras = []
-      if params[:no_redirect]
-        extras << {'success_action_status' => '201'}
-      elsif res[:success_url]
-        extras << {'success_action_redirect' => res[:success_url]}
-      end
-      if @attachment.content_type && @attachment.content_type != "unknown/unknown"
-        extras << {'content-type' => @attachment.content_type}
-      end
-      policy['conditions'] += extras
-      # flash won't send the session cookie, so for local uploads we put the user id in the signed
-      # policy so we can mock up the session for FilesController#create
-      policy['conditions'] << {'pseudonym_id' => @current_pseudonym.id} if Attachment.local_storage?
-
-      policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
-      signature = Base64.encode64(
-        OpenSSL::HMAC.digest(
-          OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded
-        )
-      ).gsub(/\n/, '')
-
-      res[:id] = @attachment.id
-      res[:upload_params].merge!({
-        'Filename' => '',
-        'folder' => '',
-        'key' => full_filename,
-        'acl' => 'private',
-        'Policy' => policy_encoded,
-        'Signature' => signature,
-      })
-      extras.map(&:to_a).each{ |extra| res[:upload_params][extra.first.first] = extra.first.last }
-
+      res = @attachment.ajax_upload_params(@current_pseudonym,
+              named_context_url(@context, :context_files_url, :format => :text),
+              s3_success_url(@attachment.id, :uuid => @attachment.uuid),
+              :no_redirect => params[:no_redirect],
+              :upload_params => {
+                'attachment[folder_id]' => params[:attachment][:folder_id] || '',
+                'attachment[unattached_attachment_id]' => @attachment.id
+              },
+              :ssl => request.ssl?)
       render :json => res.to_json
     end
   end
@@ -501,27 +445,7 @@ class FilesController < ApplicationController
     end
     details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
     if @attachment && details
-      unless @attachment.workflow_state == 'unattached_temporary'
-        @attachment.workflow_state = nil
-        @attachment.file_state = 'available'
-      end
-      @attachment.md5 = (details['etag'] || "").gsub(/\"/, '')
-      @attachment.content_type = details['content-type']
-      @attachment.size = details['content-length']
-      
-      if @attachment.md5 && !@attachment.md5.empty? && ns = @attachment.infer_namespace
-        if existing_attachment = Attachment.find_all_by_md5_and_namespace(@attachment.md5, ns).detect{|a| a.id != @attachment.id && !a.root_attachment_id && a.content_type == @attachment.content_type }
-          AWS::S3::S3Object.delete(@attachment.full_filename, @attachment.bucket_name) rescue nil
-          @attachment.root_attachment = existing_attachment
-          @attachment.write_attribute(:filename, nil)
-          @attachment.clear_cached_urls
-        end
-      end
-      
-      @attachment.save!
-      
-      # normally this would be called by attachment_fu after it had uploaded the file to S3.
-      @attachment.after_attachment_saved
+      @attachment.process_s3_details!(details)
       render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session})
     else
       render_for_text ""
@@ -665,6 +589,7 @@ class FilesController < ApplicationController
   # than to a s3 url
   def show_thumbnail
     if Attachment.local_storage?
+      cancel_cache_buster
       thumbnail = Thumbnail.find_by_id_and_uuid(params[:id], params[:uuid]) if params[:id].present?
       raise ActiveRecord::RecordNotFound unless thumbnail
       send_file thumbnail.full_filename, :content_type => thumbnail.content_type

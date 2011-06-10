@@ -164,4 +164,119 @@ describe Account do
     a2.enrollment_terms.size.should == 0
   end
 
+  context "page view reports" do
+    before(:each) do
+      @a = Account.create!(:name => 'nada')
+    end
+    it "should build hourly reports" do
+      lambda{@a.page_views_by_hour}.should_not raise_error
+    end
+    it "should build daily reports" do
+      lambda{@a.page_views_by_day}.should_not raise_error
+    end
+  end
+
+  def account_with_admin_and_restricted_user(account)
+    account.add_account_membership_type('Restricted Admin')
+    admin = User.create
+    user = User.create
+    account.account_users.create(:user => admin, :membership_type => 'AccountAdmin')
+    account.account_users.create(:user => user, :membership_type => 'Restricted Admin')
+    [ admin, user ]
+  end
+
+
+  it "should set up access policy correctly" do
+    # Set up a hierarchy of 4 accounts - a root account, a sub account,
+    # a sub sub account, and SiteAdmin account.  Create a 'Restricted Admin'
+    # role in each one, and create an admin user and a user in the restricted
+    # admin role for each one
+    root_account = Account.create
+    sub_account = Account.create(:parent_account => root_account)
+    sub_sub_account = Account.create(:parent_account => sub_account)
+
+    hash = {}
+    hash[:site_admin] = { :account => Account.site_admin}
+    hash[:root] = { :account => root_account}
+    hash[:sub] = { :account => sub_account}
+    hash[:sub_sub] = { :account => sub_sub_account}
+
+    hash.each do |k, v|
+      admin, user = account_with_admin_and_restricted_user(v[:account])
+      hash[k][:admin] = admin
+      hash[k][:user] = user
+    end
+
+    limited_access = [ :read, :manage, :update, :delete ]
+    full_access = RoleOverride.permissions.map { |k, v| k } + limited_access
+    # site admin has access to everything everywhere
+    hash.each do |k, v|
+      account = v[:account]
+      account.check_policy(hash[:site_admin][:admin]).should == full_access
+      account.check_policy(hash[:site_admin][:user]).should == limited_access
+    end
+
+    # root admin has access to everything except site admin
+    account = hash[:site_admin][:account]
+    account.check_policy(hash[:root][:admin]).should == []
+    account.check_policy(hash[:root][:user]).should == []
+    hash.each do |k, v|
+      next if k == :site_admin
+      account = v[:account]
+      account.check_policy(hash[:root][:admin]).should == full_access
+      account.check_policy(hash[:root][:user]).should == limited_access
+    end
+
+    # sub account has access to sub and sub_sub
+    hash.each do |k, v|
+      next unless k == :site_admin || k == :root
+      account = v[:account]
+      account.check_policy(hash[:sub][:admin]).should == []
+      account.check_policy(hash[:sub][:user]).should == []
+    end
+    hash.each do |k, v|
+      next if k == :site_admin || k == :root
+      account = v[:account]
+      account.check_policy(hash[:sub][:admin]).should == full_access
+      account.check_policy(hash[:sub][:user]).should == limited_access
+    end
+
+    # Grant 'Restricted Admin' a specific permission, and re-check everything
+    some_access = [:read_reports] + limited_access
+    hash.each do |k, v|
+      account = v[:account]
+      account.role_overrides.create(:permission => 'read_reports', :enrollment_type => 'Restricted Admin', :enabled => true)
+    end
+    RoleOverride.clear_cached_contexts
+    hash.each do |k, v|
+      account = v[:account]
+      account.check_policy(hash[:site_admin][:admin]).should == full_access
+      account.check_policy(hash[:site_admin][:user]).should == some_access
+    end
+
+    account = hash[:site_admin][:account]
+    account.check_policy(hash[:root][:admin]).should == []
+    account.check_policy(hash[:root][:user]).should == []
+    hash.each do |k, v|
+      next if k == :site_admin
+      account = v[:account]
+      account.check_policy(hash[:root][:admin]).should == full_access
+      account.check_policy(hash[:root][:user]).should == some_access
+    end
+
+    # sub account has access to sub and sub_sub
+    hash.each do |k, v|
+      next unless k == :site_admin || k == :root
+      account = v[:account]
+      account.check_policy(hash[:sub][:admin]).should == []
+      account.check_policy(hash[:sub][:user]).should == []
+    end
+    hash.each do |k, v|
+      next if k == :site_admin || k == :root
+      account = v[:account]
+      account.check_policy(hash[:sub][:admin]).should == full_access
+      account.check_policy(hash[:sub][:user]).should == some_access
+    end
+  end
+
 end

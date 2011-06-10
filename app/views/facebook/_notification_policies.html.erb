@@ -2,20 +2,20 @@
   <table style="margin: 10px auto; border-collapse: collapse;">
     <thead>
       <tr>
-        <th rowspan="2" style="font-size: 1.2em; border-bottom: 1px solid #ccc;">Notification Type</th>
-        <th colspan="4" style="text-align: center;">Send to Facebook?</th>
+        <th rowspan="2" style="font-size: 1.2em; border-bottom: 1px solid #ccc;"><%= t :notification_type, "Notification Type" %></th>
+        <th colspan="4" style="text-align: center;"><%= t :send_to_facebook, "Send to Facebook?" %></th>
       </tr>
       <tr>
-        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px;">Right Away</th>
-        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px;">Daily</th>
-        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px;">Weekly</th>
-        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px;">Never</th>
+        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px;"><%= t :right_away, "Right Away" %></th>
+        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px;"><%= t :daily, "Daily" %></th>
+        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px;"><%= t :weekly, "Weekly" %></th>
+        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px;"><%= t :never, "Never" %></th>
       </tr>
     </thead>
     <% @notification_categories.each do |category| %>
       <tr style="text-align: center;">
         <% policy = @policies.find_by_notification_id(category.id) %>
-        <td style="padding-right: 50px;"><%= category.category %> Alerts</td>
+        <td style="padding-right: 50px;"><%= category.category %> <%= t :alerts, "Alerts" %></td>
         <td style="text-align: center;">
           <% if policy && policy.frequency == 'immediately' %>
             <%= image_tag "checked.png" %>
@@ -37,25 +37,25 @@
     <% end %>
   </table>  
   <div style="text-align: right;">
-    <a href="#" class="button settings_link">Change Settings</a>
+    <a href="#" class="button settings_link"><%= t :change_settings, "Change Settings" %></a>
   </div>
 </div>
 <form id="notification_types_form" action="<%= facebook_notification_preferences_url %>" method="post" style="display: none;">
   <div id="notification_types_loading" style="text-align: center; margin: 5px 0; font-size: 1.2em; display: none;">
-    Updating Preferences...<br/>
-    <%= image_tag "ajax-loader-bar.gif", :alt => "loading..." %>
+    <%= t :updating_preferences, "Updating Preferences..."<br/>
+    <%= image_tag "ajax-loader-bar.gif", :alt => t(:loading, "loading...") %>
   </div>
   <table style="margin: 10px auto; border-collapse: collapse;">
     <thead>
       <tr>
-        <th rowspan="2" style="font-size: 1.2em; border-bottom: 1px solid #ccc;">Notification Type</th>
-        <th colspan="4" style="text-align: center;">Send to Facebook?</th>
+        <th rowspan="2" style="font-size: 1.2em; border-bottom: 1px solid #ccc;"><%= t :notification_type, "Notification Type" %></th>
+        <th colspan="4" style="text-align: center;"><%= t :send_to_facebook, "Send to Facebook?" %></th>
       </tr>
       <tr>
-        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px; text-align: center;">Right Away</th>
-        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px; text-align: center;">Daily</th>
-        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px; text-align: center;">Weekly</th>
-        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px; text-align: center;">Never</th>
+        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px; text-align: center;"><%= t :right_away, "Right Away" %></th>
+        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px; text-align: center;"><%= t :daily, "Daily" %></th>
+        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px; text-align: center;"><%= t :weekly, "Weekly" %></th>
+        <th style="border-bottom: 1px solid #ccc; padding: 2px 10px; text-align: center;"><%= t :never, "Never" %></th>
       </tr>
     </thead>
     <% @notification_categories.each do |category| %>
@@ -64,22 +64,22 @@
         <td style="padding-right: 50px;"><%= category.category %> Alerts</td>
         <td style="white-space: nowrap; padding: 1px 10px;">
           <input type="radio" <%= 'checked' if policy && policy.frequency == 'immediately' %> name="types[<%= category.category %>]" value="immediately" id="notification_type_<%= category.id %>_immediately"/>
-          <label for="notification_type_<%= category.id %>_immediately">Right Away</label>
+          <label for="notification_type_<%= category.id %>_immediately"><%= t :right_away, "Right Away" %></label>
         </td><td style="white-space: nowrap; padding: 1px 10px;">
           <input type="radio" <%= 'checked' if policy && policy.frequency == 'daily' %> name="types[<%= category.category %>]" value="daily" id="notification_type_<%= category.id %>_daily"/>
-          <label for="notification_type_<%= category.id %>_daily">Daily</label>
+          <label for="notification_type_<%= category.id %>_daily"><%= t :daily, "Daily" %></label>
         </td><td style="white-space: nowrap; padding: 1px 10px;">
           <input type="radio" <%= 'checked' if policy && policy.frequency == 'weekly' %> name="types[<%= category.category %>]" value="weekly" id="notification_type_<%= category.id %>_weekly"/>
-          <label for="notification_type_<%= category.id %>_weekly">Weekly</label>
+          <label for="notification_type_<%= category.id %>_weekly"><%= t :weekly, "Weekly" %></label>
         </td><td style="white-space: nowrap; padding: 1px 10px;">
           <input type="radio" <%= 'checked' if !policy || policy.frequency == 'never' %> name="types[<%= category.category %>]" value="never" id="notification_type_<%= category.id %>_never"/>
-          <label for="notification_type_<%= category.id %>_never">Never</label>
+          <label for="notification_type_<%= category.id %>_never"><%= t :never, "Never" %></label>
         </td>
       </tr>
     <% end %>
   </table>  
   <div style="text-align: right;">
-    <button type="submit" class="button">Update Preferences</button>
-    <a href="#" class="button button-secondary cancel_button">Cancel</a>
+    <button type="submit" class="button"><%= t :update_preferences, "Update Preferences" %></button>
+    <a href="#" class="button button-secondary cancel_button"><%= t :cancel, "Cancel" %></a>
   </div>
 </form>

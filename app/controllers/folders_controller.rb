@@ -52,7 +52,9 @@ class FoldersController < ApplicationController
       
       # Destroy any previous zip downloads that might exist for this folder, 
       # except the last one (cause we might be able to use it)
-      @attachments = Attachment.find_all_by_context_id_and_context_type_and_display_name_and_user_id(@folder.id, @folder.class.to_s, "folder.zip", user_id).
+      folder_filename = "#{t :folder_filename, "folder"}.zip"
+      
+      @attachments = Attachment.find_all_by_context_id_and_context_type_and_display_name_and_user_id(@folder.id, @folder.class.to_s, folder_filename, user_id).
                                 select{|a| ['to_be_zipped', 'zipping', 'zipped'].include?(a.workflow_state) && !a.deleted? }.
                                 sort_by{|a| a.created_at }
       @attachment = @attachments.pop
@@ -64,7 +66,7 @@ class FoldersController < ApplicationController
       end
       
       if @attachment.nil?
-        @attachment = @folder.file_attachments.build(:display_name => "folder.zip")
+        @attachment = @folder.file_attachments.build(:display_name => folder_filename)
         @attachment.user_id = user_id
         @attachment.workflow_state = 'to_be_zipped'
         @attachment.file_state = '0'
@@ -75,19 +77,20 @@ class FoldersController < ApplicationController
       else
         respond_to do |format|
           if @attachment.zipped?
-            format.json { render :json => @attachment.to_json(:methods => :readable_size) }
             if Attachment.s3_storage?
               format.html { redirect_to @attachment.cacheable_s3_url }
               format.zip { redirect_to @attachment.cacheable_s3_url }
             else
+              cancel_cache_buster
               format.html { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
               format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type, :disposition => 'inline') }
             end
+            format.json { render :json => @attachment.to_json(:methods => :readable_size) }
           else
-            flash[:notice] = "File zipping still in process..."
-            format.json { render :json => @attachment.to_json }
+            flash[:notice] = t :file_zip_in_process, "File zipping still in process..."
             format.html { redirect_to named_context_url(@context, :context_folder_url, @folder.id) }
             format.zip { redirect_to named_context_url(@context, :context_folder_url, @folder.id) }
+            format.json { render :json => @attachment.to_json }
           end
         end
       end
@@ -111,7 +114,7 @@ class FoldersController < ApplicationController
             @folder.parent_folder = Folder.root_folders(@context).first
             @folder.save
           end
-          flash[:notice] = 'Event was successfully updated.'
+          flash[:notice] = t :event_updated, 'Event was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_files_url) }
           format.xml  { head :ok }
           format.json { render :json => @folder.to_json(:methods => [:currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
@@ -141,7 +144,7 @@ class FoldersController < ApplicationController
       end
       respond_to do |format|
         if @folder.save
-          flash[:notice] = 'Folder was successfully created.'
+          flash[:notice] = t :folder_created, 'Folder was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_files_url) }
           format.xml  { head :created, @folder.to_xml }
           format.json { render :json => @folder.to_json(:permissions => {:user => @current_user, :session => session}) }

@@ -42,6 +42,15 @@ describe Course do
     @course.save!
     @course.uuid.should_not be_nil
   end
+
+  it "should follow account chain when looking for generic permissions from AccountUsers" do
+    account = Account.create!
+    sub_account = Account.create!(:parent_account => account)
+    sub_sub_account = Account.create!(:parent_account => sub_account)
+    user = account_admin_user(:account => sub_account)
+    course = Course.create!(:account => sub_sub_account)
+    course.grants_right?(user, nil, :manage).should be_true
+  end
 end
 
 describe Course, "account" do
@@ -116,6 +125,45 @@ describe Course, "enroll" do
   end
 end
 
+describe Course, "score_to_grade" do
+  it "should correctly map scores to grades" do
+    default = GradingStandard.default_grading_standard
+    default.to_json.should eql([["A", 1], ["A-", 0.93], ["B+", 0.89], ["B", 0.86], ["B-", 0.83], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]].to_json)
+    course_model
+    @course.score_to_grade(95).should eql("")
+    @course.grading_standard_id = 0
+    @course.score_to_grade(1005).should eql("A")
+    @course.score_to_grade(105).should eql("A")
+    @course.score_to_grade(100).should eql("A")
+    @course.score_to_grade(99).should eql("A")
+    @course.score_to_grade(94).should eql("A")
+    @course.score_to_grade(93.001).should eql("A")
+    @course.score_to_grade(93).should eql("A-")
+    @course.score_to_grade(92.999).should eql("A-")
+    @course.score_to_grade(90).should eql("A-")
+    @course.score_to_grade(89).should eql("B+")
+    @course.score_to_grade(87).should eql("B+")
+    @course.score_to_grade(86).should eql("B")
+    @course.score_to_grade(85).should eql("B")
+    @course.score_to_grade(83).should eql("B-")
+    @course.score_to_grade(80).should eql("B-")
+    @course.score_to_grade(79).should eql("C+")
+    @course.score_to_grade(76).should eql("C")
+    @course.score_to_grade(73).should eql("C-")
+    @course.score_to_grade(71).should eql("C-")
+    @course.score_to_grade(69).should eql("D+")
+    @course.score_to_grade(67).should eql("D+")
+    @course.score_to_grade(66).should eql("D")
+    @course.score_to_grade(65).should eql("D")
+    @course.score_to_grade(62).should eql("D-")
+    @course.score_to_grade(60).should eql("F")
+    @course.score_to_grade(59).should eql("F")
+    @course.score_to_grade(0).should eql("F")
+    @course.score_to_grade(-100).should eql("F")
+  end
+  
+end
+
 describe Course, "gradebook_to_csv" do
   it "should generate gradebook csv" do
     course_with_student(:active_all => true)
@@ -137,6 +185,34 @@ describe Course, "gradebook_to_csv" do
     rows[0][-2].should == "Current Score"
     rows[1][-2].should == "(read only)"
     rows[2][-2].should == "100"
+  end
+  
+  it "should generate csv with final grade if enabled" do
+    course_with_student(:active_all => true)
+    @course.grading_standard_id = 0
+    @course.save!
+    @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
+    @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+    @assignment.grade_student(@user, :grade => "10")
+    @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+    @assignment2.grade_student(@user, :grade => "8")
+    @course.recompute_student_scores
+    @user.reload
+    @course.reload
+    
+    csv = @course.gradebook_to_csv
+    csv.should_not be_nil
+    rows = FasterCSV.parse(csv)
+    rows.length.should equal(3)
+    rows[0][-1].should == "Final Grade"
+    rows[1][-1].should == "(read only)"
+    rows[2][-1].should == "A-"
+    rows[0][-2].should == "Final Score"
+    rows[1][-2].should == "(read only)"
+    rows[2][-2].should == "90"
+    rows[0][-3].should == "Current Score"
+    rows[1][-3].should == "(read only)"
+    rows[2][-3].should == "90"
   end
 end
 
@@ -362,7 +438,7 @@ describe Course, "backup" do
       html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
     end
     
-    it "should merge onlys selected content into another course" do
+    it "should merge only selected content into another course" do
       course_model
       attachment_model
       @old_attachment = @attachment
@@ -456,6 +532,63 @@ describe Course, "backup" do
       new_attachment.folder.cloned_item_id.should == folder.cloned_item_id
     end
   end
+  
+  it "should copy learning outcomes into the new course" do
+    old_course = course_model
+    lo = old_course.learning_outcomes.new
+    lo.context = old_course
+    lo.short_description = "Lone outcome"
+    lo.description = "<p>Descriptions are boring</p>"
+    lo.workflow_state = 'active'
+    lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
+    lo.save!
+    
+    old_root = LearningOutcomeGroup.default_for(old_course)
+    old_root.add_item(lo)
+    
+    lo_g = old_course.learning_outcome_groups.new
+    lo_g.context = old_course
+    lo_g.title = "Lone outcome group"
+    lo_g.description = "<p>Groupage</p>"
+    lo_g.save!
+    old_root.add_item(lo_g)
+    
+    lo2 = old_course.learning_outcomes.new
+    lo2.context = old_course
+    lo2.short_description = "outcome in group"
+    lo2.workflow_state = 'active'
+    lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+    lo2.save!
+    lo_g.add_item(lo2)
+    old_root.reload
+    
+    # copy outcomes into new course
+    new_course = course_model
+    new_root = LearningOutcomeGroup.default_for(new_course)
+    new_course.merge_into_course(old_course, :all_outcomes => true)
+    
+    new_course.learning_outcomes.count.should == old_course.learning_outcomes.count
+    new_course.learning_outcome_groups.count.should == old_course.learning_outcome_groups.count
+    new_root.sorted_content.count.should == old_root.sorted_content.count
+    
+    lo_2 = new_root.sorted_content.first
+    lo_2.short_description.should == lo.short_description
+    lo_2.description.should == lo.description
+    lo_2.data.should == lo.data
+    
+    lo_g_2 = new_root.sorted_content.last
+    lo_g_2.title.should == lo_g.title
+    lo_g_2.description.should == lo_g.description
+    lo_g_2.sorted_content.length.should == 1
+    lo_g_2.root_learning_outcome_group_id.should == new_root.id
+    lo_g_2.learning_outcome_group_id.should == new_root.id
+    
+    lo_2 = lo_g_2.sorted_content.first
+    lo_2.short_description.should == lo2.short_description
+    lo_2.description.should == lo2.description
+    lo_2.data.should == lo2.data
+  end
+  
 end
 
 def course_to_backup
@@ -508,6 +641,7 @@ describe Course, 'grade_publishing' do
       client.close
       server.close
     }
+    @course.grading_standard_id = 0
     @course.publish_final_grades(user)
     server_thread.join
     post_lines.should == [
@@ -517,5 +651,25 @@ describe Course, 'grade_publishing' do
         "Content-Length: 16",
         "",
         "test-jt-data"]
+  end
+end
+
+describe Course, 'scoping' do
+  it 'should search by multiple fields' do
+    c1 = Course.new
+    c1.root_account = Account.create
+    c1.name = "name1"
+    c1.sis_source_id = "sisid1"
+    c1.course_code = "code1"
+    c1.save
+    c2 = Course.new
+    c2.root_account = Account.create
+    c2.name = "name2"
+    c2.course_code = "code2"
+    c2.sis_source_id = "sisid2"
+    c2.save
+    Course.name_like("name1").map(&:id).should == [c1.id]
+    Course.name_like("sisid2").map(&:id).should == [c2.id]
+    Course.name_like("code1").map(&:id).should == [c1.id]    
   end
 end

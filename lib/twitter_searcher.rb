@@ -32,7 +32,8 @@ class TwitterSearcher
   def process
     count = 0
     while hashtag = Hashtag.to_be_polled.first and (count += 1) < MAX_TAGS_PER_PROCESS
-      hashtag.update_attributes(:refresh_at => Time.now.utc + REFRESH_INTERVAL)
+      hashtag.refresh_at = Time.now.utc + REFRESH_INTERVAL
+      hashtag.save
       
       require 'net/http'
       @logger.info("hashtag found: #{hashtag}  -- requesting public twitter search")
@@ -54,7 +55,8 @@ class TwitterSearcher
             hashtag.add_short_message(nil, result, true)
           end
           hashtag.last_result_id = since_id if since_id
-          hashtag.update_attributes(:refresh_at => Time.now.utc + (results.empty? ? REFRESH_INTERVAL_EMPTY : REFRESH_INTERVAL) )
+          hashtag.refresh_at = Time.now.utc + (results.empty? ? REFRESH_INTERVAL_EMPTY : REFRESH_INTERVAL)
+          hashtag.save
           @logger.info('results successfully added')
         rescue => e
           ErrorReport.log_exception(:processing, e, {
@@ -70,7 +72,8 @@ class TwitterSearcher
         # TODO: This assumes that Retry-After will always be sent as delta-seconds. We should probably support HTTP-date too:
         # http://webee.technion.ac.il/labs/comnet/netcourse/CIE/RFC/2068/201.htm
         wait_time = response['Retry-After'].to_i if response['Retry-After']
-        hashtag.update_attributes(:refresh_at => Time.now.utc + wait_time)
+        hashtag.refresh_at = Time.now.utc + wait_time
+        hashtag.save
       end
     end
     

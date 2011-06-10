@@ -65,6 +65,7 @@ module GoogleDocs
     end
     access_token
   end
+  
   def google_docs_request_token_url(return_to)
     consumer = google_consumer
     request_token = consumer.get_request_token({}, {:scope => "http://docs.google.com/feeds/ http://spreadsheets.google.com/feeds/"})
@@ -82,6 +83,7 @@ module GoogleDocs
     )
     request_token.authorize_url + "&oauth_callback=#{oauth_success_url(:service => 'google_docs', :user => session[:oauth_gdocs_user_secret])}"
   end
+  
   def google_docs_download(document_id)
     access_token = google_docs_retrieve_access_token
     entry = google_doc_list(access_token).files.find{|e| e.document_id == document_id}
@@ -93,6 +95,7 @@ module GoogleDocs
     end
     [response, filename, extension]
   end
+  
   def google_docs_download_url(document_id, format=nil)
     short_id = GoogleDocEntry.trim_document_id(document_id)
     format = format.downcase rescue nil
@@ -119,6 +122,7 @@ module GoogleDocs
     extension = format
     [url, extension]
   end
+  
   def google_doc_list(access_token=nil, only_extensions=nil)
     access_token ||= google_docs_retrieve_access_token
     docs = Atom::Feed.load_feed(access_token.get("http://docs.google.com/feeds/documents/private/full").body)
@@ -140,10 +144,12 @@ module GoogleDocs
     res
   end
   
-  def google_consumer
+  def google_consumer(key=nil, secret=nil)
     require 'oauth'
     require 'oauth/consumer'
-    consumer = OAuth::Consumer.new(GoogleDocs.config['api_key'], GoogleDocs.config['secret_key'], {
+    key ||= GoogleDocs.config['api_key']
+    secret ||= GoogleDocs.config['secret_key']
+    consumer = OAuth::Consumer.new(key, secret, {
       :site => "https://www.google.com",
       :request_token_path => "/accounts/OAuthGetRequestToken",
       :access_token_path => "/accounts/OAuthGetAccessToken",
@@ -215,7 +221,7 @@ module GoogleDocs
   
   def google_docs_create_doc(name=nil, include_time=false, access_token=nil)
     name = nil if name && name.empty?
-    name ||= "Instructure Doc"
+    name ||= I18n.t('lib.google_docs.default_document_name', "Instructure Doc")
     name += ": #{Time.now.strftime("%d %b %Y, %I:%M %p")}" if include_time
     access_token ||= google_docs_retrieve_access_token
     url = "http://docs.google.com/feeds/documents/private/full"
@@ -230,11 +236,13 @@ module GoogleDocs
     response = access_token.post(url, entry.to_xml, {'Content-Type' => 'application/atom+xml'})
     entry = GoogleDocEntry.new(Atom::Entry.load_entry(response.body))
   end
+  
   def google_docs_delete_doc(entry, access_token=nil)
     url = entry.edit_url
     access_token ||= google_docs_retrieve_access_token
     response = access_token.delete(url, {"GData-Version" => "2", "If-Match" => "*"})
   end
+  
   def google_docs_acl_remove(document_id, users)
     access_token = google_docs_retrieve_access_token
     url = "http://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
@@ -293,9 +301,18 @@ module GoogleDocs
     res
   end
   
+  def self.config_check(settings)
+    o = Object.new
+    o.extend(GoogleDocs)
+    consumer = o.google_consumer(settings[:api_key], settings[:secret_key])
+    token = consumer.get_request_token({}, {:scope => "http://docs.google.com/feeds/"}) rescue nil
+    token ? nil : "Configuration check failed, please check your settings"
+  end
+  
   def self.config
     # Return existing value, even if nil, as long as it's defined
     return @config if defined?(@config)
+    @config ||= Canvas::Plugin.find(:google_docs).try(:settings)
     @config ||= (YAML.load_file(RAILS_ROOT + "/config/google_docs.yml")[RAILS_ENV] rescue nil)
   end
 end
