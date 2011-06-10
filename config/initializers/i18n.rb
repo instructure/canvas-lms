@@ -147,6 +147,7 @@ ActionController::Base.class_eval do
 end
 
 ActiveRecord::Base.class_eval do
+  include I18nUtilities
   extend I18nUtilities
 
   def translate(key, default, options = {})
