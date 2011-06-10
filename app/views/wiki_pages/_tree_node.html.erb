@@ -3,7 +3,7 @@
 <% if tree_node && tree_node.is_a?(Folder) && folders
       tree_node = folders.to_a.find{|f| f.id == tree_node.id} || tree_node
    end %>
-<li id="<%= tree_node ? tree_node.class.to_s.downcase : 'attachment' %>_<%= tree_node ? tree_node.id : 'blank' %>" class="<%= tree_node.mime_class rescue '' %>" title="<%= "Click to insert a link to this page" unless tree_node && tree_node.is_a?(Folder) %>">
+<li id="<%= tree_node ? tree_node.class.to_s.downcase : 'attachment' %>_<%= tree_node ? tree_node.id : 'blank' %>" class="<%= tree_node.mime_class rescue '' %>" title="<%= t('#wiki_pages.links.insert_link_to_page', "Click to insert a link to this page") unless tree_node && tree_node.is_a?(Folder) %>">
   <% if tree_node && tree_node.is_a?(Folder) %>
     <span class='name'><%= tree_node.name %></span>
   <% else %>

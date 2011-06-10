@@ -224,6 +224,10 @@ module TextHelper
     end
   end
 
+  def time_ago_in_words_with_ago(time)
+    I18n.t('#time.with_ago', '%{time} ago', :time => (time_ago_in_words time rescue ''))
+  end
+
   def truncate_html(input, options={})
     doc = Nokogiri::HTML(input)
     options[:max_length] ||= 250
