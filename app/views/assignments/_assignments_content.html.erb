@@ -3,7 +3,7 @@
 
 <div style="<%= "display: none;" unless can_do(@context, @current_user, :manage_grades) %>margin-bottom: 10px; displayx: none; padding-left: 20px;" id="class_weighting_box">
   <input type="checkbox" id="class_weighting_policy" name="class_weighting_policy" <%= "checked" if (@context.group_weighting_scheme == 'percent') %>/>
-  <label for="class_weighting_policy">Weight the final grade based on assignment groups</label>
+  <label for="class_weighting_policy"><%= t 'labels.class_weighting_policy', "Weight the final grade based on assignment groups" %></label>
   <a href="<%= url_for (@context) %>" class="context_url" style="display: none;">&nbsp;</a>
 </div>
 <div id="groups" class="<%= 'groups_editable' if can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_assignments) %>">
@@ -14,26 +14,27 @@
 
 <div style="display: none;">
   <a href="<%= context_url(@context, :controller => "assignment_groups", :action => "reorder") %>" class="reorder_groups_url">&nbsp;</a>
-  <div id="delete_assignments_dialog" title="Delete Assignment Group?">
-    <h2>Delete Assignment Group?</h2>
-    <p>The assignment group <span class="name" style="font-weight: bold;">&nbsp;</span> has 
-    <span class="assignment_count">&nbsp;</span> in it.  You can
-    either delete these assignments or move them to another 
-    assignment group.</p>
+  <div id="delete_assignments_dialog" title="<%= t 'titles.delete_assignment_group', "Delete Assignment Group?" %>">
+    <h2><%= t 'titles.delete_assignment_group', "Delete Assignment Group?" %></h2>
+    <p><%= t('warnings.delete_assignment_group',
+            "The assignment group %{group} has %{assignment_count} in it.  You can either delete these assignments or move them to another assignment group.",
+            :group => '<span class="name" style="font-weight: bold;">&nbsp;</span>'.html_safe,
+            :assignment_count => '<span class="assignment_count" style="font-weight: bold;">&nbsp;</span>'.html_safe) %>
+    </p>
     <p>
       <input type="radio" name="action" value="delete" id="assignment_group_delete"/>
-      <label for="assignment_group_delete">Delete assignments in this group</label>
+      <label for="assignment_group_delete"><%= t 'labels.delete_assignments_in_group', "Delete assignments in this group" %></label>
     </p>
     <p>
       <input type="radio" name="action" value="move" id="assignment_group_move"/>
-      <label for="assignment_group_move">Move assignments from this group to </label>
-      <select name="group_id" class="group_select" title="Select a group to move this assignment to">
-        <option value="" class="blank">[ Select a Group ]</option>
+      <label for="assignment_group_move"><%= t 'labels.move_assignments_to', "Move assignments from this group to " %></label>
+      <select name="group_id" class="group_select" title="<%= t 'tooltips.target_group', "Select a group to move this assignment to" %>">
+        <option value="" class="blank"><%= t 'options.select_group', "[ Select a Group ]" %></option>
       </select>
     </p>
     <div class="button-container">
-      <button class="button delete_button">Delete Group</button>
-      <button class="button button-secondary cancel_button">Cancel</button>
+      <button class="button delete_button"><%= t 'buttons.delete_group', "Delete Group" %></button>
+      <button class="button button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
     </div>
   </div>
 </div>

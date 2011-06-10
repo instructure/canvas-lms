@@ -1,22 +1,21 @@
 <% course_home ||= false %>
 <p>
-  <b><span class="assignment_count"><%= @context.assignments.active.length %></span> <span class="assignment_count_text"><%= @context.assignments.active.length == 1 ? "Assignment" : "Assignments" %></span></b>
-  <span style="font-size: 0.8em;">( in <span class="assignment_group_count"><%= @groups.length %></span> <span class="assignment_group_count_text"><%= @groups.length == 1 ? "Group" : "Groups" %></span> )</span>
+  <b><%= t :assignment_count, { :one => "*1* **Assignment**", :other => "*%{count}* **Assignments**"}, :count => @context.assignments.active.length,
+           :wrapper => { '*' => '<span class="assignment_count">\1</span>', '**' => '<span class="assignment_count_text">\1</span>'} %></b>
+  <span style="font-size: 0.8em;">
+    <%= t :assignment_groups_count, { :one => "( in *1* **Group** )", :other => "( in *%{count}* **Groups** )"}, :count => @groups.length,
+          :wrapper => { '*' => '<span class="assignment_group_count">\1</span>', '**' => '<span class="assignment_group_count_text">\1</span>'} %>
+  </span>
 </p>
 <p>
   <% if can_do(@context.assignments.new, @current_user, :create) %>
-    <a href="<%= context_url(@context, :new_context_assignment_url) %>" class="add_assignment_link add groupless_link">
-      Add Assignment
-    </a> to 
-    <select class="assignment_groups_select">
-      <% @groups.each do |group| %>
-        <option value="group_<%= group.id %>"><%= group.name %></option>
-      <% end %>
-    </select>
+    <%= t :add_assignment_to_group, "*Add Assignment* to %{group}",
+          :wrapper => "<a href=\"#{context_url(@context, :new_context_assignment_url)}\" class=\"add_assignment_link add groupless_link\">\\1</a>",
+          :group => "<select class=\"assignment_groups_select\">#{options_for_select(@groups.map { |group| [group.name, "group_#{group.id}"] })}</select>".html_safe %>
     <br/>
   <% end %>
   <% if can_do(@context.assignment_groups.new, @current_user, :create) %>
-    <a href="#" class="add_group_link add"> Add Assignment Group</a>
+    <a href="#" class="add_group_link add"> <%= t 'links.add_assignment_group', "Add Assignment Group" %></a>
   <% end %>
 </p>
 <%= render :partial => 'assignments/group_weights', :locals => {:editable => can_do(@context, @current_user, :manage_assignments)} %>

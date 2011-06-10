@@ -1,2 +1,2 @@
-<% content_for :page_title do %>Assignment: <%= @assignment.title %><% end %>
-Locked
+<% content_for :page_title do %><%= before_label :assignment, "Assignment"%> <%= @assignment.title %><% end %>
+<%= t :locked, "Locked" %>

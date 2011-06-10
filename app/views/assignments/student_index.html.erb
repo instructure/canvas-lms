@@ -1,4 +1,4 @@
-<% content_for :page_title do %>Assignments: <%= @context.name %><% end %>
+<% content_for :page_title do %><%= before_label :assignments, "Assignments" %> <%= @context.name %><% end %>
 <% content_for :stylesheets do %>
   <% unless @just_viewing_one_course %>
     <style type="text/css">

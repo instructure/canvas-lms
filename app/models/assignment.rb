@@ -1249,8 +1249,7 @@ class Assignment < ActiveRecord::Base
   def readable_submission_types
     return nil unless self.expects_submission?
     res = (self.submission_types || "").split(",").map{|s| readable_submission_type(s) }.compact
-    res[-1] = "or " + res[-1] if res.length > 1
-    res.join(", ")
+    res.to_sentence(:or)
   end
   
   def readable_submission_type(submission_type)
