@@ -1,10 +1,10 @@
 <% content_for :page_title do %>
-  My ePortfolios
+  <%= t(:page_title, "My ePortfolios") %>
 <% end %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-    <a href="#" class="add_eportfolio_link button button-sidebar-wide"><%= image_tag "add.png" %> Create an ePortfolio</a>
+    <a href="#" class="add_eportfolio_link button button-sidebar-wide"><%= image_tag "add.png" %><%= t('links.create', "Create an ePortfolio") %></a>
   </div>
 <% end %>
 
@@ -14,28 +14,29 @@
     #sidebar{ display:none;}
   </style>
   <div id="whats_an_eportfolio">
-  <h2>What's an ePortfolio?</h2>
-  <p>ePortfolios are a place where you can display and discuss the significant
-  submissions and experiences that are happening during your learning process.
-  You can use an ePortfolio to:</p>
-    
-  <ul>
-    <li>Display the papers you're proud of for more than just your instructor to see</li>
-    <li>Talk about all the thought and work that went into your class submissions</li>
-    <li>Gather an overview of your educational experience as a whole</li>
-    <li>Share your work with friends, future employers, etc.</li>
-  </ul>
-    
-  <p>ePortfolios can be public for everyone to see, or private so only those you allow can
-  see, and you can change that setting at any time.</p>  
-  
-  <p>Ready to get started?  Click the button.</p>
+  <h2><%= t('headers.what', "What's an ePortfolio?") %></h2>
+  <%= mt('what.details1', <<-DETAILS)
+ePortfolios are a place where you can display and discuss the significant
+submissions and experiences that are happening during your learning
+process. You can use an ePortfolio to:
+
+* Display the papers you're proud of for more than just your instructor to see
+* Talk about all the thought and work that went into your class submissions
+* Gather an overview of your educational experience as a whole
+* Share your work with friends, future employers, etc.
+
+ePortfolios can be public for everyone to see, or private so only those you
+allow can see, and you can change that setting at any time.
+
+Ready to get started? Click the button.
+DETAILS
+  %>
   <div class="button-container">
-    <a href="#" class="add_eportfolio_link button button-sidebar-wide"><%= image_tag "add.png" %> Create an ePortfolio</a>
+    <a href="#" class="add_eportfolio_link button button-sidebar-wide"><%= image_tag "add.png" %><%= t('links.create', "Create an ePortfolio") %></a>
   </div>
   </div>
 <% else %>
-  <h2>My ePortfolios</h2>
+  <h2><%= t('headers.my_eportfolios', "My ePortfolios") %></h2>
   <ul class="unstyled_list" style="padding-left: 20px;">
     <%= render :partial => "eportfolio", :collection => @portfolios %>
   </ul>
@@ -58,36 +59,20 @@ $(document).ready(function() {
 </script>
 <% end %>
 <% form_for Eportfolio.new, :url => eportfolios_path, :html => {:style => "display: none;", :id => "add_eportfolio_form"} do |f| %>
-<h2>Make an ePortfolio</h2>
+<h2><%= t('headers.add_eportfolio', "Make an ePortfolio") %></h2>
 <table class="formtable">
   <tr>
-    <td><%= f.label :name, "ePortfolio Name:" %></td>
-    <td><%= f.text_field :name, :value => "My Portfolio" %></td>
+    <td><%= f.label :name, before_label(:eportfolio_name, "ePortfolio Name") %></td>
+    <td><%= f.text_field :name, :value => t('defaults.eportfolio_name', "My Portfolio") %></td>
   </tr><tr>
     <td colspan="2">
       <%= f.check_box :public, :value => true %>
-      <%= f.label :public, "Make it Public", :checked => true %>
+      <%= f.label :public, t('labels.make_public', "Make it Public"), :checked => true %>
     </td>
-  </tr><!--tr>
-    <td>This is For:</tr>
-    <td>
-      <select>
-        <optgroup label="My Class">
-          <option value="">Biology 100</option>
-          <option value="">Biology 100</option>
-        </optgroup>
-        <optgroup label="My Institution">
-          <option value="">Biology 100</option>
-        </optgroup>
-        <optgroup label="Other">
-          <option value="">Biology 100</option>
-        </optgroup>
-      </select>
-    </td>
-  </tr--><tr>
+  </tr><tr>
     <td colspan="2">
-      <button class="button " id="eportfolio_submit" name="commit" type="submit">Make ePortfolio</button>
-      <button type="button" class="cancel_button button-secondary" style>Cancel</button>
+      <button class="button " id="eportfolio_submit" name="commit" type="submit"><%= t('buttons.add_eportfolio', "Make ePortfolio") %></button>
+      <button type="button" class="cancel_button button-secondary" style><%= t('#cancel', "Cancel") %></button>
     </td>
   <td>
 </table>

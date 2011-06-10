@@ -63,8 +63,8 @@ class Eportfolio < ActiveRecord::Base
   end
   
   def setup_defaults
-    cat = self.eportfolio_categories.create(:name => "Home") if self.eportfolio_categories.empty?
-    entry = cat.eportfolio_entries.create(:eportfolio => self, :name => "Welcome", :content => "Nothing entered yet") if cat && cat.eportfolio_entries.empty?
+    cat = self.eportfolio_categories.create(:name => t(:first_category, "Home")) if self.eportfolio_categories.empty?
+    entry = cat.eportfolio_entries.create(:eportfolio => self, :name => t('first_entry.title', "Welcome"), :content => t('first_entry.content', "Nothing entered yet")) if cat && cat.eportfolio_entries.empty?
     cat
   end
   def self.serialization_excludes; [:uuid]; end

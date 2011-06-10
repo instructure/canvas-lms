@@ -3,30 +3,42 @@
   <% if page_section %>
   <div class="section_content">
       <% if !page_section["section_type"] || page_section["section_type"] == "rich_text" || page_section["section_type"] == "html" %>
-        <%= page_section["content"] || "Nothing Entered Yet" %>
+        <%= page_section["content"] || t('rich_text.default_content', "Nothing Entered Yet") %>
       <% elsif page_section["section_type"] == "attachment" %>
         <div style="text-align: center;" class="attachment">
           <% attachment = @static_attachments.find{|a| a.uuid == page_section["attachment_id"]} %>
           <% if attachment && attachment.content_type.match(/\Aimage/) %>
             <a href="<%= attachment.filename %>"><img src="<%= attachment.filename %>" alt="<%= attachment.filename %>"/></a>
           <% elsif attachment %>
-            <a href="<%= attachment.filename %>">Click here to Download <span class="filename"><%= attachment.display_name %></span></a>
+            <a href="<%= attachment.filename %>">
+              <%= t('links.download_attachment', "Click here to Download *%{attachment}*",
+                    :attachment => attachment.display_name,
+                    :wrapper => '<span class="filename">\1</span>') %>
+            </a>
           <% end %>
         </div>
       <% elsif page_section["section_type"] == "submission" %>
         <% submission = @submissions_hash[page_section["submission_id"]] rescue nil %>
         <% rendered = false %>
         <% if submission %>
-          <div style="margin-bottom: 10px;">Student Submission for <%= submission.assignment.title %>, created <%= datetime_string(submission.submitted_at || submission.graded_at || submission.created_at) %></div>
+          <div style="margin-bottom: 10px;">
+            <%= t('headers.submission', "Student Submission for %{assignment}, created %{date}",
+                  :assignment => submission.assignment.title,
+                  :created => datetime_string(submission.submitted_at || submission.graded_at || submission.created_at)) %>
+          </div>
           <% if submission.submission_type == 'online_url' %>
-            <a href="<%= submission.url %>">View the URL submitted for this assignment</a>
+            <a href="<%= submission.url %>"><%= t('links.submission_url', "View the URL submitted for this assignment") %></a>
             <% rendered = true %>
           <% elsif submission.submission_type = 'online_upload' %>
             <ul>
             <% submission.attachments.each do |a| %>
               <% attachment = @static_attachments.find{|att| att.id == a.id } %>
               <% if attachment %>
-                <li><a href="<%= attachment.filename %>">Click here to Download <%= a.display_name %></a></li>
+                <li><a href="<%= attachment.filename %>">
+                  <%= t('links.download_attachment', "Click here to Download *%{attachment}*",
+                        :attachment => a.display_name,
+                        :wrapper => '<span class="filename">\1</span>') %>
+                </a></li>
               <% end %>
             <% end %>
             </ul>
@@ -39,7 +51,7 @@
           <% end %>
         <% end %>
         <% if !rendered %>
-          There used to be a submission here, but we couldn't find it or didn't support the submission type for exporting.
+          <%= t(:not_rendered, "There used to be a submission here, but we couldn't find it or didn't support the submission type for exporting.") %>
         <% end %>
       <% end %>
   </div>

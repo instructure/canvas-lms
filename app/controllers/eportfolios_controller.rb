@@ -30,7 +30,7 @@ class EportfoliosController < ApplicationController
     @context = UserProfile.new(@current_user)
     @active_tab = "eportfolios"
     add_crumb(@current_user.short_name, profile_url)
-    add_crumb("ePortfolios")
+    add_crumb(t(:crumb, "ePortfolios"))
     @portfolios = @current_user.eportfolios.active.find(:all, :order => :updated_at)
     render :action => 'user_index'
   end
@@ -41,7 +41,7 @@ class EportfoliosController < ApplicationController
       respond_to do |format|
         if @portfolio.save
           @portfolio.setup_defaults
-          flash[:notice] = "Porfolio successfully created"
+          flash[:notice] = t('notices.created', "Porfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.to_json(:permissions => {:user => @current_user, :session => session}) }
         else
@@ -83,7 +83,7 @@ class EportfoliosController < ApplicationController
       respond_to do |format|
         if @portfolio.update_attributes(params[:eportfolio])
           @portfolio.setup_defaults
-          flash[:notice] = "Porfolio successfully updated"
+          flash[:notice] = t('notices.updated', "Porfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.to_json(:permissions => {:user => @current_user, :session => session}) }
         else
@@ -99,7 +99,7 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :delete)
       respond_to do |format|
         if @portfolio.destroy
-          flash[:notice] = "Portfolio successfully deleted"
+          flash[:notice] = t('notices.deleted', "Portfolio successfully deleted")
           format.html { redirect_to profile_url }
           format.json { render :json => @portfolio.to_json }
         else
@@ -173,7 +173,7 @@ class EportfoliosController < ApplicationController
             end
             format.json { render :json => @attachment.to_json(:methods => :readable_size) }
           else
-            flash[:notice] = "File zipping still in process..."
+            flash[:notice] = t('notices.zipping', "File zipping still in process...")
             format.html { redirect_to eportfolio_url(@portfolio.id) }
             format.zip { redirect_to eportfolio_url(@portfolio.id) }
             format.json { render :json => @attachment.to_json }
@@ -189,7 +189,7 @@ class EportfoliosController < ApplicationController
       if @portfolio.public || params[:verifier] == @portfolio.uuid
         @entries = @portfolio.eportfolio_entries.find(:all, :order => 'eportfolio_entries.created_at DESC')
         feed = Atom::Feed.new do |f|
-          f.title = "#{@portfolio.name} Feed"
+          f.title = t(:title, "%{portfolio_name} Feed", :portfolio_name => @portfolio.name)
           f.links << Atom::Link.new(:href => eportfolio_url(@portfolio.id))
           f.updated = @entries.first.updated_at rescue Time.now
           f.id = eportfolio_url(@portfolio.id)
