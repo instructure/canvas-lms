@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Thu, 02 Jun 2011 16:32:11 GMT from
+/* DO NOT MODIFY. This file was compiled Fri, 10 Jun 2011 23:17:51 GMT from
  * /Users/bpalmer/Programming/canvas/app/coffeescripts/jobs.coffee
  */
 
@@ -175,6 +175,11 @@
           name: 'priority',
           field: 'priority',
           width: 70
+        }, {
+          id: 'strand',
+          name: 'strand',
+          field: 'strand',
+          width: 100
         }, {
           id: 'run_at',
           name: 'run at',

@@ -5,7 +5,7 @@
     position: relative;
     padding: 10px;
   }
-  span.has-failed-attempts {
+  span.has-failed-attempts, span.on-hold {
     color: orange;
   }
   span.has-failed-max-attempts {
@@ -21,7 +21,6 @@
   }
   #show-job {
     margin-left: 25px;
-    width: 450px;
     float:left;
   }
   #show-job dt {
@@ -58,7 +57,7 @@
 
 <div id="running-wrapper" style="float:left">
   <h2>Running Jobs</h2>
-  <div id="running-grid" style="width:600px; height:250px;" class='grid'>
+  <div id="running-grid" style="width:700px; height:250px;" class='grid'>
   </div>
 </div>
 <div id="tags-wrapper" style="float:right">
@@ -90,7 +89,7 @@
     <button id='un-hold-jobs'>un-hold</button>
     <button id='delete-jobs'>delete</button>
   </div>
-  <div id="jobs-grid" style="width:650px; height:300px;" class='grid'>
+  <div id="jobs-grid" style="width:700px; height:300px;" class='grid'>
   </div>
 <div id="show-job">
   <h2>Selected Job</h2>

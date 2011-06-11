@@ -105,6 +105,11 @@ class Jobs extends FlavorGrid
       field: 'priority'
       width: 70
     ,
+      id: 'strand'
+      name: 'strand'
+      field: 'strand'
+      width: 100
+    ,
       id: 'run_at'
       name: 'run at'
       field: 'run_at'
