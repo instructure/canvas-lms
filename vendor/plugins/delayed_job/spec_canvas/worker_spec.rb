@@ -65,6 +65,8 @@ describe Delayed::Worker do
     it "should not run jobs locked by another worker" do
       job_create(:locked_by => 'other_worker', :locked_at => (Delayed::Job.db_time_now - 1.minutes))
       lambda { @worker.run }.should_not change { SimpleJob.runs }
+      Delayed::Job.unlock_expired_jobs
+      lambda { @worker.run }.should_not change { SimpleJob.runs }
     end
     
     it "should run open jobs" do
@@ -75,6 +77,7 @@ describe Delayed::Worker do
     it "should run expired jobs" do
       expired_time = Delayed::Job.db_time_now - (1.minutes + Delayed::Worker.max_run_time)
       job_create(:locked_by => 'other_worker', :locked_at => expired_time)
+      Delayed::Job.unlock_expired_jobs
       lambda { @worker.run }.should change { SimpleJob.runs }.from(0).to(1)
     end
   end
@@ -91,14 +94,17 @@ describe Delayed::Worker do
       @job.update_attribute(:max_attempts, 1)
       @job.lock_exclusively!(Delayed::Worker.max_run_time, @worker.name).should == true
       @worker.perform(@job)
-      @job.reload
+      old_id = @job.id
+      @job = Delayed::Job::Failed.first
+      @job.original_id.should == old_id
       @job.last_error.should =~ /did not work/
       @job.last_error.should =~ /worker_spec.rb/
       @job.attempts.should == 1
       @job.failed_at.should_not be_nil
       @job.run_at.should > Delayed::Job.db_time_now - 10.minutes
       @job.run_at.should < Delayed::Job.db_time_now + 10.minutes
-      @job.should_not be_locked
+      # job stays locked after failing, for record keeping of time/worker
+      @job.should be_locked
 
       all_jobs = Delayed::Job.all_available(@worker.name,
                                  Delayed::Worker.max_run_time,
@@ -153,7 +159,7 @@ describe Delayed::Worker do
       it "should be failed if it failed more than Worker.max_attempts times" do
         @job.reload.failed_at.should == nil
         Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
-        @job.reload.failed_at.should_not == nil
+        Delayed::Job::Failed.count.should == 1
       end
 
       it "should not be failed if it failed fewer than Worker.max_attempts times" do
@@ -164,12 +170,12 @@ describe Delayed::Worker do
     end
 
     context "and we give an on_max_failures callback" do
-      it "should not be destroyed if it failed max_attempts times and cb is false" do
+      it "should be failed max_attempts times and cb is false" do
         Delayed::Worker.on_max_failures = proc do |job, ex|
           job.should == @job
           false
         end
-        @job.should_not_receive(:destroy)
+        @job.should_receive(:fail!)
         Delayed::Worker.max_attempts.times { @worker.reschedule(@job) }
       end
 

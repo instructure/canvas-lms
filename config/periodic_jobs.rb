@@ -23,20 +23,20 @@ if ActionController::Base.session_store == ActiveRecord::SessionStore
 end
 
 Delayed::Periodic.cron 'ExternalFeedAggregator.process', '*/30 * * * *' do
-  ExternalFeedAggregator.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
+  ExternalFeedAggregator.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 })
 end
 
 Delayed::Periodic.cron 'SummaryMessageConsolidator.process', '*/15 * * * *' do
-  SummaryMessageConsolidator.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
+  SummaryMessageConsolidator.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 })
 end
 
 Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * * * *' do
-  Attachment.send_later_enqueue_args(:process_scribd_conversion_statuses, { :priority => Delayed::LOW_PRIORITY })
+  Attachment.send_later_enqueue_args(:process_scribd_conversion_statuses, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 })
 end
 
 Delayed::Periodic.cron 'Twitter processing', '*/15 * * * *' do
-  TwitterSearcher.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
-  TwitterUserPoller.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
+  TwitterSearcher.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 })
+  TwitterUserPoller.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 })
 end
 
 Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * *' do
@@ -47,12 +47,12 @@ Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
   # we pass false for the touch_users argument, on the assumption that these
   # stream items that we delete aren't visible on the user's dashboard anymore
   # anyway, so there's no need to invalidate all the caches.
-  StreamItem.send_later_enqueue_args(:destroy_stream_items, { :priority => Delayed::LOW_PRIORITY }, 4.weeks.ago, false)
+  StreamItem.send_later_enqueue_args(:destroy_stream_items, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, 4.weeks.ago, false)
 end
 
 if Mailman.config.poll_interval == 0 && Mailman.config.ignore_stdin == true
   Delayed::Periodic.cron 'IncomingMessageProcessor.process', '*/1 * * * *' do
-    IncomingMessageProcessor.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY })
+    IncomingMessageProcessor.send_later_enqueue_args(:process, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 })
   end
 end
 
@@ -60,14 +60,14 @@ if PageView.page_view_method == :cache
   # periodically pull new page views off the cache and insert them into the db
   Delayed::Periodic.cron 'PageView.process_cache_queue', '*/5 * * * *' do
     PageView.send_later_enqueue_args(:process_cache_queue,
-                                     { :priority => Delayed::LOW_PRIORITY })
+                                     { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 })
   end
 end
 
 Delayed::Periodic.cron 'ErrorReport.destroy_error_reports', '35 */1 * * *' do
   cutoff = Setting.get('error_reports_retain_for', 3.months.to_s).to_i
   if cutoff > 0
-    ErrorReport.send_later_enqueue_args(:destroy_error_reports, { :priority => Delayed::LOW_PRIORITY }, cutoff.ago)
+    ErrorReport.send_later_enqueue_args(:destroy_error_reports, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, cutoff.ago)
   end
 end
 

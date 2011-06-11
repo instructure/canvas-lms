@@ -62,19 +62,21 @@ class JobsController < ApplicationController
   end
 
   def jobs_scope
-    @jobs = Delayed::Job.scoped(:order => 'id desc')
     @flavor = params[:flavor] || 'current'
 
     case @flavor
     when 'future'
-      @jobs = @jobs.future
+      @jobs = Delayed::Job.future
     when 'current'
-      @jobs = @jobs.current
+      @jobs = Delayed::Job.current
     when 'all'
       # pass
+      @jobs = Delayed::Job
     when 'failed'
-      @jobs = @jobs.failed
+      @jobs = Delayed::Job::Failed
     end
+
+    @jobs = @jobs.scoped(:order => 'id desc')
 
     if params[:q].present?
       @jobs = @jobs.scoped(:conditions => ["#{ActiveRecord::Base.wildcard('tag', params[:q])} OR id = ?", params[:q].to_i])

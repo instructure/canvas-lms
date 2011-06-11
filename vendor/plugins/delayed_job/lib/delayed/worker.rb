@@ -80,15 +80,12 @@ class Worker
     # need to do this here, since we're avoiding db calls in the master process pre-fork
     @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '5.0').to_f
 
-    job = nil
-    Rails.logger.silence do
-      job = Delayed::Job.get_and_lock_next_available(
-        name,
-        self.class.max_run_time,
-        queue,
-        min_priority,
-        max_priority)
-    end
+    job = Delayed::Job.get_and_lock_next_available(
+      name,
+      self.class.max_run_time,
+      queue,
+      min_priority,
+      max_priority)
 
     if job
       perform(job)
@@ -140,24 +137,23 @@ class Worker
   def reschedule(job, error = nil, time = nil)
     job.attempts += 1
     if job.attempts >= (job.max_attempts || self.class.max_attempts)
-      job.failed_at = Delayed::Job.db_time_now
       destroy_job = true
       if self.class.on_max_failures
         destroy_job = self.class.on_max_failures.call(job, error)
       end
+
       if destroy_job
         say_job(job, "destroying job because of #{job.attempts} failures", :info)
         job.destroy
-        return
+      else
+        job.fail!
       end
+    else
+      time ||= job.reschedule_at
+      job.run_at = time
+      job.unlock
+      job.save!
     end
-
-    # still reschedule even if the job has failed max_attempts times -- maybe
-    # somebody will increase max_attempts later
-    time ||= job.reschedule_at
-    job.run_at = time
-    job.unlock
-    job.save!
   end
 
   def say(msg, level = :debug)
