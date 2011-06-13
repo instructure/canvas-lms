@@ -271,7 +271,7 @@ class ContextMessage < ActiveRecord::Base
   end
 
   def user_name
-    self.user ? self.user.name : "Unknown User"
+    self.user ? self.user.name : t('unknown_user', "Unknown User")
   end
   
   named_scope :after, lambda{|date|
