@@ -26,7 +26,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     
-    keep_trying { driver.find_element(:id, 'tree1').text }
+    keep_trying_until { driver.find_element(:id, 'tree1').text }
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
     driver.find_element(:css, '#editor_tabs_3 .image_list').attribute('class').should match(/initialized/)
   end

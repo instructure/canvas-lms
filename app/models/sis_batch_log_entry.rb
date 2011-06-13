@@ -19,6 +19,8 @@
 class SisBatchLogEntry < ActiveRecord::Base
   validates_length_of :text, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   belongs_to :sis_batch
+
+  attr_accessible :text, :sis_batch
   
   def text=(val)
     if !val || val.length < self.class.maximum_text_length

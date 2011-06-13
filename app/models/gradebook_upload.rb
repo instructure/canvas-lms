@@ -19,4 +19,5 @@
 class GradebookUpload < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_one :attachment
+  attr_accessible
 end

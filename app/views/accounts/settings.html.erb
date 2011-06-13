@@ -49,6 +49,20 @@
               <td><%= f.label :name, "Account Name:" %></td>
               <td><%= f.text_field :name %></td>
             </tr>
+            <% if @context.sis_source_id || can_do(@context.root_account || @context, @current_user, :manage_sis) %>
+              <tr>
+                <td><%= f.label :sis_source_id, "SIS ID:" %></td>
+                <td>
+                  <span class="course_form">
+                    <% if can_do(@context.root_account || @context, @current_user, :manage_sis) %>
+                      <%= f.text_field :sis_source_id, :title => "SIS ID", :value => @context.sis_source_id %>
+                    <% else %>
+                      <span class="sis_source_id"><%= @context.sis_source_id %></span>
+                    <% end %>
+                  </span>
+                </td>
+              </tr>
+            <% end %>
             <tr>
               <td>
                 <%= f.label :default_storage_quota, "Default File Quota:" %>
@@ -128,7 +142,7 @@
                 <%= settings.check_box :admins_can_change_passwords, :checked => @account.settings[:admins_can_change_passwords] == true %>
                 <%= settings.label :admins_can_change_passwords, "Password setting by admins" %>
               </div>
-              <% unless @account.site_admin? %>
+              <% if @account.root_account? && !@account.site_admin?%>
                 <div>
                   <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
                   <%= f.label :allow_sis_import, "SIS imports" %>

@@ -33,6 +33,8 @@ class SubmissionComment < ActiveRecord::Base
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
+
+  attr_accessible :comment, :submission, :submission_id, :recipient_id, :author, :context_id, :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous
   
   before_save :infer_details
   after_save :update_submission
@@ -140,7 +142,7 @@ class SubmissionComment < ActiveRecord::Base
         :comment => message,
         :submission_id => self.submission_id,
         :recipient_id => self.recipient_id,
-        :author_id => user.id,
+        :author => user,
         :context_id => self.context_id,
         :context_type => self.context_type
       })

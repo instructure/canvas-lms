@@ -31,6 +31,8 @@ class Course < ActiveRecord::Base
   belongs_to :abstract_course
   belongs_to :enrollment_term
   belongs_to :grading_standard
+  belongs_to :template_course, :class_name => 'Course'
+  has_many :templated_courses, :class_name => 'Course', :foreign_key => 'template_course_id'
   
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
@@ -59,7 +61,7 @@ class Course < ActiveRecord::Base
   has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
   has_many :learning_outcome_groups, :as => :context
   has_many :course_account_associations
-  has_many :associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
+  has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
   has_many :users, :through => :enrollments, :source => :user
   has_many :groups, :as => :context
   has_many :active_groups, :as => :context, :class_name => 'Group', :conditions => ['groups.workflow_state != ?', 'deleted']
@@ -118,6 +120,7 @@ class Course < ActiveRecord::Base
   before_save :update_enrollments_later
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
+  before_validation :verify_unique_sis_source_id
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
@@ -125,10 +128,16 @@ class Course < ActiveRecord::Base
   has_a_broadcast_policy
   
   def self.skip_updating_account_associations(&block)
-    @skip_updating_account_associations = true
-    block.call
-  ensure
-    @skip_updating_account_associations = false
+    if @skip_updating_account_assocations
+      block.call
+    else
+      begin
+        @skip_updating_account_associations = true
+        block.call
+      ensure
+        @skip_updating_account_associations = false
+      end
+    end
   end
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
@@ -147,6 +156,15 @@ class Course < ActiveRecord::Base
     Rails.cache.fetch(['module_based_course', self].cache_key) do
       self.context_modules.active.any?{|m| m.completion_requirements && !m.completion_requirements.empty? }
     end
+  end
+  
+  def verify_unique_sis_source_id
+    return true unless self.sis_source_id
+    existing_course = self.root_account.all_courses.find_by_sis_source_id(self.sis_source_id)
+    return true if !existing_course || existing_course.id == self.id 
+    
+    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    false
   end
   
   def public_license?
@@ -236,21 +254,23 @@ class Course < ActiveRecord::Base
     
     # Courses are tied to accounts directly and through sections and crosslisted courses
     all_sections = self.course_sections.active.find(:all)
-    initial_entities = [self] + all_sections + all_sections.map(&:nonxlist_course).compact
-    initial_entities.each do |entity|
-      accounts = entity.account ? entity.account.account_chain : []
-      section = (entity.is_a?(Course) ? entity.default_section : entity)
-      accounts.each_with_index do |account, idx|
-        key = [account.id, section.id]
-        if associations_hash[key]
-          unless associations_hash[key].depth == idx
-            associations_hash[key].update_attributes(:depth => idx)
+    initial_entities = ([self] + all_sections + all_sections.map(&:nonxlist_course)).compact.uniq
+    Course.skip_updating_account_associations do
+      initial_entities.each do |entity|
+        accounts = entity.account ? entity.account.account_chain : []
+        section = (entity.is_a?(Course) ? entity.default_section : entity)
+        accounts.each_with_index do |account, idx|
+          key = [account.id, section.id]
+          if associations_hash[key]
+            unless associations_hash[key].depth == idx
+              associations_hash[key].update_attributes(:depth => idx)
+              did_an_update = true
+            end
+            to_delete.delete(key)
+          else
+            associations_hash[key] = self.course_account_associations.create(:account => account, :depth => idx, :course_section => section)
             did_an_update = true
           end
-          to_delete.delete(key)
-        else
-          associations_hash[key] = self.course_account_associations.create(:account => account, :depth => idx, :course_section => section)
-          did_an_update = true
         end
       end
     end
@@ -261,6 +281,10 @@ class Course < ActiveRecord::Base
     end
     
     true
+  end
+  
+  def associated_accounts
+    self.non_unique_associated_accounts.uniq
   end
   
   # objects returned from this query will give you an additional attribute "page_views_count" that you can use, so:
@@ -874,6 +898,7 @@ class Course < ActiveRecord::Base
 
     settings = PluginSetting.settings_for_plugin('grade_export')
     raise "final grade publishing disabled" unless settings[:enabled] == "true"
+    raise "no grading standard supplied" unless self.grading_standard_id
     raise "endpoint undefined" if settings[:publish_endpoint].nil? || settings[:publish_endpoint].empty?
 
     enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
@@ -886,19 +911,24 @@ class Course < ActiveRecord::Base
 
     if Course.valid_grade_export_types.has_key?(settings[:format_type])
       callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
-      posts_to_make, ignored_enrollments_ids = callback.call(self, enrollments,
-          publishing_pseudonym)
+      begin
+        posts_to_make, ignored_enrollment_ids = callback.call(self, enrollments,
+            publishing_pseudonym)
+      rescue
+        Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollments.map(&:id) })
+        raise
+      end
     end
 
-    Enrollment.update ignored_enrollment_ids, [{ :grade_publishing_status => "unpublishable" }] * ignored_enrollment_ids.size
+    Enrollment.update_all({ :grade_publishing_status => "unpublishable" }, { :id => ignored_enrollment_ids })
 
     posts_to_make.each do |enrollment_ids, res, mime_type|
       begin
         SSLCommon.post_data(settings[:publish_endpoint], res, mime_type)
-        Enrollment.update enrollment_ids, [{ :grade_publishing_status => (settings[:wait_for_success] == "yes" ? "publishing" : "published") }] * enrollment_ids.size
+        Enrollment.update_all({ :grade_publishing_status => (settings[:wait_for_success] == "yes" ? "publishing" : "published") }, { :id => enrollment_ids })
       rescue => e
         errors << e
-        Enrollment.update enrollment_ids, [{ :grade_publishing_status => "error" }] * enrollment_ids.size
+        Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollment_ids })
       end
     end
     
@@ -1637,6 +1667,10 @@ class Course < ActiveRecord::Base
       wiki_namespace.wiki.wiki_pages.each do |page|
         course_import.tick(70) if course_import
         if bool_res(options[:everything] ) || bool_res(options[:all_wiki_pages] ) || bool_res(options[page.asset_string.to_sym] )
+          if page.title.blank?
+            next if page.body.blank?
+            page.title = "Unnamed Page"
+          end
           new_page = page.clone_for(self, nil, :migrate => false, :old_context => course)
           added_items << new_page
           new_page.wiki_id = self.wiki.id
@@ -1658,12 +1692,27 @@ class Course < ActiveRecord::Base
       end
     end
     
+    orig_root = LearningOutcomeGroup.default_for(course)
+    new_root = LearningOutcomeGroup.default_for(self)
+    orig_root.sorted_content.each do |item|
+      course_import.tick(85) if course_import
+      use_outcome = lambda {|lo| bool_res(options[:everything] ) || bool_res(options[:all_outcomes] ) || bool_res(options[lo.asset_string.to_sym] ) }
+      if item.is_a? LearningOutcome
+        next unless use_outcome[item]
+        lo = item.clone_for(self, new_root)
+        added_items << lo
+      else
+        f = item.clone_for(self, new_root, use_outcome)
+        added_items << f if f
+      end
+    end
+    
     # Groups could be created by objects with attached assignments as well. (like quizzes/topics)
     # So don't delete the placeholder until everything has been cloned
     delete_placeholder.destroy if delete_placeholder && self.assignment_groups.length > 1
     
     @to_migrate_links.uniq.each do |obj|
-      course_import.tick(85) if course_import
+      course_import.tick(90) if course_import
       if obj.is_a?(Assignment)
         obj.description = migrate_content_links(obj.description, course)
       elsif obj.is_a?(CalendarEvent)

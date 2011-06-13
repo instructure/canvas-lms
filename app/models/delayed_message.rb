@@ -21,7 +21,7 @@ class DelayedMessage < ActiveRecord::Base
   belongs_to :notification_policy
   belongs_to :context, :polymorphic => true
   belongs_to :communication_channel
-  
+  attr_accessible :notification, :notification_policy, :frequency, :communication_channel, :linked_name, :name_of_topic,:link, :summary, :notification_id, :notification_policy_id, :context_id, :context_type, :communication_channel_id, :context, :workflow_state
   
   validates_length_of :summary, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :communication_channel_id

@@ -29,14 +29,16 @@ describe SubmissionsApiController, :type => :integration do
     end
     sub.workflow_state = 'submitted'
     yield(sub) if block_given?
-    update_with_protected_attributes!(sub, { :submitted_at => Time.at(@submit_homework_time), :created_at => Time.at(@submit_homework_time) }.merge(opts))
+    sub.with_versioning(:explicit => true) do
+      update_with_protected_attributes!(sub, { :submitted_at => Time.at(@submit_homework_time), :created_at => Time.at(@submit_homework_time) }.merge(opts))
+    end
     sub.versions(true).each { |v| Version.update_all({ :created_at => v.model.created_at }, { :id => v.id }) }
     sub
   end
 
   it "should 404 if there is no submission" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
     raw_api_call(:get,
@@ -50,7 +52,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should return student discussion entries for discussion_topic assignments" do
     @student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(@student).accept!
     @context = @course
     @assignment = factory_with_protected_attributes(@course.assignments, {:title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model})
@@ -85,7 +87,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should return a valid preview url for quiz submissions" do
     student1 = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
     @course.enroll_student(student1).accept!
     quiz = Quiz.create!(:title => 'quiz1', :context => @course)
     quiz.did_edit!
@@ -112,7 +114,7 @@ describe SubmissionsApiController, :type => :integration do
     student1 = user(:active_all => true)
     student2 = user(:active_all => true)
 
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
 
     @course.enroll_student(student1).accept!
     @course.enroll_student(student2).accept!
@@ -284,7 +286,7 @@ describe SubmissionsApiController, :type => :integration do
     student2 = user_with_pseudonym(:active_all => true)
     student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
 
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
 
     @course.enroll_student(student1).accept!
     @course.enroll_student(student2).accept!
@@ -337,7 +339,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow grading an uncreated submission" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
 
@@ -357,7 +359,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow posting grade by sis id" do
     student = user_with_pseudonym(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @course.update_attribute(:sis_source_id, "my-course-id")
     student.pseudonym.update_attribute(:sis_user_id, "my-user-id")
@@ -379,7 +381,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should not return submissions for no-longer-enrolled students" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     enrollment = @course.enroll_student(student)
     enrollment.accept!
     assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
@@ -404,7 +406,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow updating the grade for an existing submission" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     submission = a1.find_or_create_submission(student)
@@ -493,7 +495,7 @@ describe SubmissionsApiController, :type => :integration do
 
   def submit_with_grade(assignment_opts, param, score, grade)
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!({:title => 'assignment1'}.merge(assignment_opts))
 
@@ -513,7 +515,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow posting a rubric assessment" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
     rubric = rubric_model(:user => @user, :context => @course,
@@ -553,7 +555,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow posting a comment on a submission" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
     submit_homework(@assignment, student)
@@ -574,7 +576,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow posting a media comment on a submission, given a kaltura id" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
 
@@ -597,7 +599,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow commenting on an uncreated submission" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
 
@@ -618,7 +620,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow clearing out the current grade with a blank grade" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
     @assignment.grade_student(student, { :grade => '10' })
@@ -642,7 +644,7 @@ describe SubmissionsApiController, :type => :integration do
 
   it "should allow repeated changes to a submission to accumulate" do
     student = user(:active_all => true)
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
     submit_homework(@assignment, student)

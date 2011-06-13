@@ -211,13 +211,13 @@ var quiz = {};
       }
       $.extend(question, question.question_data);
       var $question = makeQuestion(question);
-      quiz.updateDisplayQuestion($question.find(".question:first"), question, true);
       $("#unpublished_changes_message").slideDown();
       if($bottom) {
         $bottom.before($question);
       } else {
         $("#questions").append($question);
       }
+      quiz.updateDisplayQuestion($question.find(".question:first"), question, true);
     },
     updateDisplayQuestion: function($question, question, escaped) {
       $question.fillTemplateData({
@@ -235,6 +235,7 @@ var quiz = {};
       $question.find(".multiple_answer_sets_holder").css('display', 'none');
       $question.find(".variable_definitions_holder").css('display', 'none').find("tbody").empty();
       $question.find(".formulas_holder").css('display', 'none').find(".formulas_list").empty();
+      $question.find('.question_points').text(question.points_possible);
       var details = quiz.answerTypeDetails(question.question_type);
       var answer_type = details.answer_type, question_type = details.question_type, n_correct = details.n_correct;
       if(question.question_type == 'fill_in_multiple_blanks_question') {
@@ -1623,13 +1624,13 @@ var quiz = {};
           if(question) {
             quiz.addExistingQuestion(question.quiz_question);
             if(counter > 5) {
-              setTimeout(nextQuestion, 500);
+              setTimeout(nextQuestion, 50);
             } else {
               nextQuestion();
             }
           }
         }
-        setTimeout(nextQuestion, 100);
+        setTimeout(nextQuestion, 10);
         $findQuestionDialog.dialog('close');
       }, function(data) {
         $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text("Adding Questions Failed, please try again");

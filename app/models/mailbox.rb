@@ -18,6 +18,8 @@
 
 class Mailbox < ActiveRecord::Base
   belongs_to :mailboxable_entity, :polymorphic => true
+
+  attr_accessible :name, :purpose, :content_parser, :mailboxable_entity_type, :mailboxable_entity_id
   
   before_create :generate_handle
   

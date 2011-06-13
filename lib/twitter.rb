@@ -109,12 +109,12 @@ module Twitter
     res
   end
   
-  def twitter_consumer
+  def twitter_consumer(key=nil, secret=nil)
     require 'oauth'
     require 'oauth/consumer'
     twitter_config = Twitter.config
-    key = twitter_config['api_key']
-    secret = twitter_config['secret_key']
+    key ||= twitter_config['api_key']
+    secret ||= twitter_config['secret_key']
     req = request || nil rescue nil
     consumer = OAuth::Consumer.new(key, secret, {
       :site => "http://twitter.com",
@@ -125,9 +125,18 @@ module Twitter
     })
   end
   
+  def self.config_check(settings)
+    o = Object.new
+    o.extend(Twitter)
+    consumer = o.twitter_consumer(settings[:api_key], settings[:secret_key])
+    token = consumer.get_request_token rescue nil
+    token ? nil : "Configuration check failed, please check your settings"
+  end
+  
   def self.config
     # Return existing value, even if nil, as long as it's defined
     return @twitter_config if defined?(@twitter_config)
+    @twitter_config ||= Canvas::Plugin.find(:twitter).try(:settings)
     @twitter_config ||= YAML.load_file(RAILS_ROOT + "/config/twitter.yml")[RAILS_ENV] rescue nil
   end
   

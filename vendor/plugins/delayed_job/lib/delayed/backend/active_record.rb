@@ -22,28 +22,25 @@ module Delayed
         cattr_accessor :default_priority
         self.default_priority = 0
 
-        # if true, we'll use the more efficient 'select ... for update' form
-        # rather than selecting 5 rows and trying to lock each one in turn.
-        # there's some deadlock issues with this right now though.
-        cattr_accessor :use_row_locking
-        self.use_row_locking = false
-
         named_scope :current, lambda {
-          { :conditions => ["run_at <= ? AND failed_at IS NULL", db_time_now] }
+          { :conditions => ["run_at <= ?", db_time_now] }
         }
 
         named_scope :future, lambda {
-          { :conditions => ["run_at > ? AND failed_at IS NULL", db_time_now] }
+          { :conditions => ["run_at > ?", db_time_now] }
         }
 
         named_scope :failed, :conditions => ["failed_at IS NOT NULL"]
 
-        named_scope :not_running, :conditions => ["locked_at is NULL"]
+        named_scope :running, :conditions => ["locked_at is NOT NULL AND locked_by <> 'on hold'"]
 
-        named_scope :running, :conditions => ["locked_at is NOT NULL and locked_by <> 'on hold'"]
-
+        # a nice stress test:
+        # 10_000.times { |i| Kernel.send_later_enqueue_args(:system, { :strand => 's1', :run_at => (24.hours.ago + (rand(24.hours.to_i))) }, "echo #{i} >> test1.txt") }
+        # 500.times { |i| "ohai".send_later_enqueue_args(:reverse, { :run_at => (12.hours.ago + (rand(24.hours.to_i))) }) }
+        # then fire up your workers
+        # you can check out strand correctness: diff test1.txt <(sort -n test1.txt)
         named_scope :ready_to_run, lambda {|worker_name, max_run_time|
-          {:conditions => ['(run_at <= ? AND (locked_at IS NULL OR locked_at < ?) OR locked_by = ?) AND failed_at IS NULL', db_time_now, db_time_now - max_run_time, worker_name]}
+          { :conditions => ["run_at <= ? AND locked_at IS NULL AND (strand IS NULL OR (SELECT id FROM #{table_name} j2 WHERE j2.strand = #{table_name}.strand ORDER BY j2.strand, j2.id ASC LIMIT 1) = id)", db_time_now] }
         }
         named_scope :by_priority, :order => 'priority ASC, run_at ASC'
 
@@ -52,35 +49,25 @@ module Delayed
           update_all("locked_by = null, locked_at = null", ["locked_by = ?", worker_name])
         end
 
+        def self.unlock_expired_jobs(max_run_time = Delayed::Worker.max_run_time)
+          update_all("locked_by = null, locked_at = null", ["locked_by <> 'on hold' AND locked_at < ?", db_time_now - max_run_time])
+        end
+
         def self.get_and_lock_next_available(worker_name,
                                              max_run_time,
                                              queue = nil,
                                              min_priority = nil,
                                              max_priority = nil)
-          if self.use_row_locking
-            scope = self.all_available(worker_name, max_run_time, queue, min_priority, max_priority)
-
-            ::ActiveRecord::Base.silence do
-              # it'd be a big win to do this in a DB function and avoid the extra
-              # round trip.
-              transaction do
-                job = scope.find(:first, :lock => true)
-                if job
-                  job.update_attributes(:locked_at => db_time_now,
-                                        :locked_by => worker_name)
-                end
-                job
-              end
+          @batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          loop do
+            jobs = Rails.logger.silence do
+              find_available(worker_name, @batch_size, max_run_time, queue, min_priority, max_priority)
             end
-          else
-            loop do
-              jobs = find_available(worker_name, 5, max_run_time, queue, min_priority, max_priority)
-              return nil if jobs.empty?
-              job = jobs.detect do |job|
-                job.lock_exclusively!(max_run_time, worker_name)
-              end
-              return job if job
+            return nil if jobs.empty?
+            job = jobs.detect do |job|
+              job.lock_exclusively!(max_run_time, worker_name)
             end
+            return job if job
           end
         end
 
@@ -108,15 +95,15 @@ module Delayed
 
         # Lock this job for this worker.
         # Returns true if we have the lock, false otherwise.
+        #
+        # It's important to note that for performance reasons, this method does
+        # not re-check the strand constraints -- so you could manually lock a
+        # job using this method that isn't the next to run on its strand.
         def lock_exclusively!(max_run_time, worker)
           now = self.class.db_time_now
-          affected_rows = if locked_by != worker
-            # We don't own this job so we will update the locked_by name and the locked_at
-            self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and (locked_at is null or locked_at < ?) and (run_at <= ?)", id, (now - max_run_time.to_i), now])
-          else
-            # We already own this job, this may happen if the job queue crashes.
-            # Simply resume and update the locked_at
-            self.class.update_all(["locked_at = ?", now], ["id = ? and locked_by = ?", id, worker])
+          # We don't own this job so we will update the locked_by name and the locked_at
+          affected_rows = Rails.logger.silence do
+            self.class.update_all(["locked_at = ?, locked_by = ?", now, worker], ["id = ? and locked_at is null and run_at <= ?", id, now])
           end
           if affected_rows == 1
             self.locked_at    = now
@@ -126,21 +113,19 @@ module Delayed
             changed_attributes['locked_at'] = now
             changed_attributes['locked_by'] = worker
 
-            # if this job is part of a strand, make sure no earlier jobs in the
-            # strand are running.
-            if self.strand.present?
-              count = self.class.count(:conditions => ["strand = ? AND id < ? and failed_at is null", self.strand, self.id])
-              if count > 0
-                self.locked_at = self.locked_by = nil
-                self.run_at = now.advance(:seconds => Setting.get_cached('delayed_jobs_strand_sleep_time', '60').to_i)
-                self.save
-                return false
-              end
-            end
-
             return true
           else
             return false
+          end
+        end
+
+        def fail!
+          attrs = self.attributes
+          attrs['original_id'] = attrs.delete('id')
+          attrs['failed_at'] ||= self.class.db_time_now
+          self.class.transaction do
+            Failed.create(attrs)
+            self.destroy
           end
         end
 
@@ -151,7 +136,12 @@ module Delayed
           Time.now.in_time_zone
         end
 
+        class Failed < Job
+          include Delayed::Backend::Base
+          set_table_name :failed_jobs
+        end
       end
+
     end
   end
 end

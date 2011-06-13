@@ -21,4 +21,5 @@ class ClonedItem < ActiveRecord::Base
   has_many :attachments
   has_many :discussion_topics
   has_many :wiki_pages
+  attr_accessible :original_item
 end

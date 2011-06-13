@@ -3,7 +3,6 @@
  *
  * Copyright 2009, Moxiecode Systems AB
  * Released under LGPL License.
- * With additions from Instructure, Inc.
  *
  * License: http://tinymce.moxiecode.com/license
  * Contributing: http://tinymce.moxiecode.com/contributing
@@ -43,28 +42,29 @@
       
 			ed.onContextMenu.add(function(ed, e) {
         var inTable = false;
-        console.log(e);
         var obj = e.target;
         while(obj.nodeName != 'TABLE' && obj.nodeName != 'BODY' && obj.parentNode) {
           console.log(obj.nodeName);
           obj = obj.parentNode;
         }
         if(obj.nodeName == 'TABLE') {
-          // if(ed.selection) {
-          // } else {
+          var range = ed.selection.getRng(true);
+          if(range && (range.startOffset != range.endOffset || range.startContainer != range.endContainer)) {
+          } else {
             inTable = true;
-          // }
+          }
         }
-				// if (!e.ctrlKey && !spellCheckEnabled) {
 				if (!e.ctrlKey && (inTable || !spellCheckEnabled)) {
 					t._getMenu(ed).showMenu(e.clientX, e.clientY);
 					Event.add(ed.getDoc(), 'click', hide);
 					Event.cancel(e);
 				}
 			});
+      // INSTRUCTURE: added some stuff to make the context menu
+      // turn-offable
       var spellCheckEnabled = false;
 
-      ed.addCommand('toggleSpellCheck', function() {
+      function toggleSpellCheck() {
         spellCheckEnabled = !spellCheckEnabled;
         $(ed.getBody()).attr('spellcheck', spellCheckEnabled);
         cm = ed.controlManager;
@@ -73,9 +73,10 @@
         // $(ed.getBody()).attr('contenteditable', ed.getDoc().designMode == 'on');
         
         cm.setActive('instructure_table_mode', !spellCheckEnabled);
-      });
+      }
+      ed.addCommand('toggleSpellCheck', toggleSpellCheck);
       ed.onInit.add(function(ed, cm, e) {
-        ed.execCommand('toggleSpellCheck', false);
+        toggleSpellCheck();
       });
       ed.addButton('instructure_table_mode', {
         title: 'Turn on Advanced Mode (right-click table editing, disables spell-check)',

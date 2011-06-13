@@ -71,9 +71,7 @@ describe Pseudonym do
     user_with_pseudonym(:active_all => true)
     @pseudonym.sis_source_id = 'something_cool'
     @pseudonym.save!
-    @pseudonym.account.account_authorization_config = AccountAuthorizationConfig.new(:auth_type => 'ldap')
-    @pseudonym.account.account_authorization_config.account_id = @pseudonym.account_id
-    @pseudonym.account.account_authorization_config.save!
+    @pseudonym.account.account_authorization_configs.create!(:auth_type => 'ldap')
     lambda{ @pseudonym.destroy}.should raise_error("Cannot delete system-generated pseudonyms")
     @pseudonym.should_not be_deleted
   end

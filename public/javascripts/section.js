@@ -1,12 +1,44 @@
 $(document).ready(function() {
-  $("#edit_section_form .cancel_button").click(function() {
-    $("#edit_section_form").hide();
+  var $edit_section_form = $("#edit_section_form"),
+      $edit_section_link = $(".edit_section_link");
+  
+  $edit_section_form.formSubmit({
+    beforeSubmit: function(data) {
+      $edit_section_form.hide();
+      $edit_section_form.find(".name").text(data['course_section[name]']).show();
+      $edit_section_form.loadingImage({image_size: "small"});
+    },
+    success: function(data) {
+      var section = data.course_section;
+      $edit_section_form.loadingImage('remove');
+      $('#section_name').text(section.name);
+      $('span.sis_source_id').text(section.sis_source_id || "");
+    },
+    error: function(data) {
+      $edit_section_form.loadingImage('remove');
+      $edit_section_form.show();
+      $edit_section_form.formErrors(data);
+    }
+  })
+  .find(":text")
+    .keycodes('return esc', function(event) {
+      if(event.keyString == 'return') {
+        $edit_section_form.submit();
+      } else {
+        $(this).parents(".section").find(".name").show();
+        $edit_section_form.hide();
+      }
+    }).end()
+  .find(".cancel_button").click(function() {
+    $edit_section_form.hide();
   });
-  $(".edit_section_link").click(function(event) {
+
+  $edit_section_link.click(function(event) {
     event.preventDefault();
-    $("#edit_section_form").toggle();
+    $edit_section_form.toggle();
     $("#edit_section_form :text:visible:first").focus().select();
   });
+  
   $(".unenroll_user_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".user").confirmDelete({

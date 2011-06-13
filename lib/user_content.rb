@@ -50,6 +50,10 @@ module UserContent
       obj.replace(child)
       child.add_next_sibling(form)
     end
+    html.css('img.equation_image').each do |node|
+      mathml = Nokogiri::HTML::DocumentFragment.parse('<span class="hidden-readable">' + Ritex::Parser.new.parse(node.delete('alt').value) + '</span>') rescue next
+      node.add_next_sibling(mathml)
+    end
 
     html.to_s.html_safe
   end

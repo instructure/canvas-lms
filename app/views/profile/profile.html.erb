@@ -11,71 +11,8 @@
 <% end %>
 
 <% jammit_js :profile %>
+<% jammit_css :profile %>
 
-<% content_for :stylesheets do %>
-<style>
-.profile_table td {
-  vertical-align: top;
-  padding: 2px 5px;
-}
-.profile_table .edit_data {
-  display: none;
-}
-.profile_table.editing .edit_data {
-  display: inline;
-}
-.profile_table.editing .display_data {
-  display: none;
-}
-#registered_services .service {
-  font-size: 1.2em;
-  padding: 2px;
-}
-#registered_services .service .delete_service_link {
-  display: none;
-}
-#registered_services .service.service-hover {
-  background-color: #eee;
-  -moz-border-radius: 3px;
-}
-#registered_services .service.service-hover .delete_service_link {
-  display: inline;
-}
-#unregistered_services .button{
-  width: 150px;
-  margin: 3px;
-}
-#unregistered_services .button img {
-  vertical-align: middle;
-}
-.profile_pic_link img {
-  max-width: 50px;
-}
-.profile_pic_list span.img {
-  float: left;
-  width: 50px;
-  overflow: hidden;
-  margin: 2px;
-  cursor: pointer;
-  padding: 4px;
-  display: inline-block;
-}
-.profile_pic_list img {
-  max-height: 75px;
-  min-height: 25px;
-  max-width: 50px;
-  vertical-align: middle;
-}
-.profile_pic_list span.img:hover {
-  padding: 2px;
-  border: 2px solid #888;
-}
-.profile_pic_list span.img.selected {
-  padding: 2px;
-  border: 2px solid #444;
-}
-</style>
-<% end %>
 <% if service_enabled?(:avatars) %>
   <a href="#" class="profile_pic_link <%= @user.avatar_state %>" title="Click to change profile pic" style="float: left; margin-right: 5px; min-width: 50px; min-height: 50px; display: inline-block;">
     <%= avatar_image(@user.id) %>
@@ -88,11 +25,7 @@
   <tr>
     <td><%= f.label :name, "Full Name:" %></td>
     <td><span class="full_name display_data"><%=h @user.name %></span>
-      <% if @user.creation_unique_id %>
-        <span class="edit_data"><%= @user.name %> (can't change)</span>
-      <% else %>
-        <%= f.text_field :name, :class => "edit_data" %>
-      <% end %>
+      <%= f.text_field :name, :class => "edit_data" %>
       <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/>This name will be used by teachers for grading.</span>
   </tr>
   <tr>
@@ -234,7 +167,7 @@ you already use.  Click any of the services in "Other Services" to see what we m
                 <span><%= service.service_user_name %></span>
               <% end %>
               <% if service.service == 'facebook' && feature_and_service_enabled?(:facebook) && Facebook.config['canvas_name'] %>
-                <div>
+                <div style="line-height: 2.0em;">
                   <a href="<%= service.service_access_link %>">view the Facebook app</a>
                 </div>
               <% end %>
@@ -421,6 +354,117 @@ you already use.  Click any of the services in "Other Services" to see what we m
   </td>
 </tr></table>
 <% end %>
+<h3>Approved Integrations:</h3>
+<div style="margin-left: 20px;">
+  <% if @user.access_tokens.empty? %>
+    <div id="no_approved_integrations">
+      Third-party applications can request permission to access
+      the Canvas site on your behalf.  As you begin authorizing
+      applications you will see them listed here.
+    </div>
+  <% end %>
+  <div id="access_tokens_holder" style="<%= hidden if @user.access_tokens.empty? %>">
+    These are the third-party applications you have authorized
+    to access the Canvas site on your behalf:
+    <table id="access_tokens" class="summary" style="margin-top: 10px;">
+      <thead>
+        <tr>
+          <th>App</th>
+          <th>Purpose</th>
+          <th>Dates</th>
+          <th>&nbsp;</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= render :partial => "access_token", :collection => @user.access_tokens %>
+        <%= render :partial => "access_token" %>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top: 10px;">
+    <a href="#" class="button add_access_token_link"><%= image_tag "add.png" %> New Access Token</a>
+  </div>
+  <div id="token_details_dialog" style="display: none;" title="Access Token Details">
+    <p>
+      Access tokens can be used to allow other applications to make
+      API calls on your behalf.  You can also generate access tokens and
+      <a href="http://instructure.github.com/canvas-lms/doc/api/index.html" target="_blank" class="external">
+        use the Canvas Open API
+      </a>
+      to come up with your own integrations.
+    </p>
+    
+    <div class="loading_message">Loading Token Details...</div>
+    <div class="error_loading_message">Error Loading Token Details</div>
+    <div class="results">
+      <table>
+        <tr>
+          <th>Token:</th>
+          <td>
+            <div class="visible_token">&nbsp;</div>
+            <div class="full_token_warning"><strong>Copy this token down now</strong>.  Once you 
+            leave this page you won't be able to retrieve the full token anymore, you'll
+            have to regenerate it to get a new value.
+            </div>
+          </td>
+        </tr><tr>
+          <th>App:</th>
+          <td class="app_name">&nbsp;</td>
+        </tr><tr>
+          <th>Purpose:</th>
+          <td class="purpose">&nbsp;</td>
+        </tr><tr>
+          <th>Created:</th>
+          <td class="created">&nbsp;</td>
+        </tr><tr>
+          <th>Last Used:</th>
+          <td class="used">&nbsp;</td>
+        </tr><tr>
+          <th>Expires:</th>
+          <td class="expires">&nbsp;</td>
+        </tr><tr class="refresh_token">
+          <td colspan="2">
+            <div class="button-container">
+              <button class="button regenerate_token">Regenerate Token</button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div id="add_access_token_dialog" style="display: none;" title="New Access Token">
+    <h2>Generate an Access Token</h2>
+    Access tokens are what allow third-party applications to access Canvas
+    resources on your behalf.  These tokens are normally created automatically
+    for applications as needed, but if 
+    <a href="http://instructure.github.com/canvas-lms/doc/api/index.html">
+      you're developing a new or limited 
+      project</a> you can just generate the token from here.
+    <% form_for :access_token, :url => profile_tokens_url, :html => {:id => "access_token_form", :style => "margin-top: 10px;"} do |f| %>
+      <table class="formtable">
+        <tr>
+          <td><%= f.label :purpose, "Purpose:" %></td>
+          <td><%= f.text_field :purpose %></td>
+        </tr>
+        <tr>
+          <td><%= f.label :expires_at, "Expires:" %></td>
+          <td>
+            <div><%= f.text_field :expires_at, :class => "expires_field datetime_field", :style => "width: 120px;" %></div>
+            <div style="font-size: 0.8em;" class="hint">leave blank for no expiration</div>
+          </td>
+        </tr>
+          <td colspan="2">
+            <div class="button-container">
+              <button class="button submit_button" type="submit">Generate Token</button>
+              <button class="button button-secondary cancel_button" type="button">Cancel</button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    <% end %>
+  </div>
+</div>
 <div id="profile_pic_dialog" style="display: none;">
   <a href="<%= profile_pics_url %>" class="profile_pics_url" style="display: none;">&nbsp;</a>
   Select the image you'd like to use as your profile pic, or upload a new image:

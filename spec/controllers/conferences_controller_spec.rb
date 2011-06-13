@@ -41,4 +41,34 @@ describe ConferencesController do
     end
     
   end
+
+  describe "POST 'create'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'DimDim'}
+      assert_unauthorized
+    end
+    
+    it "should create a conference" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'DimDim'}, :format => 'json'
+      response.should be_success
+    end
+  end
+
+  describe "POST 'update'" do
+    it "should require authorization" do
+      course_with_teacher(:active_all => true)
+      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'DimDim'}
+      assert_unauthorized
+    end
+    
+    it "should update a conference" do
+      course_with_teacher_logged_in(:active_all => true)
+      @conference = @course.web_conferences.create(:conference_type => 'DimDim')
+      post 'update', :course_id => @course.id, :id => @conference, :web_conference => {:title => "Something else"}, :format => 'json'
+      response.should be_success
+    end
+  end
+  
 end

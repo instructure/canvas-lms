@@ -45,10 +45,10 @@
       <a href="<%= assignment_url %>" class="preview_assignment_link no-hover" style="<%= hidden unless false %>">
         <%= image_tag 'preview.png', :alt => "Preview", :title => "Preview Assignment", :style => "display: none;" %>
       </a>
-      <a href="<%= assignment_url %>/edit" class="edit_assignment_link no-hover">
+      <a href="<%= assignment_url %>/edit" rel="nofollow" class="edit_assignment_link no-hover">
         <%= image_tag 'edit.png', :alt => "Edit", :title => "Edit Assignment" %>
       </a>
-      <a href="<%= assignment_url %>" class="delete_assignment_link no-hover">
+      <a href="<%= assignment_url %>" rel="nofollow" class="delete_assignment_link no-hover">
         <%= image_tag 'delete.png', :alt => "Delete", :title => "Delete Assignment" %>
       </a>
     </div>

@@ -135,7 +135,7 @@ module VistaExpected
   TRUE_FALSE = {:correct_comments=>"",
                 :points_possible=>1,
                 :question_name=>"True/False",
-                :question_text=>"I am wearing a black hat.",
+                :question_text=>"I am wearing a black hat. <img src=\"$CANVAS_OBJECT_REFERENCE$/attachments/4444422222200000\">",
                 :incorrect_comments=>"",
                 :answers=>
                         [{:text=>"true", :weight=>100, :migration_id=>"true"},

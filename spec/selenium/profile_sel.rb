@@ -13,7 +13,7 @@ shared_examples_for "profile selenium tests" do
     form.find_element(:class, "button").click
     
     confirmation_dialog = driver.find_element(:id, "confirm_email_channel")
-    keep_trying { confirmation_dialog.displayed? }
+    keep_trying_until { confirmation_dialog.displayed? }
     
     driver.execute_script("return INST.errorCount;").should == 0
     confirmation_dialog.find_element(:css, "button").click

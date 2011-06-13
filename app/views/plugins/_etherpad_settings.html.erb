@@ -1,0 +1,38 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          EtherPad is now an open source project.  There are a number of public
+          hosted instances of EtherPad that you can use if you'd like.  These
+          include:
+        </p>
+        <ul>
+          <li><a href="http://piratepad.net/">Pirate Pad</a></li>
+          <li><a href="http://primarypad.com/">Primary Pad</a></li>
+          <li><a href="http://sketchpad.cc/">SketchPad</a></li>
+          <li><a href="http://www.edupad.ch/">eduPad</a></li>
+          <li><a href="http://typewith.me/">TypeWith.me</a></li>
+        </ul>
+
+        <p>
+          Or you can always <a href="http://etherpad.org/">set
+          up your own EtherPad site</a>.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :domain, "Domain:" %></td>
+      <td>
+        <%= f.text_field :domain %>
+        <div class="hint">Don't include the "http://" part or any slashes
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :name, "Name:" %></td>
+      <td>
+        <%= f.text_field :name %>
+      </td>
+    </tr>
+  </table>
+<% end %>

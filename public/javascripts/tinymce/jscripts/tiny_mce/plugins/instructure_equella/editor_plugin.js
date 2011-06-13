@@ -28,11 +28,12 @@
           alert("Equella is not properly configured for this account, please notify your system administrator.");
           return;
         }
+        var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
         if(!$box.length) {
           $box = $('<div id="equella_dialog" style="padding: 0; overflow-y: hidden;"/>')
             .hide()
             .html("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>" +
-                  "<iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 550px; border: 0;' src='about:blank' borderstyle='0'/>")
+                  "<iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: " + frameHeight +"px; border: 0;' src='about:blank' borderstyle='0'/>")
             .appendTo('body')
             .dialog({
               autoOpen: false,

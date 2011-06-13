@@ -27,7 +27,9 @@ class MediaObject < ActiveRecord::Base
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
   serialize :data
-  
+
+  attr_accessible :media_id, :title
+
   attr_accessor :podcast_associated_asset
 
   def infer_defaults

@@ -1,0 +1,14 @@
+development:
+  logger: rails
+
+test:
+  logger: rails
+
+production:
+  logger: rails
+#  logger: syslog
+#  app_ident: canvas-lms
+#  daemon_ident: canvas-lms-daemon
+#  facilities:
+#  - user
+#  - local3

@@ -5,7 +5,7 @@
     position: relative;
     padding: 10px;
   }
-  span.has-failed-attempts {
+  span.has-failed-attempts, span.on-hold {
     color: orange;
   }
   span.has-failed-max-attempts {
@@ -21,7 +21,6 @@
   }
   #show-job {
     margin-left: 25px;
-    width: 450px;
     float:left;
   }
   #show-job dt {
@@ -58,7 +57,7 @@
 
 <div id="running-wrapper" style="float:left">
   <h2>Running Jobs</h2>
-  <div id="running-grid" style="width:600px; height:250px;" class='grid'>
+  <div id="running-grid" style="width:700px; height:250px;" class='grid'>
   </div>
 </div>
 <div id="tags-wrapper" style="float:right">
@@ -74,25 +73,27 @@
 </div>
 <div style="clear:both">
   <h2>Jobs List</h2>
-  <select id="jobs-flavor">
-    <%= options_for_select([["All", 'all'],
-                            ["Current", 'current'],
-                            ["Future", 'future'],
-                            ["Failed", 'failed']], @flavor) %>
-  </select>
-  <button id='jobs-refresh'>refresh</button>
-  <input type='search' results='15' placeholder='Search Jobs' autosave='canvas-jobs-search' id='jobs-search' name='q' />
-  Total: <span id='jobs-total'><%= @jobs_count %></span>
-  <button id='select-all-jobs'>select all</button>
-  With Selection:
-  <button id='hold-jobs'>hold</button>
-  <button id='un-hold-jobs'>un-hold</button>
-  <button id='delete-jobs'>delete</button>
-  <div id="jobs-grid" style="width:650px; height:300px;" class='grid'>
+  <div id="jobs-grid-controls">
+    <select id="jobs-flavor">
+      <%= options_for_select([["All", 'all'],
+                              ["Current", 'current'],
+                              ["Future", 'future'],
+                              ["Failed", 'failed']], @flavor) %>
+    </select>
+    <button id='jobs-refresh'>refresh</button>
+    <input type='search' results='15' placeholder='Search Jobs' autosave='canvas-jobs-search' id='jobs-search' name='q' value="<%= params[:id].presence %>" />
+    Total: <span id='jobs-total'><%= @jobs_count %></span>
+    <button id='select-all-jobs'>select all</button>
+    With Selection:
+    <button id='hold-jobs'>hold</button>
+    <button id='un-hold-jobs'>un-hold</button>
+    <button id='delete-jobs'>delete</button>
+  </div>
+  <div id="jobs-grid" style="width:700px; height:300px;" class='grid'>
   </div>
 <div id="show-job">
   <h2>Selected Job</h2>
-  <h3>id: <span id="job-id" class="show-field">&nbsp;</span></h3>
+  <h3>id: <a href="#" id="job-id-link"><span id="job-id" class="show-field">&nbsp;</span></a></h3>
   <h4>tag: <span id='job-tag' class='show-field'>&nbsp;</span></h4>
   <h4>strand: <span id='job-strand' class='show-field'>&nbsp;</span></h4>
   <table id='job-attributes' cellspacing="0">
@@ -133,7 +134,7 @@
 </div>
 
 <% js_block do
-jobs_data = @jobs.all(:limit => 100)
+jobs_data = @jobs.all(:limit => JobsController::LIMIT)
 jobs_data.length.upto(@jobs_count - 1) { jobs_data << {} }
 jobs_opts = {
   :data => jobs_data,
@@ -143,6 +144,7 @@ jobs_opts = {
   :url => jobs_url(:only => :jobs),
   :batch_update_url => batch_update_jobs_url,
   :on_hold_attempt_count => Delayed::Job::ON_HOLD_COUNT,
+  :limit => JobsController::LIMIT,
 }
 running_opts = jobs_opts.merge({
   :data => @running.all,

@@ -24,7 +24,7 @@ class Rubric < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
-  has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+  has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   adheres_to_policy
   before_save :default_values
   after_save :update_outcome_tags
@@ -120,7 +120,9 @@ class Rubric < ActiveRecord::Base
     missing_ids = ids.select{|id| !tag_outcome_ids.include?(id) }
     tags_to_delete = tags.select{|t| !ids.include?(t.learning_outcome_id) }
     missing_ids.each do |id|
-      self.learning_outcome_tags.create!(:learning_outcome_id => id, :context => self.context, :tag_type => 'learning_outcome')
+      lot = self.learning_outcome_tags.build(:context => self.context, :tag_type => 'learning_outcome')
+      lot.learning_outcome_id = id
+      lot.save!
     end
     tags_to_delete.each{|t| t.destroy }
     true
@@ -186,7 +188,7 @@ class Rubric < ActiveRecord::Base
   end
   
   def update_criteria(params)
-    self.save if self.new_record?
+    self.without_versioning(&:save) if self.new_record?
     data = generate_criteria(params)
     self.update_assessments_for_new_criteria(data.criteria)
     self.hide_score_total = params[:hide_score_total] if self.hide_score_total == nil || (self.association_count || 0) < 2

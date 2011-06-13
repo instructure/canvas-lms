@@ -25,6 +25,7 @@ class AssetUserAccess < ActiveRecord::Base
   has_many :page_views
   has_many :asset_access_ranges
   before_save :infer_defaults
+  attr_accessible :user, :asset_code
   
   named_scope :for_context, lambda{|context|
     {:conditions => ["asset_user_accesses.context_id = ? AND asset_user_accesses.context_type = ?", context.id, context.class.to_s]}
@@ -177,7 +178,8 @@ class AssetUserAccess < ActiveRecord::Base
       view_month = Date.new(y=view.created_at.year, m=view.created_at.month, d=1) #view.created_at.strftime("%m:%Y")
       if !found_ranges[view_week]
         contexts.each do |context|
-          week_range = self.asset_access_ranges.find_or_initialize_by_start_on_and_end_on_and_context_id_and_context_type(view_week, view_week + 6, context.id, context.class.to_s)
+          week_range = self.asset_access_ranges.find_by_start_on_and_end_on_and_context_id_and_context_type(view_week, view_week + 6, context.id, context.class.to_s)
+          week_range ||= self.asset_access_ranges.build(:start_on => view_week, :end_on => view_week + 6, :context => context)
           week_range.user_id = self.user_id
           week_range.asset_code = self.asset_code
           week_range.save
@@ -185,7 +187,8 @@ class AssetUserAccess < ActiveRecord::Base
       end
       if !found_ranges[view_month]
         contexts.each do |context|
-          month_range = self.asset_access_ranges.find_or_initialize_by_start_on_and_end_on_and_context_id_and_context_type(view_month, (view_month >> 1) - 1, context.id, context.class.to_s)
+          month_range = self.asset_access_ranges.find_by_start_on_and_end_on_and_context_id_and_context_type(view_month, (view_month >> 1) - 1, context.id, context.class.to_s)
+          month_range ||= self.asset_access_ranges.build(:start_on => view_month, :end_on => (view_month >> 1) - 1, :context => context)
           month_range.user_id = self.user_id
           month_range.asset_code = self.asset_code
           month_range.save

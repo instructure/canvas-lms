@@ -302,31 +302,18 @@ class ContentZipper
     @files_in_zip ||= Set.new
     filename = Attachment.make_unique_filename(filename, @files_in_zip)
     @files_in_zip << filename
-
-    if Attachment.s3_storage?
-      # We're not using URI.parse right here because we have some escaping problems
-      # that are generating invalid URLs. (attachment_fu is not escaping filenames.)
-      # This should be temporary until we can fix the escaping issues.
-      attachment.authenticated_s3_url =~ %r{\A(https?)://(.*?)(/.*)\z}
-      scheme, host, path = $1, $2, $3
-      req = Net::HTTP::Get.new(path)
-      Net::HTTP.start(host, scheme == 'https' ? 443 : 80) do |http|
-        http.request(req) do |res|
-          zipfile.get_output_stream(filename) do |f|
-            res.read_body do |segment|
-              f.write segment
-            end
-          end
-        end
-      end
-    else
-      begin
-        zipfile.add(filename, attachment.full_filename)
-      rescue => e
-        @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
-        return false
-      end
+    
+    handle = nil
+    begin
+      handle = attachment.open(:need_local_file => true)
+      zipfile.add(filename, handle.path)
+    rescue => e
+      @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
+      return false
+    ensure
+      handle.close if handle
     end
+    
     true
   end
 end

@@ -19,4 +19,6 @@
 class QuizSubmissionSnapshot < ActiveRecord::Base
   belongs_to :quiz_submission
   serialize :data
+
+  attr_accessible :quiz_submission, :attempt, :data
 end

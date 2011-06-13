@@ -213,9 +213,9 @@ describe "security" do
         { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
       assert_response 422
 
-      key = DeveloperKey.create(:api_key => "MYKEY")
+      key = DeveloperKey.create
       post "/api/v1/courses/#{@course.id}/assignments",
-        {:api_key => "MYKEY", :assignment => { :name => 'new assignment' } },
+        {:api_key => key.api_key, :assignment => { :name => 'new assignment' } },
         { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
       assert_response 201
     end

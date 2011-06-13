@@ -54,6 +54,8 @@ class Notification < ActiveRecord::Base
   has_many :notification_policies, :dependent => :destroy
   has_many :users, :through => :notification_policies
   before_save :infer_default_content
+
+  attr_accessible  :name, :subject, :body, :sms_body, :main_link, :delay_for, :category
   
   named_scope :to_show_in_feed, :conditions => ["messages.category = ? OR messages.notification_name IN (?) ", "TestImmediately", TYPES_TO_SHOW_IN_FEED]
   
@@ -116,9 +118,9 @@ class Notification < ActiveRecord::Base
       message.parse!('summary')
       delayed_message = DelayedMessage.new(
         :notification => self,
-        :notification_policy_id => policy.id, 
+        :notification_policy => policy,
         :frequency => policy.frequency,
-        :communication_channel_id => policy.communication_channel_id, 
+        :communication_channel_id => policy.communication_channel_id,
         :linked_name => 'work on this link!!!',
         :name_of_topic => message.subject,
         :link => message.url,

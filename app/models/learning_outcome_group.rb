@@ -104,7 +104,27 @@ class LearningOutcomeGroup < ActiveRecord::Base
   
   def all_tags_for_context
     self.context.learning_outcome_tags.active
- end
+  end
+  
+  # use_outcome should be a lambda that takes an outcome and returns a boolean
+  def clone_for(context, parent, use_outcome=nil)
+    # don't create a group if none of the items in it are being copied
+    return nil if use_outcome && !self.sorted_content.any? {|lo| use_outcome[lo]}    
+    
+    new_group = context.learning_outcome_groups.new
+    new_group.context = context
+    new_group.title = self.title
+    new_group.description = self.description
+    new_group.save!
+    parent.add_item(new_group)
+    
+    self.sorted_content.each do |lo|
+      next if use_outcome && !use_outcome[lo]
+      lo.clone_for(context, new_group)
+    end
+    
+    new_group
+  end
   
   def add_item(item, opts={})
     return if item == self
@@ -129,8 +149,11 @@ class LearningOutcomeGroup < ActiveRecord::Base
           group.learning_outcome_group_id = self.id
           group.description = item.description
           group.context = self.context
-          group.save!
+        else
+          group.root_learning_outcome_group_id = self.root_learning_outcome_group_id
+          group.learning_outcome_group_id = self.id
         end
+        group.save!
         tag = ContentTag.new(:content_asset_string => group.asset_string)
       end
       tag.context = self.context

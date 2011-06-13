@@ -168,6 +168,7 @@ ActionController::Routing::Routes.draw do |map|
     course.named_wiki_page 'wiki/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
     course.resources :conferences do |conference|
       conference.join "join", :controller => "conferences", :action => "join"
+      conference.close "close", :controller => "conferences", :action => "close"
     end
     
     course.resources :question_banks do |bank|
@@ -394,7 +395,9 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :announcements
     account.resources :assignments
     account.resources :submissions
-    account.resource :account_authorization_config
+    account.resources :account_authorization_configs
+    account.update_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'update_all', :conditions => {:method => :put}
+    account.remove_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'destroy_all', :conditions => {:method => :delete}
     account.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
@@ -505,6 +508,7 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
+    profile.resources :tokens, :except => %w(index)
     profile.pics 'profile_pictures', :controller => 'profile', :action => 'profile_pics'
     profile.user_service "user_services/:id", :controller => "users", :action => "delete_user_service", :conditions => {:method => :delete}
     profile.create_user_service "user_services", :controller => "users", :action => "create_user_service", :conditions => {:method => :post}

@@ -76,12 +76,17 @@ $(document).ready(function() {
   })
   .delegate('.edit_pseudonym_link', 'click', function(event) {
     event.preventDefault();
-    var $form = $("#edit_pseudonym_form");
+    var $form = $("#edit_pseudonym_form"),
+        $sis_row = $form.find('.sis_user_id');
+    $sis_row.hide();
     $form.attr('action', $(this).attr('rel')).attr('method', 'PUT');
-    var data = $(this).parents(".login").getTemplateData({textValues: ['unique_id']});
+    var data = $(this).parents(".login").getTemplateData({textValues: ['unique_id', 'sis_user_id', 'can_edit_sis_user_id']});
     data.password = "";
     data.password_confirmation = "";
     $form.fillFormData(data, {object_name: 'pseudonym'});
+    if( data.can_edit_sis_user_id == 'true' ){
+      $sis_row.show();
+    }
     var passwordable = $(this).parents(".links").hasClass('passwordable');
     $form.toggleClass('passwordable', passwordable);
     $form.find("tr.password").showIf(passwordable);

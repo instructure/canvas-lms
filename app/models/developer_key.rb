@@ -20,10 +20,39 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
   has_many :page_views
+  has_many :access_tokens
+
+  attr_accessible :api_key, :name
   
   before_create :generate_api_key
   
   def generate_api_key(overwrite=false)
-    self.api_key = AutoHandle.generate(nil, 32) if overwrite || !self.api_key
+    self.api_key = AutoHandle.generate(nil, 64) if overwrite || !self.api_key
+  end
+  
+  def self.default
+    get_special_key("User-Generated")
+  end
+  
+  def self.get_special_key(default_key_name)
+    @special_keys ||= {}
+
+    if Rails.env.test?
+      # TODO: we have to do this because tests run in transactions. maybe it'd
+      # be good to create some sort of of memoize_if_safe method, that only
+      # memoizes when we're caching classes and not in test mode? I dunno. But
+      # this stinks.
+      return @special_keys[default_key_name] = DeveloperKey.find_or_create_by_name(default_key_name)
+    end
+
+    key = @special_keys[default_key_name]
+    return key if key
+    if (key_id = Setting.get("#{default_key_name}_developer_key_id", nil)) && key_id.present?
+      key = DeveloperKey.find_by_id(key_id)
+    end
+    return @special_keys[default_key_name] = key if key
+    key = DeveloperKey.create!(:name => default_key_name)
+    Setting.set("#{default_key_name}_developer_key_id", key.id)
+    return @special_keys[default_key_name] = key
   end
 end

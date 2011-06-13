@@ -18,4 +18,6 @@
 
 class ScribdMimeType < ActiveRecord::Base
   has_many :attachments
+
+  attr_accessible :extension, :name
 end

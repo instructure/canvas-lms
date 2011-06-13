@@ -1,0 +1,17 @@
+# Canvas doesn't currently use Redis for any critical features, and it is
+# completely optional at this time. It can be used as a replacement for
+# memcache, for both session store and caching. It can also be used for a few
+# supported types of statistics gathering.
+#
+# production:
+#   servers:
+#     # list of redis servers to use in the ring
+#     - redis://redis01
+#     - redis://redis02
+
+# test:
+#   # only tests that are exercising the integration with redis require redis to run.
+#   servers:
+#     - redis://localhost
+#   # warning: the redis database will get cleared before each test, so if you use this server for anything else, make sure to set aside a database id for these tests to use.
+#   database: 1

@@ -24,6 +24,7 @@ class ContentExport < ActiveRecord::Base
   has_many :attachments, :as => :context, :dependent => :destroy
   has_a_broadcast_policy
   serialize :settings
+  attr_accessible
   
   workflow do
     state :created

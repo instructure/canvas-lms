@@ -315,6 +315,16 @@ class PseudonymsController < ApplicationController
       params[:pseudonym].delete :password
       params[:pseudonym].delete :password_confirmation
     end
+    if sis_id = params[:pseudonym].delete(:sis_user_id)
+      if sis_id != @pseudonym.sis_user_id && @pseudonym.account.grants_right?(@current_user, session, :manage_sis)
+        if sis_id == ''
+          @pseudonym.sis_user_id = nil
+        else
+          @pseudonym.sis_user_id = sis_id
+        end
+      end
+    end
+    
     if @pseudonym.update_attributes(params[:pseudonym])
       flash[:notice] = "Account updated!"
       respond_to do |format|

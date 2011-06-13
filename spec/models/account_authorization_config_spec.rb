@@ -22,9 +22,16 @@ describe AccountAuthorizationConfig do
 
   it "should not escape auth_filter" do
     @account = Account.new
-    @account_config = @account.build_account_authorization_config(:ldap_filter => '(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))')
+    @account_config = @account.account_authorization_configs.build(:ldap_filter => '(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))')
     @account_config.save
     @account_config.auth_filter.should eql("(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))")
+  end
+  
+  it "should replace empty string with nil" do
+    @account = Account.new
+    config = @account.account_authorization_configs.build
+    config.change_password_url = ""
+    config.change_password_url.should be_nil
   end
   
   context "password" do

@@ -48,7 +48,7 @@ module SIS
           update_progress
 
           Course.skip_updating_account_associations do
-            update_account_association = false
+            courses_to_update_associations = [].to_set
 
             logger.debug("Processing Course #{row.inspect}")
             term = @root_account.enrollment_terms.find_by_sis_source_id(row['term_id'])
@@ -62,7 +62,7 @@ module SIS
             end
             course.account ||= @root_account
 
-            update_account_association = course.account_id_changed? || course.root_account_id_changed?
+            courses_to_update_associations.add course if course.account_id_changed? || course.root_account_id_changed?
 
             # only update the name/short_name on new records, and ones that haven't been changed
             # since the last sis import
@@ -94,6 +94,22 @@ module SIS
 
             update_enrollments = !course.new_record? && !(course.changes.keys & ['workflow_state', 'name', 'course_code']).empty?
             if course.changed?
+              course.templated_courses.each do |templated_course|
+                templated_course.root_account = @root_account
+                templated_course.account = course.account
+                if templated_course.sis_name && templated_course.sis_name == templated_course.name && course.sis_name && course.sis_name == course.name
+                  templated_course.name = course.name
+                  templated_course.sis_name = course.sis_name
+                end
+                if templated_course.sis_course_code && templated_course.sis_course_code == templated_course.short_name && course.sis_course_code && course.sis_course_code == course.short_name
+                  templated_course.sis_course_code = course.sis_course_code
+                  templated_course.short_name = course.short_name
+                end
+                templated_course.enrollment_term = course.enrollment_term
+                templated_course.sis_batch_id = @batch.id if @batch
+                courses_to_update_associations.add templated_course if templated_course.account_id_changed? || templated_course.root_account_id_changed?
+                templated_course.save_without_broadcasting!
+              end
               course.sis_batch_id = @batch.id if @batch
               course.save_without_broadcasting!
             elsif @batch
@@ -101,7 +117,7 @@ module SIS
             end
             @sis.counts[:courses] += 1
 
-            course.update_account_associations if update_account_association
+            courses_to_update_associations.map(&:update_account_associations)
             course.update_enrolled_users if update_enrollments
           end
         end

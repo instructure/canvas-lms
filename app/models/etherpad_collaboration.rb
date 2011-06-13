@@ -42,10 +42,10 @@ class EtherpadCollaboration < Collaboration
     true
   end
   
-  
   def self.config
     # Return existing value, even if nil, as long as it's defined
     return @config if defined?(@config)
+    @config ||= Canvas::Plugin.find(:etherpad).try(:settings)
     @config ||= (YAML.load_file(RAILS_ROOT + "/config/etherpad.yml")[RAILS_ENV] rescue nil)
   end
 end

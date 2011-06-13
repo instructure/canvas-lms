@@ -62,6 +62,17 @@
         <% end %>
       </ul>
     <% end %>
+    <% if @copy_context.learning_outcomes.active.length > 0 %>
+      <h3><%= check_box :copy, :all_outcomes, :class => "copy_all", :checked => true %><%= label :copy, :all_modules,image_tag('flagged_question_dim.png') + " Learning Outcomes for #{@copy_context.name}" %></h3>
+      <ul class="unstyled_list root_asset_list">
+        <% @copy_context.learning_outcomes.active.each do |mod| %>
+          <li>
+            <%= check_box :copy, mod.asset_string.to_sym %>
+            <%= label :copy, mod.asset_string.to_sym, mod.short_description %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
     <% if @copy_context.quizzes.active.length > 0 %>
       <h3><%= check_box :copy, :all_quizzes, :class => "copy_all", :checked => true %><%= label :copy, :all_quizzes, image_tag('quiz.png') + " Quizzes for #{@copy_context.name}" %></h3>
       <ul class="unstyled_list root_asset_list">
@@ -278,9 +289,10 @@ $(document).ready(function() {
         }).dialog('open');
       } else {
         $(this).parent().next("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $(this).attr('checked')).each(function() { $(this).triggerHandler('change'); });
+        $('#copy_everything').attr('checked', false);
       }
     } else if($(this).hasClass('copy_everything')) {
-      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.skip_on_everything)").attr('checked', $(this).attr('checked')).filter(":not(.copy_all)").each(function() { $(this).triggerHandler('change'); });
+      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything):not(.skip_on_everything):not(.shift_dates_checkbox)").attr('checked', $(this).attr('checked')).filter(":not(.copy_all)").each(function() { $(this).triggerHandler('change'); });
       $("#copy_all_topics").attr('checked', $(this).attr('checked')).triggerHandler('change');
     } else {
       $(this).parent().find(":checkbox.secondary_checkbox" + (force_secondaries ? '' : ':not(.skip)')).attr('checked', $(this).attr('checked'));
@@ -291,9 +303,12 @@ $(document).ready(function() {
         $(this).parents("ul").each(function() {
           $(this).prev("h2,h3,h4").find(":checkbox").attr('checked', false);
         });
+        if(!$(this).is('#copy_shift_dates')){
+          $('#copy_everything').attr('checked', false);
+        }
       }
     }
-  })
+  });
   $(".shift_dates_checkbox").change(function() {
     $(".shift_dates_settings").showIf($(this).attr('checked'));
   }).change();

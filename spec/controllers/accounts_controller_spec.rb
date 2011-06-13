@@ -39,23 +39,6 @@ describe AccountsController do
     @course2.update_account_associations
   end
 
-  describe "GET 'index'" do
-    it "shouldn't show duplicates of courses" do
-      cross_listed_course
-      get 'show', :id => @account1.id
-      assigns[:courses].should == [@course1]
-    end
-  end
-
-  describe "GET 'courses'" do
-    it "shouldn't show duplicates of courses" do
-      cross_listed_course
-      get 'courses', :account_id => @account1.id, :query => @course1.name
-      assigns[:courses].should == [@course1]
-      response.should be_redirect
-    end
-  end
-
   describe "SIS imports" do
     it "should set batch mode and term if given" do
       course_with_teacher_logged_in(:active_all => true)
@@ -75,5 +58,13 @@ describe AccountsController do
       batch.batch_mode.should be_true
       batch.batch_mode_term.should == @account.enrollment_terms.first
     end
+  end
+
+  it "should redirect to CAS if CAS is enabled" do
+    account = account_with_cas({:account => Account.default})
+    config = { :cas_base_url => account.account_authorization_config.auth_base }
+    cas_client = CASClient::Client.new(config)
+    get 'show', :id => account.id
+    response.should redirect_to(cas_client.add_service_to_login_url(login_url))
   end
 end

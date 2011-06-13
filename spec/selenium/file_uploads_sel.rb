@@ -64,7 +64,7 @@ shared_examples_for "file uploads selenium tests" do
         $('#editor_tabs ul li:eq(1) a').click();
       JS
       
-      keep_trying { driver.find_element(:css, '#tree1 .folder') }
+      keep_trying_until { driver.find_element(:css, '#tree1 .folder') }
       driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
       no_files = driver.execute_script("return $('#tree1 .leaf:contains(\"No Files\")')[0]")
       if first_time
@@ -78,11 +78,11 @@ shared_examples_for "file uploads selenium tests" do
       driver.find_element(:css, '.upload_new_file_link').click
       driver.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
       driver.find_element(:css, '#sidebar_upload_file_form button').click
-      keep_trying { driver.execute_script("return $('#tree1 .leaf:contains(#{filename})').length") > 0 }
+      keep_trying_until { driver.execute_script("return $('#tree1 .leaf:contains(#{filename})').length") > 0 }
       
       # let's go check out if the file is in the files controller
       get "/courses/#{@course.id}/files"
-      keep_trying { driver.execute_script("return $('a:contains(#{filename})')[0]") }
+      keep_trying_until { driver.execute_script("return $('a:contains(#{filename})')[0]") }
       
       # check out the file content, make sure it's good
       get "/courses/#{@course.id}/files/#{Attachment.last.id}/download?wrap=1"
@@ -105,19 +105,19 @@ shared_examples_for "file uploads selenium tests" do
       get "/courses/#{@course.id}/assignments/#{a.id}"
 
       driver.execute_script("$('.submit_assignment_link').click();")
-      keep_trying { driver.execute_script("return $('div#submit_assignment')[0].style.display") != "none" }
+      keep_trying_until { driver.execute_script("return $('div#submit_assignment')[0].style.display") != "none" }
       driver.find_element(:name, 'attachments[0][uploaded_data]').send_keys(fullpath)
       driver.find_element(:css, '#submit_online_upload_form #submit_file_button').click
-      keep_trying { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
+      keep_trying_until { driver.page_source =~ /Download #{Regexp.quote(filename)}<\/a>/ }
       link = driver.find_element(:css, "div.details a.forward")
       link.text.should eql("Submission Details")
 
       link.click
-      keep_trying { driver.page_source =~ /Submission Details<\/h2>/ }
+      keep_trying_until { driver.page_source =~ /Submission Details<\/h2>/ }
       wait_for_dom_ready
       in_frame('preview_frame') do
         driver.find_element(:css, '.centered-block .ui-listview .comment_attachment_link').click
-        keep_trying { driver.page_source =~ /#{Regexp.quote(data)}/ }
+        keep_trying_until { driver.page_source =~ /#{Regexp.quote(data)}/ }
       end
     end
   end
@@ -135,7 +135,7 @@ shared_examples_for "file uploads selenium tests" do
       find_element(:name, 'export_file').send_keys(fullpath)
     driver.find_element(:css, '#config_options').
       find_element(:css, '.submit_button').click
-    keep_trying { driver.find_element(:css, '#file_uploaded').displayed? }
+    keep_trying_until { driver.find_element(:css, '#file_uploaded').displayed? }
 
     ContentMigration.for_context(@course).count.should == 1
     cm = ContentMigration.for_context(@course).first

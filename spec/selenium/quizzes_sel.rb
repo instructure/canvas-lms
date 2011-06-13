@@ -19,7 +19,7 @@ shared_examples_for "quiz selenium tests" do
     get "/courses/#{e.course_id}/quizzes/new"
 
     driver.find_element(:css, ".add_question .add_question_link").click
-    keep_trying{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    keep_trying_until{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
     holder = driver.find_element(:css, "#questions .question_holder")
     holder.should be_displayed
     holder.find_element(:css, ".cancel_link").click
@@ -44,7 +44,7 @@ shared_examples_for "quiz selenium tests" do
     driver.find_elements(:css, "#question_form_template option.missing_word").length.should == 1
 
     driver.find_element(:css, ".add_question .add_question_link").click
-    keep_trying{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    keep_trying_until{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
     driver.find_elements(:css, "#questions .question_holder option.missing_word").length.should == 0
   end
   
@@ -74,7 +74,7 @@ shared_examples_for "quiz selenium tests" do
     
     def save_question_and_wait(question)
       question.find_element(:css, "button[type='submit']").click
-      keep_trying { question.find_element(:css, ".loading_image_holder").nil? rescue true }
+      keep_trying_until { question.find_element(:css, ".loading_image_holder").nil? rescue true }
     end
     
     def replace_content(el, value)
@@ -98,7 +98,7 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('Hi, this is a multiple choice question.')
     end
     
-    answers = find_all_with_jquery('.question_holder:visible:first .form_answers > .answer')
+    answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(4)
     replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
     replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
@@ -142,7 +142,7 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('This is not a true/false question.')
     end
     
-    answers = find_all_with_jquery('.question_holder:visible:eq(1) .form_answers > .answer')
+    answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(2)
     answers[1].find_element(:css, ".select_answer_link").click # false - get it?
     answers[1].find_element(:css, ".comment_focus").click
@@ -173,15 +173,15 @@ shared_examples_for "quiz selenium tests" do
       driver.find_element(:id, 'tinymce').send_keys('This is a fill in the _________ question.')
     end
     
-    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
+    answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(2)
     question.find_element(:css, ".add_answer_link").click
     question.find_element(:css, ".add_answer_link").click
-    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
+    answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(4)
     answers[3].find_element(:css, ".delete_answer_link").click
     answers[2].find_element(:css, ".delete_answer_link").click
-    answers = find_all_with_jquery('.question_holder:visible:eq(2) .form_answers > .answer')
+    answers = question.find_elements(:css, "div.form_answers > div.answer")
     answers.length.should eql(2)
     replace_content(answers[0].find_element(:css, ".short_answer input"), "blank")
     replace_content(answers[1].find_element(:css, ".short_answer input"), "Blank")
@@ -237,6 +237,22 @@ shared_examples_for "quiz selenium tests" do
     driver.find_element(:partial_link_text, "Message Students Who...").click
     dialog = find_all_with_jquery("#message_students_dialog:visible")
     dialog.length.should eql(1)
+  end
+
+  it "should tally up question bank question points" do
+    course_with_teacher_logged_in
+    quiz = @course.quizzes.create!(:title => "My Quiz")
+    bank = AssessmentQuestionBank.create!(:context => @course)
+    3.times { bank.assessment_questions << assessment_question_model }
+    harder = bank.assessment_questions.last
+    harder.question_data[:points_possible] = 15
+    harder.save!
+    get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+    find_questions_link = driver.find_element(:link, "Find Questions")
+    find_questions_link.click
+    driver.find_element(:link, "Select All").click
+    find_with_jquery("div#find_question_dialog button.submit_button").click
+    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
 end
 
