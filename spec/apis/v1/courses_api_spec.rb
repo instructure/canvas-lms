@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe CoursesController, :type => :integration do
   before do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
     @course1 = @course
     course_with_student(:user => @user, :active_all => true)

@@ -109,6 +109,15 @@ class Submission < ActiveRecord::Base
       SQL
     end
   end
+  trigger.after(:insert) do |t|
+    t.where('#{Submission.needs_grading_conditions("NEW")}') do
+      <<-SQL
+      UPDATE assignments
+      SET needs_grading_count = needs_grading_count + 1
+      WHERE id = NEW.assignment_id;
+      SQL
+    end
+  end
   
   attr_reader :suppress_broadcast
   attr_reader :group_broadcast_submission
@@ -117,7 +126,7 @@ class Submission < ActiveRecord::Base
   
   has_a_broadcast_policy
 
-  simply_versioned
+  simply_versioned :explicit => true
   
   set_policy do
     given {|user| user && user.id == self.user_id }
@@ -304,7 +313,8 @@ class Submission < ActiveRecord::Base
       if((a.context_type == 'User' && a.context_id == user_id) ||
           (a.context_type == 'Group' && a.context_id == group_id) ||
           (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?))
-        self.attachment_associations.find_or_create_by_attachment_id(a.id)
+        aa = self.attachment_associations.find_by_attachment_id(a.id)
+        aa ||= self.attachment_associations.create(:attachment => a)
       end
     end
   end
@@ -722,6 +732,7 @@ class Submission < ActiveRecord::Base
     user = obj.user rescue nil
     association = self.assignment.rubric_association
     res = self.assessment_requests.find_or_initialize_by_assessor_asset_id_and_assessor_asset_type_and_assessor_id_and_rubric_association_id(obj.id, obj.class.to_s, user.id, (association ? association.id : nil))
+    res || self.assessment_requests.build(:assessor_asset => obj, :assessor => user, :rubric_association => association)
     res.user_id = self.user_id
     res.workflow_state = 'assigned' if res.new_record?
     just_created = res.new_record?

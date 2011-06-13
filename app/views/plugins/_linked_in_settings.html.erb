@@ -1,0 +1,32 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p>
+          You will need to register a <a href="https://www.linkedin.com/secure/developer">new app on LinkedIn</a>.
+          Set the following configuration options to ensure your LinkedIn integration
+          works correctly:
+          <ul>
+            <li><b>Application Type:</b> set to "Web Application"</li> 
+            <li><b>Live Status:</b> set to "Live"</li> 
+            <li><b>OAuth Redirect URL:</b> set to <span class="nobr">https://&lt; domain &gt;/oauth_success?service=linked_in</span></li> 
+            <li>After you save your app, make a note of the API Key and Secret Key</li>
+          </ul>
+          
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :api_key, "API Key:" %></td>
+      <td>
+        <%= f.text_field :api_key %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :secret_key, "Secret Key:" %></td>
+      <td>
+        <%= f.text_field :secret_key %>
+      </td>
+    </tr>
+  </table>
+<% end %>

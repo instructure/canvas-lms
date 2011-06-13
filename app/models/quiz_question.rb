@@ -93,6 +93,7 @@ class QuizQuestion < ActiveRecord::Base
       dup.send("#{key}=", val)
     end
     data = self.question_data || {}
+    data.delete(:id)
     if options[:old_context] && options[:new_context]
       data = QuizQuestion.migrate_question_hash(data, options)
     end

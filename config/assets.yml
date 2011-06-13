@@ -229,6 +229,8 @@ stylesheets:
     - public/stylesheets/compiled/g_syllabus.css
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/print.css
+  profile:
+    - public/stylesheets/compiled/profile.css
   facebook:
     - public/stylesheets/compiled/facebook.css
   speed_grader:

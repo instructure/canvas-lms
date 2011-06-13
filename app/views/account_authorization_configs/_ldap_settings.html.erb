@@ -1,91 +1,56 @@
+<% @account_config = @account_configs.first %>
 <% form_id = @account_config.ldap_authentication? ? 'auth_form' : 'ldap_form' %>
 <% active = @account_config.ldap_authentication? ? 'class="active"' : '' %>
 <div id="ldap_div" <%= raw active %>>
-<% form_for @account_config, :url => context_url(@account, :context_account_authorization_config_url, @account.id), :html => {:id => form_id, :class=>"auth_type ldap_form"} do |f| %>
-    <input type="hidden" name="account_authorization_config[auth_type]" value="<%= @account_config.auth_type || 'ldap' %>"/>
-    <table class="formtable" style="margin-left: 20px;">
+<% form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class=>"auth_type ldap_form" ) do %>
+  <table class="formtable" style="margin-left: 20px;">
+    <tr>
+      <th>Type:</th>
+      <th>LDAP</th>
+    </tr>
+    <% fields_for @account_configs[0], :index => 0 do |f| %>
+      <%= f.hidden_field :disabled, :value => '0' %>
+      <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @account_configs[0] } %>
+
       <tr>
-        <td><%= f.label :auth_type, "Type:" %></td>
-        <td>
-          <span class="auth_form">
-            <%= @account_config.auth_type || 'LDAP' %>
-          </span>
-          <span class="auth_info"><%= @account_config.auth_type || 'LDAP' %></span>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :auth_host, "Host:" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
-          <%= f.text_field :auth_host, :class => "auth_form", :style => "width: 300px;" %>
-          <span class="auth_info auth_host"><%= @account_config.auth_host %></span>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :auth_port, "Port:" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
-          <%= f.text_field :auth_port, :class => "auth_form", :style => "width: 50px;" %>
-          <span class="auth_info auth_port"><%= @account_config.auth_port %></span>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :auth_over_tls, "Over TLS?:" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
-          <%= f.check_box :auth_over_tls, :class => "auth_form" %>
-          <span class="auth_info auth_over_tls"><%= @account_config.auth_over_tls %></span>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :auth_base, "Base:" %></td>
-        <td colspan="3" style="width: 40%; vertical-align: top;" class="nobr">
-          <%= f.text_field :auth_base, :class => "auth_form", :style => "width: 300px;" %>
-          <span class="auth_info auth_base"><%= @account_config.auth_base %></span>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :auth_filter, "Filter:" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
-          <%= f.text_field :auth_filter, :class => "auth_form", :style => "width: 300px;" %>
-          <span class="auth_info auth_filter"><%= @account_config.ldap_filter %></span>
-          <span class="auth_form" style="font-size: smaller;">
-            <br>Use <tt>{{login}}</tt> as a placeholder for the username supplied by the user.
-            <br />For example: <tt>(sAMAccountName={{login}}</tt>)
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :auth_username, "Username:" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
-          <%= f.text_field :auth_username, :class => "auth_form", :style => "width: 300px;" %>
-          <span class="auth_info auth_username"><%= @account_config.auth_username %></span>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :auth_password, "Password:" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
-          <%= text_field :account_authorization_config, :auth_password, :class => "auth_form" %>
-          <span class="auth_info auth_password"><%= "********" if @account_config.auth_crypted_password %></span>
-          <% if @account_config.auth_crypted_password -%>
-            <span class="auth_form" style="font-size: smaller;">
-              <br>Leave blank to continue using the current password.
-            </span>
-          <% end -%>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :login_handle_name, "Login label:" %></td>
-        <td style="width: 40%; vertical-align: top;" class="nobr">
+        <td style="vertical-align: top; width: 200px;"><%= f.label :login_handle_name, "Login Label:" %></td>
+        <td style="vertical-align: top;" class="nobr">
           <%= f.text_field :login_handle_name, :class => "auth_form", :style => "width: 300px;", :placeholder => AccountAuthorizationConfig.default_login_handle_name %>
-          <span class="auth_info auth_login_handle_name"><%= @account_config.login_handle_name || AccountAuthorizationConfig.default_login_handle_name %></span>
+          <span class="auth_info auth_login_handle_name"><%= @account_configs[0].login_handle_name || AccountAuthorizationConfig.default_login_handle_name %></span>
         </td>
       </tr>
       <tr>
-        <td colspan="4">
-          <span class="auth_form">
-            <button type="submit" class="button">Save Authentication Settings</button>
-            <button type="button" class="cancel_button button-secondary">Cancel</button>
-          </span>
+        <td style="vertical-align: top; width: 200px; white-space: nowrap;"><%= f.label :change_password_url, "Forgot Password URL:" %></td>
+        <td style="vertical-align: top;" class="nobr">
+          <%= f.text_field :change_password_url, :class => "auth_form", :style => "width: 300px;" %>
+          <div style="font-size: 0.8em;"><span class="auth_form">Leave blank for default Canvas behavior</span></div>
+          <span class="auth_info auth_forgot_password_url"><%= @account_configs[0].change_password_url || "None specified" %></span>
         </td>
       </tr>
-    </table>
+    <% end %>
+  </table>
+
+  <div>
+    <div class="auth_form" style="margin: 15px;">
+      <a href="#" class="add_secondary_ldap_link" style="<%= "display: none;" if @account_configs[1].ldap_authentication? %>">Add Secondary LDAP Server</a>
+    </div>
+  </div>
+
+  <table class="formtable ldap_secondary" style="margin-left: 20px; margin-top: 20px; <%= "display: none;" unless @account_configs[1].ldap_authentication? %>">
+    <tr>
+      <th>Type:</th>
+      <th>Secondary LDAP <a href="#" class="auth_form remove_secondary_ldap_link">(Remove)</a></th>
+    </tr>
+    <% fields_for @account_configs[1], :index => 1 do |f| %>
+      <%= f.hidden_field :disabled, :value => @account_configs[1].ldap_authentication? ? '0' : '1', :id => 'secondary_ldap_config_disabled' %>
+      <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @account_configs[1] } %>
+    <% end %>
+  </table>
+
+  <span class="auth_form" style="margin-top: 15px;">
+    <button type="submit" class="button">Save LDAP Settings</button>
+    <button type="button" class="cancel_button button-secondary">Cancel</button>
+  </span>
 <% end %>
 </div>
+

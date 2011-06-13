@@ -25,6 +25,8 @@ class InboxItem < ActiveRecord::Base
   before_save :infer_context_code
   after_save :update_user_inbox_items_count
   after_destroy :update_user_inbox_items_count
+
+  attr_accessible :user_id, :asset, :subject, :body_teaser, :sender_id
   
   workflow do
     state :unread

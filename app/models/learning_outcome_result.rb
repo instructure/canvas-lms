@@ -26,6 +26,8 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   simply_versioned
   before_save :infer_defaults
+
+  attr_accessible :learning_outcome, :user, :association, :content_tag, :associated_asset
   
   def infer_defaults
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
@@ -54,8 +56,8 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
   
   def save_to_version(attempt)
-    current_version = self.versions.current.model
-    if current_version.attempt && attempt < current_version.attempt
+    current_version = self.versions.current.try(:model)
+    if current_version.try(:attempt) && attempt < current_version.attempt
       versions = self.versions.sort_by(&:created_at).reverse.select{|v| v.model.attempt == attempt}
       if !versions.empty?
         versions.each do |version|

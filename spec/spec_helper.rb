@@ -64,7 +64,7 @@ Spec::Runner.configure do |config|
     config.auth_type = "cas"
     config.auth_base = cas_url
     config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
-    account.account_authorization_config = config
+    account.account_authorization_configs << config
     account
   end
 
@@ -81,9 +81,19 @@ Spec::Runner.configure do |config|
     @course
   end
 
+  def account_admin_user_with_role_changes(opts={})
+    account = opts[:account] || Account.default
+    if opts[:role_changes]
+      opts[:role_changes].each_pair do |permission, enabled|
+        account.role_overrides.create(:permission => permission, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
+      end
+    end
+    account_admin_user(opts)
+  end
+
   def account_admin_user(opts={})
     user(opts)
-    @user.account_users.create(:account => opts[:account] || Account.default)
+    @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
     @user
   end
 

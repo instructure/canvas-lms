@@ -98,13 +98,10 @@ class RubricsController < ApplicationController
   end
   
   def destroy
-    @rubric = @context.rubrics.find(params[:id])
+    @rubric = RubricAssociation.find_by_rubric_id_and_context_id_and_context_type(params[:id], @context.id, @context.class.to_s, :include => :rubric).rubric
     if authorized_action(@rubric, @current_user, :delete_associations)
-      if @rubric.destroy_for(@context)
-        render :json => @rubric.to_json
-      else
-        render :json => @rubric.errors.to_json, :status => :bad_request
-      end
+      @rubric.destroy_for(@context)
+      render :json => @rubric.to_json
     end
   end
 

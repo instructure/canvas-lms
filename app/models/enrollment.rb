@@ -38,6 +38,8 @@ class Enrollment < ActiveRecord::Base
   after_save :touch_user
   before_save :update_user_account_associations_if_necessary
 
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :invitation_email
+
   trigger.after(:insert).where("NEW.workflow_state = 'active'") do
     <<-SQL
     UPDATE assignments
@@ -402,7 +404,7 @@ class Enrollment < ActiveRecord::Base
   end
   
   def computed_final_grade
-    return "TODO"
+    self.course.score_to_grade(self.computed_final_score)
   end
 
   def self.students(opts={})

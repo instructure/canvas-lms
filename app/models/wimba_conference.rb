@@ -174,7 +174,8 @@ class WimbaConference < WebConference
     send_request('createClass', {
       'target' => wimba_id,
       'longname' => title[0,50],
-      'preview' => '0' # we want the room open by default
+      'preview' => '0', # we want the room open by default
+      'auto_open_new_archives' => '1'
     }) or return nil
     save
     conference_key

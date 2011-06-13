@@ -24,6 +24,8 @@ class StreamItem < ActiveRecord::Base
 
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :users, :through => :stream_item_instances
+
+  attr_accessible
   
   def stream_data(viewing_user_id)
     res = data.is_a?(OpenObject) ? data : OpenObject.new

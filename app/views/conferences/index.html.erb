@@ -45,12 +45,16 @@
       </tr><tr style="<%= hidden unless WebConference.conference_types.length > 1 %>">
         <td class="nobr" style="width: 5px;"><%= f.label :conference_type, "Type:" %></td>
         <td><%= f.select :conference_type, WebConference.conference_types.map{|c| [c[:conference_type], c[:conference_type]] } %></td>
-      </tr><tr style="<%= hidden %>">
+      </tr><tr>
         <td class="nobr" style="width: 5px;"><label>Options:</label></td>
-        <td id="web_conference_user_settings"></td>
+        <td>
+          <div id="web_conference_user_settings"></div>
+          <%= f.check_box :long_running? %>
+          <%= f.label :long_running?, "This is a long-running conference and should not be automatically closed" %>
+        </td>
       </tr><tr>
         <td class="nobr" style="width: 5px;"><%= f.label :duration, "Duration:" %></td>
-        <td><%= f.text_field :duration, :style => "width: 25px;", :value => "60" %> minutes</td>
+        <td><%= f.text_field :duration, :style => "width: 25px;" %> minutes</td>
       </tr><tr>
         <td colspan="2">
           <%= f.label :description, "Description:" %><br/>
@@ -117,6 +121,7 @@
       types
     }.to_json.html_safe
   %>;
+  INST.webConferenceDefaultDuration = <%= WebConference::DEFAULT_DURATION %>;
 
   $(document).ready(function() {
     $("#add_conference_form .cancel_button").click(function() {
@@ -142,6 +147,9 @@
         }
         $("#add_conference_form").hide();
         $conference.loadingImage();
+        if (!data.duration) {
+          data.long_running = "1";
+        }
         $conference.fillTemplateData({
           data: data
         });
@@ -176,11 +184,6 @@
         contents += html.html + "<br>";
       });
       $("#web_conference_user_settings").html(contents);
-      if (contents) {
-        $("#web_conference_user_settings").parent().show();
-      } else {
-        $("#web_conference_user_settings").parent().hide();
-      }
     });
     $(".edit_conference_link, .add_conference_link").click(function(event) {
       event.preventDefault();
@@ -198,7 +201,7 @@
         $conference = $("#conference_blank");
       }
       var data = $conference.getTemplateData({
-        textValues: ['title', 'duration', 'description', 'user_ids', 'conference_type'].concat(INST.webConferenceUserSettings)
+        textValues: ['title', 'duration', 'description', 'user_ids', 'conference_type', 'long_running'].concat(INST.webConferenceUserSettings)
       });
       if(edit) {
         $form.find("span.title").text("Edit Conference Details");
@@ -230,6 +233,13 @@
         $("#conferences").before($form);
       }
       $form.fillFormData(data, {object_name: 'web_conference'});
+      $form.find('#web_conference_long_running').change(function(){
+        if ($(this).attr('checked')) {
+          $form.find('#web_conference_duration').attr('disabled', true).val('');
+        } else {
+          $form.find('#web_conference_duration').attr('disabled', false).val(INST.webConferenceDefaultDuration);
+        }
+      }).change();
       $conference.hide();
       if(edit) {
         $form.show();
@@ -265,6 +275,18 @@
     $(document).fragmentChange(function(event, hash){
       if (match = hash.match(/^#conference_\d+$/)) {
         $(match[0]).find(".edit_conference_link").click();
+      }
+    });
+    $('.close_conference_link').click(function(){
+      var $conference = $(this).parents(".conference");
+      event.preventDefault();
+      if (confirm("Are you sure you want to end this conference? You will not be able to reopen it")) {
+        $conference.loadingImage();
+        $conference.find(".close_conference_link, .join_conference_link, .edit_conference_link").hide();
+        $.ajaxJSON($(this).attr('href'), "POST", {}, function(data) {
+          $("#no_conferences_message").slideUp();
+          $conference.loadingImage('remove');
+        });
       }
     });
   });

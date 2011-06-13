@@ -37,13 +37,13 @@ describe QuizSubmission do
     qs = @quiz.generate_submission(@user)
     qs.workflow_state = 'complete'
     qs.submission_data = [{ :points => 0, :text => "", :correct => "undefined", :question_id => -1 }]
-    qs.save
+    qs.with_versioning(true, &:save)
     
     qs = @quiz.generate_submission(@user)
     qs.submission_data = { "foo" => "bar" } # simulate k/v pairs we store for quizzes in progress
     qs.save
     lambda {qs.update_scores}.should raise_error
-    lambda {qs.update_scores(:submission_version_number => 3) }.should_not raise_error
+    lambda {qs.update_scores(:submission_version_number => 1) }.should_not raise_error
   end
   
   it "should not allowed grading on an already-graded submission" do
@@ -88,20 +88,20 @@ describe QuizSubmission do
     s.workflow_state = "complete"
     s.score = 5.0
     s.attempt = 1
-    s.save!
+    s.with_versioning(true, &:save!)
     s.score.should eql(5.0)
     s.kept_score.should eql(5.0)
     
     s.score = 4.0
     s.attempt = 2
-    s.save!
+    s.with_versioning(true, &:save!)
     s.kept_score.should eql(4.0)
     
     q.update_attributes!(:scoring_policy => "keep_highest")
     s.reload
     s.score = 3.0
     s.attempt = 3
-    s.save!
+    s.with_versioning(true, &:save!)
     s.kept_score.should eql(5.0)
   end
   

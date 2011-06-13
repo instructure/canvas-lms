@@ -595,7 +595,7 @@ class Assignment < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
       elsif (self.lock_at && self.lock_at <= Time.now)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
-      elsif (self.could_be_locked && self.context_module_tag && !self.context_module_tag.available_for?(user, opts[:deep_check_if_needed]))
+      elsif (self.could_be_locked && self.context_module_tag && self.context_module_tag.locked_for?(user, opts[:deep_check_if_needed]))
         locked = {:asset_string => self.asset_string, :context_module => self.context_module_tag.context_module.attributes}
       end
       locked
@@ -873,7 +873,7 @@ class Assignment < ActiveRecord::Base
     homeworks = []
     ts = Time.now.to_s
     students.each do |student|
-      homework = self.find_or_create_submission(student)
+      homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
       homework.grade_matches_current_submission = homework.score ? false : true
       homework.attributes = opts.merge({
         :attachment => nil,
@@ -884,7 +884,7 @@ class Assignment < ActiveRecord::Base
       })
       homework.submitted_at = Time.now
 
-      homework.with_versioning(true) do
+      homework.with_versioning(:explicit => true) do
         group ? homework.save_without_broadcast : homework.save
       end
       context_module_action(student, :submitted)

@@ -33,7 +33,6 @@
           <label for="batch_mode">This is a full batch update</label>
           <br>
           <select id="batch_mode_term_id" name="batch_mode_term_id">
-            <option value=''>- All Terms -</option>
             <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
           </select>
           <p class='instruction'>

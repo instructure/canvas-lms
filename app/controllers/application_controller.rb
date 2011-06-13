@@ -150,6 +150,7 @@ class ApplicationController < ActionController::Base
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html { 
         store_location if request.get?
+        return if !@current_user && initiate_delegated_login
         render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized 
       }
       format.zip { redirect_to(url_for(params)) }
@@ -489,7 +490,7 @@ class ApplicationController < ActionController::Base
   end
   
   def generate_page_view
-    @page_view = PageView.new(:url => request.url[0,255], :user_id => @current_user.id, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'])
+    @page_view = PageView.new(:url => request.url[0,255], :user => @current_user, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'])
     @page_view.interaction_seconds = 5
     @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.method == :get)
     @page_view.created_at = Time.now
@@ -551,7 +552,8 @@ class ApplicationController < ActionController::Base
       # it's not an update because if the page_view already existed, we don't want to 
       # double-count it as multiple views when it's really just a single view.
       if @current_user && @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-        @access = AssetUserAccess.find_or_create_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
+        @access = AssetUserAccess.find_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
+        @access ||= AssetUserAccess.create(:user => @current_user, :asset_code => @accessed_asset[:code])
         @accessed_asset[:level] ||= 'view'
         if @accessed_asset[:level] == 'view'
           @access.view_score ||= 0
@@ -678,6 +680,7 @@ class ApplicationController < ActionController::Base
         raise(ActionController::InvalidAuthenticityToken) unless form_authenticity_token == form_authenticity_param
       end
     end
+    Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
   def api_request?
@@ -936,7 +939,7 @@ class ApplicationController < ActionController::Base
 
   def user_content(str, cache_key = nil)
     return nil unless str
-    return str.html_safe unless str.match(/object|embed/)
+    return str.html_safe unless str.match(/object|embed|equation_image/)
 
     UserContent.escape(str)
   end

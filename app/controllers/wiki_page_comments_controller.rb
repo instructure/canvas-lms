@@ -26,7 +26,7 @@ class WikiPageCommentsController < ApplicationController
     if authorized_action(@page, @current_user, :read)
       if @context.allow_wiki_comments || @context.grants_right?(@current_user, nil, :manage_wiki)
         @comment = @page.wiki_page_comments.build(params[:wiki_page_comment])
-        @comment.user_id = @current_user && @current_user.id
+        @comment.user = @current_user
         @comment.context = @context
         @comment.user_name = @current_user ? @current_user.name : request.remote_ip
         if @comment.save

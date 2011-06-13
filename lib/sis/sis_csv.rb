@@ -30,7 +30,7 @@ module SIS
     #  * Course must be imported before Section
     #  * Course and Section must be imported before Xlist
     #  * Course, Section, and User must be imported before Enrollment
-    IMPORTERS = [:account, :term, :course, :section, :xlist, :user, :enrollment, :grade_publishing_results]
+    IMPORTERS = [:account, :term, :course, :section, :xlist, :user, :enrollment, :group, :group_membership, :grade_publishing_results]
 
     def initialize(root_account, opts = {})
       opts = opts.with_indifferent_access

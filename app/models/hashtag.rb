@@ -19,7 +19,9 @@
 class Hashtag < ActiveRecord::Base
   has_many :short_message_associations, :as => :context
   has_many :short_messages, :through => :short_message_associations
-  
+
+  attr_accessible :hashtag
+
   before_save :infer_defaults
   
   def infer_defaults

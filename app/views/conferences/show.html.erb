@@ -37,7 +37,7 @@
     <% end %>
     <tr>
       <th>Duration:</th>
-      <td><%= @conference.duration %> minutes</td>
+      <td><% if @conference.long_running? %>N/A, long-running<% else %><%= @conference.duration %> minutes<% end %></td>
     </tr>
     <tr>
       <th>Status:</th>
@@ -97,6 +97,9 @@
     <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, @conference.id) %>" class="button join_conference_link">
       <%= txt %>
     </a>
+    <% end %>
+    <% if can_do(@conference, @current_user, :close) %>
+    <a href="<%= context_url(@context, :context_conference_close_url, @conference.id) %>" class="button close_conference_link">End it now</a>
     <% end %>
   </div>
 </div>

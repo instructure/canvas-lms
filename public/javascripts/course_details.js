@@ -279,6 +279,11 @@ $(document).ready(function() {
       $("#course_form .self_enrollment_message").css('display', course.self_enrollment ? '' : 'none');
       $("#course_form").fillTemplateData({data: course});
       $(".hashtag_form").showIf($("#course_hashtag").text().length > 0);
+    },
+    error: function(data) {
+      $(this).loadingImage('remove');
+      $(".edit_course_link").click();
+      $(this).formErrors(data);
     }
   })
   .find(".cancel_button")
@@ -468,7 +473,7 @@ $(document).ready(function() {
       updatePublishingStatus();
     }, error);
   });
-  if (sisPublishEnabled) {
+  if (typeof(sisPublishEnabled) != 'undefined' && sisPublishEnabled) {
     updatePublishingStatus();
   }
 

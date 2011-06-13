@@ -410,7 +410,7 @@ var anonymousAssignment = false;
         }
         for (var i in EG.currentStudent.rubric_assessments) {
           if (response.id === EG.currentStudent.rubric_assessments[i].id) {
-            EG.currentStudent.rubric_assessments[i] = response;
+            $.extend(true, EG.currentStudent.rubric_assessments[i], response);
             found = true;
             continue;
           }
@@ -426,7 +426,8 @@ var anonymousAssignment = false;
         $.each(response.related_group_submissions_and_assessments, function(i,submissionAndAssessment){
           //setOrUpdateSubmission returns the student. so we can set student.rubric_assesments
           // submissionAndAssessment comes back with :include_root => true, so we have to get rid of the root
-          EG.setOrUpdateSubmission(response.artifact).rubric_assessments = $.map(submissionAndAssessment.rubric_assessments, function(ra){return ra.rubric_assessment;});
+          var student = EG.setOrUpdateSubmission(response.artifact);
+          student.rubric_assessments = $.map(submissionAndAssessment.rubric_assessments, function(ra){return ra.rubric_assessment;});
         });
         
         $(".rubric_summary").loadingImage('remove');
@@ -1029,7 +1030,7 @@ var anonymousAssignment = false;
           return n.assessment_type == 'grading';
         });
 
-        $rubric_assessments_select.find("option").remove().end();
+        $rubric_assessments_select.find("option").remove();
         $.each(this.currentStudent.rubric_assessments, function(){
           $rubric_assessments_select.append('<option value="' + this.id + '">' + this.assessor_name + '</option>');
         });

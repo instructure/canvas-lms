@@ -29,6 +29,7 @@ class Group < ActiveRecord::Base
   has_many :invited_users, :source => :user, :through => :invited_group_memberships
   belongs_to :context, :polymorphic => true
   belongs_to :account
+  belongs_to :root_account, :class_name => "Account"
 
   has_many :calendar_events, :as => :context, :dependent => :destroy
   has_many :discussion_topics, :as => :context, :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user, :dependent => :destroy, :order => 'discussion_topics.position DESC, discussion_topics.created_at DESC'
@@ -179,9 +180,12 @@ class Group < ActiveRecord::Base
     return nil if !user
     res = nil
     Group.transaction do
-      res = self.group_memberships.find_or_initialize_by_user_id(user.id)
-      res.workflow_state = 'invited' if res.new_record?
-      res.save
+      res = self.group_memberships.find_by_user_id(user.id)
+      unless res
+        res = self.group_memberships.build(:user => user)
+        res.workflow_state = 'invited'
+        res.save
+      end
     end
     res
   end
@@ -190,9 +194,12 @@ class Group < ActiveRecord::Base
     return nil if !user
     res = nil
     Group.transaction do
-      res = self.group_memberships.find_or_initialize_by_user_id(user.id)
-      res.workflow_state = 'requested' if res.new_record?
-      res.save
+      res = self.group_memberships.find_by_user_id(user.id)
+      unless res
+        res = self.group_memberships.build(:user => user)
+        res.workflow_state = 'requested'
+        res.save
+      end
     end
     res
   end
@@ -252,6 +259,17 @@ class Group < ActiveRecord::Base
   end
   private :ensure_defaults
 
+  # update root account when account changes
+  def account=(new_account)
+    self.account_id = new_account.id
+  end
+  def account_id=(new_account_id)
+    write_attribute(:account_id, new_account_id)
+    if self.account_id_changed?
+      self.root_account = self.account(true).try(:root_account) || self.account
+    end
+  end
+
   # if you modify this set_policy block, note that we've denormalized this
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
@@ -272,7 +290,7 @@ class Group < ActiveRecord::Base
     set { can :create }
     
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
-    set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum }
+    set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum and can :manage_wiki and can :manage_files }
     
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     set { can :read and can :read_roster }

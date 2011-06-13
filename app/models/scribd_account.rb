@@ -20,6 +20,8 @@ class ScribdAccount < ActiveRecord::Base
   belongs_to :scribdable, :polymorphic => true
   has_many :attachments
 
+  attr_accessible :scribdable, :scribdable_id, :scribdable_type, :uuid
+
   before_create :assure_uuid
   
   def assure_uuid

@@ -42,7 +42,7 @@
       <% end %>
         <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Copy this Course</a>
         <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Import Content into this Course</a>
-        <!--<a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Export this Course</a>-->
+        <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Export this Course</a>
     <% end %>
     <table class="summary" style="margin-top: 20px;">
       <thead>
@@ -137,7 +137,7 @@
                 <td><b> #san-fransisco-university-biology-100</b></td>
               </tr><tr>
                 <td>much better:</td>
-                <td><b> #usu-bio100</b></td>
+                <td><b> #sfu-bio100</b></td>
               </tr></table>
               </p>
               <div class="button-container">
@@ -147,10 +147,19 @@
           </span>
           </td>
         <% end %>
-      <% if @context.sis_source_id %>
+      <% if @context.sis_source_id || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
           <td><%= f.label :sis_source_id, "SIS ID:" %></td>
-          <td><%= @context.sis_source_id %></td>
+          <td>
+            <span class="course_form">
+              <% if can_do(@context.root_account, @current_user, :manage_sis) %>
+                <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => "SIS ID", :value => @context.sis_source_id %>
+              <% else %>
+                <%= @context.sis_source_id %>
+              <% end %>
+            </span>
+            <span class="course_info sis_source_id"><%= @context.sis_source_id %></span>
+          </td>
       <% end %>
       <% if current_user_is_site_admin? %>
         </tr><tr>
@@ -314,7 +323,7 @@
             can edit course wiki pages by default<br/>
             <div class="changed_default_wiki_editing_roles" style="display: none; padding-left: 20px; font-size: 0.8em;">
               <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
-              <label for="update_default_pages">Change pages currently editable by "<span><%= @context.readable_default_wiki_editing_roles %></span>" to "<span class="default_wiki_editing_roles_change">&nbsp;</span>".
+              <label for="update_default_pages">Change pages currently editable by "<span><%= @context.readable_default_wiki_editing_roles %></span>" to "<span class="default_wiki_editing_roles_change">&nbsp;</span>".</label>
             </div>
           </div>
         </td>

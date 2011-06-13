@@ -297,7 +297,7 @@ class DiscussionEntry < ActiveRecord::Base
   
   def context_module_action
     if self.discussion_topic && self.user
-      self.discussion_topic.context_module_action(self,user, :contributed)
+      self.discussion_topic.context_module_action(user, :contributed)
     end
   end
 end

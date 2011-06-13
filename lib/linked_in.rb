@@ -125,12 +125,12 @@ module LinkedIn
     res
   end
   
-  def linked_in_consumer
+  def linked_in_consumer(key=nil, secret=nil)
     require 'oauth'
     require 'oauth/consumer'
     config = LinkedIn.config
-    key = config['api_key']
-    secret = config['secret_key']
+    key ||= config['api_key']
+    secret ||= config['secret_key']
     req = request || nil rescue nil
     consumer = OAuth::Consumer.new(key, secret, {
       :site => "https://api.linkedin.com",
@@ -141,9 +141,19 @@ module LinkedIn
     })
   end
   
+  def self.config_check(settings)
+    o = Object.new
+    o.extend(LinkedIn)
+    consumer = o.linked_in_consumer(settings[:api_key], settings[:secret_key])
+    token = consumer.get_request_token rescue nil
+    # token = consumer.get_request_token({}, :oauth_callback => oauth_success_url(:service => 'linked_in', :user => session[:oauth_linked_in_user_secret]))
+    token ? nil : "Configuration check failed, please check your settings"
+  end
+  
   def self.config
     # Return existing value, even if nil, as long as it's defined
     return @config if defined?(@config)
+    @config ||= Canvas::Plugin.find(:linked_in).try(:settings)
     @config ||= (YAML.load_file(RAILS_ROOT + "/config/linked_in.yml")[RAILS_ENV] rescue nil)
   end
   

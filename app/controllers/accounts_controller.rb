@@ -46,10 +46,19 @@ class AccountsController < ApplicationController
         end
         if current_user_is_site_admin?
           @account.enable_user_notes = enable_user_notes if enable_user_notes
-          @account.allow_sis_import = allow_sis_import if allow_sis_import
+          @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
           if params[:account][:settings]
             @account.settings[:admins_can_change_passwords] = !!params[:account][:settings][:admins_can_change_passwords]
             @account.settings[:global_includes] = !!params[:account][:settings][:global_includes]
+          end
+        end
+        if sis_id = params[:account].delete(:sis_source_id)
+          if sis_id != @account.sis_source_id && (@account.root_account || @account).grants_right?(@current_user, session, :manage_sis)
+            if sis_id == ''
+              @account.sis_source_id = nil
+            else
+              @account.sis_source_id = sis_id
+            end
           end
         end
         if @account.update_attributes(params[:account])
@@ -88,7 +97,8 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :manage_admin_users)
       @root_account = @account.root_account || @account
       params[:pseudonym][:unique_id] ||= params[:pseudonym][:path]
-      @pseudonym = Pseudonym.find_or_initialize_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @root_account.id)
+      @pseudonym = Pseudonym.find_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @root_account.id)
+      @pseudonym ||= Pseudonym.new(:unique_id => params[:pseudonym][:unique_id], :account => @root_account)
       new_login = @pseudonym.new_record?
       if !@pseudonym.new_record?
         user = @pseudonym.user
@@ -263,8 +273,8 @@ class AccountsController < ApplicationController
   end
   
   def sis_import
-    if authorized_action(@account, @current_user, :manage_account_settings)
-      return redirect_to account_settings_url(@account) if !@account.allow_sis_import || @account.root_account_id
+    if authorized_action(@account, @current_user, :manage_sis)
+      return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.scoped(:order=>'created_at DESC', :limit=>1).first
       @terms = @account.enrollment_terms.active
@@ -276,10 +286,10 @@ class AccountsController < ApplicationController
   end
 
   def sis_import_submit
-    raise "SIS imports can only be executed on root accounts" if @account.root_account_id
+    raise "SIS imports can only be executed on root accounts" unless @account.root_account?
     raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
 
-    if authorized_action(@account, @current_user, :manage_account_settings)
+    if authorized_action(@account, @current_user, :manage_sis)
       ActiveRecord::Base.transaction do
         if !@account.current_sis_batch || !@account.current_sis_batch.importing?
           batch = SisBatch.create_with_attachment(@account, params[:import_type], params[:attachment])

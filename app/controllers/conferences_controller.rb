@@ -60,11 +60,11 @@ class ConferencesController < ApplicationController
           end
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json { render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session}) }
+          format.json { render :json => WebConference.find(@conference).to_json(:permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "new" }
-          format.xml { render :xml => @conference.errors.to_xml }
-          format.json { render :json => @conference.errors.to_json }
+          format.xml { render :xml => @conference.errors.to_xml, :status => :bad_request }
+          format.json { render :json => @conference.errors.to_json, :status => :bad_request }
         end
       end
     end
@@ -86,8 +86,8 @@ class ConferencesController < ApplicationController
           format.json { render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "edit" }
-          format.xml { render :xml => @conference.errors.to_xml }
-          format.json { render :json => @conference.errors.to_json }
+          format.xml { render :xml => @conference.errors.to_xml, :status => :bad_request }
+          format.json { render :json => @conference.errors.to_json, :status => :bad_request }
         end
       end
     end
@@ -105,7 +105,6 @@ class ConferencesController < ApplicationController
         @conference.add_attendee(@current_user)
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
         log_asset_access(@conference, "conferences", "conferences", 'participate')
-        @conference.touch
         if url = @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, :include_host => true))
           redirect_to url
         else
@@ -118,7 +117,18 @@ class ConferencesController < ApplicationController
       end
     end
   end
-  
+
+  def close
+    get_conference
+    if authorized_action(@conference, @current_user, :close)
+      if @conference.close
+        render :json => @conference.to_json(:permissions => {:user => @current_user, :session => session})
+      else
+        render :json => @conference.errors.to_json
+      end
+    end
+  end
+
   def destroy
     get_conference
     if authorized_action(@conference, @current_user, :delete)

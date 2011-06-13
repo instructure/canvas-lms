@@ -58,7 +58,7 @@
             <%= image_tag "group.png" %> Show Student <%= @quiz.readable_type %> Results 
             <div style="font-size: 0.8em; padding-left: 20px;">(<%= pluralize(@submitted_students.length, "student") %> submitted so far)</div>
             <% if @quiz.assignment %>
-              <a target="_blank" class="button button-sidebar-wide" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @quiz.assignment.id) %>"><%= image_tag "grading_icon.png" %> SpeedGrader</a><br/>
+              <a target="_blank" class="button button-sidebar-wide" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @quiz.assignment.id) %>"><%= image_tag "grading_icon.png" %> SpeedGrader&#8482;</a><br/>
             <% end %>
           </a>
         <% end %>

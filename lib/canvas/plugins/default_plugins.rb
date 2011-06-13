@@ -11,6 +11,51 @@ Canvas::Plugin.register('facebook', nil, {
   :settings_partial => 'plugins/facebook_settings',
   :validator => 'FacebookValidator'
 })
+Canvas::Plugin.register('linked_in', nil, {
+  :description => 'LinkedIn integration',
+  :website => 'http://www.linkedin.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/linked_in_settings',
+  :validator => 'LinkedInValidator'
+})
+Canvas::Plugin.register('twitter', nil, {
+  :description => 'Twitter notifications',
+  :website => 'http://www.twitter.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/twitter_settings',
+  :validator => 'TwitterValidator'
+})
+Canvas::Plugin.register('scribd', nil, {
+  :description => 'Scribd document previews',
+  :website => 'http://www.scribd.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/scribd_settings',
+  :validator => 'ScribdValidator'
+})
+Canvas::Plugin.register('etherpad', nil, {
+  :description => 'EtherPad document sharing',
+  :website => 'http://www.etherpad.org',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/etherpad_settings',
+  :validator => 'EtherpadValidator'
+})
+Canvas::Plugin.register('google_docs', nil, {
+  :description => 'Google Docs document sharing',
+  :website => 'http://docs.google.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/google_docs_settings',
+  :validator => 'GoogleDocsValidator'
+})
 Canvas::Plugin.register('kaltura', nil, {
   :description => 'Kaltura video/audio recording and playback',
   :website => 'http://corp.kaltura.com',
@@ -56,6 +101,15 @@ Canvas::Plugin.register('big_blue_button', :web_conferencing, {
   :settings_partial => 'plugins/big_blue_button_settings',
   :validator => 'BigBlueButtonValidator',
   :encrypted_settings => [:secret]
+})
+Canvas::Plugin.register('tinychat', nil, {
+  :description => 'Tinychat chat room',
+  :website => 'http://www.tinychat.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/tinychat_settings',
+  :validator => 'TinychatValidator'
 })
 require_dependency 'cc/importer/cc_worker'
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {

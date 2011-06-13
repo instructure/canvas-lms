@@ -20,4 +20,5 @@ class ContextMessageParticipant < ActiveRecord::Base
   belongs_to :user
   belongs_to :context_message
   after_save :touch_user
+  attr_accessible :user, :user_id, :participation_type
 end

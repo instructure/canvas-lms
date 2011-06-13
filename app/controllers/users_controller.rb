@@ -342,7 +342,8 @@ class UsersController < ApplicationController
   end
 
   def create
-    @pseudonym = Pseudonym.find_or_initialize_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @domain_root_account.id)
+    @pseudonym = Pseudonym.find_by_unique_id_and_account_id(params[:pseudonym][:unique_id], @domain_root_account.id)
+    @pseudonym ||= Pseudonym.new(:unique_id => params[:pseudonym][:unique_id], :account => @domain_root_account)
     @pseudonym.save_without_session_maintenance if @pseudonym.new_record?
     @active_cc = CommunicationChannel.find_by_path_and_path_type_and_workflow_state(params[:pseudonym][:unique_id], 'email', 'active')
     @any_cc = CommunicationChannel.find_by_path_and_path_type(params[:pseudonym][:unique_id], 'email') unless @active_cc

@@ -370,7 +370,7 @@ describe Enrollment do
       @term = @course.enrollment_term
       @term.should_not be_nil
       @term.save!
-      @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term_id => @term.id)
+      @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term)
       @override.start_at = 2.days.ago
       @override.end_at = 2.days.from_now
       @override.save!

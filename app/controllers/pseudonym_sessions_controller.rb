@@ -56,7 +56,7 @@ class PseudonymSessionsController < ApplicationController
         end
         if st.is_valid?
           @pseudonym = nil
-          @pseudonym = Pseudonym.find_by_unique_id_and_workflow_state(st.response.user, 'active')
+          @pseudonym = Pseudonym.active.custom_find_by_unique_id(st.response.user)
           if @pseudonym
             # Successful login and we have a user
             PseudonymSession.create!(@pseudonym, false)
@@ -81,19 +81,9 @@ class PseudonymSessionsController < ApplicationController
         end
       end
 
-      # initial session; redirect to CAS
-      reset_session
-      if @domain_root_account.account_authorization_config.log_in_url.present?
-        session[:exit_frame] = true
-        redirect_to(@domain_root_account.account_authorization_config.log_in_url)
-      else
-        redirect_to(cas_client.add_service_to_login_url(login_url))
-      end
+      initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
-      reset_session
-      settings = @domain_root_account.account_authorization_config.saml_settings
-      request = Onelogin::Saml::AuthRequest.create(settings)
-      redirect_to(request)
+      initiate_saml_login
     else
       render :action => "new"
     end
@@ -208,7 +198,7 @@ class PseudonymSessionsController < ApplicationController
     flash[:notice] = "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
-      session[:return_to] = nil      
+      session[:return_to] = nil
       if @domain_root_account.delegated_authentication?
         format.html { redirect_to login_url(:no_auto=>'true') }
       else
@@ -237,7 +227,7 @@ class PseudonymSessionsController < ApplicationController
       if response.is_valid?
         if response.success_status?
           @pseudonym = nil
-          @pseudonym = Pseudonym.find_by_unique_id_and_workflow_state(response.name_id, 'active')
+          @pseudonym = Pseudonym.active.custom_find_by_unique_id(response.name_id)
 
           if @pseudonym
             # We have to reset the session again here -- it's possible to do a

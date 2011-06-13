@@ -222,9 +222,7 @@ describe PseudonymsController do
       @p2 = @user.pseudonyms.create!(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
       @p2.sis_source_id = 'test'
       @p2.save!
-      @p2.account.account_authorization_config = AccountAuthorizationConfig.new(:auth_type => 'ldap')
-      @p2.account.account_authorization_config.account_id = @pseudonym.account_id
-      @p2.account.account_authorization_config.save!
+      @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
       delete 'destroy', :user_id => @user.id, :id => @p2.id
       assert_status(500)
       @pseudonym.should be_active
@@ -239,9 +237,7 @@ describe PseudonymsController do
       @p2 = @user.pseudonyms.build(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
       @p2.sis_source_id = 'test'
       @p2.save!
-      @p2.account.account_authorization_config = AccountAuthorizationConfig.new(:auth_type => 'ldap')
-      @p2.account.account_authorization_config.account_id = @pseudonym.account_id
-      @p2.account.account_authorization_config.save!
+      @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
       delete 'destroy', :user_id => @user.id, :id => @p2.id
       assert_status(200)
       @pseudonym.should be_active

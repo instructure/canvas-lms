@@ -302,7 +302,7 @@
     <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= context_user_name(@context, @submission.user) %></span>
     <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em; <%= 'color: #800; font-weight: bold;' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">submitted <%= datetime_string(@submission.submitted_at) %><%= ' (late)' if @submission.late? %></span>
     <% if can_do(@context, @current_user, :grade) %>
-      <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;">SpeedGrader</a>
+      <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;">SpeedGrader&#8482;</a>
     <% end %>
     <% if can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
       <span style="padding-left: 10px;"><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="add" >Re-Submit Assignment</a></span>

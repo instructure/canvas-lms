@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Tue, 17 May 2011 16:59:00 GMT from
+/* DO NOT MODIFY. This file was compiled Fri, 10 Jun 2011 23:17:51 GMT from
  * /Users/bpalmer/Programming/canvas/app/coffeescripts/jobs.coffee
  */
 
@@ -40,6 +40,7 @@
         }, __bind(function(data) {
           var i, item, _i, _len, _ref, _ref2, _ref3;
           this.data.length = 0;
+          this.loading = {};
           _ref = data[this.type_name];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             item = _ref[_i];
@@ -75,6 +76,7 @@
     };
     FlavorGrid.prototype.init = function() {
       this.columns = this.build_columns();
+      this.loading = {};
       this.grid = new Slick.Grid(this.grid_name, this.data, this.columns, this.grid_options());
       return this;
     };
@@ -90,6 +92,7 @@
         grid_name = '#jobs-grid';
       }
       this.id_formatter = __bind(this.id_formatter, this);;
+      this.load = __bind(this.load, this);;
       this.attempts_formatter = __bind(this.attempts_formatter, this);;
       if (options.max_attempts) {
         Jobs.max_attempts = options.max_attempts;
@@ -119,8 +122,34 @@
       out_of = d === 'hold' ? '' : "/ " + max;
       return "<span class='" + klass + "'>" + d + out_of + "</span>";
     };
+    Jobs.prototype.load = function(row) {
+      return this.$element.queue(__bind(function() {
+        row = row - (row % this.options.limit);
+        if (this.loading[row]) {
+          this.$element.dequeue();
+          return;
+        }
+        this.loading[row] = true;
+        return $.ajaxJSON(this.options.url, "GET", {
+          flavor: this.options.flavor,
+          q: this.query,
+          offset: row
+        }, __bind(function(data) {
+          var _ref;
+          [].splice.apply(this.data, [row, row + data.jobs.length - row].concat(_ref = data.jobs)), _ref;
+          this.grid.removeAllRows();
+          this.grid.render();
+          return this.$element.dequeue();
+        }, this));
+      }, this));
+    };
     Jobs.prototype.id_formatter = function(r, c, d) {
-      return this.data[r].id || "<span class='unloaded-id'>-</span>";
+      if (this.data[r].id) {
+        return this.data[r].id;
+      } else {
+        this.load(r);
+        return "<span class='unloaded-id'>-</span>";
+      }
     };
     Jobs.prototype.build_columns = function() {
       return [
@@ -147,6 +176,11 @@
           field: 'priority',
           width: 70
         }, {
+          id: 'strand',
+          name: 'strand',
+          field: 'strand',
+          width: 100
+        }, {
           id: 'run_at',
           name: 'run at',
           field: 'run_at',
@@ -161,12 +195,17 @@
         rows = this.grid.getSelectedRows();
         row = (rows != null ? rows.length : void 0) === 1 ? rows[0] : -1;
         job = this.data[rows[0]] || {};
-        return $('#show-job .show-field').each(__bind(function(idx, field) {
+        $('#show-job .show-field').each(__bind(function(idx, field) {
           var field_name;
           field_name = field.id.replace("job-", '');
           return $(field).text(job[field_name] || '');
         }, this));
+        return $('#job-id-link').attr('href', "/jobs?id=" + job.id);
       }, this);
+      if (this.data.length === 1 && this.type_name === 'jobs') {
+        this.grid.setSelectedRows([0]);
+        this.grid.onSelectedRowsChanged();
+      }
       return this;
     };
     Jobs.prototype.selectAll = function() {

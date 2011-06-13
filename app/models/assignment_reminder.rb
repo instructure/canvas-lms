@@ -21,6 +21,7 @@ class AssignmentReminder < ActiveRecord::Base
   belongs_to :user
   has_a_broadcast_policy
   before_save :infer_defaults
+  attr_accessible :assignment, :user, :reminder_type
   
   def infer_defaults
     self.reminder_type ||= 'due_at'

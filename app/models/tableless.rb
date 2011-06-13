@@ -20,6 +20,8 @@
 # concept pulled from the comments of this page:
 # http://stackoverflow.com/questions/937429/activerecordbase-without-table-rails
 class Tableless < ActiveRecord::Base
+  attr_accessible
+
   def self.columns
     @columns ||= [];
   end

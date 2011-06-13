@@ -438,7 +438,7 @@ describe Course, "backup" do
       html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
     end
     
-    it "should merge onlys selected content into another course" do
+    it "should merge only selected content into another course" do
       course_model
       attachment_model
       @old_attachment = @attachment
@@ -532,6 +532,63 @@ describe Course, "backup" do
       new_attachment.folder.cloned_item_id.should == folder.cloned_item_id
     end
   end
+  
+  it "should copy learning outcomes into the new course" do
+    old_course = course_model
+    lo = old_course.learning_outcomes.new
+    lo.context = old_course
+    lo.short_description = "Lone outcome"
+    lo.description = "<p>Descriptions are boring</p>"
+    lo.workflow_state = 'active'
+    lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}, {:description=>"Meets Expectations", :points=>3}, {:description=>"Does Not Meet Expectations", :points=>0}], :description=>"First outcome", :points_possible=>5}}
+    lo.save!
+    
+    old_root = LearningOutcomeGroup.default_for(old_course)
+    old_root.add_item(lo)
+    
+    lo_g = old_course.learning_outcome_groups.new
+    lo_g.context = old_course
+    lo_g.title = "Lone outcome group"
+    lo_g.description = "<p>Groupage</p>"
+    lo_g.save!
+    old_root.add_item(lo_g)
+    
+    lo2 = old_course.learning_outcomes.new
+    lo2.context = old_course
+    lo2.short_description = "outcome in group"
+    lo2.workflow_state = 'active'
+    lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+    lo2.save!
+    lo_g.add_item(lo2)
+    old_root.reload
+    
+    # copy outcomes into new course
+    new_course = course_model
+    new_root = LearningOutcomeGroup.default_for(new_course)
+    new_course.merge_into_course(old_course, :all_outcomes => true)
+    
+    new_course.learning_outcomes.count.should == old_course.learning_outcomes.count
+    new_course.learning_outcome_groups.count.should == old_course.learning_outcome_groups.count
+    new_root.sorted_content.count.should == old_root.sorted_content.count
+    
+    lo_2 = new_root.sorted_content.first
+    lo_2.short_description.should == lo.short_description
+    lo_2.description.should == lo.description
+    lo_2.data.should == lo.data
+    
+    lo_g_2 = new_root.sorted_content.last
+    lo_g_2.title.should == lo_g.title
+    lo_g_2.description.should == lo_g.description
+    lo_g_2.sorted_content.length.should == 1
+    lo_g_2.root_learning_outcome_group_id.should == new_root.id
+    lo_g_2.learning_outcome_group_id.should == new_root.id
+    
+    lo_2 = lo_g_2.sorted_content.first
+    lo_2.short_description.should == lo2.short_description
+    lo_2.description.should == lo2.description
+    lo_2.data.should == lo2.data
+  end
+  
 end
 
 def course_to_backup
@@ -584,6 +641,7 @@ describe Course, 'grade_publishing' do
       client.close
       server.close
     }
+    @course.grading_standard_id = 0
     @course.publish_final_grades(user)
     server_thread.join
     post_lines.should == [

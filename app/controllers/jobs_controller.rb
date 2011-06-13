@@ -1,8 +1,14 @@
 class JobsController < ApplicationController
   before_filter :require_site_admin
   POPULAR_TAG_COUNTS = 10
+  LIMIT = 100
 
   def index
+    if params[:id].present?
+      params[:q] = params[:id]
+      params[:flavor] = 'all'
+    end
+
     jobs_scope
 
     respond_to do |format|
@@ -21,8 +27,8 @@ class JobsController < ApplicationController
           result[:tags] = tags(@jobs)
         when 'jobs'
           result[:jobs] = @jobs.all(
-            :limit => params[:limit] || 100,
-            :offset => params[:offset].presence)
+            :limit => params[:limit] || LIMIT,
+            :offset => params[:offset].try(:to_i))
           result[:total] = @jobs.count
         end
         render :json => result.to_json(:include_root => false)
@@ -56,19 +62,21 @@ class JobsController < ApplicationController
   end
 
   def jobs_scope
-    @jobs = Delayed::Job.scoped(:order => 'id desc')
     @flavor = params[:flavor] || 'current'
 
     case @flavor
     when 'future'
-      @jobs = @jobs.future
+      @jobs = Delayed::Job.future
     when 'current'
-      @jobs = @jobs.current
+      @jobs = Delayed::Job.current
     when 'all'
       # pass
+      @jobs = Delayed::Job
     when 'failed'
-      @jobs = @jobs.failed
+      @jobs = Delayed::Job::Failed
     end
+
+    @jobs = @jobs.scoped(:order => 'id desc')
 
     if params[:q].present?
       @jobs = @jobs.scoped(:conditions => ["#{ActiveRecord::Base.wildcard('tag', params[:q])} OR id = ?", params[:q].to_i])
