@@ -105,15 +105,7 @@ module SIS
                   Enrollment.update_all({:workflow_state => 'deleted'}, :id => enrolls)
                 end
 
-                if user.changed?
-                  user.creation_sis_batch_id = @batch.id if @batch
-                  user.save_without_broadcasting
-                elsif @batch
-                  users_to_set_sis_batch_ids << user.id
-                end
-
                 pseudo ||= Pseudonym.new
-                pseudo.user_id = user.id
                 pseudo.unique_id = row['login_id']
                 pseudo.sis_source_id = row['login_id']
                 pseudo.sis_user_id = row['user_id']
@@ -124,6 +116,26 @@ module SIS
                   pseudo.password_confirmation = row['password']
                 end
                 pseudo.sis_ssha = row['ssha_password'] if !row['ssha_password'].blank?
+
+                begin
+                  ActiveRecord::Base.transaction(:requires_new => true) do
+                    if user.changed?
+                      user.creation_sis_batch_id = @batch.id if @batch
+                      raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
+                    elsif @batch
+                      users_to_set_sis_batch_ids << user.id
+                    end
+                    pseudo.user_id = user.id
+                    if pseudo.changed?
+                      pseudo.sis_batch_id = @batch.id if @batch
+                      raise pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
+                    # we do the elsif @batch thing later
+                    end
+                  end
+                rescue => e
+                  add_warning(csv, "Failed saving user. Internal error: #{e}")
+                  next
+                end
 
                 if row['email'].present?
                   comm = CommunicationChannel.find_by_path_and_workflow_state_and_path_type(row['email'], 'active', 'email')
@@ -145,10 +157,11 @@ module SIS
                     end
                   end
                 end
+
                 if pseudo.changed?
                   pseudo.sis_batch_id = @batch.id if @batch
                   pseudo.save_without_broadcasting
-                elsif @batch
+                elsif @batch && pseudo.sis_batch_id != @batch.id
                   pseudos_to_set_sis_batch_ids << pseudo.id
                 end
 
