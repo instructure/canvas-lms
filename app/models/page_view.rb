@@ -177,9 +177,8 @@ class PageView < ActiveRecord::Base
           page_view.do_update(attrs)
           page_view.save
         else
-          # request_id is primary key, so auto-protected from mass assignment
-          request_id = attrs.delete('request_id')
-          self.create(attrs) { |p| p.request_id = request_id }
+          # bypass mass assignment protection
+          self.create { |p| p.send(:attributes=, attrs, false) }
         end
       end
     ensure
