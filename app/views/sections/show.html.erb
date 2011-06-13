@@ -8,6 +8,7 @@
         <% if can_do(@section.nonxlist_course, @current_user, :manage_admin_users) %>
           <a href="#" class="button button-sidebar-wide uncrosslist_link"><%= image_tag "move.png" %> De-Cross-List this Section</a>
         <% end %>
+        <a href="#" class="button button-sidebar-wide crosslist_link"><%= image_tag "move.png" %> Re-Cross-List this Section</a>
       <% else %>
         <a href="#" class="button button-sidebar-wide crosslist_link"><%= image_tag "move.png" %> Cross-List this Section</a>
       <% end %>
