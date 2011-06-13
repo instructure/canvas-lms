@@ -444,7 +444,7 @@ I18n.scope.prototype = {
   },
   pluralize: function(count, scope, options) {
     return I18n.pluralize(count, this.resolveScope(scope), options);
-  },
+  }
 }
 I18n.scope.prototype.t = I18n.scope.prototype.translate;
 I18n.scope.prototype.l = I18n.scope.prototype.localize;
