@@ -1,4 +1,3 @@
-<% begin %>
 <% message ||= dashboard_context_message; show_context ||= false; brief ||= false %>
 <% if message.is_a?(OpenObject) 
      message.recipient_users ||= []
@@ -14,26 +13,26 @@
     <div class="link_box" style="display: none;">
       <span class="links">
         <span class="author_id user_id" style="display: none;"><%= message.try_rescue(:user_id) || nbsp %></span>
-        <a href="#" class="reply_link"><%= image_tag "reply.png", :alt => "Reply", :title => "Reply to Sender" %></a>
+        <a href="#" class="reply_link"><%= image_tag "reply.png", :alt => t('images.alt.reply', "Reply"), :title => t('images.title.reply', "Reply to Sender") %></a>
       </span>
     </div>
     <% end %>
     <div class="post_date created_at time_ago_date"><%= datetime_string(post_date) || nbsp %></div>
-    <%= image_tag "email_big.png", :class => "header_icon", :alt => "email", :title => "Email Message", :style => "width: 20px;" %>
+    <%= image_tag "email_big.png", :class => "header_icon", :alt => t('images.alt.email', "email"), :title => t('images.title.email', "Email Message"), :style => "width: 20px;" %>
     <% if brief || message.is_a?(OpenObject) %>
-      <a href="<%= inbox_path(:message_id => message ? message.id : "{{ id }}") %>#message_<%= message ? message.id : 'none' %>" class="title subject"><%= message.try_rescue(:subject) || "No Title" %></a>
+      <a href="<%= inbox_path(:message_id => message ? message.id : "{{ id }}") %>#message_<%= message ? message.id : 'none' %>" class="title subject"><%= message.try_rescue(:subject) || t(:no_title, "No Title") %></a>
     <% else %>
-      <span class="title subject"><%= message.try_rescue(:subject) || "No Title" %></span>
+      <span class="title subject"><%= message.try_rescue(:subject) || t(:no_title, "No Title") %></span>
     <% end %>
     <div class="sub_title">
       <span class="context_code group_<%= message.try_rescue(:context_code) %>"><%= cached_context_short_name(message.try_rescue(:context_code)) %></span>
       <a href="<%= context_prefix(message.try_rescue(:context_code)) %>/users/<%= message ? message.user_id : '{{ user_id }}' %>" class="user_name"><%= context_user_name(message.try_rescue(:context_code), message.try_rescue(:user_id)) || nbsp %></a>
       <span class="user_name">
-        to
+        <%= t(:to, 'to') %>
         <% if message && message.recipient_users.length == 1 %>
           <a href="<%= context_prefix(message.try_rescue(:context_code)) %>/users/<%= message.recipient_users.first.id %>"><%= context_user_name(message.try_rescue(:context_code), message.recipient_users.first) %></a>
         <% else %>
-          <a href="#" class="show_users_link show_recipients_link"><%= pluralize(message.try_rescue(:recipients_count) || (message.try_rescue(:recipient_users) || []).length || 0, "Recipient") %></a>
+          <a href="#" class="show_users_link show_recipients_link"><%= t(:recipients_count, "Recipient", :count => (message.try_rescue(:recipients_count) || (message.try_rescue(:recipient_users) || []).length || 0)) %></a>
         <% end %>
       </span>
     </div>
@@ -54,14 +53,14 @@
     </div>
     <% if message && !message.sub_messages.empty? %>
       <div class="original_post_date">
-        sent
+        <%= t(:sent, 'sent') %>
         <span class="post_date created_at time_ago_date"><%= datetime_string(message.try_rescue(:created_at)) || nbsp %></span>
       </div>
     <% end %>
     <div class="clear"></div>
     <div class="users_list" style="display: none;">
       <% if (message.try_rescue(:recipients_count) || (message.try_rescue(:recipient_users) || []).length) <= 15 %>
-        <h3>Message Recipients</h3>
+        <h3><%= t('headings.recipients', 'Message Recipients') %></h3>
         <ul class="recipients_list">
           <% if !message.try_rescue(:protect_recipients) %>
             <% (message.try_rescue(:recipient_users) || []).each do |user| %>
@@ -75,9 +74,9 @@
               <span class="id" style="display: none;">&nbsp;</span>
             </li>
           <% else %>
-            <li>Recipient list is protected</li>
+            <li><%= t(:recipients_protected, "Recipient list is protected") %></li>
           <% end %>
-        </ul>      
+        </ul>
       <% end %>
     </div>
     <div class="subcontent">
@@ -85,7 +84,7 @@
       <% if sub_messages.length > 3 %>
         <div class="communication_sub_message">
           <div class="content behavior_content">
-            <a href="#" class="show_sub_messages_link">Show <%= pluralize(sub_messages.length - 2, "More Message") %></a>
+            <a href="#" class="show_sub_messages_link"><%= t('links.show_messages', { :one => "Show %{count} More Message", :other => "Show %{count} More Messages" }, :count => sub_messages.length - 2) %></a>
           </div>
         </div>
       <% end %>
@@ -95,9 +94,9 @@
       <% if can_do(message, @current_user, :create) %>
       <div class="communication_sub_message reply_message <%= 'lonely_behavior_message' if sub_messages.empty? %>">
         <div class="content behavior_content">
-          <a href="<%= context_message_reply_path(message ? message.id : "{{ id }}") %>" class="add_entry_link textarea"><%= message.user_id != @current_user.id ? "Reply to Original Sender..." : "Reply to All Recipients..." %></a>
+          <a href="<%= context_message_reply_path(message ? message.id : "{{ id }}") %>" class="add_entry_link textarea"><%= message.user_id != @current_user.id ? t('links.reply_to_sender', "Reply to Original Sender...") : t('links.reply_to_all', "Reply to All Recipients...") %></a>
           <div class="less_important">
-            <a href="<%= inbox_path(:include_contexts => message.try_rescue(:context_code)) %>#message_<%= message.try_rescue(:id) %>">More Messages</a>
+            <a href="<%= inbox_path(:include_contexts => message.try_rescue(:context_code)) %>#message_<%= message.try_rescue(:id) %>"><%= t('links.more_messages', 'More Messages') %></a>
           </div>
         </div>
       </div>
@@ -107,6 +106,3 @@
     <div class="clear"></div>
   </div>
 </div>
-<% rescue => e %>
-  <% logger.error("Caught error rendering dashboard_context_message_html: #{e.message} #{e.backtrace.join ";"}") %>
-<% end %>

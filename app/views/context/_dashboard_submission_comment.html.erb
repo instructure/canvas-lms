@@ -28,12 +28,12 @@
         <%= f.hidden_field :group_comment, :value => '1'%>
         <%= f.text_area :comment, :style => "height: 50px;" %>
         <div style="float: right;">
-          <a href="<%= context_prefix(context_code) %>/assignments/<%= submission ? submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= submission ? submission.user_id : "{{ user_id }}" %>#comment" style="padding-right: 10px;" class="more_options_reply_link">more options</a>
+          <a href="<%= context_prefix(context_code) %>/assignments/<%= submission ? submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= submission ? submission.user_id : "{{ user_id }}" %>#comment" style="padding-right: 10px;" class="more_options_reply_link"><%= t('#links.more_options', %{more options}) %></a>
         </div>
         <span class="submission_user_id" style="display: none;"><%= submission.try_rescue(:user_id) %></span>
         <div class="button-container" style="padding-bottom: 5px;">
-          <button type="submit" class="button small-button submit_button">Post Message</button>
-          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+          <button type="submit" class="button small-button submit_button"><%= t('#buttons.post_message', %{Post Message}) %></button>
+          <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
         </div>
       <% end %>
     <% end %>

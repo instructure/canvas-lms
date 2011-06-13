@@ -1,14 +1,14 @@
-<% content_for :page_title do %>Access Report<% end %>
-<% add_crumb('People', context_url(@context, :context_users_url))
+<% content_for :page_title, t('titles.access_report', 'Access Report') %>
+<% add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
   add_crumb(@user.name, context_url(@context, :context_user_url, @user))
   @active_tab="people"
-  add_crumb("Access Report") %>
+  add_crumb(t('#crumbs.access_report', "Access Report")) %>
 <% content_for :right_side do %>
   <div class="rs-margin-all rs-margin-lr">
-    <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>"><%= image_tag "back.png" %> Back to User Page</a>
+    <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>"><%= image_tag "back.png" %> <%= t('links.back_to_user', %{Back to User Page}) %></a>
   </div>
 <% end %>
-<h2><%= @user.name %> Access Report</h2>
+<h2><%= t 'headings.user_access_report', '%{user} Access Report', :user => @user.name %></h2>
 <% content_for :stylesheets do %>
 <style>
 #usage_report table {
@@ -41,10 +41,10 @@
 <table>
   <thead>
     <tr>
-      <th>Content</th>
-      <th style="text-align: right;">Times Viewed</th>
-      <th style="text-align: right;">Times Participated</th>
-      <th>Last Viewed</th>
+      <th><%= t('table_headings.content', %{Content}) %></th>
+      <th style="text-align: right;"><%= t('table_headings.num_times_viewed', %{Times Viewed}) %></th>
+      <th style="text-align: right;"><%= t('table_headings.num_times_participated', %{Times Participated}) %></th>
+      <th><%= t('table_headings.last_viewed_time', %{Last Viewed}) %></th>
     </tr>
   </thead>
   <tbody>

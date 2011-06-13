@@ -1,7 +1,9 @@
-<% content_for :page_title, (@media_object.try(:title) || "Media Playback") %>
-<% content_for :page_header, (@media_object.try(:title) || "Media Playback") %>
-<% add_crumb "Media" %>
-<% add_crumb (@media_object.try(:title) || "Media Playback") %>
+<% title = @media_object.try(:title) || t('titles.media_playback', "Media Playback")
+   content_for :page_title, title
+   content_for :page_header, title
+   add_crumb t('#crumbs.media', "Media")
+   add_crumb title
+%>
 <div style="margin: 10px auto; width: 500px;">
   <div id="media_comment">
   </div>

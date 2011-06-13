@@ -1,12 +1,12 @@
-<% content_for :page_title do %>Registered Services<% end %>
-<% add_crumb('People', context_url(@context, :context_users_url))
+<% content_for :page_title, t('titles.registered_services', 'Registered Services') %>
+<% add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
   @active_tab="people"
-  add_crumb('Registered Services', context_url(@context, :context_user_services_url)) %>
+  add_crumb(t('#crumbs.registered_services', 'Registered Services'), context_url(@context, :context_user_services_url)) %>
 <% content_for :right_side do %>
   <div class="rs-margin-all rs-margin-lr">
-    <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_users_url) %>"><%= image_tag "back.png" %> Back to Roster</a>
+    <a class="button button-sidebar-wide" href="<%= context_url(@context, :context_users_url) %>"><%= image_tag "back.png" %> <%= t('links.back_to_roster', %{Back to Roster}) %></a>
   </div>
-  <h2>Service Types</h2>
+  <h2><%= t('headings.service_types', %{Service Types}) %></h2>
   <div class="rs-margin-lr">
     <ul class="service_types">
     <% @services_hash.sort_by{|t, s| UserService.sort_position(t) }.each do |service_type, services| %>
@@ -64,29 +64,24 @@
 }
 </style>
 <% end %>
-<h2>Registered Services</h2>
+<h2><%= t('headings.registered_services', %{Registered Services}) %></h2>
 <a href="<%= profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
 <p>
-If <%= @context.class.to_s.downcase %> members choose, they can let you see
-which outside services they've linked to their Canvas account.  This can make it easier to
-coordinate group projects and also link up outside of class.
+  <%= t 'help.user_services', %{If other members choose, they can let you see which outside services they've linked to their Canvas account.  This can make it easier to coordinate group projects and also link up outside of class.} %>
 </p>
 <% if @current_user && @current_user.user_services.empty? %>
   <p>
-    You haven't linked your user profile to any external services.  You 
-    can link your Canvas account to services like Facebook and Twitter.
+    <%= t 'help.no_services', %{You haven't linked your user profile to any external services.  You can link your Canvas account to services like Facebook and Twitter.} %>
   </p>
   <p>
-    <a href="<%= profile_path %>#registered_web_services" class="button">Link web services to my account</a>
+    <a href="<%= profile_path %>#registered_web_services" class="button"><%= t('links.link_service', %{Link web services to my account}) %></a>
   </p>
 <% elsif @current_user && !@current_user.show_user_services %>
   <p>
-    You haven't enabled your list of registered services.  Enabling this
-    list will let fellow course and group members see which services
-    you have linked to your Canvas account.
+    <%= t 'help.services_private', %{You haven't enabled your list of registered services.  Enabling this list will let fellow course and group members see which services you have linked to your Canvas account.} %>
   </p>
   <p>
-    <input type="checkbox" id="show_user_services" class="show_user_services_checkbox"/><label for="show_user_services">Let fellow course/group members see which services I've linked to my profile</label>
+    <input type="checkbox" id="show_user_services" class="show_user_services_checkbox"/><label for="show_user_services"><%= t('labels.allow_view_services', %{Let fellow course/group members see which services I've linked to my profile}) %></label>
   </p>
 <% end %>
 
@@ -107,7 +102,7 @@ coordinate group projects and also link up outside of class.
     <% end %>
     <% if service.service == 'skype' %>
       <span class="skype_status">
-        <a href="skype:<%= service.service_user_name %>?call"><img src="http://mystatus.skype.com/bigclassic/<%= service.service_user_name %>" alt="<%= @users_hash[service.user_id].name %>'s status" /></a>
+        <a href="skype:<%= service.service_user_name %>?call"><img src="http://mystatus.skype.com/bigclassic/<%= service.service_user_name %>" alt="<%= t('links.alt.skype_status', %{skype status}) %>" /></a>
       </span>
     <% end %>
   </li>
@@ -115,10 +110,10 @@ coordinate group projects and also link up outside of class.
 <% if !@current_user_services[service_type] %>
   <li class="current_user">
     <% if UserService.registration_url(service_type) %>
-      <a href="<%= UserService.registration_url(service_type) %>">Sign Up</a>
+      <a href="<%= UserService.registration_url(service_type) %>"><%= t('links.sign_up_for_service', %{Sign Up}) %></a>
       |
     <% end %>
-    <a href="<%= profile_path %>#register_<%= service_type %>">Link Existing Account</a>
+    <a href="<%= profile_path %>#register_<%= service_type %>"><%= t('links.link_existing_service_account', %{Link Existing Account}) %></a>
   </li>
 <% end %>
 </ul>

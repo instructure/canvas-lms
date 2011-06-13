@@ -6,12 +6,12 @@
   <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <div class="header">
     <div class="post_date time_ago_date"><%= datetime_string(post_date) || nbsp %></div>
-    <%= image_tag "grading_icon.png", :class => "header_icon", :alt => "submission", :title => "Assignment Submission", :style => "padding: 7px 2px 2px 2px;" %>
-    <a href="<%= context_prefix(context_code) %>/assignments/<%= dashboard_submission ? dashboard_submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= dashboard_submission ? dashboard_submission.user_id : "{{ user_id }}" %>" class="title subject"><%= dashboard_submission.try_rescue(:assignment).try_rescue(:title) || "Assignment" %>, <%= context_user_name(context_code, dashboard_submission.user_id) %></a>
+    <%= image_tag "grading_icon.png", :class => "header_icon", :alt => t('images.alt.submission', %{submission}), :title => t('images.title.submission', %{Assignment Submission}), :style => "padding: 7px 2px 2px 2px;" %>
+    <a href="<%= context_prefix(context_code) %>/assignments/<%= dashboard_submission ? dashboard_submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= dashboard_submission ? dashboard_submission.user_id : "{{ user_id }}" %>" class="title subject"><%= dashboard_submission.try_rescue(:assignment).try_rescue(:title) || t('#defaults.assignment', %{Assignment}) %>, <%= context_user_name(context_code, dashboard_submission.user_id) %></a>
     <div class="sub_title">
       <span class="points_possible" style="<%= hidden unless dashboard_submission && dashboard_submission.score && dashboard_submission.assignment && dashboard_submission.assignment.points_possible %>">
-        <%= dashboard_submission.score || "" %> out of <%= dashboard_submission.try_rescue(:assignment).try_rescue(:points_possible) %> 
-        <%= "(still needs teacher review)" if dashboard_submission && dashboard_submission.workflow_state == 'pending_review' %>
+        <%= t('#score_out_of', '%{score} out of %{points_possible}', :score => (dashboard_submission.score || ""), :points_possible => dashboard_submission.try_rescue(:assignment).try_rescue(:points_possible)) %>
+        <%= t('pending_review', %{(still needs teacher review)}) if dashboard_submission && dashboard_submission.workflow_state == 'pending_review' %>
       </span>
       <span class="context_code group_<%= context_code %>"><%= cached_context_short_name(context_code) %></span>
       <a href="<%= context_prefix(context_code) %>/users/<%= submission_comment ? submission_comment.author_id : '{{ author_id }}' %>" class="user_name"><%= context_user_name(context_code, submission_comment.try_rescue(:author_id)) || nbsp %></a>
@@ -35,11 +35,11 @@
     <% if dashboard_submission && !comments.empty? %>
       <div class="original_post_date">
         <% if dashboard_submission && latest_date == dashboard_submission.graded_at %>
-          graded 
+          <%= t('state.graded', %{graded}) %>
         <% elsif dashboard_submission && latest_date == dashboard_submission.submitted_at %>
-          submitted
+          <%= t('state.submitted', %{submitted}) %>
         <% elsif submission_comment %>
-          posted 
+          <%= t('state.posted', %{posted}) %>
         <% end %>
         <span class="post_date time_ago_date"><%= datetime_string(latest_date) || nbsp %></span>
       </div>
@@ -48,7 +48,7 @@
       <% if comments.length > 3 %>
         <div class="communication_sub_message">
           <div class="content behavior_content">
-            <a href="#" class="show_sub_messages_link">Show <%= pluralize(comments.length - 2, "More Comment") %></a>
+            <a href="#" class="show_sub_messages_link"><%= t('links.show_more_comments', { :one => 'Show 1 More Comment', :other => 'Show %{count} More Comments' }, :count => (comments.length - 2)) %></a>
           </div>
         </div>
       <% end %>
@@ -58,9 +58,9 @@
       <% if can_do(dashboard_submission, @current_user, :comment) %>
       <div class="communication_sub_message reply_message <%= 'lonely_behavior_message' if comments.empty? %>">
         <div class="content behavior_content">
-          <a href="<%= context_prefix(context_code) %>/assignments/<%= dashboard_submission ? dashboard_submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= dashboard_submission ? dashboard_submission.user_id : "{{ user_id }}" %>" class="add_entry_link textarea">Add a Comment...</a>
+          <a href="<%= context_prefix(context_code) %>/assignments/<%= dashboard_submission ? dashboard_submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= dashboard_submission ? dashboard_submission.user_id : "{{ user_id }}" %>" class="add_entry_link textarea"><%= t('links.add_comment', %{Add a Comment...}) %></a>
           <div class="less_important">
-            <a href="<%= context_prefix(context_code) %>/assignments/<%= dashboard_submission ? dashboard_submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= dashboard_submission ? dashboard_submission.user_id : "{{ user_id }}" %>">View Original Submission</a>
+            <a href="<%= context_prefix(context_code) %>/assignments/<%= dashboard_submission ? dashboard_submission.assignment_id : "{{ assignment_id }}" %>/submissions/<%= dashboard_submission ? dashboard_submission.user_id : "{{ user_id }}" %>"><%= t('links.view_original_submission', %{View Original Submission}) %></a>
           </div>
         </div>
       </div>
