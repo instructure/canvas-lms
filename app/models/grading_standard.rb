@@ -56,7 +56,7 @@ class GradingStandard < ActiveRecord::Base
     res = ""
     res += self.user.name + ", " rescue ""
     res += self.context.name rescue ""
-    res = "Unknown Details" if res.empty?
+    res = t("unknown_grading_details", "Unknown Details") if res.empty?
     res
   end
   

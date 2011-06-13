@@ -1,64 +1,70 @@
-<% content_for :page_title do %>Course Groups: <%= @context.name %><% end %>
+<% content_for :page_title do %><%= before_label '#titles.course_groups', 'Course Groups' %> <%= @context.name %><% end %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
     <% if @context.allow_student_organized_groups %>
-      <a href="#" class="button button-sidebar-wide add add_group_link"><%= image_tag "add.png" %> Start a New Group</a>
+      <a href="#" class="button button-sidebar-wide add add_group_link"><%= image_tag "add.png" %> <%= t 'actions.add', 'Start a New Group' %></a>
     <% else %>
-      Student-organized groups have been disabled for this course, so you'll have to be
-      content with the groups the teacher makes for you.
+      <%= t :groups_disabled, 'Student-organized groups have been disabled for this course, so you\'ll have to be content with the groups the teacher makes for you.' %>
     <% end %>
-    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> View <%= @context.class.to_s %> Roster</a>
+    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= @context.is_a?(Account) ? t('#buttons.view_account_roster', 'View Account Roster') : t('#buttons.view_course_roster', 'View Course Roster') %></a>
   </div>
 <% end %>
 
 <% jammit_js :groups %>
-<h2><%= @context.class.to_s %> Groups</h2>
+<h2><%= @context.is_a?(Account) ? t('account_groups', 'Account Groups') : t('course_groups', 'Course Groups') %></h2>
 <p>
+<%= t 'group_explanation', <<-TEXT
 Groups are a good place to collaborate on projects or to figure out schedules for study sessions
 and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
 files.  Groups can collaborate on documents, or even schedule web conferences.  
 It's really like a mini-course where you can work with a smaller number of students on a
 more focused project.
+TEXT
+%>
 </p>
 <ul class="unstyled_list group_list" style="font-size: 1.5em;" %>
   <% if !@user_groups || @user_groups.empty? %>
-    <li id="no_groups_message">No Groups Assigned</li>
+    <li id="no_groups_message"><%= t :no_groups_assigned, "No Groups Assigned" %></li>
   <% end %>
   <%= render :partial => 'group', :collection => @user_groups %>
   <%= render :partial => 'group', :object => nil %>
 </ul>
 <% if @available_groups && !@available_groups.empty? %>
-  <h2>Available Groups</h2>
+  <h2><%= t 'headings.available_groups', "Available Groups" %></h2>
   <ul class="unstyled_list group_list" style="font-size: 1.1em;" %>
     <%= render :partial => 'group_detailed', :collection => @available_groups %>
   </ul>
 <% end %>
 <% form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
-<h2>Make a New Group</h2>
-<%= image_tag "warning.png" %> If your teacher has talked about putting you into
+<h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
+<%= image_tag "warning.png" %>
+<%= t :student_group_warning, <<-TEXT
+If your teacher has talked about putting you into
 groups as part of an assignment, this is not the way to make that happen.
 Groups you organize yourself can't be used for grading... you can still form
 your own groups, but you won't be able to turn in an electric copy of any
 assignments unless your teacher builds the groups for you.
+TEXT
+%>
 <table class="formtable">
   <tr>
-    <td><%= f.label :name, "Group Name:" %></td>
+    <td><%= f.blabel :name, "Group Name" %></td>
     <td><%= f.text_field :name %></td>
   <% if @context %>
   <tr>
-    <td>Joining:</td>
+    <td><%= before_label :joining, 'Joining' %></td>
     <td>
       <select name="group[join_level]">
-        <option value="parent_context_auto_join">Course members are free to join</option>
-        <option value="parent_context_request">Course members can request to join</option>
-        <option value="invitation_only">Membership by invitation only</option>
+        <option value="parent_context_auto_join"><%= t 'options.open_to_course_members', 'Course members are free to join' %></option>
+        <option value="parent_context_request"><%= t 'options.course_member_can_request_access', 'Course members can request to join' %></option>
+        <option value="invitation_only"><%= t 'options.invite_only', 'Membership by invitation only' %></option>
       </select>
     </td>
   <% end %>
   </tr><tr>
     <td style="vertical-align: top;">
-      Invite:
+      <%= before_label :invite, 'Invite' %>
     </td>
     <td>
       <ul class="unstyled_list">
@@ -72,8 +78,8 @@ assignments unless your teacher builds the groups for you.
     </td>
   </tr><tr>
     <td colspan="2">
-      <button type="submit" class="button submit_button">Create Group</button>
-      <button type="button" class="cancel_button button-secondary">Cancel</button>
+      <button type="submit" class="button submit_button"><%= t 'buttons.create', 'Create Group' %></button>
+      <button type="button" class="cancel_button button-secondary"><%= t '#buttons.cancel', 'Cancel' %></button>
     </td>
 </table>
 <% end %>

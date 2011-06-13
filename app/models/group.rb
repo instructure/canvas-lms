@@ -145,8 +145,8 @@ class Group < ActiveRecord::Base
   named_scope :active, :conditions => ['groups.workflow_state != ?', 'deleted']
   
   def full_name
-    res = self.name
-    res += ": #{(self.context.course_code rescue self.context.name)}" if self.context
+    res = before_label(self.name) + " "
+    res += (self.context.course_code rescue self.context.name) if self.context
   end
 
   
@@ -324,12 +324,12 @@ class Group < ActiveRecord::Base
   TAB_FILES = 5
   def tabs_available(user=nil, opts={})
     available_tabs = [
-      { :id => TAB_HOME,        :label => "Home", :href => :group_path }, 
-      { :id => TAB_PAGES,       :label => "Pages", :href => :group_wiki_pages_path }, 
-      { :id => TAB_PEOPLE,      :label => "People", :href => :group_users_path }, 
-      { :id => TAB_DISCUSSIONS, :label => "Discussions", :href => :group_discussion_topics_path }, 
-      { :id => TAB_CHAT,        :label => "Chat", :href => :group_chat_path }, 
-      { :id => TAB_FILES,       :label => "Files", :href => :group_files_path }
+      { :id => TAB_HOME,        :label => t("tabs.home", "Home"), :href => :group_path }, 
+      { :id => TAB_PAGES,       :label => t("tabs.pages", "Pages"), :href => :group_wiki_pages_path }, 
+      { :id => TAB_PEOPLE,      :label => t("tabs.people", "People"), :href => :group_users_path }, 
+      { :id => TAB_DISCUSSIONS, :label => t("tabs.discussions", "Discussions"), :href => :group_discussion_topics_path }, 
+      { :id => TAB_CHAT,        :label => t("tabs.chat", "Chat"), :href => :group_chat_path }, 
+      { :id => TAB_FILES,       :label => t("tabs.files", "Files"), :href => :group_files_path }
     ]
   end
 
@@ -354,6 +354,7 @@ class Group < ActiveRecord::Base
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item.migration_id = hash[:migration_id]
     item.name = hash[:title]
+    # TODO i18n
     item.category = hash[:group_category] || 'Imported Groups'
     
     item.save!

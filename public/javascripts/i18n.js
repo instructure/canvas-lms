@@ -436,6 +436,9 @@ I18n.scope.prototype = {
   },
   translate: function(scope, defaultValue, options) {
     options = options || {};
+    if (typeof(options.count) != 'undefined' && typeof(defaultValue) == "string" && defaultValue.match(/^\w+$/)) {
+      defaultValue = $.pluralize_with_count(options.count, defaultValue);
+    }
     options.defaultValue = defaultValue;
     return I18n.translate(this.resolveScope(scope), options);
   },
