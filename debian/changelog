@@ -1,3 +1,94 @@
+canvas-lms (1.1-37) professional; urgency=low
+
+  * [+0d8b4fc] copy learning outcomes during course copy
+  * [+c825cc9] create error reports for migration exceptions
+  * [+bdbebfa] check all models for protecting attributes refs #3847
+  * [+ae78629] global setting to list authentication ip addresses, closes #4049
+  * [+029c29d] define accessible attrs for SisBatch, Story
+  * [+4ffd515] remove all CourseAssignedGroup usage
+  * [+e44cfb2] long running web conferences, closes #4228
+  * [+1478ac4] mathml for screen readers, refs #4362
+  * [+00f4fe6] updated mathquill, fixed cursor reset bug. closes #4486
+  * [+5f5539c] update content zipper to use attachment#open
+  * [+7ff6018] Revert "fix selenium test that was throwing errors"
+  * [+499a6a4] fix typo in log_page_view
+  * [+fffd493] only create a quiz version on actual submission refs #4189
+  * [+d3d6a26] remove question id from data on clone, fixes #4684
+  * [+ae82c57] when deleting a rubric association, find the rubric by association
+  * [+2a94eb2] add a script/ssl_server for https debugging
+  * [+657d4da] give end-users access to useful jQuery UI enhancements
+  * [+06e577e] re-enable browser spellcheck in tinymce
+  * [+c3531f7] explicitly version submissions refs #4189
+  * [+162cbc2] open smaller equella dialog if window is too short, closes #4687
+  * [+654bf60] update course account associations on section save
+  * [+c63bd9c] keep crosslisted course data up-to-date via sis imports for original course
+  * [+411b9c6] avoid several extra cases of saving learning outcome results
+  * [+0282a63] don't mark courses deleted due to crosslisting anymore
+  * [+0d41020] grade exchange fixes
+  * [+d2c0dbe] using update_all for enrollments when publishing grades
+  * [+f774f1a] don't version both saves in a single method refs #4189
+  * [+3404788] only create one version per create/update of AssessmentQuestion
+  * [+6449b4e] add tm to speedgrader buttons, closes #4732
+  * [+ab1e3ff] mark assignments locked on the assignment model itself if its module is locked
+  * [+e15cb0e] added fields for editing sis_source_ids and new sis permission
+  * [+99e05f4] allow content to be deselected on course copy
+  * [+5a4624b] avoid race condition in periodic job spec
+  * [+30d8aa1] correct tally of question points when adding from bank, fixes #4718
+  * [+cdcea38] latest hairtrigger, fixes migration re-run risk
+  * [+e7ed1c3] replace relative paths in qti from other systems
+  * [+778f684] don't disallow changing user name based on an unused column; fixes #4751
+  * [+b7bd537] optimize delayed jobs table indexes, closes #4736
+  * [+8564b1d] optionally track completed job stats in redis
+  * [+329dae5] moving twitter config to /plugins; refs #4194
+  * [+cc3bd9a] moving google docs config to /plugins; refs #4194
+  * [+3623ead] moving etherpad config to /plugins; refs #4194
+  * [+01eb970] moving linked in config to /plugins; refs #4194
+  * [+923690f] moving scribd config to /plugins; refs #4194
+  * [+053481b] moving tinychat config to /plugins; refs #4194
+  * [+50c4687] oauth 2 requests via access tokens
+  * [+5feaf3d] option for external url for forgot password link
+  * [+0fbc372] counts report error when new external status is added, fixes #4730
+  * [+9414e31] permalink to individual job in admin ui
+  * [+d3985ff] close label tag
+  * [+4b57641] make course section test more robust
+  * [+7901c34] add nofollow to some more links googlebot is fetching
+  * [+c3d98b2] must_contribute context module progressions, fixes #4734
+  * [+5d18fe7] load further jobs in the admin jobs grid w/ajax
+  * [+adc6fc0] fix api spec helper for calls that don't have a logged in user
+  * [+7131821] remove sis batch batch mode all-term mode
+  * [+ea4de3e] auto-open new archives by default, closes #4739
+  * [+af4387b] rework conference timestamp updating, fixes #4731
+  * [+d0e6974] optionally log to syslog
+  * [+d860365] show the course export button
+  * [+60f571b] ie7 cannot handle keys with '/' for $.store.set
+  * [+4ef76d9] grant manage_wiki and manage_files rights to group managers
+  * [+cda4807] syslog ident and facility configurable via yaml
+  * [+1dd7454] add root_account relation to groups, refs #4247
+  * [+33ff87b] clarify column ambiguities
+  * [+d17dfcd] add groups/group_memberships to sis csv import, closes #4247
+  * [+e2b3268] adding silencer to syslog_wrapper
+  * [+bbc9d1f] don't use cattr_accessor in syslog_wrapper
+  * [+f448077] fix syslog initializer
+  * [+cfe854e] delete courses and enrollments in sub-accounts for batch mode sis imports
+  * [+96efe8a] use custom_find_by_unique_id for cas and saml logins
+  * [+a8829c7] fix jobs grid control layout on wide screens
+  * [+e68b471] don't fail when copying wiki pages with no title
+  * [+1b3b1b2] make sure delegated auth gets a stab at first-login. fixes #4773
+  * [+29c5585] support a secondary ldap configuration for account authorization; fixes #4776
+  * [+b39bf6d] support local storage in turnitin api, fixes #4796
+  * [+4109f47] hold/unhold jobs fix
+  * [+f971e73] dont render layout on page_views partial, fixes 4782
+  * [+ba8b874] reword button to "Record / Upload Media"
+  * [+ac9b65b] speedgrader was not handling rubric assessor_name correctly
+  * [+2c48aea] improvements to javascript error reporting
+  * [+1fa9bc1] sort groups alphabetically on groups page
+  * [+416185d] modify strand sequencing strategy, close #4792
+  * [+969bcab] Revert "modify strand sequencing strategy, close #4792"
+  * [+ca195a6] fix page view redis cache mode
+  * [+7afc508] optimize delayed jobs failed jobs, strands, and held jobs, refs #4792
+
+ -- JT Olds <jt@instructure.com>  Mon, 13 Jun 2011 13:50:39 -0600
+
 canvas-lms (1.1-36) professional; urgency=low
 
   * [+a40c27b] dont limit quizzes to 100 on modules page, fixes #4771
