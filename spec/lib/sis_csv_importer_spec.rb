@@ -23,25 +23,6 @@ describe SIS::SisCsv do
     account_model
   end
   
-  def process_csv_data(*lines)
-    tmp = Tempfile.new("sis_rspec")
-    path = "#{tmp.path}.csv"
-    tmp.close!
-    File.open(path, "w+") { |f| f.puts lines.join "\n" }
-    
-    importer = SIS::SisCsv.process(@account, :files => [ path ], :allow_printing=>false)
-    
-    File.unlink path
-    
-    importer
-  end
-  
-  def process_csv_data_cleanly(*lines)
-    importer = process_csv_data(*lines)
-    importer.errors.should == []
-    importer.warnings.should == []
-  end
-  
   it "should error files with unknown headers" do
     importer = process_csv_data(
       "course_id,randomness,smelly",
