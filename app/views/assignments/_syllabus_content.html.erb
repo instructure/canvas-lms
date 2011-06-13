@@ -1,41 +1,43 @@
 <% @active_tab = "syllabus" %>
 <% course_home ||= false %>
 <% if !course_home %>
-  <div style="float: right;"><a href="#" class="jump_to_today_link">Jump to Today</a></div>
-  <h2>Course Syllabus</h2>
+  <div style="float: right;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
+  <h2><%= t 'titles.course_syllabus', "Course Syllabus" %></h2>
 <% else %>
   <h2><%= @context.name %></h2>
-  <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link">Jump to Today</a></div>
+  <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
 <% end %>
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
   <%= user_content(@context.syllabus_body) %>
 </div>
 <div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
-  <p>The syllabus page shows a table-oriented view of the course schedule, and the basics of
-  course grading.  You can add any other comments, notes, or thoughts you have about the course
-  structure, course policies or anything else.</p>
-  <p>
-    To add some comments, click the "Edit Syllabus Description" link to the right.
-  </p>
+  <%= mt 'instructions.syllabus', <<-DOC
+The syllabus page shows a table-oriented view of the course schedule, and the basics of
+course grading.  You can add any other comments, notes, or thoughts you have about the course
+structure, course policies or anything else.
+
+To add some comments, click the "Edit Syllabus Description" link to the right.
+DOC
+      %>
 </div>
 <% form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
-  <a href="#" class="toggle_views_link" style="float: right;">Switch Views</a>
-  <%= f.label :syllabus_body, "Syllabus Description:" %>
+  <a href="#" class="toggle_views_link" style="float: right;"><%= t '#links.switch_views', "Switch Views" %></a>
+  <%= f.blabel :syllabus_body, :en => "Syllabus Description" %>
   <div class="clear"></div>
   <%= f.text_area :syllabus_body, :style => "width: 100%; height: 300px;", :id => "course_syllabus_body" %>
   <div class='button-container'>
-    <button type="submit" class='button'>Update Syllabus</button>
-    <button type="button" class="button-secondary cancel_button">Cancel</button>
+    <button type="submit" class='button'><%= t 'buttons.update_syllabus', "Update Syllabus" %></button>
+    <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
   </div>
 <% end %>
 <table id="syllabus">
   <thead>
     <tr>
-      <th scope="col" style="width: 10%;">Date</th>
-      <th scope="col" style="width: 10%;">Day</th>
+      <th scope="col" style="width: 10%;"><%= t 'headers.date', "Date" %></th>
+      <th scope="col" style="width: 10%;"><%= t 'headers.day', "Day" %></th>
       <th scope="col" style="width: 80%;">
       <div style="float: right;"></div>
-      Details
+      <%= t 'headers.details', "Details" %>
       </th>
     </tr>
   </thead>

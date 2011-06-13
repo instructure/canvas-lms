@@ -3,17 +3,18 @@
 -%>
 <% js_block do %>
 <script type="text/javascript">
+I18n.scoped('assignments', function(I18n) {
 $(document).ready(function() {
   var submitting = false;
   $(".submit_assignment_form").submit(function(event) {
     var $turnitin = $(this).find(".turnitin_pledge");
     if($turnitin.length > 0 && !$turnitin.attr('checked')) {
-      alert('You must agree to the submission pledge before you can submit this assignment.');
+      alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
       event.preventDefault();
       event.stopPropagation();
       return false;
     }
-    $(this).find("button[type='submit']").text("Submitting...");
+    $(this).find("button[type='submit']").text(I18n.t('messages.submitting', "Submitting..."));
     $(this).find("button").attr('disabled', true);
     if($(this).attr('id') == 'submit_online_upload_form') {
       event.preventDefault();
@@ -39,7 +40,7 @@ $(document).ready(function() {
         },
         error: function(data) {
           console.log("failed uploading files");
-          $(this).find("button[type='submit']").text("Submit Failed, please try again");
+          $(this).find("button[type='submit']").text(I18n.t('messages.submit_failed', "Submit Failed, please try again"));
           $(this).find("button").attr('disabled', false);
         }
       });
@@ -49,7 +50,7 @@ $(document).ready(function() {
   });
   window.onbeforeunload = function() {
     if($("#submit_assignment:visible").length > 0 && !submitting) {
-      return "You haven't finished submitting your assignment.  You still need to click \"Submit\" to finish turning it in.  Do you want to leave this page anyway?";
+      return I18n.t('messages.not_submitted_yet', "You haven't finished submitting your assignment.  You still need to click \"Submit\" to finish turning it in.  Do you want to leave this page anyway?");
     }
   };
   $(document).fragmentChange(function(event, hash) {
@@ -68,9 +69,9 @@ $(document).ready(function() {
     if(late && !skipConfirmation) {
       var result;
       if($(".resubmit_link").length > 0) {
-        result = confirm("This assignment is now overdue.  Any new submissions will be marked as late.  Continue anyway?");
+        result = confirm(I18n.t('messages.now_overdue', "This assignment is now overdue.  Any new submissions will be marked as late.  Continue anyway?"));
       } else {
-        result = confirm("This assignment is overdue.  Do you still want to submit it?");
+        result = confirm(I18n.t('messages.overdue', "This assignment is overdue.  Do you still want to submit it?"));
       }
       if(!result) { return; }
     }
@@ -145,6 +146,7 @@ $(document).ready(function() {
   });
   $('.add_another_file_link').click();
 });
+});
 var submissionAttachmentIndex = -1;
 </script>
 <% end %>
@@ -156,19 +158,19 @@ var submissionAttachmentIndex = -1;
   <div class="content" id="submit_assignment_tabs">
     <ul>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
-        <li><a href="#submit_online_upload_form" class="submit_online_upload_option">File Upload</a></li>
+        <li><a href="#submit_online_upload_form" class="submit_online_upload_option"><%= t 'links.submit.file_upload', "File Upload" %></a></li>
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_text_entry/) %>
-        <li><a href="#submit_online_text_entry_form" class="submit_online_text_entry_option">Text Entry</a></li>
+        <li><a href="#submit_online_text_entry_form" class="submit_online_text_entry_option"><%= t 'links.submit.text_entry', "Text Entry" %></a></li>
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>
-        <li><a href="#submit_online_url_form" class="submit_online_url_option">Website URL</a></li>
+        <li><a href="#submit_online_url_form" class="submit_online_url_option"><%= t 'links.submit.website', "Website URL" %></a></li>
       <% end %>
       <% if show_google_docs %>
         <li><a href="#submit_google_doc_form" class="submit_online_url_option">Google Doc</a></li>
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
-        <li><a href="#submit_media_recording_form" class="submit_media_recording_option">Media</a></li>
+        <li><a href="#submit_media_recording_form" class="submit_media_recording_option"><%= t 'links.submit.media', "Media" %></a></li>
       <% end %>
     </ul>
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
@@ -178,19 +180,19 @@ var submissionAttachmentIndex = -1;
     <table class="formtable" style="width: 100%;">
       <tr>
         <td colspan="2">
-          Upload a file, or choose a file you've already uploaded.
+          <%= t :upload_or_choose_file, "Upload a file, or choose a file you've already uploaded." %>
             <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
         </td>
       </tr><tr>
-        <td><%= label :attachment, :uploaded_data, "File:" %></td>
+        <td><%= blabel :attachment, :uploaded_data, :en => "File" %></td>
         <td>
-          <a href="#" class="add add_another_file_link"> Add Another File </a>
+          <a href="#" class="add add_another_file_link"> <%= t 'links.add_another_file', "Add Another File" %> </a>
           <div class="submission_attachment" style="display: none;">
             <input type="file" name="attachments[-1][uploaded_data]"/>
             <a href="#" class="remove_attachment_link no-hover" style="display: none;"><%= image_tag "delete_circle.png" %></a>
             <% if @assignment.allowed_extensions.present? -%>
               <div class='bad_ext_msg error_message' style="display: none">
-                This file type is not allowed. Accepted file types are: <%= @assignment.allowed_extensions.join(", ") %>
+                <%= t 'errors.unacceptable_file_type', "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}", :allowed_extensions_list => @assignment.allowed_extensions.to_sentence %>
               </div>
             <% end -%>
           </div>
@@ -200,11 +202,11 @@ var submissionAttachmentIndex = -1;
       <tr>
         <td></td>
         <td style="font-size: 0.8em;">
-        <a href="#" class="toggle_uploaded_files_link">Click here to find a file you've already uploaded</a><br/>
+        <a href="#" class="toggle_uploaded_files_link"><%= t 'links.find_file', "Click here to find a file you've already uploaded" %></a><br/>
         <div id="uploaded_files" style="display: none;">
           <% folders = @current_user.folders.active %>
           <% content = (render :partial => "files/nested_content", :object => (folders.select{|f| !f.parent_folder_id}), :locals => {:folders => folders}) %>
-          <%= "No Files" if @current_user.attachments.active.empty? || !content || content.strip.empty? %>
+          <%= t(:no_files, "No Files") if @current_user.attachments.active.empty? || !content || content.strip.empty? %>
           <%= content %>
         </div>
         </td>
@@ -212,7 +214,7 @@ var submissionAttachmentIndex = -1;
       <% end %>
       <tr>
         <td colspan="2">
-          <%= label :submission, :comment, "Comments:" %>
+          <%= blabel :submission, :comment, :en => "Comments" %>
           <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
         </td>
       </tr>
@@ -221,12 +223,12 @@ var submissionAttachmentIndex = -1;
       <% end %>
       <tr>
         <td colspan="2" class='button-container'>
-          <button type="submit" class="button" id="submit_file_button">Submit Assignment</button>
-          <button type="button" class='cancel_button button-secondary'>Cancel</button>
+          <button type="submit" class="button" id="submit_file_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+          <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
         </td>
       </tr><tr style="display: none;">
         <td colspan="2" style="text-align: center;">
-          Submitting... <img src=""/>
+          <%= t 'messages.submitting', "Submitting..." %> <img src=""/>
         </td>
       </tr>
     </table>
@@ -239,19 +241,19 @@ var submissionAttachmentIndex = -1;
     <table class="formtable" style="width: 100%;">
       <tr>
         <td>
-        Copy and paste or type your submission right here.
+        <%= 'instructions.online_text_entry', "Copy and paste or type your submission right here." %>
             <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
         </td>
       </tr><tr>
         <td>
           <div style="text-align: right; font-size: 0.8em;">
-            <a id="switch_text_entry_submission_views" href="#">Switch Views</a>
+            <a id="switch_text_entry_submission_views" href="#"><%= t '#links.switch_views', "Switch Views" %></a>
           </div>
           <%= text_area :submission, :body, :style => "width: 100%; height: 250px;" %>
         </td>
       </tr><tr>
         <td>
-          <%= label :submission, :comment, "Comments:" %>
+          <%= blabel :submission, :comment, :en => "Comments" %>
           <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
         </td>
       </tr>
@@ -260,8 +262,8 @@ var submissionAttachmentIndex = -1;
       <% end %>
       <tr>
         <td class='button-container'>
-          <button type="submit" class="button">Submit Assignment</button>
-          <button type="button" class='cancel_button button-secondary'>Cancel</button>
+          <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+          <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
         </td>
       </tr>
     </table>
@@ -274,26 +276,26 @@ var submissionAttachmentIndex = -1;
     <table class="formtable" style="width: 100%;">
       <tr>
         <td colspan="2">
-          Copy and paste the link to the web site you'd like to submit for this assignment.
+          <%= t 'instructions.online_url', "Copy and paste the link to the web site you'd like to submit for this assignment." %>
             <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
           </td>
       </tr><tr>
         <td colspan="2">
-          <%= label :submission, :url, "Website URL:" %>
+          <%= blabel :submission, :url, "Website URL" %>
           &nbsp;&nbsp;
           <%= text_field :submission, :url, :style => "min-width: 250px;" %>
         </td>
       </tr><tr>
         <td colspan="2" style="text-align: center;">
           <div style="text-align: left;">
-            <%= label :submission, :comment, "Comments:" %>
+            <%= blabel :submission, :comment, "Comments" %>
           </div>
           <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
         </td>
       </tr><tr>
         <td colspan="2" class='button-container'>
-          <button type="submit" class="button">Submit Assignment</button>
-          <button type="button" class='cancel_button button-secondary'>Cancel</button>
+          <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+          <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
         </td>
       </tr>
     </table>
@@ -335,7 +337,7 @@ var submissionAttachmentIndex = -1;
         <table class="formtable" style="width: 100%;">
           <tr>
             <td style="padding-bottom: 10px;" colspan="2">
-              Select the file from the list below.
+              <%= t 'instructions.google_docs', "Select the file from the list below." %>
               <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
               </td>
           </tr><tr>
@@ -368,7 +370,7 @@ var submissionAttachmentIndex = -1;
           </tr><tr>
             <td colspan="2" style="text-align: center;">
               <div style="text-align: left;">
-                <%= label :submission, :comment, "Comments:" %>
+                <%= blabel :submission, :comment, :en => "Comments" %>
               </div>
               <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
             </td>
@@ -378,8 +380,8 @@ var submissionAttachmentIndex = -1;
           <% end %>
           <tr>
             <td colspan="2" class='button-container'>
-              <button type="submit" class="button">Submit Assignment</button>
-              <button type="button" class='cancel_button button-secondary'>Cancel</button>
+              <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+              <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
             </td>
           </tr>
         </table>
@@ -408,7 +410,7 @@ var submissionAttachmentIndex = -1;
           $("#submit_google_doc_form").submit(function() {
             $("#uploading_google_doc_message").dialog('close').dialog({
               autoOpen: false,
-              title: "Uploading Submission",
+              title: "<%= t 'titles.uploading', "Uploading Submission" %>"",
               modal: true,
               overlay: {
                 backgroundColor: "#000",
@@ -419,8 +421,8 @@ var submissionAttachmentIndex = -1;
         </script>
         <% end %>
         <div id="uploading_google_doc_message" style="display: none;">
-          Retrieving a copy of your Google Doc to submit for this assignment.  This may
-          take a little while, depending on the size of the file...
+          <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may
+          take a little while, depending on the size of the file..." %>
           <div style="text-align: center; margin: 10px;">
             <%= image_tag "ajax-loader-bar.gif" %>
           </div>
@@ -428,10 +430,10 @@ var submissionAttachmentIndex = -1;
         <% end %>
       <% else %>
         <div id="submit_google_doc_form">
-          Before you can submit assignments directly from Google Docs you need to
-          authorize Canvas to access your Google Docs account:
+          <%= t 'messages.google_docs_auth_required', "Before you can submit assignments directly from Google Docs you need to
+          authorize Canvas to access your Google Docs account:" %>
           <div style="font-size: 1.1em; text-align: center; margin: 10px;">
-            <a class="button" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#submit_google_doc_form")) %>">Authorize Google Docs Access</a>
+            <a class="button" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_docs', "Authorize Google Docs Access" %></a>
           </div>
         </div>
       <% end %>
@@ -439,11 +441,11 @@ var submissionAttachmentIndex = -1;
     <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
       <% if !feature_enabled?(:kaltura) %>
         <div id="submit_media_recording_form">
-          <h3>Media recordings are not enabled for this Canvas site</h3>
-          <p>Media recordings are not enabled for this Canvas site, and you will not be
+          <h3><%= t 'titles.media_recordings_disabled', "Media recordings are not enabled for this Canvas site" %></h3>
+          <p><%= t 'messages.media_recordings_disabled', "Media recordings are not enabled for this Canvas site, and you will not be
           able to submit these types of assignments.  Please contact your instructor about
           changing the settings for this assignment, or your system administrator about enabling
-          media recordings.</p>
+          media recordings." %></p>
         </div>
       <% else %>
         <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
@@ -453,19 +455,19 @@ var submissionAttachmentIndex = -1;
         <table class="formtable" style="width: 100%;">
           <tr>
             <td colspan="2" style="padding-bottom: 10px;">
-              Use the link below to record your submission.  Click "Save" when you're finished and ready to submit.
+              <%= t 'instructions.media_recording', "Use the link below to record your submission.  Click \"Save\" when you're finished and ready to submit." %>
                 <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
             </td>
           </tr><tr>
             <td>
               <div id="media_media_recording_submission_holder" style="font-size: 1.2em; font-weight: bold;">
                 <div id="media_media_recording_ready" style="display: none; font-size: 1.5em;">
-                  Ready to Submit!  Click 'Submit Assignment' button to finish.
+                  <%= t 'messages.media_recording_ready', "Ready to Submit!  Click 'Submit Assignment' button to finish."%>
                   <div id="media_media_recording_thumbnail">
                     <%= image_tag "media_comment.png" %>
                   </div>
                 </div>
-                <a href="#" class="record_media_comment_link button" style="font-size: 1.1em;"><%= image_tag "record.gif" %> Record / Upload Media</a>
+                <a href="#" class="record_media_comment_link button" style="font-size: 1.1em;"><%= image_tag "record.gif" %> <%= t 'buttons.record_media', "Record / Upload Media" %></a>
                 <div id="media_media_recording_submission" style="display: none; float: left; width: auto; border: 2px solid #444;">
                 </div>
                 <div class="clear"></div>
@@ -475,33 +477,33 @@ var submissionAttachmentIndex = -1;
           <tr>
             <td colspan="2" style="text-align: center;">
               <div style="text-align: left;">
-                <%= label :submission, :comment, "Comments:" %>
+                <%= blabel :submission, :comment, "Comments" %>
               </div>
               <%= text_area :submission, :comment, :style => "width: 100%; height: 75px;" %>
             </td>
           </tr><tr>
             <td colspan="2" class='button-container'>
-              <button type="submit" class="button submit_button">Submit Assignment</button>
-              <button type="button" class='cancel_button button-secondary'>Cancel</button>
+              <button type="submit" class="button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+              <button type="button" class='cancel_button button-secondary'><%= t '#buttons.cancel', "Cancel" %></button>
             </td>
           </tr><tr style="display: none;">
             <td colspan="2" style="text-align: center;">
-              Submitting... <img src=""/>
+              <%= t 'messages.submitting', "Submitting..." %> <img src=""/>
             </td>
           </tr>
         </table>
           <% js_block do %>
           <script>
             $(document).ready(function() {
-              $("#submit_media_recording_form .submit_button").attr('disabled', true).text("Record Before Submitting");
+              $("#submit_media_recording_form .submit_button").attr('disabled', true).text("<%= t 'messages.record_before_submitting', "Record Before Submitting" %>");
               $("#media_media_recording_submission_holder .record_media_comment_link").click(function(event) {
                 event.preventDefault();
                 $("#media_media_recording_submission").mediaComment('create', 'video', function(id, type) {
-                  $("#submit_media_recording_form .submit_button").attr('disabled', false).text("Submit Assignment");
+                  $("#submit_media_recording_form .submit_button").attr('disabled', false).text("<%= t 'buttons.submit_assignment', "Submit Assignment" %>");
                   $("#submit_media_recording_form .media_comment_id").val(id);
                   $("#submit_media_recording_form .media_comment_type").val(type);
                   $("#media_media_recording_submission_holder").children().hide();
-                  $("#media_media_recording_ready").show(); //.text("Recording saved.  Click Submit Assignment to complete.");
+                  $("#media_media_recording_ready").show();
                   $("#media_media_recording_thumbnail").attr('id', 'media_comment_' + id);
                 }, function() {
                 });

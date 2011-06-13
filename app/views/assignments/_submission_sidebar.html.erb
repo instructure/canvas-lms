@@ -1,58 +1,64 @@
 <% cache(['submission_sidebar_render', @current_user_submission, Time.zone.utc_offset].cache_key) do %>
 <div class="details">
-  <h3 style="margin: 0;">Submission</h3>
-  <div class="header" style="font-weight: bold; font-size: 1.2em;"><%= image_tag "graded.png" %> Turned In!</div>
+  <h3 style="margin: 0;"><%= t 'titles.submission', "Submission" %></h3>
+  <div class="header" style="font-weight: bold; font-size: 1.2em;"><%= image_tag "graded.png" %> <%= t 'titles.submission_turned_in', "Turned In!" %></div>
   <div style="padding-left: 5px;">
-    <span style="<%= "color: #800; font-weight: bold;" if @current_user_submission && @current_user_submission.late? %>">
-      <%= datetime_string(@current_user_submission.submitted_at) %>
-      <%= " (late)" if @current_user_submission && @current_user_submission.late? %>
+    <span style="<%= "color: #800; font-weight: bold;" if @current_user_submission.late? %>">
+      <% if @current_user_submission.late? %>
+        <%= t 'messages.submission_late_timestamp', "%{submitted_at} (late)", :submitted_at => datetime_string(@current_user_submission.submitted_at) %>
+      <% else %>
+        <%= datetime_string(@current_user_submission.submitted_at) %>
+      <% end %>
     </span>
     <br/>
     
-    <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" class='forward'>Submission Details</a><br/>
+    <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" class='forward'><%= t 'links.submission.details', "Submission Details" %></a><br/>
     <% if @current_user_submission.submission_type == "online_url" %>
-      <a href="<%= @current_user_submission.url %>" target="_new" class='link'>View the Original Page</a><br/>
+      <a href="<%= @current_user_submission.url %>" target="_new" class='link'><%= t 'links.submission.view_original_page', "View the Original Page" %></a><br/>
     <% elsif @current_user_submission.submission_type == "online_text_entry" %>
-      <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" target="_new" class='text-entry'>View the Original Entry</a><br/>
+      <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" target="_new" class='text-entry'><%= t 'links.submission.view_original_entry', "View the Original Entry" %></a><br/>
     <% elsif @current_user_submission.submission_type == "online_upload" %>
       <% @current_user_submission.attachments.each do |attachment| %>
-        <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :download => attachment.id) %>" class='file-big'>Download <%= attachment.display_name %></a><br/>
+        <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :download => attachment.id) %>" class='file-big'><%= t 'links.submission.download_attachment', "Download %{attachment_display_name}", :attachment_display_name => attachment.display_name %></a><br/>
       <% end %>
     <% elsif @current_user_submission.submission_type == "online_quiz" %>
-      <a href="<%= context_url(@assignment.context, :context_quiz_url, @assignment.quiz.id) %>" target="_new" class='quiz'>View the <%= @assignment.quiz.readable_type %> Submission</a><br/>
+      <a href="<%= context_url(@assignment.context, :context_quiz_url, @assignment.quiz.id) %>" target="_new" class='quiz'>
+        <%= @assignment.quiz.survey? ? t('links.submission.view_survey', "View the Survey Submission") :
+          t('links.submission.view_quiz', "View the Quiz Submission") %></a><br />
     <% end %>
     <% if @current_user_submission.grade %>
       <br/>
-      Grade: <%= @current_user_submission.grade %> <span style="font-size: 0.8em;">(<%= @assignment.points_possible %> pts possible)</span>
+      <%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", :grade => @current_user_submission.grade,
+        :points_possible => @assignment.points_possible, :wrapper => '<span style="font-size: 0.8em;">\1</span>' %>
     <% end %>
     <% if @current_user_submission.rubric_assessment %>
-      <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id) %>#rubric" class='rubric'>View Rubric Evaluation</a>
+      <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id) %>#rubric" class='rubric'><%= t 'links.view_rubric_evaluation', "View Rubric Evaluation" %></a>
     <% end %>
     <% if @assignment.has_peer_reviews? && @current_user_submission.user == @current_user %>
-      <br/><b>Assigned Peer Reviews</b>
+      <br/><b><%= t 'titles.assigned_peer_reviews', "Assigned Peer Reviews" %></b>
       <ul class="unstyled_list" style="margin: 5px 10px 10px;">
-        <li style="<%= hidden unless @current_user_submission.assigned_assessments.empty? %>">None Assigned</li>
+        <li style="<%= hidden unless @current_user_submission.assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
         <% @current_user_submission.assigned_assessments.each do |assessment| %>
-          <li><a <%= assessment.completed? ? "class='pass' title='finished'" : "class='warning' title='incomplete'"   %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, assessment.asset.user_id) %> ">
+          <li><a <%= assessment.completed? ? "class='pass' title='#{t 'tooltips.finished', "finished"}'" : "class='warning' title='#{t 'tooltips.incomplete', "incomplete"}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, assessment.asset.user_id) %> ">
             <%= assessment.asset_user_name %>
           </a></li>
         <% end %>
       </ul>
     <% end %>
-    <div style="font-size: 0.8em; padding-top: 10px; max-height: 300px; overflow: auto;"><b>Comments: </b>
-      <%= "No Comments" if @current_user_submission.submission_comments.empty? %>
+    <div style="font-size: 0.8em; padding-top: 10px; max-height: 300px; overflow: auto;"><b><%= t 'titles.comments', "Comments:" %> </b>
+      <%= t('messages.no_comments', "No Comments") if @current_user_submission.submission_comments.empty? %>
       <% @current_user_submission.submission_comments.each do |comment| %>
         <div style="margin-left: 10px;">
           <%= comment.comment %>
           <div class="comment_attachments" style="text-align: right; margin-right: 10px;">
             <% comment.attachments.each do |attachment| %>
               <div class="comment_attachment">
-                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link"><%= image_tag "file.png", :style => "height: 12px;" %> Download <%= attachment.display_name %></a>
+                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link"><%= image_tag "file.png", :style => "height: 12px;" %> <%= t 'links.download_attachment', "Download %{attachment_display_name}", :attachment_display_name => attachment.display_name %></a>
               </div>
             <% end %>
           </div>
           <div style="font-size: 0.8em; text-align: right; color: #888;">
-            <%= comment.author_name %>, <%= datetime_string(comment.created_at) %>
+            <%= t :comment_signature, "%{author}, %{created_at}", :author => comment.author_name, :created_at => datetime_string(comment.created_at) %>
           </div>
         </div>
       <% end %>
@@ -62,6 +68,6 @@
 <% end %>
 <% if can_do(@assignment, @current_user, :submit) %>
   <div class="rs-margin-lr">
-    <a href="#" class="submit_assignment_link resubmit_link add <%= 'late' if @current_user_submission && @current_user_submission.late? %>">Re-submit Assignment</a><br/>
+    <a href="#" class="submit_assignment_link resubmit_link add <%= 'late' if @current_user_submission && @current_user_submission.late? %>"><%= t 'links.resubmit', "Re-submit Assignment" %></a><br/>
   </div>
 <% end %>
