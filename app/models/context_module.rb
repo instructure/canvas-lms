@@ -345,15 +345,15 @@ class ContextModule < ActiveRecord::Base
   def self.requirement_description(req)
     case req[:type]
     when 'must_view'
-      "must view the page"
+      t('requirements.must_view', "must view the page")
     when 'must_contribute'
-      "must contribute to the page"
+      t('requirements.must_contribute', "must contribute to the page")
     when 'must_submit'
-      "must submit the assignment"
+      t('requirements.must_submit', "must submit the assignment")
     when 'min_score'
-      "must score at least a #{req[:min_score]}"
+      t('requirements.min_score', "must score at least a %{score}", :score => req[:min_score])
     when 'max_score'
-      "must score no more than a #{req[:max_score]}"
+      t('requirements.max_score', "must score no more than a %{score}", :score => req[:max_score])
     else
       nil
     end
