@@ -79,7 +79,11 @@ class JobsController < ApplicationController
     @jobs = @jobs.scoped(:order => 'id desc')
 
     if params[:q].present?
-      @jobs = @jobs.scoped(:conditions => ["#{ActiveRecord::Base.wildcard('tag', params[:q])} OR id = ?", params[:q].to_i])
+      if params[:q].to_i > 0
+        @jobs = @jobs.scoped(:conditions => { :id => params[:q].to_i })
+      else
+        @jobs = @jobs.scoped(:conditions => ["#{ActiveRecord::Base.wildcard('tag', params[:q])} OR strand = ?", params[:q]])
+      end
     end
 
     if params[:job_ids].present?
