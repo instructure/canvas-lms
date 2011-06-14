@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= t(:page_title, "Accounts") <% end %>
+<% content_for :page_title do %><%= t(:page_title, "Accounts") %><% end %>
 <% add_crumb t(:accounts_crumb, "Accounts") %>
 
 <% content_for :right_side do %>
@@ -6,7 +6,7 @@
 
 <% jammit_css :context_list %>
 
-<h2><%= t(:title, "Accounts I Manage")</h2>
+<h2><%= t(:title, "Accounts I Manage") %></h2>
 <%= t(:no_accounts_message, "No Accounts") if @accounts.empty? %>
 <ul class="context_list">
   <% @accounts.each do |account| %>
