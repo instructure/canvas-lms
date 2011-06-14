@@ -4,6 +4,10 @@ class JobsController < ApplicationController
   LIMIT = 100
 
   def index
+    if request.path == '/delayed_jobs'
+      return redirect_to(jobs_url)
+    end
+
     if params[:id].present?
       params[:q] = params[:id]
       params[:flavor] = 'all'
