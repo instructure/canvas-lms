@@ -57,6 +57,21 @@ describe I18n do
       translation.html_safe?.should be_true
       translation.should == %{User <span class="firstname">User</span> <span class="lastname">Amp&amp;Name</span>}
     end
+
+    it "should apply all duplicate wrappers" do
+      translation = I18n.t(:foo, 'From *here* to *there*', :wrapper => '<span>\1</span>')
+      translation.html_safe?.should be_true
+      translation.should == %{From <span>here</span> to <span>there</span>}
+    end
+
+    it "should handle similar looking wrappers" do
+      translation = I18n.t(:foo, 'From *here* to **there** and ***everywhere***',
+                           :wrapper => { '*' => '<span class="1">\1</span>',
+                               '**' => '<span class="2">\1</span>',
+                               '***' => '<span class="3">\1</span>' })
+      translation.html_safe?.should be_true
+      translation.should == %{From <span class="1">here</span> to <span class="2">there</span> and <span class="3">everywhere</span>}
+    end
   end
 
   context "pluralization" do

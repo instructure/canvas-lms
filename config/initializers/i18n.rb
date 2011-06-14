@@ -120,9 +120,9 @@ I18n.class_eval do
   def self.apply_wrappers(string, wrappers)
     string = ERB::Util.h(string) unless string.html_safe?
     wrappers = { '*' => wrappers } unless wrappers.is_a?(Hash)
-    wrappers.each do |sym, replace|
+    wrappers.sort { |a, b| -(a.first.length <=> b.first.length) }.each do |sym, replace|
       regex = (WRAPPER_REGEXES[sym] ||= %r{#{Regexp.escape(sym)}([^#{Regexp.escape(sym)}]*)#{Regexp.escape(sym)}})
-      string = string.sub(regex, replace)
+      string = string.gsub(regex, replace)
     end
     string.html_safe
   end
