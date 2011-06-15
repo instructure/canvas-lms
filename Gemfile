@@ -31,6 +31,7 @@ gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param
 gem 'rake',           '0.8.7'
 gem 'ratom',          '0.6.7',  :require => "atom"
 gem 'rdiscount',      '1.6.8'
+gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
