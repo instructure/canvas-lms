@@ -117,6 +117,7 @@ class Message < ActiveRecord::Base
   
   def self.old_dashboard
     res = []
+    # TODO i18n
     Notification.find_all_by_category("Course Content").each do |notification|
       res += Message.in_state(:dashboard).by_name(notification.name).before(2.weeks.ago)[0..10]
     end
@@ -330,6 +331,7 @@ class Message < ActiveRecord::Base
   def self.dashboard_messages(messages)
     message_types = {}
     messages.each do |m|
+      # TODO i18n
       type = m.notification.category rescue "Other"
       if type
         message_types[type] ||= []
