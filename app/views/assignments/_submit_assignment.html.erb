@@ -241,7 +241,7 @@ var submissionAttachmentIndex = -1;
     <table class="formtable" style="width: 100%;">
       <tr>
         <td>
-        <%= 'instructions.online_text_entry', "Copy and paste or type your submission right here." %>
+        <%= t 'instructions.online_text_entry', "Copy and paste or type your submission right here." %>
             <%= render :partial => "assignments/group_submission_reminder" if @assignment.group_category %>
         </td>
       </tr><tr>
@@ -410,7 +410,7 @@ var submissionAttachmentIndex = -1;
           $("#submit_google_doc_form").submit(function() {
             $("#uploading_google_doc_message").dialog('close').dialog({
               autoOpen: false,
-              title: "<%= t 'titles.uploading', "Uploading Submission" %>"",
+              title: "<%= t 'titles.uploading', "Uploading Submission" %>",
               modal: true,
               overlay: {
                 backgroundColor: "#000",
