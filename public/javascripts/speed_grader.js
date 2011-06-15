@@ -796,11 +796,11 @@ I18n.scoped('gradebook', function(I18n) {
 
     handleSubmissionSelectionChange: function(){
       try {
-        var currentSelectedIndex = ( 
-              $submission_to_view.filter(":visible").length ? 
-              Number($submission_to_view.filter(":visible").val()) : 
-              (this.currentStudent.submission.currentSelectedIndex || 0)
-            ),
+        var submissionToViewVal = $submission_to_view.filter(":visible").val(),
+            currentSelectedIndex = Number(submissionToViewVal) || 
+                                  ( this.currentStudent.submission &&
+                                    this.currentStudent.submission.currentSelectedIndex ) 
+                                  || 0,
             submission  = this.currentStudent.submission.submission_history[currentSelectedIndex].submission,
             dueAt       = jsonData.due_at && $.parseFromISO(jsonData.due_at),
             submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
