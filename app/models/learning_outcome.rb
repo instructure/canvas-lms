@@ -104,7 +104,7 @@ class LearningOutcome < ActiveRecord::Base
     criterion[:ratings] = []
     (hash[:ratings] || []).each do |key, rating|
       criterion[:ratings] << {
-        :description => rating[:description] || "No Comment",
+        :description => rating[:description] || t(:no_comment, "No Comment"),
         :points => rating[:points].to_f || 0
       }
     end
