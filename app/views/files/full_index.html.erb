@@ -107,12 +107,12 @@
     <div class="clear"></div>
     <div class="details">
       <div class="currently_locked_box">
-        <%= image_tag "lock.png" %> <%= t 'descriptions.locked', "This folder is locked and cannot be viewed by students." %>
-        <span class="lock_until"><br/><%= t 'descriptions.locked_until', "It is locked until %{unlock_at}.",
+        <%= image_tag "lock.png" %> <%= t 'descriptions.folder_locked', "This folder is locked and cannot be viewed by students." %>
+        <span class="lock_until"><br/><%= t 'descriptions.folder_locked_until', "It is locked until %{unlock_at}.",
                                           :unlock_at => '<span class="unlock_at_string" style="font-weight: bold;">&nbsp;</span>'.html_safe %></span>
-        <span class="lock_after"><br/><%= t 'descriptions.locked_after', "It will be locked after %{lock_at}.",
+        <span class="lock_after"><br/><%= t 'descriptions.folder_locked_after', "It will be locked after %{lock_at}.",
                                           :lock_at => '<span class="lock_at_string" style="font-weight: bold;">&nbsp;</span>'.html_safe %></span>
-        <%= image_tag "mime_types/locked.png", :class => 'locked', :style => "display: none;", :title => "Locked", :alt => "locked" %>
+        <%= image_tag "mime_types/locked.png", :class => 'locked', :style => "display: none;", :title => t('titles.folder_locked', "Locked"), :alt => t('alts.folder_locked', "locked") %>
       </div>
     </div>
   </li>
@@ -189,11 +189,11 @@
       <span class="cant_download" style="font-weight: bold;"><%= t :locked, "This file isn't unlocked yet, so it can't be downloaded." %></span>
       <div class="currently_locked_box">
         <%= image_tag "lock.png" %> <%= t :locked2, "This file is locked and cannot be downloaded by students." %>
-        <span class="lock_until"><br/><%= t 'descriptions.locked_until', "It is locked until *%{unlock_at}*.", :unlock_at => '&nbsp;'.html_safe,
-                                          :wrapper => '<span class="unlock_at_string" style="font-weight: bold;">\1</span>' %></span>
-        <span class="lock_after"><br/><%= t 'descriptions.locked_after', "It will be locked after *%{lock_at}*.", :lock_at => '&nbsp;'.html_safe,
-                                          :wrapper => '<span class="lock_at_string" style="font-weight: bold;">\1</span>' %></span>
-        <%= image_tag "mime_types/locked.png", :class => 'locked', :style => "display: none;", :title => t('titles.locked', "Locked"), :alt => t('alts.locked', "locked") %>
+        <span class="lock_until"><br/><%= t 'descriptions.file_locked_until', "It is locked until %{unlock_at}.",
+                                          :unlock_at => '<span class="unlock_at_string" style="font-weight: bold;">&nbsp;</span>'.html_safe %></span>
+        <span class="lock_after"><br/><%= t 'descriptions.file_locked_after', "It will be locked after %{lock_at}.",
+                                          :lock_at => '<span class="lock_at_string" style="font-weight: bold;">&nbsp;</span>'.html_safe %></span>
+        <%= image_tag "mime_types/locked.png", :class => 'locked', :style => "display: none;", :title => t('titles.file_locked', "Locked"), :alt => t('alts.file_locked', "locked") %>
       </div>
     </div>
   </li>
@@ -434,7 +434,7 @@ HEREDOC
         <td style="vertical-align: top;">
           <%= f.check_box :just_hide %> 
         </td><td colspan="2" style="padding-bottom: 10px; 10px; font-size: 0.8em;">
-          <%= f.label :just_hide, :en => "Let students download or view the file if I link to it, just don't show it in the file listings for students" %>
+          <%= f.label :just_hide, :just_hide_file, :en => "Let students download or view the file if I link to it, just don't show it in the file listings for students" %>
         </td>
       </tr>
       <tr class="full_lock">
@@ -473,7 +473,7 @@ HEREDOC
         <td style="vertical-align: top;">
           <%= f.check_box :just_hide %> 
         </td><td colspan="2" style="padding-bottom: 10px; font-size: 0.8em;">
-          <%= f.label :just_hide, :en => "Let students download or view files in this folder if I link to them, just don't show it in the file listings for students" %>
+          <%= f.label :just_hide, :just_hide_folder, :en => "Let students download or view files in this folder if I link to them, just don't show it in the file listings for students" %>
         </td>
       </tr>
       <tr class="full_lock">

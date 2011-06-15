@@ -102,13 +102,13 @@ class ApplicationController < ActionController::Base
   def tab_enabled?(id)
     if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :include_hidden_unused => true).any?{|t| t[:id] == id }
       if @context.is_a?(Account)
-        flash[:notice] = t "notices.page_disabled_for_account", "That page has been disabled for this account"
+        flash[:notice] = t "#application.notices.page_disabled_for_account", "That page has been disabled for this account"
       elsif @context.is_a?(Course)
-        flash[:notice] = t "notices.page_disabled_for_course", "That page has been disabled for this course"
+        flash[:notice] = t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
       elsif @context.is_a?(Group)
-        flash[:notice] = t "notices.page_disabled_for_group", "That page has been disabled for this group"
+        flash[:notice] = t "#application.notices.page_disabled_for_group", "That page has been disabled for this group"
       else
-        flash[:notice] = t "notices.page_disabled", "That page has been disabled"
+        flash[:notice] = t "#application.notices.page_disabled", "That page has been disabled"
       end
       redirect_to named_context_url(@context, :context_url)
       return false
@@ -151,10 +151,10 @@ class ApplicationController < ActionController::Base
   
   def render_unauthorized_action(object=nil)
     object ||= User.new
-    object.errors.add_to_base(t "errors.unauthorized", "You are not authorized to perform this action")
+    object.errors.add_to_base(t "#application.errors.unauthorized", "You are not authorized to perform this action")
     respond_to do |format|
       if !request.xhr?
-        flash[:notice] = t "errors.unauthorized", "You are not authorized to perform this action"
+        flash[:notice] = t "#application.errors.unauthorized", "You are not authorized to perform this action"
       end
       @show_left_side = false
       clear_crumbs
@@ -223,7 +223,7 @@ class ApplicationController < ActionController::Base
           session[:enrollment_uuid_count] ||= 0
           if session[:enrollment_uuid_count] > 4
             session[:enrollment_uuid_count] = 0
-            flash[:html_notice] = mt "notices.need_to_accept_enrollment", "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
+            flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment", "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
           end
           session[:enrollment_uuid_count] += 1
         end
@@ -403,15 +403,15 @@ class ApplicationController < ActionController::Base
     get_quota
     if response.body.size + @quota_used > @quota
       if @context.is_a?(Account)
-        error = t "errors.quota_exceeded_account", "Account storage quota exceeded"
+        error = t "#application.errors.quota_exceeded_account", "Account storage quota exceeded"
       elsif @context.is_a?(Course)
-        error = t "errors.quota_exceeded_course", "Course storage quota exceeded"
+        error = t "#application.errors.quota_exceeded_course", "Course storage quota exceeded"
       elsif @context.is_a?(Group)
-        error = t "errors.quota_exceeded_group", "Course storage quota exceeded"
+        error = t "#application.errors.quota_exceeded_group", "Course storage quota exceeded"
       elsif @context.is_a?(User)
-        error = t "errors.quota_exceeded_user", "Course storage quota exceeded"
+        error = t "#application.errors.quota_exceeded_user", "Course storage quota exceeded"
       else
-        error = t "errors.quota_exceeded", "Storage quota exceeded"
+        error = t "#application.errors.quota_exceeded", "Storage quota exceeded"
       end
       respond_to do |format|
         flash[:error] = error unless request.format.to_s == "text/plain"
@@ -439,9 +439,9 @@ class ApplicationController < ActionController::Base
       @enrollment = Enrollment.find_by_uuid(pieces[1]) if pieces[1]
       @context_type = "Course"
       if !@enrollment
-        @problem = t "errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
+        @problem = t "#application.errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
       elsif @enrollment.course && !@enrollment.course.available?
-        @problem = t "errors.feed_unpublished_course", "Feeds for this course cannot be accessed until it is published."
+        @problem = t "#application.errors.feed_unpublished_course", "Feeds for this course cannot be accessed until it is published."
       end
       @context = @enrollment.course unless @problem
       @current_user = @enrollment.user unless @problem
@@ -449,9 +449,9 @@ class ApplicationController < ActionController::Base
       @membership = GroupMembership.find_by_uuid(pieces[1]) if pieces[1]
       @context_type = "Group"
       if !@membership
-        @problem = t "errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
+        @problem = t "#application.errors.mismatched_verification_code", "The verification code does not match any currently enrolled user."
       elsif @membership.group && !@membership.group.available?
-        @problem = t "errors.feed_unpublished_group", "Feeds for this group cannot be accessed until it is published."
+        @problem = t "#application.errors.feed_unpublished_group", "Feeds for this group cannot be accessed until it is published."
       end
       @context = @membership.group unless @problem
       @current_user = @membership.user unless @problem
@@ -462,22 +462,22 @@ class ApplicationController < ActionController::Base
         @context = @context_class.find_by_uuid(pieces[1]) if pieces[1]
       end
       if !@context
-        @problem = t "errors.invalid_verification_code", "The verification code is invalid."
+        @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid."
       elsif (!@context.is_public rescue false) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
         if @context_type == 'course'
-          @problem = t "errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
+          @problem = t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
         elsif @context_type == 'group'
-          @problem = t "errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
+          @problem = t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
         else
-          @problem = t "errors.feed_private", "The matching context has gone private, so public feeds like this one will no longer be visible."
+          @problem = t "#application.errors.feed_private", "The matching context has gone private, so public feeds like this one will no longer be visible."
         end
       end
       @context = nil if @problem
       @current_user = @context if @context.is_a?(User)
     end
     if !@context || (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
-      @problem ||= t("errors.invalid_feed_parameters", "Invalid feed parameters.") if (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
-      @problem ||= t "errors.feed_not_found", "Could not find feed."
+      @problem ||= t("#application.errors.invalid_feed_parameters", "Invalid feed parameters.") if (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
+      @problem ||= t "#application.errors.feed_not_found", "Could not find feed."
       @template_format = 'html'
       @template.template_format = 'html'
       render :text => @template.render(:file => "shared/unauthorized_feed", :layout => "layouts/application"), :status => :bad_request # :template => "shared/unauthorized_feed", :status => :bad_request
@@ -675,9 +675,9 @@ class ApplicationController < ActionController::Base
     session[:claimed_enrollment_uuids] ||= []
     session[:claimed_enrollment_uuids] << e.uuid
     session[:claimed_enrollment_uuids].uniq!
-    flash[:notice] = t "notices.first_teacher", "This course is now claimed, and you've been registered as its first teacher."
+    flash[:notice] = t "#application.notices.first_teacher", "This course is now claimed, and you've been registered as its first teacher."
     if !@current_user && state == :just_registered
-      flash[:notice] = t "notices.first_teacher_with_email", "This course is now claimed, and you've been registered as its first teacher. You should receive an email shortly to complete the registration process."
+      flash[:notice] = t "#application.notices.first_teacher_with_email", "This course is now claimed, and you've been registered as its first teacher. You should receive an email shortly to complete the registration process."
     end
     session[:claimed_course_uuids] ||= []
     session[:claimed_course_uuids] << course.uuid
@@ -746,8 +746,8 @@ class ApplicationController < ActionController::Base
     )
     @page.current_namespace = @namespace
     if page_name == "front-page" && @page.new_record?
-      @page.body = t "wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
-      @page.body = t "wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
+      @page.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if @context.is_a?(Course)
+      @page.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if @context.is_a?(Group)
     end
   end
   
@@ -779,13 +779,13 @@ class ApplicationController < ActionController::Base
       @tool = ContextExternalTool.find_external_tool(tag.url, context)
       tag.context_module_action(@current_user, :read)
       if !@tool
-        flash[:error] = t "errors.invalid_external_tool", "Couldn't find valid settings for this link"
+        flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
         render :template => 'external_tools/tool_show'
       end
     else
-      flash[:error] = t "errors.invalid_tag_type", "Didn't recognize the item type for this tag"
+      flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
       redirect_to named_context_url(context, error_redirect_symbol)
     end
   end
@@ -932,7 +932,7 @@ class ApplicationController < ActionController::Base
       @current_user = @real_current_user
     end
     unless current_user_is_site_admin?(permission)
-      flash[:error] = t "errors.permission_denied", "You don't have permission to access that page"
+      flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
       redirect_to root_url
       return false
     end

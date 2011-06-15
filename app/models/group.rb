@@ -324,12 +324,12 @@ class Group < ActiveRecord::Base
   TAB_FILES = 5
   def tabs_available(user=nil, opts={})
     available_tabs = [
-      { :id => TAB_HOME,        :label => t("tabs.home", "Home"), :href => :group_path }, 
-      { :id => TAB_PAGES,       :label => t("tabs.pages", "Pages"), :href => :group_wiki_pages_path }, 
-      { :id => TAB_PEOPLE,      :label => t("tabs.people", "People"), :href => :group_users_path }, 
-      { :id => TAB_DISCUSSIONS, :label => t("tabs.discussions", "Discussions"), :href => :group_discussion_topics_path }, 
-      { :id => TAB_CHAT,        :label => t("tabs.chat", "Chat"), :href => :group_chat_path }, 
-      { :id => TAB_FILES,       :label => t("tabs.files", "Files"), :href => :group_files_path }
+      { :id => TAB_HOME,        :label => t("#group.tabs.home", "Home"), :href => :group_path }, 
+      { :id => TAB_PAGES,       :label => t("#group.tabs.pages", "Pages"), :href => :group_wiki_pages_path }, 
+      { :id => TAB_PEOPLE,      :label => t("#group.tabs.people", "People"), :href => :group_users_path }, 
+      { :id => TAB_DISCUSSIONS, :label => t("#group.tabs.discussions", "Discussions"), :href => :group_discussion_topics_path }, 
+      { :id => TAB_CHAT,        :label => t("#group.tabs.chat", "Chat"), :href => :group_chat_path }, 
+      { :id => TAB_FILES,       :label => t("#group.tabs.files", "Files"), :href => :group_files_path }
     ]
   end
 

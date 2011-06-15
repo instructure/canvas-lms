@@ -169,7 +169,7 @@ class Account < ActiveRecord::Base
       return true if !existing_account || existing_account.id == self.id
     end
     
-    self.errors.add(:sis_source_id, t(:sis_id_in_use, "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
+    self.errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
   end
   
@@ -734,7 +734,7 @@ class Account < ActiveRecord::Base
       self.turnitin_pledge
     else
       res = self.account.turnitin_pledge rescue nil
-      res ||= t(:turnitin_pledge, "This assignment submission is my own, original work")
+      res ||= t('#account.turnitin_pledge', "This assignment submission is my own, original work")
     end
   end
   
@@ -772,25 +772,25 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
       tabs = [
-        { :id => TAB_PERMISSIONS, :label => t(:tab_permissions, "Permissions"), :href => :account_role_overrides_path },
+        { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :href => :account_role_overrides_path },
       ]
     else
-      tabs = [ { :id => TAB_COURSES, :label => t(:tab_courses, "Courses"), :href => :account_path } ]
-      tabs << { :id => TAB_USERS, :label => t(:tab_users, "Users"), :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
-      tabs << { :id => TAB_STATISTICS, :label => t(:tab_statistics, "Statistics"), :href => :statistics_account_path }
-      tabs << { :id => TAB_PERMISSIONS, :label => t(:tab_permissions, "Permissions"), :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      tabs = [ { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :href => :account_path } ]
+      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
+      tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :href => :statistics_account_path }
+      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
       if user && self.grants_right?(user, nil, :manage_outcomes)
-        tabs << { :id => TAB_OUTCOMES, :label => t(:tab_outcomes, "Outcomes"), :href => :account_outcomes_path }
-        tabs << { :id => TAB_RUBRICS, :label => t(:tab_rubrics, "Rubrics"), :href => :account_rubrics_path }
+        tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :href => :account_outcomes_path }
+        tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :href => :account_rubrics_path }
       end
-      tabs << { :id => TAB_GRADING_STANDARDS, :label => t(:tab_grading_standards, "Grading Schemes"), :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
-      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t(:tab_sub_accounts, "Sub-Accounts"), :href => :account_sub_accounts_path } if manage_settings
-      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t(:tab_faculty_journal, "Faculty Journal"), :href => :account_user_notes_path} if self.enable_user_notes
-      tabs << { :id => TAB_TERMS, :label => t(:tab_terms, "Terms"), :href => :account_terms_path } if !self.root_account_id && manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => t(:tab_authentication, "Authentication"), :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
-      tabs << { :id => TAB_SIS_IMPORT, :label => t(:tab_sis_import, "SIS Import"), :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
+      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading Schemes"), :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
+      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :href => :account_sub_accounts_path } if manage_settings
+      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :href => :account_user_notes_path} if self.enable_user_notes
+      tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :href => :account_terms_path } if !self.root_account_id && manage_settings
+      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
+      tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
     end
-    tabs << { :id => TAB_SETTINGS, :label => t(:tab_settings, "Settings"), :href => :account_settings_path }
+    tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :href => :account_settings_path }
     tabs
   end
 

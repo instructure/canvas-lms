@@ -140,7 +140,7 @@ end
 ActionController::Base.class_eval do
   def translate(key, default, options = {})
     key = key.to_s
-    key = "#{controller_name}.#{action_name}.#{key}" unless key.sub!(/\A#/, '')
+    key = "#{controller_name}.#{key}" unless key.sub!(/\A#/, '')
     I18n.translate(key, default, options)
   end
   alias :t :translate
@@ -156,16 +156,9 @@ ActiveRecord::Base.class_eval do
   alias :t :translate  
 
   class << self
-    # with STI fallback, e.g. try both 'subclass.key' and 'superclass.key'
-    # this is useful when you have t calls in the superclass
     def translate(key, default, options = {})
       key = key.to_s
-      unless key.sub!(/\A#/, '')
-        scopes = self_and_descendants_from_active_record.map{ |klass| klass.name.underscore }.reverse
-        orig_key = key
-        key = "#{scopes.shift}.#{key}"
-        default = scopes.map{ |scope| "#{scope}.#{orig_key}".to_sym} + Array(default)
-      end
+      key = "#{name.underscore}.#{key}" unless key.sub!(/\A#/, '')
       I18n.translate(key, default, options)
     end
     alias :t :translate
@@ -174,6 +167,7 @@ end
 
 ActionMailer::Base.class_eval do
   def translate(key, default, options = {})
+    key = key.to_s
     key = "#{mailer_name}.#{action_name}.#{key}" unless key.sub!(/\A#/, '')
     I18n.translate(key, default, options)
   end
