@@ -958,6 +958,7 @@ var quiz = {};
       $(".show_quiz_results_options").showIf($(this).attr('checked'));
       if(!$(this).attr('checked')) {
         $("#hide_results_only_after_last").attr('checked', false);
+        $("#quiz_show_correct_answers").attr('checked', false);
       }
     }).triggerHandler('change');
     $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").bind('change', function() {
