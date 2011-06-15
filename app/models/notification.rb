@@ -75,9 +75,9 @@ class Notification < ActiveRecord::Base
   end
 
   def infer_default_content
-    self.body ||= "No comments"
-    self.subject ||= "No Subject"
-    self.sms_body ||= "No comments"
+    self.body ||= t(:no_comments, "No comments")
+    self.subject ||= t(:no_subject, "No Subject")
+    self.sms_body ||= t(:no_comments, "No comments")
   end
   protected :infer_default_content
   
@@ -425,39 +425,39 @@ class Notification < ActiveRecord::Base
   def category_description
     case category
     when 'Announcement'
-      "For new announcements"
+      t(:announcement_description, "For new announcements")
     when 'Course Content'
-      "For changes to course pages"
+      t(:course_content_description, "For changes to course pages")
     when 'Files'
-      "For new files"
+      t(:files_description, "For new files")
     when 'Discussion'
-      "For new topics"
+      t(:discussion_description, "For new topics")
     when 'DiscussionEntry'
-      "For topics I've commented on"
+      t(:discussion_entry_description, "For topics I've commented on")
     when 'Due Date'
-      "For due date changes"
+      t(:due_date_description, "For due date changes")
     when 'Grading'
-      "For course grading alerts"
+      t(:grading_description, "For course grading alerts")
     when 'Late Grading'
-      "For assignments turned in late"
+      t(:late_grading_description, "For assignments turned in late")
     when 'All Submissions'
-      "For all assignment submissions in courses you teach"
+      t(:all_submissions_description, "For all assignment submissions in courses you teach")
     when 'Submission Comment'
-      "For comments on assignment submissions"
+      t(:submission_comment_description, "For comments on assignment submissions")
     when 'Grading Policies'
-      "For course grading policy changes"
+      t(:grading_policies_description, "For course grading policy changes")
     when 'Invitation'
-      "For new invitations"
+      t(:invitation_description, "For new invitations")
     when 'Other'
-      "For any other alerts"
+      t(:other_description, "For any other alerts")
     when 'Calendar'
-      "For calendar changes"
+      t(:calendar_description, "For calendar changes")
     when 'Message'
-      "For new email messages"
+      t(:message_description, "For new email messages")
     when 'Student Message'
-      "For private messages from students"
+      t(:student_message_description, "For private messages from students")
     else
-      'For ' + (category || "Notification") + ' alerts'
+      t(:missing_description_description, "For %{category} alerts", :category => category)
     end
   end
   
