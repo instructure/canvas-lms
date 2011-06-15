@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+var GradebookUploader;
 
-var GradebookUploader = {
+I18n.scoped('gradebook', function(I18n) {
+
+GradebookUploader = {
   init:function(){
     var gradebookGrid,
         mergedGradebook = $.extend(true, {}, originalGradebook),
@@ -25,7 +28,7 @@ var GradebookUploader = {
           columns: [
             {
               id:"student", 
-              name:"Student", 
+              name:I18n.t('student', "Student"), 
               field:"student", 
               width:250, 
               cssClass:"cell-title", 
@@ -260,7 +263,7 @@ var GradebookUploader = {
         $(this).find("select").each(function(){
           if( !$(this).val() ) {
             returnFalse = true;
-            $(this).errorBox("Please select an option");
+            $(this).errorBox(I18n.t('errors.select_an_option', "Please select an option"));
             return false;
           }
         });
@@ -305,3 +308,5 @@ var GradebookUploader = {
     }
   }
 };
+
+})

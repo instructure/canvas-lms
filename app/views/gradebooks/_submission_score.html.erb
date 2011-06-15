@@ -18,9 +18,9 @@
   <% if submission && grade %>
     <% if submission.assignment.grading_type == "pass_fail" %>
       <% if score && score > 0 || grade == "complete" %>
-        <%= image_tag "pass.png", :alt => "Complete", :class => "graded_icon" %>
+        <%= image_tag "pass.png", :alt => t('#gradebooks.grades.complete', "Complete"), :class => "graded_icon" %>
       <% else %>
-        <%= image_tag "fail.png", :alt => "Incomplete", :class => "graded_icon" %>
+        <%= image_tag "fail.png", :alt => t('#gradebooks.grades.incomplete', "Incomplete"), :class => "graded_icon" %>
       <% end %>
     <% elsif submission.assignment.grading_type == "percent" %>
       <%= grade %>

@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('gradebook', function(I18n) {
+
 var grading_scheme, readOnlyGradebook;
 var gradebook = (function(){
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
@@ -70,7 +72,7 @@ var gradebook = (function(){
       }
     });
     if (!atLeastOnePersonExistsInThisSection) {
-      alert("Could not find any students in that section, falling back to showing all sections.");
+      alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
       $.store.userRemove("grading_show_only_section"+contextId);
       window.location.reload();
     }
@@ -135,7 +137,7 @@ var gradebook = (function(){
           var topRowHtml = $("#datagrid_top .assignment_title").map(function(){
             return "<div role='columnheader' id='th_" + $(this).parents('.assignment_header').attr('id') + "' tabindex='-1'>" + $(this).html() + "</div>";
           }).get().join("");
-          return "<div class='hidden-readable' role='row'><div role='columnheader' tabindex='-1'>Student Name</div>" + topRowHtml +"</div>";
+          return "<div class='hidden-readable' role='row'><div role='columnheader' tabindex='-1'>" + I18n.t('student_name', "Student Name") + "</div>" + topRowHtml +"</div>";
         })
         .find(".row")
           .attr("role", "row")
@@ -155,21 +157,21 @@ var gradebook = (function(){
     },
     publishGradesToSis: function() {
       if(sisPublishStatus == 'published') {
-        if(!confirm("Are you sure you want to republish these grades to the student information system?"))
+        if(!confirm(I18n.t('confirms.republish_to_sis', "Are you sure you want to republish these grades to the student information system?")))
           return;
       } else {
-        if(!confirm("Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized."))
+        if(!confirm(I18n.t('confirms.publish_to_sis', "Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalized.")))
           return;
       }
       sisPublishStatus = "publishing";
       var successful_statuses = { "published": 1, "publishing": 1, "pending": 1 };
       var error = function(data, xhr, status, error) {
         sisPublishStatus = "unknown";
-        $.flashError("Something went wrong when trying to publish grades to the student information system. Please try again later.");
+        $.flashError(I18n.t('errors.publishing_failed', "Something went wrong when trying to publish grades to the student information system. Please try again later."));
       };
       $.ajaxJSON($publish_to_sis_form.attr('action'), 'POST', $publish_to_sis_form.getFormData(), function(data) {
         if(!data.hasOwnProperty("sis_publish_status") || !successful_statuses.hasOwnProperty(data["sis_publish_status"])) {
-          error(null, null, "Invalid SIS publish status", null);
+          error(null, null, I18n.t('errors.invalid_publishing_response', "Invalid SIS publish status"), null);
           return;
         }
         sisPublishStatus = data["sis_publish_status"];
@@ -195,12 +197,12 @@ var gradebook = (function(){
               });
             }
             if(grid.cell.hasClass('late')) {
-              showTooltip('This submission was submitted late');
+              showTooltip(I18n.t('tooltips.submitted_late', 'This submission was submitted late'));
             } else if(grid.cell.hasClass('dropped')) {
-              showTooltip('This submission is dropped for grading purposes');
+              showTooltip(I18n.t('tooltips.submission_dropped', 'This submission is dropped for grading purposes'));
             } else if(datagrid.columns[grid.cell.column].hidden) {
               var name = objectData(datagrid.cells['0,' + grid.cell.column]).title;
-              showTooltip($.htmlEscape(name) + "<br/><span style='font-size: 0.9em;'>Click to expand</span>", true)
+              showTooltip($.htmlEscape(name) + "<br/><span style='font-size: 0.9em;'>" + I18n.t('click_to_expand', "Click to expand") + "</span>", true)
             }
           } else if(event && event.originalEvent && event.originalEvent.type && !event.originalEvent.type.match(/mouse/)) {
             grid.cell.find(".grade").focus().css('outline', 0);
@@ -349,7 +351,7 @@ var gradebook = (function(){
             }
           });
           if(idx === 0) {
-            alert("None to Update");
+            alert(I18n.t('alerts.none_to_update', "None to Update"));
             return false;
           }
           return data;
@@ -361,7 +363,7 @@ var gradebook = (function(){
             updateSubmission(submission);
             studentsToUpdate.push(submission.user_id);
           }
-          alert(data.length + " Student scores updated");
+          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%[count} Student scores updated'}, {'count': data.length}));
           $default_grade_form.find(".cancel_button").attr('disabled', false);
           $default_grade_form.dialog('close');
         }
@@ -375,10 +377,15 @@ var gradebook = (function(){
             $cell = $(this).parents(".cell"),
             options = {},
             columnData = objectData($td);
+
+        var addOption = function(icon, text, func) {
+          var label = '<span class="ui-icon ui-icon-' + icon + '">&nbsp;</span> ' + text;
+          options[label] = func;
+        };
             
         if(!$td.hasClass('group_total') && !$td.hasClass('final_grade')) {
           if(object_data.submissions) {
-            options['<span class="ui-icon ui-icon-info">&nbsp;</span> Assignment Details'] = function() {
+            addOption('info', I18n.t('assignment_details', 'Assignment Details'), function() {
               var data = objectData($td),
                   $submissions = $(".student_assignment .assignment_" + data.assignment_id);
                   
@@ -403,7 +410,7 @@ var gradebook = (function(){
               data.min = data.min || 0.0;
               data.average = Math.round(data.score_total * 10.0 / data.cnt) / 10.0;
               if(isNaN(data.average) || !isFinite(data.average)) {
-                data.average = "N/A";
+                data.average = I18n.t('#not_applicable', "N/A");
               }
               var tally = 0, width = 0, totalWidth = 200;
               $assignment_details_dialog
@@ -417,17 +424,17 @@ var gradebook = (function(){
                 })
                 .dialog('close').dialog({
                   autoOpen: false,
-                  title: "Details: " + data.title
+                  title: I18n.beforeLabel('details', "Details") + " " + data.title
                 }).dialog('open')
                 .find(".assignment_link").attr('href', data.url);
-            };
+            });
           }
-          options['<span class="ui-icon ui-icon-newwin">&nbsp;</span> SpeedGrader'] = function() {
+          addOption('newwin', I18n.t('speed_grader', 'SpeedGrader'), function() {
             window.location.href = extendedGradebookURL;
-          };
+          });
           if(object_data.submissions) {
             if(!readOnlyGradebook) {
-              options['<span class="ui-icon ui-icon-mail-closed">&nbsp;</span> Message Students Who...'] = function() {
+              addOption('mail-closed', I18n.t('message_students_who', 'Message Students Who...'), function() {
                 var data = objectData($td),
                     title = data.title,
                     $submissions = $("#datagrid_data .assignment_" + data.id);
@@ -454,9 +461,9 @@ var gradebook = (function(){
                 
                 window.messageStudents({
                   options: [
-                    {text: "Haven't submitted yet"},
-                    {text: "Scored less than", cutoff: true},
-                    {text: "Scored more than", cutoff: true}
+                    {text: I18n.t('students_who.havent_submitted_yet', "Haven't submitted yet")},
+                    {text: I18n.t('students_who.scored_less_than', "Scored less than"), cutoff: true},
+                    {text: I18n.t('students_who.scored_more_than', "Scored more than"), cutoff: true}
                   ],
                   title: title,
                   points_possible: data.points_possible,
@@ -464,19 +471,19 @@ var gradebook = (function(){
                   callback: function(selected, cutoff, students) {
                     students = $.grep(students, function($student, idx) {
                       var student = $student.user_data;
-                      if(selected == "Haven't submitted yet") {
+                      if(selected == I18n.t('not_submitted_yet', "Haven't submitted yet")) {
                         return !student.submitted_at;
-                      } else if(selected == "Scored less than") {
+                      } else if(selected == I18n.t('scored_less_than', "Scored less than")) {
                         return student.score != null && student.score !== "" && cutoff != null && student.score < cutoff;
-                      } else if(selected == "Scored more than") {
+                      } else if(selected == I18n.t('scored_more_than', "Scored more than")) {
                         return student.score != null && student.score !== "" && cutoff != null && student.score > cutoff;
                       }
                     });
                     return $.map(students, function(student) { return student.user_data.id; });
                   }
                 });
-              };
-              options['<span class="ui-icon ui-icon-check">&nbsp;</span> Set Default Grade'] = function() {
+              });
+              addOption('check', I18n.t('set_default_grade', 'Set Default Grade'), function() {
                 var data = objectData($td),
                     title = data.title;
                 
@@ -498,10 +505,10 @@ var gradebook = (function(){
                   open: function() {
                     $default_grade_form.find(".grading_box").focus();
                   }
-                }).dialog('open').dialog('option', 'title', "Default Grade for " + title);
-              };
+                }).dialog('open').dialog('option', 'title', I18n.t('default_grade_for_course', "Default Grade for %{assignment}", {'assignment': title}));
+              });
               if(columnData.grading_type != 'pass_fail' && columnData.points_possible) {
-                options['<span class="ui-icon ui-icon-check">&nbsp;</span> Curve Grades'] = function() {
+                addOption('check', I18n.t('curve_grades', 'Curve Grades'), function() {
                   var data = objectData($td),
                       title = data.title;    
                   $curve_grade_dialog
@@ -518,41 +525,41 @@ var gradebook = (function(){
                         gradebook.curve();
                       }
                     })
-                    .dialog('open').dialog('option', 'title', "Curve Grade for " + title);
-                };
+                    .dialog('open').dialog('option', 'title', I18n.t('curve_grade_for_course', "Curve Grade for %{assignment}", {'assignment': title}));
+                });
               }
             }
             var data = objectData($td);
             if(data.submission_types && data.submission_types.match(/(online_upload|online_text_entry|online_url)/)) {
-              options['<span class="ui-icon ui-icon-disk">&nbsp;</span> Download Submissions'] = function() {
+              addOption('disk', I18n.t('download_submissions', 'Download Submissions'), function() {
                 var url = $(".download_assignment_submissions_url").attr('href');
                 url = $.replaceTags(url, "assignment_id", data.assignment_id);
                 try {
                   object_data['assignment_' + data.assignment_id].assignment.submissions_downloads = (data.submissions_downloads || 0) + 1;
                 } catch(e) { }
                 INST.downloadSubmissions(url);
-              };
+              });
             }
             if(data.submissions_downloads && data.submissions_downloads > 0 && !readOnlyGradebook) {
-              options['<span class="ui-icon ui-icon-arrowthickstop-1-n">&nbsp;</span> Re-Upload Submissions'] = function() {
+              addOption('arrowthickstop-1-n', I18n.t('reupload_submissions', 'Re-Upload Submissions'), function() {
                 var url = $("#re_upload_submissions_form").find(".re_upload_submissions_url").attr('href');
                 url = $.replaceTags(url, "assignment_id", data.assignment_id);
                 $("#re_upload_submissions_form").attr('action', url);
                 $("#re_upload_submissions_form").dialog('close').dialog({
                   autoOpen: false,
-                  title: "Re-Upload Submission Files",
+                  title: I18n.t('reupload_submission_files', "Re-Upload Submission Files"),
                   width: 350
                 }).dialog('open');
-              };
+              });
             }
           }
         }
-        options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> Hide Column'] = function() {
+        addOption('carat-1-w', I18n.t('hide_column', 'Hide Column'), function() {
           datagrid.toggleColumn(datagrid.position($cell).column);
-        };
+        });
         if($td.hasClass('group_total')) {
           var type = $td.find(".assignment_title").text();
-          options['<span class="ui-icon ui-icon-carat-1-w">&nbsp;</span> ' + $.htmlEscape('Hide All ' + type)] = function() {
+          addOption('carat-1-w', $.htmlEscape(I18n.t('hide_all_things', 'Hide All %{things}', {'things': type})), function() {
             var check_id = objectData($td).assignment_group_id;
             $(".outer_assignment_name").each(function() {
               var assignment = objectData($(this));
@@ -563,7 +570,7 @@ var gradebook = (function(){
                 datagrid.sizeGrid();
               }
             });
-          };
+          });
         }
         $(this).dropdownList({
           options: options
@@ -576,7 +583,7 @@ var gradebook = (function(){
           return false;
         } else if(!data.submissions_zip.match(/\.zip$/)) {
           $(this).formErrors({
-            submissions_zip: "Please upload files as a .zip"
+            submissions_zip: I18n.t('errors.upload_as_zip', "Please upload files as a .zip")
           });
           return false;
         }
@@ -853,7 +860,7 @@ var gradebook = (function(){
           getClump.errors = getClump.errors || 0;
           getClump.errors++;
           if(getClump.errors > 10) {
-            $("#loading_gradebook_status").text("Gradebook failed to load, please try refreshing the page");
+            $("#loading_gradebook_status").text(I18n.t('errors.failed_to_load', "Gradebook failed to load, please try refreshing the page"));
           } else {
             setTimeout(function() { getClump(url); }, 50);
           }
@@ -1010,7 +1017,7 @@ var gradebook = (function(){
             cnt++;
           }
           if(cnt === 0) {
-            $curve_grade_dialog.errorBox('None to Update');
+            $curve_grade_dialog.errorBox(I18n.t('errors.none_to_update', 'None to Update'));
             return false;
           }
           return data;
@@ -1025,7 +1032,7 @@ var gradebook = (function(){
             updateSubmission(submission);
             studentsToUpdate.push(submission.user_id);
           }
-          alert(data.length + " Student scores updated");
+          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%[count} Student scores updated'}, {'count': data.length}));
           $curve_grade_dialog.find(".cancel_button").attr('disabled', false).dialog('close');
         },
         error: function(data) {
@@ -1039,62 +1046,70 @@ var gradebook = (function(){
     $('#gradebook_options').live('click', function(event) {
       event.preventDefault();
       event.stopPropagation();
-          
-      var options = {
-        '<span class="ui-icon ui-icon-carat-2-e-w" /> Sort Columns By...' : function() {
-          $(".sort_gradebook").each(function() {
-            $(this).attr('disabled', false).text($(this).attr('title'));
-          });
-          $("#sort_columns_dialog").dialog('close').dialog({
-            autoOpen: false,
-            width: 400,
-            height: 300
-          }).dialog('open');
-        },
-        '<span class="ui-icon ui-icon-carat-2-n-s" /> Sort Rows By...' : function() {
-          $(".sort_gradebook").each(function() {
-            $(this).attr('disabled', false).text($(this).attr('title'));
-          });
-          $("#sort_rows_dialog").dialog('close').dialog({
-            autoOpen: false,
-            width: 400,
-            height: 300
-          }).dialog('open');
-        },
-        '<span class="ui-icon ui-icon-pencil" /> Set Group Weights' : function() {
-          $("#groups_data").dialog('close').dialog({
-            title: "Assignment Groups",
-            autoOpen: false
-          }).dialog('open').show();
-        },
-        '<span class="ui-icon ui-icon-clock" /> View Grading History' : function() {
-          window.location.href = $(".gradebook_history_url").attr('href');
-        },
-        '<span class="ui-icon ui-icon-disk" /> Download Scores (.csv)' : function() {
-          window.location.href = $(".gradebook_csv_url").attr('href');
-        },
-        '<span class="ui-icon ui-icon-clock" /> Upload Scores (from .csv) ' : function() {
-          $("#upload_modal").dialog({
-            bgiframe: true,
-            autoOpen: false,
-            modal: true,
-            width: 410,
-            resizable: false,
-            buttons: {
-              'Upload Data': function() {
-                $(this).submit();
-              }
-            }
-          }).dialog('open');
-        }
+
+      var options = {};
+      var addOption = function(icon, text, func) {
+        var label = '<span class="ui-icon ui-icon-' + icon + '" /> ' + text;
+        options[label] = func;
       };
+
+      addOption('carat-2-e-w', I18n.t('sort_columns_by', 'Sort Columns By...'), function() {
+        $(".sort_gradebook").each(function() {
+          $(this).attr('disabled', false).text($(this).attr('title'));
+        });
+        $("#sort_columns_dialog").dialog('close').dialog({
+          autoOpen: false,
+          width: 400,
+          height: 300
+        }).dialog('open');
+      });
+
+      addOption('carat-2-n-s', I18n.t('sort_rows_by', 'Sort Rows By...'), function() {
+        $(".sort_gradebook").each(function() {
+          $(this).attr('disabled', false).text($(this).attr('title'));
+        });
+        $("#sort_rows_dialog").dialog('close').dialog({
+          autoOpen: false,
+          width: 400,
+          height: 300
+        }).dialog('open');
+      });
+
+      addOption('pencil', I18n.t('set_group_weights', 'Set Group Weights'), function() {
+        $("#groups_data").dialog('close').dialog({
+          title: I18n.t('titles.assignment_groups', "Assignment Groups"),
+          autoOpen: false
+        }).dialog('open').show();
+      });
+
+      addOption('clock', I18n.t('view_grading_history', 'View Grading History'), function() {
+        window.location.href = $(".gradebook_history_url").attr('href');
+      });
+
+      addOption('disk', I18n.t('download_scores', 'Download Scores (%{format})', {'format': '.csv'}), function() {
+        window.location.href = $(".gradebook_csv_url").attr('href');
+      });
+
+      addOption('clock', I18n.t('upload_scores', 'Upload Scores (from %{format})', {'format': '.csv'}), function() {
+        var dialogData = {
+          bgiframe: true,
+          autoOpen: false,
+          modal: true,
+          width: 410,
+          resizable: false,
+          buttons: {}
+        };
+        dialogData['buttons'][I18n.t('buttons.upload_data', 'Upload Data')] = function() { $(this).submit(); };
+        $("#upload_modal").dialog(dialogData).dialog('open');
+      });
       
       var show = $("#hide_students_option").attr('checked');
-      options['<span class="ui-icon ui-icon-person" /> ' + (show ? 'Show' : 'Hide') + ' Student Names'] = function() {
+      addOption('person', show ? I18n.t('show_student_name', 'Show Student Names') : I18n.t('hide_student_name', 'Hide Student Names'), function() {
         $("#hide_students_option").attr('checked', !show).change();
-      };
+      });
+
       var show = $.store.userGet('show_attendance_' + context_code) == 'true';
-      options['<span class="ui-icon ui-icon-contact" /> ' + (show ? 'Hide' : 'Show') + ' Attendance Columns'] = function() {
+      addOption('contact', show ? I18n.t('hide_attendance_columns', 'Hide Attendance Columns') : I18n.t('show_attendance_columns', 'Show Attendance Columns'), function() {
         $.store.userSet('show_attendance_' + context_code, show ? 'false' : 'true');
         var columns_to_toggle = [];
         $(".cell.assignment_name.attendance").each(function() {
@@ -1114,42 +1129,40 @@ var gradebook = (function(){
           }
         }
         setTimeout(function() { nextColumn(0); }, 50);
-      };
+      });
 
-      
-      options['<span class="ui-icon ui-icon-check" /> ' + (ignoreUngradedSubmissions ? 'Include' : 'Ignore') + ' Ungraded Assignments'] = function() {
+      addOption('check', ignoreUngradedSubmissions ? I18n.t('include_ungraded', 'Include Ungraded Assignments') : I18n.t('ignore_ungraded', 'Ignore Ungraded Assignments'), function() {
         ignoreUngradedSubmissions = !ignoreUngradedSubmissions;
         gradebook.updateAllStudentGrades(); 
-      };
-      
+      });
       
       // handle showing only one section
       if ($.size(possibleSections) > 1) {  
         var sectionToShowLabel = sectionToShow ? 
-                                    ('Showing Section: ' + possibleSections[sectionToShow]) : 
-                                    'Showing All Sections';
-        options['<span class="ui-icon ui-icon-search" />' + sectionToShowLabel] = function() {
-          var $dialog = $("#section_to_show_dialog").dialog({
-                modal: true,
-                resizable: false,
-                buttons: {
-                  'Change Section': function() {
-                    var val = $("#section_to_show_dialog select").val();
-                    $.store[val == "all" ? 'userRemove' : 'userSet']("grading_show_only_section"+contextId, val);
-                    window.location.reload();
-                  }
-                }
-              });
+          I18n.t('showing_section', 'Showing Section: %{section}', {'section': possibleSections[sectionToShow]}) : 
+          I18n.t('showing_all_sections', 'Showing All Sections');
+        addOption('search', sectionToShowLabel, function() {
+          var dialogData = {
+            modal: true,
+            resizable: false,
+            buttons: {}
+          };
+          dialogData['buttons'][I18n.t('buttons.change_section', 'Change Section')] = function() {
+            var val = $("#section_to_show_dialog select").val();
+            $.store[val == "all" ? 'userRemove' : 'userSet']("grading_show_only_section"+contextId, val);
+            window.location.reload();
+          };
+          var $dialog = $("#section_to_show_dialog").dialog(dialogData);
           var $select = $dialog.find('select');
           $select.find('[value != all]').remove();
           for (var key in possibleSections) {
             $select.append('<option value="' + key + '" ' + (sectionToShow == key ? 'selected' : '') + ' >' + possibleSections[key] + '</option>'); 
           }
-        };
+        });
       }
 
       if(sisPublishEnabled) {
-        options['<span class="ui-icon ui-icon-gear" /> <a href="details#tab-grade-publishing">Publish grades to SIS</a>'] = function() {};
+        addOption('gear', '<a href="details#tab-grade-publishing">' + I18n.t('publish_to_sis', 'Publish grades to SIS') + '</a>', function() {});
       }
 
       $(this).dropdownList({
@@ -1161,7 +1174,7 @@ var gradebook = (function(){
       event.preventDefault();
       var $button = $(this);
       if($button.hasClass('by_grade') && !gradebook.finalGradesReady) {
-        $button.attr('disabled', true).text("Computing Grades...");
+        $button.attr('disabled', true).text(I18n.t('computing_grades', "Computing Grades..."));
         setTimeout(function() {
           if($button.filter(":visible").length > 0) {
             $button.click();
@@ -1270,7 +1283,7 @@ var gradebook = (function(){
         updateStudentGrades(submission.user_id);
       }
       if(data.length > 1) {
-        alert(data.length + " Students Updated");
+        alert(I18n.t('alerts.students_updated', {'one': '1 Student Updated', 'other': '%{count} Students Updated'}, {'count': data.length}));
       }
       $div.loadingImage('remove');
     };
@@ -1434,7 +1447,7 @@ var gradebook = (function(){
         assignment = object_data["assignment_" + submission.assignment_id].assignment,
         student_name = $("#outer_student_" + submission.user_id + " .display_name").text(),
         assignment_name = $("#outer_assignment_" + submission.assignment_id + " .display_name").text(),
-        title = "Submission Information",
+        title = I18n.t('submission_information', "Submission Information"),
         $grade = $td.find(".grade"),
         $score = $td.find(".score"),
         grade = $.trim($grade.text()),
@@ -1467,14 +1480,14 @@ var gradebook = (function(){
     re = new RegExp('("|%22)' + submission.user_id + '("|%22)');
     url = url.replace(re, submission.user_id);
     $view.append($("#submission_view_image").clone(true).removeAttr('id'));
-    $view.append($(" <a href='" + url + "'>Submission Details</a>"));
+    $view.append($(" <a href='" + url + "'>" + I18n.t('links.submission_details', "Submission Details") + "</a>"));
 
     $type.css({textAlign: "center", fontWeight: "bold", fontSize: "1.2em", marginTop: 5});
     if(submission.submission_type && submission.submission_type != "online_quiz") {
       if(submission.submission_type == "online_url") {
         $type.append($("#submission_" + submission.submission_type + "_image").clone().removeAttr('id'));
         var url = submission.url;
-        $type.append(" <a href='" + url + "' target='_new'>Go To Submission URL</a>");
+        $type.append(" <a href='" + url + "' target='_new'>" + I18n.t('links.go_to_submission', "Go To Submission URL") + "</a>");
       } else if(submission.submission_type == "online_upload") {
         var url = $("#gradebook_urls .view_online_upload_url").attr('href');
         url = $.replaceTags(url, "assignment_id", submission.assignment_id);
@@ -1488,13 +1501,13 @@ var gradebook = (function(){
               var turnitin_url = $.replaceTags($.replaceTags($.replaceTags($(".turnitin_report_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'attachment_' + attachment.id), 'assignment_id', submission.assignment_id);
               var $link = $("<a/>");
               $link.attr('href', turnitin_url).addClass('turnitin_similarity_score').addClass(((turnitin && turnitin.state) || 'no') + '_score');
-              $link.attr('title', 'Turnitin similarity score -- more information');
+              $link.attr('title', I18n.t('titles.turnitin_score', 'Turnitin similarity score -- more information'));
               $link.attr('target', '_blank');
               $link.text((turnitin.similarity_score || '--') + "%");
               $type.append($link);
             }
             $type.append($("#submission_" + submission.submission_type + "_image").clone().removeAttr('id'));
-            $type.append(" <a href='" + attachment_url + "'>" + $.htmlEscape("Download " + attachment.display_name) + "</a><br/>");
+            $type.append(" <a href='" + attachment_url + "'>" + $.htmlEscape(I18n.t('links.download_attachment', "Download %{attachment}", {'attachment': attachment.display_name})) + "</a><br/>");
           }
         }
       } else if(submission.submission_type == "online_text_entry") {
@@ -1503,7 +1516,7 @@ var gradebook = (function(){
           var turnitin_url = $.replaceTags($.replaceTags($.replaceTags($(".turnitin_report_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'submission_' + submission.id), 'assignment_id', submission.assignment_id);
           var $link = $("<a/>");
           $link.attr('href', turnitin_url).addClass('turnitin_similarity_score').addClass(((turnitin && turnitin.state) || 'no') + '_score');
-          $link.attr('title', 'Turnitin similarity score -- more information');
+          $link.attr('title', I18n.t('titles.turnitin_score', 'Turnitin similarity score -- more information'));
           $link.attr('target', '_blank');
           $link.text(turnitin.similarity_score + "%");
           $type.append($link);
@@ -1512,7 +1525,7 @@ var gradebook = (function(){
         var url = $("#gradebook_urls .view_online_text_entry_url").attr('href');
         url = $.replaceTags(url, "assignment_id", submission.assignment_id);
         url = $.replaceTags(url, "user_id", submission.user_id);
-        $type.append(" <a href='" + url + "' target='_new'>View Submission</a>");
+        $type.append(" <a href='" + url + "' target='_new'>" + I18n.t('links.view_submission', "View Submission") + "</a>");
       }
     } else if(submission.quiz_submission) {
       var url = $("#gradebook_urls .view_quiz_url").attr('href');
@@ -1520,10 +1533,10 @@ var gradebook = (function(){
       url = $.replaceTags(url, "user_id", submission.user_id);
       if(submission.workflow_state == "pending_review") {
         $type.append($("#submission_pending_review_image").clone().removeAttr('id'));
-        $type.append(" <a href='" + url + "' target='_new'>Finish Scoring this Quiz</a>");
+        $type.append(" <a href='" + url + "' target='_new'>" + I18n.t('links.finish_scoring', "Finish Scoring this Quiz") + "</a>");
       } else {
         $type.append($("#submission_quiz_image").clone().removeAttr('id'));
-        $type.append(" <a href='" + url + "' target='_new'>View this Quiz</a>");
+        $type.append(" <a href='" + url + "' target='_new'>" + I18n.t('links.view_quiz', "View this Quiz") + "</a>");
       }
     } else if(submission.submission_type == "online_text_entry") {
       var url = $("#gradebook_urls .view_online_text_entry_url").attr('href');
@@ -1534,13 +1547,13 @@ var gradebook = (function(){
         var turnitin_url = $.replaceTags($.replaceTags($.replaceTags($(".turnitin_report_url").attr('href'), 'user_id', submission.user_id), 'asset_string', 'submission_' + submission.id), 'assignment_id', submission.assignment_id);
         var $link = $("<a/>");
         $link.attr('href', turnitin_url).addClass('turnitin_similarity_score').addClass(((turnitin && turnitin.state) || 'no') + '_score');
-        $link.attr('title', 'Turnitin similarity score -- more information');
+        $link.attr('title', I18n.t('titles.turnitin_score', 'Turnitin similarity score -- more information'));
         $link.attr('target', '_blank');
         $link.text(turnitin.similarity_score + "%");
         $type.append($link);
       }
       $type.append($("#submission_" + submission.submission_type + "_image").clone().removeAttr('id'));
-      $type.append(" <a href='" + url + "' target='_new'>View Submission</a>");
+      $type.append(" <a href='" + url + "' target='_new'>" + I18n.t('links.view_submission', "View Submission") + "</a>");
     }
 
     $submission_information
@@ -1549,7 +1562,7 @@ var gradebook = (function(){
       .find(".points_possible").text(points_possible || "").end()
       .find(".out_of").showIf(points_possible || points_possible === '0').end()
       .find(".grade_entry").empty().append($grade_entry.show()).end()
-      .find("textarea.comment_text").show().val("").end() //comment || "").end()
+      .find("textarea.comment_text").show().val("").end()
       .find(".submission_details").empty().append($view).append($type).show().end()
       .find(".submission_comments").empty().end()
       .find(".comment_attachments").empty().end()
@@ -1615,7 +1628,7 @@ var gradebook = (function(){
     } else {
       $("#loading_submission_details_dialog").dialog('close').dialog({
         autoOpen: false,
-        title: "Loading..."
+        title: I18n.t('titles.loading', "Loading...")
       }).dialog('open');
       var url = $("#loading_submission_details_dialog .submission_details_url").attr('href');
       url = $.replaceTags($.replaceTags(url, 'user_id', submission.user_id), 'assignment_id', submission.assignment_id);
@@ -2076,3 +2089,5 @@ var gradebook = (function(){
 
   return gradebook;
 })();
+
+})

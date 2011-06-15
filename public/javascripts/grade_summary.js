@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('gradebook', function(I18n) {
+
 var grading_scheme;
 (function() {
   function setGroupData(groups, $group) {
@@ -196,7 +198,7 @@ var grading_scheme;
       
       finalGrade = finalWeightedGrade;
       finalGrade = Math.round(finalGrade * 1000.0) / 10.0;
-      $(".student_assignment.final_grade .score_teaser").text('Percent');
+      $(".student_assignment.final_grade .score_teaser").text(I18n.t('percent', 'Percent'));
     }
     if(isNaN(finalGrade) || !isFinite(finalGrade)) {
       finalGrade = 0;
@@ -224,7 +226,7 @@ var grading_scheme;
     });
     $("tr.student_assignment").mouseover(function() {
       if($(this).hasClass('dropped')) {
-      $(this).attr('title', 'This assignment is not being considered in the total calculation shown to the right');
+      $(this).attr('title', I18n.t('titles.dropped_assignment', 'This assignment is not being considered in the total calculation shown to the right'));
       } else {
         $(this).attr('title', '');
       }
@@ -291,12 +293,12 @@ var grading_scheme;
       $("#grade_entry").hide().appendTo($("body"));
       if(isChanged) {
         $assignment.find(".assignment_score").attr('title', '')
-          .find(".score_teaser").text("This is a What-If score").end()
+          .find(".score_teaser").text(I18n.t('titles.hypothetical_score', "This is a What-If score")).end()
           .find(".score_holder").append($("#revert_score_template").clone(true).attr('id', '').show())
           .find(".grade").addClass('changed');
       } else {
-        $assignment.find(".assignment_score").attr('title', 'Click to test a different score')
-          .find(".score_teaser").text("Click to test a different score").end()
+        $assignment.find(".assignment_score").attr('title', I18n.t('click_to_change', 'Click to test a different score'))
+          .find(".score_teaser").text(I18n.t('click_to_change', "Click to test a different score")).end()
           .find(".grade").removeClass('changed');
         $assignment.find(".revert_score_link").remove();
       }
@@ -316,8 +318,8 @@ var grading_scheme;
       var $assignment = $(this).parents(".student_assignment");
       $assignment.find(".score").text(val);
       $assignment.find(".grade").text(val || "-");
-      $assignment.find(".assignment_score").attr('title', 'Click to test a different score')
-        .find(".score_teaser").text("Click to test a different score").end()
+      $assignment.find(".assignment_score").attr('title', I18n.t('click_to_change', 'Click to test a different score'))
+        .find(".score_teaser").text(I18n.t('click_to_change', "Click to test a different score")).end()
         .find(".grade").removeClass('changed');
       $assignment.find(".revert_score_link").remove();
       $assignment.find(".score_value").text(val);
@@ -370,3 +372,5 @@ var grading_scheme;
     $.scrollSidebar();
   });
 })();
+
+})
