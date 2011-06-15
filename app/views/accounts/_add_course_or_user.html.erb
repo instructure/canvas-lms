@@ -16,7 +16,7 @@
     <input type="hidden" name="root_account_id" value="<%= @root_account.id %>"/>
     <table class="formtable">
       <tr>
-        <td><%= f.blabel :name, :en => "Full Name" %></td>
+        <td><%= f.blabel :name, :full_name, :en => "Full Name" %></td>
         <td>
           <%= f.text_field :name %>
           <div style="font-size: 0.8em; color: #888;">This name will be used by teachers for grading.</div>
@@ -70,7 +70,7 @@
         <td><%= f.blabel :account_id, :en => "Department" %></td>
         <td><%= f.select :account_id, @account.sub_accounts_as_options, :selected => @term && @term.id %></td>
       </tr><tr>
-        <td><%= f.label :enrollment_term_id %></td>
+        <td><%= f.label :enrollment_term_id, :en => "Enrollment Term" %></td>
         <td><%= f.select :enrollment_term_id, @root_account.enrollment_terms.active.map{|t| [t.name, t.id] }, :selected => @term && @term.id %></td>
       </tr><tr>
         <td colspan="2">

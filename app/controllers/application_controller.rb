@@ -932,7 +932,7 @@ class ApplicationController < ActionController::Base
       @current_user = @real_current_user
     end
     unless current_user_is_site_admin?(permission)
-      flash[:error] = t "errors.unauthorized", "You don't have permission to access that page"
+      flash[:error] = t "errors.permission_denied", "You don't have permission to access that page"
       redirect_to root_url
       return false
     end

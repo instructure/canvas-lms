@@ -139,7 +139,7 @@ class AccountsController < ApplicationController
           render :json => {:errors => {:base => t(:invalid_login_message, "Invalid login")}}.to_json, :status => :bad_request
         end
       else
-        render :json => {:errors => {:base => t(:invalid_login_message, "Invalid user")}}.to_json, :status => :bad_request
+        render :json => {:errors => {:base => t(:invalid_login_message, "Invalid login")}}.to_json, :status => :bad_request
       end
     end
   end

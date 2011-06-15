@@ -227,7 +227,7 @@ class GroupsController < ApplicationController
   def public_feed
     return unless get_feed_context(:only => [:group])
     feed = Atom::Feed.new do |f|
-      f.title = t('feed_title, '"#{course_or_account_name} Feed", :course_or_account_name => @context.full_name)
+      f.title = t(:feed_title, "%{course_or_account_name} Feed", :course_or_account_name => @context.full_name)
       f.links << Atom::Link.new(:href => named_context_url(@context, :context_url))
       f.updated = Time.now
       f.id = named_context_url(@context, :context_url)
@@ -260,7 +260,7 @@ class GroupsController < ApplicationController
 
   def context_index
     add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
-    add_crumb t('#crumbs', "Groups"), named_context_url(@context, :context_groups_url)
+    add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
     @active_tab = @context.is_a?(Account) ? "users" : "people"
     @groups = @context.is_a?(Account) ? @context.account_groups.active : @context.groups.active
     @categories = @groups.map{|g| g.category}.uniq

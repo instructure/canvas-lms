@@ -52,12 +52,12 @@
           <div style="font-size: 17px; font-weight:bold;"><%= t "titles.add_new_feed", "Add a New Feed" %></div>
           <p style="font-size: 0.8em;">
             <% if @context.is_a? Course %>
-              <%= t "descriptions.add_new_feed",
+              <%= t "descriptions.add_new_feed_for_course",
             "You can automatically add posts from an RSS or Atom feed as announcements for this
             course. Just paste the feed URL below and any new entries
             will be added." %>
             <% elsif @context.is_a? Group %>
-              <%= t "descriptions.add_new_feed",
+              <%= t "descriptions.add_new_feed_for_group",
             "You can automatically add posts from an RSS or Atom feed as announcements for this
             group. Just paste the feed URL below and any new entries
             will be added." %>
