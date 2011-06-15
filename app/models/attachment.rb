@@ -147,7 +147,7 @@ class Attachment < ActiveRecord::Base
   
   def assert_attachment
     if !self.to_be_zipped? && !self.zipping? && !self.errored? && (!filename || !content_type || !downloadable?)
-      self.errors.add_to_base("File data could not be found")
+      self.errors.add_to_base(t('errors.not_found', "File data could not be found"))
       return false
     end
   end
@@ -430,7 +430,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def unencoded_filename
-    CGI::unescape(self.filename || "File")
+    CGI::unescape(self.filename || t(:default_filename, "File"))
   end
   
   def self.destroy_files(ids)
@@ -674,7 +674,8 @@ class Attachment < ActiveRecord::Base
   
   def to_atom(opts={})
     Atom::Entry.new do |entry|
-      entry.title     = "File#{", " + self.context.name if opts[:include_context]}: #{self.title}"
+      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", :course_or_group => self.context.name, :title => self.context.name) if opts[:include_context]
+      entry.title     = t(:feed_title, "File: %{title}", :title => self.context.name) unless opts[:include_context]
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/files/#{self.feed_code}"
@@ -1057,7 +1058,7 @@ class Attachment < ActiveRecord::Base
   
   def self.attachment_list_from_migration(context, ids)
     return "" if !ids || !ids.is_a?(Array) || ids.empty?
-    description = "<h3>Associated Files</h3><ul>"
+    description = "<h3>#{t 'title.migration_list', "Associated Files"}</h3><ul>"
     ids.each do |id|
       attachment = context.attachments.find_by_migration_id(id)
       description += "<li><a href='/courses/#{context.id}/files/#{attachment.id}/download' class='#{'instructure_file_link' if attachment.scribdable?}'>#{attachment.display_name}</a></li>" if attachment
