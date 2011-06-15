@@ -349,10 +349,13 @@ module TextHelper
       inlinify = options.delete(:inlinify) if options.has_key?(:inlinify)
       options.each_pair do |key, value|
         next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer)
+        next if key == :wrapper
         options[key] = markdown_escape(value).gsub(/\s+/, ' ').strip
       end
     end
-    result = RDiscount.new(t(*args), :filter_html).to_html.strip
+    translated = t(*args)
+    translated = ERB::Util.h(translated) unless translated.html_safe?
+    result = RDiscount.new(translated).to_html.strip
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>[^<]*?(<\/?(a|em|strong|code|img)[^<]*?)*<\/p>\z/
     result.html_safe.strip
   end
