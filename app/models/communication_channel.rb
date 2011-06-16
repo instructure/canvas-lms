@@ -57,7 +57,18 @@ class CommunicationChannel < ActiveRecord::Base
     if (self.new_record? || (self.workflow_state_was != 'active' && self.workflow_state == 'active')) && self.path_type == 'email' && self.path
       ccs = CommunicationChannel.find_all_by_path_and_path_type_and_workflow_state(self.path, self.path_type, 'active')
       if ccs.any?{|cc| cc != self }
-        self.errors.add(:path, "The #{self.path_type} address #{self.path} has already been activated for another account")
+        case self.path_type
+          when 'email'
+            self.errors.add(:path, t('errors.duplicate_email', "The email address %{email} has already been activated for another account", :email => self.path))
+          when 'sms'
+            self.errors.add(:path, t('errors.duplicate_sms', "The SMS address %{email} has already been activated for another account", :email => self.path))
+          when 'facebook'
+            self.errors.add(:path, t('errors.duplicate_facebook', "The Facebook account %{email} has already been activated for another account", :email => self.path))
+          when 'twitter'
+            self.errors.add(:path, t('errors.duplicate_twitter', "The Twitter handle %{handle} has already been activated for another account", :handle => self.path))
+          else
+            self.errors.add(:path, t('errors.duplicate', "The address %{address} has already been activated for another account", :address => self.path))
+        end
         return false
       end
     end
@@ -112,11 +123,11 @@ class CommunicationChannel < ActiveRecord::Base
   def path_description
     if self.path_type == 'facebook'
       res = self.user.user_services.for_service('facebook').first.service_user_name rescue nil
-      res ||= 'Facebook Account'
+      res ||= t :default_facebook_account, "Facebook Account"
       res
     elsif self.path_type == 'twitter'
       res = self.user.user_services.for_service('twitter').first.service_user_name rescue nil
-      res ||= 'Twitter Account'
+      res ||= t :default_twitter_handle, "Twitter Handle"
       res
     else
       self.path
