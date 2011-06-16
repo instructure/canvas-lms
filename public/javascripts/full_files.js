@@ -1566,7 +1566,7 @@ var fileStructureData = [];
       $files_content.height(Math.max(sectionTabsHeight, height - spaceNeededForFooter));
       var contentHeight = $files_content.height();
       var panelHeight = $("#file_panel").outerHeight();
-      $("#scribd_preview").height(contentHeight - panelHeight);
+      $("#doc_preview_holder").height(contentHeight - panelHeight);
     });
     $(".folder_item .edit_collaboration_link, #collaboration_panel .edit_collaboration_link").click(function(event) {
       event.preventDefault();
