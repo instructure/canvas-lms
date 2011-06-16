@@ -333,19 +333,19 @@ class ContextController < ApplicationController
       @messages_view = :sentbox
       @messages = @current_user.sentbox_context_messages
       context_messages = @messages
-      @messages_view_header = t(:sent_messages, "Sent Messages")
+      @messages_view_header = t('inbox.sent_messages', "Sent Messages")
       @per_page = 10
     when 'inbox'
       @messages_view = :inbox
       @messages = @current_user.inbox_context_messages
       context_messages = @messages
-      @messages_view_header = t(:received_messages, "Received Messages")
+      @messages_view_header = t('inbox.received_messages', "Received Messages")
       @per_page = 10
     else # default view
       @messages_view = :action_items
       @messages = @current_user.inbox_items.active
       context_messages = @current_user.context_messages
-      @messages_view_header = t(:inbox, "Inbox")
+      @messages_view_header = t('inbox.inbox', "Inbox")
       @per_page = 15
     end
     if params[:reply_id]

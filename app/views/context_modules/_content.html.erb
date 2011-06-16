@@ -220,7 +220,7 @@ TEXT
     </table>
   </div>
   <div id="module_progression_dialog" style="display: none;">
-    <h2 style="margin-top: 0;"><%= t 'headings.student_progress', "Student Progress for %{module}", :module => '<span class="module_name">&nbsp;</span>'.html_safe %></h2>
+    <h2 style="margin-top: 0;"><%= t 'headings.student_progress_for_module', "Student Progress for %{module}", :module => '<span class="module_name">&nbsp;</span>'.html_safe %></h2>
     <div style="max-height: 200px; overflow: auto;">
       <div>
         <div class="completed_list progression_list" style="margin-bottom: 10px;">
@@ -251,7 +251,7 @@ TEXT
   <a href="<%= context_url(@context, :progressions_context_context_modules_url) %>" class="progression_list_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_context_modules_assignment_info_url) %>" class="assignment_info_url">&nbsp;</a>
   <select id="module_list">
-    <option value="">[ <%= t('select_module', %{Select Module}) %> ]</option>
+    <option value="">[ <%= t('select_module.instructions', %{Select Module}) %> ]</option>
     <% @modules.each do |m| %>
       <option value="<%= m.id %>" class="context_module_option context_module_<%= m.id %>"><%= t 'select_module.name', 'the module, %{module}', :module => m.name %></option>
     <% end %>
