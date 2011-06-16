@@ -19,14 +19,14 @@
 class CalendarEventsController < ApplicationController
   before_filter :require_context
   
-  add_crumb("Calendar Events", :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
+  add_crumb(lambda { t(:'#crumbs.calendar_events', "Calendar Events")}, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
   
   
   def show
     @event = @context.calendar_events.find(params[:id])
     add_crumb(@event.title, named_context_url(@context, :context_calendar_event_url, @event))
     if @event.deleted?
-      flash[:notice] = "This event has been deleted"
+      flash[:notice] = t 'notices.deleted', "This event has been deleted"
       redirect_to calendar_url_for(@context)
       return
     end
@@ -43,7 +43,7 @@ class CalendarEventsController < ApplicationController
 
   def new
     @event = @context.calendar_events.build
-    add_crumb("New Calendar Event", named_context_url(@context, :new_context_calendar_event_url))
+    add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
     @event.start_at = params[:start_at]
     @event.end_at = params[:end_at]
     @event.title = params[:title]
@@ -58,7 +58,7 @@ class CalendarEventsController < ApplicationController
       respond_to do |format|
         @event.content_being_saved_by(@current_user)
         if @event.save
-          flash[:notice] = 'Event was successfully created.'
+          flash[:notice] = t 'notices.created', "Event was successfully created."
           format.html { redirect_to calendar_url_for(@context) }
           format.xml  { head :created, :location => named_context_url(@context, :context_calendar_url) }
           format.json { render :json => @event.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
@@ -92,7 +92,7 @@ class CalendarEventsController < ApplicationController
         @event.content_being_saved_by(@current_user)
         if @event.update_attributes(params[:calendar_event])
           log_asset_access(@event, "calendar", "calendar", 'participate')
-          flash[:notice] = 'Event was successfully updated.'
+          flash[:notice] = t 'notices.updated', "Event was successfully updated."
           format.html { redirect_to calendar_url_for(@context) }
           format.xml  { head :ok }
           format.json { render :json => @event.to_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
