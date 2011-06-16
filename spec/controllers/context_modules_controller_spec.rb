@@ -39,6 +39,41 @@ describe ContextModulesController do
       get 'index', :course_id => @course.id
       response.should be_success
     end
-    
+  end
+  
+  describe "POST 'reorder_items'" do
+    it "should reorder items" do
+      course_with_teacher_logged_in(:active_all => true)
+
+      ag = @course.assignment_groups.create!
+      a1 = ag.assignments.create!(:context => @course)
+      a1.points_possible = 10
+      a1.save
+      a2 = ag.assignments.create!(:context => @course)
+      m1 = @course.context_modules.create!
+      m2 = @course.context_modules.create!
+
+      make_content_tag = lambda do |assignment|
+        ct = ContentTag.new
+        ct.content_id = assignment.id
+        ct.content_type = 'Assignment'
+        ct.context_id = @course.id
+        ct.context_type = 'Course'
+        ct.title = "Assignment #{assignment.id}"
+        ct.tag_type = "context_module"
+        ct.context_module_id = m1.id
+        ct.context_code = "course_#{@course.id}"
+        ct.save!
+        ct
+      end
+      ct1 = make_content_tag.call a1
+      ct2 = make_content_tag.call a2
+
+      post 'reorder_items', :course_id => @course.id, :context_module_id => m2.id, :order => "#{ct2.id}"
+      ct2.reload
+      ct2.context_module.should == m2
+      ct1.reload
+      ct1.context_module.should == m1
+    end
   end
 end

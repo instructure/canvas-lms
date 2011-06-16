@@ -552,7 +552,7 @@ class Account < ActiveRecord::Base
     end
     if user
       account_user = self.account_users.find_by_user_id(user.id)
-      account_users ||= self.account_users.build(:user => user)
+      account_user ||= self.account_users.build(:user => user)
       account_user.membership_type = membership_type
       account_user.save
       if data[:new]

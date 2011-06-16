@@ -17,7 +17,8 @@
 #
 module CC
   class CCExporter
-
+    ZIP_DIR = 'zip_dir'
+    
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file
 
     def initialize(content_export, opts={})
@@ -81,8 +82,8 @@ module CC
     
     def copy_all_to_zip
       Dir["#{@export_dir}/**/**"].each do |file|
-        next if File.basename(file) == @zip_name
         file_path = file.sub(@export_dir+'/', '')
+        next if file_path.starts_with? ZIP_DIR
         @zip_file.add(file_path, file)
       end
     end
@@ -108,7 +109,8 @@ module CC
 
     def create_zip_file
       @zip_name = "#{@course.name.to_url}-export.#{CCHelper::CC_EXTENSION}"
-      @zip_path = File.join(@export_dir, @zip_name)
+      FileUtils::mkdir_p File.join(@export_dir, ZIP_DIR)
+      @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
       @zip_file = Zip::ZipFile.new(@zip_path, Zip::ZipFile::CREATE)
     end
 
