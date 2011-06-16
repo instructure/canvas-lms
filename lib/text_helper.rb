@@ -356,7 +356,7 @@ module TextHelper
     translated = t(*args)
     translated = ERB::Util.h(translated) unless translated.html_safe?
     result = RDiscount.new(translated).to_html.strip
-    result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>[^<]*?(<\/?(a|em|strong|code|img)[^<]*?)*<\/p>\z/
+    result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>[^<]*?(<\/?(a|em|strong|code|img|br( ?\/)?)[^<]*?)*<\/p>\z/
     result.html_safe.strip
   end
 end

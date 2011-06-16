@@ -11,8 +11,8 @@
     <div class="link_box">
       <span class="links">
       <% if can_do(collaboration, @current_user, :delete) %>
-        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="Edit this Collaboration" class="edit_collaboration_link"><%= image_tag "edit.png" %></a>
-        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="Delete this Collaboration" class="delete_collaboration_link"><%= image_tag "delete.png" %></a>
+        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="<%= t 'links.edit', "Edit this Collaboration" %>" class="edit_collaboration_link"><%= image_tag "edit.png" %></a>
+        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="<%= t 'links.delete', "Delete this Collaboration" %>" class="delete_collaboration_link"><%= image_tag "delete.png" %></a>
       <% end %>
       </span>
     </div>
@@ -23,8 +23,11 @@
     <div class="message user_content formatted_body"><%= user_content(collaboration.try(:description)) || nbsp %></div>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
     <div class="links">
-      <a href="<%= context_url(context, :context_users_url, :all_messages => 1) %>#message_<%= context_message.id rescue 'none' %>" class="show_participants_link brief_footer_link"><span class="users_count"><%= (collaboration.users + [collaboration.user]).compact.uniq.length rescue "0" %></span> Participants</a>
-      <a href="#" class="show_participants_link verbose_footer_link"><span class="users_count"><%= (collaboration.users + [collaboration.user]).compact.uniq.length rescue "0" %></span> Participants</a>
+      <% link = t 'links.show_participants', { :one => "*1* Participant", :other => "*%{count}* Participants" },
+            :count => ((collaboration.users + [collaboration.user]).compact.uniq.length rescue "0"),
+            :wrapper => '<span class="users_count">\1</span>' %>
+      <a href="<%= context_url(context, :context_users_url, :all_messages => 1) %>#message_<%= context_message.id rescue 'none' %>" class="show_participants_link brief_footer_link"><%= link %></a>
+      <a href="#" class="show_participants_link verbose_footer_link"><%= link %></a>
     </div>
     <div class="clear"></div>
   </div>

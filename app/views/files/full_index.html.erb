@@ -410,10 +410,10 @@ HEREDOC
         </div>
         <% if @current_user && !@current_user.user_services.map(&:service).include?("google_docs") %>
         <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none; margin: 20px;">
-          <%= t 'instructions.authorize_google_docs', "Before you can collaborate on documents, you need to authorize Canvas
+          <%= t '#instructions.authorize_google_docs', "Before you can collaborate on documents, you need to authorize Canvas
           to access your Google Docs account:" %>
           <div class="button-container">
-            <a class="button button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t 'buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
+            <a class="button button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
             <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
           </div>
         </div>
