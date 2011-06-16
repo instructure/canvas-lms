@@ -226,7 +226,9 @@ class ContextModulesController < ApplicationController
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
       items.each_index do |idx|
         item = items[idx]
-        item.update_attributes(:position => idx, :context_module_id => @module.id)
+        item.position = idx
+        item.context_module_id = @module.id
+        item.save
       end
       ContextModule.update_all({:updated_at => Time.now}, {:id => affected_module_ids})
       @context.touch
