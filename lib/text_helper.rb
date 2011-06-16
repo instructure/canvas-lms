@@ -348,7 +348,7 @@ module TextHelper
       options = args.last
       inlinify = options.delete(:inlinify) if options.has_key?(:inlinify)
       options.each_pair do |key, value|
-        next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer)
+        next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer) && !value.is_a?(ActiveSupport::SafeBuffer)
         next if key == :wrapper
         options[key] = markdown_escape(value).gsub(/\s+/, ' ').strip
       end
