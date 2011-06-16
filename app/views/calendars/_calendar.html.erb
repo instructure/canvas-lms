@@ -98,7 +98,7 @@
           <span style="display: none;" class="month_number"><%= @current.month %></span>
           <a href="#" class="prev_month_link no-hover"><%= image_tag "arrow_left.png", :alt => t('alts.previous', "Previous") %></a>
           <span id="month_and_year">
-            <span class="month_name"><%= t('#date.month_names')[current.month] %></span>
+            <span class="month_name"><%= I18n.t('date.month_names')[current.month] %></span>
             <span class="year_number"><%= @current.year %></span>
           </span>
           <a href="#" class="next_month_link no-hover"><%= image_tag "arrow_right.png", :alt => t('alts.next', "Next") %></a>
@@ -107,7 +107,7 @@
       </td>
     </tr>
     <tr id="calendar-days">
-      <% t('#date.day_names').each do |d| %>
+      <% I18n.t('date.day_names').each do |d| %>
       <td><%= d %></td>
       <% end %>
     </tr>

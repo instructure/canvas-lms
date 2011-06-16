@@ -129,7 +129,7 @@ I18n.class_eval do
 end
 
 ActionView::Base.class_eval do
-  def translate(key, default = nil, options = {})
+  def translate(key, default, options = {})
     key = key.to_s
     key = "#{template.base_path}.#{template.name.sub(/\A_/, '')}.#{key}" unless key.sub!(/\A#/, '')
     I18n.translate(key, default, options)

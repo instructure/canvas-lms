@@ -5,7 +5,7 @@
     <a href="#" class="prev_month_link"><%= image_tag "arrow_left.png" %></a>
     <a href="#" class="next_month_link"><%= image_tag "arrow_right.png" %></a>
     <span class="mini-cal-month-and-year">
-      <span class="month_name"><%= t('#date.month_names')[current.month] %></span>
+      <span class="month_name"><%= I18n.t('date.month_names')[current.month] %></span>
       <span class="year_number"><%= current.year %></span>
     </span>
   </div>
