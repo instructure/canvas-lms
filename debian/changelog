@@ -1,3 +1,12 @@
+canvas-lms (1.1-38) professional; urgency=low
+
+  * [+5dec0c8] fix course exports that are using s3
+  * [+c5e5d05] fix adding account admins; fixes #4885
+  * [+5b47095] fix reordering items in modules; fixes #4894
+  * [+ddc4a4c] fix send_to_inbox for submission comments, closes #4898
+
+ -- JT Olds <jt@instructure.com>  Thu, 16 Jun 2011 13:30:33 -0600
+
 canvas-lms (1.1-37) professional; urgency=low
 
   * [+0d8b4fc] copy learning outcomes during course copy
