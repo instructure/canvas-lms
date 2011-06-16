@@ -22,22 +22,18 @@ module SendToInbox
     def self.extended(klass)
       klass.send(:class_inheritable_accessor, :send_to_inbox_block)
     end
- 
+
     def on_create_send_to_inboxes(&block)
       self.send_to_inbox_block = block
       after_create :queue_create_inbox_items
     end
   end
- 
+
   module SendToInboxInstanceMethods
     def queue_create_inbox_items
-      if ENV['RAILS_ENV'] == 'production'
-        send_later(:create_inbox_items)
-      else
-        create_inbox_items
-      end
+      send_later_if_production(:create_inbox_items)
     end
-    
+
     def create_inbox_items
       self.extend TextHelper
       block = self.class.send_to_inbox_block
@@ -49,7 +45,7 @@ module SendToInbox
                                     else
                                       ""
                                     end
-      @inbox_item_recipient_ids = (Array(inbox_results[:recipients]) || []).each{|r| User.infer_id(i) rescue nil}.compact
+      @inbox_item_recipient_ids = (Array(inbox_results[:recipients]) || []).map{|i| User.infer_id(i) rescue nil}.compact
       sender_id = User.infer_id(inbox_results[:sender]) rescue nil
       @inbox_item_recipient_ids.each do |user_id|
         if user_id
@@ -65,19 +61,18 @@ module SendToInbox
     rescue => e
       ErrorReport.log_exception(:default, e, {
         :message => "SendToInbox failure",
-      }) if ENV['RAILS_ENV'] == 'production'
+      })
       nil
     end
 
     def inbox_item_recipient_ids
       @inbox_item_recipient_ids
     end
- 
+
   end
- 
+
   def self.included(klass)
     klass.send :include, SendToInboxInstanceMethods
     klass.extend SendToInboxClassMethods
   end
 end
- 
