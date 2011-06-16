@@ -306,7 +306,7 @@ class ContentZipper
     handle = nil
     begin
       handle = attachment.open(:need_local_file => true)
-      zipfile.add(filename, handle.path)
+      zipfile.get_output_stream(filename){|zos| IOExtras.copy_stream(zos, handle)}
     rescue => e
       @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
       return false

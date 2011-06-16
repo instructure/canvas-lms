@@ -23,6 +23,13 @@ describe AccountsController do
     @account = @course.account
   end
 
+  def account_with_admin_logged_in(opts = {})
+    course_with_teacher_logged_in({:active_all => true}.merge(opts))
+    @account = account
+    @account.add_user(@user)
+    @admin = @user
+  end
+
   def cross_listed_course
     course_with_teacher_logged_in(:active_all => true)
     @account1 = account
@@ -57,6 +64,20 @@ describe AccountsController do
       batch.should_not be_nil
       batch.batch_mode.should be_true
       batch.batch_mode_term.should == @account.enrollment_terms.first
+    end
+  end
+
+  describe "managing admins" do
+    it "should allow adding a new account admin" do
+      account_with_admin_logged_in
+
+      post 'add_account_user', :account_id => @account.id, :admin => { :membership_type => 'AccountAdmin', :email => 'testadmin@example.com' }
+      response.should be_redirect
+
+      new_admin = User.find_by_email('testadmin@example.com')
+      new_admin.should_not be_nil
+      @account.reload
+      @account.account_users.map(&:user).should be_include(new_admin)
     end
   end
 
