@@ -69,6 +69,8 @@ end
 
 group :development do
   gem 'ruby-debug',   '0.10.4'
+  gem 'ruby_parser', '2.0.6'
+  gem 'sexp_processor', '3.0.5'
 end
 
 group :redis do
