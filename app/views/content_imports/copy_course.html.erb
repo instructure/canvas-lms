@@ -28,7 +28,7 @@
   <% add_crumb t('crumbs.copy_from_course', "Copy From %{course}", :course => @copy_context.name), "#{context_url(@context, :context_import_copy_url)}&import_id=#{@copy_context.id}" %>
   <% form_tag context_url(@context, :context_import_copy_url), :id => "copy_context_form" do %>
     <%= hidden_field :copy, :course_id, :value => @copy_context.id %>
-    <h2><%= t 'titles.copy_from', "Copy Content From %{course}", :course => @copy_context.name %></h2>
+    <h2><%= t 'titles.copy_from_course', "Copy Content From %{course}", :course => @copy_context.name %></h2>
     <p><%= t 'descriptions.copy_content', "Select the content you'd like copied into this course.  We'll try to auto-correct any mismatched
     due dates and calendar event dates as best we can." %></p>
     <h3 style="margin-bottom: 10px;"><%= check_box :copy, :everything, :class => "copy_everything" %> <%= label :copy, :everything, image_tag('checked.png', :style => 'width: 16px;') + " " + t('labels.copy_everything', "Copy Everything from %{course}", :course => @copy_context.name) %></h3>
@@ -115,7 +115,7 @@
         <% @copy_context.discussion_topics.active.each do |topic| %>
           <li><%= check_box :copy, topic.asset_string.to_sym, :class => 'skip_on_everything' %><%= label :copy, topic.asset_string.to_sym, topic.title %>
             <div style="font-size: 0.8em; padding-left: 25px;">
-              <%= check_box :copy, "#{topic.asset_string}_entries".to_sym, :class => "secondary_checkbox skip" %><%= label :copy, "#{topic.asset_string}_entries".to_sym, :en => "include entries from the old course" %>
+              <%= check_box :copy, "#{topic.asset_string}_entries".to_sym, :class => "secondary_checkbox skip" %><%= label :copy, "#{topic.asset_string}_entries".to_sym, :copy, :en => "include entries from the old course" %>
             </div>
           </li>
         <% end %>

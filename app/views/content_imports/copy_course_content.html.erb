@@ -130,7 +130,7 @@ HEREDOC
 <% js_block do %>
 <script>
 $(document).ready(function() {
-  $(".added").attr('title', <%= t('titles.just_added').to_json.html_safe %>);
+  $(".added").attr('title', <%= t('titles.just_added', "Just added to the Course").to_json.html_safe %>);
 });
 </script>
 <% end %>

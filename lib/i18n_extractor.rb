@@ -42,6 +42,7 @@ class I18nExtractor < SexpProcessor
         process_label_call(receiver, method, exp.shift)
       end
     end
+
     with_scope(call_scope) do
       process exp.shift until exp.empty?
     end
@@ -62,7 +63,7 @@ class I18nExtractor < SexpProcessor
       if method == :before_label
         process args.shift until args.empty?
         return
-      elsif receiver.last == :I18n && args.size == 1
+      elsif receiver && receiver.last == :I18n && args.size == 1
         return
       else
         raise "insufficient arguments for translate call"
@@ -150,13 +151,13 @@ class I18nExtractor < SexpProcessor
 
   def process_translation_key(receiver, exp, relative_scope, allow_strings=true)
     unless exp.is_a?(Sexp) && (exp.sexp_type == :lit || allow_strings && exp.sexp_type == :str)
-      raise "invalid translation key #{exp.inspect}"
+      raise "invalid translation key #{exp.inspect} on line #{exp.line}"
     end
     key = exp.pop.to_s
     if key =~ /\A#/
       key.sub!(/\A#/, '')
     else
-      raise "ambiguous translation key #{key.inspect}" if @scope.empty? && receiver.nil?
+      raise "ambiguous translation key #{key.inspect} on line #{exp.line}" if @scope.empty? && receiver.nil?
       key = @scope + relative_scope + key
     end
   end
@@ -173,7 +174,7 @@ class I18nExtractor < SexpProcessor
       end
       hash
     else
-      process_possible_string_concat(exp, :top_level_error => lambda{ |exp| "invalid en default #{exp.inspect}" })
+      process_possible_string_concat(exp, :top_level_error => lambda{ |exp| "invalid en default #{exp.inspect} on line #{exp.line}" })
     end
   rescue
     raise "#{$!} (#{key.inspect})"

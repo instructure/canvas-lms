@@ -29,6 +29,12 @@ describe I18nExtractor do
       extractor.translations) || {}
   end
 
+  context "well-formedness" do
+    it "should complain about missing arguments" do
+      lambda{ extract("t 'foo'")}.should raise_error /insufficient arguments for translate call/
+    end
+  end
+
   context "keys" do
     it "should allow string keys" do
       extract("t 'foo', \"Foo\"").should == {'foo' => "Foo"}
@@ -138,7 +144,7 @@ describe I18nExtractor do
     end
 
     it "should require explicit keys if there is no scope" do
-      lambda{ extract("t 'foo', 'Foo'", '') }.should raise_error 'ambiguous translation key "foo"'
+      lambda{ extract("t 'foo', 'Foo'", '') }.should raise_error /ambiguous translation key "foo"/
     end
   end
 
