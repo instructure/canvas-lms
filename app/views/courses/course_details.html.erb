@@ -233,7 +233,7 @@
         <td>
           <span class="course_form">
             <% if can_do(@context.account, @current_user, :manage_courses) %>
-              <%= f.text_field :storage_quota, :style => "width: 50px;", :title => "megabytes", :value => @context.quota %>
+              <%= f.text_field :storage_quota_mb, :style => "width: 50px;", :title => "megabytes", :value => @context.quota %>
             <% else %>
               <%= @context.quota %>
             <% end %>

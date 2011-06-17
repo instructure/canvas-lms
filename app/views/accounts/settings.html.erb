@@ -67,7 +67,7 @@
               <td>
                 <%= f.blabel :default_storage_quota, :en => "Default File Quota" %>
               </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota, :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
+              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota_mb, :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
             </tr>
             <% if @account.root_account_id == nil %>
               <tr>

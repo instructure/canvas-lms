@@ -1457,8 +1457,7 @@ class User < ActiveRecord::Base
   end
   
   def quota
-    # in megabytes
-    read_attribute(:storage_quota) || 50
+    read_attribute(:storage_quota) || Setting.get_cached('user_default_quota', 50.megabytes.to_s).to_i
   end
   
   def update_last_user_note
