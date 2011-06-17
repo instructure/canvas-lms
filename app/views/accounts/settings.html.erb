@@ -404,41 +404,72 @@
   <% end %>
   <% if !@available_reports.blank? %>
     <div id="tab-reports">
-      <% @available_reports.each do |report, details|
-         title = details[:title] || details
-         description = details[:description]
-         description_partial = details[:description_partial]
-         description_partial = report + '_description' if description_partial == true
-         parameters_partial = details[:parameters_partial]
-         parameters_partial = report + '_parameters' if parameters_partial == true
-         last_run = @last_reports[report]
-      %>
-        <div id="<%= report %>" style="margin-bottom: 10px;">
-          <h3 style="margin-bottom: 3px;"><%= title %></h3>
-          <% if description || description_partial %>
-            <a href="#" class="report_description_link"><%= t(:report_description_link, "Description...") %></a><br />
-            <div class="report_description">
-              <%= render :partial => description_partial if description_partial %>
-              <%= description unless description_partial %>
-            </div>
-          <% end %>
-          <% if last_run %>
-              <%= t(:report_last_run_at, "Last Run: %{last_run_at}", :last_run_at => datetime_string(last_run.created_at)) %><br />
-              <a href="<%= "/accounts/#{last_run.account.id}/files/#{last_run.attachment.id}/download" %>">
-              <%= t(:report_download_link, "Download last version") %></a>
-          <% else %>
-              <%= t(:report_never_run, "Last Run: Never") %>
-          <% end %>
-          <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
-            <input type="hidden" name="report_type" value="<%= report %>" />
-            <span class="running_report_message" style="<%= hidden %>"><%= t(:report_running_message, "The report is running. You'll receive an email when it is done.") %></span>
-            <div class="report_parameters">
-              <%= render :partial => parameters_partial if parameters_partial %>
-            </div>
-            <a href="#" id="run_<%= report %>" class="run_report_link"><%= t(:run_report_link, "Run this report now") %></a><br/>
-          </form>
-        </div>
-      <% end %>
+      <table class="reports">
+        <tr class="reports">
+          <th class="reports"><%= t 'headers.report_name', 'Name' %></th>
+          <th class="reports"><%= t 'headers.report_last_run', 'Last Run' %></th>
+          <th class="reports"></th>
+        </tr>
+        <% @available_reports.each do |report, details|
+           title = details[:title] || details
+           description = details[:description]
+           description_partial = details[:description_partial]
+           description_partial = report + '_description' if description_partial == true
+           parameters_partial = details[:parameters_partial]
+           parameters_partial = report + '_parameters' if parameters_partial == true
+           last_complete = @last_complete_reports[report]
+           last_report = @last_reports[report]
+           in_progress = last_report && last_report.in_progress?
+        %>
+          <tr id="<%= report %>" class="reports">
+            <td class="title reports">
+              <span class="title"><%= title %></span>
+              <% if description || description_partial %>
+                <a href="#" class="open_report_description_link"><%= image_tag "help.png"%></a>
+                <div style="display: none" class="report_description">
+                  <%= description_partial ? render(:partial => description_partial) : description %>
+                </div>
+              <% end %>
+            </td>
+            <td class="last-run reports">
+              <% if last_complete %>
+                <%= datetime_string(last_complete.created_at) %>
+                <%= link_to image_tag("download.png"), context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+              <% else %>
+                <%= t 'report_last_run_never', 'Never' %>
+              <% end %>
+            </td>
+            <td class="action reports">
+              <% if parameters_partial %>
+                <div style="display: none">
+                  <div class="report_dialog">
+                    <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
+                      <div class="report_parameters">
+                        <%= render :partial => parameters_partial if parameters_partial %>
+                      </div>
+                      <br />
+                      <input type="hidden" name="report_type" value="<%= report %>" />
+                      <a href="#" id="run_<%= report %>" class="button run_report_link"><%= t 'links.run_report', 'Run Report' %></a><br/>
+                    </form>
+                  </div>
+                </div>
+                <span class="running_report_message" style="<%= hidden unless in_progress %>">
+                  <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
+                </span>
+                <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="button configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
+              <% else %>
+                <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
+                  <input type="hidden" name="report_type" value="<%= report %>" />
+                  <span class="running_report_message" style="<%= hidden unless in_progress %>">
+                    <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
+                  </span>
+                  <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="button run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+                </form>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) %>

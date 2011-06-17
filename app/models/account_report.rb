@@ -34,10 +34,16 @@ class AccountReport < ActiveRecord::Base
     state :deleted
   end
   
+  named_scope :last_complete_of_type, lambda{|type|
+    { :conditions => [ "report_type = ? AND workflow_state = 'complete'", type],
+           :order => "updated_at DESC",
+           :limit => 1 }
+    }
+
   named_scope :last_of_type, lambda{|type|
-    {:conditions=>["report_type = ? AND workflow_state = 'complete'", type], 
-            :order => "updated_at DESC", 
-            :limit => 1}
+    { :conditions => [ "report_type = ?", type ],
+           :order => "updated_at DESC",
+           :limit => 1 }
     }
 
   def context
@@ -46,6 +52,10 @@ class AccountReport < ActiveRecord::Base
   
   def root_account
     self.account.root_account || self.account
+  end
+  
+  def in_progress?
+    self.created? || self.running?
   end
   
   def run_report(type=nil)
