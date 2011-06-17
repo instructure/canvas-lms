@@ -701,7 +701,7 @@ class Course < ActiveRecord::Base
   end
   
   def storage_quota_mb
-    storage_quota < 1.megabyte ? storage_quota : storage_quota / 1.megabyte
+    storage_quota / 1.megabyte
   end
   
   def storage_quota_mb=(val)

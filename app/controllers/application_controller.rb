@@ -403,8 +403,6 @@ class ApplicationController < ActionController::Base
     return unless @context
     @quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
     @quota = @context.quota if (@context.respond_to?("quota") && @context.quota)
-    # TODO: remove this once values in the db have been migrated to be in bytes and not MB.
-    @quota = @quota.megabytes if @quota < 1.megabyte
     @quota_used = @context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
   end
   
