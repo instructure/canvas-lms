@@ -24,7 +24,7 @@ class WikiPagesController < ApplicationController
   
   def show
     if @page.deleted? && !@page.grants_right?(@current_user, session, :update) && @page.url != 'front-page'
-      flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted', :title => @page.title)
+      flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
       redirect_to named_context_url(@context, :context_wiki_page_url, 'front-page')
       return
     end
@@ -86,7 +86,7 @@ class WikiPagesController < ApplicationController
   def destroy
     if authorized_action(@page, @current_user, :delete)
       if @page.url != "front-page"
-        flash[:notice] = t('notices.page_deleted', 'Page was successfully deleted.')
+        flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
         @page.workflow_state = 'deleted'
         @page.save
         respond_to do |format|
