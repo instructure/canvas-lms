@@ -1418,31 +1418,35 @@ class Course < ActiveRecord::Base
     WikiPage.process_migration_course_outline(data, migration)
     migration.fast_update_progress(90)
     
-    #Adjust dates
-    if bool_res(params[:copy][:shift_dates])
-      shift_options = (bool_res(params[:copy][:shift_dates]) rescue false) ? params[:copy] : {}
-      shift_options = shift_date_options(self, shift_options)
-      @imported_migration_items.each do |event|
-        if event.is_a?(Assignment)
-          event.due_at = shift_date(event.due_at, shift_options)
-          event.lock_at = shift_date(event.lock_at, shift_options)
-          event.unlock_at = shift_date(event.unlock_at, shift_options)
-          event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
-          event.save_without_broadcasting!
-        elsif event.is_a?(DiscussionTopic)
-          event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
-          event.save_without_broadcasting!
-        elsif event.is_a?(CalendarEvent)
-          event.start_at = shift_date(event.start_at, shift_options)
-          event.end_at = shift_date(event.end_at, shift_options)
-          event.save_without_broadcasting!
-        elsif event.is_a?(Quiz)
-          event.due_at = shift_date(event.due_at, shift_options)
-          event.lock_at = shift_date(event.lock_at, shift_options)
-          event.unlock_at = shift_date(event.unlock_at, shift_options)
-          event.save!
+    begin
+      #Adjust dates
+      if bool_res(params[:copy][:shift_dates])
+        shift_options = (bool_res(params[:copy][:shift_dates]) rescue false) ? params[:copy] : {}
+        shift_options = shift_date_options(self, shift_options)
+        @imported_migration_items.each do |event|
+          if event.is_a?(Assignment)
+            event.due_at = shift_date(event.due_at, shift_options)
+            event.lock_at = shift_date(event.lock_at, shift_options)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
+            event.save_without_broadcasting!
+          elsif event.is_a?(DiscussionTopic)
+            event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
+            event.save_without_broadcasting!
+          elsif event.is_a?(CalendarEvent)
+            event.start_at = shift_date(event.start_at, shift_options)
+            event.end_at = shift_date(event.end_at, shift_options)
+            event.save_without_broadcasting!
+          elsif event.is_a?(Quiz)
+            event.due_at = shift_date(event.due_at, shift_options)
+            event.lock_at = shift_date(event.lock_at, shift_options)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.save!
+          end
         end
       end
+    rescue
+      migration.add_warning("Couldn't adjust the due dates.", $!)
     end
     migration.progress=100
     migration.migration_settings ||= {}
@@ -1453,12 +1457,8 @@ class Course < ActiveRecord::Base
     self.touch
     @imported_migration_items
   end
-  attr_accessor :imported_migration_items
-  attr_accessor :full_migration_hash
-  attr_accessor :external_url_hash
-  attr_accessor :folder_name_lookups
-  attr_accessor :attachment_path_id_lookup
-  attr_accessor :assignment_group_no_drop_assignments
+  attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash
+  attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :assignment_group_no_drop_assignments
   
   def import_settings_from_migration(data)
     return unless data[:course]

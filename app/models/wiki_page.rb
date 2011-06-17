@@ -382,13 +382,21 @@ class WikiPage < ActiveRecord::Base
     to_import = migration.to_import 'outline_folders'
 
     outline['root_folder'] = true
-    import_from_migration(outline.merge({:outline_folders_to_import => to_import}), migration.context)
+    begin
+      import_from_migration(outline.merge({:outline_folders_to_import => to_import}), migration.context)
+    rescue
+      migration.add_warning("Error importing the course outline.", $!)
+    end
   end
 
   def self.process_migration(data, migration)
     wikis = data['wikis'] ? data['wikis']: []
     wikis.each do |wiki|
-      import_from_migration(wiki, migration.context) if wiki
+      begin
+        import_from_migration(wiki, migration.context) if wiki
+      rescue
+        migration.add_warning("Couldn't import the wiki page \"#{wiki[:title]}\"", $!)
+      end
     end
   end
   

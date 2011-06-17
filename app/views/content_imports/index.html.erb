@@ -25,21 +25,41 @@
 <% if @successful.length > 0 %>
   <h2>Successful Migrations</h2>
   <% @successful.each do |mig| %>
-    <p><%= mig.plugin_type %> migration - This migration was successfully imported.</p>
+    <div>
+      <%= mig.plugin_type %> migration - This migration was successfully imported.
+      <%= render :partial => 'migration_warnings', :locals => {:cm => mig} %>
+    </div>
   <% end %>
 <% end %>
 
 <% if @running.length > 0 %>
   <h2>Migrations Being Processed</h2>
   <% @running.each do |mig| %>
-    <p><%= mig.plugin_type %> migration - This migration is being processed.</p>
+    <div>
+      <%= mig.plugin_type %> migration - This migration is being processed.
+      <%= render :partial => 'migration_warnings', :locals => {:cm => mig} %>
+    </div>
   <% end %>
 <% end %>
 
 <% if @failed.length > 0 %>
   <h2>Failed Migrations</h2>
   <% @failed.each do |mig| %>
-    <p><%= mig.plugin_type %> migration - There was an error with this migration. Please give
-    your administrator this migration identifier: <%= "ContentMigration:#{mig.id}" %></p>
+    <div>
+      <%= mig.plugin_type %> migration - There was an error with this migration.
+      Please give
+      your administrator this migration
+      identifier: <%= "ContentMigration:#{mig.id}" %>
+      <%= render :partial => 'migration_warnings', :locals => {:cm => mig} %>
+    </div>
   <% end %>
+<% end %>
+
+<% js_block do %>
+  <script>
+    $(".warnings_link").click(function(event) {
+      event.preventDefault();
+      $(this).parent().find("div.migration_warnings").toggle();
+    });
+  </script>
 <% end %>

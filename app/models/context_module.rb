@@ -644,7 +644,11 @@ class ContextModule < ActiveRecord::Base
     to_import = migration.to_import 'modules'
     modules.each do |mod|
       if mod['migration_id'] && (!to_import || to_import[mod['migration_id']])
-        import_from_migration(mod, migration.context)
+        begin
+          import_from_migration(mod, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the module \"#{mod[:title]}\"", $!)
+        end
       end
     end
     migration_ids = modules.map{|m| m['module_id'] }.compact

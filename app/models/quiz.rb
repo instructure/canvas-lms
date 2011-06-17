@@ -1077,7 +1077,11 @@ class Quiz < ActiveRecord::Base
           allow_update = true
           assessment[:id] = item_id.to_i
         end
-        Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
+        begin
+          Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
+        rescue
+          migration.add_warning("Couldn't import the quiz \"#{assessment[:title]}\"", $!)
+        end
       end
     end
   end

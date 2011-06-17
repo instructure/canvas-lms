@@ -223,7 +223,11 @@ class CalendarEvent < ActiveRecord::Base
     to_import = migration.to_import 'events'
     events.each do |event|
       if event['migration_id'] && (!to_import || to_import[event['migration_id']])
-        import_from_migration(event, migration.context)
+        begin
+          import_from_migration(event, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the event \"#{event[:title]}\"", $!)
+        end
       end
     end
   end

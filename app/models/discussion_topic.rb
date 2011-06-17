@@ -476,7 +476,11 @@ class DiscussionTopic < ActiveRecord::Base
     announcements.each do |event|
       if event['migration_id'] && (!to_import || to_import[event['migration_id']])
         event[:type] = 'announcement'
-        import_from_migration(event, migration.context)
+        begin
+          import_from_migration(event, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the announcement \"#{event[:title]}\"", $!)
+        end
       end
     end
 
@@ -488,7 +492,11 @@ class DiscussionTopic < ActiveRecord::Base
         context ||= migration.context
         if context
           if topic['migration_id'] && (!topics_to_import || topics_to_import[topic['migration_id']])
-            import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
+            begin
+              import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
+            rescue
+              migration.add_warning("Couldn't import the topic \"#{topic[:title]}\"", $!)
+            end
           end
         end
       end

@@ -259,7 +259,11 @@ class Rubric < ActiveRecord::Base
     to_import = migration.to_import 'rubrics'
     rubrics.each do |rubric|
       if rubric['migration_id'] && (!to_import || to_import[rubric['migration_id']])
-        import_from_migration(rubric, migration.context)
+        begin
+          import_from_migration(rubric, migration.context)
+        rescue
+          migration.add_warning("Couldn't import rubric \"#{rubric[:title]}\"", $!)
+        end
       end
     end
   end

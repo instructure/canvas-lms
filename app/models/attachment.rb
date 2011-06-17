@@ -104,7 +104,11 @@ class Attachment < ActiveRecord::Base
     to_import = migration.to_import 'files'
     attachments.values.each do |att|
       if !att['is_folder'] && att['migration_id'] && (!to_import || to_import[att['migration_id']])
-        import_from_migration(att, migration.context)
+        begin
+          import_from_migration(att, migration.context)
+        rescue
+          migration.add_warning("Couldn't import file \"#{att[:display_name] || att[:path_name]}\"", $!)
+        end
       end
     end
     
@@ -135,12 +139,12 @@ class Attachment < ActiveRecord::Base
     item ||= Attachment.find_from_path(hash[:path_name], context)
     if item
       item.context = context
-      context.imported_migration_items << item if context.imported_migration_items && item.migration_id != hash[:migration_id]
       item.migration_id = hash[:migration_id]
       item.locked = true if hash[:locked]
       item.file_state = 'hidden' if hash[:hidden]
       item.display_name = hash[:display_name] if hash[:display_name]
       item.save_without_broadcasting!
+      context.imported_migration_items << item if context.imported_migration_items
     end
     item
   end

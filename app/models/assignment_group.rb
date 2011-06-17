@@ -183,7 +183,11 @@ class AssignmentGroup < ActiveRecord::Base
     to_import = migration.to_import 'assignment_groups'
     groups.each do |group|
       if group['migration_id'] && (!to_import || to_import[group['migration_id']])
-        import_from_migration(group, migration.context)
+        begin
+          import_from_migration(group, migration.context)
+        rescue
+          migration.add_warning("Couldn't import assignment group \"#{group[:title]}\"", $!)
+        end
       end
     end
   end

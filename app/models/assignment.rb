@@ -1346,7 +1346,11 @@ class Assignment < ActiveRecord::Base
     to_import = migration.to_import 'assignments'
     assignments.each do |assign|
       if assign['migration_id'] && (!to_import || to_import[assign['migration_id']])
-        import_from_migration(assign, migration.context)
+        begin
+          import_from_migration(assign, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the assignment \"#{assign[:title]}\"", $!)
+        end
       end
     end
     migration_ids = assignments.map{|m| m['assignment_id'] }.compact

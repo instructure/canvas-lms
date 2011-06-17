@@ -444,9 +444,13 @@ class AssessmentQuestion < ActiveRecord::Base
             end
             banks[hash_id] = bank
         end
-
-        question = AssessmentQuestion.import_from_migration(question, migration.context, banks[hash_id])
-        question_data[:aq_data][question['migration_id']] = question
+        
+        begin
+          question = AssessmentQuestion.import_from_migration(question, migration.context, banks[hash_id])
+          question_data[:aq_data][question['migration_id']] = question
+        rescue
+          migration.add_warning("Couldn't import quiz question \"#{question[:question_name]}\"", $!)
+        end
       end
     end
 
