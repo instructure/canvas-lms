@@ -37,9 +37,9 @@
       <div class="rs-margin-all">
         <div id="sidebar_content">
           <p>
-            <b><%= t :message_count, { :one => "%{count_start}1%{count_end} %{text_start}post%{text_end}", :other => "%{count_start}%{count}%{count_end} %{text_start}posts%{text_end}" }, :count_start => '<span class="message_count">', :count_end => '</span>', :text_start => '<span class="message_count_text">', :text_end => '</span>', :count => @entries.length %></b>
+            <b><%= t :message_count, { :one => "*1* **post**", :other => "*%{count}* **posts**" }, :count => @entries.length, :wrapper => { '*' => '<span class="message_count">\1</span>', '**' => '<span class="message_count_text">\1</span>' } %></b>
             <% if @entries.length > 0 && !@topic_agglomerated %>
-              <span style="font-size: 0.8em; padding-left: 10px;">( <%= t :total_message_count, "%{count_start}%{count}%{count_end} including subtopics", :count_start => '<span class="total_message_count">', :count => @topic.discussion_entries.active.length, :count_end => '</span>' %> )</span>
+              <span style="font-size: 0.8em; padding-left: 10px;">( <%= t :total_message_count, "*%{count}* including subtopics", :wrapper => '<span class="total_message_count">\1</span>', :count => @topic.discussion_entries.active.length %> )</span>
             <% end %>
           </p>
           <p>
