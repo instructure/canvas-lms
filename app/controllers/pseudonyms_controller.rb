@@ -49,7 +49,7 @@ class PseudonymsController < ApplicationController
       # Whether the email was actually found or not, we display the same
       # message. Otherwise this form could be used to fish for valid
       # email addresses.
-      flash[:notice] = "Confirmation email sent to #{email}, make sure to check your spam box"
+      flash[:notice] = t 'notices.email_sent', "Confirmation email sent to %{email}, make sure to check your spam box", :email => email
       @ccs.each do |cc|
         cc.forgot_password!
       end
@@ -67,7 +67,7 @@ class PseudonymsController < ApplicationController
     # Allow unregistered users to change password.  How else can they come back later
     # and finish the registration process? 
     if !@cc || @cc.path_type != 'email'
-      flash[:error] = "Cannot change the password for that login, or login does not exist"
+      flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
       redirect_to root_url
     end
   end
@@ -91,12 +91,12 @@ class PseudonymsController < ApplicationController
       reset_session
 
       @pseudonym_session = PseudonymSession.new(@pseudonym, true)
-      flash[:notice] = "Password changed"
+      flash[:notice] = t 'notices.password_changed', "Password changed"
       redirect_to dashboard_url
     elsif @cc
       render :action => "confirm_change_password"
     else
-      flash[:notice] = "The link you used appears to no longer be valid.  If you can't login, try clicking \"Don't Know My Password\" and having a new message sent for you."
+      flash[:notice] = t 'notices.link_invalid', "The link you used appears to no longer be valid.  If you can't login, try clicking \"Don't Know My Password\" and having a new message sent for you."
       redirect_to login_url
     end
   end
@@ -122,7 +122,7 @@ class PseudonymsController < ApplicationController
     cc = CommunicationChannel.find_by_user_id_and_confirmation_code(@pseudonym.user_id, nonce)
     cc = nil if cc && (!cc.unconfirmed? || cc.confirmation_code != nonce)
     if @pseudonym && !cc
-      flash[:error] = "The login #{@pseudonym.unique_id} has already been registered.  If you're not sure how to log in, click \"Don't Know My Password\" and enter the login \"#{@pseudonym.unique_id}\""
+      flash[:error] = t 'errors.already_registered', "The login %{email} has already been registered.  If you're not sure how to log in, click \"Don't Know My Password\" and enter the login \"%{email}\"", :email => @pseudonym.unique_id
       redirect_to root_url #"/"
       return
     end
@@ -134,13 +134,13 @@ class PseudonymsController < ApplicationController
           cc.save
           @pseudonym.move_to_user(@current_user)
         end
-        flash[:notice] = "Registration confirmed!"
+        flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         respond_to do |format|
           format.html { redirect_to_enrollment_or_profile }
           format.json { render :json => cc.to_json }
         end
       else
-        flash[:notice] = "Registration failed."
+        flash[:notice] = t 'notices.registration_failed', "Registration failed."
         respond_to do |format|
           format.html { redirect_to claim_pseudonym_url(@pseudonym.id, nonce) }
           format.json { render :json => cc.to_json }
@@ -207,7 +207,7 @@ class PseudonymsController < ApplicationController
         pseudonym.password = params[:pseudonym][:password]
         pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
         if params[:pseudonym][:password].empty? 
-          flash[:error] = "You must type a password of at lest 6 characters."
+          flash[:error] = t 'errors.password_too_short', "You must type a password of at least 6 characters."
         else 
           pseudonym.save
         end
@@ -218,7 +218,7 @@ class PseudonymsController < ApplicationController
         end
       elsif cc.active? || cc.confirm
         reset_session_saving_keys(:return_to)
-        flash[:notice] = "Registration confirmed."
+        flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         pseudonym.user.register
         # Login, since we're satisfied that this person is the right person.
         @pseudonym_session = PseudonymSession.new(pseudonym, true)
@@ -276,7 +276,7 @@ class PseudonymsController < ApplicationController
         @pseudonym.save
       end
       respond_to do |format|
-        flash[:notice] = "Account registered!"
+        flash[:notice] = t 'notices.account_registered', "Account registered!"
         format.html { redirect_to profile_url }
         format.json { render :json => @pseudonym.to_json(:only => [:id, :unique_id, :account_id], :include => {:communication_channel => {:only => [:id, :path, :path_type]}}) }
       end
@@ -326,7 +326,7 @@ class PseudonymsController < ApplicationController
     end
     
     if @pseudonym.update_attributes(params[:pseudonym])
-      flash[:notice] = "Account updated!"
+      flash[:notice] = t 'notices.account_updated', "Account updated!"
       respond_to do |format|
         format.html { redirect_to profile_url }
         format.json { render :json => @pseudonym.to_json }
@@ -343,7 +343,7 @@ class PseudonymsController < ApplicationController
     return unless get_user
     @pseudonym = @user.pseudonyms.find(params[:id])
     if @user.pseudonyms.active.length < 2
-      @pseudonym.errors.add_to_base('Users must have at least one login')
+      @pseudonym.errors.add_to_base(t('errors.login_required', "Users must have at least one login"))
       render :json => @pseudonym.errors.to_json, :status => :bad_request
     elsif @pseudonym.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       render :json => @pseudonym.to_json

@@ -1,12 +1,12 @@
-<%= form.label :unique_id, "Login" %><br />
+<%= form.blabel :unique_id, :en => "Login" %><br />
 <%= form.text_field :unique_id %><br />
 <br/>
 <%= label :user, :time_zone, "Time Zone" %><br/>
 <%= time_zone_select :user, :time_zone, TimeZone.us_zones, :default => ((@domain_root_account && @domain_root_account.default_time_zone) || "Mountain Time (US & Canada)") %><br/>
 <br />
-<%= form.label :password, form.object.new_record? ? "Password" : "Change password" %><br />
+<%= form.blabel :password, form.object.new_record? ? t('labels.password', "Password") : t('labels.change_password', "Change password") %><br />
 <%= form.password_field :password %><br />
 <br />
-<%= form.label :password_confirmation, "Confirm password" %><br />
+<%= form.blabel :password_confirmation, :en => "Confirm password" %><br />
 <%= form.password_field :password_confirmation %><br />
 <br />
