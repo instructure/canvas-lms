@@ -21,7 +21,7 @@ class Account < ActiveRecord::Base
   attr_accessible :name, :turnitin_account_id,
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
-    :storage_quota, :ip_filters
+    :default_storage_quota_mb, :storage_quota, :ip_filters
 
   include Workflow
   adheres_to_policy
@@ -283,16 +283,26 @@ class Account < ActiveRecord::Base
   end
   
   def quota
-    # in megabytes
     Rails.cache.fetch(['current_quota', self].cache_key) do
-      return read_attribute(:storage_quota) || (self.parent_account.default_storage_quota rescue nil) || 500
+      read_attribute(:storage_quota) ||
+        (self.parent_account.default_storage_quota rescue nil) ||
+        Setting.get_cached('account_default_quota', 500.megabytes.to_s).to_i
     end
   end
   
   def default_storage_quota
     read_attribute(:default_storage_quota) || 
-    (self.parent_account.default_storage_quota rescue nil) ||
-    500
+      (self.parent_account.default_storage_quota rescue nil) ||
+      Setting.get_cached('account_default_quota', 500.megabytes.to_s).to_i
+  end
+  
+  def default_storage_quota_mb
+    default_storage_quota < 1.megabyte ? default_storage_quota : default_storage_quota / 1.megabyte
+  end
+  
+  def default_storage_quota_mb=(val)
+    # TODO: convert the MB to bytes once the commit introducing this line has been deployed
+    self.default_storage_quota = val
   end
   
   def default_storage_quota=(val)

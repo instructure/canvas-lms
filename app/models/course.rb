@@ -24,7 +24,7 @@ class Course < ActiveRecord::Base
   include Workflow
   include EnrollmentDateRestrictions
 
-  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :root_account, :storage_quota, :restrict_enrollments_to_course_dates, :grading_standard, :grading_standard_enabled
+  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :root_account, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates, :grading_standard, :grading_standard_enabled
 
   serialize :tab_configuration
   belongs_to :root_account, :class_name => 'Account'
@@ -651,10 +651,20 @@ class Course < ActiveRecord::Base
   end
   
   def quota
-    # in megabytes
     Rails.cache.fetch(['default_quota', self].cache_key) do
-      return read_attribute(:storage_quota) || (self.account.default_storage_quota rescue nil) || 500
+      return read_attribute(:storage_quota) ||
+        (self.account.default_storage_quota rescue nil) ||
+        Setting.get_cached('course_default_quota', 500.megabytes.to_s).to_i
     end
+  end
+  
+  def storage_quota_mb
+    storage_quota < 1.megabyte ? storage_quota : storage_quota / 1.megabyte
+  end
+  
+  def storage_quota_mb=(val)
+    # TODO: convert MB to bytes once this commit has been deployed
+    self.storage_quota = val
   end
   
   def storage_quota=(val)
