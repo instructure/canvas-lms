@@ -35,7 +35,7 @@
     </tr>
     <tr>
       <td class="total"><%= t 'headers.total', "Total" %></td>
-      <td id="group_weight_total" class="total" style="text-align: right;"><%= tally %>%</td>
+      <td id="group_weight_total" class="total" style="text-align: right;"><%= number_to_percentage(tally, :precision => 0) %></td>
     </tr>
   </table>
 </div>

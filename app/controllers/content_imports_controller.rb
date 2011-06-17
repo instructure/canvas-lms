@@ -18,7 +18,7 @@
 
 class ContentImportsController < ApplicationController
   before_filter :require_context
-  add_crumb("Content Imports") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
+  add_crumb(lambda { t 'crumbs.content_imports', "Content Imports" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
   
@@ -113,7 +113,7 @@ class ContentImportsController < ApplicationController
     if authorized_action(@context, @current_user, :manage)
       @content_migration = ContentMigration.for_context(@context).find(params[:id]) #)_all_by_context_id_and_context_type(@context.id, @context.class.to_s).last
       if @content_migration.progress && @content_migration.progress >= 100
-        flash[:notice] = "That extraction has already been imported into the course"
+        flash[:notice] = t 'notices.already_imported', "That extraction has already been imported into the course"
         redirect_to named_context_url(@context, :context_url)
         return
       end

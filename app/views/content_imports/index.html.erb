@@ -1,55 +1,51 @@
-<% add_crumb "Migrations" %>
+<% add_crumb t('crumbs.migrations', "Migrations") %>
 
-<% content_for :page_title do %>Active Migrations
-<% end %>
+<% content_for :page_title do %><%= t :page_title, "Active Migrations" %><% end %>
 
 <% content_for :page_header do %>
-  <h1>Active Migrations</h1>
+  <h1><%= t :page_title, "Active Migrations" %></h1>
 <% end %>
 
 <% if @waiting.length > 0 %>
-  <h2>Migrations Needing Action</h2>
+  <h2><%= t 'titles.migrations_needing_action', "Migrations Needing Action" %></h2>
   <% @waiting.each do |mig| %>
     <% 
        url = "/#{@context.class.to_s.downcase.pluralize}/#{@context.id}/imports/migrate/#{mig.id}"
     %>
       <p>
-        <%= mig.plugin_type %> migration - 
-        <a href="<%= url %>">
-        Click here to choose the content to import.
-      </a>
+        <%= t :migration_needing_action, "%{plugin_type} migration - *Click here to choose the content to import.*",
+              :plugin_type => mig.plugin_type, :wrapper => '<a href="#{url}">\1</a>' %>
       </p>
   <% end %>
 <% end %>
 
 <% if @successful.length > 0 %>
-  <h2>Successful Migrations</h2>
+  <h2><%= t 'titles.successful_migrations', "Successful Migrations" %></h2>
   <% @successful.each do |mig| %>
     <div>
-      <%= mig.plugin_type %> migration - This migration was successfully imported.
+      <%= t :successful_migration, "%{plugin_type} migration - This migration was successfully imported.", :plugin_type => mig.plugin_type %>
       <%= render :partial => 'migration_warnings', :locals => {:cm => mig} %>
     </div>
   <% end %>
 <% end %>
 
 <% if @running.length > 0 %>
-  <h2>Migrations Being Processed</h2>
+  <h2><%= t 'titles.migrations_in_progress', "Migrations Being Processed" %></h2>
   <% @running.each do |mig| %>
     <div>
-      <%= mig.plugin_type %> migration - This migration is being processed.
+      <%= t :migration_in_progress, "%{plugin_type} migration - This migration is being processed.", :plugin_type => mig.plugin_type %>
       <%= render :partial => 'migration_warnings', :locals => {:cm => mig} %>
     </div>
   <% end %>
 <% end %>
 
 <% if @failed.length > 0 %>
-  <h2>Failed Migrations</h2>
+  <h2><%= t 'titles.failed_migrations', "Failed Migrations" %></h2>
   <% @failed.each do |mig| %>
     <div>
-      <%= mig.plugin_type %> migration - There was an error with this migration.
-      Please give
-      your administrator this migration
-      identifier: <%= "ContentMigration:#{mig.id}" %>
+      <%= t :failed_migration, "%{plugin_type} migration - There was an error with this migration. Please give
+    your administrator this migration identifier: %{id}", :plugin_type => mig.plugin_type,
+           :id => mig.id %>
       <%= render :partial => 'migration_warnings', :locals => {:cm => mig} %>
     </div>
   <% end %>

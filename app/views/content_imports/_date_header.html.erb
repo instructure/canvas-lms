@@ -1,4 +1,4 @@
 <div class="date_header <%= date_header.strftime("%Y_%m_%d") rescue "no_date" %>">
-  <span class="date_string"><%= date_header.strftime("%a, %b #{date_header.day}") rescue "No Date set" %></span>
+  <span class="date_string"><%= date_header.strftime("%a, %b #{date_header.day}") rescue t(:no_date_set, "No Date set") %></span>
   <span class="date_sortable" style="display: none;"><%= date_header.strftime("%Y_%m_%d") rescue "0000_00_00" %>
 </div>
