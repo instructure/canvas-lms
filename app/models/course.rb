@@ -708,8 +708,7 @@ class Course < ActiveRecord::Base
   end
   
   def storage_quota_mb=(val)
-    # TODO: convert MB to bytes once this commit has been deployed
-    self.storage_quota = val
+    self.storage_quota = val.megabytes
   end
   
   def storage_quota=(val)

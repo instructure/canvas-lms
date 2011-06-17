@@ -314,8 +314,7 @@ class Account < ActiveRecord::Base
   end
   
   def default_storage_quota_mb=(val)
-    # TODO: convert the MB to bytes once the commit introducing this line has been deployed
-    self.default_storage_quota = val
+    self.default_storage_quota = val.megabytes
   end
   
   def default_storage_quota=(val)
