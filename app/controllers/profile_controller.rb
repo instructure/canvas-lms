@@ -22,7 +22,7 @@ class ProfileController < ApplicationController
   
   def show
     @user = params[:id] ? User.find(params[:id]) : @current_user
-    add_crumb("#{@user.short_name}'s profile", profile_path )
+    add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), profile_path )
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select{|c| c.path_type == "email"}
     @sms_channels = @channels.select{|c| c.path_type == 'sms'}
@@ -49,8 +49,11 @@ class ProfileController < ApplicationController
     @user = @current_user
     @user = User.find(params[:id]) if params[:id]
 
+    add_crumb(@user.short_name, profile_path )
+    add_crumb(t(:crumb_notification_preferences, "Notification Preferences"), communication_profile_path )
+
     if @user.communication_channel.blank?
-      flash[:error] = "Please define at least one email address or other way to be contacted before setting notification preferences."
+      flash[:error] = t('errors.no_channels', "Please define at least one email address or other way to be contacted before setting notification preferences.")
       redirect_to profile_url
       return
     end
@@ -146,7 +149,7 @@ class ProfileController < ApplicationController
           pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id]) if params[:pseudonym][:password_id] && change_password
           if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             pseudonymed = true
-            flash[:error] = "Invalid old password for the login #{pseudonym_to_update.unique_id}"
+            flash[:error] = t('errors.invalid_old_password', "Invalid old password for the login %{pseudonym}", :pseudonym => pseudonym_to_update.unique_id)
             format.html { redirect_to profile_url }
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
@@ -157,7 +160,7 @@ class ProfileController < ApplicationController
           params[:pseudonym].delete :password_id
           if !params[:pseudonym].empty? && pseudonym_to_update && !pseudonym_to_update.update_attributes(params[:pseudonym])
             pseudonymed = true
-            flash[:error] = "Login failed to update"
+            flash[:error] = t('errors.profile_update_failed', "Login failed to update")
             format.html { redirect_to profile_url }
             format.json { render :json => pseudonym_to_update.errors.to_json, :status => :bad_request }
           end
@@ -168,7 +171,7 @@ class ProfileController < ApplicationController
           cc.insert_at(1) if cc
         end
         unless pseudonymed
-          flash[:notice] = "Profile successfully updated"
+          flash[:notice] = t('notices.updated_profile', "Profile successfully updated")
           format.html { redirect_to profile_url }
           format.json { render :json => @user.to_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path]}, :pseudonym => {:only => [:id, :unique_id]} }) }
         end
