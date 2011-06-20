@@ -240,6 +240,20 @@ describe User do
     User.name_like("uniqueid4").map(&:id).should == []
 
   end
+
+  it "should be able to be removed from a root account with non-Canvas auth" do
+    account1 = account_with_cas
+    account2 = Account.create!
+    user = User.create!
+    user.register!
+    p1 = user.pseudonyms.new :unique_id => "id1", :account => account1
+    p1.sis_source_id = 'sis_id1'
+    p1.save!
+    user.pseudonyms.create! :unique_id => "id2", :account => account2
+    lambda { p1.destroy }.should raise_error /Cannot delete system-generated pseudonyms/
+    user.remove_from_root_account account1
+    user.associated_root_accounts.should eql [account2]
+  end
   
   context "move_to_user" do
     it "should delete the old user" do

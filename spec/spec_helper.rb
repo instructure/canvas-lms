@@ -68,6 +68,7 @@ Spec::Runner.configure do |config|
 
   def account_with_cas(opts={})
     account = opts[:account]
+    account ||= Account.create!
     config = AccountAuthorizationConfig.new
     cas_url = opts[:cas_url] || "https://localhost/cas"
     config.auth_type = "cas"
