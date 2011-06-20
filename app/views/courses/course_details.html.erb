@@ -501,8 +501,8 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     </div>
     <% end %>
     <div style="text-align: center; display: none;" id="enrollment_dialog">
-      <% user_snippet = capture { %><span class="name">User</span><% } %>
-      <% time_snippet = capture { %><div style="margin: 10px;" class="invitation_sent_at">Just Now</div><% } %>
+      <% user_snippet = capture { %><span class="name"></span><% } %>
+      <% time_snippet = capture { %><div style="margin: 10px;" class="invitation_sent_at"></div><% } %>
       <div class="admin_enrollment_re_send">
         <%= t 'admin_invitation_unaccepted', "%{user} hasn't yet accepted the invitation to join the course.  The invitation was sent: %{time}", :user => user_snippet, :time => time_snippet %>
       </div>
