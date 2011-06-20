@@ -100,11 +100,11 @@ class QuestionBanksController < ApplicationController
       respond_to do |format|
         if @bank.save
           @bank.bookmark_for(@current_user)
-          flash[:notice] = "Question bank successfully created!"
+          flash[:notice] = t :bank_success, "Question bank successfully created!"
           format.html { redirect_to named_context_url(@context, :context_question_banks_url) }
           format.json { render :json => @bank.to_json }
         else
-          flash[:error] = "Question bank failed to create."
+          flash[:error] = t :bank_fail, "Question bank failed to create."
           format.html { redirect_to named_context_url(@context, :context_question_banks_url) }
           format.json { render :json => @bank.errors.to_json, :status => :bad_request }
         end
