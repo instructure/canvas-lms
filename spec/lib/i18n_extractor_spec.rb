@@ -89,31 +89,37 @@ describe I18nExtractor do
     it "should interpret symbol names as the key" do
       extract("label :thing, :the_foo, :foo, :en => 'Foo'").should == {'labels' => {"foo" => "Foo"}}
       extract("f.label :the_foo, :foo, :en => 'Foo'").should == {'labels' => {"foo" => "Foo"}}
+      extract("label_tag :the_foo, :foo, :en => 'Foo'").should == {'labels' => {"foo" => "Foo"}}
     end
 
     it "should infer the key from the method if not provided" do
       extract("label :thing, :the_foo, :en => 'Foo'").should == {'labels' => {"the_foo" => "Foo"}}
       extract("f.label :the_foo, :en => 'Foo'").should == {'labels' => {"the_foo" => "Foo"}}
+      extract("label_tag :the_foo, :en => 'Foo'").should == {'labels' => {"the_foo" => "Foo"}}
     end
 
     it "should skip label calls with non-symbol keys (i.e. just a standard label)" do
       extract("label :thing, :the_foo, 'foo'").should == {}
       extract("f.label :the_foo, 'foo'").should == {}
+      extract("label_tag :thing, 'foo'").should == {}
     end
 
     it "should complain if a label call has a non-symbol key and a default" do
       lambda{ extract "label :thing, :the_foo, 'foo', :en => 'Foo'" }.should raise_error /invalid translation key/
       lambda{ extract "f.label :the_foo, 'foo', :en => 'Foo'" }.should raise_error /invalid translation key/
+      lambda{ extract "label_tag :the_foo, 'foo', :en => 'Foo'" }.should raise_error /invalid translation key/
     end
 
     it "should not auto-scope absolute keys" do
       extract("label :thing, :the_foo, :'#foo', :en => 'Foo'", '').should == {"foo" => "Foo"}
       extract("f.label :the_foo, :'#foo', :en => 'Foo'", '').should == {"foo" => "Foo"}
+      extract("label_tag :the_foo, :'#foo', :en => 'Foo'", '').should == {"foo" => "Foo"}
     end
 
     it "should complain if no default is provided" do
       lambda{ extract "label :thing, :the_foo, :foo" }.should raise_error 'invalid/missing en default nil'
       lambda{ extract "f.label :the_foo, :foo" }.should raise_error 'invalid/missing en default nil'
+      lambda{ extract "label_tag :the_foo, :foo" }.should raise_error 'invalid/missing en default nil'
     end
   end
 

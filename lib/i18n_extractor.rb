@@ -19,7 +19,7 @@ class I18nExtractor < SexpProcessor
   end
 
   TRANSLATE_CALLS = [:t, :ot, :mt, :translate, :before_label]
-  LABEL_CALLS = [:label, :blabel]
+  LABEL_CALLS = [:label, :blabel, :label_tag, :_label_symbol_translation]
   ALL_CALLS = TRANSLATE_CALLS + LABEL_CALLS + [:label_with_symbol_translation]
 
   def process_call(exp)
@@ -110,9 +110,11 @@ class I18nExtractor < SexpProcessor
   #  label :bar, :foo, :foo_key, :en => "Foo"
   #  f.label :foo, :en => "Foo"
   #  f.label :foo, :foo_key, :en => "Foo"
+  #  label_tag :foo, :en => "Foo"
+  #  label_tag :foo, :foo_key, :en => "Foo"
   def process_label_call(receiver, method, args)
     args.shift
-    args.shift unless receiver # remove object_name arg
+    args.shift unless receiver || method.to_s == 'label_tag' # remove object_name arg
 
     inferred = false
     default = nil

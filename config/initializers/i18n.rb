@@ -13,6 +13,20 @@ module I18nUtilities
     text_or_key = t('labels.' + text_or_key.to_s, default_value) if default_value
     t("before_label_wrapper", "%{text}:", :text => text_or_key)
   end
+
+  def _label_symbol_translation(method, text, options)
+    if text.is_a?(Hash)
+      options = text
+      text = nil
+    end
+    text = method if text.nil? && method.is_a?(Symbol)
+    if text.is_a?(Symbol)
+      text = 'labels.#{text}' unless text.to_s =~ /\A#/
+      text = t(text, options.delete(:en))
+    end
+    text = before_label(text) if options[:before]
+    return text, options
+  end
 end
 
 ActionView::Base.send(:include, I18nUtilities)
@@ -29,19 +43,19 @@ ActionView::Helpers::FormHelper.module_eval do
   end
 
   def label_with_symbol_translation(object_name, method, text = nil, options = {})
-    if text.is_a?(Hash)
-      options = text
-      text = nil
-    end
-    text = method if text.nil? && method.is_a?(Symbol)
-    if text.is_a?(Symbol)
-      text = 'labels.#{text}' unless text.to_s =~ /\A#/
-      text = t(text, options.delete(:en))
-    end
-    text = before_label(text) if options[:before]
+    text, options = _label_symbol_translation(method, text, options)
     label_without_symbol_translation(object_name, method, text, options)
   end
   alias_method_chain :label, :symbol_translation
+end
+
+ActionView::Helpers::InstanceTag.send(:include, I18nUtilities)
+ActionView::Helpers::FormTagHelper.class_eval do
+  def label_tag_with_symbol_translation(method, text = nil, options = {})
+    text, options = _label_symbol_translation(method, text, options)
+    label_tag_without_symbol_translation(method, text, options)
+  end
+  alias_method_chain :label_tag, :symbol_translation
 end
 
 ActionView::Helpers::FormBuilder.class_eval do
