@@ -219,7 +219,7 @@ class ContentMigration < ActiveRecord::Base
       @exported_data_zip = download_exported_data
       @zip_file = Zip::ZipFile.open(@exported_data_zip.path)
       @exported_data_zip.close
-      data = JSON.parse(@zip_file.read('course_export.json'))
+      data = JSON.parse(@zip_file.read('course_export.json'), :max_nesting => 50)
       data = data.with_indifferent_access if data.is_a? Hash
       data['all_files_export'] ||= {}
 
