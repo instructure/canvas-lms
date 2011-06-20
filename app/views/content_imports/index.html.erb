@@ -14,7 +14,7 @@
     %>
       <p>
         <%= t :migration_needing_action, "%{plugin_type} migration - *Click here to choose the content to import.*",
-              :plugin_type => mig.plugin_type, :wrapper => '<a href="#{url}">\1</a>' %>
+              :plugin_type => mig.plugin_type, :wrapper => "<a href=\"#{url}\">\\1</a>" %>
       </p>
   <% end %>
 <% end %>
