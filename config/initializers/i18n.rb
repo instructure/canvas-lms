@@ -99,7 +99,7 @@ I18n.class_eval do
       options[:default] ||= if options[:count]
         case default
           when String
-            default =~ /\A\w+\z/ ? pluralize(options[:count], default) : default
+            default =~ /\A[\w\-]+\z/ ? pluralize(options[:count], default) : default
           when Hash
             case options[:count]
               when 0
