@@ -133,7 +133,6 @@ describe SubmissionsApiController, :type => :integration do
                     { :include => %w(submission_comments) })
 
     json.should == {"grade"=>"A-",
-        "prior"=>nil,
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -141,7 +140,6 @@ describe SubmissionsApiController, :type => :integration do
         "grade_matches_current_submission"=>true,
         "attempt"=>1,
         "url"=>nil,
-        "focus"=>nil,
         "submission_type"=>"online_text_entry",
         "user_id"=>student1.id,
         "submission_comments"=>
@@ -153,7 +151,6 @@ describe SubmissionsApiController, :type => :integration do
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
            "author_id"=>student1.id}],
-        "comparison"=>nil,
         "score"=>13.5}
 
     # can't access other students' submissions
@@ -205,7 +202,6 @@ describe SubmissionsApiController, :type => :integration do
 
     res =
       [{"grade"=>"A-",
-        "prior"=>nil,
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -220,16 +216,13 @@ describe SubmissionsApiController, :type => :integration do
          ],
         "submission_history"=>
          [{"grade"=>nil,
-           "prior"=>nil,
            "body"=>"test!",
            "assignment_id" => a1.id,
            "submitted_at"=>"1970-01-01T01:00:00Z",
            "attempt"=>1,
            "url"=>nil,
-           "focus"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "comparison"=>nil,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=0",
            "grade_matches_current_submission"=>nil,
            "score"=>nil},
@@ -238,15 +231,12 @@ describe SubmissionsApiController, :type => :integration do
            "media_comment" =>
             { "content-type" => "video/mp4",
               "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
-           "prior"=>nil,
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T02:00:00Z",
            "attempt"=>2,
            "url"=>nil,
-           "focus"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "comparison"=>nil,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
            "grade_matches_current_submission"=>nil,
            "score"=>nil},
@@ -262,21 +252,17 @@ describe SubmissionsApiController, :type => :integration do
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser" },
             ],
-           "prior"=>nil,
            "body"=>"test!",
            "submitted_at"=>"1970-01-01T03:00:00Z",
            "attempt"=>3,
            "url"=>nil,
-           "focus"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "comparison"=>nil,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
            "grade_matches_current_submission"=>true,
            "score"=>13.5}],
         "attempt"=>3,
         "url"=>nil,
-        "focus"=>nil,
         "submission_type"=>"online_text_entry",
         "user_id"=>student1.id,
         "submission_comments"=>
@@ -288,14 +274,12 @@ describe SubmissionsApiController, :type => :integration do
            "created_at"=>comment.created_at.as_json,
            "author_name"=>"User",
            "author_id"=>student1.id}],
-        "comparison"=>nil,
         "media_comment" =>
          { "content-type" => "video/mp4",
            "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=54321&redirect=1&type=mp4" },
         "score"=>13.5},
        {"grade"=>"F",
         "assignment_id" => a1.id,
-        "prior"=>nil,
         "body"=>nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1",
         "grade_matches_current_submission"=>true,
@@ -303,15 +287,12 @@ describe SubmissionsApiController, :type => :integration do
         "submission_history"=>
          [{"grade"=>"F",
            "assignment_id" => a1.id,
-           "prior"=>nil,
            "body"=>nil,
            "submitted_at"=>"1970-01-01T04:00:00Z",
            "attempt"=>1,
            "url"=>"http://www.instructure.com",
-           "focus"=>nil,
            "submission_type"=>"online_url",
            "user_id"=>student2.id,
-           "comparison"=>nil,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=0",
           "grade_matches_current_submission"=>true,
            "attachments" =>
@@ -322,7 +303,6 @@ describe SubmissionsApiController, :type => :integration do
            "score"=>9}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
-        "focus"=>nil,
         "submission_type"=>"online_url",
         "user_id"=>student2.id,
         "attachments" =>
@@ -331,7 +311,6 @@ describe SubmissionsApiController, :type => :integration do
            "filename" => "snapshot.png",
            "url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?download=#{sub2.attachment.id}",}],
         "submission_comments"=>[],
-        "comparison"=>nil,
         "score"=>9,
         "rubric_assessment"=>
          {"crit2"=>{"comments"=>"Hmm", "points"=>2},

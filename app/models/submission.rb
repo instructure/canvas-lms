@@ -831,20 +831,6 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  # Import stuff
-  attr_accessor :comparison, :prior, :focus
-  
-  # Stuff Ryan stuck in to get the json to print the right stuff.
-  def set_serialization_options
-    if comparison == :equal
-      @serialization_methods = [:comparison, :focus]
-      #default_options = { :methods => [ :comparison, :focus ]}
-    else
-      @serialization_methods = [:comparison, :prior, :focus]
-      #default_options = { :methods => [ :comparison, :prior, :focus ]}
-    end
-  end
-
   # This little chunk makes it so that to_json will force it to always include the method :attachments
   # it is especially needed in the extended gradebook so that when we grab all of the versions through simply_versioned
   # that each of those versions include :attachments

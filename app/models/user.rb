@@ -954,9 +954,6 @@ class User < ActiveRecord::Base
     end
   }
   
-  # Import stuff
-  attr_accessor :comparison, :prior, :focus
-  
   def sorted_rubrics
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active
