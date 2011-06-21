@@ -70,7 +70,7 @@ class UserNotesController < ApplicationController
     if authorized_action(@user_note.user, @current_user, :create_user_notes)
       respond_to do |format|
         if @user_note.save
-          flash[:notice] = 'Journal Entry was successfully created.'
+          flash[:notice] = t 'notices.created', "Journal Entry was successfully created."
           format.html { redirect_to user_user_notes_path }
           format.xml { render :xml => @user_note }
           format.json { render :json => @user_note.to_json(:methods=>[:creator_name, :formatted_note]), :status => :created }
