@@ -130,14 +130,18 @@ module Stats
     end
     
     def mean
-      total.to_f / size
+      size > 0 ? total.to_f / size : 0
     end
     
     def variance
-      all.map {|value|
-        diff = value - mean
-        diff*diff
-      }.sum / size.to_f
+      if size > 0
+        all.map {|value|
+          diff = value - mean
+          diff*diff
+        }.sum / size.to_f
+      else
+        0
+      end
     end
     
     def standard_deviation
