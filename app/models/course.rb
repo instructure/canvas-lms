@@ -950,28 +950,30 @@ class Course < ActiveRecord::Base
     # actual grade publishing logic is here, but you probably want
     # 'publish_final_grades'
 
-    settings = PluginSetting.settings_for_plugin('grade_export')
-    raise "final grade publishing disabled" unless settings[:enabled] == "true"
-    raise "no grading standard supplied" unless self.grading_standard_id
-    raise "endpoint undefined" if settings[:publish_endpoint].nil? || settings[:publish_endpoint].empty?
-
     enrollments = self.student_enrollments.scoped({:include => [:user, :course_section]}).find(:all, :order => "users.sortable_name")
 
-    publishing_pseudonym = publishing_user.pseudonyms.active.find_by_account_id(self.root_account_id, :order => "sis_user_id DESC")
-    
-    errors = []
-    posts_to_make = []
-    ignored_enrollment_ids = []
+    begin
 
-    if Course.valid_grade_export_types.has_key?(settings[:format_type])
-      callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
-      begin
+      settings = PluginSetting.settings_for_plugin('grade_export')
+      raise "final grade publishing disabled" unless settings[:enabled] == "true"
+      raise "no grading standard supplied" unless self.grading_standard_id
+      raise "endpoint undefined" if settings[:publish_endpoint].blank?
+
+      publishing_pseudonym = publishing_user.pseudonyms.active.find_by_account_id(self.root_account_id, :order => "sis_user_id DESC")
+
+      errors = []
+      posts_to_make = []
+      ignored_enrollment_ids = []
+
+      if Course.valid_grade_export_types.has_key?(settings[:format_type])
+        callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
         posts_to_make, ignored_enrollment_ids = callback.call(self, enrollments,
             publishing_pseudonym)
-      rescue
-        Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollments.map(&:id) })
-        raise
       end
+
+    rescue
+      Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollments.map(&:id) })
+      raise
     end
 
     Enrollment.update_all({ :grade_publishing_status => "unpublishable" }, { :id => ignored_enrollment_ids })
@@ -985,7 +987,7 @@ class Course < ActiveRecord::Base
         Enrollment.update_all({ :grade_publishing_status => "error" }, { :id => enrollment_ids })
       end
     end
-    
+
     raise errors[0] if errors.size > 0
   end
   
