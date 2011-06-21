@@ -161,7 +161,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       <% if current_user_is_site_admin? %>
         </tr><tr>
           <td><%= f.blabel :root_account_id, :en => "Root Account" %></td>
-          <td><%= @context.root_account.name %></td>
+          <td><%= link_to @context.root_account.name, account_url(@context.root_account.id)  %></td>
       <% end %>
       </tr><tr>
         <td><%= f.blabel :account_id, :en => "Department" %></td>
@@ -177,11 +177,19 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
                   <%= render :partial => "shared/account_options", :locals => {:account => @context.root_account} %>
                 </select>
               <% end %>
+            <% elsif can_do(@context.account, @current_user, :read) %>
+              <%= link_to @context.account.name, account_url(@context.account.id) %>
             <% else %>
               <%= @context.account.name %>
             <% end %>
           </span>
-          <span class="course_info account_name"><%= @context.account.name %></span>
+          <span class="course_info account_name">
+            <% if can_do(@context.account, @current_user, :read) %>
+              <%= link_to @context.account.name, account_url(@context.account.id) %>
+            <% else %>
+              <%= @context.account.name %>
+            <% end %>
+          </span>
         </td>
       </tr><tr>
         <td><%= f.blabel :enrollment_term_id, :en => "Term" %></td>
