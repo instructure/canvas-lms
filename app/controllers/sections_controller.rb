@@ -24,11 +24,11 @@ class SectionsController < ApplicationController
       @section = @context.course_sections.build(params[:course_section])
       respond_to do |format|
         if @section.save
-          flash[:notice] = "Section successfully created!"
+          flash[:notice] = t('section_created', "Section successfully created!")
           format.html { redirect_to course_details_url(@context) }
           format.json { render :json => @section.to_json }
         else
-          flash[:error] = "Section creation failed"
+          flash[:error] = t('section_creation_failed', "Section creation failed")
           format.html { redirect_to course_details_url(@context) }
           format.json { render :json => @section.errors.to_json, :status => :bad_request }
         end
@@ -60,7 +60,7 @@ class SectionsController < ApplicationController
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage_admin_users)
       @section.crosslist_to_course @new_course
       respond_to do |format|
-        flash[:notice] = "Section successfully cross-listed!"
+        flash[:notice] = t('section_crosslisted', "Section successfully cross-listed!")
         format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
         format.json { render :json => @section.to_json }
       end
@@ -73,7 +73,7 @@ class SectionsController < ApplicationController
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage_admin_users)
       @section.uncrosslist
       respond_to do |format|
-        flash[:notice] = "Section successfully de-cross-listed!"
+        flash[:notice] = t('section_decrosslisted', "Section successfully de-cross-listed!")
         format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
         format.json { render :json => @section.to_json }
       end
@@ -95,11 +95,11 @@ class SectionsController < ApplicationController
       end
       respond_to do |format|
         if @section.update_attributes(params[:course_section])
-          flash[:notice] = "Section successfully updated!"
+          flash[:notice] = t('section_updated', "Section successfully updated!")
           format.html { redirect_to course_section_url(@context, @section) }
           format.json { render :json => @section.to_json }
         else
-          flash[:error] = "Section update failed"
+          flash[:error] = t('section_update_error', "Section update failed")
           format.html { redirect_to course_section_url(@context, @section) }
           format.json { render :json => @section.errors.to_json, :status => :bad_request }
         end
@@ -124,11 +124,11 @@ class SectionsController < ApplicationController
       respond_to do |format|
         if @section.enrollments.empty?
           @section.destroy
-          flash[:notice] = "Course section successfully deleted!"
+          flash[:notice] = t('section_deleted', "Course section successfully deleted!")
           format.html { redirect_to course_details_url(@context) }
           format.json { render :json => @section.to_json }
         else
-          flash[:error] = "You can't delete a section that has enrollments"
+          flash[:error] = t('section_delete_not_allowed', "You can't delete a section that has enrollments")
           format.html { redirect_to course_section_url(@context, @section) }
           format.json { render :json => @section.to_json, :status => :bad_request  }
         end
