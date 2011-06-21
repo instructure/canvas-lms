@@ -10,7 +10,7 @@ class JobsController < ApplicationController
 
     if params[:id].present?
       params[:q] = params[:id]
-      params[:flavor] = 'all'
+      params[:flavor] = params[:flavor] == 'failed' ? params[:flavor] : 'all'
     end
 
     jobs_scope

@@ -1,5 +1,5 @@
-/* DO NOT MODIFY. This file was compiled Tue, 14 Jun 2011 03:22:51 GMT from
- * /Users/jon/Dropbox/git/canvas-lms/app/coffeescripts/jobs.coffee
+/* DO NOT MODIFY. This file was compiled Tue, 21 Jun 2011 18:12:09 GMT from
+ * /Users/bpalmer/Programming/canvas/app/coffeescripts/jobs.coffee
  */
 
 (function() {
@@ -201,7 +201,7 @@
             field_name = field.id.replace("job-", '');
             return $(field).text(job[field_name] || '');
           }, this));
-          return $('#job-id-link').attr('href', "/jobs?id=" + job.id);
+          return $('#job-id-link').attr('href', "/jobs?id=" + job.id + "&flavor=" + this.options.flavor);
         }, this);
         if (this.data.length === 1 && this.type_name === 'jobs') {
           this.grid.setSelectedRows([0]);
