@@ -1,0 +1,24 @@
+
+<% ot(:timespan, "%{start_at} *to* %{end_at}", :start_at => capture { %>
+    <td>
+      <div class="show_term">
+        <span class="start_at"><%= (date_string(object.start_at, :long) || t('date.unspecified', "whenever")) rescue t('date.unspecified', "whenever") %></span>
+      </div>
+      <div class="edit_term">
+        <input type="text" name="enrollment_term<%= key %>[start_at]" value="<%= date_string(object.start_at, :long) rescue nil %>" title="<%= start_tooltip %>" class="date_field" style="width: 120px;"/>
+      </div>
+    </td>
+  <% }, :wrapper => capture { %>
+    <td>
+      &nbsp;\1&nbsp;
+    </td>
+  <% }, :end_at => capture { %>
+    <td>
+      <div class="show_term">
+        <span class="end_at"><%= (date_string(object.end_at, :long) || t('date.unspecified', "whenever")) rescue t('date.unspecified', "whenever") %></span>
+      </div>
+      <div class="edit_term">
+        <input type="text" name="enrollment_term[end_at]" value="<%= date_string(object.end_at, :long) rescue nil %>" title="<%= end_tooltip %>" class="date_field" style="width: 120px;"/>
+      </div>
+    </td>
+  <% }) %>
