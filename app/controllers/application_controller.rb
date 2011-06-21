@@ -256,6 +256,7 @@ class ApplicationController < ActionController::Base
       if @context.try_rescue(:only_wiki_is_public) && params[:controller].match(/wiki/) && !@current_user && (!@context.is_a?(Course) || session[:enrollment_uuid_course_id] != @context.id)
         @show_left_side = false
       end
+      add_crumb(@context.parent_account.short_name, account_url(@context.parent_account.id), :id => "crumb_#{@context.parent_account.asset_string}") if @context.is_a?(Account) && !@context.root_account? && @context.parent_account.grants_right?(@current_user, session, :read)
       add_crumb(@context.short_name, named_context_url(@context, :context_url), :id => "crumb_#{@context.asset_string}") if @context && @context.respond_to?(:short_name)
     end
   end
