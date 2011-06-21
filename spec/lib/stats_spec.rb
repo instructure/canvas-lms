@@ -30,11 +30,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 #   end
 # end
 
-# include Stats
+include Stats
 
 describe Stats do
-  # context Counter do
-  #   
+  context Counter do
+    it "should not return NaN with no values" do
+      c = Counter.new
+      c.mean.should == 0
+    end
+    
   #   before do
   #     @a = [1,2,4,6,9]
   #     @c = Counter.new(@a)
@@ -132,5 +136,5 @@ describe Stats do
   #     @c.mean.should eql(2.5)
   #     @c.standard_deviation.should be_close( 0.612372435695794, 0.000000001)
   #   end
-  # end
+  end
 end

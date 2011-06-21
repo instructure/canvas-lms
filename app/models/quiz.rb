@@ -857,7 +857,7 @@ class Quiz < ActiveRecord::Base
         questions_hash[question[:id]] ||= question
       end
     end
-    stats[:submission_score_average] = score_counter.mean.to_f rescue 0 #stats[:submission_count] > 0 ? stats[:submission_score_tally] / stats[:submission_count] : 0
+    stats[:submission_score_average] = score_counter.mean.to_f rescue 0
     stats[:submission_score_high] = score_counter.max
     stats[:submission_score_low] = score_counter.min
     stats[:submission_duration_average] = stats[:submission_count] > 0 ? stats[:submission_duration_tally].to_f / stats[:submission_count].to_f : 0
