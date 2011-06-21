@@ -160,69 +160,74 @@ class Course < ActiveRecord::Base
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
     existing_course = self.root_account.all_courses.find_by_sis_source_id(self.sis_source_id)
-    return true if !existing_course || existing_course.id == self.id 
+    return true if !existing_course || existing_course.id == self.id
     
-    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    self.errors.add(:sis_source_id, t('errors.sis_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
   end
   
   def public_license?
     license && license != 'private'
   end
-  
-  def license_data
-    case license
-    when 'public_domain'
+
+  def self.licenses
+    ActiveSupport::OrderedHash[
+      'private',
       {
-        :readable_license => 'Public Domain',
-        :license_url => "http://en.wikipedia.org/wiki/Public_domain"
-      }
-    when 'cc_by_nc_nd'
-      {
-        :readable_license => 'CC Attribution Non-Commercial No Derivatives',
-        :license_url => "http://creativecommons.org/licenses/by-nc-nd/3.0/"
-      }
-    when 'cc_by_nc_sa'
-      {
-        :readable_license => 'CC Attribution Non-Commercial Share Alike',
-        :license_url => "http://creativecommons.org/licenses/by-nc-sa/3.0"
-      }
-    when 'cc_by_nc'
-      {
-        :readable_license => 'CC Attribution Non-Commercial',
-        :license_url => "http://creativecommons.org/licenses/by-nc/3.0"
-      }
-    when 'cc_by_nd'
-      {
-        :readable_license => 'CC Attribution No Derivatives',
-        :license_url => "http://creativecommons.org/licenses/by-nd/3.0"
-      }
-    when 'cc_by_sa'
-      {
-        :readable_license => 'CC Attribution Share Alike',
-        :license_url => "http://creativecommons.org/licenses/by-sa/3.0"
-      }
-    when 'cc_by'
-      {
-        :readable_license => 'CC Attribution',
-        :license_url => "http://creativecommons.org/licenses/by/3.0"
-      }
-    else
-      {
-        :readable_license => 'Private (Copyrighted)',
+        :readable_license => t('#cc.private', 'Private (Copyrighted)'),
         :license_url => "http://en.wikipedia.org/wiki/Copyright"
-      }
-    end
+      },
+      'cc_by_nc_nd',
+      {
+        :readable_license => t('#cc.by_nc_nd', 'CC Attribution Non-Commercial No Derivatives'),
+        :license_url => "http://creativecommons.org/licenses/by-nc-nd/3.0/"
+      },
+      'cc_by_nc_sa',
+      {
+        :readable_license => t('#cc.by_nc_sa', 'CC Attribution Non-Commercial Share Alike'),
+        :license_url => "http://creativecommons.org/licenses/by-nc-sa/3.0"
+      },
+      'cc_by_nc',
+      {
+        :readable_license => t('#cc.by_nc', 'CC Attribution Non-Commercial'),
+        :license_url => "http://creativecommons.org/licenses/by-nc/3.0"
+      },
+      'cc_by_nd',
+      {
+        :readable_license => t('#cc.by_nd', 'CC Attribution No Derivatives'),
+        :license_url => "http://creativecommons.org/licenses/by-nd/3.0"
+      },
+      'cc_by_sa',
+      {
+        :readable_license => t('#cc.by_sa', 'CC Attribution Share Alike'),
+        :license_url => "http://creativecommons.org/licenses/by-sa/3.0"
+      },
+      'cc_by',
+      {
+        :readable_license => t('#cc.by', 'CC Attribution'),
+        :license_url => "http://creativecommons.org/licenses/by/3.0"
+      },
+      'public_domain',
+      {
+        :readable_license => t('#cc.public_domain', 'Public Domain'),
+        :license_url => "http://en.wikipedia.org/wiki/Public_domain"
+      },
+    ]
   end
-  
+
+  def license_data
+    licenses = self.class.licenses
+    licenses[license] || licenses['private']
+  end
+
   def license_url
     license_data[:license_url]
   end
-  
+
   def readable_license
     license_data[:readable_license]
   end
-  
+
   def self.update_account_associations(course_ids)
     Course.find_all_by_id(course_ids).compact.each do |course|
       course.update_account_associations
@@ -352,9 +357,13 @@ class Course < ActiveRecord::Base
     p.to { self.root_account.account_users }
     p.whenever { |record|
       record.root_account &&
-      ((record.just_created && record.name != "My Course") ||
-      (record.prior_version.name == 'My Course' && record.name != "My Course"))
+      ((record.just_created && record.name != Course.default_name) ||
+      (record.prior_version.name == Course.default_name && record.name != Course.default_name))
     }
+  end
+
+  def self.default_name
+    t('default_name', "My Course")
   end
   
   def paginate_users_not_in_groups(groups, page, per_page = 15)
@@ -416,7 +425,7 @@ class Course < ActiveRecord::Base
     Hashtag.find_or_create_by_hashtag(self.hashtag) if self.hashtag && self.hashtag != ""
     self.tab_configuration ||= [] unless self.tab_configuration == []
     self.name = nil if self.name && self.name.strip.empty?
-    self.name ||= "Unnamed Course"
+    self.name ||= t('missing_name', "Unnamed Course")
     self.course_code = nil if self.course_code == "" || (self.name_changed? && self.course_code && self.name_was && self.name_was.start_with?(self.course_code))
     if !self.course_code && self.name
       res = []
@@ -513,12 +522,6 @@ class Course < ActiveRecord::Base
   
   def home_page
     WikiNamespace.default_for_context(self).wiki.wiki_page
-  end
-  
-  def trim_name(length=25)
-    self.name ||= "Course"
-    self.course_code ||= self.name
-    self.name.length > length ? self.course_code : self.name
   end
   
   def context_code
@@ -635,7 +638,7 @@ class Course < ActiveRecord::Base
     has_group = Rails.cache.read(['has_assignment_group', self].cache_key)
     return if has_group && ENV['RAILS_ENV'] == 'production'
     if self.assignment_groups.active.empty?
-      self.assignment_groups.create(:name => "Assignments")
+      self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
     end
     Rails.cache.write(['has_assignment_group', self].cache_key, true)
   end
@@ -644,8 +647,8 @@ class Course < ActiveRecord::Base
     uuid ||= AutoHandle.generate_securish_uuid
     course = find_or_initialize_by_uuid(uuid)
     course = Course.new if course.deleted?
-    course.name = "My Course" if course.new_record?
-    course.short_name = "Course-101" if course.new_record?
+    course.name = self.default_name if course.new_record?
+    course.short_name = t('default_short_name', "Course-101") if course.new_record?
     course.account_id = account_id || root_account_id
     course.root_account_id = root_account_id
     course.save!
@@ -900,7 +903,7 @@ class Course < ActiveRecord::Base
   def self.valid_grade_export_types
     @valid_grade_export_types ||= {
         "instructure_csv" => {
-            :name => "Instructure formatted CSV",
+            :name => t('grade_export_types.instructure_csv', "Instructure formatted CSV"),
             :callback => lambda { |course, enrollments, publishing_pseudonym|
                 course.generate_grade_publishing_csv_output(enrollments, publishing_pseudonym)
             }
@@ -978,6 +981,7 @@ class Course < ActiveRecord::Base
     submissions = self.submissions.inject({}) { |h, sub|
       h[[sub.user_id, sub.assignment_id]] = sub; h
     }
+    read_only = t('csv.read_only_field', '(read only)')
     res = FasterCSV.generate do |csv|
       #First row
       row = ["Student", "ID", "Section"]
@@ -989,8 +993,8 @@ class Course < ActiveRecord::Base
       #Second Row
       row = ["    Points Possible", "", ""]
       row.concat(assignments.map{|a| single ? [a.points_possible, ''] : a.points_possible})
-      row.concat(["(read only)", "(read only)"])
-      row.concat(["(read only)"]) if self.grading_standard_id
+      row.concat([read_only, read_only])
+      row.concat([read_only]) if self.grading_standard_id
       csv << row.flatten
       
       student_enrollments.each do |student_enrollment|
@@ -1016,7 +1020,7 @@ class Course < ActiveRecord::Base
   
   def grading_standard_title
     if self.grading_standard_id
-      self.grading_standard.try(:title) || "Default Grading Scheme"
+      self.grading_standard.try(:title) || t('default_grading_scheme_name', "Default Grading Scheme")
     else
       nil
     end
@@ -1141,13 +1145,13 @@ class Course < ActiveRecord::Base
     roles = self.default_wiki_editing_roles || "teachers"
     case roles
     when 'teachers'
-      'Only Teachers'
+      t('wiki_permissions.only_teachers', 'Only Teachers')
     when 'teachers,students'
-      'Teacher and Students'
+      t('wiki_permissions.teachers_students', 'Teacher and Students')
     when 'teachers,students,public'
-      'Anyone'
+      t('wiki_permissions.all', 'Anyone')
     else
-      'Only Teachers'
+      t('wiki_permissions.only_teachers', 'Only Teachers')
     end
   end
   
@@ -1497,7 +1501,7 @@ class Course < ActiveRecord::Base
     failed_uploads, mo_attachments = mo_attachments.partition { |a| a.media_object.nil? }
 
     unless failed_uploads.empty?
-      migration.add_warning("There was an error importing Kaltura media objects. Some or all of your media was not imported.", failed_uploads.map&(:id))
+      migration.add_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), failed_uploads.map&(:id))
     end
 
     to_remove = mo_attachments.find_all { |a| a.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/') }
@@ -1509,7 +1513,7 @@ class Course < ActiveRecord::Base
       folder.destroy
     end
   rescue Exception => e
-    migration.add_warning("There was an error importing Kaltura media objects. Some or all of your media was not imported.", e)
+    migration.add_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), e)
   end
   
   def backup_to_json
@@ -1571,7 +1575,7 @@ class Course < ActiveRecord::Base
       end
       self.save
     end
-    if self.assignment_groups.length == 1 && self.assignment_groups.first.name == "Assignments" && self.assignment_groups.first.assignments.empty?
+    if self.assignment_groups.length == 1 && self.assignment_groups.first.name == t('#assignment_group.default_name', "Assignments") && self.assignment_groups.first.assignments.empty?
       delete_placeholder = self.assignment_groups.first
       self.group_weighting_scheme = course.group_weighting_scheme
     elsif self.assignment_groups.length == 0
@@ -1685,7 +1689,7 @@ class Course < ActiveRecord::Base
         if bool_res(options[:everything] ) || bool_res(options[:all_wiki_pages] ) || bool_res(options[page.asset_string.to_sym] )
           if page.title.blank?
             next if page.body.blank?
-            page.title = "Unnamed Page"
+            page.title = t('#wiki_page.missing_name', "Unnamed Page")
           end
           new_page = page.clone_for(self, nil, :migrate => false, :old_context => course)
           added_items << new_page
@@ -1824,7 +1828,7 @@ class Course < ActiveRecord::Base
       self.assignment_groups.active.count > 0
     end
     if !has_group
-      group = self.assignment_groups.new :name => 'Assignments', :position => 1
+      group = self.assignment_groups.new :name => t('#assignment_group.default_name', "Assignments"), :position => 1
       group.save
     end
   end
@@ -2000,26 +2004,25 @@ class Course < ActiveRecord::Base
   TAB_ANNOUNCEMENTS = 14
   TAB_OUTCOMES = 15
   TAB_COLLABORATIONS = 16
-  
+
   def self.default_tabs
     [
-      { :id => TAB_HOME,            :label => "Home",            :href => :course_path },
-      { :id => TAB_ANNOUNCEMENTS,   :label => "Announcements",   :href => :course_announcements_path },
-      { :id => TAB_ASSIGNMENTS,     :label => "Assignments",     :href => :course_assignments_path },
-      { :id => TAB_DISCUSSIONS,     :label => "Discussions",     :href => :course_discussion_topics_path },
-      { :id => TAB_GRADES,          :label => "Grades",          :href => :course_grades_path },
-      { :id => TAB_PEOPLE,          :label => "People",          :href => :course_users_path },
-      { :id => TAB_CHAT,            :label => "Chat",            :href => :course_chat_path },
-      { :id => TAB_PAGES,           :label => "Pages",           :href => :course_wiki_pages_path },
-      { :id => TAB_FILES,           :label => "Files",           :href => :course_files_path },
-      { :id => TAB_SYLLABUS,        :label => "Syllabus",        :href => :syllabus_course_assignments_path },
-      { :id => TAB_OUTCOMES,        :label => "Outcomes",        :href => :course_outcomes_path },
-      { :id => TAB_QUIZZES,         :label => "Quizzes",         :href => :course_quizzes_path },
-      # { :id => TAB_GROUPS, :label => "Groups",      :href => :course_groups_path,               :hidden => true },
-      { :id => TAB_MODULES,         :label => "Modules",         :href => :course_context_modules_path },
-      { :id => TAB_CONFERENCES,     :label => "Conferences",     :href => :course_conferences_path },
-      { :id => TAB_COLLABORATIONS,  :label => "Collaborations",  :href => :course_collaborations_path },
-      { :id => TAB_SETTINGS,        :label => "Settings",        :href => :course_details_path },
+      { :id => TAB_HOME, :label => t('#tabs.home', "Home"), :href => :course_path },
+      { :id => TAB_ANNOUNCEMENTS, :label => t('#tabs.announcements', "Announcements"), :href => :course_announcements_path },
+      { :id => TAB_ASSIGNMENTS, :label => t('#tabs.assignments', "Assignments"), :href => :course_assignments_path },
+      { :id => TAB_DISCUSSIONS, :label => t('#tabs.discussions', "Discussions"), :href => :course_discussion_topics_path },
+      { :id => TAB_GRADES, :label => t('#tabs.grades', "Grades"), :href => :course_grades_path },
+      { :id => TAB_PEOPLE, :label => t('#tabs.people', "People"), :href => :course_users_path },
+      { :id => TAB_CHAT, :label => t('#tabs.chat', "Chat"), :href => :course_chat_path },
+      { :id => TAB_PAGES, :label => t('#tabs.pages', "Pages"), :href => :course_wiki_pages_path },
+      { :id => TAB_FILES, :label => t('#tabs.files', "Files"), :href => :course_files_path },
+      { :id => TAB_SYLLABUS, :label => t('#tabs.syllabus', "Syllabus"), :href => :syllabus_course_assignments_path },
+      { :id => TAB_OUTCOMES, :label => t('#tabs.outcomes', "Outcomes"), :href => :course_outcomes_path },
+      { :id => TAB_QUIZZES, :label => t('#tabs.quizzes', "Quizzes"), :href => :course_quizzes_path },
+      { :id => TAB_MODULES, :label => t('#tabs.modules', "Modules"), :href => :course_context_modules_path },
+      { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :href => :course_conferences_path },
+      { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :href => :course_collaborations_path },
+      { :id => TAB_SETTINGS, :label => t('#tabs.settings', "Settings"), :href => :course_details_path },
     ]
   end
   
@@ -2043,17 +2046,17 @@ class Course < ActiveRecord::Base
     tabs += default_tabs
     
     tabs.each do |tab|
-      tab[:hidden_unused] = true if tab[:label] == "Modules" && !active_record_types[:modules]
-      tab[:hidden_unused] = true if tab[:label] == "Files" && !active_record_types[:files]
-      tab[:hidden_unused] = true if tab[:label] == "Quizzes" && !active_record_types[:quizzes]
-      tab[:hidden_unused] = true if tab[:label] == "Assignments" && !active_record_types[:assignments]
-      tab[:hidden_unused] = true if tab[:label] == "Pages" && !active_record_types[:pages] && !allow_student_wiki_edits
-      tab[:hidden_unused] = true if tab[:label] == "Conferences" && !active_record_types[:conferences] && !self.grants_right?(user, nil, :create_conferences)
-      tab[:hidden_unused] = true if tab[:label] == "Announcements" && !active_record_types[:announcements]
-      tab[:hidden_unused] = true if tab[:label] == "Outcomes" && !active_record_types[:outcomes]
+      tab[:hidden_unused] = true if tab[:id] == TAB_MODULES && !active_record_types[:modules]
+      tab[:hidden_unused] = true if tab[:id] == TAB_FILES && !active_record_types[:files]
+      tab[:hidden_unused] = true if tab[:id] == TAB_QUIZZES && !active_record_types[:quizzes]
+      tab[:hidden_unused] = true if tab[:id] == TAB_ASSIGNMENTS && !active_record_types[:assignments]
+      tab[:hidden_unused] = true if tab[:id] == TAB_PAGES && !active_record_types[:pages] && !allow_student_wiki_edits
+      tab[:hidden_unused] = true if tab[:id] == TAB_CONFERENCES && !active_record_types[:conferences] && !self.grants_right?(user, nil, :create_conferences)
+      tab[:hidden_unused] = true if tab[:id] == TAB_ANNOUNCEMENTS && !active_record_types[:announcements]
+      tab[:hidden_unused] = true if tab[:id] == TAB_OUTCOMES && !active_record_types[:outcomes]
     end
     if !user || !self.grants_right?(user, nil, :manage_content)
-      tabs.delete_if{ |t| t[:label] == "Settings"}
+      tabs.delete_if{ |t| t[:id] == TAB_SETTINGS }
       
       # remove some tabs for logged-out users or non-students
       if self.grants_right?(user, nil, :read_as_admin)

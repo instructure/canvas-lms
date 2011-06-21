@@ -1,37 +1,31 @@
-<% add_crumb "Confirmation" %>
-<% content_for :page_title do %>Confirm Action<% end %>
+<% add_crumb t('#crumbs.confirmation', "Confirmation") %>
+<% content_for :page_title, t('titles.confirm', 'Confirm Action') %>
 
 <% content_for :page_header do %>
-  <h1>Confirm Action</h1>
+  <h1><%= t('headings.confirm', %{Confirm Action}) %></h1>
 <% end %>
 
 <div style="margin: 10px auto; width: 600px;">
   <% if params[:event] == "delete" %>
-    <h2>Confirm Course Deletion</h2>
-    Are you sure you want to delete this course?  Once it is deleted students and
-    teachers will no longer have access to it.  If you just want to remove it from
-    the course dropdown then you should
-    <%= link_to "conclude the course instead", context_url(@context, :context_confirm_action_url, :event => 'conclude') %>.
-    
+    <h2><%= t('headings.confirm_delete', %{Confirm Course Deletion}) %></h2>
+    <%= t 'details.confirm_delete', %{Are you sure you want to delete this course?  Once it is deleted students and teachers will no longer have access to it.  If you just want to remove it from the course dropdown then you should *conclude the course instead*.}, :wrapper => link_to('\1', context_url(@context, :context_confirm_action_url, :event => 'conclude')) %>
+
     <% form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="delete"/>
       <div class="button-container">
-        <button class="button big-button" type="submit">Delete Course</button>
-        <a href="<%= context_url(@context, :context_url) %>" class="button button-secondary">Cancel</a>
+        <button class="button big-button" type="submit"><%= t('buttons.delete_course', %{Delete Course}) %></button>
+        <a href="<%= context_url(@context, :context_url) %>" class="button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></a>
       </div>
     <% end %>
   <% else %>
-    <h2>Confirm Conclude Course</h2>
-    Are you sure you want to conclude this course?  Students and teachers will
-    still be able to see the course contents in a read-only format from their 
-    "past courses" page.  If you don't want anyone to see the course, you can
-    <%= link_to "delete the course completely", context_url(@context, :context_confirm_action_url, :event => 'delete') %>.
-    
+    <h2><%= t('headings.confirm_conclude', %{Confirm Conclude Course}) %></h2>
+    <%= t 'details.confirm_conclude', %{Are you sure you want to conclude this course?  Students and teachers will still be able to see the course contents in a read-only format from their "past courses" page.  If you don't want anyone to see the course, you can *delete the course completely*.}, :wrapper => link_to('\1', context_url(@context, :context_confirm_action_url, :event => 'delete')) %>
+
     <% form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="conclude"/>
       <div class="button-container">
-        <button class="button big-button" type="submit">Conclude Course</button>
-        <a href="<%= context_url(@context, :context_url) %>" class="button button-secondary">Cancel</a>
+        <button class="button big-button" type="submit"><%= t('buttons.conclude_course', %{Conclude Course}) %></button>
+        <a href="<%= context_url(@context, :context_url) %>" class="button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></a>
       </div>
     <% end %>
   <% end %>

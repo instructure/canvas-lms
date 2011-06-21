@@ -1,15 +1,11 @@
 <div class="reminder">
-  <h2>Invitation</h2>
+  <h2><%= t('headings.invitation', %{Invitation}) %></h2>
   <div class="body">
-    You've been invited to join this course as a 
-    <b><%= @pending_enrollment.class.to_s.underscore.split("_")[0] %></b>
-    for the user account <b><%= @pending_enrollment.user.email %></b>.  
-    Feel free to wander around and see what it's
-    like.  When you're ready, you can either accept or reject the invitation.
+    <%= t 'invitation', %{You've been invited to join this course as a *%{role}* for the user account *%{user}*. Feel free to wander around and see what it's like.  When you're ready, you can either accept or reject the invitation.}, :wrapper => '<b>\1</b>', :role => 'role', :user => @pending_enrollment.user.email %>
     <div class="button-container button-container-right-aligned">
       <% form_tag course_enrollment_invitation_path(@context) do %>
-        <button type="submit" name="accept" class="button positive button-default">Accept Invitation</button>
-        <button type="submit" name="reject" class="button reject_button">Reject Invitation</button>
+        <button type="submit" name="accept" class="button positive button-default"><%= t('buttons.accept', %{Accept Invitation}) %></button>
+        <button type="submit" name="reject" class="button reject_button"><%= t('buttons.reject', %{Reject Invitation}) %></button>
       <% end %>
     </div>
   </div>

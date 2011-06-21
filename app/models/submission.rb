@@ -623,10 +623,15 @@ class Submission < ActiveRecord::Base
   end
 
   def readable_state
-    if workflow_state == 'pending_review'
-      'pending review'
-    else
-      workflow_state
+    case workflow_state
+    when 'submitted'
+      t 'state.submitted', 'submitted'
+    when 'unsubmitted'
+      t 'state.unsubmitted', 'unsubmitted'
+    when 'pending_review'
+      t 'state.pending_review', 'pending review'
+    when 'graded'
+      t 'state.graded', 'graded'
     end
   end
   

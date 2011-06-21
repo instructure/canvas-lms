@@ -317,7 +317,10 @@ $(document).ready(function() {
       }
     });
   });
-  $(".course_info").attr('title', 'Click to Edit').click(function() {
+  $(".course_info").attr('title', 'Click to Edit').click(function(event) {
+    if (event.target.nodeName == "INPUT") {
+      return;
+    }
     $(".edit_course_link:first").click();
     var $obj = $(this).parents("td").find(".course_form");
     if($obj.length) {

@@ -8,12 +8,19 @@
     context = recent_feedback.context
     assignment = recent_feedback.assignment
     url = context_url(context, :context_assignment_submission_url, :assignment_id => recent_feedback.assignment_id, :id=>@current_user.id)
-    icon_data = recent_feedback.submitted_or_graded? ? [recent_feedback.readable_state, 'icon-grading'] : ['not submitted', "icon-grading-gray"]
-    icon_explanation, icon_class = *icon_data
-    grade = recent_feedback.readable_grade if recent_feedback.grade and icon_explanation == 'graded'
+    icon_class = recent_feedback.submitted_or_graded? ? 'icon-grading' : "icon-grading-gray"
+    grade = recent_feedback.readable_grade if recent_feedback.grade and recent_feedback.workflow_state == 'graded'
     score = recent_feedback.score
     comment = recent_feedback.last_teacher_comment
     comment_text = comment.comment if comment
+    icon_explanation = case recent_feedback.workflow_state
+    when 'submitted'
+      t 'submitted', 'Submitted'
+    when 'graded'
+      t 'graded', 'Graded'
+    else
+      t 'unsubmitted', 'Not submitted'
+    end
   %>
 <li style="<%= hidden if is_hidden %>" class="event">
   <a class="<%= icon_class %> tooltip" href="<%= url %>">
@@ -21,24 +28,31 @@
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
         <% if recent_feedback.submitted_or_graded? %>
-          <span style="display: block;"><%= icon_explanation.capitalize %>: 
-            <% if icon_explanation == 'graded' %>
+          <span style="display: block;"><%= before_label(icon_explanation) %> 
+            <% if recent_feedback.workflow_state == 'graded' %>
               <span style="font-size: 0.8em;"><%= datetime_string(recent_feedback.graded_at) %></span>
             <% else %>
               <span style="font-size: 0.8em;"><%= datetime_string(recent_feedback.submitted_at) %></span>
             <% end %>
           </span>
-          <% unless icon_explanation == 'graded' %>
-            <span style="display: block; font-style: italic;">not graded</span>
+          <% unless recent_feedback.workflow_state == 'graded' %>
+            <span style="display: block; font-style: italic;"><%= t('not_graded', %{not graded}) %></span>
           <% end %>
         <% else %>
           <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
-          <span style="display: block;">Due: <span style="font-size: 0.8em;"><%= datetime_string(assignment.due_at) %></span></span>
+          <span style="display: block;"><%= before_label('due_date', %{Due}) %> <span style="font-size: 0.8em;"><%= datetime_string(assignment.due_at) %></span></span>
         <% end %>
         <% if assignment.points_possible %>
-          <span style="display: block;"><%= 'Score: ' if grade %><strong><%= score if grade %></strong> <span style="font-size: 0.8em;">out of <%= assignment.points_possible %></span></span>
+          <span style="display: block;">
+            <% if grade %>
+              <%= t 'submission_points.with_score', %{Score: %{score} *out of %{points_possible}*}, :score => score, :points_possible => assignment.points_possible,
+                :wrapper => '<span style="font-size: 0.8em;">\1</span>' %>
+            <% else %>
+              <span style="font-size: 0.8em;"><%= t 'submission_points.without_score', "out of %{points_possible}", :points_possible => assignment.points_possible %></span>
+            <% end %>
+          </span>
         <% end %>
-        <span style="display: block;">Comments: <%= recent_feedback.submission_comments.length %></span>
+        <span style="display: block;"><%= t 'comments', "Comments: %{count}", :count => recent_feedback.submission_comments.length %></span>
         <% if show_context %>
           <span style="display: block; font-size: 0.8em;"><%= context.short_name %></span>
         <% end %>
