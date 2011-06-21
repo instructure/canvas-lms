@@ -37,10 +37,10 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = @context.all_students.find(params[:id]) rescue nil
     if !@user
-      flash[:error] = "The specified user is not a student in this course"
+      flash[:error] = t('errors.student_not_enrolled', "The specified user is not a student in this course")
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-        format.json { render :json => {:errors => "The specified user (#{params[:id]}) is not a student in this course"}}
+        format.json { render :json => {:errors => t('errors.student_not_enrolled_id', "The specified user (%{id}) is not a student in this course", :id => params[:id])}}
       end
       return
     end
@@ -108,7 +108,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :submit)
       if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
-        flash[:notice] = "You can't submit an assignment when it is locked"
+        flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return
       end
@@ -128,7 +128,7 @@ class SubmissionsController < ApplicationController
             !a[:uploaded_data].empty? &&
             !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
           }
-          flash[:error] = "Invalid file type"
+          flash[:error] = t('errors.invalid_file_type', "Invalid file type")
           return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
         end
         params[:attachments].each do |idx, attachment|
@@ -167,12 +167,12 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         if @submission.save
           log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
-          flash[:notice] = 'Assignment successfully submitted.'
+          flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
           format.html { redirect_to course_assignment_url(@context, @assignment) }
           format.xml  { head :created, :location => course_gradebook_url(@submission.assignment.context) }
           format.json { render :json => @submission.to_json(:include => :submission_comments), :status => :created, :location => course_gradebook_url(@submission.assignment.context) }
         else
-          flash[:error] = "Assignment failed to submit"
+          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
           format.html { render :action => "show", :id => @submission.assignment.context.id }
           format.xml  { render :xml => @submission.errors.to_xml }
           format.json { render :json => @submission.errors.to_json, :status => :bad_request }
@@ -190,7 +190,7 @@ class SubmissionsController < ApplicationController
       if url
         redirect_to url
       else
-        flash[:notice] = "Couldn't find a report for that submission item"
+        flash[:notice] = t('errors.no_report', "Couldn't find a report for that submission item")
         redirect_to named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
       end
     end
@@ -208,7 +208,6 @@ class SubmissionsController < ApplicationController
       return
     end
     if authorized_action(@submission, @current_user, :comment)
-      @error_message = "Update Failed"
       if params[:attachments]
         attachments = []
         params[:attachments].each do |idx, attachment|
@@ -232,13 +231,14 @@ class SubmissionsController < ApplicationController
       begin
         @submissions = @assignment.update_submission(@user, params[:submission])
       rescue => e
-        @error_message = e.to_s
+        ErrorReport.log_exception(:submissions, e)
+        logger.error(e)
       end
       respond_to do |format|
         if @submissions
           @submissions.each{|s| s.limit_comments(@current_user, session) unless @submission.grants_rights?(@current_user, session, :submit)[:submit] }
           @submissions = @submissions.select{|s| s.grants_right?(@current_user, session, :read) }
-          flash[:notice] = 'Assignment submitted.'
+          flash[:notice] = t('assignment_submitted', 'Assignment submitted.')
           format.html { redirect_to course_assignment_url(@context, @assignment) }
           format.xml  { head :created, :location => course_gradebook_url(@submission.assignment.context) }
           excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
@@ -249,7 +249,8 @@ class SubmissionsController < ApplicationController
             render :json => @submissions.to_json(Submission.json_serialization_full_parameters(:exclude => excludes, :except => [:quiz_submission,:submission_history])), :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
         else
-          flash[:error] = "Problem Updating Submission: #{@error_message}"
+          @error_message = t('errors_update_failed', "Update Failed")
+          flash[:error] = @error_message
           format.html { render :action => "show", :id => @assignment.context.id }
           format.xml  { render :xml => {:errors => {:base => @error_message}}.to_xml }
           format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
@@ -291,7 +292,7 @@ class SubmissionsController < ApplicationController
           end
           format.json { render :json => @attachment.to_json(:methods => :readable_size) }
         else
-          flash[:notice] = "File zipping still in process..."
+          flash[:notice] = t('still_zipping', "File zipping still in process...")
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.zip { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.json { render :json => @attachment.to_json }

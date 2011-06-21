@@ -691,12 +691,12 @@ class Submission < ActiveRecord::Base
     opts[:attachments] ||= opts.delete :comment_attachments
     if opts[:comment].empty? 
       if opts[:media_comment_id]
-        opts[:comment] = "This is a media comment."
+        opts[:comment] = t('media_comment', "This is a media comment.")
       elsif opts[:attachments].try(:length)
-        opts[:comment] = "See attached files."
+        opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Date.today.to_s) + (opts[:media_comment_id] || opts[:comment] || "no comment"))
+    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Date.today.to_s) + (opts[:media_comment_id] || opts[:comment] || t('no_comment', "no comment")))
     self.save! if self.new_record?
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous]
     comment = self.submission_comments.create(opts.slice(*valid_keys)) if !opts[:comment].empty?
