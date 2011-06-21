@@ -360,7 +360,8 @@ module TextHelper
     translated = t(*args)
     translated = ERB::Util.h(translated) unless translated.html_safe?
     result = RDiscount.new(translated).to_html.strip
-    result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>[^<]*?(<\/?(a|em|strong|code|img|br( ?\/)?)[^<]*?)*<\/p>\z/
+    # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
+    result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.html_safe.strip
   end
 end
