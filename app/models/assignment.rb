@@ -113,7 +113,7 @@ class Assignment < ActiveRecord::Base
       # handle if it has already come due, but has not yet been auto_peer_reviewed
       if due_at && due_at <= Time.now
         # do_auto_peer_review
-      else
+      elsif due_at
        self.send_at(due_at, :do_auto_peer_review)
       end
     end
@@ -121,7 +121,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def do_auto_peer_review
-    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at <= Time.now
+    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at && due_at <= Time.now
   end
   
   def touch_assignment_group
