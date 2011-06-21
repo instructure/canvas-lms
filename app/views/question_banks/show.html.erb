@@ -374,9 +374,9 @@ $(document).ready(function() {
         $dialog.find("button").attr('disabled', false);
         var failedText = null;
         if(move){
-          failedText = I18n.t("buttons.submit_moving", {one:"Moving Question Failed, please try again", other:"Moving Questions Failed, please try again"}, {count:(multiple_questions ? 2 : 1)})
+          failedText = I18n.t("buttons.submit_moving_failed", {one:"Moving Question Failed, please try again", other:"Moving Questions Failed, please try again"}, {count:(multiple_questions ? 2 : 1)})
         } else {
-          failedText = I18n.t("buttons.submit_copying", {one:"Copying Question Failed, please try again", other:"Copying Questions Failed, please try again"}, {count:(multiple_questions ? 2 : 1)})
+          failedText = I18n.t("buttons.submit_copying_failed", {one:"Copying Question Failed, please try again", other:"Copying Questions Failed, please try again"}, {count:(multiple_questions ? 2 : 1)})
         }
         $dialog.find(".submit_button").text(failedText);
       });

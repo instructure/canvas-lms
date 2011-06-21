@@ -2260,7 +2260,7 @@ var fileUpload = {
     $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
     $("#file_uploads_progress").slideDown();
     $file.find(".cancel_upload_link").hide().end()
-      .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info} ", {error: error.info}));
+      .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info} ", {error_info: error.info}));
     $file.addClass('done').addClass('errored');
     fileUpload.swfUploadNext();
     return false;

@@ -36,6 +36,7 @@ namespace :i18n do
 
     files = Dir.glob('./**/*rb').
       reject{ |file| file =~ /\A\.\/(vendor\/plugins\/rails_xss|db|spec)\// }
+    file_count = files.size
 
     t = Time.now
     @extractor = I18nExtractor.new
@@ -54,6 +55,24 @@ namespace :i18n do
         print red "F"
       end
     end
+
+
+    files = (Dir.glob('./public/javascripts/*.js') + Dir.glob('./app/views/**/*.erb')).
+      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18n.js|translations\/)/ }
+    @js_extractor = I18nJsExtractor.new(:translations => @extractor.translations)
+
+    files.each do |file|
+      begin
+        if @js_extractor.process(File.read(file), :erb => (file =~ /\.erb\z/), :filename => file)
+          file_count += 1
+          print green "."
+        end
+      rescue
+        @errors << "#{$!}\n#{file}"
+        print red "F"
+      end
+    end
+
     print "\n\n"
     failure = @errors.size > 0
 
@@ -64,7 +83,7 @@ namespace :i18n do
     end
 
     print "Finished in #{Time.now - t} seconds\n\n"
-    puts send((failure ? :red : :green), "#{files.size} files, #{@extractor.total_unique} strings, #{@errors.size} failures")
+    puts send((failure ? :red : :green), "#{file_count} files, #{@extractor.total_unique + @js_extractor.total_unique} strings, #{@errors.size} failures")
     raise "check command encountered errors" if failure
   end
 

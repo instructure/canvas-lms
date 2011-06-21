@@ -80,7 +80,11 @@ describe I18nExtractor do
       extract("t 'foo', 'Foo foo', :count => 1").should == {'foo' => "Foo foo"}
     end
 
-    it "should ensure valid pluralization sub-keys" do
+    it "should allow valid pluralization sub-keys" do
+      extract("t 'foo', {:one => 'a foo', :other => 'some foos'}, :count => 1").should == {'foo' => {'one' => 'a foo', 'other' => 'some foos'}}
+    end
+
+    it "should reject invalid pluralization sub-keys" do
       lambda{ extract "t 'foo', {:invalid => '%{count} Foo'}, :count => 1" }.should raise_error(/invalid :count sub-key\(s\):/)
     end
   end

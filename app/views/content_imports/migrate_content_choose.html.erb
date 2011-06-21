@@ -469,7 +469,7 @@ $(document).ready(function() {
     setTimeout(function() {
       $("#copy_context_form").find(":checkbox,:text,select").attr('disabled', true);
     }, 1000);
-    $("#copy_context_form .submit_button").text(I18n.t('messages.importing', "Importing... this could take a while")).attr('disabled', true);
+    $("#copy_context_form .submit_button").text(I18n.t('messages.importing_button', "Importing... this could take a while")).attr('disabled', true);
     $(".progress_bar_holder").slideDown();
     var state = "nothing";
     var fakeTickCount = 0;

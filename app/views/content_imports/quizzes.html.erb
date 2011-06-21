@@ -89,7 +89,7 @@ $(document).ready(function() {
     uploadDataUrl: $qti_file_import_form.attr('action'),
     postFormData: true,
     beforeSubmit: function(data) {
-      $(this).find(".submit_button").attr('disabled', true).text(I18n.t('messages.uploading', "Uploading QTI File..."));
+      $(this).find(".submit_button").attr('disabled', true).text(I18n.t('messages.uploading_button', "Uploading QTI File..."));
     },
     success: function(data) {
       $(this).slideUp();

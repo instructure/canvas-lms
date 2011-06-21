@@ -1,5 +1,5 @@
-/* DO NOT MODIFY. This file was compiled Tue, 21 Jun 2011 18:12:09 GMT from
- * /Users/bpalmer/Programming/canvas/app/coffeescripts/jobs.coffee
+/* DO NOT MODIFY. This file was compiled Wed, 22 Jun 2011 20:46:48 GMT from
+ * /Users/jon/Dropbox/git/canvas-lms/app/coffeescripts/jobs.coffee
  */
 
 (function() {
@@ -183,7 +183,7 @@
             width: 100
           }, {
             id: 'run_at',
-            name: I18n.t('columns.run at', 'run at'),
+            name: I18n.t('columns.run_at', 'run at'),
             field: 'run_at',
             width: 165
           }

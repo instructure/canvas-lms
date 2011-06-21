@@ -112,7 +112,7 @@ I18n.scoped 'jobs', (I18n) ->
         width: 100
       ,
         id: 'run_at'
-        name: I18n.t('columns.run at', 'run at')
+        name: I18n.t('columns.run_at', 'run at')
         field: 'run_at'
         width: 165
       ]

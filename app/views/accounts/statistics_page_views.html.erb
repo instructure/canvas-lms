@@ -60,7 +60,7 @@
           $("#hourly_usage").text(I18n.t('no_data', "No data found for report"));
         }
       } catch(e) {
-        $("#hourly_usage").text(I18n.t('building_report_error', "Error building usage report: {{error}}", {error: e.toString()}));
+        $("#hourly_usage").text(I18n.t('building_report_error', "Error building usage report: %{error}", {error: e.toString()}));
       }
 
       var pageViewData = <%= raw @account.page_view_data(@start_at, @end_at).to_json %>;
