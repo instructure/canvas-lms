@@ -107,13 +107,14 @@ namespace :canvas do
   end
   
   desc "Compile javascript and css assets."
-  task :compile_assets => :environment do
+  task :compile_assets do
     puts "--> Compiling static assets [compass -s compressed --force]"
     output = `bundle exec compass -s compressed --force 2>&1`
     raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
     
     puts "--> Compiling static assets [jammit]"
-    Jammit.package!
+    output = `bundle exec jammit 2>&1`
+    raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
   end
 end
 
