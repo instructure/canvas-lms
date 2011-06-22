@@ -81,11 +81,10 @@ class SubmissionsApiController < ApplicationController
   #
   # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
   def show
-    if authorized_action(@context, @current_user, :manage_grades)
-      @assignment = @context.assignments.active.find(params[:assignment_id])
-      params[:id] = map_user_ids([params[:id]]).first
-      @submission = @assignment.submissions.find_by_user_id(params[:id]) or raise ActiveRecord::RecordNotFound
-
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+    params[:id] = map_user_ids([params[:id]]).first
+    @submission = @assignment.submissions.find_by_user_id(params[:id]) or raise ActiveRecord::RecordNotFound
+    if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
       render :json => submission_json(@submission, @assignment, includes).to_json
     end

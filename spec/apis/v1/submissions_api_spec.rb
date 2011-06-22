@@ -110,6 +110,64 @@ describe SubmissionsApiController, :type => :integration do
     response.body.should match(/Redirecting to quiz page/)
   end
 
+  it "should allow students to retrieve their own submission" do
+    student1 = user(:active_all => true)
+    student2 = user(:active_all => true)
+
+    course_with_teacher(:active_all => true)
+
+    @course.enroll_student(student1).accept!
+    @course.enroll_student(student2).accept!
+
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    sub1 = submit_homework(a1, student1)
+    a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio"})
+    comment = sub1.submission_comments.first
+
+    @user = student1
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
+                    { :controller => "submissions_api", :action => "show",
+                      :format => "json", :course_id => @course.id.to_s,
+                      :assignment_id => a1.id.to_s, :id => student1.id.to_s },
+                    { :include => %w(submission_comments) })
+
+    json.should == {"grade"=>"A-",
+        "prior"=>nil,
+        "body"=>"test!",
+        "assignment_id" => a1.id,
+        "submitted_at"=>"1970-01-01T01:00:00Z",
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1",
+        "grade_matches_current_submission"=>true,
+        "attempt"=>1,
+        "url"=>nil,
+        "focus"=>nil,
+        "submission_type"=>"online_text_entry",
+        "user_id"=>student1.id,
+        "submission_comments"=>
+         [{"comment"=>"Well here's the thing...",
+           "media_comment" => {
+             "content-type" => "audio/mp4",
+             "url" => "http://www.example.com/courses/#{@course.id}/media_download?entryId=3232&redirect=1&type=mp4",
+           },
+           "created_at"=>comment.created_at.as_json,
+           "author_name"=>"User",
+           "author_id"=>student1.id}],
+        "comparison"=>nil,
+        "score"=>13.5}
+
+    # can't access other students' submissions
+    @user = student2
+    raw_api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
+                    { :controller => "submissions_api", :action => "show",
+                      :format => "json", :course_id => @course.id.to_s,
+                      :assignment_id => a1.id.to_s, :id => student1.id.to_s },
+                    { :include => %w(submission_comments) })
+    response.status.should =~ /401/
+    JSON.parse(response.body).should == { 'status' => 'unauthorized' }
+  end
+
   it "should return all submissions for an assignment" do
     student1 = user(:active_all => true)
     student2 = user(:active_all => true)
