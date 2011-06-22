@@ -207,6 +207,8 @@ class ApplicationController < ActionController::Base
     redirect_to url
   end
   
+  MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
+
   # Can be used as a before_filter, or just called from controller code.
   # Assigns the variable @context to whatever context the url is scoped
   # to.  So /courses/5/assignments would have a @context=Course.find(5).
@@ -256,7 +258,20 @@ class ApplicationController < ActionController::Base
       if @context.try_rescue(:only_wiki_is_public) && params[:controller].match(/wiki/) && !@current_user && (!@context.is_a?(Course) || session[:enrollment_uuid_course_id] != @context.id)
         @show_left_side = false
       end
-      add_crumb(@context.parent_account.short_name, account_url(@context.parent_account.id), :id => "crumb_#{@context.parent_account.asset_string}") if @context.is_a?(Account) && !@context.root_account? && @context.parent_account.grants_right?(@current_user, session, :read)
+      if @context.is_a?(Account) && !@context.root_account?
+        account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
+        account_chain.slice!(0) # the first element is the current context
+        count = account_chain.length
+        account_chain.reverse.each_with_index do |a, idx|
+          if idx == 1 && count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
+            add_crumb(I18n.t('#lib.text_helper.ellipsis', '...'), nil)
+          elsif count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS && idx > 0 && idx <= count - MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
+            next
+          else
+            add_crumb(a.short_name, account_url(a.id), :id => "crumb_#{a.asset_string}")
+          end
+        end
+      end
       add_crumb(@context.short_name, named_context_url(@context, :context_url), :id => "crumb_#{@context.asset_string}") if @context && @context.respond_to?(:short_name)
     end
   end
