@@ -223,6 +223,7 @@ class ApplicationController < ActionController::Base
           session[:enrollment_uuid_count] ||= 0
           if session[:enrollment_uuid_count] > 4
             session[:enrollment_uuid_count] = 0
+            self.extend(TextHelper)
             flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment", "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
           end
           session[:enrollment_uuid_count] += 1
