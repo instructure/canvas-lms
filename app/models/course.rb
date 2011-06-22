@@ -956,7 +956,6 @@ class Course < ActiveRecord::Base
 
       settings = PluginSetting.settings_for_plugin('grade_export')
       raise "final grade publishing disabled" unless settings[:enabled] == "true"
-      raise "no grading standard supplied" unless self.grading_standard_id
       raise "endpoint undefined" if settings[:publish_endpoint].blank?
 
       publishing_pseudonym = publishing_user.pseudonyms.active.find_by_account_id(self.root_account_id, :order => "sis_user_id DESC")
@@ -994,11 +993,12 @@ class Course < ActiveRecord::Base
   def generate_grade_publishing_csv_output(enrollments, publishing_pseudonym)
     enrollment_ids = []
     res = FasterCSV.generate do |csv|
-      csv << ["publisher_id", "publisher_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "grade"]
+      csv << ["publisher_id", "publisher_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "grade", "score"]
       enrollments.each do |enrollment|
         enrollment_ids << enrollment.id
+        next unless enrollment.computed_final_score
         enrollment.user.pseudonyms.active.find_all_by_account_id(self.root_account_id).each do |user_pseudonym|
-          csv << [publishing_pseudonym.try(:id), publishing_pseudonym.try(:sis_user_id), enrollment.course_section.id, enrollment.course_section.sis_source_id, user_pseudonym.id, user_pseudonym.sis_user_id, enrollment.id, enrollment.workflow_state, enrollment.computed_final_grade]
+          csv << [publishing_pseudonym.try(:id), publishing_pseudonym.try(:sis_user_id), enrollment.course_section.id, enrollment.course_section.sis_source_id, user_pseudonym.id, user_pseudonym.sis_user_id, enrollment.id, enrollment.workflow_state, enrollment.computed_final_grade, enrollment.computed_final_score]
         end
       end
     end
