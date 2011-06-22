@@ -1,19 +1,26 @@
 <% if !(@current_submission || @submission).results_visible? %>
-  <h4>
-    Quiz results are protected for this quiz, and are not visible to students<% if @quiz.hide_results == 'until_after_last_attempt' %> 
-      until they have submitted their last attempt<% end %>.
-  </h4>
+  <h4><%= @quiz.hide_results == 'until_after_last_attempt' ?
+          t(:quiz_results_protected_until_last_attempt, "Quiz results are protected for this quiz, and are not visible to students until they have submitted their last attempt.") :
+          t(:quiz_results_protected, "Quiz results are protected for this quiz, and are not visible to students.") %></h4>
 <% end %>
 <% if !(@current_submission || @submission) || (@current_submission || @submission).settings_only? %>
-  The <%= @quiz.readable_type.downcase %> hasn't been taken yet.
+  <% if @quiz.survey? %>
+    <%= t(:survey_not_yet_taken, "The survey hasn't been taken yet.") %>
+  <% else %>
+    <%= t(:quiz_not_yet_taken, "The quiz hasn't been taken yet.") %>
+  <% end %>
 <% elsif !(@current_submission || @submission).results_visible? && !can_do(@quiz, @current_user, :grade) %>
-  <div class="quiz_score" style="<%= hidden if @quiz.quiz_type == 'survey' %>">
-    <% if @quiz.allowed_attempts == 1 %>
-      Score for this <%= @quiz.readable_type.downcase %>: 
+  <div class="quiz_score" style="<%= hidden if @quiz.ungraded? %>">
+    <% if @quiz.allowed_attempts != 1 %>
+      <%= before_label(:score_for_attempt, "Score for this attempt") %>
+    <% elsif @quiz.survey? %>
+      <%= before_label(:score_for_survey, "Score for this survey") %>
     <% else %>
-      Score for this attempt:
+      <%= before_label(:score_for_quiz, "Score for this quiz") %>
     <% end %>
-    <span class="score_value"><%= render :partial => "submission_score", :object => @submission, :locals => {:quiz => @quiz, :context => @context} %></span> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %>
+    <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+              :score => raw("<span class=\"score_value\">#{render :partial => "submission_score", :object => @submission, :locals => {:quiz => @quiz, :context => @context}}</span>"),
+              :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
   </div>
 <% else %>
 <% @stored_params ||= {}
@@ -27,7 +34,7 @@
 %>
 <% if @submission.pending_review? %>
   <% if editable %>
-    <%= image_tag "pending_review.png" %> The following questions need review:
+    <%= image_tag "pending_review.png" %> <%= before_label(:questions_need_review, "The following questions need review") %>
     <ul style="margin-top: 0;">
       <% submission_data.each do |answer| %>
         <% question = submission_questions_hash[answer[:question_id]] %>
@@ -40,31 +47,35 @@
     </ul>
   <% end %>
 <% end %>
-<div class="quiz_score" style="<%= hidden if @quiz.quiz_type == 'survey' %>">
-  <% if @quiz.allowed_attempts == 1 %>
-    Score for this <%= @quiz.readable_type.downcase %>: 
+<div class="quiz_score" style="<%= hidden if @quiz.ungraded? %>">
+  <% if @quiz.allowed_attempts != 1 %>
+    <%= before_label(:score_for_attempt, "Score for this attempt") %>
+  <% elsif @quiz.survey? %>
+    <%= before_label(:score_for_survey, "Score for this survey") %>
   <% else %>
-    Score for this attempt:
+    <%= before_label(:score_for_quiz, "Score for this quiz") %>
   <% end %>
-  <span class="score_value"><%= render :partial => "submission_score", :object => @submission, :locals => {:quiz => @quiz, :context => @context} %></span> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %>
+  <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+            :score => raw("<span class=\"score_value\">#{render :partial => "submission_score", :object => @submission, :locals => {:quiz => @quiz, :context => @context}}</span>"),
+            :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
 </div>
 <% if @submission.finished_at %>
 <div>
-  Submitted <%= datetime_string(@submission.finished_at) %>
+  <%= t(:submitted_at, "Submitted %{when}", :when => datetime_string(@submission.finished_at)) %>
 </div>
 <% end %>
-<div class="quiz_duration" style="<%= hidden if @quiz.quiz_type == 'survey' %>">
-  This attempt took <%= time_ago_in_words(Time.now + @submission.duration) %>.
+<div class="quiz_duration" style="<%= hidden if @quiz.ungraded? %>">
+  <%= t(:attempt_duration, "This attempt took %{duration}.", :duration => time_ago_in_words(Time.now + @submission.duration)) %>
 </div>
 <% if @quiz.require_lockdown_browser && @quiz.require_lockdown_browser_for_results && !@lockdown_browser_authorized_to_view && !can_do(@quiz, @current_user, :grade) %>
 <p>
   <br /><br />
-  Respondus LockDown Browser is required to view your quiz results.
-  <%= link_to "Click here to view the results.", { :viewing => 1, :version => params[:version] }, :target => "_top" %>
+  <%= t(:requires_lockdown, "Respondus LockDown Browser is required to view your quiz results.") %>
+  <%= link_to t('links.click_to_view_results', "Click here to view the results."), { :viewing => 1, :version => params[:version] }, :target => "_top" %>
 </p>
 <% else %>
 <% jammit_css :quizzes %>
-<% js_block do %>
+<% js_block :i18n_scope => 'quizzes.quiz_submission' do %>
 <script>
 $(document).ready(function() {
   $("#questions.assessment_results .question").hover(function() {
@@ -73,8 +84,6 @@ $(document).ready(function() {
     $(this).removeClass('hover');
   });
 });
-</script>
-<script>
 $(document).ready(function() {
   $(".quiz_response_text img").each(function() {
     $(this).css({
@@ -82,7 +91,7 @@ $(document).ready(function() {
       borderStyle: 'solid',
       borderWidth: '2px',
       padding: 2
-    }).attr('title', 'This is an image, not text, and could have changed since the student submitted');
+    }).attr('title', I18n.t('titles.this_is_an_image', 'This is an image, not text, and could have changed since the student submitted'));
   });
   $(".quiz_response_text iframe").each(function() {
     $(this).css({
@@ -90,7 +99,7 @@ $(document).ready(function() {
       borderStyle: 'solid',
       borderWidth: '2px',
       padding: 2
-    }).attr('title', 'This is an external frame, not text, and could have changed since the student submitted');
+    }).attr('title', I18n.t('titles.this_is_an_external_frame', 'This is an external frame, not text, and could have changed since the student submitted'));
   });
   var $list = $("nothing");
   $(".quiz_response_text").find("object,embed").each(function() {
@@ -105,12 +114,12 @@ $(document).ready(function() {
       borderStyle: 'solid',
       borderWidth: '2px',
       padding: 2
-    }).attr('title', 'This is external element, not text, and could have changed since the student submitted');
+    }).attr('title', I18n.t('titles.this_is_an_external_element', 'This is an external element, not text, and could have changed since the student submitted'));
   });
 });
 </script>
 <% end %>
-<div id="questions" class="assessment_results <%= 'survey_results' if @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey' %>">
+<div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %>">
   <%= render :partial => "quizzes/display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
 </div>
 <div style="margin: 10px 0;">
@@ -118,17 +127,31 @@ $(document).ready(function() {
     <table>
       <tr>
         <td style="vertical-align: top; white-space: nowrap;">
-          <label for="fudge_points_entry">Fudge Points:</label>
+          <label for="fudge_points_entry"><%= before_label(:fudge_points, "Fudge Points") %></label>
         </td><td style="vertical-align: top;">
           <input id="fudge_points_entry" type="text" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '--' : @submission.fudge_points) %>"/>
           <div style="font-size: 0.8em;">
             <label for="fudge_points_entry">
               <% if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible %>
-                You can manually adjust the score by adding positive or negative points to this box: 
+                <%= t('labels.fudge_points_generic_explanation', "You can manually adjust the score by adding positive or negative points to this box:") %> 
+              <% elsif @quiz.survey? %>
+                <%= t('labels.fudge_points_changed_points_survey', <<-TEXT,
+                  Since %{user} took this survey, the points possible for the
+                  survey has changed by %{difference}. You can adjust for this
+                  change and manually add positive or negative points using
+                  this box:
+                  TEXT
+                  :user => @submission.user.name,
+                  :difference => @quiz.points_possible - @submission.quiz_points_possible) %>
               <% else %>
-                Since <%= @submission.user.name %> took this <%= @quiz.readable_type.downcase %>, the points 
-                possible for the <%= @quiz.readable_type.downcase %> has changed by <%= @quiz.points_possible - @submission.quiz_points_possible %>.  You can
-                adjust for this change and manually add positive or negative points using this box:
+                <%= t('labels.fudge_points_changed_points_quiz', <<-TEXT,
+                  Since %{user} took this quiz, the points possible for the
+                  quiz has changed by %{difference}. You can adjust for this
+                  change and manually add positive or negative points using
+                  this box:
+                  TEXT
+                  :user => @submission.user.name,
+                  :difference => @quiz.points_possible - @submission.quiz_points_possible) %>
               <% end %>
             </label>
           </div>
@@ -136,23 +159,42 @@ $(document).ready(function() {
       </tr>
       <tr>
       </tr>
-        <td style="white-space: nowrap; font-size: 1.2em;"><b>Final Score:</b></td>
+        <td style="white-space: nowrap; font-size: 1.2em;"><b><%= before_label(:final_score, "Final Score") %></b></td>
         <td>
-          <span id="after_fudge_points_total" style="font-size: 1.5em; padding-left: 5px;">
-            <%= @submission.score || "0" %>
-          </span>
-          out of <%= pluralize(@quiz.points_possible || 0, "point") %>
+          <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+                :score => raw("<span id=\"after_fudge_points_total\" style=\"font-size: 1.5em; padding-left: 5px;\">#{@submission.score || 0}</span>"),
+                :points_possible => @quiz.points_possible || 0) %>
         </td>
     </table>
   <% elsif @submission.fudge_points && @submission.fudge_points != 0 %>
     <div style="font-size: 1.2em;">
-      This <%= @quiz.readable_type.downcase %> score has been manually adjusted by <%= '+' if @submission.fudge_points > 0 %><%= pluralize(@submission.fudge_points, "point") %>.
+      <% if @quiz.survey? %>
+        <% if @submission.fudge_points > 0 %>
+          <%= t(:survey_fudged_positive, "This survey score has been manually adjusted by +%{fudge} points.", :fudge => @submission.fudge_points) %>
+        <% else %>
+          <%= t(:survey_fudged_negative, "This survey score has been manually adjusted by %{fudge} points.", :fudge => @submission.fudge_points) %>
+        <% end %>
+      <% else %>
+        This quiz score has been manually adjusted by <%= '+' if @submission.fudge_points > 0 %><%= pluralize(@submission.fudge_points, "point") %>.
+        <% if @submission.fudge_points > 0 %>
+          <%= t(:quiz_fudged_positive, "This quiz score has been manually adjusted by +%{fudge} points.", :fudge => @submission.fudge_points) %>
+        <% else %>
+          <%= t(:quiz_fudged_negative, "This quiz score has been manually adjusted by %{fudge} points.", :fudge => @submission.fudge_points) %>
+        <% end %>
+      <% end %>
     </div>
   <% end %>
 </div>
 <% if !editable %>
-<div class="quiz_score" style="text-align: right; font-size: 1.2em; <%= hidden if @quiz.quiz_type == 'survey' %>">
-  <%= @quiz.readable_type %> Score: <span class="score_value"><%= render :partial => "submission_score", :object => @submission, :locals => {:quiz => @quiz, :context => @context} %></span> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %>
+<div class="quiz_score" style="text-align: right; font-size: 1.2em; <%= hidden if @quiz.ungraded? %>">
+  <% if @quiz.survey? %>
+    <%= before_label(:survey_score, "Survey Score") %>
+  <% else %>
+    <%= before_label(:quiz_score, "Quiz Score") %>
+  <% end %>
+  <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+        :score => raw("<span class=\"score_value\">#{render :partial => "submission_score", :object => @submission, :locals => {:quiz => @quiz, :context => @context}}</span>"),
+        :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
 </div>
 <% end %>
 <% end %>

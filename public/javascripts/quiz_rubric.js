@@ -1,3 +1,5 @@
+I18n.scoped('quizzes.rubric', function(I18n) {
+
 $(document).ready(function() {
   $(".show_rubric_link").click(function(event) {
     event.preventDefault();
@@ -7,7 +9,7 @@ $(document).ready(function() {
       ready();
     } else {
       var $loading = $("<div/>");
-      $loading.html("Loading...");
+      $loading.text(I18n.t('loading', "Loading..."));
       $("body").append($loading);
       $loading.dialog({
         width: 400,
@@ -23,7 +25,7 @@ $(document).ready(function() {
     function ready() {
       $dialog = $("#rubrics.rubric_dialog");
       $dialog.dialog('close').dialog({
-        title: "Assignment Rubric Details",
+        title: I18n.t('titles.details', "Assignment Rubric Details"),
         width: 600,
         modal: false,
         resizable: true,
@@ -31,4 +33,6 @@ $(document).ready(function() {
       }).dialog('open');
     }
   });
+});
+
 });

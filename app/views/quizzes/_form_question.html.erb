@@ -11,133 +11,136 @@
     </div>
     <div style="float: right; margin-right: 25px; margin-left: 25px; margin-top: 2px;">
       <select class="question_type" name="question_type">
-        <option value="multiple_choice_question" style="padding: 2px;">Multiple Choice</option>
-        <option value="true_false_question" style="padding: 2px;">True/False</option>
-        <option value="short_answer_question" style="padding: 2px;">Fill In the Blank</option>
-        <option value="fill_in_multiple_blanks_question" style="padding: 2px;">Fill In Multiple Blanks</option>
-        <option value="multiple_answers_question" style="padding: 2px;">Multiple Answers</option>
-        <option value="multiple_dropdowns_question" style="padding: 2px;">Multiple Dropdowns</option>
-        <option value="matching_question" style="padding: 2px;">Matching</option>
-        <option value="numerical_question" style="padding: 2px;">Numerical Answer</option>
-        <option value="calculated_question" style="padding: 2px;">Formula Question</option>
-        <option value="missing_word_question" style="padding: 2px;" class="missing_word">Missing Word</option>
-        <option value="essay_question" style="padding: 2px;">Essay Question</option>
-        <option value="text_only_question" style="padding: 2px;">Text (no question)</option>
+        <option value="multiple_choice_question" style="padding: 2px;"><%= t('question_type.multiple_choice', "Multiple Choice") %></option>
+        <option value="true_false_question" style="padding: 2px;"><%= t('question_type.true_false', "True/False") %></option>
+        <option value="short_answer_question" style="padding: 2px;"><%= t('question_type.short_answer', "Fill In the Blank") %></option>
+        <option value="fill_in_multiple_blanks_question" style="padding: 2px;"><%= t('question_type.fill_in_multiple_blanks', "Fill In Multiple Blanks") %></option>
+        <option value="multiple_answers_question" style="padding: 2px;"><%= t('question_type.multiple_answers', "Multiple Answers") %></option>
+        <option value="multiple_dropdowns_question" style="padding: 2px;"><%= t('question_type.multiple_dropdowns', "Multiple Dropdowns") %></option>
+        <option value="matching_question" style="padding: 2px;"><%= t('question_type.matching', "Matching") %></option>
+        <option value="numerical_question" style="padding: 2px;"><%= t('question_type.numerical', "Numerical Answer") %></option>
+        <option value="calculated_question" style="padding: 2px;"><%= t('question_type.calculated', "Formula Question") %></option>
+        <option value="missing_word_question" style="padding: 2px;" class="missing_word"><%= t('question_type.missing_word', "Missing Word") %></option>
+        <option value="essay_question" style="padding: 2px;"><%= t('question_type.essay', "Essay Question") %></option>
+        <option value="text_only_question" style="padding: 2px;"><%= t('question_type.text_only', "Text (no question)") %></option>
       </select>
     </div>
     <div class="clear"></div>
   </div>
   <div class="links">
-    <!--a href="#" class="cancel_link">&#215;</a-->
   </div>
   <div class="clear"></div>
   <div class="text">
     <div class="multiple_choice_question_explanation explanation subheader">
-      Enter your question and multiple answers, then select the one correct answer.
+      <%= t('explanations.multiple_choice', "Enter your question and multiple answers, then select the one correct answer.") %>
     </div>
     <div class="true_false_question_explanation explanation subheader">
-      Enter your question text, then select if True or False is the correct answer.
+      <%= t('explanations.true_false', "Enter your question text, then select if True or False is the correct answer.") %>
     </div>
     <div class="short_answer_question_explanation explanation subheader">
-      Enter your question text, then define all possible correct answers for the blank.<br/>Students will see the question followed by a small text box to type their answer.
+      <%= t('explanations.short_answer', "Enter your question text, then define all possible correct answers for the blank.<br/>Students will see the question followed by a small text box to type their answer.") %>
     </div>
     <div class="fill_in_multiple_blanks_question_explanation explanation subheader">
-      Enter your question, specifying where each blank should go.  Then define the possible correct answer for each blank.<br/>Students must type correct answers into text boxes at each blank.
+      <%= t('explanations.fill_in_multiple_blanks', "Enter your question, specifying where each blank should go.  Then define the possible correct answer for each blank.  Students must type correct answers into text boxes at each blank.") %>
     </div>
     <div class="multiple_answers_question_explanation explanation subheader">
-      This question will show a checkbox next to each answer, and the student must select ALL the answers you mark as correct.
+      <%= t('explanations.multiple_answers', "This question will show a checkbox next to each answer, and the student must select ALL the answers you mark as correct.") %>
     </div>
     <div class="multiple_dropdowns_question_explanation explanation subheader">
-      Enter your question, specifying where each dropdown should go.  Then define possible answers for each dropdown, with one correct answer per dropdown.
+      <%= t('explanations.multiple_dropdowns', "Enter your question, specifying where each dropdown should go.  Then define possible answers for each dropdown, with one correct answer per dropdown.") %>
     </div>
     <div class="matching_question_explanation explanation subheader">
-      Build pairs of matching values.  Students will see values on the left and have to select the matching value on the right from a dropdown.  Multiple rows can have the same answer, and you can add additional distractors to the right side.
+      <%= t('explanations.matching', "Build pairs of matching values.  Students will see values on the left and have to select the matching value on the right from a dropdown.  Multiple rows can have the same answer, and you can add additional distractors to the right side.") %>
     </div>
     <div class="numerical_question_explanation explanation subheader">
-      Define the correct answer as any number within a range, or a number plus or minus some error margin.  Student will be given an empty text box to type their numerical answer.
+      <%= t('explanations.numerical', "Define the correct answer as any number within a range, or a number plus or minus some error margin.  Student will be given an empty text box to type their numerical answer.") %>
     </div>
     <div class="calculated_question_explanation explanation subheader">
-      Enter your question, build a formula, and generate a set of possible answer combinations.  Students will see the question with a randomly selected set of variables filled in and have to type the correct numerical answer.
+      <%= t('explanations.calculated', "Enter your question, build a formula, and generate a set of possible answer combinations.  Students will see the question with a randomly selected set of variables filled in and have to type the correct numerical answer.") %>
     </div>
     <div class="missing_word_question_explanation explanation subheader">
-      Define text to go before and after the dropdown.  Build a set of possible answers and select one correct answer.
+      <%= t('explanations.missing_word', "Define text to go before and after the dropdown.  Build a set of possible answers and select one correct answer.") %>
     </div>
     <div class="essay_question_explanation explanation subheader">
-      Students will be given a text field to compose their answer.
+      <%= t('explanations.essay', "Students will be given a text field to compose their answer.") %>
     </div>
     <div class="text_only_question_explanation explanation subheader">
-      This "question" will not be scored, but can be useful for introducing a set of related questions.
+      <%= t('explanations.text_only', 'This "question" will not be scored, but can be useful for introducing a set of related questions.') %>
     </div>
-    <b class="question_header">Question:</b>
+    <b class="question_header"><%= before_label(:question, "Question") %></b>
     <div class="equation_header">
       <div class="equation_subheader">
-        You can define variables by typing variable names surrounded by brackets<br/>(i.e. "What is 5 plus [x]?")
+        <%= t('explanations.equations', "You can define variables by typing variable names surrounded by brackets") %><br/>
+        (<%= t(:equation_example, 'i.e. "What is 5 plus [x]?"') %>)
       </div>
     </div>
     <div class="multi_answer_sets multi_answer_sets_subheader">
-      In the box below, every place you want to show an answer box, type a reference word (no spaces) surrounded by brackets<br/>(i.e. "Roses are [color1], violets are [color2]")
+      <%= t('explanations.multi_answer_sets', "In the box below, every place you want to show an answer box, type a reference word (no spaces) surrounded by brackets") %><br/>
+      (<%= t(:multi_answer_sets_example, 'i.e. "Roses are [color1], violets are [color2]"') %>)
     </div>
     <div style="float: right; margin-right: 10%; font-size: 0.8em;">
-      <a href="#" class="toggle_question_content_views_link">Switch Views</a>
+      <a href="#" class="toggle_question_content_views_link"><%= t('links.switch_views', "Switch Views") %></a>
     </div>
     <div class="clear"></div>
     <div style="text-align: center;">
       <textarea style="width: 90%; height: 120px;" class="question_content" name="question_text"></textarea>
     </div>
-    <b class="answers_header">Answers:</b>
+    <b class="answers_header"><%= before_label(:answers, "Answers") %></b>
     <div style="display: none;">
     <select class="answer_selection_type" name="answer_selection_type">
-      <option value="single_answer">Only One Correct Answer</option>
-      <!--option value="partial_answer">Some Answers Worth Partial Credit</option-->
-      <option value="multiple_answer">Students Select Multiple Answers</option>
+      <option value="single_answer"><%= t('options.only_one_correct', "Only One Correct Answer") %></option>
+      <option value="multiple_answer"><%= t('options.students_select_multiple', "Students Select Multiple Answers") %></option>
     </select>
     </div>
     <div class="multi_answer_sets">
-      Show Possible Answers for
-      <select class="blank_id_select">
-      </select>
+      <%= t(:show_possible_answers, "Show Possible Answers for %{question}", :question => raw('<select class="blank_id_select"></select>')) %>
     </div>
     <div class="equation_answers">
       <div class="clear"></div>
       <div class="equation_header variables_specified">
-        Variable Definitions
+        <%= t('headers.variable_definitions', "Variable Definitions") %>
         <div class="equation_subheader">
-          Once you have entered your variables above, you should see them listed here.  You can
-          specify the range of possible values for each variable below.
+          <%= t('explanations.variable_definitions', "Once you have entered your variables above, you should see them listed here.  You can specify the range of possible values for each variable below.") %>
         </div>
       </div>
       <div class="equation_content variables_specified">
         <table class="variables">
           <thead>
-            <tr><th>Variable</th><th>Min</th><th>Max</th><th>Decimal<br/>Places</th><th>Example Value<div><button type="button" class="recompute_variables">Recompute</button></div></th></tr>
+            <tr>
+              <th><%= t('headers.variable_name', "Variable") %></th>
+              <th><%= t('headers.variable_minimum', "Min") %></th>
+              <th><%= t('headers.variable_maximum', "Max") %></th>
+              <th><%= t('headers.variable_precision', "Decimal Places") %></th>
+              <th>
+                <%= t('headers.variable_example_value', "Example Value") %>
+                <div><button type="button" class="recompute_variables"><%= t('buttons.recompute', "Recompute") %></button></div>
+              </th>
+            </tr>
           </thead>
           <tbody>
           </tbody>
         </table>
       </div>
       <div class="equation_header variables_specified">
-        Formula Definition
+        <%= t('headers.formula_definition', "Formula Definition") %>
         <div class="equation_subheader">
-          Next you'll need to write the formula or formula's used to compute the
-          correct answer.  Just use the same variable names listed above.
-          <a href="#" class="help_with_equations_link">Need help?</a>
+          <%= t('explanations.formula_definition', "Next you'll need to write the formula or formula's used to compute the correct answer.  Just use the same variable names listed above.") %>
+          <a href="#" class="help_with_equations_link"><%= t('links.need_help', "Need help?") %></a>
         </div>
       </div>
       <div class="equation_content variables_specified">
         <input type="text" class="supercalc" style="width: 300px;"/>
       </div>
       <div class="equation_header variables_specified formulas_specified">
-        Generate Possible Solutions
+        <%= t('headers.generate_possible_solutions', "Generate Possible Solutions") %>
         <div class="equation_subheader">
-          Finally, build as many variable-solution combinations as you need for your quiz.
+          <%= t('explanation.generate_possible_solutions', "Finally, build as many variable-solution combinations as you need for your quiz.") %>
         </div>
       </div>
       <div class="equation_content variables_specified formulas_specified">
-        Offer
-        <input type="text" class="combination_count combinations_option" style="width: 30px;"/>
-        possible value combinations<br/>
-        allow an error margin of <span>+/-</span> <input type="text" class="combination_answer_tolerance float_value" style="width: 30px;" value="0"/>
-        <button type="button" class="compute_combinations combinations_option">Generate</button>
+        <%= t(:offer_combinations, "Offer %{how_many} possible value combinations", :how_many => raw('<input type="text" class="combination_count combinations_option" style="width: 30px;"/>')) %><br/>
+        <%= t(:allow_tolerance, "allow an error margin of +/- %{tolerance}", :tolerance => raw('<input type="text" class="combination_answer_tolerance float_value" style="width: 30px;" value="0"/>')) %>
+        <button type="button" class="compute_combinations combinations_option"><%= t('buttons.generate', "Generate") %></button>
       </div>
       <div class="formulas_specified combinations_holder">
         <table class="combinations">
@@ -152,19 +155,19 @@
     <div class="form_answers">
     </div>
     <div style="text-align: right;" class="add_answer">
-      <a href="#" class="add_answer_link add">Add Another Answer</a>
+      <a href="#" class="add_answer_link add"><%= t('links.add_another_answer', "Add Another Answer") %></a>
     </div>
     <div class="matching_answer_incorrect_matches_holder" style="margin-top: 15px;">
-      <b>Additional Match Possibilities (distractors):</b>
-      <div style="font-size: 0.8em;">type each distractor on its own line</div>
+      <b><%= before_label(:distractors, "Additional Match Possibilities (distractors)") %></b>
+      <div style="font-size: 0.8em;"><%= t(:distractor_instructions, "type each distractor on its own line") %></div>
       <div style="text-align: center;">
       <textarea style="width: 90%; height: 50px;" name="matching_answer_incorrect_matches"></textarea>
       </div>
     </div>
     <div class="missing_word_after_answer" style="margin-top: 15px;">
-      <b>Text to go after answers:</b>
+      <b><%= before_label(:missing_word_after, "Text to go after answers") %></b>
       <div style="float: right; margin-right: 10%; font-size: 0.8em;">
-        <a href="#" class="toggle_text_after_answers_link">Switch Views</a>
+        <a href="#" class="toggle_text_after_answers_link"><%= t('links.switch_views', "Switch Views") %></a>
       </div>
       <div style="text-align: center;">
       <textarea style="width: 90%; height: 70px;" name="text_after_answers" class="text_after_answers"></textarea>
@@ -172,26 +175,26 @@
     </div>
     <div class="question_comment question_correct_comment">
       <div class="comment_top"></div>
-      <a href="#" class="comment_focus" title="Click to enter comments for a correct answer">...</a>
-      <div class="details">Correct answer comments</div>
+      <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_correct_answer_comments', "Click to enter comments for a correct answer") %>">...</a>
+      <div class="details"><%= t(:correct_answer_comments, "Correct answer comments") %></div>
       <textarea style="width: 90%; height: 75px;" class="comments" name="correct_comments"></textarea>
     </div>
     <div class="question_comment question_incorrect_comment">
       <div class="comment_top"></div>
-      <a href="#" class="comment_focus" title="Click to enter comments for a wrong answer">...</a>
-      <div class="details">Wrong answer comments</div>
+      <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_wrong_answer_comments', "Click to enter comments for a wrong answer") %>">...</a>
+      <div class="details"><%= t(:wrong_answer_comments, "Wrong answer comments") %></div>
       <textarea style="width: 90%; height: 75px;" class="comments" name="incorrect_comments"></textarea>
     </div>
     <div class="question_comment question_neutral_comment">
       <div class="comment_top"></div>
-      <a href="#" class="comment_focus" title="Click to enter general comments">...</a>
-      <div class="details">General answer comments</div>
+      <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_general_answer_comments', "Click to enter general comments") %>">...</a>
+      <div class="details"><%= t(:general_answer_comments, "General answer comments") %></div>
       <textarea style="width: 90%; height: 75px;" class="comments" name="neutral_comments"></textarea>
     </div>
     <div class="clear"></div>
     <div class="button-container">
-      <button type="submit" class="button small-button submit_button">Create/Update Question</button>
-      <button type="button" class="button-secondary cancel_link">Cancel</button>
+      <button type="submit" class="button small-button submit_button"><%= t('buttons.create_update_question', "Create/Update Question") %></button>
+      <button type="button" class="button-secondary cancel_link"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   </div>
 </div>

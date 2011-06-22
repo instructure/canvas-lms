@@ -23,18 +23,18 @@
     <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
     <% if assessing %>
       <div class="flag_question">
-        <%= image_tag "flag_question.png", :title => "Mark this question to come back to later", :class => "flag_icon" %>
+        <%= image_tag "flag_question.png", :title => t('titles.mark_to_revisit', "Mark this question to come back to later"), :class => "flag_icon" %>
       </div>
     <% end %>
     <legend class="header" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
       <span class="name question_name"><%= hash_get(question, :question_name) %></span>:
       <span class="question_points_holder" style="<%= hidden if question_type && question_type.entry_type == "none" %>">
-        <span class="points question_points"><%= hash_get(question, :points_possible, "0") %></span> pts
+        <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\">#{hash_get(question, :points_possible, "0")}</span>")) %>
       </span>
       <% if question && hash_get(question, :question_type) != "missing_word_question" && hash_get(question, :question_text) && hash_get(question, :question_text).length < 255 %>
         <span class='ui-helper-hidden-accessible'><%= hash_get(question, :question_text) %></span>
       <% else %> 
-        <a class='ui-helper-hidden-accessible' href="#question_<%= hash_get(question, :id, "new") %>_question_text">Skip to question text.</a>
+        <a class='ui-helper-hidden-accessible' href="#question_<%= hash_get(question, :id, "new") %>_question_text"><%= t(:skip_question_text, "Skip to question text.") %></a>
       <% end %>
     </legend>
     <div class="links" style="<%= hidden if user_answer || assessing %>">
@@ -61,7 +61,7 @@
         <% if question && hash_get(question, :question_type) == "missing_word_question" %>
           <span class="text_before_answers"><%= user_content(hash_get(question, :question_text)) %></span>
           <select class="answer_select question_input" name="question_<%= hash_get(question, :id, "blank") %>">
-            <option value="">[ Choose ]</option>
+            <option value=""><%= t(:default_question_answer, "[ Choose ]") %></option>
             <% hash_get(question, :answers, []).each do |answer| %>
               <option value="<%= hash_get(answer, :id) %>" <%= "selected" if user_answer && hash_get(user_answer, :answer_id) == hash_get(answer, :id) || (@stored_params && @stored_params["question_#{hash_get(question, :id)}"].to_s == hash_get(answer, :id).to_s) %>><%= hash_get(answer, :text) %></option>
             <% end %>
@@ -73,22 +73,24 @@
       </div>
       <% if question_type && question_type.unsupported %>
         <div class="unsupported_question_type_message" style="font-size: 0.8em; font-weight: bold;">
-          This question was imported from an external source.  It was a
-          <%= hash_get(question, :question_type) %> question, which is
-          not supported in this quiz tool.
-        </div>
+          <%= t(:unsupported_question_type, <<-TEXT, :question_type => hash_get(question, :question_type))
+          This question was imported from an external source. It was a
+          '%{question_type}' question, which is not supported in this quiz
+          tool.
+          TEXT
+        %></div>
       <% end %>
       <% if editing %>
       <div class="variable_definitions_holder calculated_question_answers" style="<%= hidden unless question && hash_get(question, :question_type) == 'calculated_question' %>">
-        <div class="calculated_question_answers_header">Variables</div>
+        <div class="calculated_question_answers_header"><%= t('headers.variables', "Variables") %></div>
         <div class="calculated_question_answers_content">
           <table class="variable_definitions">
             <thead>
               <tr>
-                <th>Variable</th>
-                <th>Min</th>
-                <th>Max</th>
-                <th>Decimal Places</th>
+                <th><%= t('headers.variable_name', "Variable") %></th>
+                <th><%= t('headers.variable_minimum', "Min") %></th>
+                <th><%= t('headers.variable_maximum', "Max") %></th>
+                <th><%= t('headers.variable_precision', "Decimal Places") %></th>
               </tr>
             </thead>
             <tbody>
@@ -105,7 +107,7 @@
         </div>
       </div>
       <div class="formulas_holder calculated_question_answers" style="<%= hidden unless question && hash_get(question, :question_type) == 'calculated_question' %>">
-        <div class="calculated_question_answers_header">Formula(s)</div>
+        <div class="calculated_question_answers_header"><%= t('headers.formulas', "Formulas") %></div>
         <div class="calculated_question_answers_content">
           <div class="formulas_list">
             <% hash_get(question, :formulas, []).each do |formula| %>
@@ -117,7 +119,7 @@
       <div class="equation_combinations_holder_holder calculated_question_answers" style="<%= hidden unless question && hash_get(question, :question_type) == 'calculated_question' %>">
         <div style="display: none;" class="answer_tolerance"><%= hash_get(question, :answer_tolerance, 0) %></div>
         <div style="display: none;" class="formula_decimal_places"><%= hash_get(question, :formula_decimal_places, 0) %></div>
-        <div class="calculated_question_answers_header">Possible Solutions</div>
+        <div class="calculated_question_answers_header"><%= t('headers.possible_solutions', "Possible Solutions") %></div>
         <div class="calculated_question_answers_content equation_combinations_holder">
           <table class="equation_combinations">
             <% if question && hash_get(question, :question_type) == "calculated_question" && editing %>
@@ -126,7 +128,7 @@
                   <% hash_get(question, :variables, []).each do |variable| %>
                     <th><%= hash_get(variable, :name) %></th>
                   <% end %>
-                  <th>Answer</th>
+                  <th><%= t('headers.solution_answer', "Answer") %></th>
                 </tr>
               </thead>
               <tbody>
@@ -144,12 +146,13 @@
         </div>
       </div>
       <div class="multiple_answer_sets_holder" style="<%= hidden unless question && ['multiple_dropdowns_question', 'fill_in_multiple_blanks_question'].include?(hash_get(question, :question_type)) %>">
-        Show Answers for 
+        <% ot(:show_ansers_for_variable, "Show Answers for %{variable}", :variable => capture{ %>
         <select class="blank_id_select">
           <% hash_get(question, :answers, []).map{|a| hash_get(a, :blank_id) }.uniq.compact.each do |variable| %>
             <option value="<%= variable %>"><%= variable %></option>
           <% end %>
         </select>
+        <% }) %>
       </div>
       <% end %>
       <div class="answers">
@@ -170,14 +173,15 @@
             <% variables = hash_get(question, :original_question_text, "").scan(/\[[^\]]+\]/).to_a.compact.map{|v| v[1..-2] } %>
             <% variables = variables & hash_get(question, :answers, []).map{|a| hash_get(a, :blank_id) }.compact.uniq %>
             <% variables.each_with_index do |variable, idx| %>
-              <b>For answer <%= idx + 1 %>:</b>
+              <b><%= before_label(:for_answer_number, "For answer %{answer_number}", :answer_number => idx + 1) %></b>
               <div style="margin-left: 20px;">
+                <% answers = hash_get(question, :answers, []).select{|a| hash_get(a, :blank_id) == variable } %>
                 <% if question_type.entry_type == "text_box" %>
                   <% user_answer[:text] = hash_get(user_answer, "answer_for_#{variable}") %>
-                  <% matched_answer = hash_get(question, :answers, []).select{|a| hash_get(a, :blank_id) == variable }.find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
+                  <% matched_answer = answers.find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
                   <span class="text_box_answer <%= 'correct_text_box_answer' if matched_answer && matched_answer[:weight] == 100 %>">
-                    Your Answer:
-                    <b><%= h(hash_get(user_answer, :text) || "You left this blank") %></b>
+                    <%= before_label(:your_answer, "Your Answer") %>
+                    <b><%= h(hash_get(user_answer, :text) || t(:you_left_this_blank, "You left this blank")) %></b>
                   </span>
                   <% if matched_answer && hash_get(matched_answer, :comments) && !hash_get(matched_answer, :comments).empty? %>
                     <div class="answer hide_right_arrow correct_answer">
@@ -191,19 +195,18 @@
                   <% show_headers = @quiz && @quiz.show_correct_answers %>
                   <% if show_headers %>
                     <div style="font-size: 0.8em; margin-top: 5px; margin-bottom: 5px;">
-                    <u>Correct Answer(s)</u>:
+                      <u><%= before_label(:correct_answers, {:one => "Correct Answer", :other => "Correct Answers"}, :count => answers.size) %></u>
                     <div style="xfont-size: 0.8em;">
                   <% end %>
                   <% if editing || show_headers || !question_type.entry_type.match(/text_box/) %>
-                    <%= render :partial => "quizzes/display_answer", :collection => hash_get(question, :answers, []).select{|a| hash_get(a, :blank_id) == variable }, :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question} %>
+                    <%= render :partial => "quizzes/display_answer", :collection => answers, :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question} %>
                   <% end %>
                   <% if show_headers %>
                     </div></div>
                   <% end %>
                 <% else %>
-                  <% hash_get(question, :answers, []).select{|a| hash_get(a, :blank_id) == variable } %>
                   <% user_answer[:answer_id] = hash_get(user_answer, "answer_id_for_#{variable}") %>
-                  <%= render :partial => "quizzes/display_answer", :collection => hash_get(question, :answers, []).select{|a| hash_get(a, :blank_id) == variable }, :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question} %>
+                  <%= render :partial => "quizzes/display_answer", :collection => answers, :locals => {:assessment_results => assessment_results, :question_type => question_type, :user_answer => user_answer, :question => question} %>
                 <% end %>
               </div>
             <% end %>
@@ -214,7 +217,7 @@
                 <% if question_type.entry_type == 'textarea' %>
                   <div class="user_content quiz_response_text"><%= hash_get(user_answer, :text).html_safe %></div>
                 <% else %>
-                  <b><%= h(hash_get(user_answer, :text) || "You left this blank") %></b>
+                  <b><%= h(hash_get(user_answer, :text) || t(:you_left_this_blank, "You left this blank")) %></b>
                   <% matched_answer = hash_get(question, :answers, []).find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
                   <% hash_get(question, :answers, []).each do |a| 
                     val = hash_get(user_answer, :text).to_f 
@@ -288,7 +291,7 @@
           <div class="comment_top"></div>
           <div class="question_comment_text">
             <% if editable %>
-              <span style="font-size: 0.8em;">Additional Comments:</span>
+              <span style="font-size: 0.8em;"><%= before_label(:additional_comments, "Additional Comments") %></span>
               <textarea name="question_comment_<%= hash_get(question, :id) %>" style="display: block; width: auto; margin-left: 5px; margin-right: 5px; height: 50px;"><%= h(hash_get(user_answer, :more_comments)) || "" %></textarea>
             <% else %>
               <%= h(hash_get(user_answer, :more_comments)) %>
@@ -297,15 +300,15 @@
         </div>
       <% end %>
     <% elsif !assessing %>
-      <div title="Students will see this comment if they get the question correct" class="question_comment question_correct_comment" <%= hidden(true) unless question && hash_get(question, :correct_comments) %>>
+      <div title="<%= t('titles.question_correct_comment', "Students will see this comment if they get the question correct") %>" class="question_comment question_correct_comment" <%= hidden(true) unless question && hash_get(question, :correct_comments) %>>
         <div class="comment_top"></div>
         <div class="question_comment_text correct_comments"><%= hash_get(question, :correct_comments) %></div>
       </div>
-      <div title="Students will see this comment if they get the question wrong" class="question_comment question_incorrect_comment" <%= hidden(true) unless question && hash_get(question, :incorrect_comments) %>>
+      <div title="<%= t('titles.question_incorrect_comment', "Students will see this comment if they get the question wrong") %>" class="question_comment question_incorrect_comment" <%= hidden(true) unless question && hash_get(question, :incorrect_comments) %>>
         <div class="comment_top"></div>
         <div class="question_comment_text incorrect_comments"><%= hash_get(question, :incorrect_comments) %></div>
       </div>
-      <div title="Students will see this comment once they've answered the question" class="question_comment question_neutral_comment" <%= hidden(true) unless question && hash_get(question, :neutral_comments) %>>
+      <div title="<%= t('titles.question_neutral_comment', "Students will see this comment once they've answered the question") %>" class="question_comment question_neutral_comment" <%= hidden(true) unless question && hash_get(question, :neutral_comments) %>>
         <div class="comment_top"></div>
         <div class="question_comment_text neutral_comments"><%= hash_get(question, :neutral_comments) %></div>
       </div>
@@ -327,7 +330,7 @@
     <% end %>
     <% if is_assessment_question %>
       <div class="bottom_links">
-        <a href="#" class="move_question_link">move/copy question to another bank</a> 
+        <a href="#" class="move_question_link"><%= t('links.move_copy_question', "move/copy question to another bank") %></a> 
       </div>
     <% end %>
     <div class="clear"></div>
