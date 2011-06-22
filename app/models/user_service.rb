@@ -187,21 +187,21 @@ class UserService < ActiveRecord::Base
   def self.short_description(type)
     case type
     when 'google_docs'
-      'Students can use Google Docs to collaborate on group projects.  Google Docs allows for real-time collaborative editing of documents, spreadsheets and presentations.'
+      t '#user_service.descriptions.google_docs', 'Students can use Google Docs to collaborate on group projects.  Google Docs allows for real-time collaborative editing of documents, spreadsheets and presentations.'
     when 'google_calendar'
       ''
     when 'twitter'
-      'Twitter is a great resource for out-of-class communication.'
+      t '#user_service.descriptions.twitter', 'Twitter is a great resource for out-of-class communication.'
     when 'facebook'
-      'Listing your Facebook profile will let you more easily connect with friends you make in your classes and groups.'
+      t '#user_service.descriptions.facebook', 'Listing your Facebook profile will let you more easily connect with friends you make in your classes and groups.'
     when 'delicious'
-      'Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Delicious accounts to share links of similar interest.'
+      t '#user_service.descriptions.delicious', 'Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Delicious accounts to share links of similar interest.'
     when 'diigo'
-      'Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Diigo accounts to share links of similar interest.'
+      t '#user_service.descriptions.diigo', 'Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Diigo accounts to share links of similar interest.'
     when 'linked_in'
-      'LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace.'
+      t '#user_service.descriptions.linked_in', 'LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace.'
     when 'skype'
-      'Skype is a free tool for online voice and video calls.'
+      t '#user_service.descriptions.skype', 'Skype is a free tool for online voice and video calls.'
     else
       ''
     end
