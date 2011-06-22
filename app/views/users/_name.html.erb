@@ -46,7 +46,11 @@
           <a href="#" class="edit_user_link">Edit</a>
           <% if current_user_is_site_admin?(:become_user) %>
             |
-            <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> Become</a>
+            <% if @context && !@context.is_a?(Account) %>
+              <a href="<%= context_url(@context, :context_url, :become_user_id => @user.id) %>"> Become</a>
+            <% else %>
+              <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> Become</a>
+            <% end %>
           <% end %>
           <% if can_manage_user_logins %>
             | 
