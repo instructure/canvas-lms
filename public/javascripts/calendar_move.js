@@ -19,7 +19,7 @@
 
 var calendarMonths = (function() {
   var monthNames;
-  I18n.scoped('calenders', function(I18n) {
+  I18n.scoped('calendars', function(I18n) {
     monthNames = I18n.t('#date.month_names');
   });
   function makeDate(date) {
