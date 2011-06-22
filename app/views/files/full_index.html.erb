@@ -504,12 +504,13 @@ HEREDOC
   <% end %>
 </div>
 </div>
-<% js_block do %>
+<% js_block :i18n_scope => 'files' do %>
 <script>
-var contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
+window.contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
 
-var INST = INST || {};
-I18n.scoped('files', function(I18n) {
+if (!window.INST) {
+  window.INST = {};
+}
 INST.downloadFolderFiles = function(url) {
   var cancelled = false;
   $("#download_folder_files_dialog .status_box .status").text(I18n.t('messages.gathering_data', "Gathering data..."));
@@ -559,7 +560,6 @@ INST.downloadFolderFiles = function(url) {
   }
   checkForChange();
 }
-});
 </script>
 <% end %>
 <div id="download_folder_files_dialog" style="display: none;">

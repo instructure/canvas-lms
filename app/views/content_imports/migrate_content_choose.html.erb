@@ -240,9 +240,8 @@
   </div>
 </div>
 
-<% js_block do %>
+<% js_block :i18n_scope => 'content_imports.migrate_content_choose' do %>
 <script>
-I18n.scoped('content_imports.migrate_content_choose', function(I18n) {
 $(document).ready(function() {
   $(".date_field").date_field();
   var pendingPopulates = 0;
@@ -525,7 +524,6 @@ $(document).ready(function() {
     return true;
   });
 
-});
 });
 </script>
 <% end %>

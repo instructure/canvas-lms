@@ -44,9 +44,8 @@
 }
 </style>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'rubrics.index' do %>
 <script>
-I18n.scoped('rubrics.index', function(I18n) { 
   $(document).ready(function() {
     $("#rubrics ul .delete_rubric_link").click(function(event) {
       event.preventDefault();
@@ -62,7 +61,6 @@ I18n.scoped('rubrics.index', function(I18n) {
       });
     });
   });
-})
 </script>
 <% end %>
 <h2><%= @context.class.to_s %> <%= t('titles.rubrics', 'Rubrics') %></h2>

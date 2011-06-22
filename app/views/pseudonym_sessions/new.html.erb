@@ -2,9 +2,8 @@
   <%= t :page_title, "Log In to Canvas" %>
 <% end %>
 
-<% js_block do %>
+<% js_block :i18n_scope => 'pseudonym_sessions' do %>
 <script type="text/javascript">
-I18n.scoped('pseudonym_sessions', function(I18n) {
 $(document).ready(function() {
   $(".re_send_confirmation_link").click(function(event) {
     event.preventDefault();
@@ -16,7 +15,6 @@ $(document).ready(function() {
       $link.text(I18n.t('errors.request_failed', "Request failed. Try again."));
     });
   });
-});
 });
 </script>
 <% end %>

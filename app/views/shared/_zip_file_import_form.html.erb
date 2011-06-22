@@ -22,93 +22,91 @@
   </div>
   <a href="<%= context_url(@context, :import_status_context_zip_file_imports_url) %>" class="zip_file_import_status_url" style="display: none;">&nbsp;</a>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => "zip_file_imports" do %>
 <script>
-I18n.scoped("zip_file_imports", function(I18n) {
-  $(document).ready(function() {
-    $("#zip_file_import_form #zip_file").change(function() {
-      var val = $(this).val();
-      if(val && !val.match(/\.zip$/)) {
-        $("#zip_only_message").show();
-        $("#upload_form .submit_button").attr('disabled', true);
-      } else {
-        $("#zip_only_message").hide();
-        $("#upload_form .submit_button").attr('disabled', false);
+$(document).ready(function() {
+  $("#zip_file_import_form #zip_file").change(function() {
+    var val = $(this).val();
+    if(val && !val.match(/\.zip$/)) {
+      $("#zip_only_message").show();
+      $("#upload_form .submit_button").attr('disabled', true);
+    } else {
+      $("#zip_only_message").hide();
+      $("#upload_form .submit_button").attr('disabled', false);
+    }
+  }).change();
+  $("#uploading_progressbar").progressbar();
+  $("#zip_file_import_form").submit(function(){
+    $("#uploading_please_wait_dialog").dialog('close').dialog({
+      bgiframe: true,
+      width: 400,
+      modal: true,
+      autoOpen: false,
+      closeOnEscape: false,
+      dialogClass: "ui-dialog-no-close-button"
+    }).dialog('open');
+    return true;
+  });
+  var $frame = $("<iframe id='import_frame' name='import_frame'/>")
+  $("body").append($frame.hide());
+  $("#zip_file_import_form").attr('target', 'import_frame');
+  $("#zip_file_import_form").submit(function() {
+    $("#uploading_progressbar").progressbar('value', 0);
+    var id = $("#zip_import_batch_id").val();
+    var url = $(".zip_file_import_status_url").attr('href') + "?batch_id=" + id;
+    $("#zip_file_import_form .errors").hide();
+    var importFailed = function(errors) {
+      var $div = $("<div class='errors' style='color: #a00; font-weight: bold;'/>");
+      var error_message = I18n.t('errors.extracting_file', "There were some errors extracting the zip file.  Please try again");
+      $div.text(error_message);
+      $.flashError(error_message);
+      $("#zip_import_batch_id").val($("#zip_import_batch_id").val() + "0");
+      var $ul = $("<ul class='errors'/>");
+      for(var idx in errors) {
+        var error = errors[idx];
+        var $li = $("<li/>");
+        $li.text(error);
+        $ul.append($li);
       }
-    }).change();
-    $("#uploading_progressbar").progressbar();
-    $("#zip_file_import_form").submit(function(){
-      $("#uploading_please_wait_dialog").dialog('close').dialog({
-        bgiframe: true,
-        width: 400,
-        modal: true,
-        autoOpen: false,
-        closeOnEscape: false,
-        dialogClass: "ui-dialog-no-close-button"
-      }).dialog('open');
-      return true;
-    });
-    var $frame = $("<iframe id='import_frame' name='import_frame'/>")
-    $("body").append($frame.hide());
-    $("#zip_file_import_form").attr('target', 'import_frame');
-    $("#zip_file_import_form").submit(function() {
-      $("#uploading_progressbar").progressbar('value', 0);
-      var id = $("#zip_import_batch_id").val();
-      var url = $(".zip_file_import_status_url").attr('href') + "?batch_id=" + id;
       $("#zip_file_import_form .errors").hide();
-      var importFailed = function(errors) {
-        var $div = $("<div class='errors' style='color: #a00; font-weight: bold;'/>");
-        var error_message = I18n.t('errors.extracting_file', "There were some errors extracting the zip file.  Please try again");
-        $div.text(error_message);
-        $.flashError(error_message);
-        $("#zip_import_batch_id").val($("#zip_import_batch_id").val() + "0");
-        var $ul = $("<ul class='errors'/>");
-        for(var idx in errors) {
-          var error = errors[idx];
-          var $li = $("<li/>");
-          $li.text(error);
-          $ul.append($li);
+      $("#zip_file_import_form").prepend($ul).prepend($div);
+      $("#uploading_please_wait_dialog").dialog('close');
+    }
+    var hadSomeProgress = false;
+    var pollImport = function() {
+      $.getJSON(url, function(data) {
+        if(data && data.errors) {
+          importFailed(data.errors);
+        } else if(data && data.complete) {
+          $("#uploading_progressbar").progressbar('value', 100);
+          $("#uploading_please_wait_dialog").prepend(I18n.t('notices.uploading_complete', "Uploading complete!"));
+          location.href = $("#return_to").val();
+        } else if(hadSomeProgress && (!data || data.progress == null)) {
+          pollImport.blankCount = pollImport.blankCount || 0;
+          pollImport.blankCount++;
+          if(pollImport.blankCount > 10) {
+            importFailed([I18n.t('errors.server_status', "The server stopped returning a valid status")]);
+          } else {
+            setTimeout(pollImport, 2000);
+          }
+        } else {
+          pollImport.errorCount = 0;
+          pollImport.blankCount = 0;
+          hadSomeProgress = true;
+          setTimeout(pollImport, 2000);
+          $("#uploading_progressbar").progressbar('value', ((data.progress || 0) * 100));
         }
-        $("#zip_file_import_form .errors").hide();
-        $("#zip_file_import_form").prepend($ul).prepend($div);
-        $("#uploading_please_wait_dialog").dialog('close');
-      }
-      var hadSomeProgress = false;
-      var pollImport = function() {
-        $.getJSON(url, function(data) {
-          if(data && data.errors) {
-            importFailed(data.errors);
-          } else if(data && data.complete) {
-            $("#uploading_progressbar").progressbar('value', 100);
-            $("#uploading_please_wait_dialog").prepend(I18n.t('notices.uploading_complete', "Uploading complete!"));
-            location.href = $("#return_to").val();
-          } else if(hadSomeProgress && (!data || data.progress == null)) {
-            pollImport.blankCount = pollImport.blankCount || 0;
-            pollImport.blankCount++;
-            if(pollImport.blankCount > 10) {
-              importFailed([I18n.t('errors.server_status', "The server stopped returning a valid status")]);
-            } else {
-              setTimeout(pollImport, 2000);
-            }
-          } else {
-            pollImport.errorCount = 0;
-            pollImport.blankCount = 0;
-            hadSomeProgress = true;
-            setTimeout(pollImport, 2000);
-            $("#uploading_progressbar").progressbar('value', ((data.progress || 0) * 100));
-          }
-        }, function() {
-          pollImport.errorCount = pollImport.errorCount || 0;
-          pollImport.errorCount++;
-          if(pollImport.errorCount > 10) {
-            importFailed([I18n.t('errors.server_stopped_responding', "The server stopped responding to status requests")]);
-          } else {
-            setTimeout(pollImport, 2000);
-          }
-        });
-      };
-      setTimeout(pollImport, 5000);
-    });
+      }, function() {
+        pollImport.errorCount = pollImport.errorCount || 0;
+        pollImport.errorCount++;
+        if(pollImport.errorCount > 10) {
+          importFailed([I18n.t('errors.server_stopped_responding', "The server stopped responding to status requests")]);
+        } else {
+          setTimeout(pollImport, 2000);
+        }
+      });
+    };
+    setTimeout(pollImport, 5000);
   });
 });
 </script>

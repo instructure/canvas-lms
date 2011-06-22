@@ -40,9 +40,8 @@
 }
 </style>
 
-<% js_block do %>
+<% js_block :i18n_scope => 'terms.index' do %>
 <script>
-I18n.scoped('terms.index', function(I18n) {
 $(document).ready(function() {
   $(".edit_term_link").click(function(event) {
     event.preventDefault();
@@ -120,7 +119,6 @@ $(document).ready(function() {
     $("#terms").prepend($term.show());
     $term.find(".edit_term_link").click();
   });
-});
 });
 </script>
 <% end %>

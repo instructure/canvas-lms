@@ -243,6 +243,8 @@ class I18nJsExtractor
   STRING_LITERAL = /'((\\'|[^'])*)'|"((\\"|[^"])*)"/m
   STRING_CONCATENATION = /(#{STRING_LITERAL})(\s*\+\s*(#{STRING_LITERAL})\s*)*/m
 
+  RUBY_SYMBOL = /:(\w+|#{STRING_LITERAL})/
+
   REALLY_SIMPLE_HASH_LITERAL = /
     \{\s*
       #{HASH_KEY}\s*#{STRING_LITERAL}\s*
@@ -259,8 +261,20 @@ class I18nJsExtractor
     \}
   /mx
 
-  JS_BLOCK_START = /<%\s*js_block\s*(do|\{)\s*%>\s*/
-  JS_BLOCK = /^([ \t]*)#{JS_BLOCK_START}\n(.*?)\n\1<%\s*(end|\})\s*%>/m
+  JS_BLOCK_START = /
+    <%\s*
+      js_block\s*
+      ([^%]*? :i18n_scope\s* =>\s* (#{STRING_LITERAL}|#{RUBY_SYMBOL}))? [^%]*?
+      (do|\{)\s*
+    %>\s*
+  /mx
+  JS_BLOCK = /
+    ^([ \t]*) # we rely on indentation matching for the block (and we ignore any single-line js_block calls)
+    #{JS_BLOCK_START}\n
+    (.*?)\n
+    \1
+    <%\s*(end|\})\s*%>
+  /mx
 
   SCOPED_BLOCK_START = /I18n\.scoped/
   SCOPED_BLOCK = /^([ \t]*)#{SCOPED_BLOCK_START}\(#{I18N_KEY},\s*function\s*\(I18n\)\s*\{(.*?)\n\1\}\)(;|$)/m
@@ -281,29 +295,11 @@ class I18nJsExtractor
   /mx
 
   def process(source, options = {})
-    line_offset = options[:line_offset] || 1
     return false unless source =~ I18N_ANY
     if options.delete(:erb)
-      extract_from_erb(source, :line_offset => line_offset).each do |block_source, v, offset|
-        process block_source, options.merge(:restrict_to_scope => true, :line_offset => offset + 1)
-      end
+      process_js_blocks(source, options)
     else
-      scopes = find_matches(source, SCOPED_BLOCK_START, SCOPED_BLOCK, :start_prefix => /\s*/, :line_offset => line_offset, :expression => "I18n scope")
-      scopes.each do |(v, v, scope, scope_source, v, offset)|
-        process_block scope_source, scope, options.merge(:line_offset => offset)
-      end
-      # see if any other I18n calls happen outside of a scope
-      chunks = source.split(/(#{SCOPED_BLOCK.to_s.gsub(/\\1/, '\\\\2')})/m) # captures subpatterns too, so we need to pick and choose what we want
-      while chunk = chunks.shift
-        if chunk =~ /^([ \t]*)#{SCOPED_BLOCK_START}/
-          chunks.slice!(0, 4)
-        else
-          find_matches chunk, I18N_ANY do |match|
-            raise "possibly unscoped I18n call on line #{line_offset + match.last} (hint: check your indentation)"
-          end
-        end
-        line_offset += chunk.count("\n")
-      end
+      process_js(source, options)
     end
     true
   end
@@ -337,6 +333,43 @@ class I18nJsExtractor
       end
     end
     matches
+  end
+
+  def process_js(source, options = {})
+    line_offset = options[:line_offset] || 1
+    scopes = find_matches(source, SCOPED_BLOCK_START, SCOPED_BLOCK, :start_prefix => /\s*/, :line_offset => line_offset, :expression => "I18n scope")
+    scopes.each do |(v, v, scope, scope_source, v, offset)|
+      process_block scope_source, scope, options.merge(:line_offset => offset)
+    end
+    # see if any other I18n calls happen outside of a scope
+    chunks = source.split(/(#{SCOPED_BLOCK.to_s.gsub(/\\1/, '\\\\2')})/m) # captures subpatterns too, so we need to pick and choose what we want
+    while chunk = chunks.shift
+      if chunk =~ /^([ \t]*)#{SCOPED_BLOCK_START}/
+        chunks.slice!(0, 4)
+      else
+        find_matches chunk, I18N_ANY do |match|
+          raise "possibly unscoped I18n call on line #{line_offset + match.last} (hint: check your indentation)"
+        end
+      end
+      line_offset += chunk.count("\n")
+    end
+  end
+
+  def process_js_blocks(source, options = {})
+    line_offset = options[:line_offset] || 1
+    extract_from_erb(source, :line_offset => line_offset).each do |scope, block_source, offset|
+      offset = line_offset + offset
+      find_matches block_source, /(#{SCOPED_BLOCK_START})/ do |match|
+        raise "scoped blocks are no longer supported in js_blocks, use :i18n_scope instead (line #{offset + match.last})"
+      end
+      if scope && (scope = process_literal(scope))
+        process_block block_source, scope, options.merge(:restrict_to_scope => true, :line_offset => offset)
+      elsif block_source =~ I18N_ANY
+        find_matches block_source, /#{I18N_ANY}.*$/ do |match|
+          raise "possibly unscoped I18n call on line #{offset + match.last} (hint: did you forget your :i18n_scope?)"
+        end
+      end
+    end
   end
 
   def process_block(source, scope, options = {})
@@ -402,7 +435,7 @@ class I18nJsExtractor
     raise "no default provided for #{key.inspect} on line #{line_offset}" if default.nil?
     if default =~ /\A['"]/
       raise "erb cannot be used inside of default values (line #{line_offset})" if default =~ /<%/ # e.g. if you do I18n.t('foo', '<%= name %>') in a view
-      process_string(default) rescue (raise "unable to \"parse\" default for #{key.inspect} on line #{line_offset}: #{$!}")
+      process_literal(default) rescue (raise "unable to \"parse\" default for #{key.inspect} on line #{line_offset}: #{$!}")
     else
       hash = JSON.parse(sanitize_json_hash(default)) rescue (raise "unable to \"parse\" default for #{key.inspect} on line #{line_offset}: #{$!}")
       if (invalid_keys = (hash.keys.map(&:to_sym) - [:one, :other, :zero])).size > 0
@@ -415,7 +448,7 @@ class I18nJsExtractor
   def extract_from_erb(source, options = {})
     line_offset = options[:line_offset] || 0
     blocks = find_matches(source, JS_BLOCK_START, JS_BLOCK, :start_prefix => /^\s*/, :start_suffix => /$/, :line_offset => line_offset, :expression => "js_block")
-    blocks.map{ |block| block[-3, 3] }
+    blocks.map{ |b| [b[3], b[14], b[16]] }
   end
 
   def sanitize_json_hash(string)
@@ -424,11 +457,11 @@ class I18nJsExtractor
         '"' + m2.delete("'\":") + '":'
       }
     }.gsub(STRING_LITERAL) { |match|
-      process_string(match).inspect # double-quoted strings only
+      process_literal(match).inspect # double-quoted strings only
     }
   end
 
-  def process_string(string)
+  def process_literal(string)
     instance_eval(string.gsub(/(^|[^\\])#/, '\1\\#'))
   end
 end

@@ -27,9 +27,8 @@
 }
 </style>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'rubrics.show' do %>
 <script>
-I18n.scoped('rubrics.show', function(I18n) { 
   $(document).ready(function() {
     $("#right-side .edit_rubric_link").click(function(event) {
       event.preventDefault();
@@ -49,7 +48,6 @@ I18n.scoped('rubrics.show', function(I18n) {
       }
     });
   });
-})
 </script>
 <% end %>
 <h2><%= @actual_rubric.title %></h2>

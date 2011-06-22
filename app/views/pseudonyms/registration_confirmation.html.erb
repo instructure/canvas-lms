@@ -56,9 +56,8 @@
 </div>
 
 
-<% js_block do %>
+<% js_block :i18n_scope => 'pseudonyms.regisration_confirmation' do %>
 <script type="text/javascript">
-I18n.scoped('pseudonyms.regisration_confirmation', function(I18n) {
 $(document).ready(function() {
   $("#registration_confirmation_form :text:first").focus().select();
   $("#registration_confirmation_form").submit(function(event) {
@@ -93,7 +92,6 @@ $(document).ready(function() {
     }
     return success;
   });
-});
 });
 </script>
 <% end %>

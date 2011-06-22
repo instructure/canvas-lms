@@ -56,16 +56,15 @@
   </style>
 <% end %>
 <% jammit_js :edit_rubric %>
-<% js_block do %>
+<% js_block :i18n_scope => 'rubrics.assessments' do %>
 <script>
-var rubricEditing;
-var rubricAssociation = {
-  addAssessment: function($association, assessment) {
-    $association.find(".assessor_list").find(".none_assigned_message").remove();
-    $association.find(".assessor_list").append("<li>" + assessment.assessor_name + "</li>");
+  window.rubricEditing = null;
+  window.rubricAssociation = {
+    addAssessment: function($association, assessment) {
+      $association.find(".assessor_list").find(".none_assigned_message").remove();
+      $association.find(".assessor_list").append("<li>" + assessment.assessor_name + "</li>");
+    }
   }
-}
-I18n.scoped('rubrics.assessments', function(I18n) {
   $(document).ready(function() {
     $(".association_edit textarea").focus(function() {
       $(this).select();
@@ -164,7 +163,6 @@ I18n.scoped('rubrics.assessments', function(I18n) {
       });
     });
   });
-})
 </script>
 <% end %>
 

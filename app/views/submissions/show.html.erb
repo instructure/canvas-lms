@@ -13,9 +13,8 @@
     }
   </style>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'submissions.show' do %>
   <script>
-  I18n.scoped('submissions.show', function(I18n) { 
   $("#content").addClass('padless');
   var fileIndex = 1;
   var submissionLoaded = function(data) {
@@ -267,7 +266,6 @@
       $.ajaxJSON(url, 'GET', {}, submissionLoaded);
     }, 500);
   };
-  })
   </script>
 <% end %>
   <div style="padding: 0px 20px 3px;" class="submission_details">

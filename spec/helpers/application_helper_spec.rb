@@ -75,6 +75,7 @@ describe ApplicationHelper do
     end
 
     it "should cache inline translations on render" do
+      ApplicationHelper.cached_translation_blocks = {}
       js_blocks << {:i18n_scope => "time", :contents => '<script>alert("test")</script>'} <<
                    {:i18n_scope => "time", :contents => '<script>alert("test2")</script>'} <<
                    {:i18n_scope => "foo", :contents => '<script>alert("foo")</script>'} <<

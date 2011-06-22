@@ -1,6 +1,5 @@
-<% js_block do %>
+<% js_block :i18n_scope => 'groups' do %>
 <script>
-I18n.scoped('groups', function(I18n) {
   window.addGroupCategory = function(callback) {
     $("#add_category_form").dialog('close').dialog({
       autoOpen: false,
@@ -53,7 +52,6 @@ I18n.scoped('groups', function(I18n) {
       }
     });
   });
-});
 </script>
 <% end %>
 <% form_tag context_url(@context, :create_category_context_groups_url), {:id => "add_category_form", :style => "display: none;"} do %>

@@ -1,8 +1,9 @@
-<% js_block do %>
+<% js_block :i18n_scope => "submissions" do %>
 <script>
-var INST = INST || {};
-INST.downloadSubmissions = function(url) {
-  I18n.scoped("submissions", function(I18n) { 
+  if (!window.INST) {
+    window.INST = {};
+  }
+  INST.downloadSubmissions = function(url) {
     var cancelled = false;
     $("#download_submissions_dialog").dialog('close').dialog({
       autoOpen: false,
@@ -53,8 +54,7 @@ INST.downloadSubmissions = function(url) {
       });
     }
     checkForChange();
-  })
-}
+  }
 </script>
 <% end %>
 <div id="download_submissions_dialog" style="display: none;">

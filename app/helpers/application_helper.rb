@@ -227,7 +227,7 @@ module ApplicationHelper
       @included_i18n_scopes << scope
       js_translations_for(scope)
     end
-    contents.sub!(/(<script[^>]*>)(.*?)(<\/script>)/m, "\\1\n#{translations}I18n.scoped(#{scope.inspect}, function(I18n){\n\\2\n});\n\\3")
+    contents.gsub!(/(<script[^>]*>)([^<].*?)(<\/script>)/m, "\\1\n#{translations}I18n.scoped(#{scope.inspect}, function(I18n){\n\\2\n});\n\\3")
   end
 
   def js_translations_for(scope)

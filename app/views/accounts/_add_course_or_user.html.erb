@@ -84,9 +84,8 @@
   </div>
 </div>
 
-<% js_block do %>
+<% js_block :i18n_scope => "accounts" do %>
 <script>
-I18n.scoped("accounts", function(I18n) {
   $(document).ready(function() {
     $(".add_user_link").click(function(event) {
       event.preventDefault();
@@ -179,6 +178,5 @@ I18n.scoped("accounts", function(I18n) {
       $("#add_course_dialog").dialog('close');
     });
   });
-});
 </script>
 <% end %>
