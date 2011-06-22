@@ -33,6 +33,7 @@ javascripts:
     - public/javascripts/feedback.js
     - public/javascripts/license_help.js
     - public/javascripts/wiki_sidebar.js
+    - public/javascripts/translations/_core.js
   speed_grader:
     - public/javascripts/jquery.elastic.js
     - public/javascripts/ui.selectmenu.js
