@@ -30,6 +30,12 @@ describe Assignment do
     @a.unpublish
     @a.state.should eql(:available)
   end
+
+  it "should always be associated with a group" do
+    assignment_model
+    @assignment.save!
+    @assignment.assignment_group.should_not be_nil
+  end
   
   it "should be able to submit homework" do
     setup_assignment_with_homework

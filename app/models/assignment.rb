@@ -452,6 +452,10 @@ class Assignment < ActiveRecord::Base
   
   def infer_state_from_course
     self.workflow_state = "published" if (self.context.publish_grades_immediately rescue false)
+    if self.assignment_group_id.nil?
+      self.context.require_assignment_group
+      self.assignment_group = self.context.assignment_groups.active.first
+    end
   end
   protected :infer_state_from_course
   
