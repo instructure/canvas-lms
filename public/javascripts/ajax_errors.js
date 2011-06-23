@@ -71,10 +71,11 @@ window.onerror = function (msg, url, line) {
 };
 
 // puts the little red box when something bad happens in ajax.
+I18n.scoped('ajax_errors', function(I18n){
 $(document).ready(function() {
   $("#instructure_ajax_error_result").defaultAjaxError(function(event, request, settings, error, debugOnly) {
     var status = "0";
-    var text = "No text";
+    var text = I18n.t('no_text', "No text");
     var json_data = {};
     try {
       status = request.status;
@@ -83,12 +84,12 @@ $(document).ready(function() {
     } catch(e) {}
     $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
       if(json_data && json_data.status == 'AUT') {
-        ajaxErrorFlash("There was a problem with your request, possibly due to a long period of inactivity.  Please reload the page and try again.", request);
+        ajaxErrorFlash(I18n.t('errors.timeout', "There was a problem with your request, possibly due to a long period of inactivity.  Please reload the page and try again."), request);
       } else {
-        ajaxErrorFlash("Oops! The last request didn't work out.", request);
+        ajaxErrorFlash(I18n.t('errors.unhandled', "Oops! The last request didn't work out."), request);
       }
     }, function() {
-      ajaxErrorFlash("Connection to " + location.host + " was lost.  Please make sure you're connected to the Internet and try again.", request);
+      ajaxErrorFlash(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet and try again.", {host: location.host}), request);
     }, {skipDefaultError: true});
     var $obj = $(this);
     var ajaxErrorFlash = function(message, xhr) {
@@ -98,7 +99,7 @@ $(document).ready(function() {
               (i.contentWindow && i.contentWindow.document) || 
               window.frames[$obj.attr('id')].document;
       var $body = $(d).find("body");
-      $body.html("<h1>Ajax Error: " + status + "<\/h1>");
+      $body.html($("<h1 />").text(I18n.t('error_heading', 'Ajax Error: %{status_code}', {status_code: status})));
       $body.append(text);
       $("#instructure_ajax_error_box").hide();
       var pre = "";
@@ -106,7 +107,7 @@ $(document).ready(function() {
         message = message + "<br\/><span style='font-size: 0.7em;'>(Development Only)<\/span>";
       }
       if(debugOnly || INST.environment != "production") {
-        message += "<br\/><a href='#' class='last_error_details_link'>details...<\/a>";
+        message += "<br\/><a href='#' class='last_error_details_link'>" + $.htmlEscape(I18n.t('links.details', 'details...')) + "<\/a>";
       }
       $.flashError(message);
     };
@@ -162,4 +163,5 @@ $(document).ready(function() {
     });
   });
   
+});
 });
