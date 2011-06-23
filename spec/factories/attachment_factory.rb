@@ -37,9 +37,11 @@ def valid_attachment_attributes(opts={})
   }
 end
 
-def stub_png_data
-  sio = StringIO.new("ohai")
-  sio.stub!(:original_filename).and_return('test.png')
+def stub_png_data(filename = 'test.png', data = nil)
+  $stub_file_counter ||= 0
+  data ||= "ohai#{$stub_file_counter += 1}"
+  sio = StringIO.new(data)
+  sio.stub!(:original_filename).and_return(filename)
   sio.stub!(:content_type).and_return('image/png')
   sio
 end

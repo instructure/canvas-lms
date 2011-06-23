@@ -94,6 +94,16 @@ ul.instTree li.leaf
 .content_panel.addable_content_panel .links .sub_links 
   display: block
 
+.content_panel.downloadable_content_panel .links .sub_links
+  display: block
+  float: right
+  > span
+    visibility: hidden
+  > a
+    visibility: hidden
+  > .download_zip
+    visibility: visible
+
 .content_panel #rename_entry_field 
   font-size: 1.2em
 

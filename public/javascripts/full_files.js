@@ -1322,7 +1322,8 @@ var fileStructureData = [];
                 $panel.find(".rename_item_link,.delete_item_link,.folder_url").attr('href', folder_url);
                 $panel.find(".breadcrumb").empty().append(files.breadcrumb());
                 $panel.toggleClass('editable_content_panel', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)))
-                  .toggleClass('addable_content_panel', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)));
+                  .toggleClass('addable_content_panel', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)))
+                  .toggleClass('downloadable_content_panel', !$panel.hasClass('editable_content_panel') && !$panel.hasClass('addable_content_panel') && !!(data.permissions && data.permissions.read_contents));
 
                 $panel.removeClass('to_be_hidden');
                 $panel.find(".download_zip,.upload_zip").hide();

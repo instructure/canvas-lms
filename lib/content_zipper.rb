@@ -275,7 +275,12 @@ class ContentZipper
     if callback && (folder.hidden? || folder.locked)
       callback.call(folder, folder_names)
     end
-    folder.file_attachments.scoped(:conditions => "file_state IN ('available', 'hidden')").select{|a| !@user || a.grants_right?(@user, nil, :download)}.each do |attachment|
+    attachments = if !@user || folder.context.grants_right?(@user, nil, :manage_files)
+                folder.active_file_attachments
+              else
+                folder.visible_file_attachments
+              end
+    attachments.select{|a| !@user || a.grants_right?(@user, nil, :download)}.each do |attachment|
       callback.call(attachment, folder_names) if callback
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
