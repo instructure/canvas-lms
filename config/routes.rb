@@ -636,11 +636,6 @@ ActionController::Routing::Routes.draw do |map|
   
   # Routes for course exports
   map.connect 'xsd/:version.xsd', :controller => 'content_exports', :action => 'xml_schema'
-  map.resources :content_exports do |ce|
-    ce.resources :files do |file|
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-    end
-  end
 
   map.resources :jobs, :only => %w(index), :collection => %w[batch_update]
 

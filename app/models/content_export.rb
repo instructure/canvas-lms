@@ -68,10 +68,6 @@ class ContentExport < ActiveRecord::Base
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
   
-  def download_url
-    self.attachment ? self.attachment.authenticated_s3_url : nil
-  end
-  
   def error_message
     self.settings[:last_error]
   end

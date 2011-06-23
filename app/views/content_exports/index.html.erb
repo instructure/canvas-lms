@@ -19,7 +19,7 @@
           <p>
             <%= t 'links.download', "Course Export from %{date}: *Click here to download*",
                     :date => "<span class=\"created_at time_ago_date\">#{datetime_string export.created_at}</span>".html_safe,
-                    :wrapper => "<a href=\"#{export.download_url}\">\\1</a>" %>
+                    :wrapper => link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
           </p>
         <% end %>
       <% end %>
