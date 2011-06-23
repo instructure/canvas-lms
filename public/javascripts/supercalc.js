@@ -17,7 +17,7 @@
  */
 
 var calcCmd;
-(function() {
+I18n.scoped('calculator', function(I18n){
 var generateFinds = function($table) {
   var finds = {};
   finds.formula_rows = $table.find(".formula_row");
@@ -45,13 +45,22 @@ $.fn.superCalc = function(options, more_options) {
     options = options || {};
     options.c1 = true;
     var $entryBox = $(this);
-    var $table = $("<table class='formulas'><thead><tr><th>Formula</th><th>Result</th><th>&nbsp;</th></tr></thead><tfoot><tr><td colspan='3' class='last_row_details' style='display: none;'>the last formula row will be used to compute the final answer</td></tr><tr><td></td><td class='decimal_places'><select class='round'><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select> Decimal Places</td></tr></tfoot><tbody></tbody></table>");
+    var $table = $("<table class='formulas'>" +
+                      "<thead><tr><th>" + $.h(I18n.t('headings.formula', "Formula")) + "</th><th>" + $.h(I18n.t('headings.result', "Result")) + "</th><th>&nbsp;</th></tr></thead>" +
+                      "<tfoot>" +
+                        "<tr><td colspan='3' class='last_row_details' style='display: none;'>" + $.h(I18n.t('last_formula_row', "the last formula row will be used to compute the final answer")) + "</td></tr>" +
+                        "<tr><td></td><td class='decimal_places'>" +
+                          I18n.t('how_many_decimal_places', '%{number_selector} Decimal Places', {number_selector: $.raw("<select class='round'><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select>")}) +
+                        "</td></tr>" +
+                      "</tfoot>" +
+                      "<tbody></tbody>"+
+                    "</table>");
     $(this).data('table', $table);
     $entryBox.before($table);
     $table.find("tfoot tr:last td:first").append($entryBox);
     var $displayBox = $entryBox.clone(true).removeAttr('id');
     $table.find("tfoot tr:last td:first").append($displayBox);
-    var $enter = $("<button type='button' class='save_formula_button'>Save</button>");
+    var $enter = $("<button type='button' class='save_formula_button'>" + $.h(I18n.t('buttons.save', "Save")) + "</button>");
     $table.find("tfoot tr:last td:first").append($enter);
     $entryBox.hide();
     var $input = $("<input type='text' readonly='true'/>");
@@ -114,7 +123,7 @@ $.fn.superCalc = function(options, more_options) {
           finds.formula_rows.removeClass('last_row').filter(":last").addClass('last_row');
         }
         finds.last_row_details.showIf(finds.formula_rows.length > 1);
-        finds.status.removeAttr('title').filter(":last").attr('title', 'This value is an example final answer for this question type');
+        finds.status.removeAttr('title').filter(":last").attr('title', I18n.t('sample_final_answer', 'This value is an example final answer for this question type'));
         $entryBox.val("");
       }
     });
@@ -123,7 +132,7 @@ $.fn.superCalc = function(options, more_options) {
       if(event.keyCode == 13 || enter && $displayBox.val()) {
         event.preventDefault();
         event.stopPropagation();
-        var $tr = $("<tr class='formula_row'><td class='formula' title='Drag to reorder'></td><td class='status'></td><td><a href='#' class='delete_formula_row_link no-hover'><img src='/images/delete_circle.png'/></a></td></tr>");
+        var $tr = $("<tr class='formula_row'><td class='formula' title='" + $.h(I18n.t('drag_to_reorder', 'Drag to reorder')) + "'></td><td class='status'></td><td><a href='#' class='delete_formula_row_link no-hover'><img src='/images/delete_circle.png'/></a></td></tr>");
         $tr.find("td:first").text($entryBox.val());
         $entryBox.val("");
         $displayBox.val("");
@@ -137,4 +146,4 @@ $.fn.superCalc = function(options, more_options) {
     });
   }
 };
-})();
+});
