@@ -453,8 +453,23 @@ I18n.scope.prototype = {
       textOrKey = this.t('labels.' + textOrKey, defaultValue)
     }
     return this.t("#before_label_wrapper", "%{text}:", {'text': textOrKey})
+  },
+  toTime: function(scope, d) {
+    return I18n.toTime(scope, d);
+  },
+  toNumber: function(number, options) {
+    return I18n.toNumber(number, options);
+  },
+  toCurrency: function(number, options) {
+    return I18n.toCurrency(number, options);
+  },
+  toHumanSize: function(number, options) {
+    return I18n.toHumanSize(number, options);
+  },
+  toPercentage: function(number, options) {
+    return I18n.toPercentage(number, options);
   }
-}
+};
 I18n.scope.prototype.t = I18n.scope.prototype.translate;
 I18n.scope.prototype.l = I18n.scope.prototype.localize;
 I18n.scope.prototype.p = I18n.scope.prototype.pluralize;

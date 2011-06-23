@@ -267,10 +267,9 @@ class I18nJsExtractor
 
   I18N_ANY = /(I18n)/
 
-  I18N_CALL_START = /I18n\.(t|beforeLabel)/
+  I18N_CALL_START = /I18n\.(t|translate|beforeLabel)\(/
   I18N_CALL = /
     #{I18N_CALL_START}
-    \(
       #{I18N_KEY} # key
       (,\s*
         ( #{STRING_CONCATENATION} | #{REALLY_SIMPLE_HASH_LITERAL} ) # default
