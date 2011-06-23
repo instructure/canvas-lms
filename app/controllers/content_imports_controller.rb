@@ -83,7 +83,7 @@ class ContentImportsController < ApplicationController
         end
       else
         @plugins = Canvas::Plugin.all_for_tag(:export_system)
-        @select_options = @plugins.map{|p|[p.settings[:select_text], p.id]}
+        @select_options = @plugins.map{|p|[p.setting(:select_text), p.id]}
         @pending_migrations = ContentMigration.find_all_by_context_id(@context.id).any?
         render
       end
