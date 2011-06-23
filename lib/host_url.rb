@@ -20,12 +20,15 @@ class HostUrl
   class << self
     attr_accessor :outgoing_email_address, :outgoing_email_domain
 
+    @@default_host = nil
+    @@file_host = nil
+    @@domain_config = nil
+
     def context_host(context=nil)
       default_host
     end
     
     def default_host
-      @@default_host ||= nil
       if !@@default_host
         @@domain_config ||= File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].with_indifferent_access
         @@default_host = @@domain_config[:domain] if @@domain_config && @@domain_config.has_key?(:domain)
@@ -36,7 +39,6 @@ class HostUrl
     end
     
     def file_host(account)
-      @@file_host ||= nil
       return @@file_host if @@file_host
       res = nil
       @@domain_config ||= File.exist?("#{RAILS_ROOT}/config/domain.yml") && YAML.load_file("#{RAILS_ROOT}/config/domain.yml")[RAILS_ENV].with_indifferent_access
