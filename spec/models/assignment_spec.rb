@@ -74,12 +74,12 @@ describe Assignment do
     @assignment.needs_grading_count.should eql(1)
   end
   
-  it "should not override the grade if the assignment has no points possible" do
+  it "should preserve pass/fail with zero points possible" do
     setup_assignment_without_submission
     @assignment.grading_type = 'pass_fail'
-    @assignment.points_possible = 0
+    @assignment.points_possible = 0.0
     @assignment.save
-    s = @assignment.grade_student(@user, :grade => "pass")
+    s = @assignment.grade_student(@user, :grade => 'pass')
     s.should be_is_a(Array)
     @assignment.reload
     @assignment.submissions.size.should eql(1)
@@ -87,8 +87,67 @@ describe Assignment do
     @submission.state.should eql(:graded)
     @submission.should eql(s[0])
     @submission.score.should eql(0.0)
-    @submission.grade.should eql("pass")
+    @submission.grade.should eql('pass')
     @submission.user_id.should eql(@user.id)
+
+    @assignment.grade_student(@user, :grade => 'fail')
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.should eql(s[0])
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('fail')
+    @submission.user_id.should eql(@user.id)
+  end
+
+  it "should preserve pass/fail with no points possible" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'pass_fail'
+    @assignment.points_possible = nil
+    @assignment.save
+    s = @assignment.grade_student(@user, :grade => 'pass')
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.should eql(s[0])
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('pass')
+    @submission.user_id.should eql(@user.id)
+
+    @assignment.grade_student(@user, :grade => 'fail')
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.should eql(s[0])
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('fail')
+    @submission.user_id.should eql(@user.id)
+  end
+
+  it "should give a grade to extra credit assignments" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'points'
+    @assignment.points_possible = 0.0
+    @assignment.save
+    s = @assignment.grade_student(@user, :grade => "1")
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.should eql(s[0])
+    @submission.score.should eql(1.0)
+    @submission.grade.should eql("1")
+    @submission.user_id.should eql(@user.id)
+
+    @submission.score = 2.0
+    @submission.save
+    @submission.reload
+    @submission.grade.should eql("2")
   end
   
   it "should be able to grade an already-existing submission" do
