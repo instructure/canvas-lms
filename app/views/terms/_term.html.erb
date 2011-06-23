@@ -68,7 +68,7 @@
   </td>
   <td class="links">
     <a href="#" class="edit_term_link no-hover"><%= image_tag "edit.png" %></a>
-    <% if term && !term.courses.empty? %>
+    <% if term && !term.courses.active.empty? %>
       <a href="#" class="cant_delete_term_link no-hover"><%= image_tag "delete_circle_gray.png" %></a>
     <% elsif term != @context.default_enrollment_term %>
       <a href="#" class="delete_term_link no-hover"><%= image_tag "delete.png" %></a>
