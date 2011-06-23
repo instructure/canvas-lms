@@ -1234,7 +1234,7 @@ class Course < ActiveRecord::Base
   def self.find_or_create_for_new_context(obj_class, new_context, old_context, old_id)
     association_name = obj_class.table_name
     old_item = old_context.send(association_name).find_by_id(old_id)
-    res = new_context.send(association_name).active.find_by_cloned_item_id(old_item.cloned_item_id) if old_item
+    res = new_context.send(association_name).first(:conditions => { :cloned_item_id => old_item.cloned_item_id}, :order => 'id desc') if old_item
     if !res
       old_item = old_context.send(association_name).active.find_by_id(old_id)
       res = old_item.clone_for(new_context) if old_item

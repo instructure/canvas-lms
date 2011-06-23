@@ -437,7 +437,31 @@ describe Course, "backup" do
       html = @new_topic.message
       html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
     end
-    
+
+    it "should merge locked files and retain correct html links" do
+      course_model
+      attachment_model
+      @old_attachment = @attachment
+      @old_attachment.update_attribute(:hidden, true)
+      @old_attachment.reload.should be_hidden
+      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<img src='/courses/#{@course.id}/files/#{@attachment.id}/preview'>")
+      html = @old_topic.message
+      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/preview"))
+      @old_course = @course
+      @new_course = course_model
+      @new_course.merge_into_course(@old_course, :everything => true)
+      @old_attachment.reload
+      @old_attachment.cloned_item_id.should_not be_nil
+      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
+      @new_attachment.should_not be_nil
+      @old_topic.reload
+      @old_topic.cloned_item_id.should_not be_nil
+      @new_topic = @new_course.discussion_topics.find_by_cloned_item_id(@old_topic.cloned_item_id)
+      @new_topic.should_not be_nil
+      html = @new_topic.message
+      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/preview"))
+    end
+
     it "should merge only selected content into another course" do
       course_model
       attachment_model
