@@ -82,7 +82,7 @@ I18n.prepareOptions = function() {
   return options;
 };
 
-I18n.interpolate = function(message, options) {
+I18n.interpolate = function(message, options, needsEscaping) {
   options = this.prepareOptions(options);
   var matches = message.match(this.PLACEHOLDER);
 
@@ -92,6 +92,9 @@ I18n.interpolate = function(message, options) {
 
   var placeholder, value, name;
 
+  if (needsEscaping) {
+    message = $.h(message);
+  }
   for (var i = 0; placeholder = matches[i]; i++) {
     name = placeholder.replace(this.PLACEHOLDER, "$1");
 
@@ -99,6 +102,11 @@ I18n.interpolate = function(message, options) {
 
     if (!this.isValidNode(options, name)) {
       value = "[missing " + placeholder + " value]";
+    }
+    if (needsEscaping) {
+      value = $.h(value);
+    } else if (value && value.htmlSafe) {
+      return this.interpolate(message, options, true);
     }
 
     regex = new RegExp(placeholder.replace(/\{/gm, "\\{").replace(/\}/gm, "\\}"));

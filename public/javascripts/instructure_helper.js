@@ -714,7 +714,9 @@
   };
   
   $.htmlEscape = function(str) {
-    return $.htmlEscape.element.text(str).html();
+    return str && str.htmlSafe ?
+      str.toString() :
+      $.htmlEscape.element.text(str).html();
   }
   $.htmlEscape.element = $('<div/>');
   // escape all string values (not keys) in an object
@@ -726,6 +728,16 @@
         obj[k] = $.htmlEscape(v);
       }
     }
+  }
+  $.h = $.htmlEscape;
+
+  // useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
+  // note that raw returns a String object, so you may want to call toString
+  // if you're using it elsewhere
+  $.raw = function(str) {
+    str = new String(str);
+    str.htmlSafe = true;
+    return str;
   }
   
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
