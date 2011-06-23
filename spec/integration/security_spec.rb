@@ -190,12 +190,16 @@ describe "security" do
   end
 
   it "should not allow logins to safefiles domains" do
-    HostUrl.stub!(:file_host).and_return('files-test.host')
+    HostUrl.stub!(:is_file_host?).and_return(true)
     HostUrl.stub!(:default_host).and_return('test.host')
     get "http://files-test.host/login"
     response.should be_redirect
     uri = URI.parse response['Location']
     uri.host.should == 'test.host'
+
+    HostUrl.stub!(:is_file_host?).and_return(false)
+    get "http://test.host/login"
+    response.should be_success
   end
 
   class Basic
