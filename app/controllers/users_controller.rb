@@ -26,7 +26,11 @@ class UsersController < ApplicationController
   
   def oauth
     if !feature_and_service_enabled?(params[:service])
-      flash[:error] = "#{(params[:service] || "that service").titleize} has not been enabled"
+      if params[:service]
+        flash[:error] = t('named_service_not_enabled', "The service \"%{name_of_service}\" has not been enabled", :name_of_service => params[:service])
+      else
+        flash[:error] = t('service_not_enabled', "That service has not been enabled")
+      end
       return
     end
     if params[:service] == "google_docs"
@@ -96,7 +100,7 @@ class UsersController < ApplicationController
     end
     
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
-      flash[:error] = "OAuth Request failed.  Couldn't find valid request"
+      flash[:error] = t('oauth_fail', "OAuth Request failed. Couldn't find valid request")
       redirect_to (@current_user ? profile_url : root_url)
     elsif request.host_with_port != oauth_request.original_host_with_port
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
@@ -105,35 +109,35 @@ class UsersController < ApplicationController
       if params[:service] == "facebook"
         service = Facebook.authorize_success(@current_user, params[:access_token])
         if service
-          flash[:notice] = "Facebook account successfully added!"
+          flash[:notice] = t('facebook_added', "Facebook account successfully added!")
         else
-          flash[:error] = "Facebook authorization failed."
+          flash[:error] = t('facebook_fail', "Facebook authorization failed.")
         end
         return_to(oauth_request.return_url, profile_url)
       elsif params[:service] == "google_docs"
         begin
           google_docs_get_access_token(oauth_request)
           doc_list = google_doc_list
-          flash[:notice] = "Google Docs access authorized!"
+          flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
-          flash[:error] = "Google Docs authorization failed.  Please try again"
+          flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
         end
         return_to(session[:google_docs_authorization_return_to], profile_url)
       elsif params[:service] == "linked_in"
         begin
           linked_in_get_access_token(oauth_request)
-          flash[:notice] = "LinkedIn account successfully added!"
+          flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
-          flash[:error] = "LinkedIn authorization failed.  Please try again"
+          flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
         end
         return_to(session[:linked_in_authorization_return_to], profile_url)
       else
         begin
           token = twitter_get_access_token(oauth_request)
           favorites = twitter_list(token)
-          flash[:notice] = "Twitter access authorized!"
+          flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
-          flash[:error] = "Twitter authorization failed.  Please try again"
+          flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
         return_to(session[:twitter_authorization_return_to], profile_url)
       end
@@ -143,7 +147,7 @@ class UsersController < ApplicationController
   def ignore_channel
     @current_pseudonym.update_attribute(:login_path_to_ignore, params[:path])
     session[:conflict_channel] = nil
-    flash[:notice] = "You'll no longer receive warnings about the address #{params[:path]} from this login"
+    flash[:notice] = t('remove_warning', "You'll no longer receive warnings about the address %{email} from this login", :email => params[:path])
     redirect_to dashboard_url
   end
   
@@ -315,7 +319,7 @@ class UsersController < ApplicationController
       
       # TODO this is ugly
       @enrollments = []
-      @enrollments = @user.enrollments.select{|e| !e.deleted? && !e.course.deleted? }.sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] }
+      @enrollments = @user.enrollments.select{|e| !e.deleted? && e.course && !e.course.deleted? }.sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] }
       @courses = @enrollments.map{|e| e.course }
       @group_memberships = @user.group_memberships
       @context_groups = []
@@ -373,7 +377,7 @@ class UsersController < ApplicationController
       @pseudonym.path = params[:pseudonym][:unique_id]
       @pseudonym.errors.clear
       if @pseudonym.new_record? && CommunicationChannel.find_by_path_and_workflow_state(@pseudonym.unique_id, 'active')
-        @pseudonym.errors.add(:unique_id, "That login has already been taken")
+        @pseudonym.errors.add(:unique_id, t('login_taken', "That login has already been taken"))
       end
       if @pseudonym.valid?
         @pseudonym.save_without_session_maintenance
@@ -426,7 +430,7 @@ class UsersController < ApplicationController
     get_context
     @messages_view = :sentbox
     @messages = @context.sentbox_context_messages
-    @messages_view_header = "Sent Messages"
+    @messages_view_header = t('sent_messages_header', "Sent Messages")
     @per_page = 10
     @messages = @messages.paginate(:page => params[:page], :per_page => @per_page)
     get_all_pertinent_contexts
@@ -455,7 +459,7 @@ class UsersController < ApplicationController
       end
       respond_to do |format|
         if @user.update_attributes(params[:user])
-          flash[:notice] = 'User was successfully updated.'
+          flash[:notice] = t('user_updated', 'User was successfully updated.')
           format.html { redirect_to user_url(@user) }
           format.xml  { head :ok }
           format.json { render :json => @user.to_json(:methods => :default_pseudonym_id) }
@@ -470,7 +474,7 @@ class UsersController < ApplicationController
   def kaltura_session
     @user = @current_user
     if !@current_user
-      render :json => {:errors => {:base => "You must be logged in to use Kaltura"}, :logged_in => false}.to_json
+      render :json => {:errors => {:base => t('must_be_logged_in', "You must be logged in to use Kaltura")}, :logged_in => false}.to_json
     end
     client = Kaltura::ClientV3.new
     uid = "#{@user.id}_#{@domain_root_account.id}"
@@ -517,7 +521,7 @@ class UsersController < ApplicationController
         render :json => { 'url' => url }
       end
     else
-      render :status => 404, :text => "Could not find download URL"
+      render :status => 404, :text => t('could_not_find_url', "Could not find download URL")
     end
   end
   
@@ -539,9 +543,9 @@ class UsersController < ApplicationController
       @user_about_to_go_away.move_to_user(@user_that_will_still_be_around)
       @user_that_will_still_be_around.touch
       session[:merge_user_uuid] = nil
-      flash[:notice] = "User merge succeeded! #{@user_that_will_still_be_around.name} and #{@user_about_to_go_away.name} are now one and the same."
+      flash[:notice] = t('user_merge_success', "User merge succeeded! %{first_user} and %{second_user} are now one and the same.", :first_user => @user_that_will_still_be_around.name, :second_user => @user_about_to_go_away.name)
     else
-      flash[:error] = "User merge failed.  Please make sure you have proper permission and try again."
+      flash[:error] = t('user_merge_fail', "User merge failed. Please make sure you have proper permission and try again.")
     end
     if @user_that_will_still_be_around == @current_user
       redirect_to profile_url
@@ -626,7 +630,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, :manage)
       if @user.pseudonyms.any?{|p| p.managed_password? }
-        flash[:notice] = "You cannot delete a system-generated user"
+        flash[:notice] = t('no_deleting_sis_user', "You cannot delete a system-generated user")
         redirect_to profile_url
       end
     end
@@ -642,7 +646,7 @@ class UsersController < ApplicationController
       end
       
       respond_to do |format|
-        flash[:notice] = "#{@user.name} has been deleted"
+        flash[:notice] = t('user_is_deleted', "%{user_name} has been deleted", :user_name => @user.name)
         if @user == @current_user
           format.html { redirect_to root_url }
         else
@@ -699,7 +703,7 @@ class UsersController < ApplicationController
   
   def require_open_registration
     if @domain_root_account && !@domain_root_account.settings[:open_registration]
-      flash[:error] = "Open registration has not been enabled for this account"
+      flash[:error] = t('no_open_registration', "Open registration has not been enabled for this account")
       redirect_to root_url
       return false
     end

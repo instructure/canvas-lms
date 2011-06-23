@@ -377,17 +377,34 @@ class Enrollment < ActiveRecord::Base
   def self.readable_type(type)
     case type
     when 'TeacherEnrollment'
-      "Teacher"
+      t('#enrollment.roles.teacher', "Teacher")
     when 'StudentEnrollment'
-      "Student"
+      t('#enrollment.roles.student', "Student")
     when 'TaEnrollment'
-      "TA"
+      t('#enrollment.roles.ta', "TA")
     when 'ObserverEnrollment'
-      "Observer"
+      t('#enrollment.roles.observer', "Observer")
     when 'DesignerEnrollment'
-      "Designer"
+      t('#enrollment.roles.designer', "Designer")
     else
-      "Student"
+      t('#enrollment.roles.student', "Student")
+    end
+  end
+  
+  def workflow_readable_type
+    case self.workflow_state
+      when 'active'
+        t('#enrollment.workflow.active', "Active")
+      when 'completed'
+        t('#enrollment.workflow.completed', "Completed")
+      when 'deleted'
+        t('#enrollment.workflow.deleted', "Deleted")
+      when 'invited'
+        t('#enrollment.workflow.invited', "Invited")
+      when 'pending'
+        t('#enrollment.workflow.pending', "Pending")
+      when 'rejected'
+        t('#enrollment.workflow.rejected', "Rejected")
     end
   end
   

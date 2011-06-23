@@ -8,56 +8,56 @@
 %>
 <% jammit_js :user_name %>
   <fieldset id="name_and_email">
-    <legend>Name and Email</legend>
+    <legend><%= t('titles.name_and_email', 'Name and Email') %></legend>
     <table class="profile_table details user_details">
       <tr>
-        <th>Full Name:</th>
+        <th><%= before_label('full_name', 'Full Name') %></th>
         <td class="name"><%=h @user.name %></td>
       </tr>
       <tr>
-        <th>Display Name:</th>
+        <th><%= before_label('display_name', 'Display Name') %></th>
         <td class="short_name"><%=h @user.short_name %></td>
       </tr>
       <% if service_enabled?(:avatars) %>
         <tr>
-          <th>Profile Picture:</th>
+          <th><%= before_label('profile_picture', 'Profile Picture') %></th>
           <td>
             <span class="avatar_image">
               <img src="<%= @user.avatar_url(50, @domain_root_account && @domain_root_account.settings[:avatars], "#{request.protocol}#{request.host_with_port}/images/dotted_pic.png") %>"/>
             </span>
             <% if can_do(@user, @current_user, :remove_avatar) %>
-              <a href="<%= update_avatar_image_url(@user.id) %>" class="remove_avatar_picture_link">Remove avatar picture</a>
+              <a href="<%= update_avatar_image_url(@user.id) %>" class="remove_avatar_picture_link"><%= t('remove_avatar', 'Remove avatar picture') %></a>
             <% elsif !session["reported_#{@user.id}"] %>
-              <a href="<%= report_avatar_image_url(@user.id) %>" class="report_avatar_picture_link">Report inappropriate picture</a>
+              <a href="<%= report_avatar_image_url(@user.id) %>" class="report_avatar_picture_link"><%= t('report_naughtiness', 'Report inappropriate picture') %></a>
             <% end %>
           </td>
         </tr>
       <% end %>
       <tr>
-        <th>Default Email:</th>
+        <th><%= before_label('default_email', 'Default Email') %></th>
         <td><%=h @user.email %></td>
       </tr>
       <tr>
-        <th>Time Zone:</th>
-        <td class="time_zone"><%= @user.time_zone || "None" %></td>
+        <th><%= before_label('time_zone', 'Time Zone') %></th>
+        <td class="time_zone"><%= @user.time_zone || t('none', "None") %></td>
       </tr>
       <% if can_manage_admin_users || (!@enrollments.any?(&:admin?) && !@user.creation_sis_batch_id && can_do(@context, @current_user, :manage_students)) %>
         <td class="links" colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">
-          <a href="#" class="edit_user_link">Edit</a>
+          <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
           <% if current_user_is_site_admin?(:become_user) %>
             |
             <% if @context && !@context.is_a?(Account) %>
-              <a href="<%= context_url(@context, :context_url, :become_user_id => @user.id) %>"> Become</a>
+              <a href="<%= context_url(@context, :context_url, :become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>
             <% else %>
-              <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> Become</a>
+              <a href="<%= dashboard_url(:become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>
             <% end %>
           <% end %>
           <% if can_manage_user_logins %>
             | 
-            <a href="<%= user_admin_merge_url(@user.id) %>">Merge with Another User</a>
+            <a href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User') %></a>
             <% if (@context.is_a?(User) || @context.is_a?(Account)) && root_account %>
               |
-              <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>">Delete from <%= root_account.name %></a>
+              <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
             <% end %>
           <% end %>
         </td>
@@ -65,28 +65,28 @@
     </table>
   </fieldset>
 <div title="Edit User Details" id="edit_student_dialog" style="display: none;">
-  <p>You can update some of this user's information, but they can change it back if they choose.</p>
+  <p><%= t('update_instructions', "You can update some of this user's information, but they can change it back if they choose.") %></p>
   <% form_for @user, :url => user_url(@user), :html => {:id => "edit_student_form"} do |f| %>
     <input type="hidden" name="rename" value="1"/>
     <table class="formtable">
       <tr>
-        <td><%= f.label :name, "Full Name:" %></td>
+        <td><%= f.blabel :name, :en => "Full Name:" %></td>
         <td><%= f.text_field :name %></td>
       </tr><tr>
-        <td><%= f.label :short_name, "Display Name:" %></td>
+        <td><%= f.blabel :short_name, :en => "Display Name:" %></td>
         <td><%= f.text_field :short_name %></td>
       </tr>
       <% if can_manage_admin_users %>
         <tr>
-          <td><%= f.label :time_zone, "Time Zone:" %></td>
+          <td><%= f.blabel 'time_zone', :en => "Time Zone" %></td>
           <td><%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :default => ((@domain_root_account && @domain_root_account.default_time_zone) || "Mountain Time (US & Canada)") %></td>
         </tr>
       <% end %>
       <tr>
         <td colspan="2">
           <div class="button-container">
-            <button class="button submit_button" type="submit">Update Details</button>
-            <button class="button button-secondary cancel_button" type="button">Cancel</button>
+            <button class="button submit_button" type="submit"><%= t('buttons.update_details', 'Update Details') %></button>
+            <button class="button button-secondary cancel_button" type="button"><%= t('#buttons.cancel', 'Cancel') %></button>
           </div>
         </td>
     </table>

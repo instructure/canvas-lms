@@ -5,11 +5,11 @@
       <%= image_tag "#{notification.icon || 'warning'}.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
       <span class="title subject"><%= notification.subject %></span>
       <div class="sub_title">
-        <span class="context_code">Alert</span>
+        <span class="context_code"><%= t('alert', 'Alert') %></span>
       </div>
     </div>
     <div class="links">
-      <a href="#" rel="<%= dashboard_close_notification_path(notification.id) %>" class="close_notification_link">close</a>
+      <a href="#" rel="<%= dashboard_close_notification_path(notification.id) %>" class="close_notification_link"><%= t('close', 'close') %></a>
     </div>
     <div style="clear: left;"></div>
   </div>
