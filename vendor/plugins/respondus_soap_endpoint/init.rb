@@ -1,10 +1,10 @@
 Rails.configuration.to_prepare do
   require_dependency 'respondus_soap_endpoint_plugin_validator'
   plugin = Canvas::Plugin.register :respondus_soap_endpoint, nil, {
-          :name =>'Respondus SOAP Endpoint',
+          :name => lambda{ t :name, 'Respondus SOAP Endpoint' },
           :author => 'instructure',
           :author_website => 'http://www.instructure.com',
-          :description => 'SOAP Endpoint for Respondus QTI uploads',
+          :description => lambda{ t :description, 'SOAP Endpoint for Respondus QTI uploads' },
           :version => '1.0.0',
           :settings_partial => 'plugins/respondus_soap_endpoint_settings',
           :settings => {
