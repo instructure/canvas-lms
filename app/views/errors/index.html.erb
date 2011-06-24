@@ -13,12 +13,14 @@
 <% end %>
 
 <% content_for :pagination do %>
+ <% if params[:action] == 'index' %>
   <div class='pagination'>
     <% if params[:page] > 1 %>
       <%= link_to('< Prev', params.merge(:page => (params[:page] - 1))) %>
     <% end %>
     <%= link_to('Next >', params.merge(:page => (params[:page] + 1))) %>
   </div>
+  <% end %>
 <% end %>
 
 <%= yield :pagination %>
