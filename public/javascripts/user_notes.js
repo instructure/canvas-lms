@@ -61,12 +61,13 @@ $("#add_entry_form").formSubmit({
   }
 });
 
+I18n.scoped('user_notes', function(I18n) {
 $(".delete_user_note_link").click(function(event) {
   event.preventDefault();
   var token = $("form:first").getFormData().authenticity_token;
   var $user_note = $(this).parents(".user_note");
   $user_note.confirmDelete({
-    message: "Are you sure you want to delete this journal entry?",
+    message: I18n.t('confirms.delete_journal_entry', "Are you sure you want to delete this journal entry?"),
     token: token,
     url: $(this).attr('href'),
     success: function() {
@@ -81,4 +82,5 @@ $(".delete_user_note_link").click(function(event) {
       $(this).formErrors(data);
     }
   });
+});
 });

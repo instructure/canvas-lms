@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('user_logins', function(I18n) {
 $(document).ready(function() {
   var $form = $("#edit_pseudonym_form");
   var passwordable_account_ids = $("#passwordable_account_ids").text().split(",");
@@ -26,13 +27,13 @@ $(document).ready(function() {
         delete data['pseudonym[password_confirmation]'];
       }
       if((data['pseudonym[password]'] || data['pseudonym[password_confirmation]']) && data['pseudonym[password]'] != data['pseudonym[password_confirmation]']) {
-        $(this).formErrors({'pseudonym[password]': 'passwords do not match'});
+        $(this).formErrors({'pseudonym[password]': I18n.t('errors.passwords_do_not_match', 'passwords do not match')});
         return false;
       }
     },
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true)
-        .filter(".submit_button").text("Saving...");
+        .filter(".submit_button").text(I18n.t('messages.saving', "Saving..."));
       var select = $(this).find(".account_id select")[0];
       var idx = select && select.selectedIndex;
       $(this).data('account_name', null);
@@ -40,7 +41,7 @@ $(document).ready(function() {
     },
     success: function(data) {
       $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text("Save");
+        .filter(".submit_button").text(I18n.t('buttons.save', "Save"));
       $(this).dialog('close');
       if($(this).data('unique_id_text')) {
         var $login = $(this).data('unique_id_text').parents(".login");
@@ -60,7 +61,7 @@ $(document).ready(function() {
     },
     error: function(data) {
       $(this).find("button").attr('disabled', false)
-        .filter(".submit_button").text("Save Failed");
+        .filter(".submit_button").text(I18n.t('errors.save_failed', "Save Failed"));
     }
   });
   $("#edit_pseudonym_form .account_id_select").change(function() {
@@ -100,8 +101,8 @@ $(document).ready(function() {
         }
       }
     }).dialog('open');
-    $form.dialog('option', 'title', 'Update Login')
-      .find(".submit_button").text("Update Login");
+    $form.dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
+      .find(".submit_button").text(I18n.t('buttons.update_login', "Update Login"));
     var $unique_id = $(this).parents(".login").find(".unique_id");
     $form.data('unique_id_text', $unique_id);
     $form.find(":input:visible:first").focus().select();
@@ -109,12 +110,12 @@ $(document).ready(function() {
   .delegate('.delete_pseudonym_link', 'click', function(event) {
     event.preventDefault();
     if($("#login_information .login:visible").length < 2) {
-      alert("You can't delete the last login for a user");
+      alert(I18n.t('notices.cant_delete_last_login', "You can't delete the last login for a user"));
       return;
     }
     var login = $(this).parents(".login").find(".unique_id").text();
     $(this).parents(".login").confirmDelete({
-      message: "Are you sure you want to delete the login, \"" + login + "\"?",
+      message: I18n.t('confirms.delete_login', "Are you sure you want to delete the login, \"%{login}\"?", {login: login}),
       url: $(this).attr('rel'),
       success: function() {
         $(this).fadeOut();
@@ -129,10 +130,11 @@ $(document).ready(function() {
     $("#login_information .login.blank .edit_pseudonym_link").click();
     $form.attr('action', $(this).attr('rel')).attr('method', 'POST');
     $form.fillFormData({'pseudonym[unique_id]': ''});
-    $form.dialog('option', 'title', 'Add Login')
-      .find(".submit_button").text("Add Login");
+    $form.dialog('option', 'title', I18n.t('titles.add_login', 'Add Login'))
+      .find(".submit_button").text(I18n.t('buttons.add_login', "Add Login"));
     $form.find(".account_id").show();
     $form.find(".account_id_select").change();
     $form.data('unique_id_text', null);
   });
+});
 });

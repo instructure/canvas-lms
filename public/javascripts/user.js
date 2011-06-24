@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('users', function(I18n) {
 $(function(){
   $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
     $(this).find(".info").addClass('info_hover');
@@ -27,7 +28,7 @@ $(function(){
     event.preventDefault();
     $(this).parents("li").confirmDelete({
       url: $(this).attr('rel'),
-      message: "Are you sure you want to unenroll this user?",
+      message: I18n.t('confirms.unenroll_user', "Are you sure you want to unenroll this user?"),
       success: function() {
         $(this).slideUp(function() {
           $(this).remove();
@@ -36,3 +37,4 @@ $(function(){
     });
   });
 })
+});
