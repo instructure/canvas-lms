@@ -12,7 +12,17 @@
   <button type="submit" class="button"><%= t "#buttons.search", "Search" %></button>
 <% end %>
 
-<%= will_paginate(@reports) %>
+<% content_for :pagination do %>
+  <div class='pagination'>
+    <% if params[:page] > 1 %>
+      <%= link_to('< Prev', params.merge(:page => (params[:page] - 1))) %>
+    <% end %>
+    <%= link_to('Next >', params.merge(:page => (params[:page] + 1))) %>
+  </div>
+<% end %>
+
+<%= yield :pagination %>
+
 <% @reports.each do |report| %>
   <div style="margin-bottom: 20px;">
     <h3>
@@ -40,3 +50,5 @@
     </div>
   </div>
 <% end %>
+
+<%= yield :pagination %>
