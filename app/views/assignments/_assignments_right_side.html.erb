@@ -1,10 +1,10 @@
 <% course_home ||= false %>
 <p>
-  <b><%= t :assignment_count, { :one => "*1* **Assignment**", :other => "*%{count}* **Assignments**"}, :count => @context.assignments.active.length,
-           :wrapper => { '*' => '<span class="assignment_count">\1</span>', '**' => '<span class="assignment_count_text">\1</span>'} %></b>
+  <b><span class="assignment_count"><%= t '#assignments.assignment_count', "Assignment", :count => @context.assignments.active.length %></span></b>
   <span style="font-size: 0.8em;">
-    <%= t :assignment_groups_count, { :one => "( in *1* **Group** )", :other => "( in *%{count}* **Groups** )"}, :count => @groups.length,
-          :wrapper => { '*' => '<span class="assignment_group_count">\1</span>', '**' => '<span class="assignment_group_count_text">\1</span>'} %>
+    <%= t :assignment_groups_wrapper, "( in %{number_of_groups})",
+          :number_of_groups => content_tag(:span, t("#assignments.assignment_groups_count", "Group", :count => @groups.length), :class => "assignment_group_count")
+    %>
   </span>
 </p>
 <p>

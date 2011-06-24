@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function initAssignmentsJs() {
+I18n.scoped('assignments', function(I18n) {
   var defaultShowDateOptions = false;
   function hideAssignmentForm() {
     var $form = $("#add_assignment_form");
@@ -35,16 +35,11 @@
       $group.find(".padding").show();
     }
   }
-  var assignmentCount, assignmentGroupCount;
-  if(!assignmentCount) { assignmentCount = 0; }
-  if(!assignmentGroupCount) { assignmentGroupCount = 0; }
   function updateAssignmentCounts() {
     var assignmentCount = $(".group_assignment:visible").length;
     var assignmentGroupCount = $(".assignment_group:visible").length;
-    $(".assignment_count").text(assignmentCount);
-    $(".assignment_count_text").text(assignmentCount == 1 ? "Assignment" : "Assignments");
-    $(".assignment_group_count").text(assignmentGroupCount);
-    $(".assignment_group_count_text").text(assignmentGroupCount == 1 ? "Group" : "Groups");
+    $(".assignment_count").text(I18n.t('assignment_count', "Assignment", {count: assignmentCount}));
+    $(".assignment_group_count").text(I18n.t('assignment_groups_count', "Group", {count: assignmentGroupCount}));
   }
   function editAssignment($assignment) {
     hideAssignmentForm();
@@ -130,7 +125,7 @@
     $options.empty();
     if($group.find(".group_assignment").length > 0) {
       var $option = $(document.createElement("option"));
-      $option.val("0").text("[Select Assignment]");
+      $option.val("0").text(I18n.t('select_assignment', "[Select Assignment]"));
       $options.append($option);
       $group.find(".group_assignment").each(function() {
         $option = $(document.createElement('option'));
@@ -140,7 +135,7 @@
       });
     } else {
       var $option = $(document.createElement("option"));
-      $option.val("0").text("[No Assignments]");
+      $option.val("0").text(I18n.t('no_assignments', "[No Assignments]"));
       $options.append($option);
     }
     $options.val("0");
@@ -215,8 +210,7 @@
   function updateAssignment($assignment, data) {
     var assignment = data.assignment;
     var id = $assignment.attr('id');
-    if((id == 'assignment_new' || id == 'assignment_creating') && (assignmentCount) && updateAssignmentCounts) {
-      assignmentCount++;
+    if((id == 'assignment_new' || id == 'assignment_creating')) {
       updateAssignmentCounts();
     }
     if(assignment.due_at) {
@@ -544,12 +538,12 @@
           var rule_type = parts[0];
           var value = parts[1];
           if(rule_type == "drop_lowest") {
-            rules += "Drop the Lowest " + value + " Scores<br/>";
+            rules += $.htmlEscape(I18n.t('drop_lowest_scores', "Drop the Lowest %{number} Scores", {number: value})) + "<br/>";
           } else if(rule_type == "drop_highest") {
-            rules += "Drop the Highest " + value + " Scores<br/>";
+            rules += $.htmlEscape(I18n.t('drop_highest_scores', "Drop the Highest %{number} Scores", {number: value})) + "<br/>";
           } else if(rule_type == "never_drop") {
             var title = $("#assignment_" + value).find(".title").text();
-            rules += $.htmlEscape("Never Drop " + title) + "<br/>";
+            rules += $.htmlEscape(I18n.t('never_drop_scores', "Never Drop %{assignment_name}", {assignment_name: title})) + "<br/>";
           }
         }
       });
@@ -584,10 +578,10 @@
       if($("#group_new").length > 0 && $("#add_group_form").css('display') == "block") {
         return;
       }
-      $("#group_blank .header .name").text("Other Assignments");
+      $("#group_blank .header .name").text(I18n.t('other_assignments', "Other Assignments"));
       var $group = $("#group_blank").clone(true);
       $group.find(".assignment_list").empty();
-      $group.attr('id', "group_new").find(".header .name").text("Group Name");
+      $group.attr('id', "group_new").find(".header .name").text(I18n.t('group_name', "Group Name"));
       $("#groups").prepend($group.show());
       $group.find(".padding").show();
       var doWeighting = $("#class_weighting_policy").attr('checked');
@@ -614,7 +608,7 @@
           return;
         }
       }
-      $dialog.find("button").attr('disabled', true).filter(".delete_button").text("Deleting Group...");
+      $dialog.find("button").attr('disabled', true).filter(".delete_button").text(I18n.t('status.deleting_group', "Deleting Group..."));
       var url = $old_group.find(".delete_group_link").attr('href');
       $.ajaxJSON(url, 'DELETE', params, function(data) {
         deleteGroup($old_group);
@@ -625,10 +619,10 @@
             updateAssignment($assignment, {assignment: assignment});
           }
         }
-        $dialog.find("button").attr('disabled', false).filter(".delete_button").text("Delete Group");
+        $dialog.find("button").attr('disabled', false).filter(".delete_button").text(I18n.t('buttons.delete_group', "Delete Group"));
         $dialog.dialog('close');
       }, function() {
-        $dialog.find("button").attr('disabled', false).filter(".delete_button").text("Delete Failed");
+        $dialog.find("button").attr('disabled', false).filter(".delete_button").text(I18n.t('errors.deleting_group_failed', "Delete Failed"));
       });
     }).delegate('.cancel_button', 'click', function() {
       $("#delete_assignments_dialog").dialog('close');
@@ -639,10 +633,10 @@
       var assignment_count = $group.find(".group_assignment:visible").length;
       if(assignment_count > 0) {
         var data = $group.find(".header").getTemplateData({textValues: ['assignment_group_id', 'name']});
-        data.assignment_count = assignment_count + " " + (assignment_count == 1 ? 'assignment' : $.pluralize("assignment"));
+        data.assignment_count = I18n.t('number_of_assignments', 'assignment', {count: assignment_count});
         var $dialog = $("#delete_assignments_dialog");
         $dialog.fillTemplateData({data: data});
-        $dialog.find("button").attr('disabled', false).filter(".delete_button").text("Delete Group");
+        $dialog.find("button").attr('disabled', false).filter(".delete_button").text(I18n.t('buttons.delete_group', "Delete Group"));
         $dialog.find(".group_select option:not(.blank)").remove();
         $(".assignment_group:visible").each(function() {
           if($(this)[0] != $group[0]) {
@@ -660,7 +654,7 @@
         return;
       }
       $group.confirmDelete({
-        message: "Are you sure you want to delete this group?",
+        message: I18n.t('confirm.delete_group', "Are you sure you want to delete this group?"),
         url: $(this).attr('href'),
         success: function() {
           deleteGroup($group);
@@ -675,14 +669,11 @@
         updateGroupsSelect();
         $("#group_weight_" + id).remove();
         $("#group_weight .group_weight:visible:first .weight").triggerHandler('change', false);
-      });
-      if($("#groups .assignment_group").length <= 1) {
-        $("#groups .assignment_group .delete_group_link").hide();
-      }
-      if(assignmentGroupCount && updateAssignmentCounts) {
-        assignmentGroupCount--;
         updateAssignmentCounts();
-      }
+        if($("#groups .assignment_group").length <= 1) {
+          $("#groups .assignment_group .delete_group_link").hide();
+        }
+      });
     }
     $("#add_group_form .cancel_button").click(function() {
       var $group = $(this).parents(".assignment_group");
@@ -735,10 +726,7 @@
         if($group.attr('id') == 'group_creating') {
           $(document).triggerHandler('group_create', data);
         }
-        if($group.attr('id') == 'group_creating' && assignmentGroupCount && updateAssignmentCounts) {
-          assignmentGroupCount++;
-          updateAssignmentCounts();
-        }
+        updateAssignmentCounts();
         group.assignment_group_id = group.id;
         $group.attr('id', 'group_' + group.id);
         $group_header.fillTemplateData({
@@ -863,7 +851,7 @@
       var $assignment = $(this).parents(".group_assignment");
       var $group = $assignment.parents(".assignment_group");
       $assignment.confirmDelete({
-        message: "Are you sure you want to delete this assignment?",
+        message: I18n.t('confirm.delete_assignment', "Are you sure you want to delete this assignment?"),
         url: $(this).attr('href'),
         success: function() {
           $assignment.slideUp(function() {
@@ -872,11 +860,8 @@
             if($group.find(".group_assignment").length === 0) {
               $group.find(".padding").show();
             }
-          });
-          if(assignmentCount && updateAssignmentCounts) {
-            assignmentCount--;
             updateAssignmentCounts();
-          }
+          });
         }
       });
     });
@@ -916,7 +901,7 @@
       var data = $assignment.getTemplateData({
         textValues: ['title', 'id', 'points_possible', 'due_date', 'due_time', 'due_date_string', 'due_time_string', 'submission_types', 'assignment_group_id', 'grading_type', 'min_score', 'max_score', 'mastery_score', 'unlock_at']
       });
-      data.description = $assignment.find(".description").val() || "No Content";
+      data.description = $assignment.find(".description").val() || I18n.t('assignment.default_content', "No Content");
       data.due_at = $.trim(data.due_date + " " + data.due_time);
       $("#full_assignment").fillTemplateData({
         data: data,
@@ -929,7 +914,7 @@
       }).attr('action', $assignment.find(".assignment_url").attr('href'));
       var height = Math.max(Math.round($(window).height() * 0.8), 400);
       $("#full_assignment_holder").dialog('close').dialog({
-        title: "Assignment Details",
+        title: I18n.t('titles.assignment_details', "Assignment Details"),
         autoOpen: false,
         width: 630,
         height: height,
@@ -1038,4 +1023,4 @@
       $newAssignment.find(":tabbable:first").focus();
     }
   }
-})();
+});
