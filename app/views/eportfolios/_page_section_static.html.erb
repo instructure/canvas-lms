@@ -22,9 +22,9 @@
         <% rendered = false %>
         <% if submission %>
           <div style="margin-bottom: 10px;">
-            <%= t('headers.submission', "Student Submission for %{assignment}, created %{date}",
+            <%= t('headers.submission', "Student Submission for %{assignment}, created %{created_date}",
                   :assignment => submission.assignment.title,
-                  :created => datetime_string(submission.submitted_at || submission.graded_at || submission.created_at)) %>
+                  :created_date => datetime_string(submission.submitted_at || submission.graded_at || submission.created_at)) %>
           </div>
           <% if submission.submission_type == 'online_url' %>
             <a href="<%= submission.url %>"><%= t('links.submission_url', "View the URL submitted for this assignment") %></a>

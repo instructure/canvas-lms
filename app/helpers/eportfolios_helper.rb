@@ -38,18 +38,18 @@ module EportfoliosHelper
   end
 
   def edit_link_text
-    t(:link_text, "%{edit_icon} Edit This Page", :edit_icon => edit_icon)
+    t('#eportfolios.edit_link_text', "%{edit_icon} Edit This Page", :edit_icon => edit_icon)
   end
 
   def help_link_text
-    t(:link_text, "%{help_icon} How Do I...?", :help_icon => help_icon)
+    t('#eportfolios.help_link_text', "%{help_icon} How Do I...?", :help_icon => help_icon)
   end
 
   def manage_pages_link_text
-    t(:link_text, "Organize/Manage Pages")
+    t('#eportfolios.manage_pages_link_text', "Organize/Manage Pages")
   end
 
   def manage_sections_link_text
-    t(:link_text, "Organize Sections")
+    t('#eportfolios.manage_sections_link_text', "Organize Sections")
   end
 end
