@@ -1,6 +1,19 @@
 namespace :i18n do
   desc "Verifies all translation calls"
   task :check => :environment do
+    only = if ENV['ONLY']
+      ENV['ONLY'].split(',').map{ |path|
+        path = '**/' + path if path =~ /\*/
+        path = './' + path unless path =~ /\A.?\//
+        if path =~ /\*/
+          path = Dir.glob(path)
+        elsif path !~ /\.(e?rb|js)\z/
+          path = Dir.glob(path + '/**/*') 
+        end
+        path
+      }.flatten
+    end
+
     STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`.split("\n") - ['OpenStruct', 'Tableless']).
       map{ |name| name.underscore + '.' }
 
@@ -36,6 +49,7 @@ namespace :i18n do
 
     files = Dir.glob('./**/*rb').
       reject{ |file| file =~ /\A\.\/(vendor\/plugins\/rails_xss|db|spec)\// }
+    files &= only if only
     file_count = files.size
 
     t = Time.now
@@ -59,6 +73,7 @@ namespace :i18n do
 
     files = (Dir.glob('./public/javascripts/*.js') + Dir.glob('./app/views/**/*.erb')).
       reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18n.js|translations\/)/ }
+    files &= only if only
     @js_extractor = I18nJsExtractor.new(:translations => @extractor.translations)
 
     files.each do |file|
