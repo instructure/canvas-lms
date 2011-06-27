@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('attendance', function(I18n) {
 var attendance = {
   saveKeyIndex: 0,
   toggleState: function(cell, forceState, skipSave) {
@@ -124,7 +125,7 @@ $(document).ready(function() {
     });
     $("#new_assignment_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: "New Attendance Column"
+      title: I18n.t('titles.new_attendance_column', "New Attendance Column")
     }).dialog('open');
   });
   $("#new_assignment_dialog .cancel_button").click(function(event) {
@@ -132,11 +133,11 @@ $(document).ready(function() {
   });
   $("#add_assignment_form").formSubmit({
     beforeSubmit: function(data) {
-      $(this).find(".submit_button").text("Adding Assignment...");
+      $(this).find(".submit_button").text(I18n.t('status.adding_assignment', "Adding Assignment..."));
       $(this).find("button").attr('disabled', true);
     },
     success: function(data) {
-      $(this).find(".submit_button").text("Added Assignment");
+      $(this).find(".submit_button").text(I18n.t('status.added_assignment', "Added Assignment"));
       $(this).find("button").attr('disabled', false);
       var assignment = data.assignment;
       location.href = "#assignment_" + assignment.id;
@@ -144,21 +145,33 @@ $(document).ready(function() {
     },
     error: function(data) {
       $(this).formErrors(data);
-      $(this).find(".submit_button").text("Add Assignment Failed");
+      $(this).find(".submit_button").text(I18n.t('errors.could_not_add_assignment', "Add Assignment Failed"));
       $(this).find("button").attr('disabled', false);
     }
   });
+  $("#new_assignment_dialog .title").change(function() {
+    var val = $(this).val();
+    if (val && val != defaultTitle()) {
+      $(this).attr('edited', true);
+    } else {
+      $(this).removeAttr('edited');
+    }
+  });
+  function defaultTitle() {
+    var date = $("#new_assignment_dialog .datetime_field").data('date');
+    if (date) {
+      return I18n.t('default_attendance_title', 'Attendance %{date}', {date: I18n.l('#date.formats.default', date)});
+    } else {
+      return '';
+    }
+  }
   $("#new_assignment_dialog .datetime_field").change(function() {
     var val = $("#new_assignment_dialog .title").val();
-    if(!val || val.match(/^Attendance (\d)+-(\d)+-(\d)+$/)) {
+    var titleEdited = $("#new_assignment_dialog .title").attr('edited');
+    if(!val || !titleEdited) {
       var date = $(this).data('date');
-      var string = "";
       if(date) {
-        string = date.toString("M-d-yyyy");
-      }
-      if(string) {
-        val = "Attendance " + string;
-        $("#new_assignment_dialog .title").val(val);
+        $("#new_assignment_dialog .title").val(defaultTitle());
       }
     }
   });
@@ -168,7 +181,7 @@ $(document).ready(function() {
     $("#attendance_how_to_dialog").dialog('close').dialog({
       autoOpen: false,
       width: 400,
-      title: "Attendance Help"
+      title: I18n.t('titles.attendance_help', "Attendance Help")
     }).dialog('open');
   });
   $(".submission").addClass('loading');
@@ -236,20 +249,20 @@ $(document).ready(function() {
     datagrid.focus(grid.cell.row, grid.cell.column);
   }).bind('entry_focus', function(event, grid) {
     if(grid.cell.row == 0) {
-      grid.cell.find(".options_dropdown").dropdownList({options: {
-        '<span class="ui-icon ui-icon-pencil">&nbsp;</span> Edit Assignment': function() {
-          location.href = "/";
-        },
-        '<span class="ui-icon ui-icon-check">&nbsp;</span> Mark Everyone Present': function() {
-          attendance.toggleColumnState(grid.cell.column, 'pass');
-        },
-        '<span class="ui-icon ui-icon-close">&nbsp;</span> Mark Everyone Absent': function() {
-          attendance.toggleColumnState(grid.cell.column, 'fail');
-        },
-        '<span class="ui-icon ui-icon-minus">&nbsp;</span> Clear Attendance Marks': function() {
-          attendance.toggleColumnState(grid.cell.column, 'clear');
-        }
-      }});
+      var options = {};
+      options['<span class="ui-icon ui-icon-pencil">&nbsp;</span> ' + $.htmlEscape(I18n.t('options.edit_assignment', 'Edit Assignment'))] = function() {
+        location.href = "/";
+      };
+      options['<span class="ui-icon ui-icon-check">&nbsp;</span> ' + $.htmlEscape(I18n.t('options.mark_all_as_present', 'Mark Everyone Present'))] = function() {
+        attendance.toggleColumnState(grid.cell.column, 'pass');
+      };
+      options['<span class="ui-icon ui-icon-close">&nbsp;</span> ' + $.htmlEscape(I18n.t('options.mark_all_as_absent', 'Mark Everyone Absent'))] = function() {
+        attendance.toggleColumnState(grid.cell.column, 'fail');
+      };
+      options['<span class="ui-icon ui-icon-minus">&nbsp;</span> ' + $.htmlEscape(I18n.t('options.clear_attendance_marks', 'Clear Attendance Marks'))] = function() {
+        attendance.toggleColumnState(grid.cell.column, 'clear');
+      }
+      grid.cell.find(".options_dropdown").dropdownList({options: options});
     } else {
       attendance.toggleState(grid.cell);
     }
@@ -295,4 +308,5 @@ $(document).ready(function() {
     onReady: function() {
     }
   });
+});
 });
