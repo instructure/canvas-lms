@@ -39,6 +39,7 @@ I18n.scoped('gradebook', function(I18n) {
       $body = $("body"),
       $full_width_container =$("#full_width_container"),
       $left_side = $("#left_side"),
+      $resize_overlay = $("#resize_overlay"),
       $right_side = $("#right_side"),
       $width_resizer = $("#width_resizer"),
       $gradebook_header = $("#gradebook_header"),
@@ -608,8 +609,16 @@ I18n.scoped('gradebook', function(I18n) {
         $left_side.css("width",'');
         $right_side.css("width",'');
       }
-
-      $width_resizer.draggable({
+      $(document).mouseup(function(event){
+        $resize_overlay.hide();
+      });
+      // it should disappear before it's clickable, but just in case...
+      $resize_overlay.click(function(event){
+        $(this).hide();
+      });
+      $width_resizer.mousedown(function(event){
+        $resize_overlay.show();
+      }).draggable({
         axis: 'x',
         cursor: 'crosshair',
         scroll: false,
@@ -640,6 +649,7 @@ I18n.scoped('gradebook', function(I18n) {
         },
         stop: function(event, ui) {
           event.stopImmediatePropagation();
+          $resize_overlay.hide();
         }
       }).click(function(event){
           event.preventDefault();
