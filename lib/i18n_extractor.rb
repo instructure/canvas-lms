@@ -235,7 +235,7 @@ class I18nJsExtractor
   include I18nExtraction
 
   I18N_KEY = /['"](#?[\w.]+)['"]/
-  HASH_KEY = /['"]?(\w+)['"]?:/
+  HASH_KEY = /['"]?(\w+)['"]?\s*:/
 
   INTERPOLATION_KEY = /%\{([^\}]+)\}|\{\{([^\}]+)\}\}/
   CORE_KEY = /\A(number|time|date|datetime)\./
