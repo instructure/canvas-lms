@@ -281,7 +281,7 @@ $(document).ready(function() {
         if(hash.length > 1) {
           hash = hash.substring(1);
         }
-        hash = hash.replace(/\//g, "_");
+        hash = hash.replace(/\/|%2F/g, "_");
         if(hash.indexOf("student") == 0 || hash.indexOf("assignment") == 0 || hash.indexOf("submission") == 0) {
           var $div = $("#" + hash),
               position = datagrid.position($div),
