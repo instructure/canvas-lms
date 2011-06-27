@@ -56,4 +56,6 @@ module Api
     end
   end
 
+  # See User.submissions_for_given_assignments and SubmissionsApiController#for_students
+  mattr_accessor :assignment_ids_for_students_api
 end
