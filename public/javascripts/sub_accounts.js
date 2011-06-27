@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('sub_accounts', function(I18n) {
 jQuery(function($){
   
   $(".add_sub_account_link").click(function() {
@@ -77,17 +78,17 @@ jQuery(function($){
   });
   
   $(".cant_delete_account_link").click(function() {
-    alert("You can't delete a sub-account that has courses in it");
+    alert(I18n.t('alerts.subaccount_has_courses', "You can't delete a sub-account that has courses in it"));
     return false;
   });
   
   $(".delete_account_link").click(function() {
     if ($(this).parents(".account:first").children(".sub_account > li").length) {
-      alert("You can't delete a sub-account that has sub_accounts");
+      alert(I18n.t('alerts.subaccount_has_subaccounts', "You can't delete a sub-account that has sub-accounts"));
     } else {
       $(this).parents("li:first").confirmDelete({
         url: $(this).parents(".header").find("form").attr('action'),
-        message: "Are you sure you want to delete this sub-account?",
+        message: I18n.t('confirms.delete_subaccount', "Are you sure you want to delete this sub-account?"),
         success: function() {
           $(this).slideUp(function() {
             $(this).remove();
@@ -129,8 +130,8 @@ jQuery(function($){
               sub_account = account.sub_accounts[idx][jdx];
             }
           }
-          sub_account.courses_count = sub_account.course_count + " Courses";
-          sub_account.sub_accounts_count = sub_account.sub_account_count + " Sub-Accounts";
+          sub_account.courses_count = I18n.t('courses_count', {one: '1 Course', other: '%{count} Courses'}, {count: sub_account.course_count});
+          sub_account.sub_accounts_count = I18n.t('sub_accounts_count', {one: '1 Sub-Account', other: '%{count} Sub-Accounts'}, {count: sub_account.sub_account_count});
           $("<li class='sub_account'/>")
             .append($("#account_blank")
                       .clone(true)
@@ -160,4 +161,5 @@ jQuery(function($){
     return false;
   });
   
+});
 });
