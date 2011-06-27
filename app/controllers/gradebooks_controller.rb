@@ -177,7 +177,7 @@ class GradebooksController < ApplicationController
       end
     end
   end
-  
+
   def gradebook_init_json
     # res = "{"
     if params[:assignments]

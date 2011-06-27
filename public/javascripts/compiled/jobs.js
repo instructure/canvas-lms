@@ -1,7 +1,3 @@
-/* DO NOT MODIFY. This file was compiled Wed, 22 Jun 2011 20:46:48 GMT from
- * /Users/jon/Dropbox/git/canvas-lms/app/coffeescripts/jobs.coffee
- */
-
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }

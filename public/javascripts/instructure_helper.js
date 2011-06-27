@@ -77,6 +77,54 @@
     } while (prefix && $('#' + id).length);
     return id;
   };
+  
+  // Return the first value which passes a truth test
+  $.detect = function(collection, callback) {
+    var result;
+    $.each(collection, function(index, value) {
+      if (callback.call(value, index, collection)) {
+        result = value;
+        return false; // we found it, break the $.each() loop iteration by returning false
+      }
+    });
+    return result;
+  };
+  
+  
+  // this is just pulled from jquery 1.6 because jquery 1.5 could not do .map on an object
+  $.map = function (elems, callback, arg) {
+    var value, key, ret = [],
+        i = 0,
+        length = elems.length,
+
+
+        // jquery objects are treated as arrays
+        isArray = elems instanceof jQuery || length !== undefined && typeof length === "number" && ((length > 0 && elems[0] && elems[length - 1]) || length === 0 || jQuery.isArray(elems));
+
+    // Go through the array, translating each of the items to their
+    if (isArray) {
+      for (; i < length; i++) {
+        value = callback(elems[i], i, arg);
+
+        if (value != null) {
+          ret[ret.length] = value;
+        }
+      }
+
+      // Go through every key on the object,
+    } else {
+      for (key in elems) {
+        value = callback(elems[key], key, arg);
+
+        if (value != null) {
+          ret[ret.length] = value;
+        }
+      }
+    }
+
+    // Flatten any nested arrays
+    return ret.concat.apply([], ret);
+  }
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -3315,20 +3363,26 @@
   };
   
   // this is used if you want to fill the browser window with something inside #content but you want to also leave the footer and header on the page.
-  $.fn.fillWindowWithMe = function(){
-    var $this              = $(this),
+  $.fn.fillWindowWithMe = function(options){
+    var opts               = $.extend({minHeight: 400}, options),
+        $this              = $(this),
         $wrapper_container = $('#wrapper-container'),
         $main              = $('#main'),
         $not_right_side    = $('#not_right_side'),
-        $window            = $(window);
+        $window            = $(window),
+        $toResize          = $(this).add(opts.alsoResize);
 
     function fillWindowWithThisElement(){
-      $this.height(0);
+      $toResize.height(0);
       var spaceLeftForThis = $window.height() 
                              - ($wrapper_container.offset().top + $wrapper_container.height())
-                             + ($main.height() - $not_right_side.height());
+                             + ($main.height() - $not_right_side.height()),
+          newHeight = Math.max(400, spaceLeftForThis);
                                
-      $this.height( Math.max(400, spaceLeftForThis) );
+      $toResize.height(newHeight);
+      if ($.isFunction(opts.onResize)) {
+        opts.onResize.call($this, newHeight);
+      }
     }
     fillWindowWithThisElement();
     $window

@@ -91,6 +91,8 @@ ActionController::Routing::Routes.draw do |map|
     } do |gradebook|
       gradebook.submissions_upload 'submissions_upload/:assignment_id', :controller => 'gradebooks', :action => 'submissions_zip_upload', :conditions => { :method => :post }
     end
+    course.resource :gradebook2,
+      :controller => 'gradebook2'
     course.attendance 'attendance', :controller => 'gradebooks', :action => 'attendance'
     course.attendance_user 'attendance/:user_id', :controller => 'gradebooks', :action => 'attendance'
     course.imports 'imports', :controller => 'content_imports', :action => 'intro'

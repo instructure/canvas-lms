@@ -43,19 +43,25 @@ class AssignmentGroupsController < ApplicationController
   #       "position": 7,
   #       "name": "group2",
   #       "id": 1,
-  #       "assignments": [...]
+  #       "group_weight": 20,
+  #       "assignments": [...],
+  #       "rules" : {...}
   #     },
   #     {
   #       "position": 10,
   #       "name": "group1",
   #       "id": 2,
-  #       "assignments": [...]
+  #       "group_weight": 20,
+  #       "assignments": [...],
+  #       "rules" : {...}
   #     },
   #     {
   #       "position": 12,
   #       "name": "group3",
   #       "id": 3,
-  #       "assignments": [...]
+  #       "group_weight": 60,
+  #       "assignments": [...],
+  #       "rules" : {...}
   #     }
   #   ]
   def index
@@ -73,7 +79,9 @@ class AssignmentGroupsController < ApplicationController
         format.json {
           hashes = @groups.map do |group|
             hash = group.as_json(:include_root => false,
-                                 :only => %w(id name position))
+                                 :only => %w(id name position group_weight))
+            # note that 'rules_hash' gets to_jsoned as just 'rules' because that is what GradeCalculator expects. 
+            hash['rules'] = group.rules_hash
             if include_assignments
               hash['assignments'] = group.assignments.active.map { |a| assignment_json(a, [], @context.user_is_teacher?(@current_user)) }
             end
