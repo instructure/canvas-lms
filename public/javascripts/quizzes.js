@@ -22,7 +22,6 @@ var wikiSidebar;
 // to not pollute the global namespace, but it could use more.
 var quiz = {};
 I18n.scoped('quizzes', function(I18n) {
-(function() {
   quiz = {
     uniqueLocalIDStore: {},
     generateUniqueLocalID: function($obj) {
@@ -892,63 +891,63 @@ I18n.scoped('quizzes', function(I18n) {
         $item.val('--');
       }
     }).triggerHandler('change');
-  $("#protect_quiz").change(function() {
-    var checked = $(this).attr('checked');
-    $(".protected_options").showIf(checked).find(":checkbox").each(function() {
-      if(!checked) {
-        $(this).attr('checked', false).change();
+    $("#protect_quiz").change(function() {
+      var checked = $(this).attr('checked');
+      $(".protected_options").showIf(checked).find(":checkbox").each(function() {
+        if(!checked) {
+          $(this).attr('checked', false).change();
+        }
+      });
+    }).triggerHandler('change');
+    $("#quiz_require_lockdown_browser").change(function() {
+      $("#lockdown_browser_suboptions").showIf($(this).attr('checked'));
+      $("#quiz_require_lockdown_browser_for_results").attr('checked', true).change();
+    });
+    $("#lockdown_browser_suboptions").showIf($("#quiz_require_lockdown_browser").attr('checked'));
+    $("#ip_filter").change(function() {
+      $("#ip_filter_suboptions").showIf($(this).attr('checked'));
+      if(!$(this).attr('checked')) {
+        $("#quiz_ip_filter").val("");
+      }
+    }).triggerHandler('change');
+    $("#ip_filters_dialog").delegate('.ip_filter', 'click', function(event) {
+      event.preventDefault();
+      var filter = $(this).getTemplateData({textValues: ['filter']}).filter;
+      $("#protect_quiz").attr('checked', true).triggerHandler('change');
+      $("#ip_filter").attr('checked', true).triggerHandler('change');
+      $("#quiz_ip_filter").val(filter);
+      $("#ip_filters_dialog").dialog('close');
+    });
+    $(".ip_filtering_link").click(function(event) {
+      event.preventDefault();
+      var $dialog = $("#ip_filters_dialog");
+      $dialog.dialog('close').dialog({
+        autoOpen: false,
+        width: 400,
+        title: I18n.t('titles.ip_address_filtering', "IP Address Filtering")
+      }).dialog('open');
+      if(!$dialog.hasClass('loaded')) {
+        $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
+        var url = $("#quiz_urls .filters_url").attr('href');
+        $.ajaxJSON(url, 'GET', {}, function(data) {
+          $dialog.addClass('loaded');
+          if(data.length) {
+            for(var idx in data) {
+              var filter = data[idx];
+              var $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
+              $filter.fillTemplateData({data: filter});
+              $dialog.find(".filters tbody").append($filter.show());
+            }
+            $dialog.find(".searching_message").hide().end()
+              .find(".filters").show();
+          } else {
+            $dialog.find(".searching_message").text(I18n.t('no_filters_found', "No filters found"));
+          }
+        }, function(data) {
+          $dialog.find(".searching_message").text(I18n.t('errors.retrieving_filters_failed', "Retrieving Filters Failed"));
+        });
       }
     });
-  }).triggerHandler('change');
-  $("#quiz_require_lockdown_browser").change(function() {
-    $("#lockdown_browser_suboptions").showIf($(this).attr('checked'));
-    $("#quiz_require_lockdown_browser_for_results").attr('checked', true).change();
-  });
-  $("#lockdown_browser_suboptions").showIf($("#quiz_require_lockdown_browser").attr('checked'));
-  $("#ip_filter").change(function() {
-    $("#ip_filter_suboptions").showIf($(this).attr('checked'));
-    if(!$(this).attr('checked')) {
-      $("#quiz_ip_filter").val("");
-    }
-  }).triggerHandler('change');
-  $("#ip_filters_dialog").delegate('.ip_filter', 'click', function(event) {
-    event.preventDefault();
-    var filter = $(this).getTemplateData({textValues: ['filter']}).filter;
-    $("#protect_quiz").attr('checked', true).triggerHandler('change');
-    $("#ip_filter").attr('checked', true).triggerHandler('change');
-    $("#quiz_ip_filter").val(filter);
-    $("#ip_filters_dialog").dialog('close');
-  });
-  $(".ip_filtering_link").click(function(event) {
-    event.preventDefault();
-    var $dialog = $("#ip_filters_dialog");
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
-      width: 400,
-      title: I18n.t('titles.ip_address_filtering', "IP Address Filtering")
-    }).dialog('open');
-    if(!$dialog.hasClass('loaded')) {
-      $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
-      var url = $("#quiz_urls .filters_url").attr('href');
-      $.ajaxJSON(url, 'GET', {}, function(data) {
-        $dialog.addClass('loaded');
-        if(data.length) {
-          for(var idx in data) {
-            var filter = data[idx];
-            var $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
-            $filter.fillTemplateData({data: filter});
-            $dialog.find(".filters tbody").append($filter.show());
-          }
-          $dialog.find(".searching_message").hide().end()
-            .find(".filters").show();
-        } else {
-          $dialog.find(".searching_message").text(I18n.t('no_filters_found', "No filters found"));
-        }
-      }, function(data) {
-        $dialog.find(".searching_message").text(I18n.t('errors.retrieving_filters_failed', "Retrieving Filters Failed"));
-      });
-    }
-  });
     $("#require_access_code").change(function(event) {
       $("#access_code_suboptions").showIf($(this).attr('checked'));
       if(!$(this).attr('checked')) {
@@ -1912,43 +1911,47 @@ I18n.scoped('quizzes', function(I18n) {
       quiz.parseInput($(this), $(this).hasClass('long') ? 'float_long' : 'float');
     });
     $(".question_form textarea, .question_form :text, .answer textarea, .answer :text").focus(function(event) {
-      $(this).select();
-  });
-  $("#questions").delegate('.question_teaser_link', 'click', function(event) {
-    event.preventDefault();
-    var $teaser = $(this).parents(".question_teaser");
-    var question_data = $teaser.data('question');
-    if(!question_data) {
-      $teaser.find(".teaser.question_text").text(I18n.t('loading_question', "Loading Question..."));
-      $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, function(question) {
-        showQuestion(question.quiz_question);
-      }, function() {
-        $teaser.find(".teaser.question_text").text(I18n.t('errors.loading_question_failed', "Loading Question Failed..."));
-      });
-    } else {
-      showQuestion(question_data);
-    }
-    function showQuestion(question_data) {
-      var $question = $("#question_template").clone().removeAttr('id');
-      var question = question_data;
-      var questionData = $.extend({}, question, question.question_data);
-      $teaser.after($question);
-      $teaser.remove();
-      $question.show();
-      $question.find(".question_points").text(questionData.points_possible);
-      quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
-      if($teaser.hasClass('to_edit')) {
-        $question.find(".edit_question_link").click();
+      // chrome/safari mouseup event fires after focus, causing it to get
+      // deselected. (we don't want to disable mouseup, as that has other
+      // side effects)
+      var $me = $(this);
+      setTimeout(function() { $me.select(); });
+    });
+    $("#questions").delegate('.question_teaser_link', 'click', function(event) {
+      event.preventDefault();
+      var $teaser = $(this).parents(".question_teaser");
+      var question_data = $teaser.data('question');
+      if(!question_data) {
+        $teaser.find(".teaser.question_text").text(I18n.t('loading_question', "Loading Question..."));
+        $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, function(question) {
+          showQuestion(question.quiz_question);
+        }, function() {
+          $teaser.find(".teaser.question_text").text(I18n.t('errors.loading_question_failed', "Loading Question Failed..."));
+        });
+      } else {
+        showQuestion(question_data);
       }
-    }
-  }).delegate('.teaser.question_text', 'click', function(event) {
-    event.preventDefault();
-    $(this).parents(".question_teaser").find(".question_teaser_link").click();
-  }).delegate('.edit_teaser_link', 'click', function(event) {
-    event.preventDefault();
-    $(this).parents(".question_teaser").addClass('to_edit');
-    $(this).parents(".question_teaser").find(".question_teaser_link").click();
-  });
+      function showQuestion(question_data) {
+        var $question = $("#question_template").clone().removeAttr('id');
+        var question = question_data;
+        var questionData = $.extend({}, question, question.question_data);
+        $teaser.after($question);
+        $teaser.remove();
+        $question.show();
+        $question.find(".question_points").text(questionData.points_possible);
+        quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
+        if($teaser.hasClass('to_edit')) {
+          $question.find(".edit_question_link").click();
+        }
+      }
+    }).delegate('.teaser.question_text', 'click', function(event) {
+      event.preventDefault();
+      $(this).parents(".question_teaser").find(".question_teaser_link").click();
+    }).delegate('.edit_teaser_link', 'click', function(event) {
+      event.preventDefault();
+      $(this).parents(".question_teaser").addClass('to_edit');
+      $(this).parents(".question_teaser").find(".question_teaser_link").click();
+    });
     $(".keep_editing_link").click(function(event) {
       event.preventDefault();
       $(".question_generated,.question_preview").hide()
@@ -2575,5 +2578,4 @@ I18n.scoped('quizzes', function(I18n) {
       $question.triggerHandler('settings_change', false);
     }).change();
   }
-})();
 });
