@@ -1,5 +1,5 @@
 <% content_for :page_title do %>
-  <%= t(:page_title, "Profile - %{user}", :user => @user.name) %>
+  <%= join_title t(:page_title, "Profile"), @user.name %>
 <% end %>
 
 <% content_for :right_side do %>

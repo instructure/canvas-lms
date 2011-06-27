@@ -1,5 +1,5 @@
 <% 
-  content_for :page_title, t('titles.details', "Course Details: %{course}", :course => @context.name)
+  content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   jammit_css :course_details
   jammit_js :course_details
   @active_tab = "settings"

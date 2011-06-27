@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= t :group_settings_title, "%{group_name} Settings: %{course_or_account_name}", :group_name => @group.name, :course_or_account_name => @context.full_name %><% end %>
+<% content_for :page_title do %><%= join_title t(:group_settings_title, "%{group_name} Settings", :group_name => @group.name), @context.full_name %><% end %>
 
 <% content_for :right_side do %>
   <a href="<%= context_url(@context, :context_url) %>" class="button button-sidebar delete_group_link"><%= image_tag "delete.png" %> <%= t 'buttons.delete_group', 'Delete this Group' %></a>

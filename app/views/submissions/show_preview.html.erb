@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= @assignment.title %>: <%= context_user_name(@context, @submission.user) %><% end %>
+<% content_for :page_title do %><%= join_title @assignment.title, context_user_name(@context, @submission.user) %><% end %>
 
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">

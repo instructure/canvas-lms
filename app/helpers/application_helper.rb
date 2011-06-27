@@ -443,4 +443,8 @@ var I18n = I18n || {};
   def ot(*args)
     concat(t(*args))
   end
+
+  def join_title(*parts)
+    parts.join(t('#title_separator', ': '))
+  end
 end

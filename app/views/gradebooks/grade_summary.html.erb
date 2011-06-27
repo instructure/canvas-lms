@@ -1,7 +1,7 @@
 <% 
   jammit_js :grade_summary, :rubric_assessment
   jammit_css :grade_summary 
-  content_for :page_title, t(:page_title, "Grades for %{student} - %{course}", :student => @student.name, :course => @context.name)
+  content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @student.name), @context.name)
 %>
 <% content_for :right_side do %>
   <div class="rs-margin-all">

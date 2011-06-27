@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= before_label '#titles.course_groups', 'Course Groups' %> <%= @context.name %><% end %>
+<% content_for :page_title do %><%= join_title t(:page_title, 'Course Groups'), @context.name %><% end %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">

@@ -1,5 +1,5 @@
 <% 
-  content_for :page_title, t(:page_title, "Files - %{course_or_group}", :course_or_group => @context && @context.name)
+  content_for :page_title, join_title(t(:page_title, "Files"), @context && @context.name)
   jammit_css :full_files
   jammit_js :full_files 
   showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]

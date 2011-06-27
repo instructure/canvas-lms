@@ -3,9 +3,9 @@
   @active_tab="people"
   content_for :page_title, case @context
   when Course
-    t('titles.course_roster', "Course Roster: %{course_name}", :course_name => @context.name)
+    join_title t('titles.course_roster', "Course Roster"), @context.name
   when Group
-    t('titles.group_roster', "Group Roster: %{group_name}", :group_name => @context.name)
+    join_title t('titles.group_roster', "Group Roster"), @context.name
   end
 %>
 

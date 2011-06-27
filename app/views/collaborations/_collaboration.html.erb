@@ -3,7 +3,7 @@
 <div id="collaboration_<%= collaboration ? collaboration.id : 'blank' %>" class="communication_message collaboration <%= collaboration.style_class rescue '' %> <%= 'brief_communication_message' if brief %> <%= 'show_context_communication_message' if show_context %>">
   <div class="header">
     <div class="header_title">
-      <%= image_tag "google_docs_icon.png", :alt => "collaboration", :title => "Collaboration", :style => brief ? "width: 20px;" : "" %>
+      <%= image_tag "google_docs_icon.png", :alt => t('titles.collaboration', "Collaboration"), :title => t('titles.collaboration', "Collaboration"), :style => brief ? "width: 20px;" : "" %>
       <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" target="_blank" class="title external_link"><%= collaboration.title rescue nbsp %></a>
       <span class="context_code"><%= context.short_name rescue "" %></span>
       <a href="<%= context_url(context, :context_user_url, collaboration ? collaboration.user_id : '{{ user_id }}') %>" class="user_name"><%= context_user_name(context, collaboration.user) rescue nbsp %></a>

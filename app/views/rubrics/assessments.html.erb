@@ -1,4 +1,4 @@
-<% content_for :page_title do %>Assessments<% end %>
+<% content_for :page_title, t(:page_title, "Assessments") %>
 
 <% content_for :right_side do %>
   <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_association_link add"><%= t('add_rubric_assessment', 'Add Rubric Assessment') %></a>

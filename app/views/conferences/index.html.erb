@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= t :page_title, "Web Conferences: %{group_or_class_name}", :group_or_class_name => @context.name %><% end %>
+<% content_for :page_title do %><%= join_title t(:page_title, "Web Conferences"), @context.name %><% end %>
 
 <% jammit_js :conferences %>
 
