@@ -21,4 +21,30 @@ describe "i18n js selenium tests" do
       JS
     end
   end
+
+  context "wrappers" do
+    it "should auto-html-escape" do
+      driver.execute_script(<<-JS).should == '<b>2</b> &gt; 1'
+        return I18n.scoped('foo').translate('bar', '*2* > 1', {wrapper: '<b>$1</b>'})
+      JS
+    end
+
+    it "should not escape already-escaped text" do
+      driver.execute_script(<<-JS).should == '<b><input></b> &gt; 1'
+        return I18n.scoped('foo').translate('bar', '*%{input}* > 1', {input: $.raw('<input>'), wrapper: '<b>$1</b>'})
+      JS
+    end
+
+    it "should support multiple wrappers" do
+      driver.execute_script(<<-JS).should == '<i>1 + 1</i> == <b>2</b>'
+        return I18n.scoped('foo').translate('bar', '*1 + 1* == **2**', {wrapper: {'*': '<i>$1</i>', '**': '<b>$1</b>'}})
+      JS
+    end
+
+    it "should replace globally" do
+      driver.execute_script(<<-JS).should == '<i>1 + 1</i> == <i>2</i>'
+        return I18n.scoped('foo').translate('bar', '*1 + 1* == *2*', {wrapper: '<i>$1</i>'})
+      JS
+    end
+  end
 end

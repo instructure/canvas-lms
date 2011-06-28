@@ -82,19 +82,12 @@ I18n.prepareOptions = function() {
   return options;
 };
 
-I18n.interpolate = function(message, options, needsEscaping) {
+I18n.interpolate = function(message, options) {
   options = this.prepareOptions(options);
-  var matches = message.match(this.PLACEHOLDER);
+  var matches = message.match(this.PLACEHOLDER) || [];
 
-  if (!matches) {
-    return message;
-  }
+  var placeholder, value, name, needsEscaping;
 
-  var placeholder, value, name;
-
-  if (needsEscaping) {
-    message = $.h(message);
-  }
   for (var i = 0; placeholder = matches[i]; i++) {
     name = placeholder.replace(this.PLACEHOLDER, "$1");
 
@@ -104,17 +97,48 @@ I18n.interpolate = function(message, options, needsEscaping) {
       value = "[missing " + placeholder + " value]";
     }
     if (needsEscaping) {
-      value = $.h(value);
-    } else if (value && value.htmlSafe) {
-      return this.interpolate(message, options, true);
+      if (!value.htmlSafe) {
+        value = $.h(value);
+      }
+    } else if (value.htmlSafe) {
+      needsEscaping = true;
+      message = $.h(message);
     }
 
     regex = new RegExp(placeholder.replace(/\{/gm, "\\{").replace(/\}/gm, "\\}"));
     message = message.replace(regex, value);
   }
 
+  if (options.wrapper) {
+    message = this.applyWrappers(needsEscaping ? $.raw(message) : message, options.wrapper)
+  }
   return message;
 };
+
+I18n.wrapperRegexes = {};
+
+I18n.applyWrappers = function(string, wrappers) {
+  var keys = [];
+  var key;
+
+  string = $.h(string);
+  if (typeof(wrappers) == "string") {
+    wrappers = {'*': wrappers};
+  }
+  for (key in wrappers) {
+    keys.push(key);
+  }
+  keys.sort().reverse();
+  for (var i in keys) {
+    key = keys[i];
+    if (!this.wrapperRegexes[key]) {
+      var escapedKey = key.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+      this.wrapperRegexes[key] = new RegExp(escapedKey + "([^" + escapedKey + "]*)" + escapedKey, "g");
+    }
+    string = string.replace(this.wrapperRegexes[key], wrappers[key])
+  }
+  return string;
+}
 
 I18n.translate = function(scope, options) {
   options = this.prepareOptions(options);
