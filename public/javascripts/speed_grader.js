@@ -174,7 +174,7 @@ I18n.scoped('gradebook', function(I18n) {
     var raw = submissionStateName(student.submission);
     var formatted = raw.replace("_", " ");
     if (raw === "resubmitted") {
-      formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': I18n.l($.parseFromISO(student.submission.submitted_at))});
+      formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.parseFromISO(student.submission.submitted_at).datetime_formatted});
     }
     return {raw: raw, formatted: formatted};
   }
@@ -908,7 +908,7 @@ I18n.scoped('gradebook', function(I18n) {
               
           innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + i + "' " +
                         (s == submissionToSelect ? "selected='selected'" : "") + ">" +
-                        (submittedAt ? I18n.l(submittedAt) : I18n.t('no_submission_time', 'no submission time')) +
+                        (submittedAt ? submittedAt.datetime_formatted : I18n.t('no_submission_time', 'no submission time')) +
                         (late ? " " + I18n.t('loud_late', "LATE") : "") +
                         (s.grade && s.grade_matches_current_submission ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
                        "</option>";
