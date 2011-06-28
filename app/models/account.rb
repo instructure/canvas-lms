@@ -234,12 +234,13 @@ class Account < ActiveRecord::Base
     end
     associated_courses = self.associated_courses.active
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
-    (yield associated_courses).limit(opts[:limit]).active_first.find(:all, :select => columns, :group => columns, :conditions => conditions)
+    associated_courses = yield associated_courses if block_given?
+    associated_courses.limit(opts[:limit]).active_first.find(:all, :select => columns, :group => columns, :conditions => conditions)
   end
 
   def fast_all_courses(opts={})
     @cached_fast_all_courses ||= {}
-    @cached_fast_all_courses[opts] ||= self.fast_course_base(opts) {|q| q}
+    @cached_fast_all_courses[opts] ||= self.fast_course_base(opts)
   end
 
   def all_users(limit=250)
