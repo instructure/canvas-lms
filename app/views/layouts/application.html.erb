@@ -120,7 +120,7 @@
           </table>
           <% unless @current_user.enrollments.ended.empty? %>
             <div class="menu-item-drop-padded">
-              <%= link_to t('menu.all_enrollments', 'See All Enrollments') + raw(' &raquo;'), courses_path, :class => "menu-item-drop-float-right" %>
+              <%= link_to h(t('menu.all_enrollments', 'See All Enrollments')) + raw(' &raquo;'), courses_path, :class => "menu-item-drop-float-right" %>
             </div>
           <% end %>
         </div>
