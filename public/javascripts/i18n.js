@@ -132,7 +132,7 @@ I18n.applyWrappers = function(string, wrappers) {
   for (var i in keys) {
     key = keys[i];
     if (!this.wrapperRegexes[key]) {
-      var escapedKey = key.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+      var escapedKey = $.regexEscape(key);
       this.wrapperRegexes[key] = new RegExp(escapedKey + "([^" + escapedKey + "]*)" + escapedKey, "g");
     }
     string = string.replace(this.wrapperRegexes[key], wrappers[key])

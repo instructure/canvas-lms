@@ -3390,5 +3390,9 @@
       .bind('resize.fillWindowWithMe', fillWindowWithThisElement);
     return this;
   };
-    
+
+  $.regexEscape = function(string) {
+    return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  }
+  
 })(jQuery);
