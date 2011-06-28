@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('calendar_events', function(I18n) {
 var wikiSidebar;
 jQuery(function($) {
   var $full_calendar_event        = $("#full_calendar_event"),
@@ -40,7 +41,7 @@ jQuery(function($) {
     var data = $full_calendar_event.getTemplateData({
       textValues: ['start_at_date_string', 'start_at_time_string', 'end_at_time_string', 'title', 'all_day', 'all_day_date']
     });
-    if (data.description == "No Content") {
+    if (data.description == I18n.t('no_content', "No Content")) {
       data.description = "";
     }
     data.start_date = data.start_at_date_string;
@@ -176,4 +177,5 @@ jQuery(function($) {
   });
   $.scrollSidebar();
 
+});
 });

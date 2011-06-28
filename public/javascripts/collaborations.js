@@ -16,13 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('collaborations', function(I18n) {
 $(document).ready(function() {
   $("#add_collaboration_form").submit(function(event) {
     var data = $(this).getFormData();
     if(!data['collaboration[title]']) {
       event.preventDefault();
       event.stopPropagation();
-      $(this).find("#collaboration_title").errorBox('Please enter a name for this document');
+      $(this).find("#collaboration_title").errorBox(I18n.t('errors.no_name', "Please enter a name for this document"));
       $("html,body").scrollTo($(this));
       return false;
     }
@@ -152,4 +153,5 @@ $(document).ready(function() {
       $(this).attr('checked', checked);
     });
   });
+});
 });

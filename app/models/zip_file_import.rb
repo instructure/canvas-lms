@@ -23,8 +23,8 @@ class ZipFileImport < Tableless
 
   validates_presence_of :zip_file, :context, :folder_id
   validates_each :zip_file do |record, attr, value|
-    record.errors.add attr, 'Must Upload A file' unless record.zip_file.class == Tempfile
-    record.errors.add attr, 'The file must be a valid .zip archive' unless record.zip_file.respond_to?(:content_type) && record.zip_file.content_type.to_s.strip.match(/application\/(x-)?zip/)
+    record.errors.add attr, t('errors.must_upload_file', 'Must Upload A file') unless record.zip_file.class == Tempfile
+    record.errors.add attr, t('errors.file_must_be_zip', 'The file must be a valid .zip archive') unless record.zip_file.respond_to?(:content_type) && record.zip_file.content_type.to_s.strip.match(/application\/(x-)?zip/)
   end
 
   def process!
@@ -39,7 +39,7 @@ class ZipFileImport < Tableless
       )
     rescue => e
       @error = ErrorReport.log_exception(:default, e)
-      self.errors.add :zip_file, "Unexpected Error (#{@error.id}) while processing zipped files"
+      self.errors.add :zip_file, t('errors.unexpected', "Unexpected Error (%{error_id}) while processing zipped files", :error_id => @error.id)
       return false
     end
   end

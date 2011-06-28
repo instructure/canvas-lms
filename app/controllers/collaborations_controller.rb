@@ -23,7 +23,7 @@ class CollaborationsController < ApplicationController
   
   def require_collaborations_configured
     unless Collaboration.any_collaborations_configured?
-      flash[:error] = "Collaborations have not been enabled for this Canvas site"
+      flash[:error] = t 'errors.not_enabled', "Collaborations have not been enabled for this Canvas site"
       redirect_to named_context_url(@context, :context_url)
       return false
     end
@@ -50,7 +50,7 @@ class CollaborationsController < ApplicationController
       elsif @collaboration.is_a?(GoogleDocsCollaboration)
         redirect_to oauth_url(:service => :google_docs, :return_to => request.url)
       else
-        flash[:error] = "Cannot load collaboration"
+        flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
         redirect_to named_context_url(@context, :context_collaborations_url)
       end
     end
@@ -76,7 +76,7 @@ class CollaborationsController < ApplicationController
           format.html { redirect_to @collaboration.url }
           format.json { render :json => @collaboration.to_json(:methods => [:collaborator_ids], :permissions => {:user => @current_user, :session => session}) }
         else
-          flash[:error] = "Collaboration creation failed"
+          flash[:error] = t 'errors.create_failed', "Collaboration creation failed"
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           forma.json { render :json => @collaboration.errors.to_json, :status => :bad_request }
         end
@@ -104,7 +104,7 @@ class CollaborationsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           format.json { render :json => @collaboration.to_json(:methods => [:collaborator_ids], :permissions => {:user => @current_user, :session => session}) }
         else
-          flash[:error] = "Collaboration update failed"
+          flash[:error] = t 'errors.update_failed', "Collaboration update failed"
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           format.json { render :json => @collaboration.errors.to_json, :status => :bad_request }
         end

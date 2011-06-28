@@ -29,12 +29,13 @@ class GettingStartedController < ApplicationController
   def require_course_creation_auth
     if params[:getting_started_code] && (auth_code = @domain_root_account.authorization_codes.find_by_authorization_code(params[:getting_started_code]))
       session[:course_creation_auth] = true
+      # TODO i18n
       session[:course_creation_account_id] = auth_code.associated_account_id || @domain_root_account.sub_accounts.find_or_create_by_name("Manually-Created Courses").id rescue nil
     end
     if session[:course_creation_auth] != true && @domain_root_account.require_authorization_code
       respond_to do |format|
         format.html { render :action => "authorization_code" }
-        format.json { render :json => {:errors => {:base => "Unauthorized"}}.to_json }
+        format.json { render :json => {:errors => {:base => t(:unauthorized, "Unauthorized")}}.to_json }
       end
       return false
     end
@@ -81,7 +82,7 @@ class GettingStartedController < ApplicationController
       redirect_to course_url(@context)
     else
       session[:return_to] = course_url(@context)
-      flash[:notice] = "Course created!  You'll need to log in or register to claim this course."
+      flash[:notice] = t :course_created_notice, "Course created! You'll need to log in or register to claim this course."
       redirect_to course_url(@context)
     end
   end
@@ -104,6 +105,7 @@ class GettingStartedController < ApplicationController
   def set_course
     # create_unique finds or creates, but always returns a context
     session[:course_uuid] = nil if params[:fresh]
+    # TODO i18n
     @context = Course.create_unique(session[:course_uuid], session[:course_creation_account_id] || @domain_root_account.sub_accounts.find_or_create_by_name("Manually-Created Courses").id, @domain_root_account.id)
     if session[:course_uuid] != @context.uuid && @current_user
       if params[:teacherless]

@@ -1,9 +1,5 @@
 <div id="external_tools">
-  <p>External tools are tools outside of Canvas that support
-  Basic LTI integrations.  You will need to check with the author
-  of the tool for the correct configuration parameters to add.
-  Tools are configured at the account level, and can then be
-  added as content in course modules for courses in the account.
+  <p><%= t :external_tools_note, "External tools are tools outside of Canvas that support Basic LTI integrations.  You will need to check with the author of the tool for the correct configuration parameters to add. Tools are configured at the account level, and can then be added as content in course modules for courses in the account." %>
   </p>
   <% @context.context_external_tools.active.each do |tool| %>
     <%= render :partial => 'external_tools/external_tool', :object => tool %>
@@ -14,44 +10,44 @@
     <% form_for :external_tool, :url => '.', :html => {:id => 'external_tool_form'} do |f| %>
     <table class="formtable">
       <tr>
-        <td><%= f.label :name, "Name:" %></td>
+        <td><%= f.blabel :name, :en => "Name" %></td>
         <td><%= f.text_field :name %></td>
       </tr><tr>
-        <td><%= f.label :consumer_key, "Consumer Key:" %></td>
+        <td><%= f.blabel :consumer_key, :en => "Consumer Key" %></td>
         <td><%= f.text_field :consumer_key %></td>
       </tr><tr>
-        <td style="vertical-align: top;"><%= f.label :shared_secret, "Shared Secret:" %></td>
+        <td style="vertical-align: top;"><%= f.blabel :shared_secret, :en => "Shared Secret" %></td>
         <td>
           <%= f.text_field :shared_secret %>
-          <div style="font-size: 0.8em;" class="shared_secret_note">enter a new value to change</div>
+          <div style="font-size: 0.8em;" class="shared_secret_note"><%= t :shared_secret_note, "enter a new value to change" %></div>
         </td>
       </tr><tr>
-        <td><label for="external_tool_match_by">Match By:</label></td>
+        <td><label for="external_tool_match_by"><%= before_label :match_by, "Match By" %></label></td>
         <td>
           <select id="external_tool_match_by">
-            <option value="domain">Domain</option>
-            <option value="url">URL</option>
+            <option value="domain"><%= t :domain, "Domain" %></option>
+            <option value="url"><%= t :url, "URL" %></option>
           </select>
         </td>
       </tr><tr class='tool_url'>
-        <td><%= f.label :url, "URL:" %></td>
+        <td><%= f.blabel :url, :en => "URL" %></td>
         <td><%= f.text_field :url %></td>
       </tr><tr class='tool_domain'>
-        <td><%= f.label :domain, "Domain:" %></td>
+        <td><%= f.blabel :domain, :en => "Domain" %></td>
         <td><%= f.text_field :domain %></td>
       </tr><tr>
-        <td><%= f.label :privacy_level, "Privacy:" %></td>
-        <td><%= f.select :privacy_level, [['Anonymous','anonymous'],['Name Only','name_only'],['Public','public']] %></td>
+        <td><%= f.blabel :privacy_level, :en => "Privacy" %></td>
+        <td><%= f.select :privacy_level, [[t(:anonymous, "Anonymous"),'anonymous'],[t(:name_only, "Name Only"),'name_only'],[t(:public, "Public"),'public']] %></td>
       </tr><tr>
         <td colspan="2">
-          <%= f.label :description, "Description:" %><br/>
+          <%= f.blabel :description, :en => "Description" %><br/>
           <%= f.text_area :description, :style => "width: 550px; height: 100px;" %>
         </td>
       </tr><tr>
         <td colspan="2">
           <div class="button-container">
-            <button class="button save_button" type="submit">Save Tool Settings</button>
-            <button class="button button-secondary cancel_button" type="button">Cancel</button>
+            <button class="button save_button" type="submit"><%= t "#buttons.save_tool_settings", "Save Tool Settings" %></button>
+            <button class="button button-secondary cancel_button" type="button"><%= t "#buttons.cancel", "Cancel" %></button>
           </div>
         </td>
       </tr>
@@ -60,5 +56,5 @@
   </div>
 </div>
 <div class="button-container">
-  <button class="button add_tool_link"><%= image_tag "add.png" %> Add External Tool</button>
+  <button class="button add_tool_link"><%= image_tag "add.png" %> <%= t "#buttons.add_external_tool", "Add External Tool" %></button>
 </div>

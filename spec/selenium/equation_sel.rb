@@ -4,19 +4,9 @@ shared_examples_for "equation editor selenium tests" do
   it_should_behave_like "in-process server selenium tests"
   
   it "should support multiple equation editors on the same page" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    login_as(username, password)
+    course_with_teacher_logged_in
     
-    get "/courses/#{e.course_id}/quizzes"
+    get "/courses/#{@course.id}/quizzes"
     driver.find_element(:partial_link_text, "Create a New Quiz").click
     
     driver.current_url.should match %r{/courses/\d+/quizzes/(\d+)\/edit}

@@ -1,10 +1,10 @@
-<% content_for :page_title do %>Discussions: <%= @context.name %><% end %>
+<% content_for :page_title do %><%= before_label(t('#titles.discussions', "Discussions")) %> <%= @context.name %><% end %>
 
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context_enrollment.feed_code, :atom), {:title => "Course Discussions Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context_enrollment.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")}) %>
   <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => "Course Discussions Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")}) %>
   <% end %>
 <% end %>
 
@@ -12,42 +12,24 @@
   <div id="sidebar_content" class="rs-margin-lr rs-margin-top">
     <div>
       <% if can_do(@context.discussion_topics.new, @current_user, :create) %>
-          <a href="#" class="add_topic_link button button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> Start a New Topic</a>
-          <a href="<%= context_url(@context, :context_announcements_url) %>" class="button button-sidebar-wide" style="display: none;"><%= image_tag 'announcement_icon.png', :alt => '' %> Manage Announcements</a>
+          <a href="#" class="add_topic_link button button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t :start_new_topic, "Start a New Topic" %></a>
+          <a href="<%= context_url(@context, :context_announcements_url) %>" class="button button-sidebar-wide" style="display: none;"><%= image_tag 'announcement_icon.png', :alt => '' %> <%= t :manage_announcements, "Manage Announcements" %></a>
           <% if can_do(@context, @current_user, :moderate_forum) %>
-          <a href="#" class="reorder_topics_link button button-sidebar-wide"><%= image_tag 'move-ns.png', :alt => '' %> Reorder Topics</a>
+          <a href="#" class="reorder_topics_link button button-sidebar-wide"><%= image_tag 'move-ns.png', :alt => '' %> <%= t "#buttons.reorder_topics", "Reorder Topics" %></a>
           <% end %>
       <% end %>
     </div>
-    <!-- TODO: fix the counts
-    <table class="summary">
-      <tr>
-        <th>Recent</td>
-        <td style="font-size: 0.8em; line-height: 1.7em;">
-          <% @topics.select{|t| t.last_reply_at > (Time.now - 14.days) }[0,5].each do |topic| %>
-            <a href="<%= context_url(@context, :context_discussion_topic_url, topic.id) %>" class="<%= topic.is_announcement ? "announcement-icon-small" : "discussion-icon-small" %>"><%= topic.title %></a><br/>
-          <% end %>
-        </td>
-      </tr><tr>
-        <th>Totals</th>
-        <td>
-          <%= pluralize(@context.discussion_topics.active.count - @context.announcements.active.count, "Topic") %><br/>
-          <%= pluralize(@context.announcements.active.count, "Announcement") %>
-        </td>
-      </tr>
-    </table>
-    -->
     <div>
       <% if params[:include_announcements] == "1" %>
-        <a href="<%= context_url(@context, :context_discussion_topics_url) %>" class="button button-sidebar-wide"><%= image_tag 'word_bubble.png', :alt => '' %> View Only Topics</a>
+        <a href="<%= context_url(@context, :context_discussion_topics_url) %>" class="button button-sidebar-wide"><%= image_tag 'word_bubble.png', :alt => '' %> <%= t :view_only_topics, "View Only Topics" %></a>
       <% else %>
-        <a href="<%= context_url(@context, :context_discussion_topics_url, :include_announcements => "1") %>" class="button button-sidebar-wide"><%= image_tag 'word_bubble.png', :alt => '' %> View Topics and Announcements</a>
+        <a href="<%= context_url(@context, :context_discussion_topics_url, :include_announcements => "1") %>" class="button button-sidebar-wide"><%= image_tag 'word_bubble.png', :alt => '' %> <%= t :view_topics_and_announcements, "View Topics and Announcements" %></a>
       <% end %>
     </div>
   </div>
   <%= render :partial => "shared/wiki_sidebar" %>
 <% end %>
-<h2>Discussions</h2>
+<h2><%= t "#titles.discussions", "Discussions" %></h2>
 <% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
 <% jammit_js :topics %>
 
@@ -55,11 +37,12 @@
 <%= will_paginate(@topics) %>
 <% js_block do %>
   <script type="text/javascript">
+  I18n.scoped('discussion_topics', function(I18n) {
     $(function(){
       $('#topic_list').pageless({
         totalPages: <%= @topics.total_pages %>,
         url: "<%= context_url(@context, :context_discussion_topics_url, :format => :json, :only_discussion_topics => params[:only_discussion_topics]) %>",
-        loaderMsg: "Loading more results",
+        loaderMsg: I18n.t("loading_results", "Loading more results"),
         scrape: function(data) {
           if(typeof(data) == 'string') {
             try {
@@ -76,21 +59,21 @@
         }
       });
     });
+  });
   </script>
 <% end %>
 <div id="reorder_topics_dialog" style="display: none;">
   <% form_for :discussion_topic, :url => context_url(@context, :reorder_context_discussion_topics_url), :html => {:id => "reorder_topics_form"} do %>
     <input type="hidden" name="order" value="" id="reorder_topics_ids"/>
-    You can manually define the order in which discussions will appear.
-    Click and drag any topic to change where it will appear in the list.
+    <%= t :drag_and_drop_notice, "You can manually define the order in which discussions will appear. Click and drag any topic to change where it will appear in the list." %>
     <ul id="topics_reorder_list" class="unstyled_list">
       <% @all_topics[0..50].each do |topic| %>
         <li class="topic topic_<%= topic.id %>"><%= topic.title %></li>
       <% end %>
     </ul>
     <div class="button-container">
-      <button class="button reorder_topics_button" type="submit">Reorder Topics</button>
-      <button class="button button-secondary cancel_button" type="button">Cancel</button>
+      <button class="button reorder_topics_button" type="submit"><%= t :reorder_topics, "Reorder Topics" %></button>
+      <button class="button button-secondary cancel_button" type="button"><%= t "#buttons.cancel", "Cancel" %></button>
     </div>
   <% end %>
 </div>
@@ -115,6 +98,6 @@
 
 <% if @context.try_rescue(:module_based?) && !can_do(@context, @current_user, :manage_content) %>
   <a href="<%= context_url(@context, :context_locks_url) %>" id="discussion_topic_locks_url" style="display: none;">&nbsp;</a>
-  <%= image_tag "lock.png", :style => "display: none;", :id => "discussion_topic_lock_icon", :title => "This topic is currently locked.  Visit the topic details page for more information.", :alt => "locked" %>
+  <%= image_tag "lock.png", :style => "display: none;", :id => "discussion_topic_lock_icon", :title => t(:locked_message, "This topic is currently locked.  Visit the topic details page for more information."), :alt => t(:locked_title, "locked") %>
 <% end %>
 

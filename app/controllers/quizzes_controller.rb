@@ -20,7 +20,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb("Quizzes") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only]
   
   def index
     if authorized_action(@context, @current_user, :read)
@@ -53,7 +53,7 @@ class QuizzesController < ApplicationController
   end
 
   def statistics
-    if authorized_action(@quiz, @current_user, :manage)
+    if authorized_action(@quiz, @current_user, :read_statistics)
       respond_to do |format|
         format.html {
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
@@ -94,6 +94,14 @@ class QuizzesController < ApplicationController
     end
   end
   
+  def read_only
+    @assignment = @quiz.assignment
+    if authorized_action(@quiz, @current_user, :read_statistics)
+      add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+      render
+    end
+  end
+  
   def show
     if @quiz.deleted?
       flash[:error] = "That quiz has been deleted"
@@ -130,7 +138,7 @@ class QuizzesController < ApplicationController
         @submission.reload
         @just_graded = true
       end
-      managed_quiz_data if @quiz.grants_right?(@current_user, session, :grade)
+      managed_quiz_data if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && @submission.untaken?
       @stored_params ||= {}
       log_asset_access(@quiz, "quizzes", "quizzes")

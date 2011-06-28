@@ -1,5 +1,5 @@
 <% 
-  add_crumb("People", context_url(@context, :context_users_url))
+  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
   add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
   @active_tab="people"
 %>
@@ -9,26 +9,26 @@
   <h2><%= context_user_name(@context, @user) %></h2>
   <div class="rs-margin-rl">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
-      <a class="button button-sidebar button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><%= image_tag "grading_icon.png" %> Grades for <%= context_user_name(@context, @user) %></a>
+      <a class="button button-sidebar button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><%= image_tag "grading_icon.png" %> <%= t 'links.user_grades', "Grades for %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :send_messages) %>
-      <a class="button button-sidebar-wide" href="<%= inbox_path %>#<%= CGI::escape("reply{\"context_code\":\"#{@context.asset_string}\",\"recipients\":\"#{@user.id}\"}") %>"><%= image_tag "email.png" %> Message <%= context_user_name(@context, @user) %></a>
+      <a class="button button-sidebar-wide" href="<%= inbox_path %>#<%= CGI::escape("reply{\"context_code\":\"#{@context.asset_string}\",\"recipients\":\"#{@user.id}\"}") %>"><%= image_tag "email.png" %> <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide">Faculty Journal for <%= context_user_name(@context, @user) %></a>
+      <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide"> <%= t 'links.faculty_journal', "Faculty Journal for %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :manage_students) %>
-      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>" class="button button-sidebar-wide"><%= image_tag "link.png" %> Access Report for <%= context_user_name(@context, @user) %></a>
+      <a href="<%= context_url(@context, :context_user_usage_url, @user) %>" class="button button-sidebar-wide"><%= image_tag "link.png" %> <%= t 'links.access_report', "Access Report for %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if @context.is_a?(Course) && @context.has_outcomes? && can_do(@context, @current_user, :manage) %>
-      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>" class="button button-sidebar-wide"><%= image_tag "learning_outcome.png" %> Outcomes for <%= @user.short_name %></a>
+      <a href="<%= context_url(@context, :context_user_outcomes_results_url, @user.id) %>" class="button button-sidebar-wide"><%= image_tag "learning_outcome.png" %> <%= t 'links.user_outcomes', "Outcomes for %{user}", :user => @user.short_name %></a>
     <% end %>
     <% if can_do(@domain_root_account, @current_user, :manage) %>
-      <a href="<%= user_path(@user.id) %>" class="button button-sidebar-wide"><%= image_tag "information.png" %> User Account Details</a>
+      <a href="<%= user_path(@user.id) %>" class="button button-sidebar-wide"><%= image_tag "information.png" %> <%= t('links.user_account_details', %{User Account Details}) %></a>
     <% end %>
   </div>
   <a href="<%= profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
-  <h2><%= @user.short_name %>'s Services</h2>
+  <h2><%= t 'headings.user_services', "%{user}'s Services", :user => @user.short_name %></h2>
   <div class="rs-margin-lr">
     <% if can_do(@membership, @current_user, :read_services) && !@membership.user.user_services.empty? %>
       <p>
@@ -39,32 +39,27 @@
     <% else %>
       <% if !@membership.user.user_services.empty?  %>
         <p>
-        <%= @user.short_name %>'s registered services are not visible to you at this time.
+          <%= t 'services_not_visible', "%{user}'s registered services are not visible to you at this time.", :user => @user.short_name %>
         </p>
       <% else %>
         <p>
-        <%= @user.short_name %> hasn't linked any external services to their account yet.
+          <%= t 'no_services', "%{user} hasn't linked any external services to their account yet.", :user => @user.short_name %>
         </p>
       <% end %>
     <% end %>
     <% if @current_user && @current_user == @user && @current_user.user_services.empty? %>
       <p>
-        You haven't linked your user profile to any external services.  You 
-        can link your Canvas account to services like Facebook and Twitter.
-        This will make it easier for fellow course and group members to
-        link up with you outside of class.
+        <%= t 'help.services', %{You haven't linked your user profile to any external services. You can link your Canvas account to services like Facebook and Twitter. This will make it easier for fellow course and group members to link up with you outside of class.} %>
       </p>
       <p>
-        <a href="<%= profile_path %>#registered_web_services" class="button">Link web services to my account</a>
+        <a href="<%= profile_path %>#registered_web_services" class="button"><%= t('links.link_services', %{Link web services to my account}) %></a>
       </p>
     <% elsif @current_user && @current_user == @user && !@current_user.show_user_services %>
       <p>
-        You haven't enabled your list of registered services.  Enabling this
-        list will let fellow course and group members more easily link
-        up with you outside of class.
+        <%= t 'help.list_services', %{You haven't enabled your list of registered services. Enabling this list will let fellow course and group members more easily link up with you outside of class.} %>
       </p>
       <p>
-        <input type="checkbox" id="show_user_services" class="show_user_services_checkbox"/><label for="show_user_services">Let fellow course/group members see which services I've linked to my profile</label>
+        <input type="checkbox" id="show_user_services" class="show_user_services_checkbox"/><label for="show_user_services"><%= t('labels.public_list_services', %{Let fellow course/group members see which services I've linked to my profile}) %></label>
       </p>
     <% end %>
   </div>
@@ -73,45 +68,45 @@
 <% jammit_js :user_name %>
 <% jammit_css :roster_user %>
 
-<h2><%= @user.short_name %>'s Details</h2>
+<h2><%= t 'headings.users_details', "%{user}'s Details", :user => @user.short_name %></h2>
 <% if can_do(@context, @current_user, :manage_students) %>
-<h2>User Details</h2>
+<h2><%= t('headings.user_details', %{User Details}) %></h2>
 <%= render :partial => 'users/name' %>
-<a href="#" class="more_user_information_link">more user details...</a>
+<a href="#" class="more_user_information_link"><%= t('links.more_user_details', %{more user details...}) %></a>
 <div class="more_user_information" style="display: none;">
   <% if @context.is_a?(Course) %>
     <fieldset>
-      <legend>Membership(s)</legend>
+      <legend><%= t('legends.memberships', %{Membership(s)}) %></legend>
       <table>  
         <% @enrollments.each do |enrollment| %>
           <tr class="enrollment">
             <td style="vertical-align: top; padding: 5px 50px 5px 5px;">
               <b><a href="<%= context_url(@context, :context_section_url, enrollment.course_section_id) rescue "#" %>"><%= enrollment.try_rescue(:course_section).try_rescue(:display_name) || enrollment.short_name %></a></b>
-              <div style="font-size: 0.8em; padding-left: 20px;">Enrolled as a <%= enrollment.readable_type %></div>
+              <div style="font-size: 0.8em; padding-left: 20px;"><%= t 'enrolled_as', "Enrolled as a %{enrollment_type}", :enrollment_type => enrollment.readable_type %></div>
               <div style="font-size: 0.8em; padding-left: 20px;">created <%= datetime_string(enrollment.created_at) %></div>
               <% if enrollment.associated_user && enrollment.is_a?(ObserverEnrollment) %>
-                <div style="font-size: 0.8em; padding-left: 20px;">linked to <%= enrollment.associated_user.name %></div>
+                <div style="font-size: 0.8em; padding-left: 20px;"><%= t 'enrollment_linked_to', "linked to %{linked_user}", :linked_user => enrollment.associated_user.name %></div>
               <% end %>
-              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? %>" class="completed_at_holder">completed <span class="completed_at"><%= datetime_string(enrollment.completed_at) %></div>
+              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? %>" class="completed_at_holder"><%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %></div>
             </td>
             <% if !enrollment.admin? || (can_do(@context, @current_user, :manage_admin_users) && enrollment.user_id != @current_user.id) %>
               <td style="vertical-align: top; padding: 5px; font-size: 0.8em;">
                 <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
-                  <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>">Conclude this Enrollment</a>
+                  <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
                 </div>
                 <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.completed? %>">
-                  <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>">Restore this Enrollment</a>
+                  <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
                 </div>
                 <% if can_do(@context, @current_user, :manage_admin_users) && enrollment.is_a?(ObserverEnrollment) %>
                   <div class="link_enrollment_link_holder" style="margin-bottom: 5px;">
-                    <a class="link_enrollment_link" href="#" data-id="<%= enrollment.id %>" data-associated-id="<%= enrollment.associated_user_id %>">Link this Enrollment</a>
+                    <a class="link_enrollment_link" href="#" data-id="<%= enrollment.id %>" data-associated-id="<%= enrollment.associated_user_id %>"><%= t('links.link_enrollment', %{Link this Enrollment}) %></a>
                   </div>
                   <%= render :partial => 'courses/link_enrollment' %>
                 <% end %>
                 <div><% if enrollment.defined_by_sis? %>
-                  <a href="#" title="This enrollment was defined by the university, and can't be deleted">Can't Delete</a>
+                  <a href="#" title="<%= t('links.title.enrollment_sis_defined', %{This enrollment was defined by the university, and can't be deleted}) %>"><%= t('links.cant_delete', %{Can't Delete}) %></a>
                 <% else %>
-                  <a class="delete_enrollment_link" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>">Delete this Enrollment</a>
+                  <a class="delete_enrollment_link" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>"><%= t('links.delete_enrollment', %{Delete this Enrollment}) %></a>
                 <% end %>
                 </div>
               </td>
@@ -120,18 +115,18 @@
         <% end %>
         <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
           <tr>
-            <td style="border-top: 1px solid #eee; padding-top: 5px; vertical-align: top; font-weight: bold;">Privileges:</td>
+            <td style="border-top: 1px solid #eee; padding-top: 5px; vertical-align: top; font-weight: bold;"><%= before_label('user_privileges', %{Privileges}) %></td>
             <td style="border-top: 1px solid #eee; padding-top: 5px;">
               <div class="elevate_enrollment_link_holder" style="<%= hidden if @enrollments.any?{|e| !e.limit_priveleges_to_course_section } %>">
-                this user can only view students in their assigned course section(s)
+                <%= t('user_only_view_section', %{this user can only view students in their assigned course section(s)}) %>
                 <div style="margin-left: 10px; font-size: 0.8em;">
-                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="elevate_enrollment_link">let this user see all course users</a>
+                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="elevate_enrollment_link"><%= t('links.user_view_all_sections', %{let this user see all course users}) %></a>
                 </div>
               </div>
               <div class="restrict_enrollment_link_holder" style="<%= hidden unless @enrollments.any?{|e| !e.limit_priveleges_to_course_section } %>">
-                this user can view students in any course section
+                <%= t('user_view_all_sections', %{this user can view students in any course section}) %>
                 <div style="margin-left: 10px; font-size: 0.8em;">
-                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="restrict_enrollment_link">limit this user to only see fellow section users</a>
+                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="restrict_enrollment_link"><%= t('links.user_only_view_section', %{limit this user to only see fellow section users}) %></a>
                 </div>
               </div>
             </td>
@@ -147,15 +142,15 @@
   <div style="margin-bottom: 20px;">
     <span class="avatar_image"><img src="<%= @user.avatar_url(50, @domain_root_account && @domain_root_account.settings[:avatars], "http://#{request.host_with_port}/images/dotted_pic.png") %>"/></span>
     <% if can_do(@user, @current_user, :remove_avatar) %>
-      <a href="#" class="remove_avatar_picture_link">Remove avatar picture</a>
+      <a href="#" class="remove_avatar_picture_link"><%= t('links.remove_avatar', %{Remove avatar picture}) %></a>
     <% else %>
-      <a href="#" class="report_avatar_picture_link">Report inappropriate picture</a>
+      <a href="#" class="report_avatar_picture_link"><%= t('links.report_avatar', %{Report inappropriate picture}) %></a>
     <% end %>
   </div>
 <% end %>
 
-<h2>Recent Messages</h2>
-<%= "No Messages" if @messages.empty? %>
+<h2><%= t('headings.recent_messages', %{Recent Messages}) %></h2>
+<%= t('no_messages', "No Messages") if @messages.empty? %>
 <% @messages[0,10].each do |message| %>
   <% if message.is_a?(DiscussionEntry) %>
     <%= render :partial => 'discussion_topics/entry', :object => message, :locals => {:out_of_context => true, :show_context => true} %>
@@ -194,7 +189,7 @@ $(document).ready(function() {
   $(".conclude_enrollment_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".enrollment").confirmDelete({
-      message: "Are you sure you want to conclude this student's enrollment?",
+      message: <%= raw t('confirm.conclude_student', "Are you sure you want to conclude this student's enrollment?").to_json %>,
       url: $(this).attr('href'),
       success: function(data) {
         $(this).undim();
@@ -213,7 +208,7 @@ $(document).ready(function() {
       $user.loadingImage('remove');
       $(".elevate_enrollment_link_holder,.restrict_enrollment_link_holder").slideToggle();
     }, function(data) {
-      $.flashError("Enrollment privilege change failed, please try again");
+      $.flashError(<%= raw t('enrollment_change_failed', "Enrollment privilege change failed, please try again").to_json %>);
       $user.loadingImage('remove');
     });
     event.preventDefault();
@@ -221,7 +216,7 @@ $(document).ready(function() {
   $(".delete_enrollment_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".enrollment").confirmDelete({
-      message: "Are you sure you want to delete this student's enrollment?",
+      message: <%= raw t('confirm.delete_enrollment', "Are you sure you want to delete this student's enrollment?").to_json %>,
       url: $(this).attr('href'),
       success: function(data) {
         $(this).closest('.enrollment').hide();

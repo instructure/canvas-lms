@@ -1071,7 +1071,10 @@ namespace :db do
         end
         # set the password later.
         pseudonym.password = pseudonym.password_confirmation = password
-        pseudonym.save
+        unless pseudonym.save
+          raise pseudonym.errors.first.join " " if pseudonym.errors.size > 0
+          raise "unknown error saving password"
+        end
         Account.site_admin.add_user(user, 'AccountAdmin')
         Account.default.add_user(user, 'AccountAdmin')
         user

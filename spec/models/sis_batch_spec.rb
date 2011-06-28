@@ -25,7 +25,8 @@ describe SisBatch do
 
   def process_csv_data(data, opts = {})
     i = 0
-    path = Tempfile.new(["sis_rspec", ".zip"]).path
+    tempfile = Tempfile.new(["sis_rspec", ".zip"])
+    path = tempfile.path
     FileUtils.rm(path)
     Zip::ZipFile.open(path, true) do |z|
       data.each do |dat|

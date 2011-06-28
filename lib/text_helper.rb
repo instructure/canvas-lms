@@ -23,7 +23,7 @@ module TextHelper
   end
   
   def quote_clump(quote_lines)
-    txt = "<div class='quoted_text_holder'><a href='#' class='show_quoted_text_link'>show quoted text</a><div class='quoted_text' style='display: none;'>"
+    txt = "<div class='quoted_text_holder'><a href='#' class='show_quoted_text_link'>#{TextHelper.escape_html(I18n.t('lib.text_helper.quoted_text_toggle', "show quoted text"))}</a><div class='quoted_text' style='display: none;'>"
     txt += quote_lines.join("\n")
     txt += "</div></div>"
     txt
@@ -119,7 +119,7 @@ module TextHelper
 
   def truncate_text(text, options={})
     max_length = options[:max_length] || 30
-    ellipsis = options[:ellipsis] || "..."
+    ellipsis = options[:ellipsis] || I18n.t('lib.text_helper.ellipsis', '...')
     ellipsis_length = ellipsis.length
     actual_length = max_length - ellipsis_length
 
@@ -139,17 +139,6 @@ module TextHelper
     CGI::unescapeHTML text
   end
   
-  def hours_ago_in_words(from_time)
-    diff = (Time.now - from_time).abs
-    if diff < 60
-      "< 1 minute"
-    elsif diff < 3600
-      "#{(diff / 60).to_i} minutes"
-    else
-      "#{(diff / 3600).to_i} hours"
-    end
-  end
-  
   def indent(text, spaces=2)
     text = text.to_s rescue ""
     indentation = " " * spaces
@@ -157,34 +146,33 @@ module TextHelper
   end
   
   def force_zone(time)
-    time_zone ||= @time_zone || Time.zone
-    res = ActiveSupport::TimeWithZone.new(time.utc, time_zone) rescue nil
-    res || time
+    (time.in_time_zone(@time_zone || Time.zone) rescue nil) || time
   end
 
   def date_string(start_date, style=:normal)
     return nil unless start_date
     start_date = start_date.in_time_zone.to_date rescue start_date.to_date
-    today = ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date
+    today = Time.zone.now.to_date
     if style != :long
-      return "Today" if style != :no_words && start_date == today
-      return "Tomorrow" if style != :no_words && start_date == today + 1
-      return "Yesterday" if style != :no_words && start_date == today - 1
-      return start_date.strftime("%A") if style != :no_words && start_date < today + 1.week && start_date >= today
-      return start_date.strftime("%b #{start_date.day}") if start_date.year == today.year || style == :short
+      if style != :no_words
+        string = nil
+        return string if start_date == today && (string = I18n.t('date.days.today', 'Today')) && string.strip.present?
+        return string if start_date == today + 1 && (string = I18n.t('date.days.tomorrow', 'Tomorrow')) && string.strip.present?
+        return string if start_date == today - 1 && (string = I18n.t('date.days.yesterday', 'Yesterday')) && string.strip.present?
+        return string if start_date < today + 1.week && start_date >= today && (string = I18n.l(start_date, :format => :weekday) rescue nil) && string.strip.present?
+      end
+      return I18n.l(start_date, :format => :short) if start_date.year == today.year || style == :short
     end
-    return start_date.strftime("%b #{start_date.day}, %Y")
+    return I18n.l(start_date, :format => :medium)
   end
 
   def time_string(start_time, end_time=nil)
     start_time = start_time.in_time_zone rescue start_time
     end_time = end_time.in_time_zone rescue end_time
     return nil unless start_time
-    hr = start_time.hour % 12
-    hr = 12 if hr == 0
-    result = hr.to_s + (start_time.min == 0 ? start_time.strftime("%p").downcase : start_time.strftime(":%M%p").downcase)
+    result = I18n.l(start_time, :format => start_time.min == 0 ? :tiny_on_the_hour : :tiny)
     if end_time && end_time != start_time
-      result = result + " to " + time_string(end_time)
+      result = I18n.t('time.ranges.times', "%{start_time} to %{end_time}", :start_time => result, :end_time => time_string(end_time))
     end
     result
   end
@@ -206,38 +194,45 @@ module TextHelper
       datetime_type = :event
       end_datetime = nil
     end
-    start_time = time_string(start_datetime)
-    by_at = datetime_type == :due_date ? ' by' : ' at'
-    # I am assuming that by the time we get here that start_datetime will be in the same time zone as @current_user's timezone
-    if shorten_midnight && start_datetime && ((datetime_type == :due_date  && start_datetime.hour == 23 && start_datetime.min == 59) || (datetime_type == :event && start_datetime.hour == 0 && start_datetime.min == 0))
-      start_time = ''
-      by_at = ''
-    end
-    def datestring(datetime)
-      return datetime.strftime("%b #{datetime.day}") if datetime.year == ActiveSupport::TimeWithZone.new(Time.now, Time.zone).to_date.year
-      return datetime.strftime("%b #{datetime.day}, %Y")
-    end
-    unless(end_datetime && end_datetime != start_datetime)
-      result = (datetime_type == :verbose ? start_datetime.strftime("%a, ") : "") + datestring(start_datetime) + by_at + " " + start_time
-    else
-      end_time = time_string(end_datetime)
-      unless start_datetime.to_date != end_datetime.to_date
-        result = datestring(start_datetime) + " from " + start_time + " to " + end_time
+    end_datetime = nil if datetime_type == :due_date
+
+    def datetime_component(date_string, time, type)
+      if type == :due_date
+        I18n.t('time.due_date', "%{date} by %{time}", :date => date_string, :time => time_string(time))
       else
-        result = (datetime_type == :verbose ? start_datetime.strftime("%a, ") : "") + datestring(start_datetime) + by_at + " " + start_time + " to " + (datetime_type == :verbose ? end_datetime.strftime("%a, ") : "") + datestring(end_datetime) + by_at + " " + end_time
+        I18n.t('time.event', "%{date} at %{time}", :date => date_string, :time => time_string(time))
       end
     end
-    result
-  rescue
-    nil
+
+    start_date_string = date_string(start_datetime, datetime_type == :verbose ? :long : :no_words)
+    start_string = datetime_component(start_date_string, start_datetime, datetime_type)
+
+    if !end_datetime || end_datetime == start_datetime
+      if shorten_midnight && ((datetime_type == :due_date  && start_datetime.hour == 23 && start_datetime.min == 59) || (datetime_type == :event && start_datetime.hour == 0 && start_datetime.min == 0))
+        start_date_string
+      else
+        start_string
+      end
+    else
+      if start_datetime.to_date == end_datetime.to_date
+        I18n.t('time.ranges.same_day', "%{date} from %{start_time} to %{end_time}", :date => start_date_string, :start_time => time_string(start_datetime), :end_time => time_string(end_datetime))
+      else
+        end_date_string = date_string(end_datetime, datetime_type == :verbose ? :long : :no_words)
+        end_string = datetime_component(end_date_string, end_datetime, datetime_type)
+        I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}", :start_date_and_time => start_string, :end_date_and_time => end_string)
+      end
+    end
   end
 
+  def time_ago_in_words_with_ago(time)
+    I18n.t('#time.with_ago', '%{time} ago', :time => (time_ago_in_words time rescue ''))
+  end
 
   def truncate_html(input, options={})
     doc = Nokogiri::HTML(input)
     options[:max_length] ||= 250
     num_words = options[:num_words] || (options[:max_length] / 5) || 30
-    truncate_string = options[:ellipsis] || "..."
+    truncate_string = options[:ellipsis] || I18n.t('lib.text_helper.ellipsis', '...')
     truncate_string += options[:link] if options[:link]
     truncate_elem = Nokogiri::HTML("<span>" + truncate_string + "</span>").at("span")
    
@@ -329,5 +324,43 @@ module TextHelper
     res = doc.at_css('body').inner_html rescue nil
     res ||= doc.root.children.first.inner_html rescue ""
     res && res.html_safe
+  end
+
+  def self.make_subject_reply_to(subject)
+    blank_re = I18n.t('#subject_reply_to', "Re: %{subject}", :subject => '')
+    return subject if subject.starts_with?(blank_re)
+    I18n.t('#subject_reply_to', "Re: %{subject}", :subject => subject)
+  end
+
+  class MarkdownSafeBuffer < String; end
+  # use this to flag interpolated parameters as markdown-safe (see
+  # mt below) so they get eval'ed rather than escaped, e.g.
+  #  mt(:add_description, :example => markdown_safe('`1 + 1 = 2`'))
+  def markdown_safe(string)
+    MarkdownSafeBuffer.new(string)
+  end
+
+  def markdown_escape(string)
+    return string if string.is_a?(MarkdownSafeBuffer)
+    markdown_safe(string.gsub(/([\\`\*_\{\}\[\]\(\)\#\+\-\.!])/, '\\\\\1'))
+  end
+
+  # use this rather than t() if the translation contains trusted markdown
+  def mt(*args)
+    inlinify = :auto
+    if args.last.is_a?(Hash)
+      options = args.last
+      inlinify = options.delete(:inlinify) if options.has_key?(:inlinify)
+      options.each_pair do |key, value|
+        next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer) && !value.is_a?(ActiveSupport::SafeBuffer)
+        next if key == :wrapper
+        options[key] = markdown_escape(value).gsub(/\s+/, ' ').strip
+      end
+    end
+    translated = t(*args)
+    translated = ERB::Util.h(translated) unless translated.html_safe?
+    result = RDiscount.new(translated).to_html.strip
+    result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>[^<]*?(<\/?(a|em|strong|code|img|br( ?\/)?)[^<]*?)*<\/p>\z/
+    result.html_safe.strip
   end
 end

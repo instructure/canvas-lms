@@ -1,9 +1,9 @@
 <% form_tag(context_url(@context, :context_collaborations_url), {:id => "add_collaboration_form", :target => "_blank", :style => "display: none; margin-top: 10px;"}) do %>
-<h2>Start a New Collaboration</h2>
+<h2><%= t 'titles.new', "Start a New Collaboration" %></h2>
 <table class="formtable">
   <tr>
     <td style="white-space: nowrap">
-      Collaborate Using:
+      <%= before_label :collaborate_using, "Collaborate Using" %>
     </td>
     <td style="width: 90%;">
       <select id="collaboration_collaboration_type" name="collaboration[collaboration_type]">
@@ -20,29 +20,31 @@
     </td>
   </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @google_docs %>">
     <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
-      <%= image_tag "google_docs_icon.png", :style => "float: left; margin-right: 5px;" %> Google Docs are a great place to collaborate
+      <%= image_tag "google_docs_icon.png", :style => "float: left; margin-right: 5px;" %>
+      <%= t 'descriptions.google_docs', "Google Docs are a great place to collaborate
       on a group project.  It's like Microsoft Word, but lets you work together with others
       on the same file without having to email it around.  You'll need a Google account
-      in order to participate in any Google Docs collaborations.
+      in order to participate in any Google Docs collaborations." %>
     </td>
   </tr><tr id="etherpad_description" style="display: none;" class="collaboration_type">
     <td colspan="2" style="padding: 5px 20px 10px; font-size: 0.8em;">
-      <%= image_tag "ether_pad.png", :style => "float: left; margin-right: 5px; margin-top: 5px;" %> EtherPad is a site that lets you quickly set
+      <%= image_tag "ether_pad.png", :style => "float: left; margin-right: 5px; margin-top: 5px;" %>
+      <%= t 'descriptions.etherpad', %{EtherPad is a site that lets you quickly set
       up shared documents.  It's fast enough that you can see what others are typing as they're
       typing it -- although "pads" aren't protected by a password so anyone that knows about them
       can edit them.  EtherPad might be better suited than Google Docs for things like taking
-      notes because it's so fast.
+      notes because it's so fast.} %>
     </td>
   </tr><tr class="collaborate_data">
     <td style="white-space: nowrap">
-      Document Name:
+      <%= before_label :document_name, "Document Name" %>
     </td>
     <td>
       <%= text_field :collaboration, :title, :style => "width: 300px;" %>
     </td>
   </tr><tr class="collaborate_data">
     <td style="white-space: nowrap; vertical-align: top;">
-      Description:
+      <%= before_label :description, "Description" %>
     </td>
     <td>
       <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
@@ -51,10 +53,10 @@
     <td colspan="2">
       <div class="collaborate_data">
         <div>
-          Collaborate With:
+          <%= before_label :collaborate_with, "Collaborate With" %>
           <div style="margin-left: 10px; font-size: 0.8em;">
-            <a href="#" class="select_all_link">Select All</a> | 
-            <a href="#" class="deselect_all_link">Deselect All</a>
+            <a href="#" class="select_all_link"><%= t '#links.select_all', "Select All" %></a> |
+            <a href="#" class="deselect_all_link"><%= t '#links.deselect_all', "Deselect All" %></a>
           </div>
           <ul id="collaborator_list">
             <% @users.find(:all, :order => 'sortable_name').uniq.each do |user| %>
@@ -68,16 +70,16 @@
           </ul>
         </div>
         <div class="button-container">
-          <button type="submit" class="button button-default-action">Start Collaborating</button>
-          <button type="button" class="button-secondary cancel_button">Cancel</button>
+          <button type="submit" class="button button-default-action"><%= t 'buttons.start_collaborating', "Start Collaborating" %></button>
+          <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
         </div>
       </div>
       <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none; margin: 20px;">
-        Before you can collaborate on documents, you need to authorize Canvas
-        to access your Google Docs account:
+        <%= t '#instructions.authorize_google_docs', "Before you can collaborate on documents, you need to authorize Canvas
+          to access your Google Docs account:" %>
         <div class="button-container">
-          <a class="button button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>">Authorize Google Docs Access</a>
-          <button type="button" class="button-secondary cancel_button">Cancel</button>
+          <a class="button button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
+          <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
         </div>
       </div>
     </td>
@@ -86,26 +88,26 @@
 <% end %>
 <div id="delete_collaboration_dialog" style="display: none;">
   <%= image_tag "google_docs.png", :style => "float: left;" %>
-  This collaboration is being stored as a Google Doc.  Did you want to delete it just
-  from Canvas, or remove it from Google Docs as well?  
+  <%= t 'messages.delete_google_doc_as_weel', "This collaboration is being stored as a Google Doc.  Did you want to delete it just
+  from Canvas, or remove it from Google Docs as well?" %>
   <div style="margin-top: 15px;">
-  <button type="button" class="button delete_button delete_document_button">Just Delete<br/>from Canvas</button>
-  <button type="button" class="button delete_button">Also Delete From<br/>Google Docs</button>
+  <button type="button" class="button delete_button delete_document_button"><%= mt 'buttons.delete_from_canvas', "Just Delete  \nfrom Canvas" %></button>
+  <button type="button" class="button delete_button"><%= mt 'buttons.delete_from_google_docs', "Also Delete From  \nGoogle Docs" %></button>
   </div>
 </div>
 <% form_tag(context_url(@context, :context_collaboration_url, "{{ id }}"), {:id => "edit_collaboration_form", :method => :put, :style => "display: none; margin-top: 10px;", :class => 'collaboration communication_message'}) do %>
   <div class="header">
-    <%= text_field :collaboration, :title, :style => "width: 300px;", :value => "#{@context.name} Collaboration" %>
+    <%= text_field :collaboration, :title, :style => "width: 300px;", :value => t('collaboration_name', "%{course_or_group_name} Collaboration", :course_or_group_name => @context.name) %>
   </div>
   <div class="content">
-  Description:<br/>
+  <%= before_label :description, "Description" %><br/>
   <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
   </div>
   <div class="footer">
-    Collaborate With:
+    <%= before_label :collaborate_with, "Collaborate With" %>
     <div style="margin-left: 10px; font-size: 0.8em;">
-      <a href="#" class="select_all_link">Select All</a> | 
-      <a href="#" class="deselect_all_link">Deselect All</a>
+      <a href="#" class="select_all_link"><%= t '#links.select_all', "Select All" %></a> |
+      <a href="#" class="deselect_all_link"><%= t '#links.deselect_all', "Deselect All" %></a>
     </div>
     <ul id="collaborator_list">
       <% @users.find(:all, :order => 'sortable_name').uniq.each do |user| %>
@@ -119,8 +121,8 @@
     </ul>
   </div>
   <div class="button-container">
-    <button type="submit" class="button button-default-action">Update Collaboration</button>
-    <button type="button" class="button-secondary cancel_button">Cancel</button>
+    <button type="submit" class="button button-default-action"><%= t 'buttons.update', "Update Collaboration" %></button>
+    <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
   </div>
 <% end %>
 <% js_block do %>

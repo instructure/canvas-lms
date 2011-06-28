@@ -3,6 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + "/common")
 describe "jquery ui selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  before do
+    course_with_teacher_logged_in
+    get "/"
+  end
+
   # jquery ui doesn't escape dialog titles by default (even when inferred from
   # title attributes!). our modified ui.dialog does (and hopefully jquery.ui
   # will too in 1.9). to pass in an html title that you don't want escaped,
@@ -10,8 +15,6 @@ describe "jquery ui selenium tests" do
   # 
   # see http://bugs.jqueryui.com/ticket/6016
   it "should html-escape inferred dialog titles" do
-    course_with_teacher_logged_in
-
     title = "<b>this</b> is the title"
     driver.execute_script(<<-JS).should == title
       return $('<div id="jqueryui_test" title="#{title}">hello</div>')
@@ -22,9 +25,26 @@ describe "jquery ui selenium tests" do
     JS
   end
 
-  it "should html-escape explicit string dialog titles" do
-    course_with_teacher_logged_in
+  it "should use a non-breaking space for empty titles" do
+    driver.execute_script(<<-JS).should == "\302\240"
+      return $('<div id="jqueryui_test">hello</div>')
+        .dialog()
+        .parent('.ui-dialog')
+        .find('.ui-dialog-title')
+        .text();
+    JS
 
+    driver.execute_script(<<-JS).should == "\302\240"
+      return $('#jqueryui_test')
+        .dialog('option', 'title', 'foo')
+        .dialog('option', 'title', '')
+        .parent('.ui-dialog')
+        .find('.ui-dialog-title')
+        .text();
+    JS
+  end
+
+  it "should html-escape explicit string dialog titles" do
     title = "<b>this</b> is the title"
     driver.execute_script(<<-JS).should == title
       return $('<div id="jqueryui_test">hello again</div>')
@@ -45,8 +65,6 @@ describe "jquery ui selenium tests" do
   end
 
   it "should accept jquery object dialog titles" do
-    course_with_teacher_logged_in
-
     title = "<i>i want formatting <b>for realz</b></i>"
     driver.execute_script(<<-JS).should == title
       return $('<div id="jqueryui_test">here we go</div>')

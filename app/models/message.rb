@@ -19,6 +19,7 @@
 class Message < ActiveRecord::Base
   include Workflow
   include SendToStream
+  include Twitter
 
   has_many :attachments, :as => :context
   belongs_to :notification
@@ -116,6 +117,7 @@ class Message < ActiveRecord::Base
   
   def self.old_dashboard
     res = []
+    # TODO i18n
     Notification.find_all_by_category("Course Content").each do |notification|
       res += Message.in_state(:dashboard).by_name(notification.name).before(2.weeks.ago)[0..10]
     end
@@ -260,32 +262,39 @@ class Message < ActiveRecord::Base
       filename = self.notification.name.downcase.gsub(/\s/, '_') + ".email.erb" #rescue "not.found"
       path = Canvas::MessageHelper.find_message_path(filename)
     end
+    @i18n_scope = "messages." + filename.sub(/\.erb\z/, '')
     if (File.exist?(path) rescue false)
       message = File.read(path)
       @message_content_link = nil; @message_content_subject = nil
       self.extend TextHelper
       b = binding
-      
-      self.body = ERB.new(message, nil, "%<>", "@output").result(b).strip
+
+      if path_type == 'facebook'
+        # this will ensure we escape anything that's not already safe
+        message = '<% @output = ActiveSupport::SafeBuffer.new %>' + message
+      end
+      self.body = Erubis::Eruby.new(message, :bufvar => "@output").result(b)
       if path_type == 'email'
         message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
-        comm_message = ERB.new(message, nil, "%<>", "@output").result(b).strip rescue nil
+        comm_message = Erubis::Eruby.new(message, :bufvar => "@output").result(b) rescue nil
         self.body = self.body + "\n\n\n\n\n\n________________________________________\n" + comm_message if comm_message
       end
-      self.subject = @message_content_subject || "Canvas Alert"
+      self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
       self.url = @message_content_link || nil
       self.body
     else
       self.extend TextHelper
       b = binding
-      main_link = ERB.new(self.notification.main_link || "", nil, "%<>").result(b)
+      main_link = Erubis::Eruby.new(self.notification.main_link || "").result(b)
       b = binding
-      self.subject = ERB.new(self.subject, nil, "%<>").result(b)
-      self.body = ERB.new(self.body, nil, "%<>").result(b)
+      self.subject = Erubis::Eruby.new(self.subject).result(b)
+      self.body = Erubis::Eruby.new(self.body).result(b)
       self.transmission_errors = "couldn't find #{path}"
     end
     Time.zone = old_time_zone
     self.body
+  ensure
+    @i18n_scope = nil
   end
 
   def reply_to_secure_id
@@ -322,6 +331,7 @@ class Message < ActiveRecord::Base
   def self.dashboard_messages(messages)
     message_types = {}
     messages.each do |m|
+      # TODO i18n
       type = m.notification.category rescue "Other"
       if type
         message_types[type] ||= []
@@ -350,12 +360,18 @@ class Message < ActiveRecord::Base
     self.path_type = 'summary' if self.to == 'dashboard'
     self.path_type = 'email' if self.context_type == 'ErrorReport'
     self.to_email = true if self.path_type == 'email' || self.path_type == 'sms'
-    self.from_name = "Instructure Canvas"
+    self.from_name = t(:default_from_name, "Instructure Canvas")
     self.from_name = self.asset_context.name if (self.asset_context && self.asset_context.name && self.notification.dashboard? rescue false)
     self.from_name = self.from_name if self.respond_to?(:from_name)
     true
   end
-    
+
+  def translate(key, default, options={})
+    key = "\##{@i18n_scope}.#{key}" if @i18n_scope && key !~ /\A#/
+    super(key, default, options)
+  end
+  alias :t :translate
+
   protected
   
     def deliver_via_email
@@ -394,6 +410,14 @@ class Message < ActiveRecord::Base
   
     def deliver_via_chat
       # record_delivered
+    end
+    
+    def deliver_via_twitter
+      @twitter_service = self.user.user_services.find_by_service('twitter')
+      url = "http://#{HostUrl.short_host(self.asset_context)}/mr/#{self.id}"
+      body = self.body[0, 139 - url.length]
+      twitter_self_dm(@twitter_service, "#{body} #{url}") if @twitter_service
+      complete_dispatch
     end
     
     def deliver_via_facebook

@@ -28,7 +28,7 @@ class PageCommentsController < ApplicationController
           format.html { redirect_to eportfolio_named_category_entry_url(@portfolio.id, @page.eportfolio_category.slug, @page.slug) }
           format.json { render :json => @comment.to_json }
         else
-          flash[:error] = "Comment creation failed"
+          flash[:error] = t('errors.create_failed', "Comment creation failed")
           format.html { redirect_to eportfolio_named_category_entry_url(@portfolio.id, @page.eportfolio_category.slug, @page.slug) }
           format.json { render :json => @comment.errors.to_json, :status => :bad_request }
         end

@@ -187,7 +187,7 @@ class AssociateInteraction < AssessmentItemConverter
       extract_answer!(answer, node)
       answer[:id] = unique_local_id
       @question[:answers] << answer
-      id = get_node_val(node, '@identifier')
+      id = node['identifier']
       answer_map[id] = answer
     end
 
@@ -197,7 +197,7 @@ class AssociateInteraction < AssessmentItemConverter
       match[:text] = node.text.strip
       match[:match_id] = unique_local_id
       @question[:matches] << match
-      id = get_node_val(node, '@identifier')
+      id = node['identifier']
       match_map[id] = match
     end
 

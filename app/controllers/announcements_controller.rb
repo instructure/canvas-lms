@@ -21,7 +21,7 @@ class AnnouncementsController < ApplicationController
   before_filter { |c| c.active_tab = "announcements" }  
   
   def index
-    add_crumb("Announcements")
+    add_crumb(t(:announcements_crumb, "Announcements"))
     return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
     @announcements = @context.active_announcements.paginate(:page => params[:page]).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
     if authorized_action(@context, @current_user, :read)
@@ -44,7 +44,7 @@ class AnnouncementsController < ApplicationController
     respond_to do |format|
       format.atom { 
         feed = Atom::Feed.new do |f|
-          f.title = "#{@context.name} Announcements Feed"
+          f.title = t(:feed_name, "%{course} Announcements Feed", :course => @context.name)
           f.links << Atom::Link.new(:href => named_context_url(@context, :context_announcements_url))
           f.updated = Time.now
           f.id = named_context_url(@context, :context_announcements_url)
@@ -59,8 +59,12 @@ class AnnouncementsController < ApplicationController
         require 'rss/2.0'
         rss = RSS::Rss.new("2.0")
         channel = RSS::Rss::Channel.new
-        channel.title = "#{@context.name} Announcements Podcast Feed"
-        channel.description = "Any media files linked from or embedded within announcements in the #{@context.class.to_s.downcase} \"#{@context.name}\" will appear in this feed."
+        channel.title = t(:podcast_feed_name, "%{course} Announcements Podcast Feed", :course => @context.name)
+        if @context.is_a?(Course)
+          channel.description = t(:podcast_feed_description_course, "Any media files linked from or embedded within announcements in the course \"%{course}\" will appear in this feed.", :course => @context.name)
+        elsif @context.is_a?(Group)
+          channel.description = t(:podcast_feed_description_group, "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed.", :group => @context.name)
+        end
         channel.link = named_context_url(@context, :context_announcements_url)
         channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
         elements = Announcement.podcast_elements(announcements, @context)

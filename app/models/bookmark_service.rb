@@ -22,7 +22,7 @@ class BookmarkService < UserService
   def post_bookmark(opts)
     url = opts[:url]
     return unless url
-    title = opts[:title] || "No Title"
+    title = opts[:title] || t(:default_title, "No Title")
     description = opts[:comments] || ""
     tags = opts[:tags] || ['instructure']
     begin

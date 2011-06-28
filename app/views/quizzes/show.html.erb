@@ -44,12 +44,17 @@
               </button>
             <% end %>
           <% end %>
+        <% elsif can_do(@quiz, @current_user, :review_grades) %>  
+          <% if @submitted_students && !@submitted_students.empty? %>
+            <a href="<%= context_url(@context, :context_quiz_statistics_url, @quiz.id) %>" class="button button-sidebar button-sidebar-wide"><%= image_tag "graph.png" %> <%= @quiz.readable_type %> Statistics</a>
+          <% end %>
+          <a href="<%= context_url(@context, :context_quiz_read_only_url, @quiz.id) %>" class="button button-sidebar-wide"><%= image_tag "file.png" %> See Full Quiz</a>
         <% end %>
         <% if can_do(@assignment, @current_user, :update) || @assignment.try(:rubric_association).try(:rubric) %>
           <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link button button-sidebar-wide" style="<%= hidden unless @assignment %>"><%= image_tag "rubric.png" %> Show Assignment Rubric</a>
           <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display:hidden">&nbsp;</a>
         <% end %>
-        <% if can_do(@quiz, @current_user, :grade) && @quiz.available? %>
+        <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? %>
           <% submitted_student_ids = @submitted_students.map{|s| s.id} %>
           <a href="#" class="button quiz_details_link button-sidebar-wide">
             <% if @submissions.find{|s| s.pending_review? && submitted_student_ids.include?(s.user_id)} %>
@@ -136,7 +141,7 @@
     </div>
   <% end %>
 <% else %>
-  <% if can_do(@quiz, @current_user, :grade) %>
+  <% if can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
     <table id="quiz_details" style="display: none; clear: both;">
       <tr>
         <td style="vertical-align: top;">

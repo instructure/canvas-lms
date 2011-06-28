@@ -421,6 +421,47 @@ describe QuizzesController do
     end
   end
   
+  describe "GET 'statistics'" do
+    it "should allow concluded teachers to see a quiz's statistics" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
+      response.should be_success
+      response.should render_template('statistics')
+      
+      @enrollment.conclude
+      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
+      response.should be_success
+      response.should render_template('statistics')
+    end
+  end
+  
+  describe "GET 'read_only'" do
+    it "should allow concluded teachers to see a read-only view of a quiz" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+      get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
+      response.should be_success
+      response.should render_template('read_only')
+      
+      @enrollment.conclude
+      get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
+      response.should be_success
+      response.should render_template('read_only')
+    end
+  
+    it "should not allow students to see a read-only view of a quiz" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz
+      get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
+      assert_unauthorized
+      
+      @enrollment.conclude
+      get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
+      assert_unauthorized
+    end
+  end
+  
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)

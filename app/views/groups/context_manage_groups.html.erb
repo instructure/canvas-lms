@@ -1,10 +1,10 @@
-<% content_for :page_title do %>Course Groups: <%= @context.name %><% end %>
+<% content_for :page_title do %><%= before_label '#titles.course_groups', 'Course Groups' %> <%= @context.name %><% end %>
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-    <a href="#" class="add_category_link button button-sidebar-wide"><%= image_tag "add.png" %> Make a New Set of Groups</a>
-    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> View <%= @context.class.to_s %> Roster</a>
+    <a href="#" class="add_category_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'buttons.add_group', 'Make a New Set of Groups' %></a>
+    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= @context.is_a?(Account) ? t('#buttons.view_account_roster', 'View Account Roster') : t('#buttons.view_course_roster', 'View Course Roster') %></a>
   </div>
-  <h2 id="category_header" style="margin-top: 10px;<%= hidden if !@categories || @categories.empty? %>">Group Pages</h2>
+  <h2 id="category_header" style="margin-top: 10px;<%= hidden if !@categories || @categories.empty? %>"><%= t :group_pages, "Group Pages" %></h2>
   <div class="rs-margin-lr">
     <%= render :partial => 'secondary_category', :collection => @categories %>
     <%= render :partial => 'secondary_category', :object => nil %>
@@ -143,9 +143,9 @@ a.load_members_link, .loading_members {
 
 <% if @context.is_a?(Course) && @context.students.empty? %>
   <div style="text-align: center;" id="no_students_message">
-    No students have been added for this course
+    <%= t 'messages.no_students', 'No students have been added for this course' %>
     <div style="margin: 20px; font-size: 1.2em;">
-      <a href="<%= context_url(@context, :context_details_url) %>#add_students" style="padding-left: 20px;">Add Students to the Course</a>
+      <a href="<%= context_url(@context, :context_details_url) %>#add_students" style="padding-left: 20px;"><%= t 'actions.add_students', 'Add Students to the Course' %></a>
     </div>
   </div>
 <% else %>
@@ -160,24 +160,33 @@ a.load_members_link, .loading_members {
   <div id="tabs_loading_wrapper" style="display: none;">
     <div style="text-align: left; <%= hidden unless @categories.empty? %>" id="no_groups_message">
       <% if @context.is_a?(Account) %>
-        <h2>Account-level Student Groups</h2>
-        <p>Account-level student groups are a good way to group students without being
+        <h2><%= t 'headings.account_groups', "Account-level Student Groups" %></h2>
+        <p><%= t 'account_group_explanation', <<-TEXT
+        Account-level student groups are a good way to group students without being
         tied to a specific course. Every student group gets their own calendar, discussion 
         board and collaboration tools so they can organize themselves and work together
-        more effectively.</p>
+        more effectively.
+        TEXT
+        %></p>
       <% else %>
-        <h2>Student Groups</h2>
-        <p>Student groups are a useful way to organize students for things like group projects or 
+        <h2><%= t 'headings.course_groups', "Student Groups" %></h2>
+        <p><%= t 'course_group_explanation', <<-TEXT
+        Student groups are a useful way to organize students for things like group projects or 
         papers.  Every student group gets their own calendar, discussion board and collaboration
-        tools so they can organize themselves and work together more effectively.</p>
+        tools so they can organize themselves and work together more effectively.
+        TEXT
+        %></p>
   
-        <p>You can randomly assign students to groups of a specific size, or manually
+        <p><%= t 'group_assignment_instructions', <<-TEXT
+        You can randomly assign students to groups of a specific size, or manually
         create and organize the groups.  Once your groups are created, you can set assignments
         to be "group submission" assignments, which means each group will have one submission for
-        all users of that group.</p>
+        all users of that group.
+        TEXT
+        %></p>
       <% end %>
   
-      <p>To get started, click the "Make a New Set of Groups" link to the right.</p>
+      <p><%= t "get_started_info", "To get started, click the \"Make a New Set of Groups\" link to the right." %></p>
     </div>
     <div id="group_tabs" style="<%= hidden if @categories.empty? %>;">
       <ul id="category_list">
@@ -190,7 +199,7 @@ a.load_members_link, .loading_members {
   </div>
 
   <ul style="display: none;">
-    <li class="student user_template" title="Click and drag to move student to another group.">
+    <li class="student user_template" title="<%= t :drag_and_drop_instructions, "Click and drag to move student to another group." %>">
       <span class="name"></span>
       <span class="user_id" style="display: none"></span>
     </li>
@@ -202,8 +211,8 @@ a.load_members_link, .loading_members {
       <%= f.text_field :max_membership, :style => "width: 25px;" %> users or less
     </div>
     <div class="button-container">
-      <button type="submit" class="button small-button">Update</button>
-      <button type="button" class="button-secondary cancel_button">Cancel</button>
+      <button type="submit" class="button small-button"><%= t '#buttons.update', 'Update' %></button>
+      <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', 'Cancel' %></button>
     </div>
     <div class="clear"></div>
   <% end %>

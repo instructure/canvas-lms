@@ -10,29 +10,29 @@
       <span class="links">
         <span class="author_id user_id" style="display: none;"><%= context_message.try_rescue(:user_id) || nbsp %></span>
         <span class="context_code" style="display: none;"><%= context.asset_string %></span>
-        <a href="<%= context_url(context, :context_roster_message_url, context_message ? context_message.id : "{{ id }}") %>" class="mark_as_read_link no-hover" style="<%= hidden unless show_mark_as_read %>"><%= image_tag "check.png", :alt => "Mark as Read", :title => "Mark as Read" %></a>
-        <a href="<%= context_message_reply_path(context_message ? context_message.id : "{{ id }}") %>" class="reply_link no-hover" style="<%= hidden unless can_do(context, @current_user, :send_messages) %>"><%= image_tag "reply.png", :alt => "Reply", :title => (context_message && context_message.user_id == @current_user.id ? "Reply to Recipients" : "Reply to Sender") %></a>
+        <a href="<%= context_url(context, :context_roster_message_url, context_message ? context_message.id : "{{ id }}") %>" class="mark_as_read_link no-hover" style="<%= hidden unless show_mark_as_read %>"><%= image_tag "check.png", :alt => t('images.alt.mark_as_read', "Mark as Read"), :title => t('images.title.mark_as_read', "Mark as Read") %></a>
+        <a href="<%= context_message_reply_path(context_message ? context_message.id : "{{ id }}") %>" class="reply_link no-hover" style="<%= hidden unless can_do(context, @current_user, :send_messages) %>"><%= image_tag "reply.png", :alt => t('images.alt.reply', "Reply"), :title => (context_message && context_message.user_id == @current_user.id ? t('images.title.reply_to_recipients', "Reply to Recipients") : t('images.title.reply_to_sender', "Reply to Sender")) %></a>
       </span>
     </div>
     <% end %>
     <div class="post_date created_at time_ago_date"><%= datetime_string(context_message.try_rescue(:created_at)) || nbsp %></div>
     <div class="header_title">
-      <%= image_tag "email_big.png", :class => "header_icon topic_icon", :alt => "email", :title => "Email Message", :style => brief ? "width: 20px;" : "" %>
+      <%= image_tag "email_big.png", :class => "header_icon topic_icon", :alt => t('images.alt.email', "email"), :title => t('images.title.email', "Email Message"), :style => brief ? "width: 20px;" : "" %>
       <% if brief %>
-        <a href="<%= context_url(context, :context_users_url, :all_messages => 1) %>#message_<%= context_message ? context_message.id : 'none' %>" class="title subject"><%= context_message.try_rescue(:subject) || "No Title" %></a>
+        <a href="<%= context_url(context, :context_users_url, :all_messages => 1) %>#message_<%= context_message ? context_message.id : 'none' %>" class="title subject"><%= context_message.try_rescue(:subject) || t(:no_title, "No Title") %></a>
       <% else %>
-        <span class="title subject"><%= context_message.try_rescue(:subject) || "No Title" %></span>
+        <span class="title subject"><%= context_message.try_rescue(:subject) || t(:no_title, "No Title") %></span>
       <% end %>
       <span class="root_context_message_id" style="display:none"><%= context_message ? context_message.root_context_message_id || context_message.id : '' %></span>
       <div class="sub_title" style="margin-left: 45px; line-height: 1em;">
         <span style="padding-left: 10px; <%= hidden unless show_context %>"><%= context.try_rescue(:short_name) %></span>
-        <a href="<%= context_url(context, :context_user_url, context_message ? context_message.user_id : '{{ user_id }}') %>" class="user_name sender_name"><%= context_user_name(context, context_message.try_rescue(:user_id)) %></a>
-        <span class="user_name">
-        to 
-        <% single_recipient = context_message && context_message.recipients.length == 1 %>
-          <a style="<%= hidden unless single_recipient %>" href="<%= context_url(context, :context_user_url, context_message && !context_message.recipient_users.empty? ? context_message.recipient_users.first.id : "{{ recipient_id }}") %>" class="single_recipient_link recipient_name"><%= context_user_name(context, context_message.try_rescue(:recipient_users).try_rescue(:first)) || nbsp %></a>
-          <a style="<%= hidden if single_recipient %>" href="#" class="show_recipients_link multiple_recipient_link"><span class="users_count"><%= context_message.try_rescue(:recipients).try_rescue(:length) || "0" %></span> Recipients</a>
-        </span>
+        <% ot 'from_to', '%{from_user} *to %{to_user}*', :wrapper => '<span class="user_name">\1</span>', :from_user => capture { %>
+          <a href="<%= context_url(context, :context_user_url, context_message ? context_message.user_id : '{{ user_id }}') %>" class="user_name sender_name"><%= context_user_name(context, context_message.try_rescue(:user_id)) %></a>
+        <% }, :to_user => capture { %>
+          <% single_recipient = context_message && context_message.recipients.length == 1 %>
+            <a style="<%= hidden unless single_recipient %>" href="<%= context_url(context, :context_user_url, context_message && !context_message.recipient_users.empty? ? context_message.recipient_users.first.id : "{{ recipient_id }}") %>" class="single_recipient_link recipient_name"><%= context_user_name(context, context_message.try_rescue(:recipient_users).try_rescue(:first)) || nbsp %></a>
+            <a style="<%= hidden if single_recipient %>" href="#" class="show_recipients_link multiple_recipient_link"><%= t(:recipients_count, { :one => "*1* Recipient", :other => "*%{count}* Recipients" }, :count => (context_message.try_rescue(:recipients).try_rescue(:length) || 0), :wrapper => '<span class="users_count">\1</span>') %></a>
+        <% } %>
       </div>
     </div>
     <div class="clear"></div>
@@ -60,16 +60,16 @@
   </div>
   <% if message_read && show_mark_as_read %>
     <div class="show_message_body">
-      <a class="show_message_body_link" href="#">show full message</a>
+      <a class="show_message_body_link" href="#"><%= t('links.show_full', 'show full message') %></a>
     </div>
   <% end %>
   <div style="margin: 5px; <%= hidden if (context_message.try_rescue(:recipients).try_rescue(:length) == 1) %>">
     <% if brief %>
-      <a href="<%= context_url(context, :context_users_url, :all_messages => 1) %>#message_<%= context_message ? context_message.id : 'none' %>" class="show_recipients_link"><span class="users_count"><%= context_message.try_rescue(:recipients).try_rescue(:length) || "0" %></span> Recipients</a>
+      <a href="<%= context_url(context, :context_users_url, :all_messages => 1) %>#message_<%= context_message ? context_message.id : 'none' %>" class="show_recipients_link"><%= t(:recipients_count, { :one => "*1* Recipient", :other => "*%{count}* Recipients" }, :count => (context_message.try_rescue(:recipients).try_rescue(:length) || 0), :wrapper => '<span class="users_count">\1</span>') %></a>
     <% else %>
-      <a href="#" class="_show_recipients_link _multiple_recipient_link" style="<%= hidden if true || (context_message && context_message.recipient_users.length <= 1) %>"><span class="users_count"><%= context_message.try_rescue(:recipients).try_rescue(:length) || "0" %></span> Recipients</a>
+      <a href="#" class="_show_recipients_link _multiple_recipient_link" style="<%= hidden if true %>"><%= t(:recipients_count, { :one => "*1* Recipient", :other => "*%{count}* Recipients" }, :count => (context_message.try_rescue(:recipients).try_rescue(:length) || 0), :wrapper => '<span class="users_count">\1</span>') %></a>
       <div class="recipients_list_holder" style="display: none;">
-        <h3><span class="users_count"><%= context_message.try_rescue(:recipients).try_rescue(:length) || "0" %></span> Recipients</h3>
+        <h3><%= t(:recipients_count, { :one => "*1* Recipient", :other => "*%{count}* Recipients" }, :count => (context_message.try_rescue(:recipients).try_rescue(:length) || 0), :wrapper => '<span class="users_count">\1</span>') %></h3>
         <% if can_do(context, @current_user, :manage_students) || !context_message.try_rescue(:protect_recipients) %>
           <ul class="recipients_list">
             <% (context_message.try_rescue(:recipient_users) || []).each do |user| %>
@@ -84,7 +84,7 @@
             </li>
           </ul>
         <% else %>
-          Recipient list is protected
+          <%= t(:recipients_protected, "Recipient list is protected") %>
         <% end %>
       </div>
     <% end %>

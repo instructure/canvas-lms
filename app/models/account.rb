@@ -21,7 +21,7 @@ class Account < ActiveRecord::Base
   attr_accessible :name, :turnitin_account_id,
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
-    :storage_quota, :ip_filters
+    :default_storage_quota_mb, :storage_quota, :ip_filters
 
   include Workflow
   adheres_to_policy
@@ -40,9 +40,6 @@ class Account < ActiveRecord::Base
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :learning_outcomes, :as => :context
   has_many :sis_batches
-  has_many :department_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'department_id'
-  has_many :college_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'college_id'
-  has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :authorization_codes, :dependent => :destroy
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user
@@ -172,7 +169,7 @@ class Account < ActiveRecord::Base
       return true if !existing_account || existing_account.id == self.id
     end
     
-    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    self.errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
   end
   
@@ -286,16 +283,26 @@ class Account < ActiveRecord::Base
   end
   
   def quota
-    # in megabytes
     Rails.cache.fetch(['current_quota', self].cache_key) do
-      return read_attribute(:storage_quota) || (self.parent_account.default_storage_quota rescue nil) || 500
+      read_attribute(:storage_quota) ||
+        (self.parent_account.default_storage_quota rescue nil) ||
+        Setting.get_cached('account_default_quota', 500.megabytes.to_s).to_i
     end
   end
   
   def default_storage_quota
     read_attribute(:default_storage_quota) || 
-    (self.parent_account.default_storage_quota rescue nil) ||
-    500
+      (self.parent_account.default_storage_quota rescue nil) ||
+      Setting.get_cached('account_default_quota', 500.megabytes.to_s).to_i
+  end
+  
+  def default_storage_quota_mb
+    default_storage_quota < 1.megabyte ? default_storage_quota : default_storage_quota / 1.megabyte
+  end
+  
+  def default_storage_quota_mb=(val)
+    # TODO: convert the MB to bytes once the commit introducing this line has been deployed
+    self.default_storage_quota = val
   end
   
   def default_storage_quota=(val)
@@ -470,16 +477,6 @@ class Account < ActiveRecord::Base
   
   def self_and_all_sub_accounts
     @self_and_all_sub_accounts ||= ActiveRecord::Base.connection.select_all("SELECT id FROM accounts WHERE accounts.root_account_id = #{self.id} OR accounts.parent_account_id = #{self.id}").map{|ref| ref['id'].to_i}.uniq + [self.id] #(self.all_accounts + [self]).map &:id
-  end
-  
-  def abstract_courses
-    if self.is_a?(Department)
-      self.department_abstract_courses
-    elsif self.is_a?(College)
-      self.college_abstract_courses
-    else
-      self.root_abstract_courses
-    end
   end
   
   def default_time_zone
@@ -747,7 +744,7 @@ class Account < ActiveRecord::Base
       self.turnitin_pledge
     else
       res = self.account.turnitin_pledge rescue nil
-      res ||= "This assignment submission is my own, original work"
+      res ||= t('#account.turnitin_pledge', "This assignment submission is my own, original work")
     end
   end
   
@@ -785,25 +782,25 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
       tabs = [
-        { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path },
+        { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :href => :account_role_overrides_path },
       ]
     else
-      tabs = [ { :id => TAB_COURSES, :label => "Courses", :href => :account_path } ]
-      tabs << { :id => TAB_USERS, :label => "Users", :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
-      tabs << { :id => TAB_STATISTICS, :label => "Statistics", :href => :statistics_account_path }
-      tabs << { :id => TAB_PERMISSIONS, :label => "Permissions", :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      tabs = [ { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :href => :account_path } ]
+      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
+      tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :href => :statistics_account_path }
+      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
       if user && self.grants_right?(user, nil, :manage_outcomes)
-        tabs << { :id => TAB_OUTCOMES, :label => "Outcomes", :href => :account_outcomes_path }
-        tabs << { :id => TAB_RUBRICS, :label => "Rubrics", :href => :account_rubrics_path }
+        tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :href => :account_outcomes_path }
+        tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :href => :account_rubrics_path }
       end
-      tabs << { :id => TAB_GRADING_STANDARDS, :label => "Grading Schemes", :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
-      tabs << { :id => TAB_SUB_ACCOUNTS, :label => "Sub-Accounts", :href => :account_sub_accounts_path } if manage_settings
-      tabs << { :id => TAB_FACULTY_JOURNAL, :label => "Faculty Journal", :href => :account_user_notes_path} if self.enable_user_notes
-      tabs << { :id => TAB_TERMS, :label => "Terms", :href => :account_terms_path } if !self.root_account_id && manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => "Authentication", :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
-      tabs << { :id => TAB_SIS_IMPORT, :label => "SIS Import", :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
+      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading Schemes"), :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
+      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :href => :account_sub_accounts_path } if manage_settings
+      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :href => :account_user_notes_path} if self.enable_user_notes
+      tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :href => :account_terms_path } if !self.root_account_id && manage_settings
+      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
+      tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
     end
-    tabs << { :id => TAB_SETTINGS, :label => "Settings", :href => :account_settings_path }
+    tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :href => :account_settings_path }
     tabs
   end
 

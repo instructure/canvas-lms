@@ -1,0 +1,6 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(delayed_messages.first.try(:context)) %>
+<% end %>
+Canvas Alert - <%= delayed_messages.length %> new notifications
+
+http://<%= HostUrl.context_host(delayed_messages.first.try(:context)) %>

@@ -653,3 +653,79 @@ describe Course, 'grade_publishing' do
         "test-jt-data"]
   end
 end
+
+describe Course, 'scoping' do
+  it 'should search by multiple fields' do
+    c1 = Course.new
+    c1.root_account = Account.create
+    c1.name = "name1"
+    c1.sis_source_id = "sisid1"
+    c1.course_code = "code1"
+    c1.save
+    c2 = Course.new
+    c2.root_account = Account.create
+    c2.name = "name2"
+    c2.course_code = "code2"
+    c2.sis_source_id = "sisid2"
+    c2.save
+    Course.name_like("name1").map(&:id).should == [c1.id]
+    Course.name_like("sisid2").map(&:id).should == [c2.id]
+    Course.name_like("code1").map(&:id).should == [c1.id]    
+  end
+end
+
+describe Course, "manageable_by_user" do
+  it "should include courses associated with the user's active accounts" do
+    account = Account.create!
+    sub_account = Account.create!(:parent_account => account)
+    sub_sub_account = Account.create!(:parent_account => sub_account)
+    user = account_admin_user(:account => sub_account)
+    course = Course.create!(:account => sub_sub_account)
+
+    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+  end
+
+  it "should include courses the user is actively enrolled in as a teacher" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_teacher(user)
+    e = course.teacher_enrollments.first
+    e.accept
+
+    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+  end
+
+  it "should include courses the user is actively enrolled in as a ta" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_ta(user)
+    e = course.ta_enrollments.first
+    e.accept
+
+    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+  end
+
+  it "should not include courses the user is enrolled in when the enrollment is non-active" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_teacher(user)
+    e = course.teacher_enrollments.first
+
+    # it's only invited at this point
+    Course.manageable_by_user(user.id).should be_empty
+
+    e.destroy
+    Course.manageable_by_user(user.id).should be_empty
+  end
+
+  it "should not include aborted or deleted courses the user was enrolled in" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_teacher(user)
+    e = course.teacher_enrollments.first
+    e.accept
+
+    course.destroy
+    Course.manageable_by_user(user.id).should be_empty
+  end
+end

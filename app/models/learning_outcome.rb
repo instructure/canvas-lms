@@ -104,7 +104,7 @@ class LearningOutcome < ActiveRecord::Base
     criterion[:ratings] = []
     (hash[:ratings] || []).each do |key, rating|
       criterion[:ratings] << {
-        :description => rating[:description] || "No Comment",
+        :description => rating[:description] || t(:no_comment, "No Comment"),
         :points => rating[:points].to_f || 0
       }
     end
@@ -183,10 +183,14 @@ class LearningOutcome < ActiveRecord::Base
   def self.process_migration(data, migration)
     outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
     outcomes.each do |outcome|
-      if outcome[:type] == 'learning_outcome_group'
-        LearningOutcomeGroup.import_from_migration(outcome, migration.context)
-      else
-        import_from_migration(outcome, migration.context)
+      begin
+        if outcome[:type] == 'learning_outcome_group'
+          LearningOutcomeGroup.import_from_migration(outcome, migration.context)
+        else
+          import_from_migration(outcome, migration.context)
+        end
+      rescue
+        migration.add_warning("Couldn't import learning outcome \"#{outcome[:title]}\"", $!)
       end
     end
   end

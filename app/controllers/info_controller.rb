@@ -20,13 +20,13 @@ class InfoController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => :record_error
   skip_before_filter :load_account, :only => :health_check
   skip_before_filter :load_user, :only => :health_check
-  before_filter :require_site_admin, :only => :page_views
   
-  def page_views
-    @views = PageView.recent_with_user
-    respond_to do |format|
-      format.html
-      format.json { render :json => @views.to_json(:methods => :user_name) }
+  def message_redirect
+    m = Message.find_by_id(params[:id])
+    if m && m.url
+      redirect_to m.url
+    else
+      redirect_to "http://#{HostUrl.default_host}/"
     end
   end
   
@@ -46,10 +46,10 @@ class InfoController < ApplicationController
     @admins = @course.admins
     if !@admins.empty?
       comments = params[:error][:comments] rescue nil
-      comments ||= "No comments"
+      comments ||= t(:no_comments, "No comments")
       backtrace = params[:error][:backtrace] rescue nil
       backtrace ||= ""
-      subject = "Student Feedback: #{comments[0,50]}"
+      subject = t(:feedback_subject, "Student Feedback: %{comment_preview}", :comment_preview => comments[0,50])
       comments = backtrace + "\n" + comments
       @message = ContextMessage.create!({
         :context => @course,
@@ -59,7 +59,7 @@ class InfoController < ApplicationController
         :recipients => @admins.map(&:id).join(",")
       })
       respond_to do |format|
-        flash[:notice] = "Thanks for your feedback!  Your teacher has been notified."
+        flash[:notice] = t('notices.feedback_sent', "Thanks for your feedback!  Your teacher has been notified.")
         format.html { redirect_to root_url }
         format.json { render :json => {:logged => true, :id => @message.id, :teacher_message => true}.to_json }
       end
@@ -99,7 +99,7 @@ class InfoController < ApplicationController
         :user_id => (error[:user].id rescue ''))
     end
     respond_to do |format|
-      flash[:notice] = "Thanks for your help!  We'll get right on this"
+      flash[:notice] = t('notices.error_reported', "Thanks for your help!  We'll get right on this")
       format.html { redirect_to root_url }
       format.json { render :json => {:logged => true, :id => @report.id}.to_json }
     end

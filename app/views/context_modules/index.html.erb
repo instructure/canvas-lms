@@ -1,9 +1,9 @@
-<% content_for :page_title do %><%= @context.class.to_s %> Modules: <%= @context.name %><% end %>
+<% content_for :page_title, t('titles.course_modules', "Course Modules: %{course}", :course => @context.name) %>
 <% jammit_js :context_modules %>
 <% if can_do(@context, @current_user, :manage_content) %>
   <% content_for :right_side do %>
     <%= render :partial => 'context_modules/context_module_right_side' %>
   <% end %>
 <% end %>
-<h2>Course Modules</h2>
+<h2><%= t('headings.course_modules', %{Course Modules}) %></h2>
 <%= render :partial => "context_modules/content" %>

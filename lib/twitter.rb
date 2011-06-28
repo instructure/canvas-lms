@@ -18,10 +18,13 @@
 
 module Twitter
 
-  def twitter_retrieve_access_token
+  def twitter_retrieve_access_token(token=nil, secret=nil)
     consumer = twitter_consumer
-    if @current_user
-      @service = @current_user.user_services.find_by_service("twitter")
+    if token && secret
+      access_token = OAuth::AccessToken.new(consumer, token, secret)
+    elsif @current_user
+      service = @current_user.user_services.find_by_service("twitter")
+      @twitter_service = service
       access_token = OAuth::AccessToken.new(consumer, service.token, service.secret)
     elsif @twitter_service
       access_token = OAuth::AccessToken.new(consumer, @twitter_service.token, @twitter_service.secret)
@@ -39,13 +42,13 @@ module Twitter
     consumer = twitter_consumer
     request_token = OAuth::RequestToken.new(consumer, oauth_request.token, oauth_request.secret)
     access_token = request_token.get_access_token
-    credentials = ActiveSupport::JSON.decode(access_token.get('/account/verify_credentials.json').body)
+    credentials = JSON.parse(access_token.get('/1/account/verify_credentials.json').body)
     session[:oauth_twitter_access_token_token] = access_token.token
     session[:oauth_twitter_access_token_secret] = access_token.secret
     if oauth_request.user
       service_user_id = credentials["id"]
       service_user_name = credentials["screen_name"]
-      UserService.register(
+      @twitter_service = UserService.register(
         :service => "twitter", 
         :access_token => access_token, 
         :user => oauth_request.user,
@@ -77,21 +80,29 @@ module Twitter
   
   def twitter_send(message, access_token=nil)
     access_token ||= twitter_retrieve_access_token
-    response = access_token.post("/statuses/update.json", {:status => message})
-    res = ActiveSupport::JSON.decode(response.body)
+    response = access_token.post("/1/statuses/update.json", {:status => message})
+    res = JSON.parse(response.body)
+    res
+  end
+  
+  def twitter_self_dm(service, message)
+    @twitter_service = service
+    access_token = twitter_retrieve_access_token
+    response = access_token.post("/1/direct_messages/new.json", {:screen_name => service.service_user_name, :user_id => service.service_user_id, :text => message})
+    res = JSON.parse(response.body)
     res
   end
   
   def twitter_list(access_token=nil, since_id=nil)
     access_token ||= twitter_retrieve_access_token
-    url = "/statuses/user_timeline.json"
+    url = "/1/statuses/user_timeline.json"
     url += "?since_id=#{since_id}" if since_id
     response = access_token.get(url)
     case response
     when Net::HTTPSuccess
-      return ActiveSupport::JSON.decode(response.body) rescue []
+      return JSON.parse(response.body) rescue []
     else
-      data = ActiveSupport::JSON.decode(response.body) rescue nil
+      data = JSON.parse(response.body) rescue nil
       if data && data['error'] && data['error'].match(/requires authentication/)
         @service.destroy if @service
         @twitter_service.destroy if @twitter_service
@@ -117,7 +128,7 @@ module Twitter
     secret ||= twitter_config['secret_key']
     req = request || nil rescue nil
     consumer = OAuth::Consumer.new(key, secret, {
-      :site => "http://twitter.com",
+      :site => "http://api.twitter.com",
       :request_token_path => "/oauth/request_token",
       :access_token_path => "/oauth/access_token",
       :authorize_path=> "/oauth/authorize",

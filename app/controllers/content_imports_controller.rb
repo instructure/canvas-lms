@@ -18,7 +18,7 @@
 
 class ContentImportsController < ApplicationController
   before_filter :require_context
-  add_crumb("Content Imports") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
+  add_crumb(lambda { t 'crumbs.content_imports', "Content Imports" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_imports_url }
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
   
@@ -83,7 +83,7 @@ class ContentImportsController < ApplicationController
         end
       else
         @plugins = Canvas::Plugin.all_for_tag(:export_system)
-        @select_options = @plugins.map{|p|[p.settings[:select_text], p.id]}
+        @select_options = @plugins.map{|p|[p.setting(:select_text), p.id]}
         @pending_migrations = ContentMigration.find_all_by_context_id(@context.id).any?
         render
       end
@@ -113,7 +113,7 @@ class ContentImportsController < ApplicationController
     if authorized_action(@context, @current_user, :manage)
       @content_migration = ContentMigration.for_context(@context).find(params[:id]) #)_all_by_context_id_and_context_type(@context.id, @context.class.to_s).last
       if @content_migration.progress && @content_migration.progress >= 100
-        flash[:notice] = "That extraction has already been imported into the course"
+        flash[:notice] = t 'notices.already_imported', "That extraction has already been imported into the course"
         redirect_to named_context_url(@context, :context_url)
         return
       end
@@ -159,10 +159,7 @@ class ContentImportsController < ApplicationController
         end
       else
         if request.format != :json
-          @possible_courses = (@current_user.available_courses + @context.course_sections.active.map(&:nonxlist_course)).compact.select{|c| c.grants_right?(@current_user, session, :manage) }
-          @possible_courses += @domain_root_account.all_courses if @domain_root_account.grants_right?(@current_user, session, :manage)
-          @possible_courses -= [@context]
-          @possible_courses = @possible_courses.compact.uniq
+          @possible_courses = @current_user.manageable_courses - [@context]
           course_id = params[:copy] && params[:copy][:course_id].to_i
           course_id = params[:copy][:autocomplete_course_id] if params[:copy] && params[:copy][:autocomplete_course_id] && !params[:copy][:autocomplete_course_id].empty?
           @copy_context = @possible_courses.find{|c| c.id == course_id.to_i } if course_id

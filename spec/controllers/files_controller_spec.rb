@@ -183,6 +183,32 @@ describe FilesController do
       end
     end
     
+    it "should allow concluded teachers to read and download files" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_file
+      @enrollment.conclude
+      get 'show', :course_id => @course.id, :id => @file.id
+      response.should be_success
+      begin
+        get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      rescue => e
+        e.to_s.should eql("Not Found")
+      end
+    end
+    
+    it "should allow concluded students to read and download files" do
+      course_with_student_logged_in(:active_all => true)
+      course_file
+      @enrollment.conclude
+      get 'show', :course_id => @course.id, :id => @file.id
+      response.should be_success
+      begin
+        get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      rescue => e
+        e.to_s.should eql("Not Found")
+      end
+    end
+    
     it "should mark files as viewed for module progressions if the file is downloaded" do
       file_in_a_module
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1

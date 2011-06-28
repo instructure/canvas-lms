@@ -1,5 +1,5 @@
 <% add_crumb 'Profile Pictures' %>
-<% content_for :page_title do %>Profile Pictures<% end %>
+<% content_for :page_title do %><%= t(:page_title, "Profile Pictures") %><% end %>
 <% content_for :stylesheets do %>
 <style>
 .views .selected {
@@ -35,17 +35,17 @@
 }
 </style>
 <% end %>
-<h2>Profile Pictures</h2>
+<h2><%= t(:title, "Profile Pictures") %></h2>
 <div class="views">
   <span style="padding-right: 10px; font-weight: bold;">Show: </span>
-  <a href="?avatar_state=submitted" class="<%= 'selected' if @avatar_state == 'submitted' %>">Submitted <%= count_if_any(@avatar_counts[:submitted]) %></a> | 
-  <a href="?avatar_state=reported" class="<%= 'selected' if @avatar_state == 'reported' %>">Reported <%= count_if_any(@avatar_counts[:reported]) %></a> | 
-  <a href="?avatar_state=re_reported" class="<%= 'selected' if @avatar_state == 're_reported' %>">Approved, Re-Reported <%= count_if_any(@avatar_counts[:re_reported]) %></a> | 
-  <a href="?avatar_state=any" class="<%= 'selected' if @avatar_state == 'any' %>">All <%= count_if_any(@avatar_counts[:all]) %></a>
+  <a href="?avatar_state=submitted" class="<%= 'selected' if @avatar_state == 'submitted' %>"><%= t(:submitted_link, { :zero => "Submitted", :other => "Submitted %{count}" }, :count => @avatar_counts[:submitted] || 0) %></a> |
+  <a href="?avatar_state=reported" class="<%= 'selected' if @avatar_state == 'reported' %>"><%= t(:reported_link, { :zero => "Reported", :other => "Reported %{count}" }, :count => @avatar_counts[:reported] || 0) %></a> |
+  <a href="?avatar_state=re_reported" class="<%= 'selected' if @avatar_state == 're_reported' %>"><%= t(:re_reported_link, { :zero => "Approved, Re-Reported", :other => "Approved, Re-Reported %{count}"}, :count => @avatar_counts[:re_reported] || 0) %></a> |
+  <a href="?avatar_state=any" class="<%= 'selected' if @avatar_state == 'any' %>"><%= t(:all_link, { :zero => "All", :other => "All %{count}" }, :count => @avatar_counts[:all] || 0) %></a>
 </div>
 
 <% if @users.empty? %>
-  <h3 style="padding-top: 20px;">No Profile Pics to Show</h3>
+  <h3 style="padding-top: 20px;"><%= t(:no_avatars_message, "No Profile Pics to Show") %>"</h3>
 <% end %>
 <table id="avatars">
 <% @users.each do |user| %>
@@ -61,16 +61,16 @@
     </td>
     <td class="link_holder">
       <div class="links">
-        <a href="#" class="update_avatar_link approve_avatar_link" data-state="approved" style="<%= hidden unless user.avatar_approvable? %>">approve</a>
-        <a href="#" class="update_avatar_link lock_avatar_link" data-state="locked" style="<%= hidden if user.avatar_state == :locked %>">lock</a>
-        <a href="#" class="update_avatar_link unlock_avatar_link" data-state="approved" style="<%= hidden unless user.avatar_state == :locked %>">unlock</a>
-        <a href="#" class="update_avatar_link reject_avatar_link" data-state="none">delete</a>
+        <a href="#" class="update_avatar_link approve_avatar_link" data-state="approved" style="<%= hidden unless user.avatar_approvable? %>"><%= t(:approve_link, "approve") %></a>
+        <a href="#" class="update_avatar_link lock_avatar_link" data-state="locked" style="<%= hidden if user.avatar_state == :locked %>"><%= t(:lock_link, "lock") %></a>
+        <a href="#" class="update_avatar_link unlock_avatar_link" data-state="approved" style="<%= hidden unless user.avatar_state == :locked %>"><%= t(:unlock_link, "unlock") %></a>
+        <a href="#" class="update_avatar_link reject_avatar_link" data-state="none"><%= t(:delete_link, "delete") %>"</a>
         <div style="display: none;">
           <a href="<%= update_avatar_image_url(user.id) %>" class="user_avatar_url">&nbsp;</a>
         </div>
       </div>
       <div class="progress" style="visibility: hidden;">
-        Saving...
+        <%= t(:saving, "Saving...") %>"
       </div>
     </td>
   </tr>

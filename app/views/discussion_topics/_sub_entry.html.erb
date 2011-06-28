@@ -2,7 +2,7 @@
 <div id="<%= "entry_#{entry.id}" if entry %>" style="<%= hidden unless entry %>" class="communication_sub_message <%= 'toggled_communication_sub_message' if hide_entry %> <%= 'blank' unless entry %>">
   <div class="header">
     <div class="header_title">
-      <a title="Author's name" href="<%= context_url(entry_context, :context_user_url, entry ? entry.user_id : nil) %>" class="user_name">
+      <a title="<%= t :authors_name, "Author's name" %>" href="<%= context_url(entry_context, :context_user_url, entry ? entry.user_id : nil) %>" class="user_name">
         <%= context_user_name(entry ? entry.context : nil, entry ? entry.user_id : nil) %>
       </a>
     </div>
@@ -23,8 +23,8 @@
         <%= f.hidden_field :parent_id, :value => parent_entry.id, :class => "parent_id" %>
         <%= f.text_area :message, :style => "height: 200px;", :class => "rich_text" %>
         <div class="button-container" style="padding-bottom: 5px;">
-          <button type="submit" class="button small-button submit_button">Post Message</button>
-          <button type="button" class="button button-secondary cancel_button">Cancel</button>
+          <button type="submit" class="button small-button submit_button"><%= t :post_message, "Post Message" %></button>
+          <button type="button" class="button button-secondary cancel_button"><%= t "#buttons.cancel", "Cancel" %></button>
         </div>
       <% end %>
     <% end %>

@@ -203,6 +203,14 @@ class AssessmentItemConverter
     text.gsub(%r{/webct/RelativeResourceManager/Template/}, '')
     text.gsub(%r{/webct/urw/[^/]+/RelativeResourceManager\?contentID=(\d*)}, "$CANVAS_OBJECT_REFERENCE$/attachments/\\1")
   end
+  
+  def self.get_interaction_type(manifest_node)
+    manifest_node.at_css('interactionType') || 
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_1_URL) || 
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_0_URL) || 
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_1_ITEM_URL) || 
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_0_ITEM_URL)
+  end
 
   def self.create_instructure_question(opts)
     extend Canvas::XMLHelper
@@ -210,7 +218,7 @@ class AssessmentItemConverter
     manifest_node = opts[:manifest_node]
 
     if manifest_node
-      if type = manifest_node.at_css('interactionType') || type = manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::QtiExporter::QTI_2_1_URL)
+      if type = get_interaction_type(manifest_node)
         opts[:interaction_type] ||= type.text.downcase
       end
       if type = get_node_att(manifest_node,'instructureMetadata instructureField[name=bb_question_type]', 'value')
@@ -248,9 +256,9 @@ class AssessmentItemConverter
         else
           q = ChoiceInteraction.new(opts)
         end
-      when /associateinteraction|matching_question/i
+      when /associateinteraction|matching_question|matchinteraction/i
         q = AssociateInteraction.new(opts)
-      when /extendedtextinteraction|essay_question|short_answer_question/i
+      when /extendedtextinteraction|textinteraction|essay_question|short_answer_question/i
         if opts[:custom_type] and opts[:custom_type] =~ /calculated/i
           q = CalculatedInteraction.new(opts)
         elsif opts[:custom_type] and opts[:custom_type] =~ /numeric|numerical_question/

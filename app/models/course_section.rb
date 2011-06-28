@@ -20,13 +20,12 @@ class CourseSection < ActiveRecord::Base
   include Workflow
   include EnrollmentDateRestrictions
   
-  attr_protected :sis_source_id, :sis_batch_id, :course_id, :abstract_course_id,
+  attr_protected :sis_source_id, :sis_batch_id, :course_id,
       :root_account_id, :enrollment_term_id, :sis_cross_listed_section_id, :sis_cross_listed_section_sis_batch_id
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :sis_cross_listed_section
-  belongs_to :abstract_course
   belongs_to :enrollment_term
   belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
@@ -66,7 +65,7 @@ class CourseSection < ActiveRecord::Base
     existing_section = CourseSection.find_by_root_account_id_and_sis_source_id(self.root_account_id, self.sis_source_id)
     return true if !existing_section || existing_section.id == self.id 
     
-    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
   end
   
@@ -75,11 +74,10 @@ class CourseSection < ActiveRecord::Base
   end
   
   def infer_defaults
-    self.root_account_id ||= (self.course.root_account_id rescue nil) || (self.abstract_course.root_account_id rescue nil) || Account.default.id
+    self.root_account_id ||= (self.course.root_account_id rescue nil) || Account.default.id
     self.assert_course unless self.course
     raise "Course required" unless self.course
-    self.root_account_id = self.course.root_account_id || (self.abstract_course.root_account_id rescue nil) || Account.default.id
-    self.abstract_course_id ||= self.course.abstract_course_id
+    self.root_account_id = self.course.root_account_id || Account.default.id
     # This is messy, and I hate it.
     # The SIS import actually gives us three names for a section
     #   and I don't know which one is best, or which one to show.
@@ -116,7 +114,7 @@ class CourseSection < ActiveRecord::Base
   end
   
   def assert_course
-    self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account, :abstract_course => self.abstract_course)
+    self.course ||= Course.create!(:name => self.name || self.section_code || self.long_section_code, :root_account => self.root_account)
   end
   
   def move_to_course(course, delay_jobs = true)
@@ -139,12 +137,18 @@ class CourseSection < ActiveRecord::Base
     self
   end
   
-  def crosslist_to_course(course, delay_jobs = true)
+  def crosslist_to_course(course, delay_jobs = true, make_sticky = true)
     return self if self.course == course
+    save_needed = false
     unless self.nonxlist_course
-      self.nonxlist_course = self.course 
-      self.save!
+      self.nonxlist_course = self.course
+      save_needed = true
     end
+    if !self.sticky_xlist && make_sticky
+      self.sticky_xlist = true
+      save_needed = true
+    end
+    self.save! if save_needed
     self.move_to_course(course, delay_jobs)
   end
   
@@ -156,6 +160,7 @@ class CourseSection < ActiveRecord::Base
     end
     self.move_to_course(self.nonxlist_course, delay_jobs)
     self.nonxlist_course = nil
+    self.sticky_xlist = false
     self.save!
   end
   

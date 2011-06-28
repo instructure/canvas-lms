@@ -6,6 +6,14 @@
 
 <% content_for :right_side do %>
   <%= render :partial => "ways_to_contact" %>
+  <% if service = @current_user.user_services.find_by_service('twitter') %>
+    <div class='rs-margin-lr' style="text-align: right;">
+      <a href="#" id="no_tweets" class="help">Not Receiving Tweets?</a>
+      <div id="no_tweets_dialog">
+        
+      </div>
+    </div>
+  <% end %>
 <% end %>
 <% js_block do %>
 <script>
@@ -129,6 +137,8 @@ $(document).ready(function() {
           type = "sms_select";
         } else if($(".channel_option_" + policy.communication_channel_id).parents("select").hasClass('facebook_select')) {
           type = "facebook_select";
+        } else if($(".channel_option_" + policy.communication_channel_id).parents("select").hasClass('twitter_select')) {
+          type = "twitter_select";
         }
         $preference.find(".contact_type_select").val(type).change();
         $preference.find(".contact_select").val(policy.communication_channel_id);

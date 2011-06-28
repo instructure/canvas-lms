@@ -40,7 +40,10 @@ class ZipFileImportsController < ApplicationController
       @zfi = ZipFileImport.new(zip_params)
       respond_to do |format|
         if @zfi.process!
-          flash[:notice] = "Uploaded and unzipped #{@zfi.zip_file.original_filename} into #{@zfi.root_directory.full_name}."
+          flash[:notice] = t('notices.upload_and_unzip_done',
+            "Uploaded and unzipped %{original_filename} into %{destination}.",
+            :original_filename => @zfi.zip_file.original_filename,
+            :destination => @zfi.root_directory.full_name)
           format.html { return_to(params[:return_to], named_context_url(@context, :context_url)) }
           format.json { render :json => @zfi.to_json }
         else

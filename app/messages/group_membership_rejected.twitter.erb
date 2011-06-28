@@ -1,0 +1,4 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
+<% end %>
+Canvas Alert - Rejected: <%= asset.group.name %> for the <%= asset.group.context.class.to_s.downcase %> <%= asset.group.context.name %>

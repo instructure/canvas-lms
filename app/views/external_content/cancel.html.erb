@@ -1,4 +1,4 @@
-<h2 id="dialog_message">Cancelling...</h2>
+<h2 id="dialog_message"><%= t :canceling, "Canceling..." %></h2>
 <% js_block do %>
 <script>
 var parentWindow = window.parent;
@@ -8,10 +8,10 @@ while(parentWindow && !parentWindow.equella) {
 if(parentWindow.equella && parentWindow.equella.ready) {
   parentWindow.equella.cancel();
   setTimeout(function() {
-    $("#dialog_message").text("Success!  This popup should close on its own...");
+    $("#dialog_message").text("<%= t :popup_success, "Success! This popup should close on its own..." %>");
   }, 1000);
 } else {
-  $("#dialog_message").text("Cannot find the parent window, you'll need to close this popup manually.");
+  $("#dialog_message").text("<%= t :popup_failure, "Cannot find the parent window, you'll need to close this popup manually." %>");
 }
 </script>
 <% end %>

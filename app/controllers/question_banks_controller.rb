@@ -27,7 +27,7 @@ class QuestionBanksController < ApplicationController
     end
     if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
       if !@unfiled_questions.empty?
-        @bank = @context.assessment_question_banks.find_or_create_by_title_and_workflow_state(AssessmentQuestionBank::DEFAULT_UNFILED_TITLE, 'active')
+        @bank = @context.assessment_question_banks.find_or_create_by_title_and_workflow_state(AssessmentQuestionBank.default_unfiled_title, 'active')
         AssessmentQuestion.update_all(['assessment_question_bank_id=?, position=id', @bank.id], {:context_type => @context.class.to_s, :context_id => @context.id, :assessment_question_bank_id => nil})
       end
       @question_banks = @context.assessment_question_banks.active.include_questions.sort_by{|b| b.title || "zzz" }
@@ -100,11 +100,11 @@ class QuestionBanksController < ApplicationController
       respond_to do |format|
         if @bank.save
           @bank.bookmark_for(@current_user)
-          flash[:notice] = "Question bank successfully created!"
+          flash[:notice] = t :bank_success, "Question bank successfully created!"
           format.html { redirect_to named_context_url(@context, :context_question_banks_url) }
           format.json { render :json => @bank.to_json }
         else
-          flash[:error] = "Question bank failed to create."
+          flash[:error] = t :bank_fail, "Question bank failed to create."
           format.html { redirect_to named_context_url(@context, :context_question_banks_url) }
           format.json { render :json => @bank.errors.to_json, :status => :bad_request }
         end

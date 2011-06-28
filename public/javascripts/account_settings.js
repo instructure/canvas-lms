@@ -1,3 +1,4 @@
+I18n.scoped('account_settings', function(I18n) {
 $(document).ready(function() {
   $("#account_settings").submit(function() {
     $(".ip_filter .value").each(function() {
@@ -38,7 +39,7 @@ $(document).ready(function() {
     var $link = $(this);
     $link.parents("li").confirmDelete({
       url: $link.attr('rel'),
-      message: "Are you sure you want to delete this alert?",
+      message: I18n.t('confirms.delete_alert', "Are you sure you want to delete this alert?"),
       success: function() {
         $(this).slideUp(function() {
           $(this).remove();
@@ -63,7 +64,7 @@ $(document).ready(function() {
     event.preventDefault();
     $("#ip_filters_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: "What are Quiz IP Filters?",
+      title: I18n.t('titles.what_are_quiz_ip_filters', "What are Quiz IP Filters?"),
       width: 400
     }).dialog('open');
   });
@@ -71,7 +72,7 @@ $(document).ready(function() {
     event.preventDefault();
     var $item = $(this).parent("li");
     $item.confirmDelete({
-      message: "Are you sure you want to remove this account admin?",
+      message: I18n.t('confirms.remove_account_admin', "Are you sure you want to remove this account admin?"),
       url: $(this).attr('href'),
       success: function() {
         $item.slideUp(function() {
@@ -91,7 +92,7 @@ $(document).ready(function() {
   }).change();
 
   $(".turnitin_account_settings").change(function() {
-    $(".confirm_turnitin_settings_link").text("confirm Turnitin settings");
+    $(".confirm_turnitin_settings_link").text(I18n.t('links.turnitin.confirm_settings', "confirm Turnitin settings"));
   });
   $(".confirm_turnitin_settings_link").click(function(event) {
     event.preventDefault();
@@ -99,36 +100,59 @@ $(document).ready(function() {
     var url = $link.attr('href');
     var account = $("#account_settings").getFormData({object_name: 'account'});
     url = $.replaceTags($.replaceTags(url, 'account_id', account.turnitin_account_id), 'shared_secret', account.turnitin_shared_secret);
-    $link.text("checking Turnitin settings...");
+    $link.text(I18n.t('notices.turnitin.checking_settings', "checking Turnitin settings..."));
     $.ajaxJSON(url, 'GET', {}, function(data) {
       if(data && data.success) {
-        $link.text("Turnitin settings confirmed!");
+        $link.text(I18n.t('notices.turnitin.setings_confirmed', "Turnitin settings confirmed!"));
       } else {
-        $link.text("invalid Turnitin settings, please check your account id and shared secret from Turnitin")
+        $link.text(I18n.t('notices.turnitin.invalid_settings', "invalid Turnitin settings, please check your account id and shared secret from Turnitin"))
       }
     }, function(data) {
-      $link.text("invalid Turnitin settings, please check your account id and shared secret from Turnitin")
+      $link.text(I18n.t('notices.turnitin.invalid_settings', "invalid Turnitin settings, please check your account id and shared secret from Turnitin"))
+    });
+  });
+
+  $(".open_report_description_link").click(function(event) {
+    event.preventDefault();
+    var title = $(this).parents(".title").find("span.title").text();
+    $(this).parent(".reports").find(".report_description").dialog('close').dialog({
+      title: title,
+      width: 800
     });
   });
 
   $(".run_report_link").click(function(event) {
-      event.preventDefault();
-      $(this).parent("form").submit();
+    event.preventDefault();
+    $(this).parent("form").submit();
   });
 
   $(".run_report_form").formSubmit({
-      resetForm: true,
-      beforeSubmit: function(data) {
-          $(this).find('.run_report_link').hide();
-          $(this).find('.report_parameters').hide();
-          $(this).find('.running_report_message').show();
-          return true;
-      },
-      success: function(data) {
-      },
-      error: function(data) {
-      }
+    resetForm: true,
+    beforeSubmit: function(data) {
+      $(this).loadingImage();
+      return true;
+    },
+    success: function(data) {
+      $(this).loadingImage('remove');
+      var report = $(this).find('input[name="report_type"]').val();
+      $("#" + report).find('.run_report_link').hide()
+        .end().find('.configure_report_link').hide()
+        .end().find('.running_report_message').show();
+      $(this).parent(".report_dialog").dialog('close');
+    },
+    error: function(data) {
+      $(this).loadingImage('remove');
+      $(this).parent(".report_dialog").dialog('close');
+    }
   });
+  
+  $(".configure_report_link").click(function(event) {
+    event.preventDefault();
+    $(this).parent("td").find(".report_dialog").clone(true).dialog({
+      width: 400,
+      title: I18n.t('titles.configure_report', 'Configure Report')
+    });
+  })
   
   $('.service_help_dialog').each(function(index) {
     var $dialog = $(this),
@@ -146,17 +170,5 @@ $(document).ready(function() {
       })
       .appendTo('label[for="account_services_' + serviceName + '"]');    
   });
-  
-  $(".report_description_link").click(function(event) {
-    event.preventDefault();
-    $(this).parent().find("div.report_description").toggle();
-  });
-
-  $("div.report_description table.report_example").before('<a href="#" class="report_example_link">Example...</a>');
-
-  $(".report_example_link").click(function(event) {
-    event.preventDefault();
-    $(this).parent().find("table.report_example").toggle();
-  });
-
+});
 });

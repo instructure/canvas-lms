@@ -16,9 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('calendars', function(I18n) {
 (function() {
-  var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
     window.calendar = {
     viewItem: function(context_string, item_id, item_type) {
     },
@@ -222,7 +221,7 @@
         updateEvent(data);
         updateEventInCache(data);
         if(!$day.length && day_code) {
-          $.flashMessage(($event.find(".title").text() || "event") + " was moved to " + day_code);
+          $.flashMessage(I18n.t('notices.event_moved', "%{event} was moved to %{day}", {event: ($event.find(".title").text() || I18n.t('default_title', "event")), day: day_code}));
         }
       });
     } else {
@@ -310,8 +309,6 @@
       .find(".animated").showIf($.fn.monthLoading.cnt > 0);
     return this;
   }
-
-  function monthLoading(action) { alert('month loading call!'); }
 
   function updateEvents(events, batch) {
     var cnt = 0;
@@ -676,8 +673,9 @@
     $("#edit_event").dialog('close');
     $("#event_details").dialog('close');
     $("#event_details").find(".description").css("max-height", Math.max($(window).height() - 200, 150));
+    var title = type_name == "Event" ? I18n.t('event_details', "Event Details") : I18n.t('assignment_details', "Assignment Details");
     $("#event_details").show().dialog({
-      title: type_name + " Details",
+      title: title,
       width: (data.description.length > 2000 ? Math.max($(window).width() - 300, 450) : 450),
       resizable: true,
 
@@ -689,7 +687,7 @@
         $(document).triggerHandler('event_dialog', $(this));
       },
       autoOpen: false
-    }).dialog('open').dialog('option', 'title', type_name + " Details");
+    }).dialog('open').dialog('option', 'title', title);
     $event.addClass('selected');
     selectDateForEvent($day.parents(".calendar_day_holder"));
   }
@@ -804,8 +802,14 @@
     $("#event_details").dialog('close');
     $("#edit_event").dialog('close');
     selectDateForEvent($day.parents(".calendar_day_holder"));
+    var title;
+    if (isNew) {
+      title = type_name == "Event" ? I18n.t('titles.add_new_event', "Add New Event") : I18n.t('titles.add_new_assignment', "Add New Assignment");
+    } else {
+      title = type_name == "Event" ? I18n.t('titles.edit_event', "Edit Event") : I18n.t('titles.edit_assignment', "Edit Assignment");
+    }
     $("#edit_event").show().dialog({
-      title: isNew ? "Add New " + type_name : "Edit " + type_name,
+      title: title,
       width: 400,
       open: function() {
         $(document).triggerHandler('edit_event_dialog', $box);
@@ -904,7 +908,7 @@
       autoOpen: false,
       resizable: false,
       modal: true
-    }).dialog('open').dialog('option', 'title', isNew ? "Add New " + type_name : "Edit " + type_name);
+    }).dialog('open').dialog('option', 'title', title);
     
     // if we know the context that the event is being edited for, color the box that contex's color
     if (data.context_id && data.context_type) {
@@ -1072,7 +1076,7 @@
       $("#calendar_feed_box").find(".calendar_feed_url").val($(this).attr('href')).end()
         .find(".show_calendar_feed_link").attr('href', $(this).attr('href'));
       $("#calendar_feed_box").dialog('close').dialog({
-        title: "Calendar Feed",
+        title: I18n.t('feed_title', "Calendar Feed"),
         width: 375,
         autoOpen: false
       }).dialog('open');
@@ -1280,33 +1284,61 @@
       $("#edit_event .context_select select.context_id").val(context_code).triggerHandler('change', false);
       window.thisElementFiredTheEvent = undefined;
     });
-    $(document).keycodes("ctrl+left ctrl+right ctrl+up ctrl+down", function(event) {
+    $(document).keycodes(
+            [I18n.t('keycodes.next_day', 'ctrl+right'),
+             I18n.t('keycodes.previous_day', 'ctrl+left'),
+             I18n.t('keycodes.next_week', 'ctrl+down'),
+             I18n.t('keycodes.previous_week', 'ctrl+up')].join(' '),
+            function(event) {
       event.preventDefault();
       event.stopPropagation();
-      calendarMove(event.keyString.substring(5));
+      var direction;
+      switch(event.keyString) {
+        case I18n.t('keycodes.next_day', 'ctrl+right'):
+          direction = 'right';
+          break;
+        case I18n.t('keycodes.previous_day', 'ctrl+left'):
+          direction = 'left';
+          break;
+        case I18n.t('keycodes.next_week', 'ctrl+down'):
+          direction = 'down';
+          break;
+        case I18n.t('keycodes.previous_week', 'ctrl+up'):
+          direction = 'up';
+          break;
+      }
+      calendarMove(direction);
     });
-    $(document).keycodes("j k o d e n r", function(event) {
+    $(document).keycodes(
+            [I18n.t('keycodes.next_event', 'j'),
+             I18n.t('keycodes.previous_event', 'k'),
+             I18n.t('keycodes.open', 'o'),
+             I18n.t('keycodes.edit', 'e'),
+             I18n.t('keycodes.delete', 'd'),
+             I18n.t('keycodes.new', 'n'),
+             I18n.t('keycodes.refresh', 'r')].join(' '),
+            function(event) {
       event.preventDefault();
       event.stopPropagation();
       var $selectedEvent = $(".calendar_event.selected:first");
       var $selectedDay = $(".calendar_day_holder.selected:first");
-      if(event.keyString == "j") {
+      if(event.keyString == I18n.t('keycodes.next_event', 'j')) {
         calendarEventMove('down');
-      } else if(event.keyString == "k") {
+      } else if(event.keyString == I18n.t('keycodes.previous_event', 'k')) {
         calendarEventMove('up');
-      } else if(event.keyString == "o") {
+      } else if(event.keyString == I18n.t('keycodes.open', 'o')) {
         $selectedEvent.click();
-      } else if(event.keyString == "d") {
+      } else if(event.keyString == I18n.t('keycodes.delete', 'd')) {
         if($selectedEvent.length > 0 && $selectedEvent.find(".can_delete").text() == "true") {
           deleteEvent($selectedEvent);
         }
-      } else if(event.keyString == "e") {
+      } else if(event.keyString == I18n.t('keycodes.edit', 'e')) {
         if($selectedEvent.length > 0 && $selectedEvent.find(".can_edit").text() == "true") {
           editEvent($selectedEvent, $selectedDay.children(".calendar_day"));
         }
-      } else if(event.keyString == "n") {
+      } else if(event.keyString == I18n.t('keycodes.new', 'n')) {
         editEvent($("#event_blank"), $selectedDay.children(".calendar_day"));
-      } else if(event.keyString == "r") {
+      } else if(event.keyString == I18n.t('keycodes.refresh', 'r')) {
         refreshCalendarData();
       }
     });
@@ -1511,9 +1543,9 @@
     var $box = $("#event_details");
     var data = $.extend({}, $event.data('event_data'));
     var context = data.context_type.toLowerCase() + "_" + data.context_id;
-    var message = "Are you sure you want to delete this event?";
+    var message = I18n.t('prompts.delete_event', "Are you sure you want to delete this event?");
     if(data.event_type == 'assignment') {
-      message = "Are you sure you want to delete this assignment?";
+      message = I18n.t('prompts.delete_assignment', "Are you sure you want to delete this assignment?");
     }
     var url = $("." + context + "_event_url").attr('href');
     if(data.event_type == "assignment") {
@@ -1614,3 +1646,4 @@
     });
   });
 })(jQuery);
+});

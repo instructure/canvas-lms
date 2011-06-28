@@ -2,21 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 
 shared_examples_for "quiz selenium tests" do
   it_should_behave_like "in-process server selenium tests"
-  
+
   it "should correctly hide form when cancelling quiz edit" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    login_as(username, password)
-    
-    get "/courses/#{e.course_id}/quizzes/new"
+    course_with_teacher_logged_in
+
+    get "/courses/#{@course.id}/quizzes/new"
 
     driver.find_element(:css, ".add_question .add_question_link").click
     keep_trying_until{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
@@ -27,19 +17,9 @@ shared_examples_for "quiz selenium tests" do
   end
   
   it "should not show 'Missing Word' option in question types dropdown" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    login_as(username, password)
+    course_with_teacher_logged_in
     
-    get "/courses/#{e.course_id}/quizzes/new"
+    get "/courses/#{@course.id}/quizzes/new"
     
     driver.find_elements(:css, "#question_form_template option.missing_word").length.should == 1
 
@@ -49,19 +29,9 @@ shared_examples_for "quiz selenium tests" do
   end
   
   it "should create a quiz with every question type" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    login_as(username, password)
+    course_with_teacher_logged_in
     
-    get "/courses/#{e.course_id}/quizzes"
+    get "/courses/#{@course.id}/quizzes"
     driver.find_element(:partial_link_text, "Create a New Quiz").click
     
     driver.current_url.should match %r{/courses/\d+/quizzes/(\d+)\/edit}
@@ -215,24 +185,14 @@ shared_examples_for "quiz selenium tests" do
   end
 
   it "message students who... should do something" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    q = e.course.quizzes.build(:title => "My Quiz", :description => "Sup")
+    course_with_teacher_logged_in
+    q = @course.quizzes.build(:title => "My Quiz", :description => "Sup")
     q.generate_quiz_data
     q.published_at = Time.now
     q.workflow_state = 'available'
     q.save!
-    login_as(username, password)
 
-    get "/courses/#{e.course_id}/quizzes/#{q.id}"
+    get "/courses/#{@course.id}/quizzes/#{q.id}"
 
     driver.find_element(:partial_link_text, "Message Students Who...").click
     dialog = find_all_with_jquery("#message_students_dialog:visible")

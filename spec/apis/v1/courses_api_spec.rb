@@ -26,6 +26,7 @@ describe CoursesController, :type => :integration do
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'my-course-sis')
+    @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
   it "should return course list" do
@@ -74,16 +75,41 @@ describe CoursesController, :type => :integration do
         :only => %w(id name))
   end
 
-  it "should include user sis id if site admin" do
-    Account.site_admin.add_user(@me)
+  it "should not include user sis id for non-admins" do
     first_user = @user
     new_user = User.create!(:name => 'Zombo')
     @course2.enroll_student(new_user).accept!
 
+    @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
-    json.should == api_json_response([first_user, new_user],
-        :only => %w(id name), :methods => %w(sis_user_id))
+    json.map { |u| u['sis_user_id'] }.should == [nil, nil]
+  end
+
+  it "should include user sis id if account admin" do
+    @course2.account.add_user(@me)
+    first_user = @user
+    new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
+    @course2.enroll_student(new_user).accept!
+    new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+
+    @user = @me
+    json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
+            { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
+    json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
+  end
+
+  it "should include user sis id if site admin" do
+    Account.site_admin.add_user(@me)
+    first_user = @user
+    new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
+    @course2.enroll_student(new_user).accept!
+    new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+
+    @user = @me
+    json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
+            { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
+    json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
   end
 
   it "should return the list of sections for the course" do

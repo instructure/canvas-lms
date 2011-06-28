@@ -42,6 +42,7 @@ class FacebookController < ApplicationController
         @policies.each{|p| p.save!}
       end
     end
+    # TODO: i18n
     @notification_categories = Notification.dashboard_categories.reject{|c| c.category == "Summaries"}
     @policies = @user.notification_policies.for_channel(@cc)
     redirect_to facebook_settings_url
@@ -58,7 +59,7 @@ class FacebookController < ApplicationController
       redirect_to facebook_url
       return
     end
-    flash[:notice] = "Authorization successful!  Canvas and Facebook are now friends." if params[:just_authorized]
+    flash[:notice] = t :authorization_success, "Authorization successful!  Canvas and Facebook are now friends." if params[:just_authorized]
     @messages = []
     if @user
       @messages = Message.for_user(@user.id).to_facebook.to_a
@@ -81,7 +82,7 @@ class FacebookController < ApplicationController
   
   def remove_user
     @service.destroy if @service
-    render :text => "Deleted"
+    render :text => t(:deleted, "Deleted")
   end
   
   def facebook_disabled?
@@ -96,7 +97,7 @@ class FacebookController < ApplicationController
   protected
   def require_facebook_user
     if !@user
-      flash[:error] = "Only authorized users can access that page"
+      flash[:error] = t :authorization_required, "Only authorized users can access that page"
       redirect_to facebook_url
     end
   end
@@ -114,7 +115,7 @@ class FacebookController < ApplicationController
         session[:facebook_user_id] = @facebook_user_id
         return true
       else
-        flash[:error] = "Invalid Facebook signature"
+        flash[:error] = t :invalid_signature, "Invalid Facebook signature"
         redirect_to dashboard_url
         return false
       end

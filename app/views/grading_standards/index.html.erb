@@ -1,13 +1,13 @@
 <% jammit_js :grading_standards %>
 <% jammit_css :grading_standards %>
-<% content_for :page_title, "Grading Standards" %>
+<% content_for :page_title, t(:title, "Grading Standards") %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <a href="#" class="button button-sidebar-wide add_standard_link"><%= image_tag "add.png" %> Add Grading Scheme</a>
+    <a href="#" class="button button-sidebar-wide add_standard_link"><%= image_tag "add.png" %> <%= t 'buttons.add', 'Add Grading Scheme' %></a>
   </div>
 <% end %>
-<h2>Grading Schemes</h2>
+<h2><%= t :heading_grading_schemes, 'Grading Schemes' %></h2>
 <div id="standards">
   <% @standards.each do |standard| %>
     <%= render :partial => 'shared/grading_standard', :object => standard, :locals => {:grading_standard_list => true} %>

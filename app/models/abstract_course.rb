@@ -17,12 +17,7 @@
 #
 
 class AbstractCourse < ActiveRecord::Base
-  attr_accessible :department, :college, :root_account, :course_code, :name
-  belongs_to :root_account, :class_name => 'Account'
-  belongs_to :department, :class_name => 'Account'
-  belongs_to :college, :class_name => 'Account'
-  has_many :course_sections
-  named_scope :sis_courses, lambda{|account, *source_ids|
-    {:conditions => {:root_account_id => account.id, :sis_source_id => source_ids}, :order => :sis_source_id}
-  }
+
+  attr_protected
+  
 end

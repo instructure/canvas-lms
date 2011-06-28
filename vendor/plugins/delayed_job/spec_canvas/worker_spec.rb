@@ -11,6 +11,7 @@ describe Delayed::Worker do
   before(:each) do
     @worker = worker_create
     Delayed::Job.delete_all
+    Delayed::Job::Failed.delete_all
     SimpleJob.runs = 0
     Delayed::Worker.on_max_failures = nil
   end

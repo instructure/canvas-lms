@@ -24,11 +24,10 @@ class Course < ActiveRecord::Base
   include Workflow
   include EnrollmentDateRestrictions
 
-  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :abstract_course, :root_account, :storage_quota, :restrict_enrollments_to_course_dates, :grading_standard, :grading_standard_enabled
+  attr_accessible :name, :section, :account, :group_weighting_scheme, :start_at, :conclude_at, :grading_standard_id, :is_public, :publish_grades_immediately, :allow_student_wiki_edits, :allow_student_assignment_edits, :hashtag, :show_public_context_messages, :syllabus_body, :hidden_tabs, :allow_student_forum_attachments, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view, :show_all_discussion_entries, :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :enrollment_term, :root_account, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates, :grading_standard, :grading_standard_enabled
 
   serialize :tab_configuration
   belongs_to :root_account, :class_name => 'Account'
-  belongs_to :abstract_course
   belongs_to :enrollment_term
   belongs_to :grading_standard
   belongs_to :template_course, :class_name => 'Course'
@@ -315,7 +314,7 @@ class Course < ActiveRecord::Base
     {:limit => limit }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => wildcard('courses.name', name) }
+    { :conditions => wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name) }
   }
   named_scope :needs_account, lambda{|account, limit|
     {:conditions => {:account_id => nil, :root_account_id => account.id}, :limit => limit }
@@ -327,10 +326,16 @@ class Course < ActiveRecord::Base
     {:order => 'updated_at', :limit => limit }
   }
   named_scope :manageable_by_user, lambda{|user_id|
-    {
-      :joins => {:teacher_enrollments => {}, :course_account_associations => :account_users},
-      :conditions => ["enrollments.user_id = ? OR account_users.user_id = ?", user_id, user_id],
-      :select => "DISTINCT courses.id, courses.name"
+    { :select => 'DISTINCT courses.*',
+      :joins => "INNER JOIN (
+         SELECT caa.course_id, au.user_id FROM course_account_associations AS caa
+         INNER JOIN accounts AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
+         INNER JOIN account_users AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
+       UNION SELECT courses.id AS course_id, e.user_id FROM courses
+         INNER JOIN enrollments AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
+           AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment')
+         WHERE courses.workflow_state NOT IN ('aborted', 'deleted')) as course_users
+       ON course_users.course_id = courses.id"
     }
   }
   named_scope :not_deleted, {:conditions => ['workflow_state != ?', 'deleted']}
@@ -445,8 +450,6 @@ class Course < ActiveRecord::Base
     self.enrollment_term = nil if self.enrollment_term && self.enrollment_term.root_account_id != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
     self.publish_grades_immediately = true if self.publish_grades_immediately == nil
-    self.abstract_course_id ||= self.course_sections.active.map(&:abstract_course_id).compact.first
-    self.abstract_course_id ||= AbstractCourse.create!(:root_account => self.root_account, :course_code => self.course_code, :name => self.name).id
     self.allow_student_wiki_edits = (self.default_wiki_editing_roles || "").split(',').include?('students')
     true
   end
@@ -654,10 +657,20 @@ class Course < ActiveRecord::Base
   end
   
   def quota
-    # in megabytes
     Rails.cache.fetch(['default_quota', self].cache_key) do
-      return read_attribute(:storage_quota) || (self.account.default_storage_quota rescue nil) || 500
+      return read_attribute(:storage_quota) ||
+        (self.account.default_storage_quota rescue nil) ||
+        Setting.get_cached('course_default_quota', 500.megabytes.to_s).to_i
     end
+  end
+  
+  def storage_quota_mb
+    storage_quota < 1.megabyte ? storage_quota : storage_quota / 1.megabyte
+  end
+  
+  def storage_quota_mb=(val)
+    # TODO: convert MB to bytes once this commit has been deployed
+    self.storage_quota = val
   end
   
   def storage_quota=(val)
@@ -730,6 +743,9 @@ class Course < ActiveRecord::Base
     
     given { |user| !self.deleted? && self.prior_enrollments.map(&:user_id).include?(user && user.id) }
     set { can :read}
+    
+    given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user && user.id) }
+    set { can :read_as_admin and can :read_user_notes and can :read_roster }
     
     given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user && user.id) }
     set { can :read and can :read_grades}
@@ -1418,31 +1434,35 @@ class Course < ActiveRecord::Base
     WikiPage.process_migration_course_outline(data, migration)
     migration.fast_update_progress(90)
     
-    #Adjust dates
-    if bool_res(params[:copy][:shift_dates])
-      shift_options = (bool_res(params[:copy][:shift_dates]) rescue false) ? params[:copy] : {}
-      shift_options = shift_date_options(self, shift_options)
-      @imported_migration_items.each do |event|
-        if event.is_a?(Assignment)
-          event.due_at = shift_date(event.due_at, shift_options)
-          event.lock_at = shift_date(event.lock_at, shift_options)
-          event.unlock_at = shift_date(event.unlock_at, shift_options)
-          event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
-          event.save_without_broadcasting!
-        elsif event.is_a?(DiscussionTopic)
-          event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
-          event.save_without_broadcasting!
-        elsif event.is_a?(CalendarEvent)
-          event.start_at = shift_date(event.start_at, shift_options)
-          event.end_at = shift_date(event.end_at, shift_options)
-          event.save_without_broadcasting!
-        elsif event.is_a?(Quiz)
-          event.due_at = shift_date(event.due_at, shift_options)
-          event.lock_at = shift_date(event.lock_at, shift_options)
-          event.unlock_at = shift_date(event.unlock_at, shift_options)
-          event.save!
+    begin
+      #Adjust dates
+      if bool_res(params[:copy][:shift_dates])
+        shift_options = (bool_res(params[:copy][:shift_dates]) rescue false) ? params[:copy] : {}
+        shift_options = shift_date_options(self, shift_options)
+        @imported_migration_items.each do |event|
+          if event.is_a?(Assignment)
+            event.due_at = shift_date(event.due_at, shift_options)
+            event.lock_at = shift_date(event.lock_at, shift_options)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
+            event.save_without_broadcasting!
+          elsif event.is_a?(DiscussionTopic)
+            event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
+            event.save_without_broadcasting!
+          elsif event.is_a?(CalendarEvent)
+            event.start_at = shift_date(event.start_at, shift_options)
+            event.end_at = shift_date(event.end_at, shift_options)
+            event.save_without_broadcasting!
+          elsif event.is_a?(Quiz)
+            event.due_at = shift_date(event.due_at, shift_options)
+            event.lock_at = shift_date(event.lock_at, shift_options)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.save!
+          end
         end
       end
+    rescue
+      migration.add_warning("Couldn't adjust the due dates.", $!)
     end
     migration.progress=100
     migration.migration_settings ||= {}
@@ -1453,12 +1473,8 @@ class Course < ActiveRecord::Base
     self.touch
     @imported_migration_items
   end
-  attr_accessor :imported_migration_items
-  attr_accessor :full_migration_hash
-  attr_accessor :external_url_hash
-  attr_accessor :folder_name_lookups
-  attr_accessor :attachment_path_id_lookup
-  attr_accessor :assignment_group_no_drop_assignments
+  attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash
+  attr_accessor :folder_name_lookups, :attachment_path_id_lookup, :assignment_group_no_drop_assignments
   
   def import_settings_from_migration(data)
     return unless data[:course]
@@ -1796,7 +1812,6 @@ class Course < ActiveRecord::Base
     new_course.account_id = account.id
     new_course.root_account_id = root_account.id
     new_course.enrollment_term_id = opts[:enrollment_term_id]
-    new_course.abstract_course_id = self.abstract_course_id
     new_course.save!
     if opts[:copy_content]
       new_course.send_later(:merge_into_course, self, :everything => true)
@@ -2041,8 +2056,12 @@ class Course < ActiveRecord::Base
       tabs.delete_if{ |t| t[:label] == "Settings"}
       
       # remove some tabs for logged-out users or non-students
-      tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } unless self.grants_right?(user, nil, :participate_as_student)
-      if !self.grants_right?(user, nil, :read_grades)
+      if self.grants_right?(user, nil, :read_as_admin)
+        tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) } 
+      elsif !self.grants_right?(user, nil, :participate_as_student)
+        tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } 
+      end
+      if !self.grants_right?(user, nil, :read_grades) && !self.grants_right?(user, nil, :read_as_admin)
         tabs.delete_if {|t| [TAB_GRADES].include?(t[:id]) } 
       end
       

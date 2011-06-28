@@ -32,7 +32,7 @@ class ExternalFeed < ActiveRecord::Base
   
   def display_name(short=true)
     short_url = (self.url || "").split("/")[0,3].join("/")
-    res = self.title || (short ? "#{short_url} feed" : self.url )
+    res = self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url )
     
   end
   
@@ -83,7 +83,7 @@ class ExternalFeed < ActiveRecord::Base
       entry ||= self.external_feed_entries.find_by_url(item.link)
       description = entry && entry.message
       if !description || description.empty?
-        description = "<a href='#{item.link}'>Original article</a><br/><br/>"
+        description = "<a href='#{item.link}'>#{t :original_article, "Original article"}</a><br/><br/>"
         description += format_description(item.description || item.title)
       end
       if entry
@@ -98,7 +98,7 @@ class ExternalFeed < ActiveRecord::Base
       return nil if self.header_match && !item.title.match(Regexp.new(self.header_match, true))
       return nil if self.body_match && !item.description.match(Regexp.new(self.body_match, true))
       return nil if (date && self.created_at > date rescue false)
-      description = "<a href='#{item.link}'>Original article</a><br/><br/>"
+      description = "<a href='#{item.link}'>#{t :original_article, "Original article"}</a><br/><br/>"
       description += format_description(item.description || item.title)
       entry = self.external_feed_entries.create(
         :title => item.title,
@@ -116,7 +116,7 @@ class ExternalFeed < ActiveRecord::Base
       entry ||= self.external_feed_entries.find_by_url(item.links.alternate.to_s)
       description = entry && entry.message
       if !description || description.empty?
-        description = "<a href='#{item.links.alternate.to_s}'>Original article</a><br/><br/>"
+        description = "<a href='#{item.links.alternate.to_s}'>#{t :original_article, "Original article"}</a><br/><br/>"
         description += format_description(item.content || item.title)
       end
       if entry
@@ -134,7 +134,7 @@ class ExternalFeed < ActiveRecord::Base
       return nil if self.body_match && !item.content.match(Regexp.new(self.body_match, true))
       return nil if (item.published && self.created_at > item.published rescue false)
       author = item.authors.first || OpenObject.new
-      description = "<a href='#{item.links.alternate.to_s}'>Original article</a><br/><br/>"
+      description = "<a href='#{item.links.alternate.to_s}'>#{t :original_article, "Original article"}</a><br/><br/>"
       description += format_description(item.content || item.title)
       entry = self.external_feed_entries.create(
         :title => item.title,
@@ -154,7 +154,7 @@ class ExternalFeed < ActiveRecord::Base
       entry ||= self.external_feed_entries.find_by_title_and_url(item.summary, item.url)
       description = entry && entry.message
       if !description || description.empty?
-        description = "<a href='#{item.url}'>Original article</a><br/><br/>"
+        description = "<a href='#{item.url}'>#{t :original_article, "Original article"}</a><br/><br/>"
         description += (item.description || item.summary).to_s
       end
       if entry
@@ -189,7 +189,11 @@ class ExternalFeed < ActiveRecord::Base
     to_import = migration.to_import 'external_feeds'
     tools.each do |tool|
       if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
-        import_from_migration(tool, migration.context)
+        begin
+          import_from_migration(tool, migration.context)
+        rescue
+          migration.add_warning("Couldn't import external feed \"#{tool[:title]}\"", $!)
+        end
       end
     end
   end

@@ -95,6 +95,7 @@ describe QuizSubmission do
     s.score = 4.0
     s.attempt = 2
     s.with_versioning(true, &:save!)
+    s.version_number.should eql(2)
     s.kept_score.should eql(4.0)
     
     q.update_attributes!(:scoring_policy => "keep_highest")
@@ -103,8 +104,11 @@ describe QuizSubmission do
     s.attempt = 3
     s.with_versioning(true, &:save!)
     s.kept_score.should eql(5.0)
+
+    s.update_scores(:submission_version_number => 2, :fudge_points => 6.0)
+    s.kept_score.should eql(6.0)
   end
-  
+
   it "should update associated submission" do
     c = factory_with_protected_attributes(Course, :workflow_state => "active")
     a = c.assignments.new(:title => "some assignment")

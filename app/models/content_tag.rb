@@ -69,7 +69,7 @@ class ContentTag < ActiveRecord::Base
     self.title ||= self.content.title rescue nil
     self.title ||= self.content.name rescue nil
     self.title ||= self.content.display_name rescue nil
-    self.title ||= "No title"
+    self.title ||= t(:no_title, "No title")
     self.comments ||= ""
     self.comments = "" if self.comments == "Comments"
     self.context_code = "#{self.context_type.to_s.underscore}_#{self.context_id}" rescue nil

@@ -86,11 +86,12 @@ module SIS
             end
 
             begin
-              course.start_at = DateTime.parse(row['start_date']) unless row['start_date'].blank?
-              course.conclude_at = DateTime.parse(row['end_date']) unless row['end_date'].blank?
+              course.start_at = row['start_date'].blank? ? nil : DateTime.parse(row['start_date'])
+              course.conclude_at = row['end_date'].blank? ? nil : DateTime.parse(row['end_date'])
             rescue
               add_warning(csv, "Bad date format for course #{row['course_id']}")
             end
+            course.restrict_enrollments_to_course_dates = (course.start_at.present? || course.conclude_at.present?)
 
             update_enrollments = !course.new_record? && !(course.changes.keys & ['workflow_state', 'name', 'course_code']).empty?
             if course.changed?

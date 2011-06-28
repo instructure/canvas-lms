@@ -4,9 +4,13 @@ class JobsController < ApplicationController
   LIMIT = 100
 
   def index
+    if request.path == '/delayed_jobs'
+      return redirect_to(jobs_url)
+    end
+
     if params[:id].present?
       params[:q] = params[:id]
-      params[:flavor] = 'all'
+      params[:flavor] = params[:flavor] == 'failed' ? params[:flavor] : 'all'
     end
 
     jobs_scope
@@ -79,7 +83,11 @@ class JobsController < ApplicationController
     @jobs = @jobs.scoped(:order => 'id desc')
 
     if params[:q].present?
-      @jobs = @jobs.scoped(:conditions => ["#{ActiveRecord::Base.wildcard('tag', params[:q])} OR id = ?", params[:q].to_i])
+      if params[:q].to_i > 0
+        @jobs = @jobs.scoped(:conditions => { :id => params[:q].to_i })
+      else
+        @jobs = @jobs.scoped(:conditions => ["#{ActiveRecord::Base.wildcard('tag', params[:q])} OR strand = ?", params[:q]])
+      end
     end
 
     if params[:job_ids].present?

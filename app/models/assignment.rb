@@ -514,13 +514,14 @@ class Assignment < ActiveRecord::Base
   def to_atom(opts={})
     extend ApplicationHelper
     Atom::Entry.new do |entry|
-      entry.title     = "Assignment#{", " + self.context.name if opts[:include_context]}: #{self.title}"
+      entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", :assignment => self.title) unless opts[:include_context]
+      entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", :assignment => self.title, :course => self.context.name) if opts[:include_context]
       entry.updated   = self.updated_at.utc
       entry.published = self.created_at.utc
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/assignments/#{self.feed_code}_#{self.due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
       entry.links    << Atom::Link.new(:rel => 'alternate', 
                                     :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/assignments/#{self.id}")
-      entry.content   = Atom::Content::Html.new("Due: #{datetime_string(self.due_at, :due_date)}<br/>#{self.description}<br/><br/>
+      entry.content   = Atom::Content::Html.new(before_label(:due, "Due") + " #{datetime_string(self.due_at, :due_date)}<br/>#{self.description}<br/><br/>
         <div>
           #{self.description}
         </div>
@@ -969,7 +970,7 @@ class Assignment < ActiveRecord::Base
     comment_map = partition_for_user(file_map)
     comments = []
     comment_map.each do |group|
-      comment = group.size == 1 ? 'See attached file' : 'See attached files'
+      comment = t :comment_from_files, { :one => "See attached file", :other => "See attached files" }, :count => group.size
       submission = group.first[:submission]
       user = group.first[:user]
       attachments = group.map { |g| FileInContext.attach(self, g[:filename], g[:display_name]) }
@@ -1291,8 +1292,8 @@ class Assignment < ActiveRecord::Base
       dup.send("#{key}=", val)
     end
 
-    context.log_merge_result("The Assignment \"#{self.title}\" was a group assignment, and you'll need to re-set the group settings for this new context") if self.group_category && !self.group_category.empty?
-    context.log_merge_result("The Assignment \"#{self.title}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context") if self.peer_review_count && self.peer_review_count > 0
+    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.group_category && !self.group_category.empty?
+    context.log_merge_result(t('warnings.peer_assignment', "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context", :assignment => self.title)) if self.peer_review_count && self.peer_review_count > 0
     
     dup.context = context
     dup.description = context.migrate_content_links(self.description, self.context) if options[:migrate]
@@ -1333,7 +1334,7 @@ class Assignment < ActiveRecord::Base
       dup.assignment_group = new_group
       context.map_merge(self.assignment_group, new_group)
     end
-    context.log_merge_result("Assignment \"#{self.title}\" created")
+    context.log_merge_result(t('messages.assignment_created', "Assignment \"%{assignment}\" created", :assignment => self.title))
     context.may_have_links_to_migrate(dup)
     dup.updated_at = Time.now
     dup.clone_updated = true
@@ -1345,7 +1346,11 @@ class Assignment < ActiveRecord::Base
     to_import = migration.to_import 'assignments'
     assignments.each do |assign|
       if assign['migration_id'] && (!to_import || to_import[assign['migration_id']])
-        import_from_migration(assign, migration.context)
+        begin
+          import_from_migration(assign, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the assignment \"#{assign[:title]}\"", $!)
+        end
       end
     end
     migration_ids = assignments.map{|m| m['assignment_id'] }.compact
@@ -1439,7 +1444,7 @@ class Assignment < ActiveRecord::Base
     if hash[:assignment_group_migration_id]
       item.assignment_group = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
     end
-    item.assignment_group ||= context.assignment_groups.find_or_create_by_name("Imported Assignments")
+    item.assignment_group ||= context.assignment_groups.find_or_create_by_name(t :imported_assignments_group, "Imported Assignments")
     
     hash[:due_at] ||= hash[:due_date]
     [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at, :all_day_date].each do |key|

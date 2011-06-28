@@ -24,12 +24,12 @@ module Delayed
 
     def send_at(time, method, *args)
       send_later_enqueue_args(method,
-                          { :priority => 0, :run_at => time }, *args)
+                          { :run_at => time }, *args)
     end
 
     def send_at_with_queue(time, method, queue, *args)
       send_later_enqueue_args(method,
-                          { :priority => 0, :run_at => time, :queue => queue },
+                          { :run_at => time, :queue => queue },
                           *args)
     end
 

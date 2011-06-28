@@ -137,7 +137,7 @@ class Collaboration < ActiveRecord::Base
   end
   
   def title
-    read_attribute(:title) || (self.parse_data.title rescue nil) || "Unnamed Collaboration"
+    read_attribute(:title) || (self.parse_data.title rescue nil) || t('#collaboration.default_title', "Unnamed Collaboration")
   end
   
   def service_name

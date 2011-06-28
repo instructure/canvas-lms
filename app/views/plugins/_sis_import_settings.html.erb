@@ -1,15 +1,15 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td><%= f.label :parallelism, "Number of job processors to use to process SIS imports in parallel:" %></td>
+      <td><%= f.blabel :parallelism, :en => "Number of job processors to use to process SIS imports in parallel" %></td>
       <td><%= f.text_field :parallelism %></td>
     </tr>
     <tr>
-      <td><%= f.label :minimum_rows_for_parallel, "Minimum rows in a SIS import before using parallel processing:" %></td>
+      <td><%= f.blabel :minimum_rows_for_parallel, :en => "Minimum rows in a SIS import before using parallel processing" %></td>
       <td><%= f.text_field :minimum_rows_for_parallel %></td>
     </tr>
     <tr>
-      <td><%= f.label :queue_for_parallel_jobs, "Job queue to use for parallel jobs (blank for default):" %></td>
+      <td><%= f.blabel :queue_for_parallel_jobs, :en => "Job queue to use for parallel jobs (blank for default)" %></td>
       <td><%= f.text_field :queue_for_parallel_jobs %></td>
     </tr>
   </table>

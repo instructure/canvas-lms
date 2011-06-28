@@ -28,12 +28,16 @@ class UserService < ActiveRecord::Base
   after_save :touch_user
   after_destroy :remove_related_channels
   
+  def should_have_communication_channel?
+    ['facebook', 'twitter'].include?(service) && self.user
+  end
+  
   def assert_relations
-    if self.service == 'facebook' && self.user
-      cc = self.user.communication_channels.find_or_create_by_path_type('facebook')
-      cc.path_type = "facebook"
+    if should_have_communication_channel?
+      cc = self.user.communication_channels.find_or_create_by_path_type(service)
+      cc.path_type = service
       cc.workflow_state = 'active'
-      cc.path = "#{self.service_user_id}@facebook.com"
+      cc.path = "#{self.service_user_id}@#{service}.com"
       cc.save!
     end
     if self.user_id && self.service
@@ -48,6 +52,10 @@ class UserService < ActiveRecord::Base
       ccs.each{|cc| cc.destroy }
     end
     true
+  end
+  
+  def assert_communication_channel
+    self.touch if should_have_communication_channel? && !self.user.communication_channels.find_by_path_type('twitter')
   end
   
   def infer_defaults

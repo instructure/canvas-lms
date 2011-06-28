@@ -4,11 +4,11 @@
     <div style="margin-left: 5px;">
       type: 
       <select name="assignment[submission_types]" class="icon_select">
-        <option value="on_paper" class="on_paper">Assignment</option>
-        <option value="online_upload" class="online_upload">File Upload</option>
-        <option value="discussion_topic" class="discussion_topic">Discussion</option>
-        <option value="online_quiz" class="online_quiz">Quiz</option>
-        <option value="not_graded" class="not_graded">Not Graded</option>
+        <option value="on_paper" class="on_paper"><%= t 'options.assignment', "Assignment" %></option>
+        <option value="online_upload" class="online_upload"><%= t 'options.file_upload', "File Upload" %></option>
+        <option value="discussion_topic" class="discussion_topic"><%= t 'options.discussion', "Discussion" %></option>
+        <option value="online_quiz" class="online_quiz"><%= t 'options.quiz', "Quiz" %></option>
+        <option value="not_graded" class="not_graded"><%= t 'options.not_graded', "Not Graded" %></option>
       </select>
     </div>
   </div>
@@ -24,7 +24,7 @@
       <% @context.assignment_groups.each do |group| %>
         <option value="<%= group.id %>"><%= group.name %></option>
       <% end %>
-      <option value="new">[ New Group ]</option>
+      <option value="new"><%= t 'options.new_group', "[ New Group ]" %></option>
     </select>
   </div>
   <div class="clear"></div>
@@ -32,7 +32,7 @@
     <textarea id="assignment_description" name="assignment[description]" style="width: 100%; height: 200px;"></textarea>
   </div>
   <div>
-    <button type="submit" class="button">Save Assignment</button>
-    <button type="button" class="button button-secondary cancel_button">Cancel</button>
+    <button type="submit" class="button"><%= t 'buttons.save_assignment', "Save Assignment" %></button>
+    <button type="button" class="button button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
   </div>
 </form>

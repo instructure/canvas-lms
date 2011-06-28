@@ -16,12 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('content_exports', function(I18n) {
 $(document).ready(function(event) {
   var state = 'nothing';
   var current_id = null;
  
   function startPoll() {
-    $("#exporter_form").html("Processing<div style='font-size: 0.8em;'>this may take a bit...</div>")
+    $("#exporter_form").html(I18n.t('messages.processing', "Processing") + "<div style='font-size: 0.8em;'>" + I18n.t('messages.this_may_take_a_bit', "this may take a bit...") + "</div>")
        .attr('disabled', true);
     $(".instruction").hide();
     $(".progress_bar_holder").slideDown();
@@ -57,12 +58,12 @@ $(document).ready(function(event) {
           $("#exporter_form").hide();
           $(".export_progress").progressbar('option', 'value', 100);
           $(".progress_message").html("The course has been exported.");
-          $("#exports").append('<p>New Course Export: <a href="' + content_export.download_url + '">Click here to download</a> </p>')
+          $("#exports").append('<p>' + I18n.t('labels.new_course_export', "New Course Export: ") + '<a href="' + content_export.download_url + '">' + I18n.t('links.download_plain', "Click here to download") + '</a> </p>')
         } else if(content_export.workflow_state == 'failed') {
           code = "content_export_" + content_export.id;
           $(".progress_bar_holder").hide();
           $("#exporter_form").hide();
-          var message = "There was an error exporting your course.  Please notify your system administrator and give them the following export identifier: \"" + code + "\"";
+          var message = I18n.t('errors.error', "There was an error exporting your course.  Please notify your system administrator and give them the following export identifier: \"%{code}\"", {code: code});
           $(".export_messages .error_message").html(message);
           $(".export_messages").show();
         } else {
@@ -94,7 +95,7 @@ $(document).ready(function(event) {
      }
    },
    error: function(data) {
-     $(this).find(".submit_button").attr('disabled', false).text("Process Data");
+     $(this).find(".submit_button").attr('disabled', false).text(I18n.t('buttons.process', "Process Data"));
    }
   });
 
@@ -108,4 +109,5 @@ $(document).ready(function(event) {
   }
   check_if_exporting();
 
+});
 });

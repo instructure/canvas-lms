@@ -55,6 +55,10 @@ class ProfileController < ApplicationController
       return
     end
 
+    # Add communication channel for users that already had Twitter
+    # integrated before we started offering it as a cc
+    twitter_service = @user.user_services.find_by_service('twitter')
+    twitter_service.assert_communication_channel if twitter_service
     @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active
     @channels = @user.communication_channels.unretired

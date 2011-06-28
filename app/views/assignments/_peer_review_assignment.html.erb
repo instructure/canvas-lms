@@ -10,7 +10,12 @@
   </span>
   <span class="user_id" style="display: none;"><%= request.try_rescue(:asset).try_rescue(:user_id) || nbsp %></span>
   <div style="float: right;" class="review_links">
-    <a class="remind_peer_review_link no-hover" style="<%= hidden if request && request.completed? %>" href="<%= context_url(@context, :context_assignment_remind_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>" title="Remind <%= request.try_rescue(:assessor).try_rescue(:name) || 'User' %> about Assessment<%= ", last notified #{datetime_string(request.updated_at)}" if request && request.assigned? %>"><%= image_tag "reply.png" %></a>
+    <% user = request.try_rescue(:assessor).try_rescue(:name)
+       user ||= t 'titles.user_default', "User"
+       reminder = t 'titles.remind_reviewer', "Remind %{user} about Assessment", :user => user
+       reminder = t 'titles.remind_reviewier_with_last_notification', "Remind %{user} about Assessment, last notified %{at}", :user => user, :at => datetime_string(request.updated_at) if request && request.assigned?
+    %>
+    <a class="remind_peer_review_link no-hover" style="<%= hidden if request && request.completed? %>" href="<%= context_url(@context, :context_assignment_remind_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>" title="<%= reminder %>"><%= image_tag "reply.png" %></a>
     <a class="delete_review_link no-hover" href="<%= context_url(@context, :context_assignment_delete_peer_review_url, @assignment.id, request ? request.id : '{{ id }}') %>"><%= image_tag "delete.png" %></a>
   </div>
   <div class="clear"></div>

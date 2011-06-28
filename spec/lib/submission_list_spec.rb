@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SubmissionList do
-  it "should initialize with an course" do
+  it "should initialize with a course" do
     course_model
     lambda{@sl = SubmissionList.new(@course)}.should_not raise_error
     @sl.should be_is_a(SubmissionList)
@@ -28,7 +28,7 @@ describe SubmissionList do
     lambda{@sl = SubmissionList.new(@course)}.should_not raise_error
     @sl.course.should eql(@course)
     
-    lambda{@sl = SubmissionList.new(-1)}.should raise_error(ArgumentError, "Must provide an course.")
+    lambda{@sl = SubmissionList.new(-1)}.should raise_error(ArgumentError, "Must provide a course.")
   end
   
   it "should provide a dictionary in 'list'" do

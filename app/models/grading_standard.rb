@@ -56,7 +56,7 @@ class GradingStandard < ActiveRecord::Base
     res = ""
     res += self.user.name + ", " rescue ""
     res += self.context.name rescue ""
-    res = "Unknown Details" if res.empty?
+    res = t("unknown_grading_details", "Unknown Details") if res.empty?
     res
   end
   
@@ -124,9 +124,13 @@ class GradingStandard < ActiveRecord::Base
   def self.process_migration(data, migration)
     standards = data['grading_standards'] ? data['grading_standards']: []
     to_import = migration.to_import 'grading_standards'
-    standards.each do |tool|
-      if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
-        import_from_migration(tool, migration.context)
+    standards.each do |standard|
+      if standard['migration_id'] && (!to_import || to_import[standard['migration_id']])
+        begin
+          import_from_migration(standard, migration.context)
+        rescue
+          migration.add_warning("Couldn't import grading standard \"#{standard[:title]}\"", $!)
+        end
       end
     end
   end

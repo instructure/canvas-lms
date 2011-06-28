@@ -40,6 +40,36 @@ describe ContextModulesController do
       response.should be_success
     end
   end
+
+  describe "GET 'module_redirect'" do
+    it "should skip leading and trailing sub-headers" do
+      course_with_student_logged_in(:active_all => true)
+      @module = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      assignment1 = ag.assignments.create!(:context => @course)
+      assignment2 = ag.assignments.create!(:context => @course)
+
+      header1 = @module.add_item :type => 'context_module_sub_header'
+      assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
+      assignmentTag2 = @module.add_item :type => 'assignment', :id => assignment2.id
+      header2 = @module.add_item :type => 'context_module_sub_header'
+
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      response.should redirect_to course_assignment_url(@course.id, assignment1.id)
+
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      response.should redirect_to course_assignment_url(@course.id, assignment2.id)
+
+      assignmentTag1.destroy
+      assignmentTag2.destroy
+
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
+
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
+    end
+  end
   
   describe "POST 'reorder_items'" do
     it "should reorder items" do
