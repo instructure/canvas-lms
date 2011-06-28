@@ -1,3 +1,141 @@
+canvas-lms (1.1-39) professional; urgency=low
+
+  * [+1be74ff] return user sis ids for account admins as well as site admins, refs #4644
+  * [+58a25bd] preliminary i18n setup, closes #4124
+  * [+f6e4f55] fix for i18n.js fallbacks when no translations are present
+  * [+c3ac683] fix for STI scoping
+  * [+210795b] truncate table rather than delete_all in specs
+  * [+0dc1a2e] stubbed login for in-process selenium specs
+  * [+2fabedd] refactor abstract courses stage 1
+  * [+ac419f7] extract strings for AccountNotifications
+  * [+2a67911] extract strings for ContentTag
+  * [+83639ec] fix for empty dialog titles
+  * [+1d2c6de] get rid of grey bg on red cancel links
+  * [+08a497a] extract strings for ContentMigration
+  * [+d2dedbe] extract strings for ContextController
+  * [+a295c95] remove log_merge_result translation
+  * [+2bf5c22] allow admins to search for names in other fields
+  * [+23d215c] don't call TimeWithZone directly
+  * [+1529707] html wrapper support in I18n calls
+  * [+78ac735] external content i18n
+  * [+c2f03b5] external feed i18n
+  * [+859467e] order shouldn't matter for this test
+  * [+99ae9df] extract strings for AccountAuthorizationsConfig
+  * [+2ba62b9] Accounts string extraction
+  * [+3bf52d9] fixed a 1-count bug, and don't auto-pluralize multi-word default strings
+  * [+ebe1c46] concluded teachers should still have access to student grades, content
+  * [+9b31d0f] discussion topics i18n
+  * [+3f01120] discussion entry i18n
+  * [+983a441] i18n Announcement
+  * [+b81a490] i18n ApplicationController
+  * [+c3d2863] i18n AssessmentRequest
+  * [+6802932] external tools i18n
+  * [+e693123] folder i18n
+  * [+bf1f513] zip_file_imports i18n
+  * [+625f475] i18n AssessmentQuestion
+  * [+6ea7330] i18n AssessmentQuestionBank
+  * [+a28dbe0] facebook i18n
+  * [+e11424f] fix selenium test (keep_trying -> keep_trying_until)
+  * [+66b4cb7] Convenience method to_sentence(:or)
+  * [+621bf39] use UUID gem 2.3.2. closes github issue 27
+  * [+5638a82] apply before_label translation whenever a second argument is given
+  * [+bd5a501] errors i18n
+  * [+32777b7] make before_label accessible as both a class and instance method of ActiveRecord::Base
+  * [+372fa1f] i18n assignments model and controller
+  * [+2212eaa] remove trailing comma in i18n.js
+  * [+6e9c381] enhance wrappers
+  * [+bc7a905] make sure users and pseudonyms get added together
+  * [+bd7be9a] make sure a user is not kept enrolled in an empty crosslist shell course
+  * [+33caae7] support recrosslisting in the ui
+  * [+2c5c268] add twitter to notification preferences
+  * [+1b358ff] clean up failed_jobs before each spec
+  * [+cd6407c] info i18n
+  * [+55a25c0] i18n for jobs
+  * [+405321e] i18n groups and grading_standards, plus i18n.js count fu
+  * [+ead7b33] ot() helper for t() calls with erb interpolation
+  * [+c370d5b] i18n context_message
+  * [+5eb9157] i18n course_section
+  * [+b9afedc] i18n for layouts
+  * [+d5b7d8a] fix a couple i18n typos
+  * [+91ce600] remove unused view
+  * [+1e635d0] fix syntax errors in twitter_user_poller
+  * [+2f6b3b1] don't allow quiz results to be shown when unchecked
+  * [+4d26143] assignment views, part 2
+  * [+ef7c7a1] localize DelayedNotification and Enrollment
+  * [+22986cd] discussion_topics javascript i18n wasn't scoped
+  * [+eec1d7b] i18n AssignmentGroup
+  * [+ef719f3] i18n attachments/files part 1
+  * [+17f7595] getting started i18n
+  * [+7af31d4] fix the teacherless getting started wizard
+  * [+c567ff6] support running specs in parallel
+  * [+d9b1f09] fix various typos and i18n issues
+  * [+7eccbc5] fix some i18n typos
+  * [+ad73ec5] learning_outcomes i18n
+  * [+85e3241] i18n Bookmark Service
+  * [+758d166] i18n files part 2
+  * [+9d17a0d] i18n CalendarEvent
+  * [+edcefd9] remove sti and controller action scoping
+  * [+99ad305] search by strand in jobs admin ui
+  * [+3065f0e] remove periodic job double-indirection
+  * [+4bbeacc] set enrollment restriction to course/section dates when provided
+  * [+5cd6d3b] make non-sis crosslisting sticky
+  * [+61f3d61] adding require_relative to gemfile
+  * [+840ff31] notifications i18n (everything but categories)
+  * [+cfab93c] notification category i18n reminders
+  * [+8a879e6] html escape the translated string in mt, rather than use RDiscount html stripping
+  * [+543b3d1] remove delayed_jobs controller, replaced by jobs controller
+  * [+284dcfb] don't use highest priority for send_at delayed jobs
+  * [+f4110b4] i18n context views
+  * [+858e281] i18n context_module
+  * [+941e77f] fix some key scoping/collision issues
+  * [+3aab3fd] i18n communication channel
+  * [+708e6f5] i18n content_exports
+  * [+3ecdbd0] i18n calendar
+  * [+6d7a5ab] i18n collaborations
+  * [+47b53a0] make some qti importer adjustments for moodle-produced qti
+  * [+a7f520a] treat html_safe as a "superset" of markdown_safe
+  * [+c91d187] fix some more i18n issues
+  * [+006d1a3] localize PageComments
+  * [+739a1e5] fix some orderings in submission api specs
+  * [+790f951] wiki pages i18n
+  * [+52dbe5f] clean up account reports page
+  * [+971979a] localize Plugins
+  * [+f544db6] translation checker/extractor for rb/erb files
+  * [+0683bcd] fix some i18n errors in wiki pages
+  * [+a03dd41] don't allow single item failures to stop a whole import
+  * [+00f2505] i18n content imports
+  * [+4f521c0] i18n fixes
+  * [+5a62f11] catch rails validation errors in setup rake task
+  * [+51bb272] i18n pseudonyms
+  * [+fa51dd1] i18n quiz_question
+  * [+ff12f4d] i18n pseudonym_sessions
+  * [+a7c1006] fix #4899 so scribd docs fill full screen
+  * [+54e203d] i18n quiz submissions
+  * [+d68a9d1] i18n question banks
+  * [+1a24ce0] fixup i18n content_imports
+  * [+b2b67aa] fix improper use of i18n :wrapper construct
+  * [+0467f5d] fix discussions and facebook i18n to not show raw html
+  * [+ad8bfe0] increase depth limit of json imports
+  * [+95de747] ensure quizsubmissions kept_score is kept up to date when regrading old versions
+  * [+0cc5883] i18n handle label_tag calls
+  * [+e40da41] make the default quotas configurable, and start conversion to bytes
+  * [+16d073a] make search box and drop down consistent in copy_course
+  * [+41063bc] fix divide by zero on quiz statistics page
+  * [+80a2944] jammit fu for i18n.js
+  * [+dfa2cbf] destroy "protected" pseudonyms when removing a user from an account
+  * [+ad3a39d] skip sub-headers in module first/last redirect.  fixes #4913
+  * [+6b5dff7] fix linking to individual failed jobs in the jobs admin ui
+  * [+1ea4fa3] Revert "jammit fu for i18n.js"
+  * [+4d7fa5b] add core en translations (date/time/number formats, etc.)
+  * [+fd4e761] s/calender/calendar/g
+  * [+ea5fd9d] fix display of import plugin names
+  * [+ed98ee4] update saml gem to allow shiboleth logins
+  * [+6de4b90] don't count error_reports rows for ui pagination
+  * [+518c7f3] mt is in TextHelper, so bring it into scope
+  * [+df6543d] skip error_reports pagination on individual error page
+
+ -- JT Olds <jt@instructure.com>  Tue, 28 Jun 2011 13:33:25 -0600
+
 canvas-lms (1.1-38) professional; urgency=low
 
   * [+5dec0c8] fix course exports that are using s3
