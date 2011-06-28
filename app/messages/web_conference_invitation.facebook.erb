@@ -2,4 +2,4 @@
   http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/conferences
 <% end %>
 
-You've been invited to participate in a web conference, <b><a href="<%= content :link %>"><%= asset.title %></a></b> for <b><%= asset.context.name %></b>.
+<%= t :body, "You've been invited to participate in a web conference, *%{title}* for #%{name}#.", :wrapper => { "*" => "<b><a href=\"#{content(:link)}\">\\1</a></b>", "#" => '<b>\1</b>' }, :title => asset.title, :name => asset.context.name %>
