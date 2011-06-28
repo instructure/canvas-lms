@@ -1,7 +1,7 @@
 <% item = deleted_item %>
 <li class="item">
   <div class="links">
-    <a class="restore_link button" href="<%= context_url(@context, :context_undelete_item_url, item.asset_string) %>">restore</a>
+    <a class="restore_link button" href="<%= context_url(@context, :context_undelete_item_url, item.asset_string) %>"><%= t('links.restore', %{restore}) %></a>
   </div>
   <div class="name">
     <% if item.is_a?(Enrollment) %>
@@ -26,10 +26,10 @@
   </div>
   <table class="dates">
     <tr>
-      <td>created</td>
+      <td><%= t('created', %{created}) %></td>
       <td><%= datetime_string(item.created_at) %></td>
     </tr><tr>
-      <td>last updated</td>
+      <td><%= t('last_updated', %{last updated}) %></td>
       <td><%= datetime_string(item.updated_at) %></td>
     </tr>
   </table>

@@ -123,7 +123,7 @@ class AssignmentGroupsController < ApplicationController
     @assignment_group = @context.assignment_groups.find(params[:id])
     if @assignment_group.deleted?
       respond_to do |format|
-        flash[:notice] = "This group has been deleted"
+        flash[:notice] = t 'notices.deleted', "This group has been deleted"
         format.html { redirect_to named_context_url(@context, :assignments_url) }
       end
       return
@@ -142,7 +142,7 @@ class AssignmentGroupsController < ApplicationController
       respond_to do |format|
         if @assignment_group.save
           @assignment_group.insert_at(1)
-          flash[:notice] = 'Assignment Group was successfully created.'
+          flash[:notice] = t 'notices.created', 'Assignment Group was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
           format.xml  { head :created, :location => named_context_url(@context, :context_assignments_url) }
           format.json { render :json => @assignment_group.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
@@ -159,7 +159,7 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@assignment_group, @current_user, :update)
       respond_to do |format|
         if @assignment_group.update_attributes(params[:assignment_group])
-          flash[:notice] = 'Assignment Group was successfully updated.'
+          flash[:notice] = t 'notices.updated', 'Assignment Group was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
           format.xml  { head :ok }
           format.json { render :json => @assignment_group.to_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }

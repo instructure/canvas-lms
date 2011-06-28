@@ -48,7 +48,7 @@ class AssessmentQuestion < ActiveRecord::Base
     self.question_data ||= {}
     if self.question_data.is_a?(Hash)
       if self.question_data[:question_name].try(:strip).blank?
-        self.question_data[:question_name] = "Question"
+        self.question_data[:question_name] = t :default_question_name, "Question"
       end
       self.question_data[:name] = self.question_data[:question_name]
     end
@@ -98,7 +98,7 @@ class AssessmentQuestion < ActiveRecord::Base
   def data
     res = self.question_data || {}
     res[:assessment_question_id] = self.id
-    res[:question_name] = "Question" if res[:question_name].blank?
+    res[:question_name] = t :default_question_name, "Question" if res[:question_name].blank?
     # TODO: there's a potential id conflict here, where if a quiz
     # has some questions manually created and some pulled from a
     # bank, it's possible that a manual question's id could match
@@ -138,7 +138,7 @@ class AssessmentQuestion < ActiveRecord::Base
     # based on the quiz_question to begin with
     elsif !self.new_record? && question.assessment_question_id == self.id && question.created_at && self.created_at < question.created_at + 5.minutes && self.created_at > question.created_at + 30.seconds
       false
-    elsif self.assessment_question_bank && self.assessment_question_bank.title != AssessmentQuestionBank::DEFAULT_UNFILED_TITLE
+    elsif self.assessment_question_bank && self.assessment_question_bank.title != AssessmentQuestionBank.default_unfiled_title
       false
     elsif self.new_record? || (quiz_questions.count <= 1 && question.assessment_question_id == self.id)
       true
@@ -187,10 +187,10 @@ class AssessmentQuestion < ActiveRecord::Base
     question[:incorrect_comments] = check_length(qdata[:incorrect_comments] || previous_data[:incorrect_comments] || "", 'incorrect comments', 5.kilobyte)
     question[:neutral_comments] = check_length(qdata[:neutral_comments], 'neutral comments', 5.kilobyte)
     question[:question_type] = qdata[:question_type] || previous_data[:question_type] || "text_only_question"
-    question[:question_name] = qdata[:question_name] || qdata[:name] || previous_data[:question_name] || "Question"
-    question[:question_name] = "Question" if question[:question_name].strip.blank?
+    question[:question_name] = qdata[:question_name] || qdata[:name] || previous_data[:question_name] || t(:default_question_name, "Question")
+    question[:question_name] = t(:default_question_name, "Question") if question[:question_name].strip.blank?
     question[:name] = question[:question_name]
-    question[:question_text] = sanitize(check_length(qdata[:question_text] || previous_data[:question_text] || "Question text", 'question text'))
+    question[:question_text] = sanitize(check_length(qdata[:question_text] || previous_data[:question_text] || t(:default_question_text, "Question text"), 'question text'))
     min_size = 1.kilobyte
     question[:answers] = []
     reset_local_ids
@@ -433,7 +433,7 @@ class AssessmentQuestion < ActiveRecord::Base
         question[:question_bank_name] = nil if question[:question_bank_name] == ''
         question[:question_bank_name] ||= bank_map[question[:migration_id]]
         question[:question_bank_name] ||= migration.question_bank_name
-        question[:question_bank_name] ||= AssessmentQuestionBank::DEFAULT_IMPORTED_TITLE
+        question[:question_bank_name] ||= AssessmentQuestionBank.default_imported_title
         hash_id = "#{question[:question_bank_id]}_#{question[:question_bank_name]}"
         if !banks[hash_id]
             unless bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(migration.context.class.to_s, migration.context.id, question[:question_bank_name], question[:question_bank_id])
@@ -444,9 +444,13 @@ class AssessmentQuestion < ActiveRecord::Base
             end
             banks[hash_id] = bank
         end
-
-        question = AssessmentQuestion.import_from_migration(question, migration.context, banks[hash_id])
-        question_data[:aq_data][question['migration_id']] = question
+        
+        begin
+          question = AssessmentQuestion.import_from_migration(question, migration.context, banks[hash_id])
+          question_data[:aq_data][question['migration_id']] = question
+        rescue
+          migration.add_warning("Couldn't import quiz question \"#{question[:question_name]}\"", $!)
+        end
       end
     end
 
@@ -457,7 +461,7 @@ class AssessmentQuestion < ActiveRecord::Base
     hash = hash.with_indifferent_access
     if !bank
       hash[:question_bank_name] = nil if hash[:question_bank_name] == ''
-      hash[:question_bank_name] ||= AssessmentQuestionBank::DEFAULT_IMPORTED_TITLE
+      hash[:question_bank_name] ||= AssessmentQuestionBank::default_imported_title
       unless bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(context.class.to_s, context.id, hash[:question_bank_name], hash[:question_bank_id])
         bank ||= context.assessment_question_banks.new
         bank.title = hash[:question_bank_name]

@@ -30,16 +30,25 @@ ALL_MODELS = Dir.glob(File.expand_path(File.dirname(__FILE__) + '/../app/models'
   eval(model) rescue nil
 }.find_all{|x| x.respond_to? :delete_all and x.count >= 0 rescue false}
 
-# wipe out the test db, in case some non-transactional tests crapped out before
-# cleaning up after themselves
-ALL_MODELS.each &:delete_all
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition.
 module Spec::DSL::Main
   remove_method :context
 end
+
+def truncate_table(model)
+  case model.connection.adapter_name
+  when "SQLite"
+    model.delete_all
+  else
+    model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
+  end
+end
+
+# wipe out the test db, in case some non-transactional tests crapped out before
+# cleaning up after themselves
+ALL_MODELS.each { |m| truncate_table(m) }
 
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these
@@ -59,6 +68,7 @@ Spec::Runner.configure do |config|
 
   def account_with_cas(opts={})
     account = opts[:account]
+    account ||= Account.create!
     config = AccountAuthorizationConfig.new
     cas_url = opts[:cas_url] || "https://localhost/cas"
     config.auth_type = "cas"
@@ -141,6 +151,7 @@ Spec::Runner.configure do |config|
   def course_with_teacher(opts={})
     course(opts)
     @user = opts[:user] || user(opts)
+    @teacher = @user
     @enrollment = @course.enroll_teacher(@user)
     @enrollment.accept! if opts[:active_enrollment] || opts[:active_all]
     @enrollment
@@ -231,6 +242,27 @@ Spec::Runner.configure do |config|
 
   def update_with_protected_attributes(ar_instance, attrs)
     update_with_protected_attributes!(ar_instance, attrs) rescue false
+  end
+
+  def process_csv_data(*lines)
+    account_model unless @account
+  
+    tmp = Tempfile.new("sis_rspec")
+    path = "#{tmp.path}.csv"
+    tmp.close!
+    File.open(path, "w+") { |f| f.puts lines.join "\n" }
+    
+    importer = SIS::SisCsv.process(@account, :files => [ path ], :allow_printing=>false)
+    
+    File.unlink path
+    
+    importer
+  end
+  
+  def process_csv_data_cleanly(*lines)
+    importer = process_csv_data(*lines)
+    importer.errors.should == []
+    importer.warnings.should == []
   end
 
 end

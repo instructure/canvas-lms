@@ -9,7 +9,7 @@
     </div>
     <div class="right_links">
       <%= datetime_string(message.try_rescue(:created_at)) || nbsp %>
-      <div class="delete_holder"><a class="delete_link" rel="<%= facebook_hide_message_url(message.id) %>" href="#">Hide</a></div>
+      <div class="delete_holder"><a class="delete_link" rel="<%= facebook_hide_message_url(message.id) %>" href="#"><%= t :hide, "Hide" %></a></div>
     </div>
     <div style="clear: both;"></div>
   </div>

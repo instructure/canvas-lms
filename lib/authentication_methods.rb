@@ -96,7 +96,7 @@ module AuthenticationMethods
         if teacher
           request_become_user_id = teacher.id
         else
-          flash[:error] = "No teacher found"
+          flash[:error] = I18n.t('lib.auth.errors.teacher_not_found', "No teacher found")
         end
       elsif params.keys.include?('become_student')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
@@ -104,7 +104,7 @@ module AuthenticationMethods
         if student
           request_become_user_id = student.id
         else
-          flash[:error] = "No student found"
+          flash[:error] = I18n.t('lib.auth.errors.student_not_found', "No student found")
         end
       end
       
@@ -124,7 +124,7 @@ module AuthenticationMethods
         # we can't let even site admins impersonate other site admins, since
         # they may have different permissions.
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) attempting to impersonate another site admin (#{@current_user.name}). No dice."
-        flash.now[:error] = "You can't impersonate other site admins. Sorry."
+        flash.now[:error] = I18n.t('lib.auth.errors.admin_impersonation_disallowed', "You can't impersonate other site admins. Sorry.")
         @current_user = @real_current_user
       else
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
@@ -144,16 +144,16 @@ module AuthenticationMethods
       if !@current_user 
         respond_to do |format|
           store_location
-          flash[:notice] = "You must! be logged in to access this page"
+          flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page")
           format.html {redirect_to login_url}
-          format.json {render :json => {:errors => {:message => "You must be logged in to view this page"}}, :status => :unauthorized}
+          format.json {render :json => {:errors => {:message => I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page")}}, :status => :unauthorized}
         end
         return false;
       elsif !@context.users.include?(@current_user)
         respond_to do |format|
-          flash[:notice] = "You are not authorized to view this page"
+          flash[:notice] = I18n.t('lib.auth.errors.not_authorized', "You are not authorized to view this page")
           format.html {redirect_to "/"}
-          format.json {render :json => {:errors => {:message => "You are not authorized to view this page"}}, :status => :unauthorized}
+          format.json {render :json => {:errors => {:message => I18n.t('lib.auth.errors.not_authorized', "You are not authorized to view this page")}}, :status => :unauthorized}
         end
         return false
       end
@@ -172,11 +172,11 @@ module AuthenticationMethods
         else
           format.html {
             store_location
-            flash[:notice] = "You must be logged in to access this page" unless request.path == '/'
+            flash[:notice] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
             redirect_to login_url
           }
         end
-        format.json { render :json => {:errors => {:message => "user authorization required"}}.to_json, :status => :unauthorized}
+        format.json { render :json => {:errors => {:message => I18n.t('lib.auth.authentication_required', "user authorization required")}}.to_json, :status => :unauthorized}
       end
       return false
     end

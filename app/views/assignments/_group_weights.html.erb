@@ -2,8 +2,8 @@
 <div id="group_weight" style="<%= hidden unless @context.group_weighting_scheme == 'percent' %>">
   <table id="group_weight_table">
     <thead><tr>
-      <th style="width: 100%;">Assignment Group</th>
-      <th>Weight</th>
+      <th style="width: 100%;"><%= t 'headers.assignment_group', "Assignment Group" %></th>
+      <th><%= t 'headers.group_weight', "Weight" %></th>
     </tr></thead>
     <% tally = 0 %>
     <tbody>
@@ -34,8 +34,8 @@
       <td style="white-space: nowrap;"><input type="text" class="weight" value="0">%</td>
     </tr>
     <tr>
-      <td class="total">Total</td>
-      <td id="group_weight_total" class="total" style="text-align: right;"><%= tally %>%</td>
+      <td class="total"><%= t 'headers.total', "Total" %></td>
+      <td id="group_weight_total" class="total" style="text-align: right;"><%= number_to_percentage(tally, :precision => 0) %></td>
     </tr>
   </table>
 </div>

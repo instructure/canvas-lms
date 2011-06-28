@@ -18,7 +18,7 @@
 
 class ContextModulesController < ApplicationController
   before_filter :require_context  
-  add_crumb("Modules") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
+  add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
   before_filter { |c| c.active_tab = "modules" }  
   
   def index
@@ -48,9 +48,14 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       @module = @context.context_modules.active.find(params[:context_module_id])
       @tags = @module.content_tags.active.include_progressions
+      if params[:last]
+        @tags.pop while @tags.last && @tags.last.content_type == 'ContextModuleSubHeader'
+      else
+        @tags.shift while @tags.first && @tags.first.content_type == 'ContextModuleSubHeader'
+      end
       @tag = params[:last] ? @tags.last : @tags.first
       if !@tag
-        flash[:notice] = "There are no items in the module \"#{@module.name}\""
+        flash[:notice] = t 'module_empty', %{There are no items in the module "%{module}"}, :module => @module.name
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{@module.id}")
         return
       end

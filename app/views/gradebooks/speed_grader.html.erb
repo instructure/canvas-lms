@@ -2,6 +2,7 @@
   jammit_js :speed_grader
   jammit_css :speed_grader
   @show_left_side = false 
+  @can_edit_anything = !@context.completed?
 %>
 <% content_for :page_title do %><%= [@assignment.title, "SpeedGrader", @context.name, ].join(", ") %><% end %>
 <h4 id="speed_grader_loading">
@@ -163,60 +164,62 @@
             </div>
           </div>
 
-          <form id="add_a_comment">
-            <label>Add a Comment</label>
-            <textarea></textarea>
-            <div>
-              <div id="media_media_recording" style="display: none;">
-                <div class="media_recording"></div>
-              </div>
-              <% if @assignment.group_category %>
-                <div id="group_comment_wrapper">
-                  <input type="checkbox" name="group_comment" id="submission_group_comment" checked/>
-                  <label for="submission_group_comment">Send to the Whole Group</label>
+          <% unless @context.completed? || @context_enrollment.try(:completed?) %>
+            <form id="add_a_comment">
+              <label>Add a Comment</label>
+              <textarea></textarea>
+              <div>
+                <div id="media_media_recording" style="display: none;">
+                  <div class="media_recording"></div>
                 </div>
-              <% end %>
-              <div id="comment_attachments"></div>
-              <div class="comment_attachment_input" id="comment_attachment_input_blank" style="display: none;">
-                <input type="file" name="attachments[-1][uploaded_data]" style="font-size: 0.8em;"/>
-                <a href="#">Remove Attachment</a>
-              </div>
-
-
-              <button class="button small-button" type="submit">Submit Comment</button>
-              <ul class="attach_things">
-                <li class="prompt">Attach</li>
-                <li>
-                  <a id="add_attachment" href="#" class="tooltip">
-                    <span class="tooltip_wrap">
-                      <span class="tooltip_text">File Attachment</span>
-                    </span>
-                    <span class="icon"><%= image_tag "file_multiple.png" %></span>
-                  </a>
-                </li>
-                <% if feature_enabled?(:kaltura) %>
-                  <li>
-                    <a class="media_comment_link tooltip" href="#">
-                      <span class="tooltip_wrap">
-                        <span class="tooltip_text">Media Comment</span>
-                      </span>
-                      <span class="icon"><%= image_tag "webcam.png" %></span>
-                    </a>
-                  </li>
-                  <li style="display:none">
-                    <a class="speech_recognition_link tooltip" href="#">
-                      <span class="tooltip_wrap">
-                        <span class="tooltip_text">Speech Recognition</span>
-                      </span>
-                      <span class="icon"><%= image_tag "microphone_pencil.png" %></span>
-                    </a>
-                  </li>
+                <% if @assignment.group_category %>
+                  <div id="group_comment_wrapper">
+                    <input type="checkbox" name="group_comment" id="submission_group_comment" checked/>
+                    <label for="submission_group_comment">Send to the Whole Group</label>
+                  </div>
                 <% end %>
-                <li style="clear:both;"></li>
-              </ul>
-              <div style="clear:both;"></div>
-            </div>
-          </form>
+                <div id="comment_attachments"></div>
+                <div class="comment_attachment_input" id="comment_attachment_input_blank" style="display: none;">
+                  <input type="file" name="attachments[-1][uploaded_data]" style="font-size: 0.8em;"/>
+                  <a href="#">Remove Attachment</a>
+                </div>
+
+
+                <button class="button small-button" type="submit">Submit Comment</button>
+                <ul class="attach_things">
+                  <li class="prompt">Attach</li>
+                  <li>
+                    <a id="add_attachment" href="#" class="tooltip">
+                      <span class="tooltip_wrap">
+                        <span class="tooltip_text">File Attachment</span>
+                      </span>
+                      <span class="icon"><%= image_tag "file_multiple.png" %></span>
+                    </a>
+                  </li>
+                  <% if feature_enabled?(:kaltura) %>
+                    <li>
+                      <a class="media_comment_link tooltip" href="#">
+                        <span class="tooltip_wrap">
+                          <span class="tooltip_text">Media Comment</span>
+                        </span>
+                        <span class="icon"><%= image_tag "webcam.png" %></span>
+                      </a>
+                    </li>
+                    <li style="display:none">
+                      <a class="speech_recognition_link tooltip" href="#">
+                        <span class="tooltip_wrap">
+                          <span class="tooltip_text">Speech Recognition</span>
+                        </span>
+                        <span class="icon"><%= image_tag "microphone_pencil.png" %></span>
+                      </a>
+                    </li>
+                  <% end %>
+                  <li style="clear:both;"></li>
+                </ul>
+                <div style="clear:both;"></div>
+              </div>
+            </form>
+          <% end %>
         </div><!-- end #discussion -->
       </div>
     </div>

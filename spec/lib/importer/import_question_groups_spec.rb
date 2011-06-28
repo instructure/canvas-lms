@@ -40,7 +40,7 @@ describe "Quiz Import" do
 
     q = AssessmentQuestion.find_by_migration_id(data[:migration_id])
 
-    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, AssessmentQuestionBank::DEFAULT_IMPORTED_TITLE)
+    bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title(context.class.to_s, context.id, AssessmentQuestionBank.default_imported_title)
     bank_aq = bank.assessment_questions.first
     bank_aq.id.should == q.id
   end

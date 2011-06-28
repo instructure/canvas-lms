@@ -1,14 +1,15 @@
 <% topic = dashboard_topic || nil; show_context ||= false; is_announcement ||= false; contextless ||= false %>
 <% context_code = topic.try_rescue(:context_code) %>
 <% post_date = ([topic] + topic.try_rescue(:root_discussion_entries) || []).compact.last.created_at %>
+<% assignment = topic && topic.assignment_id.present? && Assignment.find(topic.assignment_id) %>
 <% if !topic || can_do(topic, @current_user, :read) %>
 <div style="<%= hidden unless topic %>" class="<%= is_announcement || topic.try_rescue(:type) == 'Announcement' || topic.try_rescue(:is_announcement) ? 'announcement' : 'discussion_topic' %> message_<%= contextless ? "blank" : context_code %> communication_message">
   <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <div class="header">
     <div class="header_title">
-      <%= image_tag "announcement.png", :class => "header_icon announcement_header_icon", :alt => "announcement", :title => "Announcement", :style => "width: 20px;" %>
-      <%= image_tag "discussion_topic.png", :class => "header_icon discussion_topic_header_icon", :alt => "topic", :title => "Discussion", :style => "width: 20px;" %>
-      <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="title"><%= topic.try_rescue(:title) || "No Title" %></a>
+      <%= image_tag "announcement.png", :class => "header_icon announcement_header_icon", :alt => t('images.alt.announcement', "announcement"), :title => t('images.title.announcement', "Announcement"), :style => "width: 20px;" %>
+      <%= image_tag "discussion_topic.png", :class => "header_icon discussion_topic_header_icon", :alt => t('images.alt.topic', "topic"), :title => t('images.title.topic', "Discussion"), :style => "width: 20px;" %>
+      <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="title"><%= topic.try_rescue(:title) || t('no_title', "No Title") %></a>
       <div class="sub_title">
         <span class="context_code group_<%= context_code || 'blank' %>"><%= cached_context_short_name(context_code) %></span>
         <a title="Author's name" href="<%= context_prefix(context_code) %>/users/<%= topic ? topic.user_id : "{{ user_id }}" %>" class="user_name"><%= context_user_name(context_code, topic.try_rescue(:user_id)) %></a>
@@ -20,45 +21,47 @@
   <div class="content">
     <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((topic.try_rescue(:user_id)), context_code) %></div>
     <% if topic && topic.message && topic.message.length > 250 %>
-    <div class="message_short user_content"><%= truncate_html(user_content(topic.try_rescue(:message)) || nbsp, :max_length => 250, :link => link_to("more", "#{context_prefix(context_code)}/discussion_topics/#{topic ? topic.id : '{{ id }}'}", :class => "read_more_link")) %></div>
+    <div class="message_short user_content"><%= truncate_html(user_content(topic.try_rescue(:message)) || nbsp, :max_length => 250, :link => link_to(t('read_more', "more"), "#{context_prefix(context_code)}/discussion_topics/#{topic ? topic.id : '{{ id }}'}", :class => "read_more_link")) %></div>
     <% end %>
     <div class="message user_content" style="<%= hidden if topic && topic.message && topic.message.length > 250 %>"><%= user_content(topic.try_rescue(:message)) || nbsp %></div>
     <% if topic && !topic.root_discussion_entries.empty? %>
       <div class="original_post_date">
-        posted 
-        <span class="post_date time_ago_date"><%= datetime_string(topic.try_rescue(:created_at)) || nbsp %></span>
+        <%= t :post_date, "posted *%{post_date}*", :post_date => datetime_string(topic.try_rescue(:created_at)) || nbsp, :wrapper => '<span class="post_date time_ago_date">\1</span>' %>
       </div>
     <% end %>
     <div class="course_id" style="display: none;"><%= topic.context_id if topic && topic.context_type == 'Course' %></div>
     <div class="notes" style="font-size: 0.8em; float: left;">
-      <% if topic && topic.context && topic.context.respond_to?(:assignments) %>
-        <div class="for_assignment" style="font-style: italic; <%= hidden unless topic && topic.assignment_id %>">
-          This topic is for the assignment, 
-          <a href="<%= context_prefix(context_code) %>/assignments/<%= topic.try_rescue(:assignment_id) || "{{ assignment_id }}" %>" class="topic_assignment_link assignment_title"><%= topic.try_rescue(:assignment).try_rescue(:title) || nbsp %></a>.
-          <span class="for_grading_text">Posts will be used for grading.</span>
-          <a href="<%= context_prefix(context_code) %>/assignments/<%= topic.try_rescue(:assignment_id) || "{{ assignment_id }}" %>" style="display: none;" class="topic_assignment_url">&nbsp;</a>
-          <span class="assignment_id" style="display: none;"><%= topic.try_rescue(:assignment_id) || nbsp %></span>
+      <% if assignment %>
+        <div class="for_assignment" style="font-style: italic;">
+          <%= t :topic_for_assignment, "This topic is for the assignment, %{assignment_name_link}.", :assignment_name_link => link_to(assignment.title, context_url(assignment.context, :context_assignment_url, assignment)) %>
+          <span class="for_grading_text"><%= t('posts_for_grading', %{Posts will be used for grading.}) %></span>
+          <%= link_to nbsp, context_url(assignment.context, :context_assignment_url, assignment), :style => "display:none", :class => "topic_assignment_url" %>
+          <span class="assignment_id" style="display: none;"><%= assignment.id %></span>
         </div>
       <% end %>
-      <div class="attachment_data" style="<%= hidden unless topic && topic.attachment %>">
-        Attached File: <a href="<%= context_prefix(context_code) %>/files/<%= topic && topic.attachment ? topic.attachment_id : "{{ attachment_id }}" %>/download" class="attachment_name <%= 'scribdable' if topic && topic.attachment && topic.attachment.scribdable? %>"><%= topic.try_rescue(:attachment).try_rescue(:display_name) || nbsp %></a>
-        <a href="<%= context_prefix(context_code) %>/files/{{ attachment_id }}/download" class="topic_attachment_url" style="display: none;">&nbsp;</a>
-      </div>
-      <div class="delayed_posting" style="<%= hidden unless topic && topic.delayed_post_at && topic.delayed_post_at > Time.now %>">
-        This topic will not be visible to users until 
-        <span class="delayed_post_at"><%= datetime_string(topic.try_rescue(:delayed_post_at)) || nbsp %></span>
-      </div>
+      <% if topic && topic.attachment %>
+        <div class="attachment_data">
+          <%= before_label(:attached_file, %{Attached File}) %> <a href="<%= context_prefix(context_code) %>/files/<%= topic && topic.attachment ? topic.attachment_id : "{{ attachment_id }}" %>/download" class="attachment_name <%= 'scribdable' if topic && topic.attachment && topic.attachment.scribdable? %>"><%= topic.try_rescue(:attachment).try_rescue(:display_name) || nbsp %></a>
+          <a href="<%= context_prefix(context_code) %>/files/{{ attachment_id }}/download" class="topic_attachment_url" style="display: none;">&nbsp;</a>
+        </div>
+      <% end %>
+      <% if topic && topic.delayed_post_at && topic.delayed_post_at > Time.now %>
+        <div class="delayed_posting">
+          <%= t :delayed_posting, "This topic will not be visible to users until *%{date_time}*", :date_time => (datetime_string(topic.try_rescue(:delayed_post_at)) || nbsp), :wrapper => '<span class="delayed_post_at">\1</span>' %>
+        </div>
+      <% end %>
     </div>
     <div class="clear"></div>
     <div class="subcontent">
       <% entries = topic.try_rescue(:root_discussion_entries) || [] %>
       <% entry_count = topic.try_rescue(:total_root_discussion_entries) || entries.length %>
+      <% link_text = t('links.show_more_entries', { :one => "Show 1 More Entry", :other => "Show %{count} More Entries" }, :count => (entries.length - 2)) %>
       <div class="communication_sub_message" style="<%= hidden unless entries.length > 3 %>">
         <div class="content behavior_content">
           <% if entry_count > 10 %>
-            <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="_show_sub_messages_link">Show <%= pluralize(entries.length - 2, "More Entry") %></a>
+            <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="_show_sub_messages_link"><%= link_text %></a>
           <% else %>
-            <a href="#" class="show_sub_messages_link">Show <%= pluralize(entries.length - 2, "More Entry") %></a>
+            <a href="#" class="show_sub_messages_link"><%= link_text %></a>
           <% end %>
         </div>
       </div>
@@ -68,9 +71,9 @@
       <% if !topic || can_do(topic, @current_user, :reply) %>
       <div class="communication_sub_message reply_message <%= 'lonely_behavior_message' if entries.empty? %>">
         <div class="content behavior_content">
-          <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="add_entry_link textarea">Add a Comment...</a>
+          <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>" class="add_entry_link textarea"><%= t('links.add_comment', %{Add a Comment...}) %></a>
           <div class="less_important">
-            <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>">View Entire Topic</a>
+            <a href="<%= context_prefix(context_code) %>/discussion_topics/<%= topic ? topic.id : "{{ id }}" %>"><%= t('links.view_topic', %{View Entire Topic}) %></a>
           </div>
         </div>
       </div>

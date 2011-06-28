@@ -1,6 +1,6 @@
-<% add_crumb "Copy From #{@copy_context.name}", "#{context_url(@context, :context_import_copy_url)}&import_id=#{@copy_context.id}" %>
-<% add_crumb "Results" %>
-<% content_for :page_title do %>Copy Results From <%= @copy_context.name %><% end %>
+<% add_crumb t('crumbs.copy_from_course', "Copy From %{course}", :course => @copy_context.name), "#{context_url(@context, :context_import_copy_url)}&import_id=#{@copy_context.id}" %>
+<% add_crumb t('#crumbs.results', "Results") %>
+<% content_for :page_title do %><%= t :page_title, "Copy Results From %{course}", :course => @copy_context.name %><% end %>
 
 <% content_for :stylesheets do %>
 <style>
@@ -34,18 +34,20 @@
 <% end %>
 
 <div id="copy_results">
-  <h2>Course Copy Succeeded</h2>
-  <p>Course content successfully imported!  You can review the results of the import below.
-  </p>
-  <p>If you're not happy with any of the dates for assignments or events, you can easily
-  <a href="<%= calendar_url_for(@context) %>">change them by dragging and dropping on the course calendar</a>.
-  </p>
+  <h2><%= t 'titles.copy_succeeded', "Course Copy Succeeded" %></h2>
+  <%= mt('descriptions.copy_succeeded', <<-HEREDOC, :url => calendar_url_for(@context))
+Course content successfully imported!  You can review the results of the import below.
+
+If you're not happy with any of the dates for assignments or events, you can easily
+[change them by dragging and dropping on the course calendar](%{url}).
+HEREDOC
+    %>
   <p>
-    <a href="<%= context_url(@context, :context_url) %>" class="back">Back to the <%= @context.name %> Home Page</a>
+    <a href="<%= context_url(@context, :context_url) %>" class="back"><%= t 'links.back', "Back to the %{course} Home Page", :course => @context.name %></a>
   </p>
-  <h2 style="margin-bottom: 10px;">What <%= @context.name %> Looks Like Now</h2>
+  <h2 style="margin-bottom: 10px;"><%= t 'titles.what_it_looks_like_now', "What %{course} Looks Like Now", :course => @context.name %></h2>
     <% if @context.assignment_groups.active.length > 0 %>
-      <h3><%= image_tag 'assignment.png' %> Assignments for <%= @context.name %></h3>
+      <h3><%= image_tag 'assignment.png' %> <%= t('labels.assignment', "Assignments for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
         <% @context.assignment_groups.active.each do |group| %>
           <li>
@@ -62,7 +64,7 @@
       </ul>
     <% end %>
     <% if @context.folders.active.length > 0 && @context.attachments.active.length > 0 %>
-      <h3><%= image_tag 'download.png' %> Files for <%= @context.name %></h3>
+      <h3><%= image_tag 'download.png' %> <%= t('labels.files', "Files for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
         <% @context.folders.active.sort_by{|f| f.full_name}.each do |folder| %>
           <% if folder.attachments.length > 0 %>
@@ -79,7 +81,7 @@
       </ul>
     <% end %>
     <% if @context.wiki.wiki_pages.active.length > 0 %>
-      <h3><%= image_tag 'course_content_icon.png' %> Wiki Pages for <%= @context.name %></h3>
+      <h3><%= image_tag 'course_content_icon.png' %> <%= t('labels.wiki_ages', "Wiki Pages for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list asset_list">
         <% @context.wiki.wiki_pages.active.each do |page| %>
           <li class="<%= 'added' if @copies.include?(page.asset_string) %>"><%= page.title %></li>
@@ -87,23 +89,23 @@
       </ul>
     <% end %>
     <% if @context.quizzes.active.not_for_assignment.length > 0 %>
-      <h3><%= image_tag 'quiz.png' %> Quizzes for <%= @context.name %></h3>
+      <h3><%= image_tag 'quiz.png' %> <%= t('labels.quizzes', "Quizzes for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list asset_list">
         <% @context.quizzes.active.each do |quiz| %>
           <li class="<%= 'added' if @copies.include?(quiz.asset_string) %>"><%= quiz.title %></li>
         <% end %>
       </ul>
     <% end %>
-    <% if @copy_context.context_modules.active.length > 0 %>
-      <h3><%= image_tag 'ball.png' %> Modules for <%= @context.name %></h3>
+    <% if @context.context_modules.active.length > 0 %>
+      <h3><%= image_tag 'ball.png' %> <%= t('labels.modules', "Modules for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
-        <% @copy_context.context_modules.active.each do |mod| %>
+        <% @context.context_modules.active.each do |mod| %>
           <li class="<%= 'added' if @copies.include?(mod.asset_string) %>"><%= mod.name %></li>
         <% end %>
       </ul>
     <% end %>
     <% if @context.discussion_topics.active.length > 0 %>
-      <h3><%= image_tag 'word_bubble.png' %> Discussions for <%= @context.name %></h3>
+      <h3><%= image_tag 'word_bubble.png' %> <%= t('labels.discussions', "Discussions for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list asset_list">
         <% @context.discussion_topics.active.each do |topic| %>
           <li class="<%= 'added' if @copies.include?(topic.asset_string) %>"><%= topic.title %><% if topic.delayed_post_at %> - <span style="font-size: 0.8em;">will be posted <%= datetime_string(topic.delayed_post_at, :verbose) %></span><% end %></li>
@@ -111,7 +113,7 @@
       </ul>
     <% end %>
     <% if @context.calendar_events.active.length > 0 %>
-      <h3><%= image_tag 'due_date_icon.png' %> Events for <%= @context.name %></h3>
+      <h3><%= image_tag 'due_date_icon.png' %> <%= t('labels.events', "Events for %{course}", :course => @context.name) %></h3>
       <ul class="unstyled_list asset_list">
         <% @context.calendar_events.active.each do |event| %>
           <li class="<%= 'added' if @copies.include?(event.asset_string) %>"><%= event.title %><% if event.start_at %> - <span style="font-size: 0.8em;"><%= datetime_string(event.start_at, :verbose, event.end_at) %></span><% end %></li>
@@ -128,7 +130,7 @@
 <% js_block do %>
 <script>
 $(document).ready(function() {
-  $(".added").attr('title', 'Just added to the Course');
+  $(".added").attr('title', <%= t('titles.just_added', "Just added to the Course").to_json.html_safe %>);
 });
 </script>
 <% end %>

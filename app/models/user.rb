@@ -130,7 +130,7 @@ class User < ActiveRecord::Base
     {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{ActiveRecord::Base.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => wildcard('users.name', name) }
+    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", ActiveRecord::Base.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
   }
   named_scope :active, lambda {
     { :conditions => ["users.workflow_state != ?", 'deleted'] }
@@ -563,7 +563,7 @@ class User < ActiveRecord::Base
   
   def remove_from_root_account(account)
     self.enrollments.find_all_by_root_account_id(account.id).each(&:destroy)
-    self.pseudonyms.active.find_all_by_account_id(account.id).each(&:destroy)
+    self.pseudonyms.active.find_all_by_account_id(account.id).each { |p| p.destroy(true) }
     self.account_users.find_all_by_account_id(account.id).each(&:destroy)
     self.save
     self.update_account_associations
@@ -1410,10 +1410,14 @@ class User < ActiveRecord::Base
     Array(self.cached_contexts).map(&:asset_string)
   end
   
-  def courses_name_like(query="")
-    Course.manageable_by_user(self.id).name_like(query).limit(50)
+  def manageable_courses
+    Course.manageable_by_user(self.id)
   end
-  memoize :courses_name_like
+
+  def manageable_courses_name_like(query="")
+    self.manageable_courses.name_like(query).limit(50)
+  end
+  memoize :manageable_courses_name_like
   
   def last_completed_module
     self.context_module_progressions.select{|p| p.completed? }.sort_by{|p| p.completed_at || p.created_at }.last.context_module rescue nil
@@ -1457,8 +1461,7 @@ class User < ActiveRecord::Base
   end
   
   def quota
-    # in megabytes
-    read_attribute(:storage_quota) || 50
+    read_attribute(:storage_quota) || Setting.get_cached('user_default_quota', 50.megabytes.to_s).to_i
   end
   
   def update_last_user_note

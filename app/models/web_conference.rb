@@ -72,6 +72,22 @@ class WebConference < ActiveRecord::Base
       }
   end
 
+  def setting_name(key)
+    user_settings[key][:name].call
+  end
+
+  def setting_description(key)
+    user_settings[key][:description].call
+  end
+
+  def external_urls_name(key)
+    external_urls[key][:name].call
+  end
+
+  def external_urls_link_text(key)
+    external_urls[key][:link_text].call
+  end
+
   def cast_setting(value, type)
     case type
       when :boolean: ['1', 'on', 'true'].include?(value.to_s)
@@ -81,8 +97,8 @@ class WebConference < ActiveRecord::Base
 
   def friendly_setting(value)
     case value
-      when true: "on"
-      when false: "off"
+      when true: t('#web_conference.settings.boolean.true', "On")
+      when false: t('#web_conference.settings.boolean.false', "Off")
       else value.to_s
     end
   end
@@ -194,7 +210,7 @@ class WebConference < ActiveRecord::Base
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
     self.user_ids ||= (self.user_id || "").to_s
     self.added_user_ids ||= ""
-    self.title ||= "#{self.context.name} Web Conference"
+    self.title ||= self.context.is_a?(Course) ? t('#web_conference.default_name_for_courses', "Course Web Conference") : t('#web_conference.default_name_for_groups', "Group Web Conference")
     self.start_at ||= self.started_at
     self.end_at ||= self.ended_at
     self.end_at ||= self.start_at + self.duration.minutes if self.start_at && self.duration

@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('content_imports', function (I18n) {
 $(function(){
   var $config_options = $("#config_options"),
       $export_file_enabled = $("#export_file_enabled"),
@@ -111,19 +112,20 @@ $(function(){
     },
     beforeSubmit: function(data) {
       if($export_file_enabled.val() == '1'){
-        $(this).find(".submit_button").attr('disabled', true).text("Uploading Course Export...");
+        $(this).find(".submit_button").attr('disabled', true).text(I18n.t('messages.uploading', "Uploading Course Export..."));
       }
     },
     success: function(data) {
-      $(this).find(".submit_button").attr('disabled', false).text("Import Course");
+      $(this).find(".submit_button").attr('disabled', false).text(I18n.t('buttons.import', "Import Course"));
       $(this).slideUp();
       $("#file_uploaded").slideDown();
     },
     error: function(data) {
       if($export_file_enabled.val() == '1'){
-        $(this).find(".submit_button").attr('disabled', false).text("Upload Failed, please try again");
+        $(this).find(".submit_button").attr('disabled', false).text(I18n.t('errors.upload_failed', "Upload Failed, please try again"));
       }
       $(this).formErrors(data);
     }
   });
+});
 });

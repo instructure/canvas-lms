@@ -42,12 +42,31 @@ Spec::Rake::SpecTask.new(:spec) do |t|
   if ENV['SINGLE_TEST']
     t.spec_opts += ['-e', %{"#{ENV['SINGLE_TEST']}"}]
   end
-  t.spec_files = ['spec'] + FileList['vendor/plugins/*/spec_canvas']
+  spec_files = ['spec'] + FileList['vendor/plugins/*/spec_canvas']
   Gem.loaded_specs.values.each do |spec|
     path = spec.full_gem_path
     spec_canvas_path = File.expand_path(path+"/spec_canvas")
     next unless File.directory?(spec_canvas_path)
-    t.spec_files << spec_canvas_path
+    spec_files << spec_canvas_path
+  end
+  if ENV['IN_MEMORY_DB']
+    N_PROCESSES = [ENV['IN_MEMORY_DB'].to_i, 1].max
+    spec_files = spec_files.map{|x| Dir[x + "/**/*_spec.rb" ]}.flatten.sort.in_groups_of(N_PROCESSES)
+    processes = []
+    Signal.trap "SIGINT", (lambda { Process.kill "-KILL", Process.getpgid(0) })
+    child = false
+    N_PROCESSES.times do |j|
+      pid = Process.fork
+      unless pid
+        child = true
+        t.spec_files = spec_files.map{|x|x[j]}.compact
+        break
+      end
+      processes << pid
+    end
+    exit Process.waitall.map(&:last).map(&:exitstatus).count{|x|x != 0} unless child
+  else
+    t.spec_files = spec_files
   end
 end
 

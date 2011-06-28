@@ -1,5 +1,5 @@
 <% @body_classes << "content-imports" %>
-<% content_for :page_title do %>Copy From Another Course<% end %>
+<% content_for :page_title do %><%= t :page_title, "Copy From Another Course" %><% end %>
 
 <% content_for :stylesheets do %>
 <style>
@@ -25,16 +25,16 @@
 </style>
 <% end %>
 <% if @copy_context %>
-  <% add_crumb "Copy From #{@copy_context.name}", "#{context_url(@context, :context_import_copy_url)}&import_id=#{@copy_context.id}" %>
+  <% add_crumb t('crumbs.copy_from_course', "Copy From %{course}", :course => @copy_context.name), "#{context_url(@context, :context_import_copy_url)}&import_id=#{@copy_context.id}" %>
   <% form_tag context_url(@context, :context_import_copy_url), :id => "copy_context_form" do %>
     <%= hidden_field :copy, :course_id, :value => @copy_context.id %>
-    <h2>Copy Content From <%= @copy_context.name %></h2>
-    <p>Select the content you'd like copied into this course.  We'll try to auto-correct any mismatched
-    due dates and calendar event dates as best we can.</p>
-    <h3 style="margin-bottom: 10px;"><%= check_box :copy, :everything, :class => "copy_everything" %> <%= label :copy, :everything, image_tag('checked.png', :style => 'width: 16px;') + " Copy Everything from #{@copy_context.name}" %></h3>
-    <h3><%= check_box :copy, :course_settings, :class => "copy_all", :checked => false %><%= label :copy, :course_settings, image_tag('file_multiple.png') + " Settings from #{@copy_context.name}" %></h3>
+    <h2><%= t 'titles.copy_from_course', "Copy Content From %{course}", :course => @copy_context.name %></h2>
+    <p><%= t 'descriptions.copy_content', "Select the content you'd like copied into this course.  We'll try to auto-correct any mismatched
+    due dates and calendar event dates as best we can." %></p>
+    <h3 style="margin-bottom: 10px;"><%= check_box :copy, :everything, :class => "copy_everything" %> <%= label :copy, :everything, image_tag('checked.png', :style => 'width: 16px;') + " " + t('labels.copy_everything', "Copy Everything from %{course}", :course => @copy_context.name) %></h3>
+    <h3><%= check_box :copy, :course_settings, :class => "copy_all", :checked => false %><%= label :copy, :course_settings, image_tag('file_multiple.png') + " " + t('labels.copy_settings', "Settings from %{course}", :course => @copy_context.name) %></h3>
     <% if @copy_context.assignment_groups.active.length > 0 %>
-      <h3><%= check_box :copy, :all_assignments, :class => "copy_all", :checked => true %><%= label :copy, :all_assignments, image_tag('assignment.png') + " Assignments for #{@copy_context.name}" %></h3>
+      <h3><%= check_box :copy, :all_assignments, :class => "copy_all", :checked => true %><%= label :copy, :all_assignments, image_tag('assignment.png') + " " + t('labels.assignment', "Assignments for %{course}", :course => @copy_context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
         <% @copy_context.assignment_groups.active.each do |group| %>
           <li>
@@ -52,7 +52,7 @@
       </ul>
     <% end %>
     <% if @copy_context.context_modules.active.length > 0 %>
-      <h3><%= check_box :copy, :all_modules, :class => "copy_all", :checked => true %><%= label :copy, :all_modules,image_tag('ball.png') + " Modules for #{@copy_context.name}" %></h3>
+      <h3><%= check_box :copy, :all_modules, :class => "copy_all", :checked => true %><%= label :copy, :all_modules,image_tag('ball.png') + " " + t('labels.modules', "Modules for %{course}", :course => @copy_context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
         <% @copy_context.context_modules.active.each do |mod| %>
           <li>
@@ -63,7 +63,7 @@
       </ul>
     <% end %>
     <% if @copy_context.learning_outcomes.active.length > 0 %>
-      <h3><%= check_box :copy, :all_outcomes, :class => "copy_all", :checked => true %><%= label :copy, :all_modules,image_tag('flagged_question_dim.png') + " Learning Outcomes for #{@copy_context.name}" %></h3>
+      <h3><%= check_box :copy, :all_outcomes, :class => "copy_all", :checked => true %><%= label :copy, :all_modules,image_tag('flagged_question_dim.png') + " " + t('labels.learning_outcomes', "Learning Outcomes for %{course}", :course => @copy_context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
         <% @copy_context.learning_outcomes.active.each do |mod| %>
           <li>
@@ -74,7 +74,7 @@
       </ul>
     <% end %>
     <% if @copy_context.quizzes.active.length > 0 %>
-      <h3><%= check_box :copy, :all_quizzes, :class => "copy_all", :checked => true %><%= label :copy, :all_quizzes, image_tag('quiz.png') + " Quizzes for #{@copy_context.name}" %></h3>
+      <h3><%= check_box :copy, :all_quizzes, :class => "copy_all", :checked => true %><%= label :copy, :all_quizzes, image_tag('quiz.png') + " " + t('labels.quizzes', "Quizzes for %{course}", :course => @copy_context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
         <% @copy_context.quizzes.active.each do |quiz| %>
           <li>
@@ -85,7 +85,7 @@
       </ul>
     <% end %>
     <% if @copy_context.folders.active.length > 0 && @copy_context.attachments.active.length > 0 %>
-      <h3><%= check_box :copy, :all_files, :class => "copy_all", :checked => true %><%= label :copy, :all_files, image_tag('download.png') + " Files for #{@copy_context.name}" %></h3>
+      <h3><%= check_box :copy, :all_files, :class => "copy_all", :checked => true %><%= label :copy, :all_files, image_tag('download.png') + " " + t('labels.files', "Files for %{course}", :course => @copy_context.name) %></h3>
       <ul class="unstyled_list root_asset_list">
         <% @copy_context.folders.active.sort_by{|f| f.full_name}.each do |folder| %>
           <% if folder.attachments.length > 0 %>
@@ -102,7 +102,7 @@
       </ul>
     <% end %>
     <% if @copy_context.wiki.wiki_pages.active.length > 0 %>
-      <h3><%= check_box :copy, :all_wiki_pages, :class => "copy_all", :checked => true %><%= label :copy, :all_wiki_pages, image_tag('course_content_icon.png') + " Wiki Pages for #{@copy_context.name}" %></h3>
+      <h3><%= check_box :copy, :all_wiki_pages, :class => "copy_all", :checked => true %><%= label :copy, :all_wiki_pages, image_tag('course_content_icon.png') + " " + t('labels.wiki_ages', "Wiki Pages for %{course}", :course => @copy_context.name) %></h3>
       <ul class="unstyled_list asset_list">
         <% @copy_context.wiki.wiki_pages.active.each do |page| %>
           <li><%= check_box :copy, page.asset_string.to_sym %><%= label :copy, page.asset_string.to_sym, page.title %></li>
@@ -110,19 +110,19 @@
       </ul>
     <% end %>
     <% if @copy_context.discussion_topics.active.length > 0 %>
-      <h3><%= check_box :copy, :all_topics, :class => "copy_all" %><%= label :copy, :all_topics, image_tag('word_bubble.png') + " Discussions for #{@copy_context.name}" %></h3>
+      <h3><%= check_box :copy, :all_topics, :class => "copy_all" %><%= label :copy, :all_topics, image_tag('word_bubble.png') + " " + t('labels.discussions', "Discussions for %{course}", :course => @copy_context.name) %></h3>
       <ul class="unstyled_list asset_list">
         <% @copy_context.discussion_topics.active.each do |topic| %>
           <li><%= check_box :copy, topic.asset_string.to_sym, :class => 'skip_on_everything' %><%= label :copy, topic.asset_string.to_sym, topic.title %>
             <div style="font-size: 0.8em; padding-left: 25px;">
-              <%= check_box :copy, "#{topic.asset_string}_entries".to_sym, :class => "secondary_checkbox skip" %><%= label :copy, "#{topic.asset_string}_entries".to_sym, "include entries from the old course" %>
+              <%= check_box :copy, "#{topic.asset_string}_entries".to_sym, :class => "secondary_checkbox skip" %><%= label :copy, "#{topic.asset_string}_entries".to_sym, :copy, :en => "include entries from the old course" %>
             </div>
           </li>
         <% end %>
       </ul>
     <% end %>
     <% if @copy_context.calendar_events.active.length > 0 %>
-      <h3><%= check_box :copy, :all_calendar_events, :class => "copy_all", :checked => true %><%= label :copy, :all_calendar_events, image_tag('due_date_icon.png') + " Events for #{@copy_context.name}" %></h3>
+      <h3><%= check_box :copy, :all_calendar_events, :class => "copy_all", :checked => true %><%= label :copy, :all_calendar_events, image_tag('due_date_icon.png') + " " + t('labels.events', "Events for %{course}", :course => @copy_context.name) %></h3>
       <ul class="unstyled_list asset_list">
         <% @copy_context.calendar_events.active.each do |event| %>
           <li><%= check_box :copy, event.asset_string.to_sym %><%= label :copy, event.asset_string.to_sym, event.title %> - <span style="font-size: 0.8em;"><%= datetime_string(event.start_at) %></span></li>
@@ -130,41 +130,49 @@
       </ul>
     <% end %>
     <div style="margin-top: 20px;">
-      <h3><%= check_box :copy, :shift_dates, :class => "shift_dates_checkbox" %><%= label :copy, :shift_dates, "Adjust events and due dates" %></h3>
+      <h3><%= check_box :copy, :shift_dates, :class => "shift_dates_checkbox" %><%= label :copy, :shift_dates, :en => "Adjust events and due dates" %></h3>
       <div style="display: none; margin-left: 50px;" class="shift_dates_settings">
         <div>
-          <div style="margin-bottom: 5px;"><strong><%= @copy_context.name %></strong> dates range</div>
-          <div style="float: left; margin-left: 10px;">from&nbsp;</div>
-          <div style="float: left;"><%= text_field :copy, :old_start_date, :value => date_string(@copy_context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
-          <div style="float: left;">&nbsp;to&nbsp;</div>
-          <div style="float: left;"><%= text_field :copy, :old_end_date, :value => date_string(@copy_context.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <div style="margin-bottom: 5px;"><%= mt 'labels.dates_range', "**%{course}** dates range", :course => @copy_context.name %></div>
+          <% ot 'from_to', "*from* %{start_date} **to** %{end_date}",
+                :start_date => capture { %>
+            <div style="float: left;"><%= text_field :copy, :old_start_date, :value => date_string(@copy_context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <% }, :end_date => capture { %>
+            <div style="float: left;"><%= text_field :copy, :old_end_date, :value => date_string(@copy_context.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <% }, :wrapper => { '*' => '<div style="float: left; margin-left: 10px;">\1&nbsp;</div>',
+            '**' => '<div style="float: left;">&nbsp;\1&nbsp;</div>' } %>
           <div class="clear"></div>
         </div>
         <div>
-          <div style="margin-bottom: 5px margin-top: 10px;"><strong>This Course</strong> dates range</div>
-          <div style="float: left; margin-left: 10px;">from&nbsp;</div>
-          <div style="float: left;"><%= text_field :copy, :new_start_date, :value => date_string(@context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
-          <div style="float: left;">&nbsp;to&nbsp;</div>
-          <div style="float: left;"><%= text_field :copy, :new_end_date, :value => date_string(@context.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <div style="margin-bottom: 5px margin-top: 10px;"><%= mt 'labels.dates_range', "**%{course}** dates range", :course => @copy_context.name %></div>
+          <% ot 'from_to', "*from* %{start_date} **to** %{end_date}",
+                :start_date => capture { %>
+            <div style="float: left;"><%= text_field :copy, :new_start_date, :value => date_string(@context.real_start_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <% }, :end_date => capture { %>
+            <div style="float: left;"><%= text_field :copy, :new_end_date, :value => date_string(@context.real_end_date, :long), :class => "date_field", :style => "width: 120px;" %></div>
+          <% }, :wrapper => { '*' => '<div style="float: left; margin-left: 10px;">\1&nbsp;</div>',
+            '**' => '<div style="float: left;">&nbsp;\1&nbsp;</div>' } %>
           <div class="clear"></div>
         </div>
         <div style="margin-top: 15px;">
-          You can also explicitly define day substitutions to adjust for changing class schedules
-          (i.e. move everything that was on Mondays to now happen on Tuesdays)
+          <%= t 'descriptions.day_substitutions', "You can also explicitly define day substitutions to adjust for changing class schedules
+          (i.e. move everything that was on Mondays to now happen on Tuesdays)" %>
           <div class="substitutions" style="margin-top: 10px;"></div>
           <div style="display: none;">
             <div class="substitution substitution_blank">
-              Move everything on <span class="old_select">&nbsp;</span> to happen on <span class="new_select">&nbsp;</span>
+              <%= t 'move_from_to', "Move everything on %{old_day} to happen on %{new_day}",
+                    :old_day => '<span class="old_select">&nbsp;</span>'.html_safe,
+                    :new_day => '<span class="new_select">&nbsp;</span>'.html_safe %>
               <a href="#" class="delete_substitution_link no-hover"><%= image_tag "delete_circle.png" %></a>
             </div>
             <select class="weekday_select weekday_select_blank">
-              <% Date::DAYNAMES.each_with_index do |name, idx| %>
-                <option value="<%= idx %>"><%= name %>s</option>
+              <% I18n.t('date.day_names').each_with_index do |name, idx| %>
+                <option value="<%= idx %>"><%= name %></option>
               <% end %>
             </select>
           </div>
           <div>
-            <a href="#" class="add_substitution_link add">Define a day substitution</a>
+            <a href="#" class="add_substitution_link add"><%= t 'links.add_day_substitution', "Define a day substitution" %></a>
           </div>
         </div>
       </div>
@@ -173,35 +181,35 @@
       <div class="copy_progress"></div>
     </div>
     <div class="button-container" style="margin-top: 20px;">
-      <button class="button big-button submit_button" type="submit">Import Course Content</button>
+      <button class="button big-button submit_button" type="submit"><%= t 'buttons.import', "Import Course Content" %></button>
     </div>
   <% end %>
 <% else %>
-  <% add_crumb "Copy From Another Course",  context_url(@context, :context_import_copy_url) %>
+  <% add_crumb t('crumbs.copy_from', "Copy From Another Course"),  context_url(@context, :context_import_copy_url) %>
   <div>
-    <h2>Copy From another Course</h2>
+    <h2><%= t 'titles.copy_from', "Copy From another Course" %></h2>
     <p>
-      To copy content from another course to this one, you'll first need to select the
-      course you want to copy from.  Then you can specify what exactly you want copied over.
+      <%= t 'descriptions.copy_from', "To copy content from another course to this one, you'll first need to select the
+      course you want to copy from.  Then you can specify what exactly you want copied over." %>
     </p>
-    <% if @current_user.courses.length < 2 %>
-      <p>You don't have access to any additional courses.</p>
+    <% if @possible_courses.empty? %>
+      <p><%= t 'warnings.no_other_courses', "You don't have access to any additional courses." %></p>
     <% else %>
       <% form_tag context_url(@context, :context_import_copy_url), :method => :get do %>
         <table class="formtable">
           <tr>
-            <td><label for="course_autocomplete_id_lookup">Search for Course: </label></td>
+            <td><label for="course_autocomplete_id_lookup"><%= before_label :search_for_course, "Search for Course" %></label></td>
             <td>
-              <a href="<%= context_url(@current_user, :context_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
+              <a href="<%= context_url(@current_user, :context_manageable_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
               <input type="hidden" name="copy[course_id]" id="course_autocomplete_id"/>
               <input type="text" id="course_autocomplete_id_lookup" style="width: 250px;"/>
             </td>
           </tr><tr style="<%= hidden unless @possible_courses.length < 500 %>">
-            <td><label for="copy_from_course">Or Select from the List:</label></td>
+            <td><label for="copy_from_course"><%= before_label :select_course, "Or Select from the List" %></label></td>
             <td>
               <% if @possible_courses.length < 500 %>
               <select style="font-size: 1.2em; width: 250px;" id="copy_from_course">
-                <option value="none">[Select Course]</option>
+                <option value="none"><%= t 'options.select_course', "[Select Course]" %></option>
                 <% @possible_courses.sort_by{|c| c.name || "zzzz"}.each do |course| %>
                   <option value="<%= course.id %>"><%= course.name %></option>
                 <% end %>
@@ -214,7 +222,7 @@
                 Selected Course: 
                 <span id="course_autocomplete_name" style="font-weight: bold;">&nbsp;</span>
                 <div class="button-container">
-                  <button type="submit" class="button">Copy From this Course</button>
+                  <button type="submit" class="button"><%= t 'buttons.copy_from_course', "Copy From this Course" %></button>
                 </div>
               </div>
             </td>
@@ -225,23 +233,24 @@
   </div>
 <% end %>
 <div id="copy_entries_dialog" style="display: none;">
-  <h2>Copy Discussion Replies?</h2>
-  In addition to copying discussions, would you like to also
-  copy all student replies to topic posts?
+  <h2><%= t 'titles.copy_discussion_replies', "Copy Discussion Replies?" %></h2>
+  <%= t 'descriptions.copy_discussion_replies', "In addition to copying discussions, would you like to also
+  copy all student replies to topic posts?" %>
   <div class="button-container" style="margin-top: 15px;">
-    <button type="button" class="button">Just Copy Topics</button>
-    <button type="button" class="button include">Copy Topics and Replies</button>
+    <button type="button" class="button"><%= t 'buttons.copy_topics', "Just Copy Topics" %></button>
+    <button type="button" class="button include"><%= t 'buttons.copy_topics_and_replies', "Copy Topics and Replies" %></button>
   </div>
 </div>
 <% js_block do %>
 <script type="text/javascript">
+I18n.scoped('content_imports', function(I18n) {
 $(document).ready(function() {
   var $frame = $("<iframe id='copy_course_target' name='copy_course_target' src='about:blank'/>");
   $("body").append($frame.hide());
   $("#copy_context_form").attr('target', 'copy_course_target');
   $(".copy_progress").progressbar();
   $("#copy_context_form").submit(function() {
-    $("#copy_context_form .submit_button").text("Copying... this will take a few minutes").attr('disabled', true);
+    $("#copy_context_form .submit_button").text(I18n.t('messages.copying', "Copying... this will take a few minutes")).attr('disabled', true);
     $(".progress_bar_holder").show();
     var checkup = function() {
       var url = location.href;
@@ -253,7 +262,7 @@ $(document).ready(function() {
         if(course_import && course_import.workflow_state == 'completed') {
           location.href = location.href + "&import_id=" + course_import.id;
         } else if(course_import && course_import.workflow_state == 'failed') {
-          var message = "Course Import failed with the following error: \"import_" + course_import.id + "\"";
+          var message = I18n.t('errors.failed', "Course Import failed with the following error:") + " \"import_" + course_import.id + "\"";
           $.flashError(message);
           $(".progress_bar_holder").after("<b>" + message + "</b>");
         } else {
@@ -284,7 +293,7 @@ $(document).ready(function() {
       if($(this).is('#copy_all_topics') && $(this).attr('checked')) {
         $("#copy_entries_dialog").dialog('close').dialog({
           autoOpen: false,
-          title: 'Copy Discussion Replies?',
+          title: I18n.t('titles.copy_discussion_replies', "Copy Discussion Replies?"),
           width: 370
         }).dialog('open');
       } else {
@@ -359,6 +368,7 @@ $(document).ready(function() {
       }
     });
   }
+});
 });
 </script>
 <% end %>

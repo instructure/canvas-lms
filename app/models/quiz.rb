@@ -857,14 +857,14 @@ class Quiz < ActiveRecord::Base
         questions_hash[question[:id]] ||= question
       end
     end
-    stats[:submission_score_average] = score_counter.mean.to_f rescue 0 #stats[:submission_count] > 0 ? stats[:submission_score_tally] / stats[:submission_count] : 0
+    stats[:submission_score_average] = score_counter.mean.to_f rescue 0
     stats[:submission_score_high] = score_counter.max
     stats[:submission_score_low] = score_counter.min
     stats[:submission_duration_average] = stats[:submission_count] > 0 ? stats[:submission_duration_tally].to_f / stats[:submission_count].to_f : 0
     stats[:submission_score_stdev] = score_counter.standard_deviation rescue 0
     stats[:submission_incorrect_count_average] = stats[:submission_count] > 0 ? stats[:submission_incorrect_tally].to_f / stats[:submission_count].to_f : 0
     stats[:submission_correct_count_average] = stats[:submission_count] > 0 ? stats[:submission_correct_tally].to_f / stats[:submission_count].to_f : 0
-    assessment_questions = AssessmentQuestion.find_all_by_id(question_ids).compact
+    assessment_questions = question_ids.empty? ? [] : AssessmentQuestion.find_all_by_id(question_ids).compact
     question_ids.uniq.each do |id|
       obj = questions.detect{|q| q[:answers] && q[:id] == id }
       if !obj && questions_hash[id]
@@ -1077,7 +1077,11 @@ class Quiz < ActiveRecord::Base
           allow_update = true
           assessment[:id] = item_id.to_i
         end
-        Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
+        begin
+          Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
+        rescue
+          migration.add_warning("Couldn't import the quiz \"#{assessment[:title]}\"", $!)
+        end
       end
     end
   end
@@ -1168,16 +1172,19 @@ class Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#admins.include? user }
-    set { can :manage and can :read and can :update and can :delete and can :create and can :submit }
+    set { can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#admins.include? user }
-    set { can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade }
+    set { can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade }
     
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
     set { can :submit }
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
     set { can :read }
+
+    given { |user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
+    set { can :read_statistics and can :review_grades }
 
     given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }
     set { can :read and can :submit }

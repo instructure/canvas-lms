@@ -1,7 +1,7 @@
 <% 
   jammit_js :wiki 
   js_block { %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% }
-  content_for :page_title, "#{@page.title}: #{@context.name}"
+  content_for :page_title, before_label(@page.title.to_s) + " #{@context.name}"
   content_for :right_side, render(:partial => 'wiki_pages/wiki_right_side')
 %>
 
@@ -14,70 +14,6 @@
   <%= lock_explanation(reason, 'page', @context) %>
 <% else %>
   <%= render :partial => "wiki_pages/content" %>
-
-  <% content_for :wizard_box do %>
-    <div class="wizard_options">
-    <h3>I would like to:</h3>
-    <ul class="wizard_options_list">
-      <li class="option create_assignment_option">
-        <a href="#">Create a New Assignment</a>
-        <div class="details" style="display: none;">
-          Assignments are always organized into groups, so to add an assignment you first
-          need to know what group you want to add it to.  Select the group and click 
-          "Add Assignment to" or Click the <%= image_tag "add.png" %> icon to start
-          a new assignment for a group.
-          <div style="text-align: center; margin-top: 5px; font-size: 1.5em;">
-            <a href="#" class="highlight_add_assignment_icon">Show Me Where</a>
-          </div>        
-          <div style="display: none;" class="no_groups_message">
-            Oops.  You need to add an assignment group first.  Click "Create an
-            Assignment Group" to see how.
-          </div>
-        </div>
-      </li>
-      <li class="option edit_assignment_option" style="display: none;">
-        <a href="#" class="wizard_edit_assignment_details"></a>
-        <div class="details" style="display: none;">
-          Great!  Now fill in your details.  You can enter a title for your assignment,
-          a due date and the number of points possible.  If you want to do more than that,
-          you can but only after the assignment has been created.
-        </div>
-      </li>
-      <li class="option review_assignment_option" style="display: none;">
-        <a href="#" class="wizard_edit_assignment_details"></a>
-        <div class="details" style="display: none;">
-          Done!  The assignment is now added to the group!  If you hover your mouse over the
-          assignment, you'll see a bunch of options.  Here's what they mean:
-          <ul style="list-style-type: none;">
-            <li><%= image_tag "move.png" %>: Move the assignment to another group</li>
-            <li><%= image_tag "preview.png" %>: Preview the assignment and edit it in full</li>
-            <li><%= image_tag "edit.png" %>: Edit the basic options again</li>
-            <li><%= image_tag "delete.png" %>: Delete the assignment</li>
-          </ul>
-        </div>
-      </li>
-      <li class="option">
-        <a href="#">Create an Assignment Group</a>
-        <div class="details" style="display: none;">
-          Assignment groups are used to organize assignments.  You provide a name for each
-          group.  If you choose to weight the final grade based on groups 
-          (<a href="#" class="highlight_weight_groups"><b>where?</b></a>)
-          then
-          you can also set a percentage score for each group.  Click "Add Assignment Group"
-          to create a group.
-          <div style="text-align: center; margin-top: 5px; font-size: 1.5em;">
-            <a href="#" class="highlight_add_assignment_group_icon">Show Me Where</a>
-          </div>        
-        </div>
-      </li>
-    </ul>
-    </div>
-    <div class="wizard_details">
-      <div>
-        <div class="header"></div>
-      </div>
-    </div>
-    <div class="clear"></div>  
-  <% end %>
 <% end %>
+
 <%= render :partial => "shared/sequence_footer", :locals => {:asset => @page} if @page.context_module_tag_for(@context, @current_user) %>

@@ -27,6 +27,6 @@ class PageComment < ActiveRecord::Base
   }
   
   def user_name
-    self.user.name rescue "Anonymous"
+    self.user.name rescue t(:default_user_name, "Anonymous")
   end
 end

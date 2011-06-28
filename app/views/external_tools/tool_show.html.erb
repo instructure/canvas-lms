@@ -8,7 +8,7 @@
   <% settings.each do |key, value| %>
     <%= hidden_field_tag key, value %>
   <% end %>
-  <button class="button" type="submit">Load <%= @tool.name %></button>
+  <button class="button" type="submit"><%= t :load_tool_button, "Load %{tool}", :tool => @tool.name %></button>
 </form>
 
 <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>

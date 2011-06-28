@@ -40,6 +40,9 @@
         <% if !@current_user.user_services.for_service('facebook').empty? %>
           <option value="facebook_select" <%= 'selected' if preference.communication_channel.path_type == 'facebook' %>>Notify me on Facebook</option>
         <% end %>
+        <% if !@current_user.user_services.for_service('twitter').empty? %>
+          <option value="twitter_select" <%= 'selected' if preference.communication_channel.path_type == 'twitter' %>>Notify me via Twitter</option>
+        <% end %>
       </select>
       <span style="white-space: nowrap;"><span class="at" style="<%= hidden unless preference.communication_channel.path_type == 'email' || preference.communication_channel.path_type == 'sms' %>">at </span>
         <% if preference.communication_channel.path_type == "email" %>
@@ -48,6 +51,8 @@
           <%= render :partial => "sms_select", :object => preference.communication_channel %>
         <% elsif preference.communication_channel.path_type == 'facebook' %>
           <%= render :partial => "facebook_select", :object => preference.communication_channel %>
+        <% elsif preference.communication_channel.path_type == 'twitter' %>
+          <%= render :partial => "twitter_select", :object => preference.communication_channel %>
         <% end %>
       </div>
       <div style="display: none;">

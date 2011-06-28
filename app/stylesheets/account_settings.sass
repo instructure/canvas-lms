@@ -78,7 +78,6 @@
 .report_description
   display: none
   table.report_example
-    display: none
     border-collapse: collapse
     page-break-inside avoid
     thead, th
@@ -86,3 +85,29 @@
     td, th
       border: 1px solid #aaa
       padding: 2px 5px
+
+#tab-reports
+  .report_dialog
+    padding: 15px
+    
+  table.reports
+    margin: 5px 15px
+    width: 90%
+    border-collapse: collapse
+    
+    tr.reports
+      border-bottom: 1px solid #DDD
+      
+      th.reports
+        padding: 5px
+        background-color: #DDD
+        font-weight: bold
+      
+      td.reports
+        padding: 5px
+        
+        &.title
+          font-weight: bold
+        
+        &.action
+          text-align: center

@@ -19,8 +19,8 @@
 <body>
 <div id="container">
 <div id="header">
-  <a href="#skip_navigation" id="skip_navigation_link">Skip Navigation</a>
-  <a href="<%= root_url %>" class="no-hover"><%= image_tag 'logo.png', :alt => "Instructure Home", :class => "logo", :style => "filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=/images/logo.png)" %></a>
+  <a href="#skip_navigation" id="skip_navigation_link"><%= t 'links.skip_navigation', "Skip Navigation" %></a>
+  <a href="<%= root_url %>" class="no-hover"><%= image_tag 'logo.png', :alt => t('links.home', "Instructure Home"), :class => "logo", :style => "filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=/images/logo.png)" %></a>
   <%= (page_header = yield :page_header) ? page_header : render(:partial => 'shared/page_header') %>
   <%= (page_subhead = yield :page_subhead) ? page_subhead : render(:partial => 'shared/page_subhead') %>
   <div class="clear"></div>
@@ -36,7 +36,7 @@
 </div>
 <% end %>
 <div id="instructure_ajax_error_box">
-  <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link">Close</a></div>
+  <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link"><%= t 'links.close', "Close" %></a></div>
   <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;"></iframe>
 </div>
 <%= render :partial => 'shared/flash_notices' %>
@@ -46,7 +46,7 @@
   <div id="content">
     <a name="skip_navigation"></a>
     <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
-    <!--div id="ajax_loading_message" style="display: none;"><%= image_tag 'ajax-loader.gif' %> <span class="message">Loading...</span></div-->
+    <!--div id="ajax_loading_message" style="display: none;"><%= image_tag 'ajax-loader.gif' %> <span class="message"><%= t 'messages.loading', 'Loading...' %></span></div-->
     <%= render :partial => "shared/reminders_box", :object => @reminders %>
     <%= yield %>
   </div>
@@ -57,7 +57,7 @@
   <div id="wide_content">
     <a name="skip_navigation"></a>
     <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
-    <!--div id="ajax_loading_message" style="display: none;"><%= image_tag 'ajax-loader.gif' %> <span class="message">Loading...</span></div-->
+    <!--div id="ajax_loading_message" style="display: none;"><%= image_tag 'ajax-loader.gif' %> <span class="message"><%= t 'messages.loading', 'Loading...' %></span></div-->
     <%= render :partial => "shared/reminders_box", :object => @reminders %>
     <%= yield %>
   </div>
@@ -68,74 +68,76 @@
 <% if wizard %>
   <% js_block do %>
   <script>
-    $(document).ready(function() {
-      $(".close_wizard_link").click(function(event) {
-        event.preventDefault();
-        $("#wizard_box").slideUp('slow', function() {
-          $(".wizard_popup_link").slideDown();
-        });
-      });
-      $(".wizard_popup_link").click(function(event) {
-        event.preventDefault();
-        $(".wizard_popup_link").slideUp('slow');
-        $("#wizard_box").slideDown('slow', function() {
-          $(this).triggerHandler('wizard_opened');
-          $(document).add($(window)).triggerHandler('scroll');
-        });
-      });
-      setInterval(function() {
-        $("#wizard_spacer_box").height($("#wizard_box").height());
-        $("#wizard_spacer_box").showIf($("#wizard_box:visible").length > 0);
-      }, 500);
-      $(".wizard_options_list .option").click(function(event) {
-        var $a = $(event.target).closest("a");
-        if($a.length > 0 && $a.attr('href') != "#") { return; }
-        event.preventDefault();
-        $(this).parents(".wizard_options_list").find(".option.selected").removeClass('selected');
-        $(this).addClass('selected');
-        var $details = $("#wizard_box").find(".wizard_details");
-        var data = $(this).getTemplateData({textValues: ['header']});
-        data.link = "Click to " + data.header;
-        $details.fillTemplateData({
-          data: data
-        });
-        $details.find(".details").remove();
-        $details.find(".header").after($(this).find(".details").clone(true).show());
-        var url = $(this).find(".header").attr('href');
-        if(url != "#") {
-          $details.find(".link").show().attr('href', url);
-        } else {
-          $details.find(".link").hide();
-        }
-        $details.hide().fadeIn('fast');
-      });
-      setTimeout(function() {
-        $(".wizard_popup_link.auto_open:first").click();
-      }, 500);
-      $(window).bind('resize', function(event) {
-        $(window).data('height', $(window).height());
-      });
-      $(document).add($(window)).bind('scroll', function(event) {
-        $("#wizard_box").triggerHandler('document_scroll');
-      });
-      $("#wizard_box").bind('document_scroll', function(event) {
-        var doAbsolute = $.browser.msie && navigator.appVersion.match('MSIE 6.0');
-        if(doAbsolute) {
-          var height = $(this).height();
-          var windowHeight = $(window).height(); //data('height');
-          var scrollTop = $.windowScrollTop();
-          $(this).css({
-            position: 'absolute',
-            left: 0,
-            top: (scrollTop + windowHeight - height)
+    I18n.scoped('eportfolio', function(I18n) {
+      $(document).ready(function() {
+        $(".close_wizard_link").click(function(event) {
+          event.preventDefault();
+          $("#wizard_box").slideUp('slow', function() {
+            $(".wizard_popup_link").slideDown();
           });
-        } else {
-        }
+        });
+        $(".wizard_popup_link").click(function(event) {
+          event.preventDefault();
+          $(".wizard_popup_link").slideUp('slow');
+          $("#wizard_box").slideDown('slow', function() {
+            $(this).triggerHandler('wizard_opened');
+            $(document).add($(window)).triggerHandler('scroll');
+          });
+        });
+        setInterval(function() {
+          $("#wizard_spacer_box").height($("#wizard_box").height());
+          $("#wizard_spacer_box").showIf($("#wizard_box:visible").length > 0);
+        }, 500);
+        $(".wizard_options_list .option").click(function(event) {
+          var $a = $(event.target).closest("a");
+          if($a.length > 0 && $a.attr('href') != "#") { return; }
+          event.preventDefault();
+          $(this).parents(".wizard_options_list").find(".option.selected").removeClass('selected');
+          $(this).addClass('selected');
+          var $details = $("#wizard_box").find(".wizard_details");
+          var data = $(this).getTemplateData({textValues: ['header']});
+          data.link = I18n.t('action_instructions', "Click to %{action}", {action: data.header});
+          $details.fillTemplateData({
+            data: data
+          });
+          $details.find(".details").remove();
+          $details.find(".header").after($(this).find(".details").clone(true).show());
+          var url = $(this).find(".header").attr('href');
+          if(url != "#") {
+            $details.find(".link").show().attr('href', url);
+          } else {
+            $details.find(".link").hide();
+          }
+          $details.hide().fadeIn('fast');
+        });
+        setTimeout(function() {
+          $(".wizard_popup_link.auto_open:first").click();
+        }, 500);
+        $(window).bind('resize', function(event) {
+          $(window).data('height', $(window).height());
+        });
+        $(document).add($(window)).bind('scroll', function(event) {
+          $("#wizard_box").triggerHandler('document_scroll');
+        });
+        $("#wizard_box").bind('document_scroll', function(event) {
+          var doAbsolute = $.browser.msie && navigator.appVersion.match('MSIE 6.0');
+          if(doAbsolute) {
+            var height = $(this).height();
+            var windowHeight = $(window).height(); //data('height');
+            var scrollTop = $.windowScrollTop();
+            $(this).css({
+              position: 'absolute',
+              left: 0,
+              top: (scrollTop + windowHeight - height)
+            });
+          } else {
+          }
+        });
+        setInterval(function() {
+          $("#wizard_box").triggerHandler('document_scroll');
+        }, 1000);
+        $(window).trigger('resize');
       });
-      setInterval(function() {
-        $("#wizard_box").triggerHandler('document_scroll');
-      }, 1000);
-      $(window).trigger('resize');
     });
   </script>
   <% end %>

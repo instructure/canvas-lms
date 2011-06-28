@@ -8,13 +8,13 @@
     end
   end
   title_text = event ? ("#{event.title} - #{time_string(event.start_at, event.end_at)}") : ""
-  title_text = "due: " + title_text if title_text && !title_text.empty? && is_assignment
+  title_text = t(:event_title, "due: %{event_title}", :event_title => title_text) if title_text && !title_text.empty? && is_assignment
 %>
 <div class="calendar_event <%= 'assignment' if is_assignment %> <%= "group_#{event.try_rescue(:context_type).try_rescue(:downcase)}_#{event.try_rescue(:context_id)}" %> <%= "draggable" if can_do(event, @current_user, :update) %>" id="<%= full_id %>" style="<%= event ? '' : 'display: none;' %>" title="<%= title_text %>">
   <div>&nbsp;</div>
   <div class="calendar_event_text">
     <span class="due_text">
-      due
+      <%= t :due, "due" %>
     </span>
   <% if is_assignment %>
     <a href="<%= context_url(event.context, :context_assignment_url, event.id) %>" class="title"><%= event.title rescue ""%></a>

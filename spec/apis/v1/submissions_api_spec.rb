@@ -70,7 +70,7 @@ describe SubmissionsApiController, :type => :integration do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => @assignment.id.to_s, :id => @student.id.to_s })
 
-    json['discussion_entries'].should ==
+    json['discussion_entries'].sort_by { |h| h['user_id'] }.should ==
       [{
         'message' => 'sub 1',
         'user_id' => @student.id,
@@ -82,7 +82,7 @@ describe SubmissionsApiController, :type => :integration do
         'user_id' => @student.id,
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
-      }]
+      }].sort_by { |h| h['user_id'] }
   end
 
   it "should return a valid preview url for quiz submissions" do
@@ -278,7 +278,7 @@ describe SubmissionsApiController, :type => :integration do
         "rubric_assessment"=>
          {"crit2"=>{"comments"=>"Hmm", "points"=>2},
           "crit1"=>{"comments"=>nil, "points"=>7}}}]
-    json.should == res
+    json.sort_by { |h| h['user_id'] }.should == res.sort_by { |h| h['user_id'] }
   end
 
   it "should return all submissions for a student" do

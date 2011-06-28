@@ -2,22 +2,22 @@
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan=2><%= f.check_box :enabled, {}, 'true', 'false' %>
-      <%= f.label :enabled, "Enabled" %></td>
+      <%= f.label :enabled, :en => "Enabled" %></td>
     </tr>
     <tr>
-      <td><%= f.label :format_type, "Output format type:" %></td>
+      <td><%= f.blabel :format_type, :en => "Output format type" %></td>
       <td><%= f.select :format_type, Course.valid_grade_export_types.keys.map{|k| [Course.valid_grade_export_types[k][:name], k]}, {} %>
     </tr>
     <tr>
-      <td><%= f.label :publish_endpoint, "Endpoint to publish to:" %></td>
+      <td><%= f.blabel :publish_endpoint, :en => "Endpoint to publish to" %></td>
       <td><%= f.text_field :publish_endpoint %></td>
     </tr>
     <tr>
       <td colspan=2><%= f.check_box :wait_for_success, {}, 'yes', 'no' %>
-      <%= f.label :wait_for_success, "Wait for success notifications" %></td>
+      <%= f.label :wait_for_success, :en => "Wait for success notifications" %></td>
     </tr>
     <tr>
-      <td><%= f.label :success_timeout, "Success notification timeout (in seconds):" %></td>
+      <td><%= f.blabel :success_timeout, :en => "Success notification timeout (in seconds)" %></td>
       <td><%= f.text_field :success_timeout %></td>
     </tr>
   </table>

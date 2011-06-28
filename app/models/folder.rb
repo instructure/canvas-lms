@@ -201,7 +201,7 @@ class Folder < ActiveRecord::Base
         end
       end
     end
-    context.log_merge_result("Folder \"#{dup.full_name}\" created")
+    context.log_merge_result(t :folder_created, "Folder \"%{name}\" created", :name => dup.full_name)
     dup.updated_at = Time.now
     dup.clone_updated = true
     dup
@@ -219,10 +219,12 @@ class Folder < ActiveRecord::Base
         root_folders << context.folders.create(:name => ROOT_FOLDER_NAME, :full_name => ROOT_FOLDER_NAME, :workflow_state => "visible")
       end
     elsif context.is_a? User
+      # TODO i18n 
       if root_folders.select{|f| f.name == "my files" }.empty?
         root_folders << context.folders.create(:name => "my files", :full_name => "my files", :workflow_state => "visible")
       end
     else
+      # TODO i18n
       if root_folders.select{|f| f.name == "files" }.empty?
         root_folders << context.folders.create(:name => "files", :full_name => "files", :workflow_state => "visible")
       end
@@ -274,6 +276,7 @@ class Folder < ActiveRecord::Base
     if folder_id
       current_folder = context.folders.active.find(folder_id)
     else
+      # TODO i18n
       if context.is_a? Course
         current_folder = context.folders.active.find_by_full_name("course content")
       elsif @context.is_a? User

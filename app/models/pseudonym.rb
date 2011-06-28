@@ -177,7 +177,7 @@ class Pseudonym < ActiveRecord::Base
   def validate_unique_id
     if (!self.account || self.account.email_pseudonyms) && !self.deleted?
       unless self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
-        self.errors.add(:unique_id, "\"#{self.unique_id}\" is not a valid email address")
+        self.errors.add(:unique_id, t('errors.invalid_email_address', "\"%{email}\" is not a valid email address", :email => self.unique_id))
         return false
       end
     end
@@ -189,7 +189,7 @@ class Pseudonym < ActiveRecord::Base
     existing_pseudo = Pseudonym.find_by_account_id_and_sis_user_id(self.account_id, self.sis_user_id)
     return true if !existing_pseudo || existing_pseudo.id == self.id 
     
-    self.errors.add(:sis_user_id, "SIS ID \"#{self.sis_user_id}\" is already in use")
+    self.errors.add(:sis_user_id, t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id))
     false
   end
 

@@ -1,17 +1,16 @@
-<% content_for :page_title do %>Try It: Enter Code<% end %>
+<% content_for :page_title do %><%= before_label :try_it_title, "Try It" %> <%= t "#titles.enter_code", "Enter Code" %><% end %>
 
 <%= render :partial => 'wizard_secondary_nav' %>
 
 <div style="width: 300px; margin-left: auto; margin-right: auto; margin-top: 20px;">
-  <h2>Authorization Code</h2>
-  Before you can continue, you need to enter your authorization code.  You should
-  have been given this code either by Instructure or by your administrator.
+  <h2><%= t "#titles.authorization_code", "Authorization Code" %></h2>
+  <%= t :authorization_code_notice, "Before you can continue, you need to enter your authorization code.  You should have been given this code either by Instructure or by your administrator." %>
   <form action="<%= getting_started_url((params[:teacherless] ? {:teacherless => params[:teacherless]} : {})) %>" method="GET">
   <div style="text-align: center; margin: 10px;">
     <input type="text" name="getting_started_code" class="getting_started_code" style="border: 1px solid #aaa; font-size: 1.3em;"/>
   </div>
   <div style="text-align: right;">
-    <button class="button big-button" type="submit">Continue</button>
+    <button class="button big-button" type="submit"><%= t "#buttons.continue", "Continue" %></button>
   </div>
   </form>
 </div>

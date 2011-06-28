@@ -4,25 +4,15 @@ shared_examples_for "cross-listing selenium tests" do
   it_should_behave_like "in-process server selenium tests"
   
   it "should allow cross-listing a section" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    course = e.course
+    course_with_teacher_logged_in
+    course = @course
     other_course = course_with_teacher(:active_course => true,
-                            :user => u,
+                            :user => @user,
                             :active_enrollment => true).course
     other_course.update_attribute(:name, "cool course")
-    section = e.course_section
-    login_as(username, password)
+    section = course.course_sections.first
 
-    get "/courses/#{e.course_id}/sections/#{section.id}"
+    get "/courses/#{course.id}/sections/#{section.id}"
     driver.find_element(:css, ".crosslist_link").click
     form = driver.find_element(:css, "#crosslist_course_form")
     form.find_element(:css, ".submit_button").attribute(:disabled).should eql("true")
@@ -44,12 +34,12 @@ shared_examples_for "cross-listing selenium tests" do
     get "/courses/#{other_course.id}/sections/#{section.id}"
     driver.find_elements(:css, ".uncrosslist_link").length.should eql(0)
     
-    course.enroll_teacher(u).accept
+    course.enroll_teacher(@user).accept
     get "/courses/#{other_course.id}/sections/#{section.id}"
     driver.find_element(:css, ".uncrosslist_link").click
     driver.find_element(:css, "#uncrosslist_form").displayed?.should eql(true)
     driver.find_element(:css, "#uncrosslist_form .submit_button").click
-    keep_trying_until { driver.current_url.match(/courses\/#{e.course_id}/) }
+    keep_trying_until { driver.current_url.match(/courses\/#{course.id}/) }
   end
 end
 

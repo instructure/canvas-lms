@@ -19,12 +19,12 @@
 class WikiPagesController < ApplicationController
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:index]
-  add_crumb("Pages") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url }
+  add_crumb(lambda{ t '#crumbs.wiki_pages', "Pages"}) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url }
   before_filter { |c| c.active_tab = "pages" }
   
   def show
     if @page.deleted? && !@page.grants_right?(@current_user, session, :update) && @page.url != 'front-page'
-      flash[:notice] = "The page \"#{@page.title}\" has been deleted"
+      flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
       redirect_to named_context_url(@context, :context_wiki_page_url, 'front-page')
       return
     end
@@ -33,7 +33,7 @@ class WikiPagesController < ApplicationController
       unless @page.new_record?
         @page.with_versioning(false) do |page|
           page.context_module_action(@current_user, @context, :read)
-          view_count = (page.view_count || 0) + 1            
+          view_count = (page.view_count || 0) + 1
           ActiveRecord::Base.connection.execute("UPDATE wiki_pages SET view_count=#{view_count} WHERE id=#{page.id}")
         end
         log_asset_access(@page, "wiki", @namespace)
@@ -61,7 +61,7 @@ class WikiPagesController < ApplicationController
       if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
         log_asset_access(@page, "wiki", @namespace, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
-        flash[:notice] = 'Page was successfully updated.'
+        flash[:notice] = t('notices.page_updated', 'Page was successfully updated.')
         respond_to do |format|
           format.html { return_to(params[:return_to], context_wiki_page_url(:edit => params[:action] == 'create')) }
           format.json {
@@ -86,7 +86,7 @@ class WikiPagesController < ApplicationController
   def destroy
     if authorized_action(@page, @current_user, :delete)
       if @page.url != "front-page"
-        flash[:notice] = 'Page was successfully deleted.'
+        flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
         @page.workflow_state = 'deleted'
         @page.save
         respond_to do |format|
@@ -95,7 +95,7 @@ class WikiPagesController < ApplicationController
       else #they dont have permissions to destroy this page
         respond_to do |format|
           format.html { 
-            flash[:error] = 'You are not permitted to delete that page.'
+            flash[:error] = t('errors.permission_denied', 'You are not permitted to delete that page.')
             redirect_to(named_context_url(@context, :context_wiki_pages_url))
           }
         end

@@ -1,18 +1,30 @@
 <% 
-  content_for :page_title, "Error Reports"
-  add_crumb "Error Reports"
+  content_for :page_title, t("#titles.error_reports", "Error Reports")
+  add_crumb t("#crumbs.error_reports", "Error Reports")
 %>
 
 <% form_for @current_user, :url => '/error_reports', :html => { :method => :get }  do |f| %>
-  Message contains
+  <%= t :message_contains, "Message contains" %>
   <input type="text" name="message" value="<%= @message %>" style="width: 250px;"/>
   <select name="category">
-    <%= options_for_select(([['- All Categories -', nil]] + ErrorReport.all(:select => 'DISTINCT category').map(&:category)).compact, params[:category]) %>
+    <%= options_for_select(([[t(:all_categories, " - All Categories -"), nil]] + ErrorReport.all(:select => 'DISTINCT category').map(&:category)).compact, params[:category]) %>
   </select>
-  <button type="submit" class="button">Search</button>
+  <button type="submit" class="button"><%= t "#buttons.search", "Search" %></button>
 <% end %>
 
-<%= will_paginate(@reports) %>
+<% content_for :pagination do %>
+ <% if params[:action] == 'index' %>
+  <div class='pagination'>
+    <% if params[:page] > 1 %>
+      <%= link_to('< Prev', params.merge(:page => (params[:page] - 1))) %>
+    <% end %>
+    <%= link_to('Next >', params.merge(:page => (params[:page] + 1))) %>
+  </div>
+  <% end %>
+<% end %>
+
+<%= yield :pagination %>
+
 <% @reports.each do |report| %>
   <div style="margin-bottom: 20px;">
     <h3>
@@ -25,14 +37,14 @@
     </h3>
 
     <div style="border: 1px solid #eee; -moz-border-radius: 5px; padding: 5px 20px;">
-      category: <%= report.category || 'default' %><br/>
+      <%= before_label :category, "category" %> <%= report.category || t(:default_category, 'default') %><br/>
       <%= report.created_at %><br />
       <%= report.url %><br/>
       <% if report.user_id %>
         <%= link_to report.user.try(:name), user_url(report.user_id) %>
       <% end %>
       <% (report.data || {}).each do |k,v| %>
-        <br><%= k %>: <%= v %>
+        <br><%= before_label k.to_s %> <%= v %>
       <% end %>
       <pre style="font-size: 0.8em; margin-left: 20px; <%= "max-height: 150px;" if @reports.length > 1 %> overflow: auto;">
         <%= report.backtrace %>
@@ -40,3 +52,5 @@
     </div>
   </div>
 <% end %>
+
+<%= yield :pagination %>

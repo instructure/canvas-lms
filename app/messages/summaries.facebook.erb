@@ -1,1 +1,1 @@
-You've received <b><%= delayed_messages.length %> new notifications</b> in <a href="<%= HostUrl.default_host %>/dashboard">Canvas</a>.
+You've received <b><%= delayed_messages.length %> new notifications</b> in <a href="<%= HostUrl.context_host(delayed_messages.first.try(:context)) %>/dashboard">Canvas</a>.

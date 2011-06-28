@@ -27,7 +27,7 @@ class PluginsController < ApplicationController
     if find_plugin_setting
       @settings = @plugin.settings
     else
-      flash[:notice] = "The plugin #{params[:id]} doesn't exist."
+      flash[:notice] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])
       redirect_to plugins_path
     end
   end
@@ -37,15 +37,15 @@ class PluginsController < ApplicationController
       @plugin_setting.disabled = params[:plugin_setting][:disabled] if params[:plugin_setting] && params[:plugin_setting][:disabled]
       @plugin_setting.posted_settings = params[:settings] unless @plugin_setting.disabled
       if @plugin_setting.save
-        flash[:notice] = "Plugin settings successfully updated."
+        flash[:notice] = t('notices.settings_updated', "Plugin settings successfully updated.")
         redirect_to plugin_path(@plugin.id)
       else
         @settings = @plugin.settings
-        flash[:error] = "There was an error saving the plugin settings."
+        flash[:error] = t('errors.setting_update_failed', "There was an error saving the plugin settings.")
         render :action => 'show'
       end
     else
-      flash[:error] = "The plugin #{params[:id]} doesn't exist."
+      flash[:error] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])
       redirect_to plugins_path
     end
   end

@@ -82,7 +82,7 @@ class AccountUser < ActiveRecord::Base
   
   def self.readable_type(type)
     if type == 'AccountAdmin' || !type || type.empty?
-      'Account Admin'
+      t('types.account_admin', "Account Admin")
     else
       type
     end

@@ -1,0 +1,4 @@
+<% define_content :link do %>
+  http://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations
+<% end %>
+Canvas Alert - Collaboration Invite: <%= asset.collaboration.title %>, <%= asset.collaboration.context.name %>

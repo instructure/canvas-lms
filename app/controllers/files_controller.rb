@@ -154,7 +154,7 @@ class FilesController < ApplicationController
     @attachment = @context.attachments.find(params[:id])
     @skip_crumb = true
     if @attachment.deleted?
-      flash[:notice] = "The file #{@attachment.display_name} has been deleted"
+      flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
       redirect_to dashboard_url
     end
     show
@@ -190,9 +190,9 @@ class FilesController < ApplicationController
     end
     params[:download] ||= params[:preview]
     @context = UserProfile.new(@context) if @context == @current_user
-    add_crumb("Files", named_context_url(@context, :context_files_url)) unless @skip_crumb
+    add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
-      flash[:notice] = "The file #{@attachment.display_name} has been deleted"
+      flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
       if params[:preview] && @attachment.mime_class == 'image'
         redirect_to '/images/blank.png'
       elsif request.format == :json
@@ -210,7 +210,7 @@ class FilesController < ApplicationController
             send_attachment(@attachment)
           rescue => e
             @headers = false if params[:ts] && params[:verifier]
-            @not_found_message = "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
+            @not_found_message = t 'errors.not_found', "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
             logger.error "Error downloading a file: #{e} - #{e.backtrace}"
             render :template => 'shared/errors/404_message', :status => :bad_request
           end
@@ -315,7 +315,7 @@ class FilesController < ApplicationController
       # Protect ourselves against reading huge files into memory -- if the
       # attachment is too big, don't return it.
       if @attachment.size > Setting.get_cached('attachment_json_response_max_size', 1.megabyte.to_s).to_i
-        render :json => { :error => 'The file is too large to edit' }.to_json
+        render :json => { :error => t('errors.too_large', "The file is too large to edit") }.to_json
         return
       end
 
@@ -488,16 +488,16 @@ class FilesController < ApplicationController
         end
         if params[:attachment][:uploaded_data]
           success = @attachment.update_attributes(params[:attachment])
-          @attachment.errors.add_to_base("Upload failed, server error, please try again.") unless success
+          @attachment.errors.add_to_base(t('errors.server_error', "Upload failed, server error, please try again.")) unless success
         else
-          @attachment.errors.add_to_base("Upload failed, expected form field missing")
+          @attachment.errors.add_to_base(t('errors.missing_field', "Upload failed, expected form field missing"))
         end
         unless (@attachment.cacheable_s3_url rescue nil)
           success = false
           if (params[:attachment][:uploaded_data].size == 0 rescue false)
-            @attachment.errors.add_to_base("That file is empty.  Please upload a different file.")
+            @attachment.errors.add_to_base(t('errors.empty_file', "That file is empty.  Please upload a different file."))
           else
-            @attachment.errors.add_to_base("Upload failed, please try again.")
+            @attachment.errors.add_to_base(t('errors.upload_failed', "Upload failed, please try again."))
           end
           unless @attachment.new_record?
             @attachment.destroy rescue @attachment.delete
@@ -541,7 +541,7 @@ class FilesController < ApplicationController
         @folder_id_changed = @attachment.folder_id_changed?
         if @attachment.save
           @attachment.move_to_bottom if @folder_id_changed
-          flash[:notice] = 'File was successfully updated.'
+          flash[:notice] = t 'notices.updated', "File was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_files_url) }
           format.json { render :json => @attachment.to_json(:methods => [:readable_size, :mime_class, :currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
         else
@@ -601,7 +601,7 @@ class FilesController < ApplicationController
   def public_feed
     return unless get_feed_context
     feed = Atom::Feed.new do |f|
-      f.title = "#{@context.name} Files Feed"
+      f.title = t :feed_title, "%{course_or_group} Files Feed", :course_or_group => @context.name
       f.links << Atom::Link.new(:href => named_context_url(@context, :context_files_url))
       f.updated = Time.now
       f.id = named_context_url(@context, :context_files_url)

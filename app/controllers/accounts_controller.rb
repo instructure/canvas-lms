@@ -65,7 +65,7 @@ class AccountsController < ApplicationController
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account.to_json }
         else
-          flash[:error] = "Account settings update failed"
+          flash[:error] = t(:update_failed_notice, "Account settings update failed")
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account.errors.to_json, :status => :bad_request }
         end
@@ -77,8 +77,10 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :read)
       @available_reports = AccountReport.available_reports(@account) if @account.grants_right?(@current_user, @session, :read_reports)
       if @available_reports
+        @last_complete_reports = {}
         @last_reports = {}
         @available_reports.keys.each do |report|
+          @last_complete_reports[report] = @account.account_reports.last_complete_of_type(report).first
           @last_reports[report] = @account.account_reports.last_of_type(report).first
         end
       end
@@ -102,7 +104,7 @@ class AccountsController < ApplicationController
       new_login = @pseudonym.new_record?
       if !@pseudonym.new_record?
         user = @pseudonym.user
-        render :json => {:errors => {'pseudonym[unique_id]' => "The login specified is already in use by <a href='/users/#{user.id}'>#{user.name}</a>"}}.to_json, :status => :bad_request
+        render :json => {:errors => {'pseudonym[unique_id]' => mt(:login_in_use_notice, "The login specified is already in use by [%{username}](%{url})", :username => user.name, :url => "/users/#{user.id}")}}.to_json, :status => :bad_request
         return
       end
       notify = (params[:pseudonym].delete :send_confirmation) == '1'
@@ -136,10 +138,10 @@ class AccountsController < ApplicationController
           end
         else
           @user.destroy if @user.pseudonyms.select{|p| !p.new_record? }.empty?
-          render :json => {:errors => {:base => "Invalid login"}}.to_json, :status => :bad_request
+          render :json => {:errors => {:base => t(:invalid_login_message, "Invalid login")}}.to_json, :status => :bad_request
         end
       else
-        render :json => {:errors => {:base => "Invalid user"}}.to_json, :status => :bad_request
+        render :json => {:errors => {:base => t(:invalid_login_message, "Invalid login")}}.to_json, :status => :bad_request
       end
     end
   end
@@ -149,7 +151,7 @@ class AccountsController < ApplicationController
       @context = @account
       @user = @account.all_users.find_by_id(params[:user_id]) if params[:user_id].present?
       if !@user
-        flash[:error] = "No user found with that id"
+        flash[:error] = t(:no_user_message, "No user found with that id")
         redirect_to account_url(@account)
       end
     end
@@ -173,7 +175,7 @@ class AccountsController < ApplicationController
         @user && @user.destroy
       end
       respond_to do |format|
-        flash[:notice] = "#{@user.name} successfully deleted" if @user
+        flash[:notice] = t(:user_deleted_message, "%{username} successfully deleted", :username => @user.name) if @user
         format.html { redirect_to account_url(@account) }
         format.json { render :json => @user.to_json }
       end
@@ -198,7 +200,7 @@ class AccountsController < ApplicationController
   
   def statistics
     if authorized_action(@account, @current_user, :read)
-      add_crumb("Statistics", statistics_account_url(@account))
+      add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
       @recently_started_courses = @account.all_courses.recently_started
       @recently_ended_courses = @account.all_courses.recently_ended
       @recently_logged_users = @account.all_users.recently_logged_in[0,25]
@@ -225,7 +227,7 @@ class AccountsController < ApplicationController
           send_data(
             res, 
             :type => "text/csv", 
-            :filename => "#{params[:attribute].titleize} Report for #{@account.name}.csv", 
+            :filename => "#{params[:attribute].titleize} Report for #{@account.name}.csv",
             :disposition => "attachment"
           )
         }
@@ -242,8 +244,8 @@ class AccountsController < ApplicationController
 
       @end_at = [[start_at, end_at].max, Date.today].min
       @start_at = [[start_at, end_at].min, Date.today].min
-      add_crumb("Statistics", statistics_account_url(@account))
-      add_crumb("Page Views")
+      add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
+      add_crumb(t(:crumb_page_views, "Page Views"))
     end
   end
   
@@ -307,7 +309,7 @@ class AccountsController < ApplicationController
           batch.process
           render :text => batch.to_json(:include => :sis_batch_log_entries)
         else
-          render :text => {:error=>true, :error_message=>"An SIS import is already in process.", :batch_in_progress=>true}.to_json
+          render :text => {:error=>true, :error_message=> t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress=>true}.to_json
         end
       end
     end
@@ -370,7 +372,7 @@ class AccountsController < ApplicationController
       if res
         redirect_to account_settings_url(@context, :anchor => "tab-users")
       else
-        flash[:error] = "No user with that email address was found"
+        flash[:error] = t(:no_user_found_notice, "No user with that email address was found")
         redirect_to account_settings_url(@context, :anchor => "tab-users")
       end
     end

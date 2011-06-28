@@ -18,7 +18,8 @@ shared_examples_for "discussions selenium tests" do
     end
     form.find_element(:id, "discussion_topic_title").send_keys("This is my test title")
     form.find_element(:css, ".submit_button").click
-    
+    keep_trying_until { DiscussionTopic.count.should == 1 }
+
     find_all_with_jquery(".add_topic_form_new:visible").length.should == 0
     driver.execute_script("return INST.errorCount;").should == 0
   end

@@ -50,7 +50,7 @@ class PseudonymSessionsController < ApplicationController
           cas_client.validate_service_ticket(st)
         rescue => e
           logger.warn "Failed to validate CAS ticket: #{e.inspect}"
-          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
           redirect_to login_url(:no_auto=>'true')
           return
         end
@@ -63,19 +63,19 @@ class PseudonymSessionsController < ApplicationController
             session[:cas_login] = true
             @user = @pseudonym.login_assertions_for_user rescue nil
 
-            flash[:notice] = 'Login successful.'
+            flash[:notice] = t 'notices.login_success', "Login successful."
             default_url = dashboard_url
             redirect_back_or_default default_url
             return
           else
             logger.warn "Received CAS login for unknown user: #{st.response.user}"
-            session[:delegated_message] = "Canvas doesn't have an account for user: #{st.response.user}"
+            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.response.user
             redirect_to :action => :destroy
             return
           end
         else
           logger.warn "Failed CAS login attempt."
-          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
           redirect_to login_url(:no_auto=>'true')
           return
         end
@@ -114,7 +114,7 @@ class PseudonymSessionsController < ApplicationController
     @pseudonym = @pseudonym_session && @pseudonym_session.record
     # If the user's account has been deleted, feel free to share that information
     if @pseudonym && (!@pseudonym.user || @pseudonym.user.unavailable?)
-      flash[:error] = "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
+      flash[:error] = t 'errors.user_deleted', "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
       redirect_to login_url
       return
     end
@@ -143,7 +143,7 @@ class PseudonymSessionsController < ApplicationController
       # If the user is registered and logged in, redirect them to their dashboard page
       if @user && @user.registered? && found
 
-        flash[:notice] = 'Login successful.'
+        flash[:notice] = t 'notices.login_success', "Login successful."
         if session[:course_uuid] && @user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
           claim_session_course(course, @user)
           format.html { redirect_to(course_url(course, :login_success => '1')) }
@@ -157,7 +157,7 @@ class PseudonymSessionsController < ApplicationController
         format.json { render :json => @pseudonym.to_json(:methods => :user_code), :status => :ok }
       # Otherwise re-render the login page to show the error
       else
-        flash[:error] = 'Incorrect username and/or password'
+        flash[:error] = t 'errors.invalid_credentials', "Incorrect username and/or password"
         @errored = true
         if @user && @user.creation_pending?
           @user.update_attribute(:workflow_state, "pre_registered")
@@ -195,7 +195,7 @@ class PseudonymSessionsController < ApplicationController
       flash[:delegated_message] = message if message
     end
     
-    flash[:notice] = "You are currently logged out"
+    flash[:notice] = t 'notices.logged_out', "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
       session[:return_to] = nil
@@ -242,18 +242,18 @@ class PseudonymSessionsController < ApplicationController
             session[:name_qualifier] = response.name_qualifier
             session[:session_index] = response.session_index
 
-            flash[:notice] = 'Login successful.'
+            flash[:notice] = t 'notices.login_success', "Login successful."
             default_url = dashboard_url
             redirect_back_or_default default_url 
           else
             logger.warn "Received SAML login request for unknown user: #{response.name_id}"
             # the saml message has to survive a couple redirects
-            session[:delegated_message] = "Canvas doesn't have an account for user: #{response.name_id}"
+            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => response.name_id
             redirect_to :action => :destroy
           end
         elsif response.auth_failure?
           logger.warn "Failed SAML login attempt."
-          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
           redirect_to login_url(:no_auto=>'true')
         else
           logger.warn "Unexpected SAML status code - status code: #{response.status_code rescue ""}"
@@ -266,20 +266,20 @@ class PseudonymSessionsController < ApplicationController
         logger.warn "SAML Response:";i=0;while temp=params[:SAMLResponse][i...i+1500] do logger.warn temp;i+=1500;end
         @pseudonym_session.destroy rescue true
         reset_session
-        flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+        flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
         redirect_to login_url(:no_auto=>'true')
       end
     elsif !params[:SAMLResponse]
       logger.error "saml_consume request with no SAMLResponse parameter"
       @pseudonym_session.destroy rescue true
       reset_session
-      flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+      flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
       redirect_to login_url(:no_auto=>'true')
     else
       logger.error "Attempted SAML login on non-SAML enabled account."
       @pseudonym_session.destroy rescue true
       reset_session
-      flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+      flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
       redirect_to login_url(:no_auto=>'true')
     end
   end

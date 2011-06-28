@@ -38,7 +38,7 @@ module Api::V1::User
   # if a site admin is making the request
   def user_json_is_admin?
     if @user_json_is_admin.nil?
-      @user_json_is_admin = Account.site_admin_user?(@current_user, :manage)
+      @user_json_is_admin = !!(@context.account.membership_for_user(@current_user) || @context.account.grants_right?(@current_user, :manage_sis))
     end
     @user_json_is_admin
   end

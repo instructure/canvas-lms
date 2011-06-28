@@ -16,8 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var INST;
-var modules = (function() {
+var INST, modules;
+I18n.scoped('context_modules', function(I18n) {
+modules = (function() {
   return {
     updateTaggedItems: function() {
     },
@@ -154,7 +155,7 @@ var modules = (function() {
         $.each(data, function(id, info) {
           var data = {};
           if (info["points_possible"] != null) {
-            data["points_possible_display"] = "<span class='points_possible_block'>" + info["points_possible"] + "</span> pts";
+            data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "<span class='points_possible_block'>" + info["points_possible"] + "</span>" });
           }
           if (info["due_date"] != null) {
             data["due_date_display"] = $.parseFromISO(info["due_date"]).date_formatted
@@ -175,12 +176,12 @@ var modules = (function() {
         $form.attr('action', $form.find(".add_context_module_url").attr('href'));
         $form.find(".completion_entry").hide();
         $form.attr('method', 'POST');
-        $form.find(".submit_button").text("Add Module");
+        $form.find(".submit_button").text(I18n.t('buttons.add', "Add Module"));
       } else {
         $form.attr('action', $module.find(".edit_module_link").attr('href'));
         $form.find(".completion_entry").show();
         $form.attr('method', 'PUT');
-        $form.find(".submit_button").text("Update Module");
+        $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
       }
       $form.find("#unlock_module_at").attr('checked', data.unlock_at).triggerHandler('change');
       $form.find("#require_sequential_progress").attr('checked', data.require_sequential_progress == "true" || data.require_sequential_progress == "1");
@@ -226,7 +227,7 @@ var modules = (function() {
         close: function() {
           modules.hideEditModule(true);
         }
-      }).dialog('option', {title: (isNew ? "Add Module" : "Edit Module Settings"), width: (isNew ? 'auto' : 600)}).dialog('open'); //show();
+      }).dialog('option', {title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")), width: (isNew ? 'auto' : 600)}).dialog('open'); //show();
       $module.removeClass('dont_remove');
       $form.find(":text:visible:first").focus().select();
     },
@@ -389,7 +390,7 @@ var modules = (function() {
           }
         }, function(data) {
           $module.find(".content").loadingImage('remove');
-          $module.find(".content").errorBox('Reorder failed, please try again.');
+          $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
         });
       }
     }
@@ -632,7 +633,7 @@ $(document).ready(function() {
           }
         });
         $row.find(".still_need_completing")
-          .append("<b>Still Needs to Complete:</b><br/>")
+          .append("<b>"+I18n.t('still_needs_completing', 'Still Needs to Complete')+"</b><br/>")
           .append(unfulfilled.join("<br/>"));
       }
       $row.removeClass('locked').removeClass('in_progress').removeClass('completed')
@@ -658,7 +659,7 @@ $(document).ready(function() {
       var $student = $dialog.find(".student.blank:first").clone(true).removeClass('blank');
       var $studentWithProgressions = $(this);
       var data = $studentWithProgressions.getTemplateData({textValues: ['name', 'id', 'current_module']});
-      data.current_module = data.current_module || "none in progress";
+      data.current_module = data.current_module || I18n.t('none_in_progress', "none in progress");
       $student.find("a").attr('href', '#' + data.id);
       $student.fillTemplateData({data: data});
       $student_list.append($student.show())
@@ -699,7 +700,7 @@ $(document).ready(function() {
     });
     $("#module_progression_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: "Student Progress for Module",
+      title: I18n.t('titles.student_progress', "Student Progress for Module"),
       width: 500
     }).dialog('open');
   });
@@ -829,21 +830,20 @@ modules.initModuleManagement = function() {
     var $optgroups = {};
     $module.find(".content .context_module_item").not('.context_module_sub_header').each(function() {
       var data = $(this).getTemplateData({textValues: ['id', 'title', 'type']});
-      var displayType = $.pluralize($.titleize(data.type || "item"));
       if (data.type == 'assignment') {
-        displayType = "Assignments";
+        displayType = I18n.t('optgroup.assignments', "Assignments");
       } else if (data.type == 'attachment') {
-        displayType = "Files";
+        displayType = I18n.t('optgroup.files', "Files");
       } else if (data.type == 'quiz') {
-        displayType = "Quizzes";
+        displayType = I18n.t('optgroup.quizzes', "Quizzes");
       } else if (data.type == 'external_url') {
-        displayType = "External URLs";
+        displayType = I18n.t('optgroup.external_urls', "External URLs");
       } else if (data.type == 'context_external_tool') {
-        displayType = "External Tools";
+        displayType = I18n.t('optgroup.external_tools', "External Tools");
       } else if (data.type == 'discussion_topic') {
-        displayType = "Discussions";
+        displayType = I18n.t('optgroup.discussion_topics', "Discussions");
       } else if (data.type == 'wiki_page') {
-        displayType = "Wiki Pages";
+        displayType = I18n.t('optgroup.wiki_pages', "Wiki Pages");
       }
       var group = $optgroups[displayType]
       if (!group) {
@@ -896,7 +896,7 @@ modules.initModuleManagement = function() {
     event.preventDefault();
     $(this).parents(".context_module").confirmDelete({
       url: $(this).attr('href'),
-      message: "Are you sure you want to delete this module?",
+      message: I18n.t('confirm.delete', "Are you sure you want to delete this module?"),
       success: function(data) {
         var id = data.context_module.id;
         $(".context_module .prerequisites .criterion").each(function() {
@@ -937,7 +937,7 @@ modules.initModuleManagement = function() {
     $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
     $("#edit_item_form").dialog('close').dialog({
       autoOpen: false,
-      title: "Edit Item Details"
+      title: I18n.t('titles.edit_item', "Edit Item Details")
     }).dialog('open');
   });
   $("#edit_item_form .cancel_button").click(function(event) {
@@ -963,7 +963,7 @@ modules.initModuleManagement = function() {
     event.preventDefault();
     $(this).parents(".context_module_item").confirmDelete({
       url: $(this).attr('href'),
-      message: 'Are you sure you want to remove this item from the module?',
+      message: I18n.t('confirm.delete_item', 'Are you sure you want to remove this item from the module?'),
       success: function(data) {
         $(this).slideUp(function() {
           $(this).remove();
@@ -1000,9 +1000,9 @@ modules.initModuleManagement = function() {
     if(INST && INST.selectContentDialog) {
       var module = $(this).parents(".context_module").find(".header").getTemplateData({textValues: ['name', 'id']});
       var options = {for_modules: true};
-      options.select_button_text = "Add Item";
+      options.select_button_text = I18n.t('buttons.add_item', "Add Item");
       options.holder_name = module.name;
-      options.dialog_title = "Add Item to " + module.name;
+      options.dialog_title = I18n.t('titles.add_item', "Add Item to %{module}", {'module': module.name});
       options.submit = function(item_data) {
         var $module = $("#context_module_" + module.id);
         var $item = modules.addItemToModule($module, item_data);
@@ -1084,7 +1084,7 @@ modules.initModuleManagement = function() {
     $("#add_module_prerequisite_dialog").find(".prerequisite_module_select").empty().append($select.show());
     $("#add_module_prerequisite_dialog").dialog('close').dialog({
       autoOpen: true,
-      title: 'Add Prerequisite to ' + module.name,
+      title: I18n.t('titles.add_prerequisite', 'Add Prerequisite to %{module}', {'module': module.name}),
       width: 400
     }).dialog('open');
   });
@@ -1130,3 +1130,4 @@ modules.initModuleManagement = function() {
     modules.refreshModuleList();
   }, 1000);
 }
+});

@@ -46,7 +46,6 @@ module SeleniumTestsHelperMethods
         :desired_capabilities => (SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox)
       )
     end
-    driver.get(app_host)
     driver.manage.timeouts.implicit_wait = 3
     driver
   end
@@ -134,16 +133,30 @@ shared_examples_for "all selenium tests" do
   end
   alias_method :login, :login_as
 
-  def course_with_teacher_logged_in(opts={})
+  def create_session(pseudonym, real_login)
+    if real_login
+      login_as(pseudonym.unique_id, pseudonym.password)
+    else
+      @pseudonym_session = mock(PseudonymSession)
+      @pseudonym_session.stub!(:session_credentials).and_return([])
+      @pseudonym_session.stub!(:record).and_return { pseudonym.reload }
+      PseudonymSession.stub!(:find).and_return(@pseudonym_session)
+    end
+  end
+
+  def user_logged_in(opts={})
     user_with_pseudonym({:active_user => true}.merge(opts))
-    course_with_teacher({:user => @user, :active_course => true}.merge(opts))
-    login_as(@pseudonym.unique_id, @pseudonym.password)
+    create_session(@pseudonym, opts[:real_login])
+  end
+
+  def course_with_teacher_logged_in(opts={})
+    user_logged_in(opts)
+    course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
   end
 
   def course_with_student_logged_in(opts={})
-    user_with_pseudonym({:active_user => true}.merge(opts))
-    course_with_student({:user => @user, :active_course => true}.merge(opts))
-    login_as(@pseudonym.unique_id, @pseudonym.password)
+    user_logged_in(opts)
+    course_with_student({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
   end
 
   def course_with_admin_logged_in(opts={})
@@ -238,11 +251,11 @@ shared_examples_for "all selenium tests" do
   end
 
   self.use_transactional_fixtures = false
-  
+
   append_after(:each) do
-    ALL_MODELS.each &:delete_all
+    ALL_MODELS.each { |m| truncate_table(m) }
   end
-  
+
   append_before(:all) do
     @selenium_driver = setup_selenium
   end

@@ -139,9 +139,19 @@ class CalendarsController < ApplicationController
       log_asset_access("calendar_feed:#{context.asset_string}", "calendar", 'other')
     end
     respond_to do |format|
-      format.ics { render :text => @events.to_ics("#{@context.name} Calendar (Canvas)", "Calendar events for the #{@context.class.to_s.downcase}, #{@context.name}") }
+      format.ics { render :text => @events.to_ics(t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name),
+          case
+            when @context.is_a?(Course)
+              t('ics_description_course', "Calendar events for the course, %{course_name}", :course_name => @context.name)
+            when @context.is_a?(Group)
+              t('ics_description_group', "Calendar events for the group, %{group_name}", :group_name => @context.name)
+            when @context.is_a?(User)
+              t('ics_description_user', "Calendar events for the user, %{user_name}", :user_name => @context.name)
+            else
+              t('ics_description', "Calendar events for %{context_name}", :context_name => @context.name)
+          end) }
       feed = Atom::Feed.new do |f|
-        f.title = "#{@context.name} Calendar Feed"
+        f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", :course_or_group_name => @context.name
         f.links << Atom::Link.new(:href => calendar_url_for(@context))
         f.updated = Time.now
         f.id = calendar_url_for(@context)

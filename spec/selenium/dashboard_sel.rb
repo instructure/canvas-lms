@@ -4,8 +4,7 @@ shared_examples_for "dashboard selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   before(:each) do
-    course_with_student(:active_all => true)
-    user_with_pseudonym(:user => @user)
+    course_with_student_logged_in(:active_all => true)
   end
 
   def test_hiding(url)
@@ -13,8 +12,6 @@ shared_examples_for "dashboard selenium tests" do
     items = @user.stream_item_instances
     items.size.should == 1
     items.first.hidden.should == false
-
-    login
 
     get url
     find_all_with_jquery("div.communication_message.announcement").size.should == 1

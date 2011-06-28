@@ -4,14 +4,8 @@ shared_examples_for "plugins selenium tests" do
   it_should_behave_like "in-process server selenium tests"
   
   before(:each) do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    Account.site_admin.add_user(u)
-    login_as(username, password)
+    user_logged_in
+    Account.site_admin.add_user(@user)
   end
   
   it "should allow configuring twitter plugin" do

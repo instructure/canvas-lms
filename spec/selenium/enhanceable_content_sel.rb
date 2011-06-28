@@ -4,19 +4,9 @@ describe "enhanceable_content selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
   it "should automatically enhance content using jQuery UI" do
-    username = "nobody@example.com"
-    password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
-    u.save!
-    e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
-    e.save!
-    login_as(username, password)
+    course_with_teacher_logged_in
     
-    page = e.course.wiki.wiki_page
+    page = @course.wiki.wiki_page
     page.body = %{
       <div id="dialog_for_link1" class="enhanceable_content dialog">dialog for link 1</div>
       <a href="#dialog_for_link1" id="link1">link 1</a>
@@ -76,7 +66,7 @@ describe "enhanceable_content selenium tests" do
     }
     page.save!
     
-    get "/courses/#{e.course_id}/wiki/#{page.url}"
+    get "/courses/#{@course.id}/wiki/#{page.url}"
     dialog = driver.find_element(:css, ".enhanceable_content.dialog")
     dialog.should_not be_displayed
     driver.find_element(:css, "#link1").click

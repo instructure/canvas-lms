@@ -1,0 +1,26 @@
+<% if cm.migration_settings[:warnings] || (cm.migration_settings[:last_error] && current_user_is_site_admin?) %>
+  <a href="#" class="warnings_link"><%= t 'links.warnings', "Warnings/Errors" %></a><br>
+  <div class="migration_warnings" style="display:none; margin-left:10px;">
+    <% if cm.migration_settings[:warnings] %>
+      <div>
+        <strong><%= before_label :warnings, "Warnings" %></strong><br>
+        <% cm.migration_settings[:warnings].each do |warn| %>
+          <div>
+            <%= warn.first %>
+            <% if current_user_is_site_admin? %>
+             - <%= warn.last %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+    <% if cm.migration_settings[:last_error] && current_user_is_site_admin? %>
+      <div>
+        <strong><%= before_label :last_error, "Last Error" %></strong><br>
+        <pre>
+          <%= cm.migration_settings[:last_error] %>
+        </pre>
+      </div>
+    <% end %>
+  </div>
+<% end %>

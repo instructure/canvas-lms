@@ -25,7 +25,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title><%= yield :page_title || "Add a page title here." %></title>
+  <title><%= yield :page_title || t('missing_page_title', "Add a page title here.") %></title>
   <noscript> <meta http-equiv=refresh content="0; URL=/javascript-is-required.html" /> </noscript> 
   <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
   
@@ -64,8 +64,8 @@
 <body class="<%= (@body_classes << @active_tab).uniq.join(" ") %>">
   <% unless @body_class_no_headers %>
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
-    <a href="#content" id="skip_navigation_link">Skip To Content</a>
-    <a id="header-logo" href="<%= root_url %>">My Dashboard</a> 
+    <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
+    <a id="header-logo" href="<%= root_url %>"><%= t 'links.dashboard', "My Dashboard" %></a> 
     <b id="header-logo-secondary"></b>  
     <div id="topbar"> 
       <%= (identity = yield :identity) ? identity : render(:partial => 'shared/identity') %>
@@ -81,7 +81,7 @@
                 @current_user.cached_current_group_memberships,
                 @current_user.enrollments.ended ].any?{ |e| e.respond_to?(:count) && e.count > 0 }  -%>
         <a href="<%= dashboard_path %>" class="menu-item-title">
-          Courses <%= "& Groups" unless @current_user.cached_current_group_memberships.empty? -%>
+          <%= @current_user.cached_current_group_memberships.empty? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
           <span class="menu-item-title-icon"></span></a>
         <div class="menu-item-drop">
           <table cellspacing="0">
@@ -104,9 +104,9 @@
                 end
                 coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
                 [
-                  [coalesced_enrollments, "shared/menu_enrollment", "My Courses", courses_path],
-                  [@current_user.cached_current_group_memberships, "shared/menu_group_membership", "Current Groups", groups_path],
-                  [@current_user.accounts, "shared/menu_account", "Managed Accounts", accounts_path]
+                  [coalesced_enrollments, "shared/menu_enrollment", t('menu.my_courses', "My Courses"), courses_path],
+                  [@current_user.cached_current_group_memberships, "shared/menu_group_membership", t('menu.current_groups', "Current Groups"), groups_path],
+                  [@current_user.accounts, "shared/menu_account", t('menu.managed_accounts', "Managed Accounts"), accounts_path]
                 ].each do |triple| %>
               <%= render(:partial => "shared/menu_section", :locals => { 
                            :collection => triple.first[0,max_to_show],
@@ -120,15 +120,12 @@
           </table>
           <% unless @current_user.enrollments.ended.empty? %>
             <div class="menu-item-drop-padded">
-              <%= link_to raw('See All Enrollments &raquo;'), courses_path, :class => "menu-item-drop-float-right" %>
-              <!-- <div style="<%= hidden if !@domain_root_account || @domain_root_account.require_authorization_code %>">
-                You can also <a href="<%= getting_started_teacherless_path %>">use Canvas to track grades for your other classes</a>
-              </div> -->
+              <%= link_to t('menu.all_enrollments', 'See All Enrollments') + raw(' &raquo;'), courses_path, :class => "menu-item-drop-float-right" %>
             </div>
           <% end %>
         </div>
         <%- else #there is nothing inside the home menu, so dont show it as a drop-down -%>
-        <a href="<%= dashboard_path %>" class="menu-item-no-drop">Home</a>
+        <a href="<%= dashboard_path %>" class="menu-item-no-drop"><%= t 'links.home', 'Home' %></a>
         <%- end -%>
       </li>
       <%- end -%>
@@ -143,14 +140,14 @@
       <%-
         max_to_show = 8
         assignment_sets = {
-          :needing_submitting => "To Turn In",
-          :needing_grading    => "Needing Grading",
-          :recently_graded    => "Recently Graded"
+          :needing_submitting => t('menu.assignments_needing_submitting', "To Turn In"),
+          :needing_grading    => t('menu.assignments_needing_grading', "Needing Grading"),
+          :recently_graded    => t('menu.assignments_recently_graded', "Recently Graded")
         }
         total_shown = 0
         if assignment_sets.any?{ |k, v| @current_user.send("assignments_#{k}").length > 0 }  
       -%>
-        <a href="/assignments" class="menu-item-title">Assignments<span class="menu-item-title-icon"></span></a>
+        <a href="/assignments" class="menu-item-title"><%= t('menu.assignments', 'Assignments') %><span class="menu-item-title-icon"></span></a>
         <div class="menu-item-drop">
           <table cellspacing="0">
             <tr>
@@ -173,15 +170,15 @@
           </table>
         </div>
         <%- else #there is not anything to show in the assignments drop down  -%>
-        <a href="/assignments" class="menu-item-no-drop">Assignments</a>
+        <a href="/assignments" class="menu-item-no-drop"><%= t('menu.assignments', 'Assignments') %></a>
         <%- end -%>
       <% end %>
       </li>
       <li class="menu-item">
-        <%= link_to("Grades", :grades, :class=>"menu-item-no-drop") %>
+        <%= link_to(t('menu.grades', 'Grades'), :grades, :class=>"menu-item-no-drop") %>
       </li>
       <li class="menu-item">
-        <a href="<%= calendar_path %>" class="menu-item-no-drop">Calendar</a>
+        <a href="<%= calendar_path %>" class="menu-item-no-drop"><%= t('menu.calendar', 'Calendar') %></a>
       </li>      
     </ul>
     <% end %>
@@ -189,7 +186,7 @@
 
   <% end  #unless no-headers %>
   <div id="instructure_ajax_error_box">
-    <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link">Close</a></div>
+    <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link"><%= t('links.close', 'Close') %></a></div>
     <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;"></iframe>
   </div>
 <%= render :partial => 'shared/flash_notices' %>
@@ -232,16 +229,16 @@
       </div>
     </div>
     <footer role="contentinfo" id="footer">
-      <a href="http://www.instructure.com"><%= image_tag 'footer-logo.png', :alt => "Instructure, makers of the open source learning management system Canvas" %></a>
+      <a href="http://www.instructure.com"><%= image_tag 'footer-logo.png', :alt => t('instructure_description', "Instructure, makers of the open source learning management system Canvas") %></a>
       <span id="footer-links">
         <% if Setting.get_cached("show_opensource_linkback", "false") == "true" %>
-          <a href="http://instructure.com">Open Source LMS</a>      
+          <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>      
         <% end %>
         <% if url = ((@domain_root_account && @domain_root_account.settings[:support_url]) || (Account.default && Account.default.settings[:support_url])) %>
-          <%= link_to("Support", url) %>
+          <%= link_to(t('links.support', "Support"), url) %>
         <% end %>
         <%  if @headers == false && Setting.get_cached("show_feedback_link", "false") == "true" %>
-          <a href="#" id="feedback_link">Feedback</a> 
+          <a href="#" id="feedback_link"><%= t('links.feedback', 'Feedback') %></a> 
         <% end %>
         <%= render :partial => 'shared/footer_links' %>
       </span>
@@ -260,7 +257,7 @@
     <div class="shadow shadow_5"></div>
     <div class="wizard_content">
       <div class="links">
-        <a href="#" class="close_wizard_link close-link">close</a>
+        <a href="#" class="close_wizard_link close-link"><%= t('links.close', 'Close') %></a>
       </div>
       <%= wizard %>
     </div>

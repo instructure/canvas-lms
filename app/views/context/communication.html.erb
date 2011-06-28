@@ -1,12 +1,12 @@
-<% content_for :page_title do %>Communication: <%= @context.name %><% end %>
+<% content_for :page_title, t('titles.communication', "Communication: %{context_name}", :context_name => @context.name) %>
 <% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
 <% jammit_js :collaborations, :topics %>
 
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context_enrollment.feed_code, :atom), {:title => "Course Discussions Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context_enrollment.feed_code, :atom), {:title => t('links.feeds.course_discussions', "Course Discussions Atom Feed")}) %>
   <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => "Course Discussions Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t('links.feeds.course_discussions,', "Course Discussions Atom Feed")}) %>
   <% end %>
 <% end %>
 
@@ -15,20 +15,20 @@
   <div id="sidebar_content">
   <p>
     <% if can_do(@context.discussion_topics.new, @current_user, :create) %>
-      <a href="#" class="add_topic_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> Start a New Topic</a>
+      <a href="#" class="add_topic_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_topic', %{Start a New Topic}) %></a>
     <% end %>
     <% if can_do(@context.web_conferences.new, @current_user, :create) %>
-      <a href="#" class="add_collaboration_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> Start a Collaboration</a>
+      <a href="#" class="add_collaboration_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_collaboration', %{Start a Collaboration}) %></a>
     <% end %>
     <% if can_do(@context.collaborations.new, @current_user, :create) %>
-      <a href="#" class="add_conference_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> Start a Web Conference</a>
-    <% end %>    
+      <a href="#" class="add_conference_link button button-sidebar button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_conference', %{Start a Web Conference}) %></a>
+    <% end %>
   </p>
   </div>
   <%= render :partial => "shared/wiki_sidebar" %>
 <% end %>
 
-<h2>Discussions</h2>
+<h2><%= t('headings.discussions', %{Discussions}) %></h2>
 
 <%= render :partial => "shared/topics", :object => @topics, :locals => { :topic_type => "discussion_topic" } %>
 

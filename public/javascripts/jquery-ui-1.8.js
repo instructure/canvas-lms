@@ -5838,7 +5838,7 @@ $.widget("ui.dialog", {
 		var self = this,
 			options = self.options,
 
-			title = options.title || '&#160;',
+			title = options.title || $('<span>&#160;</span>'),
 			titleId = $.ui.dialog.getTitleId(self.element),
 
 			uiDialog = (self.uiDialog = $('<div></div>'))
@@ -6373,11 +6373,13 @@ $.widget("ui.dialog", {
 				}
 				break;
 			case "title":
+				if (!value) {
+					value = $('<span>&#160;</span>');
+				}
 				if ( value.jquery ) {
 					$(".ui-dialog-title", self.uiDialogTitlebar).html('').append(value);
 				} else {
-					// convert whatever was passed in to a string, for text() not to throw up
-					$(".ui-dialog-title", self.uiDialogTitlebar).text("" + (value || '&#160;'));
+					$(".ui-dialog-title", self.uiDialogTitlebar).text("" + value);
 				}
 				break;
 		}

@@ -23,25 +23,6 @@ describe SIS::SisCsv do
     account_model
   end
   
-  def process_csv_data(*lines)
-    tmp = Tempfile.new("sis_rspec")
-    path = "#{tmp.path}.csv"
-    tmp.close!
-    File.open(path, "w+") { |f| f.puts lines.join "\n" }
-    
-    importer = SIS::SisCsv.process(@account, :files => [ path ], :allow_printing=>false)
-    
-    File.unlink path
-    
-    importer
-  end
-  
-  def process_csv_data_cleanly(*lines)
-    importer = process_csv_data(*lines)
-    importer.errors.should == []
-    importer.warnings.should == []
-  end
-  
   it "should error files with unknown headers" do
     importer = process_csv_data(
       "course_id,randomness,smelly",
@@ -253,6 +234,20 @@ describe SIS::SisCsv do
       course.course_code.should eql("SUCKERS 101")
       course.name.should eql("Haha my course lol")
     end
+
+    it 'should override term dates if the start or end dates are set' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "test1,TC 101,Test Course 1,,,active,,",
+        "test2,TC 102,Test Course 2,,,active,,2011-05-14 00:00:00",
+        "test3,TC 103,Test Course 3,,,active,2011-04-14 00:00:00,",
+        "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      @account.courses.find_by_sis_source_id("test1").restrict_enrollments_to_course_dates.should be_false
+      @account.courses.find_by_sis_source_id("test2").restrict_enrollments_to_course_dates.should be_true
+      @account.courses.find_by_sis_source_id("test3").restrict_enrollments_to_course_dates.should be_true
+      @account.courses.find_by_sis_source_id("test4").restrict_enrollments_to_course_dates.should be_true
+    end
   end
   
   context "user importing" do
@@ -298,7 +293,7 @@ describe SIS::SisCsv do
       user.account.should eql(@account)
       user.name.should eql("My Awesome Name")
     end
-    
+
     it "should set passwords and not overwrite current passwords" do
       process_csv_data(
         "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
@@ -368,6 +363,21 @@ describe SIS::SisCsv do
       
       errors = importer.errors.map { |r| r.last }
       errors.should == ['Non-identical duplicate user rows for user_1']
+    end
+
+    it "should catch active-record-level errors, like too short unique_id" do
+      before_user_count = User.count
+      before_pseudo_count = Pseudonym.count
+      importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status",
+        "U1,u1,User,Uno,user@example.com,active"
+      )
+      user = User.find_by_email('user@example.com')
+      user.should be_nil
+
+      importer.errors.map(&:last).should == []
+      importer.warnings.map(&:last).should == ["Failed saving user. Internal error: unique_id is too short (minimum is 3 characters)"]
+      [User.count, Pseudonym.count].should == [before_user_count, before_pseudo_count]
     end
 
     it "should not allow non-identical duplicate user rows in multiple files" do
@@ -876,6 +886,25 @@ describe SIS::SisCsv do
                                                   "Section S003 references course C002 which doesn't exist"]
     end
     
+    it 'should override term dates if the start or end dates are set' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+        "test1,TC 101,Test Course 1,,,active,,"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      process_csv_data(
+        "section_id,course_id,name,status,start_date,end_date",
+        "sec1,test1,Test Course 1,active,,",
+        "sec2,test1,Test Course 2,active,,2011-05-14 00:00:00",
+        "sec3,test1,Test Course 3,active,2011-04-14 00:00:00,",
+        "sec4,test1,Test Course 4,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      course = @account.courses.find_by_sis_source_id('test1')
+      course.course_sections.find_by_sis_source_id("sec1").restrict_enrollments_to_section_dates.should be_false
+      course.course_sections.find_by_sis_source_id("sec2").restrict_enrollments_to_section_dates.should be_true
+      course.course_sections.find_by_sis_source_id("sec3").restrict_enrollments_to_section_dates.should be_true
+      course.course_sections.find_by_sis_source_id("sec4").restrict_enrollments_to_section_dates.should be_true
+    end
+
     it 'should verify xlist files' do
       importer = process_csv_data(
         "xlist_course_id,section_id,status",
@@ -1314,6 +1343,75 @@ describe SIS::SisCsv do
       s1.course.should eql(course2)
       s1.account.should be_nil
       s1.crosslisted?.should be_false
+    end
+
+    it 'should leave a section alone if a section has been crosslisted with the sticky_xlist flag set' do
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "C001,TC 101,Test Course 101,,,active",
+        "C002,TC 102,Test Course 102,,,active",
+        "C003,TC 103,Test Course 103,,,active"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      process_csv_data(
+        "section_id,course_id,name,start_date,end_date,status",
+        "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+
+      def with_section(&block)
+        CourseSection.find_by_root_account_id_and_sis_source_id(@account.id, 'S001').tap(&block)
+      end
+      def check_section_crosslisted(sis_id)
+        with_section do |s|
+          s.course.sis_source_id.should == sis_id
+          s.nonxlist_course.sis_source_id.should == 'C001'
+        end
+      end
+      def check_section_not_crosslisted
+        with_section do |s|
+          s.course.sis_source_id.should == 'C001'
+          s.nonxlist_course.should be_nil
+        end
+      end
+
+      check_section_not_crosslisted
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "C002,S001,active"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      check_section_crosslisted 'C002'
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "C002,S001,deleted"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      check_section_not_crosslisted
+      with_section do |s|
+        s.crosslist_to_course(Course.find_by_root_account_id_and_sis_source_id(@account.id, 'C002'))
+      end
+      check_section_crosslisted 'C002'
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "C002,S001,deleted"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      check_section_crosslisted 'C002'
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "C003,S001,active"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      check_section_crosslisted 'C002'
+      with_section do |s|
+        s.uncrosslist
+      end
+      check_section_not_crosslisted
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "C003,S001,active"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      check_section_crosslisted 'C003'
+      process_csv_data(
+        "xlist_course_id,section_id,status",
+        "C003,S001,deleted"
+      ).tap{|i| i.warnings.should == []; i.errors.should == []}
+      check_section_not_crosslisted
     end
 
   end

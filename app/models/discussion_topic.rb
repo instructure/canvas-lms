@@ -64,7 +64,7 @@ class DiscussionTopic < ActiveRecord::Base
   
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
-    self.title ||= "No Title"
+    self.title ||= t '#discussion_topic.default_title', "No Title"
     @content_changed = self.message_changed? || self.title_changed?
     if self.assignment_id != self.assignment_id_was
       @old_assignment_id = self.assignment_id_was
@@ -347,9 +347,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
   
   def to_atom(opts={})
-    prefix = self.is_announcement ? "Announcement" : "Discussion"
+    prefix = [self.is_announcement ? t('#titles.announcement', "Announcement") : t('#titles.discussion', "Discussion")]
+    prefix << self.context.name if opts[:include_context]
     Atom::Entry.new do |entry|
-      entry.title     = "#{prefix}#{", " + self.context.name if opts[:include_context]}: #{self.title}"
+      entry.title     = [before_label(prefix.to_sentence), self.title].join(" ")
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/discussion_topics/#{self.feed_code}"
@@ -391,7 +392,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
-    self.user.name rescue "User Name"
+    self.user.name rescue t '#discussion_topic.default_user_name', "User Name"
   end
   
   def locked_for?(user=nil, opts={})
@@ -475,7 +476,11 @@ class DiscussionTopic < ActiveRecord::Base
     announcements.each do |event|
       if event['migration_id'] && (!to_import || to_import[event['migration_id']])
         event[:type] = 'announcement'
-        import_from_migration(event, migration.context)
+        begin
+          import_from_migration(event, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the announcement \"#{event[:title]}\"", $!)
+        end
       end
     end
 
@@ -487,7 +492,11 @@ class DiscussionTopic < ActiveRecord::Base
         context ||= migration.context
         if context
           if topic['migration_id'] && (!topics_to_import || topics_to_import[topic['migration_id']])
-            import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
+            begin
+              import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
+            rescue
+              migration.add_warning("Couldn't import the topic \"#{topic[:title]}\"", $!)
+            end
           end
         end
       end
@@ -507,7 +516,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
-    item.message = "No message" if item.message.blank?
+    item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
     item.posted_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
     item.delayed_post_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
     item.delayed_post_at ||= Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
@@ -596,7 +605,7 @@ class DiscussionTopic < ActiveRecord::Base
       asset = elem.podcast_associated_asset
       next unless asset
       item = RSS::Rss::Channel::Item.new
-      item.title = (asset.title rescue "") + ": " + elem.name
+      item.title = before_label((asset.title rescue "")) + elem.name
       link = nil
       if asset.is_a?(DiscussionTopic)
         link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.id}"

@@ -221,7 +221,7 @@ module GoogleDocs
   
   def google_docs_create_doc(name=nil, include_time=false, access_token=nil)
     name = nil if name && name.empty?
-    name ||= "Instructure Doc"
+    name ||= I18n.t('lib.google_docs.default_document_name', "Instructure Doc")
     name += ": #{Time.now.strftime("%d %b %Y, %I:%M %p")}" if include_time
     access_token ||= google_docs_retrieve_access_token
     url = "http://docs.google.com/feeds/documents/private/full"

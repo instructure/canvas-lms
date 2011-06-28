@@ -1,44 +1,50 @@
-<% content_for :page_title do %>Collaboration: <%= @context.name %><% end %>
+<% content_for :page_title do %><%= before_label :page_title, "Collaboration" %> <%= @context.name %><% end %>
 
 <% jammit_js :collaborations %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <p>Free online web tools like 
-      <a href="http://docs.google.com">Google Docs</a> and <a href="http://www.etherpad.org">EtherPad</a>
-      are an excellent place for students to work on group projects or papers, take shared notes, etc.
-      Teacher <i>or</i> students can set up group collaborations.
+    <p><%= mt :description_rs, <<-HEREDOC
+Free online web tools like [Google Docs](http://docs.google.com) and [EtherPad](http://www.etherpad.org)
+are an excellent place for students to work on group projects or papers, take shared notes, etc.
+Teacher *or* students can set up group collaborations.
+HEREDOC
+       %>
     </p>
     <% if can_do(@context, @current_user, :create_collaborations) %>
-      <a href="#" class="add_collaboration_link button button-sidebar-wide"><%= image_tag "add.png" %> Start a New Collaboration</a>
+      <a href="#" class="add_collaboration_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'links.new', "Start a New Collaboration" %></a>
     <% end %>
   </div>
 <% end %>
 <a href="#" class="external_link" target="_blank" style="display: none;">&nbsp;</a>
-<h2>Current Collaborations</h2>
+<h2><%= t 'titles.current', "Current Collaborations" %></h2>
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
   <% if can_do(@context, @current_user, :manage_content) %>
-    <p>
-    <b>What do we mean by collaborations?</b>  We're talking about web-based tools that most
-    likely your students are already familiar with.  Students can use resources like 
-    <a href="http://docs.google.com">Google Docs</a> and <a href="http://www.etherpad.org">EtherPad</a>
-    to work collaboratively on tasks like group papers or note-taking.  This page gives them
-    (and you) an easy place to keep track of those collaborations, and also to set them
-    up without having to swap emails.
-    </p>
-    <p>To find out more about a particular type of collaboration, click "Start a New Collaboration"
-    and then choose that type in the dropdown list.</p>
+    <%= mt :description_teacher, <<-HEREDOC
+**What do we mean by collaborations?**  We're talking about web-based tools that most
+likely your students are already familiar with.  Students can use resources like
+[Google Docs](http://docs.google.com) and [EtherPad](http://www.etherpad.org)
+to work collaboratively on tasks like group papers or note-taking.  This page gives them
+(and you) an easy place to keep track of those collaborations, and also to set them
+up without having to swap emails.
+
+To find out more about a particular type of collaboration, click "Start a New Collaboration"
+and then choose that type in the dropdown list.
+HEREDOC
+        %>
   <% else %>
-    <p>
-    <b>What do we mean by collaborations?</b>  We're talking about web-based tools for 
-    working together on a shared document.  You can use resources like 
-    <a href="http://docs.google.com">Google Docs</a> and EtherPad
-    to work collaboratively on tasks like group papers or note-taking.  This page is
-    an easy place to keep track of those collaborations, and also to set them
-    up without having to swap emails.
-    </p>
-    <p>To find out more about a particular type of collaboration, click "Start a New Collaboration"
-    and then choose that type in the dropdown list.</p>
+    <%= mt :description_student, <<-HEREDOC
+**What do we mean by collaborations?**  We're talking about web-based tools for
+working together on a shared document.  You can use resources like
+[Google Docs](http://docs.google.com) and [EtherPad](http://www.etherpad.org)
+to work collaboratively on tasks like group papers or note-taking.  This page is
+an easy place to keep track of those collaborations, and also to set them
+up without having to swap emails.
+
+To find out more about a particular type of collaboration, click "Start a New Collaboration"
+and then choose that type in the dropdown list.
+HEREDOC
+        %>
   <% end %>
 </div>
 <div id="collaborations">
@@ -47,16 +53,23 @@
     <div class="collaboration <%= collaboration.style_class %>">
       <% if can_do(collaboration, @current_user, :delete) %>
       <div class="links">
-        <a href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="Edit this Collaboration" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
-        <a href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="Delete this Collaboration" class="delete_collaboration_link no-hover"><%= image_tag "delete.png" %></a>
+        <a href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="<%= t 'links.edit', "Edit this Collaboration" %>" class="edit_collaboration_link no-hover"><%= image_tag "edit.png" %></a>
+        <a href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="<%= t 'links.delete', "Delete this Collaboration" %>" class="delete_collaboration_link no-hover"><%= image_tag "delete.png" %></a>
       </div>
       <% end %>
       <h3><a href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" target="_blank" class="title"><%= collaboration.title %></a></h3>
       <div style="margin-bottom: 5px;" class="description">
         <%= collaboration.description %>
       </div>
-      <a href="#" class="toggle_collaborators_link"><%= pluralize((collaboration.users + [collaboration.user]).compact.uniq.length, "Collaborator") %></a> on <%= collaboration.service_name %><br/>
-      <span style="font-size: 0.8em;">Started by <a href="<%= context_url(@context, :context_user_url, collaboration.user_id) %>"><%= context_user_name(@context, collaboration.user) %></a>, <%= datetime_string(collaboration.created_at) %></span>
+      <%= t :collaborators_count, { :one => "*1 Collaboration* on %{service}", :other => "*%{count} Collaborations* on %{service}" },
+            :count => (collaboration.users + [collaboration.user]).compact.uniq.length,
+            :service => collaboration.service_name,
+            :wrapper => '<a href="#" class="toggle_collaborators_link">\1</a>' %>
+      <br/>
+      <span style="font-size: 0.8em;"><%= t :started_by, "Started by *%{user}*, %{at}",
+                                          :user => context_user_name(@context, collaboration.user),
+                                          :wrapper => '<a href="#{context_url(@context, :context_user_url, collaboration.user_id)}">\1</a>',
+                                          :at => datetime_string(collaboration.created_at) %></span>
       <ul class="collaborators">
         <li><b><%= context_user_name(@context, collaboration.user) %></b></li>
         <% (collaboration.users.uniq - [collaboration.user]).each do |user| %>

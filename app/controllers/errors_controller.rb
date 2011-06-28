@@ -17,8 +17,11 @@
 #
 
 class ErrorsController < ApplicationController
+  PER_PAGE = 20
+
   before_filter :require_user, :require_site_admin
   def index
+    params[:page] = params[:page].to_i > 0 ? params[:page].to_i : 1
     @reports = ErrorReport
 
     @message = params[:message]
@@ -31,7 +34,7 @@ class ErrorsController < ApplicationController
       @reports = @reports.scoped(:conditions => { :category => params[:category] })
     end
 
-    @reports = @reports.paginate(:page => params[:page], :per_page => 25, :order => 'id DESC')
+    @reports = @reports.all(:limit => PER_PAGE, :offset => ((params[:page]-1)*PER_PAGE), :order => 'id DESC')
   end
   def show
     @reports = WillPaginate::Collection.new(1, 1, 1)

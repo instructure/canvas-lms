@@ -1,18 +1,18 @@
-<% content_for :page_title do %><%= @event.title || "New Calendar Event" %><% end %>
+<% content_for :page_title do %><%= @event.title || t(:page_title, "New Calendar Event") %><% end %>
 
 <% content_for :right_side do %>
   <div id="sidebar_content" class="rs-margin-all">
     <% if @event && @event.start_at %>
-      <a class="button button-sidebar-wide return_url calendar_url" href="<%= clean_return_to(params[:return_to] && params[:return_to].match(/calendar/) && params[:return_to]) || calendar_url_for(@context, :anchor => {:month => (@event.try_rescue(:start_at).try_rescue(:month)), :year => (@event.try_rescue(:start_at).try_rescue(:year))}.to_json) %>"><%= image_tag "back.png" %> Back to Calendar</a>
+      <a class="button button-sidebar-wide return_url calendar_url" href="<%= clean_return_to(params[:return_to] && params[:return_to].match(/calendar/) && params[:return_to]) || calendar_url_for(@context, :anchor => {:month => (@event.try_rescue(:start_at).try_rescue(:month)), :year => (@event.try_rescue(:start_at).try_rescue(:year))}.to_json) %>"><%= image_tag "back.png" %> <%= t 'links.back_to_calendar', "Back to Calendar" %></a>
     <% else %>
-      <a class="button button-sidebar-wide return_url calendar_url" href="<%= clean_return_to(params[:return_to] && params[:return_to].match(/calendar/) && params[:return_to]) || calendar_url_for(@context, :anchor => {:month => (@event.try_rescue(:start_at).try_rescue(:month)), :year => (@event.try_rescue(:start_at).try_rescue(:year))}.to_json) %>"><%= image_tag "back.png" %> Back to Calendar</a>
+      <a class="button button-sidebar-wide return_url calendar_url" href="<%= clean_return_to(params[:return_to] && params[:return_to].match(/calendar/) && params[:return_to]) || calendar_url_for(@context, :anchor => {:month => (@event.try_rescue(:start_at).try_rescue(:month)), :year => (@event.try_rescue(:start_at).try_rescue(:year))}.to_json) %>"><%= image_tag "back.png" %> <%= t 'links.back_to_calendar', "Back to Calendar" %></a>
     <% end %>
     <a class="base_calendar_url" href="<%= calendar_url_for(@context) %>" style="display: none;">&nbsp;</a>
     <% if can_do(@event, @current_user, :update) %>
       <div style="margin-top: 10px;">
-        <a href="#" class="button button-sidebar-wide edit_calendar_event_link"><%= image_tag "edit.png" %> Edit Calendar Event</a><br/>
+        <a href="#" class="button button-sidebar-wide edit_calendar_event_link"><%= image_tag "edit.png" %> <%= t 'links.edit', "Edit Calendar Event"%></a><br/>
         <% unless @event.new_record? %>
-          <a href="<%= context_url(@context, :context_calendar_event_url, @event.id) %>" class="button button-sidebar-wide delete_event_link"><%= image_tag "delete.png" %> Delete the Event</a>
+          <a href="<%= context_url(@context, :context_calendar_event_url, @event.id) %>" class="button button-sidebar-wide delete_event_link"><%= image_tag "delete.png" %> <%= t 'links.delete', "Delete the Event" %></a>
         <% end %>
       </div>
     <% end %>

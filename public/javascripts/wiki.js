@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped("wiki_pages", function(I18n) {
 (function($) {
   
   // private variables & methods
@@ -166,7 +167,7 @@
       event.preventDefault();
       $(this).parents(".wiki_page_comment").confirmDelete({
         url: $(this).attr('href'),
-        message: "Are you sure you want to delete this comment?",
+        message: I18n.t('delete_comment_confirmation', "Are you sure you want to delete this comment?"),
         success: function() {
           $(this).slideUp(function() {
             $(this).remove();
@@ -176,16 +177,16 @@
     });
     $("#add_wiki_page_comment_form").formSubmit({
       beforeSubmit: function(data) {
-        $(this).find("button").attr('disabled', true).filter(".submit_button").text("Adding Comment...");
+        $(this).find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('notices.adding_comment', "Adding Comment..."));
       },
       success: function(data) {
-        $(this).find("button").attr('disabled', false).filter(".submit_button").text("Add Comment");
+        $(this).find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.add_comment', "Add Comment"));
         wikiPage.updateComment(null, data.wiki_page_comment, true);
         $(this).removeClass('commenting');
       },
       error: function(data) {
         $(this).formErrors(data);
-        $(this).find("button").attr('disabled', false).filter(".submit_button").text("Add Comment Failed, Please Try Again");
+        $(this).find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('notices.add_comment_failed', "Add comment failed, please try again"));
       }
     });
     $("#add_wiki_page_form,#rename_wiki_page_form").formSubmit({
@@ -199,3 +200,4 @@
   });
 
 })(jQuery);
+});

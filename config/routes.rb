@@ -30,6 +30,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :files do |file|
     file.download 'download', :controller => 'files', :action => 'show', :download => '1'
   end
+  map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
 
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404. I'm not sure we ever actually want
@@ -186,6 +187,7 @@ ActionController::Routing::Routes.draw do |map|
       quiz.history "history", :controller => "quizzes", :action => "history"
       quiz.statistics "statistics", :controller => 'quizzes', :action => 'statistics'
       quiz.formatted_statistics "statistics.:format", :controller => 'quizzes', :action => 'statistics'
+      quiz.read_only "read_only", :controller => 'quizzes', :action => 'read_only'
       quiz.filters 'filters', :controller => 'quizzes', :action => 'filters'
       quiz.resources :quiz_submissions, :as => "submissions", :collection => {:backup => :put} do |submission|
       end
@@ -261,7 +263,6 @@ ActionController::Routing::Routes.draw do |map|
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
   map.media_object_redirect 'media_objects/:id/redirect', :controller => 'context', :action => 'media_object_redirect'
-  map.page_views 'info/page_views', :controller => 'info', :action => 'page_views'
   map.external_content_success 'external_content/success/:service', :controller => 'external_content', :action => 'success'
   map.external_content_cancel 'external_content/cancel/:service', :controller => 'external_content', :action => 'cancel'
   
@@ -494,7 +495,7 @@ ActionController::Routing::Routes.draw do |map|
     user.merge 'merge', :controller => 'users', :action => 'merge', :conditions => {:method => :post}
     user.grades 'grades', :controller => 'users', :action => 'grades'
     user.resources :user_notes
-    user.courses 'courses', :controller => 'users', :action => 'courses'
+    user.manageable_courses 'manageable_courses', :controller => 'users', :action => 'manageable_courses'
     user.outcomes 'outcomes', :controller => 'outcomes', :action => 'user_outcome_results'
     user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
@@ -627,7 +628,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :interaction_tests, :collection => {:next => :get, :register => :get, :groups => :post}
   
-  map.resources :delayed_jobs, :member => {:update => :put, :queue => :put, :hold => :put}, :collection => {:hold => :put, :queue => :put}
+  map.resources :delayed_jobs, :only => :index, :controller => 'jobs'
   map.object_snippet 'object_snippet', :controller => 'context', :action => 'object_snippet', :conditions => { :method => :post }
   map.saml_consume "saml_consume", :controller => "pseudonym_sessions", :action => "saml_consume" 
   map.saml_logout "saml_logout", :controller => "pseudonym_sessions", :action => "saml_logout" 

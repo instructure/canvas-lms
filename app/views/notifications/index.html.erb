@@ -1,16 +1,14 @@
-<% content_for :page_title do %>Notifications<% end %>
+<% content_for :page_title do %><%= t "#titles.notifications", "Notifications" %><% end %>
 
 <% content_for :right_side do %>
   <div style="margin-bottom: 20px;">
-  <p>Click any notification to expand it and see the details.  You can 
-  also close the notification or click the title to visit the 
-  associated item's page.</p>
-  <a href="#" class="expand_notifications_link expand">Expand All Notifications<br/></a>
-  <a href="#" class="collapse_notifications_link collapse" style="display: none;">Collapse All Notifications<br/></a>
-  <a href="<%= context_url(@context, :clear_context_notifications_url) %>" class="clear_notifications_link delete-circle">Clear All Notifications</a><br/>
+  <p><%= t :notification_navigation_notice, "Click any notification to expand it and see the details. You can also close the notification or click the title to visit the associated item's page." %></p>
+  <a href="#" class="expand_notifications_link expand"><%= t :expand_all_link, "Expand All Notifications" %><br/></a>
+  <a href="#" class="collapse_notifications_link collapse" style="display: none;"><%= t :collapse_all_link, "Collapse All Notifications" %><br/></a>
+  <a href="<%= context_url(@context, :clear_context_notifications_url) %>" class="clear_notifications_link delete-circle"><%= t :clear_all_link, "Clear All Notifications" %></a><br/>
   </div>
-  <%= render :partial => "shared/event_list", :object => @upcoming_events, :locals => {:title => "Coming Up", :display_count => 3, :period => "the next week", :show_context => @context.is_a?(User), :upcoming => true } %>
-  <%= render :partial => "shared/event_list", :object => @recent_events, :locals => {:title => "Recent", :display_count => 3, :period => "the last 2 weeks", :show_context => @context.is_a?(User) } %>
+  <%= render :partial => "shared/event_list", :object => @upcoming_events, :locals => {:title => t(:coming_up, "Coming Up"), :display_count => 3, :period => "the next week", :show_context => @context.is_a?(User), :upcoming => true } %>
+  <%= render :partial => "shared/event_list", :object => @recent_events, :locals => {:title => t(:recent, "Recent"), :display_count => 3, :period => "the last 2 weeks", :show_context => @context.is_a?(User) } %>
 <% end %>
 
 <% content_for :stylesheets do %>
@@ -275,19 +273,19 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<h2>Notifications</h2>
+<h2><%= t "#titles.notifications", "Notifications" %></h2>
 <ul id="notification_list" class="unstyled_list">
   <% if @message_types.empty? %>
-    <li class="notification_type">No Notifications</li>
+    <li class="notification_type"><%= t :no_notifications, "No Notifications" %></li>
   <% end %>
   <% @message_types.each do |message_type, messages| %>
     <li class="notification_type">
       <div style="float: left;">
         <a name="<%= slugify(message_type).pluralize %>">
-          <%= image_tag "#{slugify(message_type)}_icon.png" %> <%= message_type %> Notifications
+          <%= image_tag "#{slugify(message_type)}_icon.png" %> <%= t :message_type_notifications, "%{message_type} Notifications", :message_type => message_type %>
         </a>
       </div>
-      <a href="#" class="clear_category_notifications_link" style="float: right; padding-right: 10px; font-size: 0.6em; padding-top: 0.8em;">Clear All</a>
+      <a href="#" class="clear_category_notifications_link" style="float: right; padding-right: 10px; font-size: 0.6em; padding-top: 0.8em;"><%= t :clear_all_short_link, "Clear All" %></a>
       <div class="clear"></div>
     </li>
     <% messages.each do |message| %>
@@ -301,11 +299,11 @@ $(document).ready(function() {
         </div>
         <div class="links">
           <span class="hidden_links">
-          <a class="collapse_notification_link no-hover" style="display: none;" href="#" title="Collapse"><%= image_tag "collapse.png" %></a>
-          <a class="expand_notification_link no-hover" href="#" title="Expand"><%= image_tag "expand.png" %></a>
-          <a style="padding-left: 10px;" class="delete_notification_link no-hover" href="<%= context_url(@context, :context_notification_url, message.id) %>" title="Clear Notification"><%= image_tag "delete_circle.png" %></a>
+          <a class="collapse_notification_link no-hover" style="display: none;" href="#" title="<%= t :collapse_hover, "Collapse" %>"><%= image_tag "collapse.png" %></a>
+          <a class="expand_notification_link no-hover" href="#" title="<%= t :expand_over, "Expand" %>"><%= image_tag "expand.png" %></a>
+          <a style="padding-left: 10px;" class="delete_notification_link no-hover" href="<%= context_url(@context, :context_notification_url, message.id) %>" title="<%= t :clear_hover, "Clear Notification" %>"><%= image_tag "delete_circle.png" %></a>
           </span>
-          <a class="undelete_notification_link no-hover" href="<%= context_url(@context, :context_notification_url, message.id) %>" style="display: none;" title="This message is marked as read and will be cleared.  Click to undo."><%= image_tag "check.png" %></a>
+          <a class="undelete_notification_link no-hover" href="<%= context_url(@context, :context_notification_url, message.id) %>" style="display: none;" title="<%= t :undo_hover, "This message is marked as read and will be cleared.  Click to undo." %>"><%= image_tag "check.png" %></a>
         </div>
         <div class="clear"></div>
         <div class="body"><%= body %></div>

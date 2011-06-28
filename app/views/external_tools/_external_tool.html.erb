@@ -3,27 +3,27 @@
   <div class="header">
     <div class="name"><%= tool.try(:name) %></div>
     <div class="links">
-      <a href="#" rel="<%= context_url(@context, :context_external_tool_url, tool ? tool.id : "{{ id }}") %>" class="update_tool_url edit_tool_link" title="Edit Tool"><%= image_tag "edit.png" %></a>
-      <a href="#" class="delete_tool_link" title="Delete Tool"><%= image_tag "delete.png" %></a>
+      <a href="#" rel="<%= context_url(@context, :context_external_tool_url, tool ? tool.id : "{{ id }}") %>" class="update_tool_url edit_tool_link" title="<%= t :edit_tool, "Edit Tool" %>"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_tool_link" title="<%= t :delete_tool, "Delete Tool" %>"><%= image_tag "delete.png" %></a>
     </div>
     <div class="clear"></div>
   </div>
   <div class="content">
     <table class="formtable">
       <tr>
-        <td>Privacy:</td>
+        <td><%= before_label :privacy, "Privacy" %></td>
         <td class="readable_state"><%= tool.try(:readable_state) %></td>
       </tr><tr>
-        <td>Consumer Key:</td>
+        <td><%= before_label :consumer_key, "Consumer Key" %></td>
         <td class="consumer_key"><%= tool.try(:consumer_key) %></td>
       </tr><tr class="tool_url" style="<%= hidden if tool.try(:url).blank? %>">
-        <td>URL:</td>
+        <td><%= before_label :url, "URL" %></td>
         <td class="url"><%= tool.try(:url) %></td>
       </tr><tr class="tool_domain" style="<%= hidden if tool.try(:domain).blank? %>">
-        <td>Domain:</td>
+        <td><%= before_label :domain, "Domain" %></td>
         <td class="domain"><%= tool.try(:domain) %></td>
       </tr><tr>
-        <td>Description:</td>
+        <td><%= before_label :description, "Description" %></td>
         <td class="description" style="font-size: 0.8em;">
           <%= tool.try(:description) %>
         </td>

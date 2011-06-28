@@ -45,12 +45,13 @@ class AssignmentGroup < ActiveRecord::Base
   after_save :update_student_grades
   
   def generate_default_values
-    self.name ||= "Assignments"
+    self.name ||= t 'default_title', "Assignments"
     if !self.group_weight
       self.group_weight = 0
     end
     @grades_changed = self.rules_changed? || self.group_weight_changed?
-    self.default_assignment_name = self.name.singularize
+    self.default_assignment_name = self.name
+    self.default_assignment_name = self.default_assignment_name.singularize if I18n.locale == :en
   end
   protected :generate_default_values
   
@@ -182,7 +183,11 @@ class AssignmentGroup < ActiveRecord::Base
     to_import = migration.to_import 'assignment_groups'
     groups.each do |group|
       if group['migration_id'] && (!to_import || to_import[group['migration_id']])
-        import_from_migration(group, migration.context)
+        begin
+          import_from_migration(group, migration.context)
+        rescue
+          migration.add_warning("Couldn't import assignment group \"#{group[:title]}\"", $!)
+        end
       end
     end
   end

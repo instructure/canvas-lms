@@ -60,7 +60,7 @@ class QuizSubmission < ActiveRecord::Base
     given {|user| user && user.id == self.user_id && self.untaken? }
     set { can :update }
     
-    given {|user, session| self.quiz.grants_right?(user, session, :manage) }
+    given {|user, session| self.quiz.grants_right?(user, session, :manage) || self.quiz.grants_right?(user, session, :review_grades) }
     set { can :read }
     
     given {|user, session| self.quiz.grants_right?(user, session, :manage) }
@@ -203,15 +203,7 @@ class QuizSubmission < ActiveRecord::Base
       self.kept_score = self.score
       if self.quiz && self.quiz.scoring_policy == "keep_highest"
         scores = [self.kept_score]
-        version_instances = []
-        attempt = nil
-        self.versions.sort_by(&:created_at).reverse.each do |version|
-          if version.model.attempt && (!attempt || version.model.attempt < attempt)
-            attempt = version.model.attempt
-            version_instances << version.model
-          end
-        end
-        scores += version_instances.map{|v| v.score || 0.0} rescue []
+        scores += versions.map{|v| v.model.score || 0.0} rescue []
         self.kept_score = scores.max rescue 0
       end
     end
@@ -412,12 +404,16 @@ class QuizSubmission < ActiveRecord::Base
     self.score = tally
     self.submission_data = res
     self.context_module_action
-    
+
     update_submission_version(version)
     if version == versions.current
       self.with_versioning(false) do |s|
         s.save
       end
+    elsif (self.quiz && self.quiz.scoring_policy == 'keep_highest' && self.score > self.kept_score)
+      # Force a save on the latest version so kept_score gets updated correctly
+      self.reload
+      self.without_versioning(&:save)
     end
     track_outcomes(version.model.attempt)
     

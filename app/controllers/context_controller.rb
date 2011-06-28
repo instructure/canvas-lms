@@ -93,7 +93,7 @@ class ContextController < ApplicationController
     if config
       redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id], request.ssl? ? "https" : "http")
     else
-      render :text => "Media Objects not configured"
+      render :text => t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
   
@@ -190,16 +190,16 @@ class ContextController < ApplicationController
       hash = {
         :context_code => @message.context_code,
         :recipients => @message.user_id.to_s,
-        :subject => "Re: #{@message.subject.sub(/\ARe: /, "")}"
+        :subject => TextHelper.make_subject_reply_to(@message.subject),
       }
       redirect_to inbox_url(:reply_id => @message.id, :anchor => "reply" + hash.to_json)
     end
   end
-  
+
   def inbox_item
     @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
     if !@item
-      flash[:error] = "The message you were trying to view has been removed"
+      flash[:error] = t(:message_removed, "The message you were trying to view has been removed")
       redirect_to inbox_url
       return
     else
@@ -215,10 +215,10 @@ class ContextController < ApplicationController
         elsif @asset.is_a?(ContextMessage)
           redirect_to inbox_url(:message_id => @asset.id)
         elsif @asset.nil?
-          flash[:notice] = "This message has been deleted"
+          flash[:notice] = t(:message_deleted, "This message has been deleted")
           redirect_to inbox_url
         else
-          flash[:notice] = "Unknown item type, #{@asset.class.to_s}"
+          flash[:notice] = t(:bad_message, "This message could not be displayed")
           redirect_to inbox_url
         end
       end
@@ -272,7 +272,7 @@ class ContextController < ApplicationController
       begin
         redirect_to verified_file_download_url(@attachment)
       rescue => e
-        @not_found_message = "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
+        @not_found_message = t(:roster_message_attachment_not_found, "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it.")
         render :template => 'shared/errors/404_message', :status => :bad_request
       end
     end
@@ -280,14 +280,14 @@ class ContextController < ApplicationController
   
   def chat
     if !Tinychat.config
-      flash[:error] = "Chat has not been enabled for this Canvas site"
+      flash[:error] = t(:chat_not_enabled, "Chat has not been enabled for this Canvas site")
       redirect_to named_context_url(@context, :context_url)
       return
     end
     if authorized_action(@context, @current_user, :read_roster)
       return unless tab_enabled?(@context.class::TAB_CHAT)
       
-      add_crumb("Chat", named_context_url(@context, :context_chat_url))
+      add_crumb(t('#crumbs.chat', "Chat"), named_context_url(@context, :context_chat_url))
       self.active_tab="chat"
       
       res = nil
@@ -327,25 +327,25 @@ class ContextController < ApplicationController
   
   def inbox
     add_crumb(@current_user.short_name, named_context_url(@current_user, :context_url))
-    add_crumb("Inbox", inbox_url)
+    add_crumb(t('#crumb.inbox', "Inbox"), inbox_url)
     case params[:view]
     when 'sentbox'
       @messages_view = :sentbox
       @messages = @current_user.sentbox_context_messages
       context_messages = @messages
-      @messages_view_header = "Sent Messages"
+      @messages_view_header = t('inbox.sent_messages', "Sent Messages")
       @per_page = 10
     when 'inbox'
       @messages_view = :inbox
       @messages = @current_user.inbox_context_messages
       context_messages = @messages
-      @messages_view_header = "Received Messages"
+      @messages_view_header = t('inbox.received_messages', "Received Messages")
       @per_page = 10
     else # default view
       @messages_view = :action_items
       @messages = @current_user.inbox_items.active
       context_messages = @current_user.context_messages
-      @messages_view_header = "Inbox"
+      @messages_view_header = t('inbox.inbox', "Inbox")
       @per_page = 15
     end
     if params[:reply_id]
@@ -374,7 +374,7 @@ class ContextController < ApplicationController
   end
   
   def mark_inbox_as_read
-    flash[:notice] = "Inbox messages all marked as read"
+    flash[:notice] = t(:all_marked_read, "Inbox messages all marked as read")
     if @current_user
       InboxItem.update_all({:workflow_state => 'read'}, {:user_id => @current_user.id})
       User.update_all({:unread_inbox_items_count => (@current_user.inbox_items.unread.count rescue 0)}, {:id => @current_user.id})
@@ -419,45 +419,34 @@ class ContextController < ApplicationController
     get_context
 
     if authorized_action(@context, @current_user, :read_roster)
-      
-      
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       if @context.is_a?(Course)
         @enrollments_hash = {}
         @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
         @students = @context.students_visible_to(@current_user).find(:all, :order => 'sortable_name').uniq
         @teachers = @context.admins.find(:all, :order => 'sortable_name').uniq
-        user_ids = @students.map(&:id) & @teachers.map(&:id)
+        user_ids = @students.map(&:id) + @teachers.map(&:id)
         if @context.visibility_limited_to_course_sections?(@current_user)
           user_ids = @students.map(&:id) + [@current_user.id]
         end
-        @primary_users = {'Students' => @students}
-        @secondary_users = {'Teachers & TA\'s' => @teachers}
-        @messages = @context.context_messages.find(:all, :order => 'created_at DESC', :include => [:attachments, :context], :limit => 25)
-        @messages = @messages.select{|m| !(([m.user_id] + m.recipients || []) & user_ids).empty? }
+        @primary_users = {t('roster.students', 'Students') => @students}
+        @secondary_users = {t('roster.teachers', 'Teachers & TA\'s') => @teachers}
       elsif @context.is_a?(Group)
         @users = @context.participating_users.find(:all, :order => 'sortable_name').uniq
-        @primary_users = {'Group Members' => @users}
+        @primary_users = {t('roster.group_members', 'Group Members') => @users}
         if @context.context && @context.context.is_a?(Course)
-          @secondary_users = {'Teachers & TA\'s' => @context.context.admins.find(:all, :order => 'sortable_name').uniq}
+          @secondary_users = {t('roster.teachers', 'Teachers & TA\'s') => @context.context.admins.find(:all, :order => 'sortable_name').uniq}
         end
-        @messages = @context.context_messages.find(:all, :order => 'created_at DESC', :include => [:attachments, :context], :limit => 25)
       end
       @secondary_users ||= {}
       @groups = @context.groups.active rescue []
       @categories = @groups.map{|g| g.category}.uniq
-      @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }
-      @messages = @messages[0..10] unless params[:all_messages]
-      respond_to do |format|
-        format.html
-        format.json { render :json => @messages.to_json(:methods => [:formatted_body, :user_name, :recipient_users], :include => {:attachments => {:methods => :readable_size}}) }
-      end
     end
   end
   
   def prior_users
     get_context
-    if authorized_action(@context, @current_user, :manage_admin_users)
+    if authorized_action(@context, @current_user, [:manage_admin_users, :read_as_admin])
       @prior_memberships = @context.enrollments.scoped(:conditions => {:workflow_state => 'completed'}, :include => :user).to_a.once_per(&:user_id).sort_by{|e| [e.rank_sortable(true), e.user.sortable_name] }
     end
   end
@@ -503,7 +492,11 @@ class ContextController < ApplicationController
       @enrollment ||= @membership
       @user = @context.users.find(params[:id]) rescue nil
       if !@user
-        flash[:error] = "That user does not exist or is not currently a member of this #{@context.class.to_s.downcase}"
+        if @context.is_a?(Course)
+          flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
+        elsif @context.is_a?(Group)
+          flash[:error] = t('no_user.group', "That user does not exist or is not currently a member of this group")
+        end
         redirect_to named_context_url(@context, :context_users_url)
         return
       end

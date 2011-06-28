@@ -2,12 +2,12 @@
 <div class="question_bank" id="question_bank_<%= question_bank ? question_bank.id : "blank" %>" style="<%= hidden unless question_bank %>">
   <div class="header">
     <div class="header_content">
-      <a class="title" href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>"><%= question_bank.try_rescue(:title) || "No Name" %></a>
+      <a class="title" href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>"><%= question_bank.try_rescue(:title) || t('no_name', "No Name") %></a>
     </div>
     <div class="links">
       <% not_yet_bookmarked = question_bank && !question_bank.bookmarked_for?(@current_user) %>
-      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}") %>" class="bookmark_bank_link no-hover" title="Bookmark this Question Bank" style="<%= hidden unless not_yet_bookmarked %>"><%= image_tag "bookmark_gray.png" %></a>
-      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="bookmark_bank_link no-hover" title="Unbookmark this Question Bank" style="<%= hidden if not_yet_bookmarked %>"><%= image_tag "bookmark.png" %></a>
+      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}") %>" class="bookmark_bank_link no-hover" title="<%= t('bookmark_bank', 'Bookmark this Question Bank') %>" style="<%= hidden unless not_yet_bookmarked %>"><%= image_tag "bookmark_gray.png" %></a>
+      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="bookmark_bank_link no-hover" title="<%= t('unbookmark_bank', 'Unbookmark this Question Bank') %>" style="<%= hidden if not_yet_bookmarked %>"><%= image_tag "bookmark.png" %></a>
       <% if context == @context %>
         <span style="<%= hidden if question_bank && !can_do(question_bank, @current_user, :update) %>">
           <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="edit_bank_link no-hover"><%= image_tag "edit.png" %></a>
@@ -18,7 +18,7 @@
     <div class="clear"></div>
   </div>
   <div class="content">
-    <div><%= question_bank ? pluralize(question_bank.assessment_questions.active.count, "Question") : "No Questions" %></div>
-    <div>Last Updated: <span class="last_updated_at"><%= datetime_string(question_bank.try_rescue(:updated_at)) || nbsp %></span></div>
+    <div><%= question_bank ? t('question_count', "Question", :count => question_bank.assessment_questions.active.count) : t('no_questions', "No Questions") %></div>
+    <div><%= t('last_updated', "Last Updated: *%{datetime}*", :datetime => datetime_string(question_bank.try_rescue(:updated_at)) || nbsp, :wrapper => '<span class="last_updated_at">\1</span>') %></div>
   </div>
 </div>

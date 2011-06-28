@@ -19,7 +19,7 @@
 class WikiPageRevisionsController < ApplicationController
   before_filter :require_context, :except => :latest_version_number
   before_filter :get_wiki_page, :except => :latest_version_number
-  add_crumb("Pages", :except => [:latest_version_number]) { |c| c.send :course_wiki_pages_path, c.instance_variable_get("@context") }
+  add_crumb(lambda{ t '#crumbs.wiki_pages', "Pages"}, :except => [:latest_version_number]) { |c| c.send :course_wiki_pages_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "pages" }
   
   def index
@@ -27,7 +27,7 @@ class WikiPageRevisionsController < ApplicationController
       respond_to do |format|
         format.html {
           add_crumb(@page.title, course_wiki_page_url( @context.id, @page))
-          add_crumb("Revisions")
+          add_crumb(t("#crumbs.revisions", "Revisions"))
           log_asset_access(@page, "wiki", @namespace)
         }
         format.json { render :json => @page.version_history.to_json(:methods => :version_number) }
@@ -75,7 +75,7 @@ class WikiPageRevisionsController < ApplicationController
     if authorized_action(@page, @current_user, :update)
       @revision = @page.versions.find(params[:id])
       @page.revert_to_version @revision
-      flash[:notice] = 'Page was successfully rolled-back to previous version.'
+      flash[:notice] = t('notices.page_rolled_back', 'Page was successfully rolled-back to previous version.')
       redirect_to course_wiki_page_url( @context.id, @page)
     end
   end
