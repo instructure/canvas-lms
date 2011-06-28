@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+I18n.scoped("license_help", function(I18n) {
 $(document).ready(function() {
   $(".license_help_link").live('click', function(event) {
     event.preventDefault();
@@ -97,7 +97,7 @@ $(document).ready(function() {
       });
       $dialog.dialog({
         autoOpen: false,
-        title: "Content Licensing Help",
+        title: I18n.t("content_license_help", "Content Licensing Help"),
         width: 700,
         height: 360
       });
@@ -107,4 +107,5 @@ $(document).ready(function() {
     $dialog.triggerHandler('license_change', $select.val() || "private");
     $dialog.dialog('open');
   });
+});
 });

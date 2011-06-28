@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+I18n.scoped("learning_outcome", function(I18n) {
 $(document).ready(function() {
   $('#outcome_results').pageless({
     totalPages: parseInt($("#outcome_results_total_pages").text(), 10) || 1,
     url: $(".outcome_results_url").attr('href'),
-    loaderMsg: "Loading more results",
+    loaderMsg: I18n.t("loading_more_results", "Loading more results"),
     scrape: function(data) {
       if(typeof(data) == 'string') {
         try {
@@ -45,7 +45,7 @@ $(document).ready(function() {
     event.preventDefault();
     $(this).parents(".alignment").confirmDelete({
       url: $(this).attr('href'),
-      message: "Are you sure you want to remove this alignment?",
+      message: I18n.t("remove_outcome_alignment", "Are you sure you want to remove this alignment?"),
       success: function(data) {
         $(this).slideUp(function() {
           $(this).remove();
@@ -89,9 +89,9 @@ $(document).ready(function() {
     event.preventDefault();
     if(INST && INST.selectContentDialog) {
       var options = {for_modules: false};
-      options.select_button_text = "Align Item";
-      options.holder_name = "this Outcome";
-      options.dialog_title = "Align Item to this Outcome";
+      options.select_button_text = I18n.t("align_item", "Align Item");
+      options.holder_name = I18n.t("this_outcome", "this Outcome");
+      options.dialog_title = I18n.t("align_to_outcome", "Align Item to this Outcome");
       options.submit = function(item_data) {
         var $item = addAlignment(item_data);
         var url = $("#outcome_urls .align_url").attr('href');
@@ -115,4 +115,5 @@ $(document).ready(function() {
     $(".hover_alignment,.hover_artifact").removeClass('hover_alignment').removeClass('hover_artifact');
     $(this).addClass('hover_alignment');
   });
+});
 });
