@@ -421,9 +421,9 @@ class ApplicationController < ActionController::Base
       elsif @context.is_a?(Course)
         error = t "#application.errors.quota_exceeded_course", "Course storage quota exceeded"
       elsif @context.is_a?(Group)
-        error = t "#application.errors.quota_exceeded_group", "Course storage quota exceeded"
+        error = t "#application.errors.quota_exceeded_group", "Group storage quota exceeded"
       elsif @context.is_a?(User)
-        error = t "#application.errors.quota_exceeded_user", "Course storage quota exceeded"
+        error = t "#application.errors.quota_exceeded_user", "User storage quota exceeded"
       else
         error = t "#application.errors.quota_exceeded", "Storage quota exceeded"
       end

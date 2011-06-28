@@ -374,8 +374,9 @@ class FilesController < ApplicationController
   
   def create_pending
     @context = Context.find_by_asset_string(params[:attachment][:context_code])
+    @asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string], @context) if params[:attachment][:asset_string]
     @attachment = Attachment.new
-    @attachment.context = @context
+    @check_quota = true
     permission_object = @attachment
     permission = :create
     
@@ -387,29 +388,36 @@ class FilesController < ApplicationController
     # is to upload it to a context.  In the other cases we need to check the
     # permission related to the purpose to make sure the file isn't being
     # uploaded just to disappear later
-    if @context.is_a?(Assignment) && params[:intent] == 'comment'
-      permission_object = @context
+    if @asset.is_a?(Assignment) && params[:intent] == 'comment'
+      permission_object = @asset
       permission = :attach_submission_comment_files
-    elsif @context.is_a?(Assignment) && params[:intent] == 'submit'
+      @context = @asset
+      @check_quota = false
+    elsif @asset.is_a?(Assignment) && params[:intent] == 'submit'
       permission_object = @context
       permission = (@context.submission_types || "").match(/online_file_upload/) ? :submit : :nothing
-    elsif @context.respond_to?(:is_a_context) && params[:intent] == 'attach_discussion_file'
+      @context = @current_user
+      @check_quota = false
+    elsif @context && params[:intent] == 'attach_discussion_file'
       permission_object = @context.discussion_topics.new
       permission = :attach
-    elsif @context.respond_to?(:is_a_context) && params[:intent] == 'message'
+    elsif @context && params[:intent] == 'message'
       permission_object = @context
       permission = :send_messages
       workflow_state = 'unattached_temporary'
-    elsif @context.respond_to?(:is_a_context) && params[:intent] && params[:intent] != 'upload'
+      @check_quota = false
+    elsif @context && params[:intent] && params[:intent] != 'upload'
       # In other cases (like unzipping a file, extracting a QTI, etc.
       # we don't actually want the uploaded file to show up in the context's
       # file listings.  If you set its workflow_state to unattached_temporary
       # then it will never be activated.
       workflow_state = 'unattached_temporary'
+      @check_quota = false
     end
     
+    @attachment.context = @context
     if authorized_action(permission_object, @current_user, permission)
-      if @context.respond_to?(:is_a_context) && params[:intent] == 'upload'
+      if @context.respond_to?(:is_a_context?) && @check_quota
         get_quota
         return if quota_exceeded(named_context_url(@context, :context_files_url))
       end
