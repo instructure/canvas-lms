@@ -1,4 +1,6 @@
-You were invited to collaborate on a document, <%= asset.collaboration.title %> for
-<%= asset.collaboration.context.name %>.  
+<%= t :body, <<-BODY, :document => asset.collaboration.title, :course_or_group => asset.collaboration.context.name, :link => HostUrl.context_host(asset.collaboration.context)
+You were invited to collaborate on a document, %{document} for %{course_or_group}.
 
-More info at <%= HostUrl.context_host(asset.collaboration.context) %>
+More info at %{link}
+BODY
+%>
