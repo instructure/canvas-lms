@@ -221,11 +221,11 @@ class Message < ActiveRecord::Base
   end
   
   def define_content(name, &block)
-    old_output, @output = @output, ''
+    old_output, @output_buffer = @output_buffer, ''
     yield
-    self.instance_variable_set("@message_content_#{name.to_s}".to_sym, @output.to_s.strip)
+    self.instance_variable_set("@message_content_#{name.to_s}".to_sym, @output_buffer.to_s.strip)
     old_output.sub!(/\n\z/, '')
-    @output = old_output
+    @output_buffer = old_output
     ""
   end
   
@@ -271,12 +271,13 @@ class Message < ActiveRecord::Base
 
       if path_type == 'facebook'
         # this will ensure we escape anything that's not already safe
-        message = '<% @output = ActiveSupport::SafeBuffer.new %>' + message
+        self.body = RailsXss::Erubis.new(message).result(b)
+      else
+        self.body = Erubis::Eruby.new(message, :bufvar => "@output_buffer").result(b)
       end
-      self.body = Erubis::Eruby.new(message, :bufvar => "@output").result(b)
       if path_type == 'email'
         message = File.read(Canvas::MessageHelper.find_message_path('_email_footer.email.erb'))
-        comm_message = Erubis::Eruby.new(message, :bufvar => "@output").result(b) rescue nil
+        comm_message = Erubis::Eruby.new(message, :bufvar => "@output_buffer").result(b) rescue nil
         self.body = self.body + "\n\n\n\n\n\n________________________________________\n" + comm_message if comm_message
       end
       self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
