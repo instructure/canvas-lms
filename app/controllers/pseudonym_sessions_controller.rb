@@ -57,10 +57,10 @@ class PseudonymSessionsController < ApplicationController
         end
         if st.is_valid?
           @pseudonym = nil
-          @pseudonym = Pseudonym.active.custom_find_by_unique_id(st.response.user)
+          @pseudonym = @domain_root_account.pseudonyms.active.custom_find_by_unique_id(st.response.user)
           if @pseudonym
             # Successful login and we have a user
-            PseudonymSession.create!(@pseudonym, false)
+            @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
             session[:cas_login] = true
             @user = @pseudonym.login_assertions_for_user rescue nil
 
@@ -219,16 +219,14 @@ class PseudonymSessionsController < ApplicationController
   def saml_consume
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
       settings = @domain_root_account.account_authorization_config.saml_settings
-      response = Onelogin::Saml::Response.new(params[:SAMLResponse])
-      response.settings = settings
-      response.logger = logger
+      response = saml_response(params[:SAMLResponse], settings)
 
       logger.info "Attempting SAML login for #{response.name_id} in account #{@domain_root_account.id}"
 
       if response.is_valid?
         if response.success_status?
           @pseudonym = nil
-          @pseudonym = Pseudonym.active.custom_find_by_unique_id(response.name_id)
+          @pseudonym = @domain_root_account.pseudonyms.active.custom_find_by_unique_id(response.name_id)
 
           if @pseudonym
             # We have to reset the session again here -- it's possible to do a
@@ -236,7 +234,7 @@ class PseudonymSessionsController < ApplicationController
             # school's setup.
             reset_session
             #Successful login and we have a user
-            PseudonymSession.create!(@pseudonym, false)
+            @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
             @user = @pseudonym.login_assertions_for_user rescue nil
 
             session[:name_id] = response.name_id
@@ -290,9 +288,16 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def cas_client
-      return @cas_client if @cas_client
-      config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
-      @cas_client = CASClient::Client.new(config)
+    return @cas_client if @cas_client
+    config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
+    @cas_client = CASClient::Client.new(config)
+  end
+
+  def saml_response(raw_response, settings)
+    response = Onelogin::Saml::Response.new(raw_response)
+    response.settings = settings
+    response.logger = logger
+    response
   end
 
   def forbid_on_files_domain

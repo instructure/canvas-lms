@@ -60,8 +60,18 @@ class Setting < ActiveRecord::Base
     s.destroy if s
   end
   
+  def self.config_key(config_name, with_current_rails_env=true)
+    "yaml_config_#{config_name}_#{Rails.env}_#{with_current_rails_env}"
+  end
+
+  def self.set_config(config_name, value)
+    raise "config settings can only be set via config file" unless RAILS_ENV == 'test'
+    @@cache[config_key(config_name)] = value
+  end
+
   def self.from_config(config_name, with_current_rails_env=true)
-    key = "yaml_config_#{config_name}_#{Rails.env}_#{with_current_rails_env}"
+    key = config_key(config_name, with_current_rails_env)
+    
     return @@cache[key] if @@cache[key] # if the config wasn't found it'll try again
     
     config = nil
