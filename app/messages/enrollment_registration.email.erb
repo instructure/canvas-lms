@@ -3,14 +3,28 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= asset.course.class.to_s.capitalize %> Invitation
+  <%= t :subject, "Course Invitation" %>
 <% end %>
 
-You've been invited to participate in a class at <%=  (HostUrl.context_host((asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>.  The class is called <%= asset.course.name %>, and you've been invited to participate as a <%= asset.readable_type %>.
+<% website = (HostUrl.context_host((asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>
+<%=
+    case asset.type
+    when 'TeacherEnrollment'
+      t :body_teacher, "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a teacher.", :website => website, :course => asset.course.name
+    when 'TAEnrollment'
+      t :body_ta, "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a TA.", :website => website, :course => asset.course.name
+    when 'ObserverEnrollment'
+      t :body_observer, "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a observer.", :website => website, :course => asset.course.name
+    when 'CourseDesignerEnrollment'
+      t :body_designer, "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a designer.", :website => website, :course => asset.course.name
+    else
+      t :body_student, "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a student.", :website => website, :course => asset.course.name
+    end
+%>
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
-Name: <%= asset.user.name %>
-Email: <%= asset.user.email %>
-<% if email != login %>Username: <%= asset.user.pseudonym.unique_id rescue "none" %><% end %>
+<%= before_label :name, "Name" %> <%= asset.user.name %>
+<%= before_label :email, "Email" %> <%= asset.user.email %>
+<% if email != login %><%= before_label :username, "Username" %> <%= asset.user.pseudonym.unique_id rescue t(:none, "none") %><% end %>
 
-You'll need register with Canvas before you can participate in the class.  To get started, visit the <%= asset.course.class.to_s.downcase %> page here:
+<%= t :details, "You'll need register with Canvas before you can participate in the class.  To get started, visit the course page here:" %>
 <%= content :link %>

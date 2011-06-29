@@ -268,6 +268,7 @@ class Message < ActiveRecord::Base
       message = File.read(path)
       @message_content_link = nil; @message_content_subject = nil
       self.extend TextHelper
+      self.extend ERB::Util
       b = binding
 
       if path_type == 'facebook'
