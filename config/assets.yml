@@ -291,6 +291,8 @@ stylesheets:
     - public/stylesheets/compiled/context_list.css
   prior_users:
     - public/stylesheets/compiled/prior_users.css
+  reports:
+    - public/stylesheets/compiled/reports.css
   statistics:
     - public/stylesheets/compiled/statistics.css
   slickgrid:

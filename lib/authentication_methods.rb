@@ -196,6 +196,12 @@ module AuthenticationMethods
   end
   protected :redirect_back_or_default
 
+  def redirect_to_referrer_or_default(default)
+    redirect_to(:back)
+  rescue ActionController::RedirectBackError
+    redirect_to(default)
+  end
+
   # Reset the session, and copy the specified keys over to the new session.
   # Please consider the security implications of any keys you copy over.
   def reset_session_saving_keys(*keys)

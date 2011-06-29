@@ -709,5 +709,87 @@ class UsersController < ApplicationController
     end
   end
   protected :require_open_registration
-  
+
+  def teacher_activity
+    @teacher = User.find(params[:user_id])
+    if @teacher == @current_user || authorized_action(@teacher, @current_user, :view_statistics)
+      @courses = {}
+
+      if params[:student_id]
+        student = User.find(params[:student_id])
+        enrollments = student.student_enrollments.active.all(:include => :course)
+        enrollments.each do |enrollment|
+          if enrollment.course.user_is_teacher?(@teacher) && enrollment.course.enrollments_visible_to(@teacher).find_by_id(enrollment.id) && enrollment.course.grants_right?(@current_user, :read_reports)
+            @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
+          end
+        end
+
+        if @courses.all? { |c, e| e.blank? }
+          flash[:error] = t('errors.no_teacher_courses', "There are no courses shared between this teacher and student")
+          redirect_to_referrer_or_default(root_url)
+        end
+
+      else # implied params[:course_id]
+        course = Course.find(params[:course_id])
+        if !course.user_is_teacher?(@teacher)
+          flash[:error] = t('errors.user_not_teacher', "That user is not a teacher in this course")
+          redirect_to_referrer_or_default(root_url)
+        elsif authorized_action(course, @current_user, :read_reports)
+          @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher))
+        end
+      end
+
+    end
+  end
+
+  protected
+
+  def teacher_activity_report(teacher, course, student_enrollments)
+    ids = student_enrollments.map(&:user_id)
+    data = {}
+    student_enrollments.each { |e| data[e.user.id] = { :enrollment => e, :ungraded => [] } }
+
+    # find last interactions
+    last_comment_dates = SubmissionComment.for_context(course).maximum(
+      :created_at,
+      :group => 'recipient_id',
+      :conditions => ["author_id = ? AND recipient_id IN (?)", teacher.id, ids])
+    last_comment_dates.each do |user_id, date|
+      next unless student = data[user_id]
+      student[:last_interaction] = [student[:last_interaction], date].compact.max
+    end
+    last_message_dates = ContextMessage.for_context(course).from_user(teacher).maximum(
+      :created_at,
+      :joins => :context_message_participants,
+      :group => 'context_message_participants.user_id',
+      :conditions => ["context_message_participants.user_id IN (?)", ids])
+    last_message_dates.each do |user_id, date|
+      next unless student = data[user_id]
+      student[:last_interaction] = [student[:last_interaction], date].compact.max
+    end
+
+    # find all ungraded submissions in one query
+    ungraded_submissions = course.submissions.all(
+      :include => :assignment,
+      :conditions => ["user_id IN (?) AND #{Submission.needs_grading_conditions}", ids])
+    ungraded_submissions.each do |submission|
+      next unless student = data[submission.user_id]
+      student[:ungraded] << submission
+    end
+
+    if course.root_account.enable_user_notes?
+      data.each { |k,v| v[:last_user_note] = nil }
+      # find all last user note times in one query
+      note_dates = UserNote.active.maximum(
+        :created_at,
+        :group => 'user_id',
+        :conditions => ["created_by_id = ? AND user_id IN (?)", teacher.id, ids])
+      note_dates.each do |user_id, date|
+        next unless student = data[user_id]
+        student[:last_user_note] = date
+      end
+    end
+
+    data.values.sort_by { |e| e[:enrollment].user.name }
+  end
 end

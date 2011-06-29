@@ -1960,22 +1960,29 @@ class Course < ActiveRecord::Base
     !section_visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
   end
   
+  # returns a scope, not an array of users/enrollments
   def students_visible_to(user, include_priors=false)
+    enrollments_visible_to(user, include_priors, true)
+  end
+  def enrollments_visible_to(user, include_priors=false, return_users=false)
     section_visibilities = Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
       Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type } }
     end
-    users = self.students
-    users = self.all_students if include_priors
+    if return_users
+      scope = include_priors ? self.all_students : self.students
+    else
+      scope = include_priors ? self.all_student_enrollments : self.student_enrollments
+    end
     if section_visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
-      users
+      scope
     elsif section_visibilities.empty?
       if self.grants_right?(user, nil, :manage_grades)
-        users
+        scope
       else
-        users.scoped({:conditions => ['enrollments.user_id = ? OR enrollments.associated_user_id = ?', user.id, user.id]})
+        scope.scoped({:conditions => ['enrollments.user_id = ? OR enrollments.associated_user_id = ?', user.id, user.id]})
       end
     else
-      users.scoped({:conditions => "enrollments.course_section_id IN (#{section_visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      scope.scoped({:conditions => "enrollments.course_section_id IN (#{section_visibilities.map{|s| s[:course_section_id]}.join(",")})"})
     end
   end
   
