@@ -41,13 +41,13 @@ module ApplicationHelper
     content = "<ul class='navigation_list' tabindex='-1'>\n"
     keys.each do |hash|
       content += "  <li>\n"
-      content += "    <span class='keycode'>#{hash[:key]}</span>\n"
+      content += "    <span class='keycode'>#{h(hash[:key])}</span>\n"
       content += "    <span class='colon'>:</span>\n"
-      content += "    <span class='description'>#{hash[:description]}</span>\n"
+      content += "    <span class='description'>#{h(hash[:description])}</span>\n"
       content += "  </li>\n"
     end
     content += "</ul>"
-    content_for(:keyboard_navigation) { content }
+    content_for(:keyboard_navigation) { raw(content) }
   end
   
   def context_prefix(code)
