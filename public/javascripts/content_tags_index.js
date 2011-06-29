@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('content_tags', function(I18n) {
 var contentTags = {
   currentHover: null,
   hoverCount: -1,
@@ -88,7 +89,7 @@ $(document).ready(function() {
   $(".page .delete_page_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".page").confirmDelete({
-      message: "Are you sure you want to delete this tag?",
+      message: I18n.t('prompts.delete_tag', "Are you sure you want to delete this tag?"),
       url: $(this).attr('href'),
       success: function() {
         $(this).slideUp(function() {
@@ -100,13 +101,13 @@ $(document).ready(function() {
   $(".add_external_tag_link").click(function(event) {
     event.preventDefault();
     $("#external_tag_dialog").dialog({
-      title: "Tag External Web Page",
+      title: I18n.t('titles.tag_external_web_page', "Tag External Web Page"),
       width: 400,
       open: function() {
         var data = {
           url: "http://",
-          title: "Page Title",
-          comments: "Comments"
+          title: I18n.t('defaults.page_title', "Page Title"),
+          comments: I18n.t('defaults.comments', "Comments")
         };
         $(this).fillFormData(data, {object_name: 'tag'});
         $(this).find(":text:visible:first").focus().select();
@@ -178,3 +179,4 @@ function addTagToContext($context, tag) {
   }
   return $match;
 }
+});
