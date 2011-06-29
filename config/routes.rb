@@ -404,6 +404,10 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :account_authorization_configs
     account.update_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'update_all', :conditions => {:method => :put}
     account.remove_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'destroy_all', :conditions => {:method => :delete}
+    account.test_ldap_connections 'test_ldap_connections', :controller => 'account_authorization_configs', :action => 'test_ldap_connection'
+    account.test_ldap_binds 'test_ldap_binds', :controller => 'account_authorization_configs', :action => 'test_ldap_bind'
+    account.test_ldap_searches 'test_ldap_searches', :controller => 'account_authorization_configs', :action => 'test_ldap_search'
+    account.test_ldap_logins 'test_ldap_logins', :controller => 'account_authorization_configs', :action => 'test_ldap_login'
     account.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end

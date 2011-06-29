@@ -21,7 +21,11 @@ require 'onelogin/saml'
 class AccountAuthorizationConfig < ActiveRecord::Base
   belongs_to :account
 
-  attr_accessible :account, :auth_port, :auth_host, :auth_base, :auth_username, :auth_password, :auth_password_salt, :auth_type, :auth_over_tls, :log_in_url, :log_out_url, :identifier_format, :certificate_fingerprint, :entity_id, :change_password_url, :login_handle_name, :ldap_filter, :auth_filter
+  attr_accessible :account, :auth_port, :auth_host, :auth_base, :auth_username,
+                  :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
+                  :log_in_url, :log_out_url, :identifier_format,
+                  :certificate_fingerprint, :entity_id, :change_password_url,
+                  :login_handle_name, :ldap_filter, :auth_filter
 
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
@@ -53,6 +57,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   
   def ldap_filter=(new_filter)
     self.auth_filter = new_filter
+  end
+
+  def ldap_ip
+    Socket::getaddrinfo(self.auth_host, 'http', nil, Socket::SOCK_STREAM)[0][3]
   end
   
   def auth_password=(password)
@@ -127,4 +135,64 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
   
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
+
+  def test_ldap_connection
+    begin
+      timeout(5) do
+        TCPSocket.open(self.auth_host, self.auth_port)
+      end
+      return true
+    rescue Timeout::Error
+      self.errors.add(
+        :ldap_connection_test,
+        t(:test_connection_timeout, "Timeout when connecting")
+      )
+    rescue
+      self.errors.add(
+        :ldap_connection_test,
+        t(:test_connection_failed, "Failed to connect to host/port")
+        )
+    end
+    false
+  end
+
+  def test_ldap_bind
+    begin
+      return self.ldap_connection.bind
+    rescue
+      self.errors.add(
+        :ldap_bind_test,
+        t(:test_bind_failed, "Failed to bind")
+      )
+      return false
+    end
+  end
+
+  def test_ldap_search
+    begin
+      return self.ldap_connection.search.count
+    rescue
+      self.errors.add(
+        :ldap_search_test,
+        t(:test_search_failed, "Search failed with the following error: %{error}", :error => $!)
+      )
+      return false
+    end
+  end
+
+  def test_ldap_login(username, password)
+    ldap = self.ldap_connection
+    filter = self.ldap_filter(username)
+    begin
+      res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password)
+      return true if res
+      self.errors.add(
+        :ldap_login_test,
+        t(:test_login_auth_failed, "Authentication failed")
+      )
+    rescue Net::LDAP::LdapError
+      self.errors.add(:ldap_login_test, $!)
+    end
+    false
+  end
 end
