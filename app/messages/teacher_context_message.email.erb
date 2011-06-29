@@ -5,17 +5,27 @@
   <%= asset.subject %> (<%= asset.context.name %>)
 <% end %>
 
-<%= asset.user.name rescue 'Unknown User' %> just sent you a message from the Canvas <%= asset.context.class.to_s %>, <%= asset.context.name %>:
-
+<%= case asset.context
+  when Course
+    t :course_body, "%{user_name} just sent you a message from the Canvas Course %{course_name}:", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :course_name => asset.context.name
+  when Group
+    t :group_body, "%{user_name} just sent you a message from the Canvas Group %{group_name}:", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :group_name => asset.context.name
+  when Account
+    t :account_body, "%{user_name} just sent you a message from the Canvas Account %{account_name}:", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :account_name => asset.context.name
+  when User
+    t :user_body, "%{initiator_user_name} just sent you a message from the Canvas User %{source_user_name}:", :initiator_user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :source_user_name => asset.context.name
+  else
+    t :context_body, "%{user_name} just sent you a message from the Canvas Context %{context_name}:", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :context_name => asset.context.name
+end %>
 <%= asset.body %>
 
 
 <% if asset.media_comment_id.nil? %>
-To reply to this message, click the link below:
+<%= t :reply_link, "To reply to this message, click the link below:" %>
 
 <%= content :link %>
 <% else %>
-This message includes an audio comment. To listen or reply, click the link below:
+<%= t :audio_comment_link, "This message includes an audio comment. To listen or reply, click the link below:" %>
 
 <% mo = MediaObject.find_by_media_id(asset.media_comment_id) %>
 http://<%= HostUrl.context_host(asset.context) %>/inbox/<%= InboxItem.find_by_asset_id_and_asset_type(asset.id, 'ContextMessage').id %>
@@ -23,7 +33,7 @@ http://<%= HostUrl.context_host(asset.context) %>/inbox/<%= InboxItem.find_by_as
 
 
 <% unless asset.all_attachments.empty? %>
-Attached Files:
+<%= t :attached_files, "Attached Files:" %>
 <% asset.all_attachments.each do |attachment| %>
 <%= attachment.display_name %> - <%= attachment.readable_size %> 
 http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context_type.downcase.pluralize %>/<%= asset.context_id %>/messages/<%= asset.id %>/files/<%= attachment.id %>
