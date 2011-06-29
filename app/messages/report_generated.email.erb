@@ -3,11 +3,11 @@
 <% end %>
   
 <% define_content :subject do %>
-  Report Generated
+  <%= t :subject, "Report Generated" %>
 <% end %>
 
 <%= asset.message %>
 
 
-Click here to download the report: 
+<%= t :link_message, "Click here to download the report:" %>
 <%= content :link %>
