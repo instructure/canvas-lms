@@ -65,7 +65,7 @@ $(document).ready(function() {
         var code = idx;
         var locked = !!data[idx];
         if(locked) {
-          var $icon = $("#quiz_lock_icon").clone().removeAttr('id');
+          var $icon = $("#quiz_lock_icon").clone().removeAttr('id').toggle();
           data[idx].type = "quiz";
           $icon.data('lock_reason', data[idx]);
           $("#summary_" + code).find(".quiz_title").prepend($icon);
