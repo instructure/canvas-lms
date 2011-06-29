@@ -38,4 +38,11 @@ describe AssessmentQuestionBank do
     @bank.select_for_submission(4).length.should == 4
     @bank.select_for_submission(5).length.should == 4
   end
+
+  it "should allow user read access through question bank users" do
+    user
+    @bank.assessment_question_bank_users.create!(:user => user)
+    @course.grants_right?(@user, :manage_assignments).should be_false
+    @bank.grants_right?(@user, :read).should be_true
+  end
 end

@@ -37,7 +37,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
     set { can :read and can :create and can :update and can :delete and can :manage }
     
-    given{|user, session| user && self.assessment_question_bank_users.map(&:id).include?(user.id) }
+    given{|user, session| user && self.assessment_question_bank_users.exists?(:user_id => user.id) }
     set { can :read }
   end
 
