@@ -3,10 +3,10 @@
 <% end %>
 
 <% define_content :subject do %>
-  Due: <%= asset.assignment.title %>, <%= asset.assignment.context.name %>
+  <%= t('assignment_due', 'Due: %{assignment_name}, %{course_name}', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>
 <% end %>
 
-This is a reminder that the assignment <%= asset.assignment.title %>, for the course, <%= asset.assignment.context.name %> is due <%= datetime_string(force_zone(asset.assignment.due_at)) %>.
+<%= t('assignment_due_sentence', 'This is a reminder that the assignment %{assignment_name}, for the course, %{course_name}, is due %{due_date}', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :due_date => datetime_string(force_zone(asset.assignment.due_at))) %>
 
-Click here to view the assignment: 
+<%= before_label('click_to_view_assignment', 'Click here to view the assignment') %>
 <%= content :link %>

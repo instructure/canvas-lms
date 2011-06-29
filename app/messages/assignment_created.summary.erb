@@ -3,7 +3,11 @@
 <% end %>
 
 <% define_content :subject do %>
-  Assignment Created - <%= asset.title %>: <%= asset.context.name %>
+  <%= t('assignment_created', 'Assignment Created - %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 <% end %>
 
-due: <%= force_zone(asset.due_at).strftime("%b %d at %I:%M") rescue "No Due Date" %><%= force_zone(asset.due_at).strftime("%p").downcase rescue "" %> 
+<% if asset.due_at %>
+  <%= t('due_at', 'due: %{assignment_due_date_time}', :assignment_due_date_time => datetime_string(force_zone(asset.due_at))) %>
+<% else %>
+  <%= t('no_due_date', 'due: No Due Date') %>
+<% end %>

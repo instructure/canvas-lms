@@ -2,4 +2,4 @@
   http://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
 <% end %>
 
-This is a reminder that the assignment <b><a href="<%= content :link %>"><%= asset.assignment.title %></a></b> for <%= asset.assignment.context.name %> is due <b><%= datetime_string(force_zone(asset.assignment.due_at)) %></b>.
+<%= mt('assignment_due_sentence', 'This is a reminder that the assignment [%{assignment_name}](%{assignment_url}) for %{course_name} is due %{due_date}', :assignment_name => asset.assignment.title, :assignment_url => content(:link), :course_name => asset.assignment.context.name, :due_date => datetime_string(force_zone(asset.assignment.due_at))) %>

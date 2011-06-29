@@ -20,6 +20,7 @@ class Message < ActiveRecord::Base
   include Workflow
   include SendToStream
   include Twitter
+  include TextHelper
 
   has_many :attachments, :as => :context
   belongs_to :notification
