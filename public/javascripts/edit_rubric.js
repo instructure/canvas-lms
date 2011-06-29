@@ -347,6 +347,7 @@ var rubricEditing = {
 };
 rubricEditing.sizeRatings = $.debounce(10, rubricEditing.originalSizeRatings);
 
+I18n.scoped('edit_rubric', function(I18n) {
 $(document).ready(function() {
   var limitToOneRubric = true;
   var $rubric_dialog = $("#rubric_dialog"),
@@ -369,7 +370,7 @@ $(document).ready(function() {
       .find(".displaying").showIf(!editing || $criterion.hasClass('learning_outcome_criterion')).end()
       .dialog('close').dialog({
         autoOpen: false,
-        title: "Criterion Long Description",
+        title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
         width: 400
       }).dialog('open')
       .find("textarea:visible:first").focus().select();
@@ -382,10 +383,10 @@ $(document).ready(function() {
       width: 800,
       height: 380,
       resizable: true,
-      title: 'Find Existing Rubric'
+      title: I18n.t('titles.find_existing_rubric', 'Find Existing Rubric')
     }).dialog('open');
     if(!$rubric_dialog.hasClass('loaded')) {
-      $rubric_dialog.find(".loading_message").text("Loading rubric groups...");
+      $rubric_dialog.find(".loading_message").text(I18n.t('messages.loading_rubric_groups', "Loading rubric groups..."));
       var url = $rubric_dialog.find(".grading_rubrics_url").attr('href');
       $.ajaxJSON(url, 'GET', {}, function(data) {
         for(var idx in data) {
@@ -410,7 +411,7 @@ $(document).ready(function() {
         $rubric_dialog.find(".rubrics_dialog_contexts_select .rubrics_dialog_context_select:visible:first").click();
         $rubric_dialog.addClass('loaded');
       }, function(data) {
-        $rubric_dialog.find(".loading_message").text("Loading rubrics failed, please try again");
+        $rubric_dialog.find(".loading_message").text(I18n.t('errors.load_rubrics_failed', "Loading rubrics failed, please try again"));
       });
     }
   })
@@ -418,7 +419,7 @@ $(document).ready(function() {
     var $this = $(this);
     if ( 
       !$this.hasClass('copy_edit')  || 
-      confirm("You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric based on the old rubric.  Continue anyway?")
+      confirm(I18n.t('prompts.read_only_rubric', "You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric based on the old rubric.  Continue anyway?"))
     ) {
       rubricEditing.editRubric($this.parents(".rubric"), $this.attr('href')); //.hide().after($rubric.show());
     }
@@ -428,7 +429,7 @@ $(document).ready(function() {
   // cant use delegate because events bound to a .delegate wont get triggered when you do .triggerHandler('click') because it wont bubble up.
   $(".rubric .delete_rubric_link").bind('click', function(event, callback) {
     event.preventDefault();
-    var message = "Are you sure you want to delete this rubric?";
+    var message = I18n.t('prompts.confirm_delete', "Are you sure you want to delete this rubric?");
     if(callback && callback.confirmationMessage) {
       message = callback.confirmationMessage;
     }
@@ -486,7 +487,7 @@ $(document).ready(function() {
       $rubric_dialog.find(".rubrics_dialog_rubrics_select .rubrics_dialog_rubric_select." + context_code).show();
       $rubric_dialog.find(".rubrics_dialog_rubrics_select .rubrics_dialog_rubric_select:visible:first").click();
     } else {
-      $rubric_dialog.find(".rubrics_loading_message").text("Loading rubrics...").show();
+      $rubric_dialog.find(".rubrics_loading_message").text(I18n.t('messages.loading_rubrics', "Loading rubrics...")).show();
       $rubric_dialog.find(".rubrics_dialog_rubrics,.rubrics_dialog_rubrics_select").hide();
       var url = $rubric_dialog.find(".grading_rubrics_url").attr('href') + "?context_code=" + context_code;
       $.ajaxJSON(url, 'GET', {}, function(data) {
@@ -602,7 +603,7 @@ $(document).ready(function() {
         var assignment_points = parseFloat($("#full_assignment .points_possible").text());
         var rubric_points = parseFloat(data.points_possible);
         if(assignment_points && rubric_points != assignment_points) {
-          var result = confirm("The points total does not match the assignment's points.  Do you want to change the assignment's points to match the rubric score?");
+          var result = confirm(I18n.t('prompts.update_assignment_points', "The points total does not match the assignment's points.  Do you want to change the assignment's points to match the rubric score?"));
           if(result) {
           } else {
             return false;
@@ -837,4 +838,5 @@ $(document).ready(function() {
     rubricEditing.addCriterion($("#default_rubric"));
   }
   setInterval(rubricEditing.sizeRatings, 10000);
+});
 });
