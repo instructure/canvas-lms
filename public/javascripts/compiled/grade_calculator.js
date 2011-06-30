@@ -42,7 +42,7 @@
           submission;
         } else {
           submission = {
-            score: 0
+            score: null
           };
         };
         submission.assignment_group_id = group.id;
@@ -53,11 +53,11 @@
         };
         data.submission = submission;
         sum.submissions.push(data);
-        if (!(ignore_ungraded && (!submission.score || submission.score === ''))) {
+        if (!(ignore_ungraded && (!(submission.score != null) || submission.score === ''))) {
           data.score = this.parse(submission.score);
           data.possible = this.parse(assignment.points_possible);
           data.percent = this.parse(data.score / data.possible);
-          data.submitted = submission.score && submission.score !== '';
+          data.submitted = (submission.score != null) && submission.score !== '';
           if (data.submitted) {
             sum.submission_count += 1;
           }

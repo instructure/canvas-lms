@@ -24,16 +24,16 @@ class GradeCalculator
     for assignment in group.assignments
       data = { score: 0, possible: 0, percent: 0, drop: false, submitted: false }
       submission = $.detect(submissions, -> this.assignment_id == assignment.id)
-      submission ?= { score: 0 }
+      submission ?= { score: null }
       submission.assignment_group_id = group.id
       submission.points_possible ?= assignment.points_possible
       data.submission = submission
       sum.submissions.push data
-      unless ignore_ungraded and (!submission.score || submission.score == '')
+      unless ignore_ungraded and (!submission.score? || submission.score == '')
         data.score = @parse submission.score
         data.possible = @parse assignment.points_possible
         data.percent = @parse(data.score / data.possible)
-        data.submitted = (submission.score and submission.score != '')
+        data.submitted = (submission.score? and submission.score != '')
         sum.submission_count += 1 if data.submitted
 
     # sort the submissions by assigned score
