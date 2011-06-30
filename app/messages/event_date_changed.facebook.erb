@@ -2,14 +2,12 @@
   http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>
 <% end %>
 
-The event <a href="<%= content :link %>"><%= asset.title %></a> for <%= asset.context.name %> has changed times.  It's now:
+<%= t('subject', "The event [%{event_title}](%{link_to_event}) for  %{course_name} has changed times. It's now:", :event_title => asset.title, :link_to_event => content(:link), :course_name => asset.context.name) %>
 <br/><br/>
-<% if (asset.start_at == asset.end_at || !asset.end_at) %>
-<b><%= force_zone(asset.start_at).strftime("%b %d at %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %></b>
-
+<% if !asset.start_at && !asset.end_at %>
+  <%= t('no_time_set', 'No Time Set') %>
+<% elsif (asset.start_at == asset.end_at || !asset.end_at) %>
+  <%= datetime_string(force_zone(asset.start_at)) %>
 <% else %>
-<b>from <%= force_zone(asset.start_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
-
-to <%= force_zone(asset.end_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.end_at).strftime("%p").downcase rescue "" %></b>
-
+  <%= t('from_to_time', 'from %{start_date_time} to %{end_date_time}', :start_date_time => datetime_string(force_zone(asset.start_at)), :end_date_time => datetime_string(force_zone(asset.end_at))) %>
 <% end %>
