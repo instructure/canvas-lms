@@ -170,7 +170,7 @@ I18n.localize = function(scope, value) {
       return this.toPercentage(value);
     default:
       if (scope.match(/^(date|time)/)) {
-        return this.toTime(scope, value);
+        return this.toTime(scope, value).replace(/\s{2,}/, ' ');
       } else {
         return value.toString();
       }
@@ -235,12 +235,15 @@ I18n.strftime = function(date, format) {
   var day = date.getDate();
   var year = date.getFullYear();
   var month = date.getMonth() + 1;
+  var dayOfYear = 1 + Math.round((new Date(year, month - 1, day) - new Date(year, 0, 1)) / 86400000);
   var hour = date.getHours();
   var hour12 = hour;
   var meridian = hour > 11 ? 1 : 0;
   var secs = date.getSeconds();
+  var mils = date.getMilliseconds();
   var mins = date.getMinutes();
   var offset = date.getTimezoneOffset();
+  var epochOffset = Math.floor(date.getTime() / 1000);
   var absOffsetHours = Math.floor(Math.abs(offset / 60));
   var absOffsetMinutes = Math.abs(offset) - (absOffsetHours * 60);
   var timezoneoffset = (offset > 0 ? "-" : "+") + (absOffsetHours.toString().length < 2 ? "0" + absOffsetHours : absOffsetHours) + (absOffsetMinutes.toString().length < 2 ? "0" + absOffsetMinutes : absOffsetMinutes);
@@ -251,34 +254,76 @@ I18n.strftime = function(date, format) {
     hour12 = 12;
   }
 
-  var padding = function(n) {
-    var s = "0" + n.toString();
-    return s.substr(s.length - 2);
+  var padding = function(n, pad, len) {
+    if (typeof(pad) == 'undefined') {
+      pad = '00';
+    }
+    if (typeof(len) == 'undefined') {
+      len = 2;
+    }
+    var s = pad + n.toString();
+    return s.substr(s.length - len);
   };
 
-  var f = format;
-  f = f.replace("%a", options.abbr_day_names[weekDay]);
-  f = f.replace("%A", options.day_names[weekDay]);
-  f = f.replace("%b", options.abbr_month_names[month]);
-  f = f.replace("%B", options.month_names[month]);
-  f = f.replace("%d", padding(day));
-  f = f.replace("%-d", day);
-  f = f.replace("%H", padding(hour));
-  f = f.replace("%-H", hour);
-  f = f.replace("%I", padding(hour12));
-  f = f.replace("%-I", hour12);
-  f = f.replace("%m", padding(month));
-  f = f.replace("%-m", month);
-  f = f.replace("%M", padding(mins));
-  f = f.replace("%-M", mins);
-  f = f.replace("%p", options.meridian[meridian]);
-  f = f.replace("%S", padding(secs));
-  f = f.replace("%-S", secs);
-  f = f.replace("%w", weekDay);
-  f = f.replace("%y", padding(year));
-  f = f.replace("%-y", padding(year).replace(/^0+/, ""));
-  f = f.replace("%Y", year);
-  f = f.replace("%z", timezoneoffset);
+  /*
+    not implemented:
+      %N  // nanoseconds
+      %6N // microseconds
+      %9N // nanoseconds
+      %U  // week number of year, starting with the first Sunday as the first day of the 01st week (00..53)
+      %V  // week number of year according to ISO 8601 (01..53) (week starts on Monday, week 01 is the one with the first Thursday of the year)
+      %W  // week number of year, starting with the first Monday as the first day of the 01st week (00..53)
+      %Z  // time zone name
+  */
+  var f = format.replace(/%([DFrRTv])/g, function(str, p1) {
+    return {
+      D: '%m/%d/%y',
+      F: '%Y-%m-%d',
+      r: '%I:%M:%S %p',
+      R: '%H:%M',
+      T: '%H:%M:%S',
+      v: '%e-%b-%Y'
+    }[p1]
+  }).replace(/%(%|\-?[a-zA-Z]|3N)/g, function(str, p1) {
+    switch (p1) {
+      case 'a':  return options.abbr_day_names[weekDay];
+      case 'A':  return options.day_names[weekDay];
+      case 'b':  return options.abbr_month_names[month];
+      case 'B':  return options.month_names[month];
+      case 'd':  return padding(day);
+      case '-d': return day;
+      case 'e':  return padding(day, ' ');
+      case 'h':  return options.abbr_month_names[month];
+      case 'H':  return padding(hour);
+      case '-H': return hour;
+      case 'I':  return padding(hour12);
+      case '-I': return hour12;
+      case 'j':  return padding(dayOfYear, '00', 3);
+      case 'k':  return padding(hour, ' ');
+      case 'l':  return padding(hour12, ' ');
+      case 'L':  return padding(mils, '00', 3);
+      case 'm':  return padding(month);
+      case '-m': return month;
+      case 'M':  return padding(mins);
+      case '-M': return mins;
+      case 'n':  return "\n";
+      case '3N': return padding(mils, '00', 3);
+      case 'p':  return options.meridian[meridian];
+      case 'P':  return options.meridian[meridian].toLowerCase();
+      case 's':  return epochOffset;
+      case 'S':  return padding(secs);
+      case '-S': return secs;
+      case 't':  return "\t";
+      case 'u':  return weekDay || weekDay + 7;
+      case 'w':  return weekDay;
+      case 'y':  return padding(year);
+      case '-y': return padding(year).replace(/^0+/, "");
+      case 'Y':  return year;
+      case 'z':  return timezoneoffset;
+      case '%':  return '%';
+      default:   return str;
+    }
+  });
 
   return f;
 };
