@@ -18,52 +18,50 @@
       return result;
     };
     GradeCalculator.create_group_sum = function(group, submissions, ignore_ungraded) {
-      var data, dropped, lowOrHigh, rules, s, submission, sum, _fn, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
+      var assignment, data, dropped, lowOrHigh, rules, s, submission, sum, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
       sum = {
         submissions: [],
         score: 0,
         possible: 0,
         submission_count: 0
       };
-      _fn = __bind(function(submission) {
-        var assignment, data, _ref;
-        if (!submission.assignment_group_id) {
-          assignment = $.detect(group.assignments, function() {
-            return submission.assignment_id === this.id;
-          });
-          if (assignment) {
-            submission.assignment_group_id = group.id;
-                        if ((_ref = submission.points_possible) != null) {
-              _ref;
-            } else {
-              submission.points_possible = assignment != null ? assignment.points_possible : void 0;
-            };
-          }
-        }
-        if (submission.assignment_group_id === group.id) {
-          data = {
-            submission: submission,
-            score: 0,
-            possible: 0,
-            percent: 0,
-            drop: false,
-            submitted: false
+      _ref = group.assignments;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        assignment = _ref[_i];
+        data = {
+          score: 0,
+          possible: 0,
+          percent: 0,
+          drop: false,
+          submitted: false
+        };
+        submission = $.detect(submissions, function() {
+          return this.assignment_id === assignment.id;
+        });
+                if (submission != null) {
+          submission;
+        } else {
+          submission = {
+            score: 0
           };
-          sum.submissions.push(data);
-          if (!(ignore_ungraded && (!submission.score || submission.score === ''))) {
-            data.score = this.parse(submission.score);
-            data.possible = this.parse(submission.points_possible);
-            data.percent = this.parse(data.score / data.possible);
-            data.submitted = submission.score && submission.score !== '';
-            if (data.submitted) {
-              return sum.submission_count += 1;
-            }
+        };
+        submission.assignment_group_id = group.id;
+                if ((_ref2 = submission.points_possible) != null) {
+          _ref2;
+        } else {
+          submission.points_possible = assignment.points_possible;
+        };
+        data.submission = submission;
+        sum.submissions.push(data);
+        if (!(ignore_ungraded && (!submission.score || submission.score === ''))) {
+          data.score = this.parse(submission.score);
+          data.possible = this.parse(assignment.points_possible);
+          data.percent = this.parse(data.score / data.possible);
+          data.submitted = submission.score && submission.score !== '';
+          if (data.submitted) {
+            sum.submission_count += 1;
           }
         }
-      }, this);
-      for (_i = 0, _len = submissions.length; _i < _len; _i++) {
-        submission = submissions[_i];
-        _fn(submission);
       }
       sum.submissions.sort(function(a, b) {
         return a.percent - b.percent;
@@ -74,16 +72,16 @@
         never_drop: []
       }, group.rules);
       dropped = 0;
-      _ref = ['low', 'high'];
-      for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
-        lowOrHigh = _ref[_j];
-        _ref2 = sum.submissions;
-        for (_k = 0, _len3 = _ref2.length; _k < _len3; _k++) {
-          data = _ref2[_k];
+      _ref3 = ['low', 'high'];
+      for (_j = 0, _len2 = _ref3.length; _j < _len2; _j++) {
+        lowOrHigh = _ref3[_j];
+        _ref4 = sum.submissions;
+        for (_k = 0, _len3 = _ref4.length; _k < _len3; _k++) {
+          data = _ref4[_k];
           if (!data.drop && rules["drop_" + lowOrHigh + "est"] > 0 && $.inArray(data.assignment_id, rules.never_drop) === -1 && data.possible > 0 && data.submitted) {
             data.drop = true;
-            if ((_ref3 = data.submission) != null) {
-              _ref3.drop = true;
+            if ((_ref5 = data.submission) != null) {
+              _ref5.drop = true;
             }
             rules["drop_" + lowOrHigh + "est"] -= 1;
             dropped += 1;
@@ -92,22 +90,22 @@
       }
       if (dropped > 0 && dropped === sum.submission_count) {
         sum.submissions[sum.submissions.length - 1].drop = false;
-        if ((_ref4 = sum.submissions[sum.submissions.length - 1].submission) != null) {
-          _ref4.drop = false;
+        if ((_ref6 = sum.submissions[sum.submissions.length - 1].submission) != null) {
+          _ref6.drop = false;
         }
         dropped -= 1;
       }
       sum.submission_count -= dropped;
-      _ref5 = sum.submissions;
-      for (_l = 0, _len4 = _ref5.length; _l < _len4; _l++) {
-        s = _ref5[_l];
+      _ref7 = sum.submissions;
+      for (_l = 0, _len4 = _ref7.length; _l < _len4; _l++) {
+        s = _ref7[_l];
         if (!s.drop) {
           sum.score += s.score;
         }
       }
-      _ref6 = sum.submissions;
-      for (_m = 0, _len5 = _ref6.length; _m < _len5; _m++) {
-        s = _ref6[_m];
+      _ref8 = sum.submissions;
+      for (_m = 0, _len5 = _ref8.length; _m < _len5; _m++) {
+        s = _ref8[_m];
         if (!s.drop) {
           sum.possible += s.possible;
         }

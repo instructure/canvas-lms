@@ -21,24 +21,20 @@ class GradeCalculator
 
   @create_group_sum: (group, submissions, ignore_ungraded) ->
     sum = { submissions: [], score: 0, possible: 0, submission_count: 0 }
-    for submission in submissions
-      do (submission) =>
-        # handle if the submisison comes to us without an assignment_group_id
-        unless submission.assignment_group_id
-          assignment = $.detect(group.assignments, () -> submission.assignment_id == this.id)
-          if assignment
-            submission.assignment_group_id = group.id
-            # if submission doesn't have points possible, try to use assignment's
-            submission.points_possible ?= assignment?.points_possible
-        if submission.assignment_group_id == group.id
-          data = { submission: submission, score: 0, possible: 0, percent: 0, drop: false, submitted: false }
-          sum.submissions.push data
-          unless ignore_ungraded and (!submission.score || submission.score == '')
-            data.score = @parse submission.score
-            data.possible = @parse submission.points_possible
-            data.percent = @parse(data.score / data.possible)
-            data.submitted = (submission.score and submission.score != '')
-            sum.submission_count += 1 if data.submitted
+    for assignment in group.assignments
+      data = { score: 0, possible: 0, percent: 0, drop: false, submitted: false }
+      submission = $.detect(submissions, -> this.assignment_id == assignment.id)
+      submission ?= { score: 0 }
+      submission.assignment_group_id = group.id
+      submission.points_possible ?= assignment.points_possible
+      data.submission = submission
+      sum.submissions.push data
+      unless ignore_ungraded and (!submission.score || submission.score == '')
+        data.score = @parse submission.score
+        data.possible = @parse assignment.points_possible
+        data.percent = @parse(data.score / data.possible)
+        data.submitted = (submission.score and submission.score != '')
+        sum.submission_count += 1 if data.submitted
 
     # sort the submissions by assigned score
     sum.submissions.sort (a,b) -> a.percent - b.percent
