@@ -674,7 +674,12 @@ class Attachment < ActiveRecord::Base
   def filename
     read_attribute(:filename) || (self.root_attachment && self.root_attachment.filename)
   end
-  
+
+  def thumbnail_with_root_attachment
+    self.thumbnail_without_root_attachment || self.root_attachment.try(:thumbnail)
+  end
+  alias_method_chain :thumbnail, :root_attachment
+
   def content_directory
     self.directory_name || Folder.root_folders(self.context).first.name
   end
