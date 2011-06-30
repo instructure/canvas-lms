@@ -4,10 +4,13 @@
 
 
 <% define_content :subject do %>
-  Claim Email: Canvas
+  <%= t('subject', 'Claim Email: Canvas') %>
 <% end %>
+<% url = (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>
+<%= t :body, <<-BODY, :email_address=> asset.path, :url => url, :user_name => asset.user.name, :user_id => asset.user_id
+Someone is requesting the use of this email address, %{email_address}, for their account at %{url}.  Right now this address is being used by %{user_name} (id: %{user_id}).
+BODY
+%>
 
-Someone is requesting the use of this email address, <%= asset.path %>, for their account at <%=  (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>.  Right now this address is being used by <%= asset.user.name %> (id: <%= asset.user_id %>).
-
-If you would like to assign this email address to a different user, please visit the following url:
+<%= t('reassign_link', 'If you would like to assign this email address to a different user, please visit the following url:') %>
 <%= content :link %>
