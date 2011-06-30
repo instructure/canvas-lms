@@ -283,6 +283,7 @@ class RubricAssociation < ActiveRecord::Base
           self.summary_data[:saved_comments] ||= {}
           self.summary_data[:saved_comments][criterion.id.to_s] ||= []
           self.summary_data[:saved_comments][criterion.id.to_s] << rating[:comments]
+          # TODO i18n
           self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select{|desc| desc && !desc.empty? && desc != "No Details"}.uniq.sort
           self.save
         end

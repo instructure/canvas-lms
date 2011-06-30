@@ -101,6 +101,7 @@ class Attachment < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     attachments = data['file_map'] ? data['file_map']: {}
+    # TODO i18n
     to_import = migration.to_import 'files'
     attachments.values.each do |att|
       if !att['is_folder'] && att['migration_id'] && (!to_import || to_import[att['migration_id']])
@@ -114,6 +115,7 @@ class Attachment < ActiveRecord::Base
     
     if data[:locked_folders]
       data[:locked_folders].each do |path|
+        # TODO i18n
         if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
           f.locked = true
           f.save
@@ -122,6 +124,7 @@ class Attachment < ActiveRecord::Base
     end
     if data[:hidden_folders]
       data[:hidden_folders].each do |path|
+        # TODO i18n
         if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
           f.workflow_state = 'hidden'
           f.save

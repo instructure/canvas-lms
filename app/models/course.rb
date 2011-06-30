@@ -398,6 +398,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.default_name
+    # TODO i18n
     t('default_name', "My Course")
   end
   
@@ -1019,6 +1020,14 @@ class Course < ActiveRecord::Base
       h[[sub.user_id, sub.assignment_id]] = sub; h
     }
     read_only = t('csv.read_only_field', '(read only)')
+    t 'csv.student', 'Student'
+    t 'csv.id', 'ID'
+    t 'csv.section', 'Section'
+    t 'csv.comments', 'Comments'
+    t 'csv.current_score', 'Current Score'
+    t 'csv.final_score', 'Final Score'
+    t 'csv.final_grade', 'Final Grade'
+    t 'csv.points_possible', 'Points Possible'
     res = FasterCSV.generate do |csv|
       #First row
       row = ["Student", "ID", "Section"]

@@ -404,7 +404,7 @@ class User < ActiveRecord::Base
     
   def infer_defaults
     self.name = nil if self.name == "User"
-    self.name ||= self.email || "User"
+    self.name ||= self.email || t(:default_user_name, "User")
     self.short_name = nil if self.short_name == ""
     self.short_name ||= self.name
     self.sortable_name = self.last_name_first.downcase

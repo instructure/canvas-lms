@@ -168,7 +168,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   
   def infer_details
-    self.author_name ||= self.author.short_name rescue "Someone"
+    self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
   end

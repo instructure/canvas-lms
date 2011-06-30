@@ -91,6 +91,8 @@ $(document).ready(function() {
     }
   }
   
+  // TODO i18n
+  I18n.t('percent_of_final_grade', '%{percent} of final grade', {percent: 0});
   $("#groups_for_student .assignment_group") //.find(".more_info_link").show().end()
     .find(".more_info").hide().end()
     .find(".more_info_brief").showIf($("#group_weighting_scheme").text() == "percent").append(" of final grade");
