@@ -233,8 +233,8 @@
           return '';
         }
         gradeToShow = val[this.includeUngradedAssignments ? 'final' : 'current'];
-        percentage = columnDef.field === 'total_grade' ? gradeToShow.score : (gradeToShow.score / gradeToShow.possible) * 100;
-        percentage = Math.round(percentage);
+        percentage = (gradeToShow.score / gradeToShow.possible) * 100;
+        percentage = Math.round(percentage * 10) / 10;
         if (isNaN(percentage)) {
           percentage = 0;
         }

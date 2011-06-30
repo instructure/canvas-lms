@@ -93,7 +93,7 @@
       if (dropped > 0 && dropped === sum.submission_count) {
         sum.submissions[sum.submissions.length - 1].drop = false;
         if ((_ref4 = sum.submissions[sum.submissions.length - 1].submission) != null) {
-          _ref4.drop = true;
+          _ref4.drop = false;
         }
         dropped -= 1;
       }
@@ -132,13 +132,13 @@
             total_possible_weight += data.group.group_weight;
           }
         }
-        if (ignore_ungraded && possible_weight_from_submissions < 1.0) {
-          possible = total_possible_weight < 1.0 ? total_possible_weight : 1.0;
+        if (ignore_ungraded && possible_weight_from_submissions < 100.0) {
+          possible = total_possible_weight < 100.0 ? total_possible_weight : 100.0;
           score = score * possible / possible_weight_from_submissions;
         }
         return {
           score: score,
-          possible: 1.0
+          possible: 100.0
         };
       } else {
         return {

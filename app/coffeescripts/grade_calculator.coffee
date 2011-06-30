@@ -15,8 +15,8 @@ class GradeCalculator
       group: group
       current: @create_group_sum(group, submissions, true)
       'final':   @create_group_sum(group, submissions, false)
-    result.current = @calculate_total(result.group_sums, true, weighting_scheme)
-    result['final']   = @calculate_total(result.group_sums, false, weighting_scheme)
+    result.current  = @calculate_total(result.group_sums, true, weighting_scheme)
+    result['final'] = @calculate_total(result.group_sums, false, weighting_scheme)
     result
 
   @create_group_sum: (group, submissions, ignore_ungraded) ->
@@ -61,7 +61,7 @@ class GradeCalculator
     if dropped > 0 and dropped == sum.submission_count
       sum.submissions[sum.submissions.length - 1].drop = false
       # see TODO above
-      sum.submissions[sum.submissions.length - 1].submission?.drop = true
+      sum.submissions[sum.submissions.length - 1].submission?.drop = false
       dropped -= 1
 
     sum.submission_count -= dropped
@@ -83,12 +83,12 @@ class GradeCalculator
           possible_weight_from_submissions += data.group.group_weight
         total_possible_weight += data.group.group_weight
 
-      if ignore_ungraded and possible_weight_from_submissions < 1.0
-        possible = if total_possible_weight < 1.0 then total_possible_weight else 1.0
+      if ignore_ungraded and possible_weight_from_submissions < 100.0
+        possible = if total_possible_weight < 100.0 then total_possible_weight else 100.0
         score = score * possible / possible_weight_from_submissions
       {
         score: score
-        possible: 1.0
+        possible: 100.0
       }
     else
       {
