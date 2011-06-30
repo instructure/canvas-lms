@@ -1,4 +1,11 @@
 <% define_content :link do %>
   http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups/<%= asset.group_id %>
 <% end %>
-You've been invited to join the group <b><a href="<%= content :link %>"><%= asset.group.name %></a></b> for the <%= asset.group.context.class.to_s.downcase %> <%= asset.group.context.name %>.
+<%=
+    case asset.group.context_type
+    when 'Account'
+      t :body_account, "You've been invited to join the group %{group} for the account %{account}.", :group => %{<b><a href="#{content :link}">#{h asset.group.name}</a></b>}.html_safe, :account => asset.group.context.name
+    else
+      t :body_course, "You've been invited to join the group %{group} for the course %{course}.", :group => %{<b><a href="#{content :link}">#{h asset.group.name}</a></b>}.html_safe, :course => asset.group.context.name
+    end
+%>
