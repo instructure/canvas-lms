@@ -2,18 +2,18 @@
 <% if context && context.is_a?(Course) && asset && @headers != false %>
   <div id="sequence_footer" style="display: none;">
     <a class="prev button" href="#">
-      <%= image_tag "back.png" %> <span class="text">Previous</span>
+      <%= image_tag "back.png" %> <span class="text"><%= t(:previous, "Previous") %></span>
       <span class="title ellipsis"></span>
     </a>
     <a class="next button" href="#">
-      <%= image_tag "forward.png" %> <span class="text">Next</span>
+      <%= image_tag "forward.png" %> <span class="text"><%= t(:next, "Next") %></span>
       <span class="title ellipsis"></span>
     </a>
     <a href="<%= context_url(context, :context_context_modules_item_details_url, asset.asset_string) %>" style="display: none;" class="sequence_details_url">&nbsp;</a>
     <a href="<%= context_url(context, :context_context_modules_item_redirect_url, "{{ id }}") %>" class="module_item_url" style="display: none;">&nbsp;</a>
     <a href="<%= context_url(context, :context_context_module_url, "{{ id }}") %>" class="module_url" style="display: none;">&nbsp;</a>
     <div class="all">
-      <a href="<%= context_url(context, :context_context_modules_url) %>">see full course sequence</a>
+      <a href="<%= context_url(context, :context_context_modules_url) %>"><%= t :full_course_sequence, "see full course sequence" %></a>
     </div>
     <div class="clear"></div>
   </div>

@@ -3,39 +3,39 @@
 <% cache([@context, 'select_context_content_dialog']) do %>
   <div id="select_context_content_dialog" style="display: none;">
     <div>
-      Add  
+      <% ot :add_to_module, "Add %{item} to *module*", :item => capture { %>
       <select id="add_module_item_select">
-        <option value="assignment">Assignment</option>
-        <option value="quiz">Quiz</option>
-        <option value="attachment">File</option>
-        <option value="wiki_page">Content Page</option>
-        <option value="discussion_topic">Discussion</option>
-        <option value="context_module_sub_header" class="context_module_content">Text Header</option>
-        <option value="external_url" class="context_module_content">External URL</option>
-        <option value="context_external_tool" class="context_module_content">External Tool</option>
+        <option value="assignment"><%= t :assignment_item, "Assignment" %></option>
+        <option value="quiz"><%= t :quiz_item, "Quiz" %></option>
+        <option value="attachment"><%= t :file_item, "File" %></option>
+        <option value="wiki_page"><%= t :content_page_item, "Content Page" %></option>
+        <option value="discussion_topic"><%= t :discussion_item, "Discussion" %></option>
+        <option value="context_module_sub_header" class="context_module_content"><%= t :text_header_item, "Text Header" %></option>
+        <option value="external_url" class="context_module_content"><%= t :external_url_item, "External URL" %></option>
+        <option value="context_external_tool" class="context_module_content"><%= t :external_tool_item, "External Tool" %></option>
       </select>
-      to <span class="holder_name">module</span>
+      <% }, :wrapper => '<span class="holder_name">\1</span>' %>
     </div>
     <div style="margin: 10px 20px;">
       <div id="context_module_sub_headers_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          Type the text you'd like to add as a <span class="holder_type">module</span> sub-header
+          <%= t :sub_header_notice, "Type the text you'd like to add as a *module* sub-header", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <table>
           <tr>
-            <td><label for="sub_header_title">Header:</label></td>
+            <td><label for="sub_header_title"><%= before_label :header, "Header" %></label></td>
             <td><input type="text" name="title" id="sub_header_title" style="width: 200px;"/></td>
           </tr>
         </table>
       </div>
       <div id="external_urls_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "link.png", :alt => "external_url" %> Enter a URL and page name
-          to add a link to any website URL to this <span class="holder_type">module</span>.
+          <%= image_tag "link.png", :alt => t(:external_url_link_alt, "External URL") %>
+          <%= t :external_url_notice, "Enter a URL and page name to add a link to any website URL to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <table>
           <tr>
-            <td><label for="content_tag_create_url">URL:</label></td>
+            <td><label for="content_tag_create_url"><%= before_label :url, "URL" %></label></td>
             <td>
               <input type="text" name="url" id="content_tag_create_url" style="width: 200px;"/>
               <div id="content_tag_services">
@@ -44,22 +44,21 @@
             </td>
           </tr>
           <tr>
-            <td><label for="content_tag_create_title">Page Name:</label></td>
+            <td><label for="content_tag_create_title"><%= before_label :page_name, "Page Name" %></label></td>
             <td><input type="text" name="title" id="content_tag_create_title" style="width: 120px;"/></td>
           </tr>
         </table>
       </div>
       <div id="context_external_tools_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "link.png", :alt => "external_tool" %> Select a tool from the list below,
-          or enter a URL for an external tool you already know is configured with Basic LTI
-          to add a link to it to this <span class="holder_type">module</span>.
+          <%= image_tag "link.png", :alt => t(:external_tool_link_alt, "External tool") %>
+          <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <a href="<%= context_url(@context, :context_external_tools_url, :include_parents => '1') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
         <table>
           <tr>
             <td colspan="2" class="tools">
-              <div class="message" style="margin: 10px 0;">Loading...</div>
+              <div class="message" style="margin: 10px 0;"><%= t :loading, "Loading..." %></div>
               <div class="tool" style="display: none;">
                 <div class="name"></div>
                 <div class="description"></div>
@@ -67,24 +66,24 @@
             </td>
           </tr>
           <tr>
-            <td><label for="external_tool_create_url">URL:</label></td>
+            <td><label for="external_tool_create_url"><%= before_label :url, "URL" %></label></td>
             <td>
               <input type="text" name="url" id="external_tool_create_url" style="width: 200px;"/>
               <div class="domain_message" style="font-size: 0.8em; display: none;">
-                to use this tool the domain must match <span class="domain">&nbsp;</span>
+                <%= t :domain_match_notice, "to use this tool the domain must match %{domain}", :domain => '<span class="domain">&nbsp;</span>'.html_safe %>
               </div>
             </td>
           </tr>
           <tr>
-            <td><label for="external_tool_create_title">Page Name:</label></td>
+            <td><label for="external_tool_create_title"><%= before_label :page_name, "Page Name" %></label></td>
             <td><input type="text" name="title" id="external_tool_create_title" style="width: 120px;"/></td>
           </tr>
         </table>
       </div>
       <div id="wiki_pages_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "file.png", :alt => "wiki_page" %> Select the wiki page you want to associate with this <span class="holder_type">module</span>, or
-          add a new page by selecting "New Page".
+          <%= image_tag "file.png", :alt => t(:wiki_page_alt, "Wiki page") %>
+          <%= t :wiki_page_notice, 'Select the wiki page you want to associate with this *module*, or add a new page by selecting "New Page".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
@@ -96,18 +95,19 @@
               <% end %>
             <% end %>
           <% end %>
-          <option value="new">[ New Page ]</option>
+          <option value="new"><%= t :new_page_option, "[ New Page ]" %></option>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          Page Name: <input type="text" name="wiki_page[title]" class="item_title"/>
+          <%= before_label :page_name, "Page Name" %>
+          <input type="text" name="wiki_page[title]" class="item_title"/>
           <a href="<%= context_url(@context, :context_wiki_pages_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
       <div id="attachments_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "file_download.png" %> Select the file you want to associate with this <span class="holder_type">module</span>, or
-          add a file by selecting "New File".
+          <%= image_tag "file_download.png" %>
+          <%= t :file_notice, 'Select the file you want to associate with this *module*, or add a file by selecting "New File".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
@@ -125,7 +125,7 @@
               <% end %>
             </optgroup>
           <% end %>
-          <option value="new">[ New File ]</option>
+          <option value="new"><%= t :new_file_option, "[ New File ]" %></option>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
@@ -136,7 +136,7 @@
             </tr><tr>
               <td>
                 <a href="<%= context_url(@context, :context_files_url, :format => :text) %>" style="display: none;" class="add_item_url">&nbsp;</a>
-                Folder: 
+                <%= before_label :folder, "Folder" %>
               </td><td>
                 <% Folder.root_folders(@context) %>
                 <% folders = @context.active_folders_with_sub_folders %>
@@ -151,26 +151,27 @@
       </div>
       <div id="quizs_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "quiz.png", :alt => "quiz" %> Select the  quiz you want to associate with this <span class="holder_type">module</span>, or
-          add a new one by selecting "New Quiz".
+          <%= image_tag "quiz.png", :alt => t(:quiz_alt, "Quiz") %>
+          <%= t :quiz_notice, 'Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
           <% @context.quizzes.active.scoped({:limit => 400}).each do |quiz| %>
             <option value="<%= quiz.id %>"><%= quiz.title %></option>
           <% end %>
-          <option value="new">[ New Quiz] </option>
+          <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          Quiz Name: <input type="text" name="quiz[title]" class="item_title"/>
+          <%= before_label :quiz_name, "Quiz Name" %>
+          <input type="text" name="quiz[title]" class="item_title"/>
           <a href="<%= context_url(@context, :context_quizzes_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
       <div id="assignments_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "grading_icon.png", :alt => "assignment" %> Select the assignment you want to associate with this <span class="holder_type">module</span>, or
-          add an assignment by selecting "New Assignment".
+          <%= image_tag "grading_icon.png", :alt => t(:assignment_alt, "Assignment") %>
+          <%= t :assignment_notice, 'Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
@@ -181,45 +182,46 @@
             <% end %>
             </optgroup>
           <% end %>
-          <option value="new">[ New Assignment] </option>
+          <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          Assignment Name: <input type="text" name="assignment[title]" class="item_title"/>
+          <%= before_label :assignment_name, "Assignment Name" %>
+          <input type="text" name="assignment[title]" class="item_title"/>
           <a href="<%= context_url(@context, :context_assignments_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
       <div id="discussion_topics_select" class="module_item_option" style="margin: 5px 20px;">
         <div style="font-size: 0.8em;">
-          <%= image_tag "word_bubble.png", :alt => "topic" %> Select the topic you want to associate with this <span class="holder_type">module</span>, or
-          add a topic by selecting "New Topic".
+          <%= image_tag "word_bubble.png", :alt => t(:topic_alt, "Topic") %>
+          <%= t :topic_notice, 'Select the topic you want to associate with this *module*, or add a topic by selecting "New Topic".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
           <% @context.discussion_topics.active.only_discussion_topics.scoped({:limit => 200}).each do |topic| %>
             <option value="<%= topic.id %>"><%= topic.title %></option>
           <% end %>
-          <option value="new">[ New Topic] </option>
+          <option value="new"><%= t :new_topic_option, "[ New Topic ]" %></option>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
-          Topic Name: <input type="text" name="discussion_topic[title]" class="item_title"/>
+          <%= before_label :topic_name, "Topic Name" %>
+          <input type="text" name="discussion_topic[title]" class="item_title"/>
           <a href="<%= context_url(@context, :context_discussion_topics_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
       <div style="margin: 0px 20px 5px;" class="context_module_content">
-        Indentation:
+        <%= before_label :indentation, "Indentation" %>
         <select name="content_tag[indent]" id="content_tag_indent">
-          <option value="0">Don't Indent</option>
-          <option value="1">Indent 1 Level</option>
-          <option value="2">Indent 2 Levels</option>
-          <option value="3">Indent 3 Levels</option>
+          <% (0..3).each do |level| %>
+            <%= t(:indent_level, { :zero => "*Don't Indent*", :one => "*Indent 1 Level*", :other => "*Indent %{count} levels*" }, :count => level, :wrapper => "<option value=\"#{level}\">\\1</option>") %>
+          <% end %>
         </select>
       </div>
     </div>
     <div class="button-container">
-      <button type="button" class="add_item_button button">Add Item</button>
-      <button type="button" class="cancel_button button-secondary">Cancel</button>
+      <button type="button" class="add_item_button button"><%= t "#buttons.add_item", "Add Item" %></button>
+      <button type="button" class="cancel_button button-secondary"><%= t "#buttons.cancel", "Cancel" %></button>
     </div>
   </div>
 <% end %>
