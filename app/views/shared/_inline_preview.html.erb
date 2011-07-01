@@ -114,14 +114,14 @@
   <div style="float: left;" id="file_display_name"><%= @attachment ? @attachment.display_name : @tag.title %>
   </div>
   <div style="float: right; padding-top:0.5em;">
-    <a href="#" id="frameless_link">Lose the Frames</a>
+    <a href="#" id="frameless_link"><%= t 'links.exit_frame', "Lose the Frames"%></a>
   </div>
-  <div id="current_item_id" style="display: none;"><%= @tag.id %></div>
+  <div id="current_item_id" style="display: none;"><%= @tag.try(:id) %></div>
   <div style="padding-top: 0.5em;">
-    <a href="<%= context_url(@context, :context_url) %>">Course Home</a> | 
-    <a href="<%= context_url(@context, :context_files_url) %>">Files</a>
+    <a href="<%= context_url(@context, :context_url) %>"><%= t 'links.course_home', "Course Home" %></a> |
+    <a href="<%= context_url(@context, :context_files_url) %>"><%= t 'links.files', "Files" %></a>
     <% if @module %>
-      | <a href="<%= context_url(@context, :context_context_modules_url) %>">Modules</a>
+      | <a href="<%= context_url(@context, :context_context_modules_url) %>"><%= t 'links.modules', "Modules" %></a>
     <% end %>
   </div>
   <div class="clear"></div>
@@ -132,7 +132,7 @@
       <div id="modules">
         <%= render :partial => "context_modules/context_module", :object => @module %>
         <div style="float: right; margin-top: 5px;">
-          <a href="#" class="hide_sidebar_link no-hover" title="Hide Sidebar"><%= image_tag "delete_circle.png" %></a>
+          <a href="#" class="hide_sidebar_link no-hover" title="<%= t 'links.hide_sidebar', "Hide Sidebar" %>"><%= image_tag "delete_circle.png" %></a>
         </div>
       </div>
     </td>
