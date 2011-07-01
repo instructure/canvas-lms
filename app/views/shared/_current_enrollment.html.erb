@@ -3,18 +3,28 @@
   <div class="reminder">
     <h2><a href="<%= course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid) %>"><%= current_enrollment.long_name %></a></h2>
     <div class="body">
-      You've been invited to join <%= current_enrollment.long_name %> as a<%= "n" if current_enrollment.readable_type == 'Observer' %> 
-      <b><%= current_enrollment.readable_type %></b>
-      for the user account <b><%= current_enrollment.user.email %></b>.  
+      <%=
+          case current_enrollment.type
+          when 'TeacherEnrollment'
+            mt :body_teacher, "You've been invited to join %{course} as a **teacher** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
+          when 'TAEnrollment'
+            mt :body_ta, "You've been invited to join %{course} as a **TA** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
+          when 'ObserverEnrollment'
+            mt :body_observer, "You've been invited to join %{course} as an **observer** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
+          when 'CourseDesignerEnrollment'
+            mt :body_designer, "You've been invited to join %{course} as a **designer** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
+          else
+            mt :body_student, "You've been invited to join %{course} as a **student** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
+          end
+      %>  
       <% if !@domain_root_account || @domain_root_account.allow_invitation_previews? %>
-      Feel free to <a href="<%= course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid) %>">wander around</a> and see what it's
-      like.  
+        <%= mt('wander_around_dont_get_lost', "Feel free to [wander around](%{link_to_course}) and see what it's like.", :link_to_course => course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid)) %>
       <% end %>
-      When you're ready, you can either accept or reject the invitation.
+      <%= t('accept_or_reject', "When you're ready, you can either accept or reject the invitation.") %>
       <div class="button-container button-container-right-aligned">
         <% form_tag course_enrollment_invitation_path(current_enrollment.course_id) do %>
-          <button type="submit" name="accept" class="button positive button-default">Accept Invitation</button>
-          <button type="submit" name="reject" class="button reject_button">Reject Invitation</button>
+          <button type="submit" name="accept" class="button positive button-default"><%= t('buttons.accept', 'Accept Invitation') %></button>
+          <button type="submit" name="reject" class="button reject_button"><%= t('buttons.reject', 'Reject Invitation') %></button>
         <% end %>
       </div>
     </div>
@@ -24,10 +34,23 @@
     <span class="name ellipsis" title="<%= current_enrollment.long_name %>">
       <%= current_enrollment.long_name %>
       <% if current_enrollment.course.created? || current_enrollment.course.claimed? %>
-        <%= image_tag "hammer.png", :title => "This course hasn't been published yet", :alt => "Unpublished", :class => "unpublished_icon" %>
+        <%= image_tag "hammer.png", :title => t('course_unpublished', "This course hasn't been published yet"), :alt => "Unpublished", :class => "unpublished_icon" %>
       <% end %>
     </span>
-    <span class="subtitle ellipsis">Enrolled as <%= current_enrollment.readable_type %></span> 
+    <%
+       message = t('enrolled_as_student', "Enrolled as a student")
+       case current_enrollment.type
+       when 'TeacherEnrollment'
+         message = t('enrolled_as_teacher', "Enrolled as a teacher")
+       when 'TAEnrollment'
+         message = t('enrolled_as_ta', "Enrolled as a TA")
+       when 'ObserverEnrollment'
+         message = t('enrolled_as_observer', "Enrolled as an observer")
+       when 'CourseDesignerEnrollment'
+         message = t('enrolled_as_designer', "Enrolled as a designer")
+       end
+    %> 
+    <span class="subtitle ellipsis"><%= message %></span> 
   </a>  
   <% end %>
 </li>
