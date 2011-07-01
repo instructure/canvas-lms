@@ -1,3 +1,3 @@
-A new user, <%= asset.name %>, has registered for the account <%= asset.account.name %>
+<%= t :body, "A new user, %{user}, has registered for the account %{account}", :user => asset.name, :account => asset.account.name %>
 
-More info at <%= HostUrl.default_host %>
+<%= t :details, "More info at %{url}", :url => HostUrl.default_host %>
