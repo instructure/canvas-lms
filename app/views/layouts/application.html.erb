@@ -161,6 +161,7 @@
                                 :collection => set,
                                 :collection_size => total_shown >= max_to_show ? @current_user.send("assignments_#{k}_total_count"): set.length,
                                 :partial => "shared/menu_assignment",
+                                :key => k,
                                 :title => v })  %>
                   <%
                   end
