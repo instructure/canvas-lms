@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class EnrollmentsFromEmailList
+class EnrollmentsFromUserList
   class << self
     def process(list, opts={})
       course_id = opts.delete(:course_id)
@@ -35,8 +35,8 @@ class EnrollmentsFromEmailList
   end
   
   def process(list, opts={})
-    raise ArgumentError, "Must provide a EmailList" unless
-      list.is_a?(EmailList)
+    raise ArgumentError, "Must provide a UserList" unless
+      list.is_a?(UserList)
     enrollment_type = opts.fetch(:enrollment_type, 'StudentEnrollment')
     section = @course.course_sections.active.find_by_id(opts[:course_section_id]) || @course.default_section
     limit_priveleges_to_course_section = opts[:limit_priveleges_to_course_section]
@@ -57,11 +57,11 @@ class EnrollmentsFromEmailList
     def get_students(root_account)
       @pseudonyms = []
       emails = @entries.map{|e| e.address }.compact
-      found_pseudonyms = root_account.pseudonyms.active.find(:all, :conditions => {:unique_id => emails}, :include => [:user]) #_all_by_unique_id(emails)
-      found_channels = CommunicationChannel.find(:all, :conditions => {:path => emails, :path_type => 'email', :workflow_state => ['active','unconfirmed']}, :include => {:user => :pseudonyms, :pseudonym => {}}) #_all_by_path_and_path_type_and_workflow_state(emails, 'email', 'active')
+      found_pseudonyms = root_account.pseudonyms.active.find(:all, :conditions => {:unique_id => emails}, :include => [:user])
+      found_channels = CommunicationChannel.find(:all, :conditions => {:path => emails, :path_type => 'email', :workflow_state => ['active','unconfirmed']}, :include => {:user => :pseudonyms, :pseudonym => {}})
       @students = @entries.map do |entry|
         next unless email = entry.address
-        pseudonym = found_pseudonyms.find{|p| p.unique_id == email } #root_account.pseudonyms.active.find_by_unique_id(email)
+        pseudonym = found_pseudonyms.find{|p| p.unique_id == email }
         cc = nil
         if pseudonym
           pseudonym.assert_user { |u| u.workflow_state = @new_user_state }
@@ -69,7 +69,7 @@ class EnrollmentsFromEmailList
           pseudonym.assert_communication_channel
           cc = pseudonym.communication_channel if pseudonym.communication_channel && pseudonym.communication_channel.path == email
         end
-        ccs = found_channels.select{|some_cc| some_cc.path.downcase == email.downcase } #CommunicationChannel.find_all_by_path_and_path_type_and_workflow_state(email, 'email', 'active')
+        ccs = found_channels.select{|some_cc| some_cc.path.downcase == email.downcase }
         cc ||= ccs.sort_by{|some_cc| [(some_cc.active? ? 0 : 1), (some_cc.pseudonym && some_cc.pseudonym.account_id == root_account.id ? 0 : 1), (some_cc.created_at || Time.now)] }.first
         cc ||= CommunicationChannel.create(:path => email, :path_type => 'email')
         user = cc.assert_user { |u| u.workflow_state = @new_user_state }

@@ -16,23 +16,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('email_lists', function(I18n) {
+I18n.scoped('user_lists', function(I18n) {
 
-(function($) {
-
-  var $email_lists_processed_person_template = $("#email_lists_processed_person_template").removeAttr('id').detach(),
-      $user_emails_no_valid_emails = $("#user_emails_no_valid_emails"),
-      $user_emails_with_errors = $("#user_emails_with_errors"),
-      $email_lists_processed_people = $("#email_lists_processed_people"),
-      $user_emails_duplicates_found = $("#user_emails_duplicates_found"),
+  var $user_lists_processed_person_template = $("#user_lists_processed_person_template").removeAttr('id').detach(),
+      $user_list_no_valid_users = $("#user_list_no_valid_users"),
+      $user_list_with_errors = $("#user_list_with_errors"),
+      $user_lists_processed_people = $("#user_lists_processed_people"),
+      $user_list_duplicates_found = $("#user_list_duplicates_found"),
       $form = $("#enroll_users_form"),
       $enrollment_blank = $("#enrollment_blank").removeAttr('id').hide(),
-      email_lists_path = $("#email_lists_path").attr('href');
+      user_lists_path = $("#user_lists_path").attr('href');
 
-  var EL = INST.EmailLists = {
+  var UL = INST.UserLists = {
 
     init: function(){
-      EL.showTextarea();
+      UL.showTextarea();
 
       $form
       .find(".cancel_button")
@@ -42,14 +40,14 @@ I18n.scoped('email_lists', function(I18n) {
         })
       .end()
       .find(".go_back_button")
-        .click(EL.showTextarea)
+        .click(UL.showTextarea)
       .end()
       .find(".verify_syntax_button")
         .click(function(e){
           e.preventDefault();
-          EL.showProcessing();
-          var params = {user_emails: $("#user_emails_textarea_container textarea").val().replace(/;/g, ",") };
-          $.ajaxJSON(email_lists_path, 'POST', params, EL.showResults);
+          UL.showProcessing();
+          var params = {user_list: $("#user_list_textarea_container textarea").val().replace(/;/g, ",") };
+          $.ajaxJSON(user_lists_path, 'POST', params, UL.showResults);
         })
       .end()
       .submit(function(event) {
@@ -64,17 +62,17 @@ I18n.scoped('email_lists', function(I18n) {
               ta_enrollment: "TAs"
             }[data.enrollment_type] || "Users";
         
-        var erroredEmails = [];
+        var erroredUsers = [];
         var finishedCount = 0;
         var startedCount = 0;
         var checkForFinish = function() {
           if(finishedCount == startedCount) {
-            if(!erroredEmails.length) {
+            if(!erroredUsers.length) {
               $.flashMessage([finishedCount, enrollmentTypeText, "added"].join(" "));
             } else {
-              successCount = finishedCount - erroredEmails.length;
+              successCount = finishedCount - erroredUsers.length;
               var message = [successCount, "out of", finishedCount, enrollmentTypeText, "added"].join(" ");
-              message += ".  The following addresses had problems:<br/><span style='font-size:0.8em;'>" + erroredEmails.join(',') + "</span>";
+              message += ".  The following users had problems:<br/><span style='font-size:0.8em;'>" + erroredUsers.join(',') + "</span>";
               $.flashError(message, 20000);
             }
             $(document).triggerHandler('enrollment_added');
@@ -83,7 +81,7 @@ I18n.scoped('email_lists', function(I18n) {
           }
         };
         var users = [];
-        $("#email_lists_processed_people .person").each(function() {
+        $("#user_lists_processed_people .person").each(function() {
           var user = {};
           user.name = $.trim($(this).find(".name").text());
           user.email = $.trim($(this).find(".address").text());
@@ -93,9 +91,9 @@ I18n.scoped('email_lists', function(I18n) {
         for(var idx in users) {
           var user = users[idx];
           data = $form.getFormData();
-          data.user_emails = user.email;
+          data.user_list = user.email;
           if(user.name) { 
-            data.user_emails = "\"" + user.name.replace(/\"/g, "'") + "\" <" + user.email + ">";
+            data.user_list = "\"" + user.name.replace(/\"/g, "'") + "\" <" + user.email + ">";
           }
           $.ajaxJSON(url, 'POST', data, function(enrollments) {
             finishedCount += 1;
@@ -108,15 +106,15 @@ I18n.scoped('email_lists', function(I18n) {
                   ta_enrollment: "TAs"
                 }[enrollmentType] || "Users";
                 
-            $form.find(".user_emails").val("");
-            EL.showTextarea();
+            $form.find(".user_list").val("");
+            UL.showTextarea();
 
             $.each( enrollments, function(){
-              EL.addUserToList(this.enrollment, enrollmentType);
+              UL.addUserToList(this.enrollment, enrollmentType);
             });
           }, function(data) {
             finishedCount += 1;
-            erroredEmails.push(user.email);
+            erroredUsers.push(user.email);
           });
         }
         setTimeout(checkForFinish, 500);
@@ -136,7 +134,7 @@ I18n.scoped('email_lists', function(I18n) {
             url: $(this).attr('href'),
             success: function() {
               $(this).fadeOut(function() {
-                EL.updateCounts();
+                UL.updateCounts();
               });
             }
           });
@@ -145,48 +143,48 @@ I18n.scoped('email_lists', function(I18n) {
     },
 
     showTextarea: function(){
-      $form.find(".add_users_button, .go_back_button, #user_emails_parsed").hide();
-      $form.find(".verify_syntax_button, .cancel_button, #user_emails_textarea_container").show().removeAttr('disabled');
-      $form.find(".user_emails").removeAttr('disabled').loadingImage('remove').focus().select();
+      $form.find(".add_users_button, .go_back_button, #user_list_parsed").hide();
+      $form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").show().removeAttr('disabled');
+      $form.find(".user_list").removeAttr('disabled').loadingImage('remove').focus().select();
       $form.find(".verify_syntax_button").attr('disabled', false).text("Continue...");
     },
 
     showProcessing: function(){
       $form.find(".verify_syntax_button").attr('disabled', true).text("Processing...");
-      $form.find(".user_emails").attr('disabled', true).loadingImage();
+      $form.find(".user_list").attr('disabled', true).loadingImage();
     },
 
-    showResults: function(emailList){
-      $form.find(".add_users_button, .go_back_button, #user_emails_parsed").show();
-      $form.find(".add_users_button").attr('disabled', false).text("OK Looks Good, Add These " + emailList.addresses.length + " Users");
-      $form.find(".verify_syntax_button, .cancel_button, #user_emails_textarea_container").hide();
-      $form.find(".user_emails").removeAttr('disabled').loadingImage('remove');
+    showResults: function(userList){
+      $form.find(".add_users_button, .go_back_button, #user_list_parsed").show();
+      $form.find(".add_users_button").attr('disabled', false).text("OK Looks Good, Add These " + userList.addresses.length + " Users");
+      $form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").hide();
+      $form.find(".user_list").removeAttr('disabled').loadingImage('remove');
 
-      $email_lists_processed_people.html("").show();
+      $user_lists_processed_people.html("").show();
 
-      if (!emailList || !emailList.addresses || !emailList.addresses.length) {
-       $user_emails_no_valid_emails.appendTo($email_lists_processed_people);
+      if (!userList || !userList.addresses || !userList.addresses.length) {
+       $user_list_no_valid_users.appendTo($user_lists_processed_people);
        $form.find(".add_users_button").hide();
       }
       else {
-        if (emailList.errored_addresses && emailList.errored_addresses.length) {
-          $user_emails_with_errors
-            .appendTo($email_lists_processed_people)
+        if (userList.errored_addresses && userList.errored_addresses.length) {
+          $user_list_with_errors
+            .appendTo($user_lists_processed_people)
             .find('.message_content')
-              .html(I18n.t("email_parsing_errors", { one: "There was 1 error parsing that list of emails.", other: "There were %{count} errors parsing that list of emails."}, {count:emailList.errored_addresses.length}) + " " + I18n.t("invalid_emails_notice", "There may be some that were invalid, and you might need to go back and fix any errors.") + " " + I18n.t("users_to_add", { one: "If you proceed as is, 1 user will be added.", other: "If you proceed as is, %{count} users will be added." }, {count: emailList.addresses.length}));
+              .html(I18n.t("user_parsing_errors", { one: "There was 1 error parsing that list of users.", other: "There were %{count} errors parsing that list of users."}, {count:userList.errored_addresses.length}) + " " + I18n.t("invalid_users_notice", "There may be some that were invalid, and you might need to go back and fix any errors.") + " " + I18n.t("users_to_add", { one: "If you proceed as is, 1 user will be added.", other: "If you proceed as is, %{count} users will be added." }, {count: userList.addresses.length}));
         }
-        if (emailList.duplicates && emailList.duplicates.length) {
-          $user_emails_duplicates_found
-            .appendTo($email_lists_processed_people)
+        if (userList.duplicates && userList.duplicates.length) {
+          $user_list_duplicates_found
+            .appendTo($user_lists_processed_people)
             .find('.message_content')
-              .html(I18n.t("duplicate_emails", { one: "1 duplicate address found, duplicates have been removed.", other: "%{count} duplicate addresses found, duplicates have been removed."}, {count:emailList.duplicates.length}))
+              .html(I18n.t("duplicate_users", { one: "1 duplicate user found, duplicates have been removed.", other: "%{count} duplicate user found, duplicates have been removed."}, {count:userList.duplicates.length}))
         }
 
-        $.each(emailList.addresses, function(){
-          $email_lists_processed_person_template
+        $.each(userList.addresses, function(){
+          $user_lists_processed_person_template
             .clone(true)
             .fillTemplateData({ data: this })
-            .appendTo($email_lists_processed_people)
+            .appendTo($user_lists_processed_people)
             .show();
         });
       }
@@ -247,14 +245,12 @@ I18n.scoped('email_lists', function(I18n) {
           .parents(".user_list")
           .scrollToVisible($enrollment);
       }
-      EL.updateCounts();
+      UL.updateCounts();
     }
 
   };
   
   // run the init function on domready
-  $(INST.EmailLists.init);
+  $(INST.UserLists.init);
   
-})(jQuery, INST);
-
 });

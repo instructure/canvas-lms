@@ -1,7 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
   
   map.resources :submission_comments, :only => :destroy
-  map.resources :email_lists, :only => :create
+  map.resources :user_lists, :only => :create
 
   map.mark_inbox_as_read 'inbox', :controller => 'context', :action => 'mark_inbox_as_read', :conditions => {:method => :delete}
   map.inbox 'inbox', :controller => 'context', :action => 'inbox'

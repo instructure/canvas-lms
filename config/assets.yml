@@ -103,7 +103,7 @@ javascripts:
     - public/javascripts/context_modules.js
   course_details:
     - public/javascripts/jquery.cookie.js
-    - public/javascripts/email_lists.js
+    - public/javascripts/user_lists.js
     - public/javascripts/course_details.js
     - public/javascripts/external_tools.js
     - public/javascripts/grading_standards.js
@@ -120,8 +120,8 @@ javascripts:
   full_files:
     - public/javascripts/full_files.js
     - public/flash/uploadify/jquery.uploadify.v2.1.0.js
-  email_lists:
-    - public/javascripts/email_lists.js
+  user_lists:
+    - public/javascripts/user_lists.js
   datagrid:
     - public/javascripts/datagrid.js
   gradebook2:

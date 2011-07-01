@@ -16,18 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class EmailListsController < ApplicationController
+class UserListsController < ApplicationController
   skip_before_filter :verify_authenticity_token
   
-  # POST /email_lists.js
+  # POST /user_lists.js
   def create
-    @email_list = EmailList.new(params[:user_emails])
+    @user_list = UserList.new(params[:user_list])
 
     respond_to do |format|
-      if @email_list
-        format.json  { render :json => @email_list }
+      if @user_list
+        format.json  { render :json => @user_list }
       else
-        format.json  { render :json => @email_list.errors, :status => :unprocessable_entity }
+        format.json  { render :json => @user_list.errors, :status => :unprocessable_entity }
       end
     end
   end

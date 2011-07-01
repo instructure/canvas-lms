@@ -513,10 +513,10 @@ class CoursesController < ApplicationController
       end
       email = (@current_user && @current_user.email) || params[:email]
       @user = @current_user
-      email_list = EmailList.new(params[:email])
-      @enrollments = EnrollmentsFromEmailList.process(email_list, :course_id => @context.id, :enrollment_type => 'StudentEnrollment', :limit => 1)
+      user_list = UserList.new(params[:email])
+      @enrollments = EnrollmentsFromUserList.process(user_list, :course_id => @context.id, :enrollment_type => 'StudentEnrollment', :limit => 1)
       if @enrollments.length == 0
-        flash[:error] = t('errors.invalid_email', "Invalid email address, please try again")
+        flash[:error] = t('errors.invalid_user', "Invalid user, please try again")
         render :action => 'open_enrollment'
         return
       else
@@ -725,16 +725,16 @@ class CoursesController < ApplicationController
     can_add ||= params[:enrollment_type] == 'TeacherEnrollment' && @context.teacherless? && @context.grants_right?(@current_user, session, :manage_students)
     can_add ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_add
-      params[:user_emails] ||= ""
+      params[:user_list] ||= ""
       
-      email_list = EmailList.new(params[:user_emails])
+      user_list = UserList.new(params[:user_list])
 
       respond_to do |format|
         @enrollment_state = nil
         if params[:auto_accept] && @context.account.grants_right?(@current_user, session, :manage_admin_users)
           @enrollment_state = 'active'
         end
-        if (@enrollments = EnrollmentsFromEmailList.process(email_list, :course_id => @context.id, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_priveleges_to_course_section => params[:limit_priveleges_to_course_section] == '1', :enrollment_state => @enrollment_state))
+        if (@enrollments = EnrollmentsFromUserList.process(user_list, :course_id => @context.id, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_priveleges_to_course_section => params[:limit_priveleges_to_course_section] == '1', :enrollment_state => @enrollment_state))
           format.json { render :json => @enrollments.to_json(:include => :user, :methods => [:type, :email, :last_name_first, :users_pseudonym_id, :communication_channel_id]) }
         else
           format.json { render :json => "", :status => :bad_request }

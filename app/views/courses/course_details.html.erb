@@ -494,7 +494,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
         <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative priveleges for this course.}) %>
       </div>
-      <%= render :partial => 'shared/email_lists' %>
+      <%= render :partial => 'shared/user_lists' %>
       <% unless @context.available? %>
       <div style="font-size: 0.8em;">
         <i><%= t('invite_to_unpublished_course', %{Since the course hasn't been published, students and TA's will be added, but won't be invited to join the course.  Invitations will be sent out when the course is published.}) %></i>
@@ -504,7 +504,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     <div class="button-container">
       <button type="button" class="button verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
       <button type="submit" class="button add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
-      <button type="button" class="go_back_button button-secondary"><%= t('buttons.modify_users', %{Go back and edit the list of emails}) %></button>
+      <button type="button" class="go_back_button button-secondary"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
       <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
     <% end %>

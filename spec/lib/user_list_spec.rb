@@ -18,24 +18,24 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-describe EmailList do
+describe UserList do
   
   it "should process a list of emails" do
-    EmailList.new(regular).addresses.should eql([TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>})])
+    UserList.new(regular).addresses.should eql([TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>})])
   end
   
   it "should process a list of only emails, without brackets" do
-    EmailList.new(without_brackets).addresses.should eql([TMail::Address.parse("ryankshaw@gmail.com"), TMail::Address.parse("lastfirst@gmail.com")])
+    UserList.new(without_brackets).addresses.should eql([TMail::Address.parse("ryankshaw@gmail.com"), TMail::Address.parse("lastfirst@gmail.com")])
   end
   
   it "should not break on commas inside of single quotes" do
     s = regular.gsub(/"/, "'")
-    EmailList.new(s).addresses.should eql([TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>})])
+    UserList.new(s).addresses.should eql([TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>})])
   end
   
   it "should work with a mixed entry list" do
     s = regular + "," + %{otherryankshaw@gmail.com, otherlastfirst@gmail.com}
-    EmailList.new(s).addresses.should eql([
+    UserList.new(s).addresses.should eql([
         TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), 
         TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>}), 
         TMail::Address.parse("otherryankshaw@gmail.com"), 
@@ -44,16 +44,16 @@ describe EmailList do
   end
   
   it "should work well with a single address" do
-    EmailList.new('ryankshaw@gmail.com').addresses.should eql([TMail::Address.parse('ryankshaw@gmail.com')])
+    UserList.new('ryankshaw@gmail.com').addresses.should eql([TMail::Address.parse('ryankshaw@gmail.com')])
   end
   
   it "should remove duplicates" do
     s = regular + "," + without_brackets
-    EmailList.new(s).addresses.should eql([
+    UserList.new(s).addresses.should eql([
         TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), 
         TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>})
       ])
-    EmailList.new(s).duplicates.should eql([
+    UserList.new(s).duplicates.should eql([
         TMail::Address.parse("ryankshaw@gmail.com"), 
         TMail::Address.parse("lastfirst@gmail.com")
       ])
