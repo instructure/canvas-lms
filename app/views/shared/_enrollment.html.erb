@@ -26,22 +26,51 @@
       <% end %>
     <% end %>
     <% if allowedbypermissions %>
-      <a href="<%= context_url(@context, :context_unenroll_url, (enrollment.try_rescue(:id) || "{{ id }}" ) ) %>" class="unenroll_user_link <%= cant_unenroll %> no-hover" title="Remove User from Course"><%= image_tag unenroll_image %></a>
+      <a href="<%= context_url(@context, :context_unenroll_url, (enrollment.try_rescue(:id) || "{{ id }}" ) ) %>" class="unenroll_user_link <%= cant_unenroll %> no-hover" title="<%= t 'links.unenroll_user', "Remove User from Course" %>"><%= image_tag unenroll_image %></a>
     <% end %>
     <a href="<%= re_send_confirmation_url( enrollment.try_rescue(:user_id) || "{{ user_id }}", enrollment.try_rescue(:user).try_rescue(:communication_channel).try_rescue(:id) || "{{ communication_channel_id }}", :enrollment_id => enrollment.try_rescue(:id) || "{{ id }}" ) rescue "#" %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
   </span>
   <a href="<%= context_url(@context, :context_user_url, enrollment.try_rescue(:user_id) || "{{ user_id }}") %>" class="name"><%= enrollment.try_rescue(:user).try_rescue(:last_name_first) %></a>
   <div class="short_name"><%= enrollment.try_rescue(:user).try_rescue(:short_name) %></div>
   <% if include_type || (enrollment && enrollment.limit_priveleges_to_course_section) %>
-    <div class="enrollment_type">enrolled as a <%= enrollment.try_rescue(:readable_type) %><%= " with section-only access" if enrollment && enrollment.limit_priveleges_to_course_section %></div>
+    <div class="enrollment_type">
+      <%=
+        if enrollment.try(:limit_priveleges_to_course_section)
+          case enrollment.try(:type)
+            when 'TeacherEnrollment'
+              t :enrolled_as_limited_teacher, "enrolled as a teacher with section-only access"
+            when 'TAEnrollment'
+              t :enrolled_as_limited_ta, "enrolled as a TA with section-only access"
+            when 'ObserverEnrollment'
+              t :enrolled_as_limited_observer, "enrolled as an observer with section-only access"
+            when 'CourseDesignerEnrollment'
+              t :enrolled_as_limited_designer, "enrolled as a designer with section-only access"
+            else
+              t :enrolled_as_limited_student, "enrolled as a student with section-only access"
+            end
+        else
+          case enrollment.try(:type)
+            when 'TeacherEnrollment'
+              t :enrolled_as_teacher, "enrolled as a teacher"
+            when 'TAEnrollment'
+              t :enrolled_as_ta, "enrolled as a TA"
+            when 'ObserverEnrollment'
+              t :enrolled_as_observer, "enrolled as an observer"
+            when 'CourseDesignerEnrollment'
+              t :enrolled_as_designer, "enrolled as a designer"
+            else
+              t :enrolled_as_student, "enrolled as a student"
+            end
+        end
+      %>
   <% end %>
   <div class="email"><%= enrollment.try_rescue(:user).try_rescue(:email) %></div>
   <div class="associated_user associated" style="<%= hidden unless enrollment.try_rescue(:associated_user_id) %>">
-    linked to:
+    <%= before_label :linked_to, "linked to" %>
     <span class="associated_user_name associate_user_link"><%= context_user_name(@context, enrollment.try_rescue(:associated_user_id)) %></span>
   </div>
   <div class="associated_user unassociated" style="<%= hidden if enrollment && enrollment.try_rescue(:associated_user_id) %>">
-    <a href="#" class="associate_user_link">link to a student</a>
+    <a href="#" class="associate_user_link"><%= t 'links.link_to_a_student', "link to a student" %></a>
   </div>
   <% if show_section && enrollments %>
     <% enrollments.each do |enrollment| %>
@@ -49,7 +78,7 @@
         <div class="section"><%= enrollment.course_section.display_name %></div>
         <% unless lockedbysis %>
           <% form_tag course_move_enrollment_url(@context, enrollment.id), {:class => "enrollment_course_section_form", :style => "display: none;"} do  %>
-            <select title="Course Section" name="course_section_id" id="course_section_id">
+            <select title="<%= t 'titles.course_section', "Course Section" %>" name="course_section_id" id="course_section_id">
               <% @context.course_sections.active.each do |section| %>
                 <option value="<%= section.id %>" class="option_for_section_<%= section.id %>" <%= "selected=selected" if enrollment.course_section_id==section.id %>><%= section.display_name %></option>
               <% end %>
@@ -63,5 +92,5 @@
   <span class="associated_user_id" style="display: none;"><%= enrollment.try_rescue(:associated_user_id) %></span>
   <span class="id" style="display: none;"><%= enrollment.try_rescue(:id) %></span>
   <span class="user_id" style="display: none;"><%= enrollment.try_rescue(:user_id) %></span>
-  <span class="clear"></span>
+ <span class="clear"></span>
 </li>
