@@ -16,10 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+var grading_scheme, readOnlyGradebook, gradebook;
 I18n.scoped('gradebook', function(I18n) {
-
-var grading_scheme, readOnlyGradebook;
-var gradebook = (function(){
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
       $assignment_details_dialog = $("#assignment_details_dialog"),
@@ -82,7 +80,7 @@ var gradebook = (function(){
   // =============================================
   
   
-  var gradebook = {
+  gradebook = {
     hoverCount: -1,
     fileIndex: 1,
     assignmentIndexes: {},
@@ -2086,8 +2084,4 @@ var gradebook = (function(){
       $("#datagrid_topleft").gradebookLoading('remove');
     });
   }
-
-  return gradebook;
-})();
-
-})
+});

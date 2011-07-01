@@ -17,9 +17,6 @@
  */
 
 I18n.scoped('gradebook', function(I18n) {
-
-(function($) {
-
   var GradebookHistory = {
     init: function(){
       $('.assignment_header').click(function(event) {
@@ -64,7 +61,4 @@ I18n.scoped('gradebook', function(I18n) {
   };
   
 $(document).ready(GradebookHistory.init);
-
-})(jQuery);
-
-})
+});

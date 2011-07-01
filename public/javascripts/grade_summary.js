@@ -16,10 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('gradebook', function(I18n) {
-
 var grading_scheme;
-(function() {
+I18n.scoped('gradebook', function(I18n) {
   function setGroupData(groups, $group) {
     if($group.length === 0) { return; }
     var data = $group.getTemplateData({textValues: ['assignment_group_id', 'rules', 'group_weight']});
@@ -371,6 +369,4 @@ var grading_scheme;
     });
     $.scrollSidebar();
   });
-})();
-
-})
+});
