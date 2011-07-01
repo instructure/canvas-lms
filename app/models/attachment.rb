@@ -958,6 +958,7 @@ class Attachment < ActiveRecord::Base
         self.workflow_state = 'processing'
       rescue => e
         self.workflow_state = 'errored'
+        ErrorReport.log_exception(:scribd, e, :attachment_id => self.id)
       end
       self.submitted_to_scribd_at = Time.now
       self.scribd_attempts ||= 0
