@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  New Comment for <%= asset.title %>: <%= asset.context.name %>
+  <%= t :subject, "New Comment for %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
 <% end %>
 
 <%= strip_and_truncate(asset.message, :max_length => 200) %> 
