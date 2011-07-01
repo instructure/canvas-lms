@@ -49,9 +49,9 @@ $(document).ready(function() {
         graded_count: assignment.graded_count || "0"
       }});
       if(assignment.submitted_count || assignment.graded_count) {
-        $assignment.find(".submitted").showIf(!!assignment.submitted_count);
-        $assignment.find(".graded").showIf(!!assignment.graded_count);
-        $assignment.find(".submitted_graded_comma").showIf(assignment.submitted_count && assignment.graded_count);
+        $assignment.find(".submitted").showIf(!!assignment.submitted_count && !assignment.graded_count);
+        $assignment.find(".graded").showIf(!!assignment.graded_count && !assignment.submitted_count);
+        $assignment.find(".submitted_and_graded").showIf(assignment.submitted_count && assignment.graded_count);
         $assignment.find(".submitted_details").showIf(!!(assignment.submitted_count || assignment.graded_count));
       }
     }

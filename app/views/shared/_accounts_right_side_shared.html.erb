@@ -1,9 +1,9 @@
-<h2>Find A User</h2>
+<h2><%= t 'titles.find_user', "Find A User" %></h2>
 <div class="rs-margin-lr">
   <% form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :method => :get} do |f| -%>
     <fieldset class="textfield-inline-with-button">
       <input id="user_name" type="search" name="user[name]" size=30 value="<%= @query %>" autocomplete="off" />
-      <button class='button small-button'>Go</button>
+      <button class='button small-button'><%= t 'buttons.go', "Go" %></button>
     </fieldset>
   <% end -%>
 </div>
