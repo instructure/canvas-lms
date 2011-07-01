@@ -18,10 +18,11 @@
 
 class UserListsController < ApplicationController
   skip_before_filter :verify_authenticity_token
+  before_filter :require_context
   
-  # POST /user_lists.js
+  # POST /courses/:course_id/user_lists.js
   def create
-    @user_list = UserList.new(params[:user_list])
+    @user_list = UserList.new(params[:user_list], @context.root_account)
 
     respond_to do |format|
       if @user_list

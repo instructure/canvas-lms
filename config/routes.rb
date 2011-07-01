@@ -1,7 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
   
   map.resources :submission_comments, :only => :destroy
-  map.resources :user_lists, :only => :create
 
   map.mark_inbox_as_read 'inbox', :controller => 'context', :action => 'mark_inbox_as_read', :conditions => {:method => :delete}
   map.inbox 'inbox', :controller => 'context', :action => 'inbox'
@@ -253,6 +252,8 @@ ActionController::Routing::Routes.draw do |map|
     course.switch_role 'switch_role/:role', :controller => 'courses', :action => 'switch_role'
     course.sis_publish_status 'details/sis_publish', :controller => 'courses', :action => 'sis_publish_status', :conditions => {:method => :get}
     course.publish_to_sis 'details/sis_publish', :controller => 'courses', :action => 'publish_to_sis', :conditions => {:method => :post}
+    
+    course.resources :user_lists, :only => :create
   end
 
   map.resources :rubrics do |rubric|

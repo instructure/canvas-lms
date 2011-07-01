@@ -46,78 +46,25 @@ I18n.scoped('user_lists', function(I18n) {
         .click(function(e){
           e.preventDefault();
           UL.showProcessing();
-          var params = {user_list: $("#user_list_textarea_container textarea").val().replace(/;/g, ",") };
+          var params = {user_list: $("#user_list_textarea_container textarea").val() };
           $.ajaxJSON(user_lists_path, 'POST', params, UL.showResults);
         })
       .end()
       .submit(function(event) {
         event.preventDefault();
         event.stopPropagation();
-        $form.find(".add_users_button").text("Adding Users...").attr('disabled', true);
-        var data = $form.getFormData();
-        var url = $form.attr('action');
-        var enrollmentTypeText = {
-              student_enrollment: "Students",
-              teacher_enrollment: "Teachers",
-              ta_enrollment: "TAs"
-            }[data.enrollment_type] || "Users";
-        
-        var erroredUsers = [];
-        var finishedCount = 0;
-        var startedCount = 0;
-        var checkForFinish = function() {
-          if(finishedCount == startedCount) {
-            if(!erroredUsers.length) {
-              $.flashMessage([finishedCount, enrollmentTypeText, "added"].join(" "));
-            } else {
-              successCount = finishedCount - erroredUsers.length;
-              var message = [successCount, "out of", finishedCount, enrollmentTypeText, "added"].join(" ");
-              message += ".  The following users had problems:<br/><span style='font-size:0.8em;'>" + erroredUsers.join(',') + "</span>";
-              $.flashError(message, 20000);
-            }
-            $(document).triggerHandler('enrollment_added');
-          } else {
-            setTimeout(checkForFinish, 500);
-          }
-        };
-        var users = [];
-        $("#user_lists_processed_people .person").each(function() {
-          var user = {};
-          user.name = $.trim($(this).find(".name").text());
-          user.email = $.trim($(this).find(".address").text());
-          users.push(user);
-        });
-        startedCount = users.length;
-        for(var idx in users) {
-          var user = users[idx];
-          data = $form.getFormData();
-          data.user_list = user.email;
-          if(user.name) { 
-            data.user_list = "\"" + user.name.replace(/\"/g, "'") + "\" <" + user.email + ">";
-          }
-          $.ajaxJSON(url, 'POST', data, function(enrollments) {
-            finishedCount += 1;
-            if (!enrollments || !enrollments.length) { return false; }
-
-            var enrollmentType = $.underscore(enrollments[0].enrollment.type),
-                enrollmentTypeText = {
-                  student_enrollment: "Students",
-                  teacher_enrollment: "Teachers",
-                  ta_enrollment: "TAs"
-                }[enrollmentType] || "Users";
-                
-            $form.find(".user_list").val("");
-            UL.showTextarea();
-
-            $.each( enrollments, function(){
-              UL.addUserToList(this.enrollment, enrollmentType);
-            });
-          }, function(data) {
-            finishedCount += 1;
-            erroredUsers.push(user.email);
+        $form.find(".add_users_button").text(I18n.t("adding_users", "Adding Users...")).attr('disabled', true);
+        $.ajaxJSON($form.attr('action'), 'POST', $form.getFormData(), function(enrollments) {
+          $form.find(".user_list").val("");
+          UL.showTextarea();
+          if (!enrollments || !enrollments.length) { return false; }
+          $.each( enrollments, function(){
+            UL.addUserToList(this.enrollment);
           });
-        }
-        setTimeout(checkForFinish, 500);
+          $.flashMessage(I18n.t("users_added", { one: "1 user added", other: "%{count} users added" }, { count: enrollments.length }));
+        }, function(data) {
+          $.flashError(I18n.t("users_adding_failed", "Failed to enroll users"));
+        });
       });
       $form.find("#enrollment_type").change(function() {
         $("#limit_priveleges_to_course_section_holder").showIf($(this).val() == "TeacherEnrollment" || $(this).val() == "TaEnrollment");
@@ -127,10 +74,10 @@ I18n.scoped('user_lists', function(I18n) {
         event.preventDefault();
         event.stopPropagation();
         if($(this).hasClass('cant_unenroll')) {
-          alert("This user was automatically enrolled using the campus enrollment system, so they can't be manually removed.  Please contact your system administrator if you have questions.");
+          alert(I18n.t("cant_unenroll", "This user was automatically enrolled using the campus enrollment system, so they can't be manually removed.  Please contact your system administrator if you have questions."));
         } else {
           $(this).parents(".user").confirmDelete({
-            message: "Are you sure you want to remove this user?",
+            message: I18n.t("delete_confirm", "Are you sure you want to remove this user?"),
             url: $(this).attr('href'),
             success: function() {
               $(this).fadeOut(function() {
@@ -156,22 +103,22 @@ I18n.scoped('user_lists', function(I18n) {
 
     showResults: function(userList){
       $form.find(".add_users_button, .go_back_button, #user_list_parsed").show();
-      $form.find(".add_users_button").attr('disabled', false).text("OK Looks Good, Add These " + userList.addresses.length + " Users");
+      $form.find(".add_users_button").attr('disabled', false).text(I18n.t("add_n_users", {one: "OK Looks Good, Add This 1 User", other: "OK Looks Good, Add These %{count} Users"}, {count: userList.users.length}));
       $form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").hide();
       $form.find(".user_list").removeAttr('disabled').loadingImage('remove');
 
       $user_lists_processed_people.html("").show();
 
-      if (!userList || !userList.addresses || !userList.addresses.length) {
+      if (!userList || !userList.users || !userList.users.length) {
        $user_list_no_valid_users.appendTo($user_lists_processed_people);
        $form.find(".add_users_button").hide();
       }
       else {
-        if (userList.errored_addresses && userList.errored_addresses.length) {
+        if (userList.errored_users && userList.errored_users.length) {
           $user_list_with_errors
             .appendTo($user_lists_processed_people)
             .find('.message_content')
-              .html(I18n.t("user_parsing_errors", { one: "There was 1 error parsing that list of users.", other: "There were %{count} errors parsing that list of users."}, {count:userList.errored_addresses.length}) + " " + I18n.t("invalid_users_notice", "There may be some that were invalid, and you might need to go back and fix any errors.") + " " + I18n.t("users_to_add", { one: "If you proceed as is, 1 user will be added.", other: "If you proceed as is, %{count} users will be added." }, {count: userList.addresses.length}));
+              .html(I18n.t("user_parsing_errors", { one: "There was 1 error parsing that list of users.", other: "There were %{count} errors parsing that list of users."}, {count:userList.errored_users.length}) + " " + I18n.t("invalid_users_notice", "There may be some that were invalid, and you might need to go back and fix any errors.") + " " + I18n.t("users_to_add", { one: "If you proceed as is, 1 user will be added.", other: "If you proceed as is, %{count} users will be added." }, {count: userList.users.length}));
         }
         if (userList.duplicates && userList.duplicates.length) {
           $user_list_duplicates_found
@@ -180,7 +127,7 @@ I18n.scoped('user_lists', function(I18n) {
               .html(I18n.t("duplicate_users", { one: "1 duplicate user found, duplicates have been removed.", other: "%{count} duplicate user found, duplicates have been removed."}, {count:userList.duplicates.length}))
         }
 
-        $.each(userList.addresses, function(){
+        $.each(userList.users, function(){
           $user_lists_processed_person_template
             .clone(true)
             .fillTemplateData({ data: this })
@@ -196,7 +143,8 @@ I18n.scoped('user_lists', function(I18n) {
       });
     },
 
-    addUserToList: function(enrollment, enrollmentType){
+    addUserToList: function(enrollment){
+      var enrollmentType = $.underscore(enrollment.type);
       var $list = $(".user_list." + enrollmentType + "s");
       if(!$list.length) {
         if(enrollmentType == 'student_enrollment' || enrollmentType == 'observer_enrollment') {
@@ -206,7 +154,7 @@ I18n.scoped('user_lists', function(I18n) {
         }
       }
       $list.find(".none").remove();
-      enrollment.invitation_sent_at = "Just Now";
+      enrollment.invitation_sent_at = I18n.t("just_now", "Just Now");
       try {
         enrollment.name = enrollment.user.last_name_first || enrollment.user.name;
         enrollment.pseudonym_id = enrollment.user.pseudonym.id;

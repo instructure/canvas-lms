@@ -45,24 +45,23 @@ describe EnrollmentsFromUserList do
     
     before do
       course_model(:reusable => true)
-      @efel = EnrollmentsFromUserList.new(@course)
       @el = UserList.new(list_to_parse)
     end
     
     it "should initialize with a course id" do
       lambda{EnrollmentsFromUserList.new}.should raise_error(ArgumentError, 'wrong number of arguments (0 for 1)')
-      e = EnrollmentsFromUserList.new(@course.id)
+      e = EnrollmentsFromUserList.new(@course)
       e.course.should eql(@course)
     end
     
     it "should process with an user list" do
-      enrollments = @efel.process(@el)
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.all? {|e| e.should be_is_a(StudentEnrollment)}
     end
     
     it "should process repeat addresses without creating new users" do
       @el = UserList.new(list_to_parse_with_repeats)
-      enrollments = EnrollmentsFromUserList.process(@el, :course_id => @course)
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.length.should eql(3)
     end
 
@@ -70,7 +69,7 @@ describe EnrollmentsFromUserList do
       u = factory_with_protected_attributes(User, :name => "Bob", :workflow_state => "creation_pending")
       u.pseudonyms.create!(:unique_id => "david_richards_jr@example.com", :path => "david_richards_jr@example.com", :password => "dave4Instructure", :password_confirmation => "dave4Instructure")
       @el = UserList.new(list_to_parse_with_repeats)
-      enrollments = EnrollmentsFromUserList.process(@el, :course_id => @course)
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.length.should eql(3)
       enrollments.map(&:user).should be_include(u)
     end
@@ -81,7 +80,7 @@ describe EnrollmentsFromUserList do
     it "should be able to process from the class" do
       course_model(:reusable => true)
       @el = UserList.new(list_to_parse)
-      enrollments = EnrollmentsFromUserList.process(@el, :course_id => @course)
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.all? {|e| e.should be_is_a(StudentEnrollment)}
     end
   end

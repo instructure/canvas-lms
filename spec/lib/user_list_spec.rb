@@ -20,43 +20,106 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe UserList do
   
+  before(:each) do
+    account_model
+  end
+  
   it "should process a list of emails" do
-    UserList.new(regular).addresses.should eql([TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>})])
+    ul = UserList.new(regular)
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        ["Shaw, Ryan", "ryankshaw@gmail.com"],
+        ["Last, First", "lastfirst@gmail.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.should == []
+    ul.duplicate_logins.should == []
+    ul.logins.should == []
   end
   
   it "should process a list of only emails, without brackets" do
-    UserList.new(without_brackets).addresses.should eql([TMail::Address.parse("ryankshaw@gmail.com"), TMail::Address.parse("lastfirst@gmail.com")])
-  end
-  
-  it "should not break on commas inside of single quotes" do
-    s = regular.gsub(/"/, "'")
-    UserList.new(s).addresses.should eql([TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>})])
+    ul = UserList.new without_brackets
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        [nil, "ryankshaw@gmail.com"],
+        [nil, "lastfirst@gmail.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.should == []
+    ul.duplicate_logins.should == []
+    ul.logins.should == []
   end
   
   it "should work with a mixed entry list" do
-    s = regular + "," + %{otherryankshaw@gmail.com, otherlastfirst@gmail.com}
-    UserList.new(s).addresses.should eql([
-        TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), 
-        TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>}), 
-        TMail::Address.parse("otherryankshaw@gmail.com"), 
-        TMail::Address.parse("otherlastfirst@gmail.com")
-      ])
+    ul = UserList.new regular + "," + %{otherryankshaw@gmail.com, otherlastfirst@gmail.com}
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        ["Shaw, Ryan", "ryankshaw@gmail.com"],
+        ["Last, First", "lastfirst@gmail.com"],
+        [nil, "otherryankshaw@gmail.com"],
+        [nil, "otherlastfirst@gmail.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.should == []
+    ul.duplicate_logins.should == []
+    ul.logins.should == []
   end
   
   it "should work well with a single address" do
-    UserList.new('ryankshaw@gmail.com').addresses.should eql([TMail::Address.parse('ryankshaw@gmail.com')])
+    ul = UserList.new('ryankshaw@gmail.com')
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        [nil, "ryankshaw@gmail.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.should == []
+    ul.duplicate_logins.should == []
+    ul.logins.should == []
   end
   
   it "should remove duplicates" do
-    s = regular + "," + without_brackets
-    UserList.new(s).addresses.should eql([
-        TMail::Address.parse(%{"Shaw, Ryan" <ryankshaw@gmail.com>}), 
-        TMail::Address.parse(%{"Last, First" <lastfirst@gmail.com>})
-      ])
-    UserList.new(s).duplicates.should eql([
-        TMail::Address.parse("ryankshaw@gmail.com"), 
-        TMail::Address.parse("lastfirst@gmail.com")
-      ])
+    @account.pseudonyms.create!(:unique_id => "A123451").assert_user
+    @account.pseudonyms.create!(:unique_id => "user3").assert_user
+    ul = UserList.new regular + "," + without_brackets + ", A123451, user3", @account
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        ["Shaw, Ryan", "ryankshaw@gmail.com"],
+        ["Last, First", "lastfirst@gmail.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.map{|x| [x.name, x.address]}.should eql([
+        [nil, "ryankshaw@gmail.com"],
+        [nil, "lastfirst@gmail.com"]])
+    ul.duplicate_logins.should == []
+    ul.logins.should == [{:login=>"A123451", :name=>"User"}, {:login=>"user3", :name=>"User"}]
+
+    ul = UserList.new regular + ",A123451 ,user3 ," + without_brackets + ", A123451, user3", @account
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        ["Shaw, Ryan", "ryankshaw@gmail.com"],
+        ["Last, First", "lastfirst@gmail.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.map{|x| [x.name, x.address]}.should eql([
+        [nil, "ryankshaw@gmail.com"],
+        [nil, "lastfirst@gmail.com"]])
+    ul.duplicate_logins.should == [{:login=>"A123451"}, {:login=>"user3"}]
+    ul.logins.should == [{:login=>"A123451", :name=>"User"}, {:login=>"user3", :name=>"User"}]
+  end
+  
+  it "should process login ids and email addresses" do
+    @account.pseudonyms.create!(:unique_id => "user1").assert_user
+    @account.pseudonyms.create!(:unique_id => "A112351243").assert_user
+    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>}, @account
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        ["Shaw, Ryan", "ryankshaw@gmail.com"],
+        ["Last, First", "lastfirst@gmail.com"],
+        [nil, "test@example.com"],
+        ["thomas walsh", "test2@example.com"],
+        ["walsh, thomas", "test3@example.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.should == []
+    ul.duplicate_logins.should == []
+    ul.logins.should == [{:login=>"user1", :name=>"User"}, {:login=>"A112351243", :name=>"User"}]
+  end
+  
+  it "should only add login ids that are existing unique ids" do
+    @account.pseudonyms.create!(:unique_id => "user1").assert_user
+    @account.pseudonyms.create!(:unique_id => "user2").assert_user
+    ul = UserList.new "user1,user2,user3", @account
+    ul.addresses.should == []
+    ul.errors.should == ["user3"]
+    ul.duplicate_addresses.should == []
+    ul.duplicate_logins.should == []
+    ul.logins.should == [{:login=>"user1", :name=>"User"}, {:login=>"user2", :name=>"User"}]
   end
 end
 

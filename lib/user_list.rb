@@ -17,65 +17,107 @@
 #
 
 class UserList
-  def initialize(string)
+  def initialize(string, root_account=nil, should_resolve_logins=true)
     @addresses = []
     @errors = []
-    @duplicates = []
+    @duplicate_addresses = []
+    @duplicate_logins = []
+    @logins = []
     parse_list(string)
+    resolve_logins root_account if should_resolve_logins
   end
   
-  attr_reader :addresses, :errors, :duplicates
-  
-  def parse_single_address(string, original_string)
-    #for some reason TMail thinks that things like "adsf" are valid email addresses
-    begin
-      temp = TMail::Address.parse(string)
-    rescue
-      # try to handle things like "Bob O'Connor <boconnor@pcschools.us>"
-      temp = TMail::Address.parse(original_string) rescue nil
-    end
-    if temp && string.include?('@')
-      if @addresses.any?{ |a| a.hash == temp.hash  }
-        @duplicates << temp
-      else
-        @addresses.push temp         
-      end
-    else
-      @errors.push string
-    end
-  end
-  
-  def parse_list(str)
-    addresses = []
-    at_index = 0
-    comma_index = 0
-    last_comma = 0
-    old_str = str
-    str = str.strip.gsub(/“|”|'|“/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ")
-    str.split("").each_with_index do |char, i|
-      if char == '@'
-        at_index = i;
-      end
-      if char == ','
-        comma_index = i
-      end
-      if (comma_index > at_index && at_index > 0)
-        parse_single_address(str[last_comma, comma_index - last_comma], old_str[last_comma, comma_index - last_comma])
-        last_comma = comma_index + 1
-        at_index = 0
-      end
-      if i == (str.length - 1)
-        parse_single_address(str[last_comma, str.length - last_comma], old_str[last_comma, str.length - last_comma])
-      end
-    end
-  end
+  attr_reader :errors, :addresses, :duplicate_addresses, :logins, :duplicate_logins
   
   def to_json(*options)
     {
-      :addresses => addresses.collect{|a| {:name => a.name, :address => a.address} },
-      :duplicates => duplicates.collect{|a| {:name => a.name, :address => a.address} },
-      :errored_addresses => errors
+      :users => users,
+      :duplicates => duplicate_addresses.collect{|a| {:name => a.name, :address => a.address} } + duplicate_logins,
+      :errored_users => errors
     }.to_json
+  end
+  
+  def users
+    @addresses.collect{|a| {:name => a.name, :address => a.address}} + @logins
+  end
+  
+  private
+  
+  def parse_single_user(string)
+    return if string.blank?
+    if string.include?('@')
+      address = TMail::Address.parse(string) rescue nil
+      if address
+        if @addresses.any?{ |a| a.hash == address.hash  }
+          @duplicate_addresses << address
+        else
+          @addresses << address
+        end
+      else
+        @errors << string
+      end
+    else
+      if @logins.any?{ |l| l[:login] == string }
+        @duplicate_logins << { :login => string }
+      else
+        @logins << { :login => string }
+      end
+    end
+  end
+  
+  def quote_ends(chars, i)
+    loop do
+      i = i + 1
+      return false if i >= chars.size
+      return false if chars[i] == '@'
+      return true if chars[i] == '"'
+    end
+  end
+
+  def parse_list(str)
+    str = str.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").gsub(/;/, ",") + ","
+    chars = str.split("")
+    user_start = 0
+    in_quotes = false
+    chars.each_with_index do |char, i|
+      if not in_quotes
+        case char
+        when ','
+          user_line = str[user_start, i - user_start].strip
+          parse_single_user(user_line) unless user_line.blank?
+          user_start = i + 1
+        when '"'
+          in_quotes = true if quote_ends(chars, i)
+        end
+      else
+        in_quotes = false if char == '"'
+      end
+    end
+  end
+  
+  def resolve_logins(root_account)
+    return if @logins.empty?
+    all_logins = @logins
+    @logins = []
+    
+    valid_logins = {}
+    Pseudonym.connection.select_all("
+        SELECT pseudonyms.unique_id AS login, users.name AS name
+        FROM pseudonyms, users
+        WHERE pseudonyms.user_id = users.id
+          AND pseudonyms.account_id = #{root_account.id}
+          AND (#{Pseudonym.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions])})
+          AND LOWER(pseudonyms.unique_id) in (#{all_logins.map{|x| Pseudonym.sanitize(x[:login].downcase)}.join(", ")})
+        ").map(&:symbolize_keys).each do |login|
+      valid_logins[login[:login]] = login
+    end
+    all_logins.each do |login|
+      if valid_logins.has_key?(login[:login])
+        @logins << valid_logins[login[:login]]
+      else
+        @errors << login[:login]
+      end
+    end
   end
   
 end
