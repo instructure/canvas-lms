@@ -5,17 +5,17 @@
     <div class="links editing">
       <a href="#" class="edit_criterion_link no-hover"><%= image_tag "edit.png" %></a>
     </div>
-    <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :title => "This criterion is linked to a Learning Outcome" %>
-    <span class="description criterion_description_value"><%= criterion.description rescue "Description of criterion" %></span>
+    <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :title => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
+    <span class="description criterion_description_value"><%= criterion.description rescue t('defaults.description', "Description of criterion") %></span>
     <span class="learning_outcome_id" style="display: none;"><%= criterion.learning_outcome_id rescue nbsp %></span>
     <span class="criterion_id" style="display: none;"><%= criterion && criterion.id %></span>
     <div class="long_description_holder editing <%= 'empty' if !criterion || !criterion.long_description || criterion.long_description.empty? %>">
-      <a href="#" class="long_description_link">view longer description</a>
+      <a href="#" class="long_description_link"><%= t 'links.view_longer_description', "view longer description" %></a>
       <textarea class="long_description" style="display: none;"><%= h((criterion.long_description rescue '')) %></textarea>
     </div>
     <div class="threshold">
-      threshold: 
-      <span class="mastery_points"><%= criterion.mastery_points rescue 5 %></span> pts
+      <%= before_label :threshold, "threshold" %>
+      <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{criterion.mastery_points rescue 5}</span>}.html_safe %>
     </div>
   </div>
   </td>
@@ -24,7 +24,7 @@
       <div class="custom_ratings_entry assessing">
         <div style="margin-left: 5px; margin-top: 2px; <%= hidden unless rubric_association && rubric_association.summary_data && rubric_association.summary_data[:saved_comments] && rubric_association.summary_data[:saved_comments][criterion.id.to_s] %>" class="saved_custom_rating_holder">
           <select class="saved_custom_rating">
-            <option value="">[ Select ]</option>
+            <option value=""><%= t 'options.select', "[ Select ]" %></option>
             <% (rubric_association.summary_data[:saved_comments][criterion.id.to_s] || [] rescue []).each do |comment| %>
               <option value="<%= URI.escape(comment) %>" class="comment"><%= comment[0..50] %></option>
             <% end %>
@@ -33,23 +33,23 @@
         <textarea style="margin: 5px; min-width: 100px; height: 35px;" class="custom_rating_field"></textarea>
         <div>
           <input type="checkbox" id="save_criterion_message_<%= criterion ? criterion.id : "blank" %>" class="save_custom_rating" value="1"/>
-          <label for="save_criterion_message_<%= criterion ? criterion.id : "blank" %>">Save this comment for reuse</label>
+          <label for="save_criterion_message_<%= criterion ? criterion.id : "blank" %>"><%= t 'labels.save_criterion_for_reuse', "Save this comment for reuse" %></label>
         </div>
       </div>
       <div class="displaying custom_rating_comments not_assessing" style="font-size: 0.8em; padding: 0px 5px;">
-        This area will be used by the assessor to leave
-        comments related to this criterion.
+        <%= t 'description.custom_comments_area', "This area will be used by the assessor to leave
+        comments related to this criterion." %>
       </div>
     <% else %>
       <table class="ratings" style="<%= hidden if rubric && rubric.free_form_criterion_comments %>"><tr>
         <% ratings = (criterion.ratings rescue nil); ratings = nil if ratings && ratings.length < 2  %>
-        <% ratings ||= [OpenObject.new(:id => "blank", :description => "Full Marks", :points => 5), OpenObject.new(:id => "blank_2", :description => "No Marks", :points => 0)] %>
+        <% ratings ||= [OpenObject.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), OpenObject.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
         <% ratings.each_index do |idx| %>
           <% rating = ratings[idx]; rating.edge = (idx == 0 || idx == ratings.length - 1) %>
           <td id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %>">
           <div class="container">
             <div class="description rating_description_value"><%= rating.description %></div>
-            <span class="nobr"><span class="points"><%= rating.points %></span> pts</span>
+            <span class="nobr"><%= t :points, "%{points} pts", :points => %{<span class="points">#{rating.points}</span>}.html_safe %></span>
             <span class="rating_id" style="display: none;"><%= rating && rating.id %></span>
             <div class="links">
               <a href="#" class="edit_rating_link no-hover"><%= image_tag "edit.png" %></a>
@@ -60,24 +60,27 @@
         <% end %>
       </tr></table>
       <div style="<%= hidden unless rubric && rubric.free_form_criterion_comments %> font-style: italic; font-size: 0.8em; margin: 5px;" class="custom_ratings">
-        This area will be used by the assessor to leave
-        comments related to this criterion.
+        <%= t 'description.custom_comments_area', "This area will be used by the assessor to leave
+        comments related to this criterion." %>
       </div>
     <% end %>
   </td>
   <td class="nobr points_form">
     <div class="editing" style="white-space: normal">
       <span style="white-space: nowrap;">
-        <input type="text" style="width: 30px;" value="<%= assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) %>" class="criterion_points"/> 
-        <% if assessing && criterion && criterion.points %> / <%= criterion.points %><% end %>
-        pts
+        <% rating_points = %{<input type="text" style="width: 30px;" value="#{ assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) }" class="criterion_points"/>}.html_safe %>
+        <% if assessing && criterion && criterion.points %>
+            <%= t :points_out_of, "%{points} / %{total} pts", :points => rating_points, :total => criterion.points %>
+        <% else %>
+            <%= t :points, "%{points} pts", :points => rating_points %>
+        <% end %>
       </span><br />
       <% if !rubric || !rubric.free_form_criterion_comments %>
-      <a href="#" class="no-hover criterion_comments" title="Additional Comments"><%= image_tag "rubric_comment.png" %></a>
+      <a href="#" class="no-hover criterion_comments" title="<%= t 'links.additional_comments', "Additional Comments" %>"><%= image_tag "rubric_comment.png" %></a>
       <div class="custom_rating" style="display: none;"></div>
       <% end %>
       <div style="font-size: 0.6em; <%= hidden unless assessing && criterion && criterion.ignore_for_scoring %>">
-        ignored in total
+        <%= t :ignored_in_total, "ignored in total" %>
       </div>
     </div>
     <div class="displaying">
@@ -85,10 +88,10 @@
         <span class="criterion_rating_points_holder" style="<%= hidden unless assessment_rating %>">
           <span class="criterion_rating_points"><%= assessment_rating ? assessment_rating[:points] : nbsp %></span> /
         </span>
-        <span class="display_criterion_points"><%= criterion.points rescue 5 %></span> pts<br />
+        <%= t :points, "%{points} pts", :points => %{<span class="display_criterion_points">#{ criterion.points rescue 5 }</span>}.html_safe %><br />
       </span>
       <% if rubric && !rubric.free_form_criterion_comments %>
-        <a href="#" class="<%= 'empty' if edit_view || (assessment_rating && assessment_rating[:comments].blank?)%> no-hover criterion_comments" title="Additional Comments"><%= image_tag "rubric_comment.png" %></a>
+        <a href="#" class="<%= 'empty' if edit_view || (assessment_rating && assessment_rating[:comments].blank?)%> no-hover criterion_comments" title="<%= t 'links.additional_comments', "Additional Comments" %>"><%= image_tag "rubric_comment.png" %></a>
       <% end %>
     </div>
     <div class="ignoring">

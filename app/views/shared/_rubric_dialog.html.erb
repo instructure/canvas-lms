@@ -1,6 +1,6 @@
 <div class="rubric_dialog" id="rubric_dialog" style="display: none;">
-  <h2 style="float: left;">Find a Rubric</h2>
-  <a style="float: right;" href="<%= context_url(@context, :context_rubrics_url) %>">Manage Rubrics</a>
+  <h2 style="float: left;"><%= t 'titles.find_a_rubric', "Find a Rubric" %></h2>
+  <a style="float: right;" href="<%= context_url(@context, :context_rubrics_url) %>"><%= t 'links.manage_rubrics', "Manage Rubrics" %></a>
   <a href="<%= context_url(@context, :context_grading_rubrics_url) %>" class="grading_rubrics_url" style="display: none;">&nbsp;</a>
   <div class="clear"></div>
   <div class="loading_message" style="margin: 10px; text-align: center;">
@@ -11,7 +11,7 @@
         <ul class="rubrics_dialog_contexts_select unstyled_list side_tabs">
           <li class="rubrics_dialog_context_select blank" style="display: none;">
             <a href="#">
-              <span class="name">Some context</span>
+              <span class="name">&nbsp;</span>
               <span class="context_code" style="display: none;">&nbsp;</span>
             </a>
             <div class="rubrics" style="font-size: 0.8em; color: #aaa;">&nbsp;</div>
@@ -24,12 +24,12 @@
         <ul class="rubrics_dialog_rubrics_select unstyled_list side_tabs">
           <li class="rubrics_dialog_rubric_select blank" style="display: none;">
             <a href="#">
-              <span class="title">Some standard</span>
+              <span class="title">&nbsp;</span>
               <span class="id" style="display: none;">&nbsp;</span>
             </a>
             <div class="rubrics" style="font-size: 0.8em; color: #aaa;">
-              <span class="criterion_count">&nbsp;</span> criteria<br/>
-              <span class="points_possible">&nbsp;</span> points possible
+              <%= t :criterion_count, "%{count} criteria", :count => '<span class="criterion_count">&nbsp;</span>'.html_safe %><br/>
+              <%= t :points_possible, "%{points} points possible", :points => '<span class="points_possible">&nbsp;</span>'.html_safe %>
             </div>
           </li>
         </ul>
@@ -53,13 +53,13 @@
               </div>
               <div class="clear"></div>
             </div>
-            <button type="button" class="button select_rubric_link">Use This Rubric</button>
+            <button type="button" class="button select_rubric_link"><%= t 'buttons.use_this_rubric', "Use This Rubric" %></button>
           </div>
         </div>
       </td>
     </tr>
   </table>
-  <div style="margin-top: 5px; text-align: right; display: none;"><a href="#" class="cancel_find_rubric_link">Cancel</a></div>
+  <div style="margin-top: 5px; text-align: right; display: none;"><a href="#" class="cancel_find_rubric_link"><%= t '#buttons.cancel', "Cancel" %></a></div>
   <div style="display: none;">
     <a href="<%= context_url(@context, :context_assignment_url, assignment.id) %>" style="display: none;" class="update_rubric_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_rubric_associations_url) %>" class="select_rubric_url">&nbsp;</a>
