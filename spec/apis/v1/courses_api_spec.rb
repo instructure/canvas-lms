@@ -27,6 +27,7 @@ describe CoursesController, :type => :integration do
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'my-course-sis')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
+    @user.pseudonym.update_attribute(:sis_source_id, 'login-id')
   end
 
   it "should return course list" do
@@ -38,14 +39,14 @@ describe CoursesController, :type => :integration do
         'name' => @course1.name,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
-        'sis_source_id' => nil,
+        'sis_course_id' => nil,
       },
       {
         'id' => @course2.id,
         'name' => @course2.name,
         'course_code' => @course2.course_code,
         'enrollments' => [{'type' => 'student'}],
-        'sis_source_id' => 'my-course-sis',
+        'sis_course_id' => 'my-course-sis',
       },
     ]
   end
@@ -59,7 +60,7 @@ describe CoursesController, :type => :integration do
         'name' => @course1.name,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
-        'sis_source_id' => nil,
+        'sis_course_id' => nil,
       },
     ]
   end
@@ -84,6 +85,7 @@ describe CoursesController, :type => :integration do
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.map { |u| u['sis_user_id'] }.should == [nil, nil]
+    json.map { |u| u['sis_login_id'] }.should == [nil, nil]
   end
 
   it "should include user sis id if account admin" do
@@ -92,11 +94,13 @@ describe CoursesController, :type => :integration do
     new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
     @course2.enroll_student(new_user).accept!
     new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+    new_user.pseudonym.update_attribute(:sis_source_id, 'login-2')
 
     @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
+    json.map { |u| u['sis_login_id'] }.sort.should == ['login-id', 'login-2'].sort
   end
 
   it "should include user sis id if site admin" do
@@ -105,11 +109,13 @@ describe CoursesController, :type => :integration do
     new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
     @course2.enroll_student(new_user).accept!
     new_user.pseudonym.update_attribute(:sis_user_id, 'user2')
+    new_user.pseudonym.update_attribute(:sis_source_id, 'login-2')
 
     @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
+    json.map { |u| u['sis_login_id'] }.sort.should == ['login-id', 'login-2'].sort
   end
 
   it "should return the list of sections for the course" do
@@ -132,8 +138,8 @@ describe CoursesController, :type => :integration do
     @course2.update_attribute(:sis_source_id, 'my-course-sis')
     @course2.enroll_student(new_user).accept!
 
-    json = api_call(:get, "/api/v1/courses/sis:my-course-sis/students.json",
-            { :controller => 'courses', :action => 'students', :course_id => 'sis:my-course-sis', :format => 'json' })
+    json = api_call(:get, "/api/v1/courses/sis_course_id:my-course-sis/students.json",
+            { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:my-course-sis', :format => 'json' })
     json.should == api_json_response([first_user, new_user],
         :only => %w(id name))
   end
@@ -154,7 +160,7 @@ describe CoursesController, :type => :integration do
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'needs_grading_count' => 1,
-        'sis_source_id' => nil,
+        'sis_course_id' => nil,
       },
     ]
   end
@@ -171,7 +177,7 @@ describe CoursesController, :type => :integration do
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher'}],
         'syllabus_body' => @course1.syllabus_body,
-        'sis_source_id' => nil,
+        'sis_course_id' => nil,
       },
     ]
   end
