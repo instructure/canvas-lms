@@ -153,9 +153,6 @@ class ApplicationController < ActionController::Base
     object ||= User.new
     object.errors.add_to_base(t "#application.errors.unauthorized", "You are not authorized to perform this action")
     respond_to do |format|
-      if !request.xhr?
-        flash[:notice] = t "#application.errors.unauthorized", "You are not authorized to perform this action"
-      end
       @show_left_side = false
       clear_crumbs
       params = request.path_parameters

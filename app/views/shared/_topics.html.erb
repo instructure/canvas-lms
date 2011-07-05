@@ -1,17 +1,8 @@
 <% topic_type ||= "discussion_topic"
   brief ||= false
-  topic_name = topic_type == "discussion_topic" ? "Discussion" : topic_type.gsub("_", " ").capitalize
-  short_name = topic_name.gsub("Discussion ", "")
   single_topic ||= false
   is_announcement = (topic_type == 'announcement')
  %>
-<% if !brief %>
-<% js_block do %>
-<script type="text/javascript">
-var shortName = "<%= short_name %>";
-</script>
-<% end %>
-<% end %>
 <div style="display:none;" id="topic_urls">
   <a href="<%= context_url(@context, :context_discussion_topics_url) %>" class="add_topic_url">&nbsp;</a>
   <%= image_tag "announcement.png", :class => "announcement_image" %>
@@ -20,14 +11,24 @@ var shortName = "<%= short_name %>";
 <div id="topic_list" class="communication_messages_list">
   <% if can_do((@context.send(topic_type.pluralize).new rescue nil), @current_user, :create) %>
     <div id="no_topics_message" style="<%= topics && topics.length > 0 ? 'display: none;' : '' %>">
-      There are no <%= topic_name.downcase.pluralize %>, sad to say.  Would you like to start one?
+      <% if is_announcement %>
+        <%= t 'no_announcements_admin', 'There are no announcements, sad to say.  Would you like to create one?' %>
+      <% else %>
+        <%= t 'no_discussions_admin', 'There are no discussions, sad to say.  Would you like to start one?' %>
+      <% end %>
       <div class="button-container">
-        <button type="button" class="add_topic_link button"><%= image_tag "add.png" %> Make a New <%= topic_name %></button>
+        <button type="button" class="add_topic_link button"><%= image_tag "add.png" %>
+          <%= is_announcement ? t('new_announcement', 'Make a New Announcement') : t('new_topic', 'Make a New Discussion') %>
+        </button>
       </div>
     </div>
   <% else %>
     <div id="no_topics_message" style="<%= topics && topics.length > 0 ? 'display: none;' : '' %>">
-      There are no <%= topic_name.downcase.pluralize %>, sad to say.
+      <% if is_announcement %>
+        <%= t 'no_announcements', 'There are no announcements, sad to say.' %>
+      <% else %>
+        <%= t 'no_discussions', 'There are no discussions, sad to say.' %>
+      <% end %>
     </div>
   <% end %>
   <% topics.each do |topic| %>
@@ -47,9 +48,9 @@ var shortName = "<%= short_name %>";
 <% form_for(:discussion_topic, :url => context_url(@context, :context_discussion_topics_url), :html => {:id => 'add_topic_form', :style => 'display: none; padding: 5px;'}) do |f| %>
   <div class="details_box" style="margin-bottom: 5px;">
     <div style="float: left">
-      Title: <%= f.text_field :title, :class => 'topic_title', :title => "Topic Title", :style => 'font-size: 1.2em;' %>
+      <%= before_label('title', %{Title}) %> <%= f.text_field :title, :class => 'topic_title', :style => 'font-size: 1.2em;' %>
     </div>
-    <div style="float: right; padding-top: 0.7em;"><a href="#" class="switch_topic_views_link" style="font-size: 0.8em;">Switch Views</a></div>
+    <div style="float: right; padding-top: 0.7em;"><a href="#" class="switch_topic_views_link" style="font-size: 0.8em;"><%= t('#links.switch_views', %{Switch Views}) %></a></div>
     <div class="clear"></div>
   </div>
   <div class="content_box" style="margin-bottom: 5px; margin-left: 5px; margin-right: 5px; width: auto;">
@@ -58,19 +59,19 @@ var shortName = "<%= short_name %>";
   <% if can_do(@context.discussion_topics.new, @current_user, :attach) %>
   <div>
     <div class="no_attachment" style="float: right;">
-      <a href="#" class="add add_attachment_link">Attach File</a>
+      <a href="#" class="add add_attachment_link"><%= t('links.attach_file', %{Attach File}) %></a>
     </div>
     <div class="current_attachment" style="display: none; text-align: left;">
       <div>
         <input type="hidden" name="discussion_topic[remove_attachment]" value="0" class="discussion_remove_attachment"/>          
-        <span style="font-size: 0.8em;">File Attached: </span>
+        <span style="font-size: 0.8em;"><%= before_label('files_attached', %{File Attached}) %> </span>
         <span class="attachment_name" style="font-weight: bold;">&nbsp;</span>
         <a href="#" class="delete_attachment_link no-hover"><%= image_tag "delete_circle.png" %></a>
       </div>
-      <a href="#" class="replace_attachment_link" style="font-size: 0.8em; padding-left: 20px;">Replace File</a>
+      <a href="#" class="replace_attachment_link" style="font-size: 0.8em; padding-left: 20px;"><%= t('links.replace_file', %{Replace File}) %></a>
     </div>
     <div style="display: none;" class="upload_attachment">
-      File: <input type="file" name="attachment[uploaded_data]" class="attachment_uploaded_data"/>
+      <%= before_label('file_attach', %{File}) %> <input type="file" name="attachment[uploaded_data]" class="attachment_uploaded_data"/>
       <a href="#" class="cancel_attachment_link no-hover" style="padding-left: 10px;"><%= image_tag "delete_circle.png" %></a>
     </div>
   </div>
@@ -78,34 +79,34 @@ var shortName = "<%= short_name %>";
   <% if can_do(@context.announcements.new, @current_user, :create) %>
   <div class="announcement_option" style="<%= is_announcement ? 'display: none;' : '' %>">
     <%= check_box :discussion_topic, :is_announcement, :checked => (is_announcement ? 'checked' : ''), :class => "is_announcement" %>
-    <%= label :discussion_topic, :is_announcement, " Make this post an announcement" %>
+    <%= label :discussion_topic, :is_announcement, :en => " Make this post an announcement" %>
   </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_content) %>
     <div style="margin-left: 20px;">
-      <a href="#" class="more_options_link">more options</a>
+      <a href="#" class="more_options_link"><%= t('#links.more_options', %{more options}) %></a>
     </div>
     <div class="more_options_holder">
       <div style="float: left;">
         <%= check_box :discussion_topic, :delay_posting, :class => "delay_posting" %>
-        <%= label :discussion_topic, :delay_posting, "Delay posting this message " %>
+        <%= label :discussion_topic, :delay_posting, :en => "Delay posting this message " %>
       </div>
       <div class="delay_posting_option" style="display: none; float: left;">
-        &nbsp;until 
+        &nbsp;<%= t('delay_until', %{until}) %> 
         <%= text_field :discussion_topic, :delayed_post_at, :style => "width: 100px;", :class => 'datetime_field delayed_post_at_value' %>
       </div>
       <div class="clear"></div>
       <div>
         <%= f.check_box :require_initial_post %>
-        <%= f.label :require_initial_post, "Replies are not visible until after users post" %>
+        <%= f.label :require_initial_post, :en => "Replies are not visible until after users post" %>
       </div>
       <% if can_do(@context, @current_user, :moderate_forum) %>
         <div class="podcast_options">
           <%= f.check_box :podcast_enabled, :class => 'podcast_enabled_checkbox' %>
-          <%= f.label :podcast_enabled, "Enable Podcast Feed for this Topic" %>
+          <%= f.label :podcast_enabled, :en => "Enable Podcast Feed for this Topic" %>
           <div class="podcast_sub_options" style="display: none; margin-left: 30px;">
             <%= f.check_box :podcast_has_student_posts %>
-            <%= f.label :podcast_has_student_post, "Include Student Comments in the Feed" %>
+            <%= f.label :podcast_has_student_post, :en => "Include Student Comments in the Feed" %>
           </div>
         </div>
       <% end %>
@@ -114,15 +115,15 @@ var shortName = "<%= short_name %>";
         <div class="assignment_options">
           <div>
             <%= a.check_box :set_assignment, :class => "set_assignment" %>
-            <%= a.label :set_assignment, "Use for grading" %>
+            <%= a.label :set_assignment, :en => "Use for grading" %>
           </div>
           <div class="set_assignment_option" style="display: none; margin-left: 30px;">
             <table>
               <tr>
-                <td><%= a.label :points_possible, "Points:" %></td>
+                <td><%= a.blabel :points_possible, :en => "Points" %></td>
                 <td><%= a.text_field :points_possible, :style => "width: 50px;" %></td>
               </tr><tr>
-                <td><label for="topic_assignment_group_id">Group:</label></td>
+                <td><label for="topic_assignment_group_id"><%= before_label 'assignment_group', 'Group' %></label></td>
                 <td>
                   <select name="discussion_topic[assignment][assignment_group_id]" id="topic_assignment_group_id">
                     <% @context.assignment_groups.each do |group| %>
@@ -131,7 +132,7 @@ var shortName = "<%= short_name %>";
                   </select>
                 </td>
               </tr><tr>
-                <td style="vertical-align: top;"><%= a.label :due_at, "Due:" %></td>
+                <td style="vertical-align: top;"><%= a.blabel :due_at, "Due" %></td>
                 <td><%= a.text_field :due_at, :style => "width: 152px;", :class => "datetime_field" %></td>
               </tr>
             </table>
@@ -143,8 +144,8 @@ var shortName = "<%= short_name %>";
   <% end %>
   <div class="clear"></div>
   <div class="button-container">
-    <button type="submit" class="button submit_button">Post <%= short_name %></button>
-    <button type="button" class="button-secondary cancel_button">Cancel</button>
+    <button type="submit" class="button submit_button">&nbsp;</button>
+    <button type="button" class="button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
   </div>
 <% end %>
 <% if @context.respond_to?(:assignments) %>
