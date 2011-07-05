@@ -158,4 +158,22 @@ describe CoursesController, :type => :integration do
       },
     ]
   end
+  
+  it "should return the course syllabus" do
+    @course1.syllabus_body = "Syllabi are boring"
+    @course1.save
+    json = api_call(:get, "/api/v1/courses.json?enrollment_type=teacher&include[]=syllabus_body",
+            { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_type => 'teacher', :include=>["syllabus_body"] })
+    json.should == [
+      {
+        'id' => @course1.id,
+        'name' => @course1.name,
+        'course_code' => @course1.course_code,
+        'enrollments' => [{'type' => 'teacher'}],
+        'syllabus_body' => @course1.syllabus_body,
+        'sis_source_id' => nil,
+      },
+    ]
+  end
+  
 end
