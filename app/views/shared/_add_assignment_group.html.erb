@@ -20,7 +20,7 @@
 
 <% js_block :i18n_scope => 'shared.add_assignment_group' do %>
 <script>
-function attachAddAssignmentGroup($select, url) {
+window.attachAddAssignmentGroup = function($select, url) {
   var $group = $select;
   url = url || $("#add_assignment_type_form").attr('action');
   $group.change(function(event) {
