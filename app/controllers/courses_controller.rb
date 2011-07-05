@@ -36,6 +36,10 @@ class CoursesController < ApplicationController
   #   rights, the total number of submissions needing grading for all
   #   assignments is returned.
   #
+  # @argument include[] ["syllabus_body"] Optional information to include with each Course.
+  #   When syllabus_body is given the user-generated html for the course 
+  #   syllabus is returned.
+  #
   # @response_field id The unique identifier for the course.
   # @response_field name The name of the course.
   # @response_field course_code The course code.
@@ -63,6 +67,7 @@ class CoursesController < ApplicationController
         end
 
         include_grading = Array(params[:include]).include?('needs_grading_count')
+        include_syllabus = Array(params[:include]).include?('syllabus_body')
 
         hash = []
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
@@ -72,6 +77,9 @@ class CoursesController < ApplicationController
           hash.last['enrollments'] = course_enrollments.map { |e| { :type => e.readable_type.downcase } }
           if include_grading && course_enrollments.any? { |e| e.participating_admin? }
             hash.last['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
+          end
+          if include_syllabus
+            hash.last['syllabus_body'] = course.syllabus_body
           end
         end
         render :json => hash.to_json
