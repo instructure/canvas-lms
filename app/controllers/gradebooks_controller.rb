@@ -52,10 +52,15 @@ class GradebooksController < ApplicationController
         if @student
           add_crumb(@student.name, named_context_url(@context, :context_student_grades_url, @student.id))
           
-          @groups = @context.assignment_groups.active
+          @groups = @context.assignment_groups.active.all
           @assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title') +
             groups_as_assignments(@groups, :out_of_final => true)
-          @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id])
+          @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id], :include => [ :submission_comments, :rubric_assessments ])
+          # pre-cache the assignment group for each assignment object
+          @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
+          # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
+          # assignment in order to calculate grade distributions
+          @all_submissions = @context.submissions.all
           @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
           format.html { render :action => 'grade_summary' }
         else

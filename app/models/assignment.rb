@@ -652,10 +652,11 @@ class Assignment < ActiveRecord::Base
     find(:all, :conditions => wildcard('title', 'description', query))
   end
   
-  def grade_distribution
+  def grade_distribution(submissions = nil)
+    submissions ||= self.submissions
     tally = 0
     cnt = 0
-    scores = self.submissions.map{|s| s.score}.compact
+    scores = submissions.map{|s| s.score}.compact
     scores.each do |score|
       tally += score
       cnt += 1
