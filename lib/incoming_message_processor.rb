@@ -33,7 +33,7 @@ class IncomingMessageProcessor
 
         msg = Message.find_by_id(params['captures'][1].to_i)
         context = msg.context if msg && params['captures'][0] == msg.reply_to_secure_id
-        user = msg.user
+        user = msg.try(:user)
         begin
           if user && context && context.respond_to?(:reply_from)
             context.reply_from({
