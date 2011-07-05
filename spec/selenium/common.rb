@@ -33,6 +33,9 @@ $app_host_and_port = nil
 
 module SeleniumTestsHelperMethods
   def setup_selenium
+    if SELENIUM_CONFIG[:host] && SELENIUM_CONFIG[:port] && !SELENIUM_CONFIG[:host_and_port]
+      SELENIUM_CONFIG[:host_and_port] = "#{SELENIUM_CONFIG[:host]}:#{SELENIUM_CONFIG[:port]}"
+    end
     if !SELENIUM_CONFIG[:host_and_port]
       browser = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       options = {}
