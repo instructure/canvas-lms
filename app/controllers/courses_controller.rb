@@ -73,7 +73,8 @@ class CoursesController < ApplicationController
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
           course = course_enrollments.first.course
           hash << course.as_json(
-            :include_root => false, :only => %w(id name course_code sis_source_id))
+            :include_root => false, :only => %w(id name course_code))
+          hash.last['sis_course_id'] = course.sis_source_id
           hash.last['enrollments'] = course_enrollments.map { |e| { :type => e.readable_type.downcase } }
           if include_grading && course_enrollments.any? { |e| e.participating_admin? }
             hash.last['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
@@ -207,8 +208,8 @@ class CoursesController < ApplicationController
   # @response_field sis_user_id The SIS id for the user's primary pseudonym.
   #
   # @example_response
-  #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null },
-  #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis' } ]
+  #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null, 'sis_login_id': null },
+  #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis' } ]
   def students
     get_context
     if authorized_action(@context, @current_user, :read_roster)
