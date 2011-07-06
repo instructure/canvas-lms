@@ -62,6 +62,7 @@ namespace :i18n do
 
         sexps = RubyParser.new.parse(source)
         @extractor.scope = infer_scope(file)
+        @extractor.in_html_view = (file =~ /\.(html|facebook)\.erb\z/)
         @extractor.process(sexps)
         print green "."
       rescue SyntaxError, StandardError
