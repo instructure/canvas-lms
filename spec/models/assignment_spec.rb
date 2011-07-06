@@ -239,6 +239,14 @@ describe Assignment do
       end
     end
     
+    it "should allow setting peer_reviews_assign_at" do
+      setup_assignment
+      assignment_model
+      now = Time.now
+      @assignment.peer_reviews_assign_at = now
+      @assignment.peer_reviews_assign_at.should == now
+    end
+    
     it "should assign multiple peer reviews" do
       setup_assignment
       assignment_model

@@ -1071,7 +1071,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def peer_reviews_assign_at=(val)
-    peer_reviews_due_at = val
+    write_attribute(:peer_reviews_due_at, val)
   end
   
   def has_peer_reviews?
