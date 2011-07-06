@@ -1,0 +1,13 @@
+# if this file doesn't exist, memcache will be used if there are any
+# servers configured in config/memcache.yml
+development:
+  cache_store: mem_cache_store
+  # if no servers are specified, we'll look in config/memcache.yml
+  # servers:
+  # - localhost
+  #
+  # cache_store: redis_store
+  # # if no servers are specified, we'll look in config/redis.yml
+  # servers:
+  # - localhost
+  # database: 0
