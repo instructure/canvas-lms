@@ -1123,10 +1123,11 @@ class Quiz < ActiveRecord::Base
 
     if item.quiz_questions.count == 0 && question_data
       hash[:questions] ||= []
-      hash[:questions].each do |question|
+      hash[:questions].each_with_index do |question, i|
         case question[:question_type]
           when "question_reference"
             if qq = question_data[:qq_data][question[:migration_id]]
+              qq[:position] = i + 1
               if qq[:assessment_question_migration_id]
                 if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
                   qq['assessment_question_id'] = aq['assessment_question_id']
@@ -1138,14 +1139,16 @@ class Quiz < ActiveRecord::Base
                 end
               end
             elsif aq = question_data[:aq_data][question[:migration_id]]
+              aq[:position] = i + 1
               aq[:points_possible] = question[:points_possible] if question[:points_possible]
               QuizQuestion.import_from_migration(aq, context, item)
             end
           when "question_group"
-            QuizGroup.import_from_migration(question, context, item, question_data)
+            QuizGroup.import_from_migration(question, context, item, question_data, i + 1)
           when "text_only_question"
             qq = item.quiz_questions.new
             qq.question_data = question
+            qq.position = i + 1
             qq.save!
         end
       end
