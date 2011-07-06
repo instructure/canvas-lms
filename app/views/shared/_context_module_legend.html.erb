@@ -6,7 +6,7 @@
   </div>
   <div class="module_legend <%= 'module_legend_locked' if context_module && !context_module.available_for?(@current_user) %>" style="display: none;">
     <div class="header" title="<%= t('content_part_of_module', 'This content is part of the module, %{module_name}', :module_name => context_module.name) %>">
-      <span style="font-size: 0.8em; font-weight: normal;"><%= before_label('labels.module', 'module') %></span> <a href="<%= context_url(@context, :context_url) %>/modules"><%= context_module.name %></a>
+      <span style="font-size: 0.8em; font-weight: normal;"><%= before_label('module', 'module') %></span> <a href="<%= context_url(@context, :context_url) %>/modules"><%= context_module.name %></a>
       <span class="locked_message" title="<%= t('module_not_unlocked', "This module hasn't been unlocked yet") %>"><%= image_tag "lock_small.png" %></span>
       <span class="completed_message" title="<%= t('module_completed', 'This module is completed') %>" style="<%= hidden unless progression && progression.completed? %>"><%= image_tag "checked.png" %></span>
     </div>
