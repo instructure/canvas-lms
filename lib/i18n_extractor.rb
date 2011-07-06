@@ -7,7 +7,8 @@ module I18nExtraction
     super()
   end
 
-  def add_translation(full_key, default)
+  def add_translation(full_key, default, remove_whitespace = false)
+    default = default.gsub(/\s+/, ' ') if remove_whitespace
     @total += 1
     scope = full_key.split('.')
     key = scope.pop
@@ -44,6 +45,7 @@ end
 
 class I18nExtractor < SexpProcessor
   include I18nExtraction
+  attr_accessor :in_html_view
 
   def process_defn(exp)
     exp.shift
@@ -136,7 +138,7 @@ class I18nExtractor < SexpProcessor
           raise "interpolation value not provided for #{match[0].to_sym.inspect} (#{sub_key.inspect})"
         end
       end
-      add_translation sub_key, str
+      add_translation sub_key, str, (@in_html_view && method != :mt)
     end
   end
 
@@ -179,7 +181,7 @@ class I18nExtractor < SexpProcessor
       raise "invalid/missing en default #{args.first.inspect}" if (inferred || key_arg.sexp_type == :lit) && !default
       if default
         key = process_translation_key(receiver, key_arg, 'labels.', inferred)
-        add_translation key, default
+        add_translation key, default, true
       else
         process key_arg
       end
