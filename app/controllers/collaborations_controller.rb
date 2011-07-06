@@ -34,7 +34,7 @@ class CollaborationsController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_COLLABORATIONS)
       log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
-      @google_docs = google_doc_list rescue nil
+      @google_docs = google_docs_verify_access_token rescue false
       @users = @context.users
     end
   end
