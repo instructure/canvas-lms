@@ -4,8 +4,8 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <p><%= mt :description_rs, <<-HEREDOC
-Free online web tools like [Google Docs](http://docs.google.com) and [EtherPad](http://www.etherpad.org)
+    <p><%= mt :description_rs, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
+Free online web tools like [Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
 are an excellent place for students to work on group projects or papers, take shared notes, etc.
 Teacher *or* students can set up group collaborations.
 HEREDOC
@@ -20,10 +20,10 @@ HEREDOC
 <h2><%= t 'titles.current', "Current Collaborations" %></h2>
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
   <% if can_do(@context, @current_user, :manage_content) %>
-    <%= mt :description_teacher, <<-HEREDOC
+    <%= mt :description_teacher, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
 **What do we mean by collaborations?**  We're talking about web-based tools that most
 likely your students are already familiar with.  Students can use resources like
-[Google Docs](http://docs.google.com) and [EtherPad](http://www.etherpad.org)
+[Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
 to work collaboratively on tasks like group papers or note-taking.  This page gives them
 (and you) an easy place to keep track of those collaborations, and also to set them
 up without having to swap emails.
@@ -33,10 +33,10 @@ and then choose that type in the dropdown list.
 HEREDOC
         %>
   <% else %>
-    <%= mt :description_student, <<-HEREDOC
+    <%= mt :description_student, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
 **What do we mean by collaborations?**  We're talking about web-based tools for
 working together on a shared document.  You can use resources like
-[Google Docs](http://docs.google.com) and [EtherPad](http://www.etherpad.org)
+[Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
 to work collaboratively on tasks like group papers or note-taking.  This page is
 an easy place to keep track of those collaborations, and also to set them
 up without having to swap emails.
