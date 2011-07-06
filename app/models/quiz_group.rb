@@ -69,21 +69,23 @@ class QuizGroup < ActiveRecord::Base
     }.with_indifferent_access
   end
   
-  def self.import_from_migration(hash, context, quiz, question_data)
+  def self.import_from_migration(hash, context, quiz, question_data, position = nil)
     hash = hash.with_indifferent_access
     item ||= QuizGroup.find_by_quiz_id_and_migration_id(quiz.id, hash[:migration_id].nil? ? nil : hash[:migration_id].to_s)
     item ||= quiz.quiz_groups.new
     item.migration_id = hash[:migration_id]
     item.question_points = hash[:question_points]
     item.pick_count = hash[:pick_count]
+    item.position = position
     if hash[:question_bank_migration_id]
       if bank = context.assessment_question_banks.find_by_migration_id(hash[:question_bank_migration_id])
         item.assessment_question_bank_id = bank.id
       end
     end
     item.save!
-    hash[:questions].each do |question|
+    hash[:questions].each_with_index do |question, i|
       if qq = question_data[:qq_data][question[:migration_id]]
+        qq[:position] = i + 1
         if qq[:assessment_question_migration_id]
           if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
             qq['assessment_question_id'] = aq['assessment_question_id']
@@ -96,6 +98,7 @@ class QuizGroup < ActiveRecord::Base
         end
       elsif aq = question_data[:aq_data][question[:migration_id]]
         aq[:points_possible] = question[:points_possible] if question[:points_possible]
+        aq[:position] = i + 1
         QuizQuestion.import_from_migration(aq, context, quiz, item)
       end
     end
