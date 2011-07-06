@@ -117,7 +117,7 @@ $(document).ready(function() {
       $(this).attr('title', I18n.t('overdue', "This assignment is overdue"));
     } else if($(this).hasClass('group_assignment_ungraded')) {
       var needs_grading_count = $(this).getTemplateData({textValues: ['needs_grading_count']}).needs_grading_count;
-      $(this).attr('title', I18n.t('needs_grading_count', "%{needs_grading_count} submissions for this assignment still need grading", { needs_grading_count: needs_grading_count });
+      $(this).attr('title', I18n.t('needs_grading_count', "%{needs_grading_count} submissions for this assignment still need grading", { needs_grading_count: needs_grading_count }));
     } else if($(this).hasClass('group_assignment_graded')) {
       $(this).attr('title', I18n.t('graded', "This assignment has been graded"));
     }
