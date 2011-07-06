@@ -320,11 +320,7 @@ class UsersController < ApplicationController
       # TODO this is ugly
       @enrollments = []
       @enrollments = @user.enrollments.select{|e| !e.deleted? && e.course && !e.course.deleted? }.sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] }
-      @courses = @enrollments.map{|e| e.course }
       @group_memberships = @user.group_memberships
-      @context_groups = []
-      @courses.each{|c| @context_groups += c.groups.select{|g| g.grants_right?(@user, session, :manage)} }
-      @contexts = @courses + @group_memberships + @context_groups
       @pending_enrollments = if @context.is_a?(Account)
                                @user.enrollments
                              else
