@@ -36,8 +36,8 @@
     <span class="auth_info auth_filter"><%= account_config.ldap_filter %></span>
     <span class="auth_form" style="font-size: smaller;">
       <br>
-      <%= mt(:auth_filter_description,
-             "Use `{{login}}` as a placeholder for the username supplied by the user. For example: `(sAMAccountName={{login}}`)") %>
+      <%= t(:auth_filter_description,
+             "Use *%{placeholder}* as a placeholder for the username supplied by the user. For example: *(sAMAccountName=%{placeholder})*", :placeholder => '{{login}}', :wrapper => '<code>\1</code>') %>
     </span>
   </td>
 </tr>

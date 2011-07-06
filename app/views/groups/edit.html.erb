@@ -7,7 +7,7 @@
 <% form_for :group, :url => context_url(@context, :context_url), :html => {:method => :put} do |f| %>
 <table class="formtable">
   <tr>
-    <td><%= f.blabel :name, "Group Name" %></td>
+    <td><%= f.blabel :name, :en => "Group Name" %></td>
     <td><%= f.text_field :name %></td>
   </tr><tr>
     <td colspan="2">

@@ -191,7 +191,7 @@
           <% f.fields_for :settings do |settings| %>
             <table class="formtable">
               <tr>
-                <td style="vertical-align: top;"><%= settings.label :equella_endpoint, "Equella Endpoint" %></td>
+                <td style="vertical-align: top;"><%= settings.label :equella_endpoint, :en => "Equella Endpoint" %></td>
                 <td>
                   <%= settings.text_field :equella_endpoint, :value => @account.settings[:equella_endpoint] %>
                   <div style="font-size: 0.9em;"><%= t(:equall_endpoint_help, "This is the URL to your equella service.  It will probably look something like \"%{sample_url}\".", :sample_url => "http://oer.equella.com/signon.do") %></div>

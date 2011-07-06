@@ -53,13 +53,13 @@ $(function(){
       <%= license_help_link %>
       <div style="margin-top: 10px;">
         <%= form.check_box :is_public, :class => "is_public_checkbox" %>
-        <%= form.label :is_public, "Make this course publicly visible", :style => "font-size: 1.3em;" %>
+        <%= form.label :is_public, :en => "Make this course publicly visible", :style => "font-size: 1.3em;" %>
         <div style="padding-left: 30px; margin-top: -5px; font-size: 0.8em;"><%= t :student_data_privacy, "(student data will remain private)" %></div>
       </div>
       <% if @domain_root_account == Account.default %>
       <div class="public_options" style="margin-top: 5px;">
         <%= form.check_box :indexed, :checked => @context.indexed != false, :class => 'indexed_checkbox' %>
-        <%= form.label :indexed, "Include this course in Instructure's public course index", :style => "font-size: 1.3em;" %>
+        <%= form.label :indexed, :en => "Include this course in Instructure's public course index", :style => "font-size: 1.3em;" %>
       </div>
       <% end %>
       <label>

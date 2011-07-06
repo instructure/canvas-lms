@@ -6,7 +6,7 @@
   <% if @context_enrollment %>
     <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context_enrollment.feed_code, :atom), {:title => t('links.feeds.course_discussions', "Course Discussions Atom Feed")}) %>
   <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t('links.feeds.course_discussions,', "Course Discussions Atom Feed")}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t('links.feeds.course_discussions', "Course Discussions Atom Feed")}) %>
   <% end %>
 <% end %>
 
