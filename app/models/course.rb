@@ -1618,6 +1618,7 @@ class Course < ActiveRecord::Base
       course.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
         self.send("#{attr}=", course.send(attr))
       end
+      may_have_links_to_migrate(self)
       self.save
     end
     if self.assignment_groups.length == 1 && self.assignment_groups.first.name == t('#assignment_group.default_name', "Assignments") && self.assignment_groups.first.assignments.empty?
@@ -1792,6 +1793,8 @@ class Course < ActiveRecord::Base
         obj.body = migrate_content_links(obj.body, course)
       elsif obj.is_a?(Quiz)
         obj.description = migrate_content_links(obj.description, course)
+      elsif obj.is_a?(Course)
+        obj.syllabus_body = migrate_content_links(obj.syllabus_body, course)
       end
       obj.save_without_broadcasting! rescue obj.save!
     end
