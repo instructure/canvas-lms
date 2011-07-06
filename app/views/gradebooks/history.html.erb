@@ -10,7 +10,7 @@
 <ul id="gradebook-history">
 <% @days.each do |day| %>
   <li>
-    <h3><%= l(day.date, :format => :long) %></h3>
+    <h3><%= date_string(day.date) %></h3>
     <ul>
     <% day.graders.each do |grader| %>
       <li clas="grader">
