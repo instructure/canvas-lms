@@ -220,17 +220,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def api_student_enrollments(context)
-    enrollments = context.student_enrollments
-    enrollments.map do |e|
-      hash = e.user.as_json(:include_root => false, :only => STUDENT_API_FIELDS)
-      hash.merge!(
-        :secondary_identifier   => e.user.secondary_identifier,
-        :computed_final_score   => e.computed_final_score,
-        :computed_current_score => e.computed_current_score)
-    end
-  end
-
   def destroy
     @context = Course.find(params[:id])
     if authorized_action(@context, @current_user, :delete)
