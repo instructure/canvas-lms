@@ -143,7 +143,7 @@
 </div>
 <% if WikiPage.comments_enabled? && @context.allow_wiki_comments && !@page.new_record? %>
 <div id="wiki_page_comments">
-  <h2>Page Comments</h2>
+  <h2><%= t 'headings.page_comments', "Page Comments" %></h2>
   <% comments = @page.wiki_page_comments.active.current_first.paginate(:page => 1, :per_page => 5) %>
   <% if @context.allow_wiki_comments || can_do(@context, @current_user, :manage_wiki) %>
     <%= render :partial => "wiki_pages/wiki_page_comment_form" %>

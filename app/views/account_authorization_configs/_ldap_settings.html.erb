@@ -6,7 +6,7 @@
   <table class="formtable" style="margin-left: 20px;">
     <tr>
       <th><%= before_label(t(:auth_type_label, "Type")) %></th>
-      <th>LDAP</th>
+      <th><%= t :setting_type_ldap, 'LDAP' %></th>
     </tr>
     <% fields_for @account_configs[0], :index => 0 do |f| %>
       <%= f.hidden_field :disabled, :value => '0' %>

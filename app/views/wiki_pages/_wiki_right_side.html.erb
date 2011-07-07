@@ -30,7 +30,7 @@
       <%= render :partial => 'wiki_pages/page_link' %>
       <% common_pages = pages.sort_by{|p| p.view_count} %>
       <%= render :partial => 'wiki_pages/page_link', :collection => common_pages[0..3], :locals => {:skip_front_page => true} %>
-      <li><a href="#" class="more_pages_link" style="padding-left: 20px; font-size: 0.9em; <%= hidden unless common_pages.length > 4 %>">more...</a></li>
+      <li><a href="#" class="more_pages_link" style="padding-left: 20px; font-size: 0.9em; <%= hidden unless common_pages.length > 4 %>"><%= t 'links.more', 'more...' %></a></li>
       <%= render :partial => 'wiki_pages/page_link', :collection => common_pages[4..9], :locals => {:skip_front_page => true, :hidden => true} %>
     </ul>
     </div>
@@ -41,7 +41,7 @@
     <ul class="item_list limit_height" style="max-height: 100px;">
       <% recent_pages = pages.sort_by{|p| p.last_revision_at}.reverse %>
       <%= render :partial => 'wiki_pages/page_link', :collection => recent_pages[0..2] %>
-      <li><a href="#" class="more_pages_link" style="padding-left: 20px; font-size: 0.9em; <%= hidden unless recent_pages.length > 3 %>">more...</a></li>
+      <li><a href="#" class="more_pages_link" style="padding-left: 20px; font-size: 0.9em; <%= hidden unless recent_pages.length > 3 %>"><%= t 'links.more', 'more...' %></a></li>
       <%= render :partial => 'wiki_pages/page_link', :collection => recent_pages[3..9], :locals => {:skip_front_page => true, :hidden => true} %>
     </ul>
     </div>
@@ -90,7 +90,7 @@
 <% end %>
 <div id="wiki_edit_view_secondary" style="display:none;">
   <div>
-    <h2>Page Tools</h2>
+    <h2><%= t 'headers.page_tools', 'Page Tools' %></h2>
     <ul class="item_list">
       <% unless @page.url == "front-page" || @page.new_record? %>
         <li>

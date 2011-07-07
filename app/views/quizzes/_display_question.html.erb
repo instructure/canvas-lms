@@ -241,7 +241,7 @@
               <% show_headers = @quiz && @quiz.show_correct_answers && user_answer && question_type.display_answers == "single" && hash_get(question, :question_type) != "essay_question" %>
               <% if show_headers %>
                 <div style="margin-left: 20px; font-size: 0.8em;">
-                <u>Correct Answer(s)</u>:
+                <u><%= before_label :correct_answers2, "Correct Answer(s)" %></u>
                 <div style="xfont-size: 0.8em;">
               <% end %>
               <% if editing || show_headers || !question_type.entry_type.match(/text_box/) %>

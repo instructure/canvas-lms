@@ -67,7 +67,7 @@
   });
 </script>
 <% end %>
-<h2><%= @context.class.to_s %> Rubrics</h2>
+<h2><%= t 'headings.user_rubrics', 'User Rubrics' %></h2>
 <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
 <div id="rubrics" class="raw_listing">
   <ul>

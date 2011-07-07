@@ -35,8 +35,8 @@
   <tr class="preference preference_<%= notification_preference.id %>">
     <td colspan="2" style="padding-left: 10px;">
       <select class="contact_type_select">
-        <option value="email_select" <%= "selected" if preference.communication_channel.path_type == "email" %>><%= t('contact_types.email', "Email Me") %></option>
-        <option value="sms_select" <%= "selected" if preference.communication_channel.path_type == "sms" %>><%= t('contact_types.sms', "Text my Cell") %></option>
+        <option value="email_select" <%= "selected" if preference.communication_channel.path_type == "email" %>><%= t('contact_types.email', "Email Me at") %></option>
+        <option value="sms_select" <%= "selected" if preference.communication_channel.path_type == "sms" %>><%= t('contact_types.sms', "Text my Cell at") %></option>
         <% if !@current_user.user_services.for_service('facebook').empty? %>
           <option value="facebook_select" <%= 'selected' if preference.communication_channel.path_type == 'facebook' %>><%= t('contact_types.facebook', "Notify me on Facebook") %></option>
         <% end %>
@@ -44,7 +44,7 @@
           <option value="twitter_select" <%= 'selected' if preference.communication_channel.path_type == 'twitter' %>><%= t('contact_types.twitter', "Notify me via Twitter") %></option>
         <% end %>
       </select>
-      <span style="white-space: nowrap;"><span class="at" style="<%= hidden unless preference.communication_channel.path_type == 'email' || preference.communication_channel.path_type == 'sms' %>">at </span>
+      <span style="white-space: nowrap;">
         <% if preference.communication_channel.path_type == "email" %>
           <%= render :partial => "email_select", :object => preference.communication_channel %>
         <% elsif preference.communication_channel.path_type == "sms" %>

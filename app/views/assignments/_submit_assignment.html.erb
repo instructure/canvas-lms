@@ -165,7 +165,7 @@ window.submissionAttachmentIndex = -1;
         <li><a href="#submit_online_url_form" class="submit_online_url_option"><%= t 'links.submit.website', "Website URL" %></a></li>
       <% end %>
       <% if show_google_docs %>
-        <li><a href="#submit_google_doc_form" class="submit_online_url_option">Google Doc</a></li>
+        <li><a href="#submit_google_doc_form" class="submit_online_url_option"><%= t 'links.submit.google_doc', 'Google Doc' %></a></li>
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
         <li><a href="#submit_media_recording_form" class="submit_media_recording_option"><%= t 'links.submit.media', "Media" %></a></li>

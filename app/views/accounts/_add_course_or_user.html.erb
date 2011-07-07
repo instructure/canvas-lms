@@ -19,7 +19,7 @@
         <td><%= f.blabel :name, :full_name, :en => "Full Name" %></td>
         <td>
           <%= f.text_field :name %>
-          <div style="font-size: 0.8em; color: #888;">This name will be used by teachers for grading.</div>
+          <div style="font-size: 0.8em; color: #888;"><%= t :full_name_description, 'This name will be used by teachers for grading.' %></div>
         </td>
       <tr>
         <td><%= f.blabel :short_name, :en => "Display Name" %></td>

@@ -161,11 +161,11 @@
           <% end %>
           <div>
             <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
-            <label for="enable_equella">Equella</label>
+            <label for="enable_equella"><%= t 'labels.equella', 'Equella' %></label>
           </div>
           <div>
             <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
-            <label for="turnitin">Turnitin</label>
+            <label for="turnitin"><%= t 'labels.turnitin', 'Turnitin' %></label>
           </div>
         </fieldset>
 

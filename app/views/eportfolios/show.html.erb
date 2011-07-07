@@ -329,7 +329,7 @@
 <% end %>
 <% if !@owner_view %>
 <div id="page_comments_holder" style="margin-top: 50px;">
-  <h2 style="<%= hidden unless @page.show_comments || @page.allow_comments || can_do(@portfolio, @current_user, :update) %>">Page Comments</h2>
+  <h2 style="<%= hidden unless @page.show_comments || @page.allow_comments || can_do(@portfolio, @current_user, :update) %>"><%= t 'headings.page_comments', 'Page Comments' %></h2>
   <% if @page.show_comments || can_do(@portfolio, @current_user, :update) %>
     <% if !@page.page_comments.empty? && !@page.show_comments %>
       <p><%= t(:private_comments, <<-DETAILS,

@@ -1,7 +1,7 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<-TEXT, :twitter_url => 'http://dev.twitter.com', :callback_url => raw('<span class="nobr">https://&lt; domain &gt;/oauth_success?service=twitter</span>'))
+      <td colspan="2"><%= mt(:description, <<-TEXT, :twitter_url => 'http://dev.twitter.com', :callback_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/oauth_success?service=twitter</span>'))
 You will need to create a [new app on Twitter](%{twitter_url}).
 Set the following configuration options to ensure your Twitter app
 works correctly:
