@@ -21,7 +21,7 @@ module I18nUtilities
     end
     text = method if text.nil? && method.is_a?(Symbol)
     if text.is_a?(Symbol)
-      text = 'labels.#{text}' unless text.to_s =~ /\A#/
+      text = "labels.#{text}" unless text.to_s =~ /\A#/
       text = t(text, options.delete(:en))
     end
     text = before_label(text) if options[:before]
