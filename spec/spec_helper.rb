@@ -118,7 +118,7 @@ Spec::Runner.configure do |config|
   end
 
   def user(opts={})
-    @user = User.create!
+    @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
     @user
   end

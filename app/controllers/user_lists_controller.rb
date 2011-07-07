@@ -20,16 +20,10 @@ class UserListsController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :require_context
   
-  # POST /courses/:course_id/user_lists.js
+  # POST /courses/:course_id/user_lists.json
   def create
-    @user_list = UserList.new(params[:user_list], @context.root_account)
-
     respond_to do |format|
-      if @user_list
-        format.json  { render :json => @user_list }
-      else
-        format.json  { render :json => @user_list.errors, :status => :unprocessable_entity }
-      end
+      format.json { render :json => UserList.new(params[:user_list], @context.root_account, @context.grants_right?(@current_user, session, :manage_students)) }
     end
   end
 end

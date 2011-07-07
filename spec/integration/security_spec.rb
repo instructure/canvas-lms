@@ -129,6 +129,50 @@ describe "security" do
     c2.should match(/; *secure/)
     ActionController::Base.session_options[:secure] = nil
   end
+  
+  it "should only allow user list username resolution if the current user has appropriate rights" do
+    Account.default.pseudonyms.create!(:unique_id => "A1234567").assert_user{|u| u.name = "test user"}
+    @course = Account.default.courses.create!
+    @course.offer!
+    @teacher = user :active_all => true
+    @course.enroll_teacher(@teacher).tap do |e|
+      e.workflow_state = 'active'
+      e.save!
+    end
+    @student = user :active_all => true
+    @course.enroll_student(@student).tap do |e|
+      e.workflow_state = 'active'
+      e.save!
+    end
+    @course.reload
+
+    user_session(@student)
+    post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
+    assert_response :success
+    ActiveSupport::JSON.decode(response.body).should == {
+      "duplicates" => [],
+      "errored_users" => [],
+      "users" => [{"login" => "A1234567"}, {"login" => "A345678"}]
+    }
+    
+    user_session(@teacher)
+    post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
+    assert_response :success
+    ActiveSupport::JSON.decode(response.body).should == {
+      "duplicates" => [],
+      "errored_users" => ["A345678"],
+      "users" => [{"login" => "A1234567", "name" => "test user"}]
+    }
+    
+    user_session(@student)
+    post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
+    assert_response :success
+    ActiveSupport::JSON.decode(response.body).should == {
+      "duplicates" => [],
+      "errored_users" => [],
+      "users" => [{"login" => "A1234567"}, {"login" => "A345678"}]
+    }
+  end
 
   describe "user masquerading" do
     before(:each) do

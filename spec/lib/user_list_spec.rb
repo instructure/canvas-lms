@@ -111,6 +111,38 @@ describe UserList do
     ul.logins.should == [{:login=>"user1", :name=>"User"}, {:login=>"A112351243", :name=>"User"}]
   end
   
+  it "should not process login ids if they don't exist" do
+    @account.pseudonyms.create!(:unique_id => "user1").assert_user
+    @account.pseudonyms.create!(:unique_id => "A112351243").assert_user
+    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>,A4513454}, @account
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        ["Shaw, Ryan", "ryankshaw@gmail.com"],
+        ["Last, First", "lastfirst@gmail.com"],
+        [nil, "test@example.com"],
+        ["thomas walsh", "test2@example.com"],
+        ["walsh, thomas", "test3@example.com"]])
+    ul.errors.should == ["A4513454"]
+    ul.duplicate_addresses.should == []
+    ul.duplicate_logins.should == []
+    ul.logins.should == [{:login=>"user1", :name=>"User"}, {:login=>"A112351243", :name=>"User"}]
+  end
+  
+  it "should not resolve login ids if told not to" do
+    @account.pseudonyms.create!(:unique_id => "user1").assert_user
+    @account.pseudonyms.create!(:unique_id => "A112351243").assert_user
+    ul = UserList.new regular + "," + %{user1,test@example.com,A112351243,"thomas walsh" <test2@example.com>, "walsh, thomas" <test3@example.com>,A4513454}, @account, false
+    ul.addresses.map{|x| [x.name, x.address]}.should eql([
+        ["Shaw, Ryan", "ryankshaw@gmail.com"],
+        ["Last, First", "lastfirst@gmail.com"],
+        [nil, "test@example.com"],
+        ["thomas walsh", "test2@example.com"],
+        ["walsh, thomas", "test3@example.com"]])
+    ul.errors.should == []
+    ul.duplicate_addresses.should == []
+    ul.duplicate_logins.should == []
+    ul.logins.should == [{:login=>"user1"}, {:login=>"A112351243"}, {:login=>"A4513454"}]
+  end
+  
   it "should only add login ids that are existing unique ids" do
     @account.pseudonyms.create!(:unique_id => "user1").assert_user
     @account.pseudonyms.create!(:unique_id => "user2").assert_user

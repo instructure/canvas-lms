@@ -24,7 +24,7 @@ class UserList
     @duplicate_logins = []
     @logins = []
     parse_list(string)
-    resolve_logins root_account if should_resolve_logins
+    resolve_logins root_account if should_resolve_logins && root_account
   end
   
   attr_reader :errors, :addresses, :duplicate_addresses, :logins, :duplicate_logins
