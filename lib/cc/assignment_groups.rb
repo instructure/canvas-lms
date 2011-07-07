@@ -49,12 +49,15 @@ module CC
               rules = group.rules.split("\n").map{|r|r.split(':')}
               group_node.rules do |rules_node|
                 rules.each do |rule|
+                  a = nil
+                  if rule.first == 'never_drop'
+                    a = @course.assignments.find_by_id(rule.last)
+                    next unless a
+                  end
                   rules_node.rule do |rule_node|
                     rule_node.drop_type rule.first
                     if rule.first == 'never_drop'
-                      if a = @course.assignments.find(rule.last)
-                        rule_node.identifierref CCHelper.create_key(a)
-                      end
+                      rule_node.identifierref CCHelper.create_key(a)
                     else
                       rule_node.drop_count rule.last
                     end
