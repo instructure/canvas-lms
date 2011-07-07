@@ -563,14 +563,7 @@ class ContextModule < ActiveRecord::Base
     progression.save if progression.workflow_state_changed? || requirements_met_changed
     progression
   end
-  
-  def self.fast_cached_for_context(context)
-    hashes = Rails.cache.fetch(['fast_modules_for', context].cache_key) do
-      context.context_modules.active.map{|m| {:id => m.id, :name => m.name} }
-    end
-    OpenObject.process(hashes)
-  end
-  
+
   def self.visible_module_item_count
     75
   end

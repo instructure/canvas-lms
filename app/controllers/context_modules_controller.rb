@@ -22,18 +22,17 @@ class ContextModulesController < ApplicationController
   before_filter { |c| c.active_tab = "modules" }  
   
   def index
-    @modules = ContextModule.fast_cached_for_context(@context)
-    @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
-    if @context.grants_right?(@current_user, session, :participate_as_student)
-      return unless tab_enabled?(@context.class::TAB_MODULES)
-      @modules = @context.context_modules.active.include_tags_and_progressions
-      @modules.each{|m| m.evaluate_for(@current_user) }
-      session[:module_progressions_initialized] = true
-    end
     if authorized_action(@context, @current_user, :read)
+      @modules = @context.context_modules.active
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
+      if @context.grants_right?(@current_user, session, :participate_as_student)
+        return unless tab_enabled?(@context.class::TAB_MODULES)
+        ContextModule.send(:preload_associations, @modules, [:context_module_progressions, :content_tags])
+        @modules.each{|m| m.evaluate_for(@current_user) }
+        session[:module_progressions_initialized] = true
+      end
     end
   end
-  
 
   def item_redirect
     if authorized_action(@context, @current_user, :read)

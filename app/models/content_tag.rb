@@ -132,7 +132,7 @@ class ContentTag < ActiveRecord::Base
 
   def assignment
     return self.content if self.content_type == 'Assignment'
-    return self.content.assignment rescue nil
+    return self.content.assignment if self.content.respond_to?(:assignment)
   end
   
   alias_method :old_content, :content
