@@ -11,7 +11,7 @@ end
 module I18nUtilities
   def before_label(text_or_key, default_value = nil)
     text_or_key = t('labels.' + text_or_key.to_s, default_value) if default_value
-    t("before_label_wrapper", "%{text}:", :text => text_or_key)
+    t("#before_label_wrapper", "%{text}:", :text => text_or_key)
   end
 
   def _label_symbol_translation(method, text, options)
