@@ -24,7 +24,7 @@ module CC::Importer
       
       wiki_dir = File.join(@unzipped_file_path, WIKI_FOLDER)
       Dir["#{wiki_dir}/**/**"].each do |path|
-        doc = open_file_xml(path)
+        doc = open_file(path)
         wikis << convert_wiki(doc, path)
       end
       

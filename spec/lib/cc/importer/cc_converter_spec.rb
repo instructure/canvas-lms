@@ -42,7 +42,11 @@ describe "Common Cartridge importing" do
     @copy_from.license = "cc_by_nc_nd"
     @copy_from.save!
 
-    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+<div>
+  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+</div>}
     @copy_from.syllabus_body = body_with_link % @copy_from.id 
 
     #export to xml
@@ -53,7 +57,7 @@ describe "Common Cartridge importing" do
     #convert to json
     doc = Nokogiri::XML(builder.target!)
     hash = @converter.convert_course_settings(doc)
-    syl_doc = Nokogiri::XML(syllabus.string)
+    syl_doc = Nokogiri::HTML(syllabus.string)
     hash[:syllabus_body] = @converter.convert_syllabus(syl_doc)
     #import json into new course
     hash = hash.with_indifferent_access
@@ -63,7 +67,7 @@ describe "Common Cartridge importing" do
     #compare settings
     @copy_to.conclude_at.to_i.should == @copy_from.conclude_at.to_i
     @copy_to.start_at.to_i.should == @copy_from.start_at.to_i
-    @copy_to.syllabus_body.should == body_with_link % @copy_to.id
+    @copy_to.syllabus_body.should == (body_with_link % @copy_to.id).gsub(/png">/, 'png" />')
     @copy_to.storage_quota.should_not == @copy_from.storage_quota
     @copy_to.name.should_not == @copy_from.name
     @copy_to.course_code.should_not == @copy_from.course_code
@@ -459,7 +463,11 @@ describe "Common Cartridge importing" do
       <a href=\"/courses/%s/wiki/assignments\">Assignments wiki link</a>
       <a href=\"/courses/%s/modules\">Modules</a>
       <a href=\"/courses/%s/modules/%s\">some module</a>
-      </p>}
+      </p>
+      <div>
+        <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+        <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+      </div>}
     page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id ])
     @copy_from.save!
     
@@ -467,7 +475,7 @@ describe "Common Cartridge importing" do
     migration_id = CC::CCHelper.create_key(page)
     exported_html = CC::CCHelper::HtmlContentExporter.new.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
     #convert to json
-    doc = Nokogiri::XML(exported_html)
+    doc = Nokogiri::HTML(exported_html)
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
@@ -476,11 +484,15 @@ describe "Common Cartridge importing" do
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
     page_2.url.should == page.url
-    page_2.body.should == body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id ]
+    page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id ]).gsub(/png">/, 'png" />')
   end
   
   it "should import assignments" do 
-    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+<div>
+  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+</div>}
     asmnt = @copy_from.assignments.new
     asmnt.title = "Nothing Assignment"
     asmnt.description = body_with_link % @copy_from.id
@@ -506,7 +518,7 @@ describe "Common Cartridge importing" do
     html = CC::CCHelper::HtmlContentExporter.new.html_page(asmnt.description, "Assignment: " + asmnt.title, @copy_from, @from_teacher)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
-    html_doc = Nokogiri::XML(html)
+    html_doc = Nokogiri::HTML(html)
     hash = @converter.convert_assignment(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
@@ -514,7 +526,7 @@ describe "Common Cartridge importing" do
     
     asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
     asmnt_2.title.should == asmnt.title
-    asmnt_2.description.should == body_with_link % @copy_to.id
+    asmnt_2.description.should == (body_with_link % @copy_to.id).gsub(/png">/, 'png" />')
     asmnt_2.points_possible.should == asmnt.points_possible
     asmnt_2.allowed_extensions.should == asmnt.allowed_extensions
     asmnt_2.submission_types.should == asmnt.submission_types
