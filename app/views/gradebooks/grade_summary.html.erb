@@ -142,13 +142,13 @@
         <%= image_tag "word_bubble.png" %>
       </a>
       <% has_scoring_details = submission && submission.score && assignment.points_possible && assignment.points_possible > 0 %>
-      <a href="#" class="toggle_comments_link tooltip" title="View Scoring Details" style="<%= 'visibility: hidden;' unless has_scoring_details %>">
+      <a href="#" class="toggle_comments_link tooltip" title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless has_scoring_details %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text"><%= t(:see_scoring_details, "See scoring details") %></span>
         </span>
         <%= image_tag "grading_icon.png", :style => "opacity: 0.5;" %>
       </a>
-      <a href="#" class="toggle_rubric_assessments_link tooltip" title="View Rubric Evaluation" style="<%= 'visibility: hidden;' if visible_rubric_assessments.empty? %>">
+      <a href="#" class="toggle_rubric_assessments_link tooltip" title="<%= t 'titles.view_rubric_evaluation', 'View Rubric Evaluation' %>" style="<%= 'visibility: hidden;' if visible_rubric_assessments.empty? %>">
         <span class="tooltip_wrap right">
           <span class="tooltip_text"><%= t(:see_rubric_results, "See rubric results") %></span>
         </span>

@@ -348,7 +348,7 @@ window.submissionAttachmentIndex = -1;
                       <% @google_docs.files.select{|f| f.folder == folder}.each do |file| %>
                         <li class="file <%= file.extension %>" id="document_<%= file.document_id %>">
                           <span class="filename"><%= file.entry.title %></span>
-                          <a class="popout no-hover" href="<%= file.alternate_url %>" title="View in Separate Window" target="_blank"><%= image_tag "popout.png " %></a>
+                          <a class="popout no-hover" href="<%= file.alternate_url %>" title="<%= t 'titles.view_in_separate_window', 'View in Separate Window' %>" target="_blank"><%= image_tag "popout.png " %></a>
                           <div class="clear"></div>
                         </li>
                       <% end %>

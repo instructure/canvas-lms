@@ -149,7 +149,7 @@
         <a href="#" class="lock_item_link no-hover attachment_url" title="<%= t 'links.lock_file', "Lock this File" %>"><%= image_tag "lock.png" %></a>
         <a href="#" class="unlock_item_link no-hover attachment_url" style="display: none;" title="<%= t 'links.unlock_file', "Unlock this File" %>"><%= image_tag "unlock.png" %></a>
       </span>
-      <a href="#" class="sort_icon" title="Drag to reorder"><%= image_tag "move-ns.png" %></a>
+      <a href="#" class="sort_icon" title="<%= t 'links.reorder_file', 'Drag to reorder' %>"><%= image_tag "move-ns.png" %></a>
       <a href="#" class="rename_item_link no-hover attachment_url" title="<%= t 'links.rename_file', "Rename this File" %>"><%= image_tag "edit.png" %></a>
       <a href="#" class="delete_item_link no-hover attachment_url" title="<%= t 'links.delete_file', "Delete this File" %>"><%= image_tag "delete.png" %></a>
     </div>
@@ -200,7 +200,7 @@
   <li class="file_scribd_preview">
   </li>
   <li class="file_image_preview" style="text-align: center; margin-top: 10px;">
-    <a href="#" class="no-hover"><img src="" alt="preview" title=""/></a>
+    <a href="#" class="no-hover"><img src="" alt="<%= t 'alts.file_preview', 'preview' %>" title=""/></a>
   </li>
   <li class="file_media_preview" style="text-align: center; margin-top: 10px; font-size: 1.2em;">
     <div class="media_preview">

@@ -38,8 +38,8 @@
       <% end %>
     </legend>
     <div class="links" style="<%= hidden if user_answer || assessing %>">
-      <a href="#" class="edit_question_link no-hover" title="Edit this Question"><%= image_tag "edit.png" %></a>
-      <a href="#" class="delete_question_link no-hover" title="Delete this Question"><%= image_tag "delete.png" %></a>
+      <a href="#" class="edit_question_link no-hover" title="<%= t 'links.edit_question', 'Edit this Question' %>"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_question_link no-hover" title="<%= t 'links.delete_question', 'Delete this Question' %>"><%= image_tag "delete.png" %></a>
     </div>
     <div style="display: none;">
       <span class="question_type"><%= (question_type.try_rescue(:question_type)) %></span>

@@ -176,7 +176,7 @@ TEXT
         </li>
       <% end %>
       <li id="service_blank" class="service" style="display: none;">
-        <a href="<%= profile_user_service_url("{{ id }}") %>" class="delete_service_link no-hover" style="float: right;" title="Unregister Service"><%= image_tag "delete_circle.png" %></a>
+        <a href="<%= profile_user_service_url("{{ id }}") %>" class="delete_service_link no-hover" style="float: right;" title="<%= t('titles.unregister_service', "Unregister Service") %>"><%= image_tag "delete_circle.png" %></a>
         <span class="service">&nbsp;</span>
       </li>
     </ul>

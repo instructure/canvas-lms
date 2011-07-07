@@ -381,7 +381,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         </li>
       <% end %>
       <li class="section_blank" style="display: none;">
-        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="Delete Section" class="delete_section_link no-hover" ><%= image_tag "delete_circle.png", :alt => t('images.alt.delete', "delete") %></a>
+        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.delete_section', %{Delete Section}) %>" class="delete_section_link no-hover" ><%= image_tag "delete_circle.png", :alt => t('images.alt.delete', "delete") %></a>
         <a class="edit_section_link no-hover" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.edit_section', %{Edit Section}) %>"><%= image_tag "edit.png", :alt => t('images.alt.edit', "edit") %></a>
         <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name">
         </a>
@@ -460,7 +460,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     <div style="margin-top: 5px;">
       <div>
         <%= label_tag :enrollment_type, :en => "Add More" %>
-        <select name="enrollment_type" title="Enrollment Type" id="enrollment_type">
+        <select name="enrollment_type" title="<%= t('titles.enrollment_type', 'Enrollment Type') %>" id="enrollment_type">
           <% if can_do(@context, @current_user, :manage_students) %>
             <option value="StudentEnrollment"><%= t('option.students', %{Students}) %></option>
           <% end %>
@@ -485,7 +485,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </div>
       <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
         <%= label_tag :course_section_id, :en => 'For the section' %>
-        <select title="Course Section" name="course_section_id" id="course_section_id">
+        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
           <% @context.course_sections.active.each do |section| %>
             <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
           <% end %>
