@@ -84,7 +84,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
   
   def select_for_submission(count)
-    ids = ActiveRecord::Base.connection.select_all("SELECT id FROM assessment_questions WHERE workflow_state != 'deleted' AND assessment_question_bank_id = #{self.id}")
+    ids = AssessmentQuestion.connection.select_all("SELECT id FROM assessment_questions WHERE workflow_state != 'deleted' AND assessment_question_bank_id = #{self.id}")
     ids = ids.sort_by{rand}[0...count].map{|i|i['id']}
     ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids)
   end

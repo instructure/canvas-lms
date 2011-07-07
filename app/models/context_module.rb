@@ -647,7 +647,7 @@ class ContextModule < ActiveRecord::Base
       end
     end
     migration_ids = modules.map{|m| m['module_id'] }.compact
-    conn = ActiveRecord::Base.connection
+    conn = self.connection
     cases = []
     max = migration.context.context_modules.map(&:position).compact.max || 0
     modules.each_with_index{|m, idx| cases << " WHEN migration_id=#{conn.quote(m['module_id'])} THEN #{max + idx + 1} " if m['module_id'] }

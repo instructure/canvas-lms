@@ -65,7 +65,7 @@ class LearningOutcome < ActiveRecord::Base
       tag.position = idx + 1
       updates << "WHEN id=#{tag.id} THEN #{idx + 1}"
     end
-    ActiveRecord::Base.connection.execute("UPDATE content_tags SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{tags.map(&:id).join(",")})")
+    ContentTag.connection.execute("UPDATE content_tags SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{tags.map(&:id).join(",")})")
     self.touch
     tags
   end

@@ -1365,7 +1365,7 @@ class Assignment < ActiveRecord::Base
       end
     end
     migration_ids = assignments.map{|m| m['assignment_id'] }.compact
-    conn = ActiveRecord::Base.connection
+    conn = self.connection
     cases = []
     max = migration.context.assignments.map(&:position).compact.max || 0
     migration.context.assignments

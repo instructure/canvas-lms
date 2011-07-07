@@ -186,7 +186,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   
   def update_submission
-    conn = ActiveRecord::Base.connection
+    conn = Submission.connection
     comments_count = SubmissionComment.find_all_by_submission_id(self.submission_id).length
     conn.execute("UPDATE submissions SET submission_comments_count=#{comments_count}, updated_at=#{conn.quote(Time.now.utc.to_s(:db))} WHERE id=#{self.submission_id}") rescue nil
   end

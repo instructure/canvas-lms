@@ -267,11 +267,11 @@ class DiscussionEntry < ActiveRecord::Base
     created = Time.at(hash[:date] / 1000).to_s(:db) rescue Time.now.to_s(:db)
     hash[:body] = ImportedHtmlConverter.convert_text(hash[:body], context)
     hash[:body] += "<br/><br/>-#{hash[:author]}" if hash[:author]
-    hash[:body] = ActiveRecord::Base.connection.quote hash[:body]
+    hash[:body] = self.connection.quote hash[:body]
     Sanitize.clean(hash[:body], Instructure::SanitizeField::SANITIZE)
     query = "INSERT INTO discussion_entries (message, discussion_topic_id, parent_id, created_at, updated_at, migration_id)"
     query += " VALUES (#{hash[:body]},#{topic.id},#{parent.id},'#{created}','#{Time.now.to_s(:db)}','#{hash[:migration_id]}')"
-    ActiveRecord::Base.connection.execute(query)
+    self.connection.execute(query)
 
     hash[:replies].each do |reply|
       DiscussionEntry.import_from_migration(reply, context, nil, parent, topic)

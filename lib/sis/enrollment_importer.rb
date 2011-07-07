@@ -52,7 +52,9 @@ module SIS
             until row.nil?
               update_progress(count)
               count = 0
-              ActiveRecord::Base.transaction do
+              # this transaction assumes that all these pseudonyms, courses, enrollments and
+              # course_sections are all in the same database
+              Enrollment.transaction do
                 remaining_in_transaction = @sis.updates_every
 
                 begin

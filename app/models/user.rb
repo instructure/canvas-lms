@@ -127,10 +127,10 @@ class User < ActiveRecord::Base
   }
   named_scope :for_course_section, lambda{|sections|
     section_ids = Array(sections).map{|s| s.is_a?(Fixnum) ? s : s.id }
-    {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{ActiveRecord::Base.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
+    {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{User.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", ActiveRecord::Base.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
+    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", User.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
   }
   named_scope :active, lambda {
     { :conditions => ["users.workflow_state != ?", 'deleted'] }
@@ -571,7 +571,6 @@ class User < ActiveRecord::Base
   def move_to_user(new_user)
     return unless new_user
     return if new_user == self
-    conn = ActiveRecord::Base.connection
     max_position = (new_user.pseudonyms.last.position || 0) rescue 0
     new_user.creation_email ||= self.creation_email
     new_user.creation_unique_id ||= self.creation_unique_id
@@ -582,7 +581,7 @@ class User < ActiveRecord::Base
       max_position += 1
       updates << "WHEN id=#{p.id} THEN #{max_position}"
     end
-    ActiveRecord::Base.connection.execute("UPDATE pseudonyms SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.pseudonyms.map(&:id).join(',')})") unless self.pseudonyms.empty?
+    Pseudonym.connection.execute("UPDATE pseudonyms SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.pseudonyms.map(&:id).join(',')})") unless self.pseudonyms.empty?
     max_position = (new_user.communication_channels.last.position || 0) rescue 0
     updates = []
     enrollment_emails = []
@@ -591,8 +590,9 @@ class User < ActiveRecord::Base
       updates << "WHEN id=#{cc.id} THEN #{max_position}"
       enrollment_emails << cc.path if cc.path && cc.path_type == 'email'
     end
-    conn.execute("UPDATE communication_channels SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.communication_channels.map(&:id).join(',')})") unless self.communication_channels.empty?
-    conn.execute("UPDATE enrollments SET user_id=#{new_user.id} WHERE user_id=#{self.id} AND invitation_email IN (#{enrollment_emails.map{|email| conn.quote(email)}.join(',')})") unless enrollment_emails.empty?
+    CommunicationChannel.connection.execute("UPDATE communication_channels SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.communication_channels.map(&:id).join(',')})") unless self.communication_channels.empty?
+    e_conn = Enrollment.connection
+    e_conn.execute("UPDATE enrollments SET user_id=#{new_user.id} WHERE user_id=#{self.id} AND invitation_email IN (#{enrollment_emails.map{|email| e_conn.quote(email)}.join(',')})") unless enrollment_emails.empty?
     [
       [:quiz_id, :quiz_submissions], 
       [:assignment_id, :submissions]
@@ -625,7 +625,7 @@ class User < ActiveRecord::Base
       begin
         klass = table.classify.constantize
         if klass.new.respond_to?("#{column}=".to_sym)
-          conn.execute("UPDATE #{table} SET #{column}=#{new_user.id} WHERE #{column}=#{self.id}")
+          klass.connection.execute("UPDATE #{table} SET #{column}=#{new_user.id} WHERE #{column}=#{self.id}")
         end
       rescue => e
         logger.error "migrating #{table} column #{column} failed: #{e.to_s}"

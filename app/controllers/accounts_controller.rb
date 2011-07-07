@@ -299,7 +299,7 @@ class AccountsController < ApplicationController
     raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
 
     if authorized_action(@account, @current_user, :manage_sis)
-      ActiveRecord::Base.transaction do
+      SisBatch.transaction do
         if !@account.current_sis_batch || !@account.current_sis_batch.importing?
           batch = SisBatch.create_with_attachment(@account, params[:import_type], params[:attachment])
 

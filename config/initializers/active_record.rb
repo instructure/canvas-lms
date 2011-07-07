@@ -152,26 +152,27 @@ class ActiveRecord::Base
     self.save
     @skip_touch_context = false
   end
-  
+
   def touch_context
     return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
-      conn = ActiveRecord::Base.connection
-      conn.execute("UPDATE #{self.context_type.underscore.pluralize} SET updated_at=#{conn.quote(Time.now.utc.to_s(:db))} WHERE id=#{self.context_id}") rescue nil
+      self.context_type.constantize.update_all({ :updated_at => Time.now }, { :id => self.context_id })
     end
+  rescue
+    ErrorReport.log_exception(:touch_context, $!)
   end
-  
+
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
-      conn = ActiveRecord::Base.connection
-      conn.execute("UPDATE users SET updated_at=#{conn.quote(Time.now.utc.to_s(:db))} WHERE id=#{self.user_id}") rescue nil
+      User.update_all({ :updated_at => Time.now }, { :id => self.user_id })
       User.invalidate_cache(self.user_id)
     end
     true
   rescue
+    ErrorReport.log_exception(:touch_user, $!)
     false
   end
-  
+
   def context_url_prefix
     "#{self.context_type.downcase.pluralize}/#{self.context_id}"
   end

@@ -173,7 +173,7 @@ class QuizSubmission < ActiveRecord::Base
   
   def backup_submission_data(params)
     raise "Only a hash value is accepted for backup_submission_data calls" unless params.is_a?(Hash)
-    conn = ActiveRecord::Base.connection
+    conn = QuizSubmission.connection
     new_params = params
     if self.submission_data.is_a?(Hash) && self.submission_data[:attempt] == self.attempt
       new_params = self.submission_data.deep_merge(params) rescue params

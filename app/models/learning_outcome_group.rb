@@ -98,7 +98,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
       ordered << tag
     end
     sql = "UPDATE content_tags SET associated_asset_id=#{self.id}, position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{ordered.map(&:id).join(",")})"
-    ActiveRecord::Base.connection.execute(sql) unless updates.empty?
+    ContentTag.connection.execute(sql) unless updates.empty?
     ordered
   end
   

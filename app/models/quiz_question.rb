@@ -116,14 +116,14 @@ class QuizQuestion < ActiveRecord::Base
   end
 
   def self.import_from_migration(hash, context, quiz=nil, quiz_group=nil)
-    question_data = ActiveRecord::Base.connection.quote hash.to_yaml
+    question_data = self.connection.quote hash.to_yaml
     query = "INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)"
     aq_id = hash['assessment_question_id'] ? hash['assessment_question_id'] : 'NULL'
     g_id = quiz_group ? quiz_group.id : 'NULL'
     q_id = quiz ? quiz.id : 'NULL'
     position = hash[:position].nil? ? 'NULL' : hash[:position].to_i
     query += " VALUES (#{q_id}, #{g_id}, #{aq_id},#{question_data},'#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', '#{hash[:migration_id]}', #{position})"
-    id = ActiveRecord::Base.connection.insert(query)
+    id = self.connection.insert(query)
     hash[:quiz_question_id] = id
     hash
   end

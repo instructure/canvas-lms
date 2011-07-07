@@ -40,11 +40,10 @@ class GradeCalculator
       calculate_current_score(user_id, submissions)
       calculate_final_score(user_id, submissions)
     end
-    
-    conn = ActiveRecord::Base.connection
+
     Course.update_all({:updated_at => Time.now}, {:id => @course.id})
     if !@current_updates.empty? || !@final_updates.empty?
-      query = "updated_at=#{conn.quote(Time.now.utc.to_s(:db))}"
+      query = "updated_at=#{Enrollment.connection.quote(Time.now.utc.to_s(:db))}"
       query += ", computed_current_score=CASE #{@current_updates.join(" ")} ELSE computed_current_score END" unless @current_updates.empty?
       query += ", computed_final_score=CASE #{@final_updates.join(" ")} ELSE computed_final_score END" unless @final_updates.empty?
       Enrollment.update_all(query, {:user_id => @user_ids, :course_id => @course.id})

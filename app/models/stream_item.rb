@@ -248,7 +248,6 @@ class StreamItem < ActiveRecord::Base
     # This won't actually delete StreamItems out of the table, it just deletes
     # the join table entries.
     # Old stream items are deleted in a periodic job.
-    conn = ActiveRecord::Base.connection
     StreamItemInstance.delete_all(
           ["user_id in (?) AND stream_item_id = ? AND id < ?",
           user_ids, res.id, smallest_generated_id])
