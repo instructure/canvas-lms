@@ -28,7 +28,7 @@ namespace :i18n do
           scope = filename.gsub(/.*app\/models\/|rb/, '')
           STI_SUPERCLASSES.include?(scope) ? '' : scope
         when /app\/views\//
-          filename.gsub(/.*app\/views\/|html\.erb/, '').gsub(/\/_?/, '.')
+          filename.gsub(/.*app\/views\/|(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')
         else
           ''
       end
