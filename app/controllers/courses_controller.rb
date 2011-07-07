@@ -178,6 +178,7 @@ class CoursesController < ApplicationController
       result = @context.course_sections.map do |section|
         res = section.as_json(:include_root => false,
                               :only => %w(id name))
+        res['sis_section_id'] = section.sis_source_id
         if include_students
           proxy = section.enrollments
           if user_json_is_admin?
