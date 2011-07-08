@@ -84,17 +84,17 @@ module AuthenticationMethods
       @current_user = nil 
     end
 
-    if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) } && Account.site_admin.grants_right?(@current_user, session, :become_user)
-      request_become_user_id = nil
+    if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) }
+      request_become_user = nil
       if params[:become_user_id]
-        request_become_user_id = params[:become_user_id]
+        request_become_user = User.find_by_id(params[:become_user_id])
       elsif params.keys.include?('me')
-        request_become_user_id = nil
+        request_become_user = @current_user
       elsif params.keys.include?('become_teacher')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         teacher = course.teachers.first if course
         if teacher
-          request_become_user_id = teacher.id
+          request_become_user = teacher
         else
           flash[:error] = I18n.t('lib.auth.errors.teacher_not_found', "No teacher found")
         end
@@ -102,31 +102,26 @@ module AuthenticationMethods
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         student = course.students.first if course
         if student
-          request_become_user_id = student.id
+          request_become_user = student
         else
           flash[:error] = I18n.t('lib.auth.errors.student_not_found', "No student found")
         end
       end
-      
-      if request_become_user_id != session[:become_user_id]
+
+      if request_become_user && request_become_user.id != session[:become_user_id].to_i && request_become_user.grants_right?(@current_user, session, :become_user)
         params_without_become = params.dup
         params_without_become.delete_if {|k,v| [ 'become_user_id', 'become_teacher', 'become_student', 'me' ].include? k }
         params_without_become[:only_path] = true
         session[:masquerade_return_to] = url_for(params_without_become)
-        return redirect_to user_masquerade_url(request_become_user_id || @current_user.id)
+        return redirect_to user_masquerade_url(request_become_user.id)
       end
     end
 
-    if session[:become_user_id] && Account.site_admin.grants_right?(@current_user, session, :become_user)
-      @real_current_user = @current_user
-      @current_user = User.find(session[:become_user_id]) rescue @current_user
-      if @current_user.id != @real_current_user.id && Account.site_admin_user?(@current_user)
-        # we can't let even site admins impersonate other site admins, since
-        # they may have different permissions.
-        logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) attempting to impersonate another site admin (#{@current_user.name}). No dice."
-        flash.now[:error] = I18n.t('lib.auth.errors.admin_impersonation_disallowed', "You can't impersonate other site admins. Sorry.")
-        @current_user = @real_current_user
-      else
+    if session[:become_user_id]
+      user = User.find_by_id(session[:become_user_id])
+      if user && user.grants_right?(@current_user, session, :become_user)
+        @real_current_user = @current_user
+        @current_user = user
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       end
     end

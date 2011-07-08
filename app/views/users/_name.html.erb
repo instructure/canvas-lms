@@ -44,7 +44,7 @@
       <% if can_manage_admin_users || (!@enrollments.any?(&:admin?) && !@user.creation_sis_batch_id && can_do(@context, @current_user, :manage_students)) %>
         <td class="links" colspan="2" style="text-align: right; font-size: 0.8em; padding-top: 10px;">
           <a href="#" class="edit_user_link"><%= t('edit', 'Edit') %></a>
-          <% if current_user_is_site_admin?(:become_user) %>
+          <% if @user.id != @current_user.id && can_do(@user, @real_current_user || @current_user, :become_user) %>
             |
             <% if @context && !@context.is_a?(Account) %>
               <a href="<%= context_url(@context, :context_url, :become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a>

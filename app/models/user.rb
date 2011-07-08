@@ -690,7 +690,7 @@ class User < ActiveRecord::Base
   
   set_policy do
     given { |user| user == self }
-    set { can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar }
+    set { can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :become_user }
 
     given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
     set { can :rename and can :create_user_notes and can :read_user_notes}
@@ -718,7 +718,26 @@ class User < ActiveRecord::Base
       )
     end
     set { can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes}
-    
+
+    given do |user|
+      user && ((
+        # or, if the user we are given can masquerade in *all* of this user's accounts
+        # (to prevent an account admin from masquerading and gaining access to another root account)
+        (self.associated_accounts.all?{|a| a.grants_right?(user, nil, :become_user) } && !self.associated_accounts.empty?)
+      ) && (
+        # account admins can't masquerade as other account admins
+        self.account_users.empty? || (
+          # unless they're a site admin
+          Account.site_admin.grants_right?(user, nil, :become_user) &&
+          # and not wanting to become a site admin
+          !Account.site_admin_user?(self)
+        )
+      ) || (
+        # only site admins can masquerade as users that don't belong to any account
+        self.associated_accounts.empty? && Account.site_admin.grants_right?(user, nil, :become_user)
+      ))
+    end
+    set { can :become_user }
   end
 
   def self.infer_id(obj)

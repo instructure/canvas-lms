@@ -191,8 +191,8 @@ class UsersController < ApplicationController
   end
 
   def masquerade
-    if user_is_site_admin?(@real_current_user || @current_user, :become_user)
-      @user = User.find_by_id(params[:user_id])
+    @user = User.find_by_id(params[:user_id])
+    if (authorized_action(@user, @real_current_user || @current_user, :become_user))
       if request.post?
         if @user == @real_current_user
           session[:become_user_id] = nil
@@ -203,9 +203,6 @@ class UsersController < ApplicationController
         session[:masquerade_return_to] = nil
         return return_to(return_url, request.referer)
       end
-      return
-    else
-      render_unauthorized_action
     end
   end
 

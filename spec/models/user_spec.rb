@@ -297,4 +297,81 @@ describe User do
       @user1.submissions.map(&:id).should be_include(s3.id)
     end
   end
+
+  context "permissions" do
+    it "should grant become_user to self" do
+      @user = user_with_pseudonym(:username => 'nobody1@example.com')
+      @user.grants_right?(@user, nil, :become_user).should be_true
+    end
+
+    it "should not grant become_user to other users" do
+      @user1 = user_with_pseudonym(:username => 'nobody1@example.com')
+      @user2 = user_with_pseudonym(:username => 'nobody2@example.com')
+      @user1.grants_right?(@user2, nil, :become_user).should be_false
+      @user2.grants_right?(@user1, nil, :become_user).should be_false
+    end
+
+    it "should grant become_user to site and account admins" do
+      user = user_with_pseudonym(:username => 'nobody1@example.com')
+      @admin = user_with_pseudonym(:username => 'nobody2@example.com')
+      @site_admin = user_with_pseudonym(:username => 'nobody3@example.com')
+      Account.site_admin.add_user(@site_admin)
+      Account.default.add_user(@admin)
+      user.grants_right?(@site_admin, nil, :become_user).should be_true
+      @admin.grants_right?(@site_admin, nil, :become_user).should be_true
+      user.grants_right?(@admin, nil, :become_user).should be_true
+      @admin.grants_right?(@admin, nil, :become_user).should be_true
+      @admin.grants_right?(user, nil, :become_user).should be_false
+      @site_admin.grants_right?(@site_admin, nil, :become_user).should be_true
+      @site_admin.grants_right?(user, nil, :become_user).should be_false
+      @site_admin.grants_right?(@admin, nil, :become_user).should be_false
+    end
+
+    it "should not grant become_user to other site admins" do
+      @site_admin1 = user_with_pseudonym(:username => 'nobody1@example.com')
+      @site_admin2 = user_with_pseudonym(:username => 'nobody2@example.com')
+      Account.site_admin.add_user(@site_admin1)
+      Account.site_admin.add_user(@site_admin2)
+      @site_admin1.grants_right?(@site_admin2, nil, :become_user).should be_false
+      @site_admin2.grants_right?(@site_admin1, nil, :become_user).should be_false
+    end
+
+    it "should not grant become_user to other account admins" do
+      @admin1 = user_with_pseudonym(:username => 'nobody1@example.com')
+      @admin2 = user_with_pseudonym(:username => 'nobody2@example.com')
+      Account.default.add_user(@admin1)
+      Account.default.add_user(@admin2)
+      @admin1.grants_right?(@admin2, nil, :become_user).should be_false
+      @admin2.grants_right?(@admin1, nil, :become_user).should be_false
+    end
+
+    it "should grant become_user for users in multiple accounts to site admins but not account admins" do
+      user = user_with_pseudonym(:username => 'nobody1@example.com')
+      @account2 = Account.create!
+      user.pseudonyms.create!(:unique_id => 'nobodyelse@example.com', :account => @account2)
+      @admin = user_with_pseudonym(:username => 'nobody2@example.com')
+      @site_admin = user_with_pseudonym(:username => 'nobody3@example.com')
+      Account.default.add_user(@admin)
+      Account.site_admin.add_user(@site_admin)
+      user.grants_right?(@admin, nil, :become_user).should be_false
+      user.grants_right?(@site_admin, nil, :become_user).should be_true
+      @account2.add_user(@admin)
+      user.grants_right?(@admin, nil, :become_user).should be_true
+    end
+
+    it "should not grant become_user for dis-associated users" do
+      @user1 = user_model
+      @user2 = user_model
+      @user1.grants_right?(@user2, nil, :become_user).should be_false
+      @user2.grants_right?(@user1, nil, :become_user).should be_false
+    end
+
+    it "should grant become_user for dis-associated users to site admins" do
+      user = user_model
+      @site_admin = user_model
+      Account.site_admin.add_user(@site_admin)
+      user.grants_right?(@site_admin, nil, :become_user).should be_true
+      @site_admin.grants_right?(user, nil, :become_user).should be_false
+    end
+  end
 end
