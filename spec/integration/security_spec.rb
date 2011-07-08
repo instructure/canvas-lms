@@ -187,6 +187,40 @@ describe "security" do
       assigns['current_user'].id.should == @student.id
       session[:become_user_id].should be_nil
     end
+
+    it "should record real user in page_views" do
+      Setting.set('enable_page_views', 'db')
+      user_session(@admin, @admin.pseudonyms.first)
+
+      get "/?become_user_id=#{@student.id}"
+      assert_response 302
+      response.location.should match "/users/#{@student.id}/masquerade$"
+      session[:masquerade_return_to].should == "/"
+      session[:become_user_id].should be_nil
+      assigns['current_user'].id.should == @admin.id
+      assigns['real_current_user'].should be_nil
+
+      follow_redirect!
+      assert_response 200
+      path.should == "/users/#{@student.id}/masquerade"
+      session[:become_user_id].should be_nil
+      assigns['current_user'].id.should == @admin.id
+      assigns['real_current_user'].should be_nil
+      PageView.last.user_id.should == @admin.id
+      PageView.last.real_user_id.should be_nil
+
+      post "/users/#{@student.id}/masquerade"
+      assert_response 302
+      session[:become_user_id].should == @student.id.to_s
+
+      get "/"
+      assert_response 200
+      session[:become_user_id].should == @student.id.to_s
+      assigns['current_user'].id.should == @student.id
+      assigns['real_current_user'].id.should == @admin.id
+      PageView.last.user_id.should == @student.id
+      PageView.last.real_user_id.should == @admin.id
+    end
   end
 
   it "should not allow logins to safefiles domains" do

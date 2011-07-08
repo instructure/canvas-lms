@@ -535,7 +535,7 @@ class ApplicationController < ActionController::Base
   end
   
   def generate_page_view
-    @page_view = PageView.new(:url => request.url[0,255], :user => @current_user, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'])
+    @page_view = PageView.new(:url => request.url[0,255], :user => @current_user, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'], :real_user => @real_current_user)
     @page_view.interaction_seconds = 5
     @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.method == :get)
     @page_view.created_at = Time.now
