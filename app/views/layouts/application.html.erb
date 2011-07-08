@@ -299,6 +299,9 @@
 </script>
 
 <%= include_javascripts :common %>
+<script>
+  I18n.locale = <%= raw I18n.locale.to_json %>;
+</script>
 
 <%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
 <%= render_js_blocks %>
