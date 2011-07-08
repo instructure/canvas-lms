@@ -96,13 +96,18 @@ class FilesController < ApplicationController
   
   def list
     if authorized_action(@context, @current_user, :read)
-      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
       json = Rails.cache.fetch(['file_list_json', @context.cache_key, (@current_user.cache_key rescue 'nobody')].cache_key) do
         @visible_folders = @context.active_folders_detailed.select{|f| f.grants_right?(@current_user, session, :read_contents)}
         @files = @context.active_attachments.scoped(:include => [:thumbnail, :media_object])
-        visible_folders_hash = {}
-        @visible_folders.each{|f| visible_folders_hash[f.id] = true }
-        @visible_files = @files.select{|a| can_manage_files || (!a.currently_locked && visible_folders_hash[a.folder_id]) }
+        # preload the reverse associations
+        @files.each { |f| f.thumbnail.attachment = f if f.thumbnail; f.context = @context }
+        if @context.grants_right?(@current_user, session, :manage_files)
+          @visible_files = @files
+        else
+          visible_folders_hash = {}
+          @visible_folders.each{|f| visible_folders_hash[f.id] = true }
+          @visible_files = @files.select{|a| !a.currently_locked && visible_folders_hash[a.folder_id] }
+        end
         (@visible_folders + @visible_files).to_json
       end
       render :json => json
