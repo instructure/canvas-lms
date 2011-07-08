@@ -53,7 +53,16 @@ namespace :i18n do
     file_count = files.size
 
     t = Time.now
-    @extractor = I18nExtractor.new
+
+    I18n.available_locales
+    stringifier = proc { |hash, (key, value)|
+      hash[key.to_s] = value.is_a?(Hash) ?
+        value.inject({}, &stringifier) :
+        value
+      hash
+    }
+    default_translations = I18n.backend.send(:translations)[:en].inject({}, &stringifier)
+    @extractor = I18nExtractor.new(:translations => default_translations)
     @errors = []
     files.each do |file|
       begin
