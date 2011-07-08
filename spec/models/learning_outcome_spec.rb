@@ -354,7 +354,7 @@ describe LearningOutcome do
       @tags = ContentTag.learning_outcome_tags_for(@assignment)
       @tags.length.should eql(1)
       @tags[0].rubric_association_id.should eql(@a.id)
-      
+      @assignment.reload
       @submission = @assignment.grade_student(@user, :grade => "10").first
       @assessment = @a.assess({
         :user => @user,

@@ -57,7 +57,11 @@ class AssignmentGroup < ActiveRecord::Base
   
   def update_student_grades
     if @grades_changed
-      self.context.recompute_student_scores rescue nil
+      begin
+        self.context.recompute_student_scores
+      rescue
+        ErrorReport.log_exception(:grades, $!)
+      end
     end
   end
   

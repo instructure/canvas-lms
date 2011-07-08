@@ -91,9 +91,10 @@ class Assignment < ActiveRecord::Base
                 :infer_grading_type, 
                 :process_if_quiz,
                 :default_values,
-                :update_grades_if_details_changed
+                :update_submissions_if_details_changed
   
-  after_save    :generate_reminders_if_changed,
+  after_save    :update_grades_if_details_changed,
+                :generate_reminders_if_changed,
                 :touch_assignment_group,
                 :touch_context,
                 :update_grading_standard,
@@ -129,7 +130,7 @@ class Assignment < ActiveRecord::Base
     true
   end
   
-  def update_student_grades(old_points_possible, old_grading_type)
+  def update_student_submissions(old_points_possible, old_grading_type)
     submissions.graded.each do |submission|
       submission.grade = score_to_grade(submission.score)
       submission.save
@@ -139,9 +140,20 @@ class Assignment < ActiveRecord::Base
   # if a teacher changes the settings for an assignment and students have
   # already been graded, then we need to update the "grade" column to
   # reflect the changes
-  def update_grades_if_details_changed
+  def update_submissions_if_details_changed
     if !new_record? && (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) && !submissions.graded.empty?
-      send_later_if_production(:update_student_grades, points_possible_was, grading_type_was)
+      send_later_if_production(:update_student_submissions, points_possible_was, grading_type_was)
+    end
+    true
+  end
+  
+  def update_grades_if_details_changed
+    if @points_possible_was != self.points_possible
+      begin
+        self.context.recompute_student_scores
+      rescue
+        ErrorReport.log_exception(:grades, $!)
+      end
     end
     true
   end
