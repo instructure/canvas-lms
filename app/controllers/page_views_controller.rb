@@ -28,7 +28,11 @@ class PageViewsController < ApplicationController
     if authorized_action(@user, @current_user, :view_statistics)
       @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC'
       respond_to do |format|
-        format.html
+        format.html do
+          if params[:html_xhr]
+            render :partial => @page_views
+          end
+        end
         format.js { render :partial => @page_views }
         format.json { render :partial => @page_views }
         format.csv {

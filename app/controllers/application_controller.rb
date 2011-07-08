@@ -55,7 +55,7 @@ class ApplicationController < ActionController::Base
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
   # see http://codetunes.com/2009/01/31/rails-222-ajax-and-respond_to/ for why
   def fix_xhr_requests
-    request.format = :js if request.xhr? && request.format == :html
+    request.format = :js if request.xhr? && request.format == :html && !params[:html_xhr]
   end
   
   # scopes all time objects to the user's specified time zone
