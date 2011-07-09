@@ -708,7 +708,7 @@ class Course < ActiveRecord::Base
   end
   
   def storage_quota_mb=(val)
-    self.storage_quota = val.megabytes
+    self.storage_quota = val.try(:to_i).try(:megabytes)
   end
   
   def storage_quota=(val)

@@ -314,7 +314,7 @@ class Account < ActiveRecord::Base
   end
   
   def default_storage_quota_mb=(val)
-    self.default_storage_quota = val.megabytes
+    self.default_storage_quota = val.try(:to_i).try(:megabytes)
   end
   
   def default_storage_quota=(val)
