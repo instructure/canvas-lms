@@ -148,7 +148,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :submissions
     course.resources :calendar_events
     course.resources :chats
-    course.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
+    course.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
       file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
@@ -157,6 +157,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    course.images 'images', :controller => 'files', :action => 'images'
     course.relative_file_path "file_contents/:file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     course.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -342,7 +343,7 @@ ActionController::Routing::Routes.draw do |map|
     group.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
     group.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
     group.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
-    group.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
+    group.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
       file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
@@ -351,6 +352,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    group.images 'images', :controller => 'files', :action => 'images'
     group.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
@@ -468,7 +470,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users do |user|
     user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'
-    user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
+    user.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
       file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
@@ -477,6 +479,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    user.images 'images', :controller => 'files', :action => 'images'
     user.resources :page_views, :only => [:index]
     user.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -501,14 +504,6 @@ ActionController::Routing::Routes.draw do |map|
     user.manageable_courses 'manageable_courses', :controller => 'users', :action => 'manageable_courses'
     user.outcomes 'outcomes', :controller => 'outcomes', :action => 'user_outcome_results'
     user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
-    user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
-      file.text_inline 'inline', :controller => 'files', :action => 'text_show'
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-      file.preview 'preview', :controller => 'files', :action => 'show', :preview => '1'
-      file.inline_view 'inline_view', :controller => 'files', :action => 'show', :inline => '1'
-      file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
-      file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    end
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
   end

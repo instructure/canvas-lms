@@ -328,6 +328,27 @@ shared_examples_for "all selenium tests" do
   end
 end
 
+TEST_FILE_UUIDS = { "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
+                "testfile1copy.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
+                    "testfile2.txt" => "5d714eca-2cff-4737-8604-45ca098165cc",
+                    "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
+                    "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
+                    "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37",
+                       "graded.png" => File.read(File.dirname(__FILE__) + '/../../public/images/graded.png') }
+def get_file(filename)
+  data = TEST_FILE_UUIDS[filename]
+  if !SELENIUM_CONFIG[:host_and_port]
+    @file = Tempfile.new(filename.split(/(?=\.)/))
+    @file.write data
+    @file.close
+    fullpath = @file.path
+    filename = File.basename(@file.path)
+  else
+    fullpath = "C:\\testfiles\\#{filename}"
+  end
+  [filename, fullpath, data]
+end
+
 shared_examples_for "in-process server selenium tests" do
   it_should_behave_like "all selenium tests"
   prepend_before(:all) do
