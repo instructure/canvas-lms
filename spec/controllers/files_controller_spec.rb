@@ -449,7 +449,7 @@ describe FilesController do
 
       Attachment.s3_storage?.should eql(true)
       Attachment.local_storage?.should eql(false)
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_student_logged_in(:active_all => true)
       Setting.set('user_default_quota', -1)
       post 'create_pending', {:attachment => {
         :context_code => @user.asset_string,
@@ -469,13 +469,13 @@ describe FilesController do
 
       Attachment.s3_storage?.should eql(true)
       Attachment.local_storage?.should eql(false)
-      course_with_teacher_logged_in(:active_all => true)
-      @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_file_upload')
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
       Setting.set('user_default_quota', -1)
       post 'create_pending', {:attachment => {
         :context_code => @assignment.context_code,
         :asset_string => @assignment.asset_string,
-        :purpose => 'submit',
+        :intent => 'submit',
         :filename => "bob.txt"
       }, :format => :json}
       response.should be_success

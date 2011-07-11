@@ -1397,12 +1397,12 @@ class Assignment < ActiveRecord::Base
       item.submission_types = hash[:submission_types]
     elsif ['discussion_topic'].include?(hash[:submission_format])
       item.submission_types = "discussion_topic"
-    elsif ['online_file_upload','textwithattachments'].include?(hash[:submission_format])
-      item.submission_types = "online_file_upload,online_text_entry"
+    elsif ['online_upload','textwithattachments'].include?(hash[:submission_format])
+      item.submission_types = "online_upload,online_text_entry"
     elsif ['online_text_entry'].include?(hash[:submission_format])
       item.submission_types = "online_text_entry"
     elsif ['webpage'].include?(hash[:submission_format])
-      item.submission_types = "online_file_upload"
+      item.submission_types = "online_upload"
     elsif ['online_quiz'].include?(hash[:submission_format])
       item.submission_types = "online_quiz"
     end

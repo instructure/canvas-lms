@@ -379,6 +379,7 @@ class FilesController < ApplicationController
     @check_quota = true
     permission_object = @attachment
     permission = :create
+    intent = params[:attachment][:intent]
     
     # Using workflow_state we can keep track of the files that have been built
     # but we don't know that there's an s3 component for yet (it's still being
@@ -388,25 +389,25 @@ class FilesController < ApplicationController
     # is to upload it to a context.  In the other cases we need to check the
     # permission related to the purpose to make sure the file isn't being
     # uploaded just to disappear later
-    if @asset.is_a?(Assignment) && params[:intent] == 'comment'
+    if @asset.is_a?(Assignment) && intent == 'comment'
       permission_object = @asset
       permission = :attach_submission_comment_files
       @context = @asset
       @check_quota = false
-    elsif @asset.is_a?(Assignment) && params[:intent] == 'submit'
-      permission_object = @context
-      permission = (@context.submission_types || "").match(/online_file_upload/) ? :submit : :nothing
+    elsif @asset.is_a?(Assignment) && intent == 'submit'
+      permission_object = @asset
+      permission = (@asset.submission_types || "").match(/online_upload/) ? :submit : :nothing
       @context = @current_user
       @check_quota = false
-    elsif @context && params[:intent] == 'attach_discussion_file'
+    elsif @context && intent == 'attach_discussion_file'
       permission_object = @context.discussion_topics.new
       permission = :attach
-    elsif @context && params[:intent] == 'message'
+    elsif @context && intent == 'message'
       permission_object = @context
       permission = :send_messages
       workflow_state = 'unattached_temporary'
       @check_quota = false
-    elsif @context && params[:intent] && params[:intent] != 'upload'
+    elsif @context && intent && intent != 'upload'
       # In other cases (like unzipping a file, extracting a QTI, etc.
       # we don't actually want the uploaded file to show up in the context's
       # file listings.  If you set its workflow_state to unattached_temporary
