@@ -1,3 +1,173 @@
+canvas-lms (1.1-40) professional; urgency=low
+
+  * [+a1fa31f] i18n rubrics
+  * [+ea2f9ff] don't try and set a blank sis_user_id for pseudonyms created via the browser
+  * [+13f4ccb] i18n courses
+  * [+a99b176] make selenium tests use a random port
+  * [+f1dccb4] i18n courses js
+  * [+b5cbe21] i18n sub-accounts and allow dashes in i18n pluralize
+  * [+e5ec8c6] fix mt inlinify for multiple inline tags
+  * [+03dee0f] i18n sis_imports_api_controller
+  * [+d738437] i18n rubric associations and assessments
+  * [+fb80d29] i18n role_overrides
+  * [+dd3d986] i18n sis_batch
+  * [+40826d3] i18n user_notes
+  * [+d504f1a] user_profile and user_service i18n
+  * [+c9d5d52] i18n terms_controller
+  * [+41c9ee3] fix sometimes-failing periodic job spec
+  * [+3ff0f5e] add parent account crumb in accounts context if applicable
+  * [+a17ddd6] fix i18n on user profile tabs
+  * [+c7b5753] show entire account lineage in breadcrumbs
+  * [+bde20af] linkify accounts in course_details (permission appropriate)
+  * [+dd35ef3] fix i18n extraction for enrollment invitation reminder
+  * [+b07449c] i18n extractor for javascript (files and js_blocks)
+  * [+0bcf2df] don't allow logins to the files domain; fixes #4726 and gh issue 23
+  * [+b388e01] javascript I18n.beforeLabel
+  * [+c950125] i18n rest of vendor/plugins (and lib/canvas/plugin stragglers)
+  * [+5e1e9b9] i18n submissions
+  * [+2691576] fix inconsistencies with preservation of 0-pts-possible pass/fail assignments
+  * [+e59b174] try to send to a useful location when (de-)masquerading via the UI
+  * [+170948f] make toPercentage/etc. available to I18n.scoped, fix extractor issue
+  * [+bf86a21] fix protected attr/dynamic finder error config in dev mode
+  * [+12ba408] be sure to initialize class vars in HostUrl
+  * [+d32d5f5] i18n account statistics js
+  * [+b1b4863] i18n ajax_errors
+  * [+0690ae4] auto-embed translations for js_blocks
+  * [+24c1b1d] make security login spec more robust
+  * [+46f093f] update js extractor (and views) for new js_block scoping usage
+  * [+1eb9777] allow students to access their own submissions via API, closes #4748
+  * [+d821478] fix downloading content exports with local storage + safefiles
+  * [+b3cc6fb] correct link translation when doing a course copy with locked files
+  * [+02d8fb2] fix adding new assignment from modules' add item dialog
+  * [+0242d12] i18n course sections
+  * [+774a5d7] localize Profile
+  * [+1941b8b] fix i18n_scoped -> i18n_scope typo
+  * [+e43a9b1] allow deleting terms that contain only deleted courses fixes #4937
+  * [+69d13cb] localize PageViews
+  * [+b6cbe2d] i18n Assignments views
+  * [+0a14d03] i18n aligned outcomes
+  * [+1164136] i18n users
+  * [+93898e6] targeted i18n:check
+  * [+e0e09bf] localize ePortfolios
+  * [+1006013] fix broken eportfolios i18n
+  * [+5f228c7] localize Quizzes
+  * [+0be507c] i18n mathquill
+  * [+010fa3c] i18n link_enrollment.js
+  * [+aff0f60] i18n manage_avatars.js
+  * [+3683a8d] refactor abstract courses stage 2
+  * [+eaf2c63] abstract course importer
+  * [+daf9a21] recover from grade export misconfiguration errors better
+  * [+f1ba8d0] add more tests to grade passback
+  * [+9a6d4e1] fix attendance page, closes #4151
+  * [+5b1df4e] localize sub_accounts.js
+  * [+6b73b93] localize topic.js and topics.js
+  * [+933e1d5] i18n assignments.js
+  * [+536c9dc] i18n wiki_sidebar.js
+  * [+71a9696] i18n attendance.js
+  * [+c0e0239] basic htmlSafe functionality for i18n.js
+  * [+94d6d44] i18n for calcCmd/supercalc js
+  * [+ba1d7c0] localize gradebook
+  * [+a978207] i18n user*.js
+  * [+6496094] add filter-enrollmentless-course functionality. refs #4497, closes #4602
+  * [+80caf32] localize site_admin.js
+  * [+f8a15f7] fix problem when trying to add diigo bookmark to modules
+  * [+22944c9] don't require no-op block for Account#fast_course_base
+  * [+6108b73] fix width resizer in chrome, closes #4945
+  * [+1e2236c] fix text selection on focus (chrome/safari), fixes #4949
+  * [+e0c9336] make js hash matching a little more flexible
+  * [+f0f48b5] remove unnecessary (and broken) localize calls
+  * [+98f8484] fix escaping issue
+  * [+f62e3e2] localize rubric_assessment.js
+  * [+5ba19a2] updated wiki page messages i18n
+  * [+4ddce72] extend submissions for_student api for gradebook2
+  * [+bfd18e5] i18n wrapper for js
+  * [+3a1908a] fix part of speedgrader that was throwing errors
+  * [+ad2aa1d] web conference message i18n
+  * [+e463499] restore </span> tag lost in localization
+  * [+4410dd9] checking wrong id in question bank read permissions through question_bank_users
+  * [+9d96751] include protocol if specified in authenticated_s3_url
+  * [+f284537] keyboard_navigation helper output should be html safe
+  * [+b9fe6ae] catch trailing commas in check_syntax task
+  * [+6a1bddc] enable "download zip" link for students, closes #4305
+  * [+5456031] create gradebook2
+  * [+45a4266] teacher activity / student interaction report, closes #4316
+  * [+b43dd2f] fix overzealous escaping of facebook message html
+  * [+f73513f] fix saml/cas login account scoping, closes #4973
+  * [+69a0bc4] i18n js question banks
+  * [+bf82c1c] i18n contenxt_export messages
+  * [+893a034] localize sis_import.js
+  * [+3133539] localize select_content_dialog.js
+  * [+709c81e] localize section.js
+  * [+f8b0fe4] localize scribd.view.js
+  * [+3f8fed7] i18n collaboration_invitation messages
+  * [+d857df2] i18n full_assignment.js
+  * [+75161f0] i18n dashboard.js
+  * [+1a21679] i18n content_tags_index
+  * [+b283bc5] i18n find_outcome.js
+  * [+d78bc6a] i18n feedback.js
+  * [+6ff8fc9] i18n external_tools.js
+  * [+a504409] i18n edit_rubric.js
+  * [+a0f85bd] i18n media_comments.js
+  * [+23c030a] i18n context_messages.js
+  * [+9a84bc5] i18n javascript learning outcomes and license help
+  * [+748471c] i18n confirm_* messages
+  * [+6c6147b] i18n assignment messages
+  * [+ccb0aad] import learning outcome groups correctly
+  * [+8ac9242] fix ignore_ungraded final score calculation in coffeescript grader
+  * [+ad405fb] create dummy submission if none exists, to fix coffeescript final grade calculations
+  * [+48e36ad] i18n content_locks.js
+  * [+3bd7ac1] i18n enrollment_*.erb
+  * [+a2f7933] fixup collaboration_invitation message
+  * [+29bc189] fix typo, refs #4972
+  * [+a19ca65] recover as best we can when a job fails to fail, fixes #4951
+  * [+786f21d] i18n messages - event date changed
+  * [+dc543fc] i18n group assignment messages
+  * [+86d4a42] i18n grade weight change messages
+  * [+319b970] i18n group membership messages
+  * [+b4bdac0] i18n forgot password message
+  * [+833ec56] coffeescript grade calc: count 0/N scores toward running total
+  * [+5febff3] i18n merge user message
+  * [+fba0c94] string extraction for most i18n oddities
+  * [+1042505] i18n new event messages
+  * [+dd8582e] bring i18n.js' strftime (mostly) in line w/ ruby's
+  * [+d1cc53b] formula question "need help" link was broken in question banks
+  * [+f0f9e2c] use request.remote_ip to get the client address
+  * [+a758284] log error report on submit_to_scribd failure
+  * [+174c196] i18n new_a* messages
+  * [+8a9afa9] i18n new_context_* messages
+  * [+f1cf222] i18n new_student_organized_group and new_teacher_registration messages
+  * [+6437c1d] i18n new_user and new_wiki_page messages
+  * [+cbf8ee1] i18n several shared partials
+  * [+5d30a48] i18n dashboard_secondary_nav and enrollment shared partials
+  * [+7ee0ee4] fix js scoping bugs introduced with i18n wrapper calls
+  * [+16a27d3] i18n new_course, new_discussion_* entries
+  * [+9aceb09] i18n shared error pages
+  * [+5fd76c7] i18n f* shared partials
+  * [+7af574c] i18n [ijk].* shared partials
+  * [+7f12b35] i18n menu partials
+  * [+f02680c] i18n various and sundry shared views
+  * [+5161414] sort question banks by question name
+  * [+b0c7077] i18n rubric partials
+  * [+7eb99b6] fix and localize $.parseFromISO, other date stuff
+  * [+a55b3df] don't bypass previous module requirements if sequential progress is enabled
+  * [+bbb237b] fix mass assignment error when creating web conference
+  * [+88d94d0] don't puke on nil msg when processing incoming messages
+  * [+7136f15] fix i18n regression submitting assignments
+  * [+76da6ec] switch to storing quotas as bytes instead of MB
+  * [+ed4c07a] set correct position when importing quiz questions
+  * [+42d51f6] stray html entities in getting started students page translation string
+  * [+8453fe9] fix missing paren in some I18n javascript
+  * [+3bfa3bc] don't call l() directly, use date_string
+  * [+46e4012] add course syllabus body to course api
+  * [+5dd337b] use more specific sis field names in api, and support both user sis ids
+  * [+8c210d7] fix html importing for canvas cartridges
+  * [+561d553] fix storing new quota
+  * [+219a21c] correctly scope before_label_wrapper
+  * [+2f87b88] allow other translate arguments to before_label
+  * [+ca619f5] stray line breaks with indentation while using mt = bad
+
+ -- JT Olds <jt@instructure.com>  Mon, 11 Jul 2011 11:06:51 -0600
+
 canvas-lms (1.1-39) professional; urgency=low
 
   * [+1be74ff] return user sis ids for account admins as well as site admins, refs #4644
