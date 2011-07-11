@@ -16,7 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var moderation = {
+var moderation;
+
+I18n.scoped('quizzes.moderate', function(I18n) {
+moderation = {
   updateTimes: function() {
     var now = new Date();
     moderation.studentsCurrentlyTakingQuiz = !!$("#students .student.in_progress");
@@ -32,7 +35,7 @@ var moderation = {
       $row.data('timing', row);
       var diff = row.referenceDate.getTime() - now.getTime() - row.clientServerDiff;
       if(row.isDeadline && diff < 0) { 
-        $row.find(".time").text("Time Up!");
+        $row.find(".time").text(I18n.t('time_up', "Time Up!"));
         return;
       }
       $row.data('minutes_left', diff / 60000);
@@ -60,7 +63,7 @@ var moderation = {
     }
     var state_text = "";
     if(submission.workflow_state == 'complete' || submission.workflow_state == 'pending_review') {
-      state_text = "finished in " + submission.finished_in_words;
+      state_text = I18n.t('finished_in_duration', "finished in %{duration}", {'duration': submission.finished_in_words});
     }
     var data = {
       attempt: submission.attempt || '--',
@@ -91,6 +94,7 @@ var moderation = {
   lastUpdatedAt: "",
   studentsCurrentlyTakingQuiz: false
 };
+
 $(document).ready(function(event) {
   timing.initTimes();
   setInterval(moderation.updateTimes, 500)
@@ -128,7 +132,7 @@ $(document).ready(function(event) {
       updating(false);
       updateErrors++;
       if(updateErrors > 5) {
-        $.flashMessage("There was a problem communicating with the server.  The system will try again in five minutes, or you can reload the page");
+        $.flashMessage(I18n.t('errors.server_communication_failed', "There was a problem communicating with the server.  The system will try again in five minutes, or you can reload the page"));
         updateErrors = 0;
         if(repeat) {
           setTimeout(function() { updateSubmissions(true); }, 300000);
@@ -174,11 +178,11 @@ $(document).ready(function(event) {
       });
     });
     $("#moderate_student_form").data('ids', student_ids);
-    $("#moderate_student_dialog h2").text("Extensions for " + student_ids.length + " Students");
+    $("#moderate_student_dialog h2").text(I18n.t('extensions_for_students', {'one': "Extensions for 1 Student", 'other': "Extensions for %{count} Students"}, {'count': student_ids.length}));
     $("#moderate_student_form").fillFormData(data);
     $("#moderate_student_dialog").dialog('close').dialog({
       auotOpen: false,
-      title: "Student Extensions",
+      title: I18n.t('titles.student_extensions', "Student Extensions"),
       width: 400
     }).dialog('open');
   });
@@ -195,10 +199,10 @@ $(document).ready(function(event) {
     $("#moderate_student_form").fillFormData(data);
     $("#moderate_student_form").data('ids', [$student.attr('data-user-id')]);
     $("#moderate_student_form").find("button").attr('disabled', false);
-    $("#moderate_student_dialog h2").text("Extensions for " + name);
+    $("#moderate_student_dialog h2").text(I18n.t('extensions_for_student', "Extensions for %{student}", {'student': name}));
     $("#moderate_student_dialog").dialog('close').dialog({
       auotOpen: false,
-      title: "Student Extensions",
+      title: I18n.t('titles.student_extensions', "Student Extensions"),
       width: 400
     }).dialog('open');
   });
@@ -212,19 +216,19 @@ $(document).ready(function(event) {
     var ids = $(this).data('ids');
     if(ids.length == 0) { return; }
     var $form = $(this);
-    $form.find("button").attr('disabled', true).filter(".save_button").text("Saving...");
+    $form.find("button").attr('disabled', true).filter(".save_button").text(I18n.t('buttons.saving', "Saving..."));
     var finished = 0, errors = 0;
     var formData = $(this).getFormData();
     function checkIfFinished() {
       if(finished >= ids.length) {
         if(errors > 0) {
           if(ids.length == 1) {
-            $form.find("button").attr('disabled', false).filter(".save_button").text("Save Failed, please try again");
+            $form.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.save_failed', "Save Failed, please try again"));
           } else {
-            $form.find("button").attr('disabled', false).filter(".save_button").text("Save Failed, " + errors + " Students were not updated");
+            $form.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.save_failed_n_updates_lost', "Save Failed, %{n} Students were not updated", {'n': errors}));
           }
         } else {
-          $form.find("button").attr('disabled', false).filter(".save_button").text("Save");
+          $form.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.save', "Save"));
           $("#moderate_student_dialog").dialog('close');
         }
       }
@@ -262,7 +266,7 @@ $(document).ready(function(event) {
     $dialog.find("button").attr('disabled', false);
     $dialog.dialog('close').dialog({
       auto_open: false,
-      title: "Extend Quiz Time",
+      title: I18n.t('titles.extend_quiz_time', "Extend Quiz Time"),
       width: 400
     }).dialog('open');
   });
@@ -275,18 +279,19 @@ $(document).ready(function(event) {
     data.time = parseInt(data.time, 10) || 0;
     if(data.time <= 0) { return; }
     if(data.time_type == 'extend_from_now' && data.time < $dialog.data('row').data('minutes_left')) {
-      var result = confirm("That would be less time than the student currently has.  Continue anyway?");
+      var result = confirm(I18n.t('confirms.taking_time_away', "That would be less time than the student currently has.  Continue anyway?"));
       if(!result) { return; }
     }
     params[data.time_type] = data.time;
-    $dialog.find("button").attr('disabled', true).filter(".save_button").text("Extending Time...");
+    $dialog.find("button").attr('disabled', true).filter(".save_button").text(I18n.t('buttons.extending_time', "Extending Time..."));
     var url = $.replaceTags($(".extension_url").attr('href'), 'user_id', $dialog.data('row').attr('data-user-id'));
     $.ajaxJSON(url, 'POST', params, function(data) {
-      $dialog.find("button").attr('disabled', false).filter(".save_button").text("Extend Time");
+      $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.extend_time', "Extend Time"));
       moderation.updateSubmission(data);
       $dialog.dialog('close');
     }, function(data) {
-      $dialog.find("button").attr('disabled', false).filter(".save_button").text("Extend Time Failed, please try again");
+      $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.time_extension_failed', "Extend Time Failed, please try again"));
     });
   });
+});
 });

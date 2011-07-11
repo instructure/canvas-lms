@@ -1,3 +1,4 @@
+I18n.scoped('section', function(I18n) {
 $(document).ready(function() {
   var $edit_section_form = $("#edit_section_form"),
       $edit_section_link = $(".edit_section_link");
@@ -42,7 +43,7 @@ $(document).ready(function() {
   $(".unenroll_user_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".user").confirmDelete({
-      message: "Are you sure you want to delete this enrollment permanently?",
+      message: I18n.t('confirms.delete_enrollment', "Are you sure you want to delete this enrollment permanently?"),
       url: $(this).attr('href'),
       success: function() {
         $(this).slideUp(function() {
@@ -62,7 +63,7 @@ $(document).ready(function() {
   $("#uncrosslist_form .cancel_button").click(function(event) {
     $("#uncrosslist_form").dialog('close');
   }).submit(function() {
-    $(this).find("button").attr('disabled', true).filter(".submit_button").text("De-Cross-Listing Section...");
+    $(this).find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('status.removing_crosslisting_of_section', "De-Cross-Listing Section..."));
   });
   $(".crosslist_link").click(function(event) {
     event.preventDefault();
@@ -102,9 +103,9 @@ $(document).ready(function() {
       $("#course_autocomplete_name").text("");
       return; 
     }
-    course.name = course.name || "Course ID \"" + course.id + "\"";
+    course.name = course.name || I18n.t('default_course_name', "Course ID \"%{course_id}\"", {course_id: course.id});
     $("#course_autocomplete_name_holder").show();
-    $("#course_autocomplete_name").text("Confirming " + course.name + "...");
+    $("#course_autocomplete_name").text(I18n.t('status.confirming_course', "Confirming %{course_name}...", {course_name: course.name}));
     $("#sis_id_holder,#account_name_holder").hide();
     $("#course_autocomplete_account_name").hide();
     var url = $.replaceTags($("#course_confirm_crosslist_url").attr('href'), 'id', course.id);
@@ -125,11 +126,12 @@ $(document).ready(function() {
         $("#course_autocomplete_id").val(data.course.id);
         $("#crosslist_course_form .submit_button").attr('disabled', false);
       } else {
-        $("#course_autocomplete_name").text(course.name + " not authorized for cross-listing");
+        $("#course_autocomplete_name").text(I18n.t('errors.course_not_authorized_for_crosslist', "%{course_name} not authorized for cross-listing", {course_name: course.name}));
         $("#sis_id_holder,#account_name_holder").hide();
       }
     }, function(data) {
-      $("#course_autocomplete_name").text("Confirmation Failed");
+      $("#course_autocomplete_name").text(I18n.t('errors.confirmation_failed', "Confirmation Failed"));
     });
   });
+});
 });

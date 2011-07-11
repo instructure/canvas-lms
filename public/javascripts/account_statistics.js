@@ -16,20 +16,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+I18n.scoped('accounts.statistics', function(I18n) {
   $(document).ready(function() {
     $(".over_time_link").live('click', function(event) {
       event.preventDefault();
       var name = $(this).attr('data-name');
       var url = $.replaceTags($(".over_time_url").attr('href'), 'attribute', $(this).attr('data-key'));
       var $link = $(this);
-      $link.text("loading...");
+      $link.text(I18n.t('loading_text', "loading..."));
       $.ajaxJSON(url, 'GET', {}, function(data) {
-        $link.text("over time");
+        $link.text(I18n.t('over_time_link', "over time"));
         $("#over_time_dialog .csv_url").attr('href', url + '.csv');
         populateDialog(data, name);
       }, function(data) {
-        $link.text("error");
+        $link.text(I18n.t('loading_error', "error"));
       });
     });
     function populateDialog(data_points, axis) {
@@ -37,10 +37,10 @@
         autoOpen: false,
         width: 630,
         height: 330
-      }).dialog('open').dialog('option', 'title', axis + " Over Time");
+      }).dialog('open').dialog('option', 'title', I18n.t('title_data_point_over_time', "%{data_point} Over Time", {data_point: axis}));
       var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Date');
-      data.addColumn('number', axis || "Value");
+      data.addColumn('date', I18n.t('heading_date', 'Date'));
+      data.addColumn('number', axis || I18n.t('heading_value', "Value"));
       data.addColumn('string', 'title1');
       data.addColumn('string', 'text1');
       
@@ -61,4 +61,4 @@
     }
   });
   google.load('visualization', '1', {'packages':['annotatedtimeline']});
-})();
+});

@@ -136,7 +136,7 @@ class Rubric < ActiveRecord::Base
     res = ""
     res += self.user.name + ", " rescue ""
     res += self.context.name rescue ""
-    res = "Unknown Details" if res.empty?
+    res = t('unknown_details', "Unknown Details") if res.empty?
     res
   end
 
@@ -209,12 +209,12 @@ class Rubric < ActiveRecord::Base
   
   def generate_criteria(params)
     @used_ids = {}
-    title = params[:title] || "#{context.name} Rubric"
+    title = params[:title] || t('context_name_rubric', "%{course_name} Rubric", :course_name => context.name)
     points_possible = 0
     criteria = []
     (params[:criteria] || {}).each do |idx, criterion_data|
       criterion = {}
-      criterion[:description] = (criterion_data[:description] || "No Description").strip
+      criterion[:description] = (criterion_data[:description] || t('no_description', "No Description")).strip
       criterion[:long_description] = (criterion_data[:long_description] || "").strip
       criterion[:points] = criterion_data[:points].to_i || 0
       criterion_data[:id].strip! if criterion_data[:id]
@@ -233,7 +233,7 @@ class Rubric < ActiveRecord::Base
       end
       (criterion_data[:ratings] || []).each do |jdx, rating_data|
         rating = {}
-        rating[:description] = (rating_data[:description] || "No Description").strip
+        rating[:description] = (rating_data[:description] || t('no_description', "No Description")).strip
         rating[:long_description] = (rating_data[:long_description] || "").strip
         rating[:points] = rating_data[:points].to_i || 0
         rating[:criterion_id] = criterion[:id]
@@ -262,7 +262,7 @@ class Rubric < ActiveRecord::Base
         begin
           import_from_migration(rubric, migration.context)
         rescue
-          migration.add_warning("Couldn't import rubric \"#{rubric[:title]}\"", $!)
+          migration.add_warning(t('errors.could_not_import', "Couldn't import rubric %{rubric}", :rubric => rubric[:title]), $!)
         end
       end
     end

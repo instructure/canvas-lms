@@ -16,7 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var rubricAssessment = {
+var rubricAssessment;
+I18n.scoped('rubric_assessment', function(I18n) {
+rubricAssessment = {
   
   init: function(){
     var $rubric_criterion_comments_dialog = $("#rubric_criterion_comments_dialog");
@@ -35,7 +37,7 @@ var rubricAssessment = {
             .find(".displaying").show().end()
             .dialog('close').dialog({
               autoOpen: false,
-              title: "Criterion Long Description",
+              title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
               width: 400
             }).dialog('open');
         }
@@ -65,7 +67,7 @@ var rubricAssessment = {
         $rubric_criterion_comments_dialog.find(".displaying").showIf(!editing);
         $rubric_criterion_comments_dialog.dialog('close').dialog({
           autoOpen: false,
-          title: "Additional Comments",
+          title: I18n.t('titles.additional_comments', "Additional Comments"),
           width: 400
         }).dialog('open');
       })
@@ -114,7 +116,7 @@ var rubricAssessment = {
       $rubric_criterion_comments_dialog.find(".displaying").show();
       $rubric_criterion_comments_dialog.dialog('close').dialog({
         autoOpen: false,
-        title: "Additional Comments",
+        title: I18n.t('titles.additional_comments', "Additional Comments"),
         width: 400
       }).dialog('open');
     });
@@ -200,7 +202,7 @@ var rubricAssessment = {
             $saved_custom_rating = $holder.find(".saved_custom_rating");
             
         $saved_custom_rating.find(".comment").remove();
-        $saved_custom_rating.empty().append('<option value="">[ Select ]</option>');
+        $saved_custom_rating.empty().append('<option value="">' + I18n.t('options.select', '[ Select ]') + '</option>');
         for(var jdx in comments) {
           if(comments[jdx]) {
             $saved_custom_rating.append('<option value="' + escape(comments[jdx])+ '">' + $.truncateText(comments[jdx], 50) + '</option>');
@@ -290,6 +292,7 @@ var rubricAssessment = {
     }
   }
 };
+});
 // actually initialize it on dom ready.
 $(function() {
   rubricAssessment.init();

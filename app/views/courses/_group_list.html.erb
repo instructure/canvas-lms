@@ -1,5 +1,5 @@
 <% if group_list && !group_list.empty? %>
-  <h2>Course Groups</h2>
+  <h2><%= t('headings.groups', %{Course Groups}) %></h2>
   <ul class="unstyled_list group_list" %>
     <% group_list.each do |group| %>
       <li><%= link_to group.name, group_path(group.id) %></li>

@@ -1,15 +1,15 @@
 <% define_content :link do %>http://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
 <% define_content :subject do %>
-  New Teacher Registration
+  <%= t :subject, "New Teacher Registration" %>
 <% end %>
 
-New Teacher Registration
-  
-<%= asset.name %> just registered as a teacher in Canvas.
+<%= t :subject, "New Teacher Registration" %>
 
-School Name:     <%= asset.school_name %>
-School Position: <%= asset.school_position %>
-Phone:           <%= asset.phone %>
-Email:           <%= asset.email %>
+<%= t :body, "%{user} just registered as a teacher in Canvas.", :user => asset.name %>
+
+<%= before_label :school_name, "School Name" %> <%= asset.school_name %>
+<%= before_label :school_position, "School Position" %> <%= asset.school_position %>
+<%= before_label :phone, "Phone" %> <%= asset.phone %>
+<%= before_label :email, "Email" %> <%= asset.email %>
 
 <%= content :link %>

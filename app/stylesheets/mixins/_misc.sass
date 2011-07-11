@@ -35,4 +35,14 @@
   background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, 		$topColor), color-stop(1, 		$bottomColor))
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$topColor}', EndColorStr='#{$bottomColor}')"
 	
-	
+=accessible_text_replacement
+  display: inline-block
+  text-indent: 999px
+  overflow: hidden
+  background-repeat: no-repeat
+
+
+=unselectable
+  -webkit-user-select: none
+  -moz-user-select: none
+  user-select: none

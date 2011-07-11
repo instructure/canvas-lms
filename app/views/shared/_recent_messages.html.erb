@@ -9,9 +9,9 @@
       <div class="header">
         <div class="header_title">
           <%= image_tag "discussion_icon.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
-          <span class="title subject">No Recent Messages</span>
+          <span class="title subject"><%= t('no_recent_messages', 'No Recent Messages') %></span>
           <div class="sub_title">
-            <span class="context_code">Information</span>
+            <span class="context_code"><%= t('information', 'Information') %></span>
           </div>
         </div>
         <div class="post_date time_ago_date"><%= datetime_string(Time.now) %></div>
@@ -19,10 +19,13 @@
       </div>
       <div class="content">
         <div class="message user_content">
+          <%= t 'empty_stream_message', <<-BODY 
           You don't have any messages to show in your stream yet.  Once you
           begin participating in your courses you'll see this stream fill up
           with messages from discussions, grading updates, private messages between
           you and other users, etc.
+          BODY
+          %>
         </div>
         <div class="clear"></div>
       </div>
@@ -43,6 +46,6 @@
 
 <% if recent_messages.length >= show_limit %>
   <div>
-    <a href="#" class="show_all_messages_link" style="display: none;"><%= pluralize(recent_messages.length - show_limit, "more message") %> from the past 2 weeks.</a>
+    <a href="#" class="show_all_messages_link" style="display: none;"><%= t('more_messages', {:one => "1 more message from the past 2 weeks", :other => "%{count} more messages from the past 2 weeks"}, :count =>(recent_messages.length - show_limit)) %></a>
   </div>
 <% end %>

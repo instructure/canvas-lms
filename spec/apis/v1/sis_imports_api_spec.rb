@@ -71,7 +71,8 @@ describe SisImportsApiController, :type => :integration do
     json.delete("ended_at")
     json.should == { 
           "data" => { "import_type" => "instructure_csv",
-                      "counts" => { "courses" => 0,
+                      "counts" => { "abstract_courses" => 0,
+                                    "courses" => 0,
                                     "sections" => 0,
                                     "accounts" => 0,
                                     "enrollments" => 0,
@@ -108,7 +109,7 @@ describe SisImportsApiController, :type => :integration do
             :format => 'json', :account_id => @account.id.to_s }, 
           { :import_type => 'instructure_csv',
             :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
-            :batch_mode => '1', :batch_mode_term_id => 'sis:my-term' })
+            :batch_mode => '1', :batch_mode_term_id => 'sis_term_id:my-term' })
     batch = SisBatch.last
     batch.batch_mode.should be_true
     batch.batch_mode_term.should == term

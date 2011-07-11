@@ -3,8 +3,8 @@
 <% end %>
 
 <% define_content :subject do %>
-  Unpublished Assignment: <%= asset.assignment.title %>, <%= asset.assignment.context.name %>
+  <%= t('ungraded_assignment', 'Unpublished Assignment: %{assignment_name}, %{course_name}', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>
 <% end %>
 
 
-<%= asset.assignment.title %>, <%= asset.assignment.context.name %> hasn't been published, even though it's been graded.
+<%= t('ungraded_assignment_sentence', "%{assignment_name}, %{course_name}, hasn't been published, even though it's been graded.", :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>

@@ -3,7 +3,7 @@
 <% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>
   <% content_for :right_side do %>
       <div class="rs-margin-lr rs-margin-top">
-          <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide">Faculty Journal for <%= context_user_name(@context, @user) %></a>
+          <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide"><%= t('buttons.faculty_journal_for', 'Faculty Journal for %{user}', :user => context_user_name(@context, @user)) %></a>
       </div>
   <% end %>
 <% end %>
@@ -11,11 +11,11 @@
   <div style="float: right;">
     <% if @context_account.is_a?(Account) && @context_account.has_outcomes? %>
       <div>
-        <a href="<%= context_url(@context_account, :context_user_outcomes_results_url, @user.id) %>" class="">See Outcome Results for <%= @user.short_name %></a>
+        <a href="<%= context_url(@context_account, :context_user_outcomes_results_url, @user.id) %>" class=""><%= t('see_outcomes', 'See Outcome Results for %{user}', :user => @user.short_name) %></a>
       </div>
     <% end %>
     <div>
-      <a href="<%= user_sent_messages_url(@user) %>">See Messages sent by <%= @user.short_name %></a>
+      <a href="<%= user_sent_messages_url(@user) %>"><%= t('see_message_by', 'See Messages sent by  %{user}', :user => @user.short_name) %></a>
     </div>
   </div>
   <h2><%= @user.short_name %></h2>
@@ -41,11 +41,11 @@
   <%= render :partial => 'users/name' %>
   <%= render :partial => 'users/logins' %>
   <fieldset id="courses" class="">
-    <legend>Enrollments</legend>
+    <legend><%= t('enrollments', 'Enrollments') %></legend>
     <% num_enrollments = 0 %>
     <div style="overflow: hidden; font-size: 0.8em;" id="content">
     <div id="courses_list" style="<%= hidden if @enrollments.empty? %>">
-      <h2>Courses <%= count_if_any(@enrollments.count) %></h2>
+      <h2><%= t('courses', 'Courses') %> <%= count_if_any(@enrollments.count) %></h2>
       <div class="courses" style="font-size: 1.2em">
         <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
           <% @enrollments.each do |enrollment| %>
@@ -56,7 +56,7 @@
       </div>
     </div>
     <% if @user.accounts && !@user.accounts.empty? %>
-      <h2>Accounts <%= count_if_any(@user.accounts.count) %></h2>
+      <h2><%= t('accounts', 'Accounts') %> <%= count_if_any(@user.accounts.count) %></h2>
       <div class="accounts" style="font-size: 1.2em">
         <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
           <% @user.accounts.each do |account| %>
@@ -72,7 +72,7 @@
       </div>
     <% end %>
     <% if !@group_memberships.empty? %>
-      <h2>Groups <%= count_if_any(@group_memberships.count) %></h2>
+      <h2><%= t('groups', 'Groups') %> <%= count_if_any(@group_memberships.count) %></h2>
       <div class="groups" style="font-size: 1.2em">
         <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
           <% @group_memberships.each do |membership| %>
@@ -89,7 +89,7 @@
     <% end %>
     
     <% if num_enrollments == 0 %>
-      <div style="font-size: 1.2em;">None yet.</div>
+      <div style="font-size: 1.2em;"><%= t('none_yet', 'None yet.') %></div>
     <% end %>
     
     </div>
@@ -98,11 +98,11 @@
   
   <% unless !page_views_enabled? || @page_views.total_pages == 0 %>
     <h3>
-      Page Views
+      <%= t('page_views', 'Page Views') %>
     </h3>
   
     <% if @page_views.total_pages < 5 %>
-      <h2 style="clear:both;">Page views over time</h2>
+      <h2 style="clear:both;"><%= t('page_views_over_time', 'Page views over time') %></h2>
       <div id='chart_div' style='width: 960px; height: 240px;'></div>
     <% end %>
   

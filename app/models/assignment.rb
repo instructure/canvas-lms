@@ -429,7 +429,7 @@ class Assignment < ActiveRecord::Base
       result = "#{result}%"
     elsif self.grading_type == "pass_fail"
       result = score.to_f == self.points_possible ? "complete" : "incomplete"
-      result = "complete" if !self.points_possible && score > 0.0
+      result = "complete" if !self.points_possible && score.to_f > 0.0
     elsif self.grading_type == "letter_grade"
       grades = self.grading_scheme.sort_by{|s| s[1]}.reverse
       found = false
@@ -456,7 +456,7 @@ class Assignment < ActiveRecord::Base
       # interpret as a numerical score
       (grade.to_f * 100.0).round / 100.0
     when "pass", "complete"
-      points_possible
+      points_possible.to_f
     when "fail", "incomplete"
       0.0
     else
@@ -487,7 +487,7 @@ class Assignment < ActiveRecord::Base
       # only allow full points or no points for pass_fail assignments
       score = case parsed_grade.to_f
       when points_possible
-        points_possible || 1.0
+        points_possible
       when 0.0
         0.0
       else
@@ -769,7 +769,7 @@ class Assignment < ActiveRecord::Base
           did_grade = true
           submission.score = self.grade_to_score(submission.grade)
         end
-        if self.points_possible && self.points_possible > 0 && submission.score
+        if submission.score && (self.points_possible.to_f > 0.0 || grading_type != 'pass_fail')
           did_grade = true
           submission.grade = self.score_to_grade(submission.score) 
         end
@@ -1249,8 +1249,7 @@ class Assignment < ActiveRecord::Base
   def readable_submission_types
     return nil unless self.expects_submission?
     res = (self.submission_types || "").split(",").map{|s| readable_submission_type(s) }.compact
-    res[-1] = "or " + res[-1] if res.length > 1
-    res.join(", ")
+    res.to_sentence(:or)
   end
   
   def readable_submission_type(submission_type)

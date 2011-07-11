@@ -1,3 +1,4 @@
+I18n.scoped('external_tools', function(I18n) {
 $(document).ready(function() {
   var $dialog = $("#external_tools_dialog");
   $(".add_tool_link").click(function(event) {
@@ -13,7 +14,7 @@ $(document).ready(function() {
     }
     $dialog.dialog('close').dialog({
       autoOpen: false,
-      title: "Edit External Tool",
+      title: I18n.t('titles.edit_external_tool', "Edit External Tool"),
       width: 600,
       height: 400
     }).dialog('open');
@@ -26,10 +27,10 @@ $(document).ready(function() {
   });
   $dialog.find("form").formSubmit({
     beforeSubmit: function(data) {
-      $(this).find("button").attr('disabled', true).filter('.save_button').text("Saving Tool Settings...");
+      $(this).find("button").attr('disabled', true).filter('.save_button').text(I18n.t('messages.saving_tool_settings', "Saving Tool Settings..."));
     },
     success: function(tool) {
-      $(this).find("button").attr('disabled', false).filter('.save_button').text("Save Tool Settings");
+      $(this).find("button").attr('disabled', false).filter('.save_button').text(I18n.t('buttons.save_tool_settings', "Save Tool Settings"));
       $dialog.dialog('close');
       var $tool = $("#external_tool_" + tool.id);
       if($tool.length == 0) {
@@ -47,7 +48,7 @@ $(document).ready(function() {
       $tool.show();
     },
     error: function(data) {
-      $(this).find("button").attr('disabled', false).filter('.save_button').text("Save Tool Settings Failed");
+      $(this).find("button").attr('disabled', false).filter('.save_button').text(I18n.t('errors.save_tool_settings_failed', "Save Tool Settings Failed"));
     }
   });
   $dialog.find(".cancel_button").click(function() {
@@ -67,7 +68,7 @@ $(document).ready(function() {
     $dialog.fillFormData(data, {object_name: 'external_tool'});
     $dialog.dialog('close').dialog({
       autoOpen: false,
-      title: "Edit External Tool",
+      title: I18n.t('titles.edit_external_tool', "Edit External Tool"),
       width: 600,
       height: 400
     }).dialog('open');
@@ -77,7 +78,7 @@ $(document).ready(function() {
     var url = $tool.find(".update_tool_url").attr('rel');
     $tool.confirmDelete({
       url: url,
-      message: "Are you sure you want to remove this tool?  Any courses using this tool will no longer work.",
+      message: I18n.t('prompts.remove_tool', "Are you sure you want to remove this tool?  Any courses using this tool will no longer work."),
       success: function() {
         $(this).slideUp(function() {
           $(this).remove();
@@ -94,4 +95,5 @@ $(document).ready(function() {
         .find(".tool_domain").show();
     }
   });
+});
 });

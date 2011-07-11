@@ -45,7 +45,7 @@ class SubmissionComment < ActiveRecord::Base
   
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
-    SubmissionComment.find_all_by_group_comment_id(self.group_comment_id).select{|c| c != selc }.each do |comment|
+    SubmissionComment.find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
       comment.skip_destroy_callbacks!
       comment.destroy
     end
@@ -168,7 +168,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   
   def infer_details
-    self.author_name ||= self.author.short_name rescue "Someone"
+    self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
   end

@@ -90,13 +90,13 @@
       <div class="sub_links">
         <!-- replace "Add File" with "Add Files" flash button if possible -->
         <span id="file_uploads_link">&nbsp;</span>
-        <a href="#" class="add_file_link" id="add_file_link"><%= t 'links.add_file', "Add File" %></a> |
+        <a href="#" class="add_file_link" id="add_file_link"><%= t 'links.add_file', "Add File" %></a><span> | </span>
         <a href="#" class="add_folder_link"><%= t 'links.add_folder', "Add Folder" %></a>
         <span class="download_zip" style="padding-left: 5px;">
           <a href="#" class="download_zip_link no-hover" title="<%= t 'links.download_as_zip', "Download files in this folder as a zip" %>"><%= image_tag "inst_tree/file_types/page_white_zip.png" %></a>
         </span>
         <span class="upload_zip" style="padding-left: 5px;">
-          <a href="#" class="upload_zip_link no-hover" title="<%= t 'links.import_zip', "Import a zip file" %>""><%= image_tag "file_upload.png" %></a>
+          <a href="#" class="upload_zip_link no-hover" title="<%= t 'links.import_zip', "Import a zip file" %>"><%= image_tag "file_upload.png" %></a>
         </span>
         <span class="edit_link" style="padding-left: 5px;">
           <a href="#" class="lock_item_link no-hover folder_url" title="<%= t 'links.lock_folder', "Lock this Folder" %>"><%= image_tag "lock.png" %></a>
@@ -504,12 +504,13 @@ HEREDOC
   <% end %>
 </div>
 </div>
-<% js_block do %>
+<% js_block :i18n_scope => 'files' do %>
 <script>
-var contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
+window.contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:create_collaborations,:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
 
-var INST = INST || {};
-I18n.scoped('files', function(I18n) {
+if (!window.INST) {
+  window.INST = {};
+}
 INST.downloadFolderFiles = function(url) {
   var cancelled = false;
   $("#download_folder_files_dialog .status_box .status").text(I18n.t('messages.gathering_data', "Gathering data..."));
@@ -559,7 +560,6 @@ INST.downloadFolderFiles = function(url) {
   }
   checkForChange();
 }
-});
 </script>
 <% end %>
 <div id="download_folder_files_dialog" style="display: none;">

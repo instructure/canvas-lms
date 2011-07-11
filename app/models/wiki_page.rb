@@ -40,6 +40,7 @@ class WikiPage < ActiveRecord::Base
     return if deleted?
     self.title ||= (self.url || "page").to_cased_title
     return unless self.wiki
+    # TODO i18n (see wiki.rb)
     if self.title == "Front Page" && self.new_record?
       baddies = self.wiki.wiki_pages.not_deleted.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = p.url.to_cased_title; p.save_without_broadcasting! }
@@ -328,7 +329,7 @@ class WikiPage < ActiveRecord::Base
     namespace = self.wiki.wiki_namespaces.find_by_context_id(context && context.id) || self.wiki.wiki_namespaces.find(:first)
     prefix = namespace.context_prefix || ""
     Atom::Entry.new do |entry|
-      entry.title     = "Wiki Page#{", " + namespace.context.name}: #{self.title}" # TODO: i18n
+      entry.title     = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", :course_or_group_name => namespace.context.name, :page_title => self.title)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"

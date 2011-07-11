@@ -262,6 +262,7 @@ class PseudonymsController < ApplicationController
       params[:pseudonym][:account] = Account.root_accounts.find(account_id)
     end
     params[:pseudonym][:account] ||= @domain_root_account
+    params[:pseudonym].delete(:sis_user_id) if params[:pseudonym][:sis_user_id].blank?
     @pseudonym = @user.pseudonyms.build(params[:pseudonym])
     unless @pseudonym.account && @pseudonym.account.settings[:admins_can_change_passwords]
       params[:pseudonym].delete :password

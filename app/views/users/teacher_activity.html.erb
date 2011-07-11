@@ -1,0 +1,71 @@
+<% jammit_css :reports %>
+<% content_for :page_title, t('title', 'Teacher Activity Report') %>
+<% content_for :stylesheets do %>
+<style type="text/css" media="screen">
+  a.view_full_link {
+    font-size: 85%;
+  }
+</style>
+<% end %>
+
+<h2><%= t('headings.teacher_activity', "Teacher Activity Report for %{teacher}", :teacher => @teacher.name) %></h2>
+
+<% @courses.each do |course, students| %>
+  <% has_user_notes = students.first.try(:key?, :last_user_note) %>
+  <h3><%= course.name %></h3>
+  <% if students.blank? %>
+    <%= t 'no_students', 'There are no students to report on.' %>
+  <% else %>
+  <table class='report'>
+    <thead>
+      <tr>
+        <th><%= t 'headings.student_name', %{Student} %></th>
+        <th><%= t 'headings.last_interaction', 'Last Student Interaction' %></th>
+        <% if has_user_notes %>
+          <th><%= t 'headings.last_journal_entry', %{Last Faculty Journal Entry} %></th>
+        <% end %>
+        <th><%= t('headings.current_score', %{Current Score}) %></th>
+        <th><%= t('headings.final_score', %{Final Score}) %></th>
+        <th><%= t('headings.ungraded', %{Ungraded Assignments}) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% students.each do |student| %>
+        <tr>
+          <td><%= link_to(student[:enrollment].user.name, course_user_url(course, student[:enrollment].user_id)) %></td>
+          <td>
+            <% if student[:last_interaction] %>
+              <%= t 'last_time', { :zero => "less than 1 day ago", :one => "1 day ago", :other => "%{count} days ago" }, :count => (((Time.now - student[:last_interaction])/60)/1440).abs.to_i %>
+            <% else %>
+              <%= t 'last_time_never', 'never' %>
+            <% end %>
+          </td>
+          <% if has_user_notes %>
+            <td>
+              <% if student[:last_user_note] %>
+                <% user_note_link = t 'last_time', { :zero => "less than 1 day ago", :one => "1 day ago", :other => "%{count} days ago" }, :count => (((Time.now - student[:last_user_note])/60)/1440).abs.to_i %>
+              <% else %>
+                <% user_note_link = t 'last_time_never', 'never' %>
+              <% end %>
+              <%= link_to(user_note_link, user_user_notes_url(student[:enrollment].user)) %>
+            </td>
+          <% end %>
+          <td><%= number_to_percentage(student[:enrollment].computed_current_score, :precision => 1) %></td>
+          <td><%= number_to_percentage(student[:enrollment].computed_final_score, :precision => 1) %></td>
+          <td>
+            <% student[:ungraded].each do |submission| %>
+              <%= link_to(submission.assignment.title, speed_grader_course_gradebook_path(course, :assignment_id => submission.assignment.id, :anchor => { :student_id => student[:enrollment].user_id }.to_json)) %><br/>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% end %>
+  <% if params[:student_id] %>
+    <div>
+      <%= link_to(t('links.view_full_course', 'View the full Student Interaction Report for %{course}', :course => course.name), user_course_teacher_activity_url(@teacher, course), :class => 'view_full_link') %>
+    </div>
+  <% end %>
+  <br/>
+<% end %>

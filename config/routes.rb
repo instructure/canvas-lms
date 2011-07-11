@@ -91,6 +91,8 @@ ActionController::Routing::Routes.draw do |map|
     } do |gradebook|
       gradebook.submissions_upload 'submissions_upload/:assignment_id', :controller => 'gradebooks', :action => 'submissions_zip_upload', :conditions => { :method => :post }
     end
+    course.resource :gradebook2,
+      :controller => 'gradebook2'
     course.attendance 'attendance', :controller => 'gradebooks', :action => 'attendance'
     course.attendance_user 'attendance/:user_id', :controller => 'gradebooks', :action => 'attendance'
     course.imports 'imports', :controller => 'content_imports', :action => 'intro'
@@ -506,6 +508,8 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
+    user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
   end
   map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
@@ -636,11 +640,6 @@ ActionController::Routing::Routes.draw do |map|
   
   # Routes for course exports
   map.connect 'xsd/:version.xsd', :controller => 'content_exports', :action => 'xml_schema'
-  map.resources :content_exports do |ce|
-    ce.resources :files do |file|
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-    end
-  end
 
   map.resources :jobs, :only => %w(index), :collection => %w[batch_update]
 

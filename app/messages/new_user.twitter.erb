@@ -1,2 +1,2 @@
 <% define_content :link do %>http://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
-Canvas Alert - New User: <%= asset.name %>, <%= asset.account.name %>
+<%= t :body, "Canvas Alert - New User: %{user}, %{account}", :user => asset.name, :account => asset.account.name %>

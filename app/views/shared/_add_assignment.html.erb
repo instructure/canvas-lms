@@ -3,11 +3,11 @@
     <% form_for :assignment, :url => (context_url(@context, :context_assignments_url) rescue "."), :html => {:id => "add_assignment_inline_form", :style => "padding: 10px;"} do |f| %>
     <table class="formtable">
       <tr>
-        <td><%= f.label :title, "Name:" %></td>
+        <td><%= f.blabel :title, :en => "Name" %></td>
         <td><%= f.text_field :title, :style => "width:150px;" %></td>
       </tr>
       <tr>
-        <td><%= f.label :assignment_group_id, "Group:" %></td>
+        <td><%= f.blabel :assignment_group_id, :en => "Group" %></td>
         <td>
           <select name="assignment[assignment_group_id]">
             <% cnt = 0 %>
@@ -16,32 +16,32 @@
               <option value="<%= group.id %>"><%= group.name %></option>
             <% end %>
             <% if cnt == 0 %>
-              <option value="">Assignments</option>
+              <option value=""><%= t 'options.assignments', "Assignments" %></option>
             <% end %>
           </select>
         </td>
       </tr><tr>
-        <td><%= f.label :points_possible, "Points:" %></td>
+        <td><%= f.blabel :points_possible, :en => "Points" %></td>
         <td><%= f.text_field :points_possible, :style => "width: 50px;" %></td>
       </tr><tr>
-        <td style="vertical-align: top;"><%= f.label :due_at, "Due:" %></td>
+        <td style="vertical-align: top;"><%= f.blabel :due_at, :en => "Due" %></td>
         <td><%= f.text_field :due_at, :style => "width: 100px;", :class => "datetime_field" %></td>
       </tr><tr>
         <td colspan="2">
-          <button type="submit" class="button">Add Assignment</button>
-          <button type="button" class="button-secondary cancel_button">Cancel</button>
+          <button type="submit" class="button"><%= t 'buttons.add_assignment', "Add Assignment" %></button>
+          <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
         </td>
       </tr>
     </table>
     <% end %>
   </div>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'shared.add_assignment' do %>
   <script>
     $(document).ready(function() {
       $(".add_assignment_inline:not(:first)").remove();
     });
-    function attachAddAssignment($select, url, selector, default_name) {
+    window.attachAddAssignment = function($select, url, selector, default_name) {
       var $group = $select;
       url = url || $("#add_assignment_inline_form").attr('action');
       $group.change(function(event) {
@@ -49,7 +49,7 @@
         if($(this).val() == "new") {
           $("#add_assignment_inline").dialog('close');
           $("#add_assignment_inline").show().dialog({
-            title: "Add Assignment",
+            title: I18n.t('titles.add_assignment', "Add Assignment"),
             width: 300,
             height: "auto",
             autoSize: true,

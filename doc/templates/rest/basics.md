@@ -137,8 +137,8 @@ Object IDs
 ----------
 
 Throughout the API, objects are referenced by internal ids. You can also
-reference objects by sis id, for object types that have a sis id, by
-prepending the sis id with "sis:". For instance, to retrieve the list of
-assignments for a course with sis\_source\_id of 'A1234':
+reference objects by sis id, by prepending the sis id with the name of
+the sis field, like "sis\_course\_id:". For instance, to retrieve the
+list of assignments for a course with sis id of 'A1234':
 
-    /api/v1/courses/sis:A1234/assignments.json
+    /api/v1/courses/sis_course_id:A1234/assignments.json

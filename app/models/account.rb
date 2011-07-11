@@ -40,6 +40,8 @@ class Account < ActiveRecord::Base
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :learning_outcomes, :as => :context
   has_many :sis_batches
+  has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
+  has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :authorization_codes, :dependent => :destroy
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user
@@ -223,13 +225,24 @@ class Account < ActiveRecord::Base
     @cached_users_name_like ||= {}
     @cached_users_name_like[query] ||= self.fast_all_users.name_like(query)
   end
-  
-  def fast_all_courses(opts = {})
-    columns =  "courses.id, courses.name, courses.section, courses.workflow_state, courses.course_code, courses.sis_source_id"
-    @cached_fast_all_courses ||= {}
-    @cached_fast_all_courses[opts] ||= self.associated_courses.active.for_term(opts[:term]).active_first.limit(opts[:limit]).find(:all, :select => columns, :group => columns)
+
+  def fast_course_base(opts)
+    columns = "courses.id, courses.name, courses.section, courses.workflow_state, courses.course_code, courses.sis_source_id"
+    conditions = []
+    if opts[:hide_enrollmentless_courses]
+      conditions = ["exists (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"]
+    end
+    associated_courses = self.associated_courses.active
+    associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
+    associated_courses = yield associated_courses if block_given?
+    associated_courses.limit(opts[:limit]).active_first.find(:all, :select => columns, :group => columns, :conditions => conditions)
   end
-  
+
+  def fast_all_courses(opts={})
+    @cached_fast_all_courses ||= {}
+    @cached_fast_all_courses[opts] ||= self.fast_course_base(opts)
+  end
+
   def all_users(limit=250)
     @cached_all_users ||= {}
     @cached_all_users[limit] ||= User.of_account(self).scoped(:limit=>limit)
@@ -251,12 +264,12 @@ class Account < ActiveRecord::Base
                                                             gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?}
                             ORDER BY u.sortable_name ASC", self.id], :page => page, :per_page => per_page)
   end
-  
-  def courses_name_like(query="")
-    columns =  "courses.id, name, courses.workflow_state, courses.course_code, courses.sis_source_id"
-    self.associated_courses.active.active_first.name_like(query).limit(200).find(:all, :select => columns, :group => columns)
+
+  def courses_name_like(query="", opts={})
+    opts[:limit] ||= 200
+    @cached_courses_name_like ||= {}
+    @cached_courses_name_like[[query, opts]] ||= self.fast_course_base(opts) {|q| q.name_like(query)}
   end
-  memoize :courses_name_like
 
   def file_namespace
     root = self.root_account || self
@@ -301,8 +314,7 @@ class Account < ActiveRecord::Base
   end
   
   def default_storage_quota_mb=(val)
-    # TODO: convert the MB to bytes once the commit introducing this line has been deployed
-    self.default_storage_quota = val
+    self.default_storage_quota = val.try(:to_i).try(:megabytes)
   end
   
   def default_storage_quota=(val)
@@ -534,6 +546,8 @@ class Account < ActiveRecord::Base
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     unless self.root_account_id
+      # TODO i18n
+      t '#account.default_term_name', "Default Term"
       @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name("Default Term")
     end
   end
@@ -632,10 +646,14 @@ class Account < ActiveRecord::Base
   end
 
   def self.site_admin
+    # TODO i18n
+    t '#account.default_site_administrator_account_name', 'Site Admin'
     get_special_account('site_admin', 'Site Admin')
   end
 
   def self.default
+    # TODO i18n
+    t '#account.default_account_name', 'Default Account'
     get_special_account('default', 'Default Account')
   end
 

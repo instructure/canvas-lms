@@ -1,0 +1,50 @@
+<%
+  content_for :page_title, "Gradebook - #{@context.name}"
+  @body_classes << "gradebook2"
+  @show_left_side = false
+  jammit_js :slickgrid, :gradebook2
+  jammit_css :slickgrid, :gradebook2
+  options = {
+    :chunk_size => 35,
+    :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments]),
+    :sections_and_students_url => api_v1_course_sections_url(@context, :include => [:students]),
+    :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
+    :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
+    #:assignment_groups => @context.assignment_groups.all(:include => :assignments),
+    #:sections => @context.course_sections.all(:include => :users),
+    #:submissions => @context.submissions.all(),
+  }
+%>
+<div id="gradebook-toolbar">
+
+</div>
+<div id="gradebook-grid-wrapper">
+  <div id="gradebook_students_grid"></div>
+  <div id="gradebook_grid"></div>
+</div>
+
+<!-- gradebook images -->
+<div style="display:none;">
+  <span id="submission_tooltip_dropped"><%= t 'dropped_for_grading', 'Dropped for grading purposes' %></span>
+  <span id="submission_tooltip_late"><%= t 'submitted_late', 'Submitted late' %></span>
+  <span id="submission_tooltip_resubmitted"><%= t 'resubmitted', 'Resubmitted since last graded' %></span>
+  <%= image_tag "pass.png", :id => "submission_entry_pass_image", :alt => "Pass", :title => "Pass", :class => "graded_icon" %>
+  <%= image_tag "pass.png", :id => "submission_entry_complete_image", :alt => "Complete", :title => "Complete", :class => "graded_icon" %>
+  <%= image_tag "fail.png", :id => "submission_entry_fail_image", :alt => "Fail", :title => "Fail", :class => "graded_icon" %>
+  <%= image_tag "fail.png", :id => "submission_entry_incomplete_image", :alt => "Incomplete", :title => "Incomplete", :class => "graded_icon" %>
+</div>
+
+<div id="gradebook_dialogs" style="display:none;">
+  <div id="sort_rows_dialog" title="Sort Gradebook Rows">
+    <button type="button" class="button sort_gradebook sort_rows" data-sort_by="display_name" title="By Student Name" style="width: 300px;">By Student Name</button>
+    <button type="button" class="button sort_gradebook sort_rows" data-sort_by="section" title="By Section Name" style="width: 300px;">By Section Name</button>
+    <button type="button" class="button sort_gradebook sort_rows by_grade" data-sort_by="grade_desc" title="By Total (Highest First)" style="width: 300px;">By Total (Highest First)</button>
+    <button type="button" class="button sort_gradebook sort_rows by_grade" data-sort_by="grade_asc" title="By Total (Lowest First)" style="width: 300px;">By Total (Lowest First)</button>
+  </div>
+</div>
+
+<% js_block do %>
+  <script>
+    new Gradebook(<%= options.to_json.html_safe %>);
+  </script>
+<% end %>

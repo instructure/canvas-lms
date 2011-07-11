@@ -49,16 +49,7 @@ $(function(){
     </div>
     <div style="margin-top: 50px; <%= hidden unless @domain_root_account == Account.default %>">
       <%= form.blabel :license, :en => "License for course content", :style => "font-weight: bold; font-size: 1.2em; display: block;" %>
-      <%= form.select :license, [
-          [t("#cc.private", 'Private (Copyrighted)'), 'private'],
-          [t("#cc.by_nc_nd", 'CC Attribution Non-Commercial No Derivatives'), 'cc_by_nc_nd'],
-          [t("#cc.by_nc_sa", 'CC Attribution Non-Commercial Share Alike'), 'cc_by_nc_sa'],
-          [t("#cc.by_nc", 'CC Attribution Non-Commercial'), 'cc_by_nc'],
-          [t("#cc.by_nd", 'CC Attribution No Derivatives'), 'cc_by_nd'],
-          [t("#cc.by_sa", 'CC Attribution Share Alike'), 'cc_by_sa'],
-          [t("#cc.by", 'CC Attribution'), 'cc_by'],
-          [t("#cc.public_domain", 'Public Domain'), 'public_domain']
-        ], {}, :style => "font-size: 1.3em; border: 2px solid #aaa;" %>
+      <%= form.select :license, Course.licenses.map { |id, attrs| [attrs[:readable_license], id] } , {}, :style => "font-size: 1.3em; border: 2px solid #aaa;" %>
       <%= license_help_link %>
       <div style="margin-top: 10px;">
         <%= form.check_box :is_public, :class => "is_public_checkbox" %>

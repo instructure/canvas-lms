@@ -1,6 +1,19 @@
 namespace :i18n do
   desc "Verifies all translation calls"
   task :check => :environment do
+    only = if ENV['ONLY']
+      ENV['ONLY'].split(',').map{ |path|
+        path = '**/' + path if path =~ /\*/
+        path = './' + path unless path =~ /\A.?\//
+        if path =~ /\*/
+          path = Dir.glob(path)
+        elsif path !~ /\.(e?rb|js)\z/
+          path = Dir.glob(path + '/**/*') 
+        end
+        path
+      }.flatten
+    end
+
     STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`.split("\n") - ['OpenStruct', 'Tableless']).
       map{ |name| name.underscore + '.' }
 
@@ -36,6 +49,8 @@ namespace :i18n do
 
     files = Dir.glob('./**/*rb').
       reject{ |file| file =~ /\A\.\/(vendor\/plugins\/rails_xss|db|spec)\// }
+    files &= only if only
+    file_count = files.size
 
     t = Time.now
     @extractor = I18nExtractor.new
@@ -54,6 +69,25 @@ namespace :i18n do
         print red "F"
       end
     end
+
+
+    files = (Dir.glob('./public/javascripts/*.js') + Dir.glob('./app/views/**/*.erb')).
+      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18n.js|translations\/)/ }
+    files &= only if only
+    @js_extractor = I18nJsExtractor.new(:translations => @extractor.translations)
+
+    files.each do |file|
+      begin
+        if @js_extractor.process(File.read(file), :erb => (file =~ /\.erb\z/), :filename => file)
+          file_count += 1
+          print green "."
+        end
+      rescue
+        @errors << "#{$!}\n#{file}"
+        print red "F"
+      end
+    end
+
     print "\n\n"
     failure = @errors.size > 0
 
@@ -64,7 +98,7 @@ namespace :i18n do
     end
 
     print "Finished in #{Time.now - t} seconds\n\n"
-    puts send((failure ? :red : :green), "#{files.size} files, #{@extractor.total_unique} strings, #{@errors.size} failures")
+    puts send((failure ? :red : :green), "#{file_count} files, #{@extractor.total_unique + @js_extractor.total_unique} strings, #{@errors.size} failures")
     raise "check command encountered errors" if failure
   end
 

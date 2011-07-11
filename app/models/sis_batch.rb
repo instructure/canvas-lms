@@ -36,7 +36,7 @@ class SisBatch < ActiveRecord::Base
   def self.valid_import_types
     @valid_import_types ||= {
         "instructure_csv" => {
-            :name => "Instructure formatted CSV or zipfile of CSVs",
+            :name => lambda { t(:instructure_csv, "Instructure formatted CSV or zipfile of CSVs") },
             :callback => lambda {|batch| batch.process_instructure_csv_zip},
             :default => true
           }
@@ -55,7 +55,7 @@ class SisBatch < ActiveRecord::Base
     att = Attachment.new
     att.context = batch
     att.uploaded_data = attachment
-    att.display_name = "sis_upload_#{batch.id}.zip"
+    att.display_name = t :upload_filename, "sis_upload_%{id}.zip", :id => batch.id
     att.save
     Attachment.skip_scribd_submits(false)
     batch.attachment = att
@@ -81,7 +81,7 @@ class SisBatch < ActiveRecord::Base
 
       import_scheme = SisBatch.valid_import_types[self.data[:import_type]]
       if import_scheme.nil?
-        self.data[:error_message] = "Unrecognized import type"
+        self.data[:error_message] = t 'errors.unrecorgnized_type', "Unrecognized import type"
         self.workflow_state = :failed
         self.save
       else

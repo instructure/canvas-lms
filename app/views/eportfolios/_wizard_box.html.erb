@@ -48,113 +48,169 @@ $(document).ready(function() {
 <% content_for :wizard_box do %>
   <div class="wizard_options" >
     <% if @owner_view %>
-      <h3>Getting Started</h3>
+      <h3><%= t('headers.getting_started', "Getting Started") %></h3>
     <% else %>
-      <h3>Using an ePortfolio</h3>
+      <h3><%= t('headers.instructions', "Using an ePortfolio") %></h3>
     <% end %>
     <ul class="wizard_options_list">
       <li class="option information_step">
-        <a href="#" class="header">Introduction</a>
+        <a href="#" class="header"><%= t('headers.introduction', "Introduction") %></a>
         <div class="details" style="display: none;">
-          ePortfolios are a place to demonstrate your work.  They are made of sections and pages.  
-          The list of sections are along the left side
-          of the window (<a href="#" class="sections_list_hover"><b>show me</b></a>).  Each section can have multiple pages, shown on the right
-          side of the window (<a href="#" class="pages_list_hover"><b>show me</b></a>).
+          <%= t('introduction.body', <<-DETAILS,
+            ePortfolios are a place to demonstrate your work. They are made of
+            sections and pages. The list of sections are along the left side of
+            the window (%{showme1}). Each section can have multiple pages,
+            shown on the right side of the window (%{showme2}).
+            DETAILS
+            :showme1 => show_me('sections_list_hover'),
+            :showme2 => show_me('pages_list_hover')) %>
         </div>
       </li>
       <li class="option content_step">
-        <a href="#" class="header">Portfolio Sections</a>
+        <a href="#" class="header"><%= t('headers.sections', "Portfolio Sections") %></a>
         <div class="details" style="display: none;">
           <div style="font-size: 0.8em;">
-            <p>Sections are listed along the left side of the window (<a href="#" class="sections_list_hover"><b>show me</b></a>).
-            Each section can have multiple pages inside of it.  To organize or add sections, click the
-            "Organize Sections" link (<a href="#" class="organize_sections_hover"><b>show me</b></a>).</p>
-            <p>You can rename any section by clicking on the <%= image_tag "edit.png" %>
-            icon that appears, rearrange sections by clicking and dragging them, or delete sections
-            by clicking the &#215; icon.</p>
+            <p><%= t('sections.body1', <<-DETAILS,
+              Sections are listed along the left side of the window
+              (%{showme1}). Each section can have multiple pages inside of it.
+              To organize or add sections, click the "%{manage_sections}" link
+              (%{showme2}).
+              DETAILS
+              :showme1 => show_me('sections_list_hover'),
+              :manage_sections => manage_sections_link_text,
+              :showme2 => show_me('organize_sections_hover')) %></p>
+
+            <p><%= t('sections.body2', <<-DETAILS,
+              You can rename any section by clicking on the %{edit_icon} icon
+              that appears, rearrange sections by clicking and dragging them,
+              or delete sections by clicking the %{delete_icon} icon.
+              DETAILS
+              :edit_icon => edit_icon,
+              :delete_icon => delete_icon) %></p>
           </div>
         </div>
       </li>
       <li class="option content_step">
-        <a href="#" class="header">Section Pages</a>
+        <a href="#" class="header"><%= t('headers.pages', "Section Pages") %></a>
         <div class="details" style="display: none;">
           <div style="font-size: 0.8em;">
-            <p>Sections have multiple pages.  You can see the list of pages for the current section
-            on the right side of the window (<a href="#" class="pages_list_hover"><b>show me</b></a>).
-            To organize or add pages, click the "Organize/Manage Pages" link
-            (<a href="#" class="organize_pages_hover"><b>show me</b></a>).</p>
-            <p>You can rename any page by click on the <%= image_tag "edit.png" %>
-            icon that appears, delete a page by clicking the &#215; icon, or rearrange the order
-            of pages by click and dragging them.</p>
+            <p><%= t('pages.body1', <<-DETAILS,
+              Sections have multiple pages. You can see the list of pages for
+              the current section on the right side of the window (%{showme1}).
+              To organize or add pages, click the "%{manage_pages}" link
+              (%{showme2}).
+              DETAILS
+              :showme1 => show_me('pages_list_hover'),
+              :manage_pages => manage_pages_link_text,
+              :showme2 => show_me('organize_pages_hover')) %></p>
+
+            <p><%= t('pages.body2', <<-DETAILS,
+              You can rename any page by click on the %{edit_icon} icon that
+              appears, delete a page by clicking the %{delete_icon} icon, or
+              rearrange the order of pages by click and dragging them.
+              DETAILS
+              :edit_icon => edit_icon,
+              :delete_icon => delete_icon) %></p>
           </div>
         </div>
       </li>
       <% if !@owner_view %>
         <li class="option edit_step">
-          <a href="#" class="header">Page Content</a>
+          <a href="#" class="header"><%= t('headers.page_content', "Page Content") %></a>
           <div class="details" style="display: none;">
-            The content you see on a page is the same content any visitors will see.  To edit 
-            this content, click the "<%= image_tag "edit.png" %> Edit This Page" link
-            (<a href="#" class="edit_content_hover"><b>show me</b></a>) and the page will 
-            change to editing mode.
+            <%= t('page_content.body1', <<-DETAILS,
+              The content you see on a page is the same content any visitors
+              will see. To edit this content, click the "%{edit_link_text}"
+              link (%{showme}) and the page will change to editing mode.
+              DETAILS
+              :edit_link_text => edit_link_text,
+              :showme => show_me('edit_content_hover')) %>
           </div>
         </li>
         <li class="option editing_mode" style="display: none;">
-          <a href="#" class="header">Page Content</a>
+          <a href="#" class="header"><%= t('headers.page_content', "Page Content") %></a>
           <div class="details" style="display: none;">
             <div style="font-size: 0.8em;">
-              <p>Now you're editing! Rename the page or change commenting options
-              (<a href="#" class="page_settings_hover"><b>show me</b></a>) if you like.  You can save,
-              preview or cancel your changes at any time by clicking the button on the right
-              side <a href="#" class="page_buttons_hover"><b>show me</b></a>).</p>
-              <p>Content is divided into subsections, which each have a dotted border.  You can
-              delete or edit the contents of a subsection by clicking the <%= image_tag "edit.png" %>
-              or <%= image_tag "delete.png" %> icons at the top right corner of the subsection.</p>
-              <p>To add new subsections, find and click the type of content you want to add in the 
-              options list on the right side of the page
-              (<a href="#" class="page_add_subsection_hover"><b>show me</b></a>).
-              </p>
+              <p><%= t('page_content.body2', <<-DETAILS,
+                Now you're editing! Rename the page or change commenting
+                options (%{showme1}) if you like. You can save, preview or
+                cancel your changes at any time by clicking the button on the
+                right side (%{showme2}).
+                DETAILS
+                :showme1 => show_me('page_settings_hover'),
+                :showme2 => show_me('page_buttons_hover')) %></p>
+
+              <p><%= t('page_content.body3', <<-DETAILS,
+                Content is divided into subsections, which each have a dotted
+                border. You can delete or edit the contents of a subsection by
+                clicking the %{edit_icon} or %{delete_icon} icons at the top
+                right corner of the subsection.
+                DETAILS
+                :edit_icon => edit_icon,
+                :delete_icon => delete_icon(true)) %></p>
+
+              <p><%= t('page_content.body4', <<-DETAILS,
+                To add new subsections, find and click the type of content you
+                want to add in the options list on the right side of the page
+                (%{showme}).
+                DETAILS
+                :showme => show_me('page_add_subsection_hover')) %></p>
             </div>
           </div>
         </li>
       <% end %>
       <% if @owner_view %>
         <li class="option add_step adding_submissions">
-          <a href="#" class="header">Adding Submissions</a>
+          <a href="#" class="header"><%= t('headers.submissions', "Adding Submissions") %></a>
           <div class="details" style="display: none;">
-            You may have noticed at the bottom of this page is a list of recent submissions
-            from your classes (<a href="#" class="recent_submissions_hover"><b>show me</b></a>).
-            You can quickly add submissions to new pages in your portfolio from this page.  Just
-            click the submission you want to add and a simple dialog will pop up.
+            <%= t('submissions.body1', <<-DETAILS,
+              You may have noticed at the bottom of this page is a list of
+              recent submissions from your classes (%{showme}). You can quickly
+              add submissions to new pages in your portfolio from this page.
+              Just click the submission you want to add and a simple dialog
+              will pop up.
+              DETAILS
+              :showme => show_me('recent_submissions_hover')) %>
           </div>
         </li>
         <li class="option adding_submissions_dialog" style="display: none;">
-          <a href="#" class="header">Adding Submissions</a>
+          <a href="#" class="header"><%= t('headers.submissions', "Adding Submissions") %></a>
           <div class="details" style="display: none;">
-            Great! Now to finish adding the submission, you need to choose which section 
-            you'd like to add it to and give the page a name.  After you click "Add Page"
-            you'll be taken to the new page so you can edit it in more detail if you like.
+            <%= t('submissions.body2', <<-DETAILS)
+              Great! Now to finish adding the submission, you need to choose
+              which section you'd like to add it to and give the page a name.
+              After you click "Add Page" you'll be taken to the new page so you
+              can edit it in more detail if you like.
+              DETAILS
+            %>
           </div>
         </li>
       <% end %>
       <li class="option edit_step">
-        <a href="#" class="header">ePortfolio Settings</a>
+        <a href="#" class="header"><%= t('headers.settings', "ePortfolio Settings") %></a>
         <div class="details" style="display: none;">
-          To change the settings for your ePortfolio, click the "ePortfolio Settings" link
-          (<a href="#" class="eportfolio_settings_hover"><b>show me</b></a>).
-          You can rename the portfolio and also change whether it is public or private.  Private
-          portfolios are only visible to those to whom you grant access.
+          <%= t('settings.body', <<-DETAILS,
+            To change the settings for your ePortfolio, click the "ePortfolio
+            Settings" link (%{showme}). You can rename the portfolio and also
+            change whether it is public or private. Private portfolios are only
+            visible to those to whom you grant access.
+            DETAILS
+            :showme => show_me('eportfolio_settings_hover')) %>
         </div>
       </li>
       <% if @owner_view %>
         <li class="option publish_step">
-          <a href="#" class="header">Let's Do It</a>
+          <a href="#" class="header"><%= t('headers.finish', "Let's Do It") %></a>
           <div class="details" style="display: none;">
-            Ready to get started?  You can always get back to this wizard from any page
-            by clicking the "<%= image_tag "help.png" %> How Do I...?" link you'll see there.
+            <%= t('finish.body', <<-DETAILS,
+              Ready to get started? You can always get back to this wizard from
+              any page by clicking the "%{help_link_text}" link you'll
+              see there.
+              DETAILS
+              :help_link_text => help_link_text) %>
             <div style="text-align: center; font-size: 1.2em;">
               <b><a href="<%= eportfolio_path(@portfolio.id, :view => :preview) %>">
-                View the Portfolio
+                <%= t('links.portfolio', "View the Portfolio") %>
               </a></b>
             </div>
           </div>
@@ -164,7 +220,7 @@ $(document).ready(function() {
   </div>
   <div class="wizard_details">
     <div>
-      <h3 class="header" style="display: none;">Step</h3>
+      <h3 class="header" style="display: none;"><%= t('#step', "Step") %></h3>
       <div style="text-align: center; font-size: 1.5em; margin-top: 5px;">
         <a class="link">&nbsp;</a>
       </div>

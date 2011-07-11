@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('feedback', function(I18n) {
 $(document).ready(function() {
   var dialogOpened = false;
   var $dialog = $("#feedback_dialog");
@@ -72,7 +73,7 @@ $(document).ready(function() {
     };
     var dialogParams = {
       autoOpen: false,
-      title: "Canvas Feedback",
+      title: I18n.t('titles.feedback', "Canvas Feedback"),
       width: 500,
       modal: true,
       resizable: false,
@@ -86,7 +87,7 @@ $(document).ready(function() {
         populateDialog();
       },
       close: function() {
-        $("#submit_feedback_form .sending_text").text("Send Feedback");
+        $("#submit_feedback_form .sending_text").text(I18n.t('buttons.send_feedback', "Send Feedback"));
         $(this).find(".send_button").attr('disabled', false);
       }
     };
@@ -130,7 +131,7 @@ $(document).ready(function() {
           }, 2500);
         },
         error: function(data) {
-          $(this).find(".sending_text").text("Send Failed, please try again");
+          $(this).find(".sending_text").text(I18n.t('errors.send_failed', "Send Failed, please try again"));
           $(this).find(".send_button").attr('disabled', false);
         }
       });
@@ -151,4 +152,5 @@ $(document).ready(function() {
     event.preventDefault();
     feedbackInit(true);
   });
+});
 });

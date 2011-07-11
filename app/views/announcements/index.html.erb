@@ -106,9 +106,8 @@
 }
 </style>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'announcements' do %>
 <script>
-I18n.scoped("announcements", function(I18n) {
   $(document).ready(function() {
     $("#external_feed_add_header_match").change(function() {
       $("#external_feed_header")[ $(this).attr('checked') ? 'slideDown' : 'slideUp']();
@@ -170,7 +169,6 @@ I18n.scoped("announcements", function(I18n) {
       $("#add_external_feed_form").slideUp();
     });
   });
-});
 </script>
 <% end %>
 <h2><%= t "titles.announcements", "Announcements" %></h2>
@@ -180,29 +178,27 @@ I18n.scoped("announcements", function(I18n) {
 
 <%= render :partial => "shared/topics", :object => @announcements, :locals => { :topic_type => "announcement" } %>
 <%= will_paginate(@announcements) %>
-<% js_block do %>
+<% js_block :i18n_scope => 'announcements' do %>
   <script type="text/javascript">
-    I18n.scoped("announcements", function(I18n) {
-      $(function(){
-        $('#topic_list').pageless({
-          totalPages: <%= @announcements.total_pages %>,
-          url: "<%= context_url(@context, :context_announcements_url, :format => :json) %>",
-          loaderMsg: I18n.t("messages.loading_more_results", "Loading more results"),
-          scrape: function(data) {
-            if(typeof(data) == 'string') {
-              try {
-                data = JSON.parse(data);
-              } catch(e) {
-                data = [];
-              }
+    $(function(){
+      $('#topic_list').pageless({
+        totalPages: <%= @announcements.total_pages %>,
+        url: "<%= context_url(@context, :context_announcements_url, :format => :json) %>",
+        loaderMsg: I18n.t("messages.loading_more_results", "Loading more results"),
+        scrape: function(data) {
+          if(typeof(data) == 'string') {
+            try {
+              data = JSON.parse(data);
+            } catch(e) {
+              data = [];
             }
-            for(var idx in data) {
-              var $topic = topics.updateTopic(null, data[idx]);
-            }
-            $("#topic_list").append($("#pageless-loader"));
-            return "";
           }
-        });
+          for(var idx in data) {
+            var $topic = topics.updateTopic(null, data[idx]);
+          }
+          $("#topic_list").append($("#pageless-loader"));
+          return "";
+        }
       });
     });
   </script>

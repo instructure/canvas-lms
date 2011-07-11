@@ -1,7 +1,7 @@
 <%
   jammit_js :rubric_assessment
   content_for :page_title, "#{@assignment.title}: #{@submission.user.name}"
-  add_crumb("Assignments", context_url(@context, :context_assignments_url))
+  add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
   add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
   add_crumb(@user.try_rescue(:short_name)) 
   @active_tab = "assignments"
@@ -13,7 +13,7 @@
     }
   </style>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'submissions.show' do %>
   <script>
   $("#content").addClass('padless');
   var fileIndex = 1;
@@ -34,7 +34,7 @@
         var $comment = $("#comment_blank").clone(true).removeAttr('id');
         comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
         if(comment.anonymous) {
-          comment.author_name = "Anonymous";
+          comment.author_name = I18n.t("anonymous", "Anonymous");
         }
         $comment.fillTemplateData({
           data: comment,
@@ -125,7 +125,7 @@
           formData['submission[comment]'] = $(".grading_comment").val();
         }
         if(!formData['submission[comment]'] && $("#add_comment_form input[type='file']").length > 0) {
-          formData['submission[comment]'] = formData['submission[comment]'] || "See attached files";
+          formData['submission[comment]'] = formData['submission[comment]'] || I18n.t("see_attached_files", "See attached files");
         }
       }
       if(!formData['submission[comment]'] && !formData['submission[grade]'] && !formData['submission[media_comment_id]']) {
@@ -271,7 +271,7 @@
   <div style="padding: 0px 20px 3px;" class="submission_details">
     <div style="float: right;">
       <% if can_do(@submission, @current_user, :read_grade) %>
-        Grade: 
+        <%= before_label('grade', 'Grade') %> 
           <% if can_do(@assignment, @current_user, :grade) %>
             <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
           <% elsif can_do(@submission, @current_user, :read_grade) %>
@@ -284,7 +284,7 @@
           <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.score %></span> 
         <% end %>
         <% if @submission.assignment.points_possible %>
-          out of <%= @submission.assignment.points_possible %>
+          <%= t('out_of_points', 'out of %{points_possible}', :points_possible => @submission.assignment.points_possible) %>
         <% end %>
         <br/>
         
@@ -295,27 +295,33 @@
         <% end %>
       <% end %>
       <% if @rubric_association && (can_do(@submission, @current_user, :read_grade) || can_do(@rubric_association, @current_user, :assess)) %>
-        <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;">Show Rubric</a>
+        <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;"><%= t('show_rubric', 'Show Rubric') %></a>
       <% end %>
     </div>
-    <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? "Peer Review" : "Submission Details" %></h2>
+    <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %></h2>
     <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= context_user_name(@context, @submission.user) %></span>
-    <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em; <%= 'color: #800; font-weight: bold;' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">submitted <%= datetime_string(@submission.submitted_at) %><%= ' (late)' if @submission.late? %></span>
+    <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em; <%= 'color: #800; font-weight: bold;' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">
+      <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %> 
+      <%= t('late_submission', '(late)') if @submission.late? %>
+    </span>
     <% if can_do(@context, @current_user, :grade) %>
-      <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;">SpeedGrader&#8482;</a>
+      <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;"><%= t('speedgrader', 'SpeedGrader™') %></a>
     <% end %>
     <% if can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
-      <span style="padding-left: 10px;"><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="add" >Re-Submit Assignment</a></span>
+      <span style="padding-left: 10px;"><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="add" ><%= t('resubmit', 'Re-Submit Assignment') %></a></span>
     <% end %>
     <% if @assessment_request %>
       <div class="assessment_request_completed_message" style="<%= hidden unless @assessment_request.completed? %>">
-        You have finished the required steps for this peer review.
+        <%= t('peer_review_steps_complete', 'You have finished the required steps for this peer review.') %>
       </div>
       <div class="assessment_request_incomplete_message" style="<%= hidden if @assessment_request.completed? %>">
-        <strong>This peer review is not finished yet.</strong>  For it to be considered 
-        finished, you need to leave at least one 
-        comment<% if @assessment_request && @assessment_request.rubric_association %>
-          and fill out the rubric form to the right<% end %>.
+        <% if @assessment_request && @assessment_request.rubric_association %>
+          <%= mt('peer_review_not_done_rubric', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment and fill out the rubric form to the right.") 
+          %>
+        <% else %>
+          <%= mt('peer_review_not_done', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment.") 
+            %>
+        <% end %>
       </div>
     <div>
     </div>
@@ -328,14 +334,14 @@
   <div id="rubric_holder" style="position: absolute; right: 0px; padding: 5px; background-color: #fff; border: 1px solid #aaa; border-right-width: 0; display: none;">
     <button type="button" class="button-secondary hide_rubric_link" style="float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
     <div id="rubric_assessments_list" style="text-align: right; margin-bottom: 5px; <%= hidden if @visible_rubric_assessments.empty? %>">
-      Show Assessment By:
+      <%= before_label('show_assessment_by', 'Show Assessment By') %>
       <select id="rubric_assessments_select">
         <% @visible_rubric_assessments.each do |assessment| %>
           <option id="rubric_assessment_option_<%= assessment.id %>" value="<%= assessment.id %>"><%= assessment.assessor_name %></option>
         <% end %>
         <% if can_do(@assignment.rubric_association, @current_user, :assess) && @submission.user != @current_user %>
         <% unless @visible_rubric_assessments.map{|a| a.assessor_id}.include?(@current_user.id) %>
-          <option value="new" id="new_rubric_assessment_option">[New Assessment]</option>
+          <option value="new" id="new_rubric_assessment_option"><%= t('options.new_assessment', '[New Assessment]') %></option>
         <% end %>
         <% end %>
       </select>
@@ -344,7 +350,7 @@
     <%= render :partial => "shared/rubric_criterion_dialog" %>
     <div class="button-container">
       <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
-        <button type="button" class="save_rubric_button button small-button">Save Comment</button>
+        <button type="button" class="save_rubric_button button small-button"><%= t('buttons.save_comment', 'Save Comment') %></button>
       <% end %>
     </div>
     <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
@@ -370,7 +376,7 @@
           <button type="button" class="button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
           <div class="comment_list" style="padding: 10px; clear:right;">
             <% unless can_do(@submission, @current_user, :read_grade) %>
-              <i>As a peer reviewing student, you will only see comments written by you.</i><br/><br/>
+              <i><%= t('only_see_your_own_comments', 'As a peer reviewing student, you will only see comments written by you.') %></i><br/><br/>
             <% end %>
             <% @submission.submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
@@ -378,8 +384,7 @@
                 <div class="comment" style="color: #444;">
                   <% if comment.media_comment_id && comment.media_comment_type %>
                     <div class="comment_media">
-                      This is a media comment,<br/>
-                      <a href="#" class="play_comment_link media-comment">click here to view</a>.
+                      <%= t('media_comment_link', "This is a media comment, *click here to view*.", :wrapper => '<br/><a href="#" class="play_comment_link media-comment">\1</a>.') %>
                       <span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>
                       <div class="media_comment_content">
                       </div>
@@ -404,8 +409,7 @@
             <% end %>
           </div>
           <div class="comment_media" id="comment_media_blank" style="display: none; white-space: normal;">
-            This is a media comment,
-            <a href="#" class="play_comment_link media-comment">click here to view</a>.
+            <%= t('media_comment_link', "This is a media comment, *click here to view*.", :wrapper => '<br/><a href="#" class="play_comment_link media-comment">\1</a>.') %>
             <span class="media_comment_id" style="display: none;">&nbsp;</span>
             <div class="media_comment_content">
             </div>
@@ -430,25 +434,25 @@
             </div>
           </div>
           <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
-            Add a Comment:
-            <span style="font-size: 0.9em;"><br/>Teachers and submitter will be notified of all comments</span>
+            <%= before_label('add_a_comment', 'Add a Comment') %>
+            <span style="font-size: 0.9em;"><br/><%= t('teachers_notified_of_comments', 'Teachers and submitter will be notified of all comments') %></span>
             <textarea style="width: 95%;" class="grading_comment"></textarea>
             <div class="comment_attachments">
             </div>
             <div style="text-align: right;">
               <% if feature_enabled?(:kaltura) %>
-                <a href="#" style="float: left;" class="media_comment_link media-comment">Media Comment</a>
+                <a href="#" style="float: left;" class="media_comment_link media-comment"><%= t('media_comment', 'Media Comment') %></a>
               <% end %>
-              <a href="#" style="float: right;" class="attach_comment_file_link">Attach File</a>
+              <a href="#" style="float: right;" class="attach_comment_file_link"><%= t('attach_file', 'Attach File') %></a>
               <div class="clear"></div>
             </div>
             <% if @assignment.group_category && can_do(@submission, @current_user, :make_group_comment) %>
               <br/>
               <input type="checkbox" name="group_comment" id="submission_group_comment" checked/>
-              <label for="submission_group_comment">Send Comment to the Whole Group</label>
+              <label for="submission_group_comment"><%= t('sent_to_whole_group', 'Send Comment to the Whole Group') %></label>
             <% end %>
             <div class="button-container">
-              <button type="button" class="button save_comment_button">Save</button>
+              <button type="button" class="button save_comment_button"><%= t('buttons.save', 'Save') %></button>
             </div>
           </div>
         </div>

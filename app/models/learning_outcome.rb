@@ -100,7 +100,7 @@ class LearningOutcome < ActiveRecord::Base
       self.data[:rubric_criterion] = nil
       return
     end
-    criterion[:description] = hash[:description] || "No Description"
+    criterion[:description] = hash[:description] || t(:no_description, "No Description")
     criterion[:ratings] = []
     (hash[:ratings] || []).each do |key, rating|
       criterion[:ratings] << {

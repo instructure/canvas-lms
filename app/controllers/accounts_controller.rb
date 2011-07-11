@@ -28,7 +28,7 @@ class AccountsController < ApplicationController
     return redirect_to account_settings_url(@account) if @account.site_admin?
     if authorized_action(@account, @current_user, :read)
       load_course_right_side
-      @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show)
+      @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
       build_course_stats
     end
   end
@@ -192,9 +192,15 @@ class AccountsController < ApplicationController
   def load_course_right_side
     @root_account = @account.root_account || @account
     @maximum_courses_im_gonna_show = 100
-    @term = @root_account.enrollment_terms.active.find(params[:enrollment_term_id]) rescue nil
-    @term ||= @root_account.enrollment_terms.active[-1]
-    @associated_courses_count = @account.associated_courses.active.for_term(@term).uniq.count
+    @term = nil
+    if params[:enrollment_term_id].present?
+      @term = @root_account.enrollment_terms.active.find(params[:enrollment_term_id]) rescue nil
+      @term ||= @root_account.enrollment_terms.active[-1]
+    end
+    associated_courses = @account.associated_courses.active
+    associated_courses = associated_courses.for_term(@term) if @term
+    @associated_courses_count = associated_courses.uniq.count
+    @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
   end
   protected :load_course_right_side
   
@@ -224,6 +230,7 @@ class AccountsController < ApplicationController
             end
           end
           cancel_cache_buster
+          # TODO i18n
           send_data(
             res, 
             :type => "text/csv", 
@@ -325,7 +332,9 @@ class AccountsController < ApplicationController
       load_course_right_side
       @courses = []
       @query = (params[:course] && params[:course][:name]) || params[:query]
-      @courses = @context.courses_name_like(@query) if @context && @context.is_a?(Account) && @query
+      if @context && @context.is_a?(Account) && @query
+        @courses = @context.courses_name_like(@query, :term => @term, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+      end
       respond_to do |format|
         format.html {
           build_course_stats

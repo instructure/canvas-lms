@@ -1,41 +1,41 @@
 <% form_for :context_message, :url => context_url(@context, :context_roster_messages_url), :html => {:id => 'message_recipients_dialog', :style => 'display: none;'} do |f| %>
   <%= f.hidden_field :recipients, :class => 'recipient_ids' %>
-  <div>Send To:
+  <div><%= before_label('send_to', 'Send To') %>
     <span class="select_holder">&nbsp;</span>
     <div class="recipients" style="font-size: 0.8em; font-style: italic; padding-left: 0 10px;">
     </div>
   </div>
   
   <div style="padding: 5px 20px;">
-    Subject: <%= f.text_area :subject, :style => "width: 200px;" %><br/>
+    <%= before_label('subject', 'Subject') %> <%= f.text_area :subject, :style => "width: 200px;" %><br/>
     <%= f.text_area :body, :style => "width: 100%; height: 200px;" %>
   </div>
   <div>
-    <button type="submit" class="button submit_button">Send Message</button>
-    <button type="button" class="button-secondary cancel_button">Cancel</button>
+    <button type="submit" class="button submit_button"><%= t('buttons.send_message', 'Send Message') %></button>
+    <button type="button" class="button-secondary cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
   </div>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => "message_recipients"  do %>
 <script>
 $(document).ready(function() {
   $("#message_recipients_dialog").formSubmit({
     object_name: 'context_message',
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true);
-      $(this).find(".submit_button").text("Sending Message...");
+      $(this).find(".submit_button").text(I18n.t("sending_message", "Sending Message..."));
     },
     success: function(data) {
       $(this).find("button").attr('disabled', false);
-      $(this).find(".submit_button").text("Message Sent!");
+      $(this).find(".submit_button").text(I18n.t("message_sent", "Message Sent!"));
       var $form = $(this);
       setTimeout(function() {
-        $form.find(".submit_button").text("Send Message");
+        $form.find(".submit_button").text(I18n.t("send_message", "Send Message"));
         $("#message_recipients_dialog").dialog('close');
       }, 3000);
     },
     error: function(data) {
       $(this).find("button").attr('disabled', false);
-      $(this).find(".submit_button").text("Send Failed, Please Try Again");
+      $(this).find(".submit_button").text(I18n.t("send_failed", "Send Failed, Please Try Again"));
     },
   });
 });

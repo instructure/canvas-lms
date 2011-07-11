@@ -134,14 +134,17 @@ class ContextModule < ActiveRecord::Base
     return true if !self.to_be_unlocked && (!self.prerequisites || self.prerequisites.empty?) && !self.require_sequential_progress
     return true if self.grants_right?(user, nil, :update)
     progression = self.evaluate_for(user)
+    # if the progression is locked, then position in the progression doesn't
+    # matter. we're not available.
+
     res = progression && !progression.locked?
     if tag && tag.context_module_id == self.id && self.require_sequential_progress
-      res = progression && progression.current_position && progression.current_position >= tag.position
+      res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
     if !res && deep_check
       progression = self.evaluate_for(user, true, true)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
-        res = progression && progression.current_position && progression.current_position >= tag.position
+        res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
       end
     end
     res

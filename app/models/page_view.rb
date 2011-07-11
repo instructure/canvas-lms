@@ -17,6 +17,8 @@
 #
 
 class PageView < ActiveRecord::Base
+  include TextHelper
+
   set_primary_key 'request_id'
 
   belongs_to :developer_key
@@ -44,15 +46,11 @@ class PageView < ActiveRecord::Base
   end
   
   def interaction_seconds_readable
-    time = (self.interaction_seconds || 0).to_i
-    if time <= 10
-      "--"
-    elsif time < 60
-      "#{time} secs"
-    elsif time < 3600
-      "#{time / 60} mins"
+    seconds = (self.interaction_seconds || 0).to_i
+    if seconds <= 10
+      t(:insignificant_duration, "--")
     else
-      "#{time / 3600} hrs"
+      readable_duration(seconds)
     end
   end
   
@@ -61,7 +59,7 @@ class PageView < ActiveRecord::Base
   end
   
   def user_name
-    self.user.name rescue "Unknown User"
+    self.user.name rescue t(:default_user_name, "Unknown User")
   end
   
   def context_name

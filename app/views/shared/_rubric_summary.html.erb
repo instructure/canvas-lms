@@ -5,13 +5,13 @@
 <thead>
   <tr class="rubric_title" style="<%= hidden if brief %>">
     <th colspan="2">
-      <span class="title"><%= rubric.title rescue "Title" %></span>
+      <span class="title"><%= rubric.title rescue t('defaults.title', "Title") %></span>
       <span class="id" style="display: none;"><%= rubric.id rescue nbsp %></span>
     </th>
   </tr>
   <tr>
-    <th>Criteria</th>
-    <th>Assessment</th>
+    <th><%= t 'headers.criteria', "Criteria" %></th>
+    <th><%= t 'headers.assessment', "Assessment" %></th>
   </tr>
 </thead>
 <tbody> 
@@ -25,13 +25,15 @@
   <% end %>
   <tr class="summary" style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
     <td colspan="2" style="padding-right: 10px; text-align: right;">
-      Total Points: 
-      <span class="rubric_total" style="<%= hidden if brief %>"><%= assessing ? "0" : (rubric.points_possible rescue 5) %></span> out of <span class="points_possible"><%= rubric.points_possible rescue 5 %></span>
+      <%= before_label :total_points, "Total Points" %>
+      <%= t :points_out_of, "%{points} out of %{total}",
+            :points => %{<span class="rubric_total" style="#{hidden if brief}">#{assessing ? "0" : (rubric.points_possible rescue 5) }</span>},
+            :total => %{<span class="points_possible">#{rubric.points_possible rescue 5}</span>} %>
     </td>
   </tr>
 </tbody>
 </table>
 <div class="button-container" style="<%= hidden if brief %>">
-  <button class="toggle_full_rubric edit button">Edit Assessment</button>
+  <button class="toggle_full_rubric edit button"><%= t 'buttons.edit_assessment', "Edit Assessment" %></button>
 </div>
 

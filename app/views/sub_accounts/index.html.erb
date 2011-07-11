@@ -1,9 +1,9 @@
-<% add_crumb "Sub-Accounts" %>
+<% add_crumb t('titles.sub_accounts', "Sub-Accounts") %>
 <% @active_tab = "sub-accounts" %>
-<% content_for :page_title do %>Sub-Accounts<% end %>
+<% content_for :page_title do %><%= t('titles.sub_accounts', 'Sub-Accounts') %><% end %>
 
 <% content_for :page_header do %>
-  <h1>Sub-Accounts</h1>
+  <h1><%= t('titles.sub_accounts', 'Sub-Accounts') %></h1>
 <% end %>
 
 <% content_for :page_subhead do %>

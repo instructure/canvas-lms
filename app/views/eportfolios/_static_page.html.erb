@@ -10,8 +10,8 @@
 <body>
 <div id="container">
   <div id="header">
-    <a href="#skip_navigation" id="skip_navigation_link">Skip Navigation</a>
-    <a href="http://www.instructure.com" title="Created with Canvas"><img class="logo" src="logo.png" alt="logo"/></a>
+    <a href="#skip_navigation" id="skip_navigation_link"><%= t('links.skip_navigation', "Skip Navigation") %></a>
+    <a href="http://www.instructure.com" title="<%= t('#created_with_canvas', "Created with Canvas") %>"><img class="logo" src="logo.png" alt="logo"/></a>
     <h1><%= @page.name %></h1>
     <h2><a href="<%= @page.eportfolio.eportfolio_categories.first.eportfolio_entries.first.full_slug %>.html"><%= @page.eportfolio.name %></a> &#187; <a href="<%= @page.eportfolio_category.eportfolio_entries.first.full_slug %>.html"><%= @page.eportfolio_category.name %></a></h2>
     <div class="clear"></div>
@@ -37,7 +37,7 @@
     </div>
     <% if !@page.page_comments.empty? %>
       <div id="page_comments_holder" style="margin-top: 50px;">
-        <h2>Page Comments</h2>
+        <h2><%= t('headers.page_comments', "Page Comments") %></h2>
         <div id="page_comments" style="padding: 5px 20px;">
           <%= render :partial => "eportfolios/page_comment", :collection => @page.page_comments, :locals => {:read_only => true} %>
         </div>

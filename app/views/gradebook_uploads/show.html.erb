@@ -1,8 +1,8 @@
-<% content_for :page_title do %>Gradebook - <%= @context.name %><% end %>
+<% content_for :page_title do %><%= t('titles.show_upload', "Gradebook - %{course}", :course => @context.name) %><% end %>
 
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => "Course Gradebook Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => t('titles.feed', "Course Gradebook Atom Feed")}) %>
   <% end %>
 <% end %>
 
@@ -12,23 +12,23 @@
 %>
 
 <form id="gradebook_importer_resolution_section" style="display:none;">
-  <h3>There was some stuff I couldn't figure out with the data that you uploaded:</h3>
+  <h3><%= t('headers.import_error', "There was some stuff I couldn't figure out with the data that you uploaded:") %></h3>
   <div class="student_section" style="display:none;">
-    <h4>You uploaded rows for the following students, I couldn't decide which student in your class they are.  please tell me which student they are.</h4>
+    <h4><%= t('headers.missing_student', "You uploaded rows for the following students, I couldn't decide which student in your class they are.  Please tell me which student they are.") %></h4>
     <table cellspacing="0" class="ui-widget ui-widget-content">
       <thead>
         <tr>
-          <th class="ui-widget-header">Student in question</th>
-          <th class="ui-widget-header">This person is really</th>
+          <th class="ui-widget-header"><%= t(:student_question, "Student in question") %></th>
+          <th class="ui-widget-header"><%= t(:student_answer, "This person is really") %></th>
         </tr>
       </thead>
       <tbody>
         <tr id="student_resolution_template" style="display:none">
-          <th class='name'>Some Guy</th>
+          <th class='name'><%= t(:student_example, "Some Guy") %></th>
           <td>
             <select name="student_-iterator-">
-              <option value="">-- Choose --</option>
-              <option value="ignore" class="ignore">Not in my class, Ignore this row.</option>
+              <option value=""><%= t(:choose_option, "-- Choose --") %></option>
+              <option value="ignore" class="ignore"><%= t(:ignore_student_option, "Not in my class, Ignore this row.") %></option>
             </select>
           </td>
         </tr>
@@ -36,25 +36,26 @@
     </table>
   </div>
   <div class="assignment_section" style="display:none">
-    <h4>You uploaded some assignments that don't appear to be in your gradebook before now.  Please tell me if it is a new assignment, or if it represents an existing assignment.</h4>
+    <h4><%= t('headers.missing_assignment', "You uploaded some assignments that don't appear to be in your gradebook before now.  Please tell me if it is a new assignment, or if it represents an existing assignment.") %></h4>
     <table cellspacing="0" class="ui-widget ui-widget-content">
       <thead>
         <tr>
-          <th class="ui-widget-header">Assignment in question</th>
-          <th class="ui-widget-header">This Assignment is</th>
+          <th class="ui-widget-header"><%= t(:assignment_question, "Assignment in question") %></th>
+          <th class="ui-widget-header"><%= t(:assignment_answer, "This Assignment is") %></th>
         </tr>
       </thead>
       <tbody>
         <tr id="assignment_resolution_template" style="display:none;">
-          <th class='title'>Equity Indices Quiz</th>
+          <th class='title'><%= t(:assignment_example, "Equity Indices Quiz") %></th>
           <td>
             <select name="assignment_-iterator-">
-              <option value="">-- Choose --</option>
-              <option value="new" class="new">A new assignment</option>
-              <option value="ignore" class="ignore">Bogus, ignore it</option>
+              <option value=""><%= t(:choose_option, "-- Choose --") %></option>
+              <option value="new" class="new"><%= t(:new_assignment_option, "A new assignment") %></option>
+              <option value="ignore" class="ignore"><%= t(:ignore_assignment_option, "Bogus, ignore it") %></option>
             </select>
             <span class="points_possible_section">
-              <label> Points Possible </label><input type="text" class="points_possible" />
+              <label><%= t('labels.points_possible', "Points Possible") %></label>
+              <input type="text" class="points_possible" />
             </span>
           </td>
         </tr>
@@ -62,14 +63,14 @@
     </table>
   </div>
   <div class="button-container">
-    <button type="submit" class="button">Continue &rarr;</button>
+    <button type="submit" class="button"><%= t('buttons.continue', "Continue %{icon}", :icon => raw('&rarr;')) %></button>
   </div>
 </form>
 
 <div id="no_changes_detected" style="display:none;">
-  <h2>There were no changes detected in the gradebook you uploaded.</h2>
+  <h2><%= t('headers.no_changes', "There were no changes detected in the gradebook you uploaded.") %></h2>
   <p>
-    <%= link_to("Go back to Gradebook", context_url(@context, :context_gradebook_url) ) %>
+    <%= link_to(t('links.back', "Go back to Gradebook"), context_url(@context, :context_gradebook_url) ) %>
   </p>
   
 </div>
@@ -78,9 +79,9 @@
   <div id="gradebook_grid"></div>
   <input type="hidden" name="json_data_to_submit" value="" />
   <div class="button-container" style="padding-left:7px;">
-    <button type="submit" class="button">Save Changes</button>
-    <%= link_to "Cancel", :back , :class => "button button-secondary" %>
-    <span id="assignments_without_changes_alert" style="display:none; margin-left: 50px;">Note: You uploaded some assignments that had no grade changes detected. They have been hidden.</span>
+    <button type="submit" class="button"><%= t('buttons.save_changes', "Save Changes") %></button>
+    <%= link_to t('#buttons.cancel', "Cancel"), :back , :class => "button button-secondary" %>
+    <span id="assignments_without_changes_alert" style="display:none; margin-left: 50px;"><%= t('notices.unchanged', "Note: You uploaded some assignments that had no grade changes detected. They have been hidden.") %></span>
   </div>
 <% end -%>
 <style>

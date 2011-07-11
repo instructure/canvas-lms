@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+I18n.scoped("question_banks", function(I18n) {
 $(document).ready(function() {
   $(".add_bank_link").click(function(event) {
     event.preventDefault();
@@ -27,7 +27,7 @@ $(document).ready(function() {
     event.preventDefault();
     $(this).parents(".question_bank").confirmDelete({
       url: $(this).attr('href'),
-      message: "Are you sure you want to delete this bank of questions?",
+      message: I18n.t("delete_question_bank_prompt", "Are you sure you want to delete this bank of questions?"),
       success: function() {
         $(this).slideUp(function() {
           $(this).remove();
@@ -112,4 +112,5 @@ $(document).ready(function() {
       $("#edit_bank_form").formErrors(data);
     }
   });
+});
 });

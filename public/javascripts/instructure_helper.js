@@ -77,6 +77,54 @@
     } while (prefix && $('#' + id).length);
     return id;
   };
+  
+  // Return the first value which passes a truth test
+  $.detect = function(collection, callback) {
+    var result;
+    $.each(collection, function(index, value) {
+      if (callback.call(value, index, collection)) {
+        result = value;
+        return false; // we found it, break the $.each() loop iteration by returning false
+      }
+    });
+    return result;
+  };
+  
+  
+  // this is just pulled from jquery 1.6 because jquery 1.5 could not do .map on an object
+  $.map = function (elems, callback, arg) {
+    var value, key, ret = [],
+        i = 0,
+        length = elems.length,
+
+
+        // jquery objects are treated as arrays
+        isArray = elems instanceof jQuery || length !== undefined && typeof length === "number" && ((length > 0 && elems[0] && elems[length - 1]) || length === 0 || jQuery.isArray(elems));
+
+    // Go through the array, translating each of the items to their
+    if (isArray) {
+      for (; i < length; i++) {
+        value = callback(elems[i], i, arg);
+
+        if (value != null) {
+          ret[ret.length] = value;
+        }
+      }
+
+      // Go through every key on the object,
+    } else {
+      for (key in elems) {
+        value = callback(elems[key], key, arg);
+
+        if (value != null) {
+          ret[ret.length] = value;
+        }
+      }
+    }
+
+    // Flatten any nested arrays
+    return ret.concat.apply([], ret);
+  }
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -714,7 +762,9 @@
   };
   
   $.htmlEscape = function(str) {
-    return $.htmlEscape.element.text(str).html();
+    return str && str.htmlSafe ?
+      str.toString() :
+      $.htmlEscape.element.text(str).html();
   }
   $.htmlEscape.element = $('<div/>');
   // escape all string values (not keys) in an object
@@ -726,6 +776,16 @@
         obj[k] = $.htmlEscape(v);
       }
     }
+  }
+  $.h = $.htmlEscape;
+
+  // useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
+  // note that raw returns a String object, so you may want to call toString
+  // if you're using it elsewhere
+  $.raw = function(str) {
+    str = new String(str);
+    str.htmlSafe = true;
+    return str;
   }
   
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
@@ -1556,109 +1616,123 @@
   };  
   
   $.parseFromISO = function(iso, datetime_type) {
-    var user_offset = parseInt($("#time_zone_offset").text(), 10) / -60;
-    var today = new Date();
-    datetime_type = datetime_type || 'event';
+    var userOffsetHours = parseInt($("#time_zone_offset").text(), 10) / 60 || 0;
     try {
       var result = {};
       if(!iso) {
         return $.parseFromISO.defaults;
       }
-      var year = iso.substring(0, 4);
-      var month = iso.substring(5, 7);
-      var day = iso.substring(8, 10);
+
+      // parse iso string
+      var year = parseInt(iso.substring(0, 4), 10) || 0;
+      var month = parseInt(iso.substring(5, 7), 10) || 0;
+      var day = parseInt(iso.substring(8, 10), 10) || 0;
+      var hours = parseInt(iso.substring(11, 13), 10) || 0;
+      var minutes = parseInt(iso.substring(14, 16), 10) || 0;
+      var seconds = parseInt(iso.substring(17, 19), 10) || 0;
       var date_offset = parseInt(iso.substring(19), 10) || 0;
-      result.date = new Date(year, month - 1, day);
-      if(result.date.getTimezoneOffset() != today.getTimezoneOffset()) {
-        user_offset = user_offset - ((result.date.getTimezoneOffset() - today.getTimezoneOffset()) / 60);
-      }
-      var hour_shift = user_offset - date_offset;
-      // NOTE: This value is a literal parsing of the date
-      // passed in and may technically be incorrect if there
-      // is shifting due to time zones.
-      // result.date = $.datepicker.parseDate("yy-mm-dd", iso.substring(0, 10));
-      result.date_sortable = iso.substring(0, 10);
-      result.date_string = month + "/" + day + "/" + year;
-      result.date_formatted = $.dateString(result.date);
-      var hour_string = iso.substring(11, 13);
-      var minute_string = iso.substring(14, 16);
-      var second_string = iso.substring(17, 19);
-      var hours = (parseInt(hour_string, 10)) * 1000.0 * 3600;
-      if(hour_shift && !isNaN(hour_shift)) {
-        hours = hours + (hour_shift * 1000.0 * 3600);
-      }
-      var minutes = parseInt(minute_string, 10) * 1000.0 * 60;
-      var seconds = parseInt(second_string, 10) * 1000.0;
-      var time_timestamp = (hours + minutes + seconds) || 0;
-      var date_timestamp = (Date.UTC(year, month - 1, day)) || 0;
-      result.time_timestamp = time_timestamp / 1000;
-      result.date_timestamp = date_timestamp / 1000;
-      var tz_offset = result.date.getTimezoneOffset() * 60000;
-      var time = new Date(date_timestamp + time_timestamp + tz_offset);
-      var ampm = "am";
-      hours = time.getHours();
-      if(hours > 12) {
-        hours -= 12;
-        ampm = "pm";
-      } else if(hours == 12) {
-        ampm = "pm";
-      } else if(hours === 0) {
-        hours = 12;
-      }
-      var time_formatted = hours;
-      var time_tail = ":";
-      if(time.getMinutes() < 10) {
-        time_tail += "0";
-      }
-      time_tail += time.getMinutes();
-      if(time.getMinutes() !== 0) {
-        time_formatted += time_tail;
-      }
-      var by_at = datetime_type == 'due_date' ? 'by' : 'at';
-      var time_for_date_formatted = ' ' + by_at + ' ' + time_formatted + ampm;
-      result.show_time = true;
-      var sortable_hour = time.getHours();
-      if(sortable_hour < 10) {
-        sortable_hour = "0" + sortable_hour;
-      }
-      result.time_sortable = sortable_hour + time_tail;
-      time_formatted += ampm;
-      result.time_formatted = time_formatted;
-      result.time_string = hours + time_tail + ampm;
-      result.time = time;
-      result.datetime = time;
-      result.date_formatted = $.dateString(result.datetime);
-      result.datetime_formatted = result.date_formatted + time_for_date_formatted;
-      result.timestamp = (time_timestamp + date_timestamp) / 1000;
+
+      // build timestamp, adjusting hours so result is in UTC
+      result.timestamp = Date.UTC(year, month - 1, day, hours - date_offset, minutes, seconds) / 1000;
       result.minute_timestamp = result.timestamp - (result.timestamp % 60);
+
+      // the browser will use its timezone on this datetime object, which is
+      // used for formatting dates, so we adjust the timestamp fed into this
+      // datetime object away from utc to trick the browser into displaying the
+      // time in the user's preferred timezone.
+      //
+      // NOTE: if the browser timezone and user preferred timezone don't have
+      // the same DST schedule, this might be off (i.e. the offset between
+      // browser timezone and user preferred timezone today could differ from
+      // the offset between browser timezone and user preferred timezone on the
+      // date in question). It's a small edge case, and one we're punting on
+      // for now, but it's something to consider.
+      var browserOffsetHours = (new Date()).getTimezoneOffset() / 60;
+      var tzOffsetSeconds = (browserOffsetHours - userOffsetHours) * 3600;
+
+      // time/datetime are the time, date is midnight on that day (in the user's timezone)
+      result.time = result.datetime = new Date((result.timestamp + tzOffsetSeconds) * 1000);
+      result.date = new Date(result.time).clearTime();
+
+      // break the timestamp into date and time components (in the user's timezone)
+      result.date_timestamp = result.date.getTime() / 1000;
+      result.time_timestamp = result.timestamp - result.date_timestamp;
+
+      // formatted for sorting
+      result.date_sortable = result.date.toString('yyyy-MM-dd');
+      result.time_sortable = result.time.toString('HH:mm:ss');
+      result.datetime_sortable = result.datetime.toString('yyyy-MM-dd HH:mm:ss');
+
+      // formatted for later re-parsing
+      result.date_string = result.date.toString('MM/dd/yyyy');
+      result.time_string = result.time.toString('h:mmtt').toLowerCase();
+      result.datetime_string = result.datetime.toString('MM/dd/yyyy h:mmtt').toLowerCase();
+
+      // formatted for display
+      result.time_formatted = $.timeString(result.time);
+      result.date_formatted = $.dateString(result.date);
+      result.datetime_formatted = $.dateTimeString(result.datetime, datetime_type);
+
+      // done
+      result.show_time = true;
       return result;
     } catch(e) {
       return $.parseFromISO.defaults;
     }
   };
-  $.parseFromISO.ref_date = new Date();
-  $.parseFromISO.offset = $.parseFromISO.ref_date.getTimezoneOffset() * 60000;
+  $.parseFromISO.offset = (new Date()).getTimezoneOffset() * 60000;
+  $.parseFromISO.baseline_date = new Date($.parseFromISO.offset);
   $.parseFromISO.defaults = {
-      date: new Date($.parseFromISO.offset),
+      date: new Date($.parseFromISO.baseline_date).clearTime(),
+      date_formatted: "",
       date_sortable: "0000-00-00",
       date_string: "",
-      date_formatted: "",
-      time_timestamp: 0,
       date_timestamp: 0,
-      timestamp: 0,
-      time: new Date($.parseFromISO.offset),
+      datetime: $.parseFromISO.baseline_date,
+      datetime_formatted: "",
+      datetime_sortable: "0000-00-00 00:00:00",
+      datetime_string: "",
+      minute_timestamp: 0,
+      show_time: false,
+      time: $.parseFromISO.baseline_date,
       time_formatted: "",
-      time_string: ""
+      time_sortable: "00:00:00",
+      time_string: "",
+      time_timestamp: 0,
+      timestamp: 0
   };
-  var today = new Date();
   $.thisYear = function(date) {
-    return date && (date.getFullYear() == today.getFullYear());
+    return date && (date.getFullYear() == (new Date()).getFullYear());
   };
   $.dateString = function(date) {
-    return (date && (date.toString($.thisYear(date) ? 'MMM d' : 'MMM d, yyyy'))) || "";
+    var result;
+    I18n.scoped('#date', function(I18n) {
+      result = ($.thisYear(date) ?
+          I18n.l('#date.formats.short', date) :
+          I18n.l('#date.formats.medium', date));
+    });
+    return result;
   };
-  $.timeString = function(date) {
-    return (date && date.toString('h:mmtt').toLowerCase()) || "";
+  $.timeString = function(time) {
+    var result;
+    I18n.scoped('#time', function(I18n) {
+      result = $.trim(time.getMinutes() === 0 ?
+          I18n.l('#time.formats.tiny_on_the_hour', time) :
+          I18n.l('#time.formats.tiny', time));
+    });
+    return result;
+  };
+  $.dateTimeString = function(datetime, datetime_type) {
+    datetime_type = datetime_type || 'event';
+    var result;
+    I18n.scoped('#time', function(I18n) {
+      var date = $.dateString(datetime);
+      var time = $.timeString(datetime);
+      result = (datetime_type == 'due_date' ?
+          I18n.t('due_date', '%{date} by %{time}', {date: date, time: time}) :
+          I18n.t('event', '%{date} at %{time}', {date: date, time: time}));
+    });
+    return result;
   };
   $.fn.parseFromISO = $.parseFromISO;
 
@@ -2941,14 +3015,12 @@
             }
             $("<div class='bookmark'/>")
               .appendTo($dialog.find(".results"))
-              .append($("<a class='bookmark_link' style='font-weight: bold;'/>", {
-                href: data[idx].url,
-                text: data[idx].short_title,
-                title: data[idx].title
-              }))
-              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>", {
-                text: data[idx].description || "No description"
-              }));
+              .append($('<a class="bookmark_link" style="font-weight: bold;"/>').attr({
+                  href: data[idx].url,
+                  title: data[idx].title
+                }).text(data[idx].short_title)
+              )
+              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>").text(data[idx].description || "No description"));
           }
         }, function() {
           $dialog.find(".results").empty()
@@ -3305,20 +3377,26 @@
   };
   
   // this is used if you want to fill the browser window with something inside #content but you want to also leave the footer and header on the page.
-  $.fn.fillWindowWithMe = function(){
-    var $this              = $(this),
+  $.fn.fillWindowWithMe = function(options){
+    var opts               = $.extend({minHeight: 400}, options),
+        $this              = $(this),
         $wrapper_container = $('#wrapper-container'),
         $main              = $('#main'),
         $not_right_side    = $('#not_right_side'),
-        $window            = $(window);
+        $window            = $(window),
+        $toResize          = $(this).add(opts.alsoResize);
 
     function fillWindowWithThisElement(){
-      $this.height(0);
+      $toResize.height(0);
       var spaceLeftForThis = $window.height() 
                              - ($wrapper_container.offset().top + $wrapper_container.height())
-                             + ($main.height() - $not_right_side.height());
+                             + ($main.height() - $not_right_side.height()),
+          newHeight = Math.max(400, spaceLeftForThis);
                                
-      $this.height( Math.max(400, spaceLeftForThis) );
+      $toResize.height(newHeight);
+      if ($.isFunction(opts.onResize)) {
+        opts.onResize.call($this, newHeight);
+      }
     }
     fillWindowWithThisElement();
     $window
@@ -3326,5 +3404,9 @@
       .bind('resize.fillWindowWithMe', fillWindowWithThisElement);
     return this;
   };
-    
+
+  $.regexEscape = function(string) {
+    return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  }
+  
 })(jQuery);

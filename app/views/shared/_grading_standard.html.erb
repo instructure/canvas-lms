@@ -8,28 +8,28 @@
           <th colspan="4" class="standard_title">
             <div style="float: right;" class="displaying links">
               <% if !grading_standard_list %>
-                <a href="#" class="find_grading_standard_link no-hover" title="Find Existing Grading Scheme"><%= image_tag "find.png", :alt => "Find" %></a>
+                <a href="#" class="find_grading_standard_link no-hover" title="<%= t('find_existing_scheme', 'Find Existing Grading Scheme') %>"><%= image_tag "find.png", :alt => t('find', "Find") %></a>
               <% end %>
-                <a href="#" title="Edit Grading Scheme" class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && !can_do(grading_standard, @current_user, :update) %>"><%= image_tag "edit.png" %></a>
+                <a href="#" title="<%= t('edit_scheme', 'Edit Grading Scheme') %>" class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && !can_do(grading_standard, @current_user, :update) %>"><%= image_tag "edit.png" %></a>
               <% if grading_standard_list %>
-                <a href="#" title="Delete Grading Scheme" class="delete_grading_standard_link no-hover"><%= image_tag "delete.png" %></a>
+                <a href="#" title="<%= t('delete_scheme', 'Delete Grading Scheme') %>" class="delete_grading_standard_link no-hover"><%= image_tag "delete.png" %></a>
               <% else %>
-                <a href="#" title="Remove Grading Scheme" class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>"><%= image_tag "delete_circle.png" %></a>
+                <a href="#" title="<%= t('remove_scheme', 'Remove Grading Scheme') %>" class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>"><%= image_tag "delete_circle.png" %></a>
               <% end %>
             </div>
             <div class="displaying title">
               <%= grading_standard.title rescue nbsp %>
             </div>
             <div class="editing_box">
-              Scheme Name: 
+              <%= before_label('labels.scheme_name', 'Scheme Name') %>
               <input type="text" name="grading_standard[title]" class="scheme_name" value="<%= grading_standard.title rescue "" %>" style="width: 100px;"/>
             </div>
           </th>
         </tr>
         <tr>
-          <th style="text-align: left; padding-right: 10px; width: 25%;">Name:</th>
+          <th style="text-align: left; padding-right: 10px; width: 25%;"><%= before_label('labels.name', 'Name') %></th>
           <th colspan="3" style="width: 75%;">
-            <div style="float: left; margin-left: 10px;">Range:</div>
+            <div style="float: left; margin-left: 10px;"><%= before_label('labels.range', 'Range') %></div>
             <div class="clear"></div>
           </th>
         </tr>
@@ -39,7 +39,7 @@
     <table style="width: 100%; margin-bottom: 20px;" class="grading_standard_data">
       <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
         <td colspan="4">
-          <a href="#" class="insert_grading_standard_link">insert here</a>
+          <a href="#" class="insert_grading_standard_link"><%= t('insert_here', 'insert here') %></a>
         </td>
       </tr>
       <% data.to_a.each_index do |idx|; row = data[idx] %>
@@ -60,11 +60,11 @@
             </div>
           </td><td style="padding: 2px 5px; width: 25%;">
             <div class="editing_box">
-              <span style="padding-right: 5px;">to</span>
+              <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
               <span class="edit_min_score"><%= (data[idx + 1][1] * 100).to_i + 1 rescue 0 %></span>%
             </div>
             <div class="displaying">
-              <span style="padding-right: 5px;">to</span>
+              <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
               <span class="min_score"><%= (data[idx + 1][1] * 100).to_i + 1 rescue 0 %></span>%
             </div>
           </td><td class="editing_box" style="padding: 2px 5px 2px 15px; width: 25%;">
@@ -73,13 +73,13 @@
         </tr>
         <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
           <td colspan="4">
-            <a href="#" class="insert_grading_standard_link">insert here</a>
+            <a href="#" class="insert_grading_standard_link"><%= t('insert_here', 'insert here') %></a>
           </td>
         </tr>
       <% end %>
       <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
         <td colspan="4">
-          <a href="#" class="insert_grading_standard_link">insert here</a>
+          <a href="#" class="insert_grading_standard_link"><%= t('insert_here', 'insert here') %></a>
         </td>
       </tr>
       <tr class="grading_standard_row blank" style="display: none;">
@@ -99,11 +99,11 @@
           </div>
         </td><td style="padding: 2px 5px;">
           <div class="editing_box">
-            <span style="padding-right: 5px;">to</span>
+            <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
             <span class="edit_min_score">&nbsp;</span>%
           </div>
           <div class="displaying">
-            <span style="padding-right: 5px;">to</span>
+            <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
             <span class="min_score">&nbsp;</span>%
           </div>
         </td><td class="editing_box" style="padding: 2px 5px 2px 15px;">
@@ -114,18 +114,18 @@
     </div>
     <% unless grading_standard_list %>
       <div class="displaying" style="text-align: right;">
-        <a href="<%= context_url(@context, :context_grading_standards_url) %>">manage grading schemes</a>
+        <a href="<%= context_url(@context, :context_grading_standards_url) %>"><%= t('managing_grading_standards', 'manage grading schemes') %></a>
       </div>
     <% end %>
     <div class="editing_box button-container">
-      <button type="button" class="save_button button">Save</button>
-      <button type="button" class="cancel_button button-secondary">Cancel</button>
+      <button type="button" class="save_button button"><%= t('buttons.save', 'Save') %></button>
+      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', 'Cancel') %></button>
     </div>
   </div>
   <div style="display: none;" class="find_grading_standard">
     <a href="<%= context_url(@context, :context_grading_standards_url) %>" rel="nofollow" class="grading_standards_url" style="display: none;">&nbsp;</a>
     <div class="loading_message" style="margin: 10px; text-align: center;">
-      Loading Grading Standards...
+      <%= t('loading_grading_standards', 'Loading Grading Standards...') %>
     </div>
     <table class="side_tabs_table grading_standards_holder" style="display: none;">
       <tr>
@@ -134,10 +134,10 @@
           <ul class="grading_standards_select unstyled_list side_tabs">
             <li class="grading_standard_select blank" style="display: none;">
               <a href="#">
-                <span class="title">Some standard</span>
+                <span class="title"><%= t('some_standard', 'Some standard') %></span>
                 <span class="id" style="display: none;">&nbsp;</span>
               </a>
-              <div class="display_name" style="font-size: 0.8em;">Full name, smaller text</div>
+              <div class="display_name" style="font-size: 0.8em;"><%= t('full_name', 'Full name, smaller text') %></div>
             </li>
           </ul>
         </td>
@@ -160,18 +160,18 @@
                   <tr class="details_row blank" style="display: none;">
                     <td class="name" style="padding-right: 20px;">&nbsp;</td>
                     <td style="padding: 2px 5px;"><span class="value">&nbsp;</span>%</td>
-                    <td style="padding: 2px 5px;">to</td>
+                    <td style="padding: 2px 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></td>
                     <td style="padding: 2px 5px;"><span class="next_value">&nbsp;</span>%</td>
                   </tr>
                 </table>
               </div>
-              <button type="button" class="button select_grading_standard_link">Use This Grading Standard</button>
+              <button type="button" class="button select_grading_standard_link"><%= t('use_this_standard', 'Use This Grading Standard') %></button>
             </div>
           </div>
         </td>
       </tr>
     </table>
-    <div style="margin-top: 5px; text-align: right"><a href="#" class="cancel_find_grading_standard_link">Cancel</a></div>
+    <div style="margin-top: 5px; text-align: right"><a href="#" class="cancel_find_grading_standard_link"><%= t('#buttons.cancel', 'Cancel') %></a></div>
   </div>
   <a href="<%= context_url(((grading_standard.context || @context) rescue @context), :context_grading_standard_url, grading_standard ? grading_standard.id : "{{ id }}") rescue "#" %>" style="display: none;" class="update_grading_standard_url">&nbsp;</a>
   <% unless grading_standard_list %>

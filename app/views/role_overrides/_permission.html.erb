@@ -1,6 +1,6 @@
 <% key, permission = permission -%>
         <tr class="<%= cycle("even", "odd") %>">
-          <th scope="row"><%= permission[:label] %></th>
+          <th scope="row"><%= permission[:label].call() %></th>
           <% @role_types.each do |enrollment_type| %>
           <td>
             <%= image_tag "locked_small.png", :class => "lock #{ 

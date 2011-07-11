@@ -1,3 +1,5 @@
+@import environment.sass
+
 =icon_link
   :background-repeat no-repeat  
   :background-position left center
@@ -237,20 +239,18 @@ a.no-underline,a.no-underline:hover, a.no-underline:focus
 // atr is short for accessible text replacement
 // these classes make it so you can have links like <a class="atr-reply">reply to this topic</a> and have only
 // a reply.png icon show up.
-=accessible_text_replacement
-  display: inline-block
-  text-indent: 999px
-  overflow: hidden
-  background-repeat: no-repeat
+
+=atr_link
+  +accessible_text_replacement
   width: 16px
   height: 16px
   
 .atr-reply
-  +accessible_text_replacement
+  +atr_link
   background-image: url(/images/reply.png)
 .atr-edit
-  +accessible_text_replacement
+  +atr_link
   background-image: url(/images/edit.png)
 .atr-delete
-  +accessible_text_replacement
+  +atr_link
   background-image: url(/images/delete.png)

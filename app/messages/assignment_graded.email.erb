@@ -3,10 +3,10 @@
 <% end %>
 
 <% define_content :subject do %>
-  Assignment Graded: <%= asset.title %>, <%= asset.context.name %>
+  <%= t('assignment_graded', 'Assignment Graded: %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 <% end %>
 
-<%= asset.submissions.graded.map(&:user_id).include?(user.id) ? "Your" : "The" %> assignment, <%= asset.title %>, has been graded.  
+<%= t('the_assignment_is_graded', 'The assignment, %{assignment_name}, has been graded.', :assignment_name => asset.title) %>
 
-You can view it here: 
+<%= before_label('view_here', 'You can view it here') %>
 <%= content :link %>

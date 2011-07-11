@@ -1,4 +1,31 @@
-<% enrollment = pending_enrollment %>
-<li><a href="<%= course_url(enrollment.course, :invitation => enrollment.uuid) %>" title="Invited as <%= enrollment.readable_type %>, click to see the Course" class="<%= enrollment.type.to_s.underscore %>">
-  <%= enrollment.course.name %> as a <%= enrollment.readable_type %>
+<% 
+  enrollment = pending_enrollment 
+   title_message = t :student_title, "Invited as a student, click to see the Course"
+  case enrollment.type
+  when 'TeacherEnrollment'
+    title_message = t :teacher_title, "Invited as a teacher, click to see the Course"
+  when 'TAEnrollment'
+    title_message = t :ta_title, "Invited as a TA, click to see the Course"
+  when 'ObserverEnrollment'
+    title_message = t :observer_title, "Invited as an observer, click to see the Course"
+  when 'CourseDesignerEnrollment'
+    title_message = t :designer_title, "Invited as a designer, click to see the Course"
+  end
+
+%>
+<li><a href="<%= course_url(enrollment.course, :invitation => enrollment.uuid) %>" title="<%= title_message %>" class="<%= enrollment.type.to_s.underscore %>">
+<%=
+  case enrollment.type
+  when 'TeacherEnrollment'
+    t :teacher, "%{course} as a teacher.", :course => enrollment.course.name
+  when 'TAEnrollment'
+    t :ta, "%{course} as a TA.", :course => enrollment.course.name
+  when 'ObserverEnrollment'
+    t :observer, "%{course} as an observer.", :course => enrollment.course.name
+  when 'CourseDesignerEnrollment'
+    t :designer, "%{course} as a designer.", :course => enrollment.course.name
+  else
+    t :student, "%{course} as a student.", :course => enrollment.course.name
+  end
+%>
 </a></li>

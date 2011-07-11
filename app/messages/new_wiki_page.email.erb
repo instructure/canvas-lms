@@ -4,15 +4,15 @@
 <% end %>
 
 <% define_content :subject do %>
-  New Wiki Page - <%= asset.title.titleize %>: <%= asset.find_namespace_for_user(user).context.name rescue "" %>
+  <%= t :subject, "New Wiki Page - %{page_title}: %{course_or_group}", :page_title => asset.title, :course_or_group => asset.find_namespace_for_user(user).context.name rescue "" %>
 <% end %>
 
-A new page has been added to the wiki for <%= namespace.context.name %> that may make your life easier.  
+<%= t :body, "A new page has been added to the wiki for %{course_or_group} that may make your life easier.", :course_or_group => asset.context.name %>
 
-<%= asset.title.titleize %> 
+<%= asset.title %>
 
 <%= strip_and_truncate(asset.body, :max_length => 200) %> 
 
 
-You can review it here: 
+<%= t :details, "You can review it here:" %>
 <%= content :link %>

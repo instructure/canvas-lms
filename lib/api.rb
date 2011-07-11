@@ -18,12 +18,11 @@
 
 module Api
   # find id in collection
-  # if id is a string beginning with "sis:", search by sis id rather than db id.
-  def self.find(collection, id, sis_column = :sis_source_id, &block)
+  def self.find(collection, id, &block)
     find_by_sis = block ? block :
-      proc { |sis_id| self.find_by_sis_id(collection, sis_id, sis_column) }
+      proc { |sis_column, sis_id| self.find_by_sis_id(collection, sis_id, sis_column) }
 
-    self.switch_on_id_type(id,
+    self.switch_on_id_type(id, self.valid_sis_columns_for_collection(collection),
               proc { |id| self.find_by_id(collection, id) },
               find_by_sis)
   end
@@ -37,23 +36,38 @@ module Api
   end
 
   # map a list of ids and/or sis ids to plain ids.
-  def self.map_ids(ids, collection = nil, &block)
-    block ||= proc { |sis_id| collection.first(:conditions => { :sis_source_id => sis_id }, :select => :id).try(:id) }
-    ids.map { |id| self.switch_on_id_type(id, nil, block) }
+  def self.map_ids(ids, collection, &block)
+    block ||= proc { |sis_column, sis_id| collection.first(:conditions => { sis_column => sis_id }, :select => :id).try(:id) }
+    ids.map { |id| self.switch_on_id_type(id, self.valid_sis_columns_for_collection(collection), nil, block) }
   end
 
-  def self.switch_on_id_type(id, if_id = nil, if_sis_id = nil)
+  def self.switch_on_id_type(id, valid_columns, if_id = nil, if_sis_id = nil)
     case id
     when Numeric
       if_id ? if_id.call(id) : id
     else
       id = id.to_s
-      if id =~ %r{^sis:}
-        if_sis_id ? if_sis_id.call(id[4..-1]) : id[4..-1]
+      if id =~ %r{^(sis_[\w_]+):(.+)$} && valid_columns.key?($1)
+        if_sis_id ? if_sis_id.call(valid_columns[$1], $2) : $2
       else
         if_id ? if_id.call(id) : id
       end
     end
   end
 
+  def self.valid_sis_columns_for_collection(collection)
+    case collection.table_name
+    when Course.table_name
+      { 'sis_course_id' => 'sis_source_id' }
+    when EnrollmentTerm.table_name
+      { 'sis_term_id' => 'sis_source_id' }
+    when User.table_name
+      { 'sis_user_id' => 'sis_user_id', 'sis_login_id' => 'sis_source_id' }
+    else
+      raise ArgumentError, "need to add support for table name: #{collection.table_name}"
+    end
+  end
+
+  # See User.submissions_for_given_assignments and SubmissionsApiController#for_students
+  mattr_accessor :assignment_ids_for_students_api
 end

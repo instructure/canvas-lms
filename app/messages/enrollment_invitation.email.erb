@@ -3,14 +3,27 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= asset.course.class.to_s.capitalize %> Invitation
+  <%= t :subject, "Course Invitation" %>
 <% end %>
 
-You've been invited to participate in the <%= asset.course.class.to_s.downcase %>, <%= asset.course.name %>, as a <%= asset.readable_type %>.
+<%=
+    case asset.type
+    when 'TeacherEnrollment'
+      t :body_teacher, "You've been invited to participate in the course, %{course}, as a teacher.", :course => asset.course.name
+    when 'TAEnrollment'
+      t :body_ta, "You've been invited to participate in the course, %{course}, as a TA.", :course => asset.course.name
+    when 'ObserverEnrollment'
+      t :body_observer, "You've been invited to participate in the course, %{course}, as an observer.", :course => asset.course.name
+    when 'CourseDesignerEnrollment'
+      t :body_designer, "You've been invited to participate in the course, %{course}, as a designer.", :course => asset.course.name
+    else
+      t :body_student, "You've been invited to participate in the course, %{course}, as a student.", :course => asset.course.name
+    end
+%>
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
-Name: <%= asset.user.name %>
-Email: <%= asset.user.email %>
-<% if email != login %>Username: <%= asset.user.pseudonym.unique_id rescue "none" %><% end %>
+<%= before_label :name, "Name" %> <%= asset.user.name %>
+<%= before_label :email, "Email" %> <%= asset.user.email %>
+<% if email != login %><%= before_label :username, "Username" %> <%= asset.user.pseudonym.unique_id rescue t(:none, "none") %><% end %>
 
-Visit the <%= asset.course.class.to_s.downcase %> page here:
+<%= t :details, "Visit the course page here:" %>
 <%= content :link %>

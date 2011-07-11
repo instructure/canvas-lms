@@ -7,16 +7,16 @@
   status ||= nil
   exception ||= nil
 %>
-<% content_for :page_title, :clear_first => true do %>Page Not Found<% end %>
+<% content_for :page_title, t('title', 'Page Not Found') %>
 
 <%= render :partial => "shared/errors/backtrace", :locals => {:exception => exception} %>
 <div style="width: 410px; margin-left: auto; margin-right: auto; margin-top: 50px;">
-  <h2>Page Not Found</h2>
+  <h2><%= t('headings.page', %{Page Not Found}) %></h2>
   <% if @not_found_message %>
     <p><%= @not_found_message %></p>
   <% else %>
-    <p>Oops, we couldn't find that page.</p>
+    <p><%= t('generic_description', %{Oops, we couldn't find that page.}) %></p>
   <% end %>
-  <a href="#" style="font-size: 1.2em;" class="submit_error_link discussion-topic">Click here to tell us what you were looking for.</a>
-  <%= render :partial => "shared/errors/error_form", :locals => {:status => status} %>
+  <a href="#" style="font-size: 1.2em;" class="submit_error_link discussion-topic"><%= t('#links.errors.4xx_feedback', %{Click here to tell us what you were looking for.}) %></a>
+  <%= render :partial => "shared/errors/error_form", :locals => {:status => status, :error_category => '404'} %>
 </div>

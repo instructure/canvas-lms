@@ -18,7 +18,7 @@
 
 class QuizzesController < ApplicationController
   before_filter :require_context
-  add_crumb("Quizzes") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
+  add_crumb(lambda{ t(:top_level_crumb, "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
   before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only]
   
@@ -43,7 +43,7 @@ class QuizzesController < ApplicationController
       @assignment = nil
       @assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
       @quiz = @context.quizzes.create
-      add_crumb((!@quiz.quiz_title || @quiz.quiz_title.empty? ? "New Quiz" : @quiz.quiz_title))
+      add_crumb((!@quiz.quiz_title || @quiz.quiz_title.empty? ? t(:default_new_crumb, "New Quiz") : @quiz.quiz_title))
       # this is a weird check... who can create but not update???
       if authorized_action(@quiz, @current_user, :update)
         @assignment = @quiz.assignment
@@ -57,7 +57,7 @@ class QuizzesController < ApplicationController
       respond_to do |format|
         format.html {
           add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-          add_crumb("Statistics", named_context_url(@context, :context_quiz_statistics_url, @quiz))
+          add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
           @statistics = @quiz.statistics(params[:all_versions] == '1')
           user_ids = @quiz.quiz_submissions.select{|s| !s.settings_only? }.map(&:user_id)
           @submitted_users = user_ids.empty? ? [] : User.find_all_by_id(user_ids).compact.uniq.sort_by(&:last_name_first)
@@ -67,7 +67,7 @@ class QuizzesController < ApplicationController
           send_data(
             @quiz.statistics_csv(:include_all_versions => params[:all_versions] == '1', :anonymous => !@quiz.graded? && @quiz.anonymous_submissions), 
             :type => "text/csv", 
-            :filename => "#{@quiz.title} #{@quiz.readable_type} Report.csv", 
+            :filename => t(:statistics_filename, "%{title} %{type} Report", :title => @quiz.title, :type => @quiz.readable_type) + ".csv", 
             :disposition => "attachment"
           )
         }
@@ -88,7 +88,7 @@ class QuizzesController < ApplicationController
         end
       end
       if @has_student_submissions = @quiz.has_student_submissions?
-        flash[:notice] = "Keep in mind, some students have already taken or started taking this quiz"
+        flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
       render :action => "new"
     end
@@ -104,7 +104,7 @@ class QuizzesController < ApplicationController
   
   def show
     if @quiz.deleted?
-      flash[:error] = "That quiz has been deleted"
+      flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
       redirect_to named_context_url(@context, :context_quizzes_url)
       return
     end
@@ -199,7 +199,7 @@ class QuizzesController < ApplicationController
         render :action => 'invalid_ip'
       else
         log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
-        flash[:notice] = "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz." if @submission.less_than_allotted_time?
+        flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
         render :action => "take_quiz"
       end
     else
@@ -208,7 +208,7 @@ class QuizzesController < ApplicationController
           redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         end
       else
-        flash[:error] = "You have no quiz attempts left"
+        flash[:error] = t('errors.no_more_attempts', "You have no quiz attempts left")
       end
     end
   end
@@ -223,7 +223,10 @@ class QuizzesController < ApplicationController
         quiz.workflow_state = 'available'
         quiz.save
       end
-      flash[:notice] = "#{@quizzes.length} quizzes successfully published!"
+      flash[:notice] = t('notices.quizzes_published',
+                         { :one => "1 quiz successfully published!",
+                           :other => "%{count} quizzes successfully published!" },
+                         :count => @quizzes.length)
       redirect_to named_context_url(@context, :context_quizzes_url)
     end
   end
@@ -234,7 +237,7 @@ class QuizzesController < ApplicationController
       @account = @quiz.context.account
       if @quiz.ip_filter
         @filters << {
-          :name => 'Current Filter',
+          :name => t(:current_filter, 'Current Filter'),
           :account => @quiz.title,
           :filter => @quiz.ip_filter
         }
@@ -303,17 +306,17 @@ class QuizzesController < ApplicationController
         @submission.reload
       end
       if @quiz.deleted?
-        flash[:error] = "That quiz has been deleted"
+        flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
         redirect_to named_context_url(@context, :context_quizzes_url)
         return
       end
       if !@submission
-        flash[:notice] = "There is no submission available for that user"
+        flash[:notice] = t('notices.no_submission_for_user', "There is no submission available for that user")
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
       end
       if authorized_action(@submission, @current_user, :read)
-        add_crumb((!@submission.user || @submission.user == @current_user ? "History" : @submission.user.name))
+        add_crumb((!@submission.user || @submission.user == @current_user ? t(:default_history_crumb, "History") : @submission.user.name))
         @headers = !params[:headless]
         @current_submission = @submission
         @version_instances = @submission.submitted_versions.sort_by{|v| v.version_number }
@@ -340,7 +343,7 @@ class QuizzesController < ApplicationController
   def create
     if authorized_action(@context.quizzes.new, @current_user, :create)
       params[:quiz][:title] = nil if params[:quiz][:title] == "undefined"
-      params[:quiz][:title] ||= "New Quiz"
+      params[:quiz][:title] ||= t(:default_title, "New Quiz")
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
       params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
       if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey'
@@ -382,7 +385,7 @@ class QuizzesController < ApplicationController
     n = Time.now.to_f
     if authorized_action(@quiz, @current_user, :update)
       params[:quiz] ||= {}
-      params[:quiz][:title] = "New Quiz" if params[:quiz][:title] == "undefined"
+      params[:quiz][:title] = t(:default_title, "New Quiz") if params[:quiz][:title] == "undefined"
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
       params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
       if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey' #'new' && params[:quiz][:assignment_group_id]
@@ -418,11 +421,11 @@ class QuizzesController < ApplicationController
         end
         if res
           @quiz.reload
-          flash[:notice] = "Quiz successfully updated"
+          flash[:notice] = t('notices.quiz_updated', "Quiz successfully updated")
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
           format.json {render :json =>  @quiz.to_json(:include => {:assignment => {:include => :assignment_group}})}
         else
-          flash[:error] = "Quiz failed to update"
+          flash[:error] = t('errors.quiz_update_failed', "Quiz failed to update")
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
           format.json {render :json => @quiz.errors.to_json, :status => :bad_request}
         end

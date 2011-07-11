@@ -1,18 +1,18 @@
-<% content_for :page_title do %>Masquerade as <%= @user.short_name %><% end %>
+<% content_for :page_title do %><%= t('masquerade_as', 'Masquerade as %{user_name}', :user_name => @user.short_name) %> <% end %>
 
 <% jammit_css :roster_user %>
 
 <div class="user-switch-alert">
   <% if @user == @real_current_user %>
-    <span class="warning-text">Are you sure you want to stop masquerading?</span>
+    <span class="warning-text"><%= t('are_you_sure_stop', 'Are you sure you want to stop masquerading?') %></span>
     <% link_text = "Stop Masquerading" %>
   <% else %>
-    <span class="warning-text">Are you sure you want to masquerade as this user?</span>
+    <span class="warning-text"><%= t('are_you_sure_start', 'Are you sure you want to masquerade as this user?') %></span>
     <% link_text = "Masquerade as user" %>
   <% end %>
 
   <div style="float: right">
-    <%= link_to "Cancel", :back %> &nbsp; &nbsp;
+    <%= link_to t('#buttons.cancel', "Cancel"), :back %> &nbsp; &nbsp;
     <%= link_to link_text, user_masquerade_url(@user.id), { :method => :post, :class => 'button' } %>
   </div>
 

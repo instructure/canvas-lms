@@ -42,7 +42,7 @@ class FacebookController < ApplicationController
         @policies.each{|p| p.save!}
       end
     end
-    # TODO: i18n
+    # TODO: i18n... see notification.rb
     @notification_categories = Notification.dashboard_categories.reject{|c| c.category == "Summaries"}
     @policies = @user.notification_policies.for_channel(@cc)
     redirect_to facebook_settings_url

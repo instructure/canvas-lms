@@ -1,30 +1,34 @@
 <div class="section <%= "read_only" if (page_section && (page_section["attachment_id"] || page_section["submission_id"])) %>" id="page_section_<%= idx %>">
-  <a href="#" class="move_link no-hover" title="Drag to rearrange sections"><%= image_tag "move.png" %></a>
+  <a href="#" class="move_link no-hover" title="<%= t('titles.move_section', "Drag to rearrange sections") %>"><%= image_tag "move.png" %></a>
   <div class="section_type_name">
     <% if !page_section || page_section["section_type"] == "rich_text" %>
-      Rich Text Content
+      <%= t('section_types.rich_text', "Rich Text Content") %>
     <% elsif page_section["section_type"] == "html" %>
-      HTML/Embedded Content
+      <%= t('section_types.html', "HTML/Embedded Content") %>
     <% elsif page_section["section_type"] == "submission" %>
-      Course Submission
+      <%= t('section_types.submission', "Course Submission") %>
     <% elsif page_section["section_type"] == "attachment" %>
-      Image/File Upload
+      <%= t('section_types.attachment', "Image/File Upload") %>
     <% end %>
   </div>
   <div class="links">
-    <a href="#" class="delete_page_section_link no-hover" title="Delete this section"><%= image_tag "delete.png" %></a>
+    <a href="#" class="delete_page_section_link no-hover" title="<%= t('titles.delete_section', "Delete this section") %>"><%= image_tag "delete.png" %></a>
   </div>
   <div class="section_content">
     <% if page_section %>
       <% if !page_section["section_type"] || page_section["section_type"] == "rich_text" || page_section["section_type"] == "html" %>
-        <%= raw(page_section["content"] || "Nothing Entered Yet") %>
+        <%= raw(page_section["content"] || t('rich_text.default_content', "Nothing Entered Yet")) %>
       <% elsif page_section["section_type"] == "attachment" %>
         <div style="text-align: center;" class="attachment">
           <% attachment = @portfolio.user.attachments.find(page_section["attachment_id"]) %>
           <% if attachment && attachment.content_type.match(/\Aimage/) %>
             <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>" class="no-hover"><%= image_tag eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %></a>
           <% elsif attachment %>
-            <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>">Click here to Download <span class="filename"><%= attachment.display_name %></span></a>
+            <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>">
+              <%= t('links.download_attachment', "Click here to Download *%{attachment}*",
+                    :attachment => attachment.display_name,
+                    :wrapper => '<span class="filename">\1</span>') %>
+            </a>
           <% end %>
         </div>
       <% elsif page_section["section_type"] == "submission" %>

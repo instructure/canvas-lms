@@ -2,4 +2,4 @@
   http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.id %>
 <% end %>
 
-New Forum Topic: <b><a href="<%= content :link %>"><%= asset.title %></a></b>, <%= asset.context.name %>
+<%= t :body, "New Forum Topic: %{discussion_topic}, %{course}", :discussion_topic => %{<b><a href="#{content :link }">#{h asset.title }</a></b>}.html_safe, :course => asset.context.name %>

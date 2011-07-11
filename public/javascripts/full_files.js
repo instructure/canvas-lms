@@ -1322,7 +1322,8 @@ var fileStructureData = [];
                 $panel.find(".rename_item_link,.delete_item_link,.folder_url").attr('href', folder_url);
                 $panel.find(".breadcrumb").empty().append(files.breadcrumb());
                 $panel.toggleClass('editable_content_panel', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)))
-                  .toggleClass('addable_content_panel', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)));
+                  .toggleClass('addable_content_panel', !!((data.context && data.context.permissions && data.context.permissions.manage_files) || (data.permissions && data.permissions.update)))
+                  .toggleClass('downloadable_content_panel', !$panel.hasClass('editable_content_panel') && !$panel.hasClass('addable_content_panel') && !!(data.permissions && data.permissions.read_contents));
 
                 $panel.removeClass('to_be_hidden');
                 $panel.find(".download_zip,.upload_zip").hide();
@@ -2260,7 +2261,7 @@ var fileUpload = {
     $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
     $("#file_uploads_progress").slideDown();
     $file.find(".cancel_upload_link").hide().end()
-      .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info} ", {error: error.info}));
+      .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info} ", {error_info: error.info}));
     $file.addClass('done').addClass('errored');
     fileUpload.swfUploadNext();
     return false;

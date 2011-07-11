@@ -18,6 +18,18 @@ shared_examples_for "course selenium tests" do
     wizard_box.displayed?.should be_false
   end
 
+  it "should allow content export downloads" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/content_exports"
+    driver.find_element(:css, "button.submit_button").click
+    job = Delayed::Job.last(:conditions => { :tag => 'ContentExport#export_course_without_send_later' })
+    export = keep_trying_until { ContentExport.last }
+    export.export_course_without_send_later
+    new_download_link = keep_trying_until { driver.find_element(:css, "div#exports a") }
+    url = new_download_link.attribute 'href'
+    url.should match(%r{/files/\d+/download\?verifier=})
+  end
+
   it "should allow moving a student to a different section" do
     c = course :active_course => true
     users = {:plain => {}, :sis => {}}

@@ -21,4 +21,13 @@ describe Delayed::Job do
 
     lambda { [story, 1, story, false].send_later(:first) }.should raise_error
   end
+
+  it "should recover as well as possible from a failure failing a job" do
+    Delayed::Job::Failed.stub!(:create).and_return { raise "oh noes that was weird" }
+    job = "test".send_later :reverse
+    job_id = job.id
+    proc { job.fail! }.should raise_error
+    proc { Delayed::Job.find(job_id) }.should raise_error(ActiveRecord::RecordNotFound)
+    Delayed::Job.count.should == 0
+  end
 end

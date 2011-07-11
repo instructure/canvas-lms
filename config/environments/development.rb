@@ -16,14 +16,16 @@ config.action_controller.perform_caching             = false
 # Really do care if the message wasn't sent.
 config.action_mailer.raise_delivery_errors = true
 
-# Raise an exception on bad mass assignment. Helps us catch these bugs before
-# they hit.
-Canvas.protected_attribute_error = :raise
+config.to_prepare do
+  # Raise an exception on bad mass assignment. Helps us catch these bugs before
+  # they hit.
+  Canvas.protected_attribute_error = :raise
 
-# Raise an exception on finder type mismatch or nil arguments. Helps us catch
-# these bugs before they hit.
-Canvas.dynamic_finder_nil_arguments_error = :raise
-Canvas.dynamic_finder_type_cast_error = :raise
+  # Raise an exception on finder type mismatch or nil arguments. Helps us catch
+  # these bugs before they hit.
+  Canvas.dynamic_finder_nil_arguments_error = :raise
+  Canvas.dynamic_finder_type_cast_error = :raise
+end
 
 # eval <env>-local.rb if it exists
 Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }

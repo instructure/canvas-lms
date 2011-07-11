@@ -54,7 +54,7 @@ class EportfolioEntriesController < ApplicationController
         @page = @category.eportfolio_entries.find_by_slug(params[:entry_name])
       end
       if !@page
-        flash[:notice] = "Couldn't find that page"
+        flash[:notice] = t('notices.missing_page', "Couldn't find that page")
         redirect_to eportfolio_url(@portfolio.id)
         return
       end
@@ -112,7 +112,7 @@ class EportfolioEntriesController < ApplicationController
       begin
         redirect_to verified_file_download_url(@attachment)
       rescue
-        raise "Not Found"
+        raise t('errors.not_found', "Not Found")
       end
     end
   end

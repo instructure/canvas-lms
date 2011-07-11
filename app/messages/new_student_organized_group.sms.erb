@@ -1,3 +1,10 @@
-A new group named <%= asset.group.name %> was created for the <%= asset.group.context.class.to_s.downcase %> <%= asset.group.context.name %>. The first member is <%= asset.user.name %>.
+<%=
+    case asset.group.context_type
+    when 'Account'
+      t :body_account, %{A new group named "%{group_name}" was created for the account %{account}. The first member is %{user}.}, :group_name => asset.group.name, :account => asset.group.context.name, :user => asset.user.name
+    else
+      t :body_course, %{A new group named "%{group_name}" was created for the course %{course}. The first member is %{user}.}, :group_name => asset.group.name, :course => asset.group.context.name, :user => asset.user.name
+    end
+%>
 
-More info at <%= HostUrl.context_host(asset.group.context) %>
+<%= t :detail, "More info at %{url}", :url => HostUrl.context_host(asset.group.context) %>

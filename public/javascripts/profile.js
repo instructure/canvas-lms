@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('profile', function(I18n) {
+
 $(function() {
   var $profile_table = $(".profile_table"),
       $update_profile_form = $("#update_profile_form"),
@@ -63,7 +65,7 @@ $(function() {
       property_validations: {
         '=default_email_id': function(val, data) {
           if($("#default_email_id").length && (!val || val == "new")) {
-            return "Please select an option";
+            return I18n.t('please_select_an_option', "Please select an option");
           }
         }
       },
@@ -122,7 +124,7 @@ $(function() {
       document.location.reload();
     },
     error: function(data) {
-      $(this).loadingImage('remove').errorBox('Registration failed. Check the user name and password, and try again.');
+      $(this).loadingImage('remove').errorBox(I18n.t('errors.registration_failed', 'Registration failed. Check the user name and password, and try again.'));
     }
   });
   $("#unregistered_services li.service .content form .cancel_button").click(function(event) {
@@ -131,7 +133,7 @@ $(function() {
   $("#registered_services li.service .delete_service_link").click(function(event) {
     event.preventDefault();
     $(this).parents("li.service").confirmDelete({
-      message: "Are you sure you want to unregister this service?",
+      message: I18n.t('confirms.unregister_service', "Are you sure you want to unregister this service?"),
       url: $(this).attr('href'),
       success: function(data) {
         $(this).slideUp(function() {
@@ -154,7 +156,7 @@ $(function() {
     event.preventDefault();
     $(this).parents(".pseudonym").confirmDelete({
       url: $(this).attr('href'),
-      message: "Are you sure you want to delete this login?"
+      message: I18n.t('confirms.delete_login', "Are you sure you want to delete this login?")
     });
   });
   $(".datetime_field").datetime_field();
@@ -165,7 +167,7 @@ $(function() {
     event.preventDefault();
     $(this).closest(".access_token").confirmDelete({
       url: $(this).attr('rel'),
-      message: "Are you sure you want to delete this access key?",
+      message: I18n.t('confirms.delete_access_key', "Are you sure you want to delete this access key?"),
       success: function() {
         $(this).remove();
         if(!$(".access_token:visible").length) {
@@ -181,16 +183,16 @@ $(function() {
     object_name: 'access_token',
     required: ['purpose'],
     beforeSubmit: function() {
-      $(this).find("button").attr('disabled', true).filter(".submit_button").text("Generating Token...");
+      $(this).find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('buttons.generating_token', "Generating Token..."));
     },
     success: function(data) {
-      $(this).find("button").attr('disabled', false).filter(".submit_button").text("Generate Token");
+      $(this).find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.generate_token', "Generate Token"));
       $("#add_access_token_dialog").dialog('close');
       $("#no_approved_integrations").hide()
       $("#access_tokens_holder").show();
       var $token = $(".access_token.blank:first").clone(true).removeClass('blank');
       data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
-      data.expires = $.parseFromISO(data.expires_at).datetime_formatted || "never";
+      data.expires = $.parseFromISO(data.expires_at).datetime_formatted || I18n.t('token_never_expires', "never");
       data.used = "--";
       $token.fillTemplateData({
         data: data,
@@ -201,29 +203,29 @@ $(function() {
       $token.find(".show_token_link").click();
     },
     error: function() {
-      $(this).find("button").attr('disabled', false).filter(".submit_button").text("Generating Token Failed");
+      $(this).find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('errors.generating_token_failed', "Generating Token Failed"));
     }
   });
   $("#token_details_dialog .regenerate_token").click(function() {
-    var result = confirm("Are you sure you want to regenerate this token?  Anything using this token will have to be updated.");
+    var result = confirm(I18n.t('confirms.regenerate_token', "Are you sure you want to regenerate this token?  Anything using this token will have to be updated."));
     if(!result) { return; }
     
     var $dialog = $("#token_details_dialog");
     var $token = $dialog.data('token');
     var url = $dialog.data('token_url');
     var $button = $(this);
-    $button.text("Regenerating token...").attr('disabled', true);
+    $button.text(I18n.t('buttons.regenerating_token', "Regenerating token...")).attr('disabled', true);
     $.ajaxJSON(url, 'PUT', {'access_token[regenerate]': '1'}, function(data) {
       data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
-      data.expires = $.parseFromISO(data.expires_at).datetime_formatted || "never";
+      data.expires = $.parseFromISO(data.expires_at).datetime_formatted || I18n.t('token_never_expires', "never");
       data.used = $.parseFromISO(data.last_used_at).datetime_formatted || "--";
       data.visible_token = data.visible_token || "protected";
       $dialog.fillTemplateData({data: data})
         .find(".full_token_warning").showIf(data.visible_token.length > 10);
       $token.data('token', data);
-      $button.text("Regenerate Token").attr('disabled', false);
+      $button.text(I18n.t('buttons.regenerate_token', "Regenerate Token")).attr('disabled', false);
     }, function() {
-      $button.text("Regenerating Token Failed").attr('disabled', false);
+      $button.text(I18n.t('errors.regenerating_token_failed', "Regenerating Token Failed")).attr('disabled', false);
     });
   });
   $(".show_token_link").click(function(event) {
@@ -242,7 +244,7 @@ $(function() {
       $dialog.fillTemplateData({data: token});
       $dialog.data('token_url', url);
       $dialog.find(".refresh_token").showIf(token.visible_token && token.visible_token !== "protected")
-        .find(".regenerate_token").text("Regenerate Token").attr('disabled', false);
+        .find(".regenerate_token").text(I18n.t('buttons.regenerate_token', "Regenerate Token")).attr('disabled', false);
       $dialog.find(".loading_message,.error_loading_message").hide().end()
         .find(".results").show().end()
         .find(".full_token_warning").showIf(token.visible_token.length > 10);
@@ -253,7 +255,7 @@ $(function() {
     } else {
       $.ajaxJSON(url, 'GET', {}, function(data) {
         data.created = $.parseFromISO(data.created_at).datetime_formatted || "--";
-        data.expires = $.parseFromISO(data.expires_at).datetime_formatted || "never";
+        data.expires = $.parseFromISO(data.expires_at).datetime_formatted || I18n.t('token_never_expires', "never");
         data.used = $.parseFromISO(data.last_used_at).datetime_formatted || "--";
         data.visible_token = data.visible_token || "protected";
         $token.data('token', data);
@@ -267,7 +269,7 @@ $(function() {
   });
   $(".add_access_token_link").click(function(event) {
     event.preventDefault();
-    $("#access_token_form").find("button").attr('disabled', false).filter(".submit_button").text("Generate Token");
+    $("#access_token_form").find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.generate_token', "Generate Token"));
     $("#add_access_token_dialog").find(":input").val("").end()
     .dialog({
       width: 500
@@ -296,7 +298,7 @@ $(function() {
   $("#add_pic_form").formSubmit({
     fileUpload: true,
     beforeSubmit: function() {
-      $(this).find("button").attr('disabled', true).text("Adding File...");
+      $(this).find("button").attr('disabled', true).text(I18n.t('buttons.adding_file', "Adding File..."));
       var $span = $("<span class='img'><img/></span>");
       var $img = $span.find("img");
       $img.attr('src', '/images/ajax-loader.gif');
@@ -304,7 +306,7 @@ $(function() {
       return $img;
     },
     success: function(data, $img) {
-      $(this).find("button").attr('disabled', false).text("Add File");
+      $(this).find("button").attr('disabled', false).text(I18n.t('buttons.add_file', "Add File"));
       var attachment = data.attachment;
       if($img) {
         $img.removeClass('pending');
@@ -319,7 +321,7 @@ $(function() {
       }
     },
     error: function(data, $img) {
-      $(this).find("button").attr('disabled', false).text("Adding File Failed");
+      $(this).find("button").attr('disabled', false).text(I18n.t('errors.adding_file_failed', "Adding File Failed"));
       if($img) {
         $img.remove();
       }
@@ -331,7 +333,7 @@ $(function() {
   $("#profile_pic_dialog .select_button").click(function() {
     var url = $("#update_profile_form").attr('action');
     var $dialog = $("#profile_pic_dialog");
-    $dialog.find("button").attr('disabled', true).filter(".select_button").text("Selecting Image...");
+    $dialog.find("button").attr('disabled', true).filter(".select_button").text(I18n.t('buttons.selecting_image', "Selecting Image..."));
     var $img = $("#profile_pic_dialog .profile_pic_list .img.selected img");
     if($img.length == 0) {
       return;
@@ -342,7 +344,7 @@ $(function() {
       'user[avatar_image][type]': $img.attr('data-type')
     };
     $.ajaxJSON(url, 'PUT', data, function(data) {
-      $dialog.find("button").attr('disabled', false).filter(".select_button").text("Select Image");
+      $dialog.find("button").attr('disabled', false).filter(".select_button").text(I18n.t('buttons.select_image', "Select Image"));
       var user = data.user;
       if(user.avatar_url == '/images/no_pic.gif') {
         user.avatar_url = '/images/dotted_pic.png';
@@ -350,7 +352,7 @@ $(function() {
       $(".profile_pic_link img").attr('src', user.avatar_url);
       $dialog.dialog('close');
     }, function(data) {
-      $dialog.find("button").attr('disabled', false).filter(".select_button").text("Selecting Image Failed, please try again");
+      $dialog.find("button").attr('disabled', false).filter(".select_button").text(I18n.t('errors.selecting_image_failed', "Selecting Image Failed, please try again"));
     });
   });
   $(".profile_pic_link").click(function(event) {
@@ -359,11 +361,11 @@ $(function() {
     $dialog.find(".img.selected").removeClass('selected');
     $dialog.find(".select_button").attr('disabled', true);
     if($(this).hasClass('locked')) {
-      alert("Your profile picture has been locked by an administrator, and cannot be changed.");
+      alert(I18n.t('alerts.profile_picture_locked', "Your profile picture has been locked by an administrator, and cannot be changed."));
       return;
     }
     if(!$dialog.hasClass('loaded')) {
-      $dialog.find(".profile_pic_list h3").text("Loading Images...");
+      $dialog.find(".profile_pic_list h3").text(I18n.t('headers.loading_images', "Loading Images..."));
       $.ajaxJSON($(".profile_pics_url").attr('href'), 'GET', {}, function(data) {
         if(data && data.length > 0) {
           $dialog.addClass('loaded')
@@ -382,15 +384,15 @@ $(function() {
             $dialog.find(".profile_pic_list div").before($span);
           }
         } else {
-          $dialog.find(".profile_pic_list h3").text("Loading Images Failed, please try again");
+          $dialog.find(".profile_pic_list h3").text(I18n.t('errors.loading_images_failed', "Loading Images Failed, please try again"));
         }
       }, function(data) {
-        $dialog.find(".profile_pic_list h3").text("Loading Images Failed, please try again");
+        $dialog.find(".profile_pic_list h3").text(I18n.t('errors.loading_images_failed', "Loading Images Failed, please try again"));
       });
     }
     $("#profile_pic_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: "Select Profile Pic",
+      title: I18n.t('titles.select_profile_pic', "Select Profile Pic"),
       width: 500,
       height: 300
     }).dialog('open');
@@ -409,3 +411,5 @@ $(function() {
   };
   setTimeout(checkImage, 500);
 });
+
+})

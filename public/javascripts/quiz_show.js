@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('quizzes.show', function(I18n) {
+
 $(document).ready(function () {
   function loadStudents() {
     var students_hash = {};
@@ -37,14 +39,16 @@ $(document).ready(function () {
     event.preventDefault();
     students = loadStudents();
     submittedCount = $.grep(students, function(s) { return s.submitted; }).length
+    var deleteConfirmMessage = I18n.t('confirms.delete_quiz', "Are you sure you want to delete this quiz?");
+    if (submittedCount < 0) {
+      deleteConfirmMessage += "\n\n" + I18n.t('confirms.delete_quiz_submissions_warning',
+	      {'one': "Warning: 1 student has already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.",
+	       'other': "Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook."},
+	      {'count': submittedCount});
+    }
     $("nothing").confirmDelete({
       url: $(this).attr('href'),
-      message: "Are you sure you want to delete this quiz?" +
-        (submittedCount > 0 ?
-          "\n\nWarning: " + $.pluralize_with_count(submittedCount, "student") +
-            " " + (submittedCount == 1 ? "has" : "have") + " already taken this quiz. If you delete it, " +
-            "any completed submissions will be deleted and no longer appear in the gradebook." :
-          ""),
+      message: deleteConfirmMessage,
       success: function() {
         window.location.href = $('#context_quizzes_url').attr('href');
       }
@@ -61,17 +65,17 @@ $(document).ready(function () {
 
     window.messageStudents({
       options: [
-        {text: "Have taken the quiz"},
-        {text: "Have NOT taken the quiz"}
+        {text: I18n.t('have_taken_the_quiz', "Have taken the quiz")},
+        {text: I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz")}
       ],
       title: title,
       students: students,
       callback: function(selected, cutoff, students) {
         students = $.grep(students, function($student, idx) {
           var student = $student.user_data;
-          if(selected == "Have taken the quiz") {
+          if(selected == I18n.t('have_taken_the_quiz', "Have taken the quiz")) {
             return student.submitted;
-          } else if(selected == "Have NOT taken the quiz") {
+          } else if(selected == I18n.t('have_not_taken_the_quiz', "Have NOT taken the quiz")) {
             return !student.submitted;
           }
         });
@@ -108,5 +112,7 @@ $(document).ready(function () {
       }
     }).find('.datetime_field').datetime_field();
   });
+
+});
 
 });

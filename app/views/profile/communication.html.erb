@@ -1,21 +1,17 @@
-<% 
-  add_crumb(@user.short_name, profile_path )
-  add_crumb("Notification Preferences", communication_profile_path )
-%>
-<% content_for :page_title do %>Notification Preferences<% end %>
+<% content_for :page_title do %><%= t(:page_title, "Notification Preferences") %><% end %>
 
 <% content_for :right_side do %>
   <%= render :partial => "ways_to_contact" %>
   <% if service = @current_user.user_services.find_by_service('twitter') %>
     <div class='rs-margin-lr' style="text-align: right;">
-      <a href="#" id="no_tweets" class="help">Not Receiving Tweets?</a>
+      <a href="#" id="no_tweets" class="help"><%= t('links.not_receiving_tweets', "Not Receiving Tweets?") %></a>
       <div id="no_tweets_dialog">
         
       </div>
     </div>
   <% end %>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'profile.communication' do %>
 <script>
 $(document).ready(function() {
   $(".notification_preferences .frequency").click(function(event) {
@@ -38,7 +34,6 @@ $(document).ready(function() {
       $prev = $prev.prev(".preference");
     }
     $next.find(".contact_type_select").change();
-//    $next.addClass('event_pending').find(":input").attr('disabled', true);
   });
   $(".delete_preference_link").bind('click', function(event, skipAnimate) {
     event.preventDefault();
@@ -86,7 +81,6 @@ $(document).ready(function() {
   $(".save_preferences_button").click(function(event) {
     event.preventDefault();
     var $button = $(this);
-    //$("html,body").scrollTo({top: $(".notification_preferences").offset().top});
     $(".notification_preferences").loadingImage();
     var data = $(".notification_preferences").getFormData();
     $(".notification_preferences tr.preference").each(function() {
@@ -106,16 +100,15 @@ $(document).ready(function() {
       }
     });
     var url = $("#contact_urls .update_communication_url").filter(":last").attr('href');
-    $button.text("Saving Preferences...").attr('disabled', true);
+    $button.text(I18n.t('buttons.saving_preferences', "Saving Preferences...")).attr('disabled', true);
     $.ajaxJSON(url, 'POST', data, function(data) {
-      $button.text("Saved Preferences!").attr('disabled', false);
+      $button.text(I18n.t('buttons.saved_preferences', "Saved Preferences!")).attr('disabled', false);
       setTimeout(function() {
-        $button.text("Save Preferences");
+        $button.text(I18n.t('buttons.save_preferences', "Save Preferences"));
       }, 2500);
-      $.flashMessage('Communication Preferences updated');
+      $.flashMessage(I18n.t('notices.communication_preferences_updated', 'Communication Preferences updated'));
       $(".notification_preferences").loadingImage('remove');
       $("tr.preference .frequency.selected_pending").removeClass('selected_pending').addClass('selected');
-      //location.reload();
       var found = {};
       $("tr.preference").each(function() {
         var slug = $(this).getTemplateData({textValues: ['category_slug']}).category_slug;
@@ -146,9 +139,9 @@ $(document).ready(function() {
       }
       $("tr.preference .frequency.selected_pending").removeClass('selected_pending').addClass('selected');
     }, function(data) {
-      $button.text("Problem Saving Preferences").attr('disabled', false);
+      $button.text(I18n.t('buttons.problem_saving_preferences', "Problem Saving Preferences")).attr('disabled', false);
       $(".notification_preferences").loadingImage('remove');
-      $.flashError('Oops! Something broke.  Try saving again');
+      $.flashError(I18n.t('errors.saving_preferences_failed', 'Oops! Something broke.  Try saving again'));
     });
   });
   $(".sms_select, .email_select").change(function() {
@@ -223,11 +216,11 @@ $(document).ready(function() {
 
 <table class="notification_preferences" cellspacing="0">
   <tr>
-    <td colspan="2"><h2>Notification Preferences</h2></td>
-    <td class="frequency_header">Right Away</td>
-    <td class="frequency_header">Daily</td>
-    <td class="frequency_header">Weekly</td>
-    <td class="frequency_header">Never</td>
+    <td colspan="2"><h2><%= t('headers.notification_preferences', "Notification Preferences") %></h2></td>
+    <td class="frequency_header"><%= t('frequencies.right_away', "Right Away") %></td>
+    <td class="frequency_header"><%= t('frequencies.daily', "Daily") %></td>
+    <td class="frequency_header"><%= t('frequencies.weekly', "Weekly") %></td>
+    <td class="frequency_header"><%= t('frequencies.never', "Never") %></td>
     <td>&nbsp;</td>
   </tr>
   <% @notification_categories.each do |n| %>
@@ -235,6 +228,6 @@ $(document).ready(function() {
   <% end %>
 </table>
 <p class="button-container">
-  <button type="button" class="save_preferences_button button">Save Preferences</button>
+  <button type="button" class="save_preferences_button button"><%= t('buttons.save_preferences', "Save Preferences") %></button>
 </p>
 

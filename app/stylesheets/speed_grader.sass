@@ -115,10 +115,14 @@
 #left_side
   width: 75%
   float: left
-  #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder
+  #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder, #resize_overlay
     height: 100%
     width: 100%
     border: 0 none
+  #resize_overlay
+    position: relative
+    top: -100%
+    z-index: 1
   h3
     margin: 0
     padding: 2em
@@ -133,6 +137,8 @@
   width: 7px
   float: left
   border-right: 1px solid #838383
+  position: relative
+  z-index: 2
   &.highlight
     background-color: #FBEC88
 

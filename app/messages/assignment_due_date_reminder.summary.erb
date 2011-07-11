@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  Due: <%= asset.assignment.title %>, <%= asset.assignment.context.name %>
+  <%= t('assignment_due', 'Due: %{assignment_name}, %{course_name}', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>
 <% end %>
 
-<%= asset.assignment.title %>, <%= asset.assignment.context.name %> is due <%= datetime_string(force_zone(asset.assignment.due_at)) %>.
+<%= t('assignment_is_due', '%{assignment_name}, %{course_name} is due %{due_date}', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :due_date => datetime_string(force_zone(asset.assignment.due_at))) %>

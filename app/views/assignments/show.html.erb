@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= @assignment.new_record? ? "New Assignment" : @assignment.title %>: <%= @context.name %><% end %>
+<% content_for :page_title do %><%= @assignment.new_record? ? t(:new_assignment, "New Assignment") : @assignment.title %>: <%= @context.name %><% end %>
 <% content_for :right_side do %>
     <%= render :partial => "assignment_sidebar" %>
     <%= render :partial => "shared/wiki_sidebar" %>
@@ -25,7 +25,7 @@ $(document).ready(function() {
       event.preventDefault();
       event.stopPropagation();
       $(this).formErrors({
-        submissions_zip: "Please upload files as a .zip"
+        submissions_zip: <%= t('errors.upload_as_zip', "Please upload files as a .zip").to_json.html_safe %>
       });
     }
   });
@@ -52,7 +52,7 @@ $(document).ready(function() {
 </style>
 <% end %>
 <% if @context.claimed? && params[:getting_started] %>
-  <a href="<%= getting_started_assignments_url %>" class="back" style="font-size: 1.2em;">Back to Getting Started Wizard</a>
+  <a href="<%= getting_started_assignments_url %>" class="back" style="font-size: 1.2em;"><%= t 'links.back_to_getting_started', "Back to Getting Started Wizard"%></a>
 <% end %>
 <% unless @assignment.new_record? %>
   <% if can_do(@assignment, @current_user, :update) %>
@@ -64,7 +64,7 @@ $(document).ready(function() {
   <% if @assignment_module && @assignment_module.context_module %>
     <%= render :partial => "shared/context_module_legend", :object => @assignment_module.context_module %>
   <% end %>
-  <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : "This assignment is currently locked." %>
+  <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 <% else %>
   <%= render :partial => "shared/full_assignment", :object => @assignment %>
 <% end %>

@@ -2,6 +2,8 @@
  * Copyright 2010 Jay and Han (laughinghan@gmail.com)
  * License, Usage and Readme at http://mathquill.com
  */
+
+I18n.scoped('mathquill', function(I18n) {
  (function($){ //takes in the jQuery function as an argument
 
 var _, //temp variable of prototypes
@@ -405,7 +407,7 @@ function addToolbar(root, jQ) {
   // functions like "log" are excluded, since we have some fu to auto-convert
   // them as they are typed (i.e. you can just type "log", don't need the \ )
   var button_tabs = [
-    { name: 'Basic',
+    { name: I18n.t('tabs.basic', 'Basic'),
       example: '+',
       button_groups: [
         ["subscript", "supscript", "frac", "sqrt", "nthroot", "langle", "binomial", "vector", "f", "prime"],
@@ -414,30 +416,30 @@ function addToolbar(root, jQ) {
         ["sum", "prod", "coprod", "int"],
         ["N", "P", "Z", "Q", "R", "C", "H"]
       ]},
-    { name: 'Greek',
+    { name: I18n.t('tabs.greek', 'Greek'),
       example: '&pi;',
       button_groups: [
         ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega"],
         ["digamma", "varepsilon", "vartheta", "varkappa", "varpi", "varrho", "varsigma", "varphi"],
         ["Gamma", "Delta", "Theta", "Lambda", "Xi", "Pi", "Sigma", "Upsilon", "Phi", "Psi", "Omega"]
       ]},
-    { name: 'Operators',
+    { name: I18n.t('tabs.operators', 'Operators'),
       example: '&oplus;',
       button_groups: [["wedge", "vee", "cup", "cap", "diamond", "bigtriangleup", "ominus", "uplus", "otimes", "oplus", "bigtriangledown", "sqcap", "triangleleft", "sqcup", "triangleright", "odot", "bigcirc", "dagger", "ddagger", "wr", "amalg"]
       ]},
-    { name: 'Relationships',
+    { name: I18n.t('tabs.relationships', 'Relationships'),
       example: '&le;',
       button_groups: [["<", ">", "equiv", "cong", "sim", "notin", "ne", "propto", "approx", "le", "ge", "in", "ni", "notni", "subset", "supset", "notsubset", "notsupset", "subseteq", "supseteq", "notsubseteq", "notsupseteq", "models", "prec", "succ", "preceq", "succeq", "simeq", "mid", "ll", "gg", "parallel", "bowtie", "sqsubset", "sqsupset", "smile", "sqsubseteq", "sqsupseteq", "doteq", "frown", "vdash", "dashv", "exists", "varnothing"]
       ]},
-    { name: 'Arrows',
+    { name: I18n.t('tabs.arrows', 'Arrows'),
       example: '&hArr;',
       button_groups: [["longleftarrow", "longrightarrow", "Longleftarrow", "Longrightarrow", "longleftrightarrow", "updownarrow", "Longleftrightarrow", "Updownarrow", "mapsto", "nearrow", "hookleftarrow", "hookrightarrow", "searrow", "leftharpoonup", "rightharpoonup", "swarrow", "leftharpoondown", "rightharpoondown", "nwarrow", "downarrow", "Downarrow", "uparrow", "Uparrow", "rightarrow", "Rightarrow", "leftarrow", "lArr", "leftrightarrow", "Leftrightarrow"]
       ]},
-    { name: 'Delimiters',
+    { name: I18n.t('tabs.delimiters', 'Delimiters'),
       example: '{',
       button_groups: [["lfloor", "rfloor", "lceil", "rceil", "slash", "opencurlybrace", "closecurlybrace"]
       ]},
-    { name: 'Misc',
+    { name: I18n.t('tabs.miscellaneous', 'Misc'),
       example: '&infin;',
       button_groups: [["forall", "ldots", "cdots", "vdots", "ddots", "surd", "triangle", "ell", "top", "flat", "natural", "sharp", "wp", "bot", "clubsuit", "diamondsuit", "heartsuit", "spadesuit", "caret", "underscore", "backslash", "vert", "perp", "nabla", "hbar", "AA", "circ", "bullet", "setminus", "neg", "dots", "Re", "Im", "partial", "infty", "aleph", "deg", "angle"]
       ]}
@@ -2647,3 +2649,4 @@ $(function() {
 
 
 }(jQuery));
+});

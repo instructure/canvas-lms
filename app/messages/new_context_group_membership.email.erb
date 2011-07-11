@@ -2,12 +2,26 @@
   http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups
 <% end %>
 <% define_content :subject do %>
-  New Group Membership for <%= asset.group.context.name %>
+  <%= t :subject, "New Group Membership for %{course_or_account}", :course_or_account => asset.group.context.name %>
 <% end %>
 
-New Group Membership: <%= asset.group.name %>
+<%= t :title, "New Group Membership: %{group_name}", :group_name => asset.group.name %>
 
-You've been added to a new group for the <%= asset.group.context.class.to_s.downcase %> <%= asset.group.context.name %>.  The name of the group is <%= asset.group.name %>.
+<%=
+    case asset.group.context_type
+    when 'Account'
+      t :body_account, "You've been added to a new group for the account %{account}.  The name of the group is %{group_name}.", :account => asset.group.context.name, :group_name => asset.group.name
+    else
+      t :body_course, "You've been added to a new group for the course %{course}.  The name of the group is %{group_name}.", :course => asset.group.context.name, :group_name => asset.group.name
+    end
+%>
 
-You can see which groups you're a part of for this <%= asset.group.context.class.to_s.downcase %> by clicking the link below:
+<%=
+    case asset.group.context_type
+    when 'Account'
+      t :details_account, "You can see which groups you're a part of for this account by clicking the link below:"
+    else
+      t :details_account, "You can see which groups you're a part of for this account by clicking the link below:"
+    end
+%>
 <%= content :link %>

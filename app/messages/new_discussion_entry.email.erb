@@ -3,12 +3,12 @@
 <% end %>
 
 <% define_content :subject do %>
-  New Comment for <%= asset.title %>: <%= asset.context.name %>
+  <%= t :subject, "New Comment for %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
 <% end %>
 
-<%= asset.user.short_name %> posted a new comment on the thread <%= asset.title %> for <%= asset.context.name %>:
+<%= t :body, "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %>
 
 <%= strip_and_truncate(asset.message, :max_length => 200) %> 
 
-Join the conversation here: 
+<%= t :details, "Join the conversation here:" %>
 <%= content :link %>

@@ -2,7 +2,7 @@
   jammit_css :login
   @headers = false
   @body_classes << "modal" if @body_classes
-  content_for :page_title, "Register as a Teacher"
+  content_for :page_title, t('register_as_teacher', "Register as a Teacher")
   @errors = [] 
   [@user, @pseudonym].each do |obj|
     obj.errors.full_messages.each do |m| 
@@ -12,7 +12,7 @@
     end
   end
 %>
-<% js_block do %>
+<% js_block :i18n_scope => "users.new" do %>
 <script type="text/javascript">
 $(function(){
   $(".field-with-fancyplaceholder input").fancyPlaceholder();
@@ -24,13 +24,13 @@ $(function(){
     
     if(!data['user[name]']) {
       $form.formErrors({
-        'user[name]': "User name is required"
+        'user[name]': I18n.t("username_required", "User name is required")
       });
       success = false;
     } 
     if(!data.unique_id || !data.unique_id.length || data.unique_id.length < 3 || !data.unique_id.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,10}$/i)) {
       $form.formErrors({
-        unique_id: "Invalid Email Address"
+        unique_id: I18n.t("invalid_email", "Invalid Email Address")
       });
       success = false;
     } 
@@ -38,7 +38,7 @@ $(function(){
   });
   var errors = <%= raw(@errors.join(', ').to_json) %>;
   if (errors) {
-    $.flashError('There were problems with the following fields: ' + errors);
+    $.flashError(I18n.t("problems_with_fields", 'There were problems with the following fields: %{errors}', {errors: errors}));
   }
 });
 </script>
@@ -46,14 +46,14 @@ $(function(){
 <div id="modal-box-top"></div>
 <div id="modal-box-arbitrary-size">
   <div style="margin: 30px 80px 0; position: relative;">
-    <h2>Register for a new account</h2>
+    <h2><%= t('register_for_new_account', 'Register for a new account') %></h2>
     <% form_for @pseudonym, :url => users_path, :html => {:id => "register_form", :method => :post} do |form|  %>
       <table>
         <tr>
           <td colspan="2">
             <input type="hidden" name="new_teacher" value="1"/>
-            <span class="field-with-fancyplaceholder"><%= label :user, :name, "Your name" %><%= text_field :user, :name, :class => "text" %></span>
-            <span class="field-with-fancyplaceholder"><%= form.label :unique_id, "Email address" %><%= form.text_field :unique_id, :class => "text", :value => !@pseudonym || @pseudonym.deleted? ? (@pseudonym.deleted_unique_id rescue nil) : @pseudonym.unique_id %></span>
+            <span class="field-with-fancyplaceholder"><%= label :user, :name, t('your_name', "Your name") %><%= text_field :user, :name, :class => "text" %></span>
+            <span class="field-with-fancyplaceholder"><%= form.label :unique_id, t('email_address', "Email address") %><%= form.text_field :unique_id, :class => "text", :value => !@pseudonym || @pseudonym.deleted? ? (@pseudonym.deleted_unique_id rescue nil) : @pseudonym.unique_id %></span>
           </td>
         </tr>
         <% Canvas::Plugin.all_for_tag('registration_form').each do |plugin| %>
@@ -61,7 +61,7 @@ $(function(){
         <% end %>
         <tr>
           <td colspan="2">
-            <button type="submit" class="button">Register</button>
+            <button type="submit" class="button"><%= t('buttons.register', 'Register') %></button>
           </td>
         </tr>
       </table>

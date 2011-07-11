@@ -1,10 +1,10 @@
 <% if @assignments.empty? %>
-  <h2>Assignments</h2>
-  No Assignments created for this course.
+  <h2><%= t 'titles.assignments', "Assignments" %></h2>
+  <%= t :no_assignments, "No Assignments created for this course." %>
 <% else %>
   <% if @just_viewing_one_course %>
   <div id="groups_for_student" style="display: none;">
-    <h2>Course Assignments</h2>
+    <h2><%= t 'titles.course_assignments', "Course Assignments" %></h2>
     <%= render :partial => "shared/assignment_group", 
                :collection => @groups, 
                :locals => { 
@@ -14,14 +14,14 @@
   </div>
   <% end %>
   <div id="assignments_for_student">
-    <% [ { :label => "Overdue", :variable => @overdue_assignments},
-         { :label => "Ungraded", :variable => @ungraded_assignments},
-         { :label => "Upcoming", :variable => @future_assignments},
-         { :label => "Undated", :variable => @undated_assignments},
-         { :label => "Past", :variable => @past_assignments}
+    <% [ { :label => t('titles.overdue_assignments', "Overdue Assignments"), :variable => @overdue_assignments},
+         { :label => t('titles.ungraded_assignments', "Ungraded Assignments"), :variable => @ungraded_assignments},
+         { :label => t('titles.upcoming_assignments', "Upcoming Assignments"), :variable => @future_assignments},
+         { :label => t('titles.undated_assignments', "Undated Assignments"), :variable => @undated_assignments},
+         { :label => t('titles.past_assignments', "Past Assignments"), :variable => @past_assignments}
        ].each do |group| %>
     <div style="margin-bottom: 25px; <%= hidden if !group[:variable] || group[:variable].empty? %>" class="assignment_list <%= 'show_context' unless @just_viewing_one_course %>">
-      <h2><%= group[:label] %> Assignments</h2>
+      <h2><%= group[:label] %></h2>
       <%= render :partial    => "shared/assignment", 
                  :collection => group[:variable], 
                  :locals     => {
@@ -35,7 +35,7 @@
 <% if @just_viewing_one_course %>
 <div id="group_weighting_scheme" style="display: none;"><%= @context.group_weighting_scheme %></div>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'assignments' do %>
 <script>
 var submissionsHash = <%= raw @submissions_hash.to_json %>;
 var managedAssignments = null;
@@ -49,9 +49,9 @@ $(document).ready(function() {
         graded_count: assignment.graded_count || "0"
       }});
       if(assignment.submitted_count || assignment.graded_count) {
-        $assignment.find(".submitted").showIf(!!assignment.submitted_count);
-        $assignment.find(".graded").showIf(!!assignment.graded_count);
-        $assignment.find(".submitted_graded_comma").showIf(assignment.submitted_count && assignment.graded_count);
+        $assignment.find(".submitted").showIf(!!assignment.submitted_count && !assignment.graded_count);
+        $assignment.find(".graded").showIf(!!assignment.graded_count && !assignment.submitted_count);
+        $assignment.find(".submitted_and_graded").showIf(assignment.submitted_count && assignment.graded_count);
         $assignment.find(".submitted_details").showIf(!!(assignment.submitted_count || assignment.graded_count));
       }
     }
@@ -91,6 +91,8 @@ $(document).ready(function() {
     }
   }
   
+  // TODO i18n
+  I18n.t('percent_of_final_grade', '%{percent} of final grade', {percent: 0});
   $("#groups_for_student .assignment_group") //.find(".more_info_link").show().end()
     .find(".more_info").hide().end()
     .find(".more_info_brief").showIf($("#group_weighting_scheme").text() == "percent").append(" of final grade");
@@ -112,12 +114,12 @@ $(document).ready(function() {
   });
   $(".group_assignment").hover(function() {
     if($(this).hasClass('group_assignment_overdue')) {
-      $(this).attr('title', "This assignment is overdue");
+      $(this).attr('title', I18n.t('overdue', "This assignment is overdue"));
     } else if($(this).hasClass('group_assignment_ungraded')) {
       var needs_grading_count = $(this).getTemplateData({textValues: ['needs_grading_count']}).needs_grading_count;
-      $(this).attr('title', needs_grading_count + " submissions for this assignment still need grading");
+      $(this).attr('title', I18n.t('needs_grading_count', "%{needs_grading_count} submissions for this assignment still need grading", { needs_grading_count: needs_grading_count }));
     } else if($(this).hasClass('group_assignment_graded')) {
-      $(this).attr('title', "This assignment has been graded");
+      $(this).attr('title', I18n.t('graded', "This assignment has been graded"));
     }
   }, function() {
     $(this).attr('title', '');

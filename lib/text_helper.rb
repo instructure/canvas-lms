@@ -228,6 +228,27 @@ module TextHelper
     I18n.t('#time.with_ago', '%{time} ago', :time => (time_ago_in_words time rescue ''))
   end
 
+  # more precise than distance_of_time_in_words, and takes a number of seconds,
+  # rather than two times. also assumes durations on the scale of hours or
+  # less, so doesn't bother with days, months, or years
+  def readable_duration(seconds)
+    # keys stolen from ActionView::Helpers::DateHelper#distance_of_time_in_words
+    case seconds
+    when  0...60
+      I18n.t('datetime.distance_in_words.x_seconds',
+        { :one => "1 second", :other => "%{count} seconds" },
+        :count => seconds.round)
+    when 60...3600
+      I18n.t('datetime.distance_in_words.x_minutes',
+        { :one => "1 minute", :other => "%{count} minutes" },
+        :count => (seconds / 60.0).round)
+    else
+      I18n.t('datetime.distance_in_words.about_x_hours',
+        { :one => "about 1 hour", :other => "about %{count} hours" },
+        :count => (seconds / 3600.0).round)
+    end
+  end
+
   def truncate_html(input, options={})
     doc = Nokogiri::HTML(input)
     options[:max_length] ||= 250
@@ -360,7 +381,8 @@ module TextHelper
     translated = t(*args)
     translated = ERB::Util.h(translated) unless translated.html_safe?
     result = RDiscount.new(translated).to_html.strip
-    result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>[^<]*?(<\/?(a|em|strong|code|img|br( ?\/)?)[^<]*?)*<\/p>\z/
+    # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
+    result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.html_safe.strip
   end
 end
