@@ -71,7 +71,7 @@ class ContentExport < ActiveRecord::Base
   end
   
   def error_messages
-    self.settings[:errors]
+    self.settings[:errors] ||= []
   end
   
   def add_error(user_message, exception_or_info)
