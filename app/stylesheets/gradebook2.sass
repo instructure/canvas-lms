@@ -2,15 +2,21 @@
 
 $cell_height: 33px
 
-// overrides of the default slick.grid.css styles
+// ******* overrides of the default slick.grid.css styles ********
+.slick-sort-indicator
+  position: absolute
+  bottom: 4px
+  left: 4px
 #gradebook_grid
   .slick-cell
     border: 0
     padding: 0
     overflow: visible
+    position: relative
     &.editable
       background: transparent
       border: none
+// ******* END overrides of the default slick.grid.css styles ********
 
 .gradebook2 #content
   position: relative
@@ -145,7 +151,7 @@ $cell_height: 33px
       border-width: 0 5px 5px
       bottom: auto
       top: -5px
-  .gradebook-cell.hover &, .gradebook-cell.focus &, .slick-cell.selected &
+  .slick-cell.hover &, .gradebook-cell.focus &, .slick-cell.selected &
     display: block
 
 
@@ -278,4 +284,13 @@ $gradebook_checkbox_width: 16px
       background-position: -16px 0
     &.gradebook-checkbox-fail
       background-position: -32px 0
+
+.minimized
+  background-image: url("/images/4_percent_opacity.png")
+  .gradebook-cell
+    font-size: 0px
+    *
+      display: none
+.minimized .slick-column-name
+  display: none
 

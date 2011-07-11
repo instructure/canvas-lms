@@ -66,8 +66,8 @@ this.SubmissionCell = class SubmissionCell
     ).join(', ')
 
     """
+    #{ if tooltipText then '<div class="gradebook-tooltip">'+ tooltipText + '</div>' else ''}
     <div class="gradebook-cell #{ if opts.editable then 'gradebook-cell-editable focus' else ''} #{opts.classes} #{specialClasses.join(' ')}">
-      #{ if tooltipText then '<div class="gradebook-tooltip">'+ tooltipText + '</div>' else ''}
       <a href="#" class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
       #{innerContents}
     </div>

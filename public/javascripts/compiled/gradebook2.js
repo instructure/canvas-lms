@@ -3,8 +3,15 @@
   I18n.scoped('gradebook2', function(I18n) {
     var Gradebook;
     return this.Gradebook = Gradebook = (function() {
+      var assignmentsToHide, minimumAssignmentColumWidth;
+      minimumAssignmentColumWidth = 10;
+      assignmentsToHide = $.store.userGet('hidden_columns_' + $("#current_context_code").text()).split(',');
       function Gradebook(options) {
         this.options = options;
+        this.hoverMinimizedCell = __bind(this.hoverMinimizedCell, this);
+        this.unminimizeColumn = __bind(this.unminimizeColumn, this);
+        this.minimizeColumn = __bind(this.minimizeColumn, this);
+        this.fixColumnReordering = __bind(this.fixColumnReordering, this);
         this.showCommentDialog = __bind(this.showCommentDialog, this);
         this.unhighlightColumns = __bind(this.unhighlightColumns, this);
         this.highlightColumn = __bind(this.highlightColumn, this);
@@ -128,29 +135,6 @@
         this.multiGrid.updateRowCount();
         return this.multiGrid.render();
       };
-      Gradebook.prototype.sortBy = function(sort) {
-        this.sortFn = (function() {
-          switch (sort) {
-            case "display_name":
-              return function(student) {
-                return student.display_name;
-              };
-            case "section":
-              return function(student) {
-                return student.section.name;
-              };
-            case "grade_desc":
-              return function(student) {
-                return -student.computed_current_score;
-              };
-            case "grade_asc":
-              return function(student) {
-                return student.computed_current_score;
-              };
-          }
-        })();
-        return this.buildRows();
-      };
       Gradebook.prototype.getSubmissionsChunk = function(student_id) {
         var assignment, id, params, student, students;
         if (this.options.submissions) {
@@ -233,9 +217,9 @@
         if (val == null) {
           return '';
         }
-        gradeToShow = val[this.includeUngradedAssignments ? 'final' : 'current'];
-        percentage = (gradeToShow.score / gradeToShow.possible) * 100;
-        percentage = Math.round(percentage * 10) / 10;
+        gradeToShow = val;
+        percentage = columnDef.field === 'total_grade' ? gradeToShow.score : (gradeToShow.score / gradeToShow.possible) * 100;
+        percentage = Math.round(percentage);
         if (isNaN(percentage)) {
           percentage = 0;
         }
@@ -254,15 +238,9 @@
           _ref = result.group_sums;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             group = _ref[_i];
-            student["assignment_group_" + group.group.id] = {
-              current: group.current,
-              'final': group['final']
-            };
+            student["assignment_group_" + group.group.id] = group[this.includeUngradedAssignments ? 'final' : 'current'];
           }
-          return student["total_grade"] = {
-            current: result.current,
-            'final': result['final']
-          };
+          return student["total_grade"] = result[this.includeUngradedAssignments ? 'final' : 'current'];
         }
       };
       Gradebook.prototype.highlightColumn = function(columnIndexOrEvent) {
@@ -282,34 +260,144 @@
         $('<div>TODO: show comments and stuff</div>').dialog();
         return false;
       };
+      Gradebook.prototype.fixColumnReordering = function() {
+        var $headers, fixupStopCallback, makeOnlyAssignmentsSortable, onlyAssignmentColsSelector, originalItemsSelector, originalStopFn;
+        $headers = $('#gradebook_grid').find('.slick-header-columns');
+        originalItemsSelector = $headers.sortable('option', 'items');
+        onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"])';
+        (makeOnlyAssignmentsSortable = function() {
+          var $notAssignments;
+          $headers.sortable('option', 'items', onlyAssignmentColsSelector);
+          $notAssignments = $(originalItemsSelector, $headers).not($(onlyAssignmentColsSelector, $headers));
+          return $notAssignments.data('sortable-item', null);
+        })();
+        originalStopFn = $headers.sortable('option', 'stop');
+        return (fixupStopCallback = function() {
+          return $headers.sortable('option', 'stop', function(event, ui) {
+            var returnVal;
+            $headers.sortable('option', 'items', originalItemsSelector);
+            returnVal = originalStopFn.apply(this, arguments);
+            makeOnlyAssignmentsSortable();
+            fixupStopCallback();
+            return returnVal;
+          });
+        })();
+      };
+      Gradebook.prototype.minimizeColumn = function($columnHeader) {
+        var colIndex, columnDef;
+        colIndex = $columnHeader.index();
+        columnDef = this.gradeGrid.getColumns()[colIndex];
+        columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '') + ' minimized';
+        columnDef.unselectable = true;
+        columnDef.unminimizedName = columnDef.name;
+        columnDef.name = '';
+        this.$grid.find(".c" + colIndex).add($columnHeader).addClass('minimized');
+        $columnHeader.data('minimized', true);
+        assignmentsToHide.push(columnDef.id);
+        return $.store.userSet('hidden_columns_' + $("#current_context_code").text(), $.uniq(assignmentsToHide).join(','));
+      };
+      Gradebook.prototype.unminimizeColumn = function($columnHeader) {
+        var colIndex, columnDef;
+        colIndex = $columnHeader.index();
+        columnDef = this.gradeGrid.getColumns()[colIndex];
+        columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '');
+        columnDef.unselectable = false;
+        columnDef.name = columnDef.unminimizedName;
+        this.$grid.find(".c" + colIndex).add($columnHeader).removeClass('minimized');
+        $columnHeader.removeData('minimized');
+        assignmentsToHide = $.grep(assignmentsToHide, function(el) {
+          return el !== columnDef.id;
+        });
+        return $.store.userSet('hidden_columns_' + $("#current_context_code").text(), $.uniq(assignmentsToHide).join(','));
+      };
+      Gradebook.prototype.hoverMinimizedCell = function(event) {
+        var $hoveredCell, assignment, columnDef, htmlLines, offset, submission, _ref;
+        $hoveredCell = $(event.currentTarget).removeClass('hover');
+        columnDef = this.gradeGrid.getColumns()[$hoveredCell.index()];
+        assignment = columnDef.object;
+        offset = $hoveredCell.offset();
+        htmlLines = [assignment.name];
+        if ($hoveredCell.hasClass('slick-cell')) {
+          submission = this.rows[this.gradeGrid.getCellFromEvent(event).row][columnDef.id];
+          if (assignment.points_possible != null) {
+            htmlLines.push("" + ((_ref = submission.score) != null ? _ref : '--') + " / " + assignment.points_possible);
+          } else if (submission.score != null) {
+            htmlLines.push(submission.score);
+          }
+          Array.prototype.push.apply(htmlLines, $.map(SubmissionCell.classesBasedOnSubmission(submission, assignment), function(c) {
+            return $("#submission_tooltip_" + c).text();
+          }));
+        } else if (assignment.points_possible != null) {
+          htmlLines.push(I18n.t('points_out_of', "out of %{points_possible}", {
+            points_possible: assignment.points_possible
+          }));
+        }
+        return $hoveredCell.data('tooltip', $("<span />", {
+          "class": 'gradebook-tooltip',
+          css: {
+            left: offset.left - 15,
+            top: offset.top,
+            zIndex: 10000,
+            display: 'block'
+          },
+          html: htmlLines.join('<br />')
+        }).appendTo('body').css('top', function(i, top) {
+          return parseInt(top) - $(this).outerHeight();
+        }));
+      };
+      Gradebook.prototype.unhoverMinimizedCell = function(event) {
+        var $tooltip;
+        if ($tooltip = $(this).data('tooltip')) {
+          if (event.toElement === $tooltip[0]) {
+            return $tooltip.mouseleave(function() {
+              return $tooltip.remove();
+            });
+          } else {
+            return $tooltip.remove();
+          }
+        }
+      };
       Gradebook.prototype.onGridInit = function() {
-        var tooltipTexts;
+        var grid, tooltipTexts;
+        this.fixColumnReordering();
         tooltipTexts = {};
-        this.$grid = $('#gradebook_grid').fillWindowWithMe({
+        this.$grid = grid = $('#gradebook_grid').fillWindowWithMe({
           alsoResize: '#gradebook_students_grid',
           onResize: __bind(function() {
             return this.multiGrid.resizeCanvas();
           }, this)
-        }).delegate('.slick-cell', 'mouseenter.gradebook focusin.gradebook', this.highlightColumn).delegate('.slick-cell', 'mouseleave.gradebook focusout.gradebook', this.unhighlightColumns).delegate('.gradebook-cell', 'hover.gradebook', function() {
-          return $(this).toggleClass('hover');
-        }).delegate('.gradebook-cell-comment', 'click.gradebook', this.showCommentDialog);
-        $('#grid-options').click(function(event) {
-          event.preventDefault();
-          return $('#sort_rows_dialog').dialog('close').dialog({
-            width: 400,
-            height: 300
-          });
+        }).delegate('.slick-cell', {
+          'mouseenter.gradebook focusin.gradebook': this.highlightColumn,
+          'mouseleave.gradebook focusout.gradebook': this.unhighlightColumns,
+          'mouseenter focusin': function(event) {
+            grid.find('.hover, .focus').removeClass('hover focus');
+            return $(this).addClass((event.type === 'mouseenter' ? 'hover' : 'focus'));
+          },
+          'mouseleave focusout': function() {
+            return $(this).removeClass('hover focus');
+          }
+        }).delegate('.gradebook-cell-comment', 'click.gradebook', this.showCommentDialog).delegate('.minimized', {
+          'mouseenter': this.hoverMinimizedCell,
+          'mouseleave': this.unhoverMinimizedCell
         });
-        if (!this.sections_enabled) {
-          $('#sort_rows_dialog .by_section').hide();
-        }
-        return $('#sort_rows_dialog button.sort_rows').click(function() {
-          gradebook.sortBy($(this).data('sort_by'));
-          return $('#sort_rows_dialog').dialog('close');
-        });
+        $('#gradebook_grid .slick-resizable-handle').live('drag', __bind(function(e, dd) {
+          return this.$grid.find('.slick-header-column').each(__bind(function(i, elem) {
+            var $columnHeader, isMinimized;
+            $columnHeader = $(elem);
+            isMinimized = $columnHeader.data('minimized');
+            if ($columnHeader.outerWidth() <= minimumAssignmentColumWidth) {
+              if (!isMinimized) {
+                return this.minimizeColumn($columnHeader);
+              }
+            } else if (isMinimized) {
+              return this.unminimizeColumn($columnHeader);
+            }
+          }, this));
+        }, this));
+        return $(document).trigger('gridready');
       };
       Gradebook.prototype.initGrid = function() {
-        var $widthTester, assignment, grids, group, html, id, minWidth, options, outOfFormatter, testWidth, _ref, _ref2;
+        var $widthTester, assignment, columnDef, fieldName, grids, group, html, id, minWidth, options, outOfFormatter, testWidth, _ref, _ref2;
         $widthTester = $('<span style="padding:10px" />').appendTo('#content');
         testWidth = function(text, minWidth) {
           return Math.max($widthTester.text(text).outerWidth(), minWidth);
@@ -317,16 +405,20 @@
         this.columns = [
           {
             id: 'student',
-            name: "<a href='javascript:void(0)' id='grid-options'>Options</a>",
+            name: 'Student Name',
             field: 'display_name',
             width: 150,
-            cssClass: "meta-cell"
+            cssClass: "meta-cell",
+            resizable: false,
+            sortable: true
           }, {
             id: 'secondary_identifier',
             name: 'secondary ID',
             field: 'secondary_identifier',
             width: 100,
-            cssClass: "meta-cell secondary_identifier_cell"
+            cssClass: "meta-cell secondary_identifier_cell",
+            resizable: false,
+            sortable: true
           }
         ];
         _ref = this.assignments;
@@ -341,17 +433,31 @@
             }
             outOfFormatter = assignment && assignment.grading_type === 'points' && (assignment.points_possible != null) && SubmissionCell.out_of;
             minWidth = outOfFormatter ? 70 : 50;
-            this.columns.push({
-              id: "assignment_" + id,
-              field: "assignment_" + id,
+            fieldName = "assignment_" + id;
+            columnDef = {
+              id: fieldName,
+              field: fieldName,
               name: html,
               object: assignment,
               formatter: this.cellFormatter,
               editor: outOfFormatter || SubmissionCell[assignment.grading_type] || SubmissionCell,
-              minWidth: minWidth,
+              minWidth: minimumAssignmentColumWidth,
               maxWidth: 200,
-              width: testWidth(assignment.name, minWidth)
-            });
+              width: testWidth(assignment.name, minWidth),
+              sortable: true,
+              toolTip: true
+            };
+            if ($.inArray(fieldName, assignmentsToHide) !== -1) {
+              columnDef.width = 10;
+              __bind(function(fieldName) {
+                return $(document).bind('gridready', __bind(function() {
+                  return this.minimizeColumn(this.$grid.find("[id*='" + fieldName + "']"));
+                }, this)).unbind('gridready.render').bind('gridready.render', __bind(function() {
+                  return this.gradeGrid.invalidate();
+                }, this));
+              }, this)(fieldName);
+            }
+            this.columns.push(columnDef);
           }
         }
         _ref2 = this.assignment_groups;
@@ -374,7 +480,8 @@
             minWidth: 35,
             maxWidth: 200,
             width: testWidth(group.name, 35),
-            cssClass: "meta-cell assignment-group-cell"
+            cssClass: "meta-cell assignment-group-cell",
+            sortable: true
           });
         }
         this.columns.push({
@@ -385,7 +492,8 @@
           minWidth: 50,
           maxWidth: 100,
           width: testWidth("Total", 50),
-          cssClass: "total-cell"
+          cssClass: "total-cell",
+          sortable: true
         });
         $widthTester.remove();
         options = $.extend({
@@ -406,18 +514,45 @@
             options: {
               enableCellNavigation: true,
               editable: true,
-              syncColumnCellResize: true
+              syncColumnCellResize: true,
+              enableColumnReorder: true
             }
           }
         ];
         this.multiGrid = new MultiGrid(this.rows, options, grids, 1);
-        this.multiGrid.grids[1].onCellChange = __bind(function(row, col, student) {
+        this.gradeGrid = this.multiGrid.grids[1];
+        this.gradeGrid.onCellChange = __bind(function(row, col, student) {
           return this.calculateStudentGrade(student);
+        }, this);
+        this.gradeGrid.onSort = __bind(function(sortCol, sortAsc) {
+          var i, student, _len, _ref3;
+          this.rows.sort(__bind(function(a, b) {
+            var aScore, bScore, _ref3, _ref4;
+            aScore = (_ref3 = a[sortCol.field]) != null ? _ref3.score : void 0;
+            bScore = (_ref4 = b[sortCol.field]) != null ? _ref4.score : void 0;
+            if (!aScore && aScore !== 0) {
+              aScore = -99999999999;
+            }
+            if (!bScore && bScore !== 0) {
+              bScore = -99999999999;
+            }
+            if (sortAsc) {
+              return bScore - aScore;
+            } else {
+              return aScore - bScore;
+            }
+          }, this));
+          _ref3 = this.rows;
+          for (i = 0, _len = _ref3.length; i < _len; i++) {
+            student = _ref3[i];
+            student.row = i;
+          }
+          return this.multiGrid.invalidate();
         }, this);
         this.multiGrid.parent_grid.onKeyDown = __bind(function() {
           return false;
         }, this);
-        return typeof this.onGridInit === "function" ? this.onGridInit() : void 0;
+        return this.onGridInit();
       };
       return Gradebook;
     })();

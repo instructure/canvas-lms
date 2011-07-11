@@ -37,7 +37,7 @@
     }
     return MultiGrid;
   })();
-  _ref = ['render', 'removeRow', 'removeAllRows', 'updateRowCount', 'autosizeColumns', 'resizeCanvas'];
+  _ref = ['render', 'removeRow', 'removeAllRows', 'updateRowCount', 'autosizeColumns', 'resizeCanvas', 'invalidate'];
   _fn = function(method) {
     return MultiGrid.prototype[method] = function() {
       var grid, _j, _len2, _ref2, _results;

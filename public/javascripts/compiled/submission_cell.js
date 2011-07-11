@@ -89,7 +89,7 @@
         var _ref;
         return (_ref = tooltipTexts[c]) != null ? _ref : tooltipTexts[c] = $("#submission_tooltip_" + c).text();
       }).join(', ');
-      return "<div class=\"gradebook-cell " + (opts.editable ? 'gradebook-cell-editable focus' : '') + " " + opts.classes + " " + (specialClasses.join(' ')) + "\">\n  " + (tooltipText ? '<div class="gradebook-tooltip">' + tooltipText + '</div>' : '') + "\n  <a href=\"#\" class=\"gradebook-cell-comment\"><span class=\"gradebook-cell-comment-label\">submission comments</span></a>\n  " + innerContents + "\n</div>";
+      return "" + (tooltipText ? '<div class="gradebook-tooltip">' + tooltipText + '</div>' : '') + "\n<div class=\"gradebook-cell " + (opts.editable ? 'gradebook-cell-editable focus' : '') + " " + opts.classes + " " + (specialClasses.join(' ')) + "\">\n  <a href=\"#\" class=\"gradebook-cell-comment\"><span class=\"gradebook-cell-comment-label\">submission comments</span></a>\n  " + innerContents + "\n</div>";
     };
     SubmissionCell.classesBasedOnSubmission = function(submission, assignment) {
       var classes;

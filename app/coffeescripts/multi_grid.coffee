@@ -23,7 +23,7 @@ this.MultiGrid = class MultiGrid
           grid.multiview_grid_opts.$viewport.trigger('scroll.slickgrid')
 
 # simple delegation
-for method in ['render', 'removeRow', 'removeAllRows', 'updateRowCount', 'autosizeColumns', 'resizeCanvas']
+for method in ['render', 'removeRow', 'removeAllRows', 'updateRowCount', 'autosizeColumns', 'resizeCanvas', 'invalidate']
   do (method) ->
     MultiGrid::[method] = () ->
       grid[method].apply(grid, arguments) for grid in @grids

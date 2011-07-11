@@ -2,6 +2,10 @@
 # for that instance.
 I18n.scoped 'gradebook2', (I18n) ->
   this.Gradebook = class Gradebook
+    minimumAssignmentColumWidth = 10
+
+    assignmentsToHide = $.store.userGet('hidden_columns_' + $("#current_context_code").text()).split(',')
+
     constructor: (@options) ->
       @chunk_start = 0
       @students    = {}
@@ -81,14 +85,6 @@ I18n.scoped 'gradebook2', (I18n) ->
       @multiGrid.updateRowCount()
       @multiGrid.render()
 
-    sortBy: (sort) ->
-      @sortFn = switch sort
-        when "display_name" then (student) -> student.display_name
-        when "section" then (student) -> student.section.name
-        when "grade_desc" then (student) -> -student.computed_current_score
-        when "grade_asc" then (student) -> student.computed_current_score
-      this.buildRows()
-
     getSubmissionsChunk: (student_id) ->
       if @options.submissions
         return this.gotSubmissionsChunk(@options.submissions)
@@ -136,9 +132,9 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
-      gradeToShow = val[if @includeUngradedAssignments then 'final' else 'current']
-      percentage = (gradeToShow.score/gradeToShow.possible)*100
-      percentage = Math.round(percentage * 10) / 10
+      gradeToShow = val
+      percentage = if columnDef.field == 'total_grade' then gradeToShow.score else (gradeToShow.score/gradeToShow.possible)*100
+      percentage = Math.round(percentage)
       percentage = 0 if isNaN(percentage)
       if !gradeToShow.possible then percentage = '-' else percentage+= "%"
       res = """
@@ -153,8 +149,8 @@ I18n.scoped 'gradebook2', (I18n) ->
       if student.loaded
         result = INST.GradeCalculator.calculate(student.submissionsAsArray, @assignment_groups, 'percent')
         for group in result.group_sums
-          student["assignment_group_#{group.group.id}"] = {current: group.current, 'final': group['final']}
-        student["total_grade"] = {current: result.current, 'final': result['final']}
+          student["assignment_group_#{group.group.id}"] = group[if @includeUngradedAssignments then 'final' else 'current']
+        student["total_grade"] = result[if @includeUngradedAssignments then 'final' else 'current']
 
     highlightColumn: (columnIndexOrEvent) =>
       if isNaN(columnIndexOrEvent)
@@ -172,18 +168,120 @@ I18n.scoped 'gradebook2', (I18n) ->
       $('<div>TODO: show comments and stuff</div>').dialog()
       return false
 
+    # this is a workaroud to make it so only assignments are sortable but at the same time
+    # so that the total and final grade columns don't dissapear after reordering columns
+    fixColumnReordering: =>
+      $headers = $('#gradebook_grid').find('.slick-header-columns')
+      originalItemsSelector = $headers.sortable 'option', 'items'
+      onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"])'
+      (makeOnlyAssignmentsSortable = ->
+        $headers.sortable 'option', 'items', onlyAssignmentColsSelector
+        $notAssignments = $(originalItemsSelector, $headers).not($(onlyAssignmentColsSelector, $headers))
+        $notAssignments.data('sortable-item', null)
+      )()
+      originalStopFn = $headers.sortable 'option', 'stop'
+      (fixupStopCallback = ->
+        $headers.sortable 'option', 'stop', (event, ui) ->
+          # we need to set the items selector back to the default because slickgrid's 'stop'
+          # function relies on it to re-render correctly.  if not it will render without the
+          # assignment group and final grade columns
+          $headers.sortable 'option', 'items', originalItemsSelector
+          returnVal = originalStopFn.apply(this, arguments)
+          makeOnlyAssignmentsSortable() # set it back
+          fixupStopCallback() # originalStopFn re-creates sortable widget so we need to re-fix
+          returnVal
+      )()
+
+    minimizeColumn: ($columnHeader) =>
+      colIndex = $columnHeader.index()
+      columnDef = @gradeGrid.getColumns()[colIndex]
+      columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '') + ' minimized'
+      columnDef.unselectable = true
+      columnDef.unminimizedName = columnDef.name
+      columnDef.name = ''
+      @$grid.find(".c#{colIndex}").add($columnHeader).addClass('minimized')
+      $columnHeader.data('minimized', true)
+      assignmentsToHide.push(columnDef.id)
+      $.store.userSet('hidden_columns_' + $("#current_context_code").text(), $.uniq(assignmentsToHide).join(','))
+
+    unminimizeColumn: ($columnHeader) =>
+      colIndex = $columnHeader.index()
+      columnDef = @gradeGrid.getColumns()[colIndex]
+      columnDef.cssClass = (columnDef.cssClass || '').replace(' minimized', '')
+      columnDef.unselectable = false
+      columnDef.name = columnDef.unminimizedName
+      @$grid.find(".c#{colIndex}").add($columnHeader).removeClass('minimized')
+      $columnHeader.removeData('minimized')
+      assignmentsToHide = $.grep assignmentsToHide, (el) -> el != columnDef.id
+      $.store.userSet('hidden_columns_' + $("#current_context_code").text(), $.uniq(assignmentsToHide).join(','))
+
+    hoverMinimizedCell: (event) =>
+      $hoveredCell = $(event.currentTarget)
+                     # get rid of hover class so that no other tooltips show up
+                     .removeClass('hover')
+      columnDef = @gradeGrid.getColumns()[$hoveredCell.index()]
+      assignment = columnDef.object
+      offset = $hoveredCell.offset()
+      htmlLines = [assignment.name]
+      if $hoveredCell.hasClass('slick-cell')
+        submission = @rows[@gradeGrid.getCellFromEvent(event).row][columnDef.id]
+        if assignment.points_possible?
+          htmlLines.push "#{submission.score ? '--'} / #{assignment.points_possible}"
+        else if submission.score?
+          htmlLines.push submission.score
+        # add lines for dropped, late, resubmitted
+        Array::push.apply htmlLines, $.map(SubmissionCell.classesBasedOnSubmission(submission, assignment), (c)-> $("#submission_tooltip_#{c}").text())
+      else if assignment.points_possible?
+        htmlLines.push I18n.t('points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible)
+
+      $hoveredCell.data('tooltip', $("<span />",
+        class: 'gradebook-tooltip'
+        css:
+          left: offset.left - 15
+          top: offset.top
+          zIndex: 10000
+          display: 'block'
+        html: htmlLines.join('<br />')
+      ).appendTo('body')
+      .css('top', (i, top) -> parseInt(top) - $(this).outerHeight()))
+
+    unhoverMinimizedCell: (event) ->
+      if $tooltip = $(this).data('tooltip')
+        if event.toElement == $tooltip[0]
+          $tooltip.mouseleave -> $tooltip.remove()
+        else
+          $tooltip.remove()
+
     onGridInit: () ->
+      @fixColumnReordering()
       tooltipTexts = {}
-      @$grid = $('#gradebook_grid')
+      @$grid = grid = $('#gradebook_grid')
         .fillWindowWithMe({
           alsoResize: '#gradebook_students_grid',
           onResize: () =>
             @multiGrid.resizeCanvas()
         })
-        .delegate('.slick-cell', 'mouseenter.gradebook focusin.gradebook', @highlightColumn)
-        .delegate('.slick-cell', 'mouseleave.gradebook focusout.gradebook', @unhighlightColumns)
-        .delegate('.gradebook-cell', 'hover.gradebook', -> $(this).toggleClass('hover'))
-        .delegate('.gradebook-cell-comment', 'click.gradebook', @showCommentDialog )
+        .delegate '.slick-cell',
+          'mouseenter.gradebook focusin.gradebook' : @highlightColumn
+          'mouseleave.gradebook focusout.gradebook' : @unhighlightColumns
+          'mouseenter focusin' : (event) ->
+            grid.find('.hover, .focus').removeClass('hover focus')
+            $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
+          'mouseleave focusout' : -> $(this).removeClass('hover focus')
+        .delegate('.gradebook-cell-comment', 'click.gradebook', @showCommentDialog)
+        .delegate '.minimized',
+          'mouseenter' : @hoverMinimizedCell,
+          'mouseleave' : @unhoverMinimizedCell
+
+      $('#gradebook_grid .slick-resizable-handle').live 'drag', (e,dd) =>
+        @$grid.find('.slick-header-column').each (i, elem) =>
+          $columnHeader = $(elem)
+          isMinimized = $columnHeader.data('minimized')
+          if $columnHeader.outerWidth() <= minimumAssignmentColumWidth
+            @minimizeColumn($columnHeader) unless isMinimized
+          else if isMinimized
+            @unminimizeColumn($columnHeader)
+      $(document).trigger('gridready')
 
       # # debugging stuff, remove
       # events =
@@ -213,14 +311,7 @@ I18n.scoped 'gradebook2', (I18n) ->
       #   @multiGrid.grids[1][event] = () ->
       #     $.isFunction(old) && old.apply(this, arguments)
       #     console.log(event, documentation, arguments)
-      $('#grid-options').click (event) ->
-        event.preventDefault()
-        $('#sort_rows_dialog').dialog('close').dialog(width: 400, height: 300)
       # set up row sorting options
-      $('#sort_rows_dialog .by_section').hide() unless @sections_enabled
-      $('#sort_rows_dialog button.sort_rows').click ->
-        gradebook.sortBy($(this).data('sort_by'))
-        $('#sort_rows_dialog').dialog('close')
 
     initGrid: () ->
       #this is used to figure out how wide to make each column
@@ -230,17 +321,21 @@ I18n.scoped 'gradebook2', (I18n) ->
 
       @columns = [{
         id: 'student',
-        name: "<a href='javascript:void(0)' id='grid-options'>Options</a>",
+        name: 'Student Name',
         field: 'display_name',
         width: 150,
-        cssClass: "meta-cell"
+        cssClass: "meta-cell",
+        resizable: false,
+        sortable: true
       },
       {
         id: 'secondary_identifier',
         name: 'secondary ID',
         field: 'secondary_identifier'
         width: 100,
-        cssClass: "meta-cell secondary_identifier_cell"
+        cssClass: "meta-cell secondary_identifier_cell",
+        resizable: false,
+        sortable: true
       }]
 
       for id, assignment of @assignments when assignment.submission_types isnt "not_graded"
@@ -251,19 +346,30 @@ I18n.scoped 'gradebook2', (I18n) ->
                          assignment.points_possible? &&
                          SubmissionCell.out_of
         minWidth = if outOfFormatter then 70 else 50
-
-        @columns.push
-          id: "assignment_#{id}"
-          field: "assignment_#{id}"
+        fieldName = "assignment_#{id}"
+        columnDef =
+          id: fieldName
+          field: fieldName
           name: html
           object: assignment
           formatter: this.cellFormatter
           editor: outOfFormatter ||
                   SubmissionCell[assignment.grading_type] ||
                   SubmissionCell
-          minWidth: minWidth,
+          minWidth: minimumAssignmentColumWidth,
           maxWidth:200,
-          width: testWidth(assignment.name, minWidth)
+          width: testWidth(assignment.name, minWidth),
+          sortable: true
+          toolTip: true
+
+        if $.inArray(fieldName, assignmentsToHide) != -1
+          columnDef.width = 10
+          do (fieldName) =>
+            $(document)
+              .bind('gridready', => @minimizeColumn(@$grid.find("[id*='#{fieldName}']")))
+              .unbind('gridready.render')
+              .bind('gridready.render', => @gradeGrid.invalidate())
+        @columns.push columnDef
 
       for id, group of @assignment_groups
         html = "#{group.name}"
@@ -278,7 +384,8 @@ I18n.scoped 'gradebook2', (I18n) ->
           minWidth: 35,
           maxWidth:200,
           width: testWidth(group.name, 35)
-          cssClass: "meta-cell assignment-group-cell"
+          cssClass: "meta-cell assignment-group-cell",
+          sortable: true
 
       @columns.push
         id: "total_grade"
@@ -288,7 +395,8 @@ I18n.scoped 'gradebook2', (I18n) ->
         minWidth: 50,
         maxWidth: 100,
         width: testWidth("Total", 50)
-        cssClass: "total-cell"
+        cssClass: "total-cell",
+        sortable: true
 
       $widthTester.remove()
 
@@ -311,13 +419,24 @@ I18n.scoped 'gradebook2', (I18n) ->
           enableCellNavigation: true
           editable: true
           syncColumnCellResize: true
+          enableColumnReorder: true
       }]
 
       @multiGrid = new MultiGrid(@rows, options, grids, 1)
       # this is the magic that actually updates group and final grades when you edit a cell
-      @multiGrid.grids[1].onCellChange = (row, col, student) =>
-        @calculateStudentGrade(student)
+      @gradeGrid = @multiGrid.grids[1]
+      @gradeGrid.onCellChange = (row, col, student) => @calculateStudentGrade(student)
+      @gradeGrid.onSort = (sortCol, sortAsc) =>
+        @rows.sort (a, b) =>
+          aScore = a[sortCol.field]?.score
+          bScore = b[sortCol.field]?.score
+          aScore = -99999999999 if not aScore and aScore != 0
+          bScore = -99999999999 if not bScore and bScore != 0
+          if sortAsc then bScore - aScore else aScore - bScore
+        student.row = i for student, i in @rows
+        @multiGrid.invalidate()
+        
       @multiGrid.parent_grid.onKeyDown = () =>
         # TODO: start editing automatically when a number or letter is typed
         false
-      @onGridInit?()
+      @onGridInit()
