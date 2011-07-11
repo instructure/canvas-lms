@@ -28,7 +28,7 @@ class ErrorsController < ApplicationController
     if @message.present?
       @reports = @reports.scoped(:conditions => ["message LIKE ?", '%' + @message + '%'])
     elsif params[:category].blank?
-      @reports = @reports.scoped(:conditions => ["message NOT LIKE ?", 'No route matches %'])
+      @reports = @reports.scoped(:conditions => "category != '404'")
     end
     if params[:category].present?
       @reports = @reports.scoped(:conditions => { :category => params[:category] })
