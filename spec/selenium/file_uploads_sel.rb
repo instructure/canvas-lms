@@ -130,7 +130,7 @@ shared_examples_for "file uploads selenium tests" do
     filename, fullpath, data = get_file("testfile5.zip")
 
     driver.find_element(:css, '#choose_migration_system').
-      find_element(:css, 'option[value="common_cartridge_importer"]').select
+      find_element(:css, 'option[value="common_cartridge_importer"]').click
     driver.find_element(:css, '#config_options').
       find_element(:name, 'export_file').send_keys(fullpath)
     driver.find_element(:css, '#config_options').

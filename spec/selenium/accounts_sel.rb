@@ -8,7 +8,7 @@ describe "account authentication configs" do
 
     get "/accounts/#{Account.default.id}/account_authorization_configs"
     driver.find_element(:id, 'add_auth_select').
-      find_element(:css, 'option[value="ldap"]').select
+      find_element(:css, 'option[value="ldap"]').click
     ldap_div = driver.find_element(:id, 'ldap_div')
     ldap_form = driver.find_element(:css, 'form.ldap_form')
     ldap_div.should be_displayed

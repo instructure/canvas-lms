@@ -109,7 +109,7 @@ shared_examples_for "course selenium tests" do
               edit_section_link.click
               section_label.displayed?.should be_false
               section_dropdown.displayed?.should be_true
-              section_dropdown.find_element(:css, "option[value=\"#{section.id.to_s}\"]").select
+              section_dropdown.find_element(:css, "option[value=\"#{section.id.to_s}\"]").click
 
               keep_trying_until { !section_dropdown.displayed? }
 

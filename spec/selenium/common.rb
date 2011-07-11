@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
+require "timeout"
 require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 
@@ -144,8 +145,14 @@ module SeleniumTestsHelperMethods
     end
     at_exit { shutdown.call }
     for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
-      break if s
+      begin
+        Timeout::timeout(5) do
+          s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
+          break if s
+        end
+      rescue Timeout::Error
+        # pass
+      end
       sleep 1
     end
     raise "Failed starting script/server" unless s
@@ -304,7 +311,18 @@ shared_examples_for "all selenium tests" do
     @webserver_shutdown.call
     @selenium_driver.quit
   end
- 
+
+  append_before(:all) do
+    unless $check_screen_dimensions
+      w, h = driver.execute_script <<-JS
+        if (window.screen) {
+          return [window.screen.availWidth, window.screen.availHeight];
+        }
+      JS
+      raise("desktop dimensions (#{w}x#{h}) are too small to successfully run the selenium specs, minimum size of 1024x768 is required.") unless w >= 1024 && h >= 768
+      $check_screen_dimensions = true
+    end
+  end
 end
 
 shared_examples_for "in-process server selenium tests" do
