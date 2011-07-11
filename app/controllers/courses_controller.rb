@@ -837,6 +837,7 @@ class CoursesController < ApplicationController
       end
       if !@course.account.grants_right?(@current_user, session, :manage_courses)
         params[:course].delete :storage_quota
+        params[:course].delete :storage_quota_mb
         if @course.root_account.settings[:prevent_course_renaming_by_teachers]
           params[:course].delete :name
           params[:course].delete :course_code
@@ -862,7 +863,7 @@ class CoursesController < ApplicationController
           flash[:notice] = t('notices.updated', 'Course was successfully updated.')
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
           format.xml  { head :ok }
-          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title]), :status => :ok }
+          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.xml  { render :xml => @course.errors.to_xml }
