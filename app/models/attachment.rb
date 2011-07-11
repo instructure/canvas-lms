@@ -1106,7 +1106,7 @@ class Attachment < ActiveRecord::Base
     @@domain_namespace ||= nil
   end
   
-  def self.serialization_methods; [:mime_class, :thumbnail_url, :scribdable?, :currently_locked]; end
+  def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked]; end
   cattr_accessor :skip_thumbnails
   
   
