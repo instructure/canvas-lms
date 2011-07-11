@@ -696,9 +696,7 @@ class Course < ActiveRecord::Base
   
   def quota
     Rails.cache.fetch(['default_quota', self].cache_key) do
-      return read_attribute(:storage_quota) ||
-        (self.account.default_storage_quota rescue nil) ||
-        Setting.get_cached('course_default_quota', 500.megabytes.to_s).to_i
+      storage_quota
     end
   end
   
@@ -710,6 +708,12 @@ class Course < ActiveRecord::Base
     self.storage_quota = val.try(:to_i).try(:megabytes)
   end
   
+  def storage_quota
+    return read_attribute(:storage_quota) ||
+      (self.account.default_storage_quota rescue nil) ||
+      Setting.get_cached('course_default_quota', 500.megabytes.to_s).to_i
+  end
+
   def storage_quota=(val)
     val = val.to_f
     val = nil if val <= 0

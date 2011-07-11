@@ -234,16 +234,16 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           </div>
         </td>
       </tr><tr>
-        <td style="width: 10%;"><%= f.blabel :storage_quota, :en => "File Storage" %></td>
+        <td style="width: 10%;"><%= f.blabel :storage_quota_mb, :storage_quota, :en => "File Storage" %></td>
         <td>
           <span class="course_form">
             <% if can_do(@context.account, @current_user, :manage_courses) %>
-              <%= f.text_field :storage_quota_mb, :style => "width: 50px;", :title => t('megabytes', "megabytes"), :value => @context.quota %>
+              <%= f.text_field :storage_quota_mb, :style => "width: 50px;", :title => t('megabytes', "megabytes"), :value => @context.storage_quota_mb %>
             <% else %>
-              <%= @context.quota %>
+              <%= @context.storage_quota_mb %>
             <% end %>
           </span>
-          <span class="course_info quota"><%= @context.quota %></span>
+          <span class="course_info storage_quota_mb"><%= @context.storage_quota_mb %></span>
           <%= t('megabytes', %{megabytes}) %>
         </td>
       <% if @context.turnitin_enabled? %>
