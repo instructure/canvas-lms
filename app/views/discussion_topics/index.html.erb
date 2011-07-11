@@ -35,9 +35,8 @@
 
 <%= render :partial => "shared/topics", :object => @topics, :locals => { :topic_type => "discussion_topic" } %>
 <%= will_paginate(@topics) %>
-<% js_block do %>
+<% js_block :i18n_scope => 'discussion_topics' do %>
   <script type="text/javascript">
-  I18n.scoped('discussion_topics', function(I18n) {
     $(function(){
       $('#topic_list').pageless({
         totalPages: <%= @topics.total_pages %>,
@@ -59,7 +58,6 @@
         }
       });
     });
-  });
   </script>
 <% end %>
 <div id="reorder_topics_dialog" style="display: none;">

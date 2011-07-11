@@ -33,61 +33,59 @@
 <h3 class="h-margin-top"><%= t(:page_views_by_hour_title, "Page views by hour") %></h3>
 <div id='hourly_usage' style='width: 600px; height: 260px;'></div>
 
-<% js_block do %>
+<% js_block :i18n_scope => 'accounts.statistics_page_views' do %>
   <!--Load the GOOGLE AJAX API-->
   <script type="text/javascript" src="//www.google.com/jsapi"></script>
 
   <script type="text/javascript">
-    I18n.scoped('accounts.statistics_page_views', function(I18n) {
-      $(document).ready(function() {
-        $(".date_field").date_field();
-      });
-      try {
-        var pageViewHourlyReport = <%= raw @account.page_view_hourly_report(@start_at, @end_at).to_json %>;
-        var r = Raphael('hourly_usage');
-        var x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]; //'12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'];
-        var y = [];
-        var anyFound = false;
-        for(var idx = 0; idx < 24; idx++) {
-          anyFound = anyFound || pageViewHourlyReport[idx][1] > 0;
-          y.push(pageViewHourlyReport[idx][1]);
-        }
-        if(anyFound) {
-          r.g.linechart(40, 10, 500, 220, x, y, {nostroke: false, smooth: true})
-          r.g.axis(40, 230, 220, 0, 100, 5, 1, [' ', '20%', '40%', '60%', '80%', '100%'], '|');
-          r.g.axis(40, 230, 500, 0, 23, 24, 0, ['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm', '12am'], '+');
-        } else {
-          $("#hourly_usage").text(I18n.t('no_data', "No data found for report"));
-        }
-      } catch(e) {
-        $("#hourly_usage").text(I18n.t('building_report_error', "Error building usage report: {{error}}", {error: e.toString()}));
+    $(document).ready(function() {
+      $(".date_field").date_field();
+    });
+    try {
+      var pageViewHourlyReport = <%= raw @account.page_view_hourly_report(@start_at, @end_at).to_json %>;
+      var r = Raphael('hourly_usage');
+      var x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]; //'12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'];
+      var y = [];
+      var anyFound = false;
+      for(var idx = 0; idx < 24; idx++) {
+        anyFound = anyFound || pageViewHourlyReport[idx][1] > 0;
+        y.push(pageViewHourlyReport[idx][1]);
       }
-
-      var pageViewData = <%= raw @account.page_view_data(@start_at, @end_at).to_json %>;
-      google.load('visualization', '1', {'packages':['annotatedtimeline']});
-      google.setOnLoadCallback(function(){
-        var data = new google.visualization.DataTable();
-        data.addColumn('date', I18n.t('date_column', 'Date'));
-        data.addColumn('number', I18n.t('page_views_column', 'Page Views'));
-        data.addColumn('string', 'title1');
-        data.addColumn('string', 'text1');
-
-        var rows = []
-        $.each(pageViewData, function() {
-          var date = new Date();
-          date.setTime(this[0]);
-          rows.push(
-            //this ends up being [(a date), (the number of pageViews on that date), "an annotation tile, (if any)", ""]
-            [date, this[1], undefined, undefined]
-          )
-        });
-
-        data.addRows(rows);
-
-        var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-        chart.draw(data, {displayAnnotations: false});
-
+      if(anyFound) {
+        r.g.linechart(40, 10, 500, 220, x, y, {nostroke: false, smooth: true})
+        r.g.axis(40, 230, 220, 0, 100, 5, 1, [' ', '20%', '40%', '60%', '80%', '100%'], '|');
+        r.g.axis(40, 230, 500, 0, 23, 24, 0, ['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm', '12am'], '+');
+      } else {
+        $("#hourly_usage").text(I18n.t('no_data', "No data found for report"));
+      }
+    } catch(e) {
+      $("#hourly_usage").text(I18n.t('building_report_error', "Error building usage report: %{error}", {error: e.toString()}));
+    }
+  
+    var pageViewData = <%= raw @account.page_view_data(@start_at, @end_at).to_json %>;
+    google.load('visualization', '1', {'packages':['annotatedtimeline']});
+    google.setOnLoadCallback(function(){
+      var data = new google.visualization.DataTable();
+      data.addColumn('date', I18n.t('date_column', 'Date'));
+      data.addColumn('number', I18n.t('page_views_column', 'Page Views'));
+      data.addColumn('string', 'title1');
+      data.addColumn('string', 'text1');
+  
+      var rows = []
+      $.each(pageViewData, function() {
+        var date = new Date();
+        date.setTime(this[0]);
+        rows.push(
+          //this ends up being [(a date), (the number of pageViews on that date), "an annotation tile, (if any)", ""]
+          [date, this[1], undefined, undefined]
+        )
       });
+  
+      data.addRows(rows);
+  
+      var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
+      chart.draw(data, {displayAnnotations: false});
+  
     });
   </script>
 <% end %>

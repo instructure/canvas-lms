@@ -241,9 +241,8 @@
     <button type="button" class="button include"><%= t 'buttons.copy_topics_and_replies', "Copy Topics and Replies" %></button>
   </div>
 </div>
-<% js_block do %>
+<% js_block :i18n_scope => 'content_imports' do %>
 <script type="text/javascript">
-I18n.scoped('content_imports', function(I18n) {
 $(document).ready(function() {
   var $frame = $("<iframe id='copy_course_target' name='copy_course_target' src='about:blank'/>");
   $("body").append($frame.hide());
@@ -368,7 +367,6 @@ $(document).ready(function() {
       }
     });
   }
-});
 });
 </script>
 <% end %>

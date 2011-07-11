@@ -3,17 +3,37 @@
     <span class="name ellipsis" title="<%= enrollment.long_name %>">
       <%= enrollment.long_name %>
       <% if enrollment.course.created? || enrollment.course.claimed? %>
-        <%= image_tag "hammer.png", :title => "This course hasn't been published yet", :alt => "Unpublished", :class => "unpublished_icon" %>
+        <%= image_tag "hammer.png", :title => t('course_not_published', "This course hasn't been published yet"), :alt => t('unpublished', "Unpublished"), :class => "unpublished_icon" %>
       <% end %>
     </span>
     <span class="subtitle ellipsis">
-      <%= enrollment.workflow_state.titleize %>, 
-      Enrolled as <%= enrollment.readable_type %>
+      <%= enrollment.workflow_readable_type %>,
+      <%= 
+        case enrollment.class.to_s
+        when 'TeacherEnrollment'
+          t('roles_teacher', "Enrolled as a Teacher.")
+        when 'StudentEnrollment'
+          t('roles_student', "Enrolled as a Student.")
+        when 'TaEnrollment'
+          t('roles_ta', "Enrolled as a TA.")
+        when 'ObserverEnrollment'
+          t('roles_observer', "Enrolled as an Observer.")
+        when 'DesignerEnrollment'
+          t('roles_designer', "Enrolled as a Designer.")
+        else
+          t('roles_student', "Enrolled as a Student.")
+        end
+      %>
       <% if enrollment.associated_user %>
-        linked to <%= enrollment.associated_user.name %>
+        <%= t('linked_to_user', '(Linked to %{user_name})', :user_name => enrollment.associated_user.name) %>
       <% end %>
     </span>
   </a>
+  <% if enrollment.admin? && can_do(enrollment.user, @current_user, :view_statistics) %>
+    <div style='clear:left'>
+      <%= link_to(t('links.teacher_activity', 'See Student Interactions Report'), user_course_teacher_activity_url(enrollment.user_id, enrollment.course_id)) %>
+    </div>
+  <% end %>
   <span style="float: right; margin-right: 5px; margin-top: 3px;">
     <a href="#" rel="<%= course_unenroll_url(enrollment.course_id, enrollment.id) %>" class="unenroll_link"><%= image_tag "delete_circle.png" %></a>
   </span>

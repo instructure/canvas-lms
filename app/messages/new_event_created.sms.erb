@@ -1,15 +1,13 @@
-New event for <%= asset.context.name %>
+<%= t('subject', "New event for %{course_name}:", :course_name => asset.context.name) %>
 
 <%= asset.title %>
 
-<% if (asset.start_at == asset.end_at || !asset.end_at) %>
-<%= force_zone(asset.start_at).strftime("%b %d at %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
-
+<% if !asset.start_at && !asset.end_at %>
+  <%= t('no_time_set', 'No Time Set') %>
+<% elsif (asset.start_at == asset.end_at || !asset.end_at) %>
+  <%= datetime_string(force_zone(asset.start_at)) %>
 <% else %>
-from <%= force_zone(asset.start_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
-
-to <%= force_zone(asset.end_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.end_at).strftime("%p").downcase rescue "" %> 
-
+  <%= t('from_to_time', 'from %{start_date_time} to %{end_date_time}', :start_date_time => datetime_string(force_zone(asset.start_at)), :end_date_time => datetime_string(force_zone(asset.end_at))) %>
 <% end %>
 
-More info at <%= HostUrl.context_host(asset.context) %>
+<%= t('more_info', 'More info at %{web_address}', :web_address => HostUrl.context_host(asset.context)) %>

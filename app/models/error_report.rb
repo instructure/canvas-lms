@@ -124,10 +124,12 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def self.useful_http_env_stuff_from_request(request)
-    request.env.slice( *["HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING", "HTTP_COOKIE", "HTTP_HOST", "HTTP_REFERER", 
-                         "HTTP_USER_AGENT", "PATH_INFO", "QUERY_STRING", "REMOTE_ADDR", "REMOTE_HOST", 
-                         "REQUEST_METHOD", "REQUEST_PATH", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT", 
+    stuff = request.env.slice( *["HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING", "HTTP_COOKIE", "HTTP_HOST", "HTTP_REFERER",
+                         "HTTP_USER_AGENT", "PATH_INFO", "QUERY_STRING", "REMOTE_HOST",
+                         "REQUEST_METHOD", "REQUEST_PATH", "REQUEST_URI", "SERVER_NAME", "SERVER_PORT",
                          "SERVER_PROTOCOL", "action_controller.request.path_parameters"] )
+    stuff['REMOTE_ADDR'] = request.remote_ip # ActionController::Request#remote_ip has proxy smarts
+    stuff
   end
 
   on_send_to_external do |error_report|

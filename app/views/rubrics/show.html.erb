@@ -5,12 +5,12 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
   <% if can_do(@actual_rubric, @current_user, :update) %>
-    <a href="#" class="edit_rubric_link button button-sidebar-wide"><%= image_tag "edit.png" %> Edit Rubric</a>
+    <a href="#" class="edit_rubric_link button button-sidebar-wide"><%= image_tag "edit.png" %> <%= t('titles.edit_rubric', 'Edit Rubric') %></a>
   <% else %>
-    Rubrics cannot be modified once they have been used in more than one place.
+      <%= t('rubric_can_not_modify', 'Rubrics cannot be modified once they have been used in more than one place.') %>
   <% end %>
   <% if can_do(@actual_rubric, @current_user, :delete) %>
-    <a href="#" class="delete_rubric_link button button-sidebar-wide"><%= image_tag "delete.png" %> Delete Rubric</a>
+    <a href="#" class="delete_rubric_link button button-sidebar-wide"><%= image_tag "delete.png" %> <%= t('buttons.delete', 'Delete Rubric') %></a>
   <% end %>
   </div>
   <a href="<%= context_url(@context, :context_rubrics_url) %>" class="rubrics_url" style="display: none;">&nbsp;</a>
@@ -27,27 +27,27 @@
 }
 </style>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'rubrics.show' do %>
 <script>
-$(document).ready(function() {
-  $("#right-side .edit_rubric_link").click(function(event) {
-    event.preventDefault();
-    $(".rubric:visible:first .edit_rubric_link").click();
+  $(document).ready(function() {
+    $("#right-side .edit_rubric_link").click(function(event) {
+      event.preventDefault();
+      $(".rubric:visible:first .edit_rubric_link").click();
+    });
+    $("#right-side .delete_rubric_link").click(function(event) {
+      event.preventDefault();
+      var callback = function() {
+        location.href = $(".rubrics_url").attr('href');
+      }
+      callback.confirmationMessage = I18n.t('prompts.are_you_sure_delete', "Are you sure you want to delete this rubric?  Anywhere currently using the rubric will still have access to it, but no one else will be able to use it.");
+      $(".rubric:visible:first .delete_rubric_link").triggerHandler('click', callback);
+    });
+    $(document).fragmentChange(function(event, hash) {
+      if(hash == '#edit') {
+        $("#right-side .edit_rubric_link").click();
+      }
+    });
   });
-  $("#right-side .delete_rubric_link").click(function(event) {
-    event.preventDefault();
-    var callback = function() {
-      location.href = $(".rubrics_url").attr('href');
-    }
-    callback.confirmationMessage = "Are you sure you want to delete this rubric?  Anywhere currently using the rubric will still have access to it, but no one else will be able to use it.";
-    $(".rubric:visible:first .delete_rubric_link").triggerHandler('click', callback);
-  });
-  $(document).fragmentChange(function(event, hash) {
-    if(hash == '#edit') {
-      $("#right-side .edit_rubric_link").click();
-    }
-  });
-});
 </script>
 <% end %>
 <h2><%= @actual_rubric.title %></h2>

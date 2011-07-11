@@ -127,6 +127,12 @@ module Delayed
             Failed.create(attrs)
             self.destroy
           end
+        rescue
+          # we got an error while failing the job -- we need to at least get
+          # the job out of the queue
+          self.destroy
+          # re-raise so the worker logs the error, at least
+          raise
         end
 
         # Get the current time (GMT or local depending on DB)

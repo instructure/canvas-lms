@@ -2,9 +2,9 @@
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
-        <p><%= t(:description, <<-TEXT)
+        <p><%= t(:description, <<-TEXT, :console_command => "Setting.set('show_feedback_link', 'true')")
           Error reporting can be enabled on the console by calling
-          Setting.set('show_feedback_link', 'true').  Once this is
+          %{console_command}.  Once this is
           enabled you can specify an email address or a POST URL where
           error messages will be delivered.
           TEXT

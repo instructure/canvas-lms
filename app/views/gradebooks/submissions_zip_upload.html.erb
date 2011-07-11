@@ -1,16 +1,21 @@
-<% content_for :page_title do %><%= @assignment.title %> Submissions Upload: <%= pluralize @comments.length, "Comment" %> Made, <%= pluralize @failures.length, "Files" %> Ignored<% end %>
+<% content_for :page_title do %><%= t(:submissions_upload, "%{assignment} Submissions Upload", :assignment => @assignment.title) %>: <%= t(:comments_made, {:one => "1 Comment Made", :other => "%{count} Comments Made"}, :count => @comments.length) %>, <%= t(:files_ignored, {:one => "1 File Ignored", :other => "%{count} Files Ignored"}, :count => @failures.length) %><% end %>
 
 <% content_for :right_side do %>
-  <p>Done!  We took the files you uploaded and attached them with a short comment
-  to each user's submission page for this assignment.  The students will get a notification
-  that a new comment was added.
-  </p>
+  <p><%= t(:done, <<-TEXT)
+    Done! We took the files you uploaded and attached them with a short comment
+    to each user's submission page for this assignment. The students will get a
+    notification that a new comment was added.
+    TEXT
+  %></p>
   <% if !@failures.empty? %>
-    <p>There were some files we didn't know what to do with.  They have not been added
-    to anyone's submission page.  You can see the list to the left.</p>
+    <p><%= t(:failures, <<-TEXT)
+      There were some files we didn't know what to do with. They have not been
+      added to anyone's submission page. You can see the list to the left.
+      TEXT
+    %></p>
   <% end %>
-  <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class="back">Back to Assignment Page</a><br/>
-  <a href="<%= context_url(@context, :context_gradebook_url) %>#assignment_<%= @assignment.id %>" class="back">Back to Gradebook</a>
+  <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class="back"><%= t('links.back_to_assignment', "Back to Assignment Page") %></a><br/>
+  <a href="<%= context_url(@context, :context_gradebook_url) %>#assignment_<%= @assignment.id %>" class="back"><%= t('links.back_to_gradebook', "Back to Gradebook") %></a>
 <% end %>
 
 <% content_for :stylesheets do %>
@@ -51,11 +56,11 @@
 </style>
 <% end %>
 
-<h2><%= @assignment.title %> Submissions Upload</h2>
-<h3 style="margin-top: 5px;">Attached files to the following user submissions</h3>
+<h2><%= t(:submissions_upload, "%{assignment} Submissions Upload", :assignment => @assignment.title) %></h2>
+<h3 style="margin-top: 5px;"><%= t('headers.attached_files', "Attached files to the following user submissions") %></h3>
 <ul id="student_list" style="margin-top: 10px;">
 <% if @comments.empty? %>
-  <li>No Comments Added</li>
+  <li><%= t(:no_comments_added, "No Comments Added") %></li>
 <% end %>
 <% @comments.each do |comment| %>
   <li>
@@ -65,7 +70,7 @@
       <li>
         <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, comment.submission.user_id, :download => file.id, :comment_id => comment.id) %>"><%= file.display_name %></a>
         <% if file.filename != file.display_name %>
-          <span style="font-size: 0.6em;">(renamed from <%= file.filename %>)</span>
+          <span style="font-size: 0.6em;">(<%= t(:renamed_file, "renamed from %{filename}", :filename => file.filename) %>)</span>
         <% end %>
       </li>
       <% end %>
@@ -74,7 +79,7 @@
 <% end %>
 </ul>
 <% unless @failures.empty? %>
-  <h3 style="margin-top: 40px;">Ignored the following files</h3>
+  <h3 style="margin-top: 40px;"><%= t('header.ignored_files', "Ignored the following files") %></h3>
   <ul id="failure_list">
   <% @failures.each do |failure| %>
     <li><%= failure.match(/\/([^\/]*)\z/)[1].to_s %></li>

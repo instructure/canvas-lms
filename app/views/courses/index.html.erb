@@ -1,15 +1,15 @@
-<% content_for :page_title do %>Courses<% end %>
+<% content_for :page_title, t('titles.courses', 'Courses') %>
 
 <% content_for :auto_discovery do %>
   <% if @current_user %>
-      <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => "Course Announcements Atom Feed"}) %>
+      <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")}) %>
   <% end %>
 <% end %>
 
 <% if show_user_create_course_button(@current_user) %>
     <% content_for :right_side do %>
         <div class="rs-margin-lr rs-margin-top">
-            <a href="<%= getting_started_path(:fresh => 1) %>" style="font-size: 1.3em;" class="button button-sidebar-wide">Start a New Course</a>
+            <a href="<%= getting_started_path(:fresh => 1) %>" style="font-size: 1.3em;" class="button button-sidebar-wide"><%= t('links.start_course', %{Start a New Course}) %></a>
         </div>
     <% end %>
 <% end %>
@@ -17,7 +17,7 @@
 <% jammit_css :context_list %>
 
 <% unless @current_enrollments.empty? %>
-  <h2>My Courses</h2>
+  <h2><%= t('headings.my_courses', %{My Courses}) %></h2>
   <ul class="unstyled_list context_list">
     <% @current_enrollments.each do |enrollment| %>
       <%= render :partial => "shared/current_enrollment", :object => enrollment %>
@@ -26,7 +26,7 @@
 <% end %>
 
 <% unless @past_enrollments.empty? %>
-<h2>Past Enrollments</h2>
+<h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
 <ul class="unstyled_list context_list">
   <% @past_enrollments.each do |enrollment| %>
     <%= render :partial => "shared/current_enrollment", :object => enrollment %>

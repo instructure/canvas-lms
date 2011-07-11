@@ -152,7 +152,6 @@
   # </div>
 # </div>
 # <div id="course_messages">
-  # <h2>Recent Messages</h2>
   # <div class="clear"></div>
   # <div id="topic_list">
     # <div id="no_topics_message" style="<%= @topics && @topics.length > 0 ? 'display: none;' : '' %>">

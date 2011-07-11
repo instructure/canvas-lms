@@ -248,7 +248,35 @@ describe ContextModule do
       @progression.should_not be_nil
       @progression.should be_locked
     end
-    
+
+    it "should not be available if previous module is incomplete" do
+      course_module
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.save!
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+
+      @module2 = @course.context_modules.create!(:name => "another module")
+      @module2.prerequisites = "module_#{@module.id}"
+      @assignment2 = @course.assignments.create!(:title => 'a2')
+      @tag2 = @module2.add_item({:id => @assignment2.id, :type => 'assignment'})
+      @module2.completion_requirements = {@tag2.id => {:type => 'must_view'}}
+      @module2.save!
+      @module2.prerequisites.should_not be_nil
+      @module2.prerequisites.should_not be_empty
+      @module2.available_for?(@user, @tag2, true).should be_false
+
+      # same with sequential progress enabled
+      @module2.update_attribute(:require_sequential_progress, true)
+      @module2.available_for?(@user, @tag2).should be_false
+      @module2.available_for?(@user, @tag2, true).should be_false
+      @module.update_attribute(:require_sequential_progress, true)
+      @module2.available_for?(@user, @tag2).should be_false
+      @module2.available_for?(@user, @tag2, true).should be_false
+    end
+
     it "should create an unlocked progression if there are prerequisites that are met" do
       course_module
       @user = User.create!(:name => "some name")

@@ -136,9 +136,8 @@
 </div>
 <div id="assessment_question_bank_id" style="display: none;"><%= @bank.id %></div>
 
-<% js_block do %>
+<% js_block :i18n_scope => 'question_banks.show' do %>
 <script>
-I18n.scoped('question_banks.show', function(I18n) {
 $(document).ready(function() {
   if($("#more_questions").length > 0) {
     $(".display_question .move").remove();
@@ -374,9 +373,9 @@ $(document).ready(function() {
         $dialog.find("button").attr('disabled', false);
         var failedText = null;
         if(move){
-          failedText = I18n.t("buttons.submit_moving", {one:"Moving Question Failed, please try again", other:"Moving Questions Failed, please try again"}, {count:(multiple_questions ? 2 : 1)})
+          failedText = I18n.t("buttons.submit_moving_failed", {one:"Moving Question Failed, please try again", other:"Moving Questions Failed, please try again"}, {count:(multiple_questions ? 2 : 1)})
         } else {
-          failedText = I18n.t("buttons.submit_copying", {one:"Copying Question Failed, please try again", other:"Copying Questions Failed, please try again"}, {count:(multiple_questions ? 2 : 1)})
+          failedText = I18n.t("buttons.submit_copying_failed", {one:"Copying Question Failed, please try again", other:"Copying Questions Failed, please try again"}, {count:(multiple_questions ? 2 : 1)})
         }
         $dialog.find(".submit_button").text(failedText);
       });
@@ -409,7 +408,6 @@ $(document).ready(function() {
     $("#move_question_dialog .new_question_bank_name").showIf($(this).attr('checked') && $(this).val() == 'new');
   });
 });
-})
 </script>
 <% end %>
 <% content_for :stylesheets do %>
@@ -475,3 +473,4 @@ $(document).ready(function() {
 }
 </style>
 <% end %>
+<%= render :partial => 'quizzes/equations_help' %>

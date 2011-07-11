@@ -40,7 +40,7 @@ class GradebookUploadsController < ApplicationController
         end
         respond_to do |format|
           if errored_csv
-            flash[:error] = "Invalid csv file, grades could not be updated"
+            flash[:error] = t('errors.invalid_file', "Invalid csv file, grades could not be updated")
             format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
           else
             format.html { render :action => "show" }
@@ -48,7 +48,7 @@ class GradebookUploadsController < ApplicationController
         end
       else
         respond_to do |format|
-          flash[:error] = 'File could not be uploaded.'
+          flash[:error] = t('errors.upload_failed', 'File could not be uploaded.')
           format.html { redirect_to named_context_url(@context, :context_gradebook_url) }
         end
       end
@@ -102,7 +102,7 @@ class GradebookUploadsController < ApplicationController
             logger.info "updated #{submission.student.name} with score #{submission.score} for assignment: #{submission.assignment.title} old score was #{old_score}"
           end
         end
-        flash[:notice] = "Successfully updated #{submissions_updated_count} submissions."
+        flash[:notice] = t('notices.updated', {:one => "Successfully updated 1 submission.", :other => "Successfully updated %{count} submissions."}, :count => submissions_updated_count)
       end
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_gradebook_url) }

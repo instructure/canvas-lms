@@ -404,7 +404,7 @@ class User < ActiveRecord::Base
     
   def infer_defaults
     self.name = nil if self.name == "User"
-    self.name ||= self.email || "User"
+    self.name ||= self.email || t(:default_user_name, "User")
     self.short_name = nil if self.short_name == ""
     self.short_name ||= self.name
     self.sortable_name = self.last_name_first.downcase
@@ -1478,4 +1478,11 @@ class User < ActiveRecord::Base
   def sis_user_id
     pseudonym.try(:sis_user_id)
   end
+
+  # association with dynamic, filtered join condition for submissions.
+  # This is messy, but in ActiveRecord 2 this is the only way to do an eager
+  # loading :include condition that has dynamic join conditions. It looks like
+  # there's better solutions in AR 3.
+  # See also e.g., http://makandra.com/notes/983-dynamic-conditions-for-belongs_to-has_many-and-has_one-associations
+  has_many :submissions_for_given_assignments, :include => [:assignment, :submission_comments], :conditions => 'submissions.assignment_id IN (#{Api.assignment_ids_for_students_api.join(",")})', :class_name => 'Submission'
 end

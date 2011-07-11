@@ -1,7 +1,3 @@
-/* DO NOT MODIFY. This file was compiled Tue, 21 Jun 2011 18:12:09 GMT from
- * /Users/bpalmer/Programming/canvas/app/coffeescripts/jobs.coffee
- */
-
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -183,7 +179,7 @@
             width: 100
           }, {
             id: 'run_at',
-            name: I18n.t('columns.run at', 'run at'),
+            name: I18n.t('columns.run_at', 'run at'),
             field: 'run_at',
             width: 165
           }

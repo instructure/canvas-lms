@@ -75,7 +75,7 @@ I18n.scoped('groups', function(I18n){
       
       $.ajaxJSON(url, "GET", null, function(data) {
         $group.data("page_loaded", page);
-        $group.find(".user_count").text(I18n.t('#groups.category.student', 'student', {count: data['total_entries']}));
+        $group.find(".user_count").text(I18n.t('category.student', 'student', {count: data['total_entries']}));
         $group.find(".user_count_hidden").text(data['total_entries'] - data['users'].length);
         $group.find(".group_user_count").show();
         $group.find(".student").remove();
@@ -196,7 +196,7 @@ I18n.scoped('groups', function(I18n){
     updateCategoryCounts: function($category) {
       $category.find(".group").each(function() {
         var userCount = $(this).find(".student_list .student").length + parseInt($(this).find(".user_count_hidden").text());
-        $(this).find(".user_count").text(I18n.t('#groups.category.student', 'student', {count: userCount}));
+        $(this).find(".user_count").text(I18n.t('category.student', 'student', {count: userCount}));
       });
       
       var groupCount = $category.find(".group:not(.group_blank)").length;

@@ -6,7 +6,7 @@
         <td style="vertical-align: bottom;" class="student_name"><div id="outer_topleft">
           <div style="float: right;"><a href="#" class="refresh_grades_link no-hover" style="font-size: 0.8em;" title="Refresh Scores"><%= image_tag 'ajax-reload.gif', :class => 'static' %><%= image_tag "ajax-reload-animated.gif", :class => 'animated', :style => 'display: none;' %></a></div>
           <div id="outer_gradebook_options_holder" style="<%= hidden if hide_dropdowns %>">
-            <a href="#" id="gradebook_options" class="no-underline">Options</a>
+            <a href="#" id="gradebook_options" class="no-underline"><%= t(:options, "Options") %></a>
           </div>
         </div></td>
       </tr>
@@ -46,9 +46,9 @@
     <table cellspacing="0" id="gradebook_table" style="position: relative;" class="gradebook_table">
       <tr id="table_header">
         <td id="topleft_box" style="vertical-align: bottom;" class="student_name"><div id="topleft" style="width: 100%;">
-          <div style="float: right;"><a href="#" class="refresh_grades_link" style="font-size: 0.8em; <%= hidden if hide_dropdowns %>" title="Refresh Grades"><%= image_tag 'ajax-reload.gif', :class => 'static' %><%= image_tag "ajax-reload-animated.gif", :class => 'animated', :style => 'display: none;' %></a></div>
+            <div style="float: right;"><a href="#" class="refresh_grades_link" style="font-size: 0.8em; <%= hidden if hide_dropdowns %>" title="<%= t(:refresh_grades, "Refresh Grades") %>"><%= image_tag 'ajax-reload.gif', :class => 'static' %><%= image_tag "ajax-reload-animated.gif", :class => 'animated', :style => 'display: none;' %></a></div>
           <div id="gradebook_options_holder">
-            <a href="#" id="gradebook_options" class="no-underline">Options</a>
+            <a href="#" id="gradebook_options" class="no-underline"><%= t(:options, "Options") %></a>
           </div>
           <div class="clear"></div>
         </div></td>

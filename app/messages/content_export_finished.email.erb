@@ -3,9 +3,9 @@
 <% end %>
 
 <% define_content :subject do %>
-  Course Export Finished: <%= asset.context.name %>
+  <%= t :subject, "Course Export Finished: %{course}", :course => asset.context.name %>
 <% end %>
-      
-Your course export for "<%= asset.context.name %>" has finished.
+
+<%= t :body, %{Your course export for "%{course}" has finished.}, :course => asset.context.name %>
 
 <%= content :link %>

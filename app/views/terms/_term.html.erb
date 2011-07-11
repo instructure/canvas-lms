@@ -7,11 +7,11 @@
     <div class="show_term" style="font-size: 0.8em;">
       <% if term && (term.sis_source_id || can_do(term.root_account, @current_user, :manage_sis)) %>
         <div style="font-size: 0.8em;">
-          SIS ID: <span class="sis_source_id"><%= term.sis_source_id %></span> 
+          <%= before_label :sis_id, "SIS ID" %> <span class="sis_source_id"><%= term.sis_source_id %></span>
         </div>
       <% end %>
-      <%= term && pluralize(term.courses.active.count, "Course") %><br/>
-      <%= term && pluralize(term.users_count, "User") %>
+      <%= term && t(:course_count, "Course", :count => term.courses.active.count) %><br/>
+      <%= term && t(:user_count, "User", :count => term.users_count) %>
     </div>
     <% form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
       <div class="edit_term">
@@ -19,12 +19,12 @@
       </div>
       <% if term && can_do(@root_account, @current_user, :manage_sis) %>
         <div class="edit_term" style="font-size: 0.8em;">
-          SIS ID: <%= f.text_field :sis_source_id %>
+          <%= before_label :sis_id, "SIS ID" %> <%= f.text_field :sis_source_id %>
         </div>
       <% end %>
       <div class="edit_term" style="margin-top: 10px;">
-        <button class="button submit_button" type="submit"><%= term ? "Update Term" : "Add Term" %></button>
-        <button class="button button-secondary cancel_button" type="button">Cancel</button>
+        <button class="button submit_button" type="submit"><%= term ? t('buttons.update', "Update Term") : t('buttons.add', "Add Term") %></button>
+        <button class="button button-secondary cancel_button" type="button"><%= t '#buttons.cancel', "Cancel" %></button>
       </div>
     <% end %>
   </td>
@@ -33,63 +33,42 @@
     <table>
       <tr>
         <td>
-          <strong>Term Runs</strong> from&nbsp;
+          <%= mt :term_runs_from, "**Term Runs** from" %>&nbsp;
         </td>
-        <td>
-          <div class="show_term">
-            <span class="start_at"><%= (date_string(term.start_at, :long) || 'whenever') rescue 'whenever' %></span>
-          </div>
-          <div class="edit_term">
-            <input type="text" name="enrollment_term[start_at]" value="<%= date_string(term.start_at, :long) rescue nil %>" title="Term starts" class="date_field" style="width: 120px;"/>
-          </div>
-        </td>
-        <td>
-          &nbsp;to&nbsp;
-        </td>
-        <td>
-          <div class="show_term">
-            <span class="end_at"><%= (date_string(term.end_at, :long) || 'whenever') rescue 'whenever' %></span>
-          </div>
-          <div class="edit_term">
-            <input type="text" name="enrollment_term[end_at]" value="<%= date_string(term.end_at, :long) rescue nil %>" title="Term ends" class="date_field" style="width: 120px;"/>
-          </div>
-        </td>
+        <%= render :partial => 'timespan', :locals => { :object => term, :key => '', :start_tooltip => t('titles.term_starts', "Term starts"), :end_tooltip => t('titles.term_ends', "Term ends") } %>
       </tr>
     <% types.each do |type| %>
       <% override = term.enrollment_dates_overrides.find_by_context_type_and_context_id_and_enrollment_type(@context.class.to_s, @context.id, type.to_s) if term %>
       <% override ||= OpenStruct.new %>
       <% type_string = type.to_s.underscore %>
-      <% readable_type = Enrollment.readable_type(type.to_s) %>
       <tr>
         <td>
-          <strong><%= readable_type %>s</strong> can access from&nbsp;
+          <% case type_string
+              when 'student_enrollment'
+                start_tooltip = t 'tooltips.term_starts_students', "For students the term starts"
+                end_tooltip = t 'tooltips.term_ends_students', "For students the term ends"
+                access_label = mt 'labels.students_can_access_from', "**Students** can access from"
+              when 'teacher_enrollment'
+                start_tooltip = t 'tooltips.term_starts_teachers', "For teachers the term starts"
+                end_tooltip = t 'tooltips.term_ends_teachers', "For teachers the term ends"
+                access_label = mt 'labels.teachers_can_access_from', "**Teachers** can access from"
+              when 'ta_enrollment'
+                start_tooltip = t 'tooltips.term_starts_tas', "For TAs the term starts"
+                end_tooltip = t 'tooltips.term_ends_tas', "For TAs the term ends"
+                access_label = mt 'labels.tas_can_access_from', "**TAs** can access from"
+              end
+          %>
+          <%= access_label %>
+          &nbsp;
         </td>
-        <td>
-          <div class="show_term">
-            <span class="<%= type_string %>_start_at"><%= date_string(override.start_at || term.start_at, :long) rescue 'whenever' %></span>
-          </div>
-          <div class="edit_term">
-            <input type="text" name="enrollment_term[overrides][<%= type_string %>][start_at]" value="<%= date_string(override.start_at || term.start_at, :long) rescue nil %>" title="For <%= readable_type.downcase %>s the term starts" class="date_field" style="width: 120px;"/>
-          </div>
-        </td>
-        <td>
-          &nbsp;to&nbsp;
-        </td>
-        <td>
-          <div class="show_term">
-            <span class="<%= type_string %>_end_at"><%= date_string(override.end_at || term.end_at, :long) rescue 'whenever' %></span>
-          </div>
-          <div class="edit_term">
-            <input type="text" name="enrollment_term[overrides][<%= type_string %>][end_at]" value="<%= date_string(override.end_at || term.end_at, :long) rescue nil %>" title="For <%= readable_type.downcase %>s the term ends" class="date_field" style="width: 120px;"/>
-          </div>
-        </td>
+        <%= render :partial => 'timespan', :locals => { :object => override, :key => "[overrides][#{type_string}]", :start_tooltip => start_tooltip, :end_tooltip => end_tooltip } %>
       </tr>
     <% end %>
     </table>
   </td>
   <td class="links">
     <a href="#" class="edit_term_link no-hover"><%= image_tag "edit.png" %></a>
-    <% if term && !term.courses.empty? %>
+    <% if term && !term.courses.active.empty? %>
       <a href="#" class="cant_delete_term_link no-hover"><%= image_tag "delete_circle_gray.png" %></a>
     <% elsif term != @context.default_enrollment_term %>
       <a href="#" class="delete_term_link no-hover"><%= image_tag "delete.png" %></a>

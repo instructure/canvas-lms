@@ -3,53 +3,63 @@
   <div>
     <div style="border-bottom: 1px solid #888; font-size: 1.1em; font-weight: bold;">
       <% if @quiz.allowed_attempts == 1 %>
-        Submission Details:
+        <%= before_label(:submission_details, "Submission Details") %>
       <% else %>
-        Last Attempt Details:
+        <%= before_label(:last_attempt_details, "Last Attempt Details") %>
       <% end %>
     </div>
     <div>
     <table class="summary" style="font-size: 1.1em;">
       <tr>
-        <th>Time:</th>
+        <th><%= before_label(:time, "Time") %></th>
         <td><%= time_ago_in_words(Time.now - ((@submission.finished_at || @submission.end_at || @submission.started_at) - @submission.started_at)) %></td>
       </tr>
       <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
-        <th>Current Score:</th>
-        <td><%= render :partial => "submission_score", :object => @submission %> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %></td>
+        <th><%= before_label(:current_score, "Current Score") %></th>
+        <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+                  :score => render(:partial => "submission_score", :object => @submission),
+                  :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
       </tr>
       <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
-        <th>Kept Score:</th>
-        <td><%= @submission.kept_score %> out of <%= params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible %></td>
+        <th><%= before_label(:kept_score, "Kept Score") %></th>
+        <td><%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+                  :score => @submission.kept_score,
+                  :points_possible => params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %></td>
       </tr>
     </table>
     </div>
   </div>
     <% if @submission && params[:preview] %>
-      <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :preview => 1) %>">Preview the <%= @quiz.readable_type %> Again</a><br/>
+      <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :preview => 1) %>"><%= @quiz.survey? ?
+          t('links.preview_survey_again', "Preview the Survey Again") :
+          t('links.preview_quiz_again', "Preview the Quiz Again") %></a><br/>
     <% elsif !@quiz.single_attempt? || can_do(@quiz, @current_user, :update) %>
       <div style="margin-left: 20px; margin-top: 20px; line-height: 1.3em;">
         <% if @submission.attempt > 1 || (@submission.attempt == 1 && can_do(@quiz, @current_user, :update)) %>
-          <%= pluralize(@submission.attempt, "Attempt") %> so far<br/>
-          <a href="<%= context_url(@context, :context_quiz_history_url, @quiz) %>" class="history"> View Previous Attempts</a>
+          <%= t(:attempts_so_far, {:one => "1 Attempt so far", :other => "%{count} Attempts so far"}, :count => @submission.attempt) %><br/>
+          <a href="<%= context_url(@context, :context_quiz_history_url, @quiz) %>" class="history"> <%= t(:view_previous_attempts, "View Previous Attempts") %></a>
           <br/>
         <% end %>
         <% if @quiz.unlimited_attempts? %>
-          Unlimited Attempts<br/>
+          <%= t(:unlimited_attempts, "Unlimited Attempts") %><br/>
         <% elsif !can_do(@quiz, @current_user, :update) %>
           <% if @submission.attempts_left <= 0 %>
-            No More Attempts available<br/>
+            <%= t(:no_more_attempts, "No More Attempts available") %><br/>
           <% elsif can_do(@quiz, @current_user, :submit) %>
-            <%= @submission.attempts_left %> More Attempts available<br/>
+            <%= t(:attempts_left, {:one => "1 More Attempt available", :other => "%{count} More Attempts available"}, :count => @submission.attempts_left) %><br/>
           <% end %>
         <% end %>
       </div>
       <% if allow_take && can_do(@quiz, @current_user, :submit) %>
         <div style="margin-top: 10px; font-size: 1.2em;">
         <% if (!@locked && (@quiz.unlimited_attempts? || @submission.attempts_left > 0)) || can_do(@quiz, @current_user, :update) %>
-          <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>">Take the <%= @quiz.readable_type %> Again</a><br/>
+          <a href="<%= context_url(@context, :context_quiz_take_url, @quiz.id, :user_id => @current_user && @current_user.id) %>"><%= @quiz.survey? ?
+            t('links.take_survey_again', "Take the Survey Again") :
+            t('links.take_quiz_again', "Take the Quiz Again") %></a><br/>
           <span style="font-size: 0.7em; padding-left: 20px;">
-            (Will keep the <%= @quiz.scoring_policy == "keep_highest" ? "highest" : "latest" %> of all your scores)
+            (<%= @quiz.scoring_policy == "keep_highest" ?
+                 t(:will_keep_highest_score, "Will keep the highest of all your scores") :
+                 t(:will_keep_latest_score, "Will keep the latest of all your scores") %>)
           </span>
         <% end %>
         </div>

@@ -20,7 +20,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :title, :user, :outcomes
   belongs_to :context, :polymorphic => true
-  has_many :assessment_questions, :order => 'position, created_at'
+  has_many :assessment_questions, :order => 'name, position, created_at'
   has_many :assessment_question_bank_users
   has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_many :quiz_groups
@@ -37,7 +37,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
     set { can :read and can :create and can :update and can :delete and can :manage }
     
-    given{|user, session| user && self.assessment_question_bank_users.map(&:id).include?(user.id) }
+    given{|user, session| user && self.assessment_question_bank_users.exists?(:user_id => user.id) }
     set { can :read }
   end
 

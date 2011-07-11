@@ -309,12 +309,13 @@ shared_examples_for 'a backend' do
 
     it "should schedule jobs if they aren't scheduled yet" do
       @backend.count.should == 0
+      audit_started = @backend.db_time_now
       Delayed::Periodic.perform_audit!
       @backend.count.should == 1
       job = @backend.first
       job.tag.should == 'periodic: my SimpleJob'
       job.payload_object.should == Delayed::Periodic.scheduled['my SimpleJob']
-      job.run_at.should >= @backend.db_time_now
+      job.run_at.should >= audit_started
       job.run_at.should <= @backend.db_time_now + 6.minutes
     end
 

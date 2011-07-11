@@ -1,14 +1,14 @@
-<% content_for :page_title do %>User Dashboard<% end %>
+<% content_for :page_title do %><%= t('user_dashboard', 'User Dashboard') %><% end %>
 <% jammit_js :dashboard %>
 <% content_for :auto_discovery do %>
   <% if @current_user %>
-      <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => "User Atom Feed (All Courses)"}) %>
+      <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")}) %>
   <% end %>
 <% end %>
 
 <% content_for :right_side do %>
   <%= render :partial => 'courses/assignments_needing_grading', :locals => {:contexts => nil} %>
-  <% locals = {:title => "Coming Up", :display_count => 3, :period => "the next week", :show_context => true, :upcoming => true} %>
+  <% locals = {:title => t('coming_up', "Coming Up"), :display_count => 3, :period => :one_week, :show_context => true, :upcoming => true} %>
   <% if @current_user %>    
     <% cache([@current_user, 'user_dashboard_upcoming_events' ], :expires_in => 3.minutes) do %>
       <% 
@@ -21,11 +21,11 @@
     <%= render :partial => "shared/event_list", :object => [], :locals => locals %>
   <% end %>
   <% if @show_recent_feedback %>
-    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => "Recent Feedback", :display_count => 3, :period => "the last 2 weeks", :show_context => true, :is_recent_feedback => true} %>
+    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :display_count => 3, :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
   <% end %>
   <% if show_user_create_course_button(@current_user) %>
   <div class="rs-margin-lr">
-    <a href="<%= getting_started_path(:fresh => 1) %>" class="button button-sidebar-wide">Start a New Course</a>
+    <a href="<%= getting_started_path(:fresh => 1) %>" class="button button-sidebar-wide"><%= t('start_new_course', 'Start a New Course') %></a>
   </div>
   <% end %>
 <% end %>
@@ -33,19 +33,16 @@
 <div>
 <% if session[:conflict_channel] %>
   <div class="reminder">
-    <h2>Confirm Email</h2>
+    <h2><%= t('titles.confirm_email', 'Confirm Email') %></h2>
     <div class="body">
-      Does the email address, <b><%= session[:conflict_channel].path %></b>,
-      belong to you?  Right now it belongs to another user.
-      If you're sure it belongs to you, then you should claim it as part
-      of your account.
+      <%= mt('email_conflict', "Does the email address, **%{email}**, belong to you?  Right now it belongs to another user. If you're sure it belongs to you, then you should claim it as part of your account.", :email => session[:conflict_channel].path) %>
       <div class="button-container button-container-right-aligned">
         <% form_for session[:conflict_channel], :url => try_merge_communication_channels_path, :html => {:style => "float: left;", :method => :post} do |f| %>
           <input type="hidden" name="path" value="<%= session[:conflict_channel].path %>"/>
-          <button type="submit" name="accept" class="button positive button-default">Claim This Address</button>
+          <button type="submit" name="accept" class="button positive button-default"><%= t('buttons.claim_email', 'Claim This Address') %></button>
         <% end %>
         <% form_for User, :url => dashboard_ignore_channel_path(:path => session[:conflict_channel].path), :html => {:style => "float: left;", :method => :post} do |f| %>
-          <button type="submit" name="reject" class="button">Ignore This Address</button>
+          <button type="submit" name="reject" class="button"><%= t('ignore_email', 'Ignore This Address') %></button>
         <% end %>
         <div class="clear"></div>
       </div>
@@ -57,18 +54,18 @@
     <div class="header">
       <div class="header_title">
         <%= image_tag "information.png", :class => "header_icon", :style => "padding: 7px 2px 2px;" %>
-        <span class="title subject">Welcome to Canvas!</a>
+        <span class="title subject"><%= t('welcome_to_happiness', 'Welcome to Canvas!') %></span>
         <div class="sub_title">
-          <span class="context_code">Information</span>
+          <span class="context_code"><%= t('information', 'Information') %></span>
         </div>
       </div>
       <div style="clear: left;"></div>
     </div>
     <div class="content">
       <div class="message user_content">
-        You don't have any courses, so this page won't be very exciting for now.
+        <%= t('no_courses_message', "You don't have any courses, so this page won't be very exciting for now.
         Once you've created or signed up for courses, you'll start to see
-        conversations from all of your classes.
+        conversations from all of your classes.") %>
       </div>
       <div class="clear"></div>
     </div>

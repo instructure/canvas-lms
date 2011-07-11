@@ -9,9 +9,9 @@ Gem.loaded_specs.values.each do |spec|
 end
 
 module I18nUtilities
-  def before_label(text_or_key, default_value = nil)
-    text_or_key = t('labels.' + text_or_key.to_s, default_value) if default_value
-    t("before_label_wrapper", "%{text}:", :text => text_or_key)
+  def before_label(text_or_key, default_value = nil, *args)
+    text_or_key = t('labels.' + text_or_key.to_s, default_value, *args) if default_value
+    t("#before_label_wrapper", "%{text}:", :text => text_or_key)
   end
 
   def _label_symbol_translation(method, text, options)
@@ -99,7 +99,7 @@ I18n.class_eval do
       options[:default] ||= if options[:count]
         case default
           when String
-            default =~ /\A\w+\z/ ? pluralize(options[:count], default) : default
+            default =~ /\A[\w\-]+\z/ ? pluralize(options[:count], default) : default
           when Hash
             case options[:count]
               when 0

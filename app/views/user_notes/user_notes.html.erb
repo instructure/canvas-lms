@@ -1,21 +1,22 @@
-<% add_crumb "Faculty Journal" %>
+<% add_crumb t('curmbs.faculty_journal', "Faculty Journal") %>
 <% @active_tab = "faculty-journal" %>
-<% content_for :page_title do %>Faculty Journal<% end %>
+<% content_for :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
 
 <% content_for :page_header do %>
-    <h1>Faculty Journal</h1>
+    <h1><%= t :page_title, "Faculty Journal" %></h1>
 <% end %>
 
-<p>Last Faculty Journal entries for students currently enrolled in <%= @is_course ? 'this' : 'a' %> course.</p>
+<p><%= @is_course ? t(:details_this_course, "Last Faculty Journal entries for students currently enrolled in this course.") :
+       t(:details_a_course, "Last Faculty Journal entries for students currently enrolled in a course.") %></p>
 
 <%= will_paginate(@users, :style=>"margin-bottom: 1em;") %>
 
 <table id="syllabus">
   <thead>
     <tr>
-      <th>Student</th>
-      <th>Last Faculty Journal Entry</th>
-      <th>Current Courses</th>
+      <th><%= t 'headers.student', "Student" %></th>
+      <th><%= t 'headers.last_entry', "Last Faculty Journal Entry" %></th>
+      <th><%= t 'headers.current_courses', "Current Courses" %></th>
     </tr>
   </thead>
   <% @users.each do |user| %>

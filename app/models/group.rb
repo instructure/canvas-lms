@@ -359,6 +359,7 @@ class Group < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.name = hash[:title]
     # TODO i18n
+    t '#group.default_category', 'Imported Groups'
     item.category = hash[:group_category] || 'Imported Groups'
     
     item.save!

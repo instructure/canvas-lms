@@ -1,6 +1,6 @@
-New wiki page for <%= asset.find_namespace_for_user(user).context.name rescue "" %>:
+<%= t :body, "New wiki page for %{course_or_group}:", :course_or_group => asset.find_namespace_for_user(user).context.name rescue "" %>
 <%= asset.title.titleize %>
 
 <%= strip_and_truncate(asset.body, :max_length => 50) %>
 
-More info at <%= HostUrl.context_host(asset.find_namespace_for_user(user).context) %>
+<%= t :details, "More info at %{url}", :url => HostUrl.context_host(asset.find_namespace_for_user(user).context) %>

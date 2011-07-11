@@ -1,19 +1,29 @@
 <% term_count =  @root_account.enrollment_terms.active.count %>
 <% if term_count > 1 || @associated_courses_count > 0  %>
-  <% if term_count > 1 %>
-    <h2><%= t(:choose_term_label, "Choose Term")%></h2>
-    <div class="rs-margin-lr rs-margin-bottom">
-      <label for="enrollment_term"><%= before_label(t(:enrollment_term_label, "Show courses from the term")) %></label><br />
-      <select id="enrollment_term">
-        <% @root_account.enrollment_terms.active.each do |term| %>
-          <option value="<%= context_url(@account, :context_url, :enrollment_term_id => term.id) %>" <%= 'selected' if term == @term %>><%= term.name %></option>
-        <% end %>
-      </select>
-    </div>
-  <% end %>
+  <h2><%= t(:course_filtering, "Course Filtering")%></h2>
+  <div class="rs-margin-lr rs-margin-bottom">
+    <form method="get">
+      <% if term_count > 1 %>
+        <label for="enrollment_term"><%= before_label(t(:enrollment_term_label, "Show courses from the term")) %></label><br />
+        <select name="enrollment_term_id">
+          <option value="" <%= 'selected' unless @term %>><%= t(:all_terms, "All Terms") %></option>
+          <% @root_account.enrollment_terms.active.each do |term| %>
+            <option value="<%= term.id %>" <%= 'selected' if term == @term %>><%= term.name %></option>
+          <% end %>
+        </select>
+        <br />
+      <% end %>
+      <% if @query.present? %><input name="course[name]" type="hidden" value="<%= @query %>" /><% end %>
+      <input name="hide_enrollmentless_courses" type="hidden" value="0" />
+      <input name="hide_enrollmentless_courses" type="checkbox" value="1" <% if params[:hide_enrollmentless_courses] == "1" %>checked="checked"<% end %>/>
+      <label for="hide_enrollmentless_courses"><%= t(:hide_enrollmentless_courses, "Hide enrollmentless courses") %></label>
+      <br />
+      <button class='button'><%= t("#buttons.filter", "Filter") %></button>
+    </form>
+  </div>
   
   <% if @associated_courses_count > 0 %>
-    <h2><label for="filter"><%= t(:filter_label, "Find a Course") %></label></h2>
+    <h2><label><%= t(:filter_label, "Find a Course") %></label></h2>
     <div class="rs-margin-lr rs-margin-bottom">
       <% form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :method => :get} do |f| -%>
         <fieldset class="textfield-inline-with-button">

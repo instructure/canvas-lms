@@ -1,9 +1,9 @@
   <select class="sms_select contact_select" name="channel_id">
     <% if @sms_channels.empty? %>
-      <option value="" class="blank_option">[Select Cell]</option>
+      <option value="" class="blank_option"><%= t(:default_sms_option, "[Select Cell]") %></option>
     <% end %>
     <% @sms_channels.each do |c| %>
       <option value="<%= c.id %>" class="channel_option_<%= c.id %>" <%= "selected" if c == sms_select %>><%= c.path %></option>
     <% end %>
-    <option value="new">New Cell Number</option>
+    <option value="new"><%= t(:new_sms_option, "New Cell Number") %></option>
   </select>

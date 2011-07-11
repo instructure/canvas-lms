@@ -3,10 +3,14 @@
 <% end %>
 
 <% define_content :subject do %>
-  Confirm Email: Canvas
+  <%= t :subject, "Confirm Email: Canvas" %>
 <% end %>
 
-The email address, <%= asset.path %> is being registered at <%=  (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %> for the user, <%= asset.user.name %>.
+<%= t :body,
+      "The email address, %{email} is being registered at %{website} for the user, %{user}.",
+      :email => asset.path,
+      :website => (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host,
+      :user => asset.user.name %>
 
-To confirm this registration, please visit the following url: 
+<%= t :details, "To confirm this registration, please visit the following url:" %>
 <%= content :link %>

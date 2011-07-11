@@ -172,7 +172,7 @@ class FilesController < ApplicationController
           @attachment ||= @submission.submission_history.map(&:versioned_attachments).flatten.find{|a| a.id == params[:download].to_i }
         end        
         if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
-          render :json  => { :public_url => @attachment.authenticated_s3_url }
+          render :json  => { :public_url => @attachment.authenticated_s3_url(:protocol => request.protocol) }
         end
       end
     end

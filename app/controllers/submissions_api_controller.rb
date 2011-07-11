@@ -49,29 +49,63 @@ class SubmissionsApiController < ApplicationController
   #
   # @argument student_ids[] List of student ids to return submissions for. At least one is required.
   # @argument assignment_ids[] List of assignments to return submissions for. If none are given, submissions for all assignments are returned.
-  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
+  # @argument grouped If this argument is present, the response will be grouped by student, rather than a flat array of submissions.
+  # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"|"total_scores"] Associations to include with the group. `total_scores` requires the `grouped` argument.
+  #
+  # @example_response
+  #
+  # Without grouped:
+  #
+  # [
+  #   { "assignment_id": 100, grade: 5, "user_id": 1, ... },
+  #   { "assignment_id": 101, grade: 6, "user_id": 2, ... }
+  #
+  # With grouped:
+  #
+  # [
+  #   {
+  #     "user_id": 1,
+  #     "submissions: [
+  #       { "assignment_id": 100, grade: 5, ... },
+  #       { "assignment_id": 101, grade: 6, ... }
+  #     ]
+  #   }
+  # ]
   def for_students
     if authorized_action(@context, @current_user, :manage_grades)
       student_ids = map_user_ids(params[:student_ids])
       raise ActiveRecord::RecordNotFound if student_ids.blank?
 
-      assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
-
-      scope = @context.submissions.scoped(:include => :assignment)
-
-      if assignment_ids.present?
-        @submissions = scope.all(
-          :conditions => {:user_id => student_ids, :assignment_id => assignment_ids})
-      else
-        @submissions = scope.all(
-          :conditions => {:user_id => student_ids})
-      end
-
       includes = Array(params[:include])
 
-      result = @submissions.map { |s| submission_json(s, s.assignment, includes) }
+      assignment_ids = @context.assignments.active.all(:select => :id).map(&:id)
+      requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
+      assignment_ids &= requested_assignment_ids if requested_assignment_ids.present?
 
-      render :json => result.to_json
+      Api.assignment_ids_for_students_api = assignment_ids
+      scope = @context.student_enrollments.scoped(
+        :include => { :user => :submissions_for_given_assignments },
+        :conditions => { 'users.id' => student_ids })
+
+      result = scope.map do |enrollment|
+        student = enrollment.user
+        hash = { :user_id => student.id, :submissions => [] }
+        student.submissions_for_given_assignments.each do |submission|
+          hash[:submissions] << submission_json(submission, submission.assignment, includes)
+        end
+        if includes.include?('total_scores') && params[:grouped].present?
+          hash.merge!(
+            :computed_final_score => enrollment.computed_final_score,
+            :computed_current_score => enrollment.computed_current_score)
+        end
+        hash
+      end
+
+      unless params[:grouped].present?
+        result = result.inject([]) { |arr, user_info| arr.concat(user_info[:submissions]) }
+      end
+
+      render :json => result
     end
   end
 
@@ -81,11 +115,10 @@ class SubmissionsApiController < ApplicationController
   #
   # @argument include[] ["submission_history"|"submission_comments"|"rubric_assessment"] Associations to include with the group.
   def show
-    if authorized_action(@context, @current_user, :manage_grades)
-      @assignment = @context.assignments.active.find(params[:assignment_id])
-      params[:id] = map_user_ids([params[:id]]).first
-      @submission = @assignment.submissions.find_by_user_id(params[:id]) or raise ActiveRecord::RecordNotFound
-
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+    params[:id] = map_user_ids([params[:id]]).first
+    @submission = @assignment.submissions.find_by_user_id(params[:id]) or raise ActiveRecord::RecordNotFound
+    if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
       render :json => submission_json(@submission, @assignment, includes).to_json
     end
@@ -147,7 +180,7 @@ class SubmissionsApiController < ApplicationController
   def update
     if authorized_action(@context, @current_user, :manage_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @user = Api.find(@context.students_visible_to(@current_user), params[:id]) { |sis_id| User.first(:include => :pseudonym, :conditions => { 'pseudonyms.sis_user_id' => sis_id }) } || raise(ActiveRecord::RecordNotFound)
+      @user = Api.find(@context.students_visible_to(@current_user), params[:id]) { |sis_column, sis_id| User.first(:include => :pseudonym, :conditions => { "pseudonyms.#{sis_column}" => sis_id }) } || raise(ActiveRecord::RecordNotFound)
 
       submission = {}
       if params[:submission].is_a?(Hash)
@@ -231,12 +264,17 @@ class SubmissionsApiController < ApplicationController
     hash
   end
 
-  SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission)
+  SUBMISSION_JSON_FIELDS = %w(user_id url score grade attempt submission_type submitted_at body assignment_id grade_matches_current_submission).freeze
 
   def submission_attempt_json(attempt, assignment, version_idx = nil)
+    json_fields = SUBMISSION_JSON_FIELDS
+    if params[:response_fields]
+      json_fields = json_fields & params[:response_fields]
+    end
+
     hash = attempt.as_json(
       :include_root => false,
-      :only => SUBMISSION_JSON_FIELDS)
+      :only => json_fields)
 
     hash['preview_url'] = course_assignment_submission_url(
       @context, assignment, attempt[:user_id], 'preview' => '1',
@@ -306,10 +344,10 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids) { |sis_id|
+    Api.map_ids(user_ids, User) { |sis_column, sis_id|
       User.first(:include => :pseudonym,
                  :select => 'user.id',
-                 :conditions => { 'pseudonyms.sis_user_id' => sis_id }).try(:id)
+                 :conditions => { "pseudonyms.#{sis_column}" => sis_id }).try(:id)
     }.compact
   end
 

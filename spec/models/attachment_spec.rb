@@ -81,6 +81,24 @@ describe Attachment do
     @attachment.should be_scribdable
   end
   
+  context "authenticated_s3_url" do
+    prepend_before(:each) {
+      Setting.set("file_storage_test_override", "local")
+    }
+    
+    it "should not return the protocol by default" do
+      course_model
+      attachment_with_context(@course)
+      @attachment.authenticated_s3_url.should match(/^\/\//)
+    end
+    
+    it "should return the protocol if specified" do
+      course_model
+      attachment_with_context(@course)
+      @attachment.authenticated_s3_url(:protocol => "https://").should match(/^https:\/\//)
+    end
+  end
+  
   context "scribdable_context" do
     it "should be a scribdable_context if the context is Course" do
       course_model

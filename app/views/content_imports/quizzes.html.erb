@@ -59,9 +59,8 @@
   </div>
 </div>
 
-<% js_block do %>
+<% js_block :i18n_scope => 'content_imports.quizzes' do %>
 <script>
-I18n.scoped('content_imports.quizzes', function(I18n) {
 $(document).ready(function() {
   $qti_file_import_form = $("#qti_file_import_form");
   $("#export_file_input").change(function() {
@@ -89,7 +88,7 @@ $(document).ready(function() {
     uploadDataUrl: $qti_file_import_form.attr('action'),
     postFormData: true,
     beforeSubmit: function(data) {
-      $(this).find(".submit_button").attr('disabled', true).text(I18n.t('messages.uploading', "Uploading QTI File..."));
+      $(this).find(".submit_button").attr('disabled', true).text(I18n.t('messages.uploading_button', "Uploading QTI File..."));
     },
     success: function(data) {
       $(this).slideUp();
@@ -100,7 +99,6 @@ $(document).ready(function() {
       $(this).formErrors(data);
     }
   });
-});
 });
 </script>
 <% end %>

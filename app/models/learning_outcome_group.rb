@@ -201,6 +201,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
     item.title = hash[:title]
     item.description = hash[:description]
     
+    # make sure the root group is created before saving the new group
+    log = LearningOutcomeGroup.default_for(context)
     item.save!
     
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
@@ -212,7 +214,6 @@ class LearningOutcomeGroup < ActiveRecord::Base
       end
     end
     
-    log = LearningOutcomeGroup.default_for(context)
     log.add_item(item)
 
     item

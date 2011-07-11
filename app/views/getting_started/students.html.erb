@@ -54,7 +54,7 @@
 <% if @context.teacherless? %>
   <p style="margin-top: 10px;"><%= t :teacherless_add_student_notice, "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies all over again, and we'll also give you a place to share files and collaborate. Just paste in a list of email addresses below to invite others to join." %></p>
 <% else %>
-  <p style="margin-top: 10px;"><%= t :teacher_add_student_notice, "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. Paste in just email addresses (bob@example.com) or names with addresses #(\"Jones, Bob M.\" &lt;bob@example.com&gt;)# separated by commas or on separate lines.", :wrapper => { "*" => "<b>\\1</b>", "#" => "<span style=\"white-space:nowrap;\">\\1</span>" } %>
+  <p style="margin-top: 10px;"><%= t :teacher_add_student_notice, "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. Paste in just email addresses (bob@example.com) or names with addresses #(\"Jones, Bob M.\" <bob@example.com>)# separated by commas or on separate lines.", :wrapper => { "*" => "<b>\\1</b>", "#" => "<span style=\"white-space:nowrap;\">\\1</span>" } %>
   </p>
 <% end %>
 <% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form"} do  %>

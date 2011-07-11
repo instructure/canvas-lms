@@ -46,7 +46,7 @@
   </script>
 <% end %>
 
-<h2 id="messages_view" style="float: left;"><%= @messages_view_header %></h2>
+<h2 id="messages_view" style="float: left;" data-view="<%= @messages_view %>"><%= @messages_view_header %></h2>
 <% if @messages_view == :action_items %>
   <div style="float: left; padding-top: 0.5em; margin-left: 15px;">
     <a href="<%= inbox_path(:view => 'inbox') %>" style="display: none;"><%= t('links.received_messages', %{Received Messages}) %></a>
@@ -234,6 +234,6 @@
   </div>
 <% end %>
 </div>
-<div id="context_message_recipient_not_available_dialog" title='<span class="ui-icon ui-icon-alert" style="float: left; margin-right: 0.3em; "></span> Alert:' style="display:none;">
+<div id="context_message_recipient_not_available_dialog" style="display:none;">
   <%= t 'alerts.recipients_not_available', %{Some of the original intended recipients are no longer available. %{newline} This may be because they are no longer an active member of the course or group. They might have been deleted or un-enrolled.}, :newline => raw('<br />') %>
 </div>

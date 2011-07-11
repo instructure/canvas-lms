@@ -84,9 +84,8 @@
   </div>
 </div>
 
-<% js_block do %>
+<% js_block :i18n_scope => "accounts" do %>
 <script>
-I18n.scoped("accounts", function(I18n) {
   $(document).ready(function() {
     $(".add_user_link").click(function(event) {
       event.preventDefault();
@@ -112,15 +111,15 @@ I18n.scoped("accounts", function(I18n) {
         var message = '';
         if(data.new_user) {
             if(data.message_sent) {
-                message = I18n.t('user_added_message_sent_message', '{{user}} successfully added! They should receive an email confirmation shortly.', {user: link});
+                message = I18n.t('user_added_message_sent_message', '%{user} successfully added! They should receive an email confirmation shortly.', {user: link});
             } else {
-                message = I18n.t('user_added_message', '{{user}} successfully added!', {user: link});
+                message = I18n.t('user_added_message', '%{user} successfully added!', {user: link});
             }
         } else {
             if(data.message_sent) {
-                message = I18n.t('user_updated_message_sent_message', '{{user}} successfully updated! They should receive an email confirmation shortly.', {user: link});
+                message = I18n.t('user_updated_message_sent_message', '%{user} successfully updated! They should receive an email confirmation shortly.', {user: link});
             } else {
-                message = I18n.t('user_updated_message', '{{user}} successfully updated!', {user: link});
+                message = I18n.t('user_updated_message', '%{user} successfully updated!', {user: link});
             }
         }
         $.flashMessage(message);
@@ -167,7 +166,7 @@ I18n.scoped("accounts", function(I18n) {
           $("ul.courses").prepend($course);
           $course.slideDown();
         }
-        $.flashMessage(I18n.t('course_added_message', "{{course}} successfully added!", {course: course.name}));
+        $.flashMessage(I18n.t('course_added_message', "%{course} successfully added!", {course: course.name}));
         $("#add_course_dialog").dialog('close');
       },
       error: function(data) {
@@ -179,6 +178,5 @@ I18n.scoped("accounts", function(I18n) {
       $("#add_course_dialog").dialog('close');
     });
   });
-});
 </script>
 <% end %>

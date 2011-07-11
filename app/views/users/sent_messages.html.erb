@@ -1,6 +1,6 @@
 <% content_for :page_title do %><%= @messages_view_header %><% end %>
 
-<% add_crumb "Sent Messages" %>
+<% add_crumb t('crumbs.sent_messages', "Sent Messages") %>
 
 <% jammit_js :context_messages %>
 <h2 id="messages_view" style="float: left;"><%= @messages_view_header %></h2>
@@ -8,7 +8,7 @@
 
 <div id="message_list" class="communication_messages_list">
   <div class="no_messages" style="<%= hidden unless @messages.empty? %>">
-    No sent messages
+    <%= t('no_sent_messages', 'No sent messages') %>
   </div>
   <% @messages.each do |message| %>
     <%= render :partial => 'context/context_message', :object => message, :locals => {:show_mark_as_read => true} %>
@@ -18,7 +18,7 @@
   <% end %>
   <%= will_paginate(@messages) %>
 </div>
-<% js_block do %>
+<% js_block :i18n_scope => "users.sent_messages" do %>
   <script type="text/javascript">
     $(function(){
       url = "<%= user_sent_messages_url(@context, :format => :json) %>";
@@ -26,7 +26,7 @@
         totalPages: <%= @messages.total_pages %>,
         url: url,
         params: { 'view': $.queryParam("view") },
-        loaderMsg: "Loading more results",
+        loaderMsg: I18n.t("loading_more_results", "Loading more results"),
         scrape: function(data) {
             if(typeof(data) == 'string') {
               try {

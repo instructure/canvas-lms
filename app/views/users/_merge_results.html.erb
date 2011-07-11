@@ -1,24 +1,24 @@
       <table class="merge_results">
         <thead>
           <tr class="result">
-            <th>User</th>
+            <th><%= t('user', 'User') %></th>
             <td><%= user.name %></td>
             <td><%= other_user.name %></td>
           </tr>
         </thead>
         <tbody>
           <tr class="result">
-            <th>Action</th>
-            <td>will be deleted</td>
-            <td>will be kept</td>
+            <th><%= t('action', 'Action') %></th>
+            <td><%= t('will_be_deleted', 'will be deleted') %></td>
+            <td><%= t('will_be_kept', 'will be kept') %></td>
           </tr>
           <tr class="result">
-            <th>Emails</th>
-            <td>no emails</td>
+            <th><%= t('emails', 'Emails') %></th>
+            <td><%= t('no_emails', 'no emails') %></td>
             <td>
                 <% emails = (user.communication_channels.unretired.email + other_user.communication_channels.unretired.email).map(&:path).uniq.sort %>
                 <% if emails.empty? %>
-                  no emails
+                <%= t('no_emails', 'no emails') %>
                 <% else %>
                   <ul class="unstyled_list">
                     <% emails.each do |email| %>
@@ -29,12 +29,12 @@
             </td>
           </tr>
           <tr class="result">
-            <th>Logins</th>
-            <td>no logins</td>
+            <th><%= t('logins', 'Logins') %></th>
+            <td><%= t('no_logins', 'no logins') %></td>
             <td>
               <% pseudonyms = (user.pseudonyms.active + other_user.pseudonyms.active).sort_by(&:unique_id) %>
               <% if pseudonyms.empty? %>
-                no logins
+                <%= t('no_logins', 'no logins') %>
               <% else %>
                 <table>
                   <% pseudonyms.each do |pseudonym| %>
@@ -48,12 +48,12 @@
             </td>
           </tr>
           <tr class="result">
-            <th>Enrollments</th>
-            <td>no enrollments</td>
+            <th><%= t('enrollments', 'Enrollments') %></th>
+            <td><%= t('no_enrollments', 'no enrollments') %></td>
             <td>
               <% enrollments = (user.current_enrollments + other_user.current_enrollments).sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] } %>
               <% if enrollments.empty? %>
-                no enrollments
+                <%= t('no_enrollments', 'no enrollments') %>
               <% else %>
                 <table>
                   <% enrollments.each do |enrollment| %>

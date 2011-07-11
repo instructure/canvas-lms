@@ -1076,7 +1076,7 @@ I18n.scoped('calendars', function(I18n) {
       $("#calendar_feed_box").find(".calendar_feed_url").val($(this).attr('href')).end()
         .find(".show_calendar_feed_link").attr('href', $(this).attr('href'));
       $("#calendar_feed_box").dialog('close').dialog({
-        title: I18n.t('feed_title', "Calendar Feed"),
+        title: I18n.t('feed_dialog_title', "Calendar Feed"),
         width: 375,
         autoOpen: false
       }).dialog('open');

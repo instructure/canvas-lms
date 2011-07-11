@@ -24,6 +24,9 @@
 // the worst they can do is override endpoint urls for eportfolio 
 // settings on their own personal eportfolio, they can't 
 // affect anyone else
+
+I18n.scoped('eportfolio', function(I18n) {
+
 (function eportfolioInit() {
   function ePortfolioFormData() {
     var data = $("#edit_page_form").getFormData({
@@ -60,7 +63,7 @@
       $("#edit_eportfolio_form").dialog('close').dialog({
         autoOpen: false,
         width: "auto",
-        title: "ePortfolio Settings"
+        title: I18n.t('eportfolio_settings', "ePortfolio Settings")
       }).dialog('open');
     });
     $("#edit_eportfolio_form .cancel_button").click(function(event) {
@@ -189,16 +192,16 @@
       $section.attr('id', 'page_section_' + sectionCountIdx++);
       $("#page_content").append($section);
       var section_type = "rich_text";
-      var section_type_name = "Rich Text Content"
+      var section_type_name = I18n.t('#eportfolios._page_section.section_types.rich_text', "Rich Text Content")
       if($(this).hasClass('add_html_link')) {
         section_type = "html";
-        section_type_name = "HTML/Embedded Content";
+        section_type_name = I18n.t('#eportfolios._page_section.section_types.html', "HTML/Embedded Content");
       } else if($(this).hasClass('add_submission_link')) {
         section_type = "submission";
-        section_type_name = "Course Submission";
+        section_type_name = I18n.t('#eportfolios._page_section.section_types.submission', "Course Submission");
       } else if($(this).hasClass('add_file_link')) {
         section_type = "attachment";
-        section_type_name = "Image/File Upload";
+        section_type_name = I18n.t('#eportfolios._page_section.section_types.attachment', "Image/File Upload");
       }
       var edit_type = "edit_" + section_type + "_content";
       $section.fillTemplateData({
@@ -326,7 +329,7 @@
             }
             $(this).remove();
           } else {
-            $(this).errorBox('Please select a file');
+            $(this).errorBox(I18n.t('errors.missing_file', 'Please select a file'));
           }
           return false;
         }
@@ -358,7 +361,7 @@
       },
       error: function(data) {
         var $section = $(this).data("section");
-        $section.find(".uploading_file").html("Upload Failed.");
+        $section.find(".uploading_file").html(I18n.t('errors.upload_failed', "Upload Failed."));
         $section.addClass('failed');
         $section.formErrors(data.errors || data);
       }
@@ -373,10 +376,12 @@
         $("#add_submission_form .submission_id").val(id);
         var assignment = $(this).find(".assignment_title").text();
         var context = $(this).find(".context_name").text();
-        $("#add_submission_form .submission_description").val("This is my " + assignment + " submission for " + context + ".");
+        $("#add_submission_form .submission_description").val(
+          I18n.t('default_description', "This is my %{assignment} submission for %{course}.",
+            { 'assignment': assignment, 'course': context }));
         $("#add_submission_form").dialog('close').dialog({
           autoOpen: false,
-          title: 'Add Page for Submission',
+          title: I18n.t('titles.add_submission', 'Add Page for Submission'),
           width: 400,
           open: function() {
             $(this).find(":text:visible:first").val(assignment).focus().select();
@@ -429,7 +434,7 @@
       event.preventDefault();
       $(this).parents(".comment").confirmDelete({
         url: $(this).attr('href'),
-        message: "Are you sure you want to delete this message?",
+        message: I18n.t('confirm_delete_message', "Are you sure you want to delete this message?"),
         success: function(data) {
           $(this).slideUp(function() {
             $(this).remove();
@@ -594,7 +599,7 @@
         $("#section_pages").removeClass('editing');
       } else {
         $("#page_list").addClass('editing');
-        $("#page_list .page").attr('title', 'Click to edit, drag to reorder');
+        $("#page_list .page").attr('title', I18n.t('links.manage_pages', 'Click to edit, drag to reorder'));
         $("#page_list").sortable({
           axis: 'y',
           helper: 'clone',
@@ -644,7 +649,7 @@
       event.preventDefault();
       hideEditObject('page');
       $(this).parents("li").confirmDelete({
-        message: "Delete this page and all its content?",
+        message: I18n.t('confirm_delete_page', "Delete this page and all its content?"),
         url: $(this).parents("li").find(".rename_page_url").attr('href'),
         success: function(data) {
           $(this).fadeOut(function() {
@@ -720,7 +725,8 @@
         $("#section_list").sortable('destroy');
         $("#section_list_manage").removeClass('editing');
         $("#section_list").removeClass('editing').sortable('disable');
-        $(".arrange_sections_link").text("Manage Sections").val("Manage Sections");
+        var manage_sections = I18n.t('buttons.manage_sections', "Manage Sections");
+        $(".arrange_sections_link").text(manage_sections).val(manage_sections);
         $(".add_section").hide();
         $("#section_list > li").attr('title', "");
       } else {
@@ -748,9 +754,10 @@
           }
         });
         $("#section_list").addClass('editing').sortable('enable');
-        $(".arrange_sections_link").text("Done Editing").val("Done Editing");
+        var done_editing = I18n.t('buttons.done_editing', "Done Editing");
+        $(".arrange_sections_link").text(done_editing).val(done_editing);
         $(".add_section").show();
-        $("#section_list > li").attr('title', "Drag to Arrange, Click to Edit");
+        $("#section_list > li").attr('title', I18n.t('titles.section_list', "Drag to Arrange, Click to Edit"));
       }
     });
     $(".add_section_link").click(function(event) {
@@ -763,7 +770,7 @@
       event.preventDefault();
       hideEditObject('section');
       $(this).parents("li").confirmDelete({
-        message: "Delete this section and all its pages?",
+        message: I18n.t('confirm_delete_section', "Delete this section and all its pages?"),
         url: $(this).parents("li").find(".rename_section_url").attr('href'),
         success: function(data) {
           $(this).fadeOut(function() {
@@ -812,7 +819,7 @@
       $("#export_progress").progressbar().progressbar('option', 'value', 0);
       var $box = $("#downloading_eportfolio_message")
       $box.slideDown();
-      $box.find(".message").text("Collecting ePortfolio resources. this may take a while if you have a lot of files in your ePortfolio...");
+      $box.find(".message").text(I18n.t('#eportfolios.show.headers.export_progress', "Collecting ePortfolio resources. this may take a while if you have a lot of files in your ePortfolio."));
       var url = $(this).attr('href');
       var errorCount = 0;
       var check = function(first) {
@@ -835,7 +842,7 @@
         }, function(data) {
           errorCount++;
           if(errorCount > 5) {
-            $box.find(".message").text("There was an error compiling your eportfolio.  Please try again in a little while.");
+            $box.find(".message").text(I18n.t('errors.compiling', "There was an error compiling your eportfolio.  Please try again in a little while."));
           } else {
             setTimeout(check, 5000);
           }
@@ -846,8 +853,10 @@
     $(".download_eportfolio_link").click(function(event) {
       $("#downloading_eportfolio_dialog").dialog('close').dialog({
         autoOpen: false,
-        title: "Download ePortfolio"
+        title: I18n.t('titles.download_eportfolio', "Download ePortfolio")
       }).dialog('open');
     });
   });
 })();
+
+})

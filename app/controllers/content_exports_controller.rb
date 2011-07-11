@@ -87,10 +87,12 @@ class ContentExportsController < ApplicationController
       render :template => 'shared/errors/404_message', :status => :bad_request
     end
   end
-  
+
   private
-  
+
   def render_export(export)
-    render :json => export.to_json(:only => [:id, :progress, :workflow_state],:methods => [:download_url, :error_message])
+    json = export.as_json(:only => [:id, :progress, :workflow_state],:methods => [:error_message])
+    json['content_export']['download_url'] = verified_file_download_url(export.attachment) if export.attachment
+    render :json => json
   end
 end

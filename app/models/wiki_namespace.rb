@@ -68,6 +68,9 @@ class WikiNamespace < ActiveRecord::Base
       wiki_namespace = context.wiki_namespaces.find_by_namespace(name)
       wiki_namespace ||= context.wiki_namespaces.build(:namespace => name)
       if !wiki_namespace.wiki
+        # TODO i18n
+        t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
+        t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
         wiki_namespace.wiki = Wiki.create(:title => "#{context.name} Wiki")
         wiki_namespace.save!
       end

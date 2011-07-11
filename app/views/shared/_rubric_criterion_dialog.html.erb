@@ -4,8 +4,8 @@
   <div class="editing">
     <textarea class="long_description" name="long_description" style="width: 370px;"></textarea>
     <div class="button-container">
-      <button type="button" class="button save_button">Update Description</button>
-      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+      <button type="button" class="button save_button"><%= t 'buttons.update_description', "Update Description" %></button>
+      <button type="button" class="button button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
     </div>
   </div>
   <div class="displaying">
@@ -17,15 +17,15 @@
   <div class="criterion_description" style="border-bottom: 1px solid #ccc; padding: 5px 0; font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">
   </div>
   <div class="editing">
-    Additional Comments:
+    <%= before_label :additional_comments, "Additional Comments" %>
     <textarea class="criterion_comments" name="criterion_comments" style="width: 370px;"></textarea>
     <div class="button-container">
-      <button type="button" class="button save_button">Update Comments</button>
-      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+      <button type="button" class="button save_button"><%= t 'buttons.update_comments', "Update Comments" %></button>
+      <button type="button" class="button button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
     </div>
   </div>
   <div class="displaying">
-    Additional Comments:
+    <%= before_label :additional_comments, "Additional Comments" %>
     <div class="criterion_comments" style="margin-top: 10px;">
     </div>
   </div>

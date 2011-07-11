@@ -1,3 +1,4 @@
+I18n.scoped('find_outcome', function(I18n) {
 var find_outcome = (function() {
   return {
     find: function(callback, options) {
@@ -5,7 +6,7 @@ var find_outcome = (function() {
       find_outcome.callback = callback;
       var $dialog = $("#find_outcome_criterion_dialog");
       if(!$dialog.hasClass('loaded')) {
-        $dialog.find(".loading_message").text("Loading Outcomes...");
+        $dialog.find(".loading_message").text(I18n.t('messages.loading_outcomes', "Loading Outcomes..."));
         $.ajaxJSON($dialog.find(".outcomes_list_url").attr('href'), 'GET', {}, function(data) {
           valids = [];
           for(var idx in data) {
@@ -15,7 +16,13 @@ var find_outcome = (function() {
             }
           }
           if(valids.length === 0) {
-            $dialog.find(".loading_message").text("No" + (options.for_rubric ? " Rubric-Configured" : "") + " Outcomes found");
+            var message;
+            if (options.for_rubric) {
+              message = I18n.t('messages.no_rubric_outcomes_found', "No Rubric-Configured Outcomes found");
+            } else {
+              message = I18n.t('messages.no_outcomes_found', "No Outcomes found");
+            }
+            $dialog.find(".loading_message").text(message);
           } else {
             $dialog.find(".loading_message").hide();
             $dialog.addClass('loaded');
@@ -55,13 +62,19 @@ var find_outcome = (function() {
             $dialog.find(".outcomes_select:not(.blank):first").click();
           }
         }, function(data) {
-          $dialog.find(".loading_message").text("Outcomes Retrieval failed unexpected.  Please try again.");
+          $dialog.find(".loading_message").text(I18n.t('errors.outcome_retrieval_failed', "Outcomes Retrieval failed unexpected.  Please try again."));
         });
+      }
+      var find_outcome_title;
+      if (options.for_rubric) {
+        find_outcome_title = I18n.t('titles.find_outcome_criterion', "Find Outcome Criterion");
+      } else {
+        find_outcome_title = I18n.t('titles.find_outcome', "Find Outcome");
       }
       $dialog.dialog('close').dialog({
         autoOpen: false,
         modal: true,
-        title: "Find Outcome" + (options.for_rubric ? " Criterion" : ""),
+        title: find_outcome_title,
         width: 700,
         height: 400
       }).dialog('open');
@@ -86,4 +99,5 @@ $(document).ready(function() {
       find_outcome.callback($outcome);
     }
   });
+});
 });

@@ -359,7 +359,7 @@ class Submission < ActiveRecord::Base
     if self.score_changed?
       @score_changed = true
       if self.assignment
-        self.grade = self.assignment.score_to_grade(self.score) if self.assignment.points_possible && self.assignment.points_possible > 0
+        self.grade = self.assignment.score_to_grade(self.score) if self.assignment.points_possible.to_f > 0.0 || self.assignment.grading_type != 'pass_fail'
       else
         self.grade = self.score
       end
@@ -623,10 +623,15 @@ class Submission < ActiveRecord::Base
   end
 
   def readable_state
-    if workflow_state == 'pending_review'
-      'pending review'
-    else
-      workflow_state
+    case workflow_state
+    when 'submitted'
+      t 'state.submitted', 'submitted'
+    when 'unsubmitted'
+      t 'state.unsubmitted', 'unsubmitted'
+    when 'pending_review'
+      t 'state.pending_review', 'pending review'
+    when 'graded'
+      t 'state.graded', 'graded'
     end
   end
   
@@ -686,12 +691,12 @@ class Submission < ActiveRecord::Base
     opts[:attachments] ||= opts.delete :comment_attachments
     if opts[:comment].empty? 
       if opts[:media_comment_id]
-        opts[:comment] = "This is a media comment."
+        opts[:comment] = t('media_comment', "This is a media comment.")
       elsif opts[:attachments].try(:length)
-        opts[:comment] = "See attached files."
+        opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Date.today.to_s) + (opts[:media_comment_id] || opts[:comment] || "no comment"))
+    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Date.today.to_s) + (opts[:media_comment_id] || opts[:comment] || t('no_comment', "no comment")))
     self.save! if self.new_record?
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous]
     comment = self.submission_comments.create(opts.slice(*valid_keys)) if !opts[:comment].empty?

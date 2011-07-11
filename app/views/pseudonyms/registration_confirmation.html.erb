@@ -10,8 +10,7 @@
     <h2><%= t 'titles.welcome_aboard', "Welcome aboard!" %></h2>
     <h4 style="margin-bottom: 0.2em"><%= t 'titles.email_confirmed', "Email address: %{email} confirmed.", :email => @communication_channel.path %></h4>
     <p><%= if @course
-          mt :details_with_course, "In order to finish signing you up for the course **%{course}**, we'll need a few more pieces of information.  Please
-    fill out the form below:", :course => @course.name
+          mt :details_with_course, "In order to finish signing you up for the course **%{course}**, we'll need a few more pieces of information.  Please fill out the form below:", :course => @course.name
         else
           t :details, "In order to finish signing you up, we'll need a few more pieces of information.  Please fill out the form below:"
         end %></p>
@@ -56,9 +55,8 @@
 </div>
 
 
-<% js_block do %>
+<% js_block :i18n_scope => 'pseudonyms.regisration_confirmation' do %>
 <script type="text/javascript">
-I18n.scoped('pseudonyms.regisration_confirmation', function(I18n) {
 $(document).ready(function() {
   $("#registration_confirmation_form :text:first").focus().select();
   $("#registration_confirmation_form").submit(function(event) {
@@ -93,7 +91,6 @@ $(document).ready(function() {
     }
     return success;
   });
-});
 });
 </script>
 <% end %>

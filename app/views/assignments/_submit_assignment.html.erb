@@ -1,9 +1,8 @@
 <%
   show_google_docs = @assignment.submission_types && @assignment.submission_types.match(/online_upload/) && @domain_root_account && feature_and_service_enabled?(:google_docs) && (@assignment.allowed_extensions.blank? || @assignment.allowed_extensions.grep(/doc|xls|ppt/).present?)
 -%>
-<% js_block do %>
+<% js_block :i18n_scope => 'assignments' do %>
 <script type="text/javascript">
-I18n.scoped('assignments', function(I18n) {
 $(document).ready(function() {
   var submitting = false;
   $(".submit_assignment_form").submit(function(event) {
@@ -146,8 +145,7 @@ $(document).ready(function() {
   });
   $('.add_another_file_link').click();
 });
-});
-var submissionAttachmentIndex = -1;
+window.submissionAttachmentIndex = -1;
 </script>
 <% end %>
 <script type="text/javascript">

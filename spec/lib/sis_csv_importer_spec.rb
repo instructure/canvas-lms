@@ -122,6 +122,101 @@ describe SIS::SisCsv do
       "G003,Group 3,,closed"
     )
   end
+
+  context "abstract course importing" do
+    it 'should detect bad content' do
+      before_count = AbstractCourse.count
+      importer = process_csv_data(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        "C001,Hum101,Humanities,A001,T001,active",
+        "C001,Hum102,Humanities 2,A001,T001,active",
+        ",Hum102,Humanities 2,A001,T001,active",
+        "C003,Hum102,Humanities 2,A001,T001,inactive",
+        "C004,,Humanities 2,A001,T001,active",
+        "C005,Hum102,,A001,T001,active"
+      )
+      AbstractCourse.count.should == before_count
+
+      importer.warnings.should == []
+      importer.errors.map(&:last).should == [
+          "Duplicate abstract course id C001",
+          "No abstract_course_id given for an abstract course",
+          "Improper status \"inactive\" for abstract course C003",
+          "No short_name given for abstract course C004",
+          "No long_name given for abstract course C005"]
+    end
+
+    it 'should create new abstract courses' do
+      before_count = AbstractCourse.count
+      process_csv_data(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter13,active,,"
+      ).tap{|i| i.errors.should == []; i.warnings.should == []}
+      process_csv_data(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount,active"
+      ).tap{|i| i.errors.should == []; i.warnings.should == []}
+      importer = process_csv_data(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        "C001,Hum101,Humanities,A001,T001,active"
+      )
+      importer.warnings.should == []
+      importer.errors.should == []
+      AbstractCourse.count.should == before_count + 1
+      AbstractCourse.last.tap{|c|
+        c.sis_source_id.should == "C001"
+        c.short_name.should == "Hum101"
+        c.name.should == "Humanities"
+        c.enrollment_term.should == EnrollmentTerm.last
+        c.enrollment_term.name.should == "Winter13"
+        c.account.should == Account.last
+        c.account.name.should == "TestAccount"
+        c.root_account.should == @account
+        c.workflow_state.should == 'active'
+      }
+    end
+
+    it 'should allow instantiations of abstract courses' do
+      process_csv_data(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter13,active,,"
+      ).tap{|i| i.errors.should == []; i.warnings.should == []}
+      process_csv_data(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount,active"
+      ).tap{|i| i.errors.should == []; i.warnings.should == []}
+      process_csv_data(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        "AC001,Hum101,Humanities,A001,T001,active"
+      ).tap{|i| i.errors.should == []; i.warnings.should == []}
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
+        "C001,,,,,active,AC001"
+      ).tap{|i| i.errors.should == []; i.warnings.should == []}
+      Course.last.tap{|c|      
+        c.sis_source_id.should == "C001"
+        c.abstract_course.should == AbstractCourse.last
+        c.abstract_course.sis_source_id.should == "AC001"
+        c.short_name.should == "Hum101"
+        c.name.should == "Humanities"
+        c.enrollment_term.should == EnrollmentTerm.last
+        c.enrollment_term.name.should == "Winter13"
+        c.account.should == Account.last
+        c.account.name.should == "TestAccount"
+        c.root_account.should == @account
+      }
+    end
+
+    it 'should disallow instantiations of nonexistent abstract courses' do
+      beforecount = Course.count
+      process_csv_data(
+        "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
+        "C001,,,,,active,AC001"
+      ).tap{|i| i.errors.should == []; i.warnings.map(&:last).should == [
+          "unknown abstract course id AC001"]}
+      Course.count.should == beforecount
+    end
+  end
   
   context "course importing" do
     it 'should detect bad content' do

@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('shared.aligned_outcomes', function(I18n) {
 $(document).ready(function() {
   var url = $("#aligned_outcomes .outcomes_url").attr('href');
   var updateOutcomesList = function(data) {
@@ -33,10 +34,10 @@ $(document).ready(function() {
       outcome.mastery = "";
       if(tag.rubric_association_id) {
         $outcome.addClass('rubric_alignment');
-        outcome.mastery = "see the rubric for mastery details";
+        outcome.mastery = I18n.t('mastery_info_see_rubric', "see the rubric for mastery details");
       } else {
         if(mastery_points) {
-          outcome.mastery = "mastery with a score of " + mastery_points + " or higher";
+          outcome.mastery = I18n.t('mastery_score_info', "mastery with a score of %{score} or higher", {score: mastery_points});
         }
       }
       $outcome.fillTemplateData({
@@ -77,7 +78,7 @@ $(document).ready(function() {
     $("#aligned_outcomes_mastery_score").val(mastery);
     $("#align_outcomes_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: "Align Outcomes",
+      title: I18n.t('buttons.align_outcomes', 'Align Outcomes'),
       width: 500
     }).dialog('open');
   });
@@ -94,17 +95,18 @@ $(document).ready(function() {
     var url = $("#aligned_outcomes .outcomes_url").attr('href');
     var mastery_score = parseFloat($("#aligned_outcomes_mastery_score").val()) || "";
     var $button = $(this);
-    $button.text("Aligning Outcomes...");
+    $button.text(I18n.t('status.aligning_outcomes', 'Aligning Outcomes...'));
     $("#align_outcomes_dialog .button-container .button").attr('disabled', true);
     $.ajaxJSON(url, 'POST', {outcome_ids: ids, mastery_score: mastery_score}, function(data) {
       $("#align_outcomes_dialog .button-container .button").attr('disabled', false);
-      $button.text("Align Outcomes");
+      $button.text(I18n.t('buttons.align_outcomes', 'Align Outcomes'));
       $("#full_assignment_holder input[name='assignment[mastery_score]']").val(mastery_score);
       updateOutcomesList(data);
       $("#align_outcomes_dialog").dialog('close');
     }, function() {
       $("#align_outcomes_dialog .button-container .button").attr('disabled', false);
-      $button.text("Align Outcomes Failed, Please Try Again");
+      $button.text(I18n.t('errors.align_outcomes_failed', 'Aligning Outcomes Failed, Please Try Again'));
     });
   });
+});
 });

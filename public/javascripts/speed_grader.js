@@ -18,6 +18,9 @@
 
 var jsonData, visibleRubricAssessments;
 var anonymousAssignment = false;
+
+I18n.scoped('gradebook', function(I18n) {
+
 (function($, INST, scribd, rubricAssessment) {
   
   // fire off the request to get the jsonData,
@@ -36,6 +39,7 @@ var anonymousAssignment = false;
       $body = $("body"),
       $full_width_container =$("#full_width_container"),
       $left_side = $("#left_side"),
+      $resize_overlay = $("#resize_overlay"),
       $right_side = $("#right_side"),
       $width_resizer = $("#width_resizer"),
       $gradebook_header = $("#gradebook_header"),
@@ -77,7 +81,6 @@ var anonymousAssignment = false;
       $submission_files_container = $("#submission_files_container"),
       $submission_files_list = $("#submission_files_list"),
       $submission_file_hidden = $("#submission_file_hidden").removeAttr('id').detach(),
-      $submitted_files_plurality = $("#submitted_files_plurality"),
       $submission_to_view = $("#submission_to_view"),
       $assignment_submission_url = $("#assignment_submission_url"),
       $rubric_full = $("#rubric_full"),
@@ -116,7 +119,7 @@ var anonymousAssignment = false;
       if (tempArray.length) {
         jsonData.studentsWithSubmissions = tempArray;
       } else {
-        alert("Could not find any students in that section, falling back to showing all sections.");
+        alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
         $.store.userRemove("grading_show_only_section"+jsonData.context_id);
         window.location.reload();
       }
@@ -171,7 +174,7 @@ var anonymousAssignment = false;
     var raw = submissionStateName(student.submission);
     var formatted = raw.replace("_", " ");
     if (raw === "resubmitted") {
-      formatted = "graded, then resubmitted (" + $.parseFromISO(student.submission.submitted_at).datetime_formatted + ")";
+      formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.parseFromISO(student.submission.submitted_at).datetime_formatted});
     }
     return {raw: raw, formatted: formatted};
   }
@@ -188,7 +191,7 @@ var anonymousAssignment = false;
           className = classNameBasedOnStudent(s);
 
       if(hideStudentNames) {
-        name = "Student " + (idx + 1);
+        name = I18n.t('nth_student', "Student %{n}", {'n': idx + 1});
       }
 
       return '<option value="' + s.id + '" class="' + className.raw + '">' + name + ' ---- ' + className.formatted +'</option>';
@@ -274,7 +277,7 @@ var anonymousAssignment = false;
     $("#settings_form").submit(function(){
       $.store.userSet('eg_sort_by', $('#eg_sort_by').val());
       $.store.userSet('eg_hide_student_names', $("#hide_student_names").attr('checked').toString());
-      $(this).find(".submit_button").attr('disabled', true).text("Saving Settings...");
+      $(this).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
       window.location.reload();
       return false;
     });
@@ -318,7 +321,7 @@ var anonymousAssignment = false;
       $(".speech_recognition_link").click(function() {
           $('<input style="font-size: 30px;" speech x-webkit-speech />')
             .dialog({
-              title: "Click the mic to record your comments",
+              title: I18n.t('titles.click_to_record', "Click the mic to record your comments"),
               open: function(){
                 $(this).width(100);
               }
@@ -357,7 +360,7 @@ var anonymousAssignment = false;
   
   function initRubricStuff(){
 
-    $("#rubric_summary_container .button-container").appendTo("#rubric_assessments_list_and_edit_button_holder").find('.edit').text("Edit/View Rubric");
+    $("#rubric_summary_container .button-container").appendTo("#rubric_assessments_list_and_edit_button_holder").find('.edit').text(I18n.t('edit_view_rubric', "Edit/View Rubric"));
 
     $(".toggle_full_rubric, .hide_rubric_link").click(function(e){
       e.preventDefault();
@@ -507,13 +510,11 @@ var anonymousAssignment = false;
           }
         });
         if (shortestElement) {
-          // console.log("grew", shortestElement, "by", step)
           shortestElement.data.newHeight = shortestElementHeight + step;
           deltaRemaining = deltaRemaining - step;
           didNothing = false;
         }
         if (didNothing) {
-          // console.log("couldn't find shorter. deltaRemaining:", deltaRemaining) ;
           break;
         }
       }
@@ -536,7 +537,6 @@ var anonymousAssignment = false;
           didNothing = false;
         }
         if (didNothing) {
-          // console.log('no elements without scrollbars:', deltaRemaining)
           break;
         }
       }
@@ -589,9 +589,7 @@ var anonymousAssignment = false;
     });
     
     if (userNamesWithPendingQuizSubmission.length) {
-      return "The following students have unsaved changes to their quiz submissions: \n\n " +
-              userNamesWithPendingQuizSubmission.join('\n ') +
-              "\nContinue anyway?";
+      return I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
     }
   };
 
@@ -611,8 +609,16 @@ var anonymousAssignment = false;
         $left_side.css("width",'');
         $right_side.css("width",'');
       }
-
-      $width_resizer.draggable({
+      $(document).mouseup(function(event){
+        $resize_overlay.hide();
+      });
+      // it should disappear before it's clickable, but just in case...
+      $resize_overlay.click(function(event){
+        $(this).hide();
+      });
+      $width_resizer.mousedown(function(event){
+        $resize_overlay.show();
+      }).draggable({
         axis: 'x',
         cursor: 'crosshair',
         scroll: false,
@@ -643,6 +649,7 @@ var anonymousAssignment = false;
         },
         stop: function(event, ui) {
           event.stopImmediatePropagation();
+          $resize_overlay.hide();
         }
       }).click(function(event){
           event.preventDefault();
@@ -651,7 +658,6 @@ var anonymousAssignment = false;
           }
           else {
             makeFullWidth();
-            // $(this).animate({backgroundColor: '#DCECFB'}, 500).animate({backgroundColor: '#bbbbbb'}, 1500);
             $(this).addClass('highlight', 100, function(){
               $(this).removeClass('highlight', 4000);
             });
@@ -685,7 +691,7 @@ var anonymousAssignment = false;
       
       mergeStudentsAndSubmission();
       if (!jsonData.studentsWithSubmissions.length) {
-        alert("Sorry, there are either no active students in the course or none are gradable by you.")
+        alert(I18n.t('alerts.no_active_students', "Sorry, there are either no active students in the course or none are gradable by you."))
         window.history.back();
       } else {
         $("#speed_grader_loading").hide();
@@ -790,11 +796,11 @@ var anonymousAssignment = false;
 
     handleSubmissionSelectionChange: function(){
       try {
-        var currentSelectedIndex = ( 
-              $submission_to_view.filter(":visible").length ? 
-              Number($submission_to_view.filter(":visible").val()) : 
-              (this.currentStudent.submission.currentSelectedIndex || 0)
-            ),
+        var submissionToViewVal = $submission_to_view.filter(":visible").val(),
+            currentSelectedIndex = Number(submissionToViewVal) || 
+                                  ( this.currentStudent.submission &&
+                                    this.currentStudent.submission.currentSelectedIndex ) 
+                                  || 0,
             submission  = this.currentStudent.submission.submission_history[currentSelectedIndex].submission,
             dueAt       = jsonData.due_at && $.parseFromISO(jsonData.due_at),
             submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
@@ -863,7 +869,6 @@ var anonymousAssignment = false;
             .show();
         });
 
-        $submitted_files_plurality.html(submission.versioned_attachments.length > 1 ? "s" : "");
         $submission_files_container.showIf(submission.versioned_attachments.length);
 
         // load up a preview of one of the attachments if we can.
@@ -903,9 +908,9 @@ var anonymousAssignment = false;
               
           innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + i + "' " +
                         (s == submissionToSelect ? "selected='selected'" : "") + ">" +
-                        (submittedAt && submittedAt.datetime_formatted || 'no submission time') +
-                        (late ? " LATE" : "") +
-                        (s.grade && s.grade_matches_current_submission ? " (grade: " + s.grade +")" : "") +
+                        (submittedAt ? submittedAt.datetime_formatted : I18n.t('no_submission_time', 'no submission time')) +
+                        (late ? " " + I18n.t('loud_late', "LATE") : "") +
+                        (s.grade && s.grade_matches_current_submission ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
                        "</option>";
         });
         $submission_to_view.html(innerHTML);
@@ -1038,7 +1043,7 @@ var anonymousAssignment = false;
         // show a new option if there is not an assessment by me
         // or, if I can :manage_course, there is not an assessment already with assessment_type = 'grading'
         if( !assessmentsByMe.length || (rubricAssessment.assessment_type == 'grading' && !gradingAssessments.length) ) {
-          $rubric_assessments_select.append('<option value="new">[New Assessment]</option>');
+          $rubric_assessments_select.append('<option value="new">' + I18n.t('new_assessment', '[New Assessment]') + '</option>');
         }
 
         //select the assessment that meets these rules:
@@ -1080,7 +1085,7 @@ var anonymousAssignment = false;
           $comment.find(".delete_comment_link").click(function(event) {
             $(this).parents(".comment").confirmDelete({
               url: "/submission_comments/" + comment.id,
-              message: "Are you sure you want to delete this comment?",
+              message: I18n.t('confirms.delete_comment', "Are you sure you want to delete this comment?"),
               success: function(data) {
                 $(this).slideUp(function() {
                   $(this).remove();
@@ -1118,7 +1123,7 @@ var anonymousAssignment = false;
         setTimeout(function(){ $add_a_comment_textarea.trigger('keyup'); }, 0);
 
         $add_a_comment.find(":input").attr("disabled", false);
-        $add_a_comment_submit_button.text("Submit Comment");
+        $add_a_comment_submit_button.text(I18n.t('buttons.submit_comment', "Submit Comment"));
     },
     
     handleCommentFormSubmit: function(){
@@ -1159,7 +1164,7 @@ var anonymousAssignment = false;
 
       $("#comment_attachments").empty();
       $add_a_comment.find(":input").attr("disabled", true);
-      $add_a_comment_submit_button.text("Submitting...");
+      $add_a_comment_submit_button.text(I18n.t('buttons.submitting', "Submitting..."));
       hideMediaRecorderContainer();
     },
     
@@ -1272,3 +1277,5 @@ var anonymousAssignment = false;
   $(EG.domReady);
 
 })(jQuery, INST, scribd, rubricAssessment);
+
+})

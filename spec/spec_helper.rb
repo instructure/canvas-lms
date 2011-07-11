@@ -78,6 +78,16 @@ Spec::Runner.configure do |config|
     account
   end
 
+  def account_with_saml(opts={})
+    account = opts[:account]
+    account ||= Account.create!
+    config = AccountAuthorizationConfig.new
+    config.auth_type = "saml"
+    config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
+    account.account_authorization_configs << config
+    account
+  end
+
   def course(opts={})
     @course = Course.create!
     @course.offer! if opts[:active_course] || opts[:active_all]

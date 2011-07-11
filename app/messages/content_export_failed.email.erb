@@ -3,10 +3,13 @@
 <% end %>
 
 <% define_content :subject do %>
-  Course Export Failed: <%= asset.context.name %>
+<%= t :subject, "Course Export Failed: %{course}", :course => asset.context.name %>
 <% end %>
       
-There was a problem exporting the course "<%= asset.context.name %>".
-Please notify your system administrator, and give them the following export identifier: "ContentExport:<%= asset.id %>".
+<%= t :body, <<-BODY, :course => asset.context.name, :id => %{"ContentExport:#{asset.id}"}
+There was a problem exporting the course "%{course}".
+Please notify your system administrator, and give them the following export identifier: %{id}.
+BODY
+%>
 
 <%= content :link %>

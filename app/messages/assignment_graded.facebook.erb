@@ -2,4 +2,4 @@
   http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>
 <% end %>
 
-<%= asset.submissions.graded.map(&:user_id).include?(user.id) ? "Your" : "The" %> assignment, <b><a href="<%= content :link %>"><%= asset.title %></a></b>, has been graded.  
+<%= t('the_assignment_is_graded', 'The assignment, %{assignment_name}, has been graded.', :assignment_name => asset.title) %>

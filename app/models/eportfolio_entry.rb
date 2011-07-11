@@ -123,7 +123,7 @@ class EportfolioEntry < ActiveRecord::Base
           self.content << new_obj
       end
     end
-    self.content << "No Content Added Yet" if self.content.empty?
+    self.content << t(:default_content, "No Content Added Yet") if self.content.empty?
   end
 
   
@@ -133,7 +133,7 @@ class EportfolioEntry < ActiveRecord::Base
   
   def infer_unique_slug
     pages = self.eportfolio_category.eportfolio_entries rescue []
-    self.name ||= "Page Name"
+    self.name ||= t(:default_name, "Page Name")
     self.slug = self.name.gsub(/[\s]+/, "_").gsub(/[^\w\d]/, "")
     match_cnt = pages.select{|p| p != self && p.slug && p.slug == self.slug}.length
     if match_cnt > 0
@@ -151,7 +151,7 @@ class EportfolioEntry < ActiveRecord::Base
       url += "?verifier=#{self.eportfolio.uuid}" if opts[:private]
       entry.links    << Atom::Link.new(:rel => 'alternate', :href => url)
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{self.feed_code}_#{self.created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      rendered_content = "Click to view page content"
+      rendered_content = t(:click_through, "Click to view page content")
       entry.content   = Atom::Content::Html.new(rendered_content)
     end
   end

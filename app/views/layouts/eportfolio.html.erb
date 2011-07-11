@@ -66,78 +66,76 @@
 <div class="clear" id="wizard_spacer_box"></div>
 <% wizard = yield :wizard_box %>
 <% if wizard %>
-  <% js_block do %>
+  <% js_block :i18n_scope => 'eportfolio' do %>
   <script>
-    I18n.scoped('eportfolio', function(I18n) {
-      $(document).ready(function() {
-        $(".close_wizard_link").click(function(event) {
-          event.preventDefault();
-          $("#wizard_box").slideUp('slow', function() {
-            $(".wizard_popup_link").slideDown();
-          });
+    $(document).ready(function() {
+      $(".close_wizard_link").click(function(event) {
+        event.preventDefault();
+        $("#wizard_box").slideUp('slow', function() {
+          $(".wizard_popup_link").slideDown();
         });
-        $(".wizard_popup_link").click(function(event) {
-          event.preventDefault();
-          $(".wizard_popup_link").slideUp('slow');
-          $("#wizard_box").slideDown('slow', function() {
-            $(this).triggerHandler('wizard_opened');
-            $(document).add($(window)).triggerHandler('scroll');
-          });
-        });
-        setInterval(function() {
-          $("#wizard_spacer_box").height($("#wizard_box").height());
-          $("#wizard_spacer_box").showIf($("#wizard_box:visible").length > 0);
-        }, 500);
-        $(".wizard_options_list .option").click(function(event) {
-          var $a = $(event.target).closest("a");
-          if($a.length > 0 && $a.attr('href') != "#") { return; }
-          event.preventDefault();
-          $(this).parents(".wizard_options_list").find(".option.selected").removeClass('selected');
-          $(this).addClass('selected');
-          var $details = $("#wizard_box").find(".wizard_details");
-          var data = $(this).getTemplateData({textValues: ['header']});
-          data.link = I18n.t('action_instructions', "Click to %{action}", {action: data.header});
-          $details.fillTemplateData({
-            data: data
-          });
-          $details.find(".details").remove();
-          $details.find(".header").after($(this).find(".details").clone(true).show());
-          var url = $(this).find(".header").attr('href');
-          if(url != "#") {
-            $details.find(".link").show().attr('href', url);
-          } else {
-            $details.find(".link").hide();
-          }
-          $details.hide().fadeIn('fast');
-        });
-        setTimeout(function() {
-          $(".wizard_popup_link.auto_open:first").click();
-        }, 500);
-        $(window).bind('resize', function(event) {
-          $(window).data('height', $(window).height());
-        });
-        $(document).add($(window)).bind('scroll', function(event) {
-          $("#wizard_box").triggerHandler('document_scroll');
-        });
-        $("#wizard_box").bind('document_scroll', function(event) {
-          var doAbsolute = $.browser.msie && navigator.appVersion.match('MSIE 6.0');
-          if(doAbsolute) {
-            var height = $(this).height();
-            var windowHeight = $(window).height(); //data('height');
-            var scrollTop = $.windowScrollTop();
-            $(this).css({
-              position: 'absolute',
-              left: 0,
-              top: (scrollTop + windowHeight - height)
-            });
-          } else {
-          }
-        });
-        setInterval(function() {
-          $("#wizard_box").triggerHandler('document_scroll');
-        }, 1000);
-        $(window).trigger('resize');
       });
+      $(".wizard_popup_link").click(function(event) {
+        event.preventDefault();
+        $(".wizard_popup_link").slideUp('slow');
+        $("#wizard_box").slideDown('slow', function() {
+          $(this).triggerHandler('wizard_opened');
+          $(document).add($(window)).triggerHandler('scroll');
+        });
+      });
+      setInterval(function() {
+        $("#wizard_spacer_box").height($("#wizard_box").height());
+        $("#wizard_spacer_box").showIf($("#wizard_box:visible").length > 0);
+      }, 500);
+      $(".wizard_options_list .option").click(function(event) {
+        var $a = $(event.target).closest("a");
+        if($a.length > 0 && $a.attr('href') != "#") { return; }
+        event.preventDefault();
+        $(this).parents(".wizard_options_list").find(".option.selected").removeClass('selected');
+        $(this).addClass('selected');
+        var $details = $("#wizard_box").find(".wizard_details");
+        var data = $(this).getTemplateData({textValues: ['header']});
+        data.link = I18n.t('action_instructions', "Click to %{action}", {action: data.header});
+        $details.fillTemplateData({
+          data: data
+        });
+        $details.find(".details").remove();
+        $details.find(".header").after($(this).find(".details").clone(true).show());
+        var url = $(this).find(".header").attr('href');
+        if(url != "#") {
+          $details.find(".link").show().attr('href', url);
+        } else {
+          $details.find(".link").hide();
+        }
+        $details.hide().fadeIn('fast');
+      });
+      setTimeout(function() {
+        $(".wizard_popup_link.auto_open:first").click();
+      }, 500);
+      $(window).bind('resize', function(event) {
+        $(window).data('height', $(window).height());
+      });
+      $(document).add($(window)).bind('scroll', function(event) {
+        $("#wizard_box").triggerHandler('document_scroll');
+      });
+      $("#wizard_box").bind('document_scroll', function(event) {
+        var doAbsolute = $.browser.msie && navigator.appVersion.match('MSIE 6.0');
+        if(doAbsolute) {
+          var height = $(this).height();
+          var windowHeight = $(window).height(); //data('height');
+          var scrollTop = $.windowScrollTop();
+          $(this).css({
+            position: 'absolute',
+            left: 0,
+            top: (scrollTop + windowHeight - height)
+          });
+        } else {
+        }
+      });
+      setInterval(function() {
+        $("#wizard_box").triggerHandler('document_scroll');
+      }, 1000);
+      $(window).trigger('resize');
     });
   </script>
   <% end %>

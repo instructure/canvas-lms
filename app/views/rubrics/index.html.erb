@@ -2,7 +2,7 @@
 <% add_crumb "Rubrics" %>
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="button button-sidebar-wide add_rubric_link"><%= image_tag "add.png" %> Add Rubric</a>
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="button button-sidebar-wide add_rubric_link"><%= image_tag "add.png" %> <%= t('buttons.add_rubric', 'Add Rubric') %></a>
   </div>
 <% end %>
 
@@ -44,26 +44,26 @@
 }
 </style>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'rubrics.index' do %>
 <script>
-$(document).ready(function() {
-  $("#rubrics ul .delete_rubric_link").click(function(event) {
-    event.preventDefault();
-    var $rubric = $(this).parents("li");
-    $rubric.confirmDelete({
-      url: $(this).attr('href'),
-      message: "Are you sure you want to delete this rubric?  Anywhere currently using the rubric will still have access to it, but no one else will be able to use it.",
-      success: function() {
-        $(this).slideUp(function() {
-          $(this).remove();
-        });
-      }
+  $(document).ready(function() {
+    $("#rubrics ul .delete_rubric_link").click(function(event) {
+      event.preventDefault();
+      var $rubric = $(this).parents("li");
+      $rubric.confirmDelete({
+        url: $(this).attr('href'),
+        message: I18n.t('are_you_sure_prompt', "Are you sure you want to delete this rubric?  Anywhere currently using the rubric will still have access to it, but no one else will be able to use it."),
+        success: function() {
+          $(this).slideUp(function() {
+            $(this).remove();
+          });
+        }
+      });
     });
   });
-});
 </script>
 <% end %>
-<h2><%= @context.class.to_s %> Rubrics</h2>
+<h2><%= @context.class.to_s %> <%= t('titles.rubrics', 'Rubrics') %></h2>
 <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
 <div id="rubrics" class="raw_listing">
   <ul>
@@ -76,12 +76,12 @@ $(document).ready(function() {
           <a href="<%= context_url(@context, :context_rubric_url, association.rubric_id) %>#edit" class="no-hover"><%= image_tag "edit.png" %></a>
         <% end %>
         <% if can_do(association, @current_user, :delete) %>
-          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover" title="Delete Rubric"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover" title="<%= t('delete_rubric', 'Delete Rubric') %>"><%= image_tag "delete.png" %></a>
         <% end %>
       </span>
       <span class="details">
         <%= rubric.criteria.length %> <%= rubric.criteria.length == 1 ? 'criterion' : 'criteria' %><br/>
-        <%= pluralize(rubric.points_possible, "point") %> possible
+        <%= t('points_possible', {:one => "point possible", :other => "points possible"}, :count => rubric.points_possible) %>
       </span>
     </li>
   <% end %>

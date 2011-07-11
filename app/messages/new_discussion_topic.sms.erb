@@ -1,6 +1,6 @@
-New Topic for <%= asset.context.name %>:
+<%= t :body, "New Topic for %{course}:", :course => asset.context.name %>
 <%= asset.title %>
 
 <%= strip_and_truncate(asset.message, :max_length => 50) %>
 
-More info at <%= HostUrl.context_host(asset.context) %>
+<%= t :details, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>

@@ -3,16 +3,16 @@
 <% end %>
 
 <% define_content :subject do %>
-  New Discussion - <%= asset.title %>: <%= asset.context.name %>
+  <%= t :subject, "New Discussion - %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
 <% end %>
 
-A new discussion has been started that may be interesting to you:
+<%= t :body, "A new discussion has been started that may be interesting to you:" %>
 
 <%= asset.title %> 
 
 <%= strip_and_truncate(asset.message, :max_length => 200) %> 
-<% if asset.attachment %>File Included: <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
+<% if asset.attachment %><%= before_label :file_included, "File Included" %> <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
   http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.attachment_id %>/download<% end %>
 
-Join the conversation here: 
+<%= t :details, "Join the conversation here:" %>
 <%= content :link %>

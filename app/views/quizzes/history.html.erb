@@ -1,18 +1,23 @@
-<% user_name = @quiz.survey? && @quiz.anonymous_submissions ? "Student" : context_user_name(@context, @user) %>
-<% content_for :page_title do %><%= user_name %> <%= @quiz.readable_type %> History: <%= @quiz.quiz_title || "#{@quiz.readable_type} #{ @context.name}" %><% end   %>
+<% user_name = @quiz.survey? && @quiz.anonymous_submissions ? t(:anonymous_username, "Student") : context_user_name(@context, @user) %>
+<% content_for :page_title, (@quiz.survey? ?
+     t(:page_title_survey, "%{user}'s Survey History: %{quiz_title}", :user => user_name, :quiz_title => @quiz.quiz_title || "Survey #{@context.name}") :
+     t(:page_title_quiz, "%{user}'s Quiz History: %{quiz_title}", :user => user_name, :quiz_title => @quiz.quiz_title || "Quiz #{@context.name}"))
+%>
 
 <% unless params[:headless] %>
 <% content_for :right_side do %>
   <% if @current_version && can_do(@quiz, @current_user, :grade) %>
     <div class="rs-margin-lr rs-margin-top">
-      <p>Here's the latest <%= @quiz.readable_type.downcase %> results for <%= user_name %>.  You can modify the
-      points for any question and add more comments, then click "Update Scores"
-      at the bottom of the page.</p>
+      <p><%= @quiz.survey? ?
+           t(:latest_survey_results, "Here's the latest survey results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page.", :user => user_name) :
+           t(:latest_quiz_results, "Here's the latest quiz results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page.", :user => user_name) %></p>
     </div>
   <% end %>
   <% unless params[:headless] %>
     <h2>
-      <%= @quiz.readable_type %> Submissions
+      <%= @quiz.survey? ?
+        t('headers.survey_submissions', "Survey Submissions") :
+        t('headers.quiz_submissions', "Quiz Submissions") %>
     </h2>
     <div class="rs-margin-lr">
       <ul id="quiz_versions" style="max-height: 250px; overflow: auto;">
@@ -21,12 +26,12 @@
           <a class="no-hover" href="?version=<%= version_instance.version_number %><%= "&user_id=#{@submission.user_id}" if @current_user.id != @submission.user_id %>">
             <% if version_instance.pending_review? %>
               <% if can_do(@quiz, @current_user, :grade) %>
-                <%= image_tag "pending_review.png", :title => "This submission needs review" %>
+                <%= image_tag "pending_review.png", :title => t('titles.submission_needs_review', "This submission needs review") %>
               <% else %>
-                <%= image_tag "hourglass.png", :title => "This score is pending review, and may change" %>
+                <%= image_tag "hourglass.png", :title => t('titles.score_pending_review', "This score is pending review, and may change") %>
               <% end %>
             <% end %>
-            Attempt <%= version_instance.attempt %>: <%= version_instance.score %>
+            <%= t(:score_for_attempt, "Attempt %{attempt_number}: %{score}", :attempt_number => version_instance.attempt, :score => version_instance.score) %>
           </a>
         </li>
       <% end %>
@@ -34,33 +39,47 @@
       <div style="margin-bottom: 10px;">
         <% if !@quiz.unlimited_attempts? %>
           <% if @current_submission.attempts_left <= 0 %>
-            <%= user_name %> has no attempts left
+            <%= t(:no_more_attempts, "%{user} has no attempts left", :user => user_name) %>
           <% else %>
-            <%= user_name %> has <%= pluralize(@current_submission.attempts_left, "attempt") %>  left
+            <%= t(:count_attempts_left, {:one => "%{user} has 1 attempt left", :other => "%{user} has %{count} attempts left"}, :user => user_name, :count => @current_submission.attempts_left) %>
           <% end %>
           <% if can_do(@submission, @current_user, :add_attempts) %>
             <% form_for :quiz_submission, :url => context_url(@context, :context_quiz_extensions_url, @quiz.id, @submission.user_id), :html => {:method => :post} do |f| %>
               <input type="hidden" name="extra_attempts" value="<%= (@submission.extra_attempts || 0) + 1 %>"/>
-              <button type="submit" class="button">allow this student an extra attempt</button>
+              <button type="submit" class="button"><%= t('buttons.allow_extra_attempt', "allow this student an extra attempt") %></button>
             <% end %>
           <% end %>
         <% else %>
-          This <%= @quiz.readable_type.downcase %> has unlimited attempts
+          <%= @quiz.survey? ?
+            t(:survey_unlimited_attempts, "This survey has unlimited attempts") :
+            t(:quiz_unlimited_attempts, "This quiz has unlimited attempts") %>
         <% end %>
       </div>
-      <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class='no-hover'><%= image_tag "back.png" %> Back to <%= @quiz.readable_type %></a>
+      <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class='no-hover'><%= image_tag "back.png" %> <%= @quiz.survey? ? t('links.back_to_survey', "Back to Survey") : t('links.back_to_quiz', "Back to Quiz") %></a>
     </div>
   <% end %>
 <% end %>
 <% end %>
 
-<h2><%= @quiz.quiz_title || @quiz.readable_type %> Results for <%= user_name %></h2>
+<h2>
+  <% if @quiz.quiz_title %>
+    <%= t(:named_quiz_results, "%{quiz_name} Results for %{user}", :quiz_name => @quiz.quiz_title, :user => user_name) %>
+  <% elsif @quiz.survey? %>
+    <%= t(:unnamed_survey_results, "Survey Results for %{user}", :user => user_name) %>
+  <% else %>
+    <%= t(:unnamed_quiz_results, "Quiz Results for %{user}", :user => user_name) %>
+  <% end %>
+</h2>
 <div id="feel_free_to_toggle_message">
 </div>
 <% if !@submission || @submission.settings_only? %>
-  <%= @quiz.readable_type %> hasn't been taken yet.
+  <%= @quiz.survey? ?
+    t(:survey_not_yet_taken, "Survey hasn't been taken yet.") :
+    t(:quiz_not_yet_taken, "Quiz hasn't been taken yet.") %>
 <% elsif @submission.untaken? %>
-  <%= @quiz.readable_type %> hasn't been taken yet or is currently in progress
+  <%= @quiz.survey? ?
+    t(:survey_not_yet_taken_or_in_progress, "Survey hasn't been taken yet or is currently in progress") :
+    t(:quiz_not_yet_taken_or_in_progress, "Quiz hasn't been taken yet or is currently in progress") %>
 <% else %>
   <% form_tag context_url(@context, :context_quiz_quiz_submission_url, @quiz.id, @submission.id), {:method => :put, :id => "update_history_form"} do %>
     <input type="hidden" name="override_scores" value="true"/>
@@ -71,7 +90,7 @@
     <%= render :partial => "quizzes/quiz_submission", :locals => {:editable => can_do(@quiz, @current_user, :grade)} %>
     <% if can_do(@quiz, @current_user, :grade) %>
       <div class="button-container">
-        <button type="submit" class="button">Update Scores</button>
+        <button type="submit" class="button"><%= t('buttons.update_scores', "Update Scores") %></button>
       </div>
     <% end %>
   <% end %>

@@ -1,16 +1,16 @@
 <%
   jammit_css :quizzes
   jammit_js :quizzes_bundle
-  content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : 'New Quiz' )
+  content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="button button-sidebar-wide"><%= image_tag "back.png" %> Back to Quiz Page</a>
+    <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="button button-sidebar-wide"><%= image_tag "back.png" %> <%= t('links.back_to_quiz_page', "Back to Quiz Page") %></a>
   </div>
 <% end %>
 
 
-<h2>Quiz Details</h2>
+<h2><%= t('headers.quiz_details', "Quiz Details") %></h2>
 <div style="display: none;" id="quiz_urls">
   <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="update_quiz_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_question_url">&nbsp;</a>
@@ -21,11 +21,11 @@
 
 
 <div style="margin-bottom: 25px;">
-  Quiz Instructions:
+  <%= before_label(:quiz_instructions, "Quiz Instructions") %>
   <%= user_content(@quiz.description, @context.asset_string) %>
 </div>
 <div style="margin-bottom: 5px;">
-  <input type="checkbox" id="show_question_details"/><label for="show_question_details"> Show Question Details</label>
+  <input type="checkbox" id="show_question_details"/> <label for="show_question_details"><%= t('labels.question_details', "Show Question Details") %></label>
 </div>
 <div id="questions" class="brief">
   <% @quiz.root_entries.each do |question| %>

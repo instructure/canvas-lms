@@ -17,6 +17,7 @@
  */
 
 var INST;
+I18n.scoped('select_content_dialog', function(I18n) {
 $(document).ready(function() {
   var external_services = null;
   var $dialog = $("#select_context_content_dialog");
@@ -24,9 +25,9 @@ $(document).ready(function() {
   INST = INST || {};
   INST.selectContentDialog = function(options) {
     var for_modules = options.for_modules;
-    var select_button_text = options.select_button_text || "Add Item";
+    var select_button_text = options.select_button_text || I18n.t('buttons.add_item', "Add Item");
     var holder_name = options.holder_name || "module";
-    var dialog_title = options.dialog_title || "Add Item to Module";
+    var dialog_title = options.dialog_title || I18n.t('titles.add_item_to_module', "Add Item to Module");
     var allow_external_urls = for_modules;
     $dialog.data('submitted_function', options.submit);
     $dialog.find(".context_module_content").showIf(for_modules);
@@ -40,7 +41,7 @@ $(document).ready(function() {
           $service = $("<a href='#' class='bookmark_service no-hover'/>");
           $service.addClass(service.service);
           $service.data('service', service);
-          $service.attr('title', 'Find links using ' + service.service);
+          $service.attr('title', I18n.t('titles.find_links_using_service', 'Find links using %{service}', {service: service.service}));
           var $img = $("<img/>");
           $img.attr('src', '/images/' + service.service + '_small_icon.png');
           $service.append($img);
@@ -137,14 +138,14 @@ $(document).ready(function() {
               callback(data);
             }, function(data) {
               $("#select_context_content_dialog").loadingImage('remove');
-              $("#select_context_content_dialog").errorBox('Failed to Create new Item');
+              $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
             });
           } else {
             $.ajaxJSON(url, 'POST', data, function(data) {
               callback(data);
             }, function(data) {
               $("#select_context_content_dialog").loadingImage('remove');
-              $("#select_context_content_dialog").errorBox('Failed to Create new Item');
+              $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
             });
           }
         } else {
@@ -189,7 +190,7 @@ $(document).ready(function() {
             $select.find(".tools").append($tool.show());
           }
         }, function(data) {
-          $select.find(".message").text("Loading Failed");
+          $select.find(".message").text(I18n.t('errors.loading_failed', "Loading Failed"));
         });
       }
     }
@@ -201,4 +202,5 @@ $(document).ready(function() {
       $(this).parents(".module_item_option").find(".new").hide();
     }
   }).change();
+});
 });

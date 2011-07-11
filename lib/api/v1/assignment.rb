@@ -19,7 +19,7 @@
 module Api::V1::Assignment
   def assignment_json(assignment, includes = [], show_admin_fields = false)
   # no includes supported right now
-  hash = assignment.as_json(:include_root => false, :only => %w(id grading_type points_possible position))
+  hash = assignment.as_json(:include_root => false, :only => %w(id grading_type points_possible position due_at))
 
   hash['name'] = assignment.title
 

@@ -380,7 +380,7 @@ var datagrid = {};
         if(col === 0) { classes.push('row_header'); }
         if(col !== 0 && row !== 0) { classes.push('data_cell'); }
         var $cell = $(
-          [ "<div class='", classes.join(" "), "' style='visiblity: hidden; height:", datagrid.rows[row].metrics.height, 
+          [ "<div class='", classes.join(" "), "' style='visibility: hidden; height:", datagrid.rows[row].metrics.height, 
             "px; width:", datagrid.columns[col].metrics.width, "px;' data-row='", row,
             "' data-column='", col,"'/>"
           ].join('')

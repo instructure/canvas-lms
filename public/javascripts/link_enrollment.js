@@ -1,3 +1,4 @@
+I18n.scoped('link_enrollment', function (I18n) {
 var link_enrollment = (function() {
   return {
     choose: function(user_name, enrollment_id, current_user_id, callback) {
@@ -7,7 +8,7 @@ var link_enrollment = (function() {
       user_data.short_name = user_name;
       $dialog.fillTemplateData({data: user_data});
       if(!$dialog.data('loaded')) {
-        $dialog.find(".loading_message").text("Loading Students...");
+        $dialog.find(".loading_message").text(I18n.t('messages.loading_students', "Loading Students..."));
         var url = $dialog.find(".student_url").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(data) {
           for(var idx in data) {
@@ -19,7 +20,7 @@ var link_enrollment = (function() {
             }
           }
           var $option = $("<option/>");
-          $option.val("none").text("[ No Link ]");
+          $option.val("none").text(I18n.t('options.no_link', "[ No Link ]"));
           $dialog.data('loaded', true);
           $dialog.find(".student_options").append($option);
           
@@ -32,7 +33,7 @@ var link_enrollment = (function() {
           user_data.existing_user_name = $dialog.find(".student_options option[value='" + current_user_id + "']").text();
           $dialog.fillTemplateData({data: user_data});
         }, function() {
-          $dialog.find(".loading_message").text("Loading Students Failed, please try again");
+          $dialog.find(".loading_message").text(I18n.t('errors.load_failed', "Loading Students Failed, please try again"));
           $dialog.data('callback', callback);
         });
       } else {
@@ -48,7 +49,7 @@ var link_enrollment = (function() {
       $dialog
         .dialog('close').dialog({
           autoOpen: false,
-          title: "Link to Student",
+          title: I18n.t('titles.link_to_student', "Link to Student"),
           width: 400
         }).dialog('open');
     }
@@ -65,12 +66,12 @@ $(document).ready(function() {
     beforeSubmit: function(data) {
       $(this)
         .find("button").attr('disabled', true).end()
-        .find(".save_button").text("Linking to Student...");
+        .find(".save_button").text(I18n.t('messages.linking_to_student', "Linking to Student..."));
     },
     success: function(data) {
       $(this)
         .find("button").attr('disabled', false).end()
-        .find(".save_button").text("Link to Student");
+        .find(".save_button").text(I18n.t('buttons.link', "Link to Student"));
       var enrollment = data.enrollment;
       var callback = $("#link_student_dialog").data('callback');
       $("#link_student_dialog").dialog('close');
@@ -81,7 +82,8 @@ $(document).ready(function() {
     error: function(data) {
       $(this)
         .find("button").attr('disabled', false)
-        .find(".save_button").text("Linking Failed, please try again");
+        .find(".save_button").text(I18n.t('errors.link_failed', "Linking Failed, please try again"));
     }
   });
+});
 });

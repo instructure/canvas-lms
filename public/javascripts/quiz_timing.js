@@ -16,7 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var timing = {
+var timing;
+I18n.scoped('quizzes.timing', function(I18n) {
+
+timing = {
   initialTime: new Date(),
   initTimes: function() {
     if(timing.timesReady) { return timing.clientServerDiff; }
@@ -30,10 +33,10 @@ var timing = {
     var result = {};
     result.referenceDate = Date.parse(end_at);
     result.isDeadline = true;
-    $(".time_header").text("Time Remaining:");
+    $(".time_header").text(I18n.beforeLabel('labels.time_remaining', "Time Remaining"));
     if(!result.referenceDate) {
       result.isDeadline = false;
-      $(".time_header").text("Time Elapsed:");
+      $(".time_header").text(I18n.beforeLabel('labels.time_elapsed', "Time Elapsed"));
       result.referenceDate = Date.parse(started_at);
     }
     result.clientServerDiff = timing.clientServerDiff;
@@ -45,3 +48,5 @@ var timing = {
     return result;
   }
 };
+
+});

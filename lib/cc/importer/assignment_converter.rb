@@ -28,7 +28,7 @@ module CC::Importer
           html_path = File.join @unzipped_file_path, res.at_css('file[href$="html"]')['href']
           
           meta_node = open_file_xml(meta_path)
-          html_node = open_file_xml(html_path)
+          html_node = open_file(html_path)
           
           assignments << convert_assignment(meta_node, html_node)
         end

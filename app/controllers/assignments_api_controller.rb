@@ -49,6 +49,7 @@ class AssignmentsApiController < ApplicationController
   #       "name": "some assignment",
   #       "points_possible": 12,
   #       "grading_type": "points",
+  #       "due_at": "2011-05-26T23:59:00-06:00",
   #       "submission_types" : [
   #         "online_upload",
   #         "online_text_entry",

@@ -17,7 +17,7 @@
  */
 
 var wikiSidebar;
-(function() {
+I18n.scoped('topics', function(I18n) {
   function editEntry($entry, params) {
     var $form = $("#add_entry_form").clone(true);
     if($entry.attr('id') == 'entry_id') { $entry.attr('id', 'entry_new'); }
@@ -32,8 +32,7 @@ var wikiSidebar;
     if(params && params.message) {
       data.message = params.message;
     }
-    var addMessage = "Update";
-    var addButton = "Update Entry";
+    var addOrUpdateEntry = I18n.t('update_entry', "Update Entry");
     $form.attr('method', 'PUT')
       .attr('action', $entry.find(".edit_entry_url").attr('href'));
     $form.find(".entry_remove_attachment").val("0");
@@ -43,8 +42,7 @@ var wikiSidebar;
       .find(".upload_attachment").hide().end()
       .find(".attachment_name").text(data.attachment_name);
     if($entry.attr('id') == "entry_new") {
-      addMessage = "Add New";
-      addButton = "Add Entry";
+      addOrUpdateEntry = I18n.t('add_new_entry', "Add New Entry");
 
       $entry.find(".user_name")
         .text($(".current_user_name").text())
@@ -64,7 +62,7 @@ var wikiSidebar;
         .find(".post_date").hide().end()
         .find(".link_box").hide().end()
         .find(".title").hide().end()
-        .prepend("<div class='add_message title' style='float: left; padding-right: 20px;'>" + addMessage + " Entry<\/div>")
+        .prepend("<div class='add_message title' style='float: left; padding-right: 20px;'>" + addOrUpdateEntry + "<\/div>")
       .show();
     $form.find(".entry_content_new").editorBox()
         .editorBox('set_code', data.message);
@@ -73,7 +71,7 @@ var wikiSidebar;
       $("#sidebar_content").hide();
       wikiSidebar.show();
     }
-    $form.find("button[type='submit']").val(addButton);
+    $form.find("button[type='submit']").val(addOrUpdateEntry);
     setTimeout(function() { doFocus('entry_content_' + id); }, 500);
     selectEntry($entry);
     $("html,body").scrollTo($form);
@@ -187,14 +185,11 @@ var wikiSidebar;
       $children.removeClass('discussion_start').removeClass('discussion_end');
       $children.filter(":first").addClass('discussion_start');
       $children.filter(":last").addClass('discussion_end');
-      var replies = $list.children(".discussion_entry").length;
-      if($list.prev(".discussion_entry").hasClass('has_loaded')) {
-        var $entry = $list.prev(".discussion_entry");
-        if(replies === 0) { replies = "No Replies"; }
-        else if(replies === 1) { replies = "1 Reply"; }
-        else { replies += " Replies"; }
-        var data = {replies: replies};
-        $entry.fillTemplateData({data: data});
+      var $entry = $list.prev(".discussion_entry");
+      if($entry.hasClass('has_loaded')) {
+        $entry.fillTemplateData({data: {replies: I18n.t('number_of_replies',
+          {zero: "No Replies", one: "1 Reply", other: "%{count} Replies"},
+          {count: $list.children(".discussion_entry").length})}});
       }
     }
   }
@@ -251,7 +246,7 @@ var wikiSidebar;
         ready();
       } else {
         var $loading = $("<div/>");
-        $loading.html("Loading...");
+        $loading.text(I18n.t('loading', "Loading..."));
         $("body").append($loading);
         $loading.dialog({
           width: 400,
@@ -267,7 +262,7 @@ var wikiSidebar;
       function ready() {
         $dialog = $("#rubrics.rubric_dialog");
         $dialog.dialog('close').dialog({
-          title: "Assignment Rubric Details",
+          title: I18n.t('titles.assignment_rubric_details', "Assignment Rubric Details"),
           width: 600,
           modal: false,
           resizable: true,
@@ -279,7 +274,7 @@ var wikiSidebar;
       event.preventDefault();
       var $dialog = $("#rubrics.rubric_dialog");
       $dialog.dialog('close').dialog({
-        title: "Assignment Rubric Details",
+        title: I18n.t('titles.assignment_rubric_details', "Assignment Rubric Details"),
         width: 600,
         modal: false,
         resizable: true,
@@ -333,9 +328,9 @@ var wikiSidebar;
       },
       beforeSubmit: function(data) {
         var $entry = $(this).parents(".discussion_entry");
-        var addingMessage = "Updating...";
+        var addingMessage = I18n.t('updating', "Updating...");
         if($entry.attr('id') == "entry_new") {
-          addingMessage = "Adding...";
+          addingMessage = I18n.t('adding', "Adding...");
           $entry.attr('id', 'entry_id');
         }
         $entry.next().attr('id', 'replies_entry_id');
@@ -352,7 +347,7 @@ var wikiSidebar;
         return $entry;
       }, success: function(data, $entry) {
         var entry = data.discussion_entry;
-        entry.user_name = entry.user_name ? entry.user_name : "User Name";
+        entry.user_name = entry.user_name ? entry.user_name : I18n.t('default_user_name', "User Name");
         delete entry['user'];
         var date_data = $.parseFromISO(entry.created_at, 'event');
         entry.post_date = date_data.datetime_formatted;
@@ -420,7 +415,7 @@ var wikiSidebar;
         data.parent_id = $entryList.prev().getTemplateData({ textValues: ['id'] }).id;
       }
       var $parent_entry = $entryList.prev(".discussion_entry");
-      if($parent_entry.length > 0 && $parent_entry.find(".replies_link").text() != "No Replies" && !$parent_entry.hasClass('has_loaded')) {
+      if($parent_entry.length > 0 && $parent_entry.find(".replies_link").text() != I18n.t('no_replies', "No Replies") && !$parent_entry.hasClass('has_loaded')) {
         return;
       }
       var $entry = $("#entry_blank").clone(true);
@@ -451,7 +446,7 @@ var wikiSidebar;
       $(this).closest(".discussion_entry,.communication_sub_message").confirmDelete({
         token: data.authenticity_token,
         url: $(this).attr('href'),
-        message: "Are you sure you want to delete this entry?",
+        message: I18n.t('confirms.delete_entry', "Are you sure you want to delete this entry?"),
         success: function() {
           $(this).fadeOut('normal', function() {
             var $subtopic = $(this).parents(".discussion_subtopic:first");
@@ -471,7 +466,7 @@ var wikiSidebar;
     });
     $(".toggle_subtopics_link").live('click', function(event) {
       event.preventDefault();
-      if($(this).text().indexOf("Expand") != -1) {
+      if($(this).text().indexOf(I18n.t('expand', "Expand")) != -1) {
         $(".toggle_subtopics_link").toggle();
       } else {
         $(".toggle_subtopics_link").toggle();
@@ -528,4 +523,4 @@ var wikiSidebar;
       }
     });
   });
-})();
+});
