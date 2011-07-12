@@ -44,10 +44,15 @@ module SeleniumTestsHelperMethods
       end
       driver = Selenium::WebDriver.for(browser, options)
     else
+      caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
+      if caps == :firefox && SELENIUM_CONFIG[:firefox_profile]
+        profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
+        caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+      end
       driver = Selenium::WebDriver.for(
         :remote, 
         :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub', 
-        :desired_capabilities => (SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox)
+        :desired_capabilities => caps
       )
     end
     driver.manage.timeouts.implicit_wait = 3
