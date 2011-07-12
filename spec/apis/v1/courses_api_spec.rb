@@ -76,7 +76,7 @@ describe CoursesController, :type => :integration do
         :only => %w(id name))
   end
 
-  it "should not include user sis id for non-admins" do
+  it "should not include user sis id or login id for non-admins" do
     first_user = @user
     new_user = User.create!(:name => 'Zombo')
     @course2.enroll_student(new_user).accept!
@@ -84,11 +84,12 @@ describe CoursesController, :type => :integration do
     @user = @me
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
-    json.map { |u| u['sis_user_id'] }.should == [nil, nil]
-    json.map { |u| u['sis_login_id'] }.should == [nil, nil]
+    %w{sis_user_id sis_login_id unique_id}.each do |attribute|    
+      json.map { |u| u[attribute] }.should == [nil, nil]
+    end
   end
 
-  it "should include user sis id if account admin" do
+  it "should include user sis id and login id if account admin" do
     @course2.account.add_user(@me)
     first_user = @user
     new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
@@ -101,9 +102,29 @@ describe CoursesController, :type => :integration do
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
     json.map { |u| u['sis_login_id'] }.sort.should == ['login-id', 'login-2'].sort
+    json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
+  end
+  
+  it "should include user sis id and login id if can manage_students in the course" do
+    @course1.grants_right?(@me, :manage_students).should be_true
+    first_student = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
+    @course1.enroll_student(first_student).accept!
+    first_student.pseudonym.update_attribute(:sis_user_id, 'user2')
+    first_student.pseudonym.update_attribute(:sis_source_id, 'login-2')
+    second_student = user_with_pseudonym(:name => 'second student', :username => 'nobody3@example.com')
+    @course1.enroll_student(second_student).accept!
+    second_student.pseudonym.update_attribute(:sis_user_id, 'user3')
+    second_student.pseudonym.update_attribute(:sis_source_id, 'login-3')
+    
+    @user = @me
+    json = api_call(:get, "/api/v1/courses/#{@course1.id}/students.json",
+            { :controller => 'courses', :action => 'students', :course_id => @course1.to_param, :format => 'json' })
+    json.map { |u| u['sis_user_id'] }.sort.should == ['user2', 'user3'].sort
+    json.map { |u| u['sis_login_id'] }.sort.should == ['login-2', 'login-3'].sort
+    json.map { |u| u['login_id'] }.sort.should == ['nobody2@example.com', 'nobody3@example.com'].sort
   end
 
-  it "should include user sis id if site admin" do
+  it "should include user sis id and login id if site admin" do
     Account.site_admin.add_user(@me)
     first_user = @user
     new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
@@ -116,6 +137,7 @@ describe CoursesController, :type => :integration do
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.map { |u| u['sis_user_id'] }.sort.should == ['user1', 'user2'].sort
     json.map { |u| u['sis_login_id'] }.sort.should == ['login-id', 'login-2'].sort
+    json.map { |u| u['login_id'] }.sort.should == ["nobody@example.com", "nobody2@example.com"].sort
   end
 
   it "should return the list of sections for the course" do

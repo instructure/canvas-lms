@@ -29,16 +29,22 @@ module Api::V1::User
         # the id in the SIS import data, where on every other table
         # that's called sis_source_id. But on pseudonym, sis_source_id is
         # the login in from the SIS import data.
-        json.merge!(:sis_user_id => user.pseudonym.try(:sis_user_id), :sis_login_id => user.pseudonym.try(:sis_source_id))
+        json.merge! :sis_user_id => user.pseudonym.try(:sis_user_id), 
+                    :sis_login_id => user.pseudonym.try(:sis_source_id), 
+                    :login_id => user.pseudonym.unique_id
       end
     end
   end
 
   # optimization hint, currently user only needs to pull pseudonym from the db
-  # if a site admin is making the request
+  # if a site admin is making the request or they can manage_students
   def user_json_is_admin?
     if @user_json_is_admin.nil?
-      @user_json_is_admin = !!(@context.account.membership_for_user(@current_user) || @context.account.grants_right?(@current_user, :manage_sis))
+      @user_json_is_admin = !!(
+        @context.grants_right?(@current_user, :manage_students) ||
+        @context.account.membership_for_user(@current_user) || 
+        @context.account.grants_right?(@current_user, :manage_sis)
+      )
     end
     @user_json_is_admin
   end
