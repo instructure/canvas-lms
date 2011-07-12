@@ -397,7 +397,7 @@
         return $(document).trigger('gridready');
       };
       Gradebook.prototype.initGrid = function() {
-        var $widthTester, assignment, columnDef, fieldName, grids, group, html, id, minWidth, options, outOfFormatter, testWidth, _ref, _ref2;
+        var $widthTester, assignment, columnDef, fieldName, grids, group, html, id, minWidth, options, outOfFormatter, sortRowsBy, testWidth, _ref, _ref2;
         $widthTester = $('<span style="padding:10px" />').appendTo('#content');
         testWidth = function(text, minWidth) {
           return Math.max($widthTester.text(text).outerWidth(), minWidth);
@@ -524,9 +524,18 @@
         this.gradeGrid.onCellChange = __bind(function(row, col, student) {
           return this.calculateStudentGrade(student);
         }, this);
-        this.gradeGrid.onSort = __bind(function(sortCol, sortAsc) {
+        sortRowsBy = __bind(function(sortFn) {
           var i, student, _len, _ref3;
-          this.rows.sort(__bind(function(a, b) {
+          this.rows.sort(sortFn);
+          _ref3 = this.rows;
+          for (i = 0, _len = _ref3.length; i < _len; i++) {
+            student = _ref3[i];
+            student.row = i;
+          }
+          return this.multiGrid.invalidate();
+        }, this);
+        this.gradeGrid.onSort = __bind(function(sortCol, sortAsc) {
+          return sortRowsBy(function(a, b) {
             var aScore, bScore, _ref3, _ref4;
             aScore = (_ref3 = a[sortCol.field]) != null ? _ref3.score : void 0;
             bScore = (_ref4 = b[sortCol.field]) != null ? _ref4.score : void 0;
@@ -541,13 +550,23 @@
             } else {
               return aScore - bScore;
             }
-          }, this));
-          _ref3 = this.rows;
-          for (i = 0, _len = _ref3.length; i < _len; i++) {
-            student = _ref3[i];
-            student.row = i;
-          }
-          return this.multiGrid.invalidate();
+          });
+        }, this);
+        this.multiGrid.grids[0].onSort = __bind(function(sortCol, sortAsc) {
+          var propertyToSortBy;
+          propertyToSortBy = {
+            display_name: 'sortable_name',
+            secondary_identifier: 'secondary_identifier'
+          }[sortCol.field];
+          return sortRowsBy(function(a, b) {
+            var res;
+            res = a[propertyToSortBy] < b[propertyToSortBy] ? -1 : a[propertyToSortBy] > b[propertyToSortBy] ? 1 : 0;
+            if (sortAsc) {
+              return res;
+            } else {
+              return 0 - res;
+            }
+          });
         }, this);
         this.multiGrid.parent_grid.onKeyDown = __bind(function() {
           return false;

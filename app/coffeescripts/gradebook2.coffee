@@ -426,16 +426,25 @@ I18n.scoped 'gradebook2', (I18n) ->
       # this is the magic that actually updates group and final grades when you edit a cell
       @gradeGrid = @multiGrid.grids[1]
       @gradeGrid.onCellChange = (row, col, student) => @calculateStudentGrade(student)
+      sortRowsBy = (sortFn) =>
+        @rows.sort(sortFn)
+        student.row = i for student, i in @rows
+        @multiGrid.invalidate()
       @gradeGrid.onSort = (sortCol, sortAsc) =>
-        @rows.sort (a, b) =>
+        sortRowsBy (a, b) ->
           aScore = a[sortCol.field]?.score
           bScore = b[sortCol.field]?.score
           aScore = -99999999999 if not aScore and aScore != 0
           bScore = -99999999999 if not bScore and bScore != 0
           if sortAsc then bScore - aScore else aScore - bScore
-        student.row = i for student, i in @rows
-        @multiGrid.invalidate()
-        
+      @multiGrid.grids[0].onSort = (sortCol, sortAsc) =>
+        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier'}[sortCol.field]
+        sortRowsBy (a, b) ->
+          res = if a[propertyToSortBy] < b[propertyToSortBy] then -1
+          else if a[propertyToSortBy] > b[propertyToSortBy] then 1
+          else 0
+          if sortAsc then res else 0 - res
+          
       @multiGrid.parent_grid.onKeyDown = () =>
         # TODO: start editing automatically when a number or letter is typed
         false
