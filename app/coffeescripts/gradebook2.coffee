@@ -40,6 +40,7 @@ I18n.scoped 'gradebook2', (I18n) ->
           $.htmlEscapeValues(student)
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
+          student.secondary_identifier = student.sis_login_id || student.login_id
           @students[student.id] = student
           student.section = section
           # fill in dummy submissions, so there's something there even if the
