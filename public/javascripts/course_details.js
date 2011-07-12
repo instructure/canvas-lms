@@ -268,7 +268,6 @@ I18n.scoped('course_details', function(I18n) {
         $(".course_form_more_options").hide();
       },
       success: function(data) {
-        $(this).loadingImage('remove');
         var course = data.course;
         course.start_at = $.parseFromISO(course.start_at).datetime_formatted;
         course.conclude_at = $.parseFromISO(course.conclude_at).datetime_formatted;
@@ -276,6 +275,12 @@ I18n.scoped('course_details', function(I18n) {
         course.indexed = course.indexed ? I18n.t('indexed_course', "Included in public course index") : "";
         course.grading_scheme_set = course.grading_standard_title || (course.grading_standard_id ? I18n.t('grading_standard_set', "Currently Set") : I18n.t('grading_standard_unset', "Not Set"));
         course.restrict_dates = course.restrict_enrollments_to_course_dates ? I18n.t('course_dates_enforced', "Users can only access the course between these dates") : I18n.t('course_dates_unenforced', "These dates will not affect course availability");
+        course.locale = $("#course_locale option[value='" + (course.locale || '') + "']").text();
+        if (course.locale != $course_form.find('.locale').text()) {
+          location.reload();
+          return;
+        }
+        $(this).loadingImage('remove');
         $("#course_form .public_options").showIf(course.is_public);
         $("#course_form .self_enrollment_message").css('display', course.self_enrollment ? '' : 'none');
         $("#course_form").fillTemplateData({data: course});

@@ -73,6 +73,8 @@ end
 
 I18n.class_eval do
   class << self
+    attr_writer :localizer
+
     include ::ActionView::Helpers::TextHelper
     # if one of the interpolated values is a SafeBuffer (e.g. the result of a
     # link_to call) or the string itself is, we don't want anything to get
@@ -96,6 +98,11 @@ I18n.class_eval do
     alias_method_chain :localize, :whitespace_removal
 
     def translate_with_default_and_count_magic(key, *args)
+      if @localizer
+        self.locale = @localizer.call
+        @localizer = nil
+      end
+
       default = args.shift if args.first.is_a?(String) || args.size > 1
       options = args.shift || {}
       options[:default] ||= if options[:count]
@@ -178,6 +185,21 @@ ActiveRecord::Base.class_eval do
       I18n.translate(key, default, options)
     end
     alias :t :translate
+
+    def validates_locale(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      args << :locale if args.empty?
+      if options[:allow_nil] && !options[:allow_empty]
+        before_validation do |record|
+          args.each do |field|
+            record.write_attribute(field, nil) if record.read_attribute(field) == ''
+          end
+        end
+      end
+      args.each do |field|
+        validates_inclusion_of field, options.merge(:in => I18n.available_locales.map(&:to_s))
+      end
+    end
   end
 end
 

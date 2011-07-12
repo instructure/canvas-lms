@@ -23,7 +23,9 @@ class ApplicationController < ActionController::Base
   
   attr_accessor :active_tab
   
-  before_filter :set_locale
+  include LocaleSelection
+  around_filter :set_locale
+
   add_crumb "home", :root_path, :class => "home"
   helper :all
   filter_parameter_logging :password
@@ -43,8 +45,15 @@ class ApplicationController < ActionController::Base
   protected
   
   def set_locale
-    # if params[:locale] is nil then I18n.default_locale will be used
-    I18n.locale = params[:locale] && I18n.available_locales.include?(params[:locale].to_sym) ? params[:locale] : nil
+    I18n.localizer = lambda {
+      infer_locale :context => @context,
+                   :user => @current_user,
+                   :root_account => @domain_root_account,
+                   :accept_language => request.headers['Accept-Language']
+    }
+    yield if block_given?
+  ensure
+    I18n.localizer = nil
   end
 
   def init_body_classes_and_active_tab

@@ -74,6 +74,16 @@ $(function() {
       },
       success: function(data) {
         var user = data.user;
+        var templateData = {
+          short_name: user.short_name,
+          full_name: user.name,
+          time_zone: user.time_zone,
+          locale: $("#user_locale option[value='" + user.locale + "']").text()
+        };
+        if (templateData.locale != $update_profile_form.find('.locale').text()) {
+          location.reload();
+          return;
+        }
         $update_profile_form.loadingImage('remove');
         if ($default_email_id.length > 0) {
           var default_email = $default_email_id.find('option:selected').text();
@@ -81,11 +91,6 @@ $(function() {
         }
         $('.channel').removeClass('default');
         $("#channel_" + user.communication_channel.id).addClass('default');
-        var templateData = {
-          short_name: user.short_name,
-          full_name: user.name,
-          time_zone: user.time_zone
-        };
         $update_profile_form.fillTemplateData({
           data: templateData
         }).find(".cancel_button").click();

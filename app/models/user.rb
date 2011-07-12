@@ -19,7 +19,7 @@
 class User < ActiveRecord::Base
   include Context
 
-  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails
+  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
   attr_accessor :original_id
   
   before_save :infer_defaults
@@ -170,6 +170,7 @@ class User < ActiveRecord::Base
   has_a_broadcast_policy
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  validates_locale :locale, :browser_locale, :allow_nil => true
 
   before_save :assign_uuid
   before_save :update_avatar_image

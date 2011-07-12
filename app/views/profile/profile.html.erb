@@ -49,10 +49,22 @@
       </td>
     </tr>
   <% end %>
+  <% if available_locales.size > 1 %>
+  <tr>
+    <td><%= f.blabel :locale, :en => "Language" %></td>
+    <td>
+      <% no_language = t(:no_language_preference, "System Default (%{language})", :language => available_locales[infer_locale(:root_account => @domain_root_account, :accept_language => request.headers['Accept-Language'])]) %>
+      <span class="locale display_data"><%= @user.locale ? available_locales[@user.locale] : no_language %></span>
+      <span class="edit_data"><%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @user.locale %>
+      <span style="font-size: 0.8em; color: #888;"><br/><%= t('hints.language', "This will override any browser or account settings.") %></span>
+      </span>
+    </td>
+  </tr>
+  <% end %>
   <tr>
     <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
     <td>
-      <span class="time_zone display_data"><%= @user.time_zone || "None" %></span>
+      <span class="time_zone display_data"><%= @user.time_zone || t(:none, "None") %></span>
       <span class="edit_data"><%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :model => I18nTimeZone, :default => ((@domain_root_account && @domain_root_account.default_time_zone) || "Mountain Time (US & Canada)") %><%# that default time zone is a value, not text %></span>
     </td>
   </tr>

@@ -19,6 +19,7 @@
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
   include TextHelper
+  include LocaleSelection
   
   # Admins of the given context can see the User.name attribute,
   # but everyone else sees the User.short_name attribute.
