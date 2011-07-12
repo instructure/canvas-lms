@@ -1,3 +1,14 @@
+canvas-lms (1.1-41) professional; urgency=low
+
+  * [+85cdb69] fix displaying rubric totals
+  * [+14fcaa3] fix display of rubric criteria points
+  * [+3fe73c2] change default error report filter to ignore the 404 category
+  * [+8505c8c] fix saving media comments
+  * [+766a956] fix showing names during quiz moderation
+  * [+d4365cc] not all non-assignments are surveys
+
+ -- JT Olds <jt@instructure.com>  Tue, 12 Jul 2011 14:16:51 -0600
+
 canvas-lms (1.1-40) professional; urgency=low
 
   * [+a1fa31f] i18n rubrics
