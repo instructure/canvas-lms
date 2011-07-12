@@ -655,7 +655,7 @@ class ApplicationController < ActionController::Base
       @status = @status_code
       @status = 'AUT' if exception.is_a?(ActionController::InvalidAuthenticityToken)
       type = 'default'
-      type = '404' if @status == '404 Not Found' && Rails.env == "production"
+      type = '404' if @status == '404 Not Found'
 
       @error = ErrorReport.log_exception(type, exception, {
         :url => request.url,
