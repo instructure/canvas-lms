@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe CoursesController, :type => :integration do
+  USER_API_FIELDS = %w(id name sortable_name)
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
@@ -73,7 +74,7 @@ describe CoursesController, :type => :integration do
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
             { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     json.should == api_json_response([first_user, new_user],
-        :only => %w(id name))
+        :only => USER_API_FIELDS)
   end
 
   it "should not include user sis id or login id for non-admins" do
@@ -150,8 +151,8 @@ describe CoursesController, :type => :integration do
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
             { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
     json.size.should == 2
-    json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => %w(id name))
-    json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => %w(id name))
+    json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => USER_API_FIELDS)
+    json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => USER_API_FIELDS)
   end
 
   it "should allow specifying course sis id" do
@@ -163,7 +164,7 @@ describe CoursesController, :type => :integration do
     json = api_call(:get, "/api/v1/courses/sis_course_id:my-course-sis/students.json",
             { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:my-course-sis', :format => 'json' })
     json.should == api_json_response([first_user, new_user],
-        :only => %w(id name))
+        :only => USER_API_FIELDS)
   end
 
   it "should return the needs_grading_count for all assignments" do

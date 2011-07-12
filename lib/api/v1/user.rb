@@ -19,7 +19,8 @@
 module Api::V1::User
   JSON_FIELDS = {
     :include_root => false,
-    :only => %w(id name)
+    :only => %w(id name),
+    :methods => :sortable_name
   }
 
   def user_json(user)
