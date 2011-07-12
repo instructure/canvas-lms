@@ -694,7 +694,7 @@ I18n.scoped('media_comments', function(I18n) {
   });
 })(jQuery, INST);
 
-function mediaCommentCallback(results) {
+window.mediaCommentCallback = function(results) {
   var context_code = $.trim($("#current_context_code").text()) || $.trim("user_" + $("#identity .user_id").text());
   for(var idx in results) { 
     var entry = results[idx];
@@ -720,7 +720,7 @@ function mediaCommentCallback(results) {
   }
   $("#media_comment_create_dialog").empty().dialog('close');
 }
-function beforeAddEntry() {
+window.beforeAddEntry = function() {
   var attemptId = Math.random();
   $.mediaComment.lastAddAttemptId = attemptId;
   setTimeout(function() {
@@ -730,13 +730,13 @@ function beforeAddEntry() {
   }, 30000);
   $("#audio_record_holder_message,#video_record_holder_message").addClass('saving');
 }
-function addEntryFail() {
+window.addEntryFail = function() {
   $(document).triggerHandler('media_recording_error');
 }
-function addEntryFailed() {
+window.addEntryFailed = function() {
   $(document).triggerHandler('media_recording_error');
 }
-function addEntryComplete(entries) {
+window.addEntryComplete = function(entries) {
   $.mediaComment.lastAddAttemptId = null;
   $("#audio_record_holder_message,#video_record_holder_message").removeClass('saving');
   try {
