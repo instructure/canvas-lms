@@ -424,8 +424,8 @@ I18n.scoped('context.inbox', function(I18n) {
   });
   window.messages = {
     replySubject: function(subject) {
-      var pattern = new RegExp($.regexEscape(I18n.t('regarding_original_subject', "Re: %{subject}", {subject: '.*'})).replace(/\\\.\\\*/, '.*'), 'gmi');
-      return subject.match(pattern) ? subject : I18n.t('regarding_original_subject', "Re: %{subject}", {subject: subject});
+      var pattern = new RegExp($.regexEscape(I18n.t('#subject_reply_to', "Re: %{subject}", {subject: '.*'})).replace(/\\\.\\\*/, '.*'), 'gmi');
+      return subject.match(pattern) ? subject : I18n.t('#subject_reply_to', "Re: %{subject}", {subject: subject});
     },
     findUserName: function(id, users) {
       var name = $.trim($(".user_name_" + id + ":first").text());

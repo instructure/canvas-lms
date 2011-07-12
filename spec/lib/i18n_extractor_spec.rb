@@ -85,7 +85,7 @@ describe I18nExtractor do
     end
 
     it "should reject invalid pluralization sub-keys" do
-      lambda{ extract "t 'foo', {:invalid => '%{count} Foo'}, :count => 1" }.should raise_error(/invalid :count sub-key\(s\):/)
+      lambda{ extract "t 'foo', {:invalid => '%{count} Foo'}, :count => 1" }.should raise_error(/invalid :count sub-key\(s\)/)
     end
   end
 
@@ -121,9 +121,9 @@ describe I18nExtractor do
     end
 
     it "should complain if no default is provided" do
-      lambda{ extract "label :thing, :the_foo, :foo" }.should raise_error 'invalid/missing en default nil'
-      lambda{ extract "f.label :the_foo, :foo" }.should raise_error 'invalid/missing en default nil'
-      lambda{ extract "label_tag :the_foo, :foo" }.should raise_error 'invalid/missing en default nil'
+      lambda{ extract "label :thing, :the_foo, :foo" }.should raise_error /invalid\/missing en default nil/
+      lambda{ extract "f.label :the_foo, :foo" }.should raise_error /invalid\/missing en default nil/
+      lambda{ extract "label_tag :the_foo, :foo" }.should raise_error /invalid\/missing en default nil/
     end
   end
 

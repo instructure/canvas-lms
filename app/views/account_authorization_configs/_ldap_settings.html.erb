@@ -13,7 +13,7 @@
       <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @account_configs[0] } %>
 
       <tr>
-        <td style="vertical-align: top; width: 200px;"><%= f.blabel :login_handle_name, :en => "Login Label:" %></td>
+        <td style="vertical-align: top; width: 200px;"><%= f.blabel :login_handle_name, :en => "Login Label" %></td>
         <td style="vertical-align: top;" class="nobr">
           <%= f.text_field :login_handle_name, :class => "auth_form", :style => "width: 300px;", :placeholder => AccountAuthorizationConfig.default_login_handle_name %>
           <span class="auth_info auth_login_handle_name"><%= @account_configs[0].login_handle_name || AccountAuthorizationConfig.default_login_handle_name %></span>

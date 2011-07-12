@@ -78,7 +78,7 @@ var shortName = "<%= short_name %>";
   <% if can_do(@context.announcements.new, @current_user, :create) %>
   <div class="announcement_option" style="<%= is_announcement ? 'display: none;' : '' %>">
     <%= check_box :discussion_topic, :is_announcement, :checked => (is_announcement ? 'checked' : ''), :class => "is_announcement" %>
-    <%= label :discussion_topic, :is_announcement, " Make this post an announcement" %>
+    <%= label :discussion_topic, :is_announcement, :en => "Make this post an announcement" %>
   </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_content) %>
@@ -88,7 +88,7 @@ var shortName = "<%= short_name %>";
     <div class="more_options_holder">
       <div style="float: left;">
         <%= check_box :discussion_topic, :delay_posting, :class => "delay_posting" %>
-        <%= label :discussion_topic, :delay_posting, "Delay posting this message " %>
+        <%= label :discussion_topic, :delay_posting, :en => "Delay posting this message" %>
       </div>
       <div class="delay_posting_option" style="display: none; float: left;">
         &nbsp;until 
@@ -131,7 +131,7 @@ var shortName = "<%= short_name %>";
                   </select>
                 </td>
               </tr><tr>
-                <td style="vertical-align: top;"><%= a.label :due_at, "Due:" %></td>
+                <td style="vertical-align: top;"><%= a.blabel :due_at, :en => "Due" %></td>
                 <td><%= a.text_field :due_at, :style => "width: 152px;", :class => "datetime_field" %></td>
               </tr>
             </table>
