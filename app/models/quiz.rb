@@ -181,7 +181,7 @@ class Quiz < ActiveRecord::Base
   end
   
   def survey?
-    !self.assignment?
+    self.quiz_type == 'survey' || self.quiz_type == 'graded_survey'
   end
   
   def graded?
