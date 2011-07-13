@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-require 'i18n_extractor'
+require 'i18n_extractor' unless defined?(I18nJsExtractor)
 
 describe I18nJsExtractor do
   def extract(source, scope = 'asdf', options = {})

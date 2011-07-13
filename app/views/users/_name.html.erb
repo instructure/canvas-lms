@@ -70,10 +70,10 @@
     <input type="hidden" name="rename" value="1"/>
     <table class="formtable">
       <tr>
-        <td><%= f.blabel :name, :en => "Full Name:" %></td>
+        <td><%= f.blabel :name, :en => "Full Name" %></td>
         <td><%= f.text_field :name %></td>
       </tr><tr>
-        <td><%= f.blabel :short_name, :en => "Display Name:" %></td>
+        <td><%= f.blabel :short_name, :en => "Display Name" %></td>
         <td><%= f.text_field :short_name %></td>
       </tr>
       <% if can_manage_admin_users %>

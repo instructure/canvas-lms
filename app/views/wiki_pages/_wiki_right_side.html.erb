@@ -77,7 +77,7 @@
     <div id="wiki_page_new">
       <a class="new button button-sidebar-wide" href="#"><%= image_tag "add.png" %> <%= t 'links.create_page', 'Create a New Page' %></a>
       <% form_for(:wiki_page, :url => context_url(@context, :context_wiki_pages_url), :html => {:method => :post, :style => "margin-left: 20px; display: none", :id => 'add_wiki_page_form'}) do |f| -%>
-        <%= f.blabel :title, "New page name:" %><br />
+        <%= f.blabel :title, :en => "New page title" %><br />
         <%= f.text_field :title, :style => "width: 150px;" %>
         <input type="hidden" name="url_prefix" value="" id="url_prefix" />
         <button class="button small-button" type="submit"><%= t 'buttons.create', 'Create' %></button>

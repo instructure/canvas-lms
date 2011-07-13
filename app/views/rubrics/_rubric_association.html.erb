@@ -26,7 +26,7 @@
       <div class="association_display" style="font-size: 0.8em;">
         <table style="width: 100%;"><tr>
           <td style="vertical-align: top;">
-            <%= t('invited_assessors', 'Invited Assessors:') %>
+            <%= before_label('invited_assessors', 'Invited Assessors') %>
             <ul class="unstyled_list assessor_list" style="margin-left: 20px;">
               <% if !association || association.assessment_requests.incomplete.empty? %>
                 <li class="none_assigned_message"><%= t('none_invited', 'None Invited') %></li>
@@ -37,7 +37,7 @@
               <% end %>
             </ul>
             <% if association && !association.rubric_assessments.empty? %>
-              <%= t('completed_assessments', 'Completed Assessments') %>
+              <%= before_label('completed_assessments', 'Completed Assessments') %>
               <ul class="unstyled_list" style="margin-left: 20px;">
                 <% association.rubric_assessments.each do |assessment| %>
                   <li><%= assessment.assessor_name %></li>
@@ -55,7 +55,7 @@
               <% end %>
             </div>
           </td><td style="vertical-align: top; width: 60%;" class="description">
-            <%= (association.description || "No Description") rescue "No Description" %>
+            <%= association && association.description || t("no_description", "No Description") %>
           </td>
         </tr></table>
       </div>
@@ -76,7 +76,7 @@
       <div class="association_display" style="font-size: 0.8em;">
         <table style="width: 100%;"><tr>
           <td style="vertical-align: top;">
-            <%= t('unsubmitted', 'Unsubmitted:') %>
+            <%= before_label('unsubmitted_assessments', 'Unsubmitted') %>
             <ul class="unstyled_list" style="margin-left: 20px;">
               <% if association %>
                 <% association.unsubmitted_users.each do |user| %>
@@ -85,13 +85,13 @@
               <% end %>
             </ul>
             <% if association && !association.rubric_assessments.empty? %>
-              <%= t('submitted_and_incomplete', 'Submitted and Incomplete:') %>
+              <%= before_label('submitted_and_incomplete_assessments', 'Submitted and Incomplete') %>
               <ul class="unstyled_list" style="margin-left: 20px;">
                 <% association.assessment_requests.incomplete.each do |assessment| %>
                   <li><%= context_user_name(@context, assessment.user) %></li>
                 <% end %>
               </ul>
-              <%= t('submitted_and_completed', 'Submitted and Completed:') %>
+              <%= before_label('submitted_and_completed_assessments', 'Submitted and Completed') %>
               <ul class="unstyled_list" style="margin-left: 20px;">
                 <% association.rubric_assessments.each do |assessment| %>
                   <li><%= context_user_name(@context, assessment.user) %></li>
@@ -99,7 +99,7 @@
               </ul>
             <% end %>
           </td><td style="vertical-align: top; width: 60%;" class="description">
-            <%= (association.description || t('no_description', "No Description")) rescue t('no_description', "No Description") %>
+            <%= association && association.description || t("no_description", "No Description") %>
           </td>
         </tr></table>
       </div>
@@ -125,7 +125,7 @@
     </div>
     <div class="association_buttons association_edit button-container">
       <button type="button" class="save_button button"><%= t('buttons.save_assessment', 'Save Assessment') %></button>
-      <button type="button" class="cancel_button button-secondary"><%= t('buttons.cancel', 'Cancel') %></button>
+      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', 'Cancel') %></button>
     </div>
     <a href="<%= context_url(@context, :context_rubric_association_url, association ? association.id : "{{ id }}") %>" style="display: none;" class="update_rubric_association_url">&nbsp;</a>
   </div>

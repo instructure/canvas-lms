@@ -350,7 +350,7 @@
   <% form_for :collaboration, :url => "", :html => {:id => "edit_collaboration_form"} do |f| %>
   <table class="formtable">
     <tr class="add_collaboration">
-      <td style="white-space: nowrap;"><label for="collaboration_collaboration_type">Collaborate Using:</label></td>
+      <td style="white-space: nowrap;"><label for="collaboration_collaboration_type"><%= before_label :collaborate_using, "Collaborate Using" %></label></td>
       <td><select id="collaboration_collaboration_type" name="collaboration[collaboration_type]">
         <% Collaboration.collaboration_types.each do |collab_type| %>
           <% if collab_type['type'] == 'google_docs' %>
@@ -480,7 +480,7 @@ HEREDOC
         <td style="padding-bottom: 10px;">
           <%= f.check_box :locked, :class => 'lock_checkbox' %> 
         </td><td colspan="2" style="padding-bottom: 10px;">
-          <%= f.label :locked, ":en => Lock until I manually unlock it" %>
+          <%= f.label :locked, :en => "Lock until I manually unlock it" %>
         </td>
       </tr><tr class="lock_range full_lock">
         <td>&nbsp;</td>

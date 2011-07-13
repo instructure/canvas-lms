@@ -46,7 +46,7 @@
     <h2><%= @bank.title %></h2>
   </div>
   <div class="editing" style="display: none;">
-    <b><%= f.label :title, "Bank Name:" %></b>
+    <b><%= f.label :title, :en => "Bank Name" %></b>
     <%= f.text_field :title, :class => "bank_name_box" %>
   </div>
 <% end %>
@@ -114,19 +114,19 @@
       <li class="bank blank" style="display: none;">
         <input type="radio" class="bank_radio" name="assessment_question_bank_id" value="new" id="bank_new"/>
         <label for="bank_new" class="bank_label">
-          <span class="bank_name">[ <%= t 'new_question_bank', 'New Question Bank' %> ]</span>
+          <span class="bank_name">[ <%= t 'labels.new_question_bank', 'New Question Bank' %> ]</span>
           <span class="context_name">&nbsp;</span>
         </label>
         <div class="clear"></div>
       </li>
     </ul>
     <div class="new_question_bank_name" style="display: none;">
-      <label for="new_question_bank_name"><%= t 'new_bank_name', 'New Bank Name:' %></label>
+      <label for="new_question_bank_name"><%= before_label 'new_bank_name', 'New Bank Name' %></label>
       <input type="text" name="assessment_question_bank_name" value="" id="new_question_bank_name">
     </div>
     <div class="copy_option">
       <input type="checkbox" name="copy" id="copy_question" value="1" checked />
-      <label for="copy_question"><%= t 'keep_copy', 'Keep a copy in this question bank as well' %></label>
+      <label for="copy_question"><%= t 'labels.keep_copy', 'Keep a copy in this question bank as well' %></label>
     </div>
     <div class="button-container">
       <button type="button" class="button submit_button"><%= t 'button.move_copy_question', 'Move/Copy Question' %></button>

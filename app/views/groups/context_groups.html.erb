@@ -49,11 +49,11 @@ TEXT
 %>
 <table class="formtable">
   <tr>
-    <td><%= f.blabel :name, "Group Name" %></td>
+    <td><%= f.blabel :name, :en => "Group Name" %></td>
     <td><%= f.text_field :name %></td>
   <% if @context %>
   <tr>
-    <td><%= before_label :joining, 'Joining' %></td>
+    <td><%= before_label :restrictions_for_joining_groups, 'Joining' %></td>
     <td>
       <select name="group[join_level]">
         <option value="parent_context_auto_join"><%= t 'options.open_to_course_members', 'Course members are free to join' %></option>
@@ -64,7 +64,7 @@ TEXT
   <% end %>
   </tr><tr>
     <td style="vertical-align: top;">
-      <%= before_label :invite, 'Invite' %>
+      <%= before_label :users_to_invite, 'Invite' %>
     </td>
     <td>
       <ul class="unstyled_list">

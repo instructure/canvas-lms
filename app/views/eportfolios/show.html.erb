@@ -41,12 +41,12 @@
         <div class="form_content button-container">
           <button type="button" class="submit_button button small-button button-default"><%= t('buttons.save_page', "Save Page") %></button>
           <button type="button" class="preview_button button small-button"><%= t('buttons.preview', "Preview") %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t('#cancel', "Cancel") %></button>
+          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
         </div>
         <div class="preview_content button-container">
           <button type="button" class="submit_button button small-button button-default"><%= t('buttons.save_page', "Save Page") %></button>
           <button type="button" class="keep_editing_button button small-button"><%= t('buttons.keep_editing', "Keep Editing") %></button>
-          <button type="button" class="cancel_button button-secondary"><%= t('#cancel', "Cancel") %></button>
+          <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
         </div>
       </div>
     </div>
@@ -178,7 +178,7 @@
     </table>
     <div class="button-container">
       <button type="submit" class="button"><%= t('buttons.add_page', "Add Page") %></button>
-      <button type="button" class="cancel_button button-secondary"><%= t('#cancel', "Cancel") %></button>
+      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
     <div style="display: none;">
       <a class="add_eportfolio_entry_url" href="<%= eportfolio_entries_path(@portfolio.id) %>">&nbsp;</a>
@@ -213,12 +213,12 @@
   <div class="form_content button-container">
     <button type="submit" class="button button-default"><%= t('buttons.save_page', "Save Page") %></button>
     <button type="button" class="preview_button button"><%= t('buttons.preview', "Preview") %></button>
-    <button type="button" class="cancel_button button-secondary"><%= t('#cancel', "Cancel") %></button>
+    <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
   </div>
   <div class="preview_content button-container">
     <button type="submit" class="button button-default"><%= t('buttons.save_page', "Save Page") %></button>
     <button type="button" class="keep_editing_button button"><%= t('buttons.keep_editing', "Keep Editing") %></button>
-    <button type="button" class="cancel_button button-secondary"><%= t('#cancel', "Cancel") %></button>
+    <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
   </div>
   <table class="formtable" style="width: 100%; display: none;">
     <tr>
@@ -267,7 +267,7 @@
       </ul>
       <div class='button-container button-container-right-aligned'>
         <button type="button" class="select_submission_button button small-button"><%= t('buttons.select_submission', "Select Submission") %></button>
-        <button type="button" class="cancel_content_button button-secondary"><%= t('#cancel', "Cancel") %></button>
+        <button type="button" class="cancel_content_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
       </div>
     </div>
     <div class="edit_attachment_content form_content" style="display: none;">
@@ -285,7 +285,7 @@
       </div>
       <div class='button-container button-container-right-aligned'>
         <button type="button" class="upload_file_button button small-button"><%= t('buttons.upload_file', "Select/Upload File") %></button>
-        <button type="button" class="cancel_content_button button-secondary"><%= t('#cancel', "Cancel") %></button>
+        <button type="button" class="cancel_content_button button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
       </div>
     </div>
     <div class="loading_submission" style="text-align: center;">
@@ -390,7 +390,7 @@
       }, :count => @portfolio.eportfolio_entries.count) %>
     <div class="button-container">
       <button type="submit" class="button"><%= t('buttons.delete', "Delete ePortfolio") %></button>
-      <button type="button" class="button-secondary delete_eportfolio_link"><%= t('#cancel', "Cancel") %></button>
+      <button type="button" class="button-secondary delete_eportfolio_link"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   <% end %>
 <% end %>
