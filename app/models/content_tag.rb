@@ -36,11 +36,10 @@ class ContentTag < ActiveRecord::Base
 
   attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url
   
-  adheres_to_policy
-  
+
   set_policy do
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}
-    set {can :delete }
+    can :delete
   end
   
   workflow do

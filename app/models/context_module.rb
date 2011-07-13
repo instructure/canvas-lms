@@ -23,7 +23,6 @@ class ContextModule < ActiveRecord::Base
   belongs_to :cloned_item
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
-  adheres_to_policy
   acts_as_list :scope => :context
   
   serialize :prerequisites
@@ -117,10 +116,10 @@ class ContextModule < ActiveRecord::Base
   
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_content) }
-    set { can :read and can :create and can :update and can :delete }
+    can :read and can :create and can :update and can :delete
     
     given {|user, session| self.cached_context_grants_right?(user, session, :read) }
-    set { can :read }
+    can :read
   end
   
   def locked_for?(user, tag=nil, deep_check=false)

@@ -38,7 +38,6 @@ class ContextMessage < ActiveRecord::Base
   before_save :set_defaults, :infer_values
   after_save :set_attachments
   after_save :record_participants
-  adheres_to_policy
   has_a_broadcast_policy
   
   workflow do
@@ -68,13 +67,13 @@ class ContextMessage < ActiveRecord::Base
   
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_content) }
-    set { can :read and can :update and can :delete and can :create and can :download }
+    can :read and can :update and can :delete and can :create and can :download
     
     given { |user, session| self.cached_context_grants_right?(user, session, :send_messages) }
-    set { can :create }
+    can :create
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) && self.users.include?(user) }
-    set { can :read }
+    can :read
   end
   
   set_broadcast_policy do |p|

@@ -27,7 +27,6 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :assessor, :class_name => 'User'
   belongs_to :artifact, :polymorphic => true, :touch => true
   has_many :assessment_requests, :dependent => :destroy
-  adheres_to_policy
   serialize :data
   
   simply_versioned
@@ -93,23 +92,23 @@ class RubricAssessment < ActiveRecord::Base
   
   set_policy do
     given {|user, session| session && session[:rubric_assessment_ids] && session[:rubric_assessment_ids].include?(self.id) }
-    set { can :create and can :read and can :update }
+    can :create and can :read and can :update
   
     given {|user, session| user && self.assessor_id == user.id }
-    set { can :create and can :read and can :update }
+    can :create and can :read and can :update
     
     given {|user, session| user && self.user_id == user.id }
-    set { can :read }
+    can :read
     
     given {|user, session| self.rubric_association && self.rubric_association.grants_rights?(user, session, :manage)[:manage] }
-    set { can :create and can :read and can :delete}
+    can :create and can :read and can :delete
 
     given {|user, session| 
       self.rubric_association && 
       self.rubric_association.grants_rights?(user, session, :manage)[:manage] &&
       (self.rubric_association.association.context.grants_right?(self.assessor, nil, :manage_grades) rescue false)
     }
-    set { can :update }
+    can :update
   end
   
   named_scope :of_type, lambda {|type|

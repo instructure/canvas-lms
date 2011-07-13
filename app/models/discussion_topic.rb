@@ -28,8 +28,7 @@ class DiscussionTopic < ActiveRecord::Base
     :require_initial_post
 
   attr_readonly :context_id, :context_type, :user_id
-  adheres_to_policy
-  
+
   has_many :discussion_entries, :order => :created_at, :dependent => :destroy
   has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id = ? AND discussion_entries.workflow_state != ?', 0, 'deleted']
   has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
@@ -308,34 +307,34 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_policy do
     given { |user| self.user && self.user == user && !self.locked? }
-    set { can :update and can :reply and can :read }
+    can :update and can :reply and can :read
     
     given { |user| self.user && self.user == user }
-    set { can :read }
+    can :read
 
     given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && !self.locked? && !self.root_topic_id }
-    set { can :delete }
+    can :delete
     
     given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :read) }#
-    set {can :read}
+    can :read
     
     given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.locked? }#students.include?(user) }
-    set { can :reply and can :read }
+    can :reply and can :read
     
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) and not self.is_announcement }
-    set { can :create }
+    can :create
     
     given { |user, session| self.context.respond_to?(:allow_student_forum_attachments) && self.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
-    set { can :attach }
+    can :attach
     
     given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
-    set { can :update and can :delete and can :create and can :read and can :attach }
+    can :update and can :delete and can :create and can :read and can :attach
     
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
-    set { can :update }
+    can :update
     
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
-    set { can :delete }
+    can :delete
   end
 
   def discussion_topic_id

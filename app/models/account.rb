@@ -24,7 +24,6 @@ class Account < ActiveRecord::Base
     :default_storage_quota_mb, :storage_quota, :ip_filters
 
   include Workflow
-  adheres_to_policy
   belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
   authenticates_many :pseudonym_sessions
@@ -506,23 +505,23 @@ class Account < ActiveRecord::Base
   set_policy do
     RoleOverride.permissions.each do |permission, params|
       given {|user, session| self.membership_allows(user, permission) }
-      set { can permission }
+      can permission
       
       given {|user, session| self.parent_account && self.parent_account.grants_right?(user, session, permission) }
-      set { can permission }
+      can permission
 
       given {|user, session| !site_admin? && Account.site_admin.grants_right?(user, session, permission) }
-      set { can permission }
+      can permission
     end
 
     given { |user| self.active? && self.users.include?(user) }
-    set { can :read and can :manage and can :update and can :delete }
+    can :read and can :manage and can :update and can :delete
 
     given { |user| self.parent_account && self.parent_account.grants_right?(user, nil, :manage) }
-    set { can :read and can :manage and can :update and can :delete }
+    can :read and can :manage and can :update and can :delete
 
     given { |user| !site_admin? && Account.site_admin_user?(user, :manage) }
-    set { can :read and can :manage and can :update and can :delete }
+    can :read and can :manage and can :update and can :delete
   end
 
   alias_method :destroy!, :destroy

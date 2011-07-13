@@ -56,7 +56,6 @@ class Assignment < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
 
   acts_as_list :scope => :assignment_group_id
-  adheres_to_policy
   has_a_broadcast_policy
   simply_versioned :keep => 5
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
@@ -639,25 +638,25 @@ class Assignment < ActiveRecord::Base
   
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }
-    set { can :read and can :read_own_submission }
+    can :read and can :read_own_submission
     
     given { |user, session| self.submittable_type? && 
       self.cached_context_grants_right?(user, session, :participate_as_student) &&
       !self.locked_for?(user)
     }
-    set { can :submit and can :attach_submission_comment_files }
+    can :submit and can :attach_submission_comment_files
     
     given { |user, session| !self.locked_for?(user) && 
       (self.context.allow_student_assignment_edits rescue false) && 
       self.cached_context_grants_right?(user, session, :participate_as_student)
     }
-    set { can :update_content }
+    can :update_content
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
-    set { can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files }
+    can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
-    set { can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files }
+    can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
   def self.search(query)

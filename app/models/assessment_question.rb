@@ -24,7 +24,6 @@ class AssessmentQuestion < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :assessment_question_bank, :touch => true
   simply_versioned :automatic => false
-  adheres_to_policy
   acts_as_list :scope => :assessment_question_bank_id
   before_save :infer_defaults
   after_save :translate_links_if_changed
@@ -41,7 +40,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   set_policy do
     given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
-    set { can :read and can :create and can :update and can :delete }
+    can :read and can :create and can :update and can :delete
   end
   
   def infer_defaults

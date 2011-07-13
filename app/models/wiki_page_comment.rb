@@ -21,7 +21,6 @@ class WikiPageComment < ActiveRecord::Base
   belongs_to :user
   belongs_to :wiki_page
   belongs_to :context, :polymorphic => true
-  adheres_to_policy
   after_create :update_wiki_page_comments_count
 
   attr_accessible :comments, :user_name
@@ -51,16 +50,16 @@ class WikiPageComment < ActiveRecord::Base
   
   set_policy do
     given{|user, session| self.cached_context_grants_right?(user, session, :manage_wiki) }
-    set{ can :read and can :delete }
+    can :read and can :delete
     
     given{|user, session| self.cached_context_grants_right?(user, session, :read) }
-    set{ can :read }
+    can :read
     
     given{|user, session| user && self.user_id == user.id }
-    set{ can :delete }
+    can :delete
     
     given{|user, session| self.wiki_page.grants_right?(user, session, :read) }
-    set{ can :read }
+    can :read
   end
   
   named_scope :active, lambda{

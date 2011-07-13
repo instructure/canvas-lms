@@ -167,7 +167,6 @@ class User < ActiveRecord::Base
     }
   }
 
-  adheres_to_policy
   has_a_broadcast_policy
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
@@ -690,10 +689,10 @@ class User < ActiveRecord::Base
   
   set_policy do
     given { |user| user == self }
-    set { can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :become_user }
+    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :become_user
 
     given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
-    set { can :rename and can :create_user_notes and can :read_user_notes}
+    can :rename and can :create_user_notes and can :read_user_notes
     
     given do |user|
       user && (
@@ -701,7 +700,7 @@ class User < ActiveRecord::Base
         self.all_courses.any? { |c| c.grants_right?(user, nil, :read_reports) }
       )
     end
-    set { can :rename and can :remove_avatar and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes}
+    can :rename and can :remove_avatar and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
     
     given do |user|
       user && (
@@ -709,7 +708,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_students) })
       )
     end
-    set { can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes}
+    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
     
     given do |user|
       user && (
@@ -717,7 +716,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) })
       )
     end
-    set { can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes}
+    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
 
     given do |user|
       user && ((
@@ -737,7 +736,7 @@ class User < ActiveRecord::Base
         self.associated_accounts.empty? && Account.site_admin.grants_right?(user, nil, :become_user)
       ))
     end
-    set { can :become_user }
+    can :become_user
   end
 
   def self.infer_id(obj)

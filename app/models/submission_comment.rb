@@ -56,8 +56,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   
   has_a_broadcast_policy
-  adheres_to_policy
-  
+
   on_create_send_to_inboxes do
     if self.submission
       users = []
@@ -93,13 +92,13 @@ class SubmissionComment < ActiveRecord::Base
 
   set_policy do
     given {|user,session| !self.teacher_only_comment && self.submission.grants_right?(user, session, :read_grade) }
-    set {can :read}
+    can :read
     
     given {|user| self.author == user}
-    set {can :read and can :delete}
+    can :read and can :delete
     
     given {|user, session| self.submission.grants_right?(user, session, :grade) }
-    set {can :read and can :delete}
+    can :read and can :delete
   end
   
   set_broadcast_policy do |p|

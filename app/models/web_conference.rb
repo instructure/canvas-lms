@@ -30,7 +30,6 @@ class WebConference < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :conference_type, :title
   
-  adheres_to_policy
   before_validation :infer_conference_details
 
   before_create :assign_uuid
@@ -343,25 +342,25 @@ class WebConference < ActiveRecord::Base
   
   set_policy do
     given { |user, session| self.users.include?(user) && self.cached_context_grants_right?(user, session, :read) }
-    set { can :read and can :join }
+    can :read and can :join
     
     given { |user, session| (self.is_public rescue false) }
-    set { can :read and can :join }
+    can :read and can :join
     
     given { |user, session| self.cached_context_grants_right?(user, session, :create_conferences) }
-    set { can :create }
+    can :create
     
     given { |user, session| user && user.id == self.user_id && self.cached_context_grants_right?(user, session, :create_conferences) }
-    set { can :initiate }
+    can :initiate
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_content) }
-    set { can :read and can :join and can :initiate and can :create and can :delete }
+    can :read and can :join and can :initiate and can :create and can :delete
     
     given { |user, session| cached_context_grants_right?(user, session, :manage_content) && !finished? }
-    set { can :update }
+    can :update
     
     given { |user, session| cached_context_grants_right?(user, session, :manage_content) && long_running? && active? }
-    set { can :close }
+    can :close
   end
   
   def config

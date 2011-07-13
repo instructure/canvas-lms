@@ -37,7 +37,6 @@ class Quiz < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
-  adheres_to_policy
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
@@ -1183,22 +1182,22 @@ class Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#admins.include? user }
-    set { can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit }
+    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#admins.include? user }
-    set { can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade }
+    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade
     
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
-    set { can :submit }
+    can :submit
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
-    set { can :read }
+    can :read
 
     given { |user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
-    set { can :read_statistics and can :review_grades }
+    can :read_statistics and can :review_grades
 
     given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }
-    set { can :read and can :submit }
+    can :read and can :submit
   end
   named_scope :include_assignment, lambda{
     { :include => :assignment }

@@ -32,8 +32,7 @@ class QuizSubmission < ActiveRecord::Base
   serialize :quiz_data
   serialize :submission_data
 
-  adheres_to_policy
-  
+
   simply_versioned :automatic => false
 
   workflow do
@@ -55,19 +54,19 @@ class QuizSubmission < ActiveRecord::Base
   
   set_policy do
     given {|user| user && user.id == self.user_id }
-    set { can :read }
+    can :read
     
     given {|user| user && user.id == self.user_id && self.untaken? }
-    set { can :update }
+    can :update
     
     given {|user, session| self.quiz.grants_right?(user, session, :manage) || self.quiz.grants_right?(user, session, :review_grades) }
-    set { can :read }
+    can :read
     
     given {|user, session| self.quiz.grants_right?(user, session, :manage) }
-    set { can :update_scores }
+    can :update_scores
     
     given {|user, session| self.quiz.grants_right?(user, session, :manage) }
-    set { can :add_attempts }
+    can :add_attempts
   end
   
   def sanitize_responses

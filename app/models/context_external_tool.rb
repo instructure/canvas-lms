@@ -8,8 +8,7 @@ class ContextExternalTool < ActiveRecord::Base
   validates_presence_of :shared_secret
   
   before_save :infer_defaults
-  adheres_to_policy
-  
+
   workflow do
     state :anonymous
     state :name_only
@@ -19,7 +18,7 @@ class ContextExternalTool < ActiveRecord::Base
   
   set_policy do 
     given { |user, session| self.cached_context_grants_right?(user, session, :update) }
-    set { can :read and can :update and can :delete }
+    can :read and can :update and can :delete
   end
   
   def settings

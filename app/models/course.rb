@@ -18,8 +18,7 @@
 
 class Course < ActiveRecord::Base
   
-  adheres_to_policy
-  
+
   include Context
   include Workflow
   include EnrollmentDateRestrictions
@@ -745,54 +744,54 @@ class Course < ActiveRecord::Base
     # confidential information, and shouldn't be taken to things like the dashboard view.
     # "read_full" implies access to the dashboard and course roster.
     given { |user| self.available? && self.is_public }
-    set { can :read }
+    can :read
     
     RoleOverride.permissions.each do |permission, params|
       given {|user, session| self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission) }
-      set { can permission }
+      can permission
     end
     
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && hash[:enrollment_state] == "invited" }
-    set { can :read }
+    can :read
     
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && hash[:enrollment_state] == "active" && hash[:user_state] == "pre_registered" }
-    set { can :read }
+    can :read
     
     given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && !e.rejected? && !e.deleted? } }
-    set { can :read }
+    can :read
     
     given { |user| self.available? && user &&  user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
-    set { can :read and can :participate_as_student and can :read_grades and can :read_groups }
+    can :read and can :participate_as_student and can :read_grades and can :read_groups
 
     given { |user| self.completed? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
-    set { can :read and can :read_groups }
+    can :read and can :read_groups
     
     given { |user| (self.available? || self.completed?) && user &&  user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? } }
-    set { can :read }
+    can :read
     
     given { |user| (self.available? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? && e.associated_user_id} }
-    set { can :read_grades }
+    can :read_grades
      
     given { |user, session| self.available? && self.teacherless? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } && (!session || !session["role_course_#{self.id}"]) }
-    set { can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p } }
+    can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
     
     given { |user, session| (self.available? || self.created? || self.claimed? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    set { can :read and can :manage and can :manage_content and can :impersonate_as_context_member and can :update and can :delete and can :read_reports and can :read_groups and can :create_user_notes and can :read_user_notes and can :delete_user_notes }
+    can :read and can :manage and can :manage_content and can :impersonate_as_context_member and can :update and can :delete and can :read_reports and can :read_groups and can :create_user_notes and can :read_user_notes and can :delete_user_notes
     
     given { |user| !self.deleted? && self.prior_enrollments.map(&:user_id).include?(user && user.id) }
-    set { can :read}
+    can :read
     
     given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user && user.id) }
-    set { can :read_as_admin and can :read_user_notes and can :read_roster }
+    can :read_as_admin and can :read_user_notes and can :read_roster
     
     given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user && user.id) }
-    set { can :read and can :read_grades}
+    can :read and can :read_grades
     
     given { |user, session| session && session["role_course_#{self.id}"] }
-    set { can :read }
+    can :read
     
     given { |user, session| user && account.grants_right?(user, session, :manage) && (!session || !session["role_course_#{self.id}"]) rescue false }
-    set { can :update and can :manage and can :manage_content and can :impersonate_as_context_member and can :delete and can :create and can :read and can :read_groups }
+    can :update and can :manage and can :manage_content and can :impersonate_as_context_member and can :delete and can :create and can :read and can :read_groups
   end
   
   def enrollment_allows(user, session, permission)

@@ -1,21 +1,3 @@
-AdheresToPolicy
-===============
-
-This allows us to do something like:
-
-class Account < ActiveRecord::Base
-  adheres_to_policy
-  
-  set_policy do
-    given { |u| self.user == u }
-    set { can :read and can :write and cannot :destroy and cannot :update }
-  end
-end
-
-u = User.find(:first)
-a = Account.find(:first)
-a.check_policy(u)
-
 License
 =======
 
