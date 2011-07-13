@@ -153,8 +153,28 @@ jQuery(function($) {
   $("#switched_role_type").ifExists(function(){
     var context_class = $(this).attr('class');
     var $img = $("<img/>");
+    var role = null;
+    switch ($(this).data('role')) {
+      case 'TeacherEnrollment':
+        role = 'teacher';
+        break;
+      case 'StudentEnrollment':
+        role = 'student';
+        break;
+      case 'TaEnrollment':
+        role = 'TA';
+        break;
+      case 'ObserverEnrollment':
+        role = 'observer';
+        break;
+      case 'DesignerEnrollment':
+        role = 'designer';
+        break;
+      default:
+        role = 'student';
+    };
     $img.attr('src', '/images/warning.png')
-      .attr('title', "You have switched roles temporarily for this course, and are now viewing the course as a " + $(this).text().toLowerCase() + ".  You can restore your role and permissions from the course home page.")
+      .attr('title', "You have switched roles temporarily for this course, and are now viewing the course as a " + role + ".  You can restore your role and permissions from the course home page.")
       .css({
         paddingRight: 2,
         width: 12,
