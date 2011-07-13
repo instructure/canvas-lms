@@ -245,6 +245,7 @@ I18n.scoped('instructure', function(I18n) {
             url: action,
             body: params.body,
             content_type: params.content_type,
+            form_data: params.form_data,
             method: method,
             success: function(data) {
               if(options.success && $.isFunction(options.success)) {
@@ -389,7 +390,7 @@ I18n.scoped('instructure', function(I18n) {
     return this;
   };
   
-  $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest && (new XMLHttpRequest()).sendAsBinary);
+  $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest);
   if($.handlesHTML5Files) {
     $("input[type='file']").live('change', function(event) {
       var file_list = this.files;
@@ -408,6 +409,7 @@ I18n.scoped('instructure', function(I18n) {
         url: options.url,
         body: params.body,
         content_type: params.content_type,
+        form_data: params.form_data,
         method: options.method,
         success: function(data) {
           if(options.success && $.isFunction(options.success)) {
@@ -488,18 +490,24 @@ I18n.scoped('instructure', function(I18n) {
       };
     }
     xhr.open(method, url);
-    xhr.overrideMimeType(options.content_type || "multipart/form-data");
-    xhr.setRequestHeader('Content-Type', options.content_type || "multipart/form-data");
-    xhr.setRequestHeader('Content-Length', body.length);
     xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*');
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    if(not_binary) {
-      xhr.send(body);
+    if(options.form_data) {
+      xhr.send(options.form_data);
     } else {
-      if(!xhr.sendAsBinary) {
-        console.log('xhr.sendAsBinary not supported');
+      xhr.overrideMimeType(options.content_type || "multipart/form-data");
+      
+      xhr.setRequestHeader('Content-Type', options.content_type || "multipart/form-data");
+      xhr.setRequestHeader('Content-Length', body.length);
+      if(not_binary) {
+        xhr.send(body);
+      } else {
+        if(!xhr.sendAsBinary) {
+          console.log('xhr.sendAsBinary not supported');
+        } else {
+          xhr.sendAsBinary(body);
+        }
       }
-      xhr.sendAsBinary(body);
     }
   };
   
@@ -520,6 +528,19 @@ I18n.scoped('instructure', function(I18n) {
     
     for(var idx in params) {
       paramsList.push([idx, params[idx]]);
+    }
+    if(window.FormData) {
+      var fd = new FormData();
+      for(var idx in params) {
+        var param = params[idx];
+        if(window.FileList && (param instanceof FileList)) {
+          param = param[0];
+        }
+        fd.append(idx, param);
+      }
+      result.form_data = fd;
+      callback(result);
+      return;
     }
     function sanitizeQuotedString(text) {
       return text.replace(/\"/g, "");
