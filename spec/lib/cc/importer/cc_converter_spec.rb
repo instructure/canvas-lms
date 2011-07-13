@@ -578,7 +578,7 @@ describe "Common Cartridge importing" do
   
   it "should import assignment discussion topic" do
     body_with_link = "<p>What do you think about the <a href=\"/courses/%s/grades\">grades?</a>?</p>"
-    dt = @copy_from.announcements.new
+    dt = @copy_from.discussion_topics.new
     dt.title = "Topic"
     dt.message = body_with_link % @copy_from.id
     dt.posted_at = 1.day.ago
@@ -607,6 +607,12 @@ describe "Common Cartridge importing" do
     meta_doc = Nokogiri::XML(canvas_topic_builder.target!)
     hash = @converter.convert_topic(cc_doc, meta_doc)
     hash = hash.with_indifferent_access
+    #have assignment group ready:
+    @copy_to.assignment_groups.find_or_create_by_name("Distractor")
+    ag1 = @copy_to.assignment_groups.new
+    ag1.name = "Stupid Group"
+    ag1.migration_id = CC::CCHelper.create_key(assignment.assignment_group)
+    ag1.save!
     #import
     DiscussionTopic.import_from_migration(hash, @copy_to)
     
@@ -621,6 +627,7 @@ describe "Common Cartridge importing" do
     a.due_at.to_i.should == assignment.due_at.to_i
     a.points_possible.should == assignment.points_possible
     a.discussion_topic.should == dt_2
+    a.assignment_group.id.should == ag1.id
   end
   
   it "should import calendar events" do
@@ -665,6 +672,60 @@ describe "Common Cartridge importing" do
     cal2_2.start_at.to_i.should == cal2.start_at.to_i
     cal2_2.end_at.to_i.should == cal2.end_at.to_i
     cal2_2.description.should == ''
+  end
+  
+  it "should import quizzes into correct assignment group" do
+    quiz_hash = {"lock_at"=>nil,
+                 "questions"=>[],
+                 "title"=>"Assignment Quiz",
+                 "available"=>true,
+                 "assignment"=>
+                         {"position"=>2,
+                          "rubric_migration_id"=>nil,
+                          "title"=>"Assignment Quiz",
+                          "grading_standard_migration_id"=>nil,
+                          "migration_id"=>"i0c012cbae54b972138520466e557f5e4",
+                          "quiz_migration_id"=>"ie3d8f8adfad423eb225229c539cdc450",
+                          "points_possible"=>0,
+                          "all_day_date"=>1305698400000,
+                          "peer_reviews_assigned"=>false,
+                          "submission_types"=>"online_quiz",
+                          "peer_review_count"=>0,
+                          "assignment_group_migration_id"=>"i713e960ab2685259505efeb08cd48a1d",
+                          "automatic_peer_reviews"=>false,
+                          "grading_type"=>"points",
+                          "due_at"=>1305805680000,
+                          "peer_reviews"=>false,
+                          "all_day"=>false},
+                 "migration_id"=>"ie3d8f8adfad423eb225229c539cdc450",
+                 "question_count"=>19,
+                 "scoring_policy"=>"keep_highest",
+                 "shuffle_answers"=>true,
+                 "quiz_name"=>"Assignment Quiz",
+                 "unlock_at"=>nil,
+                 "quiz_type"=>"assignment",
+                 "points_possible"=>0,
+                 "description"=>"",
+                 "assignment_group_migration_id"=>"i713e960ab2685259505efeb08cd48a1d",
+                 "time_limit"=>nil,
+                 "allowed_attempts"=>-1,
+                 "due_at"=>1305805680000,
+                 "could_be_locked"=>true,
+                 "anonymous_submissions"=>false,
+                 "show_correct_answers"=>true}
+    
+    #have assignment group ready:
+    @copy_to.assignment_groups.find_or_create_by_name("Distractor")
+    ag = @copy_to.assignment_groups.new
+    ag.name = "Stupid Group"
+    ag.migration_id = "i713e960ab2685259505efeb08cd48a1d"
+    ag.save!
+    
+    Quiz.import_from_migration(quiz_hash, @copy_to, {})
+    q = @copy_to.quizzes.find_by_migration_id("ie3d8f8adfad423eb225229c539cdc450")
+    a = @copy_to.assignments.find_by_migration_id("i0c012cbae54b972138520466e557f5e4")
+    a.assignment_group.id.should == ag.id
+    q.assignment_group_id.should == ag.id
   end
 
 end

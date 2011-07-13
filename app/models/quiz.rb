@@ -1153,7 +1153,8 @@ class Quiz < ActiveRecord::Base
         end
       end
     end
-
+    item.reload # reload to catch question additions
+    
     if hash[:assignment] && hash[:available]
       assignment = Assignment.import_from_migration(hash[:assignment], context)
       item.assignment = assignment
@@ -1172,7 +1173,6 @@ class Quiz < ActiveRecord::Base
       end
     end
 
-    item.reload
     item.save
 
     context.imported_migration_items << item if context.imported_migration_items
