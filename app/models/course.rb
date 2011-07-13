@@ -1546,7 +1546,7 @@ class Course < ActiveRecord::Base
     failed_uploads, mo_attachments = mo_attachments.partition { |a| a.media_object.nil? }
 
     unless failed_uploads.empty?
-      migration.add_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), failed_uploads.map&(:id))
+      migration.add_warning(t('errors.import.kaltura', "There was an error importing Kaltura media objects. Some or all of your media was not imported."), failed_uploads.map(&:id).join(','))
     end
 
     to_remove = mo_attachments.find_all { |a| a.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/') }
