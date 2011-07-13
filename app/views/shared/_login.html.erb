@@ -84,7 +84,7 @@ $(document).ready(function() {
           <input type="hidden" name="redirect_to_ssl" value="1"/>
           <div>
             <span class=" field-with-fancyplaceholder"><%= f.label :unique_id, login_handle_name %><%= f.text_field :unique_id, :class => "text", :value => (@unauthorized_user.email rescue '') %></span>
-            <span class=" field-with-fancyplaceholder"><%= f.label :password, "Password" %><%= f.password_field :password, :class => "text" %></span>
+            <span class=" field-with-fancyplaceholder"><%= f.label :password, :en => "Password" %><%= f.password_field :password, :class => "text" %></span>
           </div>
           <div>
             <div style="float: left;">

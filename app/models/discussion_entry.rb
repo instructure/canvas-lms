@@ -66,7 +66,7 @@ class DiscussionEntry < ActiveRecord::Base
       if user_id && user_id != self.user_id
         {
           :recipients => user_id,
-          :subject => t("#email_reply_subject", "Re: %{subject}", :subject => self.discussion_topic.title),
+          :subject => t("#subject_reply_to", "Re: %{subject}", :subject => self.discussion_topic.title),
           :html_body => self.message,
           :sender => self.user_id
         }
@@ -228,7 +228,7 @@ class DiscussionEntry < ActiveRecord::Base
       subject = [self.discussion_topic.title]
       subject << self.discussion_topic.context.name if opts[:include_context]
       if parent_id != 0
-        entry.title = t "#email_reply_subject", "Re: %{subject}", :subject => subject.to_sentence
+        entry.title = t "#subject_reply_to", "Re: %{subject}", :subject => subject.to_sentence
       else
         entry.title = subject.to_sentence
       end
