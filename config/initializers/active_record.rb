@@ -179,17 +179,23 @@ class ActiveRecord::Base
   # Example: 
   # obj.to_json(:permissions => {:user => u, :policies => [:read, :write, :update]})
   def as_json(options = nil)
-    options ||= {}
+    options = options.try(:dup) || {}
 
-    self.set_serialization_options rescue nil
-    options[:except] = [options[:except]] 
-    options[:methods] = [options[:methods]]
+    self.set_serialization_options if self.respond_to?(:set_serialization_options)
 
-    options[:except] = (options[:except] + ([self.class.serialization_excludes] rescue []) + [@serialization_excludes]).flatten.compact
-    options[:methods] = (options[:methods] + ([self.class.serialization_methods] rescue []) + [@serialization_methods]).flatten.compact
+    except = options.delete(:except) || []
+    except = Array(except)
+    except.concat(self.class.serialization_excludes) if self.class.respond_to?(:serialization_excludes)
+    except.concat(@serialization_excludes) if @serialization_excludes
+    except.uniq!
+    methods = options.delete(:methods) || []
+    methods = Array(methods)
+    methods.concat(self.class.serialization_methods) if self.class.respond_to?(:serialization_methods)
+    methods.concat(@serialization_methods) if @serialization_methods
+    methods.uniq!
 
-    options.delete :except if options[:except].empty?
-    options.delete :methods if options[:methods].empty?
+    options[:except] = except unless except.empty?
+    options[:methods] = methods unless methods.empty?
 
     # We include a root in all the association json objects (if it's a
     # collection), which is different than the rails behavior of just including
@@ -213,7 +219,7 @@ class ActiveRecord::Base
       end
     end
 
-    self.revert_from_serialization_options rescue nil
+    self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)
 
     hash
   end
