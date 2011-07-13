@@ -1,3 +1,11 @@
+canvas-lms (1.1-42) professional; urgency=low
+
+  * [+b3ac332] remove whitespace from en defaults (only for non-mt translate calls in html views)
+  * [+92cb9c2] various i18n fixes/deduplication
+  * [+52b5e96] Revert "fix and localize $.parseFromISO, other date stuff"
+
+ -- JT Olds <jt@instructure.com>  Wed, 13 Jul 2011 10:55:54 -0600
+
 canvas-lms (1.1-41) professional; urgency=low
 
   * [+85cdb69] fix displaying rubric totals
