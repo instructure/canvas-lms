@@ -938,7 +938,7 @@ I18n.scoped('gradebook', function(I18n) {
     },
 
     updateStatsInHeader: function(){
-      $x_of_x_students.html( $.ordinalize(EG.currentIndex() + 1) );
+      $x_of_x_students.html( EG.currentIndex() + 1 );
 
       var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s){
         return (s.submission && s.submission.workflow_state === 'graded');

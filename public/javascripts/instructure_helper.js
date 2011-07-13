@@ -2848,19 +2848,6 @@
       results.push(property);
     return results;
   };
-
-  $.ordinalize = function(number) {
-    if (11 <= parseInt(number, 10) % 100 && parseInt(number, 10) % 100 <= 13) {
-      return number + "th";
-    } else {
-      switch (parseInt(number, 10) % 10) {
-        case  1: return number + "st";
-        case  2: return number + "nd";
-        case  3: return number + "rd";
-        default: return number + "th";
-      }
-    }
-  };
   
   $.fn.hasScrollbar = function(){
     return this.length && (this[0].clientHeight < this[0].scrollHeight);
