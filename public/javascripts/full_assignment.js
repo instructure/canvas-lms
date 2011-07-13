@@ -277,9 +277,10 @@ jQuery(function($){
     event.preventDefault();
     if (!$(this).parents(".rubric").hasClass('editing')) {
       var data = $(this).parents(".criterion").getTemplateData({textValues: ['long_description', 'description']}),
+          is_learning_outcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion"),
           $dialog = $("#rubric_long_description_dialog");
       
-      $dialog.fillTemplateData({data: data});
+      $dialog.fillTemplateData({data: data, htmlValues: ( is_learning_outcome ? ['long_description'] : [] )});
       $dialog.find(".editing").hide();
       $dialog.find(".displaying").show();
       $dialog.dialog('close').dialog({
