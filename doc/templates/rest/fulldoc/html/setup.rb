@@ -37,8 +37,6 @@ def init
   serialize_index
   serialize_static_pages
 
-  raise("TODO: add support for extra files") unless options[:files].empty?
-
   options.delete(:objects)
 
   options[:resources].each do |resource, controllers|
@@ -63,7 +61,6 @@ def serialize_resource(resource, controllers)
 end
 
 def serialize_index
-  puts "README: #{options[:readme]}"
   options[:file] = options[:readme]
   serialize('index.html')
   options.delete(:file)
@@ -80,7 +77,7 @@ def generate_assets
 end
 
 def serialize_static_pages
-  %w( basics.md ).each do |file|
+  %w( basics.md oauth.md ).each do |file|
     options[:file] = "doc/templates/rest/#{file}"
     serialize(file.sub(/\..*$/, '.html'))
     options.delete(:file)
