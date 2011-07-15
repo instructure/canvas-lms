@@ -373,6 +373,16 @@ describe "Common Cartridge importing" do
     att_2.save
     mod4.add_item({:title => att.display_name, :type => "attachment", :id => att.id})
     
+    # create @copy_to module link with different name than attachment
+    att_3 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+    att_3.migration_id = CC::CCHelper.create_key(att_3)
+    att_3.save
+    mod4.add_item({:title => "test answers", :type => "attachment", :id => att_3.id})
+    
+    att_3_2 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to)
+    att_3_2.migration_id = CC::CCHelper.create_key(att_3)
+    att_3_2.save
+    
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
     @resource.create_module_meta(builder)
@@ -417,6 +427,11 @@ describe "Common Cartridge importing" do
     mod4_2.content_tags.first.title.should == att.display_name
     att_2.reload
     att_2.display_name.should == att.display_name
+    
+    mod4_2.content_tags.count.should == 2
+    tag = mod4_2.content_tags.last
+    tag.content_type.should == "Attachment"
+    tag.content_id.should == att_3_2.id
   end
 
   it "should translate attachment links on import" do

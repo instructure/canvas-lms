@@ -229,22 +229,22 @@ class ContextModule < ActiveRecord::Base
     write_attribute(:completion_requirements, val)
   end
 
-  def add_item(params, added_item=nil)
+  def add_item(params, added_item=nil, opts={})
     association_id = nil
     position = (self.content_tags.active.map(&:position).compact.max || 0) + 1
     if params[:type] == "wiki_page"
-      item = WikiPage.find(params[:id]) rescue nil
+      item = opts[:wiki_page] || WikiPage.find_by_id(params[:id])
       item_namespace = item.wiki.wiki_namespaces.find_by_context_id_and_context_type(self.context_id, self.context_type)
       item = nil unless item && item_namespace
       association_id = item_namespace.id rescue nil
     elsif params[:type] == "attachment"
-      item = self.context.attachments.active.find(params[:id]) rescue nil
+      item = opts[:attachment] || self.context.attachments.active.find_by_id(params[:id])
     elsif params[:type] == "assignment"
-      item = self.context.assignments.active.find(params[:id]) rescue nil
+      item = opts[:assignment] || self.context.assignments.active.find_by_id(params[:id])
     elsif params[:type] == "discussion_topic"
-      item = self.context.discussion_topics.active.find(params[:id]) rescue nil
+      item = opts[:discussion_topic] || self.context.discussion_topics.active.find_by_id(params[:id])
     elsif params[:type] == "quiz"
-      item = self.context.quizzes.active.find(params[:id]) rescue nil
+      item = opts[:quiz] || self.context.quizzes.active.find_by_id(params[:id])
     end
     if params[:type] == 'external_url'
       title = params[:title]
@@ -728,7 +728,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'wiki_page',
           :id => wiki.id,
           :indent => hash[:indent].to_i
-        }, existing_item)
+        }, existing_item, :wiki_page => wiki)
       end
     elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
       # this is a file of some kind
@@ -744,7 +744,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'attachment',
           :id => file.id,
           :indent => hash[:indent].to_i
-        }, existing_item)
+        }, existing_item, :attachment => file)
       end
     elsif hash[:linked_resource_type] =~ /assignment|project/i
       # this is a file of some kind
@@ -755,7 +755,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'assignment',
           :id => ass.id,
           :indent => hash[:indent].to_i
-        }, existing_item)
+        }, existing_item, :assignment => ass)
       end
     elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
       # just a snippet of text
@@ -792,7 +792,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'quiz',
           :indent => hash[:indent].to_i,
           :id => quiz.id
-        }, existing_item)
+        }, existing_item, :quiz => quiz)
       end
     elsif hash[:linked_resource_type] =~ /discussion|topic/i
       topic = self.context.discussion_topics.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
@@ -802,7 +802,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'discussion_topic',
           :indent => hash[:indent].to_i,
           :id => topic.id
-        }, existing_item)
+        }, existing_item, :discussion_topic => topic)
       end
     elsif hash[:linked_resource_type] == 'UNSUPPORTED_TYPE'
       # We know what this is and that we don't support it
