@@ -380,12 +380,12 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
     placeholder_mismatches = {}
     markdown_mismatches = {}
     new_translations.keys.each do |key|
-      p1 = placeholders(source_translations[key])
-      p2 = placeholders(new_translations[key])
+      p1 = placeholders(source_translations[key].to_s)
+      p2 = placeholders(new_translations[key].to_s)
       placeholder_mismatches[key] = [p1, p2] if p1 != p2
 
-      m1 = markdown_and_wrappers(source_translations[key])
-      m2 = markdown_and_wrappers(new_translations[key])
+      m1 = markdown_and_wrappers(source_translations[key].to_s)
+      m2 = markdown_and_wrappers(new_translations[key].to_s)
       markdown_mismatches[key] = [m1, m2] if m1 != m2
     end
 
