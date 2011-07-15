@@ -275,4 +275,12 @@ Spec::Runner.configure do |config|
     importer.warnings.should == []
   end
 
+  def enable_cache
+    old_cache = RAILS_CACHE
+    silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
+    yield
+  ensure
+    silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
+  end
+
 end

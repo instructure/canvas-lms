@@ -64,9 +64,7 @@ class PseudonymSessionsController < ApplicationController
             session[:cas_login] = true
             @user = @pseudonym.login_assertions_for_user rescue nil
 
-            flash[:notice] = t 'notices.login_success', "Login successful."
-            default_url = dashboard_url
-            redirect_back_or_default default_url
+            successful_login(@user, @pseudonym)
             return
           else
             logger.warn "Received CAS login for unknown user: #{st.response.user}"
@@ -92,7 +90,7 @@ class PseudonymSessionsController < ApplicationController
 
   def create
     # reset the session id cookie to prevent session fixation.
-    reset_session_saving_keys(:return_to)
+    reset_session_for_login
 
     # Try to use authlogic's built-in login approach first
     @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session])
@@ -140,24 +138,12 @@ class PseudonymSessionsController < ApplicationController
       end
     end
 
-    respond_to do |format|
-      # If the user is registered and logged in, redirect them to their dashboard page
-      if @user && @user.registered? && found
-
-        flash[:notice] = t 'notices.login_success', "Login successful."
-        if session[:course_uuid] && @user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
-          claim_session_course(course, @user)
-          format.html { redirect_to(course_url(course, :login_success => '1')) }
-        else
-          # the URL to redirect back to is stored in the session, so it's
-          # assumed that if that URL is found rather than using the default,
-          # they must have cookies enabled and we don't need to worry about
-          # adding the :login_success param to it.
-          format.html { redirect_back_or_default(dashboard_url(:login_success => '1')) }
-        end
-        format.json { render :json => @pseudonym.to_json(:methods => :user_code), :status => :ok }
-      # Otherwise re-render the login page to show the error
-      else
+    # If the user is registered and logged in, redirect them to their dashboard page
+    if @user && @user.registered? && found
+      successful_login(@user, @pseudonym)
+    # Otherwise re-render the login page to show the error
+    else
+      respond_to do |format|
         flash[:error] = t 'errors.invalid_credentials', "Incorrect username and/or password"
         @errored = true
         if @user && @user.creation_pending?
@@ -232,7 +218,7 @@ class PseudonymSessionsController < ApplicationController
             # We have to reset the session again here -- it's possible to do a
             # SAML login without hitting the #new action, depending on the
             # school's setup.
-            reset_session
+            reset_session_for_login
             #Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
             @user = @pseudonym.login_assertions_for_user rescue nil
@@ -241,9 +227,7 @@ class PseudonymSessionsController < ApplicationController
             session[:name_qualifier] = response.name_qualifier
             session[:session_index] = response.session_index
 
-            flash[:notice] = t 'notices.login_success', "Login successful."
-            default_url = dashboard_url
-            redirect_back_or_default default_url 
+            successful_login(@user, @pseudonym)
           else
             logger.warn "Received SAML login request for unknown user: #{response.name_id}"
             # the saml message has to survive a couple redirects
@@ -306,5 +290,85 @@ class PseudonymSessionsController < ApplicationController
       return redirect_to dashboard_url(:host => HostUrl.default_host)
     end
     true
+  end
+
+  def successful_login(user, pseudonym)
+    respond_to do |format|
+      flash[:notice] = t 'notices.login_success', "Login successful."
+      if session[:oauth2]
+        # this is where we will verify client authorization and scopes, once implemented
+        # .....
+        # now generate the temporary code, and respond/redirect
+        # (right now we don't support redirect, just oob response using a canvas url)
+        code = ActiveSupport::SecureRandom.hex(64)
+        code_data = { 'user' => user.id, 'client_id' => session[:oauth2][:client_id] }
+        Rails.cache.write("oauth2:#{code}", code_data.to_json, :expires_in => 1.day)
+        format.html { redirect_to oauth2_auth_url(:code => code) }
+      elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
+        claim_session_course(course, user)
+        format.html { redirect_to(course_url(course, :login_success => '1')) }
+      else
+        # the URL to redirect back to is stored in the session, so it's
+        # assumed that if that URL is found rather than using the default,
+        # they must have cookies enabled and we don't need to worry about
+        # adding the :login_success param to it.
+        format.html { redirect_back_or_default(dashboard_url(:login_success => '1')) }
+      end
+      format.json { render :json => pseudonym.to_json(:methods => :user_code), :status => :ok }
+    end
+  end
+
+  OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
+
+  def oauth2_auth
+    if session[:oauth2] && params[:code]
+      # hopefully the user never sees this, since it's an oob response and the
+      # browser should be closed automatically. but we'll at least display
+      # something basic.
+      reset_session
+      return render()
+    end
+
+    # for now, this is the only allowed redirect_uri
+    redirect_uri = params[:redirect_uri].presence || OAUTH2_OOB_URI
+    unless redirect_uri == OAUTH2_OOB_URI
+      return render(:status => 400, :json => { :message => "invalid redirect_uri" })
+    end
+
+    key = DeveloperKey.find_by_id(params[:client_id]) if params[:client_id].present?
+    unless key
+      return render(:status => 400, :json => { :message => "invalid client_id" })
+    end
+
+    session[:oauth2] = { :client_id => key.id, :redirect_uri => redirect_uri }
+    # force the user to re-authenticate
+    redirect_to login_url(:re_login => true)
+  end
+
+  def oauth2_token
+    basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
+
+    client_id = params[:client_id].presence || basic_user
+    key = DeveloperKey.find_by_id(client_id) if client_id.present?
+    unless key
+      return render(:status => 400, :json => { :message => "invalid client_id" })
+    end
+
+    secret = params[:client_secret].presence || basic_pass
+    unless secret == key.api_key
+      return render(:status => 400, :json => { :message => "invalid client_secret" })
+    end
+
+    code = params[:code]
+    code_data = JSON.parse(Rails.cache.read("oauth2:#{code}").presence || "{}")
+    unless code_data.present? && code_data['client_id'] == key.id
+      return render(:status => 400, :json => { :message => "invalid code" })
+    end
+
+    user = User.find(code_data['user'])
+    token = AccessToken.create!(:user => user, :developer_key => key)
+    render :json => {
+      'access_token' => token.token,
+    }
   end
 end

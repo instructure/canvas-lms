@@ -41,7 +41,7 @@ describe PseudonymSessionsController do
 
       controller.request.env['canvas.domain_root_account'] = account1
       get 'saml_consume', :SAMLResponse => "foo"
-      response.should redirect_to(dashboard_url)
+      response.should redirect_to(dashboard_url(:login_success => 1))
       session[:name_id].should == unique_id
       session[:pseudonym_credentials_id].should == user1.pseudonyms.first.id
 
@@ -50,7 +50,7 @@ describe PseudonymSessionsController do
 
       controller.request.env['canvas.domain_root_account'] = account2
       get 'saml_consume', :SAMLResponse => "bar"
-      response.should redirect_to(dashboard_url)
+      response.should redirect_to(dashboard_url(:login_success => 1))
       session[:name_id].should == unique_id
       session[:pseudonym_credentials_id].should == user2.pseudonyms.first.id
 
@@ -82,7 +82,7 @@ describe PseudonymSessionsController do
 
       controller.request.env['canvas.domain_root_account'] = account1
       get 'new', :ticket => 'ST-abcd'
-      response.should redirect_to(dashboard_url)
+      response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_login].should == true
       session[:pseudonym_credentials_id].should == user1.pseudonyms.first.id
 
@@ -91,7 +91,7 @@ describe PseudonymSessionsController do
 
       controller.request.env['canvas.domain_root_account'] = account2
       get 'new', :ticket => 'ST-efgh'
-      response.should redirect_to(dashboard_url)
+      response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_login].should == true
       session[:pseudonym_credentials_id].should == user2.pseudonyms.first.id
     end
@@ -108,7 +108,7 @@ describe PseudonymSessionsController do
       }
   
       get 'new', :ticket => 'ST-abcd'
-      response.should redirect_to(dashboard_url)
+      response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_login].should == true
   
       get 'destroy'
@@ -184,7 +184,7 @@ describe PseudonymSessionsController do
       }
   
       get 'new', :ticket => 'ST-abcd'
-      response.should redirect_to(dashboard_url)
+      response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_login].should == true
     end
   end

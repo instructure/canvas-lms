@@ -207,6 +207,10 @@ module AuthenticationMethods
     session.merge!(saved)
   end
 
+  def reset_session_for_login
+    reset_session_saving_keys(:return_to, :oauth2)
+  end
+
   def initiate_delegated_login
     is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
     is_cas = @domain_root_account.cas_authentication? && is_delegated
@@ -222,7 +226,7 @@ module AuthenticationMethods
   end
 
   def initiate_cas_login(cas_client = nil)
-    reset_session_saving_keys(:return_to)
+    reset_session_for_login
     if @domain_root_account.account_authorization_config.log_in_url.present?
       session[:exit_frame] = true
       redirect_to(@domain_root_account.account_authorization_config.log_in_url)
@@ -234,7 +238,7 @@ module AuthenticationMethods
   end
 
   def initiate_saml_login
-    reset_session_saving_keys(:return_to)
+    reset_session_for_login
     settings = @domain_root_account.account_authorization_config.saml_settings
     request = Onelogin::Saml::AuthRequest.create(settings)
     redirect_to(request)

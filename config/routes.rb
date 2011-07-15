@@ -677,5 +677,8 @@ ActionController::Routing::Routes.draw do |map|
     end
   end
 
+  map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
+  map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }
+
   # See how all your routes lay out with "rake routes"
 end
