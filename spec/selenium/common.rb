@@ -322,7 +322,7 @@ shared_examples_for "all selenium tests" do
           return [window.screen.availWidth, window.screen.availHeight];
         }
       JS
-      raise("desktop dimensions (#{w}x#{h}) are too small to successfully run the selenium specs, minimum size of 1024x768 is required.") unless w >= 1024 && h >= 768
+      raise("desktop dimensions (#{w}x#{h}) are too small to successfully run the selenium specs, minimum size of 1024x760 is required.") unless w >= 1024 && h >= 760
       $check_screen_dimensions = true
     end
   end

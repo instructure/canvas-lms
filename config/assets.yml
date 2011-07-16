@@ -208,6 +208,9 @@ javascripts:
     - public/javascripts/content_exports.js
   conferences:
     - public/javascripts/conferences.js
+  teacher_activity_report:
+    - public/javascripts/jquery.tablesorter.min.js
+    - public/javascripts/compiled/teacher_activity_report.js
 
 stylesheets:
   common:
