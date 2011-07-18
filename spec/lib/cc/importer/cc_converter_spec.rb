@@ -471,6 +471,18 @@ describe "Common Cartridge importing" do
     mod2 = @copy_to.context_modules.create(:name => "some module")
     mod2.migration_id = CC::CCHelper.create_key(mod)
     mod2.save!
+    # Create files for the wiki text to reference
+    from_root = Folder.root_folders(@copy_from).first
+    from_dir = Folder.create!(:name => "sub & folder", :parent_folder => from_root, :context => @copy_from)
+    from_att = Attachment.create!(:filename => 'picture+%2B+cropped.png', :display_name => "picture + cropped.png", :uploaded_data => StringIO.new('pretend .png data'), :folder => from_dir, :context => @copy_from)
+    
+    to_root = Folder.root_folders(@copy_to).first
+    to_dir = Folder.create!(:name => "sub & folder", :parent_folder => to_root, :context => @copy_to)
+    to_att = Attachment.create!(:filename => 'picture+%2B+cropped.png', :display_name => "picture + cropped.png", :uploaded_data => StringIO.new('pretend .png data'), :folder => to_dir, :context => @copy_to)
+    to_att.migration_id = CC::CCHelper.create_key(from_att)
+    to_att.save
+    path = to_att.full_display_path.gsub('course files/', '')
+    @copy_to.attachment_path_id_lookup = {path => to_att.migration_id}
     
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
@@ -478,12 +490,12 @@ describe "Common Cartridge importing" do
       <a href=\"/courses/%s/wiki/assignments\">Assignments wiki link</a>
       <a href=\"/courses/%s/modules\">Modules</a>
       <a href=\"/courses/%s/modules/%s\">some module</a>
-      </p>
+      <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
       <div>
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
       </div>}
-    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id ])
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id ])
     @copy_from.save!
     
     #export to html file
@@ -499,7 +511,7 @@ describe "Common Cartridge importing" do
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
     page_2.url.should == page.url
-    page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id ]).gsub(/png">/, 'png" />')
+    page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png">/, 'png" />')
   end
   
   it "should import assignments" do 

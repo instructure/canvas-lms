@@ -145,13 +145,12 @@ module CCHelper
           }.each do |type, obj_class|
             if type != 'wiki' && sub_spot =~ %r{\A#{type}/(\d+)([^\s"]*)$}
               # it's pointing to a specific file or object
-              obj = obj_class.find($1) rescue nil
+              obj = obj_class.find_by_id($1)
               rest = $2
               if obj && obj.respond_to?(:grants_right?) && obj.grants_right?(user, nil, :read)
                 if type == 'files'
                   folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
-                  # attachment filenames are already url encoded
-                  new_url = "#{folder}/#{obj.filename}#{CCHelper.file_query_string(rest)}"
+                  new_url = "#{folder}/#{URI.escape(obj.display_name)}#{CCHelper.file_query_string(rest)}"
                 elsif migration_id = CCHelper.create_key(obj)
                   new_url = "#{OBJECT_TOKEN}/#{type}/#{migration_id}"
                 end
