@@ -405,10 +405,7 @@ class ApplicationController < ActionController::Base
     @quota = @context.quota if (@context.respond_to?("quota") && @context.quota)
     # TODO: remove this once values in the db have been migrated to be in bytes and not MB.
     @quota = @quota.megabytes if @quota < 1.megabyte
-    @quota_used = 0
-    @context.attachments.active.select{|a| !a.root_attachment_id }.each do |a|
-      @quota_used += a.size || 0.0
-    end
+    @quota_used = @context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
   end
   
   # Renders a quota exceeded message if the @context's quota is exceeded
