@@ -8,7 +8,7 @@ describe "assignment selenium tests" do
     
     @assignment = @course.assignments.create(:name => 'assignment with rubric')
     @outcome = @course.learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>')
-    @rubric = Rubric.new(:context => @course)
+    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [
       {
         :points => 3,
@@ -39,6 +39,7 @@ describe "assignment selenium tests" do
     
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     
+    driver.find_element(:css, "#rubrics tr.rubric_title").text.should == "My Rubric"
     driver.find_element(:css, ".criterion_description .long_description_link").click
     el = driver.find_element(:css, ".ui-dialog div.long_description").text.should == "This is awesome."
   end

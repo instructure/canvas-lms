@@ -91,7 +91,7 @@
         <%= t :points, "%{points} pts", :points => %{<span class="display_criterion_points">#{ criterion.points rescue 5 }</span>}.html_safe %><br />
       </span>
       <% if rubric && !rubric.free_form_criterion_comments %>
-        <a href="#" class="<%= 'empty' if edit_view || (assessment_rating && assessment_rating[:comments].blank?)%> no-hover criterion_comments" title="<%= t 'links.additional_comments', "Additional Comments" %>"><%= image_tag "rubric_comment.png" %></a>
+        <a href="#" class="<%= 'empty' if edit_view || (!assessment_rating || assessment_rating[:comments].blank?)%> no-hover criterion_comments" title="<%= t 'links.additional_comments', "Additional Comments" %>"><%= image_tag "rubric_comment.png" %></a>
       <% end %>
     </div>
     <div class="ignoring">
