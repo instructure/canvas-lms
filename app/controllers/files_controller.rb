@@ -57,30 +57,16 @@ class FilesController < ApplicationController
   end
   protected :check_file_access_flags
   
-  def retrieve_folders
-    Folder.root_folders(@context)
-    @all_folders = @context.active_folders_detailed.to_a
-    @folders = @all_folders.select {|f| f.grants_rights?(@current_user, session, :read)[:read] }
-    @root_folders = @all_folders.select {|f| f.parent_folder_id == nil}
-    @current_folder ||= @root_folders[0]
-  end
-  protected :retrieve_folders
-  
   def index
     if request.format == :json
       if authorized_action(@context.attachments.new, @current_user, :read)
         @current_folder = Folder.find_folder(@context, params[:folder_id])
-        get_quota
-        retrieve_folders if !@current_folder
         if !@current_folder || authorized_action(@current_folder, @current_user, :read)
           if params[:folder_id]
             if @context.grants_right?(@current_user, session, :manage_files)
               @current_attachments = @current_folder.active_file_attachments
             else
               @current_attachments = @current_folder.visible_file_attachments
-              @root_folders = @root_folders.select{|f| f.visible? } rescue []
-              @folders = @folders.select{|f| f.visible? } rescue []
-              @current_folder = @root_folders[0] if !@current_folder.visible?
             end
             @current_attachments = @current_attachments.scoped(:include => [:thumbnail, :media_object])
             render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked, :thumbnail_url], :permissions => {:user => @current_user, :session => session})

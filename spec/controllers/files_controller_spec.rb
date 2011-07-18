@@ -116,14 +116,6 @@ describe FilesController do
       assigns[:contexts][0].should eql(@course)
     end
     
-    it "should select a default folder" do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'index', :course_id => @course.id, :format => 'json'
-      response.should be_success
-      assigns[:current_folder].should_not be_nil
-      assigns[:current_folder].name.should eql("course files")
-    end
-    
     it "should return data for sub_folder if specified" do
       course_with_teacher_logged_in(:active_all => true)
       f1 = course_folder
