@@ -61,7 +61,7 @@ def serialize_resource(resource, controllers)
 end
 
 def serialize_index
-  options[:file] = options[:readme]
+  options[:file] = "doc/templates/rest/README.md"
   serialize('index.html')
   options.delete(:file)
 end
