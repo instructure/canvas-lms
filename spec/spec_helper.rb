@@ -283,4 +283,12 @@ Spec::Runner.configure do |config|
     silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
   end
 
+  # enforce forgery protection, so we can verify usage of the authenticity token
+  def enable_forgery_protection
+    ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
+    yield
+  ensure
+    ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
+  end
+
 end

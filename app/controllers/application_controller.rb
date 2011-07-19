@@ -704,12 +704,12 @@ class ApplicationController < ActionController::Base
   # we also check for the session token not being set at all here, to catch
   # those who have cookies disabled.
   def verify_authenticity_token
-    params[request_forgery_protection_token] = params[request_forgery_protection_token].gsub(" ", "+") rescue nil
-    if params[:api_key] && api_request?
-      @developer_key = DeveloperKey.find_by_api_key(params[:api_key])
-      @developer_key || raise(InvalidDeveloperAPIKey)
-    elsif protect_against_forgery? &&
+    token = params[request_forgery_protection_token].try(:gsub, " ", "+")
+    params[request_forgery_protection_token] = token if token
+
+    if    protect_against_forgery? &&
           request.method != :get &&
+          !api_request? &&
           verifiable_request_format?
       if session[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
         # the session should have the token stored by now, but doesn't? sounds
@@ -723,8 +723,10 @@ class ApplicationController < ActionController::Base
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
+  API_REQUEST_REGEX = /\A\/api\//
+
   def api_request?
-    @api_request ||= !!request.path.match(/\A\/api\//)
+    @api_request ||= !!request.path.match(API_REQUEST_REGEX)
   end
 
   def session_loaded?
