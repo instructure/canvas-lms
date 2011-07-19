@@ -1,7 +1,5 @@
 this.SubmissionCell = class SubmissionCell
 
-  tooltipTexts = {}
-
   constructor: (@opts) ->
     @init()
 
@@ -61,9 +59,7 @@ this.SubmissionCell = class SubmissionCell
     opts.submission ||= @opts.item[@opts.column.field]
     opts.assignment ||= @opts.column.object
     specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment)
-    tooltipText = $.map(specialClasses, (c)->
-      tooltipTexts[c] ?= $("#submission_tooltip_#{c}").text()
-    ).join(', ')
+    tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
 
     """
     #{ if tooltipText then '<div class="gradebook-tooltip">'+ tooltipText + '</div>' else ''}
@@ -78,6 +74,7 @@ this.SubmissionCell = class SubmissionCell
     classes.push('resubmitted') if submission.grade_matches_current_submission == false
     classes.push('late') if assignment.due_at && submission.submitted_at && (submission.submitted_at.timestamp > assignment.due_at.timestamp)
     classes.push('dropped') if submission.drop
+    classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
     classes
 
 class SubmissionCell.out_of extends SubmissionCell

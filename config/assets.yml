@@ -124,6 +124,17 @@ javascripts:
     - public/javascripts/user_lists.js
   datagrid:
     - public/javascripts/datagrid.js
+  jquery_ui_menu:
+    - public/javascripts/jquery-1.6.2.js
+    - public/javascripts/jquery.ui.core-1.9.js
+    - public/javascripts/jquery.ui.position-1.9.js
+    - public/javascripts/jquery.ui.widget-1.9.js
+    - public/javascripts/jquery.ui.menu-1.9.js
+    - public/javascripts/jquery.ui.button-1.9.js
+    - public/javascripts/jquery.ui.popup-1.9.js
+    - public/javascripts/jquery.ui.menu.inputmenu.js
+    - public/javascripts/compiled/jquery.kylemenu.js
+    - public/javascripts/jquery.ui.menu-1.9_unsetup.js
   gradebook2:
     - public/javascripts/compiled/multi_grid.js
     - public/javascripts/compiled/grade_calculator.js
@@ -214,6 +225,8 @@ stylesheets:
     - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/g_base.css
     - public/stylesheets/static/jquery-ui-theme.css
+    - public/stylesheets/compiled/jquery-ui-button.css
+    - public/stylesheets/compiled/jquery-ui-menu.css
     - public/stylesheets/static/jquery.autocomplete.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/g_util_misc.css
