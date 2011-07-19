@@ -4,12 +4,11 @@ Request/Response Basics
 Schema
 ------
 
-All API access is over HTTP and is of the form
+All API access is over HTTPS and is of the form
 
     /api/v1/<path>.json
 
 All responses are in <a href="http://www.json.org/">JSON format</a>.
-Additional response formats may be added in the future.
 
 Authentication
 --------------
@@ -17,9 +16,13 @@ Authentication
 ### Access Tokens
 
 You can use access tokens to authenticate as any user in the system.
-Currently access tokens must be created by the user and then given to
+Currently, there are two ways to get an access token:
+
+  * Tokens may be created manually by the user and then given to
 the third party for use.  Access tokens can be generated from the user's
 profile page.
+  * Tokens can be created automatically from third-party apps by
+    following the <a href="oauth.html">OAuth2</a> flow.
 
 Note that all requests will need the
 "access_token" query parameter set, not just the first request.
@@ -60,12 +63,13 @@ your user is enrolled in as a teacher:
 
 You can use HTTP Basic Auth to authenticate with any username/password
 combination. Note that all requests will need the Authentication header,
-not just the first request. Most API calls will only return data that is
-visible to the authenticated user. For example, to list the courses that
-your user is enrolled in as a teacher:
+not just the first request. All API requests using Basic Auth will need
+to include an API key (developer key) as well. Most API calls will only
+return data that is visible to the authenticated user. For example, to
+list the courses that your user is enrolled in as a teacher:
 
     $ curl -u 'YOUR_USER:YOUR_PASS' \
-      https://canvas.instructure.com/api/v1/courses.json | jsonpretty
+      https://canvas.instructure.com/api/v1/courses.json?api_key=DEVELOPER_API_KEY | jsonpretty
     [
       {
         "name": "First Course",
@@ -99,20 +103,20 @@ Canvas Cloud Edition requires all API access to be over SSL, using
 HTTPS. By default, open source installs have this requirement as well.
 Open source installs are strongly encouraged to require SSL for API
 calls, since the username and password are sent in the clear for HTTP
-Basic Auth if SSL is not used.
+Basic Auth, or the access token for oauth, if SSL is not used.
 
 Note that if you make an API call using HTTP instead of HTTPS, you will
-be redirected to HTTPS. However, at that point, the username and
-password have already been sent in clear over the internet. Please make
+be redirected to HTTPS. However, at that point, the credentials
+have already been sent in clear over the internet. Please make
 sure that you are using HTTPS.
 
 API Keys
 --------
 
-GET requests to the API can be made with any valid username/password
-combination. However, any modifying request such as a PUT, POST or
-DELETE will require a developer API key to be sent with the request
-data. Contact your Canvas LMS administrator to request an API key.
+When using HTTP Basic Auth, all requests will require a developer API
+key to be sent with the request data. Contact your Canvas LMS
+administrator to request an API key. The developer key is not required
+when using an access token.
 
 The API is a work in progress, and the web UI for managing API keys is
 still in development. If you are running your own Canvas LMS instance,
