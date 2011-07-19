@@ -32,6 +32,10 @@ MAX_SERVER_START_TIME = 60
 $server_port = nil
 $app_host_and_port = nil
 
+at_exit do
+  $selenium_driver.try(:quit)
+end
+
 module SeleniumTestsHelperMethods
   def setup_selenium
     if SELENIUM_CONFIG[:host] && SELENIUM_CONFIG[:port] && !SELENIUM_CONFIG[:host_and_port]
@@ -166,9 +170,9 @@ shared_examples_for "all selenium tests" do
   include SeleniumTestsHelperMethods
   include CustomSeleniumRspecMatchers
 
-  attr_reader :selenium_driver
+  def selenium_driver; $selenium_driver; end
   alias_method :driver, :selenium_driver
-  
+
   def login_as(username = "nobody@example.com", password = "asdfasdf")
     # log out (just in case)
     driver.navigate.to(app_host + '/logout')
@@ -304,12 +308,7 @@ shared_examples_for "all selenium tests" do
   end
 
   append_before(:all) do
-    @selenium_driver = setup_selenium
-  end
-
-  append_after(:all) do
-    @webserver_shutdown.call
-    @selenium_driver.quit
+    $selenium_driver ||= setup_selenium
   end
 
   append_before(:all) do
@@ -328,13 +327,19 @@ end
 shared_examples_for "in-process server selenium tests" do
   it_should_behave_like "all selenium tests"
   prepend_before(:all) do
-    @webserver_shutdown = SeleniumTestsHelperMethods.start_in_process_webrick_server
+    $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_in_process_webrick_server
   end
 end
 
 shared_examples_for "forked server selenium tests" do
   it_should_behave_like "all selenium tests"
   prepend_before(:all) do
-    @webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
+    $in_proc_webserver_shutdown.try(:call)
+    $in_proc_webserver_shutdown = nil
+    @forked_webserver_shutdown = SeleniumTestsHelperMethods.start_forked_webrick_server
+  end
+
+  append_after(:all) do
+    @forked_webserver_shutdown.call
   end
 end
