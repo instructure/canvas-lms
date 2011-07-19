@@ -17,7 +17,7 @@
 #
 
 class PseudonymSessionsController < ApplicationController
-  protect_from_forgery :except => [:create, :destroy, :saml_consume]
+  protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
 
   def new

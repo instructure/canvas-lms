@@ -50,17 +50,28 @@ module AuthenticationMethods
   end
 
   def load_user
-    if params[:access_token] && api_request?
-      @access_token = AccessToken.find_by_token(params[:access_token])
-      @developer_key = @access_token.try(:developer_key)
-      if !@access_token.try(:usable?)
-        render :json => {:errors => "Invalid access token"}, :status => :bad_request
-        return false
+    if api_request?
+      if params[:access_token]
+        @access_token = AccessToken.find_by_token(params[:access_token])
+        @developer_key = @access_token.try(:developer_key)
+        if !@access_token.try(:usable?)
+          render :json => {:errors => "Invalid access token"}, :status => :bad_request
+          return false
+        end
+        @current_user = @access_token.user
+        @current_pseudonym = @current_user.pseudonym
+        unless @current_user
+          render :json => {:errors => "Invalid access token"}, :status => :bad_request
+          return false
+        end
+        @access_token.used!
+      else
+        @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) if params[:api_key].present?
+        @developer_key || raise(ApplicationController::InvalidDeveloperAPIKey)
       end
-      @access_token.used!
-      @current_user = @access_token.user
-      @current_pseudonym = @current_user.pseudonym
-    else
+    end
+
+    if !@access_token
       @pseudonym_session = @domain_root_account.pseudonym_session_scope.find
       key = @pseudonym_session.send(:session_credentials)[1] rescue nil
       if key
@@ -79,6 +90,7 @@ module AuthenticationMethods
       end
       @current_user = @current_pseudonym && @current_pseudonym.user
     end
+
     if @current_user && @current_user.unavailable?
       @current_pseudonym = nil
       @current_user = nil 
