@@ -481,7 +481,7 @@ class Account < ActiveRecord::Base
   end
   
   def login_handle_name_is_customized?
-    self.account_authorization_config && self.account_authorizaction_config.login_handle_name.present?
+    self.account_authorization_config && self.account_authorization_config.login_handle_name.present?
   end
   
   def login_handle_name
