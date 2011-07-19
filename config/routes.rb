@@ -644,7 +644,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :jobs, :only => %w(index), :collection => %w[batch_update]
 
-  Jammit::Routes.draw(map)
+  Jammit::Routes.draw(map) if defined?(Jammit)
 
   # API routes
   ApiRouteSet.new(map, "/api/v1") do |api|
