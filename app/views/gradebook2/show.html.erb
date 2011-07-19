@@ -2,7 +2,7 @@
   content_for :page_title, "Gradebook - #{@context.name}"
   @body_classes << "gradebook2"
   @show_left_side = false
-  jammit_js :slickgrid, :gradebook2
+  jammit_js :jquery_ui_menu, :slickgrid, :gradebook2
   jammit_css :slickgrid, :gradebook2
   options = {
     :chunk_size => 35,
@@ -10,41 +10,43 @@
     :sections_and_students_url => api_v1_course_sections_url(@context, :include => [:students]),
     :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
     :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
-    #:assignment_groups => @context.assignment_groups.all(:include => :assignments),
-    #:sections => @context.course_sections.all(:include => :users),
-    #:submissions => @context.submissions.all(),
+    :context_id => @context.id,
+    :context_code => @context.asset_string
   }
 %>
 <div id="gradebook-toolbar">
-
+  <button style="display:none;" id="section_to_show">Showing: <span id="section_being_shown">All Sections</span></button>
+  <ul style="display: none; width: 200px;">
+    <li>Choose a section to show</li>
+    <li><a href="#"><label for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" checked /></a></li>
+    <li id="course_section_template"><a href="#"><label class="section_name" for="radio4">All Sections</label><input type="radio" name="section_to_show_radio" /></a></li>
+  </ul>
+  <button id="gradebook_settings">&nbsp;</button>
+  <ul style="display: none; width: 210px;">
+    <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= I18n.t('view_grading_history', 'View Grading History') %></a></li>
+    <li><a href="<%= context_url(@context, :context_gradebook_url) %>.csv"><%= I18n.t('download_scores', 'Download Scores (.csv)') %></a></li>
+    <li><a class="gradebook_upload_link" href="#"><%= I18n.t('upload_scores', 'Upload Scores (from .csv)') %></a></li>
+    <!-- <li><a href="#"><%= I18n.t('set_group_weights', 'Set Group Weights') %></a></li> -->
+    <li><a href="#"><label><%= I18n.t('show_attendance_columns', 'Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
+    <li><a href="#"><label><%= I18n.t('include_ungraded', 'Include Ungraded Assignments') %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
+  </ul>
 </div>
 <div id="gradebook-grid-wrapper">
   <div id="gradebook_students_grid"></div>
   <div id="gradebook_grid"></div>
 </div>
-
-<!-- gradebook images -->
 <div style="display:none;">
-  <span id="submission_tooltip_dropped"><%= t 'dropped_for_grading', 'Dropped for grading purposes' %></span>
-  <span id="submission_tooltip_late"><%= t 'submitted_late', 'Submitted late' %></span>
-  <span id="submission_tooltip_resubmitted"><%= t 'resubmitted', 'Resubmitted since last graded' %></span>
-  <%= image_tag "pass.png", :id => "submission_entry_pass_image", :alt => "Pass", :title => "Pass", :class => "graded_icon" %>
-  <%= image_tag "pass.png", :id => "submission_entry_complete_image", :alt => "Complete", :title => "Complete", :class => "graded_icon" %>
-  <%= image_tag "fail.png", :id => "submission_entry_fail_image", :alt => "Fail", :title => "Fail", :class => "graded_icon" %>
-  <%= image_tag "fail.png", :id => "submission_entry_incomplete_image", :alt => "Incomplete", :title => "Incomplete", :class => "graded_icon" %>
-</div>
-
-<div id="gradebook_dialogs" style="display:none;">
-  <div id="sort_rows_dialog" title="Sort Gradebook Rows">
-    <button type="button" class="button sort_gradebook sort_rows" data-sort_by="display_name" title="By Student Name" style="width: 300px;">By Student Name</button>
-    <button type="button" class="button sort_gradebook sort_rows" data-sort_by="section" title="By Section Name" style="width: 300px;">By Section Name</button>
-    <button type="button" class="button sort_gradebook sort_rows by_grade" data-sort_by="grade_desc" title="By Total (Highest First)" style="width: 300px;">By Total (Highest First)</button>
-    <button type="button" class="button sort_gradebook sort_rows by_grade" data-sort_by="grade_asc" title="By Total (Lowest First)" style="width: 300px;">By Total (Lowest First)</button>
-  </div>
+  <%= render :partial => 'gradebook_uploads/form' %>
 </div>
 
 <% js_block do %>
   <script>
+    GRADEBOOK_TRANSLATIONS = <%= {
+      :submission_tooltip_dropped => t('dropped_for_grading', 'Dropped for grading purposes'),
+      :submission_tooltip_late => t('submitted_late', 'Submitted late'),
+      :submission_tooltip_resubmitted => t('resubmitted', 'Resubmitted since last graded'),
+      :submission_tooltip_ungraded => t('ungraded', 'Not factored into grading')
+    }.to_json.html_safe %>;
     new Gradebook(<%= options.to_json.html_safe %>);
   </script>
 <% end %>

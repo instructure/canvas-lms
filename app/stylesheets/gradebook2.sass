@@ -122,6 +122,10 @@ $cell_height: 33px
 .slick-cell.editable
   border-color: #2fa1ff
 
+.slick-cell.ungraded
+  background-image: url("/images/4_percent_opacity.png")
+  background-repeat: repeat
+
 .gradebook-tooltip
   display: none
   background-color: #444
@@ -153,7 +157,8 @@ $cell_height: 33px
       top: -5px
   .slick-cell.hover &, .gradebook-cell.focus &, .slick-cell.selected &
     display: block
-
+.slick-cell.completely-hidden
+  display: none
 
 
 .gradebook-cell
@@ -161,7 +166,6 @@ $cell_height: 33px
   height: $cell_height - 8px
   position: relative
   text-align: center
-
   border: 1px solid transparent
   border-right: 1px dotted silver
   border-bottom-color: silver
@@ -293,4 +297,10 @@ $gradebook_checkbox_width: 16px
       display: none
 .minimized .slick-column-name
   display: none
+
+// STUFF FOR HEADER
+#gradebook-toolbar
+  background: url('/images/gradebook-header-bg.png') repeat-x
+  height: 28px
+  padding: 8px 20px
 
