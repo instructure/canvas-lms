@@ -19,19 +19,24 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
+require "timeout"
 require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
 SERVER_IP = UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
-SERVER_PORT = SELENIUM_CONFIG[:app_port] || 3002
-APP_HOST = "#{SERVER_IP}:#{SERVER_PORT}"
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 60
 MAX_SERVER_START_TIME = 60
 
+$server_port = nil
+$app_host_and_port = nil
+
 module SeleniumTestsHelperMethods
   def setup_selenium
+    if SELENIUM_CONFIG[:host] && SELENIUM_CONFIG[:port] && !SELENIUM_CONFIG[:host_and_port]
+      SELENIUM_CONFIG[:host_and_port] = "#{SELENIUM_CONFIG[:host]}:#{SELENIUM_CONFIG[:port]}"
+    end
     if !SELENIUM_CONFIG[:host_and_port]
       browser = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       options = {}
@@ -40,10 +45,15 @@ module SeleniumTestsHelperMethods
       end
       driver = Selenium::WebDriver.for(browser, options)
     else
+      caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
+      if caps == :firefox && SELENIUM_CONFIG[:firefox_profile]
+        profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
+        caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+      end
       driver = Selenium::WebDriver.for(
         :remote, 
         :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub', 
-        :desired_capabilities => (SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox)
+        :desired_capabilities => caps
       )
     end
     driver.manage.timeouts.implicit_wait = 3
@@ -51,12 +61,41 @@ module SeleniumTestsHelperMethods
   end
   
   def app_host
-    "http://#{APP_HOST}"
+    "http://#{$app_host_and_port}"
   end
 
+  def self.setup_host_and_port(tries = 60)
+    tried_ports = Set.new
+    while tried_ports.length < 60
+      port = rand(65535 - 1024) + 1024
+      next if tried_ports.include? port
+      tried_ports << port
+      
+      socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
+      socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true)
+      sockaddr = Socket.pack_sockaddr_in(port, '0.0.0.0')
+      begin
+        socket.bind(sockaddr)
+        socket.close
+        puts "found port #{port} after #{tried_ports.length} tries"
+        $server_port = port
+        $app_host_and_port = "#{SERVER_IP}:#{$server_port}"
+        
+        return $server_port
+      rescue Errno::EADDRINUSE => e
+        # pass
+      end
+    end
+    
+    raise "couldn't find an available port after #{tried_ports.length} tries! ports tried: #{tried_ports.join ", "}"
+  end
+
+
   def self.start_in_process_webrick_server
-    HostUrl.default_host = APP_HOST
-    HostUrl.file_host = APP_HOST
+    setup_host_and_port
+    
+    HostUrl.default_host = $app_host_and_port
+    HostUrl.file_host = $app_host_and_port
     server = SpecFriendlyWEBrickServer
     app = Rack::Builder.new do
       use Rails::Rack::Debugger unless Rails.env.test?
@@ -65,7 +104,7 @@ module SeleniumTestsHelperMethods
         run ActionController::Dispatcher.new
       end
     end.to_app
-    server.run(app, :Port => SERVER_PORT, :AccessLog => [])
+    server.run(app, :Port => $server_port, :AccessLog => [])
     shutdown = lambda do
       server.shutdown
       HostUrl.default_host = nil
@@ -76,19 +115,21 @@ module SeleniumTestsHelperMethods
   end
   
   def self.start_forked_webrick_server
+    setup_host_and_port
+    
     domain_conf_path = File.expand_path(File.dirname(__FILE__) + '/../../config/domain.yml')
     domain_conf = YAML.load_file(domain_conf_path)
     old_domain = domain_conf[Rails.env]["domain"]
-    domain_conf[Rails.env]["domain"] = APP_HOST
+    domain_conf[Rails.env]["domain"] = $app_host_and_port
     File.open(domain_conf_path, 'w') { |f| YAML.dump(domain_conf, f) }
-    HostUrl.default_host = APP_HOST
-    HostUrl.file_host = APP_HOST
+    HostUrl.default_host = $app_host_and_port
+    HostUrl.file_host = $app_host_and_port
     server_pid = fork do
       base = File.expand_path(File.dirname(__FILE__))
       STDOUT.reopen(File.open("/dev/null", "w"))
       STDERR.reopen(File.open("#{base}/../../log/test-server.log", "a"))
       ENV['SELENIUM_WEBRICK_SERVER'] = '1'
-      exec("#{base}/../../script/server", "-p", SERVER_PORT.to_s, "-e", Rails.env)
+      exec("#{base}/../../script/server", "-p", $server_port.to_s, "-e", Rails.env)
     end
     closed = false
     shutdown = lambda do
@@ -104,8 +145,14 @@ module SeleniumTestsHelperMethods
     end
     at_exit { shutdown.call }
     for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open('127.0.0.1', SERVER_PORT) rescue nil
-      break if s
+      begin
+        Timeout::timeout(5) do
+          s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
+          break if s
+        end
+      rescue Timeout::Error
+        # pass
+      end
       sleep 1
     end
     raise "Failed starting script/server" unless s
@@ -264,7 +311,18 @@ shared_examples_for "all selenium tests" do
     @webserver_shutdown.call
     @selenium_driver.quit
   end
- 
+
+  append_before(:all) do
+    unless $check_screen_dimensions
+      w, h = driver.execute_script <<-JS
+        if (window.screen) {
+          return [window.screen.availWidth, window.screen.availHeight];
+        }
+      JS
+      raise("desktop dimensions (#{w}x#{h}) are too small to successfully run the selenium specs, minimum size of 1024x768 is required.") unless w >= 1024 && h >= 768
+      $check_screen_dimensions = true
+    end
+  end
 end
 
 shared_examples_for "in-process server selenium tests" do

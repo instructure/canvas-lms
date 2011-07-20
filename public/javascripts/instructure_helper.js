@@ -77,6 +77,54 @@
     } while (prefix && $('#' + id).length);
     return id;
   };
+  
+  // Return the first value which passes a truth test
+  $.detect = function(collection, callback) {
+    var result;
+    $.each(collection, function(index, value) {
+      if (callback.call(value, index, collection)) {
+        result = value;
+        return false; // we found it, break the $.each() loop iteration by returning false
+      }
+    });
+    return result;
+  };
+  
+  
+  // this is just pulled from jquery 1.6 because jquery 1.5 could not do .map on an object
+  $.map = function (elems, callback, arg) {
+    var value, key, ret = [],
+        i = 0,
+        length = elems.length,
+
+
+        // jquery objects are treated as arrays
+        isArray = elems instanceof jQuery || length !== undefined && typeof length === "number" && ((length > 0 && elems[0] && elems[length - 1]) || length === 0 || jQuery.isArray(elems));
+
+    // Go through the array, translating each of the items to their
+    if (isArray) {
+      for (; i < length; i++) {
+        value = callback(elems[i], i, arg);
+
+        if (value != null) {
+          ret[ret.length] = value;
+        }
+      }
+
+      // Go through every key on the object,
+    } else {
+      for (key in elems) {
+        value = callback(elems[key], key, arg);
+
+        if (value != null) {
+          ret[ret.length] = value;
+        }
+      }
+    }
+
+    // Flatten any nested arrays
+    return ret.concat.apply([], ret);
+  }
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -173,6 +221,7 @@
           handle_files: (options.upload_only ? options.success : options.handle_files),
           single_file: options.singleFile,
           context_code: $.isFunction(options.context_code) ? (options.context_code.call($form)) : options.context_code,
+          asset_string: options.asset_string,
           intent: options.intent,
           folder_id: $.isFunction(options.folder_id) ? (options.folder_id.call($form)) : options.folder_id,
           file_elements: $form.find("input[type='file']"),
@@ -714,7 +763,9 @@
   };
   
   $.htmlEscape = function(str) {
-    return $.htmlEscape.element.text(str).html();
+    return str && str.htmlSafe ?
+      str.toString() :
+      $.htmlEscape.element.text(str).html();
   }
   $.htmlEscape.element = $('<div/>');
   // escape all string values (not keys) in an object
@@ -726,6 +777,16 @@
         obj[k] = $.htmlEscape(v);
       }
     }
+  }
+  $.h = $.htmlEscape;
+
+  // useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
+  // note that raw returns a String object, so you may want to call toString
+  // if you're using it elsewhere
+  $.raw = function(str) {
+    str = new String(str);
+    str.htmlSafe = true;
+    return str;
   }
   
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
@@ -1943,6 +2004,7 @@
         uploadFile.call($this, $.extend({
           'attachment[folder_id]': options.folder_id,
           'attachment[intent]': options.intent,
+          'attachment[asset_string]': options.asset_string,
           'attachment[filename]': item.name,
           'attachment[context_code]': options.context_code
         }, options.formData || {}), item);
@@ -2941,14 +3003,12 @@
             }
             $("<div class='bookmark'/>")
               .appendTo($dialog.find(".results"))
-              .append($("<a class='bookmark_link' style='font-weight: bold;'/>", {
-                href: data[idx].url,
-                text: data[idx].short_title,
-                title: data[idx].title
-              }))
-              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>", {
-                text: data[idx].description || "No description"
-              }));
+              .append($('<a class="bookmark_link" style="font-weight: bold;"/>').attr({
+                  href: data[idx].url,
+                  title: data[idx].title
+                }).text(data[idx].short_title)
+              )
+              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>").text(data[idx].description || "No description"));
           }
         }, function() {
           $dialog.find(".results").empty()
@@ -3305,20 +3365,26 @@
   };
   
   // this is used if you want to fill the browser window with something inside #content but you want to also leave the footer and header on the page.
-  $.fn.fillWindowWithMe = function(){
-    var $this              = $(this),
+  $.fn.fillWindowWithMe = function(options){
+    var opts               = $.extend({minHeight: 400}, options),
+        $this              = $(this),
         $wrapper_container = $('#wrapper-container'),
         $main              = $('#main'),
         $not_right_side    = $('#not_right_side'),
-        $window            = $(window);
+        $window            = $(window),
+        $toResize          = $(this).add(opts.alsoResize);
 
     function fillWindowWithThisElement(){
-      $this.height(0);
+      $toResize.height(0);
       var spaceLeftForThis = $window.height() 
                              - ($wrapper_container.offset().top + $wrapper_container.height())
-                             + ($main.height() - $not_right_side.height());
+                             + ($main.height() - $not_right_side.height()),
+          newHeight = Math.max(400, spaceLeftForThis);
                                
-      $this.height( Math.max(400, spaceLeftForThis) );
+      $toResize.height(newHeight);
+      if ($.isFunction(opts.onResize)) {
+        opts.onResize.call($this, newHeight);
+      }
     }
     fillWindowWithThisElement();
     $window
@@ -3326,5 +3392,9 @@
       .bind('resize.fillWindowWithMe', fillWindowWithThisElement);
     return this;
   };
-    
+
+  $.regexEscape = function(string) {
+    return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  }
+  
 })(jQuery);

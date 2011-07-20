@@ -2,7 +2,7 @@
 <% url = dashboard_notifications_path
   url = context_url(@context, :context_notifications_url) if @context && !@context.is_a?(User) %>
 
-<h2>Notifications <a href="<%=url %>" class="small_link">View All</a></h2>
+<h2><%= t('notifications', 'Notifications') %> <a href="<%=url %>" class="small_link"><%= t('view_all', 'View All') %></a></h2>
 <ul class="unstyled_list notification_list">
   <% if !message_types.empty? %>
     <% message_types.each do |message_type, messages| %>
@@ -16,6 +16,6 @@
       <% end %>
     <% end %>
   <% else %>
-    <li>No Notifications</li>
+    <li><%= t('no_notifications', 'No Notifications') %></li>
   <% end %>
 </ul>

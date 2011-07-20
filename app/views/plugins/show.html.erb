@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= t :page_title, "Plugin Settings: %{plugin}", :plugin => @plugin.name %><% end %>
+<% content_for :page_title do %><%= join_title t(:page_title, "Plugin Settings"), @plugin.name %><% end %>
 <% 
   jammit_css :plugins
   jammit_js :plugins
@@ -6,7 +6,7 @@
   add_crumb(@plugin.name)
 %>  
 
-<h2><%= t :page_title, "Plugin Settings: %{plugin}", :plugin => @plugin.name %></h2>
+<h2><%= join_title t(:page_title, "Plugin Settings"), @plugin.name %></h2>
 
 <%= render :partial => "settings_header" %>
 
@@ -14,7 +14,7 @@
   <% form_for(@plugin_setting, :url => plugin_path(@plugin.id), :html => {:method => :put}) do |f| %>
     <div style="margin-bottom: 15px; margin-top: -10px;">
       <%= f.check_box :disabled, :class => "disabled_checkbox" %>
-      <%= f.label :disabled, "Disable this Plugin" %>
+      <%= f.label :disabled, :en => "Disable this Plugin" %>
     </div>
     <% partial = render :partial => @plugin.settings_partial, :locals => {:settings => (@plugin_setting.settings || {}).merge(params[:settings] || {})} %>
     <%= f.error_messages if !@error_messages_handled %>

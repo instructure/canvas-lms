@@ -58,6 +58,8 @@ class Wiki < ActiveRecord::Base
   end
   
   def wiki_page
+    # TODO i18n
+    t :front_page_name, "Front Page"
     self.wiki_pages.find_by_url("front-page") || self.wiki_pages.build(:title => "Front Page", :url => 'front-page')
   end
   

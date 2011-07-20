@@ -215,6 +215,32 @@ describe TextHelper do
         th.mt(:foo, "**one** more test", :inlinify => :never).
           should == "<p><strong>one</strong> more test</p>"
       end
+
+      it "should allow wrapper with markdown" do
+        th.mt(:foo, %{Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.
+
+Commodo in ham, *short ribs %{name} pastrami* sausage elit sunt dolore eiusmod ut ea proident ribeye.
+
+Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis **eu short loin pancetta**.},
+        :name => '<b>test</b>'.html_safe,
+        :wrapper => {
+          '*' => '<span>\1</span>',
+          '**' => '<a>\1</a>',
+        }).should == "<p>Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.</p>\n\n<p>Commodo in ham, <span>short ribs <b>test</b> pastrami</span> sausage elit sunt dolore eiusmod ut ea proident ribeye.</p>\n\n<p>Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis <a>eu short loin pancetta</a>.</p>"
+      end
+
+      it "should inlinify complex single paragraphs" do
+        th.mt(:foo, "**this** is a *test*").
+          should == "<strong>this</strong> is a <em>test</em>"
+
+        th.mt(:foo, "*%{button}*", :button => '<button type="submit" />'.html_safe, :wrapper => '<span>\1</span>').
+          should == '<span><button type="submit" /></span>'
+      end
+
+      it "should not inlinify multiple paragraphs" do
+        th.mt(:foo, "para1\n\npara2").
+          should == "<p>para1</p>\n\n<p>para2</p>"
+      end
     end
   end
 end

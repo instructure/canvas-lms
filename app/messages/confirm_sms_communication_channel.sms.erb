@@ -1,5 +1,8 @@
+<%= t :body, <<-BODY, :confirmation_code => asset.confirmation_code, :user => asset.user.name, :website => (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host
 Confirm Canvas registration w/ code:
 
-<%= asset.confirmation_code %>
+%{confirmation_code}
 
-for <%= asset.user.name %> by visiting <%= HostUrl.context_host(((asset.pseudonym || asset.user.pseudonym).account rescue nil)) %>.
+for %{user} by visiting %{website}.
+BODY
+%>

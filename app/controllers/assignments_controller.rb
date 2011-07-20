@@ -19,14 +19,14 @@
 class AssignmentsController < ApplicationController
   include GoogleDocs
   before_filter :require_context
-  add_crumb("Assignments", :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
+  add_crumb(lambda { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
   
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :read)
       get_all_pertinent_contexts
       get_sorted_assignments
-      add_crumb("Assignments", (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
+      add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
       @context= (@just_viewing_one_course ? @context : @current_user)
       return if @just_viewing_one_course && !tab_enabled?(@context.class::TAB_ASSIGNMENTS)
 
@@ -54,7 +54,7 @@ class AssignmentsController < ApplicationController
     @assignment ||= @context.assignments.find(params[:id])
     if @assignment.deleted?
       respond_to do |format|
-        flash[:notice] = "This assignment has been deleted"
+        flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"
         format.html { redirect_to named_context_url(@context, :context_assignments_url) }
       end
       return
@@ -85,7 +85,7 @@ class AssignmentsController < ApplicationController
       end
       
       if @assignment.new_record?
-        add_crumb("New Assignment", request.url)
+        add_crumb(t('crumbs.new_assignment', "New Assignment"), request.url)
       else
         add_crumb(@assignment.title, named_context_url(@context, :context_assignment_url, @assignment))
       end
@@ -148,7 +148,7 @@ class AssignmentsController < ApplicationController
           format.json { render :json => @request.to_json }
         else
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
-          format.json { render :json => {:errors => {:base => "Reminder failed"}}.to_json, :status => :bad_request }
+          format.json { render :json => {:errors => {:base => t('errors.reminder_failed', "Reminder failed")}}.to_json, :status => :bad_request }
         end
       end
     end
@@ -164,7 +164,7 @@ class AssignmentsController < ApplicationController
           format.json { render :json => @request.to_json }
         else
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
-          format.json { render :json => {:errors => {:base => "Delete failed"}}.to_json, :status => :bad_request }
+          format.json { render :json => {:errors => {:base => t('errors.delete_reminder_failed', "Delete failed")}}.to_json, :status => :bad_request }
         end
       end
     end
@@ -184,7 +184,7 @@ class AssignmentsController < ApplicationController
   
   def syllabus
     return unless tab_enabled?(@context.class::TAB_SYLLABUS)
-    add_crumb "Syllabus"
+    add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
     if authorized_action(@context.assignments.new, @current_user, :read)
       @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
@@ -248,7 +248,7 @@ class AssignmentsController < ApplicationController
           if params[:model_key]
             session["assignment_#{params[:model_key]}"] = @assignment.id
           end
-          flash[:notice] = 'Assignment was successfully created.'
+          flash[:notice] = t 'notices.created', "Assignment was successfully created."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.xml  { head :created, :location => named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
@@ -315,7 +315,7 @@ class AssignmentsController < ApplicationController
           log_asset_access(@assignment, "assignments", @assignment_group, 'participate')
           @assignment.context_module_action(@current_user, :contributed)
           @assignment.reload
-          flash[:notice] = 'Assignment was successfully updated.'
+          flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
           format.xml  { head :ok }
           format.json { render :json => @assignment.to_json(:permissions => {:user => @current_user, :session => session}, :methods => [:readable_submission_types], :include => [:quiz, :discussion_topic]), :status => :ok }
@@ -345,7 +345,7 @@ class AssignmentsController < ApplicationController
 
   def get_assignment_group(assignment_params)
     return unless assignment_params
-    if group_id = assignment_params.delete(:assignment_group_id)
+    if (group_id = assignment_params.delete(:assignment_group_id)).present?
       group = @context.assignment_groups.find(group_id)
     end
   end

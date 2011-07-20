@@ -200,19 +200,19 @@ describe CoursesController do
   describe "POST 'enroll_users'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      post 'enroll_users', :course_id => @course.id, :user_emails => "sam@yahoo.com"
+      post 'enroll_users', :course_id => @course.id, :user_list => "sam@yahoo.com"
       assert_unauthorized
     end
     
     it "should not allow students to enroll people" do
       course_with_student_logged_in(:active_all => true)
-      post 'enroll_users', :course_id => @course.id, :user_emails => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"
+      post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"
       assert_unauthorized
     end
     
     it "should enroll people" do
       course_with_teacher_logged_in(:active_all => true)
-      post 'enroll_users', :course_id => @course.id, :user_emails => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"
+      post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>"
       response.should be_success
       @course.reload
       @course.students.map{|s| s.name}.should be_include("Sam")
@@ -224,7 +224,7 @@ describe CoursesController do
       @user = user
       @course.enroll_ta(user).accept!
       user_session(@user)
-      post 'enroll_users', :course_id => @course.id, :user_emails => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>", :enrollment_type => 'ObserverEnrollment'
+      post 'enroll_users', :course_id => @course.id, :user_list => "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>", :enrollment_type => 'ObserverEnrollment'
       response.should be_success
       @course.reload
       @course.students.should be_empty

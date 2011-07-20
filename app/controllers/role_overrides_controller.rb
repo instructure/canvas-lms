@@ -81,7 +81,7 @@ class RoleOverridesController < ApplicationController
           end
         end
       end
-      flash[:notice] = 'Changes Saved Successfully.'
+      flash[:notice] = t 'notices.saved', "Changes Saved Successfully."
       redirect_to named_context_url(@context, :context_role_overrides_url, :account_roles => params[:account_roles])
     end
   end

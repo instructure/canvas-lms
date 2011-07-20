@@ -1,24 +1,24 @@
 <% 
-  add_crumb("People", context_url(@context, :context_users_url))
-  add_crumb("Prior Users")
+  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
+  add_crumb(t('#crumbs.prior_users', "Prior Users"))
   @active_tab="people"
 %>
-<% content_for :page_title do %>Prior Users<% end %>
+<% content_for :page_title, t('titles.prior_users', "Prior Users") %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> Back to People</a>
+    <a href="<%= context_url(@context, :context_users_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= t('links.back_to_people', %{Back to People}) %></a>
   </div>
 <% end %>
 
 <% jammit_css :prior_users %>
-<h2>Prior Users</h2>
+<h2><%= t('headings.prior_users', %{Prior Users}) %></h2>
 <table id="users">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Total</th>
+      <th><%= t('#table_headings.name', %{Name}) %></th>
+      <th><%= t('#table_headings.type', %{Type}) %></th>
+      <th><%= t('#table_headings.total', %{Total}) %></th>
     </tr>
   </thead>
   <tbody>

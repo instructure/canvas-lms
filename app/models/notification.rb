@@ -75,9 +75,9 @@ class Notification < ActiveRecord::Base
   end
 
   def infer_default_content
-    self.body ||= "No comments"
-    self.subject ||= "No Subject"
-    self.sms_body ||= "No comments"
+    self.body ||= t(:no_comments, "No comments")
+    self.subject ||= t(:no_subject, "No Subject")
+    self.sms_body ||= t(:no_comments, "No comments")
   end
   protected :infer_default_content
   
@@ -422,42 +422,131 @@ class Notification < ActiveRecord::Base
     end
   end
   
+  # TODO i18n: show the localized notification name in the dashboard (or
+  # wherever), even if we continue to store the english string in the db
+  # (it's actually just the titleized message template filename)
+  def names
+    t 'names.account_user_notification', 'Account User Notification'
+    t 'names.account_user_registration', 'Account User Registration'
+    t 'names.assignment_changed', 'Assignment Changed'
+    t 'names.assignment_created', 'Assignment Created'
+    t 'names.assignment_due_date_changed', 'Assignment Due Date Changed'
+    t 'names.assignment_due_date_reminder', 'Assignment Due Date Reminder'
+    t 'names.assignment_graded', 'Assignment Graded'
+    t 'names.assignment_grading_reminder', 'Assignment Grading Reminder'
+    t 'names.assignment_publishing_reminder', 'Assignment Publishing Reminder'
+    t 'names.assignment_resubmitted', 'Assignment Resubmitted'
+    t 'names.assignment_submitted', 'Assignment Submitted'
+    t 'names.assignment_submitted_late', 'Assignment Submitted Late'
+    t 'names.collaboration_invitation', 'Collaboration Invitation'
+    t 'names.confirm_email_communication_channel', 'Confirm Email Communication Channel'
+    t 'names.confirm_registration', 'Confirm Registration'
+    t 'names.confirm_sms_communication_channel', 'Confirm Sms Communication Channel'
+    t 'names.content_export_failed', 'Content Export Failed'
+    t 'names.content_export_finished', 'Content Export Finished'
+    t 'names.enrollment_accepted', 'Enrollment Accepted'
+    t 'names.enrollment_invitation', 'Enrollment Invitation'
+    t 'names.enrollment_notification', 'Enrollment Notification'
+    t 'names.enrollment_registration', 'Enrollment Registration'
+    t 'names.event_date_changed', 'Event Date Changed'
+    t 'names.forgot_password', 'Forgot Password'
+    t 'names.grade_weight_changed', 'Grade Weight Changed'
+    t 'names.group_assignment_submitted_late', 'Group Assignment Submitted Late'
+    t 'names.group_membership_accepted', 'Group Membership Accepted'
+    t 'names.group_membership_rejected', 'Group Membership Rejected'
+    t 'names.merge_email_communication_channel', 'Merge Email Communication Channel'
+    t 'names.migration_export_ready', 'Migration Export Ready'
+    t 'names.migration_import_failed', 'Migration Import Failed'
+    t 'names.migration_import_finished', 'Migration Import Finished'
+    t 'names.new_account_user', 'New Account User'
+    t 'names.new_announcement', 'New Announcement'
+    t 'names.new_context_group_membership', 'New Context Group Membership'
+    t 'names.new_context_group_membership_invitation', 'New Context Group Membership Invitation'
+    t 'names.new_course', 'New Course'
+    t 'names.new_discussion_entry', 'New Discussion Entry'
+    t 'names.new_discussion_topic', 'New Discussion Topic'
+    t 'names.new_event_created', 'New Event Created'
+    t 'names.new_file_added', 'New File Added'
+    t 'names.new_student_organized_group', 'New Student Organized Group'
+    t 'names.new_teacher_registration', 'New Teacher Registration'
+    t 'names.new_user', 'New User'
+    t 'names.new_wiki_page', 'New Wiki Page'
+    t 'names.pseudonym_registration', 'Pseudonym Registration'
+    t 'names.report_generated', 'Report Generated'
+    t 'names.report_generation_failed', 'Report Generation Failed'
+    t 'names.rubric_assessment_invitation', 'Rubric Assessment Invitation'
+    t 'names.rubric_assessment_submission_reminder', 'Rubric Assessment Submission Reminder'
+    t 'names.rubric_association_created', 'Rubric Association Created'
+    t 'names.student_context_message', 'Student Context Message'
+    t 'names.submission_comment', 'Submission Comment'
+    t 'names.submission_comment_for_teacher', 'Submission Comment For Teacher'
+    t 'names.submission_grade_changed', 'Submission Grade Changed'
+    t 'names.submission_graded', 'Submission Graded'
+    t 'names.summaries', 'Summaries'
+    t 'names.teacher_context_message', 'Teacher Context Message'
+    t 'names.updated_wiki_page', 'Updated Wiki Page'
+    t 'names.web_conference_invitation', 'Web Conference Invitation'
+  end
+
+  # TODO: i18n ... show these anywhere we show the category today
+  def category_names
+    t 'categories.all_submissions', 'All Submissions'
+    t 'categories.announcement', 'Announcement'
+    t 'categories.calendar', 'Calendar'
+    t 'categories.course_content', 'Course Content'
+    t 'categories.discussion', 'Discussion'
+    t 'categories.discussion_entry', 'DiscussionEntry'
+    t 'categories.due_date', 'Due Date'
+    t 'categories.files', 'Files'
+    t 'categories.grading', 'Grading'
+    t 'categories.grading_policies', 'Grading Policies'
+    t 'categories.invitiation', 'Invitation'
+    t 'categories.late_grading', 'Late Grading'
+    t 'categories.membership_update', 'Membership Update'
+    t 'categories.message', 'Message'
+    t 'categories.other', 'Other'
+    t 'categories.registration', 'Registration'
+    t 'categories.reminder', 'Reminder'
+    t 'categories.student_message', 'Student Message'
+    t 'categories.submission_comment', 'Submission Comment'
+  end
+
   def category_description
     case category
     when 'Announcement'
-      "For new announcements"
+      t(:announcement_description, "For new announcements")
     when 'Course Content'
-      "For changes to course pages"
+      t(:course_content_description, "For changes to course pages")
     when 'Files'
-      "For new files"
+      t(:files_description, "For new files")
     when 'Discussion'
-      "For new topics"
+      t(:discussion_description, "For new topics")
     when 'DiscussionEntry'
-      "For topics I've commented on"
+      t(:discussion_entry_description, "For topics I've commented on")
     when 'Due Date'
-      "For due date changes"
+      t(:due_date_description, "For due date changes")
     when 'Grading'
-      "For course grading alerts"
+      t(:grading_description, "For course grading alerts")
     when 'Late Grading'
-      "For assignments turned in late"
+      t(:late_grading_description, "For assignments turned in late")
     when 'All Submissions'
-      "For all assignment submissions in courses you teach"
+      t(:all_submissions_description, "For all assignment submissions in courses you teach")
     when 'Submission Comment'
-      "For comments on assignment submissions"
+      t(:submission_comment_description, "For comments on assignment submissions")
     when 'Grading Policies'
-      "For course grading policy changes"
+      t(:grading_policies_description, "For course grading policy changes")
     when 'Invitation'
-      "For new invitations"
+      t(:invitation_description, "For new invitations")
     when 'Other'
-      "For any other alerts"
+      t(:other_description, "For any other alerts")
     when 'Calendar'
-      "For calendar changes"
+      t(:calendar_description, "For calendar changes")
     when 'Message'
-      "For new email messages"
+      t(:message_description, "For new email messages")
     when 'Student Message'
-      "For private messages from students"
+      t(:student_message_description, "For private messages from students")
     else
-      'For ' + (category || "Notification") + ' alerts'
+      t(:missing_description_description, "For %{category} alerts", :category => category)
     end
   end
   

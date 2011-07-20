@@ -17,11 +17,14 @@
 #
 
 class PageView < ActiveRecord::Base
+  include TextHelper
+
   set_primary_key 'request_id'
 
   belongs_to :developer_key
   belongs_to :user
   belongs_to :account
+  belongs_to :real_user, :class_name => 'User'
   
   before_save :ensure_account
   before_save :cap_interaction_seconds
@@ -36,7 +39,7 @@ class PageView < ActiveRecord::Base
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
-  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent
+  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user
   
   def ensure_account
     self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
@@ -44,15 +47,11 @@ class PageView < ActiveRecord::Base
   end
   
   def interaction_seconds_readable
-    time = (self.interaction_seconds || 0).to_i
-    if time <= 10
-      "--"
-    elsif time < 60
-      "#{time} secs"
-    elsif time < 3600
-      "#{time / 60} mins"
+    seconds = (self.interaction_seconds || 0).to_i
+    if seconds <= 10
+      t(:insignificant_duration, "--")
     else
-      "#{time / 3600} hrs"
+      readable_duration(seconds)
     end
   end
   
@@ -61,7 +60,7 @@ class PageView < ActiveRecord::Base
   end
   
   def user_name
-    self.user.name rescue "Unknown User"
+    self.user.name rescue t(:default_user_name, "Unknown User")
   end
   
   def context_name
@@ -103,7 +102,6 @@ class PageView < ActiveRecord::Base
   end
 
   def self.page_views_enabled?
-    return false if Rails.env.test?
     !!page_view_method
   end
 
@@ -177,9 +175,8 @@ class PageView < ActiveRecord::Base
           page_view.do_update(attrs)
           page_view.save
         else
-          # request_id is primary key, so auto-protected from mass assignment
-          request_id = attrs.delete('request_id')
-          self.create(attrs) { |p| p.request_id = request_id }
+          # bypass mass assignment protection
+          self.create { |p| p.send(:attributes=, attrs, false) }
         end
       end
     ensure

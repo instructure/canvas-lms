@@ -27,11 +27,10 @@ class LearningOutcome < ActiveRecord::Base
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
-  adheres_to_policy
-  
+
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_outcomes) }
-    set { can :create and can :read and can :update and can :delete }
+    can :create and can :read and can :update and can :delete
   end
   
   def infer_defaults
@@ -66,7 +65,7 @@ class LearningOutcome < ActiveRecord::Base
       tag.position = idx + 1
       updates << "WHEN id=#{tag.id} THEN #{idx + 1}"
     end
-    ActiveRecord::Base.connection.execute("UPDATE content_tags SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{tags.map(&:id).join(",")})")
+    ContentTag.connection.execute("UPDATE content_tags SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{tags.map(&:id).join(",")})")
     self.touch
     tags
   end
@@ -100,11 +99,11 @@ class LearningOutcome < ActiveRecord::Base
       self.data[:rubric_criterion] = nil
       return
     end
-    criterion[:description] = hash[:description] || "No Description"
+    criterion[:description] = hash[:description] || t(:no_description, "No Description")
     criterion[:ratings] = []
     (hash[:ratings] || []).each do |key, rating|
       criterion[:ratings] << {
-        :description => rating[:description] || "No Comment",
+        :description => rating[:description] || t(:no_comment, "No Comment"),
         :points => rating[:points].to_f || 0
       }
     end
@@ -183,10 +182,14 @@ class LearningOutcome < ActiveRecord::Base
   def self.process_migration(data, migration)
     outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
     outcomes.each do |outcome|
-      if outcome[:type] == 'learning_outcome_group'
-        LearningOutcomeGroup.import_from_migration(outcome, migration.context)
-      else
-        import_from_migration(outcome, migration.context)
+      begin
+        if outcome[:type] == 'learning_outcome_group'
+          LearningOutcomeGroup.import_from_migration(outcome, migration.context)
+        else
+          import_from_migration(outcome, migration.context)
+        end
+      rescue
+        migration.add_warning("Couldn't import learning outcome \"#{outcome[:title]}\"", $!)
       end
     end
   end

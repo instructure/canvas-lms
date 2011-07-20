@@ -21,7 +21,10 @@
           </div>
           <div class="question_details">
              <% if in_group %>
-               <%= pluralize(question[:responses], "student") %> <%= question[:responses] == 1 ? "was" : "were" %> given this question
+               <%= t(:response_count,
+                     { :one => "1 student was given this question",
+                       :other => "%{count} students were given this question" },
+                     :count => question[:responses]) %>
              <% end %>
              &nbsp;
           </div>
@@ -37,9 +40,9 @@
                   <div><%= var[:name] %>: <%= var[:value] %></div>
                 <% end %>
               <% else %>
-                <div>No Data</div>
+                <div><%= t(:no_data, "No Data") %></div>
               <% end %>
-              <div class="attempts"><%= pluralize(answer[:responses], 'attempt') %></div>
+              <div class="attempts"><%= t(:attempts, "attempt", :count => answer[:responses]) %></div>
             </div>
           <% elsif question[:multiple_responses] %>
             <% answer = (question[:answer_sets] || question[:answers])[i] %>
@@ -54,21 +57,21 @@
       <% end %>
       <td class="<%= 'multi_row' if question[:multiple_responses] %>" <%= 'colspan="2"' unless question[:multiple_responses] %>>
         <% if question[:responses] == 0 %>
-          No responses recorded for this question
+          <%= t(:no_responses, "No responses recorded for this question") %>
         <% elsif question[:question_type] == 'calculated_question' %>
           <div class="calculated_data">
             <% if answer[:numbers] %>
               <% answer[:numbers].each do |num, data| %>
                 <div class="number_answer <%= 'correct_answer' if data[:correct] %>" data-responses="<%= data[:responses] %>">
                   <span class="answer_text"><%= num %></span>
-                  <span style="font-size: 0.8em; padding-left: 10px;"><%= pluralize(data[:responses], 'attempt') %></span>
+                  <span style="font-size: 0.8em; padding-left: 10px;"><%= t(:attempts, "attempt", :count => data[:responses]) %></span>
                   <span class="user_ids" style="display: none;"><%= data[:user_ids].join(',') %></span>
                 </div>
               <% end %>
             <% else %>
               <div class="number_answer" data-responses="<%= answer[:responses] %>">
-                <span class="answer_text">Empty Response</span>
-                <span style="font-size: 0.8em; padding-left: 10px;"><%= pluralize(answer[:responses], 'attempt') %></span>
+                <span class="answer_text"><%= t(:empty_response, "Empty Response") %></span>
+                <span style="font-size: 0.8em; padding-left: 10px;"><%= t(:attempts, "attempt", :count => answer[:responses]) %></span>
                 <span class="user_ids" style="display: none;"><%= answer[:user_ids].join(',') %></span>
               </div>
             <% end %>
@@ -83,7 +86,7 @@
                   <td class="answer <%= 'correct_answer' if (right[:correct] || answer[:id] == right[:id]) && !ignore_correct_answers %>" data-responses="<%= right[:responses].to_f %>">
                     <span href="#" class="tooltip answer_bar">
                       <span class="tooltip_wrap" style="font-size: 1.2em;">
-                        <span class="tooltip_text" style="padding: 10px 5px;"><%= pct.to_i %>% of <%= question[:responses] %> attempts selected this answer</span>
+                        <span class="tooltip_text" style="padding: 10px 5px;"><%= t(:percent_of_responses, "%{percent} of %{total} attempts selected this answer", :percent => pct.to_i, :total => question[:responses]) %></span>
                       </span>
                       <div class="response">
                         <div class="response_bar" style="margin-top: <%= ((100 - pct) / 2).to_i %>px; height: <%= (pct / 2).to_i %>px;">
@@ -125,12 +128,11 @@
               <td title="<%= pct.to_i %>% of <%= question[:responses] %> attempts selected this answer" class="answer <%= 'correct_answer' if answer[:weight] == 100 && !ignore_correct_answers %>" data-responses="<%= answer[:responses].to_f %>">
                 <span href="#" class="tooltip answer_bar">
                   <span class="tooltip_wrap" style="font-size: 1.2em;">
-                    <span class="tooltip_text" style="padding: 10px 5px;"><%= pct.to_i %>% of <%= question[:responses] %> attempts selected this answer</span>
+                    <span class="tooltip_text" style="padding: 10px 5px;"><%= t(:percent_of_responses, "%{percent} of %{total} attempts selected this answer", :percent => pct.to_i, :total => question[:responses]) %></span>
                   </span>
                   <div class="response">
                     <div class="response_bar" style="margin-top: <%= (100 - pct).to_i %>px; height: <%= pct.to_i %>px;">
                     </div>
-                    <%=  %>
                   </div>
                   <div class="answer_text">
                     <%= answer[:text] %>
@@ -148,7 +150,7 @@
     <tr class=" <%= 'group_row' if in_group %>">
       <td colspan="2">&nbsp;</td>
       <td>
-        Other Answers:
+        <%= before_label(:other_answers, "Other Answers") %>
         <%= question[:unexpected_response_values].uniq.join(", ") %>
       </td>
     </tr>

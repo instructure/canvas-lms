@@ -26,36 +26,41 @@ module CC
 
       zipper = ContentZipper.new
       zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER]) do |file, folder_names|
-        if file.is_a? Folder
-          dir = File.join(folder_names[1..-1])
-          files_with_metadata[:folders] << [ file, dir ] if file.hidden? || file.locked
-          next
-        end
-
-        @added_attachment_ids << file.id
-        path = File.join(folder_names, file.unencoded_filename)
-        migration_id = CCHelper.create_key(file)
-        if file.hidden? || file.locked || file.unencoded_filename != file.display_name
-          files_with_metadata[:files] << [ file, migration_id ]
-        end
-        @resources.resource(
-                "type" => CCHelper::WEBCONTENT,
-                :identifier => migration_id,
-                :href => path
-        ) do |res|
-          if file.locked
-            res.metadata do |meta_node|
-              meta_node.lom :lom do |lom_node|
-                lom_node.lom :educational do |edu_node|
-                  edu_node.lom :intendedEndUserRole do |role_node|
-                    role_node.lom :source, "IMSGLC_CC_Rolesv1p1"
-                    role_node.lom :value, "Instructor"
+        begin
+          if file.is_a? Folder
+            dir = File.join(folder_names[1..-1])
+            files_with_metadata[:folders] << [file, dir] if file.hidden? || file.locked
+            next
+          end
+          
+          @added_attachment_ids << file.id
+          path = File.join(folder_names, file.unencoded_filename)
+          migration_id = CCHelper.create_key(file)
+          if file.hidden? || file.locked || file.unencoded_filename != file.display_name
+            files_with_metadata[:files] << [file, migration_id]
+          end
+          @resources.resource(
+                  "type" => CCHelper::WEBCONTENT,
+                  :identifier => migration_id,
+                  :href => path
+          ) do |res|
+            if file.locked
+              res.metadata do |meta_node|
+                meta_node.lom :lom do |lom_node|
+                  lom_node.lom :educational do |edu_node|
+                    edu_node.lom :intendedEndUserRole do |role_node|
+                      role_node.lom :source, "IMSGLC_CC_Rolesv1p1"
+                      role_node.lom :value, "Instructor"
+                    end
                   end
                 end
               end
             end
+            res.file(:href=>path)
           end
-          res.file(:href=>path)
+        rescue
+          title = file.unencoded_filename rescue I18n.t('course_exports.unknown_titles.file', "Unknown file")
+          add_error(I18n.t('course_exports.errors.file', "The file \"%{file_name}\" failed to export", :file_name => title), $!)
         end
       end
       
@@ -112,26 +117,30 @@ module CC
 
       html_content_exporter.used_media_objects.each do |obj|
         next if @added_attachment_ids.include?(obj.attachment_id)
-        migration_id = CCHelper.create_key(obj)
-        info = html_content_exporter.media_object_infos[obj.id]
-        next unless info && info[:asset]
-        url = client.flavorAssetGetDownloadUrl(info[:asset][:id])
+        begin
+          migration_id = CCHelper.create_key(obj)
+          info = html_content_exporter.media_object_infos[obj.id]
+          next unless info && info[:asset]
+          url = client.flavorAssetGetDownloadUrl(info[:asset][:id])
 
-        path = base_path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
+          path = base_path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
 
-        remote_stream = open(url)
-        @zip_file.get_output_stream(path) do |stream|
-          FileUtils.copy_stream(remote_stream, stream)
-        end
-
-        if url
-          @resources.resource(
-            "type" => CCHelper::WEBCONTENT,
-            :identifier => migration_id,
-            :href => path
-          ) do |res|
-            res.file(:href => path)
+          remote_stream = open(url)
+          @zip_file.get_output_stream(path) do |stream|
+            FileUtils.copy_stream(remote_stream, stream)
           end
+
+          if url
+            @resources.resource(
+                    "type" => CCHelper::WEBCONTENT,
+                    :identifier => migration_id,
+                    :href => path
+            ) do |res|
+              res.file(:href => path)
+            end
+          end
+        rescue
+          add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"), $!)
         end
       end
     end

@@ -17,4 +17,39 @@
 #
 
 module EportfoliosHelper
+  def show_me(link_class)
+    raw("<a href=\"#\" class=\"#{link_class}\"><b>#{t('#eportfolios.show_me', "show me")}</b></a>")
+  end
+
+  def edit_icon
+    image_tag("edit.png")
+  end
+
+  def delete_icon(png=false)
+    if png
+      image_tag("delete.png")
+    else
+      raw('&#215;')
+    end
+  end
+
+  def help_icon
+    image_tag("help.png")
+  end
+
+  def edit_link_text
+    t('#eportfolios.edit_link_text', "%{edit_icon} Edit This Page", :edit_icon => edit_icon)
+  end
+
+  def help_link_text
+    t('#eportfolios.help_link_text', "%{help_icon} How Do I...?", :help_icon => help_icon)
+  end
+
+  def manage_pages_link_text
+    t('#eportfolios.manage_pages_link_text', "Organize/Manage Pages")
+  end
+
+  def manage_sections_link_text
+    t('#eportfolios.manage_sections_link_text', "Organize Sections")
+  end
 end

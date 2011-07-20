@@ -39,6 +39,71 @@ describe ContextModulesController do
       get 'index', :course_id => @course.id
       response.should be_success
     end
-    
+  end
+
+  describe "GET 'module_redirect'" do
+    it "should skip leading and trailing sub-headers" do
+      course_with_student_logged_in(:active_all => true)
+      @module = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      assignment1 = ag.assignments.create!(:context => @course)
+      assignment2 = ag.assignments.create!(:context => @course)
+
+      header1 = @module.add_item :type => 'context_module_sub_header'
+      assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
+      assignmentTag2 = @module.add_item :type => 'assignment', :id => assignment2.id
+      header2 = @module.add_item :type => 'context_module_sub_header'
+
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      response.should redirect_to course_assignment_url(@course.id, assignment1.id)
+
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      response.should redirect_to course_assignment_url(@course.id, assignment2.id)
+
+      assignmentTag1.destroy
+      assignmentTag2.destroy
+
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
+
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
+    end
+  end
+  
+  describe "POST 'reorder_items'" do
+    it "should reorder items" do
+      course_with_teacher_logged_in(:active_all => true)
+
+      ag = @course.assignment_groups.create!
+      a1 = ag.assignments.create!(:context => @course)
+      a1.points_possible = 10
+      a1.save
+      a2 = ag.assignments.create!(:context => @course)
+      m1 = @course.context_modules.create!
+      m2 = @course.context_modules.create!
+
+      make_content_tag = lambda do |assignment|
+        ct = ContentTag.new
+        ct.content_id = assignment.id
+        ct.content_type = 'Assignment'
+        ct.context_id = @course.id
+        ct.context_type = 'Course'
+        ct.title = "Assignment #{assignment.id}"
+        ct.tag_type = "context_module"
+        ct.context_module_id = m1.id
+        ct.context_code = "course_#{@course.id}"
+        ct.save!
+        ct
+      end
+      ct1 = make_content_tag.call a1
+      ct2 = make_content_tag.call a2
+
+      post 'reorder_items', :course_id => @course.id, :context_module_id => m2.id, :order => "#{ct2.id}"
+      ct2.reload
+      ct2.context_module.should == m2
+      ct1.reload
+      ct1.context_module.should == m1
+    end
   end
 end

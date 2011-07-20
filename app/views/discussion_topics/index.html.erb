@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= before_label(t('#titles.discussions', "Discussions")) %> <%= @context.name %><% end %>
+<% content_for :page_title do %><%= join_title t('#titles.discussions', "Discussions"), @context.name %><% end %>
 
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
@@ -35,7 +35,7 @@
 
 <%= render :partial => "shared/topics", :object => @topics, :locals => { :topic_type => "discussion_topic" } %>
 <%= will_paginate(@topics) %>
-<% js_block do %>
+<% js_block :i18n_scope => 'discussion_topics' do %>
   <script type="text/javascript">
     $(function(){
       $('#topic_list').pageless({

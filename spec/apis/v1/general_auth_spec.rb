@@ -31,7 +31,7 @@ describe CoursesController, :type => :integration do
 
     @token.last_used_at.should be_nil
     
-    raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
+    raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json?access_token=#{@token.token}",
             { :access_token => @token.token, :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     response.status.to_i.should == 200
     json = JSON.parse(response.body)
@@ -44,7 +44,7 @@ describe CoursesController, :type => :integration do
   it "should not accept an invalid access_token" do
     @token = @user.access_tokens.create!(:purpose => "test")
 
-    raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
+    raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json?access_token=1234",
             { :access_token => "1234", :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     response.status.to_i.should == 400
     json = JSON.parse(response.body)
@@ -54,7 +54,7 @@ describe CoursesController, :type => :integration do
   it "should not accept an expired access_token" do
     @token = @user.access_tokens.create!(:purpose => "test", :expires_at => 2.weeks.ago)
 
-    raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
+    raw_api_call(:get, "/api/v1/courses/#{@course2.id}/students.json?access_token=#{@token.token}",
             { :access_token => @token.token, :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
     response.status.to_i.should == 400
     json = JSON.parse(response.body)

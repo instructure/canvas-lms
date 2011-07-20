@@ -1,4 +1,4 @@
-<% content_for :page_title do %>Question Banks<% end %>
+<% content_for :page_title, t(:page_title, "Question Banks") %>
 
 <% jammit_css :quizzes %>
 <% jammit_js :question_banks %>
@@ -38,15 +38,22 @@
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% if !@context.is_a?(User) %>
-      <a href="#" class="add_bank_link button button-sidebar button-sidebar-wide"><%= image_tag "add.png" %> Add Question Bank</a>
+      <a href="#" class="add_bank_link button button-sidebar button-sidebar-wide"><%= image_tag "add.png" %> <%= t 'add_bank', 'Add Question Bank' %></a>
     <% end %>
     <% if @current_user && @context != @current_user %>
-      <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="button button-sidebar-wide"><%= image_tag "bookmark.png" %> See My Bookmarked Banks</a>
+      <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="button button-sidebar-wide"><%= image_tag "bookmark.png" %> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>
     <% end %>
   </div>
 <% end %>
 
-<h2><%= @context.class.to_s %> Question Banks</h2>
+<h2>
+  <% case @context.class.to_s %>
+    <% when 'Course' %>
+      <%= t 'course_question_banks', "Course Question Banks" %>
+    <% when 'User' %>
+      <%= t 'user_question_banks', "User Question Banks" %>
+  <% end %>
+</h2>
 <% if @context != @current_user %>
   <%= render :partial => "question_bank" %>
   <%= render :partial => "quizzes/display_question", :object => nil, :locals => {:is_assessment_question => true} %>
@@ -55,7 +62,7 @@
   <%= render :partial => "quizzes/form_question", :object => nil %>
 
   <% form_for :assessment_question_bank, :url => "", :html => {:id => "edit_bank_form", :style => "display: none;"} do |f| %>
-    <%= f.label :title, "Bank Name:" %>
+    <%= f.blabel :title, :en => "Bank Name" %>
     <%= f.text_field :title, :class => "bank_name_box" %>
   <% end %>
   <div id="bank_urls">

@@ -16,12 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$(document).ready(function() {
-  $(".reject_button").click(function(event) {
-    var result = confirm("Are you sure you want to reject the invitation to participate in this course?");
-    if(!result) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
+I18n.scoped('courses', function(I18n) {
+  $(document).ready(function() {
+    $(".reject_button").click(function(event) {
+      var result = confirm(I18n.t('confirm_reject_invitation', "Are you sure you want to reject the invitation to participate in this course?"));
+      if(!result) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
   });
 });

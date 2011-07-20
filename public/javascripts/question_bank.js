@@ -1,6 +1,7 @@
+I18n.scoped("question_bank", function(I18n) {
 $(document).ready(function() {
   function updateOutcomes(outcomes) {
-    $(".add_outcome_text").text("Updating Outcomes...").attr('disabled', true);
+    $(".add_outcome_text").text(I18n.t("updating_outcomes", "Updating Outcomes...")).attr('disabled', true);
     var params = {};
     for(var idx in outcomes) {
       var outcome = outcomes[idx];
@@ -18,7 +19,7 @@ $(document).ready(function() {
         else if(a_name > b_name) { return 1; }
         else { return 0; }
       });
-      $(".add_outcome_text").text("Align Outcomes").attr('disabled', false);
+      $(".add_outcome_text").text(I18n.t("align_outcomes", "Align Outcomes")).attr('disabled', false);
       var $outcomes = $("#aligned_outcomes_list");
       $outcomes.find(".outcome:not(.blank)").remove();
       var $template = $outcomes.find(".blank:first").clone(true).removeClass('blank');
@@ -36,12 +37,12 @@ $(document).ready(function() {
           $outcomes.append($outcome.show());
       }
     }, function(data) {
-      $(".add_outcome_text").text("Updating Outcomes Failed").attr('disabled', false);
+      $(".add_outcome_text").text(I18n.t("update_outcomes_fail", "Updating Outcomes Failed")).attr('disabled', false);
     });
   }
   $("#aligned_outcomes_list").delegate('.delete_outcome_link', 'click', function(event) {
     event.preventDefault();
-    var result = confirm("Are you sure you want to remove this outcome from the bank?");
+    var result = confirm(I18n.t("remove_outcome_from_bank", "Are you sure you want to remove this outcome from the bank?"));
     var $outcome = $(this).parents(".outcome");
     var outcomes = [];
     var outcome_id = $outcome.attr('data-id');
@@ -72,4 +73,5 @@ $(document).ready(function() {
       updateOutcomes(outcomes);
     });
   });
+});
 });

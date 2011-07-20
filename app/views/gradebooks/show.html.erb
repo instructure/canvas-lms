@@ -1,7 +1,7 @@
-<% content_for :page_title do %>Gradebook - <%= @context.name %><% end %>
+<% content_for :page_title do %><%= join_title t(:page_title, "Gradebook"), @context.name %><% end %>
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => "Course Gradebook Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_gradebook_url(@context_enrollment.feed_code), {:title => t('titles.feed', "Course Gradebook Atom Feed")}) %>
   <% end %>
 <% end %>
 
@@ -10,39 +10,39 @@
 <% content_for :keyboard_navigation do %>
   <ul class="navigation_list" tabindex="-1">
     <li>
-      <span class="keycode">right</span>
+      <span class="keycode"><%= t('keycodes.next_assignment', "right") %></span>
       <span class="colon">:</span>
-      <span class="description">Next Assignment</span>
+      <span class="description"><%= t('keycode_descriptions.next_assignment', "Next Assignment") %></span>
     </li>
     <li>
-      <span class="keycode">left</span>
+      <span class="keycode"><%= t('keycodes.previous_assignment', "left") %></span>
       <span class="colon">:</span>
-      <span class="description">Previous Assignment</span>
+      <span class="description"><%= t('keycode_descriptions.previous_assignment', "Previous Assignment") %></span>
     </li>
     <li>
-      <span class="keycode">down</span>
+      <span class="keycode"><%= t('keycodes.next_student', "down") %></span>
       <span class="colon">:</span>
-      <span class="description">Next Student</span>
+      <span class="description"><%= t('keycode_descriptions.next_student', "Next Student") %></span>
     </li>
     <li>
-      <span class="keycode">right</span>
+      <span class="keycode"><%= t('keycodes.previous_student', "up") %></span>
       <span class="colon">:</span>
-      <span class="description">Previous Student</span>
+      <span class="description"><%= t('keycode_descriptions.previous_student', "Previous Student") %></span>
     </li>
     <li>
-      <span class="keycode">enter</span>
+      <span class="keycode"><%= t('keycodes.edit_cell', "enter") %></span>
       <span class="colon">:</span>
-      <span class="description">Edit Cell</span>
+      <span class="description"><%= t('keycode_descriptions.edit_cell', "Edit Cell") %></span>
     </li>
     <li>
-      <span class="keycode">i</span>
+      <span class="keycode"><%= t('keycodes.more_information', "i") %></span>
       <span class="colon">:</span>
-      <span class="description">More Information for Current Cell</span>
+      <span class="description"><%= t('keycode_descriptions.more_information', "More Information for Current Cell") %></span>
     </li>
     <li>
-      <span class="keycode">r</span>
+      <span class="keycode"><%= t('keycodes.refresh_gradebook', "r") %></span>
       <span class="colon">:</span>
-      <span class="description">Refresh Gradebook</span>
+      <span class="description"><%= t('keycode_descriptions.refresh_gradebook', "Refresh Gradebook") %></span>
     </li>
   </ul>
 <% end %>

@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('wiki.sidebar', function(I18n) {
 (function(window, $, undefined){
   // stick the whole thing in a document.ready so we can make sure the dom is ready before we start doing our selectors       
   $(function(){
@@ -90,7 +91,7 @@
             src: attachment.thumbnail_url || '/images/ajax-loader.gif',
             _mce_src: url,
             alt: attachment.display_name,
-            title: 'Click to embed ' + attachment.display_name
+            title: I18n.t('titles.click_to_embed', 'Click to embed %{attachment}', { attachment: attachment.display_name })
           }).data('url', url);
           $image.find(".display_name").text(attachment.display_name);
           if(in_folder) {
@@ -154,7 +155,7 @@
 
               var finish = function() {
                 if(!hasFiles) {
-                  $tree1.append("<li>No Files</li>");
+                  $tree1.append($('<li />').text(I18n.t('no_files', "No Files")));
                 }
                 $("#editor_tabs_3 .image_list .loading").remove();
                 if(options_list.length > 0) {
@@ -347,7 +348,7 @@
               }
             }
             if(filesToUpload.length === 0) {
-              alert("No valid files were selected");
+              alert(I18n.t('errors.no_valid_files_selected', "No valid files were selected"));
               return;
             }
             var folderSelect = function(folder_id) {
@@ -361,7 +362,7 @@
             });
             $wiki_sidebar_select_folder_dialog.dialog('close').dialog({
               autoOpen: false,
-              title: "Select folder for file uploads"
+              title: I18n.t('titles.select_folder_for_uploads', "Select folder for file uploads")
             }).dialog('open');
             return false;
           }, false);
@@ -406,7 +407,7 @@
               }
             }
             if(images.length === 0) {
-              alert("No valid image files were selected");
+              alert(I18n.t('errors.no_valid_image_files_selected', "No valid image files were selected"));
               return;
             }
             var folderSelect = function(folder_id) {
@@ -420,7 +421,7 @@
             });
             $wiki_sidebar_select_folder_dialog.dialog('close').dialog({
               autoOpen: false,
-              title: "Select folder for file uploads"
+              title: I18n.t('titles.select_folder_for_uploads', "Select folder for file uploads")
             }).dialog('open');
             return false;
           }, false);
@@ -465,7 +466,7 @@
                 console.log('progress!');
               },
               error: function(data) {
-                $.flashError('Unexpected problem uploading ' + fileData.name + '.  Please try again.');
+                $.flashError(I18n.t('errors.unexpected_upload_problem', 'Unexpected problem uploading %{filename}.  Please try again.', {filename: fileData.name}));
                 $list.triggerHandler('file_list_update');
                 fileUploadsReady = true;
               }
@@ -518,7 +519,7 @@
                 console.log('progress!');
               },
               error: function(data) {
-                $.flashError('Unexpected problem uploading ' + fileData.name + '.  Please try again.');
+                $.flashError(I18n.t('errors.unexpected_upload_problem', 'Unexpected problem uploading %{filename}.  Please try again.', {filename: fileData.name}));
                 $list.triggerHandler('file_list_update');
                 imageUploadsReady = true;
               }
@@ -586,7 +587,7 @@
           beforeSubmit: function(data) {
             $sidebar_upload_file_form.find(".uploading").slideDown();
             $sidebar_upload_file_form.attr('action', $sidebar_upload_file_form.find(".json_upload_url").attr('href'));
-            $(this).find("button").attr('disabled', true).text("Uploading...");
+            $(this).find("button").attr('disabled', true).text(I18n.t('buttons.uploading', "Uploading..."));
           },
           success: function(data) {
             $(this).find("button").attr('disabled', false).text("Upload");
@@ -630,7 +631,7 @@
             wikiSidebar.fileSelected($attachment);
           },
           error: function(data) {
-            $(this).find("button").attr('disabled', false).text("Upload Failed, please try again");
+            $(this).find("button").attr('disabled', false).text(I18n.t('errors.upload_failed', "Upload Failed, please try again"));
             $sidebar_upload_file_form.find(".uploading").slideUp();
           }
         });
@@ -642,3 +643,4 @@
   });
 
 })(window, window.jQuery);
+});

@@ -30,21 +30,5 @@ Canvas.protected_attribute_error = :raise
 Canvas.dynamic_finder_nil_arguments_error = :raise
 Canvas.dynamic_finder_type_cast_error = :raise
 
-# Inject our Rails 2.3.x broken cookie fix. See the whole sordid tale
-# here:
-# https://rails.lighthouseapp.com/projects/8994/tickets/4743-session-cookie-breaks-if-used-with-custom-cookie-in-rails-238
-# and the unreleased fix on the 2.3 branch:
-# https://github.com/rails/rails/commit/e0eb8e9c65ededce64169948d4dd51b0079cdd10
-# and this temporary fix is based off:
-# https://gist.github.com/431811
-# We only need this in the test environment, because when sending the
-# header to the browser, the cookies are converted to a string and the
-# problem is avoided. Only tests manually inspect the cookie response
-# header in ways that show the breakage.
-config.after_initialize do
-  require(Rails.root + 'spec/rack_rails_cookie_header_hack')
-  ActionController::Dispatcher.middleware.insert_before(ActionController::Base.session_store, RackRailsCookieHeaderHack)
-end
-
 # eval <env>-local.rb if it exists
 Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }

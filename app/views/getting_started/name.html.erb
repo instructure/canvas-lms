@@ -1,21 +1,18 @@
-<% content_for :page_title do %>Try It: Choose a Course Name<% end %>
+<% content_for :page_title do %><%= t :page_title, "Try It: Choose Course Name" %><% end %>
 
 <% content_for :right_side do %>
     <div class="rs-margin-lr rs-margin-top">
       <% if @context.teacherless? %>
-          <p>First thing's first, tell us the name of the course you'd like to
-            track.</p>
+          <p><%= t :course_name_notice, "First thing's first, tell us the name of the course you'd like to
+            track." %></p>
       <% else %>
-          <p>Right, then. Let's get this course set up! It should only take a
-            few minutes for the whole process. First off
-            come up with a name for your course. Then you'll add your
-            assignments and students. Shouldn't take too long at all.
+          <p><%= t :course_name_notice_longer, "Right, then. Let's get this course set up! It should only take a few minutes for the whole process. First off come up with a name for your course. Then you'll add your assignments and students. Shouldn't take too long at all." %>
           </p>
       <% end %>
     </div>
     <div class="rs-margin-lr" style="text-align: right;">
-        <button class="next_step_button button big-button button-sidebar-wide" type="submit">Next Step: Assignments</button>
-        <a href="#" class="save_button button button-secondary">Save &amp; Skip the Rest</a>
+        <button class="next_step_button button big-button button-sidebar-wide" type="submit"><%= t :assignment_next_step_link, "Next Step: Assignments" %></button>
+        <a href="#" class="save_button button button-secondary"><%= t :save_and_skip, "Save & Skip the Rest" %></a>
   </div>
 <% end %>
 <% js_block do %>
@@ -39,34 +36,30 @@ $(function(){
 <% form_for @context, :html => { :id => 'setup_course_form' } do |form| %>
   <div style="text-align: left; margin-left: 50px; margin-top: 10px; width: auto; position: relative;" id="course_name_div">
     <% if @context.teacherless? %>
-      <p>You can use Canvas to keep track of how you're doing in all your courses,
-      whether they're using Canvas or not.  Just tell us how your
-      course's grading policy is set up and then enter your scores manually.  You can
-      also invite your classmates to use the course you set up so they can track
-      their grades, too!</p>
+      <p><%= t :teacherless_grades_notice, "You can use Canvas to keep track of how you're doing in all your courses, whether they're using Canvas or not. Just tell us how your course's grading policy is set up and then enter your scores manually. You can also invite your classmates to use the course you set up so they can track their grades, too!" %></p>
     <% end %>
     <div>
-      <%= form.label :name, "Enter a name for your course:", :style => "font-weight: bold; font-size: 1.2em; display: block;" %>
+      <%= form.blabel :name, :en => "Enter a name for your course", :style => "font-weight: bold; font-size: 1.2em; display: block;" %>
       <%= form.text_field :name, :style => "font-size: 2.0em; border: 2px solid #aaa; padding: 2px;" %>  
     </div>
     <div>
-      <%= form.label :course_code, "And a shorter reference code:", :style => "margin-top: 25px;font-weight: bold; font-size: 1.2em; display: block;" %>
+      <%= form.blabel :course_code, :en => "And a shorter reference code", :style => "margin-top: 25px;font-weight: bold; font-size: 1.2em; display: block;" %>
       <%= form.text_field :course_code, :style => "font-size: 1.5em; border: 2px solid #aaa; padding: 2px; width: 250px;" %><br/>
-      <span style="font-weight: normal; font-size: 0.8em;">(something like BIO 100, ENG 315, etc.)</span>
+      <span style="font-weight: normal; font-size: 0.8em;"><%= t :course_code_example, "(something like BIO 100, ENG 315, etc.)" %></span>
     </div>
     <div style="margin-top: 50px; <%= hidden unless @domain_root_account == Account.default %>">
-      <%= form.label :license, "License for course content:", :style => "font-weight: bold; font-size: 1.2em; display: block;" %>
-      <%= form.select :license, [['Private (Copyrighted)', 'private'], ['CC Attribution Non-Commercial No Derivatives', 'cc_by_nc_nd'], ['CC Attribution Non-Commercial Share Alike', 'cc_by_nc_sa'], ['CC Attribution Non-Commercial', 'cc_by_nc'], ['CC Attribution No Derivatives', 'cc_by_nd'], ['CC Attribution Share Alike', 'cc_by_sa'], ['CC Attribution', 'cc_by'], ['Public Domain', 'public_domain']], {}, :style => "font-size: 1.3em; border: 2px solid #aaa;" %>
+      <%= form.blabel :license, :en => "License for course content", :style => "font-weight: bold; font-size: 1.2em; display: block;" %>
+      <%= form.select :license, Course.licenses.map { |id, attrs| [attrs[:readable_license], id] } , {}, :style => "font-size: 1.3em; border: 2px solid #aaa;" %>
       <%= license_help_link %>
       <div style="margin-top: 10px;">
         <%= form.check_box :is_public, :class => "is_public_checkbox" %>
-        <%= form.label :is_public, "Make this course publicly visible", :style => "font-size: 1.3em;" %>
-        <div style="padding-left: 30px; margin-top: -5px; font-size: 0.8em;">(student data will remain private)</div>
+        <%= form.label :is_public, :en => "Make this course publicly visible", :style => "font-size: 1.3em;" %>
+        <div style="padding-left: 30px; margin-top: -5px; font-size: 0.8em;"><%= t :student_data_privacy, "(student data will remain private)" %></div>
       </div>
       <% if @domain_root_account == Account.default %>
       <div class="public_options" style="margin-top: 5px;">
         <%= form.check_box :indexed, :checked => @context.indexed != false, :class => 'indexed_checkbox' %>
-        <%= form.label :indexed, "Include this course in Instructure's public course index", :style => "font-size: 1.3em;" %>
+        <%= form.label :indexed, :en => "Include this course in Instructure's public course index", :style => "font-size: 1.3em;" %>
       </div>
       <% end %>
       <label>

@@ -1,21 +1,18 @@
-<% content_for :page_title do %>Try It: Add Students<% end %>
+<% content_for :page_title, t(:page_title, "Try It: Add Students") %>
 <% content_for :right_side do %>
 <div class="rs-margin-lr rs-margin-top">
     <% if @context.teacherless? %>
-      <p>You can always skip this step and invite your classmates (or even your teacher)
-      to share this course later on.
+      <p><%= t :teacherless_add_student_skip, "You can always skip this step and invite your classmates (or even your teacher) to share this course later on." %>
       </p>
     <% else %>
-      <p>If you're not sure who's going to be in your class, you can skip this step
-      and add students (along with TA's and other teachers) anytime after you finish
-      the wizard.
+      <p><%= t :teacher_add_student_skip, "If you're not sure who's going to be in your class, you can skip this step and add students (along with TA's and other teachers) anytime after you finish the wizard." %>
       </p>
     <% end %>
 </div>
 <div class="rs-margin-lr" style="text-align: right;">
-  <a href="<%= url_for :action => "assignments" %>" class="previous_step_button button small-button">Previous</a>
-  <a href="<%= url_for :action => "setup" %>" class="next_step_button button big-button">Next Step: Save</a>
-  <div style="margin-top: 5px; margin-right: 5px;"><a href="<%= context_url(@context, :context_url) %>" class="save_button button  button-secondary">Save &amp; Skip the Rest</a></div>
+  <a href="<%= url_for :action => "assignments" %>" class="previous_step_button button small-button"><%= t "#buttons.previous", "Previous" %></a>
+  <a href="<%= url_for :action => "setup" %>" class="next_step_button button big-button"><%= t :save_next_step_link, "Next Step: Save" %></a>
+  <div style="margin-top: 5px; margin-right: 5px;"><a href="<%= context_url(@context, :context_url) %>" class="save_button button  button-secondary"><%= t :save_and_skip, "Save & Skip the Rest" %></a></div>
 </div>
 <% end %>
 <% content_for :stylesheets do %>
@@ -54,86 +51,40 @@
 
 <%= render :partial => 'wizard_secondary_nav', :locals => {:view => 'students'} %>
 
-<% if @context.teacherless? %>
-  <p style="margin-top: 10px;">If you'd like, you can invite your fellow classmates
-  to also use this course.  That way they won't have to set up the grading policies
-  all over again, and we'll also give you a place to share files and collaborate.  Just
-  paste in a list of email addresses below to invite others to join.</p>
-<% else %>
-  <p style="margin-top: 10px;"><b>Next, you'll want to add students to your course.</b>  You can add them one by
-  one or as a whole list.  Paste in just email addresses (bob@example.com) or
-  names with addresses <span style="white-space:nowrap;">("Jones, Bob M." &lt;bob@example.com&gt;)</span> separated by commas or
-  on separate lines.
-  </p>
-<% end %>
-<% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form"} do  %>
-<h2>Add Students</h2>
-<div style="margin-top: 5px;">
-  <div id="email_list_boxes">
-    <a id="email_lists_path" style="display:none;" href="<%= url_for email_lists_path(:format => :json) %>"></a>
-    <div id="user_emails_textarea_container" style="z-index: 2;">
-      <input type="hidden" name="enrollment_type" value="StudentEnrollment" />
-      <span style="font-size: 0.8em;">Copy and paste a list of email addresses to add users to this course.</span>
-      <textarea name="user_emails" class="user_emails"><% if @students.empty? %>"Example Student" <student@example.com>
-"Other Student" <otherstudent@example.com>
-"Lastname, Firstname" <firstlast@example.com>
-<justAnEmailAddress@example.com>
-<% end %></textarea>
-    </div>
-    <div id="user_emails_parsed" style="z-index: 1; display:none;">
-      <div class="ui-helper-reset ui-widget-content ui-corner-all" id="email_lists_processed_people">
-        <div id="user_emails_duplicates_found" class="ui-widget">
-          <div class="ui-state-highlight ui-corner-all">
-            <p>
-              <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
-              <strong>Notice:</strong> <strong class='duplicate_count'>???</strong> duplicate address<span class="duplicates_plurality">es</span> found, duplicates have been removed.
-            </p>
-          </div>
-        </div>
-        <div id="user_emails_no_valid_emails" class="ui-widget">
-          <div class="ui-state-highlight ui-corner-all">
-            <p><span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
-            <strong>Sorry,</strong> it does not seem as if there were any valid email addresses typed in, please go back and try again.</p>
-          </div>
-        </div>
-        <div id="user_emails_with_errors" class="ui-widget">
-          <div class="ui-state-highlight ui-corner-all">
-            <p>
-              <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-alert"></span>
-              <strong>Alert:</strong> There were <strong class="errors_count">???</strong> errors parsing that list of emails. There may be some that
-              were invalid, you might need to go back and fix any errors.  If you proceed as is, <strong class="addresses_count">???</strong>
-              users will be added.
-            </p>
-          </div>
-        </div>
+<p style="margin-top: 10px;">
+<%= if @context.teacherless?
+  if @context.root_account.login_handle_name_is_customized?
+    t :teacherless_add_student_notice_with_login_handle, "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies all over again, and we'll also give you a place to share files and collaborate. Just paste in a list of users below to invite others to join. You can use their email addresses or %{login_handle_name}.", :login_handle_name => @context.root_account.login_handle_name
+  else
+    t :teacherless_add_student_notice_just_email, "If you'd like, you can invite your fellow classmates to also use this course. That way they won't have to set up the grading policies all over again, and we'll also give you a place to share files and collaborate. Just paste in a list of email addresses below to invite others to join."
+  end
+else
+  if @context.root_account.login_handle_name_is_customized?
+    t :teacher_add_student_notice_with_login_handle, "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. You can paste in their %{login_handle_name}, just their email address (bob@example.com), or their name and address #(\"Jones, Bob M.\" <bob@example.com>)#. Multiple users should be separated by commas or be on separate lines.", :wrapper => { "*" => "<b>\\1</b>", "#" => "<span style=\"white-space:nowrap;\">\\1</span>" }, :login_handle_name => @context.root_account.login_handle_name
+  else
+    t :teacher_add_student_notice_just_email, "*Next, you'll want to add students to your course.* You can add them one by one or as a whole list. Paste in just email addresses (bob@example.com) or names with addresses #(\"Jones, Bob M.\" <bob@example.com>)# separated by commas or on separate lines.", :wrapper => { "*" => "<b>\\1</b>", "#" => "<span style=\"white-space:nowrap;\">\\1</span>" }
+  end
+end %>
+</p>
 
-        <div class="person ui-helper-reset ui-state-default ui-corner-all" id="email_lists_processed_person_template" style="display:none;">
-          <div class="name">Last, First</div>
-          <div class="address">user@domain.com</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- <% unless @context.available? %>
-  <div>
-    <i>Since the course hasn't been published, students and TA's will be added, but won't be
-    invited to join the course.  Invitations will be sent out when the course is published.</i>
-  </div>
-  <% end %> -->
+<% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form"} do  %>
+<h2><%= t "#titles.add_students", "Add Students" %></h2>
+<div style="margin-top: 5px;">
+<%= render :partial => 'shared/user_lists' %>
 </div>
 <div class="button-container">
-  <button type="button" class="button verify_syntax_button">Continue...</button>
-  <button type="submit" class="button add_users_button">OK Looks Good, Add These Users</button>
-  <button type="button" class="go_back_button button-secondary">Go back and edit the list of emails</button>
+  <button type="button" class="button verify_syntax_button"><%= t "#buttons.continue", "Continue" %></button>
+  <button type="submit" class="button add_users_button"><%= t :looks_good, "OK Looks Good, Add These Users" %></button>
+  <button type="button" class="go_back_button button-secondary"><%= t :go_back_and_edit, "Go back and edit the list of users" %></button>
 </div>
 <br /><br />
 <% end %>
 
-<h2>Students <span class="tally">(<span class="student_count"><%= @students.length %></span>)</span></h2>
+<h2><%= t "#titles.students", "Students" %> <span class="tally">(<span class="student_count"><%= @students.length %></span>)</span></h2>
 
 <ul class="user_list student_enrollments">
   <% if @students.empty? %>
-    <li class="none">No Students Enrolled</li>
+    <li class="none"><%= t :no_enrollments, "No Students Enrolled" %></li>
   <% else %>
     <%= render :partial => 'shared/enrollment', :collection => @students %>
   <% end %>
@@ -141,4 +92,4 @@
 </ul>
 
 
-<% jammit_js :email_lists %>
+<% jammit_js :user_lists %>

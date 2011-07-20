@@ -17,47 +17,56 @@
 #
 module CC
   module AssignmentResources
-
+    
     def add_assignments
       @course.assignments.active.no_graded_quizzes_or_topics.each do |assignment|
-        migration_id = CCHelper.create_key(assignment)
-
-        lo_folder = File.join(@export_dir, migration_id)
-        FileUtils::mkdir_p lo_folder
-
-        file_name = "#{assignment.title.to_url}.html"
-        relative_path = File.join(migration_id, file_name)
-        path = File.join(lo_folder, file_name)
-
-        # Write the assignment description as an .html file
-        # That way at least the content of the assignment will
-        # appear when someone non-canvas imports the package
-        File.open(path, 'w') do |file|
-          file << @html_exporter.html_page(assignment.description || '', "Assignment: " + assignment.title, @course, @manifest.exporter.user)
+        begin
+          add_assignment(assignment)
+        rescue
+          title = assignment.title rescue I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
+          add_error(I18n.t('course_exports.errors.assignment', "The assignment \"%{title}\" failed to export", :title => title), $!)
         end
-        
-        assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')
-        document = Builder::XmlMarkup.new(:target=>assignment_file, :indent=>2)
-        document.instruct!
-  
-        # Save all the meta-data into a canvas-specific xml schema
-        document.assignment("identifier" => migration_id,
-                        "xmlns" => CCHelper::CANVAS_NAMESPACE,
-                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                        "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
-        ) do |a|
-          AssignmentResources.create_assignment(a, assignment)
-        end
-        assignment_file.close
+      end
+    end
 
-        @resources.resource(
-                :identifier => migration_id,
-                "type" => CCHelper::LOR,
-                :href => relative_path
-        ) do |res|
-          res.file(:href=>relative_path)
-          res.file(:href=>File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
-        end
+    def add_assignment(assignment)
+      migration_id = CCHelper.create_key(assignment)
+
+      lo_folder = File.join(@export_dir, migration_id)
+      FileUtils::mkdir_p lo_folder
+
+      file_name = "#{assignment.title.to_url}.html"
+      relative_path = File.join(migration_id, file_name)
+      path = File.join(lo_folder, file_name)
+
+      # Write the assignment description as an .html file
+      # That way at least the content of the assignment will
+      # appear when someone non-canvas imports the package
+      File.open(path, 'w') do |file|
+        file << @html_exporter.html_page(assignment.description || '', "Assignment: " + assignment.title, @course, @manifest.exporter.user)
+      end
+
+      assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')
+      document = Builder::XmlMarkup.new(:target=>assignment_file, :indent=>2)
+      document.instruct!
+
+      # Save all the meta-data into a canvas-specific xml schema
+      document.assignment("identifier" => migration_id,
+                          "xmlns" => CCHelper::CANVAS_NAMESPACE,
+                          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
+                          "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+      ) do |a|
+        AssignmentResources.create_assignment(a, assignment)
+      end
+      assignment_file.close
+
+      @resources.resource(
+              :identifier => migration_id,
+              "type" => CCHelper::LOR,
+              :href => relative_path
+      ) do |res|
+        res.file(:href=>relative_path)
+        res.file(:href=>File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
       end
     end
     

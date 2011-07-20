@@ -33,6 +33,8 @@ javascripts:
     - public/javascripts/feedback.js
     - public/javascripts/license_help.js
     - public/javascripts/wiki_sidebar.js
+    - public/javascripts/translations/_core.js
+    - public/javascripts/translations/common.js
   speed_grader:
     - public/javascripts/jquery.elastic.js
     - public/javascripts/ui.selectmenu.js
@@ -68,7 +70,7 @@ javascripts:
     - public/javascripts/jquery.metadata.js 
     - public/javascripts/gradebook-history.js
   jobs:
-    - public/javascripts/jobs.js
+    - public/javascripts/compiled/jobs.js
   profile:
     - public/javascripts/profile.js
   topics:
@@ -77,6 +79,7 @@ javascripts:
     - public/javascripts/topic.js
   account_statistics:
     - public/javascripts/account_statistics.js
+    - public/javascripts/translations/account_statistics.js
   assignments:
     - public/javascripts/assignments.js
   edit_rubric:
@@ -98,11 +101,12 @@ javascripts:
     - public/javascripts/collaborations.js
   context_messages:
     - public/javascripts/context_messages.js
+    - public/javascripts/translations/context_messages.js
   context_modules:
     - public/javascripts/context_modules.js
   course_details:
     - public/javascripts/jquery.cookie.js
-    - public/javascripts/email_lists.js
+    - public/javascripts/user_lists.js
     - public/javascripts/course_details.js
     - public/javascripts/external_tools.js
     - public/javascripts/grading_standards.js
@@ -119,13 +123,19 @@ javascripts:
   full_files:
     - public/javascripts/full_files.js
     - public/flash/uploadify/jquery.uploadify.v2.1.0.js
-  email_lists:
-    - public/javascripts/email_lists.js
+  user_lists:
+    - public/javascripts/user_lists.js
   datagrid:
     - public/javascripts/datagrid.js
+  gradebook2:
+    - public/javascripts/compiled/multi_grid.js
+    - public/javascripts/compiled/grade_calculator.js
+    - public/javascripts/compiled/gradebook2.js
+    - public/javascripts/compiled/submission_cell.js
   gradebooks:
     - public/javascripts/gradebooks.js
     - public/javascripts/message_students.js
+    - public/javascripts/compiled/grade_calculator.js
   attendance:
     - public/javascripts/datagrid.js
     - public/javascripts/attendance.js
@@ -142,6 +152,7 @@ javascripts:
     - public/javascripts/supercalc.js
     - public/javascripts/calcCmd.js
     - public/javascripts/quiz_rubric.js
+    - public/javascripts/translations/quizzes_bundle.js
   quizzes_index:
     - public/javascripts/quiz_index.js
     - public/javascripts/content_locks.js
@@ -187,6 +198,7 @@ javascripts:
     - public/javascripts/user.js
   manage_groups:
     - public/javascripts/manage_groups.js
+    - public/javascripts/translations/manage_groups.js
   manage_avatars:
     - public/javascripts/manage_avatars.js
   ie7:
@@ -201,6 +213,7 @@ javascripts:
     - public/javascripts/content_exports.js
   conferences:
     - public/javascripts/conferences.js
+    - public/javascripts/translations/conferences.js
 
 stylesheets:
   common:
@@ -257,6 +270,8 @@ stylesheets:
   gradebooks:
     - public/stylesheets/compiled/gradebooks.css
     - public/stylesheets/compiled/message_students.css
+  gradebook2:
+    - public/stylesheets/compiled/gradebook2.css
   attendance:
     - public/stylesheets/compiled/attendance.css
   quizzes:
@@ -282,6 +297,8 @@ stylesheets:
     - public/stylesheets/compiled/context_list.css
   prior_users:
     - public/stylesheets/compiled/prior_users.css
+  reports:
+    - public/stylesheets/compiled/reports.css
   statistics:
     - public/stylesheets/compiled/statistics.css
   slickgrid:

@@ -3,10 +3,23 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= asset.user.name %> accepted the <%= asset.course.class.to_s.capitalize %> Invitation
+  <%= t :subject, "%{user} accepted the Course Invitation", :user => asset.user.name %>
 <% end %>
 
-<%= asset.user.name %> just accepted their invitation to participate in the <%= asset.course.class.to_s.downcase %>, <%= asset.course.name %>, as a <%= asset.readable_type %>.
+<%=
+    case asset.type
+    when 'TeacherEnrollment'
+      t :body_teacher, "%{user} just accepted their invitation to participate in the course, %{course}, as a teacher.", :user => asset.user.name, :course => asset.course.name
+    when 'TAEnrollment'
+      t :body_ta, "%{user} just accepted their invitation to participate in the course, %{course}, as a TA.", :user => asset.user.name, :course => asset.course.name
+    when 'ObserverEnrollment'
+      t :body_observer, "%{user} just accepted their invitation to participate in the course, %{course}, as an observer.", :user => asset.user.name, :course => asset.course.name
+    when 'CourseDesignerEnrollment'
+      t :body_designer, "%{user} justed accept their invitation to participate in the course, %{course}, as a designer.", :user => asset.user.name, :course => asset.course.name
+    else
+      t :body_student, "%{user} just accepted their invitation to participate in the course, %{course}, as a student.", :user => asset.user.name, :course => asset.course.name
+    end
+%>
 
-See the list of current enrollments here:
+<%= t :details, "See the list of current enrollments here:" %>
 <%= content :link %>

@@ -21,7 +21,7 @@ var wikiSidebar;
 // take a little bit of work.  I just wrapped it in a closure for now
 // to not pollute the global namespace, but it could use more.
 var quiz = {};
-(function() {
+I18n.scoped('quizzes', function(I18n) {
   quiz = {
     uniqueLocalIDStore: {},
     generateUniqueLocalID: function($obj) {
@@ -75,26 +75,26 @@ var quiz = {};
         id: answer.id,
         match_id: answer.match_id
       }
-      templateData.comments_header = "Comments, if the user chooses this answer:";
-      templateData.short_answer_header = "Possible Answer:";
-      $answer.find(".comment_focus").attr('title', 'Click to enter comments for the student if they choose this answer');
+      templateData.comments_header = I18n.beforeLabel('comments_on_answer', "Comments, if the user chooses this answer");
+      templateData.short_answer_header = I18n.beforeLabel('possible_answer', "Possible Answer");
+      $answer.find(".comment_focus").attr('title', I18n.t('titles.click_to_enter_comments_on_answer', 'Click to enter comments for the student if they choose this answer'));
       if(question_type == "essay_question") {
-        templateData.comments_header = "Comments for this question:";
+        templateData.comments_header = I18n.beforeLabel('comments_on_question', "Comments for this question");
       } else if(question_type == "matching_question") {
         templateData.answer_match_left_html = answer.answer_match_left_html;
-        templateData.comments_header = "Comments if the user gets this match wrong:";
-        $answer.find(".comment_focus").attr('title', 'Click to enter comments for the student if they miss this match');
+        templateData.comments_header = I18n.beforeLabel('comments_on_wrong_match', "Comments if the user gets this match wrong");
+        $answer.find(".comment_focus").attr('title', I18n.t('titles.click_to_enter_comments_on_wrong_match', 'Click to enter comments for the student if they miss this match'));
       } else if(question_type == "missing_word_question") {
-        templateData.short_answer_header = "Answer text:";
+        templateData.short_answer_header = I18n.beforeLabel('answer_text', "Answer text");
       } else if(question_type == "multiple_choice_question") {
         templateData.answer_html = answer.answer_html;
       } else if(question_type == "multiple_answers_question") {
         templateData.answer_html = answer.answer_html;
-        templateData.short_answer_header = "Answer text:";
+        templateData.short_answer_header = I18n.beforeLabel('answer_text', "Answer text");
       } else if(question_type == "fill_in_multiple_blanks_question") {
         templateData.blank_id = answer.blank_id;
       } else if(question_type == "multiple_dropdowns_question") {
-        templateData.short_answer_header = "Answer text:";
+        templateData.short_answer_header = I18n.t('answer_text', "Answer text");
         templateData.blank_id = answer.blank_id;
       }
       if(answer.blank_id && answer.blank_id != '0') {
@@ -279,7 +279,7 @@ var quiz = {};
             $tr.append($th);
           }
           var $th = $("<th/>");
-          $th.text("Final Answer");
+          $th.text(I18n.t('final_answer', "Final Answer"));
           $tr.append($th);
           $question.find(".equation_combinations_holder_holder").css('display', '');
           $question.find(".equation_combinations thead").append($tr).show();
@@ -305,7 +305,7 @@ var quiz = {};
         }
       } else {
         var $option = $(document.createElement('option'));
-        $option.val("").text("[ Choose ]");
+        $option.val("").text(I18n.t('choose_option', "[ Choose ]"));
         $select.append($option);
         $.each(question.answers, function(i, data) {
           data.answer_type = answer_type;
@@ -373,7 +373,7 @@ var quiz = {};
           }
         }
         if(code) {
-          $text.append("Other Incorrect Match Options:<ul class='matching_answer_incorrect_matches_list'>" + code + "</ul>");
+          $text.append(I18n.beforeLabel('other_incorrect_matches', "Other Incorrect Match Options") + "<ul class='matching_answer_incorrect_matches_list'>" + code + "</ul>");
         }
       }
       $question.find(".blank_id_select").change();
@@ -455,10 +455,10 @@ var quiz = {};
         var answerOptions = {
           question_type: "true_false_question",
           answer_type: "fixed_answer",
-          answer_text: "True"
+          answer_text: I18n.t('true', "True")
         };
         quiz.updateFormAnswer($formQuestion.find(".answer:first"), answerOptions);
-        answerOptions.answer_text = "False";
+        answerOptions.answer_text = I18n.t('false', "False");
         quiz.updateFormAnswer($formQuestion.find(".answer:last"), answerOptions);
         result.answer_type = "fixed_answer";
       } else if(question_type == 'short_answer_question') {
@@ -507,7 +507,7 @@ var quiz = {};
         $formQuestion.removeClass('selectable');
         $formQuestion.find(".answers_header").hide().end()
           .find(".question_comment").css('display', 'none');
-        $formQuestion.find(".question_header").text("Message Text:");
+        $formQuestion.find(".question_header").text(I18n.beforeLabel('message_text', "Message Text"));
         $form.find(":input[name='question_points']").val(0);
         result.answer_type = "none";
         result.textValues = [];
@@ -600,16 +600,16 @@ var quiz = {};
       question_type: "multiple_choice_question",
       question_text: "",
       question_points: 1,
-      question_name: "Question",
+      question_name: I18n.t('default_question_name', "Question"),
       answer_count: 4
     },
     defaultAnswerData: {
       answer_type: "select_answer",
-      answer_text: "Answer Text",
+      answer_text: I18n.t('default_answer_text', "Answer Text"),
       answer_comment: "",
       answer_weight: 0,
-      answer_match_left: "Matching left side",
-      answer_match_right: "Matching right side",
+      answer_match_left: I18n.t('default_match_left', "Matching left side"),
+      answer_match_right: I18n.t('default_match_right', "Matching right side"),
       numerical_answer_type: "exact_answer",
       answer_exact: "",
       answer_error_margin: "",
@@ -619,7 +619,7 @@ var quiz = {};
   }
   function makeQuestion(data) {
     var idx = $(".question_holder:visible").length + 1;
-    var question = $.extend({}, quiz.defaultQuestionData, {question_name: "Question"}, data);
+    var question = $.extend({}, quiz.defaultQuestionData, {question_name: I18n.t('default_quesiton_name', "Question")}, data);
     var $question = $("#question_template").clone(true);
     $question.attr('id', '').find('.question').attr('id', 'question_new');
     $question.fillTemplateData({ data: question, except: ['answers'] });
@@ -670,7 +670,7 @@ var quiz = {};
     if(isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
     $answer.fillFormData({answer_text: answer.answer_text});
     $answer.fillTemplateData({data: answer, htmlValues: ['answer_html', 'answer_match_left_html']});
-    if(!answer.answer_comment || answer.answer_comment == "" || answer.answer_comment == "Answer comments") {
+    if(!answer.answer_comment || answer.answer_comment == "" || answer.answer_comment == I18n.t('answer_comments', "Answer comments")) {
       $answer.find(".answer_comment_holder").hide();
     }
     if(answer.answer_weight == 100) {
@@ -891,63 +891,63 @@ var quiz = {};
         $item.val('--');
       }
     }).triggerHandler('change');
-  $("#protect_quiz").change(function() {
-    var checked = $(this).attr('checked');
-    $(".protected_options").showIf(checked).find(":checkbox").each(function() {
-      if(!checked) {
-        $(this).attr('checked', false).change();
+    $("#protect_quiz").change(function() {
+      var checked = $(this).attr('checked');
+      $(".protected_options").showIf(checked).find(":checkbox").each(function() {
+        if(!checked) {
+          $(this).attr('checked', false).change();
+        }
+      });
+    }).triggerHandler('change');
+    $("#quiz_require_lockdown_browser").change(function() {
+      $("#lockdown_browser_suboptions").showIf($(this).attr('checked'));
+      $("#quiz_require_lockdown_browser_for_results").attr('checked', true).change();
+    });
+    $("#lockdown_browser_suboptions").showIf($("#quiz_require_lockdown_browser").attr('checked'));
+    $("#ip_filter").change(function() {
+      $("#ip_filter_suboptions").showIf($(this).attr('checked'));
+      if(!$(this).attr('checked')) {
+        $("#quiz_ip_filter").val("");
+      }
+    }).triggerHandler('change');
+    $("#ip_filters_dialog").delegate('.ip_filter', 'click', function(event) {
+      event.preventDefault();
+      var filter = $(this).getTemplateData({textValues: ['filter']}).filter;
+      $("#protect_quiz").attr('checked', true).triggerHandler('change');
+      $("#ip_filter").attr('checked', true).triggerHandler('change');
+      $("#quiz_ip_filter").val(filter);
+      $("#ip_filters_dialog").dialog('close');
+    });
+    $(".ip_filtering_link").click(function(event) {
+      event.preventDefault();
+      var $dialog = $("#ip_filters_dialog");
+      $dialog.dialog('close').dialog({
+        autoOpen: false,
+        width: 400,
+        title: I18n.t('titles.ip_address_filtering', "IP Address Filtering")
+      }).dialog('open');
+      if(!$dialog.hasClass('loaded')) {
+        $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
+        var url = $("#quiz_urls .filters_url").attr('href');
+        $.ajaxJSON(url, 'GET', {}, function(data) {
+          $dialog.addClass('loaded');
+          if(data.length) {
+            for(var idx in data) {
+              var filter = data[idx];
+              var $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
+              $filter.fillTemplateData({data: filter});
+              $dialog.find(".filters tbody").append($filter.show());
+            }
+            $dialog.find(".searching_message").hide().end()
+              .find(".filters").show();
+          } else {
+            $dialog.find(".searching_message").text(I18n.t('no_filters_found', "No filters found"));
+          }
+        }, function(data) {
+          $dialog.find(".searching_message").text(I18n.t('errors.retrieving_filters_failed', "Retrieving Filters Failed"));
+        });
       }
     });
-  }).triggerHandler('change');
-  $("#quiz_require_lockdown_browser").change(function() {
-    $("#lockdown_browser_suboptions").showIf($(this).attr('checked'));
-    $("#quiz_require_lockdown_browser_for_results").attr('checked', true).change();
-  });
-  $("#lockdown_browser_suboptions").showIf($("#quiz_require_lockdown_browser").attr('checked'));
-  $("#ip_filter").change(function() {
-    $("#ip_filter_suboptions").showIf($(this).attr('checked'));
-    if(!$(this).attr('checked')) {
-      $("#quiz_ip_filter").val("");
-    }
-  }).triggerHandler('change');
-  $("#ip_filters_dialog").delegate('.ip_filter', 'click', function(event) {
-    event.preventDefault();
-    var filter = $(this).getTemplateData({textValues: ['filter']}).filter;
-    $("#protect_quiz").attr('checked', true).triggerHandler('change');
-    $("#ip_filter").attr('checked', true).triggerHandler('change');
-    $("#quiz_ip_filter").val(filter);
-    $("#ip_filters_dialog").dialog('close');
-  });
-  $(".ip_filtering_link").click(function(event) {
-    event.preventDefault();
-    var $dialog = $("#ip_filters_dialog");
-    $dialog.dialog('close').dialog({
-      autoOpen: false,
-      width: 400,
-      title: "IP Address Filtering"
-    }).dialog('open');
-    if(!$dialog.hasClass('loaded')) {
-      $dialog.find(".searching_message").text("Retrieving Filters...");
-      var url = $("#quiz_urls .filters_url").attr('href');
-      $.ajaxJSON(url, 'GET', {}, function(data) {
-        $dialog.addClass('loaded');
-        if(data.length) {
-          for(var idx in data) {
-            var filter = data[idx];
-            var $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
-            $filter.fillTemplateData({data: filter});
-            $dialog.find(".filters tbody").append($filter.show());
-          }
-          $dialog.find(".searching_message").hide().end()
-            .find(".filters").show();
-        } else {
-          $dialog.find(".searching_message").text("No filters found");
-        }
-      }, function(data) {
-        $dialog.find(".searching_message").text("Retrieving Filters Failed");
-      });
-    }
-  });
     $("#require_access_code").change(function(event) {
       $("#access_code_suboptions").showIf($(this).attr('checked'));
       if(!$(this).attr('checked')) {
@@ -958,6 +958,7 @@ var quiz = {};
       $(".show_quiz_results_options").showIf($(this).attr('checked'));
       if(!$(this).attr('checked')) {
         $("#hide_results_only_after_last").attr('checked', false);
+        $("#quiz_show_correct_answers").attr('checked', false);
       }
     }).triggerHandler('change');
     $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").bind('change', function() {
@@ -985,7 +986,7 @@ var quiz = {};
         if($(this).data('submit_type') == 'save_only') {
           delete data['activate'];
         }
-        data['quiz[description]'] = $("#quiz_description").editorBox('get_code'); //val();
+        data['quiz[description]'] = $("#quiz_description").editorBox('get_code');
         var attempts = 1;
         if(data.multiple_attempts) {
           attempts = parseInt(data.allowed_attempts, 10);
@@ -999,9 +1000,9 @@ var quiz = {};
         $(this).find(".button.save_quiz_button").attr('disabled', true);
         $(this).find(".button.publish_quiz_button").attr('disabled', true);
         if($(this).data('activator') == 'publish') {
-          $(this).find(".button.publish_quiz_button").text("Publishing...");
+          $(this).find(".button.publish_quiz_button").text(I18n.t('buttons.publishing', "Publishing..."));
         } else {
-          $(this).find(".button.save_quiz_button").text("Saving...");
+          $(this).find(".button.save_quiz_button").text(I18n.t('buttons.saving', "Saving..."));
         }
       },
       success: function(data) {
@@ -1009,12 +1010,12 @@ var quiz = {};
         $(this).find(".button.save_quiz_button").attr('disabled', false);
         $(this).find(".button.publish_quiz_button").attr('disabled', false);
         if($(this).data('activator') == 'publish') {
-          $(this).find(".button.publish_quiz_button").text("Published!");
+          $(this).find(".button.publish_quiz_button").text(I18n.t('buttons.published', "Published!"));
         } else {
-          $(this).find(".button.save_quiz_button").text("Saved!");
+          $(this).find(".button.save_quiz_button").text(I18n.t('buttons.saved', "Saved!"));
         }
         setTimeout(function() {
-          $form.find(".button.save_quiz_button").text("Save Settings");
+          $form.find(".button.save_quiz_button").text(I18n.t('buttons.save_settings', "Save Settings"));
         }, 2500);
         if(data.quiz.assignment) {
           var assignment = data.quiz.assignment;
@@ -1031,11 +1032,11 @@ var quiz = {};
           }
         }
         $(".show_rubric_link").showIf(data.quiz.assignment);
-        $("#quiz_assignment_id").val(data.quiz.quiz_type || "practice_quiz").change(); //data.quiz.assignment.id).change();
+        $("#quiz_assignment_id").val(data.quiz.quiz_type || "practice_quiz").change();
         if($(this).data('submit_type') == 'save_and_publish') {
           location.href = $(this).attr('action');
         } else {
-          $.flashMessage("Quiz data saved");
+          $.flashMessage(I18n.t('notices.quiz_data_saved', "Quiz data saved"));
         }
         quiz.updateDisplayComments();
     },
@@ -1059,7 +1060,7 @@ var quiz = {};
     }).triggerHandler('change');
     $(".start_over_link").click(function(event) {
       event.preventDefault();
-      var result = confirm("Scrap this quiz and start from scratch?");
+      var result = confirm(I18n.t('confirms.scrap_and_restart', "Scrap this quiz and start from scratch?"));
       if(result) {
         location.href = location.href + "?fresh=1";
       }
@@ -1072,7 +1073,7 @@ var quiz = {};
         var select = $("#quiz_assignment_id")[0];
         quiz_title = $(select.options[select.selectedIndex]).text();
       } else if(previousData.assignment_id) {
-        quiz_title = "Quiz";
+        quiz_title = I18n.t('default_quiz_title', "Quiz");
       }
       var data = {
         'quiz[assignment_id]': assignment_id,
@@ -1091,7 +1092,7 @@ var quiz = {};
       $("#quiz_title_text").text(quiz_title);
     }).change();
     $(".question_form :input").keycodes("esc", function(event) {
-      $(this).parents("form").find("input[value='Cancel']").click();
+      $(this).parents("form").find("input[value='" + I18n.t('#buttons.cancel', "Cancel") + "']").click();
     });
     $(document).delegate('.blank_id_select', 'change', function() {
       var variable = $(this).val();
@@ -1115,7 +1116,7 @@ var quiz = {};
       event.preventDefault();
       $(this).parents(".question_holder").confirmDelete({
         url: $(this).parents(".question_holder").find(".update_question_url").attr('href'),
-        message: "Are you sure you want to delete this question?",
+        message: I18n.t('confirms.delete_question', "Are you sure you want to delete this question?"),
         success: function(data) {
           $(this).remove();
           quiz.updateDisplayComments();
@@ -1173,7 +1174,7 @@ var quiz = {};
           $form.find(".combinations_holder .combinations thead tr").append($th);
         }
         var $th = $("<th class='final_answer'/>");
-        $th.text("Final Answer");
+        $th.text(I18n.t('final_answer', "Final Answer"));
         $form.find(".combinations_holder .combinations thead tr").append($th);
         for(var idx in question.formulas) {
           $form.find(".supercalc").val(question.formulas[idx]);
@@ -1216,13 +1217,13 @@ var quiz = {};
         });
       }
       if($question.hasClass('essay_question')) {
-        $formQuestion.find(".comments_header").text("Comments for this question:");
+        $formQuestion.find(".comments_header").text(I18n.beforeLabel('comments_on_question', "Comments for this question"));
       }
       $question.hide().after($form);
       quiz.showFormQuestion($form);
       $form.attr('action', $question.find(".update_question_url").attr('href'))
         .attr('method', 'POST')
-        .find('.submit_button').html('Update Question');
+        .find('.submit_button').text(I18n.t('buttons.update_question', 'Update Question'));
       $form.find(":input:visible:first").focus().select();
       $("html,body").scrollTo({top: $form.offset().top - 10, left: 0});
       setTimeout(function() {
@@ -1307,7 +1308,7 @@ var quiz = {};
       $group_top.find(".edit_group_link").click();
       $group_top.find(".quiz_group_form").attr('action', $("#quiz_urls .add_group_url").attr('href'))
         .attr('method', 'POST');
-      $group_top.find(".submit_button").html("Create Group");
+      $group_top.find(".submit_button").text(I18n.t('buttons.create_group', "Create Group"));
     });
     $(".add_question_link").click(function(event) {
       event.preventDefault();
@@ -1326,7 +1327,7 @@ var quiz = {};
       var $form = $question.parents(".question_holder").children("form");
       $form.attr('action', $("#quiz_urls .add_question_url,#bank_urls .add_question_url").attr('href'))
         .attr('method', 'POST')
-        .find(".submit_button").html("Create Question");
+        .find(".submit_button").html(I18n.t('buttons.create_question', "Create Question"));
       $form.find("option.missing_word").remove();
       $question.find(".question_type").change();
       $("html,body").scrollTo({top: $question.offset().top - 10, left: 0});
@@ -1340,7 +1341,7 @@ var quiz = {};
       if(!$dialog.hasClass('loaded')) {
         $dialog.data('banks', {});
         $dialog.find(".find_banks").hide();
-        $dialog.find(".message").show().text("Loading Question Banks...");
+        $dialog.find(".message").show().text(I18n.t('loading_question_banks', "Loading Question Banks..."));
         var url = $dialog.find(".find_question_banks_url").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(banks) {
           $dialog.find(".message").hide();
@@ -1356,14 +1357,14 @@ var quiz = {};
             $bank.show();
           }
         }, function(data) {
-          $dialog.find(".message").text("Question Banks failed to load, please try again");
+          $dialog.find(".message").text(I18n.t('errors.loading_banks_failed', "Question Banks failed to load, please try again"));
         });
       }
       $dialog.find(".bank.selected").removeClass('selected');
       $dialog.find(".submit_button").attr('disabled', true);
       $dialog.dialog('close').dialog({
         autoOpen: false,
-        title: "Find Question Bank",
+        title: I18n.t('titles.find_question_bank', "Find Question Bank"),
         width: 600,
         height: 400
       }).dialog('open');
@@ -1396,7 +1397,7 @@ var quiz = {};
       if(!$dialog.hasClass('loaded')) {
         $dialog.data('banks', {});
         $dialog.find(".side_tabs_table").hide();
-        $dialog.find(".message").show().text("Loading Question Banks...");
+        $dialog.find(".message").show().text(I18n.t('loading_question_banks', "Loading Question Banks..."));
         var url = $dialog.find(".find_question_banks_url").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(banks) {
           $dialog.find(".message").hide();
@@ -1413,13 +1414,13 @@ var quiz = {};
           }
           $dialog.find(".bank:not(.blank):first").click();
         }, function(data) {
-          $dialog.find(".message").text("Question Banks failed to load, please try again");
+          $dialog.find(".message").text(I18n.t('errors.loading_banks_failed', "Question Banks failed to load, please try again"));
         });
       }
       $dialog.data('add_source', '');
       $dialog.dialog('close').dialog({
         autoOpen: false,
-        title: "Find Quiz Question",
+        title: I18n.t('titles.find_quiz_question', "Find Quiz Question"),
         open: function() {
           if($dialog.find(".selected_side_tab").length == 0) {
             $dialog.find(".bank:not(.blank):first").click();
@@ -1459,7 +1460,7 @@ var quiz = {};
           question_ids.push($(this).parents(".found_question").data('question_data').id);
         });
         $dialog.find(".questions_count").text(question_ids.length);
-        $dialog.find("button").attr('disabled', false).filter(".submit_button").text("Create Group");
+        $dialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.create_group', "Create Group"));
         $dialog.dialog('close').dialog({
           width: 400,
           autoOpen: false
@@ -1468,11 +1469,11 @@ var quiz = {};
     });
     $("#add_question_group_dialog .submit_button").click(function(event) {
       var $dialog = $("#add_question_group_dialog");
-      $dialog.find("button").attr('disabled', true).filter(".submit_button").text("Creating Group...");
+      $dialog.find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('buttons.creating_group', "Creating Group..."));
       var params = $dialog.getFormData();
       var url = $dialog.find(".add_question_group_url").attr('href');
       $.ajaxJSON(url, 'POST', params, function(data) {
-        $dialog.find("button").attr('disabled', false).filter(".submit_button").text("Create Group");
+        $dialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.create_group', "Create Group"));
 
         var $group_top = $("#group_top_template").clone(true).attr('id', 'group_top_new');
         var $group_bottom = $("#group_bottom_template").clone(true).attr('id', 'group_bottom_new');
@@ -1491,7 +1492,7 @@ var quiz = {};
         updateFindQuestionDialogQuizGroups(data.quiz_group.id);
         $dialog.dialog('close');
       }, function(data) {
-        $dialog.find("button").attr('disabled', false).filter(".submit_button").text("Create Group Failed, Please Try Again");
+        $dialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('errors.creating_group_failed', "Create Group Failed, Please Try Again"));
       });
     });
     $("#add_question_group_dialog .cancel_button").click(function(event) {
@@ -1546,7 +1547,7 @@ var quiz = {};
         $findQuestionDialog.find(".found_question:visible").remove();
         $findQuestionDialog.find(".page_link").click();
         $findQuestionDialog.find(".question_list_holder").hide();
-        $findQuestionDialog.find(".question_message").show().text("Loading Questions...");
+        $findQuestionDialog.find(".question_message").show().text(I18n.t('loading_questions', "Loading Questions..."));
       } else {
         $findQuestionDialog.find(".found_question:visible").remove();
         showQuestions(data);
@@ -1556,7 +1557,7 @@ var quiz = {};
       var $link = $(this);
       if($link.hasClass('loading')) { return; }
       $link.addClass('loading');
-      $findQuestionDialog.find(".page_link").text("loading more questions...");
+      $findQuestionDialog.find(".page_link").text(I18n.t('loading_more_questions', "loading more questions..."));
       var $bank = $findQuestionDialog.find(".bank.selected_side_tab");
       var bank = $bank.data('bank_data');
       var url = $findQuestionDialog.find(".question_bank_questions_url").attr('href');
@@ -1566,7 +1567,7 @@ var quiz = {};
       $.ajaxJSON(url, 'GET', {}, function(data) {
         $link.removeClass('loading');
         $findQuestionDialog.find(".page_link").data('page', page);
-        $findQuestionDialog.find(".page_link").text("more questions");
+        $findQuestionDialog.find(".page_link").text(I18n.t('more_questions', "more questions"));
         var questions = data.questions;
         var banks = $findQuestionDialog.data('banks') || {};
         var bank_data = banks[bank.id] || {};
@@ -1580,8 +1581,8 @@ var quiz = {};
         showQuestions(data);
       }, function(data) {
         $link.removeClass('loading');
-        $findQuestionDialog.find(".question_message").text("Questions failed to load, please try again");
-        $findQuestionDialog.find(".page_link").text("loading more questions failed");
+        $findQuestionDialog.find(".question_message").text(I18n.t('errors.loading_questions_failed', "Questions failed to load, please try again"));
+        $findQuestionDialog.find(".page_link").text(I18n.t('errors.loading_more_questions_failed', "loading more questions failed"));
       });
     }).delegate('.select_all_link', 'click', function(event) {
       event.preventDefault();
@@ -1600,7 +1601,7 @@ var quiz = {};
       $dialog.find(".questions_count").text(question_ids.length);
       $dialog.dialog('close').dialog({
         autoOpen: false,
-        title: "Add Questions as a Group"
+        title: I18n.t('titles.add_questions_as_group', "Add Questions as a Group")
       }).dialog('open');
     }).delegate('.submit_button', 'click', function(event) {
       var question_ids = [];
@@ -1613,9 +1614,9 @@ var quiz = {};
       params.assessment_questions_ids = question_ids.join(',');
       params.existing_questions = '1';
       var url = $findQuestionDialog.find(".add_questions_url").attr('href');
-      $findQuestionDialog.find("button").attr('disabled', true).filter(".submit_button").text("Adding Questions...");
+      $findQuestionDialog.find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('buttons.adding_questions', "Adding Questions..."));
       $.ajaxJSON(url, 'POST', params, function(question_results) {
-        $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text("Add Selected Questions");
+        $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.add_selected_questions', "Add Selected Questions"));
         $findQuestionDialog.find(".selected_side_tab").removeClass('selected_side_tab');
         var counter = 0;
         function nextQuestion() { 
@@ -1633,7 +1634,7 @@ var quiz = {};
         setTimeout(nextQuestion, 10);
         $findQuestionDialog.dialog('close');
       }, function(data) {
-        $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text("Adding Questions Failed, please try again");
+        $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('errors.adding_questions_failed', "Adding Questions Failed, please try again"));
       });
     });
     $(".add_answer_link").bind('click', function(event, skipFocus) {
@@ -1643,8 +1644,8 @@ var quiz = {};
       var answer_type = null, question_type = null, answer_selection_type = "single_answer";
       if($question.hasClass('multiple_choice_question')) {
         var answers = [{
-          answer_text: "Answer Text",
-          comments: "Response if the student chooses this answer"
+          answer_text: I18n.t('default_answer_text', "Answer Text"),
+          comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "select_answer";
         question_type = "multiple_choice_question";
@@ -1652,31 +1653,31 @@ var quiz = {};
         return;
       } else if($question.hasClass('short_answer_question')) {
         var answers = [{
-          answer_text: "Answer Text",
-          comments: "Response if the student chooses this answer"
+          answer_text: I18n.t('default_answer_text', "Answer Text"),
+          comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "short_answer";
         question_type = "short_answer_question";
         answer_selection_type = "any_answer";
       } else if($question.hasClass('essay_question')) {
         var answers = [{
-          comments: "Response to show student after they submit an answer"
+          comments: I18n.t('default_response_to_essay', "Response to show student after they submit an answer")
         }];
         answer_type = "comment";
         question_type = "essay_question";
       } else if($question.hasClass('matching_question')) {
         var answers = [{
-          answer_match_left: "Answer Text",
-          answer_match_right: "Matching Text",
-          comments: "Response if the user misses this match"
+          answer_match_left: I18n.t('default_answer_text', "Answer Text"),
+          answer_match_right: I18n.t('matching_text', "Matching Text"),
+          comments: I18n.t('default_comments_on_wrong_match', "Response if the user misses this match")
         }];
         answer_type = "matching_answer";
         question_type = "matching_question";
         answer_selection_type = "matching";
       } else if($question.hasClass('missing_word_question')) {
         var answers = [{
-          answer_text: "Answer Text",
-          comments: "Response if the student chooses this answer"
+          answer_text: I18n.t('default_answer_text', "Answer Text"),
+          comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "short_answer";
         question_type = "missing_word_question";
@@ -1685,30 +1686,30 @@ var quiz = {};
           numerical_answer_type: "exact_answer",
           answer_exact: "#",
           answer_error_margin: "#",
-          comments: "Response if the student matches this answer"
+          comments: I18n.t('default_answer_comments_on_match', "Response if the student matches this answer")
         }];
         answer_type = "numerical_answer";
         question_type = "numerical_question";
         answer_selection_type = "any_answer";
       } else if($question.hasClass('multiple_answers_question')) {
         var answers = [{
-          answer_text: "Answer Text",
-          comments: "Response if the student chooses this answer"
+          answer_text: I18n.t('default_answer_text', "Answer Text"),
+          comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "select_answer";
         question_type = "multiple_answers_question";
         answer_selection_type = "multiple_answers";
       } else if($question.hasClass('multiple_dropdowns_question')) {
         var answers = [{
-          answer_text: "Answer Text",
-          comments: "Response if the student chooses this answer"
+          answer_text: I18n.t('default_answer_text', "Answer Text"),
+          comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "select_answer";
         question_type = "multiple_dropdowns_question";
       } else if($question.hasClass('fill_in_multiple_blanks_question')) {
         var answers = [{
-          answer_text: "Answer Text",
-          comments: "Response if the student chooses this answer"
+          answer_text: I18n.t('default_answer_text', "Answer Text"),
+          comments: I18n.t('default_answer_comments', "Response if the student chooses this answer")
         }];
         answer_type = "short_answer";
         question_type = "fill_in_multiple_blanks_question";
@@ -1752,13 +1753,13 @@ var quiz = {};
       var error_text = null;
       if(questionData.question_type == 'calculated_question') {
         if($form.find(".combinations_holder .combinations tbody tr").length === 0) {
-          error_text = "Please generate at least one possible solution";
+          error_text = I18n.t('errors.no_possible_solution', "Please generate at least one possible solution");
         }
       } else if($answers.length === 0 || $answers.filter(".correct_answer").length === 0) {
         if($answers.length === 0 && questionData.question_type != "essay_question" && questionData.question_type != "text_only_question") {
-          error_text = "Please add at least one answer";
+          error_text = I18n.t('errors.no_answer', "Please add at least one answer");
         } else if($answers.filter(".correct_answer").length === 0 && (questionData.question_type == "multiple_choice_question" || questionData.question_type == "true_false_question" || questionData.question_tyep == "missing_word_question")) {
-          error_text = "Please choose a correct answer";
+          error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");
         }
       }
       if(error_text) {
@@ -1789,7 +1790,7 @@ var quiz = {};
         data.blank_id = $answer.find(".blank_id").text();
         data.answer_text = $answer.find("input[name='answer_text']:visible").val();
         if(questionData.question_type == "true_false_question") {
-          data.answer_text = (i == 0) ? "True" : "False";
+          data.answer_text = (i == 0) ? I18n.t('true', "True") : I18n.t('false', "False");
         }
         if($answer.hasClass('correct_answer')) {
           data.answer_weight = 100;
@@ -1875,10 +1876,14 @@ var quiz = {};
         $displayQuestion.loadingImage('remove');
         var question = data.quiz_question || data.assessment_question;
         var questionData = $.extend({}, question, question.question_data);
-        // questionData.assessment_question_id might be null now because question.question_data.assessment_quesiton_id
-        // might be null but question.assessment_question_id is the right value. because $.extend overwrites all kes that exist
-        // even if they have null values.  this is hacky, the better thing to do is just get the right thing back from the server.
-        // it matters because the form when you click "find questions" uses it to see if the question already exists in this quiz.
+        // questionData.assessment_question_id might be null now because
+        // question.question_data.assessment_quesiton_id might be null but
+        // question.assessment_question_id is the right value. because $.extend
+        // overwrites all kes that exist even if they have null values.  this
+        // is hacky, the better thing to do is just get the right thing back
+        // from the server.  it matters because the form when you click "find
+        // questions" uses it to see if the question already exists in this
+        // quiz.
         questionData.assessment_question_id = questionData.assessment_question_id || question.assessment_question_id || question.id;
         quiz.updateDisplayQuestion($displayQuestion, questionData, true);
         $("#unpublished_changes_message").slideDown();
@@ -1906,43 +1911,47 @@ var quiz = {};
       quiz.parseInput($(this), $(this).hasClass('long') ? 'float_long' : 'float');
     });
     $(".question_form textarea, .question_form :text, .answer textarea, .answer :text").focus(function(event) {
-      $(this).select();
-  });
-  $("#questions").delegate('.question_teaser_link', 'click', function(event) {
-    event.preventDefault();
-    var $teaser = $(this).parents(".question_teaser");
-    var question_data = $teaser.data('question');
-    if(!question_data) {
-      $teaser.find(".teaser.question_text").text("Loading Question...");
-      $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, function(question) {
-        showQuestion(question.quiz_question);
-      }, function() {
-        $teaser.find(".teaser.question_text").text("Loading Question Failed...");
-      });
-    } else {
-      showQuestion(question_data);
-    }
-    function showQuestion(question_data) {
-      var $question = $("#question_template").clone().removeAttr('id');
-      var question = question_data;
-      var questionData = $.extend({}, question, question.question_data);
-      $teaser.after($question);
-      $teaser.remove();
-      $question.show();
-      $question.find(".question_points").text(questionData.points_possible);
-      quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
-      if($teaser.hasClass('to_edit')) {
-        $question.find(".edit_question_link").click();
+      // chrome/safari mouseup event fires after focus, causing it to get
+      // deselected. (we don't want to disable mouseup, as that has other
+      // side effects)
+      var $me = $(this);
+      setTimeout(function() { $me.select(); });
+    });
+    $("#questions").delegate('.question_teaser_link', 'click', function(event) {
+      event.preventDefault();
+      var $teaser = $(this).parents(".question_teaser");
+      var question_data = $teaser.data('question');
+      if(!question_data) {
+        $teaser.find(".teaser.question_text").text(I18n.t('loading_question', "Loading Question..."));
+        $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, function(question) {
+          showQuestion(question.quiz_question);
+        }, function() {
+          $teaser.find(".teaser.question_text").text(I18n.t('errors.loading_question_failed', "Loading Question Failed..."));
+        });
+      } else {
+        showQuestion(question_data);
       }
-    }
-  }).delegate('.teaser.question_text', 'click', function(event) {
-    event.preventDefault();
-    $(this).parents(".question_teaser").find(".question_teaser_link").click();
-  }).delegate('.edit_teaser_link', 'click', function(event) {
-    event.preventDefault();
-    $(this).parents(".question_teaser").addClass('to_edit');
-    $(this).parents(".question_teaser").find(".question_teaser_link").click();
-  });
+      function showQuestion(question_data) {
+        var $question = $("#question_template").clone().removeAttr('id');
+        var question = question_data;
+        var questionData = $.extend({}, question, question.question_data);
+        $teaser.after($question);
+        $teaser.remove();
+        $question.show();
+        $question.find(".question_points").text(questionData.points_possible);
+        quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
+        if($teaser.hasClass('to_edit')) {
+          $question.find(".edit_question_link").click();
+        }
+      }
+    }).delegate('.teaser.question_text', 'click', function(event) {
+      event.preventDefault();
+      $(this).parents(".question_teaser").find(".question_teaser_link").click();
+    }).delegate('.edit_teaser_link', 'click', function(event) {
+      event.preventDefault();
+      $(this).parents(".question_teaser").addClass('to_edit');
+      $(this).parents(".question_teaser").find(".question_teaser_link").click();
+    });
     $(".keep_editing_link").click(function(event) {
       event.preventDefault();
       $(".question_generated,.question_preview").hide()
@@ -2065,7 +2074,7 @@ var quiz = {};
         if(quiz.findContainerGroup(ui.item)) {
           $container = quiz.findContainerGroup(ui.item);
           $list = [];
-          url = $container.find(".reorder_group_questions_url").attr('href'); //ui.item.find(".update_question_url").attr('href');
+          url = $container.find(".reorder_group_questions_url").attr('href');
           var $obj = $container.next();
           while($obj.length > 0 && !$obj.hasClass('group_bottom')) {
             items.push($obj);
@@ -2131,7 +2140,7 @@ var quiz = {};
       $top.find(":text:visible:first").focus().select();
       $top.find(".quiz_group_form").attr('action', $top.find(".update_group_url").attr('href'))
         .attr('method', 'PUT');
-      $top.find(".submit_button").html("Update Group");
+      $top.find(".submit_button").text(I18n.t('buttons.update_group', "Update Group"));
     }).delegate(".delete_group_link", 'click', function(event) {
       if($(this).closest('.group_top').length == 0) { return; }
       event.preventDefault();
@@ -2252,7 +2261,7 @@ var quiz = {};
       if(question_type != 'multiple_dropdowns_question' && question_type != 'fill_in_multiple_blanks_question') {
         return;
       }
-      var text = $(this).editorBox('get_code'); //.val();
+      var text = $(this).editorBox('get_code');
       var matches = text.match(/\[[A-Za-z][A-Za-z0-9]*\]/g);
       $select.find("option.shown_when_no_other_options_available").remove();
       $select.find("option").addClass('to_be_removed');
@@ -2278,7 +2287,7 @@ var quiz = {};
       }
       // if there are not any options besides the default "<option class="shown_when_no_other_options_available" value='0'>[ Enter Answer Variables Above ]</option>" one
       if(!$select.find("option:not(.shown_when_no_other_options_available)").length) {
-        $select.append("<option class='shown_when_no_other_options_available' value='0'>[ Enter Answer Variables Above ]</option>");
+        $select.append("<option class='shown_when_no_other_options_available' value='0'>" + I18n.t('enter_answer_variable_above', "[ Enter Answer Variables Above ]") + "</option>");
       }
       $select.find("option.to_be_removed").remove();
       $select.change();
@@ -2365,7 +2374,7 @@ var quiz = {};
     });
     $question.find(".compute_combinations").click(function() {
       var $button = $(this);
-      $button.text("Generating...").attr('disabled', true);
+      $button.text(I18n.t('buttons.generating', "Generating...")).attr('disabled', true);
       var question_type = $question.find(".question_type").val();
       if(question_type != 'calculated_question') {
         return;
@@ -2378,7 +2387,7 @@ var quiz = {};
         $table.find("thead tr").append($th);
       });
       var $th = $("<th/>");
-      $th.text("Final Answer");
+      $th.text(I18n.t('final_answer', "Final Answer"));
       $th.addClass('final_answer');
       $table.find("thead tr").append($th);
       $table.find("tbody").empty();
@@ -2390,9 +2399,9 @@ var quiz = {};
         $question.find(".supercalc").superCalc('clear_cached_finds');
         $button.text("Generate").attr('disabled', false);
         if(succeeded == 0) {
-          alert("The system could not generate any valid combinations for the parameters given");
+          alert(I18n.t('alerts.no_valid_combinations', "The system could not generate any valid combinations for the parameters given"));
         } else if(succeeded < cnt) {
-          alert("The system could only generate " + succeeded + " valid combinations for the parameters given");
+          alert(I18n.t('alerts.only_n_valid_combinations', {'one': "The system could only generate 1 valid combination for the parameters given", 'other': "The system could only generate %{count} valid combinations for the parameters given"}, {'count': succeeded}));
         }
         $question.triggerHandler('settings_change', false);
       };
@@ -2404,7 +2413,7 @@ var quiz = {};
       $question.find(".supercalc").superCalc('cache_finds');
       var answer_tolerance = parseFloat($question.find(".combination_answer_tolerance").val(), 10);
       var next = function() {
-        $button.html("Generating... (" + succeeded + "/" + cnt + ")");
+        $button.text(I18n.t('buttons.generating_combinations_progress', "Generating... (%{done}/%{total})", {'done': succeeded, 'total': cnt}));
         var fragment = document.createDocumentFragment();
         for(var idx = 0; idx < 5 && succeeded < cnt && failedCount < 25; idx++) {
           $variable_values.each(function() {
@@ -2447,7 +2456,7 @@ var quiz = {};
         }
         $tbody[0].appendChild(fragment);
         
-        $button.html("Generating... (" + succeeded + "/" + cnt + ")");
+        $button.text(I18n.t('buttons.generating_combinations_progress', "Generating... (%{done}/%{total})", {'done': succeeded, 'total': cnt}));
         if(combinationIndex >= cnt || succeeded >= cnt || failedCount >= 25) {
           finished();
           return;
@@ -2482,7 +2491,7 @@ var quiz = {};
       
       $question.find(".combinations_option").attr('disabled', !variables || !formulas);
       $question.find(".variables_specified").showIf(variables);
-      $question.find(".formulas_specified").showIf(formulas); //defined);
+      $question.find(".formulas_specified").showIf(formulas);
       if($question.hasClass('ready') && remove) {
         $question.find(".combinations_holder .combinations tbody tr").remove();
       }
@@ -2530,7 +2539,7 @@ var quiz = {};
       $("#calc_helper_methods").change();
       $("#help_with_equations_dialog").dialog('close').dialog({
         autoOpen: false,
-        title: "Help with Quiz Question Formulas",
+        title: I18n.t('titles.help_with_formulas', "Help with Quiz Question Formulas"),
         width: 500
       }).dialog('open');
     });
@@ -2539,7 +2548,7 @@ var quiz = {};
       setTimeout(function() {$(event.target).triggerHandler('change')}, 50);
     });
     $question.find(".question_content").bind('change', function(event) {
-      var text = $(this).editorBox('get_code'); //.val();
+      var text = $(this).editorBox('get_code');
       var matches = text.match(/\[[A-Za-z][A-Za-z0-9]*\]/g);
       $question.find(".variables").find("tr.variable").addClass('to_be_removed');
       $question.find(".variables").showIf(matches && matches.length > 0);
@@ -2569,4 +2578,4 @@ var quiz = {};
       $question.triggerHandler('settings_change', false);
     }).change();
   }
-})();
+});

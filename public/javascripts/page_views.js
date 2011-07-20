@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('page_views', function(I18n) {
 (function($, INST){
   $(document).ready(function(){
     var interactionSeconds = 0,
@@ -99,3 +100,4 @@
     }
   });
 })(jQuery, INST);
+})

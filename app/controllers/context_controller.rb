@@ -333,19 +333,19 @@ class ContextController < ApplicationController
       @messages_view = :sentbox
       @messages = @current_user.sentbox_context_messages
       context_messages = @messages
-      @messages_view_header = t(:sent_messages, "Sent Messages")
+      @messages_view_header = t('inbox.sent_messages', "Sent Messages")
       @per_page = 10
     when 'inbox'
       @messages_view = :inbox
       @messages = @current_user.inbox_context_messages
       context_messages = @messages
-      @messages_view_header = t(:received_messages, "Received Messages")
+      @messages_view_header = t('inbox.received_messages', "Received Messages")
       @per_page = 10
     else # default view
       @messages_view = :action_items
       @messages = @current_user.inbox_items.active
       context_messages = @current_user.context_messages
-      @messages_view_header = t(:inbox, "Inbox")
+      @messages_view_header = t('inbox.inbox', "Inbox")
       @per_page = 15
     end
     if params[:reply_id]
@@ -419,39 +419,28 @@ class ContextController < ApplicationController
     get_context
 
     if authorized_action(@context, @current_user, :read_roster)
-      
-      
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       if @context.is_a?(Course)
         @enrollments_hash = {}
         @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{|e| @enrollments_hash[e.user_id] ||= e }
         @students = @context.students_visible_to(@current_user).find(:all, :order => 'sortable_name').uniq
         @teachers = @context.admins.find(:all, :order => 'sortable_name').uniq
-        user_ids = @students.map(&:id) & @teachers.map(&:id)
+        user_ids = @students.map(&:id) + @teachers.map(&:id)
         if @context.visibility_limited_to_course_sections?(@current_user)
           user_ids = @students.map(&:id) + [@current_user.id]
         end
         @primary_users = {t('roster.students', 'Students') => @students}
         @secondary_users = {t('roster.teachers', 'Teachers & TA\'s') => @teachers}
-        @messages = @context.context_messages.find(:all, :order => 'created_at DESC', :include => [:attachments, :context], :limit => 25)
-        @messages = @messages.select{|m| !(([m.user_id] + m.recipients || []) & user_ids).empty? }
       elsif @context.is_a?(Group)
         @users = @context.participating_users.find(:all, :order => 'sortable_name').uniq
         @primary_users = {t('roster.group_members', 'Group Members') => @users}
         if @context.context && @context.context.is_a?(Course)
           @secondary_users = {t('roster.teachers', 'Teachers & TA\'s') => @context.context.admins.find(:all, :order => 'sortable_name').uniq}
         end
-        @messages = @context.context_messages.find(:all, :order => 'created_at DESC', :include => [:attachments, :context], :limit => 25)
       end
       @secondary_users ||= {}
       @groups = @context.groups.active rescue []
       @categories = @groups.map{|g| g.category}.uniq
-      @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }
-      @messages = @messages[0..10] unless params[:all_messages]
-      respond_to do |format|
-        format.html
-        format.json { render :json => @messages.to_json(:methods => [:formatted_body, :user_name, :recipient_users], :include => {:attachments => {:methods => :readable_size}}) }
-      end
     end
   end
   

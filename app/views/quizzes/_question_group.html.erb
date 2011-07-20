@@ -11,8 +11,8 @@
   </div>
   <div style="float: left;">
     <input type="hidden" name="quiz_group[assessment_question_bank_id]" class="bank_id"/>
-    <span class="group_display name" style="font-weight: bold; padding-right: 20px;"><%= hash_get(group, :name, "Group") %></span>
-    <input name="quiz_group[name]" type="text" value="Group Name" class="group_edit" value="<%= hash_get(group, :name, "Group") %>"/>
+    <span class="group_display name" style="font-weight: bold; padding-right: 20px;"><%= hash_get(group, :name, t(:default_group_name, "Group")) %></span>
+    <input name="quiz_group[name]" type="text" value="Group Name" class="group_edit" value="<%= hash_get(group, :name, t(:default_group_name, "Group")) %>"/>
     Pick 
     <span class="group_display pick_count"><%= hash_get(group, :pick_count, 1) %></span>
     <input name="quiz_group[pick_count]" type="text" style="width: 20px;" class="group_edit" value="<%= hash_get(group, :pick_count, 1) %>"/> 
@@ -22,23 +22,23 @@
     pts per question
     <% if !group %>
       <div class="group_edit" style="margin-left: 20px;">
-        <a href="#" class="find find_bank_link">Link to a Question Bank</a>
+        <a href="#" class="find find_bank_link"><%= t('links.link_to_a_question_bank', "Link to a Question Bank") %></a>
       </div>
     <% end %>
   </div>
   <div style="float: right;" class="links">
     <span class="local_group_links">
-      <a href="#" class="collapse_link group_display no-hover" title="Collapse Group"><%= image_tag "collapse.png" %></a>
-      <a href="#" class="expand_link group_display hidden no-hover" title="Expand Group"><%= image_tag "expand.png" %></a>
-      <a href="#" class="add_question_link group_display no-hover" title="Add Question to this Group"><%= image_tag "add.png" %></a>
+      <a href="#" class="collapse_link group_display no-hover" title="<%= t('titles.collapse_group', "Collapse Group") %>"><%= image_tag "collapse.png" %></a>
+      <a href="#" class="expand_link group_display hidden no-hover" title="<%= t('titles.expand_group', "Expand Group") %>"><%= image_tag "expand.png" %></a>
+      <a href="#" class="add_question_link group_display no-hover" title="<%= t('titles.add_question_to_group', "Add Question to this Group") %>"><%= image_tag "add.png" %></a>
     </span>
-    <a href="#" class="edit_group_link group_display no-hover" title="Edit Group Details"><%= image_tag "edit.png" %></a>
-    <a href="#" class="delete_group_link group_display no-hover" title="Delete Group"><%= image_tag "delete.png" %></a>
+    <a href="#" class="edit_group_link group_display no-hover" title="<%= t('titles.edit_group_details', "Edit Group Details") %>"><%= image_tag "edit.png" %></a>
+    <a href="#" class="delete_group_link group_display no-hover" title="<%= t('titles.delete_group', "Delete Group") %>"><%= image_tag "delete.png" %></a>
   </div>
   <div class="clear"></div>
   <div class="button-container">
-    <button type="submit" class="group_edit submit_button button small-button">Update</button>
-    <button type="button" class="group_edit cancel_button button-secondary"/>Cancel</button>
+    <button type="submit" class="group_edit submit_button button small-button"><%= t('buttons.update', "Update") %></button>
+    <button type="button" class="group_edit cancel_button button-secondary"/><%= t('#buttons.cancel', "Cancel") %></button>
   </div>
   <div style="display: none;">
     <a href="<%= context_url(@context, :context_quiz_quiz_group_url, @quiz.id, hash_get(group, :id, "{{ id }}")) %>" class="update_group_url">&nbsp;</a>
@@ -47,7 +47,7 @@
   <% end %>
 </div>
 <% if !group || question_bank %>
-  <div class="assessment_question_bank" style="<%= hidden unless question_bank %>">Questions will be pulled from the bank: 
+  <div class="assessment_question_bank" style="<%= hidden unless question_bank %>"><%= before_label(:question_bank, "Questions will be pulled from the bank") %> 
     <a href="/<%= question_bank.try(:context_type).try(:underscore).try(:pluralize) || '{{ context_type_string }}' %>/<%= question_bank.try(:context_id) || '{{ context_id }}' %>/question_banks/<%= question_bank.try(:id) || '{{ bank_id }}' %>" class="bank_name bank_name_link" style="font-weight: bold; <%= hidden unless question_bank %>"><%= question_bank.try(:title) %></a>
     <span class="bank_name" style="font-weight: bold; <%= hidden if question_bank %>"><%= question_bank.try(:title) %></span>
   </div>

@@ -40,16 +40,22 @@ describe AssignmentGroupsController, :type => :integration do
         'id' => group2.id,
         'name' => 'group2',
         'position' => 7,
+        'rules' => {},
+        'group_weight' => 0
       },
       {
         'id' => group1.id,
         'name' => 'group1',
         'position' => 10,
+        'rules' => {},
+        'group_weight' => 0
       },
       {
         'id' => group3.id,
         'name' => 'group3',
         'position' => 12,
+        'rules' => {},
+        'group_weight' => 0
       },
     ]
   end
@@ -58,8 +64,10 @@ describe AssignmentGroupsController, :type => :integration do
     course_with_teacher(:active_all => true)
     group1 = @course.assignment_groups.create!(:name => 'group1')
     group1.update_attribute(:position, 10)
+    group1.update_attribute(:group_weight, 40)
     group2 = @course.assignment_groups.create!(:name => 'group2')
     group2.update_attribute(:position, 7)
+    group2.update_attribute(:group_weight, 60)
 
     a1 = @course.assignments.create!(:title => "test1", :assignment_group => group1, :points_possible => 10)
     a2 = @course.assignments.create!(:title => "test2", :assignment_group => group1, :points_possible => 12)
@@ -82,9 +90,12 @@ describe AssignmentGroupsController, :type => :integration do
         'id' => group2.id,
         'name' => 'group2',
         'position' => 7,
+        'rules' => {},
+        'group_weight' => 60,
         'assignments' => [
           {
             'id' => a3.id,
+            'due_at' => nil,
             'name' => 'test3',
             'position' => 1,
             'points_possible' => 8,
@@ -113,6 +124,7 @@ describe AssignmentGroupsController, :type => :integration do
           },
           {
             'id' => a4.id,
+            'due_at' => nil,
             'name' => 'test4',
             'position' => 2,
             'points_possible' => 9,
@@ -128,9 +140,12 @@ describe AssignmentGroupsController, :type => :integration do
         'id' => group1.id,
         'name' => 'group1',
         'position' => 10,
+        'rules' => {},
+        'group_weight' => 40,
         'assignments' => [
           {
             'id' => a1.id,
+            'due_at' => nil,
             'name' => 'test1',
             'position' => 1,
             'points_possible' => 10,
@@ -142,6 +157,7 @@ describe AssignmentGroupsController, :type => :integration do
           },
           {
             'id' => a2.id,
+            'due_at' => nil,
             'name' => 'test2',
             'position' => 2,
             'points_possible' => 12,

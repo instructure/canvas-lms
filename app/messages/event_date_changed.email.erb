@@ -3,19 +3,18 @@
 <% end %>
 
 <% define_content :subject do %>
-  Event Date Changed: <%= asset.title %>, <%= asset.context.name %>
+  <%= t('subject', 'Event Date Changed: %{event_title}, %{course_name}', :event_title => asset.title, :course_name => asset.context.name) %>
 <% end %>
 
-The event, <%= asset.title %>, for the course, <%= asset.context.name %> has changed times.  It's now:
-<% if (asset.start_at == asset.end_at || !asset.end_at) %>
-<%= force_zone(asset.start_at).strftime("%b %d at %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
+<%= t('email_body', "The event, %{event_title}, for the course, %{course_name}, has changed times. It's now:", :event_title => asset.title, :course_name => asset.context.name) %>
 
+<% if !asset.start_at && !asset.end_at %>
+  <%= t('no_time_set', 'No Time Set') %>
+<% elsif (asset.start_at == asset.end_at || !asset.end_at) %>
+  <%= datetime_string(force_zone(asset.start_at)) %>
 <% else %>
-from <%= force_zone(asset.start_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
-
-to <%= force_zone(asset.end_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.end_at).strftime("%p").downcase rescue "" %> 
-
+  <%= t('from_to_time', 'from %{start_date_time} to %{end_date_time}', :start_date_time => datetime_string(force_zone(asset.start_at)), :end_date_time => datetime_string(force_zone(asset.end_at))) %>
 <% end %>
 
-You can see details here: 
+<%= before_label('see_details', 'You can see details here') %>
 <%= content :link %>

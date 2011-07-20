@@ -15,13 +15,18 @@ class Periodic
 
   def self.load_periodic_jobs_config
     require Rails.root+'config/periodic_jobs'
+
+    # schedule the built-in unlocking job
+    self.cron('Unlock Expired Jobs', '*/5 * * * *') do
+      Delayed::Job.unlock_expired_jobs
+    end
   end
 
   STRAND = 'periodic scheduling'
 
-  def self.cron(job_name, cron_line, &block)
+  def self.cron(job_name, cron_line, job_args = {}, &block)
     raise ArgumentError, "job #{job_name} already scheduled!" if self.scheduled[job_name]
-    self.scheduled[job_name] = self.new(job_name, cron_line, block)
+    self.scheduled[job_name] = self.new(job_name, cron_line, job_args, block)
   end
 
   def self.audit_queue
@@ -43,14 +48,15 @@ class Periodic
     end
   end
 
-  def initialize(name, cron_line, block)
+  def initialize(name, cron_line, job_args, block)
     @name = name
     @cron = Rufus::CronLine.new(cron_line)
+    @job_args = { :priority => Delayed::LOW_PRIORITY }.merge(job_args.symbolize_keys)
     @block = block
   end
 
   def enqueue
-    Delayed::Job.enqueue(self, :max_attempts => 1, :run_at => @cron.next_time)
+    Delayed::Job.enqueue(self, @job_args.merge(:max_attempts => 1, :run_at => @cron.next_time))
   end
 
   def perform
@@ -67,5 +73,6 @@ class Periodic
   def tag
     "periodic: #{@name}"
   end
+  alias_method :display_name, :tag
 end
 end

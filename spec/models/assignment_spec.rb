@@ -74,12 +74,12 @@ describe Assignment do
     @assignment.needs_grading_count.should eql(1)
   end
   
-  it "should not override the grade if the assignment has no points possible" do
+  it "should preserve pass/fail with zero points possible" do
     setup_assignment_without_submission
     @assignment.grading_type = 'pass_fail'
-    @assignment.points_possible = 0
+    @assignment.points_possible = 0.0
     @assignment.save
-    s = @assignment.grade_student(@user, :grade => "pass")
+    s = @assignment.grade_student(@user, :grade => 'pass')
     s.should be_is_a(Array)
     @assignment.reload
     @assignment.submissions.size.should eql(1)
@@ -87,8 +87,67 @@ describe Assignment do
     @submission.state.should eql(:graded)
     @submission.should eql(s[0])
     @submission.score.should eql(0.0)
-    @submission.grade.should eql("pass")
+    @submission.grade.should eql('pass')
     @submission.user_id.should eql(@user.id)
+
+    @assignment.grade_student(@user, :grade => 'fail')
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.should eql(s[0])
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('fail')
+    @submission.user_id.should eql(@user.id)
+  end
+
+  it "should preserve pass/fail with no points possible" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'pass_fail'
+    @assignment.points_possible = nil
+    @assignment.save
+    s = @assignment.grade_student(@user, :grade => 'pass')
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.should eql(s[0])
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('pass')
+    @submission.user_id.should eql(@user.id)
+
+    @assignment.grade_student(@user, :grade => 'fail')
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.should eql(s[0])
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('fail')
+    @submission.user_id.should eql(@user.id)
+  end
+
+  it "should give a grade to extra credit assignments" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'points'
+    @assignment.points_possible = 0.0
+    @assignment.save
+    s = @assignment.grade_student(@user, :grade => "1")
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.should eql(s[0])
+    @submission.score.should eql(1.0)
+    @submission.grade.should eql("1")
+    @submission.user_id.should eql(@user.id)
+
+    @submission.score = 2.0
+    @submission.save
+    @submission.reload
+    @submission.grade.should eql("2")
   end
   
   it "should be able to grade an already-existing submission" do
@@ -165,6 +224,7 @@ describe Assignment do
       end
       # log.info("adding submissions #{Time.now - n}")
       # n = Time.now
+      @a.reload
       users.each do |u|
         @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
@@ -180,10 +240,18 @@ describe Assignment do
       end
     end
     
+    it "should allow setting peer_reviews_assign_at" do
+      setup_assignment
+      assignment_model
+      now = Time.now
+      @assignment.peer_reviews_assign_at = now
+      @assignment.peer_reviews_assign_at.should == now
+    end
+    
     it "should assign multiple peer reviews" do
       setup_assignment
       assignment_model
-      
+      @a.reload
       @submissions = []
       3.times do |i|
         e = @c.enroll_user(User.create(:name => "user #{i}"))
@@ -210,6 +278,7 @@ describe Assignment do
       @submissions = []
       5.times do |i|
         e = @c.enroll_user(User.create(:name => "user #{i}"))
+        @a.context.reload
         @submissions << @a.submit_homework(e.user, :submission_type => "online_url", :url => "http://www.google.com")
       end
       @a.peer_review_count = 2
@@ -237,7 +306,7 @@ describe Assignment do
     it "should assign late peer reviews to each other if there is more than one" do
       setup_assignment
       assignment_model
-      
+      @a.reload
       @submissions = []
       10.times do |i|
         e = @c.enroll_user(User.create(:name => "user #{i}"))
@@ -402,7 +471,7 @@ describe Assignment do
       @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
       @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
       @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
-
+      @assignment.reload
       @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'C').first
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
@@ -419,7 +488,7 @@ describe Assignment do
       @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
       @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
       @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
-
+      @assignment.reload
       @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'c').first
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
@@ -1089,6 +1158,7 @@ def setup_assignment_with_group
   @u3 = @a.context.enroll_user(User.create(:name => "user 3")).user
   @group.add_user(@u1)
   @group.add_user(@u2)
+  @assignment.reload
 end
 def setup_assignment_without_submission
   # Established course too, as a context
@@ -1097,6 +1167,7 @@ def setup_assignment_without_submission
   e = @course.enroll_student(@user)
   e.invite
   e.accept
+  @assignment.reload
 end
 
 def setup_assignment_with_homework

@@ -23,7 +23,6 @@ class AssignmentGroup < ActiveRecord::Base
   attr_accessible :name, :rules, :assignment_weighting_scheme, :group_weight, :position, :default_assignment_name
   attr_readonly :context_id, :context_type
   acts_as_list :scope => :context
-  adheres_to_policy
   has_a_broadcast_policy
   
   has_many :assignments, :order => 'position, due_at, title', :dependent => :destroy
@@ -45,18 +44,23 @@ class AssignmentGroup < ActiveRecord::Base
   after_save :update_student_grades
   
   def generate_default_values
-    self.name ||= "Assignments"
+    self.name ||= t 'default_title', "Assignments"
     if !self.group_weight
       self.group_weight = 0
     end
     @grades_changed = self.rules_changed? || self.group_weight_changed?
-    self.default_assignment_name = self.name.singularize
+    self.default_assignment_name = self.name
+    self.default_assignment_name = self.default_assignment_name.singularize if I18n.locale == :en
   end
   protected :generate_default_values
   
   def update_student_grades
     if @grades_changed
-      self.context.recompute_student_scores rescue nil
+      begin
+        self.context.recompute_student_scores
+      rescue
+        ErrorReport.log_exception(:grades, $!)
+      end
     end
   end
   
@@ -66,13 +70,13 @@ class AssignmentGroup < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.context.grants_rights?(user, session, :read)[:read] } #self.context.students.include? user }
-    set { can :read }
+    can :read
     
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    set { can :update and can :delete and can :create and can :read }
+    can :update and can :delete and can :create and can :read
 
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
-    set { can :update and can :delete and can :create and can :read }
+    can :update and can :delete and can :create and can :read
   end
   
   workflow do
@@ -182,7 +186,11 @@ class AssignmentGroup < ActiveRecord::Base
     to_import = migration.to_import 'assignment_groups'
     groups.each do |group|
       if group['migration_id'] && (!to_import || to_import[group['migration_id']])
-        import_from_migration(group, migration.context)
+        begin
+          import_from_migration(group, migration.context)
+        rescue
+          migration.add_warning("Couldn't import assignment group \"#{group[:title]}\"", $!)
+        end
       end
     end
   end

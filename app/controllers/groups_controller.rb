@@ -67,7 +67,7 @@ class GroupsController < ApplicationController
 
   def show
     if @group.deleted? && @group.context
-      flash[:notice] = "That group has been deleted"
+      flash[:notice] = t('notices.already_deleted', "That group has been deleted")
       redirect_to named_context_url(@group.context, :context_url)
       return
     end
@@ -79,7 +79,7 @@ class GroupsController < ApplicationController
         render :action => 'membership_pending'
         return
       else
-        flash[:notice] = "Welcome to the group #{@group.name}!"
+        flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", :group_name => @group.name)
       end
     end
     if authorized_action(@group, @current_user, :read)
@@ -99,7 +99,7 @@ class GroupsController < ApplicationController
   
   def create_category
     if authorized_action(@context, @current_user, :manage_groups)
-      name = (params[:category][:name] || "Study Groups").titleize
+      name = (params[:category][:name] || t(:default_category_title, "Study Groups")).titleize
       limit = nil
       limit = params[:category][:max_memberships].to_i if params[:category][:limit_groups] == "1"
       limit = nil if limit && limit <= 0
@@ -110,8 +110,10 @@ class GroupsController < ApplicationController
         count = @context.students.length if count > @context.students.length
       end
       @groups = []
+      # TODO i18n
+      group_name = I18n.locale == :en ? name.singularize : name
       count.times do |idx|
-        @groups << Group.create(:name => "#{name.singularize} #{idx + 1}", :category => name, :max_membership => limit, :context => @context)
+        @groups << Group.create(:name => "#{group_name} #{idx + 1}", :category => name, :max_membership => limit, :context => @context)
       end
       if params[:category][:split_groups] == "1"
         @students = @context.students.sort_by{|s| rand}
@@ -163,7 +165,7 @@ class GroupsController < ApplicationController
             @group.add_user(@current_user)
           end
           @group.invitees = params[:invitees]
-          flash[:notice] = 'Group was successfully created.'
+          flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
           format.xml  { head :created, :location => group_url(@group) }
           format.json { render :json => @group.to_json }
@@ -188,7 +190,7 @@ class GroupsController < ApplicationController
     if authorized_action(@group, @current_user, :manage)
       respond_to do |format|
         if @group.update_attributes(params[:group])
-          flash[:notice] = 'Group was successfully updated.'
+          flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to group_url(@group) }
           format.json { render :json => @group.to_json }
           format.xml  { head :ok }
@@ -206,7 +208,7 @@ class GroupsController < ApplicationController
     if authorized_action(@group, @current_user, :manage)
       begin
         @group.destroy
-        flash[:notice] = "Group successfully deleted"
+        flash[:notice] = t('notices.delete_success', "Group successfully deleted")
         respond_to do |format|
           format.html { redirect_to(dashboard_url) }
           format.xml  { head :ok }
@@ -225,7 +227,7 @@ class GroupsController < ApplicationController
   def public_feed
     return unless get_feed_context(:only => [:group])
     feed = Atom::Feed.new do |f|
-      f.title = "#{@context.full_name} Feed"
+      f.title = t(:feed_title, "%{course_or_account_name} Feed", :course_or_account_name => @context.full_name)
       f.links << Atom::Link.new(:href => named_context_url(@context, :context_url))
       f.updated = Time.now
       f.id = named_context_url(@context, :context_url)
@@ -257,8 +259,8 @@ class GroupsController < ApplicationController
   end
 
   def context_index
-    add_crumb (@context.is_a?(Account) ? "Users" : "People"), named_context_url(@context, :context_users_url)
-    add_crumb "Groups", named_context_url(@context, :context_groups_url)
+    add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
+    add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
     @active_tab = @context.is_a?(Account) ? "users" : "people"
     @groups = @context.is_a?(Account) ? @context.account_groups.active : @context.groups.active
     @categories = @groups.map{|g| g.category}.uniq

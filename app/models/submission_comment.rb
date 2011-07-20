@@ -45,7 +45,7 @@ class SubmissionComment < ActiveRecord::Base
   
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
-    SubmissionComment.find_all_by_group_comment_id(self.group_comment_id).select{|c| c != selc }.each do |comment|
+    SubmissionComment.find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
       comment.skip_destroy_callbacks!
       comment.destroy
     end
@@ -56,8 +56,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   
   has_a_broadcast_policy
-  adheres_to_policy
-  
+
   on_create_send_to_inboxes do
     if self.submission
       users = []
@@ -93,13 +92,13 @@ class SubmissionComment < ActiveRecord::Base
 
   set_policy do
     given {|user,session| !self.teacher_only_comment && self.submission.grants_right?(user, session, :read_grade) }
-    set {can :read}
+    can :read
     
     given {|user| self.author == user}
-    set {can :read and can :delete}
+    can :read and can :delete
     
     given {|user, session| self.submission.grants_right?(user, session, :grade) }
-    set {can :read and can :delete}
+    can :read and can :delete
   end
   
   set_broadcast_policy do |p|
@@ -168,7 +167,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   
   def infer_details
-    self.author_name ||= self.author.short_name rescue "Someone"
+    self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
   end
@@ -187,7 +186,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   
   def update_submission
-    conn = ActiveRecord::Base.connection
+    conn = Submission.connection
     comments_count = SubmissionComment.find_all_by_submission_id(self.submission_id).length
     conn.execute("UPDATE submissions SET submission_comments_count=#{comments_count}, updated_at=#{conn.quote(Time.now.utc.to_s(:db))} WHERE id=#{self.submission_id}") rescue nil
   end

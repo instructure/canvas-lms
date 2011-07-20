@@ -20,27 +20,16 @@
 
 class AutoHandle
   class << self
-    def chars
-      return @chars if @chars
-      @chars = (65..90).map { |x| x.chr }
-      @chars << (48..57).map { |x| x.chr }
-      @chars << (97..122).map { |x| x.chr }
-      @chars.flatten!
+    CHARS = ('0'..'9').to_a + ('a'..'z').to_a + ('A'..'Z').to_a
+    def generate_securish_uuid(length = 40)
+      Array.new(length) { CHARS[ActiveSupport::SecureRandom.random_number(CHARS.length)] }.join
     end
-  
-    def rand_char
-      chars[rand(chars.size)]
-    end
-
-    def generate(purpose=nil, n=4)
-      slug = purpose + '-' if purpose
-      slug ||= ''
-      n.times { slug << rand_char }
+    
+    def generate(purpose = nil, length = 4)
+      slug = ''
+      slug << purpose << '-' if purpose
+      slug << generate_securish_uuid(length)
       slug
-    end
-
-    def generate_securish_uuid
-      Canvas::Security.hmac_sha1("#{UUIDSingleton.instance.generate}#{AutoHandle.generate(nil, 20)}")
     end
   end
 end

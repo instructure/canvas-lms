@@ -19,6 +19,7 @@
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
   include TextHelper
+  include LocaleSelection
   
   # Admins of the given context can see the User.name attribute,
   # but everyone else sees the User.short_name attribute.
@@ -41,13 +42,13 @@ module ApplicationHelper
     content = "<ul class='navigation_list' tabindex='-1'>\n"
     keys.each do |hash|
       content += "  <li>\n"
-      content += "    <span class='keycode'>#{hash[:key]}</span>\n"
+      content += "    <span class='keycode'>#{h(hash[:key])}</span>\n"
       content += "    <span class='colon'>:</span>\n"
-      content += "    <span class='description'>#{hash[:description]}</span>\n"
+      content += "    <span class='description'>#{h(hash[:description])}</span>\n"
       content += "  </li>\n"
     end
     content += "</ul>"
-    content_for(:keyboard_navigation) { content }
+    content_for(:keyboard_navigation) { raw(content) }
   end
   
   def context_prefix(code)
@@ -197,15 +198,16 @@ module ApplicationHelper
   # render all of the blocks that were captured by js_block inside of a <script> tag
   # if you are in the development environment it will also print out a javascript // comment
   # that shows the file and line number of where this block of javascript came from.
-  def js_block(&block)
-    js_blocks << {
+  def js_block(options = {}, &block)
+    js_blocks << options.merge(
       :file_and_line => block.to_s,
       :contents => capture(&block)
-    }
+    )
   end
   def js_blocks; @js_blocks ||= []; end
   def render_js_blocks
     output = js_blocks.inject('') do |str, e|
+      add_i18n_scoping!(e[:i18n_scope].to_s, e[:contents]) if e[:i18n_scope]
       # print file and line number for debugging in development mode.
       value = ""
       value << "<!-- BEGIN SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env == "development"
@@ -214,6 +216,44 @@ module ApplicationHelper
       str << value
     end
     raw(output)
+  end
+
+  class << self
+    attr_accessor :cached_translation_blocks
+  end
+
+  def add_i18n_scoping!(scope, contents)
+    @included_i18n_scopes ||= []
+    translations = unless @included_i18n_scopes.include?(scope)
+      @included_i18n_scopes << scope
+      js_translations_for(scope)
+    end
+    contents.gsub!(/(<script[^>]*>)([^<].*?)(<\/script>)/m, "\\1\n#{translations}I18n.scoped(#{scope.inspect}, function(I18n){\n\\2\n});\n\\3")
+  end
+
+  def js_translations_for(scope)
+    scope = [I18n.locale] + scope.split(/\./).map(&:to_sym)
+    (ApplicationHelper.cached_translation_blocks ||= {})[scope] ||=
+    if scoped_translations = scope.inject(I18n.backend.send(:translations)) { |hash, key| hash && hash[key] }
+      last_key = scope.last
+      translations = {}
+      scope[0..scope.size-2].inject(translations) { |hash, key|
+        hash[key] ||= {}
+      }[last_key] = scoped_translations
+      <<-TRANSLATIONS
+var I18n = I18n || {};
+(function($) {
+  var translations = #{translations.to_json};
+  if (I18n.translations) {
+    $.extend(true, I18n.translations, translations);
+  } else {
+    I18n.translations = translations;
+  }
+})(jQuery);
+      TRANSLATIONS
+    else
+      ''
+    end
   end
 
   def jammit_js_bundles; @jammit_js_bundles ||= []; end
@@ -393,5 +433,19 @@ module ApplicationHelper
       end
     end
     opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
+  end
+
+  # this little helper just allows you to do <% ot(...) %> and have it output the same as <%= t(...) %>. The upside though, is you can interpolate whole blocks of HTML, like:
+  # <% ot 'some_key', 'For %{a} select %{b}', :a => capture { %>
+  # <div>...</div>
+  # <% }, :b => capture { %>
+  # <select>...</select>
+  # <% } %>
+  def ot(*args)
+    concat(t(*args))
+  end
+
+  def join_title(*parts)
+    parts.join(t('#title_separator', ': '))
   end
 end

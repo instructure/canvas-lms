@@ -4,7 +4,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  New Wiki Page - <%= asset.title.titleize %>: <%= wiki_namespace.context.name rescue "" %>
+  <%= t :subject, "New Wiki Page - %{page_title}: %{course_or_group}", :page_title => asset.title, :course_or_group => wiki_namespace.context.name rescue "" %>
 <% end %>
 
 <%= strip_and_truncate(asset.body, :max_length => 200) %> 

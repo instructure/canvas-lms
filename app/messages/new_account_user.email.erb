@@ -1,9 +1,9 @@
 <% define_content :link do %>http://<%= HostUrl.default_host %><% end %>
 <% define_content :subject do %>
-  New Account User
+  <%= t :subject, "New Account User" %>
 <% end %>
 
-New Account Admin for <%= asset.account.name %>
+<%= t :body, "New Account Admin for %{account}", :account => asset.account.name %>
   
-A new admin, <%= asset.user.name %>, has been added for the account <%= asset.account.name %>
+<%= t :details, "A new admin, %{user}, has been added for the account %{account}", :user => asset.user.name, :account => asset.account.name %>
 <%= content :link %>

@@ -1,19 +1,19 @@
 <% content_for :secondary_content do %>
   <% form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :method => :get} do |f| -%>
   <fieldset class="textfield-inline-with-button">
-    <legend>Find A User</legend>
+    <legend><%= t 'titles.find_user', "Find A User" %></legend>
     <%= f.text_field :name %>
-    <button class='button small-button'>Go</button>
+    <button class='button small-button'><%= t 'buttons.go', "Go" %></button>
   </fieldset>
   <% end -%>
   <div style="margin-top: 10px;">
-    <%= link_to(image_tag('graph.png') + " View Statistics", statistics_account_path(@account), :class => "button button-sidebar-wide") %>
-    <%= link_to(image_tag('group.png') + " Manage Role Permissions", account_role_overrides_path(@account), :class => "button button-sidebar-wide") %>
+    <%= link_to(image_tag('graph.png') + " " + t('links.view_statistics', "View Statistics"), statistics_account_path(@account), :class => "button button-sidebar-wide") %>
+    <%= link_to(image_tag('group.png') + " " + t('links.manage_permissions', "Manage Role Permissions"), account_role_overrides_path(@account), :class => "button button-sidebar-wide") %>
     <% unless @account.root_account_id %>
-      <%= link_to(image_tag('history.png') + " Manage Terms", account_terms_path(@account), :class => "button button-sidebar-wide") %>
+      <%= link_to(image_tag('history.png') + " " + t('links.manage_terms', "Manage Terms"), account_terms_path(@account), :class => "button button-sidebar-wide") %>
     <% end %>
     <% if @account.sub_accounts.count > 0 %>
-      <%= link_to(image_tag('ball.png') + " Manage Sub-Accounts", account_sub_accounts_path(@account), :class => "button button-sidebar-wide") %>
+      <%= link_to(image_tag('ball.png') + " " + t('links.manage_subaccounts', "Manage Sub-Accounts"), account_sub_accounts_path(@account), :class => "button button-sidebar-wide") %>
     <% end %>
   </div>
 <% end %>

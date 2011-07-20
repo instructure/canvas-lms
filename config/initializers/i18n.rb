@@ -1,5 +1,7 @@
 I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
                   Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
+I18n.load_path -= Dir[Rails.root.join('config', 'locales', 'generated', '**', '*.{rb,yml}')] unless ENV["RAILS_ENV"] == "production"
+I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
 Gem.loaded_specs.values.each do |spec|
   path = spec.full_gem_path
@@ -9,9 +11,23 @@ Gem.loaded_specs.values.each do |spec|
 end
 
 module I18nUtilities
-  def before_label(text_or_key, default_value = nil)
-    text_or_key = t('labels.' + text_or_key.to_s, default_value) if default_value
-    t("before_label_wrapper", "%{text}:", :text => text_or_key)
+  def before_label(text_or_key, default_value = nil, *args)
+    text_or_key = t('labels.' + text_or_key.to_s, default_value, *args) if default_value
+    t("#before_label_wrapper", "%{text}:", :text => text_or_key)
+  end
+
+  def _label_symbol_translation(method, text, options)
+    if text.is_a?(Hash)
+      options = text
+      text = nil
+    end
+    text = method if text.nil? && method.is_a?(Symbol)
+    if text.is_a?(Symbol)
+      text = "labels.#{text}" unless text.to_s =~ /\A#/
+      text = t(text, options.delete(:en))
+    end
+    text = before_label(text) if options[:before]
+    return text, options
   end
 end
 
@@ -29,19 +45,19 @@ ActionView::Helpers::FormHelper.module_eval do
   end
 
   def label_with_symbol_translation(object_name, method, text = nil, options = {})
-    if text.is_a?(Hash)
-      options = text
-      text = nil
-    end
-    text = method if text.nil? && method.is_a?(Symbol)
-    if text.is_a?(Symbol)
-      text = 'labels.#{text}' unless text.to_s =~ /\A#/
-      text = t(text, options.delete(:en))
-    end
-    text = before_label(text) if options[:before]
+    text, options = _label_symbol_translation(method, text, options)
     label_without_symbol_translation(object_name, method, text, options)
   end
   alias_method_chain :label, :symbol_translation
+end
+
+ActionView::Helpers::InstanceTag.send(:include, I18nUtilities)
+ActionView::Helpers::FormTagHelper.class_eval do
+  def label_tag_with_symbol_translation(method, text = nil, options = {})
+    text, options = _label_symbol_translation(method, text, options)
+    label_tag_without_symbol_translation(method, text, options)
+  end
+  alias_method_chain :label_tag, :symbol_translation
 end
 
 ActionView::Helpers::FormBuilder.class_eval do
@@ -57,6 +73,8 @@ end
 
 I18n.class_eval do
   class << self
+    attr_writer :localizer
+
     include ::ActionView::Helpers::TextHelper
     # if one of the interpolated values is a SafeBuffer (e.g. the result of a
     # link_to call) or the string itself is, we don't want anything to get
@@ -80,12 +98,17 @@ I18n.class_eval do
     alias_method_chain :localize, :whitespace_removal
 
     def translate_with_default_and_count_magic(key, *args)
+      if @localizer
+        self.locale = @localizer.call
+        @localizer = nil
+      end
+
       default = args.shift if args.first.is_a?(String) || args.size > 1
       options = args.shift || {}
       options[:default] ||= if options[:count]
         case default
           when String
-            default =~ /\A\w+\z/ ? pluralize(options[:count], default) : default
+            default =~ /\A[\w\-]+\z/ ? pluralize(options[:count], default) : default
           when Hash
             case options[:count]
               when 0
@@ -120,9 +143,9 @@ I18n.class_eval do
   def self.apply_wrappers(string, wrappers)
     string = ERB::Util.h(string) unless string.html_safe?
     wrappers = { '*' => wrappers } unless wrappers.is_a?(Hash)
-    wrappers.each do |sym, replace|
+    wrappers.sort { |a, b| -(a.first.length <=> b.first.length) }.each do |sym, replace|
       regex = (WRAPPER_REGEXES[sym] ||= %r{#{Regexp.escape(sym)}([^#{Regexp.escape(sym)}]*)#{Regexp.escape(sym)}})
-      string = string.sub(regex, replace)
+      string = string.gsub(regex, replace)
     end
     string.html_safe
   end
@@ -140,13 +163,14 @@ end
 ActionController::Base.class_eval do
   def translate(key, default, options = {})
     key = key.to_s
-    key = "#{controller_name}.#{action_name}.#{key}" unless key.sub!(/\A#/, '')
+    key = "#{controller_name}.#{key}" unless key.sub!(/\A#/, '')
     I18n.translate(key, default, options)
   end
   alias :t :translate
 end
 
 ActiveRecord::Base.class_eval do
+  include I18nUtilities
   extend I18nUtilities
 
   def translate(key, default, options = {})
@@ -155,24 +179,33 @@ ActiveRecord::Base.class_eval do
   alias :t :translate  
 
   class << self
-    # with STI fallback, e.g. try both 'subclass.key' and 'superclass.key'
-    # this is useful when you have t calls in the superclass
     def translate(key, default, options = {})
       key = key.to_s
-      unless key.sub!(/\A#/, '')
-        scopes = self_and_descendants_from_active_record.map{ |klass| klass.name.underscore }.reverse
-        orig_key = key
-        key = "#{scopes.shift}.#{key}"
-        default = scopes.map{ |scope| "#{scope}.#{orig_key}".to_sym} + Array(default)
-      end
+      key = "#{name.underscore}.#{key}" unless key.sub!(/\A#/, '')
       I18n.translate(key, default, options)
     end
     alias :t :translate
+
+    def validates_locale(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      args << :locale if args.empty?
+      if options[:allow_nil] && !options[:allow_empty]
+        before_validation do |record|
+          args.each do |field|
+            record.write_attribute(field, nil) if record.read_attribute(field) == ''
+          end
+        end
+      end
+      args.each do |field|
+        validates_inclusion_of field, options.merge(:in => I18n.available_locales.map(&:to_s))
+      end
+    end
   end
 end
 
 ActionMailer::Base.class_eval do
   def translate(key, default, options = {})
+    key = key.to_s
     key = "#{mailer_name}.#{action_name}.#{key}" unless key.sub!(/\A#/, '')
     I18n.translate(key, default, options)
   end

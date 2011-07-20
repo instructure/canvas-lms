@@ -23,7 +23,6 @@ class ContextModule < ActiveRecord::Base
   belongs_to :cloned_item
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
-  adheres_to_policy
   acts_as_list :scope => :context
   
   serialize :prerequisites
@@ -117,10 +116,10 @@ class ContextModule < ActiveRecord::Base
   
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_content) }
-    set { can :read and can :create and can :update and can :delete }
+    can :read and can :create and can :update and can :delete
     
     given {|user, session| self.cached_context_grants_right?(user, session, :read) }
-    set { can :read }
+    can :read
   end
   
   def locked_for?(user, tag=nil, deep_check=false)
@@ -134,14 +133,17 @@ class ContextModule < ActiveRecord::Base
     return true if !self.to_be_unlocked && (!self.prerequisites || self.prerequisites.empty?) && !self.require_sequential_progress
     return true if self.grants_right?(user, nil, :update)
     progression = self.evaluate_for(user)
+    # if the progression is locked, then position in the progression doesn't
+    # matter. we're not available.
+
     res = progression && !progression.locked?
     if tag && tag.context_module_id == self.id && self.require_sequential_progress
-      res = progression && progression.current_position && progression.current_position >= tag.position
+      res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
     if !res && deep_check
       progression = self.evaluate_for(user, true, true)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
-        res = progression && progression.current_position && progression.current_position >= tag.position
+        res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
       end
     end
     res
@@ -227,22 +229,22 @@ class ContextModule < ActiveRecord::Base
     write_attribute(:completion_requirements, val)
   end
 
-  def add_item(params, added_item=nil)
+  def add_item(params, added_item=nil, opts={})
     association_id = nil
     position = (self.content_tags.active.map(&:position).compact.max || 0) + 1
     if params[:type] == "wiki_page"
-      item = WikiPage.find(params[:id]) rescue nil
+      item = opts[:wiki_page] || WikiPage.find_by_id(params[:id])
       item_namespace = item.wiki.wiki_namespaces.find_by_context_id_and_context_type(self.context_id, self.context_type)
       item = nil unless item && item_namespace
       association_id = item_namespace.id rescue nil
     elsif params[:type] == "attachment"
-      item = self.context.attachments.active.find(params[:id]) rescue nil
+      item = opts[:attachment] || self.context.attachments.active.find_by_id(params[:id])
     elsif params[:type] == "assignment"
-      item = self.context.assignments.active.find(params[:id]) rescue nil
+      item = opts[:assignment] || self.context.assignments.active.find_by_id(params[:id])
     elsif params[:type] == "discussion_topic"
-      item = self.context.discussion_topics.active.find(params[:id]) rescue nil
+      item = opts[:discussion_topic] || self.context.discussion_topics.active.find_by_id(params[:id])
     elsif params[:type] == "quiz"
-      item = self.context.quizzes.active.find(params[:id]) rescue nil
+      item = opts[:quiz] || self.context.quizzes.active.find_by_id(params[:id])
     end
     if params[:type] == 'external_url'
       title = params[:title]
@@ -345,15 +347,15 @@ class ContextModule < ActiveRecord::Base
   def self.requirement_description(req)
     case req[:type]
     when 'must_view'
-      "must view the page"
+      t('requirements.must_view', "must view the page")
     when 'must_contribute'
-      "must contribute to the page"
+      t('requirements.must_contribute', "must contribute to the page")
     when 'must_submit'
-      "must submit the assignment"
+      t('requirements.must_submit', "must submit the assignment")
     when 'min_score'
-      "must score at least a #{req[:min_score]}"
+      t('requirements.min_score', "must score at least a %{score}", :score => req[:min_score])
     when 'max_score'
-      "must score no more than a #{req[:max_score]}"
+      t('requirements.max_score', "must score no more than a %{score}", :score => req[:max_score])
     else
       nil
     end
@@ -560,14 +562,7 @@ class ContextModule < ActiveRecord::Base
     progression.save if progression.workflow_state_changed? || requirements_met_changed
     progression
   end
-  
-  def self.fast_cached_for_context(context)
-    hashes = Rails.cache.fetch(['fast_modules_for', context].cache_key) do
-      context.context_modules.active.map{|m| {:id => m.id, :name => m.name} }
-    end
-    OpenObject.process(hashes)
-  end
-  
+
   def self.visible_module_item_count
     75
   end
@@ -644,11 +639,15 @@ class ContextModule < ActiveRecord::Base
     to_import = migration.to_import 'modules'
     modules.each do |mod|
       if mod['migration_id'] && (!to_import || to_import[mod['migration_id']])
-        import_from_migration(mod, migration.context)
+        begin
+          import_from_migration(mod, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the module \"#{mod[:title]}\"", $!)
+        end
       end
     end
     migration_ids = modules.map{|m| m['module_id'] }.compact
-    conn = ActiveRecord::Base.connection
+    conn = self.connection
     cases = []
     max = migration.context.context_modules.map(&:position).compact.max || 0
     modules.each_with_index{|m, idx| cases << " WHEN migration_id=#{conn.quote(m['module_id'])} THEN #{max + idx + 1} " if m['module_id'] }
@@ -729,7 +728,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'wiki_page',
           :id => wiki.id,
           :indent => hash[:indent].to_i
-        }, existing_item)
+        }, existing_item, :wiki_page => wiki)
       end
     elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
       # this is a file of some kind
@@ -745,7 +744,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'attachment',
           :id => file.id,
           :indent => hash[:indent].to_i
-        }, existing_item)
+        }, existing_item, :attachment => file)
       end
     elsif hash[:linked_resource_type] =~ /assignment|project/i
       # this is a file of some kind
@@ -756,7 +755,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'assignment',
           :id => ass.id,
           :indent => hash[:indent].to_i
-        }, existing_item)
+        }, existing_item, :assignment => ass)
       end
     elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
       # just a snippet of text
@@ -793,7 +792,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'quiz',
           :indent => hash[:indent].to_i,
           :id => quiz.id
-        }, existing_item)
+        }, existing_item, :quiz => quiz)
       end
     elsif hash[:linked_resource_type] =~ /discussion|topic/i
       topic = self.context.discussion_topics.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
@@ -803,7 +802,7 @@ class ContextModule < ActiveRecord::Base
           :type => 'discussion_topic',
           :indent => hash[:indent].to_i,
           :id => topic.id
-        }, existing_item)
+        }, existing_item, :discussion_topic => topic)
       end
     elsif hash[:linked_resource_type] == 'UNSUPPORTED_TYPE'
       # We know what this is and that we don't support it

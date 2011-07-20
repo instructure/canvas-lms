@@ -5,6 +5,17 @@
   <%= asset.subject %>
 <% end %>
 
-<%= asset.user.name rescue 'Unknown User' %> just sent you a message from the Canvas <%= asset.context.class.to_s %>, <%= asset.context.name %>:
+<%= case asset.context
+  when Course
+    t :course_body, "%{user_name} just sent you a message from the Canvas Course %{course_name}:", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :course_name => asset.context.name
+  when Group
+    t :group_body, "%{user_name} just sent you a message from the Canvas Group %{group_name}:", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :group_name => asset.context.name
+  when Account
+    t :account_body, "%{user_name} just sent you a message from the Canvas Account %{account_name}:", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :account_name => asset.context.name
+  when User
+    t :user_body, "%{initiator_user_name} just sent you a message from the Canvas User %{source_user_name}:", :initiator_user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :source_user_name => asset.context.name
+  else
+    t :context_body, "%{user_name} just sent you a message from the Canvas Context %{context_name}:", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :context_name => asset.context.name
+end %>
 
 <%= strip_and_truncate(asset.body, :max_length => 200) %>

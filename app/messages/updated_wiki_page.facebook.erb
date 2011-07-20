@@ -3,6 +3,6 @@
   http://<%= HostUrl.context_host(namespace.context) %>/<%= namespace.context.class.to_s.downcase.pluralize %>/<%= namespace.context_id %>/wiki/<%= namespace.namespace + ":" if !namespace.default? %><%= asset.url %>
   <% end %>
 
-A page has been updated on the wiki for <%= namespace.context.name %>.  
+<%= t :body, "A page has been updated on the wiki for %{title}.", :title => namespace.context.name %>
 <br/>
 <b><a href="<%= content :link %>"><%= asset.title.titleize %></a></b>

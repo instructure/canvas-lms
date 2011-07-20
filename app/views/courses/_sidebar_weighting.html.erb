@@ -1,34 +1,34 @@
 <% groups = sidebar_weighting || @context.assignment_groups.active %>
 <% if @context.group_weighting_scheme == "percent" %>
-  Assignments are weighted by group:
+  <%= before_label 'assignments_weighting', 'Assignments are weighted by group' %>
   <table class="summary">
     <thead>
     <tr>
-      <th scope='col'>Group</th>
-      <th scope='col'>Weight</th>
+      <th scope='col'><%= t('headings.group', %{Group}) %></th>
+      <th scope='col'><%= t('headings.weight', %{Weight}) %></th>
     </tr>
     </thead>
     <tbody>
     <% if groups.empty? %>
       <tr>
-        <th scope='row' colspan="2">No Groups Set Up</th>
+        <th scope='row' colspan="2"><%= t('no_groups', %{No Groups Set Up}) %></th>
       </tr>
     <% else %>
       <% tally = 0 %>
       <% groups.each do |group| %>
         <tr>
-          <th scope='row'><%= group.name || "Group" %></th>
+          <th scope='row'><%= group.name || t('default_name', "Group") %></th>
           <td><%= ((group.group_weight.to_s + "%") || "none") rescue "none" %></td>
           <% tally += group.group_weight || 0 %>
         </tr>
       <% end %>
       <tr style="font-weight: bold;">
-        <th scope='row'>Total</th>
-        <td><%= tally %>%</td>
+        <th scope='row'><%= t('headings.total', %{Total}) %></th>
+        <td><%= number_to_percentage(tally, :precision => 0) %></td>
       </tr>
     <% end %>
     </tbody>
   </table>
 <% else %>
-  Course assignments are not weighted.
+  <%= t('not_weighted', %{Course assignments are not weighted.}) %>
 <% end %>

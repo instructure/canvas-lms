@@ -17,8 +17,10 @@
 #
 module CC
   class CCExporter
-
+    ZIP_DIR = 'zip_dir'
+    
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file
+    delegate :add_error, :to => :@content_export, :allow_nil => true
 
     def initialize(content_export, opts={})
       @content_export = content_export
@@ -30,6 +32,7 @@ module CC
       @zip_name = nil
       @logger = Rails.logger
       @migration_config = Setting.from_config('external_migration')
+      @migration_config ||= {:keep_after_complete => false} 
     end
 
     def self.export(content_export, opts={})
@@ -59,9 +62,7 @@ module CC
           end
         end
       rescue
-        message = $!.to_s
-        stack = "#{$!}: #{$!.backtrace.join("\n")}"
-        @content_export.add_error(message, stack) if @content_export
+        add_error(I18n.t('course_exports.errors.course_export', "Error running course export."), $!)
         @logger.error $!
         return false
       ensure
@@ -77,19 +78,27 @@ module CC
       @content_export.fast_update_progress(progress) if @content_export  
     end
     
+    def errors
+      @content_export ? @content_export.error_messages : []
+    end
+    
+    def export_id
+      @content_export ? @content_export.id : nil
+    end
+    
     private
     
     def copy_all_to_zip
       Dir["#{@export_dir}/**/**"].each do |file|
-        next if File.basename(file) == @zip_name
         file_path = file.sub(@export_dir+'/', '')
+        next if file_path.starts_with? ZIP_DIR
         @zip_file.add(file_path, file)
       end
     end
 
     def create_export_dir
       slug = "common_cartridge_#{@course.id}_user_#{@user.id}"
-      if @migration_config && @migration_config[:data_folder]
+      if @migration_config[:data_folder]
         folder = @migration_config[:data_folder]
       else
         folder = Dir.tmpdir
@@ -108,7 +117,8 @@ module CC
 
     def create_zip_file
       @zip_name = "#{@course.name.to_url}-export.#{CCHelper::CC_EXTENSION}"
-      @zip_path = File.join(@export_dir, @zip_name)
+      FileUtils::mkdir_p File.join(@export_dir, ZIP_DIR)
+      @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
       @zip_file = Zip::ZipFile.new(@zip_path, Zip::ZipFile::CREATE)
     end
 

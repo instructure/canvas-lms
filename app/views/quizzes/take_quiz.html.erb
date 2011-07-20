@@ -1,11 +1,11 @@
-<% content_for :page_title do %><%= @quiz.readable_type %>: <%= @quiz.quiz_title %><% end %>
+<% content_for :page_title do %><%= join_title @quiz.readable_type, @quiz.quiz_title %><% end %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
   <% if @submission && params[:preview] %>
-    <a id="preview_mode_link" href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="button button-sidebar-wide"><%= image_tag "edit.png" %> Keep Editing This <%= @quiz.readable_type %></a><br/>
+    <a id="preview_mode_link" href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="button button-sidebar-wide"><%= image_tag "edit.png" %> <%= @quiz.survey? ? t('links.keep_editing_survey', "Keep Editing This Survey") : t('links.keep_editing_quiz', "Keep Editing This Quiz") %></a><br/>
   <% end %>
-  <h3 style="margin: 0px;">Questions</h3>
+  <h3 style="margin: 0px;"><%= t('headers.questions', "Questions") %></h3>
   <ul id="question_list" style="max-height: 200px; overflow: auto;">
     <% @submission.questions_as_object.compact.each do |q| %>
       <li id="list_question_<%= q[:id] %>" class="list_question <%= "marked" if @stored_params["question_#{q[:id]}_marked"] %>">
@@ -15,17 +15,21 @@
   </ul>
   <% if @submission.finished_at %>
     <div class="quiz_score">
-      Score: <span class="score_value"><%= @submission.score %></span> out of <%= @quiz.points_possible %>
+      <%= before_label(:score, "Score") %>
+      <%= t(:score_out_of_points_possible, "%{score} out of %{points_possible}",
+            :score => raw("<span class=\"score_value\">#{@submission.score}</span>"),
+            :points_possible => @quiz.points_possible) %>
     </div>
   <% end %>
   <div>
-    <span class="time_header">Time Running:</span>
+    <span class="time_header"><%= before_label(:time_running, "Time Running") %></span>
     <span style="font-size: 0.8em; padding-left: 10px;">
-      <a href="#" class="hide_time_link">Hide</a>
+      <a href="#" class="hide_time_link"><%= t('links.hide_time_running', "Hide") %></a>
     </span>
     <% if @submission.end_at %>
       <div style="font-size: 0.8em;">
-        Attempt due: <%= datetime_string(@submission.end_at) %>
+        <%= before_label(:attempt_due, "Attempt due") %>
+        <%= datetime_string(@submission.end_at) %>
       </div>
     <% end %>
     <div class="clear"></div>
@@ -37,9 +41,10 @@
 
 <h2><%= @quiz.quiz_title || @quiz.readable_type %></h2>
 <% if @submission.preview? %>
-<h3><%= image_tag "warning.png" %> This is a preview of the draft version of the quiz</h3>
+<h3><%= image_tag "warning.png" %> <%= t('headers.draft_preview', "This is a preview of the draft version of the quiz") %></h3>
 <% end %>
-Started: <%= datetime_string(@submission.started_at) %>
+<%= before_label(:started, "Started") %>
+<%= datetime_string(@submission.started_at) %>
 
 <% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
 <% jammit_js :take_quiz %>
@@ -65,14 +70,14 @@ Started: <%= datetime_string(@submission.started_at) %>
 </div>
 <%= render :partial => "display_question", :collection => @submission.questions_as_object, :locals => {:assessing => true } %>
 <div class="button-container">
-  <button type="submit" class="button submit_button">Submit Answers</button>
+  <button type="submit" class="button submit_button"><%= t('buttons.submit_answer', "Submit Answers") %></button>
 </div>
 <% end %>
 </div>
 <div style="font-size: 1.2em; display: none;" id="times_up_dialog">
-  Time's Up!  Submitting results in:
+  <%= before_label(:times_up, "Time's Up!  Submitting results in") %>
   <div style="text-align: center; font-size: 1.2em; margin: 10px;" class="countdown_seconds"></div>
   <div class="button-container">
-    <button type="button" class="submit_quiz_button button">Ok, fine</button>
+    <button type="button" class="submit_quiz_button button"><%= t('buttons.out_of_time_submit', "Ok, fine") %></button>
   </div>
 </div>

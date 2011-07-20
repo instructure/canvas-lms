@@ -28,7 +28,6 @@ class RubricAssociation < ActiveRecord::Base
   has_many :rubric_assessments, :dependent => :destroy
   has_many :assessment_requests, :dependent => :destroy
   
-  adheres_to_policy
   has_a_broadcast_policy
 
   validates_presence_of :purpose
@@ -142,13 +141,13 @@ class RubricAssociation < ActiveRecord::Base
   
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
-    set { can :update and can :delete and can :manage and can :assess }
+    can :update and can :delete and can :manage and can :assess
     
     given {|user, session| user && @assessing_user_id && self.assessment_requests.for_assessee(@assessing_user_id).map{|r| r.assessor_id}.include?(user.id) }
-    set { can :assess }
+    can :assess
     
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) }
-    set { can :submit }
+    can :submit
   end
   
   def update_assignment_points
@@ -283,10 +282,11 @@ class RubricAssociation < ActiveRecord::Base
           self.summary_data[:saved_comments] ||= {}
           self.summary_data[:saved_comments][criterion.id.to_s] ||= []
           self.summary_data[:saved_comments][criterion.id.to_s] << rating[:comments]
+          # TODO i18n
           self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select{|desc| desc && !desc.empty? && desc != "No Details"}.uniq.sort
           self.save
         end
-        rating[:description] = "No details" if !rating[:description] || rating[:description].empty?
+        rating[:description] = t('no_details', "No details") if !rating[:description] || rating[:description].empty?
         ratings << rating
       end
     end

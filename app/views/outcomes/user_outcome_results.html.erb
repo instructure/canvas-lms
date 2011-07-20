@@ -1,12 +1,12 @@
 <% jammit_css :learning_outcomes %>
 <% jammit_js :rubric_assessment %>
-<% content_for :page_title do %>Outcomes for <%= @user.name %><% end %>
+<% content_for :page_title do %><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %><% end %>
   
 <% content_for :right_side do %>
   <div class="rs-margin-all">
     <% chain = (@context.account_chain rescue [@domain_root_account]).select{|a| can_do(a, @current_user, :manage) }; %>
     <% if !chain.empty? %>
-      See <%= @user.short_name %>'s results for:
+      <%= before_label :see_results, "See %{user_name}'s results for", :user_name => @user.short_name %>
       <ul>
       <% chain.each do |account| %>
         <li><a href="<%= context_url(account, :context_user_outcomes_results_url, @user.id) %>"><%= account.name %></a></li>
@@ -14,7 +14,7 @@
       </ul>
     <% end %>
     <div class="show_all_artificts">
-      <a href="#" class="button" id="show_all_artifacts_link">Show All Artifacts</a>
+      <a href="#" class="button" id="show_all_artifacts_link"><%= t "#buttons.show_all_artifacts", "Show All Artifacts" %></a>
     </div>
   </div>
 <% end %>
@@ -67,10 +67,10 @@
     showAllArtifacts.click(function(event) {
       event.preventDefault();
       $("tr.artifact_details").toggle();
-      if (showAllArtifacts.html() === 'Show All Artifacts') {
-        showAllArtifacts.html('Hide All Artifacts');
+      if (showAllArtifacts.html() === '<%= t "#buttons.show_all_artifacts", "Show All Artifacts" %>') {
+        showAllArtifacts.html('<%= t "#buttons.hide_all_artifacts", "Hide All Artifacts" %>');
       } else {
-        showAllArtifacts.html('Show All Artifacts');
+        showAllArtifacts.html('<%= t "#buttons.show_all_artifacts", "Show All Artifacts" %>');
       }
     });
   });
@@ -80,10 +80,10 @@
 <table id="outcomes">
 <thead>
   <tr>
-    <th class="outcome">Outcome</th>
-    <th>Attempts</th>
-    <th>Latest Score</th>
-    <th>Avg Percent</th>
+    <th class="outcome"><%= t "short_title.outcome", "Outcome" %></th>
+    <th><%= t "short_title.attempts", "Attempts" %></th>
+    <th><%= t "short_title.latest_score", "Latest Score" %></th>
+    <th><%= t "short_title.average_percent", "Avg Percent" %></th>
 </thead>
 <tbody>
   <% @outcomes.each do |outcome| %>
@@ -91,16 +91,17 @@
       <td class="short_description"><%= outcome.short_description %></td>
       <% results = @results_for_outcome[outcome.id] || [] %>
       <td class="attempts">
-        <%= pluralize(results.map{|r| [1, r.attempt || 0].max }.sum, "attempt") %>
-        <div class="sub_attempt">
-          from <%= pluralize(results.length, "artifact") %>
-        </div>
+        <%= t :attempts_from_artifacts, "%{attempts} *from %{artifacts}*", :wrapper => '<div class="sub_attempt">\1</div>', :attempts => t(:attempts, "attempt", :count => results.map{|r| [1, r.attempt || 0].max }.sum), :artifacts => t(:artifacts, "artifact", :count => results.length) %>
       </td>
-      <td class="latest_score <%= 'mastery' if results[-1] && results[-1].mastery %>" title="<%= (results[-1] && results[-1].mastery) ? "Mastery on latest attempt" : "No Mastery on latest attempt" %>">
+      <td class="latest_score <%= 'mastery' if results[-1] && results[-1].mastery %>" title="<%= (results[-1] && results[-1].mastery) ? t(:mastery, "Mastery on latest attempt") : t(:no_mastery, "No Mastery on latest attempt") %>">
         <% if results.empty? %>
            - 
         <% else %>
-          <%= results[-1].score %><span class="out_of"><% if results[-1].possible %> out of <%= results[-1].possible%><% end %></span>
+          <% if results[-1].possible %>
+            <%= t :score_out_of_possible, "%{score}* out of %{possible}*", :score => results[-1].score, :possible => results[-1].possible, :wrapper => '<span class="out_of">\1</span>' %>
+          <% else %>
+            <%= results[-1].score %><span class="out_of"></span>
+          <% end %>
         <% end %>
       </td>
       <td class="avg_percent">

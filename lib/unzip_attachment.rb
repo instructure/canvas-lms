@@ -155,7 +155,7 @@ class UnzipAttachment
     id_positions.each do |id, position|
       updates << "WHEN id=#{id} THEN #{position}" if id && position
     end
-    ActiveRecord::Base.connection.execute("UPDATE attachments SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{id_positions.keys.join(",")})") unless updates.empty?
+    Attachment.connection.execute("UPDATE attachments SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{id_positions.keys.join(",")})") unless updates.empty?
     Attachment.skip_broadcast_messages(false)
     Attachment.skip_touch_context(false)
     Attachment.skip_scribd_submits(false)

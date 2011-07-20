@@ -2,15 +2,15 @@
   <table cellspacing="0" class="ui-widget ui-widget-content ui-corner-all zebra-stripes" style="width: 100%;">
     <thead class='ui-widget-header'>
       <tr>
-        <th>URL</th>
-        <th>Date</th>
-        <th>Participated</th>
-        <th>Time</th>
+        <th><%= t('headers.url', "URL") %></th>
+        <th><%= t('headers.date', "Date") %></th>
+        <th><%= t('headers.participated', "Participated") %></th>
+        <th><%= t('headers.time', "Time") %></th>
         <th>
           <div style="float:right; margin-right: 4px">
             <%= link_to("csv", user_page_views_path(@user, :format => :csv), :class => 'xls' ) %>, <%= link_to("xml", user_page_views_path(@user, :format => :xml), :class => 'code' ) %>
           </div>
-          User Agent
+          <%= t('headers.user_agent', "User Agent") %>
         </th>
       </tr>
     </thead>
@@ -20,13 +20,13 @@
   </table>
 </div>
 <%= will_paginate(@page_views) %>
-<% js_block do %>
+<% js_block :i18n_scope => 'page_views._table' do %>
   <script type="text/javascript">
     $(function(){
       $('#page_view_results').pageless({
         totalPages: <%= @page_views.total_pages %>,
-        url: "<%= user_page_views_path(@user, :format => :js) %>",
-        loaderMsg: "Loading more results",
+        url: <%= raw user_page_views_path(@user, :format => :html, :html_xhr => true).to_json %>,
+        loaderMsg: I18n.t('loading_more_results', "Loading more results"),
         complete: function() {
           $(document).triggerHandler('page_views_added');
         }

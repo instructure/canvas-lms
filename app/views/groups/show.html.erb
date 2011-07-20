@@ -1,15 +1,15 @@
-<% content_for :page_title do %><%= @group.name %>: <%= @context.full_name %><% end %>
+<% content_for :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
 <%  @active_tab = "home" %>
 <% content_for :auto_discovery do %>
   <% if @context_membership %>
-    <%= auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), {:title => "Group Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")}) %>
   <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), {:title => "Group Atom Feed"}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")}) %>
   <% end %>
 <% end %>
 
 <% content_for :right_side do %>
-  <% locals = {:title => "Coming Up", :display_count => 3, :period => "the next week", :contexts_to_link_to => @context, :upcoming => true} %>
+  <% locals = {:title => t('coming_up', "Coming Up"), :display_count => 3, :period => t('next_week', "the next week"), :contexts_to_link_to => @context, :upcoming => true} %>
   <% if @current_user %>
     <% cache([@current_user, @context, 'group_upcoming_events' ]) do %>
       <%= render :partial => "shared/event_list", :object => @current_user.upcoming_events(:contexts => @context), :locals => locals %>
@@ -21,7 +21,7 @@
 
 <div style="float: right; text-align: left;" class="floating_links">
   <% if can_do(@context.announcements.new, @current_user, :create) %>
-    <div><a href="<%= context_url(@context, :controller => :announcements) %>#new" class='add'>New Announcement</a></div>
+    <div><a href="<%= context_url(@context, :controller => :announcements) %>#new" class='add'><%= t 'new_announcement', "New Announcement" %></a></div>
   <% end %>
 </div>
 <div id="group_messages">

@@ -21,17 +21,18 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   end
   
   it "should resize the WYSIWYG editor height gracefully" do
+    wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
     make_full_screen
     resizer = driver.find_element(:class, 'editor_box_resizer')
     # drag the resizer way up to the top of the screen (to make the wysiwyg the shortest it will go)
-    resizer.drag_and_drop_by(0, -99999999)
-    resizer.drag_and_drop_by(0, -99999999)
-    driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200)
+    driver.action.drag_and_drop_by(resizer, 0, -1500).perform
+    keep_trying_until { driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(200) }
     resizer.attribute('style').should be_blank
 
-    # now move it down 300px from 200px high
-    resizer.drag_and_drop_by(0, 300)
-    driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(500)
+    # now move it down 30px from 200px high
+    resizer = driver.find_element(:class, 'editor_box_resizer')
+    keep_trying_until { driver.action.drag_and_drop_by(resizer, 0, 30).perform; true }
+    driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(230)
     resizer.attribute('style').should be_blank
   end
   

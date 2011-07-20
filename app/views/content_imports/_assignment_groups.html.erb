@@ -1,6 +1,6 @@
 <% editable ||= false %>
 <div id="group_weight" class="<%= 'not_percent_weighted' unless @context.group_weighting_scheme == 'percent' %>">
-  <h2>Assignment Groups</h2>
+  <h2><%= t 'titles.assignment_groups', "Assignment Groups" %></h2>
   <table id="group_weight_table">
     <% tally = 0 %>
     <tbody>
@@ -17,8 +17,8 @@
         </td>
         <td>
           <div class="links">
-            <a href="<%= context_url(@context, :context_assignment_group_url, group.id) %>" class="edit_group_link assignment_group_url no-hover" title="Edit Group Name"><%= image_tag "edit.png" %></a>
-            <a href="<%= context_url(@context, :context_assignment_group_url, group.id) %>" class="delete_group_link no-hover" title="Delete Group"><%= image_tag "delete.png" %></a>
+            <a href="<%= context_url(@context, :context_assignment_group_url, group.id) %>" class="edit_group_link assignment_group_url no-hover" title="<%= t 'links.edit_group', "Edit Group Name" %>"><%= image_tag "edit.png" %></a>
+            <a href="<%= context_url(@context, :context_assignment_group_url, group.id) %>" class="delete_group_link no-hover" title="<%= t 'links.delete_group', "Delete Group" %>"><%= image_tag "delete.png" %></a>
           </div>
         </td>
       </tr>
@@ -26,7 +26,7 @@
     </tbody>
     <tr>
       <td colspan="3" style="padding-left: 20px;">
-        <a href="#" class="add_group_weight_link add-small" style="font-size: 0.8em;">Add Assignment Group</a>
+        <a href="#" class="add_group_weight_link add-small" style="font-size: 0.8em;"><%= t 'links.add_group', "Add Assignment Group" %></a>
       </td>
     </tr>
     <tr id="group_weight_blank" style="display: none;" class="group_weight">
@@ -43,11 +43,11 @@
       </td>
     </tr>
     <tr class="percent_weight">
-      <td class="total">Total</td>
-      <td id="group_weight_total" class="total" style="text-align: right;"><%= tally %>%</td>
+      <td class="total"><%= t 'labels.total', 'Total' %></td>
+      <td id="group_weight_total" class="total" style="text-align: right;"><%= number_to_percentage(tally, :precision => 0) %></td>
       <td>&nbsp;</td>
     </tr>
   </table>
   <input type="checkbox" id="weight_final_grade" <%= 'checked' if @context.group_weighting_scheme == 'percent' %>/>
-  <label for="weight_final_grade">Weight final grade by groups</label>
+  <label for="weight_final_grade"><%= t 'labels.weight_groups', "Weight final grade by groups" %></label>
 </div>

@@ -26,8 +26,7 @@ class GradingStandard < ActiveRecord::Base
   
   before_save :update_usage_count
   
-  adheres_to_policy
-  
+
   workflow do
     state :active
     state :deleted
@@ -42,10 +41,10 @@ class GradingStandard < ActiveRecord::Base
   
   set_policy do
     given {|user| true }
-    set { can :read and can :create }
+    can :read and can :create
     
     given {|user| self.assignments.active.length < 2}
-    set { can :update and can :delete }
+    can :update and can :delete
   end
   
   def update_data(params)
@@ -56,7 +55,7 @@ class GradingStandard < ActiveRecord::Base
     res = ""
     res += self.user.name + ", " rescue ""
     res += self.context.name rescue ""
-    res = "Unknown Details" if res.empty?
+    res = t("unknown_grading_details", "Unknown Details") if res.empty?
     res
   end
   
@@ -124,9 +123,13 @@ class GradingStandard < ActiveRecord::Base
   def self.process_migration(data, migration)
     standards = data['grading_standards'] ? data['grading_standards']: []
     to_import = migration.to_import 'grading_standards'
-    standards.each do |tool|
-      if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
-        import_from_migration(tool, migration.context)
+    standards.each do |standard|
+      if standard['migration_id'] && (!to_import || to_import[standard['migration_id']])
+        begin
+          import_from_migration(standard, migration.context)
+        rescue
+          migration.add_warning("Couldn't import grading standard \"#{standard[:title]}\"", $!)
+        end
       end
     end
   end

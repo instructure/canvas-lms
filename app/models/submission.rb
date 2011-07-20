@@ -122,28 +122,27 @@ class Submission < ActiveRecord::Base
   attr_reader :suppress_broadcast
   attr_reader :group_broadcast_submission
 
-  adheres_to_policy
-  
+
   has_a_broadcast_policy
 
   simply_versioned :explicit => true
   
   set_policy do
     given {|user| user && user.id == self.user_id }
-    set {can :read and can :comment and can :make_group_comment and can :read_grade and can :submit }
+    can :read and can :comment and can :make_group_comment and can :read_grade and can :submit
     
     given {|user| self.assignment && self.assignment.context && user && self.user &&
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active') }
-    set {can :read and can :read_comments}
+    can :read and can :read_comments
     
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
-    set {can :read and can :comment and can :make_group_comment and can :read_grade and can :grade }
+    can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
     
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :read_as_admin) }
-    set {can :read and can :read_grade }
+    can :read and can :read_grade
     
     given {|user| user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
-    set {can :read and can :comment}
+    can :read and can :comment
   end
   
   on_update_send_to_streams do
@@ -359,7 +358,7 @@ class Submission < ActiveRecord::Base
     if self.score_changed?
       @score_changed = true
       if self.assignment
-        self.grade = self.assignment.score_to_grade(self.score) if self.assignment.points_possible && self.assignment.points_possible > 0
+        self.grade = self.assignment.score_to_grade(self.score) if self.assignment.points_possible.to_f > 0.0 || self.assignment.grading_type != 'pass_fail'
       else
         self.grade = self.score
       end
@@ -623,10 +622,15 @@ class Submission < ActiveRecord::Base
   end
 
   def readable_state
-    if workflow_state == 'pending_review'
-      'pending review'
-    else
-      workflow_state
+    case workflow_state
+    when 'submitted'
+      t 'state.submitted', 'submitted'
+    when 'unsubmitted'
+      t 'state.unsubmitted', 'unsubmitted'
+    when 'pending_review'
+      t 'state.pending_review', 'pending review'
+    when 'graded'
+      t 'state.graded', 'graded'
     end
   end
   
@@ -686,12 +690,12 @@ class Submission < ActiveRecord::Base
     opts[:attachments] ||= opts.delete :comment_attachments
     if opts[:comment].empty? 
       if opts[:media_comment_id]
-        opts[:comment] = "This is a media comment."
+        opts[:comment] = t('media_comment', "This is a media comment.")
       elsif opts[:attachments].try(:length)
-        opts[:comment] = "See attached files."
+        opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Date.today.to_s) + (opts[:media_comment_id] || opts[:comment] || "no comment"))
+    opts[:group_comment_id] = Digest::MD5.hexdigest((opts[:unique_key] || Date.today.to_s) + (opts[:media_comment_id] || opts[:comment] || t('no_comment', "no comment")))
     self.save! if self.new_record?
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous]
     comment = self.submission_comments.create(opts.slice(*valid_keys)) if !opts[:comment].empty?
@@ -823,20 +827,6 @@ class Submission < ActiveRecord::Base
                                     :href => "http://#{HostUrl.context_host(self.assignment.context)}/#{prefix}/assignments/#{self.assignment_id}/submissions/#{self.id}")
       entry.content   = Atom::Content::Html.new(self.body || "")
       # entry.author    = Atom::Person.new(self.user)
-    end
-  end
-
-  # Import stuff
-  attr_accessor :comparison, :prior, :focus
-  
-  # Stuff Ryan stuck in to get the json to print the right stuff.
-  def set_serialization_options
-    if comparison == :equal
-      @serialization_methods = [:comparison, :focus]
-      #default_options = { :methods => [ :comparison, :focus ]}
-    else
-      @serialization_methods = [:comparison, :prior, :focus]
-      #default_options = { :methods => [ :comparison, :prior, :focus ]}
     end
   end
 

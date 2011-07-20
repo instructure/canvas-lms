@@ -31,10 +31,11 @@ gem 'rack',           '~> 1.1.2' # rails requires ~> 1.1.0 but 1.1.0 has a param
 gem 'rake',           '0.8.7'
 gem 'ratom',          '0.6.7',  :require => "atom"
 gem 'rdiscount',      '1.6.8'
+gem 'require_relative', '1.0.1'
 gem 'ritex',          '1.0.1'
 gem 'rscribd',        '1.2.0'
 gem 'ruby-net-ldap',  '0.0.4',  :require => 'net/ldap'
-gem 'ruby-saml-mod',  '0.1.0'
+gem 'ruby-saml-mod',  '0.1.2'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip',        '0.9.4',  :require => 'zip/zip'
 gem 'sanitize',       '1.2.1'
@@ -61,13 +62,16 @@ group :test do
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.1'
   gem 'rspec-rails',  '1.3.3'
-  gem 'selenium-webdriver', '0.2.0'
+  gem 'selenium-webdriver', '2.0.1'
   gem 'webrat',       '0.7.2'
-  gem 'yard',         '0.6.3'
+  gem 'yard',         '0.7.2'
 end
 
 group :development do
   gem 'ruby-debug',   '0.10.4'
+  gem 'ruby_parser', '2.0.6'
+  gem 'sexp_processor', '3.0.5'
+  gem 'ya2yaml', '0.30'
 end
 
 group :redis do

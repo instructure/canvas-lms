@@ -1,9 +1,9 @@
 <% 
-  content_for :page_title, "Course Details: #{@context.name}"
+  content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   jammit_css :course_details
   jammit_js :course_details
   @active_tab = "settings"
-  
+
   enrollment_hashes  = {} 
   ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment'].each do |type|
     enrollment_hashes[type] = {} 
@@ -15,10 +15,10 @@
     list.each{|e| enrollment_hashes[type][e.user] ||= []; enrollment_hashes[type][e.user] << e }
   end
   can_rename_course = can_do(@context.account, @current_user, :manage_courses) || !@context.root_account.settings[:prevent_course_renaming_by_teachers]
-  students = enrollment_hashes['StudentEnrollment'].map{|k, v| v[0]} #@context.detailed_enrollments.select{|e| e.type == 'StudentEnrollment' && e.active_or_pending?}.sort_by{|e| e.user.sortable_name rescue "a" }
-  teachers = enrollment_hashes['TeacherEnrollment'].map{|k, v| v[0]} #@context.detailed_enrollments.select{|e| e.type == 'TeacherEnrollment' && e.active_or_pending?}.sort_by{|e| e.user.sortable_name rescue "a" }
-  tas = enrollment_hashes['TaEnrollment'].map{|k, v| v[0]} #@context.detailed_enrollments.select{|e| e.type == 'TaEnrollment' && e.active_or_pending?}.sort_by{|e| e.user.sortable_name rescue "a" }
-  observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]} #@context.detailed_enrollments.select{|e| e.type == 'ObserverEnrollment' && e.active_or_pending?}.sort_by{|e| e.user.sortable_name rescue "a" }
+  students = enrollment_hashes['StudentEnrollment'].map{|k, v| v[0]}
+  teachers = enrollment_hashes['TeacherEnrollment'].map{|k, v| v[0]}
+  tas = enrollment_hashes['TaEnrollment'].map{|k, v| v[0]}
+  observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]}
   has_multiple_sections = @context.course_sections.active.count > 1
 
   publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true'
@@ -27,44 +27,44 @@
 
   <div class="rs-margin-lr rs-margin-top">
     <% if can_do(@context, @current_user, :manage) %>
-      <a href="<%= context_url(@context, :context_statistics_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> Course Statistics</a>
-      <a href="<%= calendar_url_for(@context) %>" class="button button-sidebar-wide"><%= image_tag "calendar_icon.png" %> Course Calendar</a>
+      <a href="<%= context_url(@context, :context_statistics_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> <%= t('links.stats', %{Course Statistics}) %></a>
+      <a href="<%= calendar_url_for(@context) %>" class="button button-sidebar-wide"><%= image_tag "calendar_icon.png" %> <%= t('links.calendar', %{Course Calendar}) %></a>
     <% end %>
     
     <% if can_do(@context, @current_user, :update) %>
       <% if @context.completed? %>
         <% form_tag context_url(@context, :context_unconclude_url) do %>
-          <button class="button button-sidebar-wide" type="submit"><%= image_tag "add.png" %>Un-Conclude Course</button>
+          <button class="button button-sidebar-wide" type="submit"><%= image_tag "add.png" %><%= t('buttons.unconclude', %{Un-Conclude Course}) %></button>
         <% end %>
-        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'delete') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %>Permanently Delete this Course</a>
+        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'delete') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.delete', %{Permanently Delete this Course}) %></a>
       <% else %>
-        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %>End this Course</a>
+        <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.conclude', %{End this Course}) %></a>
       <% end %>
-        <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Copy this Course</a>
-        <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Import Content into this Course</a>
-        <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %>Export this Course</a>
+        <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.copy', %{Copy this Course}) %></a>
+        <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
+        <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export', %{Export this Course}) %></a>
     <% end %>
     <table class="summary" style="margin-top: 20px;">
       <thead>
       <tr>
-        <th colspan="2">Current Users</th>
+        <th colspan="2"><%= t('headings.current_users', %{Current Users}) %></th>
       </tr>
       </thead>
       <tr>
-        <td>Students:</td>
-        <td class="student_count"><%= students.empty? ? "None" : students.length %></td>
+        <td><%= before_label('students', %{Students}) %></td>
+        <td class="student_count"><%= students.empty? ? t('none', "None") : students.length %></td>
       </tr>
       <tr>
-        <td>Teachers:</td>
-        <td class="teacher_count"><%= teachers.empty? ? "None" : teachers.length %></td>
+        <td><%= before_label('teachers', %{Teachers}) %></td>
+        <td class="teacher_count"><%= teachers.empty? ? t('none', "None") : teachers.length %></td>
       </tr>
       <tr>
-        <td>TA's:</td>
-        <td class="ta_count"><%= tas.empty? ? "None" : tas.length %></td>
+        <td><%= before_label('tas', %{TAs}) %></td>
+        <td class="ta_count"><%= tas.empty? ? t('none', "None") : tas.length %></td>
       </tr>
       <tr>
-        <td>Observers:</td>
-        <td class="observer_count"><%= observers.empty? ? "None" : observers.length %></td>
+        <td><%= before_label('observers', %{Observers}) %></td>
+        <td class="observer_count"><%= observers.empty? ? t('none', "None") : observers.length %></td>
       </tr>
     </table>
   </div>
@@ -72,21 +72,21 @@
 
 <div id="course_details_tabs" style="display:none;">
   <ul>
-    <li><a href="#tab-details">Course Details</a></li>
-    <li><a href="#tab-sections">Sections</a></li>
-    <li><a href="#tab-users" id="tab-users-link">Users</a></li>
-    <li><a href="#tab-navigation">Navigation</a></li>
-    <li><a href="#tab-tools" id="tab-tols-link">External Tools</a></li>
+    <li><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
+    <li><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
+    <li><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
+    <li><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
+    <li><a href="#tab-tools" id="tab-tols-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
     <% if publishing_enabled %>
-      <li><a href="#tab-grade-publishing" id="tab-grade-publishing-link">Grade Publishing</a></li>
+      <li><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
     <% end %>
   </ul>
   <div id="tab-details">
-    <h2>Course Details</h2>
+    <h2><%= t('headings.details', %{Course Details}) %></h2>
     <% form_for @context, :html => {:id => "course_form"} do |f| %>
     <table class="formtable">
       <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :name, "Name:" %></td>
+        <td style="vertical-align: top; width: 10%;"><%= f.blabel :name, :course_name, :en => "Name" %></td>
         <td style="width: 40%; vertical-align: top;" class="nobr">
           <% if can_rename_course %>
             <%= f.text_field :name, :class => "course_form", :style => "width: 150px;" %>
@@ -96,19 +96,19 @@
           <span class="course_info name"><%= @context.name %></span>
         </td>
         <% if feature_and_service_enabled?(:twitter) %>
-          <td class="hashtag_form" style="<%= hidden unless @context.hashtag && @context.hashtag != "" %> vertical-align: top;"><%= f.label :hashtag, "Hashtag:" %></td>
+          <td class="hashtag_form" style="<%= hidden unless @context.hashtag && @context.hashtag != "" %> vertical-align: top;"><%= f.blabel :hashtag, :en => "Hashtag" %></td>
           <td class="hashtag_form" style="<%= hidden unless @context.hashtag && @context.hashtag != "" %> width: 60%;">
             <%= f.text_field :hashtag, :class => "course_form" %>
             <span class="course_info" id="course_hashtag"><%= @context.hashtag %></span>
             <div style="font-size: 0.8em;" id="hashtag_options"><span class="course_form">
               <%= f.check_box :show_public_context_messages %>
-              <%= f.label :show_public_context_messages, "collect public messages for this hashtag" %>
+              <%= f.label :show_public_context_messages, :en => "collect public messages for this hashtag" %>
             </span></div>
           </td>
         <% end %>
       </tr>
       <tr>
-        <td style="width: 10%; white-space: nowrap;"><%= f.label :course_code, "Course Code:" %></td>
+        <td style="width: 10%; white-space: nowrap;"><%= f.blabel :course_code, :en => "Course Code" %></td>
         <td class="nobr">
           <% if can_rename_course %>
             <span class="course_form"><%= f.text_field :course_code, :style => "width: 100px;" %></span>
@@ -119,29 +119,26 @@
         </td>
         <% if feature_and_service_enabled?(:twitter) %>
           <td colspan="2" style=" display: none; padding-left: 10px;"><span class="course_form" style="font-size: 0.8em;">
-            <a href="#" class="hashtag_dialog_link help"> What's a hashtag?</a>
+            <a href="#" class="hashtag_dialog_link help"> <%= t('links.hashtag_help', %{What's a hashtag?}) %></a>
             <div id="hashtag_dialog" style="display: none; font-size: 0.8em;">
               <%= image_tag "twitter.png", :style => "float: left; margin: 10px;" %>
-              <p>Hashtags are special phrases that let people consistently mention the same
-              idea (like a course) on web sites like Twitter.  For example, the message "I like #instructure" is
-              using the hashtag "instructure".</p>
-              <p>Hashtags should consist of letters, numbers, dashes and underscores (no spaces).  The 
-              hashtag should be unique, easily recognizable, and short.  Short hashtags are better
-              since sites like Twitter limit the number of letters per message.</p>
-              <p>Examples:<br/>
+              <%= mt 'help.hashtags', %{Hashtags are special phrases that let people consistently mention the same idea (like a course) on web sites like Twitter.  For example, the message "I like #instructure" is using the hashtag "instructure".
+
+Hashtags should consist of letters, numbers, dashes and underscores (no spaces).  The hashtag should be unique, easily recognizable, and short.  Short hashtags are better since sites like Twitter limit the number of letters per message.}%>
+              <p><%= before_label('examples', %{Examples}) %><br/>
               <table style="margin-left: 20px;"><tr>
-                <td>too general:</td>
-                <td><b> #biology</b></td>
+                <td><%= before_label('too_general_twitter_hashtag.description', %{too general}) %></td>
+                <td><b> <%= t('too_general_twitter_hashtag.example', %{#biology}) %></b></td>
               </tr><tr>
-                <td>too long:</td>
-                <td><b> #san-fransisco-university-biology-100</b></td>
+                <td><%= before_label('too_long_twitter_hashtag.description', %{too long}) %></td>
+                <td><b> <%= t('too_long_twitter_hashtag.example', %{#san-fransisco-university-biology-100}) %></b></td>
               </tr><tr>
-                <td>much better:</td>
-                <td><b> #sfu-bio100</b></td>
+                <td><%= before_label('good_twitter_hashtag.description', %{much better}) %></td>
+                <td><b> <%= t('good_twitter_hashtag.example', %{#sfu-bio100}) %></b></td>
               </tr></table>
               </p>
               <div class="button-container">
-                <button type="button" class="close_dialog_button button">Cool, Thanks</button>
+                <button type="button" class="close_dialog_button button"><%= t('buttons.kthxbai', %{Cool, Thanks}) %></button>
               </div>
             </div>
           </span>
@@ -149,11 +146,11 @@
         <% end %>
       <% if @context.sis_source_id || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
-          <td><%= f.label :sis_source_id, "SIS ID:" %></td>
+          <td><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
           <td>
             <span class="course_form">
               <% if can_do(@context.root_account, @current_user, :manage_sis) %>
-                <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => "SIS ID", :value => @context.sis_source_id %>
+                <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => t('sis_source_id', "SIS ID"), :value => @context.sis_source_id %>
               <% else %>
                 <%= @context.sis_source_id %>
               <% end %>
@@ -163,11 +160,11 @@
       <% end %>
       <% if current_user_is_site_admin? %>
         </tr><tr>
-          <td><%= f.label :root_account_id, "Root Account:" %></td>
-          <td><%= @context.root_account.name %></td>
+          <td><%= f.blabel :root_account_id, :en => "Root Account" %></td>
+          <td><%= link_to @context.root_account.name, account_url(@context.root_account.id)  %></td>
       <% end %>
       </tr><tr>
-        <td><%= f.label :account_id, "Department:" %></td>
+        <td><%= f.blabel :account_id, :en => "Department" %></td>
         <td>
           <span class="course_form">
             <% if can_do(@context.root_account, @current_user, :manage) %>
@@ -180,14 +177,22 @@
                   <%= render :partial => "shared/account_options", :locals => {:account => @context.root_account} %>
                 </select>
               <% end %>
+            <% elsif can_do(@context.account, @current_user, :read) %>
+              <%= link_to @context.account.name, account_url(@context.account.id) %>
             <% else %>
               <%= @context.account.name %>
             <% end %>
           </span>
-          <span class="course_info account_name"><%= @context.account.name %></span>
+          <span class="course_info account_name">
+            <% if can_do(@context.account, @current_user, :read) %>
+              <%= link_to @context.account.name, account_url(@context.account.id) %>
+            <% else %>
+              <%= @context.account.name %>
+            <% end %>
+          </span>
         </td>
       </tr><tr>
-        <td><%= f.label :enrollment_term_id, "Term:" %></td>
+        <td><%= f.blabel :enrollment_term_id, :en => "Term" %></td>
         <td>
           <span class="course_form">
             <% if can_do(@context.root_account, @current_user, :manage) %>
@@ -203,95 +208,109 @@
           <span class="course_info term_name"><%= @context.enrollment_term.name %></span>
         </td>
       </tr><tr>
-        <td style="width: 10%;"><%= f.label :start_at, "Starts:" %></td>
+        <td style="width: 10%;"><%= f.blabel :start_at, :en => "Starts" %></td>
         <td class="nobr">
           <span class="course_form"><%= f.text_field :start_at, :class => "date_entry" %></span>
-          <span class="course_info start_at"><%= datetime_string(@context.start_at) || "No Date Set" %></span>
+          <span class="course_info start_at"><%= datetime_string(@context.start_at) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
-        <td style="width: 10%;"><%= f.label :conclude_at, "Ends:" %></td>
+        <td style="width: 10%;"><%= f.blabel :conclude_at, :en => "Ends" %></td>
         <td class="nobr">
           <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry" %></span>
-          <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at) || "No Date Set" %></span>
+          <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
         <td></td>
         <td>
           <div class="course_form">
             <%= f.check_box :restrict_enrollments_to_course_dates %>
-            <%= f.label :restrict_enrollments_to_course_dates, "Users can only access the course between these dates" %>
+            <%= f.label :restrict_enrollments_to_course_dates, :en => "Users can only access the course between these dates" %>
             <div style="font-size: 0.8em; padding-left: 25px;">
-              This will override any term availability settings.
+              <%= t('course_overrides_term', %{This will override any term availability settings.}) %>
             </div>
           </div>
           <div class="course_info restrict_dates" style="font-size: 0.8em;">
-            <%= @context.restrict_enrollments_to_course_dates ? "Users can only access the course between these dates" : "These dates will not affect course availability" %>
+            <%= @context.restrict_enrollments_to_course_dates ? t('date_restricted', "Users can only access the course between these dates") : t('not_date_restricted', "These dates will not affect course availability") %>
           </div>
         </td>
+      <% if available_locales.size > 1 %>
       </tr><tr>
-        <td style="width: 10%;"><%= f.label :storage_quota, "File Storage:" %></td>
+        <td style="width: 10%;"><%= f.blabel :locale, :language, :en => "Language" %></td>
+        <td>
+          <span class="course_form">
+            <% no_language = t(:no_language_preference, "Not set (user-configurable, defaults to %{language})", :language => available_locales[infer_locale(:context => @context.account)]) %>
+            <%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.locale %>
+            <div style="font-size: 0.8em;">
+              <%= t('language_overrides_preferences', "This will override any user/system language preferences. This is only recommended for foreign language courses") %>
+            </div>
+          </span>
+          <span class="course_info locale"><%= @context.locale ? available_locales[@context.locale] : no_language %></span>
+        </td>
+      <% end %>
+      </tr><tr>
+        <td style="width: 10%;"><%= f.blabel :storage_quota_mb, :storage_quota, :en => "File Storage" %></td>
         <td>
           <span class="course_form">
             <% if can_do(@context.account, @current_user, :manage_courses) %>
-              <%= f.text_field :storage_quota, :style => "width: 50px;", :title => "megabytes", :value => @context.quota %>
+              <%= f.text_field :storage_quota_mb, :style => "width: 50px;", :title => t('megabytes', "megabytes"), :value => @context.storage_quota_mb %>
             <% else %>
-              <%= @context.quota %>
+              <%= @context.storage_quota_mb %>
             <% end %>
           </span>
-          <span class="course_info quota"><%= @context.quota %></span>
-          megabytes
+          <span class="course_info storage_quota_mb"><%= @context.storage_quota_mb %></span>
+          <%= t('megabytes', %{megabytes}) %>
         </td>
       <% if @context.turnitin_enabled? %>
       </tr><tr>
-        <td style="width: 10%;"><%= f.label :turnitin_comments, "Turnitin Submission Comments:" %></td>
+        <td style="width: 10%;"><%= f.blabel :turnitin_comments, :en => "Turnitin Submission Comments" %></td>
         <td class="nobr">
-          <span class="course_form"><span style="font-size: 0.8em;">these comments will be shown to students when submitting a Turnitin-enabled assignment</span><br/><%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %></span>
+          <span class="course_form"><span style="font-size: 0.8em;"><%= t('turnitin', %{these comments will be shown to students when submitting a Turnitin-enabled assignment}) %></span><br/><%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %></span>
           <span class="course_info turnitin_comments"><%= @context.turnitin_comments %></span>
         </td>
       <% end %>
       </tr>
       <tr>
         <td style="width: 10%;">
-          Grading Scheme:
+          <%= before_label('grading_scheme', %{Grading Scheme}) %>
         </td>
         <td>
           <span class="course_info grading_scheme_set">
-            <%= @context.grading_standard_id ? (@context.grading_standard_title || "Currently Set") : "Not Set" %>
+            <%= @context.grading_standard_id ? (@context.grading_standard_title || t('grading_standard_currently_set', "Currently Set")) : t('grading_standard_not_set', "Not Set") %>
           </span>
           <span class="course_form">
             <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox" %>
-            <%= f.label :grading_standard_enabled, "Enable course grading scheme" %>
+            <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
             <div class="grading_standard_link" style="margin-left: 20px;">
-              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_id ? "view" : "set" %> grading scheme</a>
+              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_id ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
             </div>
           </span>
         </td>
       </tr>
       <tr>
-        <td style="vertical-align: top; width: 10%;"><%= f.label :license, "License:" %></td>
+        <td style="vertical-align: top; width: 10%;"><%= f.blabel :license, :en => "License" %></td>
         <td colspan="3">
           <span class="course_form">
-            <%= f.select :license, [['Private (Copyrighted)', 'private'], ['CC Attribution Non-Commercial No Derivatives', 'cc_by_nc_nd'], ['CC Attribution Non-Commercial Share Alike', 'cc_by_nc_sa'], ['CC Attribution Non-Commercial', 'cc_by_nc'], ['CC Attribution No Derivatives', 'cc_by_nd'], ['CC Attribution Share Alike', 'cc_by_sa'], ['CC Attribution', 'cc_by'], ['Public Domain', 'public_domain']] %>
+            <%= f.select :license, Course.licenses.map { |id, attrs| [attrs[:readable_license], id] }%>
             <%= license_help_link %>
           </span>
           <span class="course_info readable_license"><%= @context.readable_license %></span>
         </td>
       </tr><tr>
-        <td style="vertical-align: top; width: 10%;">Visibility:</td>
+        <td style="vertical-align: top; width: 10%;"><%= before_label('course_visibility', %{Visibility}) %></td>
         <td colspan="3">
           <span class="course_form">
             <%= f.check_box :is_public, :class => "is_public_checkbox" %>
-            <%= f.label :is_public, "Make this course publicly visible" %>
-            <span style='font-size: 0.8em; padding-left: 5px;'>(student data will remain private)</span>      
+            <%= f.label :is_public, :en => "Make this course publicly visible" %>
+            <span style='font-size: 0.8em; padding-left: 5px;'><%= t('help.public_course', %{(student data will remain private)}) %></span>
           </span>
-          <span class="course_info is_public"><%= @context.is_public ? 'Public' : 'Private' %></span>
+          <span class="course_info is_public"><%= @context.is_public ? t('public_course', 'Public') : t('private_course', 'Private') %></span>
           <div class="public_options">
             <span class="course_form">
               <%= f.check_box :indexed %>
-              <%= f.label :indexed, "Include this course in the public course index" %>
+              <%= f.label :indexed, :en => "Include this course in the public course index" %>
             </span>
             <span class="course_info indexed">
-              <%= @context.indexed ? "Included in public course index" : "" %>
+              <%= @context.indexed ? t('indexed_course', "Included in public course index") : "" %>
             </span>
           </div>
         </td>
@@ -299,45 +318,47 @@
         <td></td>
         <td colspan="3">
           <span class="course_info self_enrollment_message" style="<%= hidden unless @context.self_enrollment %>">
-            This course has enabled open enrollment.  Students can self-enroll in the course
-            once you share with them this url:<br/>
+            <%= before_label 'course_open_enrollment', 'This course has enabled open enrollment.  Students can self-enroll in the course once you share with them this url' %><br/>
             <input type="text" class="copyable" value="<%= h(course_self_enrollment_url(@context, @context.self_enrollment_code)) %>"/>
           </span>
-          <a href="#" class="course_form course_form_more_options_link" style="padding-left: 20px;">more options</a>
+          <a href="#" class="course_form course_form_more_options_link" style="padding-left: 20px;"><%= t('links.more_options', %{more options}) %></a>
           <div class="course_form_more_options" style="display: none; padding-left: 20px;">
             <% if @context.self_enrollment_allowed? %>
               <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox' %>
-              <%= f.label :self_enrollment, "Let students self-enroll by sharing with them a secret URL" %><br/>
+              <%= f.label :self_enrollment, :en => "Let students self-enroll by sharing with them a secret URL" %><br/>
               <div class="open_enrollment_holder" style="display: none;">
               <%= f.check_box :open_enrollment %>
-              <%= f.label :open_enrollment, "Add a \"Join this Course\" link to the course home page" %><br/>
+              <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
               </div>
             <% end %>
             <%= f.check_box :allow_student_assignment_edits %>
-            <%= f.label :allow_student_assignment_edits, "Let Students edit Assignment Descriptions" %><br/>
+            <%= f.label :allow_student_assignment_edits, :en => "Let Students edit Assignment Descriptions" %><br/>
             <%= f.check_box :allow_student_forum_attachments %>
-            <%= f.label :allow_student_forum_attachments, "Let Students attach files to Discussion Posts" %><br/>
+            <%= f.label :allow_student_forum_attachments, :en => "Let Students attach files to Discussion Posts" %><br/>
             <%= f.check_box :allow_student_organized_groups %>
-            <%= f.label :allow_student_organized_groups, "Let Students organize their own Groups" %><br/>
-            <%= f.select :default_wiki_editing_roles, [["Only Teachers", "teachers"], ["Teacher and Students", "teachers,students"], ["Anyone", "teachers,students,public"]] %>
-            can edit course wiki pages by default<br/>
+            <%= f.label :allow_student_organized_groups, :en => "Let Students organize their own Groups" %><br/>
+            <%= f.select :default_wiki_editing_roles, [
+              [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
+              [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
+              [t('#course.wiki_permissions.all', "Anyone"), "teachers,students,public"]] %>
+            <%= t('wiki_editing_roles', %{can edit course wiki pages by default}) %><br/>
             <div class="changed_default_wiki_editing_roles" style="display: none; padding-left: 20px; font-size: 0.8em;">
               <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
-              <label for="update_default_pages">Change pages currently editable by "<span><%= @context.readable_default_wiki_editing_roles %></span>" to "<span class="default_wiki_editing_roles_change">&nbsp;</span>".</label>
+              <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
             </div>
           </div>
         </td>
       </tr><tr>
         <td colspan="4">
           <% if can_do(@context, @current_user, :update) %>
-            <a href="#" class="edit_course_link button"><%= image_tag "edit.png" %>Edit Course Details</a>
+            <a href="#" class="edit_course_link button"><%= image_tag "edit.png" %><%= t('links.edit_course', %{Edit Course Details}) %></a>
           <% end %>
           <% if current_user_is_site_admin? && Account.root_accounts.length > 1 %>
-            <a href="#" class="move_course_link button"><%= image_tag "ball.png" %>Move To Another Account</a>
+            <a href="#" class="move_course_link button"><%= image_tag "ball.png" %><%= t('links.move_course', %{Move To Another Account}) %></a>
           <% end %>
           <span class="course_form">
-            <button type="submit" class="button">Update Course Details</button>
-            <button type="button" class="cancel_button button-secondary">Cancel</button>
+            <button type="submit" class="button"><%= t('buttons.update_course', %{Update Course Details}) %></button>
+            <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
           </span>
         </td>
       </tr>
@@ -346,27 +367,27 @@
     
   </div>
   <div id="tab-sections">
-    <h2 style="margin-top: 10px;">Course Sections</h2>
+    <h2 style="margin-top: 10px;"><%= t('headings.sections', %{Course Sections}) %></h2>
     <ul id="sections">
       <% @context.course_sections.active.each do |section| %>
         <li class="section">
           <% if can_do(section, @current_user, :delete) %>
             <% if section.deletable? %>
-              <a class="section_link delete_section_link no-hover" title="Delete Section" href="<%= context_url(@context, :context_section_url, section) %>"><%= image_tag "delete_circle.png", :alt => "delete" %></a>
+              <a class="section_link delete_section_link no-hover" title="<%= t('links.title.delete_section', %{Delete Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><%= image_tag "delete_circle.png", :alt => t('images.alt.delete', "delete") %></a>
             <% else %>
-              <a class="section_link cant_delete_section_link no-hover" href="#" title="You can't delete sections that have users enrolled"><%= image_tag "delete_circle_gray.png", :alt => "can't delete" %></a>
+              <a class="section_link cant_delete_section_link no-hover" href="#" title="<%= t('links.title.cant_delete', %{You can't delete sections that have users enrolled}) %>"><%= image_tag "delete_circle_gray.png", :alt => t('images.alt.cant_delete', "can't delete") %></a>
             <% end %>
           <% end %>
           <% if can_do(section, @current_user, :update) && !section.defined_by_sis? %>
-            <a class="section_link edit_section_link no-hover" title="Edit Section" href="<%= context_url(@context, :context_section_url, section) %>"><%= image_tag "edit.png", :alt => "edit" %></a>
+            <a class="section_link edit_section_link no-hover" title="<%= t('links.title.edit_section', %{Edit Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><%= image_tag "edit.png", :alt => t('images.alt.edit', "edit") %></a>
           <% end %>
           <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">
             <%= section.display_name %>
           </a>
           <span class="users_count">
             (
-              <%= pluralize(section.enrollments.count, "User") %><% if section && section.sis_source_id %>, 
-                SIS ID: <%= section.sis_source_id %>
+              <%= t 'enrollment_count', 'User', :count => section.enrollments.count %><% if section && section.sis_source_id %>, 
+                <%= t 'section_sis_id', 'SIS ID: %{section_sis}', :section_sis => section.sis_source_id %>
               <% end %>
             )
           </span>
@@ -374,8 +395,8 @@
         </li>
       <% end %>
       <li class="section_blank" style="display: none;">
-        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="Delete Section" class="delete_section_link no-hover" ><%= image_tag "delete_circle.png", :alt => "delete" %></a>
-        <a class="edit_section_link no-hover" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="Edit Section"><%= image_tag "edit.png", :alt => "edit" %></a>
+        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.delete_section', %{Delete Section}) %>" class="delete_section_link no-hover" ><%= image_tag "delete_circle.png", :alt => t('images.alt.delete', "delete") %></a>
+        <a class="edit_section_link no-hover" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.edit_section', %{Edit Section}) %>"><%= image_tag "edit.png", :alt => t('images.alt.edit', "edit") %></a>
         <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name">
         </a>
         <div class="clear"></div>
@@ -383,9 +404,9 @@
       <% if can_do(@context.course_sections.new, @current_user, :create) %>
         <li>
           <% form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :style => "margin-top: 20px;"} do |f| %>
-            <h3><%= f.label :name, "Add a New Section:" %></h3>
+            <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
             <%= f.text_field :name %>
-            <button class="button small-button" type="submit">Add Section</button>
+            <button class="button small-button" type="submit"><%= t('buttons.add_section', %{Add Section}) %></button>
           <% end %>
         </li>
       <% end %>
@@ -395,49 +416,49 @@
     <% end %>
   </div>
   <div id="tab-users">
-    <h2 style="margin-top: 10px;">Current Users</h2>
+    <h2 style="margin-top: 10px;"><%= t('headings.current_users', %{Current Users}) %></h2>
     <div style="margin-bottom: 10px; <%= hidden if (students + teachers + tas + observers).select{|e| e.invited? }.empty? %>">
-      <span class="unaccepted_invitations"><%= (students + teachers + tas + observers).select{|e| e.invited? }.length %></span>
-      Invitations haven't been accepted.  You can click a user's name to re-send their invitation
+      <%= t 'unaccepted_invitations', "%{count} Invitations haven't been accepted.  You can click a user's name to re-send their invitation", :count => %[<span class="unaccepted_invitations">#{(students + teachers + tas + observers).select{|e| e.invited? }.length}</span>].html_safe %>
+
       <% if @context.available? %>
-        or<br/>
-        <span><button type="button" href="<%= course_re_send_invitations_url %>" class="button re_send_invitations_link">Re-Send All Unaccepted Invitations</button></span>
+        <% ot 're_send_all', 'or *Re-Send All Unaccepted Invitations*', :wrapper => capture { %><div><span><button type="button" href="<%= course_re_send_invitations_url %>" class="button re_send_invitations_link">\1</button></span>
+      </div><% } %>
       <% end %>
     </div>
     <table style="width: 100%;">
       <tr>
         <td style="vertical-align: top; padding-right: 30px;">
-          <h3>Students <span class="tally">(<span class="student_count"><%= students.length %></span>)</span></h3>
+          <h3><%= t 'headings.students', 'Students' %> <span class="tally">(<span class="student_count"><%= students.length %></span>)</span></h3>
           <ul class="user_list student_enrollments">
             <% if students.empty? %>
-              <li class="none">No Students Enrolled</li>
+              <li class="none"><%= t('no_students', %{No Students Enrolled}) %></li>
             <% else %>
               <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['StudentEnrollment'].to_a.sort_by{|e| e[0].sortable_name rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
             <% end %>
             <%= render :partial => 'shared/enrollment', :object => nil, :locals => {:show_information_link => true} %>
           </ul>
-          <h3>Observers <span class="tally">(<span class="observer_count"><%= observers.length %></span>)</span></h3>
+          <h3><%= t('headings.observers', 'Observers') %> <span class="tally">(<span class="observer_count"><%= observers.length %></span>)</span></h3>
           <ul class="user_list observer_enrollments">
             <% if observers.empty? %>
-              <li class="none">No Observers Enrolled</li>
+              <li class="none"><%= t('no_observers', %{No Observers Enrolled}) %></li>
             <% else %>
               <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['ObserverEnrollment'].to_a.sort_by{|e| e[0].sortable_name rescue 'a' }, :locals => {:show_information_link => true} %>
             <% end %>
           </ul>
         </td>
         <td style="vertical-align: top;">
-          <h3>Teachers <span class="tally">(<span class="teacher_count"><%= teachers.length %></span>)</span></h3>
+          <h3><%= t('headings.teachers', %{Teachers}) %> <span class="tally">(<span class="teacher_count"><%= teachers.length %></span>)</span></h3>
           <ul class="user_list teacher_enrollments">
             <% if teachers.empty? %>
-              <li class="none">No Teachers Assigned</li>
+              <li class="none"><%= t('no_teachers', %{No Teachers Assigned}) %></li>
             <% else %>
               <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TeacherEnrollment'].to_a.sort_by{|e| e[0].sortable_name rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
             <% end %>
           </ul>
-          <h3>TA's <span class="tally">(<span class="ta_count"><%= tas.length %></span>)</span></h3>
+          <h3><%= t('headings.tas', %{TAs}) %> <span class="tally">(<span class="ta_count"><%= tas.length %></span>)</span></h3>
           <ul class="user_list ta_enrollments">
             <% if tas.empty? %>
-              <li class="none">No TA's Assigned</li>
+              <li class="none"><%= t('no_tas', %{No TAs Assigned}) %></li>
             <% else %>
               <%= render :partial => 'shared/enrollment', :collection => enrollment_hashes['TaEnrollment'].to_a.sort_by{|e| e[0].sortable_name rescue 'a' }, :locals => {:show_section => has_multiple_sections, :show_information_link => true} %>
             <% end %>
@@ -446,130 +467,89 @@
       </tr>
     </table>
     <% if can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users) %>
-        <a href="#" class="add_users_link button"><%= image_tag "add.png" %>Add Users</a>
+        <a href="#" class="add_users_link button"><%= image_tag "add.png" %><%= t('links.add_users', %{Add Users}) %></a>
     <% end %>
     <% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :style => "display: none;"} do  %>
-    <h2>Add Course Users</h2>
+    <h2><%= t('headings.add_users', %{Add Course Users}) %></h2>
     <div style="margin-top: 5px;">
       <div>
-        <label for="enrollment_type">Add More </label>
-        <select name="enrollment_type" title="Enrollment Type" id="enrollment_type">
+        <%= label_tag :enrollment_type, :en => "Add More" %>
+        <select name="enrollment_type" title="<%= t('titles.enrollment_type', 'Enrollment Type') %>" id="enrollment_type">
           <% if can_do(@context, @current_user, :manage_students) %>
-            <option value="StudentEnrollment">Students</option>
+            <option value="StudentEnrollment"><%= t('option.students', %{Students}) %></option>
           <% end %>
           <% if can_do(@context, @current_user, :manage_admin_users) %>
-            <option value="TeacherEnrollment">Teachers</option>
-            <option value="TaEnrollment">TA's</option>
+            <option value="TeacherEnrollment"><%= t('option.teachers', %{Teachers}) %></option>
+            <option value="TaEnrollment"><%= t('option.tas', %{TAs}) %></option>
           <% elsif @context.teacherless? %>
-            <option value="TeacherEnrollment" class="teacherless_invite">Teachers</option>
+            <option value="TeacherEnrollment" class="teacherless_invite"><%= t('option.teachers', %{Teachers}) %></option>
           <% end %>
-          <option value="ObserverEnrollment">Observers</option>
+          <option value="ObserverEnrollment"><%= t('option.observers', %{Observers}) %></option>
         </select>
         <span id="limit_priveleges_to_course_section_holder" style="padding-left: 10px; white-space: nowrap;">
           <input type="checkbox" id="limit_priveleges_to_course_section" name="limit_priveleges_to_course_section" value="1"/>
-          <label for="limit_priveleges_to_course_section">these admins can only grade students in their section</label>
+          <%= label_tag :limit_priveleges_to_course_section, :en => 'these admins can only grade students in their section' %>
         </span>
         <% if can_do(@context.account, @current_user, :manage_admin_users) %>
           <div style="white-space: nowrap;">
             <input type="checkbox" id="auto_accept_enrollment" name="auto_accept" value="1"/>
-            <label for="auto_accept_enrollment">don't send invite, just auto-accept these users</label>
+            <%= label_tag :auto_accept_enrollment, :en => "don't send invite, just auto-accept these users" %>
           </div>
         <% end %>
       </div>
       <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
-        <label for="course_section_id">For the section:</label>
-        <select title="Course Section" name="course_section_id" id="course_section_id">
+        <%= label_tag :course_section_id, :en => 'For the section' %>
+        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
           <% @context.course_sections.active.each do |section| %>
             <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
           <% end %>
         </select>
       </div>
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
-        If you invite a teacher and they accept, you will give up administrative priveleges for this course.
+        <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative priveleges for this course.}) %>
       </div>
-      <div id="email_list_boxes">
-        <a id="email_lists_path" style="display:none;" href="<%= url_for email_lists_path(:format => :json) %>"></a>  
-        <div id="user_emails_textarea_container" style="z-index: 2;">
-          <span style="font-size: 0.8em;">Copy and paste a list of email addresses to add users to this course.</span>
-          <textarea name="user_emails" class="user_emails"></textarea>
-        </div>
-        <div id="user_emails_parsed" style="z-index: 1; display:none;">
-          <div class="ui-helper-reset ui-widget-content ui-corner-all" id="email_lists_processed_people">
-            <div id="user_emails_duplicates_found" class="ui-widget">
-              <div class="ui-state-highlight ui-corner-all"> 
-                <p>
-                  <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
-                  <strong>Notice:</strong> <strong class='duplicate_count'>???</strong> duplicate address<span class="duplicates_plurality">es</span> found, duplicates have been removed.
-                </p>
-              </div>
-            </div>
-            <div id="user_emails_no_valid_emails" class="ui-widget">
-              <div class="ui-state-highlight ui-corner-all"> 
-                <p><span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
-                <strong>Sorry,</strong> it does not seem as if there were any valid email addresses typed in, please go back and try again.</p>
-              </div>
-            </div>
-            <div id="user_emails_with_errors" class="ui-widget">
-              <div class="ui-state-highlight ui-corner-all"> 
-                <p>
-                  <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-alert"></span>
-                  <strong>Alert:</strong> There were <strong class="errors_count">???</strong> errors parsing that list of emails. There may be some that 
-                  were invalid, you might need to go back and fix any errors.  If you proceed as is, <strong class="addresses_count">???</strong>
-                  users will be added.
-                </p>
-              </div>
-            </div>
-
-            <div class="person ui-helper-reset ui-state-default ui-corner-all" id="email_lists_processed_person_template" style="display:none;">
-              <div class="name">Last, First</div>
-              <div class="address">user@domain.com</div>
-            </div>      
-          </div>
-        </div>
-      </div>
+      <%= render :partial => 'shared/user_lists' %>
       <% unless @context.available? %>
       <div style="font-size: 0.8em;">
-        <i>Since the course hasn't been published, students and TA's will be added, but won't be
-        invited to join the course.  Invitations will be sent out when the course is published.</i>
+        <i><%= t('invite_to_unpublished_course', %{Since the course hasn't been published, students and TA's will be added, but won't be invited to join the course.  Invitations will be sent out when the course is published.}) %></i>
       </div>
       <% end %>
     </div>
     <div class="button-container">
-      <button type="button" class="button verify_syntax_button">Continue...</button>
-      <button type="submit" class="button add_users_button">OK Looks Good, Add These Users</button>
-      <button type="button" class="go_back_button button-secondary">Go back and edit the list of emails</button>
-      <button type="button" class="cancel_button button-secondary">Cancel</button>
+      <button type="button" class="button verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
+      <button type="submit" class="button add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
+      <button type="button" class="go_back_button button-secondary"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
+      <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
     <% end %>
     <div style="text-align: center; display: none;" id="enrollment_dialog">
-      <span class="name">User</span>
+      <% user_snippet = capture { %><span class="name"></span><% } %>
+      <% time_snippet = capture { %><div style="margin: 10px;" class="invitation_sent_at"></div><% } %>
       <div class="admin_enrollment_re_send">
-        hasn't yet accepted the invitation to join the course.  The invitation was sent:
+        <%= t 'admin_invitation_unaccepted', "%{user} hasn't yet accepted the invitation to join the course.  The invitation was sent: %{time}", :user => user_snippet, :time => time_snippet %>
       </div>
       <div class="student_enrollment_re_send">
         <% if @context.available? %>
-          hasn't yet accepted the invitation to join the course.  The invitation was sent:
+          <%= t 'student_invitation_unaccepted_available', "%{user} hasn't yet accepted the invitation to join the course.  The invitation was sent: %{time}", :user => user_snippet, :time => time_snippet %>
         <% else %>
-          was added to the course:
+          <%= t 'student_invitation_unaccepted_unavailable', "%{user} was added to the course: %{time}", :user => user_snippet, :time => time_snippet %>
         <% end %>
       </div>
       <div class="accepted_enrollment_re_send">
-        has already received and accepted the invitation to join the course, but you can still
-        re-send the invitation if they need it.
+        <%= t 'accepted_invitation', "%{user} has already received and accepted the invitation to join the course, but you can still re-send the invitation if they need it.", :user => user_snippet %>
       </div>
-      <div style="margin: 10px;" class="invitation_sent_at">Just Now</div>
       <div style="margin: 15px 10px; font-weight: bold;">
         <div class="admin_enrollment_re_send">
-          <a href="#" class="re_send_invitation_link button">Re-Send Invitation</a>
+          <a href="#" class="re_send_invitation_link button"><%= t('links.re_send_invitation', %{Re-Send Invitation}) %></a>
         </div>
         <div class="accepted_enrollment_re_send">
-          <a href="#" class="re_send_invitation_link button">Re-Send Invitation</a>
+          <a href="#" class="re_send_invitation_link button"><%= t('links.re_send_invitation', %{Re-Send Invitation}) %></a>
         </div>
         <div class="student_enrollment_re_send">
           <% if @context.available? %>
-            <a href="#" class="re_send_invitation_link button">Re-Send Invitation</a>
+            <a href="#" class="re_send_invitation_link button"><%= t('links.re_send_invitation', %{Re-Send Invitation}) %></a>
           <% else %>
-            Invitations aren't sent until the course is <a href="<%= context_url(@context, :context_url) %>">published</a>
+            <%= t 'invitations_pending_publish', "Invitations aren't sent until the course is *published*", :wrapper => %{<a href="#{context_url(@context, :context_url)}">\\1</a>} %>
           <% end %>
         </div>
       </div>
@@ -577,68 +557,62 @@
     <%= render :partial => 'link_enrollment' %>
   </div>
   <div id="tab-navigation">
-    <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => "Edit Course Navigation" } do %>
+    <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
       <% tabs = sortable_tabs %>
       <p style="margin-bottom: 4px; padding-top: 10px">
-        Drag and drop items to reorder them in the course navigation.
+        <%= t('help.edit_navigation', %{Drag and drop items to reorder them in the course navigation.}) %>
       </p>
       <% tabs.each do |tab|
-        tab[:disabled_message] = ['Grades', 'People', 'Discussions'].include?(tab[:label]) ? "This page can't be disabled, only hidden" : "Page disabled, will redirect to course home page"
+        tab[:disabled_message] = [Course::TAB_GRADES, Course::TAB_PEOPLE, Course::TAB_DISCUSSIONS].include?(tab[:id]) ? t('tab_cant_disable', "This page can't be disabled, only hidden") : t('tab_disabled', "Page disabled, will redirect to course home page")
       end %>
       <ul id="nav_enabled_list" class="nav_list connectedSortable">
         <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
-          <!-- <span class="ui-icon ui-icon-arrowthick-2-n-s" style="float: left; display: none;"></span> -->
-          <li class="navitem <%= 'enabled' if tab[:label] != 'Home' %> <%= tab[:label].downcase %>" id="nav_edit_tab_id_<%= tab[:id] %>"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
+          <li class="navitem <%= 'enabled' if tab[:id] != Course::TAB_HOME %> <%= tab[:label].downcase %>" id="nav_edit_tab_id_<%= tab[:id] %>"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
         <% end %>
       </ul>
 
       <ul id="nav_disabled_list" class="nav_list connectedSortable">
         <li class="disabled">
-          Drag items here to hide them from students.
+          <%= t('drag_to_hide', %{Drag items here to hide them from students.}) %>
           <div style="font-size: 0.8em;">
-            Disabling most pages will cause students who visit those
-            pages to be redirected to the course home page.
+            <%= t('drag_details', %{Disabling most pages will cause students who visit those pages to be redirected to the course home page.}) %>
           </div>
         </li>
         <% tabs.select {|t| t[:hidden] }.each do |tab|  %>
-          <!-- <span class="ui-icon ui-icon-arrowthick-2-n-s" style="float: left; display: none;"></span> -->
-          <li class="navitem enabled <%= tab[:label].downcase %>" id="nav_edit_tab_id_<%= tab[:id] %>"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
+          <li class="navitem enabled" id="nav_edit_tab_id_<%= tab[:id] %>"><%= tab[:label] %><span class="disabled_message"><%= tab[:disabled_message] %></span></li>
         <% end %>
       </ul>
 
       <p>
-        <button type="submit" class="button">Save</button>
+        <button type="submit" class="button"><%= t('#buttons.save', %{Save}) %></button>
       </p>
     <% end %>
   </div>
   <div id="tab-tools">
-    <h2>External Tools</h2>
+    <h2><%= t('headings.external_tools', %{External Tools}) %></h2>
     <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
   </div>
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
-      <h2>Grade Publishing</h2>
+      <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
       <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %>
       <a href="<%= context_url(@context, :context_publish_to_sis_url) %>" id="sis_publish_link" style="display: none;">&nbsp;</a>
       <% end %>
-      <a href="#" id="publish_grades_link" class="button disabled">Publishing grades to SIS...</a>
-      <span id="publish_grades_error" style="display: none;">&nbsp;An error occurred
-        on the last attempt to publish grades to SIS.</span>
+      <a href="#" id="publish_grades_link" class="button disabled"><%= t('links.publishing_to_sis', %{Publishing grades to SIS...}) %></a>
+      <span id="publish_grades_error" style="display: none;">&nbsp;<%= t('errors.sis_publish', %{An error occurred on the last attempt to publish grades to SIS.}) %></span>
     </div>
   <% end %>
 </div>
 <% if current_user_is_site_admin? %>
   <div id="move_course_dialog" style="display: none;">
-    <h2>Move the course to another root account</h2>
-    Select a new root account for this course.  After you move the
-    course you'll want to specify a new department for the
-    course as well.
+    <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
+    <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>
     <% form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
       <table class="formtable">
         <tr>
           <td>
-            <%= f.label :root_account_id, "Root Account:" %>
+            <%= f.blabel :root_account_id, :en => "Root Account" %>
           </td>
           <td>
             <%= f.select :root_account_id, Account.root_accounts.sort_by(&:name).map{|a| [a.name, a.id] }, :selected => @context.root_account_id %>
@@ -647,8 +621,8 @@
         <tr>
           <td colspan="2">
             <div class="button-container">
-              <button type="submit" class="button">Move Course</button>
-              <button type="button" class="button button-secondary cancel_button">Cancel</button>
+              <button type="submit" class="button"><%= t('buttons.move_course', %{Move Course}) %></button>
+              <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
             </div>
           </td>
         </tr>

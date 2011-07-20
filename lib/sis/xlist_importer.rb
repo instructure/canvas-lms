@@ -73,51 +73,54 @@ module SIS
               end
             end
 
-            if row['status'] =~ /\Aactive\z/i
+            unless section.sticky_xlist
+              if row['status'] =~ /\Aactive\z/i
 
-              if course.deleted?
-                course.workflow_state = 'claimed'
-                course.save_without_broadcasting!
-                course.update_enrolled_users
-                courses_to_update_associations.add course
+                if course.deleted?
+                  course.workflow_state = 'claimed'
+                  course.save_without_broadcasting!
+                  course.update_enrolled_users
+                  courses_to_update_associations.add course
+                end
+
+                if section.course_id == course.id
+                  courses_to_update_associations.map(&:update_account_associations)
+                  @sis.counts[:xlists] += 1
+                  next
+                end
+
+                begin
+                  courses_to_update_associations.add section.course
+                  courses_to_update_associations.add course
+                  section.crosslist_to_course(course, false, false)
+                rescue => e
+                  add_warning(csv, "An active cross-listing failed: #{e}")
+                  next
+                end
+
+              elsif row['status'] =~ /\Adeleted\z/i
+                if course && section.course_id != course.id
+                  @sis.counts[:xlists] += 1
+                  next
+                end
+
+                begin
+                  courses_to_update_associations.add section.course
+                  section.uncrosslist(false)
+                  courses_to_update_associations.add section.course
+                rescue => e
+                  add_warning(csv, "A deleted cross-listing failed: #{e}")
+                  next
+                end
+
+              else
+                add_error(csv, "Improper status #{row['status']} for a cross-listing")
               end
 
-              if section.course_id == course.id
-                courses_to_update_associations.map(&:update_account_associations)
-                @sis.counts[:xlists] += 1
-                next
-              end
-
-              begin
-                courses_to_update_associations.add section.course
-                courses_to_update_associations.add course
-                section.crosslist_to_course(course, false)
-              rescue => e
-                add_warning(csv, "An active cross-listing failed: #{e}")
-                next
-              end
-
-            elsif row['status'] =~ /\Adeleted\z/i
-              if course && section.course_id != course.id
-                @sis.counts[:xlists] += 1
-                next
-              end
-
-              begin
-                courses_to_update_associations.add section.course
-                section.uncrosslist(false)
-                courses_to_update_associations.add section.course
-              rescue => e
-                add_warning(csv, "A deleted cross-listing failed: #{e}")
-                next
-              end
-
-            else
-              add_error(csv, "Improper status #{row['status']} for a cross-listing")
+              @sis.counts[:xlists] += 1
             end
 
             courses_to_update_associations.map(&:update_account_associations)
-            @sis.counts[:xlists] += 1
           end
         end
       end

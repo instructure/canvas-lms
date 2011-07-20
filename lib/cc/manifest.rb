@@ -20,6 +20,7 @@ module CC
     include CCHelper
     
     attr_accessor :exporter, :weblinks, :basic_ltis
+    delegate :add_error, :set_progress, :to => :exporter
 
     def initialize(exporter)
       @exporter = exporter
@@ -64,12 +65,27 @@ module CC
         end
         set_progress(5)
         
-        Organization.create_organizations(self, manifest_node)
+        begin
+          Organization.create_organizations(self, manifest_node)
+        rescue
+          add_error(I18n.t('course_exports.errors.organization', "Failed to generate organization structure."), $!)
+        end
         set_progress(10)
 
-        Resource.create_resources(self, manifest_node)
-
+        begin
+          Resource.create_resources(self, manifest_node)
+        rescue
+          add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
+        end
       end #manifest
+      
+      # write any errors to the manifest file
+      if @exporter.errors.length > 0
+        @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)
+        @exporter.errors.each do |error|
+          @document.comment! error.first
+        end
+      end
     end
 
     def create_metadata(md)
@@ -97,10 +113,6 @@ module CC
           end
         end
       end
-    end
-    
-    def set_progress(progress)
-      @exporter.set_progress(progress)
     end
   end
 end

@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  Ungraded Assignment: <%= asset.assignment.title %>, <%= asset.assignment.context.name %>
+  <%= t('ungraded_assignment', 'Ungraded Assignment: %{assignment_name}, %{course_name}', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>
 <% end %>
 
-<%= asset.assignment.title %>, <%= asset.assignment.context.name %> hasn't been graded.  It was due <%= datetime_string(force_zone(asset.assignment.due_at)) %>.
+<%= t('not_graded', "%{assignment_name}, %{course_name}, hasn't been graded. It was due %{due_date}", :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :due_date => datetime_string(force_zone(asset.assignment.due_at)))  %>

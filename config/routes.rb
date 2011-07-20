@@ -1,7 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
   
   map.resources :submission_comments, :only => :destroy
-  map.resources :email_lists, :only => :create
 
   map.mark_inbox_as_read 'inbox', :controller => 'context', :action => 'mark_inbox_as_read', :conditions => {:method => :delete}
   map.inbox 'inbox', :controller => 'context', :action => 'inbox'
@@ -43,6 +42,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :files do |file|
     file.download 'download', :controller => 'files', :action => 'show', :download => '1'
   end
+  map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
 
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404. I'm not sure we ever actually want
@@ -103,6 +103,8 @@ ActionController::Routing::Routes.draw do |map|
     } do |gradebook|
       gradebook.submissions_upload 'submissions_upload/:assignment_id', :controller => 'gradebooks', :action => 'submissions_zip_upload', :conditions => { :method => :post }
     end
+    course.resource :gradebook2,
+      :controller => 'gradebook2'
     course.attendance 'attendance', :controller => 'gradebooks', :action => 'attendance'
     course.attendance_user 'attendance/:user_id', :controller => 'gradebooks', :action => 'attendance'
     course.imports 'imports', :controller => 'content_imports', :action => 'intro'
@@ -263,6 +265,8 @@ ActionController::Routing::Routes.draw do |map|
     course.switch_role 'switch_role/:role', :controller => 'courses', :action => 'switch_role'
     course.sis_publish_status 'details/sis_publish', :controller => 'courses', :action => 'sis_publish_status', :conditions => {:method => :get}
     course.publish_to_sis 'details/sis_publish', :controller => 'courses', :action => 'publish_to_sis', :conditions => {:method => :post}
+    
+    course.resources :user_lists, :only => :create
   end
 
   map.resources :rubrics do |rubric|
@@ -275,7 +279,6 @@ ActionController::Routing::Routes.draw do |map|
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
   map.media_object_redirect 'media_objects/:id/redirect', :controller => 'context', :action => 'media_object_redirect'
-  map.page_views 'info/page_views', :controller => 'info', :action => 'page_views'
   map.external_content_success 'external_content/success/:service', :controller => 'external_content', :action => 'success'
   map.external_content_cancel 'external_content/cancel/:service', :controller => 'external_content', :action => 'cancel'
   
@@ -508,7 +511,7 @@ ActionController::Routing::Routes.draw do |map|
     user.merge 'merge', :controller => 'users', :action => 'merge', :conditions => {:method => :post}
     user.grades 'grades', :controller => 'users', :action => 'grades'
     user.resources :user_notes
-    user.courses 'courses', :controller => 'users', :action => 'courses'
+    user.manageable_courses 'manageable_courses', :controller => 'users', :action => 'manageable_courses'
     user.outcomes 'outcomes', :controller => 'outcomes', :action => 'user_outcome_results'
     user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
     user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
@@ -519,6 +522,8 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
+    user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
   end
   map.resource :profile, :only => [:show, :update], :controller => "profile", :member => { :communication => :get, :update_communication => :post } do |profile|
     profile.resources :pseudonyms, :except => %w(index)
@@ -641,7 +646,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :interaction_tests, :collection => {:next => :get, :register => :get, :groups => :post}
   
-  map.resources :delayed_jobs, :member => {:update => :put, :queue => :put, :hold => :put}, :collection => {:hold => :put, :queue => :put}
+  map.resources :delayed_jobs, :only => :index, :controller => 'jobs'
   map.object_snippet 'object_snippet', :controller => 'context', :action => 'object_snippet', :conditions => { :method => :post }
   map.saml_consume "saml_consume", :controller => "pseudonym_sessions", :action => "saml_consume" 
   map.saml_logout "saml_logout", :controller => "pseudonym_sessions", :action => "saml_logout" 
@@ -649,15 +654,10 @@ ActionController::Routing::Routes.draw do |map|
   
   # Routes for course exports
   map.connect 'xsd/:version.xsd', :controller => 'content_exports', :action => 'xml_schema'
-  map.resources :content_exports do |ce|
-    ce.resources :files do |file|
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-    end
-  end
 
   map.resources :jobs, :only => %w(index), :collection => %w[batch_update]
 
-  Jammit::Routes.draw(map)
+  Jammit::Routes.draw(map) if defined?(Jammit)
 
   # API routes
   ApiRouteSet.new(map, "/api/v1") do |api|
@@ -689,6 +689,9 @@ ActionController::Routing::Routes.draw do |map|
                         :only => %w(show create)
     end
   end
+
+  map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
+  map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }
 
   # See how all your routes lay out with "rake routes"
 end

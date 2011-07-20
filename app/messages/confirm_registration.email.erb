@@ -5,10 +5,13 @@
 <% end %>
 
 <% define_content :subject do %>
-  Confirm Registration: Canvas
+  <%= t :subject, "Confirm Registration: Canvas" %>
 <% end %>
 
-Thank you for registering with Canvas!  This email is confirmation that the user <%= asset.user.short_name %> is registering for a new account at <%= (HostUrl.context_host(p.account) rescue nil) || HostUrl.default_host %>.
+<%= t :body,
+      "Thank you for registering with Canvas!  This email is confirmation that the user %{user} is registering for a new account at %{website}.",
+      :user => asset.user.short_name,
+      :website => (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host %>
 
-To finish the registration process, please visit the following url: 
+<%= t :details, "To finish the registration process, please visit the following url:" %>
 <%= content :link %>

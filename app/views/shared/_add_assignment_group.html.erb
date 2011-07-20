@@ -2,32 +2,32 @@
   <% form_for :assignment_group, :url => (context_url(@context, :context_assignment_groups_url) rescue "."), :html => {:id => "add_assignment_type_form", :style => "padding: 10px;"} do |f| %>
   <table class="formtable">
     <tr>
-      <td><%= f.label :name, "Name:" %></td>
+      <td><%= f.blabel :name, :en => "Name" %></td>
       <td><%= f.text_field :name, :style => " width:90%;" %></td>
     </tr>
     <tr class="weight_assignment_groups" style="<%= hidden unless (@context.weight_assignment_groups rescue false) %>">
-      <td><%= f.label :group_weight, "Weight:" %></td>
-      <td><%= f.text_field :group_weight, :size => 4 %> % of grade</td>
+      <td><%= f.blabel :group_weight, :en => "Weight" %></td>
+      <td><%= t :percent_of_grade, "%{percent} % of grade", :percent => f.text_field(:group_weight, :size => 4) %></td>
     </tr><tr>
       <td colspan="2">
-        <button type="submit" class="button add_button">Add Group</button>
-        <button type="button" class="button-secondary cancel_button">Cancel</button>
+        <button type="submit" class="button add_button"><%= t 'buttons.add_group', "Add Group" %></button>
+        <button type="button" class="button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
       </td>
     </tr>
   </table>
   <% end %>
 </div>
 
-<% js_block do %>
+<% js_block :i18n_scope => 'shared.add_assignment_group' do %>
 <script>
-function attachAddAssignmentGroup($select, url) {
+window.attachAddAssignmentGroup = function($select, url) {
   var $group = $select;
   url = url || $("#add_assignment_type_form").attr('action');
   $group.change(function(event) {
     if($(this).val() == "new") {
       $("#add_assignment_type").dialog('close');
       $("#add_assignment_type").show().dialog({
-        title: "Add Assignment Group",
+        title: I18n.t('titles.add_assignment_group', "Add Assignment Group"),
         width: 300,
         height: "auto",
         autoSize: true,
@@ -59,10 +59,10 @@ function attachAddAssignmentGroup($select, url) {
 $(document).ready(function() {
   $("#add_assignment_type_form").formSubmit({
     beforeSubmit: function(data) {
-      $(this).find("button").attr('disabled', true).filter(".add_button").text("Adding Group...");
+      $(this).find("button").attr('disabled', true).filter(".add_button").text(I18n.t('messages.adding_group', "Adding Group..."));
     },
     success: function(data) {
-      $(this).find("button").attr('disabled', false).filter(".add_button").text("Add Group");
+      $(this).find("button").attr('disabled', false).filter(".add_button").text(I18n.t('buttons.add_group', "Add Group"));
       var group = data.assignment_group;
       var $group = $("#add_assignment_type_form").data('group_select');
       var $option = $(document.createElement('option'));
@@ -73,7 +73,7 @@ $(document).ready(function() {
     },
     error: function(data) {
       $(this).formErrors(data);
-      $(this).find("button").attr('disabled', false).filter(".add_button").text("Add Group Failed");
+      $(this).find("button").attr('disabled', false).filter(".add_button").text(I18n.t('errors.add_group_failed', "Add Group Failed"));
     }
   });
   $("#add_assignment_type .cancel_button").click(function(event) {

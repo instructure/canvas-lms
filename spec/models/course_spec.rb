@@ -437,7 +437,31 @@ describe Course, "backup" do
       html = @new_topic.message
       html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/download"))
     end
-    
+
+    it "should merge locked files and retain correct html links" do
+      course_model
+      attachment_model
+      @old_attachment = @attachment
+      @old_attachment.update_attribute(:hidden, true)
+      @old_attachment.reload.should be_hidden
+      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "<img src='/courses/#{@course.id}/files/#{@attachment.id}/preview'>")
+      html = @old_topic.message
+      html.should match(Regexp.new("/courses/#{@course.id}/files/#{@attachment.id}/preview"))
+      @old_course = @course
+      @new_course = course_model
+      @new_course.merge_into_course(@old_course, :everything => true)
+      @old_attachment.reload
+      @old_attachment.cloned_item_id.should_not be_nil
+      @new_attachment = @new_course.attachments.find_by_cloned_item_id(@old_attachment.cloned_item_id)
+      @new_attachment.should_not be_nil
+      @old_topic.reload
+      @old_topic.cloned_item_id.should_not be_nil
+      @new_topic = @new_course.discussion_topics.find_by_cloned_item_id(@old_topic.cloned_item_id)
+      @new_topic.should_not be_nil
+      html = @new_topic.message
+      html.should match(Regexp.new("/courses/#{@new_course.id}/files/#{@new_attachment.id}/preview"))
+    end
+
     it "should merge only selected content into another course" do
       course_model
       attachment_model
@@ -455,6 +479,22 @@ describe Course, "backup" do
       @old_topic.reload
       @old_topic.cloned_item_id.should be_nil
       @new_course.discussion_topics.count.should eql(0)
+    end
+
+    it "should migrate syllabus links on copy" do
+      course_model
+      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "some text")
+      @old_course = @course
+      @old_course.syllabus_body = "<a href='/courses/#{@old_course.id}/discussion_topics/#{@old_topic.id}'>link</a>"
+      @old_course.save!
+      @new_course = course_model
+      @new_course.merge_into_course(@old_course, :course_settings => true, :all_topics => true)
+      @old_topic.reload
+      @new_topic = @new_course.discussion_topics.find_by_cloned_item_id(@old_topic.cloned_item_id)
+      @new_topic.should_not be_nil
+      @old_topic.cloned_item_id.should == @new_topic.cloned_item_id
+      @new_course.reload
+      @new_course.syllabus_body.should match(/\/courses\/#{@new_course.id}\/discussion_topics\/#{@new_topic.id}/)
     end
 
     it "should merge implied content into another course" do
@@ -612,6 +652,31 @@ describe Course, 'grade_publishing' do
     PluginSetting.settings_for_plugin('grade_export')[:format_type] = "instructure_csv"
     PluginSetting.settings_for_plugin('grade_export')[:enabled] = "false"
     PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = ""
+    PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = "no"
+  end
+  
+  def start_server
+    post_lines = []
+    server = TCPServer.open(0)
+    port = server.addr[1]
+    post_lines = []
+    server_thread = Thread.new(server, post_lines) do |server, post_lines|
+      client = server.accept
+      content_length = 0
+      loop do
+        line = client.readline
+        post_lines << line.strip unless line =~ /\AHost: localhost:|\AContent-Length: /
+        content_length = line.split(":")[1].to_i if line.strip =~ /\AContent-Length: [0-9]+\z/
+        if line.strip.blank?
+          post_lines << client.read(content_length)
+          break
+        end
+      end
+      client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
+      client.close
+      server.close
+    end
+    return server, server_thread, post_lines
   end
 
   it 'should pass a quick sanity check' do
@@ -621,26 +686,14 @@ describe Course, 'grade_publishing' do
         :callback => lambda {|course, enrollments, publishing_pseudonym|
           course.should == @course
           publishing_pseudonym.should == nil
-          return [[[], "test-jt-data\r\n\r\n", "application/jtmimetype"]], []
+          return [[[], "test-jt-data", "application/jtmimetype"]], []
         }}
     PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
     PluginSetting.settings_for_plugin('grade_export')[:format_type] = "test_export"
-    
-    server = TCPServer.open(0)
-    port = server.addr[1]
-    PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{port}/endpoint"
-    post_lines = []
-    server_thread = Thread.new(server, post_lines) { |server, post_lines|
-      client = server.accept
-      loop do
-        line = client.readline
-        post_lines << line.strip unless line =~ /^Host: localhost:/
-        break if line =~ /test-jt-data/
-      end
-      client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
-      client.close
-      server.close
-    }
+    PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = "no"
+    server, server_thread, post_lines = start_server
+    PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
+
     @course.grading_standard_id = 0
     @course.publish_final_grades(user)
     server_thread.join
@@ -648,10 +701,166 @@ describe Course, 'grade_publishing' do
         "POST /endpoint HTTP/1.1",
         "Accept: */*",
         "Content-Type: application/jtmimetype",
-        "Content-Length: 16",
         "",
         "test-jt-data"]
   end
+  
+  it 'should publish csv' do
+    user = User.new
+    PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
+    PluginSetting.settings_for_plugin('grade_export')[:format_type] = "instructure_csv"
+    PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = "no"
+    server, server_thread, post_lines = start_server
+    PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
+    @course.grading_standard_id = 0
+    @course.publish_final_grades(user)
+    server_thread.join
+    post_lines.should == [
+        "POST /endpoint HTTP/1.1",
+        "Accept: */*",
+        "Content-Type: text/csv",
+        "",
+        "publisher_id,publisher_sis_id,section_id,section_sis_id,student_id," +
+        "student_sis_id,enrollment_id,enrollment_status,grade,score\n"]
+  end
+
+  it 'should publish grades' do
+    process_csv_data_cleanly(
+      "user_id,login_id,password,first_name,last_name,email,status",
+      "T1,Teacher1,,T,1,t1@example.com,active",
+      "S1,Student1,,S,1,s1@example.com,active",
+      "S2,Student2,,S,2,s2@example.com,active",
+      "S3,Student3,,S,3,s3@example.com,active",
+      "S4,Student4,,S,4,s4@example.com,active",
+      "S5,Student5,,S,5,s5@example.com,active",
+      "S6,Student6,,S,6,s6@example.com,active")
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C1,C1,C1,,,active")
+    @course = Course.find_by_sis_source_id("C1")
+    @course.assignment_groups.create(:name => "Assignments")
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status,start_date,end_date",
+      "S1,C1,S1,active,,",
+      "S2,C1,S2,active,,",
+      "S3,C1,S3,active,,",
+      "S4,C1,S4,active,,")
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status",
+      ",T1,teacher,S1,active",
+      ",S1,student,S1,active",
+      ",S2,student,S2,active",
+      ",S3,student,S2,active",
+      ",S4,student,S1,active",
+      ",S5,student,S3,active",
+      ",S6,student,S4,active")
+    a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
+    a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
+    
+    def getpseudonym(user_sis_id)
+      pseudo = Pseudonym.find_by_sis_user_id(user_sis_id)
+      pseudo.should_not be_nil
+      pseudo
+    end
+    
+    def getuser(user_sis_id)
+      user = getpseudonym(user_sis_id).user
+      user.should_not be_nil
+      user
+    end
+    
+    def getsection(section_sis_id)
+      section = CourseSection.find_by_sis_source_id(section_sis_id)
+      section.should_not be_nil
+      section
+    end
+    
+    def getenroll(user_sis_id, section_sis_id)
+      e = Enrollment.find_by_user_id_and_course_section_id(getuser(user_sis_id).id, getsection(section_sis_id).id)
+      e.should_not be_nil
+      e
+    end
+    
+    a1.grade_student(getuser("S1"), { :grade => "6", :grader => getuser("T1") })
+    a1.grade_student(getuser("S2"), { :grade => "6", :grader => getuser("T1") })
+    a1.grade_student(getuser("S3"), { :grade => "7", :grader => getuser("T1") })
+    a1.grade_student(getuser("S5"), { :grade => "7", :grader => getuser("T1") })
+    a1.grade_student(getuser("S6"), { :grade => "8", :grader => getuser("T1") })
+    a2.grade_student(getuser("S1"), { :grade => "8", :grader => getuser("T1") })
+    a2.grade_student(getuser("S2"), { :grade => "9", :grader => getuser("T1") })
+    a2.grade_student(getuser("S3"), { :grade => "9", :grader => getuser("T1") })
+    a2.grade_student(getuser("S5"), { :grade => "10", :grader => getuser("T1") })
+    a2.grade_student(getuser("S6"), { :grade => "10", :grader => getuser("T1") })
+    
+    stud5, stud6, sec4 = nil, nil, nil
+    Pseudonym.find_by_sis_user_id("S5").tap do |p|
+      stud5 = p
+      p.sis_user_id = nil
+      p.sis_source_id = nil
+      p.save
+    end
+    
+    Pseudonym.find_by_sis_user_id("S6").tap do |p|
+      stud6 = p
+      p.sis_user_id = nil
+      p.sis_source_id = nil
+      p.save
+    end
+    
+    getsection("S4").tap do |s|
+      sec4 = s
+      sec4id = s.sis_source_id
+      s.sis_source_id = nil
+      s.save
+    end
+    
+    GradeCalculator.recompute_final_score(["S1", "S2", "S3", "S4"].map{|x|getuser(x).id}, @course.id)
+    @course.reload
+    
+    teacher = Pseudonym.find_by_sis_user_id("T1")
+    teacher.should_not be_nil
+    
+    PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
+    PluginSetting.settings_for_plugin('grade_export')[:format_type] = "instructure_csv"
+    PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = "no"
+    server, server_thread, post_lines = start_server
+    PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
+    @course.publish_final_grades(teacher.user)
+    server_thread.join
+    post_lines.should == [
+        "POST /endpoint HTTP/1.1",
+        "Accept: */*",
+        "Content-Type: text/csv",
+        "",
+        "publisher_id,publisher_sis_id,section_id,section_sis_id,student_id," +
+        "student_sis_id,enrollment_id,enrollment_status,grade,score\n" +
+        "#{teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S1").id},S1,#{getenroll("S1", "S1").id},active,\"\",70\n" +
+        "#{teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S2").id},S2,#{getenroll("S2", "S2").id},active,\"\",75\n" +
+        "#{teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S3").id},S3,#{getenroll("S3", "S2").id},active,\"\",80\n" +
+        "#{teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").id},S4,#{getenroll("S4", "S1").id},active,\"\",0\n" + 
+        "#{teacher.id},T1,#{getsection("S3").id},S3,#{stud5.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,\"\",85\n" + 
+        "#{teacher.id},T1,#{sec4.id},,#{stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,\"\",90\n"]
+    @course.grading_standard_id = 0
+    @course.save
+    server, server_thread, post_lines = start_server
+    PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
+    @course.publish_final_grades(teacher.user)
+    server_thread.join
+    post_lines.should == [
+        "POST /endpoint HTTP/1.1",
+        "Accept: */*",
+        "Content-Type: text/csv",
+        "",
+        "publisher_id,publisher_sis_id,section_id,section_sis_id,student_id," +
+        "student_sis_id,enrollment_id,enrollment_status,grade,score\n" +
+        "#{teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S1").id},S1,#{getenroll("S1", "S1").id},active,C-,70\n" +
+        "#{teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S2").id},S2,#{getenroll("S2", "S2").id},active,C,75\n" +
+        "#{teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S3").id},S3,#{getenroll("S3", "S2").id},active,B-,80\n" +
+        "#{teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").id},S4,#{getenroll("S4", "S1").id},active,F,0\n" + 
+        "#{teacher.id},T1,#{getsection("S3").id},S3,#{stud5.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,B,85\n" + 
+        "#{teacher.id},T1,#{sec4.id},,#{stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,A-,90\n"]
+  end
+  
 end
 
 describe Course, 'scoping' do
@@ -671,5 +880,61 @@ describe Course, 'scoping' do
     Course.name_like("name1").map(&:id).should == [c1.id]
     Course.name_like("sisid2").map(&:id).should == [c2.id]
     Course.name_like("code1").map(&:id).should == [c1.id]    
+  end
+end
+
+describe Course, "manageable_by_user" do
+  it "should include courses associated with the user's active accounts" do
+    account = Account.create!
+    sub_account = Account.create!(:parent_account => account)
+    sub_sub_account = Account.create!(:parent_account => sub_account)
+    user = account_admin_user(:account => sub_account)
+    course = Course.create!(:account => sub_sub_account)
+
+    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+  end
+
+  it "should include courses the user is actively enrolled in as a teacher" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_teacher(user)
+    e = course.teacher_enrollments.first
+    e.accept
+
+    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+  end
+
+  it "should include courses the user is actively enrolled in as a ta" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_ta(user)
+    e = course.ta_enrollments.first
+    e.accept
+
+    Course.manageable_by_user(user.id).map{ |c| c.id }.should be_include(course.id)
+  end
+
+  it "should not include courses the user is enrolled in when the enrollment is non-active" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_teacher(user)
+    e = course.teacher_enrollments.first
+
+    # it's only invited at this point
+    Course.manageable_by_user(user.id).should be_empty
+
+    e.destroy
+    Course.manageable_by_user(user.id).should be_empty
+  end
+
+  it "should not include aborted or deleted courses the user was enrolled in" do
+    course = Course.create
+    user = user_with_pseudonym
+    course.enroll_teacher(user)
+    e = course.teacher_enrollments.first
+    e.accept
+
+    course.destroy
+    Course.manageable_by_user(user.id).should be_empty
   end
 end

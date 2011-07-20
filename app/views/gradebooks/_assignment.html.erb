@@ -15,19 +15,21 @@
 <div class="clear"></div>
 </div>
 <div style="font-size: 0.8em; text-align: center;">
-  <div class="nobr">
-    <span class="before_points_possible">
-    <% if assignment.special_class != "group_total" %>
-      out of
-    <% end %>
-    </span>
-    <span class="points_possible"><%= (assignment.points_possible || nbsp) rescue nbsp %></span>
-    <span class="after_points_possible">
-    <% if assignment.special_class == "group_total" && assignment.points_possible %>
-     of grade
-    <% end %>
-    </span>
-  </div>
+  <div class="nobr"><%=
+    points_possible = (assignment.points_possible || nbsp) rescue nbsp
+    points_possible_html = raw("<span class=\"points_possible\">#{points_possible}</span>")
+    if assignment.special_class != "group_total"
+      t(:out_of_points_possible, "*out of* %{points_possible}",
+        :wrapper => '<span class="before_points_possible">\1</span>',
+        :points_possible => points_possible_html)
+    elsif assignment.points_possible
+      t(:points_possible_of_grade, "%{points_possible} *of grade*",
+        :points_possible => points_possible_html,
+        :wrapper => '<span class="after_points_possible">\1</span>')
+    else
+      points_possible_html
+    end
+  %></div>
 </div>
 <div style="display: none;">
   <span class="assignment_group_id"><%= assignment.assignment_group_id || nbsp %></span>

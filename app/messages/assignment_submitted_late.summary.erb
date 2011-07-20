@@ -3,6 +3,6 @@
 <% end %>
 
 <% define_content :subject do %>
-  Late Assignment: <%= asset.user.name %>, <%= asset.assignment.title %>
+  <%= t('user_submitted', 'Late Assignment: %{user_name}, %{assignment_name}', :user_name => asset.user.name, :assignment_name => asset.assignment.title) %>
 <% end %>
-turned in: <%= force_zone(asset.submitted_at).strftime("%b %d at %I:%M") rescue "" %><%= force_zone(asset.submitted_at).strftime("%p").downcase rescue "" %>
+<%= t('turned_in_at', 'turned in: %{submission_date}', :submission_date => datetime_string(force_zone(asset.submitted_at))) %>

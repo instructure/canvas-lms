@@ -17,59 +17,68 @@
 #
 module CC
   module TopicResources
-
+    
     def add_topics
       @course.discussion_topics.active.each do |topic|
-        migration_id = CCHelper.create_key(topic)
-        
-        # the CC Discussion Topic
-        topic_file_name = "#{migration_id}.xml"
-        topic_path = File.join(@export_dir, topic_file_name)
-        topic_file = File.new(topic_path, 'w')
-        topic_doc = Builder::XmlMarkup.new(:target=>topic_file, :indent=>2)
-        topic_doc.instruct!
-  
-        topic_doc.topic("xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1",
-                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                        "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1  http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imsdt_v1p1.xsd"
-        ) do |t|
-          create_cc_topic(t, topic)
-        end
-        topic_file.close
-        
-        # Save all the meta-data into a canvas-specific xml schema
-        meta_migration_id = CCHelper.create_key(topic, "meta")
-        meta_file_name = "#{meta_migration_id}.xml"
-        meta_path = File.join(@export_dir, meta_file_name)
-        meta_file = File.new(meta_path, 'w')
-        meta_doc = Builder::XmlMarkup.new(:target=>meta_file, :indent=>2)
-        meta_doc.instruct!
-        meta_doc.topicMeta("identifier" => meta_migration_id,
-                        "xmlns" => CCHelper::CANVAS_NAMESPACE,
-                        "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                        "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
-        ) do |t|
-          create_canvas_topic(t, topic)
-        end
-        meta_file.close
-        
-        @resources.resource(
-                :identifier => migration_id,
-                "type" => CCHelper::DISCUSSION_TOPIC
-        ) do |res|
-          res.file(:href=>topic_file_name)
-          res.dependency(:identifierref=>meta_migration_id)
-        end
-        @resources.resource(
-                :identifier => meta_migration_id,
-                :type => CCHelper::LOR,
-                :href => meta_file_name
-        ) do |res|
-          res.file(:href=>meta_file_name)
+        begin
+          add_topic(topic)
+        rescue
+          title = topic.title rescue I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
+          add_error(I18n.t('course_exports.errors.topic', "The discussion topic \"%{title}\" failed to export", :title => title), $!)
         end
       end
     end
-    
+
+    def add_topic(topic)
+      migration_id = CCHelper.create_key(topic)
+
+      # the CC Discussion Topic
+      topic_file_name = "#{migration_id}.xml"
+      topic_path = File.join(@export_dir, topic_file_name)
+      topic_file = File.new(topic_path, 'w')
+      topic_doc = Builder::XmlMarkup.new(:target=>topic_file, :indent=>2)
+      topic_doc.instruct!
+
+      topic_doc.topic("xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1",
+                      "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
+                      "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1  http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imsdt_v1p1.xsd"
+      ) do |t|
+        create_cc_topic(t, topic)
+      end
+      topic_file.close
+
+      # Save all the meta-data into a canvas-specific xml schema
+      meta_migration_id = CCHelper.create_key(topic, "meta")
+      meta_file_name = "#{meta_migration_id}.xml"
+      meta_path = File.join(@export_dir, meta_file_name)
+      meta_file = File.new(meta_path, 'w')
+      meta_doc = Builder::XmlMarkup.new(:target=>meta_file, :indent=>2)
+      meta_doc.instruct!
+      meta_doc.topicMeta("identifier" => meta_migration_id,
+                         "xmlns" => CCHelper::CANVAS_NAMESPACE,
+                         "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
+                         "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+      ) do |t|
+        create_canvas_topic(t, topic)
+      end
+      meta_file.close
+
+      @resources.resource(
+              :identifier => migration_id,
+              "type" => CCHelper::DISCUSSION_TOPIC
+      ) do |res|
+        res.file(:href=>topic_file_name)
+        res.dependency(:identifierref=>meta_migration_id)
+      end
+      @resources.resource(
+              :identifier => meta_migration_id,
+              :type => CCHelper::LOR,
+              :href => meta_file_name
+      ) do |res|
+        res.file(:href=>meta_file_name)
+      end
+    end
+
     def create_cc_topic(doc, topic)
       doc.title topic.title
       html = @html_exporter.html_content(topic.message || '', @course, @manifest.exporter.user)

@@ -55,6 +55,10 @@ def check_syntax(files)
       jsl_output = `jsl -process "#{file_path}" -nologo -conf "#{File.join(Rails.root, 'config', 'jslint.conf')}"`
       exit_status = $?.exitstatus
       if exit_status != 0
+        if jsl_output.match("warning: trailing comma is not legal in ECMA-262 object initializers")
+          exit_status = 2
+          jsl_output << "fatal trailing comma found. Stupid IE!"
+        end
         if exit_status >= 2
           show_stoppers << jsl_output 
           puts "\033[1;31m #{jsl_output} \033[0m"
@@ -115,6 +119,9 @@ namespace :canvas do
     puts "--> Compiling static assets [jammit]"
     output = `bundle exec jammit 2>&1`
     raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
+
+    puts "--> Generating documentation [yardoc]"
+    Rake::Task['doc:api'].invoke
   end
 end
 

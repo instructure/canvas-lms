@@ -37,7 +37,6 @@ class Quiz < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :cloned_item
-  adheres_to_policy
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
@@ -67,10 +66,10 @@ class Quiz < ActiveRecord::Base
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= self.lock_at if self.lock_at.present?
     self.ip_filter = nil if self.ip_filter && self.ip_filter.strip.empty?
-    if !self.available? && self.quiz_type != 'survey' && self.quiz_type != 'graded_survey'
+    if !self.available? && !self.survey?
       self.points_possible = self.current_points_possible
     end
-    self.title = "Unnamed Quiz" if self.title.blank?
+    self.title = t(:default_title, "Unnamed Quiz") if self.title.blank?
     self.quiz_type ||= "assignment"
     self.last_assignment_id = self.assignment_id_was if self.assignment_id_was
     if (!graded? && self.assignment_id) || (self.assignment_id_was && self.assignment_id != self.assignment_id_was)
@@ -96,7 +95,7 @@ class Quiz < ActiveRecord::Base
   end
   
   def readable_type
-    (self.quiz_type || "").match(/survey/) ? "Survey" : "Quiz"
+    self.survey? ? t('types.survey', "Survey") : t('types.quiz', "Quiz")
   end
   
   def valid_ip?(ip)
@@ -107,11 +106,7 @@ class Quiz < ActiveRecord::Base
       addr && addr_range && addr_range.include?(addr)
     end
   end
-  
-  def survey?
-    self.quiz_type && self.quiz_type.match(/survey/)
-  end
-  
+
   def current_points_possible
     entries = self.root_entries
     possible = 0
@@ -180,8 +175,20 @@ class Quiz < ActiveRecord::Base
     write_attribute(:assignment_id, val)
   end
   
+  def assignment?
+    self.quiz_type == 'assignment'
+  end
+  
+  def survey?
+    self.quiz_type == 'survey' || self.quiz_type == 'graded_survey'
+  end
+  
   def graded?
     self.quiz_type == 'assignment' || self.quiz_type == 'graded_survey'
+  end
+  
+  def ungraded?
+    !self.graded?
   end
   
   def update_existing_submissions
@@ -208,7 +215,6 @@ class Quiz < ActiveRecord::Base
     if self.assignment && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
       if !self.graded? && @old_assignment_id
       else
-        conn = ActiveRecord::Base.connection
         Quiz.update_all({:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc}, ["assignment_id = ? AND id != ?", self.assignment_id, self.id]) if self.assignment_id
         a = self.assignment
         a.points_possible = self.points_possible
@@ -364,7 +370,7 @@ class Quiz < ActiveRecord::Base
         variable_id = AssessmentQuestion.variable_id(variable)
         variable_answers = q[:answers].select{|a| a[:blank_id] == variable }
         options = variable_answers.map{|a| "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>" }
-        select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>[ Select ]</option>#{options}</select>"
+        select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>#{t(:default_question_input, "[ Select ]")}</option>#{options}</select>"
         re = Regexp.new("\\[#{variable}\\]")
         text = text.sub(re, select)
       end
@@ -502,7 +508,7 @@ class Quiz < ActiveRecord::Base
     data = entries
     if opts[:persist] != false
       self.quiz_data = data
-      if self.quiz_type != 'survey' && self.quiz_type != 'graded_survey'
+      if !self.survey?
         self.points_possible = possible
       end
       self.allowed_attempts ||= 1
@@ -526,7 +532,7 @@ class Quiz < ActiveRecord::Base
   
   def quiz_title
     result = self.title
-    result = "Unnamed Quiz" if result == "undefined" || !result
+    result = t(:default_title, "Unnamed Quiz") if result == "undefined" || !result
     result = self.assignment.title if self.assignment
     result
   end
@@ -720,10 +726,10 @@ class Quiz < ActiveRecord::Base
   def statistics_csv(options={})
     options ||= {}
     columns = []
-    columns << 'name' unless options[:anonymous]
-    columns << 'id'
-    columns << 'submitted'
-    columns << 'attempt' if options[:include_all_versions]
+    columns << t('statistics.csv_columns.name', 'name') unless options[:anonymous]
+    columns << t('statistics.csv_columns.id', 'id')
+    columns << t('statistics.csv_columns.submitted', 'submitted')
+    columns << t('statistics.csv_columns.attempt', 'attempt') if options[:include_all_versions]
     first_question_index = columns.length
     submissions = self.quiz_submissions.scoped(:include => (options[:include_all_versions] ? [:versions] : [])).select{|s| s.completed? && s.submission_data.is_a?(Array) && self.context.students.map(&:id).include?(s.user_id) }
     if options[:include_all_versions]
@@ -743,9 +749,9 @@ class Quiz < ActiveRecord::Base
       end
     end
     last_question_index = columns.length - 1
-    columns << 'n correct'
-    columns << 'n incorrect'
-    columns << 'score'
+    columns << t('statistics.csv_columns.n_correct', 'n correct')
+    columns << t('statistics.csv_columns.n_incorrect', 'n incorrect')
+    columns << t('statistics.csv_columns.score', 'score')
     rows = []
     submissions.each do |submission|
       row = []
@@ -857,7 +863,7 @@ class Quiz < ActiveRecord::Base
         questions_hash[question[:id]] ||= question
       end
     end
-    stats[:submission_score_average] = score_counter.mean.to_f rescue 0 #stats[:submission_count] > 0 ? stats[:submission_score_tally] / stats[:submission_count] : 0
+    stats[:submission_score_average] = score_counter.mean.to_f rescue 0
     stats[:submission_score_high] = score_counter.max
     stats[:submission_score_low] = score_counter.min
     stats[:submission_duration_average] = stats[:submission_count] > 0 ? stats[:submission_duration_tally].to_f / stats[:submission_count].to_f : 0
@@ -897,9 +903,9 @@ class Quiz < ActiveRecord::Base
     if question[:question_type] == 'numerical_question'
       res[:answers].each do |answer|
         if answer[:numerical_answer_type] == 'exact_answer'
-          answer[:text] = "#{answer[:exact]} +/- #{answer[:margin]}"
+          answer[:text] = t('statistics.exact_answer', "%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
         else
-          answer[:text] = "#{answer[:start]} to #{answer[:end]}"
+          answer[:text] = t('statistics.inexact_answer', "%{lower_bound} to %{upper_bound}", :lower_bound => answer[:start], :upper_bound => answer[:end])
         end
       end
     end
@@ -1036,7 +1042,7 @@ class Quiz < ActiveRecord::Base
       :responses => res[:responses] - res[:answers].map{|a| a[:responses] || 0}.sum,
       :id => "none",
       :weight => 0,
-      :text => "No Answer",
+      :text => t('statistics.no_answer', "No Answer"),
       :user_ids => res[:user_ids] - res[:answers].map{|a| a[:user_ids] }.flatten
     } rescue nil
     res[:answers] << none if none && none[:responses] > 0
@@ -1077,7 +1083,11 @@ class Quiz < ActiveRecord::Base
           allow_update = true
           assessment[:id] = item_id.to_i
         end
-        Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
+        begin
+          Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
+        rescue
+          migration.add_warning(t('warnings.import_from_migration_failed', "Couldn't import the quiz \"%{quiz_title}\"", :quiz_title => assessment[:title]), $!)
+        end
       end
     end
   end
@@ -1111,10 +1121,11 @@ class Quiz < ActiveRecord::Base
 
     if item.quiz_questions.count == 0 && question_data
       hash[:questions] ||= []
-      hash[:questions].each do |question|
+      hash[:questions].each_with_index do |question, i|
         case question[:question_type]
           when "question_reference"
             if qq = question_data[:qq_data][question[:migration_id]]
+              qq[:position] = i + 1
               if qq[:assessment_question_migration_id]
                 if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
                   qq['assessment_question_id'] = aq['assessment_question_id']
@@ -1126,19 +1137,22 @@ class Quiz < ActiveRecord::Base
                 end
               end
             elsif aq = question_data[:aq_data][question[:migration_id]]
+              aq[:position] = i + 1
               aq[:points_possible] = question[:points_possible] if question[:points_possible]
               QuizQuestion.import_from_migration(aq, context, item)
             end
           when "question_group"
-            QuizGroup.import_from_migration(question, context, item, question_data)
+            QuizGroup.import_from_migration(question, context, item, question_data, i + 1)
           when "text_only_question"
             qq = item.quiz_questions.new
             qq.question_data = question
+            qq.position = i + 1
             qq.save!
         end
       end
     end
-
+    item.reload # reload to catch question additions
+    
     if hash[:assignment] && hash[:available]
       assignment = Assignment.import_from_migration(hash[:assignment], context)
       item.assignment = assignment
@@ -1157,7 +1171,6 @@ class Quiz < ActiveRecord::Base
       end
     end
 
-    item.reload
     item.save
 
     context.imported_migration_items << item if context.imported_migration_items
@@ -1168,22 +1181,22 @@ class Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#admins.include? user }
-    set { can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit }
+    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#admins.include? user }
-    set { can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade }
+    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade
     
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
-    set { can :submit }
+    can :submit
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
-    set { can :read }
+    can :read
 
     given { |user, session| self.cached_context_grants_right?(user, session, :read_as_admin) }
-    set { can :read_statistics and can :review_grades }
+    can :read_statistics and can :review_grades
 
     given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }
-    set { can :read and can :submit }
+    can :read and can :submit
   end
   named_scope :include_assignment, lambda{
     { :include => :assignment }

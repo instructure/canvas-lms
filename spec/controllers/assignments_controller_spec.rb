@@ -173,6 +173,14 @@ describe AssignmentsController do
       assigns[:assignment].title.should eql("some assignment")
       assigns[:assignment].context_id.should eql(@course.id)
     end
+
+    it "should create assignment when no groups exist yet" do
+      course_with_student_logged_in(:active_all => true)
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :assignment_group_id => ''}
+      assigns[:assignment].should_not be_nil
+      assigns[:assignment].title.should eql("some assignment")
+      assigns[:assignment].context_id.should eql(@course.id)
+    end
   end
   
   describe "GET 'edit'" do

@@ -1,21 +1,21 @@
 <p>
-  <b>User:</b>
+  <b><%= before_label :user, "User" %></b>
   <%=h @user_note.user.name %>
 </p>
 
 <p>
-  <b>Title:</b>
+  <b><%= before_label :title, "Title" %></b>
   <%=h @user_note.title %>
 </p>
 
 
 <p>
-  <b>Note:</b>
+  <b><%= before_label :note, "Note" %></b>
   <%=h @user_note.note %>
 </p>
 
 <p>
-  <b>Created by:</b>
+  <b><%= before_label :created_by, "Created by" %></b>
   <%=h @user_note.creator.name %>
 </p>
 

@@ -300,6 +300,11 @@ module GoogleDocs
     end
     res
   end
+
+  def google_docs_verify_access_token
+    access_token = google_docs_retrieve_access_token
+    access_token.head("https://www.google.com/accounts/AuthSubTokenInfo").is_a? Net::HTTPSuccess
+  end
   
   def self.config_check(settings)
     o = Object.new

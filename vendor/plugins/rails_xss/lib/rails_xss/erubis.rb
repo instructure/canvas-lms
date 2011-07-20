@@ -1,4 +1,6 @@
+$stdout, stdout_saved = (Class.new do def puts(string); end; def write(string); end; end).new, $stdout
 require 'erubis/helpers/rails_helper'
+$stdout = stdout_saved
 
 module RailsXss
   class Erubis < ::Erubis::Eruby

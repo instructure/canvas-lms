@@ -19,26 +19,33 @@
 module Api::V1::User
   JSON_FIELDS = {
     :include_root => false,
-    :only => %w(id name)
+    :only => %w(id name),
+    :methods => :sortable_name
   }
 
-  ADMIN_JSON_FIELDS = JSON_FIELDS.merge({
-    :methods => %w(sis_user_id)
-  })
-
   def user_json(user)
-    if user_json_is_admin?
-      user.as_json(ADMIN_JSON_FIELDS)
-    else
-      user.as_json(JSON_FIELDS)
+    user.as_json(JSON_FIELDS).tap do |json|
+      if user_json_is_admin?
+        # the sis fields on pseudonym are poorly named -- sis_user_id is
+        # the id in the SIS import data, where on every other table
+        # that's called sis_source_id. But on pseudonym, sis_source_id is
+        # the login in from the SIS import data.
+        json.merge! :sis_user_id => user.pseudonym.try(:sis_user_id), 
+                    :sis_login_id => user.pseudonym.try(:sis_source_id), 
+                    :login_id => user.pseudonym.unique_id
+      end
     end
   end
 
   # optimization hint, currently user only needs to pull pseudonym from the db
-  # if a site admin is making the request
+  # if a site admin is making the request or they can manage_students
   def user_json_is_admin?
     if @user_json_is_admin.nil?
-      @user_json_is_admin = !!(@context.account.membership_for_user(@current_user) || @context.account.grants_right?(@current_user, :manage_sis))
+      @user_json_is_admin = !!(
+        @context.grants_right?(@current_user, :manage_students) ||
+        @context.account.membership_for_user(@current_user) || 
+        @context.account.grants_right?(@current_user, :manage_sis)
+      )
     end
     @user_json_is_admin
   end

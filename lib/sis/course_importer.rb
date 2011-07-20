@@ -32,8 +32,8 @@ module SIS
         add_error(csv, "Duplicate course id #{course_id}") if course_ids[course_id]
         course_ids[course_id] = true
         add_error(csv, "No course_id given for a course") if row['course_id'].blank?
-        add_error(csv, "No short_name given for course #{course_id}") if row['short_name'].blank?
-        add_error(csv, "No long_name given for course #{course_id}") if row['long_name'].blank?
+        add_error(csv, "No short_name given for course #{course_id}") if row['short_name'].blank? && row['abstract_course_id'].blank?
+        add_error(csv, "No long_name given for course #{course_id}") if row['long_name'].blank? && row['abstract_course_id'].blank?
         add_error(csv, "Improper status \"#{row['status']}\" for course #{course_id}") unless row['status'] =~ /\Aactive|\Adeleted|\Acompleted/i
       end
     end
@@ -64,14 +64,6 @@ module SIS
 
             courses_to_update_associations.add course if course.account_id_changed? || course.root_account_id_changed?
 
-            # only update the name/short_name on new records, and ones that haven't been changed
-            # since the last sis import
-            if course.new_record? || (course.sis_course_code && course.sis_course_code == course.short_name)
-              course.short_name = course.sis_course_code = row['short_name']
-            end
-            if course.new_record? || (course.sis_name && course.sis_name == course.name)
-              course.name = course.sis_name = row['long_name']
-            end
             course.sis_source_id = row['course_id']
             if row['status'] =~ /active/i
               if course.workflow_state == 'completed'
@@ -86,10 +78,46 @@ module SIS
             end
 
             begin
-              course.start_at = DateTime.parse(row['start_date']) unless row['start_date'].blank?
-              course.conclude_at = DateTime.parse(row['end_date']) unless row['end_date'].blank?
+              course.start_at = row['start_date'].blank? ? nil : DateTime.parse(row['start_date'])
+              course.conclude_at = row['end_date'].blank? ? nil : DateTime.parse(row['end_date'])
             rescue
               add_warning(csv, "Bad date format for course #{row['course_id']}")
+            end
+            course.restrict_enrollments_to_course_dates = (course.start_at.present? || course.conclude_at.present?)
+
+            abstract_course = nil
+            if row['abstract_course_id'].present? 
+              abstract_course = AbstractCourse.find_by_root_account_id_and_sis_source_id(@root_account.id, row['abstract_course_id'])
+              unless abstract_course
+                add_warning(csv, "unknown abstract course id #{row['abstract_course_id']}")
+                next
+              end
+              if row['term_id'].blank? && course.enrollment_term_id != abstract_course.enrollment_term
+                course.send(:association_instance_set, :enrollment_term, nil)
+                course.enrollment_term_id = abstract_course.enrollment_term_id
+              end
+              if row['account_id'].blank? && course.account_id != abstract_course.account_id
+                course.send(:association_instance_set, :account, nil)
+                course.account_id = abstract_course.account_id
+              end
+            end
+            course.abstract_course = abstract_course
+
+            # only update the name/short_name on new records, and ones that haven't been changed
+            # since the last sis import
+            if course.short_name.blank? || course.sis_course_code == course.short_name
+              if row['short_name'].present?
+                course.short_name = course.sis_course_code = row['short_name']
+              elsif abstract_course && course.short_name.blank?
+                course.short_name = course.sis_course_code = abstract_course.short_name
+              end
+            end
+            if course.name.blank? || course.sis_name == course.name
+              if row['long_name'].present?
+                course.name = course.sis_name = row['long_name']
+              elsif abstract_course && course.name.blank?
+                course.name = course.sis_name = abstract_course.name
+              end
             end
 
             update_enrollments = !course.new_record? && !(course.changes.keys & ['workflow_state', 'name', 'course_code']).empty?

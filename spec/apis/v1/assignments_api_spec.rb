@@ -79,6 +79,7 @@ describe AssignmentsApiController, :type => :integration do
           'use_rubric_for_grading' => true,
           'free_form_criterion_comments' => true,
           'needs_grading_count' => 0,
+          'due_at' => nil,
           'submission_types' => [
             "online_upload",
             "online_text_entry",
@@ -145,6 +146,7 @@ describe AssignmentsApiController, :type => :integration do
       'points_possible' => 12,
       'grading_type' => 'points',
       'needs_grading_count' => 0,
+      'due_at' => nil,
       'submission_types' => [
         'none',
       ],
@@ -181,6 +183,7 @@ describe AssignmentsApiController, :type => :integration do
       'points_possible' => 15,
       'grading_type' => 'points',
       'needs_grading_count' => 0,
+      'due_at' => nil,
       'submission_types' => [
         'none',
       ],

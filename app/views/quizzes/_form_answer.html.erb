@@ -4,12 +4,12 @@
     <tr>
       <td class="answer_select" style="width: 30px;">
         <div style="width: 30px;" class="answer_box">
-          <a href="#" class="select_answer_link no-hover" title="Click to set this answer as correct"><%= image_tag "blank_answer.png", :class => "answer_image" %></a><br/>
+          <a href="#" class="select_answer_link no-hover" title="<%= t('titles.click_to_set_as_correct', "Click to set this answer as correct") %>"><%= image_tag "blank_answer.png", :class => "answer_image" %></a><br/>
           <span class="answer_weight"><input class="float_value" type="text" style="width: 25px;" name="answer_weight"/>%</span>
         </div>
       </td><td>
         <div class="select_answer answer_type">
-          <b>Answer text:</b>
+          <b><%= before_label(:answer_text, "Answer text") %></b>
           <input type="text" style="width: 200px;" name="answer_text"/>
           <input type="hidden" name="answer_html"/>
           <span class="answer_html" style="display:inline-block;"></span>
@@ -18,7 +18,7 @@
           <b class="answer_text"></b>
         </div>
         <div class="short_answer answer_type">
-          <b class="short_answer_header">Possible Answer:</b>
+          <b class="short_answer_header"><%= before_label(:possible_answer, "Possible Answer") %></b>
           <input type="text" name="answer_text"/>
         </div>
         <div class="matching_answer answer_match answer_type">
@@ -36,21 +36,24 @@
         </div>
         <div class="numerical_answer answer_type">
           <select style="font-weight: bold;" class="numerical_answer_type" name="numerical_answer_type">
-            <option value="exact_answer">Exact Answer:</option>
-            <option value="range_answer">Answer in the Range:</option>
+            <option value="exact_answer"><%= before_label(:exact_answer, "Exact Answer") %></option>
+            <option value="range_answer"><%= before_label(:answer_in_range, "Answer in the Range") %></option>
           </select>
           <span class="exact_answer numerical_answer_text">
-            <input class="float_value long" type="text" style="width: 50px;" name="answer_exact"/>
-            with error margin <input class="float_value long" type="text" style="width: 70px;" name="answer_error_margin"/>
+            <%= t(:exact_answer_with_error_margin, "%{exact_answer} with error margin %{error_margin}",
+                  :exact_answer => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_exact"/>'),
+                  :error_margin => raw('<input class="float_value long" type="text" style="width: 70px;" name="answer_error_margin"/>')) %>
           </span>
           <span class="range_answer numerical_answer_text">
-            between <input class="float_value long" type="text" style="width: 50px;" name="answer_range_start"/> and <input class="float_value long" type="text" style="width: 50px;" name="answer_range_end"/>
+            <%= t(:answer_in_range, "between %{lower_bound} and %{upper_bound}",
+                  :lower_bound => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_range_start"/>'),
+                  :upper_bound => raw('<input class="float_value long" type="text" style="width: 50px;" name="answer_range_end"/>')) %>
           </span>
         </div>
         <div class="answer_comments empty">
           <div class="comment_top"></div>
-          <a href="#" class="comment_focus" title="Click to enter comments, if the student chooses this answer">...</a>
-          <span class="comments_header">Comments, if the student chooses this answer:</span>
+          <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_answer_comments', "Click to enter comments, if the student chooses this answer") %>">...</a>
+          <span class="comments_header"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
           <textarea style="width: 95%;" name="answer_comment" class="comments answer_comment_box"></textarea>
         </div>
         <div style="display: none;">
@@ -60,7 +63,7 @@
         </div>
       </td><td style="vertical-align: top; padding-top: 0.5em; text-align: right; width: 20px;">
         <div style="width: 20px;">
-        <a href="#" class="delete_answer_link no-hover" title="Delete this Answer"><%= image_tag "blank.png", :alt => "Delete" %></a>
+        <a href="#" class="delete_answer_link no-hover" title="<%= t('titles.delete_answer', "Delete this Answer") %>"><%= image_tag "blank.png", :alt => t(:delete, "Delete") %></a>
         </div>
       </td>
     </tr>

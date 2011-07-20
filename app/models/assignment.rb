@@ -56,7 +56,6 @@ class Assignment < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
 
   acts_as_list :scope => :assignment_group_id
-  adheres_to_policy
   has_a_broadcast_policy
   simply_versioned :keep => 5
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
@@ -91,9 +90,10 @@ class Assignment < ActiveRecord::Base
                 :infer_grading_type, 
                 :process_if_quiz,
                 :default_values,
-                :update_grades_if_details_changed
+                :update_submissions_if_details_changed
   
-  after_save    :generate_reminders_if_changed,
+  after_save    :update_grades_if_details_changed,
+                :generate_reminders_if_changed,
                 :touch_assignment_group,
                 :touch_context,
                 :update_grading_standard,
@@ -113,7 +113,7 @@ class Assignment < ActiveRecord::Base
       # handle if it has already come due, but has not yet been auto_peer_reviewed
       if due_at && due_at <= Time.now
         # do_auto_peer_review
-      else
+      elsif due_at
        self.send_at(due_at, :do_auto_peer_review)
       end
     end
@@ -121,7 +121,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def do_auto_peer_review
-    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at <= Time.now
+    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at && due_at <= Time.now
   end
   
   def touch_assignment_group
@@ -129,7 +129,7 @@ class Assignment < ActiveRecord::Base
     true
   end
   
-  def update_student_grades(old_points_possible, old_grading_type)
+  def update_student_submissions(old_points_possible, old_grading_type)
     submissions.graded.each do |submission|
       submission.grade = score_to_grade(submission.score)
       submission.save
@@ -139,9 +139,20 @@ class Assignment < ActiveRecord::Base
   # if a teacher changes the settings for an assignment and students have
   # already been graded, then we need to update the "grade" column to
   # reflect the changes
-  def update_grades_if_details_changed
+  def update_submissions_if_details_changed
     if !new_record? && (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) && !submissions.graded.empty?
-      send_later_if_production(:update_student_grades, points_possible_was, grading_type_was)
+      send_later_if_production(:update_student_submissions, points_possible_was, grading_type_was)
+    end
+    true
+  end
+  
+  def update_grades_if_details_changed
+    if @points_possible_was != self.points_possible
+      begin
+        self.context.recompute_student_scores
+      rescue
+        ErrorReport.log_exception(:grades, $!)
+      end
     end
     true
   end
@@ -429,7 +440,7 @@ class Assignment < ActiveRecord::Base
       result = "#{result}%"
     elsif self.grading_type == "pass_fail"
       result = score.to_f == self.points_possible ? "complete" : "incomplete"
-      result = "complete" if !self.points_possible && score > 0.0
+      result = "complete" if !self.points_possible && score.to_f > 0.0
     elsif self.grading_type == "letter_grade"
       grades = self.grading_scheme.sort_by{|s| s[1]}.reverse
       found = false
@@ -456,7 +467,7 @@ class Assignment < ActiveRecord::Base
       # interpret as a numerical score
       (grade.to_f * 100.0).round / 100.0
     when "pass", "complete"
-      points_possible
+      points_possible.to_f
     when "fail", "incomplete"
       0.0
     else
@@ -487,7 +498,7 @@ class Assignment < ActiveRecord::Base
       # only allow full points or no points for pass_fail assignments
       score = case parsed_grade.to_f
       when points_possible
-        points_possible || 1.0
+        points_possible
       when 0.0
         0.0
       else
@@ -514,13 +525,14 @@ class Assignment < ActiveRecord::Base
   def to_atom(opts={})
     extend ApplicationHelper
     Atom::Entry.new do |entry|
-      entry.title     = "Assignment#{", " + self.context.name if opts[:include_context]}: #{self.title}"
+      entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", :assignment => self.title) unless opts[:include_context]
+      entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", :assignment => self.title, :course => self.context.name) if opts[:include_context]
       entry.updated   = self.updated_at.utc
       entry.published = self.created_at.utc
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/assignments/#{self.feed_code}_#{self.due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
       entry.links    << Atom::Link.new(:rel => 'alternate', 
                                     :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/assignments/#{self.id}")
-      entry.content   = Atom::Content::Html.new("Due: #{datetime_string(self.due_at, :due_date)}<br/>#{self.description}<br/><br/>
+      entry.content   = Atom::Content::Html.new(before_label(:due, "Due") + " #{datetime_string(self.due_at, :due_date)}<br/>#{self.description}<br/><br/>
         <div>
           #{self.description}
         </div>
@@ -626,35 +638,36 @@ class Assignment < ActiveRecord::Base
   
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }
-    set { can :read and can :read_own_submission }
+    can :read and can :read_own_submission
     
     given { |user, session| self.submittable_type? && 
       self.cached_context_grants_right?(user, session, :participate_as_student) &&
       !self.locked_for?(user)
     }
-    set { can :submit and can :attach_submission_comment_files }
+    can :submit and can :attach_submission_comment_files
     
     given { |user, session| !self.locked_for?(user) && 
       (self.context.allow_student_assignment_edits rescue false) && 
       self.cached_context_grants_right?(user, session, :participate_as_student)
     }
-    set { can :update_content }
+    can :update_content
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
-    set { can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files }
+    can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
-    set { can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files }
+    can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
   def self.search(query)
     find(:all, :conditions => wildcard('title', 'description', query))
   end
   
-  def grade_distribution
+  def grade_distribution(submissions = nil)
+    submissions ||= self.submissions
     tally = 0
     cnt = 0
-    scores = self.submissions.map{|s| s.score}.compact
+    scores = submissions.map{|s| s.score}.compact
     scores.each do |score|
       tally += score
       cnt += 1
@@ -768,7 +781,7 @@ class Assignment < ActiveRecord::Base
           did_grade = true
           submission.score = self.grade_to_score(submission.grade)
         end
-        if self.points_possible && self.points_possible > 0 && submission.score
+        if submission.score && (self.points_possible.to_f > 0.0 || grading_type != 'pass_fail')
           did_grade = true
           submission.grade = self.score_to_grade(submission.score) 
         end
@@ -969,7 +982,7 @@ class Assignment < ActiveRecord::Base
     comment_map = partition_for_user(file_map)
     comments = []
     comment_map.each do |group|
-      comment = group.size == 1 ? 'See attached file' : 'See attached files'
+      comment = t :comment_from_files, { :one => "See attached file", :other => "See attached files" }, :count => group.size
       submission = group.first[:submission]
       user = group.first[:user]
       attachments = group.map { |g| FileInContext.attach(self, g[:filename], g[:display_name]) }
@@ -1069,7 +1082,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def peer_reviews_assign_at=(val)
-    peer_reviews_due_at = val
+    write_attribute(:peer_reviews_due_at, val)
   end
   
   def has_peer_reviews?
@@ -1248,8 +1261,7 @@ class Assignment < ActiveRecord::Base
   def readable_submission_types
     return nil unless self.expects_submission?
     res = (self.submission_types || "").split(",").map{|s| readable_submission_type(s) }.compact
-    res[-1] = "or " + res[-1] if res.length > 1
-    res.join(", ")
+    res.to_sentence(:or)
   end
   
   def readable_submission_type(submission_type)
@@ -1291,8 +1303,8 @@ class Assignment < ActiveRecord::Base
       dup.send("#{key}=", val)
     end
 
-    context.log_merge_result("The Assignment \"#{self.title}\" was a group assignment, and you'll need to re-set the group settings for this new context") if self.group_category && !self.group_category.empty?
-    context.log_merge_result("The Assignment \"#{self.title}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context") if self.peer_review_count && self.peer_review_count > 0
+    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.group_category && !self.group_category.empty?
+    context.log_merge_result(t('warnings.peer_assignment', "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context", :assignment => self.title)) if self.peer_review_count && self.peer_review_count > 0
     
     dup.context = context
     dup.description = context.migrate_content_links(self.description, self.context) if options[:migrate]
@@ -1333,7 +1345,7 @@ class Assignment < ActiveRecord::Base
       dup.assignment_group = new_group
       context.map_merge(self.assignment_group, new_group)
     end
-    context.log_merge_result("Assignment \"#{self.title}\" created")
+    context.log_merge_result(t('messages.assignment_created', "Assignment \"%{assignment}\" created", :assignment => self.title))
     context.may_have_links_to_migrate(dup)
     dup.updated_at = Time.now
     dup.clone_updated = true
@@ -1345,11 +1357,15 @@ class Assignment < ActiveRecord::Base
     to_import = migration.to_import 'assignments'
     assignments.each do |assign|
       if assign['migration_id'] && (!to_import || to_import[assign['migration_id']])
-        import_from_migration(assign, migration.context)
+        begin
+          import_from_migration(assign, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the assignment \"#{assign[:title]}\"", $!)
+        end
       end
     end
     migration_ids = assignments.map{|m| m['assignment_id'] }.compact
-    conn = ActiveRecord::Base.connection
+    conn = self.connection
     cases = []
     max = migration.context.assignments.map(&:position).compact.max || 0
     migration.context.assignments
@@ -1380,12 +1396,12 @@ class Assignment < ActiveRecord::Base
       item.submission_types = hash[:submission_types]
     elsif ['discussion_topic'].include?(hash[:submission_format])
       item.submission_types = "discussion_topic"
-    elsif ['online_file_upload','textwithattachments'].include?(hash[:submission_format])
-      item.submission_types = "online_file_upload,online_text_entry"
+    elsif ['online_upload','textwithattachments'].include?(hash[:submission_format])
+      item.submission_types = "online_upload,online_text_entry"
     elsif ['online_text_entry'].include?(hash[:submission_format])
       item.submission_types = "online_text_entry"
     elsif ['webpage'].include?(hash[:submission_format])
-      item.submission_types = "online_file_upload"
+      item.submission_types = "online_upload"
     elsif ['online_quiz'].include?(hash[:submission_format])
       item.submission_types = "online_quiz"
     end
@@ -1439,7 +1455,7 @@ class Assignment < ActiveRecord::Base
     if hash[:assignment_group_migration_id]
       item.assignment_group = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
     end
-    item.assignment_group ||= context.assignment_groups.find_or_create_by_name("Imported Assignments")
+    item.assignment_group ||= context.assignment_groups.find_or_create_by_name(t :imported_assignments_group, "Imported Assignments")
     
     hash[:due_at] ||= hash[:due_date]
     [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at, :all_day_date].each do |key|

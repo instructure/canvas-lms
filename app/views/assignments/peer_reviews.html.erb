@@ -1,112 +1,113 @@
-<% content_for :page_title do %><%= @context.name %>: <%= @assignment.title %>: Peer Reviews<% end %>
+<% content_for :page_title do %><%= join_title @context.name, @assignment.title, t(:page_title, "Peer Reviews") %><% end %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-  <p><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class='back'>Back to Assignment</a></p>
-  <p>To the left you can see the list of students for this assignment, and also
-  which student submissions (if any) they have been assigned to review.</p>
+  <p><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class='back'><%= t 'links.back_to_assignment', "Back to Assignment" %></a></p>
+  <p><%= t :details, "To the left you can see the list of students for this assignment, and also
+  which student submissions (if any) they have been assigned to review." %></p>
   <% unless @submissions.empty? %>
     <% form_tag context_url(@context, :context_assignment_assign_peer_reviews_url, @assignment.id), {} do %>
-      <h3 style="margin-bottom: 0;">Automatically Assign Reviews</h3>
-      <p>You can assign peer reviews to those users who have submitted but don't already have 
-      reviews assigned by clicking the button below.</p>
-      <input type="text" name="peer_review_count" value="<%= @assignment.peer_review_count || 1 %>" style="width: 25px;"/> reviews per user
+      <h3 style="margin-bottom: 0;"><%= t 'titles.automatically_assign_reviews', "Automatically Assign Reviews" %></h3>
+      <p><%= t 'descriptions.automatically_assign_reviews', "You can assign peer reviews to those users who have submitted but don't already have
+      reviews assigned by clicking the button below." %></p>
+      <%= t :reviews_per_user, "%{count} reviews per user", :count => %{<input type="text" name="peer_review_count" value="#{@assignment.peer_review_count || 1}" style="width: 25px;"/>}.html_safe %>
       <div class='button-container button-container-right-aligned'>
-        <button type="submit" class="button big-button">Assign Peer Reviews</button>
+        <button type="submit" class="button big-button"><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
       </div>
     <% end %>
   <% end %>
   </div>
 <% end %>
-<% js_block do %>
+<% js_block :i18n_scope => 'assignments.peer_reviews' do %>
 <script>
-$(document).ready(function() {
-  $(".peer_review").hover(function() {
-    $(".peer_review.submission-hover").removeClass('submission-hover');
-    $(this).addClass('submission-hover');
-  }, function() {
-    $(this).removeClass('submission-hover');
-  });
-//  $(document).mouseover(function(event) {
-//    if(!$(event.target).hasClass('peer_review')) {
-//      $(".peer_review.submission-hover").removeClass('submission-hover');
-//    }
-//  });
-  $(".peer_review .delete_review_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".peer_review").confirmDelete({
-      url: $(this).attr('href'),
-      message: "Cancel this peer review?"
+  $(document).ready(function() {
+    $(".peer_review").hover(function() {
+      $(".peer_review.submission-hover").removeClass('submission-hover');
+      $(this).addClass('submission-hover');
+    }, function() {
+      $(this).removeClass('submission-hover');
     });
-  });
-  $(".assign_peer_review_link").click(function(event) {
-    event.preventDefault();
-    //if the form is there and is being shown, then slide it up.
-    if ($(this).parents(".student_reviews").find(".form_content form:visible").length) {
-      $(this).parents(".student_reviews").find(".form_content form:visible").slideUp();
-    } else { //otherwise make it and inject it then slide it down
-      var $form = $("#assign_peer_review_form").clone(true).removeAttr('id');
-      var url = $(".assign_peer_review_url").attr('href');
-      var user_id = $(this).parents(".student_reviews").getTemplateData({textValues: ['student_review_id']}).student_review_id;
-      url = $.replaceTags(url, 'reviewer_id', user_id);
-      $form.find("select option.student_" + user_id).attr('disabled', true);
-      $(this).parents(".student_reviews").find(".peer_review").each(function() {
-        user_id = $(this).getTemplateData({textValues: ['user_id']}).user_id;
+//    $(document).mouseover(function(event) {
+//      if(!$(event.target).hasClass('peer_review')) {
+//        $(".peer_review.submission-hover").removeClass('submission-hover');
+//      }
+//    });
+    $(".peer_review .delete_review_link").click(function(event) {
+      event.preventDefault();
+      $(this).parents(".peer_review").confirmDelete({
+        url: $(this).attr('href'),
+        message: I18n.t('messages.cancel_peer_review', "Cancel this peer review?")
+      });
+    });
+    $(".assign_peer_review_link").click(function(event) {
+      event.preventDefault();
+      //if the form is there and is being shown, then slide it up.
+      if ($(this).parents(".student_reviews").find(".form_content form:visible").length) {
+        $(this).parents(".student_reviews").find(".form_content form:visible").slideUp();
+      } else { //otherwise make it and inject it then slide it down
+        var $form = $("#assign_peer_review_form").clone(true).removeAttr('id');
+        var url = $(".assign_peer_review_url").attr('href');
+        var user_id = $(this).parents(".student_reviews").getTemplateData({textValues: ['student_review_id']}).student_review_id;
+        url = $.replaceTags(url, 'reviewer_id', user_id);
         $form.find("select option.student_" + user_id).attr('disabled', true);
-      });
-      $form.attr('action', url);
-      $(this).parents(".student_reviews").find(".form_content").empty().append($form);
-      $form.slideDown();
-    }
-  });
-  $("#assign_peer_review_form").formSubmit({
-    beforeSubmit: function(data) {
-      if(!data.reviewee_id) {
-        return false;
+        $(this).parents(".student_reviews").find(".peer_review").each(function() {
+          user_id = $(this).getTemplateData({textValues: ['user_id']}).user_id;
+          $form.find("select option.student_" + user_id).attr('disabled', true);
+        });
+        $form.attr('action', url);
+        $(this).parents(".student_reviews").find(".form_content").empty().append($form);
+        $form.slideDown();
       }
-      $(this).loadingImage();
-    },
-    success: function(data) {
-      $(this).loadingImage('remove');
-      $(this).slideUp(function() {
-        $(this).remove();
+    });
+    $("#assign_peer_review_form").formSubmit({
+      beforeSubmit: function(data) {
+        if(!data.reviewee_id) {
+          return false;
+        }
+        $(this).loadingImage();
+      },
+      success: function(data) {
+        $(this).loadingImage('remove');
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
+        var $review = $("#review_request_blank").clone(true).removeAttr('id');
+        $review.fillTemplateData({
+          data: data.assessment_request,
+          hrefValues: ['id', 'user_id']
+        });
+        $(this).parents(".student_reviews").find(".no_requests_message").slideUp().end()
+          .find(".peer_reviews").append($review);
+        $review.slideDown();
+        var assessor_name = $(this).parents(".student_reviews").find(".assessor_name").text();
+        var time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted;
+        $review.find(".reminder_peer_review_link").attr('title', 'Remind ' + assessor_name + ' about Assessment, last notified ' + time);
+        $(this).slideUp(function() {
+          $(this).remove();
+        });
+      },
+      error: function(data) {
+        $(this).loadingImage('remove');
+        $(this).formErrors(data);
+      }
+    });
+    $(".remind_peer_review_link").click(function(event) {
+      event.preventDefault();
+      var $link = $(this);
+      $link.parents(".peer_review").loadingImage({image_size: 'small'});
+      $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
+        $link.parents(".peer_review").loadingImage('remove');
+        var assessor_name = $link.parents(".student_reviews").find(".assessor_name").text();
+        var time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted;
+        $link.attr('title', I18n.t('titles.remind', 'Remind %{assessor} about Assessment, last notified %{time}',
+          { assessor: assessor_name, time: time });
       });
-      var $review = $("#review_request_blank").clone(true).removeAttr('id');
-      $review.fillTemplateData({
-        data: data.assessment_request,
-        hrefValues: ['id', 'user_id']
-      });
-      $(this).parents(".student_reviews").find(".no_requests_message").slideUp().end()
-        .find(".peer_reviews").append($review);
-      $review.slideDown();
-      var assessor_name = $(this).parents(".student_reviews").find(".assessor_name").text();
-      var time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted;
-      $review.find(".reminder_peer_review_link").attr('title', 'Remind ' + assessor_name + ' about Assessment, last notified ' + time);
-      $(this).slideUp(function() {
-        $(this).remove();
-      });
-    },
-    error: function(data) {
-      $(this).loadingImage('remove');
-      $(this).formErrors(data);
-    }
-  });
-  $(".remind_peer_review_link").click(function(event) {
-    event.preventDefault();
-    var $link = $(this);
-    $link.parents(".peer_review").loadingImage({image_size: 'small'});
-    $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
-      $link.parents(".peer_review").loadingImage('remove');
-      var assessor_name = $link.parents(".student_reviews").find(".assessor_name").text();
-      var time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted;
-      $link.attr('title', 'Remind ' + assessor_name + ' about Assessment, last notified ' + time);
+    });
+    $(".remind_peer_reviews_link").click(function(event) {
+      event.preventDefault();
+      $(".peer_review.assigned .remind_peer_review_link").click();
     });
   });
-  $(".remind_peer_reviews_link").click(function(event) {
-    event.preventDefault();
-    $(".peer_review.assigned .remind_peer_review_link").click();
-  });
-});
 </script>
 <% end %>
 <% content_for :stylesheets do %>
@@ -135,22 +136,25 @@ $(document).ready(function() {
 }
 </style>
 <% end %>
-<h2><%= @assignment.title %> Peer Reviews</h2>
-  Student peer reviews will be considered complete when students have commented
-  at least once on the page<% if @assignment.rubric_association %> and filled
-  out the rubric form for the assignment.
-  <% end %>.
+<h2><%= t :title, "%{assignment} Peer Reviews", :assignment => @assignment.title %></h2>
+  <% if @assignment.rubric_association %>
+    <%= t :overview_with_rubric, "Student peer reviews will be considered complete when students have commented
+      at least once on the page and filled out the rubric form for the assignment." %>
+  <% else %>
+    <%= t :overview, "Student peer reviews will be considered complete when students have commented
+      at least once on the page." %>
+  <% end %>
 <ul class="unstyled_list" style="margin-left: 20px;">
-  <li style="<%= hidden unless @students.empty? %>" class="no_students_message">No Students Found</li>
+  <li style="<%= hidden unless @students.empty? %>" class="no_students_message"><%= t 'messages.no_students_found', "No Students Found" %></li>
   <% @students.each do |student| %>
     <% submission = @submissions.to_a.find{|s| s.user_id == student.id} %>
     <li style="font-size: 1.2em; margin-bottom: 10px;" class="student_reviews">
-      <a <%= submission && submission.has_submission? ? "class='person' title='submitted'" : "class='person_gray' title='not yet submitted'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, student.id) %>">
+      <a <%= submission && submission.has_submission? ? "class='person' title='#{t :submitted, "submitted"}'" : "class='person_gray' title='#{t :not_yet_submitted, "not yet submitted"}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, student.id) %>">
         <span class="assessor_name"><%= student.last_name_first %></span>
         <span class="user_id student_review_id" style="display: none;"><%= student.id %></span>
       </a>
       <ul class="unstyled_list peer_reviews" style="padding-left: 30px; font-size: 0.8em; width: 50%;">
-        <li class="peer_review no_requests_message" style="<%= hidden unless !submission || submission.assigned_assessments.empty? %>">None Assigned</li>
+        <li class="peer_review no_requests_message" style="<%= hidden unless !submission || submission.assigned_assessments.empty? %>"><%= t :none_assigned, "None Assigned" %></li>
         <% if submission %>
         <% submission.assigned_assessments.sort_by{|r| r.asset.user.last_name_first}.each do |request| %>
           <% if (request && request.asset && request.asset.user) %>
@@ -160,7 +164,7 @@ $(document).ready(function() {
         <% end %>
       </ul>
       <div style="margin-left: 25px; font-size: 0.7em;" class="assign_box">
-        <a href="#" style="color: #888;" class="assign_peer_review_link add-small">Give <%= student.name %> another submission to assess</a>
+        <a href="#" style="color: #888;" class="assign_peer_review_link add-small"><%= t 'links.assign_peer_review', "Give %{student} another submission to assess", :student => student.name %></a>
         <div class="form_content">
         </div>
       </div>
@@ -169,12 +173,12 @@ $(document).ready(function() {
 </ul>
 <% form_tag ".", {:id => "assign_peer_review_form", :style => "display: none;"} do %>
   <select name="reviewee_id">
-    <option value="">[ Select Student ]</option>
+    <option value=""><%= t 'options.select_student', "[ Select Student ]" %></option>
     <% @students.each do |student| %>
       <option value="<%= student.id %>" class="student_<%= student.id %>"><%= student.last_name_first %></option>
     <% end %>
   </select>
-  <button type="submit" class="button small-button">Add</button>
+  <button type="submit" class="button small-button"><%= t 'buttons.add', 'Add' %></button>
 <% end %>
 <a href="<%= context_url(@context, :context_assignment_assign_peer_review_url, @assignment.id, '{{ reviewer_id }}') %>" style="display: none;" class="assign_peer_review_url">&nbsp;</a>
 <ul style="display: none;">

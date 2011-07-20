@@ -19,7 +19,6 @@
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data
-  adheres_to_policy
   include HasContentTags
   
   belongs_to :enrollment
@@ -101,15 +100,21 @@ class Attachment < ActiveRecord::Base
 
   def self.process_migration(data, migration)
     attachments = data['file_map'] ? data['file_map']: {}
+    # TODO i18n
     to_import = migration.to_import 'files'
     attachments.values.each do |att|
       if !att['is_folder'] && att['migration_id'] && (!to_import || to_import[att['migration_id']])
-        import_from_migration(att, migration.context)
+        begin
+          import_from_migration(att, migration.context)
+        rescue
+          migration.add_warning("Couldn't import file \"#{att[:display_name] || att[:path_name]}\"", $!)
+        end
       end
     end
     
     if data[:locked_folders]
       data[:locked_folders].each do |path|
+        # TODO i18n
         if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
           f.locked = true
           f.save
@@ -118,6 +123,7 @@ class Attachment < ActiveRecord::Base
     end
     if data[:hidden_folders]
       data[:hidden_folders].each do |path|
+        # TODO i18n
         if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
           f.workflow_state = 'hidden'
           f.save
@@ -135,19 +141,19 @@ class Attachment < ActiveRecord::Base
     item ||= Attachment.find_from_path(hash[:path_name], context)
     if item
       item.context = context
-      context.imported_migration_items << item if context.imported_migration_items && item.migration_id != hash[:migration_id]
       item.migration_id = hash[:migration_id]
       item.locked = true if hash[:locked]
       item.file_state = 'hidden' if hash[:hidden]
       item.display_name = hash[:display_name] if hash[:display_name]
       item.save_without_broadcasting!
+      context.imported_migration_items << item if context.imported_migration_items
     end
     item
   end
   
   def assert_attachment
     if !self.to_be_zipped? && !self.zipping? && !self.errored? && (!filename || !content_type || !downloadable?)
-      self.errors.add_to_base("File data could not be found")
+      self.errors.add_to_base(t('errors.not_found', "File data could not be found"))
       return false
     end
   end
@@ -430,7 +436,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def unencoded_filename
-    CGI::unescape(self.filename || "File")
+    CGI::unescape(self.filename || t(:default_filename, "File"))
   end
   
   def self.destroy_files(ids)
@@ -487,7 +493,7 @@ class Attachment < ActiveRecord::Base
     )
     def authenticated_s3_url(*args)
       return root_attachment.authenticated_s3_url(*args) if root_attachment
-      "//#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
+      "#{(args[0].is_a?(Hash) && args[0][:protocol]) || '//'}#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
     end
 
     alias_method :attachment_fu_filename=, :filename=
@@ -667,14 +673,20 @@ class Attachment < ActiveRecord::Base
   def filename
     read_attribute(:filename) || (self.root_attachment && self.root_attachment.filename)
   end
-  
+
+  def thumbnail_with_root_attachment
+    self.thumbnail_without_root_attachment || self.root_attachment.try(:thumbnail)
+  end
+  alias_method_chain :thumbnail, :root_attachment
+
   def content_directory
     self.directory_name || Folder.root_folders(self.context).first.name
   end
   
   def to_atom(opts={})
     Atom::Entry.new do |entry|
-      entry.title     = "File#{", " + self.context.name if opts[:include_context]}: #{self.title}"
+      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", :course_or_group => self.context.name, :title => self.context.name) if opts[:include_context]
+      entry.title     = t(:feed_title, "File: %{title}", :title => self.context.name) unless opts[:include_context]
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/files/#{self.feed_code}"
@@ -750,22 +762,22 @@ class Attachment < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) } #admins.include? user }
-    set { can :read and can :update and can :delete and can :create and can :download }
+    can :read and can :update and can :delete and can :create and can :download
     
     given { |user, session| self.public? }
-    set { can :read and can :download }
+    can :read and can :download
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) } #students.include? user }
-    set { can :read }
+    can :read
     
     given { |user, session| 
       self.cached_context_grants_right?(user, session, :read) && 
       (self.cached_context_grants_right?(user, session, :manage_files) || !self.locked_for?(user))
     }
-    set { can :download }
+    can :download
     
     given { |user, session| self.context_type == 'Submission' && self.context.grant_rights?(user, session, :comment) }
-    set { can :create }
+    can :create
     
     given { |user, session|
         session && session['file_access_user_id'].present? &&
@@ -773,7 +785,7 @@ class Attachment < ActiveRecord::Base
         self.cached_context_grants_right?(u, session, :read) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
-    set { can :read }
+    can :read
     
     given { |user, session|
         session && session['file_access_user_id'].present? &&
@@ -782,7 +794,7 @@ class Attachment < ActiveRecord::Base
         (self.cached_context_grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
-    set { can :download }
+    can :download
   end
   
   def locked_for?(user, opts={})
@@ -950,6 +962,7 @@ class Attachment < ActiveRecord::Base
         self.workflow_state = 'processing'
       rescue => e
         self.workflow_state = 'errored'
+        ErrorReport.log_exception(:scribd, e, :attachment_id => self.id)
       end
       self.submitted_to_scribd_at = Time.now
       self.scribd_attempts ||= 0
@@ -1057,7 +1070,7 @@ class Attachment < ActiveRecord::Base
   
   def self.attachment_list_from_migration(context, ids)
     return "" if !ids || !ids.is_a?(Array) || ids.empty?
-    description = "<h3>Associated Files</h3><ul>"
+    description = "<h3>#{t 'title.migration_list', "Associated Files"}</h3><ul>"
     ids.each do |id|
       attachment = context.attachments.find_by_migration_id(id)
       description += "<li><a href='/courses/#{context.id}/files/#{attachment.id}/download' class='#{'instructure_file_link' if attachment.scribdable?}'>#{attachment.display_name}</a></li>" if attachment
@@ -1092,7 +1105,7 @@ class Attachment < ActiveRecord::Base
     @@domain_namespace ||= nil
   end
   
-  def self.serialization_methods; [:mime_class, :thumbnail_url, :scribdable?, :currently_locked]; end
+  def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked]; end
   cattr_accessor :skip_thumbnails
   
   

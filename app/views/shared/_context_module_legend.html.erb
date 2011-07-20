@@ -5,10 +5,10 @@
     <a href="#" class="module_legend_link"><%= context_module.name %></a>
   </div>
   <div class="module_legend <%= 'module_legend_locked' if context_module && !context_module.available_for?(@current_user) %>" style="display: none;">
-    <div class="header" title="This content is part of the module, <%= context_module.name %>">
-      <span style="font-size: 0.8em; font-weight: normal;">module:</span> <a href="<%= context_url(@context, :context_url) %>/modules"><%= context_module.name %></a>
-      <span class="locked_message" title="This module hasn't been unlocked yet"><%= image_tag "lock_small.png" %></span>
-      <span class="completed_message" title="This module is completed" style="<%= hidden unless progression && progression.completed? %>"><%= image_tag "checked.png" %></span>
+    <div class="header" title="<%= t('content_part_of_module', 'This content is part of the module, %{module_name}', :module_name => context_module.name) %>">
+      <span style="font-size: 0.8em; font-weight: normal;"><%= before_label('module', 'module') %></span> <a href="<%= context_url(@context, :context_url) %>/modules"><%= context_module.name %></a>
+      <span class="locked_message" title="<%= t('module_not_unlocked', "This module hasn't been unlocked yet") %>"><%= image_tag "lock_small.png" %></span>
+      <span class="completed_message" title="<%= t('module_completed', 'This module is completed') %>" style="<%= hidden unless progression && progression.completed? %>"><%= image_tag "checked.png" %></span>
     </div>
     <div class="content">
     <ul>
@@ -22,15 +22,15 @@
           <span class="criterion <%= 'defined' if criterion %> <%= 'completed' if module_item && progression && progression.finished_item?(module_item) %>" style="<%= hidden unless progression && progression.started? %>">
             <% if criterion %>
               <% if criterion[:type] == 'min_score' %>
-                <%= image_tag "flagged_question_dim.png", :class => "image", :alt => "minimum score", :title => "Students must get at least a #{criterion[:min_score]} on this item before the module is considered complete" %>
+                <%= image_tag "flagged_question_dim.png", :class => "image", :alt => t('minimum_score', "minimum score"), :title => t('min_score_required', "Students must get at least a %{min_score} on this item before the module is considered complete", :min_score => criterion[:min_score]) %>
               <% elsif criterion[:type] == 'max' %>
-                <%= image_tag "flagged_question_dim.png", :class => "image", :alt => "maximum score", :title => "Students must get no more than a #{criterion[:min_score]} on this item before the module is considered complete" %>
+                <%= image_tag "flagged_question_dim.png", :class => "image", :alt => t('max_score', "maximum score"), :title => t('max_score_required', "Students must get no more than a %{max_score} on this item before the module is considered complete", :max_score => criterion[:min_score]) %>
               <% elsif criterion[:type] == 'must_view' %>
-                <%= image_tag "preview_dim.png", :class => "image", :alt => "must view", :title => "Students must view this item before the module is considered complete" %>
+                <%= image_tag "preview_dim.png", :class => "image", :alt => t('must_view', "must view"), :title => t('must_view_title', "Students must view this item before the module is considered complete") %>
               <% elsif criterion[:type] == 'must_contribute' %>
-                <%= image_tag "text_entry_dim.png", :class => "image", :alt => "must contribute", :title => "Students must contribute to this item before the module is considered complete" %>
+                <%= image_tag "text_entry_dim.png", :class => "image", :alt => t('must_contribute', "must contribute"), :title => t('must_contribute_title', "Students must contribute to this item before the module is considered complete") %>
               <% elsif criterion[:type] == 'must_submit' %>
-                <%= image_tag "text_entry_dim.png", :class => "image", :alt => "must submit", :title => "Students must submit this assignment before the module is considered complete" %>
+                <%= image_tag "text_entry_dim.png", :class => "image", :alt => t('must_submit', "must submit"), :title => t('must_submit_title', "Students must submit this assignment before the module is considered complete") %>
               <% end %>
             <% else %>
               <%= image_tag "blank.png", :alt => '' %>
@@ -43,7 +43,7 @@
     </ul>
     </div>
     <div class="footer">
-      <a href="<%= context_url(@context, :context_url) %>/modules">View Modules</a>
+      <a href="<%= context_url(@context, :context_url) %>/modules"><%= t('view_modules', 'View Modules') %></a>
     </div>
   </div>
   <% end %>

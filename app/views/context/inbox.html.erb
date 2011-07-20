@@ -3,20 +3,20 @@
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-all">
     <% if !@message_contexts.empty? %>
-      <a href="#" class="button button-sidebar new_message_link button-sidebar-wide"><%= image_tag "email.png" %> Write a Message</a>
+      <a href="#" class="button button-sidebar new_message_link button-sidebar-wide"><%= image_tag "email.png" %> <%= t('links.write_message', %{Write a Message}) %></a>
     <% end %>
     <% if @current_user && @current_user.unread_inbox_items_count && @current_user.unread_inbox_items_count > 0 %>
       <% form_tag mark_inbox_as_read_path, {:method => :delete, :id => "mark_inbox_as_read_form"} do %>
-        <button class="button button-sidebar-wide" type="submit"><%= image_tag "pass.png" %> <span class="msg">Mark All Messages as Read</span></button>
+        <button class="button button-sidebar-wide" type="submit"><%= image_tag "pass.png" %> <span class="msg"><%= t('buttons.mark_all_as_read', %{Mark All Messages as Read}) %></span></button>
       <% end %>
     <% end %>
   </div>
-  <h2>Show Message Types</h2>
+  <h2><%= t('headings.show_message_types', %{Show Message Types}) %></h2>
   <div class="rs-margin-lr">
     <a href="<%= user_path(@current_user) %>" class="update_user_url" style="display: none;">&nbsp;</a>
-    Select which message types you'd like to show up in your inbox:
+    <%= before_label('select_message_types', %{Select which message types you'd like to show up in your inbox}) %>
     <ul class="unstyled_list" id="visible_message_types">
-      <% [['ContextMessage', 'Private Messages'], ['SubmissionComment', 'Submission Comments'], ['DiscussionEntry', 'Discussion Replies']].each do |type, desc| %>
+      <% [['ContextMessage', t('private_messages', 'Private Messages')], ['SubmissionComment', t('submission_comments', 'Submission Comments')], ['DiscussionEntry', t('discussion_replies', 'Discussion Replies')]].each do |type, desc| %>
         <li><input type="checkbox" value="<%= type.underscore %>" id="show_<%= type.underscore %>" <%= 'checked' if @current_user.show_in_inbox?(type) %> /><label for="show_<%= type.underscore %>"><%= desc %></label></li>
       <% end %>
     </ul>
@@ -46,25 +46,25 @@
   </script>
 <% end %>
 
-<h2 id="messages_view" style="float: left;"><%= @messages_view_header %></h2>
+<h2 id="messages_view" style="float: left;" data-view="<%= @messages_view %>"><%= @messages_view_header %></h2>
 <% if @messages_view == :action_items %>
   <div style="float: left; padding-top: 0.5em; margin-left: 15px;">
-    <a href="<%= inbox_path(:view => 'inbox') %>" style="display: none;">Received Messages</a>
-    <a href="<%= inbox_path(:view => 'sentbox') %>">Sent Messages</a>
+    <a href="<%= inbox_path(:view => 'inbox') %>" style="display: none;"><%= t('links.received_messages', %{Received Messages}) %></a>
+    <a href="<%= inbox_path(:view => 'sentbox') %>"><%= t('links.sent_messages', %{Sent Messages}) %></a>
   </div>
 <% elsif @messages_view == :inbox %>
   <div style="float: left; padding-top: 0.5em; margin-left: 15px;">
-    <a href="<%= inbox_path(:view => 'sentbox') %>">Sent Messages</a>
+    <a href="<%= inbox_path(:view => 'sentbox') %>"><%= t('links.sent_messages', %{Sent Messages}) %></a>
   </div>
 <% else %>
   <div style="float: left; padding-top: 0.5em; margin-left: 15px;">
-    <a href="<%= inbox_path %>">Inbox</a>
-    <a href="<%= inbox_path(:view => (@messages_view == :inbox ? 'sentbox' : nil)) %>" style="display: none;"><%= @messages_view == :inbox ? "Sent Messages" : "Received Messages" %></a>
+    <a href="<%= inbox_path %>"><%= t('links.inbox', %{Inbox}) %></a>
+    <a href="<%= inbox_path(:view => (@messages_view == :inbox ? 'sentbox' : nil)) %>" style="display: none;"><%= @messages_view == :inbox ? t('links.sent_messages', "Sent Messages") : t('links.received_messages', "Received Messages") %></a>
   </div>
 <% end %>
 <div class="clear"></div>
 <div id="send_message" style="display: none; margin-bottom: 10px;">
-  <h3>New Message for 
+  <h3><%= t('new_message_select', %{New Message for}) %> 
     <select id="current_message_context">
     <% @message_contexts.each do |context| %>
       <option value="<%= context.asset_string %>"><%= context.name %></option>
@@ -79,14 +79,14 @@
     <table class="formtable" style="width: 100%;">
       <tr>
         <td style="vertical-align: top; font-weight: bold;">
-          Recipients:
+          <%= before_label('labels.recipients', %{Recipients}) %>
         </td>
         <td colspan="2" class="recipients" style="font-size: 0.8em; text-align: left; vertical-align: top; width: 80%">
           <div style="max-height: 75px; overflow: auto;" class="recipients_scroll">
-            <button type="button" class="button small-button nobr select_recipients" style="float: left;">Select Recipients</button>
-            <div class="no_recipients">No Recipients</div>
+            <button type="button" class="button small-button nobr select_recipients" style="float: left;"><%= t('buttons.select_recipients', %{Select Recipients}) %></button>
+            <div class="no_recipients"><%= t('no_recipients', %{No Recipients}) %></div>
             <div class="recipient blank" style="display: none;">
-              <span class="user_name">user name</span>
+              <span class="user_name"><%= t('user_name', %{user name}) %></span>
               <a href="#" class="delete_recipient_link">&#215;</a>
               <span class="id" style="display: none;">&nbsp;</span>
             </div>
@@ -95,7 +95,7 @@
         </td>
       </tr>
       <tr>
-        <td style="font-weight: bold">Subject:</td>
+        <td style="font-weight: bold"><%= before_label('labels.subject', %{Subject}) %></td>
         <td><%= f.text_field :subject, :class => "subject" %></td>
         <td>&nbsp;</td>
       </tr>
@@ -103,9 +103,7 @@
         <td colspan="3">
           <%= f.text_area :body, :style => "width: 98%; height: 200px;" %>
           <div style="display: none;">
-            <i style="font-size: 0.8em;">Keep in mind this message will be sent out as an
-            email to the selected recipients, and we can't promise it won't be read by unregistered
-            users if they share email accounts.</i>
+            <i style="font-size: 0.8em;"><%= t('helps.messages_email_warning', %{Keep in mind this message will be sent out as an email to the selected recipients, and we can't promise it won't be read by unregistered users if they share email accounts.}) %></i>
           </div>
         </td>
       </tr>
@@ -113,25 +111,25 @@
         <td colspan="2">
           <% if can_do(context.announcements.new, @current_user, :create) %>
             <input type="checkbox" id="<%= context.asset_string %>_also_announcement" name="also_announcement" class="also_announcement" value="1"/>
-            <label for="<%= context.asset_string %>_also_announcement">Also post as an announcement</label>
+            <label for="<%= context.asset_string %>_also_announcement"><%= t('labels.also_announcement', %{Also post as an announcement}) %></label>
           <% end %>
         </td>
         <td style="width: 250px; padding-right: 50px;">
           <% if feature_enabled?(:kaltura) %>
-            <span class="media_comment_span"><a href="#" style="float: left;" class="media_comment_link media-comment">Media Comment</a>&nbsp;</span>
+            <span class="media_comment_span"><a href="#" style="float: left;" class="media_comment_link media-comment"><%= t('links.add_media_comment', %{Media Comment}) %></a>&nbsp;</span>
             <%= f.hidden_field :media_comment_id, :class => "media_comment_id" %>
             <%= f.hidden_field :media_comment_type, :class => "media_comment_type" %>
           <% end %>
-          <a class="add-small add_attachment_link" href="#">Add Attachment</a>
+          <a class="add-small add_attachment_link" href="#"><%= t('links.add_attachment', %{Add Attachment}) %></a>
           <div class="context_message_media_comment" style="display: none;">
-            Media Comment
+            <%= t('media_comment', %{Media Comment}) %>
             <a href="#" class="remove_media_comment_link" style="float: right;"><%= image_tag "delete_circle.png" %></a>
-            <div class="clear" />
+            <div class="clear"></div>
           </div>
           <div class="context_message_attachment blank" style="display: none;">
             <input type="file" name="" class="file_input"/>
             <a href="#" class="remove_attachment_link" style="float: right;"><%= image_tag "delete_circle.png" %></a>
-            <div class="clear" />
+            <div class="clear"></div>
           </div>
         </td>
       </tr>
@@ -139,7 +137,7 @@
           <tr>
             <td colspan="2">
               <input type="checkbox" id="add_as_user_note" class="add_as_user_note" name="add_as_user_note" value="1" disabled/>
-              <label for="add_as_user_note">Add as a Faculty Journal entry</label>
+              <label for="add_as_user_note"><%= t('labels.add_to_faculty_journal', %{Add as a Faculty Journal entry}) %></label>
             </td>
           </tr>
         <% end %>
@@ -147,8 +145,8 @@
         <td colspan="3">
           <%= f.hidden_field :recipients, :class => 'recipient_ids' %>
           <div class="button-container">
-            <button type="submit" class="button send_button">Send Message</button>
-            <button type="button" class="cancel_button button-secondary">Cancel</button>
+            <button type="submit" class="button send_button"><%= t('#buttons.send_message', %{Send Message}) %></button>
+            <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
           </div>
         </td>
       </tr>
@@ -177,28 +175,28 @@
 <% end %>
 <div id="recipients_dialogs" style="display: none;">
 <% @message_contexts.each do |context| %>
-  <div id="<%= context.asset_string %>_recipients_dialog" class="recipients_dialog" title="Recipients for <%=h context.name %>">
+  <div id="<%= context.asset_string %>_recipients_dialog" class="recipients_dialog" title="<%= context.is_a?(Course) ? t('recipients_for_course', 'Recipient for %{course_name}', :course_name => context.name) : t('recipients_for_group', 'Recipient for %{group_name}', :group_name => context.name) %>">
     <div class="left_side <%= 'not_course' unless context.is_a?(Course) %>" style="float: left; width: 35%; height: 300px; overflow: auto;">
       <% if context.is_a?(Course) %>
       <div>
-        <h3 style="margin-top: 0; margin-bottom: 0;">Possible Recipients</h3>
+        <h3 style="margin-top: 0; margin-bottom: 0;"><%= t('headings.possible_recipients', %{Possible Recipients}) %></h3>
         <ul class="unstyled_list" style="margin-left: 10px; margin-bottom: 15px;">
           <li class="message_group">
-            <a href="#" class="message_all_students_link select_recipients_link email">Current Students
+            <a href="#" class="message_all_students_link select_recipients_link email"><%= t('links.current_students', %{Current Students}) %>
             </a>
           </li>
           <li class="message_group">
-            <a href="#" class="message_all_teachers_link select_recipients_link email">Current Teachers
+            <a href="#" class="message_all_teachers_link select_recipients_link email"><%= t('links.current_teachers', %{Current Teachers}) %>
             </a>
           </li>
           <li class="message_group">
-            <a href="#" class="message_all_observers_link select_recipients_link email">Current Observers
+            <a href="#" class="message_all_observers_link select_recipients_link email"><%= t('links.current_observers', %{Current Observers}) %>
             </a>
           </li>
         </ul>
       </div>
       <div class="message_groups" style="display: none;">
-        <h3 style="margin-bottom: 0;">Select a Group</h3>
+        <h3 style="margin-bottom: 0;"><%= t('headings.select_group', %{Select a Group}) %></h3>
         <ul class="unstyled_list category blank" style="margin-left: 10px; margin-bottom: 15px; display: none;">
           <li class="message_group blank" style="display: none;">
             <a href="#" class="message_group_link email select_recipients_link"><span class="group_name"></span>
@@ -213,10 +211,10 @@
     </div>
     <div class="right_side" style="float: left; width: 60%; height: 300px; overflow: auto; padding-left: 10px;">
       
-      <h3 style="margin-top: 0; float: left;">Recipients</h3>
+      <h3 style="margin-top: 0; float: left;"><%= t('headings.select_recipients', %{Recipients}) %></h3>
       <div style="float: right; margin-right: 5px;">
-        <a href="#" class="select_all_recipients_link">select all</a> | 
-        <a href="#" class="clear_recipients_link">clear all</a>
+        <a href="#" class="select_all_recipients_link"><%= t('#links.select_all', %{Select All}) %></a> | 
+        <a href="#" class="clear_recipients_link"><%= t('#links.clear_all', %{Clear All}) %></a>
       </div>
       <div class="clear"></div>
       <div style="margin-left: 10px;">
@@ -230,14 +228,12 @@
     </div>
     <div class="clear"></div>
     <div class="button-container">
-      <button type="button" class="button select_button">Add Recipients</button>
-      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+      <button type="button" class="button select_button"><%= t('buttons.add_recipients', %{Add Recipients}) %></button>
+      <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
   </div>
 <% end %>
 </div>
-<div id="context_message_recipient_not_available_dialog" title='<span class="ui-icon ui-icon-alert" style="float: left; margin-right: 0.3em; "></span> Alert:' style="display:none;">
-  Some of the original intended recipients are no longer available. <br />
-  This may be because they are no longer an active member of the course or group. 
-  They might have been deleted or un-enrolled.     
+<div id="context_message_recipient_not_available_dialog" style="display:none;">
+  <%= t 'alerts.recipients_not_available', %{Some of the original intended recipients are no longer available. %{newline} This may be because they are no longer an active member of the course or group. They might have been deleted or un-enrolled.}, :newline => raw('<br />') %>
 </div>

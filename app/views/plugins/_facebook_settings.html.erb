@@ -1,66 +1,63 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2">
-        <p>
-          You will need to create a <a href="http://www.facebook.com/developers">new app on facebook.com</a>.
-          Set the following configuration options to ensure your Facebook app
-          works correctly:
-          <ul>
-            <li><b>Web Site -- Site URL:</b> set to https://&lt; domain &gt;/</li> 
-            <li><b>Web Site -- Site Domain:</b> domain of your main Canvas site.  This must match the Site URL setting</li> 
-            <li><b>Facebook Integration -- Canvas Page:</b> make a note of whatever you choose and enter in the form below</li>
-            <li><b>Facebook Integration -- Canvas URL:</b> set to https://&lt; domain &gt;/facebook</li>
-            <li>Make sure <b>Advanced -- OAuth 2.0 for Canvas</b> is enabled</li>
-            <li>After you save your app, make a note of the App ID, API Key and App Secret</li>
-          </ul>
-          
-        </p>
-      </td>
+      <td colspan="2"><%= mt(:description, <<-TEXT, :site_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/</span>'), :canvas_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/facebook</span>'), :facebook_url => "http://www.facebook.com/developers")
+You will need to create a [new app on facebook.com](%{facebook_url}).
+Set the following configuration options to ensure your Facebook app
+works correctly:
+
+* **Web Site -- Site URL:** set to %{site_url}
+* **Web Site -- Site Domain:** domain of your main Canvas site.  This must match the Site URL setting
+* **Facebook Integration -- Canvas Page:** make a note of whatever you choose and enter in the form below
+* **Facebook Integration -- Canvas URL:** set to %{canvas_url}
+* Make sure **Advanced -- OAuth 2.0 for Canvas** is enabled
+* After you save your app, make a note of the App ID, API Key and App Secret
+TEXT
+      %></td>
     </tr>
     <tr>
       <td colspan="2" class="sub">
-        <h3>Domain Settings</h3>
+        <h3><%= t('headers.domain_settings', "Domain Settings") %></h3>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :app_id, "App ID:" %></td>
+      <td><%= f.blabel :app_id, :en => "App ID" %></td>
       <td>
         <%= f.text_field :app_id %>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :api_key, "API Key:" %></td>
+      <td><%= f.blabel :api_key, :en => "API Key" %></td>
       <td>
         <%= f.text_field :api_key %>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :secret, "App Secret:" %></td>
+      <td><%= f.blabel :secret, :en => "App Secret" %></td>
       <td>
         <%= f.text_field :secret %>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :canvas_name, "Canvas Name:" %></td>
+      <td><%= f.blabel :canvas_name, :en => "Canvas Name" %></td>
       <td>
         <%= f.text_field :canvas_name %>
-        <div class="hint">this is the path specified in "Canvas Page"</div>
+        <div class="hint"><%= t('hints.canvas_name', 'this is the path specified in "Canvas Page"') %></div>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :canvas_domain, "Canvas Domain:" %></td>
+      <td><%= f.blabel :canvas_domain, :en => "Canvas Domain" %></td>
       <td>
         <%= f.text_field :canvas_domain %>
-        <div class="hint">this is the domain specified in "Canvas URL"</div>
+        <div class="hint"><%= t('hints.canvas_domain', 'this is the domain specified in "Canvas URL"') %></div>
       </td>
     </tr>
     <tr>
       <td></td>
       <td>
         <%= f.check_box :disable_ssl %>
-        <%= f.label :disable_ssl, "Disable SSL" %>
-        <div class="hint">Use only for local testing</div>
+        <%= f.label :disable_ssl, :en => "Disable SSL" %>
+        <div class="hint"><%= t('hints.disable_ssl', "Use only for local testing") %></div>
       </td>
     </tr>
   </table>

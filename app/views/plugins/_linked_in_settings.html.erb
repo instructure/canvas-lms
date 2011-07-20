@@ -1,29 +1,26 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2">
-        <p>
-          You will need to register a <a href="https://www.linkedin.com/secure/developer">new app on LinkedIn</a>.
-          Set the following configuration options to ensure your LinkedIn integration
-          works correctly:
-          <ul>
-            <li><b>Application Type:</b> set to "Web Application"</li> 
-            <li><b>Live Status:</b> set to "Live"</li> 
-            <li><b>OAuth Redirect URL:</b> set to <span class="nobr">https://&lt; domain &gt;/oauth_success?service=linked_in</span></li> 
-            <li>After you save your app, make a note of the API Key and Secret Key</li>
-          </ul>
-          
-        </p>
-      </td>
+      <td colspan="2"><%= mt(:description, <<-TEXT, :linkedin_url => 'https://www.linkedin.com/secure/developer', :oauth_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/oauth_success?service=linked_in</span>'))
+You will need to register a [new app on LinkedIn](%{linkedin_url}).
+Set the following configuration options to ensure your LinkedIn integration
+works correctly:
+
+* **Application Type:** set to "Web Application"
+* **Live Status:** set to "Live"
+* **OAuth Redirect URL:** set to %{oauth_url}
+* After you save your app, make a note of the API Key and Secret Key
+TEXT
+      %></td>
     </tr>
     <tr>
-      <td><%= f.label :api_key, "API Key:" %></td>
+      <td><%= f.blabel :api_key, :en => "API Key" %></td>
       <td>
         <%= f.text_field :api_key %>
       </td>
     </tr>
     <tr>
-      <td><%= f.label :secret_key, "Secret Key:" %></td>
+      <td><%= f.blabel :secret_key, :en => "Secret Key" %></td>
       <td>
         <%= f.text_field :secret_key %>
       </td>

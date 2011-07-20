@@ -27,8 +27,7 @@ class CalendarEvent < ActiveRecord::Base
   
   include Workflow
   
-  adheres_to_policy
-  
+
   belongs_to :context, :polymorphic => true
   belongs_to :user
   belongs_to :cloned_item
@@ -130,7 +129,8 @@ class CalendarEvent < ActiveRecord::Base
   def to_atom(opts={})
     extend ApplicationHelper
     Atom::Entry.new do |entry|
-      entry.title     = "Calendar Event#{", " + self.context.name if opts[:include_context]}: #{self.title}"
+      entry.title     = t(:feed_item_title, "Calendar Event: %{event_title}", :event_title => self.title) unless opts[:include_context]
+      entry.title     = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", :course_or_account_name => self.context.name, :event_title => self.title) if opts[:include_context]
       entry.updated   = self.updated_at.utc
       entry.published = self.created_at.utc
       entry.links    << Atom::Link.new(:rel => 'alternate', 
@@ -222,7 +222,11 @@ class CalendarEvent < ActiveRecord::Base
     to_import = migration.to_import 'events'
     events.each do |event|
       if event['migration_id'] && (!to_import || to_import[event['migration_id']])
-        import_from_migration(event, migration.context)
+        begin
+          import_from_migration(event, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the event \"#{event[:title]}\"", $!)
+        end
       end
     end
   end
@@ -239,27 +243,27 @@ class CalendarEvent < ActiveRecord::Base
     description = ImportedHtmlConverter.convert(hash[:description] || "", context)
     if hash[:attachment_type] == 'external_url'
       url = hash[:attachment_value]
-      description += "<p><a href='#{url}'>See Related Link</a></p>" if url
+      description += "<p><a href='#{url}'>" + ERB::Util.h(t(:see_related_link, "See Related Link")) + "</a></p>" if url
     elsif hash[:attachment_type] == 'assignment'
       assignment = context.assignments.find_by_migration_id(hash[:attachment_value]) rescue nil
-      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/assignments/#{assignment.id}'>See #{assignment.title}</a></p>" if assignment
+      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/assignments/#{assignment.id}'>" + ERB::Util.h(t(:see_assignment, "See %{assignment_name}", :assignment_name => assignment.title)) + "</a></p>" if assignment
     elsif hash[:attachment_type] == 'assessment'
       quiz = context.quizzes.find_by_migration_id(hash[:attachment_value]) rescue nil
-      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/quizzes/#{quiz.id}'>See #{quiz.title}</a></p>" if quiz
+      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/quizzes/#{quiz.id}'>" + ERB::Util.h(t(:see_quiz, "See %{quiz_name}", :quiz_name => quiz.title)) + "</a></p>" if quiz
     elsif hash[:attachment_type] == 'file'
       file = context.attachments.find_by_migration_id(hash[:attachment_value]) rescue nil
-      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/files/#{file.id}/download'>See #{file.display_name}</a></p>" if file
+      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/files/#{file.id}/download'>" + ERB::Util.h(t(:see_file, "See %{file_name}", :file_name => file.display_name)) + "</a></p>" if file
     elsif hash[:attachment_type] == 'area'
      # ignored, no idea what this is
     elsif hash[:attachment_type] == 'web_link'
       link = context.external_url_hash[hash[:attachment_value]] rescue nil
       link ||= context.full_migration_hash['web_link_categories'].map{|c| c['links'] }.flatten.select{|l| l['link_id'] == hash[:attachment_value] } rescue nil
-      description += "<p><a href='#{link['url']}'>#{link['name'] || 'See Related Link'}</a></p>" if link
+      description += "<p><a href='#{link['url']}'>#{link['name'] || ERB::Util.h(t(:see_related_link, "See Related Link"))}</a></p>" if link
     elsif hash[:attachment_type] == 'media_collection'
      # ignored, no idea what this is
     elsif hash[:attachment_type] == 'topic'
       topic = context.discussion_topic.find_by_migration_id(hash[:attachment_value]) rescue nil
-      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/discussion_topics/#{topic.id}'>See #{topic.title}</a></p>" if topic
+      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/discussion_topics/#{topic.id}'>" + ERB::Util.h(t(:see_discussion_topic, "See %{discussion_topic_name}", :discussion_topic_name => topic.title)) + "</a></p>" if topic
     end
     item.description = description
     
@@ -283,13 +287,13 @@ class CalendarEvent < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
-    set { can :read }
+    can :read
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
-    set { can :read and can :create }
+    can :read and can :create
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
-    set { can :update and can :update_content and can :delete }
+    can :update and can :update_content and can :delete
     
   end
 end

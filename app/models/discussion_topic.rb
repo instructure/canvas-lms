@@ -28,8 +28,7 @@ class DiscussionTopic < ActiveRecord::Base
     :require_initial_post
 
   attr_readonly :context_id, :context_type, :user_id
-  adheres_to_policy
-  
+
   has_many :discussion_entries, :order => :created_at, :dependent => :destroy
   has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id = ? AND discussion_entries.workflow_state != ?', 0, 'deleted']
   has_one :context_module_tag, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags, :context_module_progressions]}
@@ -64,7 +63,7 @@ class DiscussionTopic < ActiveRecord::Base
   
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
-    self.title ||= t :default_title, "No Title"
+    self.title ||= t '#discussion_topic.default_title', "No Title"
     @content_changed = self.message_changed? || self.title_changed?
     if self.assignment_id != self.assignment_id_was
       @old_assignment_id = self.assignment_id_was
@@ -308,34 +307,34 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_policy do
     given { |user| self.user && self.user == user && !self.locked? }
-    set { can :update and can :reply and can :read }
+    can :update and can :reply and can :read
     
     given { |user| self.user && self.user == user }
-    set { can :read }
+    can :read
 
     given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && !self.locked? && !self.root_topic_id }
-    set { can :delete }
+    can :delete
     
     given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :read) }#
-    set {can :read}
+    can :read
     
     given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.locked? }#students.include?(user) }
-    set { can :reply and can :read }
+    can :reply and can :read
     
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) and not self.is_announcement }
-    set { can :create }
+    can :create
     
     given { |user, session| self.context.respond_to?(:allow_student_forum_attachments) && self.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
-    set { can :attach }
+    can :attach
     
     given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
-    set { can :update and can :delete and can :create and can :read and can :attach }
+    can :update and can :delete and can :create and can :read and can :attach
     
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
-    set { can :update }
+    can :update
     
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
-    set { can :delete }
+    can :delete
   end
 
   def discussion_topic_id
@@ -392,7 +391,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
-    self.user.name rescue t :default_user_name, "User Name"
+    self.user.name rescue t '#discussion_topic.default_user_name', "User Name"
   end
   
   def locked_for?(user=nil, opts={})
@@ -476,7 +475,11 @@ class DiscussionTopic < ActiveRecord::Base
     announcements.each do |event|
       if event['migration_id'] && (!to_import || to_import[event['migration_id']])
         event[:type] = 'announcement'
-        import_from_migration(event, migration.context)
+        begin
+          import_from_migration(event, migration.context)
+        rescue
+          migration.add_warning("Couldn't import the announcement \"#{event[:title]}\"", $!)
+        end
       end
     end
 
@@ -488,7 +491,11 @@ class DiscussionTopic < ActiveRecord::Base
         context ||= migration.context
         if context
           if topic['migration_id'] && (!topics_to_import || topics_to_import[topic['migration_id']])
-            import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
+            begin
+              import_from_migration(topic.merge({:topic_entries_to_import => topic_entries_to_import}), context)
+            rescue
+              migration.add_warning("Couldn't import the topic \"#{topic[:title]}\"", $!)
+            end
           end
         end
       end
@@ -508,7 +515,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.migration_id = hash[:migration_id]
     item.title = hash[:title]
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context)
-    item.message = t(:empty_message, "No message") if item.message.blank?
+    item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
     item.posted_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
     item.delayed_post_at = Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
     item.delayed_post_at ||= Canvas::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]

@@ -29,9 +29,10 @@ class CourseSection < ActiveRecord::Base
   belongs_to :enrollment_term
   belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
+  has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected', 'inactive'], :include => :user
+  has_many :users, :through => :enrollments
   has_many :course_account_associations
   
-  adheres_to_policy
   before_validation :infer_defaults, :verify_unique_sis_source_id
   validates_presence_of :course_id
   
@@ -40,10 +41,10 @@ class CourseSection < ActiveRecord::Base
 
   set_policy do
     given {|user, session| self.cached_course_grants_right?(user, session, :manage_admin_users) }
-    set { can :read and can :create and can :update and can :delete }
+    can :read and can :create and can :update and can :delete
     
     given {|user, session| self.enrollments.find_by_user_id(user.id) }
-    set { can :read }
+    can :read
   end
 
   def set_update_account_associations_if_changed
@@ -65,7 +66,7 @@ class CourseSection < ActiveRecord::Base
     existing_section = CourseSection.find_by_root_account_id_and_sis_source_id(self.root_account_id, self.sis_source_id)
     return true if !existing_section || existing_section.id == self.id 
     
-    self.errors.add(:sis_source_id, "SIS ID \"#{self.sis_source_id}\" is already in use")
+    self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
   end
   
@@ -137,12 +138,18 @@ class CourseSection < ActiveRecord::Base
     self
   end
   
-  def crosslist_to_course(course, delay_jobs = true)
+  def crosslist_to_course(course, delay_jobs = true, make_sticky = true)
     return self if self.course == course
+    save_needed = false
     unless self.nonxlist_course
-      self.nonxlist_course = self.course 
-      self.save!
+      self.nonxlist_course = self.course
+      save_needed = true
     end
+    if !self.sticky_xlist && make_sticky
+      self.sticky_xlist = true
+      save_needed = true
+    end
+    self.save! if save_needed
     self.move_to_course(course, delay_jobs)
   end
   
@@ -154,6 +161,7 @@ class CourseSection < ActiveRecord::Base
     end
     self.move_to_course(self.nonxlist_course, delay_jobs)
     self.nonxlist_course = nil
+    self.sticky_xlist = false
     self.save!
   end
   

@@ -1,18 +1,18 @@
 <% add_crumb "Migrate From Another System", context_url(@context, :context_import_migrate_url) %>
-<% content_for :page_title do %>Migrate From another System<% end %>
+<% content_for :page_title do %><%= t :page_title, "Migrate From another System" %><% end %>
 
-<h2>Migrate From another System</h2>
+<h2><%= t :page_title, "Migrate From another System" %></h2>
 <p>
-  We have integrated with other Learning Management Systems
+  <%= t :page_details, "We have integrated with other Learning Management Systems
   to provide a simple and automated migration process. If you
   see your current system in the list select that option and
   provide the requested information. We'll extract the content
   from your course, and you can then specify which parts you'd
-  like to have added to your new course.
+  like to have added to your new course." %>
 </p>
 
 <% if @pending_migrations %>
-  <p>There are previous migrations for this course: <%= link_to "View Migrations", course_import_list_path(@context) %></p>
+  <p><%= t :previous_migrations, "There are previous migrations for this course:" %> <%= link_to t('links.view_migrations', "View Migrations"), course_import_list_path(@context) %></p>
 <% end %>
 
 
@@ -20,7 +20,7 @@
   <input type="hidden" name="export_file_enabled" value="0" id="export_file_enabled"/>
   <input type="hidden" name="content_migration_id" id="content_migration_id"/>
   <select id="choose_migration_system" name="migration_settings[migration_type]" style="font-size: 1.3em; border: 2px solid #aaa;">
-    <option value="none">Choose the system you want to migrate from</option>
+    <option value="none"><%= t 'options.source_system', "Choose the system you want to migrate from" %></option>
     <%= options_for_select @select_options %>
   </select>
 
@@ -28,99 +28,98 @@
     <div id="migration_config"></div>
 
     <fieldset id="file_upload" style="display:none;">
-      <legend>Choose a <span id="upload_extension">.zip</span> file to import</legend>
+      <legend><%= t :choose_file, "Choose a %{file_extension} file to import", :file_extension => '<span id="upload_extension">.zip</span>'.html_safe %></legend>
       <input type="file" id="export_file_input" name="export_file" class="export_file_input"/>
-      <br/><span class="error zip_error ui-state-error" style="display:none; font-size: 16px">You must choose a .zip file to upload</span>
+      <br/><span class="error zip_error ui-state-error" style="display:none; font-size: 16px"><%= t 'errors.choos_file', "You must choose a .zip file to upload" %></span>
     </fieldset>
 
     <fieldset class="qti_settings">
-      <legend>Question Bank Configuration</legend>
+      <legend><%= t :question_bank_configuration, "Question Bank Configuration" %></legend>
       <%= render :partial=>'question_bank_config' %>
     </fieldset>
 
     <fieldset class="migration_part_selection">
-      <legend>Selective import</legend>
+      <legend><%= t :selective_import, "Selective import" %></legend>
       <input type="checkbox" id="import_subset"/>
-      <label for="import_subset">Choose which parts of the course to migrate</label>
+      <label for="import_subset"><%= t 'instructions.selective_import', "Choose which parts of the course to migrate" %></label>
       <ul id="import_subset_options" class="unstyled_list" style="margin: 10px 20px; font-size: 0.9em; display: none;">
         <li>
-          We'll only extract the areas you select below. Not all courses will have all these features. 
+          <%= t 'details.selective_import', "We'll only extract the areas you select below. Not all courses will have all these features.
           After we've finished extracting, you can decide exactly
-          which items from each area to import into your course.
+          which items from each area to import into your course." %>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][assignments]" id="import_only_assignments" value="1"/>
-          <label for="import_only_assignments">Assignments</label>
+          <label for="import_only_assignments"><%= t '#labels.assignments', "Assignments" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][announcements]" id="import_only_announcements" value="1"/>
-          <label for="import_only_announcements">Announcements</label>
+          <label for="import_only_announcements"><%= t '#labels.announcements', "Announcements" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][calendar_events]" id="import_only_calendar_events" value="1"/>
-          <label for="import_only_calendar_events">Calendar Events</label>
+          <label for="import_only_calendar_events"><%= t '#labels.calendar_events', "Calendar Events" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][discussions]" id="import_only_discussions" value="1"/>
-          <label for="import_only_discussions">Discussions</label>
+          <label for="import_only_discussions"><%= t '#labels.discussions', "Discussions" %></label>
         </li>
         <li>
           <input type="checkbox" name="migration_settings[only][discussion_responses]" id="import_only_discussion_responses" value="1"/>
-          <label for="import_only_discussion_responses">Discussion Responses</label>
+          <label for="import_only_discussion_responses"><%= t '#labels.discussion_responses', "Discussion Responses" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][all_files]" id="import_only_all_files" value="1"/>
-          <label for="import_only_all_files">Files</label>
+          <label for="import_only_all_files"><%= t '#labels.files', "Files" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][assessments]" id="import_only_assessments" value="1"/>
-          <label for="import_only_assessments">Quizzes and Assessments</label>
+          <label for="import_only_assessments"><%= t 'labels.quizzes', "Quizzes and Assessments" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][question_bank]" id="import_only_question_bank" value="1"/>
-          <label for="import_only_question_bank">Question Banks</label>
+          <label for="import_only_question_bank"><%= t 'labels.question_banks', "Question Banks" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][goals]" id="import_only_goals" value="1"/>
-          <label for="import_only_goals">Goals</label>
+          <label for="import_only_goals"><%= t '#labels.goals', "Goals" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][tasks]" id="import_only_tasks" value="1"/>
-          <label for="import_only_tasks">Tasks</label>
+          <label for="import_only_tasks"><%= t '#labels.tasks', "Tasks" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][groups]" id="import_only_groups" value="1"/>
-          <label for="import_only_groups">Groups</label>
+          <label for="import_only_groups"><%= t '#labels.groups', "Groups" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][rubrics]" id="import_only_rubrics" value="1"/>
-          <label for="import_only_rubrics">Rubrics</label>
+          <label for="import_only_rubrics"><%= t '#labels.rubrics', "Rubrics" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][web_links]" id="import_only_web_links" value="1"/>
-          <label for="import_only_web_links">Web Links</label>
+          <label for="import_only_web_links"><%= t '#labels.web_links', "Web Links" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][wikis]" id="import_only_wikis" value="1"/>
-          <label for="import_only_wikis">Wikis</label>
+          <label for="import_only_wikis"><%= t '#labels.wikis', "Wikis" %></label>
         </li>
         <li>
           <input type="checkbox" checked name="migration_settings[only][learning_modules]" id="import_only_learning_modules" value="1"/>
-          <label for="import_only_learning_modules">Learning Modules</label>
+          <label for="import_only_learning_modules"><%= t '#labels.learning_modules', "Learning Modules" %></label>
         </li>
       </ul>
     </fieldset>
 
     <div>
-      <button type="submit" class="button submit_button">Import Course</button>
-      <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-secondary">Cancel</a>
+      <button type="submit" class="button submit_button"><%= t 'buttons.import', "Import Course" %></button>
+      <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-secondary"><%= t '#buttons.cancel', "Cancel" %></a>
     </div>
   </div>
 <% end %>
 
 <div id="file_uploaded" style="display: none;">
-  <p><b>Thank you!</b> We'll start exporting your course, you'll get an email when it's done and you'll
-    be able to select the sections you'd like to import.</p>
+  <p><%= mt 'messages.import_started', "**Thank you!** We'll start exporting your course, you'll get an email when it's done and you'll be able to select the sections you'd like to import." %></p>
 </div>
 
 <div id="migration_configs" style="display:none;">

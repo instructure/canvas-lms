@@ -3,22 +3,20 @@
 <% end %>
 
 <% define_content :subject do %>
-  New Event - <%= asset.title %>: <%= asset.context.name %>
+  <%= t('subject', 'New Event - %{event_title}, %{course_name}', :event_title => asset.title, :course_name => asset.context.name) %>
 <% end %>
 
-There's a new event scheduled for <%= asset.context.name %> that you should be aware of:
+<%= t('body', "There's a new event scheduled for %{course_name} that you should be aware of:", :course_name => asset.context.name) %>
 
 <%= asset.title %> 
 
-<% if (asset.start_at == asset.end_at || !asset.end_at) %>
-<%= force_zone(asset.start_at).strftime("%b %d at %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
-
+<% if !asset.start_at && !asset.end_at %>
+  <%= t('no_time_set', 'No Time Set') %>
+<% elsif (asset.start_at == asset.end_at || !asset.end_at) %>
+  <%= datetime_string(force_zone(asset.start_at)) %>
 <% else %>
-from <%= force_zone(asset.start_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.start_at).strftime("%p").downcase rescue "" %> 
-
-to <%= force_zone(asset.end_at).strftime("%b %d %I:%M") rescue "No Time Set" %><%= force_zone(asset.end_at).strftime("%p").downcase rescue "" %> 
-
+  <%= t('from_to_time', 'from %{start_date_time} to %{end_date_time}', :start_date_time => datetime_string(force_zone(asset.start_at)), :end_date_time => datetime_string(force_zone(asset.end_at))) %>
 <% end %>
 
-You can see details here: 
+<%= before_label('see_details', 'You can see details here') %> 
 <%= content :link %>

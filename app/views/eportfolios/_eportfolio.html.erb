@@ -4,7 +4,10 @@
     <span class="name"><%= eportfolio.name rescue nbsp %></span>
   </a>
   <div style="padding-left: 30px;">
-    <span class="entry_count"><%= eportfolio.eportfolio_entries.length rescue 0 %></span> pages &nbsp;&nbsp;&nbsp;&nbsp;
-    last updated <span class="updated_at"><%= datetime_string(eportfolio.updated_at) rescue nbsp %></span>
+    <%= t(:entry_count, { :one => "*1* page", :other => "*%{count}* pages" },
+          :count => (eportfolio.eportfolio_entries.length rescue 0),
+          :wrapper => '<span class="entry_count">\1</span>') %>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <%= t(:updated_at, "last updated %{updated_at}", :updated_at => raw("<span class=\"updated_at\">#{datetime_string(eportfolio.updated_at) rescue nbsp}</span>")) %>
   </div>
 </li>

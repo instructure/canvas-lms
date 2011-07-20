@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= t :page_title, "Web Conferences: %{group_or_class_name}", :group_or_class_name => @context.name %><% end %>
+<% content_for :page_title do %><%= join_title t(:page_title, "Web Conferences"), @context.name %><% end %>
 
 <% jammit_js :conferences %>
 
@@ -27,7 +27,7 @@
 
 <% form_for :web_conference, :url => context_url(@context, :context_conferences_url), :html => {:id => "add_conference_form", :style => "display: none;", :class => "communication_message"} do |f| %>
   <div class="header">
-    <span class="title"><%= t :new_conference_heading, "Start a New Conference?" %></span>
+    <span class="title"><%= t :new_conference_heading, "Start a New Conference" %></span>
   </div>
   <div class="content">
     <table class="formtable" style="width: 100%;">
@@ -49,7 +49,7 @@
         <td><%= t :duration_input, "%{text_field} minutes", :text_field => f.text_field(:duration, :style => "width: 25px;", :value => "60") %></td>
       </tr><tr>
         <td colspan="2">
-          <%= f.blabel :description, "Description" %><br/>
+          <%= f.blabel :description, :en => "Description" %><br/>
           <%= f.text_area :description, :style => "display: block; margin: 0 auto; width: 90%; height: 50px;" %>
         </td>
       </tr><tr>

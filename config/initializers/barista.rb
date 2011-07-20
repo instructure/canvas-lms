@@ -1,11 +1,12 @@
 # Configure barista.
 Barista.configure do |c|
+  c.add_preamble = false
   
   # Change the root to use app/scripts
   # c.root = Rails.root.join("app", "scripts")
   
-  # Change the output root, causing Barista to compile into public/coffeescripts
-  # c.output_root = Rails.root.join("public", "coffeescripts")
+  # Change the output root, causing Barista to compile into javascripts/compiled
+  c.output_root = Rails.root+'public/javascripts/compiled'
   
   # Set the compiler
   

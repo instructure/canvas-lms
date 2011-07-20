@@ -36,11 +36,10 @@ class ContentTag < ActiveRecord::Base
 
   attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :rubric_association, :content_asset_string, :content, :title, :indent, :position, :url
   
-  adheres_to_policy
-  
+
   set_policy do
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}
-    set {can :delete }
+    can :delete
   end
   
   workflow do
@@ -132,7 +131,7 @@ class ContentTag < ActiveRecord::Base
 
   def assignment
     return self.content if self.content_type == 'Assignment'
-    return self.content.assignment rescue nil
+    return self.content.assignment if self.content.respond_to?(:assignment)
   end
   
   alias_method :old_content, :content

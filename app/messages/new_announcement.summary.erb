@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= asset.title %>: <%= asset.context.name %>
+  <%= before_label asset.title %> <%= asset.context.name %>
 <% end %>
 
 <%= strip_and_truncate(asset.message, :max_length => 500) %> 

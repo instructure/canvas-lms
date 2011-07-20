@@ -2,9 +2,9 @@
   jammit_css :login
   @headers = false
   @body_classes << "modal" if @body_classes
-  content_for :page_title, "Registration Complete"
+  content_for :page_title, t('registration_complete', "Registration Complete")
 %>
-<% js_block do %>
+<% js_block :i18n_scope => "users.registered" do %>
 <script type="text/javascript">
 $(document).ready(function() {
   var runAjax = true;
@@ -15,12 +15,12 @@ $(document).ready(function() {
     // if it doesnt work then its ok so they can try to see if they can get it to work.
     if (runAjax) {
       var $link = $(this);
-      $link.text("Re-Sending...");
+      $link.text(I18n.t("resending", "Re-Sending..."));
       $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
-        $link.text("Done! Message may take a few minutes.");
+        $link.text(I18n.t("done_resending", "Done! Message may take a few minutes."));
         runAjax = false;
       }, function(data) {
-        $link.text("Request failed. Try again.");
+        $link.text(I18n.t("failed_resending", "Request failed. Try again."));
       }); 
     }
   });
@@ -36,11 +36,10 @@ $(document).ready(function() {
   $("#play_overview_video_link").click(function(){
     $("#video_wrapper").dialog({
       width: videoWidth,
-      title: "Overview Video of Canvas"
+      title: I18n.t("overview_video", "Overview Video of Canvas")
     });
     return false;
   });
-    
   
 });
 
@@ -66,27 +65,33 @@ var google_conversion_value = 0;
 <% end %>
 <div id="modal-box">
   <div style="margin: 55px 17px 0 45px; position: relative;">
-    <h2>You're almost there...</h2>
+    <h2><%= t('almost_there', "You're almost there...") %></h2>
     <% if @user.workflow_state == 'pending_approval' %>
       <%= render :partial => 'users/pending_approval' %>
     <% else %>
-      <p>We sent an email to <%= @email_address %>. <b style="font-size: 1.1em;"> Click the link in the email to
-        finish registering</b>. If you don&#x27;t see it,
-        <a href="<%= re_send_confirmation_path(@cc.user_id, @cc.id) %>" class="re_send_confirmation_link">click
-        to re-send the email</a>, and make sure to check your spam box.</p>
+      <p><%= t('sent_email_paragraph', 
+               "We sent an email to %{email_address}. *Click the link in the email to finish registering*. If you don't see it,
+               **click to re-send the email**, and make sure to check your spam box.", 
+               :email_address => @email_address, 
+               :wrapper => {
+                       '*' => '<b style="font-size: 1.1em;">\1</b>',
+                       '**' => "<a href=\"#{re_send_confirmation_path(@cc.user_id, @cc.id)}\" class=\"re_send_confirmation_link\">\\1</a>"
+               }) %></p>
     <% end %>
     <div style="margin-top:2em">
       <a href="#" id="play_overview_video_link"><%= image_tag("play_button.png", :alt => "Play overview video") %></a>
-      <h3>While you&#x27;re waiting...</h3>
+      <h3><%= t('while_you_wait', "While you're waiting...") %></h3>
       <p>
-        We invite you to watch this brief overview of Canvas.  You may also <a href="http://www.instructure.com/images/case_study_byuh.pdf" title="download PDF" class="not_external">read about how Canvas is helping</a> to bring students in 27 countries closer to lecture halls, instructors and classmates. 
+        <%= t('invite_to_read', 
+              "We invite you to watch this brief overview of Canvas.  You may also *read about how Canvas is helping* to bring students in 27 countries closer to lecture halls, instructors and classmates.", 
+              :wrapper => '<a href="http://www.instructure.com/images/case_study_byuh.pdf" title="' + h(t('links.download_pdf', 'download PDF')) + '" class="not_external">\1</a>') %>
       </p> 
     </div>
   </div>
 </div>
 <div id="video_wrapper" style="padding:0; overflow: hidden; display:none;">
   <div id="youtube_player">
-    You need Flash player 8+ and JavaScript enabled to view this video.
+    <%= t('need_flash', 'You need Flash player 8+ and JavaScript enabled to view this video.') %>
   </div>
 </div>
 <% content_for :stylesheets do %>

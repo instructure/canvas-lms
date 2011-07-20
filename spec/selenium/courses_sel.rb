@@ -18,6 +18,49 @@ shared_examples_for "course selenium tests" do
     wizard_box.displayed?.should be_false
   end
 
+  it "should allow content export downloads" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/content_exports"
+    driver.find_element(:css, "button.submit_button").click
+    job = Delayed::Job.last(:conditions => { :tag => 'ContentExport#export_course_without_send_later' })
+    export = keep_trying_until { ContentExport.last }
+    export.export_course_without_send_later
+    new_download_link = keep_trying_until { driver.find_element(:css, "div#exports a") }
+    url = new_download_link.attribute 'href'
+    url.should match(%r{/files/\d+/download\?verifier=})
+  end
+
+  it "should correctly update the course quota" do
+    course_with_admin_logged_in
+    
+    # first try setting the quota explicitly
+    get "/courses/#{@course.id}/details"
+    form = driver.find_element(:css, "#course_form")
+    form.find_element(:css, ".edit_course_link").click
+    quota_input = form.find_element(:css, "input#course_storage_quota_mb")
+    quota_input.clear
+    quota_input.send_keys("10")
+    form.find_element(:css, 'button[type="submit"]').click
+    keep_trying_until { driver.find_element(:css, ".loading_image_holder").nil? rescue true }
+    form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
+    
+    # then try just saving it (without resetting it)
+    get "/courses/#{@course.id}/details"
+    form = driver.find_element(:css, "#course_form")
+    form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
+    form.find_element(:css, ".edit_course_link").click
+    form.find_element(:css, 'button[type="submit"]').click
+    keep_trying_until { driver.find_element(:css, ".loading_image_holder").nil? rescue true }
+    form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
+    
+    # then make sure it's right after a reload
+    get "/courses/#{@course.id}/details"
+    form = driver.find_element(:css, "#course_form")
+    form.find_element(:css, ".course_info.storage_quota_mb").text.should == "10"
+    @course.reload
+    @course.storage_quota.should == 10.megabytes
+  end
+
   it "should allow moving a student to a different section" do
     c = course :active_course => true
     users = {:plain => {}, :sis => {}}
@@ -97,7 +140,7 @@ shared_examples_for "course selenium tests" do
               edit_section_link.click
               section_label.displayed?.should be_false
               section_dropdown.displayed?.should be_true
-              section_dropdown.find_element(:css, "option[value=\"#{section.id.to_s}\"]").select
+              section_dropdown.find_element(:css, "option[value=\"#{section.id.to_s}\"]").click
 
               keep_trying_until { !section_dropdown.displayed? }
 

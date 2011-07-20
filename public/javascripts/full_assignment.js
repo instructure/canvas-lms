@@ -20,6 +20,7 @@ var wikiSidebar,
     hideFullAssignmentForm,
     addGroupCategory;
 
+I18n.scoped('full_assignment', function(I18n) {
 jQuery(function($){
   hideFullAssignmentForm = function(redirect) {
     var $assignment = $("#full_assignment");
@@ -129,7 +130,7 @@ jQuery(function($){
   }).change();
   $(".more_grading_options_link").click(function() {
     var hadClass = $(this).hasClass('hide_options');
-    $(this).toggleClass('hide_options').text(hadClass ? "more grading options" : "hide grading options");
+    $(this).toggleClass('hide_options').text(hadClass ? I18n.t('links.more_grading_options', "more grading options") : I18n.t('links.hide_grading_options', "hide grading options"));
     $(".more_grading_options").showIf(!hadClass);
     return false;
   });
@@ -148,20 +149,20 @@ jQuery(function($){
         var unlock_date = Date.parse(data.unlock_at);
         var due_date = Date.parse(data.due_at);
         if(unlock_date && due_date && unlock_date > due_date) {
-          return "The assignment should be unlocked before it's due";
+          return I18n.t('messages.unlock_before_due', "The assignment should be unlocked before it's due");
         }
       },
       'lock_at': function(value, data) {
         var lock_date = Date.parse(data.lock_at);
         var due_date = Date.parse(data.due_at);
         if(lock_date && due_date && lock_date < due_date) {
-          return "The assignment shouldn't be locked again until after the due date";
+          return I18n.t('messages.lock_after_due', "The assignment shouldn't be locked again until after the due date");
         }
       },
       '=submission_type': function(value, data) {
         if(value == "online") {
           if(!data.online_upload && !data.online_text_entry && !data.online_url && !data.media_recording) {
-            return "Please choose at least one type of online submission";
+            return I18n.t('messages.need_online_submission_type', "Please choose at least one type of online submission");
           }
         }
       }
@@ -276,14 +277,15 @@ jQuery(function($){
     event.preventDefault();
     if (!$(this).parents(".rubric").hasClass('editing')) {
       var data = $(this).parents(".criterion").getTemplateData({textValues: ['long_description', 'description']}),
+          is_learning_outcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion"),
           $dialog = $("#rubric_long_description_dialog");
       
-      $dialog.fillTemplateData({data: data});
+      $dialog.fillTemplateData({data: data, htmlValues: ( is_learning_outcome ? ['long_description'] : [] )});
       $dialog.find(".editing").hide();
       $dialog.find(".displaying").show();
       $dialog.dialog('close').dialog({
         autoOpen: false,
-        title: "Criterion Long Description",
+        title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
         width: 400
       }).dialog('open');
     }
@@ -349,4 +351,5 @@ jQuery(function($){
       $("#full_assignment_holder .more_options_link:first").click();
     }
   }, 500);
+});
 });

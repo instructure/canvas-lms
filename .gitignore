@@ -23,7 +23,6 @@ noodle*
 tmp_*
 public/files/**/*
 public/javascripts/cached/*
-public/javascripts/translations/*
 public/stylesheets/compiled/*
 public/stylesheets/compiled/**/*
 public/stylesheets/cached/*
@@ -49,4 +48,5 @@ public/*/*/*/*/*/*/*/*/*.gz
 public/assets/*
 doc/api/*
 doc/plugins/*
+public/doc/api/*
 .yardoc/*

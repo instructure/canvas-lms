@@ -1,14 +1,14 @@
-<% 
+<%
   @active_tab = 'settings'
   jammit_js :graphael
   jammit_css :statistics
-  add_crumb "Statistics"
+  add_crumb t('#crumbs.stats', "Statistics")
  %>
 
-<% content_for :page_title do %><%= @context.class.to_s %> Statistics: <%= @context.name %><% end %>
+<% content_for :page_title, join_title(t(:page_title, "Course Statistics"), @context.name) %>
 
 <div style="padding: 0 20px;" id="stats">
-<h2>Statistics for <%= @context.name %></h2>
+<h2><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h2>
 
 <% active_students = @context.participating_students.enrolled_before(@range_end).length %>
 <% inactive_students = @context.student_enrollments.before(@range_end).select{|e| e.invited? }.length %>
@@ -28,94 +28,94 @@
 %>
 <div id="reports-tabs">
   <ul>
-    <li><a href="#tab-totals">Totals</a></li>
-    <li><a href="#tab-assignments">Assignments</a></li>
-    <li><a href="#tab-students">Students</a></li>
-    <li><a href="#tab-files">File Storage</a></li>
+    <li><a href="#tab-totals"><%= t('tabs.totals', %{Totals}) %></a></li>
+    <li><a href="#tab-assignments"><%= t('tabs.assignments', %{Assignments}) %></a></li>
+    <li><a href="#tab-students"><%= t('tabs.students', %{Students}) %></a></li>
+    <li><a href="#tab-files"><%= t('tabs.files', %{File Storage}) %></a></li>
   </ul>
   <div class="stats" id="tab-totals">
-    <h3>Running Totals</h3>
+    <h3><%= t('headings.totals', %{Running Totals}) %></h3>
     <table>
       <tr>
-        <td>Discussions</td>
+        <td><%= t('discussions', %{Discussions}) %></td>
         <td><%= total_topics %></td>
       </tr><tr>
-        <td class="indent">Discussion Posts</td>
+        <td class="indent"><%= t('discussion_posts', %{Discussion Posts}) %></td>
         <td class="indent"><%= total_entries %></td>
       </tr><tr>
-        <td class="indent">New Discussions</td>
+        <td class="indent"><%= t('new_discussions', %{New Discussions}) %></td>
         <td class="indent"><%= new_topics %></td>
       </tr><tr>
-        <td class="indent">New Discussion Entries</td>
+        <td class="indent"><%= t('new_discussion_entries', %{New Discussion Entries}) %></td>
         <td class="indent"><%= new_entries %></td>
           </tr><tr>
-        <td>Assignments</td>
+        <td><%= t('assignments', %{Assignments}) %></td>
         <td><%= @context.assignments.active.before(@range_end).count %></td>
       </tr><tr>
-        <td class="indent">Assignment Groups</td>
+        <td class="indent"><%= t('assignment_groups', %{Assignment Groups}) %></td>
         <td class="indent"><%= @context.assignment_groups.active.before(@range_end).count %></td>
       </tr><tr>
-        <td class="indent">Course Rubrics</td>
+        <td class="indent"><%= t('course_rubrics', %{Course Rubrics}) %></td>
         <td class="indent"><%= rubric_associations.count %></td>
       </tr><tr>
-        <td class="indent">All Rubrics</td>
+        <td class="indent"><%= t('all_rubrics', %{All Rubrics}) %></td>
         <td class="indent"><%= @context.rubrics.active.count %></td>
       </tr><tr>
-        <td>Active Students</td>
+        <td><%= t('active_students', %{Active Students}) %></td>
         <td><%= active_students %></td>
       </tr><tr>
-        <td class="indent">Unaccepted Students</td>
+        <td class="indent"><%= t('unaccepted_students', %{Unaccepted Students}) %></td>
         <td class="indent"><%= inactive_students %></td>
       </tr><tr>
-        <td>Quizzes</td>
+        <td><%= t('quizzes', %{Quizzes}) %></td>
         <td><%= @context.quizzes.count %></td>
       </tr><tr>
-        <td class="indent">Quiz Questions</td>
+        <td class="indent"><%= t('quiz_questions', %{Quiz Questions}) %></td>
         <td class="indent"><%= @context.quizzes.before(@range_end).map{|q| (q.quiz_data || []).length}.sum %></td>
       </tr><tr>
-        <td class="indent">Quiz Submissions</td>
+        <td class="indent"><%= t('quiz_submissions', %{Quiz Submissions}) %></td>
         <td class="indent"><%= QuizSubmission.scoped(:conditions => {:quiz_id => @context.quizzes.before(@range_end).map(&:id)}).count %></td>
       </tr>
     </table>
   </div>
   <div class="stats" id="tab-assignments">
-    <h3>Assignments Usage Report</h3>
+    <h3><%= t('headings.assignments', %{Assignments Usage Report}) %></h3>
     <table>
       <thead><tr>
-        <th>Submission Type</th>
-        <th># Assignments</th>
-        <th># Submissions</th>
+        <th><%= t('submission_type', %{Submission Type}) %></th>
+        <th><%= t('num_assignments', %{# Assignments}) %></th>
+        <th><%= t('num_submissions', %{# Submissions}) %></th>
       </tr>
       </thead>
       <tfoot>
       <tr>
-        <th>New</th>
+        <th><%= t('new', %{New}) %></th>
         <th><%= new_assignments %></th>
         <th><%= new_submissions %></th>
       </tr><tr>
-        <th>Any</th>
+        <th><%= t('any', %{Any}) %></th>
         <th><%= total_assignments %></th>
         <th><%= total_submissions %></th>
       </tr></tfoot>
       <tbody>
       <tr>
-        <td>File Upload</td>
+        <td><%= t('file_upload', %{File Upload}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_upload/) }.length %></td>
         <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'online_upload' }).count %></td>
       </tr><tr>
-        <td>Text Entry</td>
+        <td><%= t('text_entry', %{Text Entry}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_text_entry/) }.length %></td>
         <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'online_text_entry' }).count %></td>
       </tr><tr>
-        <td>Website URL</td>
+        <td><%= t('website_url', %{Website URL}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_url/) }.length %></td>
         <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'online_url' }).count %></td>
       </tr><tr>
-        <td>Quiz</td>
+        <td><%= t('quiz', %{Quiz}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/online_quiz/) }.length %></td>
         <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'online_quiz' }).count %></td>
       </tr><tr>
-        <td>Discussion Topic</td>
+        <td><%= t('discussion_topic', %{Discussion Topic}) %></td>
         <td><%= @context.assignments.active.before(@range_end).select{|a| a.submission_types.match(/discussion_topic/) }.length %></td>
         <td><%= @context.submissions.before(@range_end).scoped(:conditions => {:submission_type => 'discussion_topic' }).count %></td>
       </tr>
@@ -123,42 +123,42 @@
     </table>
   </div>
   <div id="tab-students">
-    <h3>Recently Logged-In Users</h3>
+    <h3><%= t('headings.students', %{Recently Logged-In Users}) %></h3>
     <ul class="item_list">
       <% @recently_logged_students.each do |user| %>
         <li>
           <a href="<%= user_path(user.id) %>" class="header"><%= user.name %></a>
-          <div class="sub_header">last logged in <%= datetime_string(user.pseudonyms.map{|p| [p.current_login_at, p.last_login_at]}.flatten.compact.max) %></div>
+          <div class="sub_header"><%= t 'student_last_logged_in', "last logged in %{time}", :time => datetime_string(user.pseudonyms.map{|p| [p.current_login_at, p.last_login_at]}.flatten.compact.max) %></div>
         </li>
       <% end %>
       <% if @recently_logged_students.empty? %>
-        <li>None to show</li>
+        <li><%= t('none_to_show', %{None to show}) %></li>
       <% end %>
     </ul>
   </div>
   <div class="stats" id="tab-files">
-    <h3>File Storage</h3>
+    <h3><%= t('headings.files', %{File Storage}) %></h3>
     <table>
       <tr>
-        <td>Allotted Storage:</td>
+        <td><%= before_label('allotted_storage', %{Allotted Storage}) %></td>
         <td style="padding-left: 10px; text-align: right;"><%= number_to_human_size(@context.quota.megabytes) %></td>
         <td></td>
       </tr>
       <tr>
-        <td>Uploaded Files:</td>
+        <td><%= before_label('uploaded_files', %{Uploaded Files}) %></td>
         <td style="padding-left: 10px; text-align: right;"><%= number_to_human_size(@files_size) %></td>
-        <td style="padding-left: 10px; text-align: right;"><%= pluralize(number_with_delimiter(@file_count), 'file') %></td>
+        <td style="padding-left: 10px; text-align: right;"><%= t 'file_count', 'file', :count => @file_count %></td>
       </tr>
       <tr>
-        <td>Media Files:</td>
+        <td><%= before_label('media_files', %{Media Files}) %></td>
         <td style="padding-left: 10px; text-align: right;"><%= number_to_human_size(@media_files_size) %></td>
-        <td style="padding-left: 10px; text-align: right;"><%= pluralize(number_with_delimiter(@media_file_count), 'file') %></td>
+        <td style="padding-left: 10px; text-align: right;"><%= t 'file_count', 'file', :count => @media_file_count %></td>
       </tr>
     </table>
   </div>
 </div>
 <% if page_views_enabled? -%>
-<h3 class='h-margin-top'>Page views over time</h3>
+<h3 class='h-margin-top'><%= t('headings.page_views', %{Page views over time}) %></h3>
 <div id='page_views_by_day' style='width: 600px; height: 240px;'></div>
 
 <% js_block do %>
@@ -171,7 +171,7 @@
     google.setOnLoadCallback(function(){
       var data = new google.visualization.DataTable();
       data.addColumn('date', 'Date');
-      data.addColumn('number', 'Page Views');
+      data.addColumn('number', <%= raw t('page_views', %{'Page Views'}).to_json %>);
       data.addColumn('string', 'title1');
       data.addColumn('string', 'text1');
       

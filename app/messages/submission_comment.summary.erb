@@ -3,8 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  Submission Comment: <%= asset.submission.user.short_name %>, <%= asset.submission.assignment.title %>, <%= asset.submission.assignment.context.name %>
+  <%= t :subject, "Submission Comment: %{user}, %{assignment}, %{context}", :user => asset.submission.user.short_name, :assignment => asset.submission.assignment.title, :context => asset.submission.assignment.context.name %>
 <% end %>
 
-<%= asset.author_name || "Someone" %> just made a new comment on the submission for <%= asset.submission.user.short_name %>
-for <%= asset.submission.assignment.title %>.  
+<%= t :body, "%{author} just made a new comment on the submission for %{user} for %{assignment}.", :author => (asset.author_name || t(:someone, "Someone")), :user => asset.submission.user.short_name, :assignment => asset.submission.assignment.title %>

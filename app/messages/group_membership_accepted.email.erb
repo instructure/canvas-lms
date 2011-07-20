@@ -2,12 +2,15 @@
   http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups/<%= asset.group_id %>
 <% end %>
 <% define_content :subject do %>
-  Group Membership Accepted: <%= asset.group.name %>
+  <%= t('subject', 'Group Membership Accepted: %{group_name}', :group_name => asset.group.name) %>
 <% end %>
 
-Group Request Accepted: <%= asset.group.name %>
+<%= t('group_request_accepted', 'Group Request Accepted: %{group_name}', :group_name => asset.group.name) %>
+<% if asset.group.context.class.to_s == 'Account' %>
+<%= t('account_group', "Your request to join the group %{group_name} for the account %{account_name} has been accepted.", :group_name => asset.group.name, :account_name => asset.group.context.name) %>
+<% elsif asset.group.context.class.to_s == 'Course' %>
+<%= t('course_group', "Your request to join the group %{group_name} for the course %{course_name} has been accepted.", :group_name => asset.group.name, :course_name => asset.group.context.name) %>
+<% end %>
 
-You're request to join the group <%= asset.group.name %> for the <%= asset.group.context.class.to_s.downcase %> <%= asset.group.context.name %> has been accepted.
-
-You can check out the group by clicking the link below:
+<%= before_label('click_below', 'You can check out the group by clicking the link below') %>
 <%= content :link %>

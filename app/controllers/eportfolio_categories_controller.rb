@@ -28,13 +28,9 @@ class EportfolioCategoriesController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       category_names = @portfolio.eportfolio_categories.map{|c| c.name}
       @category = @portfolio.eportfolio_categories.build(params[:eportfolio_category])
-  #    if category_names.include?(@category.name)
-  #      @category.errors.add_to_base("Category names must be unique");
-  #    end
       respond_to do |format|
-        if @category.save #@category.errors.empty? && @category.save
-          @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :name => "New Page", :allow_comments => true, :show_comments => :true)
-          #@portfolio.eportfolio_categories << @category
+        if @category.save
+          @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :name => t(:default_name, "New Page"), :allow_comments => true, :show_comments => :true)
           format.html { redirect_to eportfolio_category_url(@portfolio, @category) }
           format.json { render :json => @category.to_json }
         else
@@ -72,13 +68,13 @@ class EportfolioCategoriesController < ApplicationController
           @category = @portfolio.eportfolio_categories.find_by_slug(params[:category_name]) or raise ActiveRecord::RecordNotFound
         end
         @page = @category.eportfolio_entries.first
-        @page ||= @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :allow_comments => true, :show_comments => true, :name => "New Page") if @portfolio.grants_right?(@current_user, session, :update)
+        @page ||= @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :allow_comments => true, :show_comments => true, :name => t(:default_name, "New Page")) if @portfolio.grants_right?(@current_user, session, :update)
         raise ActiveRecord::RecordNotFound if !@page
         eportfolio_page_attributes
         render :template => "eportfolios/show"
       end
     rescue ActiveRecord::RecordNotFound
-      flash[:notice] = "Couldn't find that page"
+      flash[:notice] = t('errors.missing_page', "Couldn't find that page")
       redirect_to eportfolio_url(@portfolio.id)
     end
   end

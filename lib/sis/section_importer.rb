@@ -102,15 +102,12 @@ module SIS
           end
           
           begin
-            unless row['start_date'].blank?
-              section.start_at = DateTime.parse(row['start_date'])
-            end
-            unless row['end_date'].blank?
-              section.end_at = DateTime.parse(row['end_date'])
-            end
+            section.start_at = row['start_date'].blank? ? nil : DateTime.parse(row['start_date'])
+            section.end_at = row['end_date'].blank? ? nil : DateTime.parse(row['end_date'])
           rescue
             add_warning(csv, "Bad date format for section #{row['section_id']}")
           end
+          section.restrict_enrollments_to_section_dates = (section.start_at.present? || section.end_at.present?)
 
           if section.changed?
             section.sis_batch_id = @batch.id if @batch

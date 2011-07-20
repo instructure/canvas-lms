@@ -2,7 +2,7 @@
   @active_tab = "settings"
   add_crumb t(:settings_crumb, "Settings")
   jammit_js :account_settings
-  jammit_css :account_settings
+  jammit_css :account_settings, :reports
   content_for :page_title, t(:page_title, "Account Settings")
 %>
 <% js_block do %><%= javascript_include_tag "tinymce/jscripts/tiny_mce/tiny_mce.js" %><% end %>
@@ -67,8 +67,18 @@
               <td>
                 <%= f.blabel :default_storage_quota, :en => "Default File Quota" %>
               </td>
-              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota, :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
+              <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota_mb, :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
             </tr>
+            <% if available_locales.size > 1 %>
+            <tr>
+              <td><%= f.blabel :default_locale, :default_language, :en => "Default Language" %></td>
+              <td>
+                <% no_language = t(:no_language_preference, "Not set (defaults to %{language})", :language => available_locales[infer_locale(:context => @context.parent_account)]) %>
+                <%= f.select :default_locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.default_locale %>
+                <p style="font-size: 0.9em;"><%= t(:default_language_description, "This will override any browser/OS language settings. Preferred languages can still be set at the course/user level.") %></p>
+              </td>
+            </tr>
+            <% end %>
             <% if @account.root_account_id == nil %>
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>
@@ -161,11 +171,11 @@
           <% end %>
           <div>
             <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
-            <label for="enable_equella">Equella</label>
+            <label for="enable_equella"><%= t 'labels.equella', 'Equella' %></label>
           </div>
           <div>
             <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
-            <label for="turnitin">Turnitin</label>
+            <label for="turnitin"><%= t 'labels.turnitin', 'Turnitin' %></label>
           </div>
         </fieldset>
 
@@ -191,10 +201,10 @@
           <% f.fields_for :settings do |settings| %>
             <table class="formtable">
               <tr>
-                <td style="vertical-align: top;"><%= settings.label :equella_endpoint, "Equella Endpoint" %></td>
+                <td style="vertical-align: top;"><%= settings.label :equella_endpoint, :en => "Equella Endpoint" %></td>
                 <td>
                   <%= settings.text_field :equella_endpoint, :value => @account.settings[:equella_endpoint] %>
-                  <div style="font-size: 0.9em;"><%= t(:equall_endpoint_help, "This is the URL to your equella service.  It will probably look something like \"http://oer.equella.com/signon.do\".") %></div>
+                  <div style="font-size: 0.9em;"><%= t(:equall_endpoint_help, "This is the URL to your equella service.  It will probably look something like \"%{sample_url}\".", :sample_url => "http://oer.equella.com/signon.do") %></div>
                 </td>
               </tr>
               <tr>
@@ -266,7 +276,7 @@
                   "(namely those using an iPad/iPhone) do not have Flash Player installed, that preview " +
                   "will not work.  By leaving Google Docs Previews enabled, when a browser does not have " +
                   "Flash enabled, or if Scribd is not enabled, it will use preview powered by Google Docs. " +
-                  "Using this service is subject to Google's viewer [terms of service](https://docs.google.com/viewer/TOS)") %>
+                  "Using this service is subject to Google's viewer [terms of service](%{terms_url})", :terms_url => "https://docs.google.com/viewer/TOS") %>
               </div>
             </div>
           </fieldset>
@@ -404,41 +414,72 @@
   <% end %>
   <% if !@available_reports.blank? %>
     <div id="tab-reports">
-      <% @available_reports.each do |report, details|
-         title = details[:title] || details
-         description = details[:description]
-         description_partial = details[:description_partial]
-         description_partial = report + '_description' if description_partial == true
-         parameters_partial = details[:parameters_partial]
-         parameters_partial = report + '_parameters' if parameters_partial == true
-         last_run = @last_reports[report]
-      %>
-        <div id="<%= report %>" style="margin-bottom: 10px;">
-          <h3 style="margin-bottom: 3px;"><%= title %></h3>
-          <% if description || description_partial %>
-            <a href="#" class="report_description_link"><%= t(:report_description_link, "Description...") %></a><br />
-            <div class="report_description">
-              <%= render :partial => description_partial if description_partial %>
-              <%= description unless description_partial %>
-            </div>
-          <% end %>
-          <% if last_run %>
-              <%= t(:report_last_run_at, "Last Run: %{last_run_at}", :last_run_at => datetime_string(last_run.created_at)) %><br />
-              <a href="<%= "/accounts/#{last_run.account.id}/files/#{last_run.attachment.id}/download" %>">
-              <%= t(:report_download_link, "Download last version") %></a>
-          <% else %>
-              <%= t(:report_never_run, "Last Run: Never") %>
-          <% end %>
-          <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
-            <input type="hidden" name="report_type" value="<%= report %>" />
-            <span class="running_report_message" style="<%= hidden %>"><%= t(:report_running_message, "The report is running. You'll receive an email when it is done.") %></span>
-            <div class="report_parameters">
-              <%= render :partial => parameters_partial if parameters_partial %>
-            </div>
-            <a href="#" id="run_<%= report %>" class="run_report_link"><%= t(:run_report_link, "Run this report now") %></a><br/>
-          </form>
-        </div>
-      <% end %>
+      <table class="reports">
+        <tr class="reports">
+          <th class="reports"><%= t 'headers.report_name', 'Name' %></th>
+          <th class="reports"><%= t 'headers.report_last_run', 'Last Run' %></th>
+          <th class="reports"></th>
+        </tr>
+        <% @available_reports.each do |report, details|
+           title = details[:title] || details
+           description = details[:description]
+           description_partial = details[:description_partial]
+           description_partial = report + '_description' if description_partial == true
+           parameters_partial = details[:parameters_partial]
+           parameters_partial = report + '_parameters' if parameters_partial == true
+           last_complete = @last_complete_reports[report]
+           last_report = @last_reports[report]
+           in_progress = last_report && last_report.in_progress?
+        %>
+          <tr id="<%= report %>" class="reports">
+            <td class="title reports">
+              <span class="title"><%= title %></span>
+              <% if description || description_partial %>
+                <a href="#" class="open_report_description_link"><%= image_tag "help.png"%></a>
+                <div style="display: none" class="report_description">
+                  <%= description_partial ? render(:partial => description_partial) : description %>
+                </div>
+              <% end %>
+            </td>
+            <td class="last-run reports">
+              <% if last_complete %>
+                <%= datetime_string(last_complete.created_at) %>
+                <%= link_to image_tag("download.png"), context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+              <% else %>
+                <%= t 'report_last_run_never', 'Never' %>
+              <% end %>
+            </td>
+            <td class="action reports">
+              <% if parameters_partial %>
+                <div style="display: none">
+                  <div class="report_dialog">
+                    <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
+                      <div class="report_parameters">
+                        <%= render :partial => parameters_partial if parameters_partial %>
+                      </div>
+                      <br />
+                      <input type="hidden" name="report_type" value="<%= report %>" />
+                      <a href="#" id="run_<%= report %>" class="button run_report_link"><%= t 'links.run_report', 'Run Report' %></a><br/>
+                    </form>
+                  </div>
+                </div>
+                <span class="running_report_message" style="<%= hidden unless in_progress %>">
+                  <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
+                </span>
+                <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="button configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
+              <% else %>
+                <form id="<%= report %>_form" class="run_report_form" action="<%= account_run_report_path %>">
+                  <input type="hidden" name="report_type" value="<%= report %>" />
+                  <span class="running_report_message" style="<%= hidden unless in_progress %>">
+                    <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
+                  </span>
+                  <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="button run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+                </form>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) %>

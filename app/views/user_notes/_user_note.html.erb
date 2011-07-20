@@ -7,10 +7,10 @@
     <div class="post_date">
       <span class="created_at time_ago_date"><%= datetime_string(user_note.try_rescue(:created_at)) || nbsp %></span>
       <% if user_note.new_record? %>
-        <a href="#" class="delete_user_note_link delete_link no-hover" title="Delete this entry"><%= image_tag "delete.png" %></a>
+        <a href="#" class="delete_user_note_link delete_link no-hover" title="<%= t 'links.delete', "Delete this entry" %>"><%= image_tag "delete.png" %></a>
       <% else %>
         <% if can_do(user_note, @current_user, :delete) %>
-          <a href="<%= user_user_note_path(user_note.user, user_note) %>" class="delete_user_note_link delete_link no-hover" title="Delete this entry"><%= image_tag "delete.png" %></a>
+          <a href="<%= user_user_note_path(user_note.user, user_note) %>" class="delete_user_note_link delete_link no-hover" title="<%= t 'links.delete', "Delete this entry" %>"><%= image_tag "delete.png" %></a>
         <% else %>
           &nbsp;
         <% end %>
@@ -18,7 +18,7 @@
     </div>
     <div class="header_title">
       <div class="title subject">
-        <%= user_note.try_rescue(:title) || "No Title" %>
+        <%= user_note.try_rescue(:title) || t(:no_title, "No Title") %>
       </div>
       <div class="sub_title creator_name">
         <%= user_note.creator.try_rescue(:name) || nbsp %>

@@ -31,7 +31,23 @@
 }
 </style>
 <% end %>
-<% js_block do %>
+<%# set up separately scoped error checker to match model scope; this is way
+    fragile. It's just the list of possible "already been activated" errors
+    from the CommunicationChannel model. if one is added there, it needs to be
+    added here as well. %>
+<% js_block :i18n_scope => 'communication_channel.errors' do %>
+<script>
+var alreadyActivatedPattern = new RegExp(
+  I18n.t('duplicate_email', "The email address %{email} has already been activated for another account", {'email': '.*'}) + '|' +
+  I18n.t('duplicate_sms', "The SMS address %{email} has already been activated for another account", {'email': '.*'}) + '|' +
+  I18n.t('duplicate_facebook', "The Facebook account %{email} has already been activated for another account", {'email': '.*'}) + '|' +
+  I18n.t('duplicate_twitter', "The Twitter handle %{handle} has already been activated for another account", {'handle': '.*'}) + '|' +
+  I18n.t('duplicate', "The address %{address} has already been activated for another account", {'address': '.*'}));
+window.isAlreadyActivatedError = function(message) { return message.match(alreadyActivatedPattern); };
+</script>
+<% end %>
+
+<% js_block :i18n_scope => 'profile._ways_to_contact' do %>
 <script>
 $(document).ready(function() {
   $("#communication_channels").tabs();
@@ -47,12 +63,12 @@ $(document).ready(function() {
   });
   $(".channel_list tr").hover(function() {
     if($(this).hasClass('unconfirmed')) {
-      var channel_type = "contact";
+      var title = I18n.t('titles.contact_not_confirmed', 'This contact has not been confirmed.  Click the address for more details');
       if($(this).closest(".email_channels").length > 0) {
-        channel_type = "email";
+        title = I18n.t('titles.email_not_confirmed', 'This email has not been confirmed.  Click the address for more details');
       }
-      $(this).attr('title', 'This ' + channel_type + ' has not been confirmed.  Click the address for more details');
-      $(this).find("a.path").parent().attr('title', 'This ' + channel_type + ' has not been confirmed.  Click for more details');
+      $(this).attr('title', title);
+      $(this).find("a.path").parent().attr('title', title);
     }
   }, function() {
     $(this).attr('title', '');
@@ -62,7 +78,7 @@ $(document).ready(function() {
     event.preventDefault();
     var view = "email";
     $("#communication_channels").show().dialog('close').dialog({
-      title: "Register Communication",
+      title: I18n.t('titles.register_communication', "Register Communication"),
       width: 430,
       resizable: false,
       modal: true,
@@ -104,7 +120,7 @@ $(document).ready(function() {
       var $channel = null;
       if(path) {
         $channel = $list.find(".channel.blank").clone(true).removeClass('blank');
-        $channel.find(".path").attr('title', "Unconfirmed.  Click to confirm");
+        $channel.find(".path").attr('title', I18n.t('titles.unconfirmed_click_to_confirm', "Unconfirmed.  Click to confirm"));
         $channel.fillTemplateData({
           data: {path: path}
         });
@@ -137,7 +153,6 @@ $(document).ready(function() {
         }
         $(this).after($select.clone(true).val(val)).remove();
       });
-      //$(".email_select or .sms_select")
       $channel.fillTemplateData({
         data: channel,
         id: 'channel_' + channel.id,
@@ -154,7 +169,7 @@ $(document).ready(function() {
       if(data && data.path) {
         for(var idx in data.path) {
           var error = data.path[idx];
-          if(error && error.message.match(/has already been activated for another account/)) {
+          if(error && isAlreadyActivatedError(error.message)) {
             var email = $(this).data('email');
             $("#claim_email_address_dialog")
               .find(":text").val(email || "").end()
@@ -162,16 +177,11 @@ $(document).ready(function() {
             $("#claim_email_address_dialog").dialog('close').dialog({
               autoOpen: false,
               width: 400,
-              title: "Email Address Already Taken"
+              title: I18n.t('titles.email_address_already_taken', "Email Address Already Taken")
             }).dialog('open');
-            // var message = error.message + "<br/><a href='#' class='email_address_taken_learn_more' style='font-size: 0.8em;'>learn more</a>";
-            // $channel.parents(".channel_list").errorBox(message);
             errored = true;
           }
         }
-      }
-      if(!errored) {
-        // $channel.parents(".channel_list").formErrors(data); //.errorBox(message); //formErrors(data);
       }
       $channel.remove();
     }
@@ -202,9 +212,9 @@ $(document).ready(function() {
     event.preventDefault();
     var $channel = $(this).parents(".channel");
     if($channel.hasClass('unconfirmed')) {
-      var type = "email address", type_proper = "Email Address";
+      var type = "email address", confirm_title = I18n.t('titles.confirm_email_address', "Confirm Email Address");
       if($(this).parents(".channel_list").hasClass('other_channels')) {
-        type = "sms number", type_proper = "SMS Number";
+        type = "sms number", confirm_title = I18n.t('titles.confirm_sms_number', "Confirm SMS Number");
       }
       var $box = $("#confirm_communication_channel");
       if($channel.parents(".email_channels").length > 0) {
@@ -228,11 +238,11 @@ $(document).ready(function() {
       url = $.replaceTags(url, "pseudonym_id", data.pseudonym_id);
       url = $.replaceTags(url, "user_id", data.user_id);
       $box.find(".re_send_confirmation_link").attr('href', url)
-        .text("Re-Send Confirmation");
+        .text(I18n.t('links.resend_confirmation', "Re-Send Confirmation"));
       $box.fillFormData(data);
       $box.show().dialog('close').dialog({
         autoOpen: false,
-        title: "Confirm " + type_proper,
+        title: confirm_title,
         width: 350,
         open: function() {
           $(this).find(":text:first").focus().select();
@@ -249,7 +259,7 @@ $(document).ready(function() {
       $(this).attr('action', url);
     },
     beforeSubmit: function(data) {
-      $(this).find(".status_message").text("Confirming...").css('visibility', 'visible');
+      $(this).find(".status_message").text(I18n.t('confirming_contact', "Confirming...")).css('visibility', 'visible');
     },
     success: function(data) {
       $(this).find(".status_message").css('visibility', 'hidden');
@@ -257,10 +267,10 @@ $(document).ready(function() {
       $("#channel_" + data.communication_channel.id).removeClass('unconfirmed');
       $(".channel.pseudonym_" + pseudonym_id).removeClass('unconfirmed');
       $("#confirm_communication_channel").dialog('close');
-      $.flashMessage("Contact successfully confirmed!");
+      $.flashMessage(I18n.t('notices.contact_confirmed', "Contact successfully confirmed!"));
     },
     error: function(data) {
-      $(this).find(".status_message").text("Confirmation failed.  Please try again.");
+      $(this).find(".status_message").text(I18n.t('errors.confirmation_failed', "Confirmation failed.  Please try again."));
     }
   });
   $(".channel_list .channel .default_link").click(function(event) {
@@ -279,11 +289,11 @@ $(document).ready(function() {
   $(".dialog .re_send_confirmation_link").click(function(event) {
     event.preventDefault();
     var $link = $(this);
-    $link.text("Re-Sending...");
+    $link.text(I18n.t('links.resending_confirmation', "Re-Sending..."));
     $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
-      $link.text("Done! Message may take a few minutes.");
+      $link.text(I18n.t('links.resent_confirmation', "Done! Message may take a few minutes."));
     }, function(data) {
-      $link.text("Request failed. Try again.");
+      $link.text(I18n.t('links.resend_confirmation_failed', "Request failed. Try again."));
     });
   });
   $("#communication_channels .cancel_button").click(function(event) {
@@ -295,27 +305,27 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<h2>Ways to Contact</h2>
+<h2><%= t('headers.ways_to_contact', "Ways to Contact") %></h2>
 <div class="rs-margin-lr">
 <table class="<%= 'single' if @email_channels.length <= 1 %> summary channel_list email_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
   <thead>
     <tr>
       <th style="padding: 0;">&nbsp;</th>
-      <th>Email Addresses</th>
+      <th><%= t('headers.email_addresses', "Email Addresses") %></th>
       <th style="padding: 0;" class="hidden_for_single">&nbsp;</th>
     </tr>
   </thead>
   <% @email_channels.each do |c| %>
     <tr class="channel <%= "default" if c.position && c.position <= 1 %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
       <td style="padding: 0; text-align: center;">
-        <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => "Default email address" %></a>
+        <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
       </td>
       <td><div style="overflow: hidden; position: relative;">&nbsp;
       <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="<%=h c.path %>">
         <a href="#" class="path"><%= c.path %></a>
       </div></div></td>
       <td style="padding: 0; text-align: center;" class="hidden_for_single">
-        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => "Remove email address" %></a>
+        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => t('titles.remove_email_address', "Remove email address") %></a>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
         <span class="channel_id" style="display: none;"><%= c.id %></span>
         <span class="user_id" style="display: none;"><%= c.user_id %></span>
@@ -324,7 +334,7 @@ $(document).ready(function() {
   <% end %>
   <tr class="channel blank unconfirmed" style="display: none;">
     <td style="padding: 0; text-align: center;">
-      <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => "Default email address" %></a>
+      <a href="<%= profile_url %>" class="default_link no-hover"><%= image_tag "star.png", :title => t('titles.default_email_address', "Default email address") %></a>
     </td>
     <td><div style="overflow: hidden; position: relative;">&nbsp;
     <div style="position: absolute; top: 0; left: 0; font-size: 0.8em;" title="">
@@ -339,15 +349,15 @@ $(document).ready(function() {
   </tr>
   <tr>
     <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_email_link add">Add Email Address</a>
+      <a href="#" class="add_email_link add"><%= t('links.add_email_address', "Add Email Address") %></a>
     </td>
   </tr>
 </table>
 <table class="summary channel_list other_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
   <thead>
     <tr>
-      <th>Other Contacts</th>
-      <th colspan='2'>Type</th>
+      <th><%= t('headers.other_contact', "Other Contacts") %></th>
+      <th colspan='2'><%= t('headers.contact_type', "Type") %></th>
     </tr>
   </thead>
   <tbody style="font-size: 0.8em">
@@ -356,7 +366,7 @@ $(document).ready(function() {
       <td><a href="#" class="path"><%= c.path_description %></a></td>
       <td><%= c.path_type %></td>
       <td style="padding: 0; text-align: center;">
-        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => "Remove email address", :style => (c.first?) ? "display: none;" : "" %></a>
+        <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><%= image_tag "delete.png", :title => t('titles.remove_email_address', "Remove email address"), :style => (c.first?) ? "display: none;" : "" %></a>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
         <span class="channel_id" style="display: none;"><%= c.id %></span>
         <span class="user_id" style="display: none;"><%= c.user_id %></span>
@@ -365,7 +375,7 @@ $(document).ready(function() {
   <% end %>
   <tr class="channel blank unconfirmed" style="display: none;">
     <td><a href="#" class="path">&nbsp;</a></td>
-    <td>sms</td>
+    <td><%= t('contact_types.sms', "sms") %></td>
     <td style="padding: 0; text-align: center;">
       <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><%= image_tag "delete.png" %></a>
       <span class="pseudonym_id" style="display: none;">&nbsp;</span>
@@ -377,7 +387,7 @@ $(document).ready(function() {
   <tfoot>
   <tr>
     <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_contact_link add"> Add Contact Method</a>
+      <a href="#" class="add_contact_link add"> <%= t('links.add_contact_method', "Add Contact Method") %></a>
     </td>
   </tr>
   </tfoot>
@@ -385,23 +395,23 @@ $(document).ready(function() {
 </div>
 <div id="communication_channels" style="display: none;">
 <ul>
-  <li><a href="#register_email_address">Email</a></li>
-  <li><a href="#register_sms_number">Text (SMS)</a></li>
+  <li><a href="#register_email_address"><%= t('links.email', "Email") %></a></li>
+  <li><a href="#register_sms_number"><%= t('links.text_sms', "Text (SMS)") %></a></li>
 </ul>
 <% form_tag communication_channels_url, {:id => "register_email_address"} do %>
 <input type="hidden" name="path_type" value="email"/>
 <table>
   <tr>
-    <td style="white-space: nowrap"><%= label :pseudonym, :unique_id, "Email Address:" %></td>
+    <td style="white-space: nowrap"><%= label :pseudonym, :unique_id, before_label(:email_address, "Email Address") %></td>
     <td><%= text_field :pseudonym, :unique_id %></td>
   </tr><tr>
     <td colspan="2">
       <input type="checkbox" id="build_pseudonym_for_email" name="build_pseudonym" value="1"/>
-      <label for="build_pseudonym_for_email">I want to log in to Canvas using this email address</label>
+      <label for="build_pseudonym_for_email"><%= t('labels.enable_login_for_email', "I want to log in to Canvas using this email address") %></label>
     </td>
   </tr><tr>
     <td colspan="2">
-      <button type="submit" class="button">Register Email</button>
+      <button type="submit" class="button"><%= t('buttons.register_email', "Register Email") %></button>
     </td>
   </tr>
 </table>
@@ -410,90 +420,95 @@ $(document).ready(function() {
 <input type="hidden" name="path_type" value="sms"/>
 <table>
   <tr>
-    <td style="white-space: nowrap; vertical-align: top;">Cell Number:</td>
+    <td style="white-space: nowrap; vertical-align: top;"><%= before_label(:cell_number, "Cell Number") %></td>
     <td>
       <input type="text" class="user_selected sms_number"/><br/>
-      <span style="font-size: 0.8em; color: #a44" class="should_be_10_digits">should be 10-digit number</span>
+      <span style="font-size: 0.8em; color: #a44" class="should_be_10_digits"><%= t('validations.should_be_10_digits', "should be 10-digit number") %></span>
     </td>
   </tr><tr>
-    <td>Carrier:</td>
+    <td><%= before_label(:carrier, "Carrier") %></td>
     <td>
       <select class="user_selected carrier">
-        <option value="other">[Select Carrier]</option>
-        <option value="#@txt.att.net">AT&amp;T</option>
-        <option value="#@message.alltel.com">Alltel</option>
-        <option value="#@myboostmobile.com">Boost</option>
-        <option value="#@cingularme.com">Cingular</option>
-        <option value="#@mobile.celloneusa.com">CellularOne</option>
-        <option value="#@sms.mycricket.com">Cricket</option>
-        <option value="#@messaging.nextel.com">Nextel</option>
-        <option value="#@messaging.sprintpcs.com">Sprint PCS</option>
-        <option value="#@tmomail.net">T-Mobile</option>
-        <option value="#@vtext.com">Verizon</option>
-        <option value="#@vmobile.com">Virgin Mobile</option>
-        <option value="other">Other Carrier</option>
+        <option value="other"><%= t(:default_carrier_option, "[Select Carrier]") %></option>
+        <option value="#@txt.att.net"><%= t('carriers.a_t_and_t', "AT&T") %></option>
+        <option value="#@message.alltel.com"><%= t('carriers.alltel', "Alltel") %></option>
+        <option value="#@myboostmobile.com"><%= t('carriers.boost', "Boost") %></option>
+        <option value="#@cingularme.com"><%= t('carriers.cingular', "Cingular") %></option>
+        <option value="#@mobile.celloneusa.com"><%= t('carriers.cellular_one', "CellularOne") %></option>
+        <option value="#@sms.mycricket.com"><%= t('carriers.cricket', "Cricket") %></option>
+        <option value="#@messaging.nextel.com"><%= t('carriers.nextel', "Nextel") %></option>
+        <option value="#@messaging.sprintpcs.com"><%= t('carriers.sprint_psc', "Sprint PCS") %></option>
+        <option value="#@tmomail.net"><%= t('carriers.t_mobile', "T-Mobile") %></option>
+        <option value="#@vtext.com"><%= t('carriers.verizon', "Verizon") %></option>
+        <option value="#@vmobile.com"><%= t('carriers.virgin_mobile', "Virgin Mobile") %></option>
+        <option value="other"><%= t('carriers.other', "Other Carrier") %></option>
       </select>
     </td>
   </tr><tr>
-    <td style="white-space: nowrap; vertical-align: top;">SMS Email:</td>
+    <td style="white-space: nowrap; vertical-align: top;"><%= before_label(:sms_email, "SMS Email") %></td>
     <td>
       <%= text_field :pseudonym, :unique_id, :class => "sms_email" %><br/>
     </td>
   </tr><tr>
     <td colspan="2">
-      <button type="submit" class="button">Register SMS</button>
+      <button type="submit" class="button"><%= t('buttons.register_sms', "Register SMS") %></button>
     </td>
 </table>
 <% end %>
 </div>
 <div id="confirm_email_channel" style="display: none;" class="dialog">
-  <div style="text-align: center;">We emailed a confirmation link to 
-    <span class="path" style="font-weight: bold;">&nbsp;</span>.  Click the link in that
-    email to finish registering.  Make sure to check your spam box in case
-    it got filtered.
-  </div>
+  <div style="text-align: center;"><%= t(:sent_confirmation_email, <<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+    We emailed a confirmation link to %{email_address}. Click the link in that
+    email to finish registering. Make sure to check your spam box in case it
+    got filtered.
+    TEXT
+  %></div>
   <div style="text-align: center; margin: 10px 0; font-weight: bold;">
-    <a href="#" class="re_send_confirmation_link">Re-Send Confirmation</a>
+    <a href="#" class="re_send_confirmation_link"><%= t('links.resend_confirmation', "Re-Send Confirmation") %></a>
     <a href="<%= re_send_confirmation_url("{{ user_id }}", "{{ id }}") %>" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
   </div>
   <div class="button-container">
-    <button type="button" class="button cancel_button">Ok, Thanks</button>
+    <button type="button" class="button cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
   </div>
 </div>
 <% form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog"} do %>
   <input type="hidden" name="pseudonym_id" value=""/>
   <input type="hidden" name="channel_id" value=""/>
   <input type="hidden" name="user_id" value=""/>
-  <div style="text-align: center;">We sent a four-character confirmation code to <span class="path" style="font-weight: bold;">&nbsp;</span>.
-    Enter the code below to activate this <span class="path_type">&nbsp;</span></div>
+  <div style="text-align: center;"><%= t(:sent_confirmation_sms, <<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+    We sent a four-character confirmation code to %{sms_number}.
+    Enter the code below to activate this sms number.
+    TEXT
+  %></div>
   <div style="text-align: center;">
     <input type="text" style="width: 100px; font-size: 1.5em;" name="code"/><br/>
-    <!--a href="#" style="font-size: 0.8em;">Re-send code</a-->
     <span style="display: none;" class="channel_id">&nbsp;</span>
     <a href="<%= communication_channel_confirm_path("{{ id }}", "{{ code }}") %>" style="display: none;" class="register_channel_link">&nbsp;</a>
   </div>
   <div style="margin: 0 0 5px; text-align: center; font-size: 0.8em;">
-    <a href="#" class="re_send_confirmation_link">Re-Send Confirmation</a>
+    <a href="#" class="re_send_confirmation_link"><%= t('links.resend_confirmation', "Re-Send Confirmation") %></a>
   </div>
-  <div class="status_message" style="visibility: hidden; text-align: center; color: #444; font-weight: bold">Confirming...</div>
+  <div class="status_message" style="visibility: hidden; text-align: center; color: #444; font-weight: bold"><%= t(:confirming_contact, "Confirming...") %></div>
   <div class="button-container">
-    <button type="submit" class="button">Confirm</button>
+    <button type="submit" class="button"><%= t('buttons.confirm', "Confirm") %></button>
   </div>
 <% end %>
 <div id="claim_email_address_dialog" style="display: none;">
   <%= image_tag "email_big.png", :style => "float: left; padding-right: 5px; padding-bottom: 3px;" %>
-  The address you entered (<b class="user_email">email</b>) is 
-  currently assigned to another user.  Email addresses can only be 
-  tied to one user at a time.  If you're sure this
-  address belongs to you and you want to claim it, enter it again in the
-  form below:
+  <%= t('errors.address_already_claimed', <<-TEXT, :email => raw('<b class="user_email">email</b>'))
+  The address you entered (%{email}) is currently assigned to another user.
+  Email addresses can only be tied to one user at a time. If you're sure this
+  address belongs to you and you want to claim it, enter it again in the form
+  below:
+  TEXT
+  %>
   <% form_for :communication_channel, :url => try_merge_communication_channels_url, :html => {:id => ""} do |f| %>
     <div style="margin: 10px; text-align: center;">
       <%= f.text_field :path %>
     </div>
     <div class="button-container">
-      <button type="submit" class="button">Find Email Address</button>
-      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+      <button type="submit" class="button"><%= t('buttons.find_email_address', "Find Email Address") %></button>
+      <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
     </div>
   <% end %>
 </div>
@@ -501,6 +516,7 @@ $(document).ready(function() {
   <%= render :partial => "email_select" %>
   <%= render :partial => "sms_select" %>
   <%= render :partial => "facebook_select" %>
+  <%= render :partial => "twitter_select" %>
 </div>
 <div id="contact_urls">
   <a href="<%= update_communication_profile_url %>" class="update_communication_url">&nbsp;</a>

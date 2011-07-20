@@ -3,7 +3,8 @@ Dir.glob('lib/canvas/plugins/validators/*').each do |file|
 end
 
 Canvas::Plugin.register('facebook', nil, {
-  :description => 'Canvas Facebook application',
+  :name => lambda{ t :name, 'Facebook' },
+  :description => lambda{ t :description, 'Canvas Facebook application' },
   :website => 'http://www.facebook.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -12,7 +13,8 @@ Canvas::Plugin.register('facebook', nil, {
   :validator => 'FacebookValidator'
 })
 Canvas::Plugin.register('linked_in', nil, {
-  :description => 'LinkedIn integration',
+  :name => lambda{ t :name, 'LinkedIn' },
+  :description => lambda{ t :description, 'LinkedIn integration' },
   :website => 'http://www.linkedin.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -21,7 +23,8 @@ Canvas::Plugin.register('linked_in', nil, {
   :validator => 'LinkedInValidator'
 })
 Canvas::Plugin.register('twitter', nil, {
-  :description => 'Twitter notifications',
+  :name => lambda{ t :name, 'Twitter' },
+  :description => lambda{ t :description, 'Twitter notifications' },
   :website => 'http://www.twitter.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -30,7 +33,8 @@ Canvas::Plugin.register('twitter', nil, {
   :validator => 'TwitterValidator'
 })
 Canvas::Plugin.register('scribd', nil, {
-  :description => 'Scribd document previews',
+  :name => lambda{ t :name, 'Scribd' },
+  :description => lambda{ t :description, 'Scribd document previews' },
   :website => 'http://www.scribd.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -39,7 +43,8 @@ Canvas::Plugin.register('scribd', nil, {
   :validator => 'ScribdValidator'
 })
 Canvas::Plugin.register('etherpad', nil, {
-  :description => 'EtherPad document sharing',
+  :name => lambda{ t :name, 'EtherPad' },
+  :description => lambda{ t :description, 'EtherPad document sharing' },
   :website => 'http://www.etherpad.org',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -48,7 +53,8 @@ Canvas::Plugin.register('etherpad', nil, {
   :validator => 'EtherpadValidator'
 })
 Canvas::Plugin.register('google_docs', nil, {
-  :description => 'Google Docs document sharing',
+  :name => lambda{ t :name, 'Google Docs' },
+  :description => lambda{ t :description, 'Google Docs document sharing' },
   :website => 'http://docs.google.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -57,7 +63,8 @@ Canvas::Plugin.register('google_docs', nil, {
   :validator => 'GoogleDocsValidator'
 })
 Canvas::Plugin.register('kaltura', nil, {
-  :description => 'Kaltura video/audio recording and playback',
+  :name => lambda{ t :name, 'Kaltura' },
+  :description => lambda{ t :description, 'Kaltura video/audio recording and playback'},
   :website => 'http://corp.kaltura.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -87,7 +94,8 @@ Canvas::Plugin.register('wimba', :web_conferencing, {
   :encrypted_settings => [:password]
 })
 Canvas::Plugin.register('error_reporting', :error_reporting, {
-  :description => 'Default error reporting mechanisms',
+  :name => lambda{ t :name, 'Error Reporting' },
+  :description => lambda{ t :description, 'Default error reporting mechanisms' },
   :website => 'http://www.instructure.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -106,7 +114,8 @@ Canvas::Plugin.register('big_blue_button', :web_conferencing, {
   :encrypted_settings => [:secret]
 })
 Canvas::Plugin.register('tinychat', nil, {
-  :description => 'Tinychat chat room',
+  :name => lambda{ t :name, 'Tinychat' },
+  :description => lambda{ t :description, 'Tinychat chat room'},
   :website => 'http://www.tinychat.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -116,20 +125,20 @@ Canvas::Plugin.register('tinychat', nil, {
 })
 require_dependency 'cc/importer/cc_worker'
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
-  :name => 'Common Cartridge Importer',
+  :name => lambda{ t :name, 'Common Cartridge Importer' },
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
-  :description => 'This enables converting a canvas CC export to the intermediary json format to be imported',
+  :description => lambda{ t :description, 'This enables converting a canvas CC export to the intermediary json format to be imported' },
   :version => '1.0.0',
   :settings => {
-    :worker=>'CCWorker',
+    :worker => 'CCWorker',
     :migration_partial => 'cc_config',
-    :select_text => "Canvas Course Export"
+    :select_text => lambda{ t :file_description, "Canvas Course Export" }
   }
 }
 Canvas::Plugin.register('grade_export', :sis, {
-  :name => "Grade Export",
-  :description => 'Grade Export for SIS',
+  :name => lambda{ t :name, "Grade Export" },
+  :description => lambda{ t :description, 'Grade Export for SIS' },
   :website => 'http://www.instructure.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -142,8 +151,8 @@ Canvas::Plugin.register('grade_export', :sis, {
                  :format_type => "instructure_csv" }
 })
 Canvas::Plugin.register('sis_import', :sis, {
-  :name => 'SIS Import',
-  :description => 'Import SIS Data',
+  :name => lambda{ t :name, 'SIS Import' },
+  :description => lambda{ t :description, 'Import SIS Data' },
   :website => 'http://www.instructure.com',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',

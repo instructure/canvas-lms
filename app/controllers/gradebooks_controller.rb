@@ -17,6 +17,8 @@
 #
 
 class GradebooksController < ApplicationController
+  include ActionView::Helpers::NumberHelper
+
   before_filter :require_user_for_context, :except => :public_feed
 
   add_crumb("Grades", :except => :public_feed) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
@@ -50,10 +52,15 @@ class GradebooksController < ApplicationController
         if @student
           add_crumb(@student.name, named_context_url(@context, :context_student_grades_url, @student.id))
           
-          @groups = @context.assignment_groups.active
+          @groups = @context.assignment_groups.active.all
           @assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title') +
-            groups_as_assignments(:groups => @groups, :group_percent_string => "%s%% of Final", :total_points_string => '-')
-          @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id])
+            groups_as_assignments(@groups, :out_of_final => true)
+          @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id], :include => [ :submission_comments, :rubric_assessments ])
+          # pre-cache the assignment group for each assignment object
+          @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
+          # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
+          # assignment in order to calculate grade distributions
+          @all_submissions = @context.submissions.all
           @courses_with_grades = @student.available_courses.select{|c| c.grants_right?(@student, nil, :participate_as_student)}
           format.html { render :action => 'grade_summary' }
         else
@@ -97,7 +104,7 @@ class GradebooksController < ApplicationController
   def attendance
     @enrollment = @context.all_student_enrollments.find_by_user_id(params[:user_id]) if params[:user_id].present?
     @enrollment ||= @context.all_student_enrollments.find_by_user_id(@current_user.id) if !@context.grants_right?(@current_user, session, :manage_grades)
-    add_crumb 'Attendance'
+    add_crumb t(:crumb, 'Attendance')
     if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)
       @assignments = @context.assignments.active.select{|a| a.submission_types == "attendance" }
       @students = @context.students_visible_to(@current_user)
@@ -115,7 +122,7 @@ class GradebooksController < ApplicationController
       render :action => "student_attendance"
       # render student_attendance, optional params[:assignment_id] to highlight and scroll to that particular assignment
     else
-      flash[:notice] = "You are not authorized to view attendance for this course"
+      flash[:notice] = t('notices.unauthorized', "You are not authorized to view attendance for this course")
       redirect_to named_context_url(@context, :context_url)
       # redirect
     end
@@ -136,7 +143,7 @@ class GradebooksController < ApplicationController
       @just_assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title').select{|a| @groups_order[a.assignment_group_id] }
       newest = Time.parse("Jan 1 2010")
       @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
-      @assignments = @just_assignments.dup + groups_as_assignments(:groups => @groups)
+      @assignments = @just_assignments.dup + groups_as_assignments(@groups)
       @gradebook_upload = @context.build_gradebook_upload      
       @submissions = []
       @submissions = @context.submissions
@@ -167,7 +174,7 @@ class GradebooksController < ApplicationController
           send_data(
             @context.gradebook_to_csv, 
             :type => "text/csv", 
-            :filename => "Grades-" + @context.name.to_s.gsub(/ /, "_") + ".csv", 
+            :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv", 
             :disposition => "attachment"
           ) 
         }
@@ -175,7 +182,7 @@ class GradebooksController < ApplicationController
       end
     end
   end
-  
+
   def gradebook_init_json
     # res = "{"
     if params[:assignments]
@@ -260,7 +267,7 @@ class GradebooksController < ApplicationController
 
       respond_to do |format|
         if @submissions && !@error_message#&& !@submission.errors || @submission.errors.empty?
-          flash[:notice] = 'Assignment submission was successfully updated.'
+          flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
           format.xml  { head :created, :location => course_gradebook_url(@assignment.context) }
           format.json { 
@@ -270,9 +277,9 @@ class GradebooksController < ApplicationController
             render_for_text @submissions.to_json(Submission.json_serialization_full_parameters), :status => :created, :location => course_gradebook_url(@assignment.context)
           }
         else
-          flash[:error] = "Submission was unsuccessful: #{@error_message || 'Submission Failed'}"
+          flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
           format.html { render :action => "show", :course_id => @assignment.context.id }
-          format.xml  { render :xml => {:errors => {:base => @error_message}}.to_xml }#@submission.errors.to_xml }
+          format.xml  { render :xml => {:errors => {:base => @error_message}}.to_xml }
           format.json { render :json => {:errors => {:base => @error_message}}.to_json, :status => :bad_request }
           format.text { render_for_text({:errors => {:base => @error_message}}.to_json) }
         end
@@ -283,12 +290,15 @@ class GradebooksController < ApplicationController
   def submissions_zip_upload
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if !params[:submissions_zip] || params[:submissions_zip].is_a?(String)
-      flash[:error] = "Could not find file to upload"
+      flash[:error] = t('errors.missing_file', "Could not find file to upload")
       redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
       return
     end
     @comments, @failures = @assignment.generate_comments_from_files(params[:submissions_zip].path, @current_user)
-    flash[:notice] = "Files and comments created for #{@comments.length} user submissions"
+    flash[:notice] = t('notices.uploaded',
+                       { :one => "Files and comments created for 1 user submission",
+                         :other => "Files and comments created for %{count} user submissions" },
+                       :count => @comments.length)
   end
   
   def speed_grader
@@ -315,7 +325,7 @@ class GradebooksController < ApplicationController
     
     respond_to do |format|
       feed = Atom::Feed.new do |f|
-        f.title = "#{@context.name} Gradebook Feed"
+        f.title = t('titles.feed_for_course', "%{course} Gradebook Feed", :course => @context.name)
         f.links << Atom::Link.new(:href => named_context_url(@context, :context_gradebook_url))
         f.updated = Time.now
         f.id = named_context_url(@context, :context_gradebook_url)
@@ -327,13 +337,41 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def groups_as_assignments(options = {})
-    options[:groups] ||= @context.assignment_groups.active
-    options[:group_percent_string] ||= "%s%%"
-    options[:total_points_string] ||= "100%"
-    options[:groups].map{ |group|
-      points_possible = (@context.group_weighting_scheme == "percent") ? options[:group_percent_string] % group.group_weight : nil
-      OpenObject.build('assignment', :id => 'group-' + group.id.to_s, :rules => group.rules, :title => group.name, :points_possible => points_possible, :hard_coded => true, :special_class => 'group_total', :assignment_group_id => group.id, :group_weight => group.group_weight, :asset_string => "group_total_#{group.id}")
-    } << OpenObject.build('assignment', :id => 'final-grade', :title => 'Total', :points_possible => options[:total_points_string], :hard_coded => true, :special_class => 'final_grade', :asset_string => "final_grade_column")
+  def groups_as_assignments(groups=nil, options = {})
+    groups ||= @context.assignment_groups.active
+
+    percentage = lambda do |weight|
+      # find the smallest precision necessary to capture up to two digits of
+      # significant decimals, but to avoid unnecessary zeros on the end. (so we
+      # can have 100%, but still have 33.33%, for example)
+      precision = sprintf('%.2f', weight % 1).sub(/^(?:0|1)\.(\d?[1-9])?0*$/, '\1').length
+      number_to_percentage(weight, :precision => precision)
+    end
+
+    points_possible = 
+      (@context.group_weighting_scheme == "percent") ?
+        (options[:out_of_final] ?
+          lambda{ |group| t(:out_of_final, "%{weight} of Final", :weight => percentage[group.group_weight]) } :
+          lambda{ |group| percentage[group.group_weight] }) :
+        lambda{ |group| nil }
+
+    groups.map{ |group|
+      OpenObject.build('assignment',
+        :id => 'group-' + group.id.to_s,
+        :rules => group.rules,
+        :title => group.name,
+        :points_possible => points_possible[group],
+        :hard_coded => true,
+        :special_class => 'group_total',
+        :assignment_group_id => group.id,
+        :group_weight => group.group_weight,
+        :asset_string => "group_total_#{group.id}")
+    } << OpenObject.build('assignment',
+        :id => 'final-grade',
+        :title => t('titles.total', 'Total'),
+        :points_possible => (options[:out_of_final] ? '-' : percentage[100]),
+        :hard_coded => true,
+        :special_class => 'final_grade',
+        :asset_string => "final_grade_column")
   end
 end

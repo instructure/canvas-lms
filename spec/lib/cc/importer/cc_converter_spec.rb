@@ -42,7 +42,11 @@ describe "Common Cartridge importing" do
     @copy_from.license = "cc_by_nc_nd"
     @copy_from.save!
 
-    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+<div>
+  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+</div>}
     @copy_from.syllabus_body = body_with_link % @copy_from.id 
 
     #export to xml
@@ -53,7 +57,7 @@ describe "Common Cartridge importing" do
     #convert to json
     doc = Nokogiri::XML(builder.target!)
     hash = @converter.convert_course_settings(doc)
-    syl_doc = Nokogiri::XML(syllabus.string)
+    syl_doc = Nokogiri::HTML(syllabus.string)
     hash[:syllabus_body] = @converter.convert_syllabus(syl_doc)
     #import json into new course
     hash = hash.with_indifferent_access
@@ -63,7 +67,7 @@ describe "Common Cartridge importing" do
     #compare settings
     @copy_to.conclude_at.to_i.should == @copy_from.conclude_at.to_i
     @copy_to.start_at.to_i.should == @copy_from.start_at.to_i
-    @copy_to.syllabus_body.should == body_with_link % @copy_to.id
+    @copy_to.syllabus_body.should == (body_with_link % @copy_to.id).gsub(/png">/, 'png" />')
     @copy_to.storage_quota.should_not == @copy_from.storage_quota
     @copy_to.name.should_not == @copy_from.name
     @copy_to.course_code.should_not == @copy_from.course_code
@@ -369,6 +373,16 @@ describe "Common Cartridge importing" do
     att_2.save
     mod4.add_item({:title => att.display_name, :type => "attachment", :id => att.id})
     
+    # create @copy_to module link with different name than attachment
+    att_3 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+    att_3.migration_id = CC::CCHelper.create_key(att_3)
+    att_3.save
+    mod4.add_item({:title => "test answers", :type => "attachment", :id => att_3.id})
+    
+    att_3_2 = Attachment.create!(:filename => 'filename.txt', :uploaded_data => StringIO.new('even more boring'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to)
+    att_3_2.migration_id = CC::CCHelper.create_key(att_3)
+    att_3_2.save
+    
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
     @resource.create_module_meta(builder)
@@ -413,6 +427,11 @@ describe "Common Cartridge importing" do
     mod4_2.content_tags.first.title.should == att.display_name
     att_2.reload
     att_2.display_name.should == att.display_name
+    
+    mod4_2.content_tags.count.should == 2
+    tag = mod4_2.content_tags.last
+    tag.content_type.should == "Attachment"
+    tag.content_id.should == att_3_2.id
   end
 
   it "should translate attachment links on import" do
@@ -452,6 +471,18 @@ describe "Common Cartridge importing" do
     mod2 = @copy_to.context_modules.create(:name => "some module")
     mod2.migration_id = CC::CCHelper.create_key(mod)
     mod2.save!
+    # Create files for the wiki text to reference
+    from_root = Folder.root_folders(@copy_from).first
+    from_dir = Folder.create!(:name => "sub & folder", :parent_folder => from_root, :context => @copy_from)
+    from_att = Attachment.create!(:filename => 'picture+%2B+cropped.png', :display_name => "picture + cropped.png", :uploaded_data => StringIO.new('pretend .png data'), :folder => from_dir, :context => @copy_from)
+    
+    to_root = Folder.root_folders(@copy_to).first
+    to_dir = Folder.create!(:name => "sub & folder", :parent_folder => to_root, :context => @copy_to)
+    to_att = Attachment.create!(:filename => 'picture+%2B+cropped.png', :display_name => "picture + cropped.png", :uploaded_data => StringIO.new('pretend .png data'), :folder => to_dir, :context => @copy_to)
+    to_att.migration_id = CC::CCHelper.create_key(from_att)
+    to_att.save
+    path = to_att.full_display_path.gsub('course files/', '')
+    @copy_to.attachment_path_id_lookup = {path => to_att.migration_id}
     
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
@@ -459,15 +490,19 @@ describe "Common Cartridge importing" do
       <a href=\"/courses/%s/wiki/assignments\">Assignments wiki link</a>
       <a href=\"/courses/%s/modules\">Modules</a>
       <a href=\"/courses/%s/modules/%s\">some module</a>
-      </p>}
-    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id ])
+      <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
+      <div>
+        <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+        <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+      </div>}
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id ])
     @copy_from.save!
     
     #export to html file
     migration_id = CC::CCHelper.create_key(page)
     exported_html = CC::CCHelper::HtmlContentExporter.new.html_page(page.body, page.title, @copy_from, @from_teacher, migration_id)
     #convert to json
-    doc = Nokogiri::XML(exported_html)
+    doc = Nokogiri::HTML(exported_html)
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
@@ -476,11 +511,15 @@ describe "Common Cartridge importing" do
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
     page_2.url.should == page.url
-    page_2.body.should == body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id ]
+    page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png">/, 'png" />')
   end
   
   it "should import assignments" do 
-    body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
+    body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+<div>
+  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+  <div><img src="http://www.instructure.com/images/header-logo.png"></div>
+</div>}
     asmnt = @copy_from.assignments.new
     asmnt.title = "Nothing Assignment"
     asmnt.description = body_with_link % @copy_from.id
@@ -506,7 +545,7 @@ describe "Common Cartridge importing" do
     html = CC::CCHelper::HtmlContentExporter.new.html_page(asmnt.description, "Assignment: " + asmnt.title, @copy_from, @from_teacher)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
-    html_doc = Nokogiri::XML(html)
+    html_doc = Nokogiri::HTML(html)
     hash = @converter.convert_assignment(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
@@ -514,7 +553,7 @@ describe "Common Cartridge importing" do
     
     asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
     asmnt_2.title.should == asmnt.title
-    asmnt_2.description.should == body_with_link % @copy_to.id
+    asmnt_2.description.should == (body_with_link % @copy_to.id).gsub(/png">/, 'png" />')
     asmnt_2.points_possible.should == asmnt.points_possible
     asmnt_2.allowed_extensions.should == asmnt.allowed_extensions
     asmnt_2.submission_types.should == asmnt.submission_types
@@ -566,7 +605,7 @@ describe "Common Cartridge importing" do
   
   it "should import assignment discussion topic" do
     body_with_link = "<p>What do you think about the <a href=\"/courses/%s/grades\">grades?</a>?</p>"
-    dt = @copy_from.announcements.new
+    dt = @copy_from.discussion_topics.new
     dt.title = "Topic"
     dt.message = body_with_link % @copy_from.id
     dt.posted_at = 1.day.ago
@@ -595,6 +634,12 @@ describe "Common Cartridge importing" do
     meta_doc = Nokogiri::XML(canvas_topic_builder.target!)
     hash = @converter.convert_topic(cc_doc, meta_doc)
     hash = hash.with_indifferent_access
+    #have assignment group ready:
+    @copy_to.assignment_groups.find_or_create_by_name("Distractor")
+    ag1 = @copy_to.assignment_groups.new
+    ag1.name = "Stupid Group"
+    ag1.migration_id = CC::CCHelper.create_key(assignment.assignment_group)
+    ag1.save!
     #import
     DiscussionTopic.import_from_migration(hash, @copy_to)
     
@@ -609,6 +654,7 @@ describe "Common Cartridge importing" do
     a.due_at.to_i.should == assignment.due_at.to_i
     a.points_possible.should == assignment.points_possible
     a.discussion_topic.should == dt_2
+    a.assignment_group.id.should == ag1.id
   end
   
   it "should import calendar events" do
@@ -653,6 +699,60 @@ describe "Common Cartridge importing" do
     cal2_2.start_at.to_i.should == cal2.start_at.to_i
     cal2_2.end_at.to_i.should == cal2.end_at.to_i
     cal2_2.description.should == ''
+  end
+  
+  it "should import quizzes into correct assignment group" do
+    quiz_hash = {"lock_at"=>nil,
+                 "questions"=>[],
+                 "title"=>"Assignment Quiz",
+                 "available"=>true,
+                 "assignment"=>
+                         {"position"=>2,
+                          "rubric_migration_id"=>nil,
+                          "title"=>"Assignment Quiz",
+                          "grading_standard_migration_id"=>nil,
+                          "migration_id"=>"i0c012cbae54b972138520466e557f5e4",
+                          "quiz_migration_id"=>"ie3d8f8adfad423eb225229c539cdc450",
+                          "points_possible"=>0,
+                          "all_day_date"=>1305698400000,
+                          "peer_reviews_assigned"=>false,
+                          "submission_types"=>"online_quiz",
+                          "peer_review_count"=>0,
+                          "assignment_group_migration_id"=>"i713e960ab2685259505efeb08cd48a1d",
+                          "automatic_peer_reviews"=>false,
+                          "grading_type"=>"points",
+                          "due_at"=>1305805680000,
+                          "peer_reviews"=>false,
+                          "all_day"=>false},
+                 "migration_id"=>"ie3d8f8adfad423eb225229c539cdc450",
+                 "question_count"=>19,
+                 "scoring_policy"=>"keep_highest",
+                 "shuffle_answers"=>true,
+                 "quiz_name"=>"Assignment Quiz",
+                 "unlock_at"=>nil,
+                 "quiz_type"=>"assignment",
+                 "points_possible"=>0,
+                 "description"=>"",
+                 "assignment_group_migration_id"=>"i713e960ab2685259505efeb08cd48a1d",
+                 "time_limit"=>nil,
+                 "allowed_attempts"=>-1,
+                 "due_at"=>1305805680000,
+                 "could_be_locked"=>true,
+                 "anonymous_submissions"=>false,
+                 "show_correct_answers"=>true}
+    
+    #have assignment group ready:
+    @copy_to.assignment_groups.find_or_create_by_name("Distractor")
+    ag = @copy_to.assignment_groups.new
+    ag.name = "Stupid Group"
+    ag.migration_id = "i713e960ab2685259505efeb08cd48a1d"
+    ag.save!
+    
+    Quiz.import_from_migration(quiz_hash, @copy_to, {})
+    q = @copy_to.quizzes.find_by_migration_id("ie3d8f8adfad423eb225229c539cdc450")
+    a = @copy_to.assignments.find_by_migration_id("i0c012cbae54b972138520466e557f5e4")
+    a.assignment_group.id.should == ag.id
+    q.assignment_group_id.should == ag.id
   end
 
 end

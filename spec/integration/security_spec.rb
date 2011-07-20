@@ -129,6 +129,50 @@ describe "security" do
     c2.should match(/; *secure/)
     ActionController::Base.session_options[:secure] = nil
   end
+  
+  it "should only allow user list username resolution if the current user has appropriate rights" do
+    Account.default.pseudonyms.create!(:unique_id => "A1234567").assert_user{|u| u.name = "test user"}
+    @course = Account.default.courses.create!
+    @course.offer!
+    @teacher = user :active_all => true
+    @course.enroll_teacher(@teacher).tap do |e|
+      e.workflow_state = 'active'
+      e.save!
+    end
+    @student = user :active_all => true
+    @course.enroll_student(@student).tap do |e|
+      e.workflow_state = 'active'
+      e.save!
+    end
+    @course.reload
+
+    user_session(@student)
+    post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
+    assert_response :success
+    ActiveSupport::JSON.decode(response.body).should == {
+      "duplicates" => [],
+      "errored_users" => [],
+      "users" => [{"login" => "A1234567"}, {"login" => "A345678"}]
+    }
+    
+    user_session(@teacher)
+    post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
+    assert_response :success
+    ActiveSupport::JSON.decode(response.body).should == {
+      "duplicates" => [],
+      "errored_users" => ["A345678"],
+      "users" => [{"login" => "A1234567", "name" => "test user"}]
+    }
+    
+    user_session(@student)
+    post "/courses/#{@course.id}/user_lists.json", :user_list => "A1234567, A345678"
+    assert_response :success
+    ActiveSupport::JSON.decode(response.body).should == {
+      "duplicates" => [],
+      "errored_users" => [],
+      "users" => [{"login" => "A1234567"}, {"login" => "A345678"}]
+    }
+  end
 
   describe "user masquerading" do
     before(:each) do
@@ -187,52 +231,52 @@ describe "security" do
       assigns['current_user'].id.should == @student.id
       session[:become_user_id].should be_nil
     end
-  end
 
-  class Basic
-    extend ActionController::HttpAuthentication::Basic
-  end
+    it "should record real user in page_views" do
+      Setting.set('enable_page_views', 'db')
+      user_session(@admin, @admin.pseudonyms.first)
 
-  describe "API" do
-    it "should require a developer key for /api non-GETs" do
-      AssignmentsApiController.allow_forgery_protection = true
+      get "/?become_user_id=#{@student.id}"
+      assert_response 302
+      response.location.should match "/users/#{@student.id}/masquerade$"
+      session[:masquerade_return_to].should == "/"
+      session[:become_user_id].should be_nil
+      assigns['current_user'].id.should == @admin.id
+      assigns['real_current_user'].should be_nil
 
-      # well, unless they have an authenticity token
-      course_with_teacher(:active_all => true)
-      user_with_pseudonym(:user => @user,
-                          :username => "nobody@example.com",
-                          :password => "asdfasdf")
-
-      post "/api/v1/courses/#{@course.id}/assignments",
-      {},
-        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
-      assert_response 422
-
-      post "/api/v1/courses/#{@course.id}/assignments",
-      {:api_key => "MYKEY"},
-        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
-      assert_response 422
-
-      key = DeveloperKey.create
-      post "/api/v1/courses/#{@course.id}/assignments",
-        {:api_key => key.api_key, :assignment => { :name => 'new assignment' } },
-        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
-      assert_response 201
-    end
-
-    # this might change eventually
-    it "should allow GET for /api even without a key" do
-      AssignmentsApiController.allow_forgery_protection = true
-
-      # well, unless they have an authenticity token
-      course_with_teacher(:active_all => true)
-      user_with_pseudonym(:user => @user,
-                          :username => "nobody@example.com",
-                          :password => "asdfasdf")
-      get "/api/v1/courses/#{@course.id}/assignments",
-      {},
-        { "Authorization" => Basic.encode_credentials("nobody@example.com", 'asdfasdf') }
+      follow_redirect!
       assert_response 200
+      path.should == "/users/#{@student.id}/masquerade"
+      session[:become_user_id].should be_nil
+      assigns['current_user'].id.should == @admin.id
+      assigns['real_current_user'].should be_nil
+      PageView.last.user_id.should == @admin.id
+      PageView.last.real_user_id.should be_nil
+
+      post "/users/#{@student.id}/masquerade"
+      assert_response 302
+      session[:become_user_id].should == @student.id.to_s
+
+      get "/"
+      assert_response 200
+      session[:become_user_id].should == @student.id.to_s
+      assigns['current_user'].id.should == @student.id
+      assigns['real_current_user'].id.should == @admin.id
+      PageView.last.user_id.should == @student.id
+      PageView.last.real_user_id.should == @admin.id
     end
+  end
+
+  it "should not allow logins to safefiles domains" do
+    HostUrl.stub!(:is_file_host?).and_return(true)
+    HostUrl.stub!(:default_host).and_return('test.host')
+    get "http://files-test.host/login"
+    response.should be_redirect
+    uri = URI.parse response['Location']
+    uri.host.should == 'test.host'
+
+    HostUrl.stub!(:is_file_host?).and_return(false)
+    get "http://test.host/login"
+    response.should be_success
   end
 end

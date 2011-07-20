@@ -37,24 +37,12 @@
 <% js_block do %>
 <script type="text/javascript">
 $(document).ready(function() {
-  $("#filter").keyup(function(){
-    var val = $(this).val().toLowerCase();
-    $(".courses li .name a").each(function(){
-      $(this).closest('li')[ $(this).text().toLowerCase().match(val) ? 'show' : 'hide']();
-    });
-  });
-  
   
   $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
     $(this).find(".info").addClass('info_hover');
   });
   $(".courses .course,.groups .group").bind('blur mouseout', function(event) {
     $(this).find(".info").removeClass('info_hover');
-  });
-  $("#enrollment_term").change(function() {
-    if(location.href != $(this).val()) {
-      location.href = $(this).val();
-    }
   });
   if($("#new_course").length > 0) {
     var reEscape = new RegExp('(\\' + ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'].join('|\\') + ')', 'g');

@@ -30,7 +30,6 @@ class WebConference < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :conference_type, :title
   
-  adheres_to_policy
   before_validation :infer_conference_details
 
   before_create :assign_uuid
@@ -97,8 +96,8 @@ class WebConference < ActiveRecord::Base
 
   def friendly_setting(value)
     case value
-      when true: t('settings.boolean.true', "On")
-      when false: t('settings.boolean.false', "Off")
+      when true: t('#web_conference.settings.boolean.true', "On")
+      when false: t('#web_conference.settings.boolean.false', "Off")
       else value.to_s
     end
   end
@@ -210,7 +209,7 @@ class WebConference < ActiveRecord::Base
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
     self.user_ids ||= (self.user_id || "").to_s
     self.added_user_ids ||= ""
-    self.title ||= self.context.is_a?(Course) ? t(:default_name_for_courses, "Course Web Conference") : t(:default_name_for_groups, "Group Web Conference")
+    self.title ||= self.context.is_a?(Course) ? t('#web_conference.default_name_for_courses', "Course Web Conference") : t('#web_conference.default_name_for_groups', "Group Web Conference")
     self.start_at ||= self.started_at
     self.end_at ||= self.ended_at
     self.end_at ||= self.start_at + self.duration.minutes if self.start_at && self.duration
@@ -343,25 +342,25 @@ class WebConference < ActiveRecord::Base
   
   set_policy do
     given { |user, session| self.users.include?(user) && self.cached_context_grants_right?(user, session, :read) }
-    set { can :read and can :join }
+    can :read and can :join
     
     given { |user, session| (self.is_public rescue false) }
-    set { can :read and can :join }
+    can :read and can :join
     
     given { |user, session| self.cached_context_grants_right?(user, session, :create_conferences) }
-    set { can :create }
+    can :create
     
     given { |user, session| user && user.id == self.user_id && self.cached_context_grants_right?(user, session, :create_conferences) }
-    set { can :initiate }
+    can :initiate
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_content) }
-    set { can :read and can :join and can :initiate and can :create and can :delete }
+    can :read and can :join and can :initiate and can :create and can :delete
     
     given { |user, session| cached_context_grants_right?(user, session, :manage_content) && !finished? }
-    set { can :update }
+    can :update
     
     given { |user, session| cached_context_grants_right?(user, session, :manage_content) && long_running? && active? }
-    set { can :close }
+    can :close
   end
   
   def config

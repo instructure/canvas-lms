@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('media_comments', function(I18n) {
 (function($, INST){
   var yourVersion = null;
   try {
@@ -23,7 +24,8 @@
     yourVersion = " (you have " + yourVersion + " installed)";
   } catch(e) {
   }
-  var flashRequiredMessage = "<div>This video requires Flash version 9 or higher" + yourVersion + ".  <br/><a target='_blank' href='http://get.adobe.com/flashplayer/'>Click here to upgrade</a></div>";
+  var flashRequiredMessage = "<div>" + $.h(I18n.t('messages.flash_required', "This video requires Flash version 9 or higher (you have %{version} installed).", { version: yourVersion })) +
+          "<br/><a target='_blank' href='http://get.adobe.com/flashplayer/'>" + $.h(I18n.t('links.upgrade_flash', "Click here to upgrade")) +"</a></div>";
   $.fn.mediaComment = function(command, arg1, arg2, arg3, arg4, arg5) {
     var id = arg1, mediaType = arg2, downloadUrl = arg3;
     if(!INST.kalturaSettings) { console.log('Kaltura has not been enabled for this account'); return; }
@@ -91,10 +93,10 @@
             $holder.text("");
             showInline(data.attachment.media_entry_id);
           } else {
-            $holder.text("This media file failed to load");
+            $holder.text(I18n.t('messages.file_failed_to_load', "This media file failed to load"));
           }
         }, function() {
-          $holder.text("This media file failed to load");
+          $holder.text(I18n.t('messages.file_failed_to_load', "This media file failed to load"));
         });
       } else {
         showInline(id);
@@ -116,7 +118,7 @@
       }
       $dialog.dialog('close').dialog({
         autoOpen: false,
-        title: "Play Media Comment",
+        title: I18n.t('titles.play_comment', "Play Media Comment"),
         width: 575,
         height: 493,
         modal: true,
@@ -193,7 +195,7 @@
           });
         }
         $img.css('backgroundImage', 'url(' + url + ')');
-        $img.attr('title', 'Click to View');
+        $img.attr('title', I18n.t('titles.click_to_view', 'Click to View'));
         var $a = $(this);
         if(!keep_original_text) {
           $(this).empty();
@@ -329,7 +331,7 @@
         return;
       }
       $("#media_upload_progress").css('visibility', 'visible').progressbar({value: 1});
-      $("#media_upload_submit").attr('disabled', true).text("Submitting Media File...");
+      $("#media_upload_submit").attr('disabled', true).text(I18n.t('messages.submitting', "Submitting Media File..."));
       $("#" + type + "_upload")[0].upload();
     },
     selectHandler: function(type) {
@@ -351,7 +353,7 @@
       $("#media_upload_feedback_text").html("");
       $("#media_upload_feedback").css('visibility', 'hidden');
       if (file.bytesTotal > INST.kalturaSettings.max_file_size_bytes) {
-        $("#media_upload_feedback_text").html("<b>This file is too large.</b> The maximum size is " + INST.kalturaSettings.max_file_size_bytes / 1048576 + "MB.");
+        $("#media_upload_feedback_text").html(I18n.t('errors.file_too_large', "*This file is too large.* The maximum size is %{size}MB.", { size: INST.kalturaSettings.max_file_size_bytes / 1048576, wrapper: '<b>$1</b>' }));
         $("#media_upload_feedback").css('visibility', 'visible');
         $("#media_upload_submit").hide();
         return;
@@ -376,7 +378,7 @@
     entriesAddedHandler: function(type, entries) {
       $("#media_upload_progress").progressbar('option', 'value', 100);
       var entry = entries[0];
-      $("#media_upload_submit").text("Submitted Media File!");
+      $("#media_upload_submit").text(I18n.t('messages.submitted', "Submitted Media File!"));
       setTimeout(function() {
         $("#media_comment_dialog").dialog('close');
       }, 1500);
@@ -393,7 +395,7 @@
     },
     uploadErrorHandler: function(type) {
       var error = $("#" + type + "_upload")[0].getError();
-      $("#media_upload_errors").text("Upload failed with error " + error);
+      $("#media_upload_errors").text(I18n.t('errors.upload_failed', "Upload failed with error:") + " " + error);
       $("#media_upload_progress").hide();
     }
   }
@@ -407,12 +409,12 @@
     if(user_name) {
       user_name = user_name + ": " + (new Date()).toString("ddd MMM d, yyyy");
     }
-    var defaultTitle = opts.defaultTitle ||  user_name || "Media Contribution";
+    var defaultTitle = opts.defaultTitle || user_name || I18n.t('titles.media_contribution', "Media Contribution");
     var mediaCommentReady = function() {
       $("#video_record_title,#audio_record_title").val(defaultTitle);
       $dialog.dialog('close').dialog({
         autoOpen: false,
-        title: "Record/Upload Media Comment",
+        title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
         width: 560,
         height: 460,
         modal: (opts.modal == false ? false : true)
@@ -480,7 +482,7 @@
           "pluginspage": "http://www.adobe.com/go/getflashplayer",
           "wmode": "opaque"
         }
-        $("#audio_record").html("Flash required for recording audio.")
+        $("#audio_record").text(I18n.t('messages.flash_required_record_audio', "Flash required for recording audio."))
         swfobject.embedSWF("/media_record/KRecord.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
 
         var params = $.extend({}, params, {name: 'KRecordVideo'});
@@ -515,13 +517,13 @@
         "pluginspage": "http://www.adobe.com/go/getflashplayer",
         "wmode": "transparent"
       }
-      $("#audio_upload").html("Flash required for uploading audio.");
+      $("#audio_upload").text(I18n.t('messages.flash_required_upload_audio', "Flash required for uploading audio."));
       var width = "180";
       var height = "50";
       swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "audio_upload", width, height, "9.0.0", false, flashVars, params)
       
       flashVars = $.extend({}, flashVars, {jsDelegate: '$.mediaComment.video_delegate'});
-      $("#video_upload").html("Flash required for uploading video.");
+      $("#video_upload").text(I18n.t('messages.flash_required_upload_video', "Flash required for uploading video."));
       var width = "180";
       var height = "50";
       swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "video_upload", width, height, "9.0.0", false, flashVars, params)
@@ -604,10 +606,10 @@
     var $dialog = $("#media_comment_dialog");
     if($dialog.length == 0) {
       var $div = $("<div/>").attr('id', 'media_comment_dialog');
-      $div.html("Loading...");
+      $div.text(I18n.t('messages.loading', "Loading..."));
       $div.dialog('close').dialog({
         autoOpen: false,
-        title: "Record/Upload Media Comment",
+        title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
         resizable: false,
         width: 470,
         height: 300
@@ -617,9 +619,9 @@
         $div.data('uid', data.uid);
       }, function(data) {
         if(data.logged_in == false) {
-          $div.data('ks-error', "You must be logged in to record media.");
+          $div.data('ks-error', I18n.t('errors.must_be_logged_in', "You must be logged in to record media."));
         } else {
-          $div.data('ks-error', "Media Comment Application failed to load.  Please try again.");
+          $div.data('ks-error', I18n.t('errors.load_failed', "Media Comment Application failed to load.  Please try again."));
         }
       });
       $.get("/partials/_media_comments.html", function(html) {
@@ -652,7 +654,7 @@
         .find(".recorder_message").html("Saving Recording...<img src='/images/media-saving.gif'/>");
       $("#audio_record_holder").stop(true, true).clearQueue().css('width', '').removeClass('with_volume');
       $("#video_record_holder").stop(true, true).clearQueue().css('width', '').removeClass('with_volume');
-      $("#media_upload_submit").text("Submit Media File").attr('disabled', true);
+      $("#media_upload_submit").text(I18n.t('buttons.submit', "Submit Media File")).attr('disabled', true);
       $("#media_upload_settings").css('visibility', 'hidden');
       $("#media_upload_progress").css('visibility', 'hidden').progressbar().progressbar('option', 'value', 1);
       $("#media_upload_title").val("");
@@ -684,11 +686,15 @@
     });
   });
   $(document).bind('media_recording_error', function() {
-    $("#audio_record_holder_message,#video_record_holder_message").find(".recorder_message").html("Saving appears to have failed.  Please close this popup to try again.<div style='font-size: 0.8em; margin-top: 20px;'>If this problem keeps happening, you may want to try recording your media locally and then uploading the saved file instead.</div>");
+    $("#audio_record_holder_message,#video_record_holder_message").find(".recorder_message").html(
+            $.h(I18n.t('errors.save_failed', "Saving appears to have failed.  Please close this popup to try again.")) +
+            "<div style='font-size: 0.8em; margin-top: 20px;'>" +
+            $.h(I18n.t('errors.persistent_problem', "If this problem keeps happening, you may want to try recording your media locally and then uploading the saved file instead.")) +
+            "</div>");
   });
 })(jQuery, INST);
 
-function mediaCommentCallback(results) {
+window.mediaCommentCallback = function(results) {
   var context_code = $.trim($("#current_context_code").text()) || $.trim("user_" + $("#identity .user_id").text());
   for(var idx in results) { 
     var entry = results[idx];
@@ -714,7 +720,7 @@ function mediaCommentCallback(results) {
   }
   $("#media_comment_create_dialog").empty().dialog('close');
 }
-function beforeAddEntry() {
+window.beforeAddEntry = function() {
   var attemptId = Math.random();
   $.mediaComment.lastAddAttemptId = attemptId;
   setTimeout(function() {
@@ -724,13 +730,13 @@ function beforeAddEntry() {
   }, 30000);
   $("#audio_record_holder_message,#video_record_holder_message").addClass('saving');
 }
-function addEntryFail() {
+window.addEntryFail = function() {
   $(document).triggerHandler('media_recording_error');
 }
-function addEntryFailed() {
+window.addEntryFailed = function() {
   $(document).triggerHandler('media_recording_error');
 }
-function addEntryComplete(entries) {
+window.addEntryComplete = function(entries) {
   $.mediaComment.lastAddAttemptId = null;
   $("#audio_record_holder_message,#video_record_holder_message").removeClass('saving');
   try {
@@ -752,6 +758,7 @@ function addEntryComplete(entries) {
     }
   } catch(e) {
     console.log(e);
-    alert("Entry failed to save.  Please try again.");
+    alert(I18n.t('errors.save_failed_try_again', "Entry failed to save.  Please try again."));
   }
 }
+});

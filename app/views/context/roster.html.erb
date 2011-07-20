@@ -1,48 +1,60 @@
 <% 
-  add_crumb("People", context_url(@context, :context_users_url))
+  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
   @active_tab="people"
+  content_for :page_title, case @context
+  when Course
+    join_title t('titles.course_roster', "Course Roster"), @context.name
+  when Group
+    join_title t('titles.group_roster', "Group Roster"), @context.name
+  end
 %>
-<% content_for :page_title do %><%= @context.class.to_s %> Roster: <%= @context.name %><% end %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-    <a href="<%= inbox_url %>#reply" class="_message_link button button-sidebar-wide"><%= image_tag "email.png" %> Write a Message</a>
+    <a href="<%= inbox_url %>#reply" class="_message_link button button-sidebar-wide"><%= image_tag "email.png" %> <%= t('links.write_message', %{Write a Message}) %></a>
     <% if @context.is_a?(Course) %>
-      <a href="<%= context_url(@context, :context_groups_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> View Student Groups</a>
+      <a href="<%= context_url(@context, :context_groups_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= t('links.view_student_groups', %{View Student Groups}) %></a>
       <% if can_do(@context, @current_user, :manage_students) && @context.enable_user_notes %>
-        <a href="<%= course_user_notes_path(@context) %>" class="button button-sidebar-wide">View Faculty Journals</a>
+        <a href="<%= course_user_notes_path(@context) %>" class="button button-sidebar-wide"><%= t('links.view_faculty_journals', %{View Faculty Journals}) %></a>
       <% end %>
       <% if can_do(@context, @current_user, :manage_admin_users) || can_do(@context, @current_user, :read_as_admin)%>
-        <a href="<%= course_prior_users_path(@context) %>" class="button button-sidebar-wide"><%= image_tag "history.png" %> View Prior Enrollments</a>
+        <a href="<%= course_prior_users_path(@context) %>" class="button button-sidebar-wide"><%= image_tag "history.png" %> <%= t('links.view_prior_enrollments', %{View Prior Enrollments}) %></a>
       <% end %>
     <% end %>
     <% if can_do(@context, @current_user, :read_roster) %>
-      <a href="<%= context_url(@context, :context_user_services_url) %>" class="button button-sidebar-wide"><%= image_tag "link.png" %> View Registered Services</a>
+      <a href="<%= context_url(@context, :context_user_services_url) %>" class="button button-sidebar-wide"><%= image_tag "link.png" %> <%= t('links.view_services', %{View Registered Services}) %></a>
     <% end %>
     <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_students) %>
-      <a href="<%= context_url(@context, :context_details_url) %>#tab-users" class="button button-sidebar-wide"><%= image_tag "group.png" %> Manage Users</a>
+      <a href="<%= context_url(@context, :context_details_url) %>#tab-users" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= t('links.manage_users', %{Manage Users}) %></a>
     <% end %>
   </div>
   
   <div class="message_options" style="width: auto; margin: 00px; border: 0px solid #888; -moz-border-radius: 5px; padding: 0px 10px; display: none;">
     <a href="#" class="close_message_link no-hover" style="float: right;"><%= image_tag 'delete_circle.png', :alt => 'close' %></a>
-    <h3 style="margin-bottom: 0;">Send a Message</h3>
+    <h3 style="margin-bottom: 0;"><%= t('headings.send_message', %{Send a Message}) %></h3>
     <div style="padding-left: 10px; line-height: 1.7em;">
       <div class="message_selected_recipients_link" style="display: none; margin-bottom: 10px;">
-        <a href="#" class="message_selected_recipients_link email" style="display: none;">Message Selected Recipients</a>
+        <a href="#" class="message_selected_recipients_link email" style="display: none;"><%= t('links.message_recipients', %{Message Selected Recipients}) %></a>
       </div>
-      <a href="#" class="message_all_students_link email">Message All <%= @primary_users.keys.first %></a><br/>
-      <a href="#" class="message_all_teachers_link email" style="<%= hidden if @secondary_users.empty? %>">Message <%= @secondary_users.keys.first %></a><br/>
+      <a href="#" class="message_all_students_link email">
+        <%= case @context
+            when Course
+            t('links.message_all_students', "Message all Students")
+            when Group
+            t('links.message_all_group_members', "Mesage all Group Members")
+            end %>
+      </a><br/>
+      <a href="#" class="message_all_teachers_link email" style="<%= hidden if @secondary_users.empty? %>"><%= t('links.message_teachers', "Message Teachers & TA's") %></a><br/>
     </div>
     <% if !@categories.empty? %>
       <div class="rs-margin-lr rs-margin-top">
-      <h3 style="margin-bottom: 0;">Message a Group</h3>
+      <h3 style="margin-bottom: 0;"><%= t 'headings.send_message_to_group', 'Message a Group' %></h3>
       <% @categories.each do |category| %>
         <%= category %>
         <ul class="unstyled_list" style="margin-left: 10px;">
           <% @groups.select{|g| g.category == category}.each do |group| %>
             <li class="message_group">
-              <a href="#" class="message_group_link mail">Message <%= group.name %></a>
+              <a href="#" class="message_group_link mail"><%= t 'links.send_message_to', "Message %{group_name}", :group_name => group.name %></a>
               <% group.users.each do |user| %>
               <div class="recipient" style="display: none;">
                 <a href="<%= context_url(@context, :context_user_url, user.id) %>" class="recipient_name"><%= context_user_name(@context, user) %></a>
@@ -81,252 +93,10 @@
 </style>
 <% end %>
 
-<% js_block do %>
-<script type="text/javascript">
-$(document).ready(function() {
-  $(".message_link").click(function(event) {
-    event.preventDefault();
-    $(this).hide();
-    $(".message_options").show();
-    $("#select_recipients .selection_help").show();
-    $("#select_recipients .selector").show();
-  });
-  $(".recipient_name").click(function(event) {
-    if($(".message_options").css('display') != 'none') {
-      event.preventDefault();
-      var $obj = $(this).parents(".recipient").find(".recipient_selected");
-      $obj.attr('checked', !$obj.attr('checked')).change();
-    }
-  });
-  $(".close_message_link").click(function(event) {
-    event.preventDefault();
-    $("#send_message_form .cancel_button").click();
-    $(this).parents(".message_options").hide();
-    $(".message_link").show();
-    $("#select_recipients .selector").hide();
-    $("#select_recipients .selection_help").hide();
-  });
-  $(".recipient_selected").change(function(event) {
-    var selected = false;
-    $(".recipient_selected").each(function() {
-      if($(this).attr('checked')) {
-        selected = true;
-        return false;
-      }
-    });
-    $(".message_selected_recipients_link").showIf(selected);
-  }).change();
-  $(".select_all_recipients_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".recipients").find(".recipient_selected").attr('checked', true).change();
-  });
-  $(".unselect_all_recipients_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".recipients").find(".recipient_selected").attr('checked', false).change();
-  });
-  $(".message_group_link").click(function(event) {
-    event.preventDefault();
-    var recipients = [];
-    var recipient_ids = []
-    $(this).parents(".message_group").find(".recipient").each(function() {
-        recipients.push($(this).find(".recipient_name").text());
-        recipient_ids.push($(this).find(".id").text());
-    });
-    if(recipients.length > 0) {
-      $("#select_recipients").hide();
-      $("#send_message_form .recipient_ids").val(recipient_ids.join(','));
-      $("#send_message_form .recipients").text(recipients.join(", "));
-      $("#send_message_form").show();
-    }
-  });
-  $(".message_all_students_link,.message_all_teachers_link,.message_selected_recipients_link").click(function(event) {
-    event.preventDefault();
-    //if($("#select_recipients").css('display') == 'none') { return; }
-    var recipients = [];
-    var recipient_ids = []
-    if($(this).hasClass('message_all_students_link')) {
-      $("#select_recipients .student_recipients .recipient_selected").each(function() {
-        recipients.push($(this).parents(".recipient").find(".recipient_name").text());
-        recipient_ids.push($(this).parents(".recipient").find(".id").text());
-      });
-    } else if($(this).hasClass('message_all_teachers_link')) {
-      $("#select_recipients .teacher_recipients .recipient_selected").each(function() {
-        recipients.push($(this).parents(".recipient").find(".recipient_name").text());
-        recipient_ids.push($(this).parents(".recipient").find(".id").text());
-      });
-    } else {
-      $("#select_recipients .student_recipients .recipient_selected").each(function() {
-        if($(this).attr('checked')) {
-          recipients.push($(this).parents(".recipient").find(".recipient_name").text());
-          recipient_ids.push($(this).parents(".recipient").find(".id").text());
-        }
-      });
-      $("#select_recipients .teacher_recipients .recipient_selected").each(function() {
-        if($(this).attr('checked')) {
-          recipients.push($(this).parents(".recipient").find(".recipient_name").text());
-          recipient_ids.push($(this).parents(".recipient").find(".id").text());
-        }
-      });
-    }
-    if(recipients.length > 0) {
-      $("#select_recipients").hide();
-      $("#send_message_form .recipient_ids").val(recipient_ids.join(','));
-      $("#send_message_form .recipients").text(recipients.join(", "));
-      $("#send_message_form").prev(".context_message").remove();
-      $("#send_message_form").show();
-      $("html,body").scrollTo($("#send_message_form"));
-    }
-  });
-  $("#send_message_form .cancel_button").click(function() {
-    $("#send_message_form").hide();
-    $("#send_message_form").prev(".context_message").remove();
-    $("#select_recipients").show();
-  });
-  $(document).bind('message_recipients', function(event, data) {
-    if(!data || !data.body || !data.subject || !data.recipients) { return; }
-    var recipients = (data.recipients || "").split(",");
-    var ids = []
-    var names = [];
-    for(var idx in recipients) {
-      var recipient = recipients[idx];
-      var $recipient = $("#recipient_" + recipient);
-      if($recipient.length > 0) {
-        ids.push(recipient);
-        names.push($recipient.find(".recipient_name").text());
-      }
-    }
-    if(ids.length > 0) {
-      $(".message_link").click();
-      $("#select_recipients").hide();
-      var $form = $("#send_message_form");
-      $form.find(".recipient_ids").val(ids.join(','));
-      $form.find(".recipients").text(names.join(", "));
-      formData = {subject: data.subject, body: data.body};
-      $form.fillFormData(formData, {object_name: 'context_message'});
-      $("#send_message_form").show();
-      $("html,body").scrollTo($form);
-    }
-  });
-  $(document).fragmentChange(function(event, fragment) {
-    if(fragment == "#new_students_message") {
-      $(".message_link").click();
-      $(".message_all_students_link").click();
-    } else if(fragment.match(/^#reply/)) {
-      var params = null;
-      try {
-        params = JSON.parse(fragment.substring(6));
-      } catch(e) { }
-      if(params) {
-        $(document).triggerHandler('message_recipients', params);
-      }
-    }
-  });
-  $(".context_message").find(".show_recipients_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".context_message").find(".recipients_list").slideToggle();
-  });
-  var tableHeight = $("#select_recipients").height();
-  $(window).resize(function() {
-    var top = $("#select_recipients").offset().top;
-    var height = $(window).height();
-    var fillHeight = Math.min(tableHeight, height - top);
-    $(".fill_height_div").css('height', Math.max(fillHeight, 0)).css('maxHeight', '');
-  }).triggerHandler('resize');
-  $(".context_message").find("._reply_link,._reply_to_all_link").click(function(event) {
-    event.preventDefault();
-    var $message = $(this).parents(".context_message");
-    $(".message_link:first").click();
-    $("#select_recipients .recipient_selected").attr('checked', false);
-    var author_id = $message.getTemplateData({textValues: ['author_id']}).author_id;
-    $("#select_recipients #recipient_" + author_id + " .recipient_selected").attr('checked', true);
-    if($(this).hasClass('reply_to_all_link')) {
-      $message.find(".recipient").each(function() {
-        var id = $(this).getTemplateData({textValues: ['id']}).id;
-        $("#select_recipients #recipient_" + id + " .recipient_selected").attr('checked', true);
-      });
-    }
-    $(".message_selected_recipients_link:first").click();
-    $message = $message.clone(true);
-    $message.find(".link_box").remove();
-    $("#send_message_form").before($message);
-    $("#send_message_form").fillFormData({subject: ""}, {object_name: 'context_message'});
-  });
-  $.scrollSidebar();
-  var attachmentIndex = 0;
-  $("#send_message_form .add_attachment_link").click(function(event) {
-    event.preventDefault();
-    var $attachment = $(this).parents("td").find(".context_message_attachment.blank").clone(true);
-    attachmentIndex++;
-    $attachment.find(".file_input").attr('name', 'context_message[attachments][' + attachmentIndex + ']');
-    $attachment.removeClass('blank');
-    $(this).parents("td").append($attachment);
-    $attachment.slideDown();
-  });
-  $("#send_message_form .remove_attachment_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".context_message_attachment").slideUp(function() {
-      $(this).remove();
-    });
-  });
-  $(".more_messages_link").click(function(event) {
-    event.preventDefault();
-    var $link = $(this);
-    $link.text("Loading Messages...");
-    $.ajaxJSON($(this).attr('href'), 'GET', {}, function(data) {
-      for(var idx in data) {
-        var message = data[idx].context_message;
-        message.created_at = $.parseFromISO(message.created_at).datetime_formatted;
-        message.users_count = message.recipient_users.length;
-        if($("#context_message_" + message.id).length == 0) {
-          var $message = $("#context_message_blank").clone(true);
-          $message.fillTemplateData({
-            data: message,
-            id: 'context_message_' + message.id,
-            htmlValues: ['formatted_body'],
-            hrefValues: ['user_id', 'id']
-          });
-          if(message.recipient_users.length > 0) {
-            for(var jdx in message.recipient_users) {
-              var recipient = message.recipient_users[jdx].user;
-              recipient.recipient_id = recipient.id;
-              var $recipient = $message.find(".recipient_blank").clone(true).removeClass('recipient_blank');
-              $recipient.fillTemplateData({
-                data: recipient,
-                hrefValues: ['recipient_id']
-              });
-              $message.find(".recipients_list").append($recipient.show());
-            }
-          }
-          if(message.attachments.length > 0) {
-            for(var jdx in message.attachments) {
-              var attachment = message.attachments[jdx].attachment;
-              attachment.attachment_id = attachment.id;
-              var $attachment = $message.find(".attachment_blank").clone(true).removeClass('attachment_blank');
-              $attachment.fillTemplateData({
-                data: attachment,
-                hrefValues: ['attachment_id']
-              });
-              $message.find(".attachments_list").show().append($attachment.show());
-            }
-          }
-          $("#past_messages").append($message.show());
-        }
-      }
-      $("#more_messages").hide();
-    }, function(data) {
-      $link.text("Loading Failed.  Click to try again.");
-    });
-  });
-});
-</script>
-<% end %>
 <table id="select_recipients" style="width: 100%;">
   <tr>
     <td style="width: 50%; vertical-align: top;" class="recipients student_recipients">
       <h2><%= @primary_users.keys.first %></h2>
-      <div style="font-size: 0.8em; padding-left: 20px; display: none;" class="selection_help">
-      <a href="#" class="select_all_recipients_link">Select All</a> | <a href="#" class="unselect_all_recipients_link">Unselect All</a>
-      </div>
       <div style="max-height: 300px; margin-right: 20px;" class="fill_height_div">
       <table>
       <% @primary_users[@primary_users.keys.first].each do |student| %>
@@ -351,9 +121,6 @@ $(document).ready(function() {
     <% unless !@secondary_users || @secondary_users.empty? %>
     <td style="vertical-align: top;" class="recipients teacher_recipients">
       <h2><%= @secondary_users.keys.first %></h2>
-      <div style="font-size: 0.8em; padding-left: 20px; display: none;" class="selection_help">
-      <a href="#" class="select_all_recipients_link">Select All</a> | <a href="#" class="unselect_all_recipients_link">Unselect All</a>
-      </div>
       <div style="max-height: 300px;" class="fill_height_div">
       <table>
       <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
@@ -378,69 +145,3 @@ $(document).ready(function() {
     <% end %>
   </tr>
 </table>
-<% form_for :context_message, :url => context_url(@context, :context_roster_messages_url), :html => {:id => 'send_message_form', :style => 'display: none;', :multipart => true} do |f| %>
-<table class="formtable" style="width: 100%;">
-  <tr>
-    <td colspan="2"><h2>Send a Message</h2></td>
-  </tr>
-  <tr>
-    <td style="vertical-align: top; font-weight: bold;">Recipients:</td>
-    <td class="recipients" style="font-size: 0.8em; text-align: left; width: 80%"></td>
-  </tr>
-  <tr>
-    <td style="font-weight: bold">Subject:</td>
-    <td><%= f.text_field :subject %></td>
-  </tr>
-  <tr>
-    <td colspan="2">
-      <%= f.text_area :body, :style => "width: 98%; height: 200px;" %><br/>
-      <i style="font-size: 0.8em;">Keep in mind this message will be sent out as an
-      email to the selected recipients, and we can't promise it won't be read by unregistered
-      users if they share email accounts.</i>
-    </td>
-  </tr>
-  <% if can_do(@context.announcements.new, @current_user, :create) %>
-  <tr>
-    <td colspan="2">
-      <input type="checkbox" id="also_announcement" name="also_announcement" value="1"/>
-      <label for="also_announcement">Also post as an announcement</label>
-    </td>
-  </tr>
-  <% end %>
-  <tr>
-    <td colspan="2">
-      <a class="add add_attachment_link" href="#">Add Attachment</a>
-      <div class="context_message_attachment blank" style="display: none;">
-        <input type="file" name="" class="file_input"/>
-        <a href="#" class="remove_attachment_link"><%= image_tag "delete_circle.png" %></a>
-      </div>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2">
-      <%= f.hidden_field :recipients, :class => 'recipient_ids' %>
-      <div class="button-container">
-        <button type="submit" class="button">Send Message</button>
-        <button type="button" class="cancel_button button-secondary">Cancel</button>
-      </div>
-    </td>
-  </tr>
-</table>
-<% end %>
-
-<% unless @messages.empty? %>
-<div id="past_messages" class="communication_messages_list">
-  <h2 style="margin-top: 20px;">Past Messages</h2>
-  <% @messages[0..4].each do |message| %>
-    <% if can_do(message, @current_user, :read) %>
-      <%= render :partial => 'context/context_message', :object => message, :locals => {:context => @context} %>
-    <% end %>
-  <% end %>
-  <%= render :partial => 'context/context_message', :object => nil, :locals => {:context => @context} %>
-  <% if @messages.length > 5 %>
-  <div style="text-align: center; font-size: 1.2em; margin: 10px;" id="more_messages">
-    <a href="<%= context_url(@context, :context_users_url, :all_messages => 1) %>" class="more_messages_link">Show <%= pluralize(@messages.length - 5, "More Message") %></a>
-  </div>
-  <% end %>
-</div>
-<% end %>

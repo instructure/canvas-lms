@@ -1,6 +1,6 @@
 <select class="facebook_select contact_select" name="channel_id" style="display: none;">
-  <% facebook = @current_user.communication_channels.find_by_path_type('facebook') %>
-  <% if facebook %>
-    <option class="channel_option_<%= facebook.id %>" value="<%= facebook.id %>" selected>Facebook</option>
+  <% facebook = @current_user.communication_channels.unretired.find_by_path_type('facebook') %>
+  <% if facebook && feature_and_service_enabled?(:facebook) %>
+    <option class="channel_option_<%= facebook.id %>" value="<%= facebook.id %>" selected><%= t(:facebook, "Facebook") %></option>
   <% end %>
 </select>

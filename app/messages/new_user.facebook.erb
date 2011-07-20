@@ -1,5 +1,5 @@
 <% define_content :link do %>http://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
 
-New User for <%= asset.account.name %>
-  
-A new user <b><%= asset.name %></b> has registered for the account <b><%= asset.account.name %></b>.
+<%= t :title, "New User for %{account}", :account => asset.account.name %>
+
+<%= mt :body, "A new user, **%{user}**, has just registered for the account **%{account}**.", :user => asset.name, :account => asset.account.name %>

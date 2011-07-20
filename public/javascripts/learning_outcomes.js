@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+I18n.scoped("learning_outcomes", function(I18n) {
 var outcomes = {
   ratingCounter: 0,
   updateOutcome: function(outcome, $outcome) {
@@ -120,7 +120,7 @@ var outcomes = {
   },
   deleteOutcome: function($outcome) {
     $outcome.confirmDelete({
-      message: "Are you sure you want to remove this learning outcome?",
+      message: I18n.t("remove_learning_outcome", "Are you sure you want to remove this learning outcome?"),
       url: $outcome.find(".delete_outcome_link").attr('href'),
       success: function() {
         $(this).slideUp(function() {
@@ -188,7 +188,7 @@ var outcomes = {
   },
   deleteOutcomeGroup: function($group) {
     $group.confirmDelete({
-      message: "Are you sure you want to remove this learning outcome group and all its outcomes?",
+      message: I18n.t("remove_outcome_group", "Are you sure you want to remove this learning outcome group and all its outcomes?"),
       url: $group.find(".delete_group_link").attr('href'),
       success: function() {
         $(this).slideUp(function() {
@@ -226,7 +226,7 @@ $(document).ready(function() {
     event.preventDefault();
     $("#outcome_criterion_dialog").dialog('close').dialog({
       autoOpen: false,
-      title: "Learning Outcome Criterion",
+      title: I18n.t("outcome_criterion", "Learning Outcome Criterion"),
       width: 400
     }).dialog('open');
   });
@@ -241,14 +241,14 @@ $(document).ready(function() {
         $link.text("loading details...");
         var url = $outcome.find("a.show_details_link").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(data) {
-          $link.text("show details");
+          $link.text(I18n.t("show_details", "show details"));
           outcomes.updateOutcome(data.learning_outcome, $outcome);
           $outcome.addClass('expanded');
           if(callback && $.isFunction(callback)) {
             callback();
           }
         }, function(data) {
-          $link.text("details failed to load, please try again");
+          $link.text(I18n.t("details_failed_to_load", "details failed to load, please try again"));
         });
       }
     } else {
@@ -331,10 +331,10 @@ $(document).ready(function() {
       autoOpen: true,
       width: 600,
       height: 350,
-      title: 'Find Existing Outcome'
+      title: I18n.t("find_existing_outcome", 'Find Existing Outcome')
     }).dialog('open');
     if(!$dialog.hasClass('loaded')) {
-      $dialog.find(".loading_message").text("Loading outcomes...");
+      $dialog.find(".loading_message").text(I18n.t("loading_outcomes", "Loading outcomes..."));
       var url = $dialog.find(".outcomes_url").attr('href');
       $.ajaxJSON(url, 'GET', {}, function(data) {
         $dialog.find(".loading_message").remove();
@@ -362,7 +362,7 @@ $(document).ready(function() {
         $dialog.find(".outcomes_dialog_outcomes_select .outcomes_dialog_select:visible:first").click();
         $dialog.addClass('loaded');
       }, function(data) {
-        $dialog.find(".loading_message").text("Loading outcomes failed, please try again");
+        $dialog.find(".loading_message").text(I18n.t("loading_outcomes_failed", "Loading outcomes failed, please try again"));
       });
     }
   });
@@ -425,19 +425,19 @@ $(document).ready(function() {
     if($form.find(".rating:not(.blank)").length === 0) {
       var $rating = $form.find(".rating.blank:first").clone(true).removeClass('blank');
       var idx = outcomes.ratingCounter++;
-      $rating.find(".outcome_rating_description").val("Exceeds Expectations").attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][description]');
+      $rating.find(".outcome_rating_description").val(I18n.t("criteria.exceeds_expectations", "Exceeds Expectations")).attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][description]');
       $rating.find(".outcome_rating_points").val("5").attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][points]');
       $form.find(".add_holder").before($rating.show());
 
       idx = outcomes.ratingCounter++;
       $rating = $form.find(".rating.blank:first").clone(true).removeClass('blank');
-      $rating.find(".outcome_rating_description").val("Meets Expectations").attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][description]');
+      $rating.find(".outcome_rating_description").val(I18n.t("criteria.meets_expectations", "Meets Expectations")).attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][description]');
       $rating.find(".outcome_rating_points").val("3").attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][points]');
       $form.find(".add_holder").before($rating.show());
 
       idx = outcomes.ratingCounter++;
       $rating = $form.find(".rating.blank:first").clone(true).removeClass('blank');
-      $rating.find(".outcome_rating_description").val("Does Not Meet Expectations").attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][description]');
+      $rating.find(".outcome_rating_description").val(I18n.t("criteria.does_not_meet_expectations", "Does Not Meet Expectations")).attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][description]');
       $rating.find(".outcome_rating_points").val("0").attr('name', 'learning_outcome[rubric_criterion][ratings][' + idx + '][points]');
       $form.find(".add_holder").before($rating.show());
       
@@ -478,4 +478,5 @@ $(document).ready(function() {
     $(this).parents("tr").remove();
     outcomes.sizeRatings();
   });
+});
 });

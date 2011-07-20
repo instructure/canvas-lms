@@ -16,8 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function($) {
-
+I18n.scoped('gradebook', function(I18n) {
   var GradebookHistory = {
     init: function(){
       $('.assignment_header').click(function(event) {
@@ -54,7 +53,7 @@
           var submission = this.submission;
           $(".assignment_" + submission.assignment_id + "_user_" + submission.user_id + "_current_grade")
             .removeClass('loading')
-            .attr('title', $.parseFromISO(submission.graded_at).datetime_formatted + " by me.")
+            .attr('title', I18n.t('graded_by_me', "%{graded_time} by me", { 'graded_time': $.parseFromISO(submission.graded_at).datetime_formatted }))
             .text(submission.grade || "--");
         });
       });
@@ -62,5 +61,4 @@
   };
   
 $(document).ready(GradebookHistory.init);
-
-})(jQuery);
+});

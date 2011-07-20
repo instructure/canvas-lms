@@ -36,6 +36,10 @@ class CoursesController < ApplicationController
   #   rights, the total number of submissions needing grading for all
   #   assignments is returned.
   #
+  # @argument include[] ["syllabus_body"] Optional information to include with each Course.
+  #   When syllabus_body is given the user-generated html for the course 
+  #   syllabus is returned.
+  #
   # @response_field id The unique identifier for the course.
   # @response_field name The name of the course.
   # @response_field course_code The course code.
@@ -63,15 +67,20 @@ class CoursesController < ApplicationController
         end
 
         include_grading = Array(params[:include]).include?('needs_grading_count')
+        include_syllabus = Array(params[:include]).include?('syllabus_body')
 
         hash = []
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
           course = course_enrollments.first.course
           hash << course.as_json(
-            :include_root => false, :only => %w(id name course_code sis_source_id))
+            :include_root => false, :only => %w(id name course_code))
+          hash.last['sis_course_id'] = course.sis_source_id
           hash.last['enrollments'] = course_enrollments.map { |e| { :type => e.readable_type.downcase } }
           if include_grading && course_enrollments.any? { |e| e.participating_admin? }
             hash.last['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
+          end
+          if include_syllabus
+            hash.last['syllabus_body'] = course.syllabus_body
           end
         end
         render :json => hash.to_json
@@ -97,7 +106,7 @@ class CoursesController < ApplicationController
           format.html
           format.json { render :json => @course.to_json }
         else
-          flash[:error] = "Course creation failed"
+          flash[:error] = t('errors.create_failed', "Course creation failed")
           format.html { redirect_to :root_url }
           format.json { render :json => @course.errors.to_json, :status => :bad_request }
         end
@@ -122,7 +131,7 @@ class CoursesController < ApplicationController
       respond_to do |format|
         if params[:restore]
           @context.restore_from_json_backup(params[:restore])
-          flash[:notice] = "Backup Successfully Restored!"
+          flash[:notice] = t('notices.backup_restored', "Backup Successfully Restored!")
           format.html { redirect_to named_context_url(@context, :context_url) }
         else
           format.html
@@ -135,7 +144,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :update)
       @context.unconclude
-      flash[:notice] = "Course un-concluded"
+      flash[:notice] = t('notices.unconcluded', "Course un-concluded")
       redirect_to(named_context_url(@context, :context_url))
     end
   end
@@ -199,8 +208,8 @@ class CoursesController < ApplicationController
   # @response_field sis_user_id The SIS id for the user's primary pseudonym.
   #
   # @example_response
-  #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null },
-  #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis' } ]
+  #   [ { 'id': 1, 'name': 'first student', 'sis_user_id': null, 'sis_login_id': null },
+  #     { 'id': 2, 'name': 'second student', 'sis_user_id': 'from-sis', 'sis_login_id': 'login-from-sis' } ]
   def students
     get_context
     if authorized_action(@context, @current_user, :read_roster)
@@ -219,10 +228,10 @@ class CoursesController < ApplicationController
         @context.workflow_state = 'deleted'
         @context.sis_source_id = nil
         @context.save
-        flash[:notice] = "Course successfully deleted"
+        flash[:notice] = t('notices.deleted', "Course successfully deleted")
       else
         @context.complete
-        flash[:notice] = "Course successfully concluded"
+        flash[:notice] = t('notices.concluded', "Course successfully concluded")
       end
       @current_user.touch
       respond_to do |format|
@@ -240,10 +249,10 @@ class CoursesController < ApplicationController
       @range_end = Date.tomorrow
       
       query = "SELECT COUNT(id), SUM(size) FROM attachments WHERE context_id=%s AND context_type='Course' AND root_attachment_id IS NULL AND file_state != 'deleted'"
-      row = ActiveRecord::Base.connection.select_rows(query % [@context.id]).first
+      row = Attachment.connection.select_rows(query % [@context.id]).first
       @file_count, @files_size = [row[0].to_i, row[1].to_i]
       query = "SELECT COUNT(id), SUM(max_size) FROM media_objects WHERE context_id=%s AND context_type='Course' AND attachment_id IS NULL AND workflow_state != 'deleted'"
-      row = ActiveRecord::Base.connection.select_rows(query % [@context.id]).first
+      row = MediaObject.connection.select_rows(query % [@context.id]).first
       @media_file_count, @media_files_size = [row[0].to_i, row[1].to_i]
       
       if params[:range] && params[:date]
@@ -273,7 +282,7 @@ class CoursesController < ApplicationController
   def course_details
     get_context
     if authorized_action(@context, @current_user, [:update, :add_students, :add_admin_users])
-      add_crumb("Settings", named_context_url(@context, :context_details_url))
+      add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
       render :action => :course_details
     end
   end
@@ -325,18 +334,17 @@ class CoursesController < ApplicationController
     if params[:reject]
       @pending_enrollment.reject!
       session[:enrollment_uuid] = nil
+      flash[:notice] = t('notices.invitation_cancelled', "Invitation cancelled.")
       if @current_user
-        flash[:notice] = "Invitation cancelled."  #If you change your mind you can still...
         redirect_to dashboard_url
       else
-        flash[:notice] = "Invitation cancelled."
         redirect_to root_url
       end
     elsif params[:accept]
       if @current_user && @pending_enrollment.user == @current_user
         @pending_enrollment.accept!
         session[:accepted_enrollment_uuid] = @pending_enrollment.uuid #session[:enrollment_uuid]
-        flash[:notice] = "Invitation accepted!  Welcome to #{@context.name}!"
+        flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
         redirect_to course_url(@context.id)
       elsif !@current_user && @pending_enrollment.user.registered?
         @pseudonym = @pending_enrollment.user.pseudonym rescue nil
@@ -347,14 +355,14 @@ class CoursesController < ApplicationController
           redirect_to request.url
         else
           session[:return_to] = course_url(@context.id)
-          flash[:notice] = "You'll need to log in before you can accept the enrollment."
+          flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
           redirect_to login_url
         end
       elsif @current_user && @current_user.registered? && @current_user != @pending_enrollment.user
         if params[:transfer_enrollment]
           @pending_enrollment.user = @current_user
           @pending_enrollment.accept!
-          flash[:notice] = "Invitation accepted!  Welcome to #{@context.name}!"
+          flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
           session[:return_to] = nil
           redirect_to course_url(@context.id)
         else
@@ -405,9 +413,9 @@ class CoursesController < ApplicationController
     if enrollment && enrollment.inactive?
       start_at, end_at = @context.enrollment_dates_for(enrollment)
       if start_at && start_at > Time.now
-        flash[:notice] = "You do not have permission to access the course, #{@context.name}, until #{start_at.to_date.to_s}"
+        flash[:notice] = t('notices.course_not_available_until', "You do not have permission to access the course, %{course}, until %{date}", :course => @context.name, :date => start_at.to_date.to_s)
       else
-        flash[:notice] = "Your membership in the course, #{@context.name}, is not yet activated"
+        flash[:notice] = t('notices.enrollment_not_active', "Your membership in the course, %{course}, is not yet activated", :course => @context.name)
       end
       redirect_to dashboard_url
       return true
@@ -423,7 +431,7 @@ class CoursesController < ApplicationController
       session[:enrollment_as_student] = true if e.is_a?(StudentEnrollment)
       session[:enrollment_uuid_course_id] = e.course_id
       if (!@domain_root_account || @domain_root_account.allow_invitation_previews?)
-        flash[:notice] = "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate."
+        flash[:notice] = t('notices.preview_course', "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
         redirect_to course_enrollment_invitation_url(@context, :invitation => enrollment.uuid, :accept => 1)
         return true
@@ -438,7 +446,7 @@ class CoursesController < ApplicationController
     @finished_enrollment = @context.enrollments.find_by_uuid(params[:invitation]) if params[:invitation]
     if session[:accepted_enrollment_uuid] && (e = @context.enrollments.find_by_uuid(session[:accepted_enrollment_uuid]))
       e.accept! if e.invited?
-      flash[:notice] = "Invitation accepted!  Welcome to #{@context.name}!"
+      flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       session[:accepted_enrollment_uuid] = nil
       session[:enrollment_uuid_course_id] = nil
       session[:enrollment_uuid] = nil if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
@@ -499,16 +507,15 @@ class CoursesController < ApplicationController
       @user = User.find_by_email(params[:email])
       if @user && @user.registered?
         store_location
-        flash[:notice] = "That user already exists.  Please log in before accepting the enrollment."
+        flash[:notice] = t('notices.user_exists', "That user already exists.  Please log in before accepting the enrollment.")
         redirect_to login_url
         return
       end
       email = (@current_user && @current_user.email) || params[:email]
       @user = @current_user
-      email_list = EmailList.new(params[:email])
-      @enrollments = EnrollmentsFromEmailList.process(email_list, :course_id => @context.id, :enrollment_type => 'StudentEnrollment', :limit => 1)
+      @enrollments = EnrollmentsFromUserList.process(UserList.new(params[:email], @context.root_account), @context, :enrollment_type => 'StudentEnrollment', :limit => 1)
       if @enrollments.length == 0
-        flash[:error] = "Invalid email address, please try again"
+        flash[:error] = t('errors.invalid_user', "Invalid user, please try again")
         render :action => 'open_enrollment'
         return
       else
@@ -547,7 +554,7 @@ class CoursesController < ApplicationController
   def show
     @context = Course.find(params[:id])
     @context_enrollment = @context.enrollments.find_by_user_id(@current_user.id) if @context && @current_user
-    @unauthorized_message = "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled." if params[:invitation]
+    @unauthorized_message = t('unauthorized.invalid_link', "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.") if params[:invitation]
     claim_course if session[:claim_course_uuid] || params[:verification] 
     @context.claim if @context.created?
     return if check_enrollment
@@ -570,15 +577,15 @@ class CoursesController < ApplicationController
         @wiki = @context.wiki
         @page = @wiki.wiki_page
       when 'assignments'
-        add_crumb("Assignments")
+        add_crumb(t('#crumbs.assignments', "Assignments"))
         @contexts = [@context]
         get_sorted_assignments
       when 'modules'
-        add_crumb("Modules")
-        @modules = ContextModule.fast_cached_for_context(@context)
+        add_crumb(t('#crumbs.modules', "Modules"))
+        @modules = @context.context_modules.active
         @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
       when 'syllabus'
-        add_crumb("Syllabus")
+        add_crumb(t('#crumbs.syllabus', "Syllabus"))
         @groups = @context.assignment_groups.active.find(:all, :order => 'position, name')
         @events = @context.calendar_events.active.to_a
         @events.concat @context.assignments.active.to_a
@@ -615,18 +622,18 @@ class CoursesController < ApplicationController
     @enrollment = @enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.first
     if params[:role] == 'revert'
       session["role_course_#{@context.id}"] = nil
-      flash[:notice] = "Your default role and permissions have been restored"
+      flash[:notice] = t('notices.role_restored', "Your default role and permissions have been restored")
     elsif (@enrollment && @enrollment.can_switch_to?(params[:role])) || @context.grants_right?(@current_user, session, :manage_admin_users)
       @temp_enrollment = Enrollment.typed_enrollment(params[:role]).new rescue nil
       if @temp_enrollment
         session["role_course_#{@context.id}"] = params[:role]
         session[:session_affects_permissions] = true
-        flash[:notice] = "You have switched roles for this course.  You will now see it as if you were a #{@temp_enrollment.readable_type}"
+        flash[:notice] = t('notices.role_switched', "You have switched roles for this course.  You will now see the course in this new role: %{enrollment_type}", :enrollment_type => @temp_enrollment.readable_type)
       else
-        flash[:error] = "Invalid role type"
+        flash[:error] = t('errors.invalid_role', "Invalid role type")
       end
     else
-      flash[:error] = "You do not have permission to switch roles"
+      flash[:error] = t('errors.unauthorized.switch_roles', "You do not have permission to switch roles")
     end
     redirect_to course_url(@context)
   end
@@ -717,16 +724,14 @@ class CoursesController < ApplicationController
     can_add ||= params[:enrollment_type] == 'TeacherEnrollment' && @context.teacherless? && @context.grants_right?(@current_user, session, :manage_students)
     can_add ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_add
-      params[:user_emails] ||= ""
+      params[:user_list] ||= ""
       
-      email_list = EmailList.new(params[:user_emails])
-
       respond_to do |format|
         @enrollment_state = nil
         if params[:auto_accept] && @context.account.grants_right?(@current_user, session, :manage_admin_users)
           @enrollment_state = 'active'
         end
-        if (@enrollments = EnrollmentsFromEmailList.process(email_list, :course_id => @context.id, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_priveleges_to_course_section => params[:limit_priveleges_to_course_section] == '1', :enrollment_state => @enrollment_state))
+        if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_priveleges_to_course_section => params[:limit_priveleges_to_course_section] == '1', :enrollment_state => @enrollment_state))
           format.json { render :json => @enrollments.to_json(:include => :user, :methods => [:type, :email, :last_name_first, :users_pseudonym_id, :communication_channel_id]) }
         else
           format.json { render :json => "", :status => :bad_request }
@@ -783,7 +788,7 @@ class CoursesController < ApplicationController
         account = Account.find(params[:course][:account_id])
         account = nil unless account.grants_right?(@current_user, session, :manage_courses)
       end
-      account ||= @domain_root_account.sub_accounts.find_or_create_by_name("Manually-Created Courses")
+      account ||= @domain_root_account.sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
       if account.grants_right?(@current_user, session, :manage_courses)
         args = params[:course].slice(:name, :start_at, :conclude_at)
         root_account = account.root_account || account
@@ -792,6 +797,7 @@ class CoursesController < ApplicationController
         end
       end
       args[:enrollment_term] ||= @context.enrollment_term
+      args[:abstract_course] = @context.abstract_course
       args[:account] = account
       @course = @context.account.courses.new
       @context.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
@@ -831,6 +837,7 @@ class CoursesController < ApplicationController
       end
       if !@course.account.grants_right?(@current_user, session, :manage_courses)
         params[:course].delete :storage_quota
+        params[:course].delete :storage_quota_mb
         if @course.root_account.settings[:prevent_course_renaming_by_teachers]
           params[:course].delete :name
           params[:course].delete :course_code
@@ -853,10 +860,10 @@ class CoursesController < ApplicationController
           if params[:update_default_pages]
             @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
           end
-          flash[:notice] = 'Course was successfully updated.'
+          flash[:notice] = t('notices.updated', 'Course was successfully updated.')
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
           format.xml  { head :ok }
-          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title]), :status => :ok }
+          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.xml  { render :xml => @course.errors.to_xml }
@@ -865,11 +872,11 @@ class CoursesController < ApplicationController
       end
     end
   end
-  
+
   def public_feed
     return unless get_feed_context(:only => [:course])
     feed = Atom::Feed.new do |f|
-      f.title = "#{@context.name} Feed"
+      f.title = t('titles.rss_feed', "%{course} Feed", :course => @context.name)
       f.links << Atom::Link.new(:href => named_context_url(@context, :context_url))
       f.updated = Time.now
       f.id = named_context_url(@context, :context_url)

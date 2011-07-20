@@ -1,29 +1,29 @@
 <ul id="identity">
   <% if !@current_user %>
     <% if !@domain_root_account || @domain_root_account == Account.default %>
-      <li class="no-left-border"><%= link_to "Sign Up as a Teacher", register_path %></li>
+      <li class="no-left-border"><%= link_to t('links.sign_up_as_teacher', "Sign Up as a Teacher"), register_path %></li>
       <li><%= link_to "Log In", login_path %></li>
     <% else %>
-      <li class="no-left-border"><%= link_to "Log In", login_path %></li>
+      <li class="no-left-border"><%= link_to t('links.log_in', "Log In"), login_path %></li>
     <% end %>
   <% else %>
     <li class="user_name"><%= link_to @current_user.short_name, profile_path %></li>
     <% if @real_current_user && @real_current_user != @current_user %>
-      <li class="stop_masquerading"><%= link_to "[Stop Masquerading]", user_masquerade_url(@real_current_user.id), :method => :post %></li>
+      <li class="stop_masquerading"><%= link_to t('links.stop_masquerading', "[Stop Masquerading]"), user_masquerade_url(@real_current_user.id), :method => :post %></li>
     <% end %>
-    <li class="first inbox"><a href="<%= inbox_path %>"><span>Inbox</span> 
+    <li class="first inbox"><a href="<%= inbox_path %>"><span><%= t 'links.inbox', "Inbox" %></span>
     <% unread = @current_user.unread_inbox_items_count; if unread > 0 %>
       <b class="unread-messages-count"><%= unread %></b>
     <% end %>
     </a></li>
-    <li><%= link_to "Profile", profile_path %></li>
+    <li><%= link_to t('links.profile', "Profile"), profile_path %></li>
     <li class="user_id" style="display: none;"><%= @current_user.id %></li>
     <li class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></li>
     <li id="current_context_code" style="display: none;"><%= @context.try_rescue(:asset_string) %></li>
     <li class="user_long_name" style="display: none;"><%= @current_user.name %></li>
-    <li class="logout"><%= link_to "Logout", logout_path, :method => :delete %></li>
+    <li class="logout"><%= link_to t('links.logout', "Logout"), logout_path, :method => :delete %></li>
   <% end %>
   <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
-    <li class="feedback"><a href="#" id="feedback_link">Feedback</a></li>
+    <li class="feedback"><a href="#" id="feedback_link"><%= t 'links.feedback', "Feedback" %></a></li>
   <% end %>
 </ul>

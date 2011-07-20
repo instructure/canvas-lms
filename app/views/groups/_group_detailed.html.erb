@@ -3,12 +3,12 @@
   <span class="name"><%= group.name %></span>
   <a class="link" href="<%= context_url(@context, :context_group_url, group.id, :join => 1) %>">
     <% if group.auto_accept?(@current_user) %>
-      join this group
+      <%= t 'actions.join_group', 'join this group' %>
     <% else %>
-      ask to join this group
+      <%= t 'actions.ask_to_join_group', 'ask to join this group' %>
     <% end %>
   </a>
   <div class="members">
-    <%= pluralize(group.participating_users.length, 'Member') %>
+    <%= t :member, 'member', :count => group.participating_users.length %>
   </div>
 </li>

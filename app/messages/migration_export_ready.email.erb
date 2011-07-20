@@ -3,10 +3,10 @@
 <% end %>
 
 <% define_content :subject do %>
-  Course Extraction Ready: <%= asset.migration_settings[:course_name] %>
+  <%= t :subject, "Course Extraction Ready: %{course_name}", :course_name => asset.migration_settings[:course_name] %>
 <% end %>
 
-The extraction process for the course, <%= asset.migration_settings[:course_name] || asset.context.name %>, has completed.  The content is now ready to be imported into your course.
+<%= t :body, "The extraction process for the course, %{course_name}, has completed. The content is now ready to be imported into your course.", :course_name => (asset.migration_settings[:course_name] || asset.context.name) %>
 
-To finish importing content into <%= asset.context.name %> you'll need to click the following link:
+<%= t :link_message, "To finish importing content into %{course_name} you'll need to click the following link:", :course_name => asset.context.name %>
 <%= content :link %>

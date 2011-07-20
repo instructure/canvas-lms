@@ -6,6 +6,9 @@ class QtiExporter < Canvas::Migrator
   MANIFEST_FILE = "imsmanifest.xml"
   QTI_2_1_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p1'
   QTI_2_0_URL = 'http://www.imsglobal.org/xsd/imsqti_v2p0'
+  QTI_2_0_ITEM_URL = 'http://www.imsglobal.org/xsd/imsqti_item_v2p0'
+  QTI_2_1_ITEM_URL = 'http://www.imsglobal.org/xsd/imsqti_item_v2p1'
+  QTI_2_REGEX = %r{http://www.imsglobal.org/xsd/(?:imsqti_v2p0|imsqti_item_v2p0|imsqti_v2p1|imsqti_item_v2p1)}
   IMS_MD = "http://www.imsglobal.org/xsd/imsmd_v1p2"
 
   def initialize(settings)
@@ -62,7 +65,7 @@ class QtiExporter < Canvas::Migrator
   def self.is_qti_2(manifest_path)
     if File.exists?(manifest_path)
       File.open(manifest_path) do |io|
-        io.each { |line| return true if line.include?(QTI_2_1_URL) || line.include?(QTI_2_0_URL) }
+        io.each { |line| return true if line =~ QTI_2_REGEX }
       end
     end
     false

@@ -1,6 +1,6 @@
 <% jammit_css :login %>
 <% @body_classes << "modal" if @body_classes %>
-<% js_block do %>
+<% js_block :i18n_scope => "pseudonyms.login"  do %>
 <script>
 $(document).ready(function() {
   $("#register_link").click(function(){
@@ -16,7 +16,7 @@ $(document).ready(function() {
     },
     success: function(data) {
       $(this).loadingImage('remove');
-      $.flashMessage("Password confirmation sent to " + $(this).find(".email_address").val() + ".  Make sure you check your spam box.");
+      $.flashMessage(I18n.t("password_confirmation_sent", "Password confirmation sent to %{email_address}. Make sure you check your spam box.", {email_address: $(this).find(".email_address").val()}));
       $(".login_link:first").click();
     },
     error: function(data) {
@@ -40,12 +40,12 @@ $(document).ready(function() {
       var success = true;
       if(!data.unique_id || data.unique_id.length < 1) {
         $(this).formErrors({
-          unique_id: 'Invalid login'
+          unique_id: I18n.t("invalid_login", 'Invalid login')
         });
         success = false;
       } else if(!data.password || data.password.length < 1) {
         $(this).formErrors({
-          password: 'Invalid password'
+          password: I18n.t("invalid_password", 'Invalid password')
         });
         success = false;
       }
@@ -56,7 +56,7 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<% login_handle_name = @domain_root_account.login_handle_name rescue "Email Address" %>
+<% login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name %>
 <% @is_delegated = @domain_root_account.delegated_authentication? if @domain_root_account and @is_delegated.nil? %>
 <div id="modal-box">
   <div id="modal-box-inner">
@@ -67,40 +67,46 @@ $(document).ready(function() {
                   <div class="error_text"><%= flash[:delegated_message] %></div>
                 </div>
         <% end %>
-            <a href="<%= login_path %>" style="font-size: 1.3em;" class="button">Log in at <%= @domain_root_account.display_name rescue "your institution" %></a>
+          <% 
+             login_message = t('default_login_message', "Log in at your institution") 
+             if @domain_root_account && @domain_root_account.display_name
+               login_message = t('login_at_account', "Log in at %{school_name}", :school_name => @domain_root_account.display_name)
+             end
+          %>
+            <a href="<%= login_path %>" style="font-size: 1.3em;" class="button"><%= login_message %></a>
         </div>
     <% else %>
         <% form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form"} do |f| %>
           <%= link_to "Click to register",  Setting.get_cached("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account && @domain_root_account.settings[:open_registration] %>
-          <h2 class="ui-helper-hidden-accessible">Login</h2>
+          <h2 class="ui-helper-hidden-accessible"><%= t('login', 'Login') %></h2>
           <% login_inner_dialog = yield :login_inner_dialog %>
           <%= login_inner_dialog if login_inner_dialog && !login_inner_dialog.strip.empty? %>
           <input type="hidden" name="redirect_to_ssl" value="1"/>
           <div>
             <span class=" field-with-fancyplaceholder"><%= f.label :unique_id, login_handle_name %><%= f.text_field :unique_id, :class => "text", :value => (@unauthorized_user.email rescue '') %></span>
-            <span class=" field-with-fancyplaceholder"><%= f.label :password, "Password" %><%= f.password_field :password, :class => "text" %></span>
+            <span class=" field-with-fancyplaceholder"><%= f.label :password, :en => "Password" %><%= f.password_field :password, :class => "text" %></span>
           </div>
           <div>
             <div style="float: left;">
-              <%= f.check_box :remember_me %><%= f.label :remember_me, "Stay logged in" %>
+              <%= f.check_box :remember_me %><%= f.blabel :remember_me, :en => "Stay logged in" %>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <% url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || "#" %>
-              <%= link_to "I don't know my password", url, :class => (url != '#' ? "not_external" : "forgot_password_link"), :id => "login_forgot_password" %>
+              <%= link_to t('dont_know_password', "I don't know my password"), url, :class => (url != '#' ? "not_external" : "forgot_password_link"), :id => "login_forgot_password" %>
             </div>
-            <button type="submit" class="button">Login</button> 
+            <button type="submit" class="button"><%= t('login', 'Login') %></button> 
           </div>
         <% end %>
     <% end %>
 
     <% form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :style => "display: none;"} do |f| %>
 
-      <p>Enter your <%= login_handle_name %> and we'll send you a link to change your password.</p>
+      <p><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => login_handle_name) %></p>
       <div>
         <span class=" field-with-fancyplaceholder"><label for="pseudonym_session_unique_id_forgot"><%= login_handle_name %></label><input class="email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" /></span>
-        <button type="submit" class="button">Request Password</button>
+        <button type="submit" class="button"><%= t('buttons.request_password', 'Request Password') %></button>
       </div>
 
-      &larr; <%= link_to "Back to Login", login_path, :class => "login_link" %>
+      &larr; <%= link_to t('back_to_login', "Back to Login"), login_path, :class => "login_link" %>
     <% end %>
   </div>
 </div>

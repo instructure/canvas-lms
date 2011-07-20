@@ -8,8 +8,10 @@ shared_examples_for "quiz selenium tests" do
 
     get "/courses/#{@course.id}/quizzes/new"
 
-    driver.find_element(:css, ".add_question .add_question_link").click
-    keep_trying_until{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    keep_trying_until {
+      driver.find_element(:css, ".add_question .add_question_link").click
+      driver.find_elements(:css, "#questions .question_holder").length > 0
+    }
     holder = driver.find_element(:css, "#questions .question_holder")
     holder.should be_displayed
     holder.find_element(:css, ".cancel_link").click
@@ -61,7 +63,7 @@ shared_examples_for "quiz selenium tests" do
     question = questions[0]
     question.
       find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="multiple_choice_question"]').select
+      find_element(:css, 'option[value="multiple_choice_question"]').click
     
     tiny_frame = wait_for_tiny(question.find_element(:css, 'textarea.question_content'))
     in_frame tiny_frame["id"] do
@@ -103,7 +105,7 @@ shared_examples_for "quiz selenium tests" do
     question = questions[1]
     question.
       find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="true_false_question"]').select
+      find_element(:css, 'option[value="true_false_question"]').click
     
     replace_content(question.find_element(:css, "input[name='question_points']"), "2")
     
@@ -134,7 +136,7 @@ shared_examples_for "quiz selenium tests" do
     question = questions[2]
     question.
       find_element(:css, 'select.question_type').
-      find_element(:css, 'option[value="short_answer_question"]').select
+      find_element(:css, 'option[value="short_answer_question"]').click
     
     replace_content(question.find_element(:css, "input[name='question_points']"), "1")
     
@@ -210,7 +212,7 @@ shared_examples_for "quiz selenium tests" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     find_questions_link = driver.find_element(:link, "Find Questions")
     find_questions_link.click
-    driver.find_element(:link, "Select All").click
+    keep_trying_until { driver.find_element(:link, "Select All") }.click
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
   end

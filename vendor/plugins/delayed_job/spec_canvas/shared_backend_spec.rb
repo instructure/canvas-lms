@@ -79,7 +79,8 @@ shared_examples_for 'a backend' do
   
   describe "find_available" do
     it "should not find failed jobs" do
-      @job = create_job :attempts => 50, :failed_at => @backend.db_time_now
+      @job = create_job :attempts => 50
+      @job.fail!
       @backend.find_available('worker', 5, 1.second).should_not include(@job)
     end
     
@@ -100,6 +101,7 @@ shared_examples_for 'a backend' do
     
     it "should find expired jobs" do
       @job = create_job(:locked_by => 'worker', :locked_at => @backend.db_time_now - 2.minutes)
+      Delayed::Job.unlock_expired_jobs(1.minute)
       @backend.find_available('worker', 5, 1.minute).should include(@job)
     end
   end
@@ -115,13 +117,15 @@ shared_examples_for 'a backend' do
     end
 
     it "should allow a second worker to get exclusive access if the timeout has passed" do
+      Delayed::Job.unlock_expired_jobs(1.minute)
       @job.lock_exclusively!(1.minute, 'worker2').should == true
-    end      
-    
+    end
+
     it "should be able to get access to the task if it was started more then max_age ago" do
       @job.locked_at = 5.hours.ago
       @job.save
 
+      Delayed::Job.unlock_expired_jobs(4.hours)
       @job.lock_exclusively! 4.hours, 'worker2'
       @job.reload
       @job.locked_by.should == 'worker2'
@@ -133,15 +137,8 @@ shared_examples_for 'a backend' do
     end
 
     it "should be found by another worker if the time has expired" do
+      Delayed::Job.unlock_expired_jobs(4.minutes)
       @backend.find_available('worker2', 1, 4.minutes).length.should == 1
-    end
-
-    it "should be able to get exclusive access again when the worker name is the same" do
-      @job.lock_exclusively!(5.minutes, 'worker1').should be_true
-      @job.update_attribute(:locked_at, 1.minute.ago)
-      @job.lock_exclusively!(5.minutes, 'worker1').should be_true
-      @job.update_attribute(:locked_at, 1.minute.ago)
-      @job.lock_exclusively!(5.minutes, 'worker1').should be_true
     end
   end
   
@@ -234,8 +231,8 @@ shared_examples_for 'a backend' do
     it "should fail to lock if an earlier job gets locked" do
       job1 = create_job(:strand => 'myjobs')
       job2 = create_job(:strand => 'myjobs')
-      @backend.find_available('w1', 2, 60).should == [job1, job2]
-      @backend.find_available('w2', 2, 60).should == [job1, job2]
+      @backend.find_available('w1', 2, 60).should == [job1]
+      @backend.find_available('w2', 2, 60).should == [job1]
 
       # job1 gets locked by w1
       job1.lock_exclusively!(60, 'w1').should == true
@@ -243,7 +240,7 @@ shared_examples_for 'a backend' do
       # w2 tries to lock job1, fails
       job1.lock_exclusively!(60, 'w2').should == false
       # normally w2 would now be able to lock job2, but strands prevent it
-      job2.lock_exclusively!(60, 'w2').should == false
+      @backend.get_and_lock_next_available('w2', 60).should be_nil
 
       # now job1 is done
       job1.destroy
@@ -257,19 +254,19 @@ shared_examples_for 'a backend' do
       job2 = create_job(:strand => 'myjobs')
       job3 = create_job(:strand => 'myjobs')
       @backend.get_and_lock_next_available('w1', 60).should == job1
-      @backend.find_available('w2', 1, 60).should == [job2]
-      job2.reload.lock_exclusively!(60, 'w2').should be_false
-      # job2 just got rescheduled, but not job3. make sure that job2 still runs first.
+      @backend.find_available('w2', 1, 60).should == []
       job1.destroy
-      # fake out the current time since the job got rescheduled for the future
-      @backend.stub!(:db_time_now).and_return(5.minutes.from_now)
+      # move job2's time forward
+      job2.update_attribute(:run_at, 1.second.ago)
+      job3.update_attribute(:run_at, 5.seconds.ago)
+      # we should still get job2, not job3
       @backend.get_and_lock_next_available('w1', 60).should == job2
     end
 
     it "should allow to run the next job if a failed job is present" do
       job1 = create_job(:strand => 'myjobs')
       job2 = create_job(:strand => 'myjobs')
-      job1.update_attribute(:failed_at, Time.now)
+      job1.fail!
       @backend.find_available('w1', 2, 60).should == [job2]
       job2.lock_exclusively!(60, 'w1').should == true
     end
@@ -312,23 +309,23 @@ shared_examples_for 'a backend' do
 
     it "should schedule jobs if they aren't scheduled yet" do
       @backend.count.should == 0
+      audit_started = @backend.db_time_now
       Delayed::Periodic.perform_audit!
       @backend.count.should == 1
       job = @backend.first
       job.tag.should == 'periodic: my SimpleJob'
       job.payload_object.should == Delayed::Periodic.scheduled['my SimpleJob']
-      job.run_at.should >= @backend.db_time_now
+      job.run_at.should >= audit_started
       job.run_at.should <= @backend.db_time_now + 6.minutes
     end
 
     it "should schedule jobs if there are only failed jobs on the queue" do
       @backend.count.should == 0
-      Delayed::Periodic.perform_audit!
+      expect { Delayed::Periodic.perform_audit! }.to change(@backend, :count).by(1)
       @backend.count.should == 1
       job = @backend.first
-      job.update_attribute :failed_at, @backend.db_time_now
-      Delayed::Periodic.perform_audit!
-      @backend.count.should == 2
+      job.fail!
+      expect { Delayed::Periodic.perform_audit! }.to change(@backend, :count).by(1)
     end
 
     it "should not schedule jobs that are already scheduled" do

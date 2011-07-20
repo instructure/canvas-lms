@@ -18,15 +18,15 @@
     if recent_event.is_a?(Assignment)
       icon_data = [nil, 'icon-grading-gray']
       if can_do(context, @current_user, :participate_as_student)
-        icon_data = submission && submission.submitted_or_graded? ? [submission.readable_state, 'icon-grading'] : ['not submitted', "icon-grading-gray"]
+        icon_data = submission && submission.submitted_or_graded? ? [submission.readable_state, 'icon-grading'] : [t('not_submitted', 'not submitted'), "icon-grading-gray"]
         icon_data[0] = nil if !recent_event.expects_submission?
       elsif can_do(context, @current_user, :manage_grades)
         if recent_event.has_submitted_submissions?
-          icon_data = ['no submissions', "icon-grading-gray"]
+          icon_data = [t('no_submissions', 'no submissions'), "icon-grading-gray"]
         elsif !@current_user.assignments_needing_grading(:contexts => @contexts).include?(recent_event)
-          icon_data = ['all graded', 'icon-grading']
+          icon_data = [t('all_graded', 'all graded'), 'icon-grading']
         else
-          icon_data = ['needs grading', "icon-grading-gray"]
+          icon_data = [t('needs_grading', 'needs grading'), "icon-grading-gray"]
         end
       end
     end
@@ -43,7 +43,10 @@
             <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
           <% end %>
           <% if recent_event.points_possible %>
-          <span style="display: block;"><strong><%= submission.score if submission %></strong> <span style="font-size: 0.8em;">out of <%= recent_event.points_possible %></span></span>
+            <span style="display: block;"><%= t 'submission_score', %{%{score} *out of %{points_possible}*},
+              :score => "<strong>#{submission.score if submission}</strong>".html_safe,
+              :points_possible => recent_event.points_possible,
+              :wrapper => '<span style="font-size: 0.8em;">\1</span>' %></span>
           <% end %>
         <% else %>
           <span style="display: block;"><%= datetime_string(recent_event.start_at, :event, recent_event.end_at) %></span>

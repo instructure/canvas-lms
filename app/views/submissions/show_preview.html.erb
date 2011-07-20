@@ -1,10 +1,11 @@
-<% content_for :page_title do %><%= @assignment.title %>: <%= context_user_name(@context, @submission.user) %><% end %>
+<% content_for :page_title do %><%= join_title @assignment.title, context_user_name(@context, @submission.user) %><% end %>
 
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
-    <p>The submissions for this assignment are posts in the assignment's discussion.
-    Below are the discussion posts for <%= context_user_name(@context, @submission.user) %>, or you can
-    <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1) %>"><b>view the full discussion</b></a>
+    <p><%= t('discussion_submission_description', 
+            "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.", 
+            :user => context_user_name(@context, @submission.user), 
+            :wrapper => "<a href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1)}\"><b>\\1</b></a>") %>
     </p>
     <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
     <% if @assignment.group_category %>
@@ -14,22 +15,20 @@
       <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true} %>
     <% end %>
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-      <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward">Show the Entire Discussion</a>
+      <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
     </div>
   </div>
 <% elsif @submission.submission_type == "online_url" %>
   <div style="text-align: center; width: 500px; margin: 10px auto; font-size: 0.8em;">
     <% image = @submission.attachment if @submission.processed? %>
-    This submission was a URL to an external page.
+    <%= t('external_url_submission', 'This submission was a URL to an external page.') %>
     <% if image %>
-      We've included a snapshot of what the page looked like when it was submitted.  Or you
-      can click to view the original submission.
+      <%= t('entry_with_image', "We've included a snapshot of what the page looked like when it was submitted. Or you can click to view the original submission.")  %>
     <% else %>
-      Keep in mind that this page may
-      have changed since the submission originally occurred.
+      <%= t('entry_no_image', 'Keep in mind that this page may have changed since the submission originally occurred.') %>
     <% end %>
     <div style="font-size: 1.4em; margin: 10px;">
-      <a href="<%= @submission.url %>" class="not_external">View the Original Submission for <%= context_user_name(@context, @submission.user) %></a>
+      <a href="<%= @submission.url %>" class="not_external"><%= t('view_original_submission', 'View the Original Submission for %{user}', :user => context_user_name(@context, @submission.user)) %></a>
     </div>
     <div style="font-size: 1.4em; margin: 10px;">
       <a href="<%= @submission.url %>" class="not_external"><%= @submission.url %></a>
@@ -37,7 +36,7 @@
   </div>
   <div style="text-align: center;">
   <% if @submission.processed %>
-    <img src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => image.id) %>" alt="URL Preview"/>
+    <img src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => image.id) %>" alt="<%= t('url_preview', 'URL Preview') %>"/>
   <% end %>
   </div>
 <% elsif @submission.submission_type == "online_text_entry" %>
@@ -56,8 +55,8 @@
   <% end %>
   <div style="text-align: right; margin-right: 20px;">
     <select class="data_view">
-      <option value="paper">Paper View</option>
-      <option value="plain_text">Plain Text View</option>
+      <option value="paper"><%= t('paper_view', 'Paper View') %></option>
+      <option value="plain_text"><%= t('plain_view', 'Plain Text View') %></option>
     </select>
   </div>
   <div id="submission_preview" class="paper user_content">
@@ -68,12 +67,12 @@
     <div class="centered-block-wrap">
       <div class="centered-block-inner">
         <ul class="ui-listview" style="margin-top: 30px">
-          <li class="ui-listview-header">File Uploads for <b><%= @submission.user.name %></b></li>
+          <li class="ui-listview-header"><%= mt('file_uploads_for_user', 'File Uploads for **%{user}**', :user => @submission.user.name) %></li>
           <% if @submission.attachments.empty? %>
             <li>
               <div class="ui-listview-text ui-listview-right"></div>
               <span class="ui-listview-text">
-                No files were uploaded for this submission
+                <%= t('no_files', 'No files were uploaded for this submission') %>
               </span>
             </li>
           <% else %>
@@ -88,7 +87,7 @@
                 <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
                   <%= attachment.display_name %>
                   <% if attachment.scribdable? %>
-                    <span style="padding: 0 3px;" title="Preview the document" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-scribd_doc_id="<%= attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= attachment.scribd_doc.try(:access_key) %>" ><%= image_tag('preview.png') %></span>
+                    <span style="padding: 0 3px;" title="<%= t('preview_document', 'Preview the document') %>" class="modal_preview_link" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-scribd_doc_id="<%= attachment.scribd_doc.try(:doc_id) %>" data-scribd_access_key="<%= attachment.scribd_doc.try(:access_key) %>" ><%= image_tag('preview.png') %></span>
                   <% end %>
                 </a>
               </li>
@@ -131,11 +130,10 @@
     <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version) %>"/>
   <% end %>
   <div style="text-align: center;">
-    This submission was a quiz submission.  Redirecting to quiz page.
+    <%= t('quiz_submission', 'This submission was a quiz submission.  Redirecting to quiz page.') %>
   </div>
 <% elsif @submission.submission_type == 'media_recording' && @submission.media_comment_id %>
-  This submission is a media recording.
-  <a href="#" class="play_media_recording_link">Click here to view</a>
+  <%= t('media_comment_link', "This submission is a media recording. *click here to view*.", :wrapper => '<a href="#" class="play_media_recording_link">\1</a>.') %>
   <div style="width: 400px; margin: 10px auto;" id="media_recording_box">
     <div class="box_content">
     </div>
@@ -157,6 +155,6 @@
   <% end %>
 <% else %>
   <div style="margin: 20px auto; width: 200px; height: 50px; font-size: 1.5em;  font-weight: bold;">
-    No Submission
+    <%= t('no_submission', 'No Submission') %>
   </div>
 <% end %>

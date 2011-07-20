@@ -16,8 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 var calendarMonths = (function() {
-  var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var monthNames;
+  I18n.scoped('calendars', function(I18n) {
+    monthNames = I18n.t('#date.month_names');
+  });
   function makeDate(date) {
     return {
       day: date.getDate(),
@@ -42,7 +46,7 @@ var calendarMonths = (function() {
         var current = new Date(year, month + change - 1, 1);
       }
       var data = { 
-        month_name: monthNames[current.getMonth()],
+        month_name: monthNames[current.getMonth() + 1],
         month_number: current.getMonth() + 1,
         year_number: current.getFullYear()
       };

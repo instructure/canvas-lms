@@ -6,12 +6,12 @@
   <div class="header group_header">
     <div class="header_content">
       <div style="float: left; width: 20px;" class="group_move nobr">
-        <%= image_tag "move.png", :class => "group_move_icon", :alt => "Move", :title => "Reorder Groups" %>
+        <%= image_tag "move.png", :class => "group_move_icon", :alt => t('alts.move', "Move"), :title => t('links.reorder_groups', "Reorder Groups") %>
         &nbsp;
       </div>
       <div style="float: left;">
-        <span class="group_name" tabindex="0"><span class="name"><%= group.try_rescue(:name) || "Course Assignments" %></span>:</span>
-        <a href="#" class="more_info_link" style="font-size: 0.8em; padding-left: 10px; display: none;">more info...</a>
+        <span class="group_name" tabindex="0"><span class="name"><%= group.try_rescue(:name) || t('defaults.group_name', "Course Assignments") %></span>:</span>
+        <a href="#" class="more_info_link" style="font-size: 0.8em; padding-left: 10px; display: none;"><%= t 'links.more_info', "more info..." %></a>
         <!--a href="#" class="hide_info_link" style="font-size: 0.8em; padding-left: 10px; display: none;">Hide Info</a-->
       </div>
       <div style="display: none;">
@@ -22,26 +22,26 @@
         <a href="<%= context_url(@context, :controller => :assignment_groups, :action => :update, :id => (group ? group.id : "{{ id }}")) %>" class="assignment_group_url">&nbsp;</a>
       </div>
       <div style="float: right; margin-right: 5px; display: block;" class="links">
-        <span class="more_info_brief" style="font-weight: bold; display: none; font-size: 0.8em; padding-right: 10px;" title="Percent of Final Grade"><span class="group_weight"><%= (group.try_rescue(:group_weight) || "0") %></span>%</span>
+        <span class="more_info_brief" style="font-weight: bold; display: none; font-size: 0.8em; padding-right: 10px;" title="<%= t 'titles.percent_of_final_grade', 'Percent of Final Grade' %>"><span class="group_weight"><%= (group.try_rescue(:group_weight) || "0") %></span>%</span>
         <a href="<%= context_url(@context, :new_context_assignment_url, :assignment_group_id => (group ? group.id : "{{ id }}")) %>" class="add_assignment_link no-hover" style="padding-right: 15px;">
-          <%= image_tag 'add.png', :alt => 'Add Assignment', :title => 'Add Assignment' %>
+          <%= image_tag 'add.png', :alt => t('alts.add_assignment', "Add Assignment"), :title => t('links.add_assignment', "Add Assignment") %>
         </a>
         <a href="<%= context_url(@context, :context_assignment_group_reorder_assignments_url, group ? group.id : "{{ id }}") %>" class="reorder_assignments_url" style="display: none;">&nbsp;</a>
         <a href="#" class="edit_group_link no-hover">
-          <%= image_tag 'edit.png', :alt => 'Edit', :title => 'Edit Group Details' %>
+          <%= image_tag 'edit.png', :alt => t('alts.edit_group_details', "Edit"), :title => t('links.edit_group_details', "Edit Group Details") %>
         </a>
         <a href="<%= context_url(@context, :controller => :assignment_groups, :action => :destroy, :id => (assignment_group ? assignment_group.id : "{{ id }}")) %>" class="delete_group_link no-hover">
-          <%= image_tag 'delete.png', :alt => 'Delete', :title => 'Delete Assignment Group' %>
+          <%= image_tag 'delete.png', :alt => t('alts.delete_assignment_group', "Delete"), :title => t('titles.delete_assignment_group', "Delete Assignment Group") %>
         </a>
       </div>
       <div class="clear"></div>
       <div class="more_info" style="min-height: 30px; display: none; padding-left: 30px; font-size: 0.8em;">
-        <div class="group_weight_percent" style="font-weight: bold;"><span class="group_weight"><%= (group.try_rescue(:group_weight) || "0") %></span>% of total grade</div>
+        <div class="group_weight_percent" style="font-weight: bold;"><%= t :group_weight, "*%{percent}% of total grade", :percent => (group.try_rescue(:group_weight) || "0"), :wrapper => '<span class="group_weight">\1</span>' %></div>
         <div class="rule_details"></div>
         <% if can_do(assignment_group, @current_user, :update) %>
         <div class="button-container">
-          <button type="button" class="edit_group_link button small-button">Edit Group Details</button>
-          <button type="button" class="hide_info_link button-secondary">hide info</button>
+          <button type="button" class="edit_group_link button small-button"><%= t 'links.edit_group_details', "Edit Group Details" %></button>
+          <button type="button" class="hide_info_link button-secondary"><%= t 'links.hide_info', "hide info" %></button>
         </div>
         <div class="clear"></div>
         <% end %>
@@ -50,7 +50,7 @@
   </div>
   <div class="assignment_list content">
     <div class="no_assignments_message" style="padding: 3px 10px;<%= multiple_groups || (group && group.active_assignments && group.active_assignments.length > 0) ? "display: none;" : "" %>">
-      No assignments yet <a href="<%= context_url(@context, :controller => :assignments, :action => :create) %>" class="add_assignment_link" style="padding-left: 15px;"> Add an Assignment</a>
+      <%= t :no_assignments, "No assignments yet" %> <a href="<%= context_url(@context, :controller => :assignments, :action => :create) %>" class="add_assignment_link" style="padding-left: 15px;"> <%= t 'links.add_an_assignment', "Add an Assignment" %></a>
     </div>
     <% if !skip_assignments && group && group.active_assignments %>
       <%= render :partial => "shared/assignment", 

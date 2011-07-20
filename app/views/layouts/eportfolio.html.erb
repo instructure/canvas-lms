@@ -19,8 +19,8 @@
 <body>
 <div id="container">
 <div id="header">
-  <a href="#skip_navigation" id="skip_navigation_link">Skip Navigation</a>
-  <a href="<%= root_url %>" class="no-hover"><%= image_tag 'logo.png', :alt => "Instructure Home", :class => "logo", :style => "filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=/images/logo.png)" %></a>
+  <a href="#skip_navigation" id="skip_navigation_link"><%= t 'links.skip_navigation', "Skip Navigation" %></a>
+  <a href="<%= root_url %>" class="no-hover"><%= image_tag 'logo.png', :alt => t('links.home', "Instructure Home"), :class => "logo", :style => "filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=/images/logo.png)" %></a>
   <%= (page_header = yield :page_header) ? page_header : render(:partial => 'shared/page_header') %>
   <%= (page_subhead = yield :page_subhead) ? page_subhead : render(:partial => 'shared/page_subhead') %>
   <div class="clear"></div>
@@ -36,7 +36,7 @@
 </div>
 <% end %>
 <div id="instructure_ajax_error_box">
-  <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link">Close</a></div>
+  <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link"><%= t 'links.close', "Close" %></a></div>
   <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;"></iframe>
 </div>
 <%= render :partial => 'shared/flash_notices' %>
@@ -46,7 +46,7 @@
   <div id="content">
     <a name="skip_navigation"></a>
     <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
-    <!--div id="ajax_loading_message" style="display: none;"><%= image_tag 'ajax-loader.gif' %> <span class="message">Loading...</span></div-->
+    <!--div id="ajax_loading_message" style="display: none;"><%= image_tag 'ajax-loader.gif' %> <span class="message"><%= t 'messages.loading', 'Loading...' %></span></div-->
     <%= render :partial => "shared/reminders_box", :object => @reminders %>
     <%= yield %>
   </div>
@@ -57,7 +57,7 @@
   <div id="wide_content">
     <a name="skip_navigation"></a>
     <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
-    <!--div id="ajax_loading_message" style="display: none;"><%= image_tag 'ajax-loader.gif' %> <span class="message">Loading...</span></div-->
+    <!--div id="ajax_loading_message" style="display: none;"><%= image_tag 'ajax-loader.gif' %> <span class="message"><%= t 'messages.loading', 'Loading...' %></span></div-->
     <%= render :partial => "shared/reminders_box", :object => @reminders %>
     <%= yield %>
   </div>
@@ -66,7 +66,7 @@
 <div class="clear" id="wizard_spacer_box"></div>
 <% wizard = yield :wizard_box %>
 <% if wizard %>
-  <% js_block do %>
+  <% js_block :i18n_scope => 'eportfolio' do %>
   <script>
     $(document).ready(function() {
       $(".close_wizard_link").click(function(event) {
@@ -95,7 +95,7 @@
         $(this).addClass('selected');
         var $details = $("#wizard_box").find(".wizard_details");
         var data = $(this).getTemplateData({textValues: ['header']});
-        data.link = "Click to " + data.header;
+        data.link = I18n.t('action_instructions', "Click to %{action}", {action: data.header});
         $details.fillTemplateData({
           data: data
         });

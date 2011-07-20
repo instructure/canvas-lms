@@ -19,7 +19,6 @@
 class UserNote < ActiveRecord::Base
   include Workflow
   attr_accessible :user, :note, :title, :creator
-  adheres_to_policy
   belongs_to :user
   belongs_to :creator, :class_name => 'User', :foreign_key => :created_by_id
   validates_length_of :note, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -37,13 +36,13 @@ class UserNote < ActiveRecord::Base
   
   set_policy do
     given { |user| self.creator == user }
-    set { can :delete and can :read }
+    can :delete and can :read
     
     given { |user| self.user.grants_right?(user, nil, :delete_user_notes) }
-    set { can :delete and can :read }
+    can :delete and can :read
     
     given { |user| self.user.grants_right?(user, nil, :read_user_notes) }
-    set { can :read }
+    can :read
   end
   
   alias_method :destroy!, :destroy
@@ -76,11 +75,11 @@ class UserNote < ActiveRecord::Base
     if to.grants_right?(from, :create_user_notes)
       note = to.user_notes.new
       note.created_by_id = from.id
-      note.title = "#{message.subject} (Added from a message)"
+      note.title = t :subject, "%{message_subject} (Added from a message)", :message_subject => message.subject
       note.note = message.body
       if root_note = message.root_context_message
         note.note += "\n\n-------------------------\n"
-        note.note += "In reply to: #{root_note.subject}\nFrom: #{root_note.user.name}\n\n"
+        note.note += t :in_reply_to, "In reply to: %{message_subject}\nFrom: %{user}\n\n", :message_subject => root_note.subject, :user => root_note.user.name
         note.note += root_note.body
       end
       # The note content built up above is all plaintext, but note is an html field.

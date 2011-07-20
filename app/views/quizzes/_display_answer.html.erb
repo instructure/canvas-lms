@@ -20,7 +20,7 @@
   show_comment = !assessment_results || selected_answer
 %>
 <% unless question && [ "short_answer_question", "fill_in_multiple_blanks_question" ].include?(question[:question_type]) && !show_correct_answers %>
-  <div class="answer answer_for_<%= hash_get(answer, :blank_id) %> <%= "hide_right_arrow" if hide_right_arrow %> <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>" id="answer_<%= hash_get(answer, :id, "template") %>" style="<%= hidden unless answer %>" title="<%= "You selected this answer. " if selected_answer %><%= "This was the correct answer." if correct_answer && show_correct_answers %>">
+  <div class="answer answer_for_<%= hash_get(answer, :blank_id) %> <%= "hide_right_arrow" if hide_right_arrow %> <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>" id="answer_<%= hash_get(answer, :id, "template") %>" style="<%= hidden unless answer %>" title="<%= t(:selected_answer, "You selected this answer.") if selected_answer %> <%= t(:correct_answer, "This was the correct answer.") if correct_answer && show_correct_answers %>">
     <% if !user_answer || question_type.display_answers != "xsingle" %>
     <div class="select_answer answer_type" <%= hidden(true) unless answer_type == "select_answer" %>>
       <div class="answer_text" <%= hidden(true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
@@ -64,20 +64,22 @@
       <% number_type = "range" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) != "exact_answer" %>
       <% number_type = "equation" if answer_type == "numerical_answer" && hash_get(answer, :variables) %>
       <div class="numerical_exact_answer answer_type" <%= hidden(true) unless number_type == 'exact' %>>
-        <span class="answer_exact"><%= hash_get(answer, :exact, "0") %></span> (with margin: <span class="answer_error_margin"><%= hash_get(answer, :margin, "0") %></span>)
+        <span class="answer_exact"><%= hash_get(answer, :exact, "0") %></span> (<%= before_label :answer_with_margin, 'with margin' %> <span class="answer_error_margin"><%= hash_get(answer, :margin, "0") %></span>)
       </div>
       <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'range' %>>
-        Between <span class="answer_range_start"><%= hash_get(answer, :start, 0) %></span> and <span class="answer_range_end"><%= hash_get(answer, :end, 0) %></span>
+        <%= t(:range_answer, "Between %{lower_bound} and %{upper_bound}",
+              :lower_bound => raw("<span class=\"answer_range_start\">#{hash_get(answer, :start, 0)}</span>"),
+              :upper_bound => raw("<span class=\"answer_range_end\">#{hash_get(answer, :end, 0)}</span>")) %>
       </div>
     <% end %>
     <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'equation' %>>
       <span class="answer_equation"><%= hash_get(answer, :answer) || hash_get(answer, :exact) %></span>
       <span class="margin" style="<%= hidden unless hash_get(answer, :answer_tolerance, 0) > 0 %>">
-        <span style="font-size: 0.8em;">+/-</span>
+        <span style="font-size: 0.8em;"><%= t(:plus_or_minus, "+/-") %></span>
         <span class="answer_tolerance"><%= hash_get(answer, :answer_tolerance) %></span>
       </span>
     </div>
-    <div class="answer_percent"><span class="answer_weight"><%= hash_get(answer, :weight, 0) %></span>% of points</div>
+    <div class="answer_percent"><%= t(:percent_of_points, "%{percent}% of points", :percent => raw("<span class=\"answer_weight\">#{hash_get(answer, :weight, 0)}</span>")) %></div>
     <% end %>
     <% if show_comment %>
     <div class="answer_comment_holder <%= "empty" unless hash_get(answer, :comments) && !hash_get(answer, :comments).empty? %>" <%= hidden(true) unless !answer || hash_get(answer, :comments) %>>

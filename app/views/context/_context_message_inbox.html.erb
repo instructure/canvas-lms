@@ -1,6 +1,6 @@
 <div id="message_list" class="communication_messages_list">
   <div class="no_messages" style="<%= hidden unless @messages.empty? %>">
-    Sorry, no messages yet.
+    <%= t(:no_messages, "Sorry, no messages yet.") %>
   </div>
   <% @messages.each do |message| %>
     <%= render :partial => 'context/context_message', :object => message, :locals => {:show_mark_as_read => true} %>
@@ -18,7 +18,7 @@
         totalPages: <%= @messages.total_pages %>,
         url: url,
         params: { 'view': $.queryParam("view") },
-        loaderMsg: "Loading more results",
+        loaderMsg: <%= raw t(:loading_results, "Loading more results").to_json %>,
         scrape: function(data) {
             if(typeof(data) == 'string') {
               try {

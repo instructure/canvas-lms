@@ -17,8 +17,9 @@
 #
 
 class PseudonymSessionsController < ApplicationController
-  protect_from_forgery :except => [:create, :destroy, :saml_consume]
-  
+  protect_from_forgery :except => [:create, :destroy, :saml_consume, :oauth2_token]
+  before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
+
   def new
     if @current_user && !params[:re_login]
       redirect_to dashboard_url
@@ -50,32 +51,30 @@ class PseudonymSessionsController < ApplicationController
           cas_client.validate_service_ticket(st)
         rescue => e
           logger.warn "Failed to validate CAS ticket: #{e.inspect}"
-          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
           redirect_to login_url(:no_auto=>'true')
           return
         end
         if st.is_valid?
           @pseudonym = nil
-          @pseudonym = Pseudonym.active.custom_find_by_unique_id(st.response.user)
+          @pseudonym = @domain_root_account.pseudonyms.active.custom_find_by_unique_id(st.response.user)
           if @pseudonym
             # Successful login and we have a user
-            PseudonymSession.create!(@pseudonym, false)
+            @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
             session[:cas_login] = true
             @user = @pseudonym.login_assertions_for_user rescue nil
 
-            flash[:notice] = 'Login successful.'
-            default_url = dashboard_url
-            redirect_back_or_default default_url
+            successful_login(@user, @pseudonym)
             return
           else
             logger.warn "Received CAS login for unknown user: #{st.response.user}"
-            session[:delegated_message] = "Canvas doesn't have an account for user: #{st.response.user}"
+            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.response.user
             redirect_to :action => :destroy
             return
           end
         else
           logger.warn "Failed CAS login attempt."
-          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
           redirect_to login_url(:no_auto=>'true')
           return
         end
@@ -91,7 +90,7 @@ class PseudonymSessionsController < ApplicationController
 
   def create
     # reset the session id cookie to prevent session fixation.
-    reset_session_saving_keys(:return_to)
+    reset_session_for_login
 
     # Try to use authlogic's built-in login approach first
     @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session])
@@ -114,7 +113,7 @@ class PseudonymSessionsController < ApplicationController
     @pseudonym = @pseudonym_session && @pseudonym_session.record
     # If the user's account has been deleted, feel free to share that information
     if @pseudonym && (!@pseudonym.user || @pseudonym.user.unavailable?)
-      flash[:error] = "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
+      flash[:error] = t 'errors.user_deleted', "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
       redirect_to login_url
       return
     end
@@ -139,25 +138,13 @@ class PseudonymSessionsController < ApplicationController
       end
     end
 
-    respond_to do |format|
-      # If the user is registered and logged in, redirect them to their dashboard page
-      if @user && @user.registered? && found
-
-        flash[:notice] = 'Login successful.'
-        if session[:course_uuid] && @user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
-          claim_session_course(course, @user)
-          format.html { redirect_to(course_url(course, :login_success => '1')) }
-        else
-          # the URL to redirect back to is stored in the session, so it's
-          # assumed that if that URL is found rather than using the default,
-          # they must have cookies enabled and we don't need to worry about
-          # adding the :login_success param to it.
-          format.html { redirect_back_or_default(dashboard_url(:login_success => '1')) }
-        end
-        format.json { render :json => @pseudonym.to_json(:methods => :user_code), :status => :ok }
-      # Otherwise re-render the login page to show the error
-      else
-        flash[:error] = 'Incorrect username and/or password'
+    # If the user is registered and logged in, redirect them to their dashboard page
+    if @user && @user.registered? && found
+      successful_login(@user, @pseudonym)
+    # Otherwise re-render the login page to show the error
+    else
+      respond_to do |format|
+        flash[:error] = t 'errors.invalid_credentials', "Incorrect username and/or password"
         @errored = true
         if @user && @user.creation_pending?
           @user.update_attribute(:workflow_state, "pre_registered")
@@ -195,7 +182,7 @@ class PseudonymSessionsController < ApplicationController
       flash[:delegated_message] = message if message
     end
     
-    flash[:notice] = "You are currently logged out"
+    flash[:notice] = t 'notices.logged_out', "You are currently logged out"
     flash[:logged_out] = true
     respond_to do |format|
       session[:return_to] = nil
@@ -218,42 +205,38 @@ class PseudonymSessionsController < ApplicationController
   def saml_consume
     if @domain_root_account.saml_authentication? && params[:SAMLResponse]
       settings = @domain_root_account.account_authorization_config.saml_settings
-      response = Onelogin::Saml::Response.new(params[:SAMLResponse])
-      response.settings = settings
-      response.logger = logger
+      response = saml_response(params[:SAMLResponse], settings)
 
       logger.info "Attempting SAML login for #{response.name_id} in account #{@domain_root_account.id}"
 
       if response.is_valid?
         if response.success_status?
           @pseudonym = nil
-          @pseudonym = Pseudonym.active.custom_find_by_unique_id(response.name_id)
+          @pseudonym = @domain_root_account.pseudonyms.active.custom_find_by_unique_id(response.name_id)
 
           if @pseudonym
             # We have to reset the session again here -- it's possible to do a
             # SAML login without hitting the #new action, depending on the
             # school's setup.
-            reset_session
+            reset_session_for_login
             #Successful login and we have a user
-            PseudonymSession.create!(@pseudonym, false)
+            @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
             @user = @pseudonym.login_assertions_for_user rescue nil
 
             session[:name_id] = response.name_id
             session[:name_qualifier] = response.name_qualifier
             session[:session_index] = response.session_index
 
-            flash[:notice] = 'Login successful.'
-            default_url = dashboard_url
-            redirect_back_or_default default_url 
+            successful_login(@user, @pseudonym)
           else
             logger.warn "Received SAML login request for unknown user: #{response.name_id}"
             # the saml message has to survive a couple redirects
-            session[:delegated_message] = "Canvas doesn't have an account for user: #{response.name_id}"
+            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => response.name_id
             redirect_to :action => :destroy
           end
         elsif response.auth_failure?
           logger.warn "Failed SAML login attempt."
-          flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+          flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
           redirect_to login_url(:no_auto=>'true')
         else
           logger.warn "Unexpected SAML status code - status code: #{response.status_code rescue ""}"
@@ -266,20 +249,20 @@ class PseudonymSessionsController < ApplicationController
         logger.warn "SAML Response:";i=0;while temp=params[:SAMLResponse][i...i+1500] do logger.warn temp;i+=1500;end
         @pseudonym_session.destroy rescue true
         reset_session
-        flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+        flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
         redirect_to login_url(:no_auto=>'true')
       end
     elsif !params[:SAMLResponse]
       logger.error "saml_consume request with no SAMLResponse parameter"
       @pseudonym_session.destroy rescue true
       reset_session
-      flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+      flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
       redirect_to login_url(:no_auto=>'true')
     else
       logger.error "Attempted SAML login on non-SAML enabled account."
       @pseudonym_session.destroy rescue true
       reset_session
-      flash[:delegated_message] = "There was a problem logging in at #{@domain_root_account.display_name rescue "your institution"}"
+      flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
       redirect_to login_url(:no_auto=>'true')
     end
   end
@@ -289,9 +272,103 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def cas_client
-      return @cas_client if @cas_client
-      config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
-      @cas_client = CASClient::Client.new(config)
+    return @cas_client if @cas_client
+    config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
+    @cas_client = CASClient::Client.new(config)
   end
-  
+
+  def saml_response(raw_response, settings)
+    response = Onelogin::Saml::Response.new(raw_response)
+    response.settings = settings
+    response.logger = logger
+    response
+  end
+
+  def forbid_on_files_domain
+    if HostUrl.is_file_host?(request.host)
+      reset_session
+      return redirect_to dashboard_url(:host => HostUrl.default_host)
+    end
+    true
+  end
+
+  def successful_login(user, pseudonym)
+    respond_to do |format|
+      flash[:notice] = t 'notices.login_success', "Login successful."
+      if session[:oauth2]
+        # this is where we will verify client authorization and scopes, once implemented
+        # .....
+        # now generate the temporary code, and respond/redirect
+        # (right now we don't support redirect, just oob response using a canvas url)
+        code = ActiveSupport::SecureRandom.hex(64)
+        code_data = { 'user' => user.id, 'client_id' => session[:oauth2][:client_id] }
+        Rails.cache.write("oauth2:#{code}", code_data.to_json, :expires_in => 1.day)
+        format.html { redirect_to oauth2_auth_url(:code => code) }
+      elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
+        claim_session_course(course, user)
+        format.html { redirect_to(course_url(course, :login_success => '1')) }
+      else
+        # the URL to redirect back to is stored in the session, so it's
+        # assumed that if that URL is found rather than using the default,
+        # they must have cookies enabled and we don't need to worry about
+        # adding the :login_success param to it.
+        format.html { redirect_back_or_default(dashboard_url(:login_success => '1')) }
+      end
+      format.json { render :json => pseudonym.to_json(:methods => :user_code), :status => :ok }
+    end
+  end
+
+  OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
+
+  def oauth2_auth
+    if session[:oauth2] && params[:code]
+      # hopefully the user never sees this, since it's an oob response and the
+      # browser should be closed automatically. but we'll at least display
+      # something basic.
+      reset_session
+      return render()
+    end
+
+    # for now, this is the only allowed redirect_uri
+    redirect_uri = params[:redirect_uri].presence || OAUTH2_OOB_URI
+    unless redirect_uri == OAUTH2_OOB_URI
+      return render(:status => 400, :json => { :message => "invalid redirect_uri" })
+    end
+
+    key = DeveloperKey.find_by_id(params[:client_id]) if params[:client_id].present?
+    unless key
+      return render(:status => 400, :json => { :message => "invalid client_id" })
+    end
+
+    session[:oauth2] = { :client_id => key.id, :redirect_uri => redirect_uri }
+    # force the user to re-authenticate
+    redirect_to login_url(:re_login => true)
+  end
+
+  def oauth2_token
+    basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
+
+    client_id = params[:client_id].presence || basic_user
+    key = DeveloperKey.find_by_id(client_id) if client_id.present?
+    unless key
+      return render(:status => 400, :json => { :message => "invalid client_id" })
+    end
+
+    secret = params[:client_secret].presence || basic_pass
+    unless secret == key.api_key
+      return render(:status => 400, :json => { :message => "invalid client_secret" })
+    end
+
+    code = params[:code]
+    code_data = JSON.parse(Rails.cache.read("oauth2:#{code}").presence || "{}")
+    unless code_data.present? && code_data['client_id'] == key.id
+      return render(:status => 400, :json => { :message => "invalid code" })
+    end
+
+    user = User.find(code_data['user'])
+    token = AccessToken.create!(:user => user, :developer_key => key)
+    render :json => {
+      'access_token' => token.token,
+    }
+  end
 end

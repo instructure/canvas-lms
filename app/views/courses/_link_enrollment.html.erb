@@ -3,27 +3,22 @@
   <a href="<%= context_url(@context, :context_students_url) %>" class="student_url" style="display: none;">&nbsp;</a>
   <% form_tag context_url(@context, :context_link_enrollment_url), {:id => "link_student_dialog_form"} do %>
     <input type="hidden" name="enrollment_id" class="enrollment_id"/>
-    <p>
-      When an observer is linked to a student, they have access to that student's grades
-      and course interactions.
-      <span class="existing_user">
-        Right now this observer is linked to the student, <b class="existing_user_name">&nbsp;</b>.
-      </span>
-    </p>
-    <p>
-    To link the course observer <b class="short_name">&nbsp;</b> to a student, select
-    the student's name from the list below.
-    </p>
-    <p class="loading_message">Loading Students...</p>
+    <%= mt 'details', %{When an observer is linked to a student, they have access to that student's grades and course interactions. *Right now this observer is linked to the student, %{student}.*
+
+To link the course observer %{user} to a student, select the student's name from the list below.},
+            :wrapper => '<span class="existing_user"> \1</span>',
+            :student => '<b class="existing_user_name">&nbsp;</b>'.html_safe,
+            :user => '<b class="short_name">&nbsp;</b>'.html_safe %>
+    <p class="loading_message"><%= t('loading', %{Loading Students...}) %></p>
     <p class="students_link" style="display: none;">
-      <label for="student_enrollment_link_option">Student:</label>
+      <label for="student_enrollment_link_option"><%= before_label('student', %{Student}) %></label>
       <select name="student_id" class="student_options" id="student_enrollment_link_option">
-        <option value="none" class="blank">[ Select Student ]</option>
+        <option value="none" class="blank">[ <%= t('select_student', %{Select Student}) %> ]</option>
       </select>
     </p>
     <div class="button-container">
-      <button type="submit" class="button save_button">Link to Student</button>
-      <button type="button" class="button button-secondary cancel_button">Cancel</button>
+      <button type="submit" class="button save_button"><%= t('buttons.link', %{Link to Student}) %></button>
+      <button type="button" class="button button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
   <% end %>
 </div>

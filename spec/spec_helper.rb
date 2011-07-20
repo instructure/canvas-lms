@@ -68,11 +68,22 @@ Spec::Runner.configure do |config|
 
   def account_with_cas(opts={})
     account = opts[:account]
+    account ||= Account.create!
     config = AccountAuthorizationConfig.new
     cas_url = opts[:cas_url] || "https://localhost/cas"
     config.auth_type = "cas"
     config.auth_base = cas_url
     config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
+    account.account_authorization_configs << config
+    account
+  end
+
+  def account_with_saml(opts={})
+    account = opts[:account]
+    account ||= Account.create!
+    config = AccountAuthorizationConfig.new
+    config.auth_type = "saml"
+    config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
     account.account_authorization_configs << config
     account
   end
@@ -107,7 +118,7 @@ Spec::Runner.configure do |config|
   end
 
   def user(opts={})
-    @user = User.create!
+    @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
     @user
   end
@@ -241,6 +252,43 @@ Spec::Runner.configure do |config|
 
   def update_with_protected_attributes(ar_instance, attrs)
     update_with_protected_attributes!(ar_instance, attrs) rescue false
+  end
+
+  def process_csv_data(*lines)
+    account_model unless @account
+  
+    tmp = Tempfile.new("sis_rspec")
+    path = "#{tmp.path}.csv"
+    tmp.close!
+    File.open(path, "w+") { |f| f.puts lines.join "\n" }
+    
+    importer = SIS::SisCsv.process(@account, :files => [ path ], :allow_printing=>false)
+    
+    File.unlink path
+    
+    importer
+  end
+  
+  def process_csv_data_cleanly(*lines)
+    importer = process_csv_data(*lines)
+    importer.errors.should == []
+    importer.warnings.should == []
+  end
+
+  def enable_cache
+    old_cache = RAILS_CACHE
+    silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
+    yield
+  ensure
+    silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
+  end
+
+  # enforce forgery protection, so we can verify usage of the authenticity token
+  def enable_forgery_protection
+    ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
+    yield
+  ensure
+    ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
   end
 
 end

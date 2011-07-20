@@ -3,13 +3,17 @@
 <% end %>
 
 <% define_content :subject do %>
-  Assignment Due Date Changed: <%= asset.title %>, <%= asset.context.name %>
+  <%= t('assignment_due_date_changed', 'Assignment Due Date Changed: %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 <% end %>
       
-The due date for the assignment, <%= asset.title %>, for the course, <%= asset.context.name %> has changed to:
+<%= t('assignment_due_date_changed_sentence', 'The due date for the assignment, %{assignment_name}, for the course, %{course_name}, has changed to:', :assignment_name => asset.title, :course_name => asset.context.name) %>
 
-<%= force_zone(asset.due_at).strftime("%b %d at %I:%M") rescue "No Due Date" %><%= force_zone(asset.due_at).strftime("%p").downcase rescue "" %>
+<% if asset.due_at %>
+  <%= datetime_string(force_zone(asset.due_at)) %>
+<% else %>
+  <%= t('no_due_date', 'No Due Date') %>
+<% end %>
 
 
-Click here to view the assignment: 
+<%= before_label('click_to_see_assignment', 'Click here to view the assignment') %> 
 <%= content :link %>

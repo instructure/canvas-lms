@@ -18,22 +18,21 @@
 
 class ContextModulesController < ApplicationController
   before_filter :require_context  
-  add_crumb("Modules") { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
+  add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
   before_filter { |c| c.active_tab = "modules" }  
   
   def index
-    @modules = ContextModule.fast_cached_for_context(@context)
-    @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
-    if @context.grants_right?(@current_user, session, :participate_as_student)
-      return unless tab_enabled?(@context.class::TAB_MODULES)
-      @modules = @context.context_modules.active.include_tags_and_progressions
-      @modules.each{|m| m.evaluate_for(@current_user) }
-      session[:module_progressions_initialized] = true
-    end
     if authorized_action(@context, @current_user, :read)
+      @modules = @context.context_modules.active
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
+      if @context.grants_right?(@current_user, session, :participate_as_student)
+        return unless tab_enabled?(@context.class::TAB_MODULES)
+        ContextModule.send(:preload_associations, @modules, [:context_module_progressions, :content_tags])
+        @modules.each{|m| m.evaluate_for(@current_user) }
+        session[:module_progressions_initialized] = true
+      end
     end
   end
-  
 
   def item_redirect
     if authorized_action(@context, @current_user, :read)
@@ -48,9 +47,14 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       @module = @context.context_modules.active.find(params[:context_module_id])
       @tags = @module.content_tags.active.include_progressions
+      if params[:last]
+        @tags.pop while @tags.last && @tags.last.content_type == 'ContextModuleSubHeader'
+      else
+        @tags.shift while @tags.first && @tags.first.content_type == 'ContextModuleSubHeader'
+      end
       @tag = params[:last] ? @tags.last : @tags.first
       if !@tag
-        flash[:notice] = "There are no items in the module \"#{@module.name}\""
+        flash[:notice] = t 'module_empty', %{There are no items in the module "%{module}"}, :module => @module.name
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{@module.id}")
         return
       end
@@ -226,7 +230,9 @@ class ContextModulesController < ApplicationController
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
       items.each_index do |idx|
         item = items[idx]
-        item.update_attributes(:position => idx, :context_module_id => @module.id)
+        item.position = idx
+        item.context_module_id = @module.id
+        item.save
       end
       ContextModule.update_all({:updated_at => Time.now}, {:id => affected_module_ids})
       @context.touch

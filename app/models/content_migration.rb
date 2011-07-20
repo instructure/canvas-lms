@@ -168,11 +168,11 @@ class ContentMigration < ActiveRecord::Base
   def add_warning(user_message, exception_or_info)
     migration_settings[:warnings] ||= []
     if exception_or_info.is_a?(Exception)
-      info = [exception_or_info.to_s, exception_or_info.backtrace]
+      er = ErrorReport.log_exception(:content_migration, exception_or_info)
+      migration_settings[:warnings] << [user_message, "ErrorReport id: #{er.id}"]
     else
-      info = exception_or_info
+      migration_settings[:warnings] << [user_message, exception_or_info]
     end
-    migration_settings[:warnings] << [user_message, info]
   end
 
   def warnings
@@ -219,7 +219,7 @@ class ContentMigration < ActiveRecord::Base
       @exported_data_zip = download_exported_data
       @zip_file = Zip::ZipFile.open(@exported_data_zip.path)
       @exported_data_zip.close
-      data = JSON.parse(@zip_file.read('course_export.json'))
+      data = JSON.parse(@zip_file.read('course_export.json'), :max_nesting => 50)
       data = data.with_indifferent_access if data.is_a? Hash
       data['all_files_export'] ||= {}
 

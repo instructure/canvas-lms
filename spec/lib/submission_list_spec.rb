@@ -223,9 +223,11 @@ def interesting_submission_data(opts={})
   @assignment.grade_student(@student, {:grade => 5, :grader => @grader}.merge(opts[:submission]))
   @student = user_model(:name => 'another student')
   @course.enroll_student(@student)
+  @assignment.reload
   @assignment.grade_student(@student, {:grade => 8, :grader => @grader}.merge(opts[:submission]))
   @student = user_model(:name => 'smart student')
   @course.enroll_student(@student)
+  @assignment.reload
   @assignment.grade_student(@student, {:grade => 10, :grader => @grader}.merge(opts[:submission]))
   @assignment = @course.assignments.create({
     :title => "another assignment", 

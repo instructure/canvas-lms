@@ -189,7 +189,11 @@ class ExternalFeed < ActiveRecord::Base
     to_import = migration.to_import 'external_feeds'
     tools.each do |tool|
       if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
-        import_from_migration(tool, migration.context)
+        begin
+          import_from_migration(tool, migration.context)
+        rescue
+          migration.add_warning("Couldn't import external feed \"#{tool[:title]}\"", $!)
+        end
       end
     end
   end

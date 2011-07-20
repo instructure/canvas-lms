@@ -1,5 +1,5 @@
-New Comment for <%= asset.title %>, <%= asset.context.name %>
+<%= t :body, "New Comment for %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
 
 <%= strip_and_truncate(asset.message, :max_length => 50) %>
 
-More info at <%= HostUrl.context_host(asset.context) %>
+<%= t :details, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>

@@ -1,0 +1,2902 @@
+es: 
+  account: 
+    sis_id_in_use: SIS ID "%{sis_id}" ya está en uso
+    tab_authentication: Autentificación
+    tab_courses: Cursos
+    tab_faculty_journal: Diario de la Facultad
+    tab_grading_standards: Esquemas de Calificación
+    tab_outcomes: Resultados
+    tab_permissions: Permisos
+    tab_rubrics: Rúbricas
+    tab_settings: Configuraciones
+    tab_sis_import: Importación de SIS
+    tab_statistics: Estadísticas
+    tab_sub_accounts: Subcuentas
+    tab_terms: Términos
+    tab_users: Usuarios
+    turnitin_pledge: Este trabajo es mi propio trabajo
+  account_authorization_config: 
+    default_login_handle_name: Email
+  account_authorization_configs: 
+    cas_settings: 
+      alternate_login_url_description: Un URL alterno para entrar a CAS. Usted probablemente no debería modificar esto.
+      labels: 
+        auth_base: URL del CAS
+        auth_type: Tipo
+        log_in_url: URL de entrada alterno
+      save_button: Guardar las configuraciones de autentificación
+    index: 
+      add_auth_desc: "Agregue un proveedor de identidad para esta cuenta: "
+      canvas_login_tip: |-
+        Si configura los ajustes que resultan en no poder ingresar, agregue
+          *%{url1}* al final de su URL de entrada. Esto le permitirá entrar usando el procedimiento normal de ingreso a Canvas. Para esta cuenta el url sería %{url2}
+      choose_auth_type_option: Escoja un servicio de autentificación
+      current_settings_title: Integración Actual
+      delete_auth_confirmation: ¿Está seguro? Usuarios pueden no poder ser capaces de ingresar si esto se remueve.
+      delete_auth_link: Remover la Autentificación
+      edit_auth_link: Editar los Detalles
+      ip_address_list_description: "Si está usando un servicio de autentificación que requiere que los servidores de Canvas contacten a sus servidores directamente, como LDAP, necesitará asegurarse que sus servidores pueden aceptar conexiones de estas direcciones IP:"
+      no_auth_type_description: Esta cuenta actualmente no se integra con un proveedor de identidad.
+      page_title: Configuraciones de Autentificación
+      profile_page_link_example: "Por ejemplo, aquí está la página de su perfil: [%{friendlyname}](%{url})"
+      settings_description: |-
+        Para que un usuario pueda autentificar a través de un proveedor externo de identidad (IdP), el usuario debe tener un identificador de ingreso que está unido a esta cuenta y que concuerda el identificador único provisto por el IdP. Para ver los ingresos actuales del usuario, vea la sección  “Información de Ingreso” en la página del perfil del usuario. (Encontrado haciendo una busqueda del usuario en la lengüeta de “Usuarios”.)
+      settings_title: Configuraciónes de Autentificación
+      title: Configuraciones de Autentificación
+    ldap_settings: 
+      add_secondary_ldap_server_link: Agregar un Servidor Secundario de LDAP
+      auth_type_label: Tipo
+      change_password_url_help: Deje en blanco para comportamiento predeterminado de Canvas
+      change_password_url_not_specified: Nada especificado
+      labels: 
+        change_password_url: Olvidó URL de Contraseña
+        login_handle_name: Etiqueta de Ingreso
+      remove_secondary_ldap_link: (Remover)
+      save_button: Guardar Configuraciones LDAP
+      secondary_ldap_label: LDAP Secundario
+    ldap_settings_fields: 
+      auth_filter_description: "Usar *%{placeholder}* como un marcador para el nombre de usuario suplido por el usuario. Por ejemplo: *(sAMAccountName=%{placeholder})*"
+      auth_password_description: Dejar en blanco para continuar usando la contraseña actual.
+      labels: 
+        auth_base: Base
+        auth_filter: Filtro
+        auth_host: Huésped
+        auth_over_tls: ¿Sobre TLS?
+        auth_password: Contraseña
+        auth_port: Puerto
+        auth_username: Nombre de Usuario
+    saml_settings: 
+      labels: 
+        auth_type: Tipo
+        certificate_fingerprint: Huella de Certificado
+        change_password_url: Cambiar el enlace de contraseña
+        identifier_format: Formato Identificador
+        log_in_url: URL de Ingreso
+        log_out_url: URL de Salida
+      saml_meta_data_link: Haga click aquí para ver el proveedor de servicio de identidad XML para esta cuenta.
+      save_button: Guarde las Configuraciones de Autentificación
+  account_notifications: 
+    alert_created_notice: Alerta creada con éxito
+    alert_creation_failed_notice: Creación de la alerta falló
+    alert_deleted_notice: Alerta borrada con éxito
+    permission_denied_notice: No puede crear alertas para esta cuenta
+  account_user: 
+    types: 
+      account_admin: Administrador de Cuenta
+  accounts: 
+    add_course_or_user: 
+      add_course_button: Agregar Curso
+      add_course_link: Agregar un curso nuevo
+      add_course_title: Agregar un curso nuevo
+      add_user_button: Agregar un usuario
+      add_user_link: Agregar un usuario nuevo
+      add_user_title: Agregar un usuario nuevo
+      display_name_help: La gente verá este nombre en discusiones, mensajes y comentarios.
+      labels: 
+        account_id: Departamento
+        course_code: Código de Referencia
+        enrollment_term_id: Término de Inscripción
+        full_name: Nombre completo
+        name: Nombre del curso
+        path: Correo electrónico
+        short_name: Mostrar el nombre
+    avatars: 
+      all_link: 
+        other: Todo %{count}
+        zero: Todo
+      approve_link: aprobar
+      delete_link: borrar
+      lock_link: bloquear
+      no_avatars_message: No hay una foto de perfil que mostrar
+      page_title: Fotos de perfil
+      re_reported_link: 
+        other: Aprobado, Reportado otra vez %{count}
+        zero: Aprobado, Reportado otra vez
+      reported_link: 
+        other: Reportado %{count}
+        zero: Reportado
+      saving: Guardando...
+      submitted_link: 
+        other: Presentado %{count}
+        zero: Presentado
+      title: Fotos de perfil
+      unlock_link: desbloquear
+    confirm_delete_user: 
+      confirm_delete: |-
+        ¿Está seguro de que quiere borrar este usuario de la cuenta %{account}?
+          Esto removerá la información del usuario (incluyendo calificaciones) de todos los cursos y grupos. Este proceso no se puede deshacer.
+      delete_button: Borrar %{user}
+      page_title: Confirmar el borrado
+      title: Confirmar el borrado de %{user} del %{account}
+    course: 
+      course_unpublished_title: Este curso no ha sido publicado todavia
+      course_unpublished_tooltip: Sin publicar
+      homepage_link: Página de Inicio
+      more_count: 
+        other: "%{count}"
+      none: ninguno
+      settings_link: Configuraciones
+      sis_id_label: ID de SIS
+      statistics_link: Estadísticas
+      student_count: 
+        one: 1 Estudiante
+        other: "%{count} Estudiantes"
+      teachers_label: Profesores
+    courses: 
+      courses_crumb: Cursos
+      no_results_message: No se encontraron resultados
+      page_title: Resultados de búsqueda de curso para "%{query}"
+      search_results_crumb: Resultados de búsqueda para "%{query}"
+      title: Resultados de búsqueda de curso para "%{query}"
+    courses_right_side: 
+      enrollment_term_label: Mostrar cursos del término
+      filter_label: Encontrar un Curso
+      go_button: Ir
+    crumb_page_views: Vistas de Páginas
+    crumb_statistics: Estadísticas
+    index: 
+      accounts_crumb: Cuentas
+      no_accounts_message: No hay Cuentas
+      page_title: Cuentas
+      title: Cuentas que Administro
+    invalid_login_message: Ingreso Inválido
+    login_in_use_notice: El nombre de ingreso especificado ya está en uso por [%{username}](%{url})
+    no_user_found_notice: Ningun usuario con ese correo electrónico fue encontrado
+    no_user_message: No se encontró ningun usuario con esa identificación
+    settings: 
+      about_google_docs: |-
+        Para poder facilitar las cosas para los usuarios, en vez de forzarlos a descargar cosas como Word docs, PDFs, hojas de Excel y documentos de open (Además de requerir que esos programas sean instalados en su computadora), en muchas áreas a través de Canvas, le permitirá tener una vista previa del documento.
+        
+        Si Scribd ha sido activado para esta cuenta, tratará de usarlo para mostrar la vista previa. Pero ya que Scribd usa flash para visualizar los documentos, y muchos usuarios (especialmente aquellos usando una iPad/iPhone) no tienen Flash instalado, esa vista previa no funcionará. Al dejar las vistas previas de Google Docs activas, usará las vistas previas proporcionadas por Google Docs. Usando este servicio está sujeto a los términos de servicio de Google Viewer (%{terms_url})
+      about_google_docs_tooltip: Acerca de vista previa en Google Docs 
+      account_admins_title: Administradores de Cuenta
+      account_settings_title: Configuraciones de Cuenta
+      add_admin_button: Agregar Administrador
+      add_admin_title: Agregar un Administrador Nuevo
+      add_alert_button: Agregar una alerta
+      add_alert_link: Agregar una alerta nueva
+      add_ip_filter_link: Agregar otro filtro
+      alert_icon_calendar_option: Calendario
+      alert_icon_file_option: archivo
+      alert_icon_help_option: ayuda
+      alert_icon_people_option: gente
+      alert_icon_warning_option: alerta
+      alert_timespan: de %{start_at} a %{end_at}
+      confirm_turnitin_settings_link: confirmar configuraciones de Turnitin
+      create_courses_description: (Administradores de Cuenta siempre pueden crear cursos)
+      create_courses_title: Quien puede crear cursos nuevos
+      delete_alert_tooltip: Borrar esta alerta
+      enabled_web_serices_title: Servicios Web Activados
+      equall_endpoint_help: Este es el URL para su servicio equella. Probablemente se verá así "%{sample_url}".
+      equella_settings_title: Configuraciones de Equella
+      external_tools_title: Herramientas Externas
+      features_title: Características
+      global_js_and_css_includes_description: Estos archivos serán incluídos en todas las cargas de la página para su cuenta
+      global_js_and_css_includes_title: JavaScript Global y CSS incluye
+      headers: 
+        report_last_run: Última corrida
+        report_name: Nombre
+      ip_filter_filter_label: Filtro
+      ip_filter_name_label: Nombre
+      labels: 
+        account_notification_icon: Icono
+        admin_email: Dirección de Correo Electrónico
+        admin_membership_type: Tipo
+        admins_can_change_passwords: Configuración de contraseña por administrador
+        allow_sending_scores_in_emails: Estudiantes pueden optar para recibir calificaciones por correo electrónico
+        allow_sis_import: Importaciones de SIS
+        default_storage_quota: Cuota Predeterminada de Archivo
+        default_time_zone: Zona Horaria Predeterminada
+        enable_user_notes: Revista de Facultad
+        end_at: Termina
+        equella_teaser: Comentarios de Equella
+        global_includes: CSS/JavaScript Global incluye
+        global_javascript: Global JavaScript URL
+        global_stylesheet: Global CSS URL
+        message: Mensaje
+        name: Nombre de Cuenta
+        no_enrollments_can_create_courses: Usuarios sin inscripciones
+        prevent_course_renaming_by_teachers: No permita que los profesores vuelvan a nombrar sus cursos
+        self_enrollment: Permitir la Auto-Inscripción
+        sis_source_id: Identificación de SIS
+        start_at: Comienza
+        students_can_create_courses: Estudiantes
+        subject: Tema
+        teachers_can_create_courses: Profesores
+        turnitin_account_id: Cuenta de Identificación de Turnitin
+        turnitin_comments: Comentarios de Envío de Turnitin
+        turnitin_pledge: Compromiso de Turnitin
+        turnitin_shared_secret: Secreto Compartido de Turnitin
+      links: 
+        configure_report: Configure...
+        run_report: Ejecutar el Informe
+      megabytes_field: "%{text_field} megabytes"
+      megabytes_tooltip: megabytes
+      never_allow_self_enrollment_option: Nunca
+      page_title: Configuraciones de Cuenta
+      quiz_ip_filters_help_message: |-
+        Filtros de IP de evaluación son una forma de limitar el acceso a las evaluaciones en computadoras en un rango específico de IP.
+        
+        Especifique una serie de filtros de direcciones IP que los profesores pueden usar para proteger el acceso a las evaluaciones. Los filtros pueden ser listas de direcciones o una dirección separada por una coma seguido por una caratula ("192.168.217.1/24" or "192.168.217.1/255.255.255.0")."
+      quiz_ip_filters_help_title: ¿Qué son Filtros de Evaluaciones de IP?
+      quiz_ip_filters_help_tooltip: ¿Qué son Filtros de Evaluaciones de IP?
+      quiz_ip_filters_title: Filtros de Evaluaciones de IP
+      remove_admin_tooltip: Remover este administrador
+      report_last_run_never: Nunca
+      report_running: El reporte se está corriendo.*Recibirá un correo electrónico cuando esté listo.*
+      self_enroll_for_any_courses_option: Para cualquier curso
+      self_enroll_for_manually_created_courses_option: Para cursos creados manualmente
+      settings_crumb: Configuraciones
+      tab_admins: Administradores
+      tab_alerts: Alertas
+      tab_external_tools: Herramientas Externas
+      tab_reports: Reportes
+      tab_settings: Configuraciones
+      turnitin_comments_help: estos comentarios se mostrarán a los estudiantes al presenter una asignación activada para Turnitin
+      turnitin_pledge_help: los estudiantes deben marcar una caja reconociendo que están de acuerdo con este compromiso
+      turnitin_settings_title: Configuraciones de Turnitin
+      update_settings_button: Actualizar Configuraciones
+      user_alerts_description: Las alertas son una forma para poder postear mensajes en el tablero de todos los usuarios en su cuenta. Aparecerán en el tablero de cada usuario por un periodo de tiempo o hasta que el usuario haga click en el enlace de “cerrar” para ignorar la alerta. **Estas alertas deben usarse poco.**
+      user_alerts_title: Alertas de Usuario
+    show: 
+      courses_crumb: Cursos
+      no_courses_account_message: No hay cursos en esta cuenta
+      no_courses_term_message: No hay cursos en este término
+      subtitle_term: Para el término **%{term}**
+      title: Cursos en esta Cuenta
+      too_many_courses_message: 
+        other: Hay demasiados cursos que mostrar (%{count}). Por favor use el buscador en la derecha para encontrar un curso específico.
+    sis_batch_counts: 
+      accounts_label: Cuentas
+      courses_label: Cursos
+      crosslists_label: Listas compuestas
+      enrollments_label: Inscripciones
+      imported_items_title: Elementos Importados
+      sections_label: Secciones
+      terms_label: Términos
+      users_label: Usuarios
+    sis_batch_messages: 
+      sis_batch_errors_title: Errores que previenen la importación
+      sis_batch_warnings_title: Alertas
+    sis_import: 
+      batch_import_instructions: |-
+        Si se selecciona, la información de SIS importada previamente para el término selecto será borrada.  
+        Vea la documentación para los detalles.
+      batch_mode_label: Esta es una actualización completa de grupo
+      import_failed_message: Hubo un error al importar su información SIS. No se importaron registros.
+      import_failed_with_messages_message: "No se importaron registros de SIS. La importación falló con estos mensajes:"
+      import_log_title: Registro del Progreso de Importación
+      import_started_message: ¡El proceso de importación ha comenzado! Esto puede tomar un tiempo ya que hay mucho que importar. Puede dejar la página y volver.
+      import_type_label: Tipo de Importación
+      imported_message: Toda la información de SIS se importó con éxito.
+      imported_with_messages_message: "La información de SIS fue importada pero con estos mensajes:"
+      last_batch_title: Último Grupo
+      page_header: Importación SIS
+      page_title: Importación SIS
+      process_data_button: Información de Proceso
+      select_file_instructions: |-
+        Seleccione el archivo zip que quiere importar.  
+        Para una descripción de como generar estos archivos zip, [porfavor vea esta documentación](%{uri}).
+      sis_import_crumb: Importación SIS
+      started_at_message: "Comenzó: %{started_at}"
+      title: Importación SIS
+      try_import_again_link: Intente importar otra vez
+    sis_import_in_process_notice: Una importación SIS ya esta procesandose.
+    statistics: 
+      concluded_at: finalizado %{at}
+      created_at: creado %{at}
+      created_at_by: creado %{at} por [%{teacher}](%{url})
+      download_csv_link: Descargar csv
+      file_storage_header: Almacenaje de Archivo
+      general_numbers_title: Números Generales
+      labels: 
+        courses: Cursos
+        generated_at: Generado
+        last_month: en el ultimo mes
+        last_week: en la ultima semana
+        students: Estudiantes
+        teachers: Profesores
+        users: Usuarios
+      last_logged_in_at: conectado últimamente en %{at}
+      media_data: 
+        one: "%{file_size} *de un archivo*"
+        other: "%{file_size} *de %{count} archivos*"
+      none_message: Nada que mostrar
+      over_time_link: sobre el tiempo
+      page_title: Estadísticas para %{account}
+      page_views_header: Vistas de página
+      recently_created_courses_title: Cursos Creados Recientemente
+      recently_ended_courses_title: Cursos Finalizados Recientemente
+      recently_logged_in_users_title: Usuarios Conectados Recientemente
+      recently_started_courses_title: Cursos Comenzados Recientemente
+      started_at: comenzó %{at}
+      uploaded_data: 
+        one: "%{file_size} *de un archivo*"
+        other: "%{file_size} *de %{count} archivos*"
+    statistics_page_views: 
+      go_button: Ir
+      page_title: Estadísticas para %{account}
+      page_views_by_hour_title: Vistas de páginas por hora
+      page_views_over_time_title: Vistas de págínas a través del tiempo
+      title: Reportes de Vistas de Páginas
+    statistics_right_side: 
+      general_statistics_link: Estadísticas Generales
+      page_views_link: Vistas de Páginas
+      reports_title: Reportes
+    update_failed_notice: Configuraciones de actualización de cuenta falló
+    user_deleted_message: "%{username} borrado con éxito"
+  announcement: 
+    no_title: Sin Título
+  announcements: 
+    announcements_crumb: Anuncios
+    external_feed: 
+      alts: 
+        deleted_feed: Borró este canal
+      labels: 
+        keyword: Palabra clave
+      messages: 
+        external_feed_post_count: 
+          one: 1 Tema Agregado
+          other: "%{count} Temas Agregados"
+    feed_name: "%{course} Canal de Anuncios"
+    index: 
+      buttons: 
+        add_feed: Agregar Canal
+      descriptions: 
+        add_new_feed_for_course: |-
+          Usted puede agregar temas automáticamente de un RSS o Canal Atom como anuncios para este curso. Sólo pegue el canal de URL debajo y cualquier entrada nueva será agregada.
+
+        add_new_feed_for_group: |-
+          Usted puede agregar temas automáticamente de un RSS o Canal Atom como anuncios para este grupo. Sólo pegue el URL del canal debajo y cualquier entrada nueva será agregada.
+
+      feed_title_course: Canal Atom para Anuncios de Curso
+      feed_title_group: Canal Atom para Anuncios de Grupo
+      labels: 
+        external_feed_verbosity: Contenido para publicar
+        match_phrase_checkbox: Sólo agregue temas con una frase específica en el título
+        phrase_to_look_for: Frase que se quiere buscar
+        url: URL
+      links: 
+        add_external_feed: Agregar un Canal Externo
+        create_announcement: Crear un Anuncio
+        feed: Canal de Anuncios
+      options: 
+        full_article: Artículo completo
+        link_only: Sólo enlace
+        truncated: Truncado
+      page_title: Anuncios
+      podcast_title_course: Canal de Anuncios de Podcasts del Curso
+      podcast_title_group: Canal de Anuncios de Podcasts del Grupo
+      titles: 
+        add_new_feed: Agregue un Canal Nuevo
+        announcements: Anuncios
+        external_feeds: Canales Externos
+    podcast_feed_description_course: Cualquier archivo de media desde o integrado en los anuncios en el curso "%{course}" aparecerá en este canal.
+    podcast_feed_description_group: Cualquier archivo de media enlazado desde o integrado dentro de los anuncios en el grupo "%{group}" aparecerá en este canal.
+    podcast_feed_name: "%{course} Canal de Anuncios de Podcast"
+  application: 
+    errors: 
+      feed_not_found: No se pudo encontrar el canal.
+      feed_private: El contexto correspondiente se ha hecho privado, entonces los canales públicos como este ya no estarán visibles.
+      feed_private_course: El curso correspondiente se ha hecho privado, entonces canales públicos como éste ya no estarán visibles.
+      feed_unpublished_course: Los canales para este curso no pueden ser accesados hasta que sean publicados.
+      feed_unpublished_group: Los canales para este grupo no pueden ser accesados hasta que sean publicados.
+      invalid_external_tool: No se pudieron encontrar configuraciones válidas para este enlace
+      invalid_feed_parameters: Parámetros inválidos del canal.
+      invalid_tag_type: No se reconoció el tipo de artículo para esta etiqueta
+      invalid_verification_code: El código de verificación es inválido.
+      mismatched_verification_code: El código de verificación no coincide ningún usuario inscrito actualmente.
+      permission_denied: No tiene permiso para accesar esa página
+      quota_exceeded: La cuota de almacenaje se excedió
+      quota_exceeded_account: La cuota de almacenaje de la cuenta se excedió
+      quota_exceeded_course: La cuota de almacenaje del curso se excedió
+      quota_exceeded_group: La cuota de almacenaje del grupo se excedió
+      quota_exceeded_user: La cuota de almacenaje del usuario se excedió
+      unauthorized: No está autorizado para realizer esta acción
+    notices: 
+      first_teacher: Este curso ya está tomado, y se ha registrado como el primer profesor.
+      first_teacher_with_email: Este curso ya está tomado, y se ha registrado como el primer profesor. Debería recibir un correo electrónico para completar el proceso de registro.
+      need_to_accept_enrollment: Necesitará [aceptar la invitación de inscripción](%{url}) antes de que pueda participar completamente en este curso.
+      page_disabled: Esta página ha sido inhabilitado
+      page_disabled_for_account: Esa página ha sido inhabilitada para esta cuenta
+      page_disabled_for_course: Esa página ha sido inhabilitada para este curso
+      page_disabled_for_group: Esa página ha sido inhabilitada para este grupo
+    wiki_front_page_default_content_course: ¡Bienvenido a nuestro nuevo wiki para el curso!
+    wiki_front_page_default_content_group: ¡Bienvenido a nuestro nuevo wiki para el grupo!
+  assessment_question: 
+    default_question_name: Pregunta
+    default_question_text: Texto de la pregunta
+  assessment_question_bank: 
+    default_imported_title: Preguntas Importadas
+    default_title: Sin Nombre - %{course}
+    default_unfiled_title: Preguntas sin archivar
+  assignment: 
+    comment_from_files: 
+      one: Ver archivo adjunto
+      other: Ver archivos adjuntos
+    feed_entry_title: "Tarea: %{assignment}"
+    feed_entry_title_with_course: "Tarea, %{course}: %{assignment}"
+    imported_assignments_group: Tareas Importadas
+    labels: 
+      due: Fecha límite
+    messages: 
+      assignment_created: Tarea "%{assignment}" creada
+    warnings: 
+      group_assignment: La tarea "%{assignment}" fue una tarea de grupo, y deberá reiniciar las configuraciones del grupo para este contexto nuevo
+      peer_assignment: La tarea "%{assignment}" fue una tarea revisada por otros, y deberá reiniciar las configuraciones para este contexto nuevo
+  assignment_group: 
+    default_title: Tareas
+  assignment_groups: 
+    notices: 
+      created: La tarea de grupo se creó con éxito.
+      deleted: Este grupo ha sido borrado
+      updated: La tarea del grupo se actualizó con éxito.
+  assignments: 
+    crumbs: 
+      new_assignment: Nueva tarea
+    errors: 
+      delete_reminder_failed: El borrado falló
+      reminder_failed: El recordatorio falló
+    group_submission_reminder: 
+      warnings: 
+        group_submission: Recuerde, esta contribución contará para todos en su grupo %{group_type}.
+    group_weights: 
+      headers: 
+        assignment_group: Tarea de Grupo
+        group_weight: Peso
+        total: Total
+    notices: 
+      assignment_delete: Esta tarea ha sido borrada.
+      created: Esta tarea se creó con éxito.
+      updated: Esta tarea se actualize con éxito.
+    peer_review_assignment: 
+      titles: 
+        remind_reviewer: Recuerde a %{user} acerca de la evaluación
+        remind_reviewier_with_last_notification: Recuerde a %{user} acerca de la evaluación, se notificó %{at} últimamente 
+        user_default: Usuario
+    submission_sidebar: 
+      comment_signature: "%{author}, %{created_at}"
+      labels: 
+        grade: "Grado: %{grade} *(%{points_possible} pts posibles)*"
+        none_assigned: Nada Asignado
+      links: 
+        download_attachment: Descargar %{attachment_display_name}
+        resubmit: Reenviar la tarea
+        submission: 
+          details: Detalles del envío
+          download_attachment: Descargar %{attachment_display_name}
+          view_original_entry: Ver la Entrada Original
+          view_original_page: Ver la Página Original
+          view_quiz: Ver el Envío de la Evaluación
+          view_survey: Ver el Envío de la Encuesta
+        view_rubric_evaluation: Ver la Rúbrica de la Evaluación
+      messages: 
+        no_comments: No hay Comentarios
+        submission_late_timestamp: "%{submitted_at} (tarde)"
+      titles: 
+        assigned_peer_reviews: Revisiones Asignadas a Otros
+        comments: "Comentarios:"
+        submission: Envío
+        submission_turned_in: ¡Entregado!
+      tooltips: 
+        finished: finalizado
+        incomplete: incompleto
+    submission_type_icon: 
+      tooltips: 
+        submitted: Enviado
+    submit_assignment: 
+      buttons: 
+        record_media: Grabar / Cargar Contenido Audiovisual
+        submit_assignment: Enviar la tarea
+      errors: 
+        unacceptable_file_type: "Este tipo de archive no está. Los archivos aceptados son: %{allowed_extensions_list}"
+      instructions: 
+        google_docs: Seleccione el archive de la lista siguiente.
+        media_recording: Use el enlace siguiente para registrar su envio. Haga click en “Guardar” cuando haya terminado y esté listo para enviar.
+        online_text_entry: Copie y pegue o escriba su envío aquí.
+        online_url: Copie y pegue el enlace a la página de internet que le gustaría enviar para esta tarea.
+      labels: 
+        comment: Comentarios
+        uploaded_data: Archivo
+      links: 
+        add_another_file: Agregue Otro Archivo
+        authorize_google_docs: Autorize Acceso a Google Docs
+        find_file: Haga click aqui para encontrar un archivo que ya ha cargado
+        submit: 
+          file_upload: Carga de Archivo
+          media: Contenido Audiovisual
+          text_entry: Entrada de Texto
+          website: URL de Pagína Website URL
+      messages: 
+        google_docs_auth_required: |-
+          Antes de enviar tareas directamente desde Google Docs necesita
+                   Autorizar Canvas para accesar su cuenta de Google Docs:
+        media_recording_ready: ¡Listo para Enviar! Haga click en el botón “Enviar Tarea” para finalizar.
+        media_recordings_disabled: |-
+          Grabaciones de media no estan disponibles para este sitio de Canvas, y no podrá enviar estos tipos de tareas. Por favor contacte a su instructor acerca de cambiar las configuraciones para esta tarea, o su administrador de sistema acerca de activar grabaciones de media.
+
+        record_before_submitting: Grabar antes de Enviar
+        submitting: Enviando...
+        uploading: |-
+          Recuperando una copia de su Google Doc para enviar para esta tarea. Esto puede llevar un tiempo, dependiendo en el tamaño del archivo…
+
+      no_files: No hay archivos
+      titles: 
+        media_recordings_disabled: Grabación de Contenido Audiovisual no está activado para este sitio de Canvas
+        uploading: Cargando el Envio
+      upload_or_choose_file: Cargar un archive, o escoja un archivo que ya ha cargado.
+    syllabus_content: 
+      buttons: 
+        update_syllabus: Actualizar el Programa de Estudio
+      headers: 
+        date: Fecha
+        day: Día
+        details: Detalles
+      instructions: 
+        syllabus: |
+          El programa de studio muestra una vista de tabla del calendario del curso, y lo básico de la calificación del curso. Puede agregar otros comentarios, notas o pensamientos que tenga acerca de la estructura del curso, pólizas del curso o cualquier otra cosa.
+          
+          Para agregar algunos comentarios, haga click en el enlace de "Editar la Descripción del Programa de Estudio " en la derecha.
+
+      labels: 
+        syllabus_body: Descripción del Programa de Estudio
+      links: 
+        jump_to_today: Salte a Hoy
+      titles: 
+        course_syllabus: Programa de Estudio del Curso
+    syllabus_right_side: 
+      links: 
+        edit_syllabus_description: Editar la Descripción del Programa de Estudio
+    syllabus_row: 
+      syllabus: 
+        other_day: Otro
+    wizard_box: 
+      descriptions: 
+        delete_icon: "%{icon}: Borrar esta tarea"
+        edit_icon: "%{icon}: Editar las opciones básicas otra vez"
+        move_icon: "%{icon}: Mover la tarea a otro grupo"
+        preview_icon: "%{icon}: Vista previa de la tarea y editarla"
+      errors: 
+        no_assignment_group: |-
+          Oops. Debe agregar un Grupo de Trabajo primero. Haga click en “Crear un Grupo de Trabajo” para ver cómo. 
+
+      instructions: 
+        wizard: 
+          details: |-
+            Hay mucho más que se incluye en una tarea que fechas de entrega y puntos. Si quiere escribir una descripción de la tarea, permita cargas de archivos, cambie el tipo de calificación o muchas otras cosas, haga click en el nombre de la tarea o en el ícono %{edit_icon} y luego “más opciones”.
+          group: 
+            step1: |-
+              Grupos de trabajo son usados para organizar tareas. Provea un nombre para cada grupo. Si decide darle más importancia basado en los grupos (*¿donde?*) luego puede establecer un porcentaje de calificación para cada grupo. Haga click en "Agregar un Grupo de Trabajo" para crear un grupo.
+
+          overview: |-
+            Esta página es para establecer si curso a un nivel más alto. Puede agregar tareas, agruparlos y luego darle más importancia a esos grupos. La idea es que pueda organizarse, y luego seguir con lo específico. Incluso, hay mucho que puede hacer desde aquí.
+
+          quizzes: |-
+            Las evaluaciones son tipos especiales de tareas. Puede crear o importar evaluaciones haciendo click en el enlace de “Evaluaciones” en la izquierda.
+
+          step1: |-
+            Las tareas siempre se organizan en grupos, entonces para agregar una tarea debe saber qué grupo al que quiere agregarlo. Seleccione el grupo y haga click en “Agregar Tarea a” o haga click en el ícono %{add_icon} para comenzar una tarea nueva para un grupo.
+
+          step2: |-
+            ¡Excelente! Ahora incluya los detalles. Puede asignar un título para su tarea, una fecha límite y el número de puntos posibles. Si quiere hacer más, puede, pero sólo después de que la tarea ha sido creada.
+
+          step3: |-
+            ¡Completo! ¡La tarea ahora está agregada al grupo! Si pasa su ratón o mouse sobre la tarea, podrá ver una lista de opciones.
+
+      links: 
+        create_assignment: Crear una Tarea Nueva
+        create_assignment_group: Crear un Grupo de Trabajo
+        create_or_import_quiz: Crear/Importar una Evaluación
+        edit_assignment_in_detail: Editar la Tareas en Detalle
+        show_me_where: Mostrarme donde
+      subtitles: 
+        edit_assignment_in_detail: (permitir cargas, edición de descripción, etc.)
+      titles: 
+        wizard_box: "Me gustaría:"
+  attachment: 
+    default_filename: Archivo
+    errors: 
+      not_found: La información del archive no pudo encontrarse
+    feed_title: "Archivo: %{title}"
+    feed_title_with_context: "Archivo, %{course_or_group}: %{title}"
+    title: 
+      migration_list: Archivos Asociados
+  bookmark_service: 
+    default_title: Sín Título
+  buttons: 
+    add_external_tool: Agregar una Herramienta Externa
+    apply: Aplicar
+    authorize_google_docs: Autorizar el Acceso a Google Docs
+    cancel: Cancelar
+    continue: Continuar
+    hide: Esconder
+    okay: Okay
+    post_message: Publicar Mensaje
+    previous: Previo
+    refresh: refrescar
+    reorder_topics: Reordenar Temas
+    save_course: Guardar el Curso
+    save_tool_settings: Guardar las Configuraciones de Herramientas
+    search: Buscar
+    send_message: Enviar Mensaje
+    show: Mostrar
+    submit: Enviar
+    update: Actualizar
+    view_account_roster: Ver Nómina de la Cuenta
+    view_course_roster: Ver Nómina del Curso
+  calendar_event: 
+    feed_item_title: "Evento del Calendario: %{event_title}"
+    feed_item_title_with_context: "Evento del Calendario, %{course_or_account_name}: %{event_title}"
+  calendar_events: 
+    crumbs: 
+      new: Nuevo Evento en el Calendario
+    full_calendar_event: 
+      buttons: 
+        create: Crear Evento
+        update: Actualizar Evento
+      labels: 
+        date: Fecha
+        event_description: Descripción de Evento
+        from: De
+        title: Título
+      no_content: Sin Contenido
+      timespan: "%{start_time} *para* %{end_time}"
+    new: 
+      links: 
+        back_to_calendar: Regresar el Calendario
+        delete: Borrar el Evento
+        edit: Editar el Evento del Calendario
+      page_title: Nuevo Evento del Calendario
+    notices: 
+      created: Evento fue creado con éxito.
+      deleted: Este evento ha sido borrado
+      updated: Evento actualizado con éxito.
+  calendars: 
+    calendar: 
+      alts: 
+        next: Siguiente
+        previous: Previo
+      calendars_count: 
+        one: 1 calendario, %{open_count} abrir
+        other: "%{count} calendarios, abrir %{open_count}"
+      feed_title: Canal de Calendario
+      instructions: 
+        ics_link: |-
+          Copiar el enlace debajo y pegarlo en cualquier aplicación de calendario que acepta canales iCal (Calendario Google, iCal, Outlook, etc.)
+      labels: 
+        calendar: Calendario
+        date: Fecha
+        details: Detalles
+        due: Vence
+        from: De
+        group: Grupo
+        title: Título
+        undated_events: Eventos sin Fecha
+      links: 
+        add_event: Agregar Evento
+        delete: Borrar
+        edit: Editar
+        feed: Hacer click aquí para ver el canal
+        full_details: Detalles Completos
+        how_do_i: ¿Cómo hago...?
+        jump_to_calendar: Saltar al Calendario
+        more_options: más opciones
+        show_undated_events: mostrar %{count} eventos sin fechas
+      messages: 
+        max_visible: Puede visualizar hasta %{count} calendarios a la vez
+      options: 
+        new_group: "[ New Group ]"
+      tabs: 
+        assignment: Tarea
+        event: Evento
+      timespan: "%{start_time} *para* %{end_time}"
+    event: 
+      due: vence
+      event_title: "vence: %{event_title}"
+    feed_title: "%{course_or_group_name} Canal del Calendario"
+    ics_description: Eventos de calendario para %{context_name}
+    ics_description_course: Eventos de calendario para el curso, %{course_name}
+    ics_description_group: Eventos de calendario para el grupo, %{group_name}
+    ics_description_user: Eventos de calendario para el usuario, %{user_name}
+    ics_title: " Calendario (Canvas) %{course_or_group_name}"
+    show: 
+      crumbs: 
+        my_calendar: Mi Calendario
+      feed_title: Canal Atom para el Calendario del Curso
+      keycode_descriptions: 
+        delete: Borrar el Evento Actual
+        edit: Editar el Evento Actual
+        next_day: Próximo Día
+        next_event: Próximo Día/Evento
+        next_week: Próxima Semana
+        open: Abrir el Evento Actual
+        previous_day: Día Previo
+        previous_event: Día/Evento Previo
+        previous_week: Semana Previa
+        refresh: Refrescar el Calendario
+      keycode_descriptoins: 
+        new: Evento Nuevo para el Día Actual
+      keycodes: 
+        delete: d
+        edit: e
+        new: n
+        next_day: ctrl+derecha
+        next_event: j
+        next_week: ctrl+abajo
+        open: o
+        previous_day: ctrl+izquierda
+        previous_event: k
+        previous_week: ctrl+arriba
+        refresh: r
+      page_title: Calendario
+    wizard_box: 
+      descriptions: 
+        assignment: |-
+          Excelente. Ahora haga click en la etiqueta de "Tarea" en el diálogo para crear una tarea en vez de un evento del calendario.
+        assignment_done: |-
+          ¡Hecho! ¡La tarea ha sido creada! Puede hacerle click para ver los detalles, editar y borrar el evento, o arrastre y colóquelo en un día nuevo para cambiar su fecha.
+        change_date: |-
+          Eso es fácil. Sólo arrastre el evento a una fecha nueva. O puede hacer click en “Editar” para poder ser más específico.
+        create: |-
+          Para crear un evento en el calendario, solo haga click en el día en el calendario en donde quiere el evento.
+        create_assignment: |-
+          Al igual que con el evento del calendario, haga click en la fecha donde quiere agregar la tarea. O puede crear una tarea sin una fecha límite, haciendo click en la caja de “Eventos sin Fecha” (*¿donde?*).
+
+        delete: Haga click en el evento o tarea en el calendario que quiere borrar.
+
+        delete2: Ahora haga click en “Borrar” (*¿donde?*) y su evento será borrado.
+        delete_done: Hecho y listo. Esa fue una acción de borrado extreme que hizo.
+        done: |-
+          ¡Listo! ¡El evento se ha creado! Puede hacerle click para ver los detalles, editarlo y borrarlo, o arrástrelo y póngalo en un día nuevo para cambiar su fecha.
+
+        edit: |-
+          ¡Excelente! Ahora solo agregue un nombre para el (*¿donde?*). Puede especificar un tiempo de comienzo y finalizado si quiere. O sólo un tiempo de inicio. Haga click en “Enviar” para terminar.
+
+        edit_assignment: |-
+          Ahora solo ingrese un nombre para la tarea (*¿donde?*) y el grupo de trabajo al que pertenece. Puede especificar una fecha límite si quiere también. Haga click en “Enviar” para finalizar.
+
+      labels: 
+        i_would_like_to: Me gustaría 
+      links: 
+        change_date: Cambie la Fecha de un Evento/Tarea
+        create_assignment: Crear una Tarea Nueva
+        delete: Borre un Evento/Tarea
+        new: Crear un Evento Nuevo
+  cc: 
+    by: Atribución de CC
+    by_nc: Atribución No Comercial de CC
+    by_nc_nd: Atribución No Comercial Sin Derivativos
+    by_nc_sa: Atribución No Comercial Compartida de CC
+    by_nd: Atribución Sin Derivativos de CC
+    by_sa: Atribución Compartida de CC
+    private: Privado (Derechos de Autor)
+    public_domain: Dominio Público
+  collaboration: 
+    default_title: Colaboración No Identificada
+  collaborations: 
+    collaboration: 
+      links: 
+        delete: Borrar esta Colaboración
+        edit: Editar esta Colaboración
+        show_participants: 
+          one: "*1* Participante"
+          other: "*%{count}* Participantes"
+    errors: 
+      cannot_load_collaboration: No se puede cargar la colaboración
+      create_failed: La creación de la colaboración falló
+      not_enabled: Colaboraciones no han sido activadas para este sitio de Canvas
+      update_failed: La actualización de la colaboración falló
+    forms: 
+      buttons: 
+        delete_from_canvas: |-
+          Sólo Borrar de Canvas
+
+        delete_from_google_docs: |-
+          Borrar también de Google Docs
+
+        start_collaborating: Comenzar la Colaboración
+        update: Actualizar la Colaboración
+      collaboration_name: "Colaboración de %{course_or_group_name}"
+      descriptions: 
+        etherpad: |-
+          EtherPad es un sitio que le permite establecer documentos compartidos. Es lo suficientemente rápido que se puede ver lo que los otros estan escribiendo – aunque las computadoras ´tablet´no están protegidas por una contraseña para que cualquiera que la conoce puede hacer ediciones. EtherPad puede funcionar major que Google docs para tomar notas ya que es rápido.
+
+        google_docs: |-
+          Google Docs es un buen lugar para colaborar en un proyecto de grupo. Es como Microsoft Word, pero le permite trabajar en conjunto con otros en el mismo archive sin tener que mandarlo por correo electrónico. Necesitará una cuenta de Google para poder participar en colaboraciones de Google Docs.
+
+      labels: 
+        collaborate_using: Colaborar Usando
+        collaborate_with: Colaborar Con
+        description: Descripción
+        document_name: Nombre de Documento
+      messages: 
+        delete_google_doc_as_weel: |-
+          Esta colaboración está siendo almacenada como un Google Doc. Quiere borrarlo solo de Canvas, o removerlo también de Google Docs?
+
+      titles: 
+        new: Comenzar una Nueva Colaboración
+
+    index: 
+      collaborators_count: 
+        one: "*1 Colaboración* en %{service}"
+        other: "*%{count} Colaboraciones* en %{service}"
+      description_rs: |
+        Herramientas gratis en línea como [Google Docs](%{google_url}) y [EtherPad](%{etherpad_url})
+        son un lugar excelente para que los estudiantes puedan trabajar en proyectos de grupo o artículos, tomen notas compartidas, etc.
+        El profesor *o* los estudiantes pueden establecer colaboraciones de grupo.
+
+      description_student: |
+        **¿Qué queremos decir con colaboraciones?** Estamos hablando acerca de herramientas en línea para trabajar juntos en un documento compartido. Puede usar recursos como [Google Docs](%{google_url}) y [EtherPad](%{etherpad_url}) para trabajar en conjunto en tareas de grupo o toma de notas. Esta página es un buen lugar para tener seguimiento de esas colaboraciones, y también para establecerlas sin tener que intercambiar correos electrónicos.
+        
+        Para saber más acerca de un tipo particular de colaboración, haga click en “Comenzar una Nueva Colaboración” y luego escoja el tipo de las lista.
+
+
+      description_teacher: |
+        **¿Qué queremos decir con colaboraciones?** Estamos hablando acerca de herramientas en línea que lo más seguro sus estudiantes ya conocen. Los estudiantes pueden usar recursos como [Google Docs](%{google_url}) y [EtherPad](%{etherpad_url}) para trabajar en colaboración en tareas como artículos de grupo o toma de notas. Esta página les provee (y a usted) un lugar fácil para llevar un seguimiento de esas colaboraciones, y también para configurarlas sin tener que intercambiar correos electrónicos.
+
+        Para saber más acerca de un tipo particular de colaboración, haga click en “Comience una Colaboración Nueva” y luego escoja el tipo de la lista. 
+
+      links: 
+        delete: Borre esta Colaboración
+        edit: Edite esta Colaboración
+        new: Comience una Nueva Colaboración
+      page_title: Colaboración
+      started_by: Iniciada por *%{user}*, %{at}
+      titles: 
+        current: Colaboraciones Actuales
+  communication_channel: 
+    default_facebook_account: Cuenta de Facebook
+    default_twitter_handle: Nombre de Twitter
+    errors: 
+      duplicate: La dirección %{address} ya ha sido activada por otra cuenta
+      duplicate_email: Este correo electrónico %{email} ya ha sido activado por otra cuenta
+      duplicate_facebook: La cuenta de Facebook %{email} ya ha sido activada por otra cuenta
+      duplicate_sms: La dirección SMS %{email} has already been activated for another account
+      duplicate_twitter: The Twitter handle %{handle} has already been activated for another account
+  communication_channels: 
+    merge: 
+      buttons: 
+        cancel: No se preocupe
+        claim: Reclame la dirección
+        merge: Una Cuentas de Usuario
+      labels: 
+        address_belongs_to: |-
+          El correo electrónico pertenece a
+
+        email_address: Correo electrónico
+        logged_in_as: Está conectado como
+      messages: 
+        must_merge: |-
+          El usuario solo tiene un correo electrónico, entonces para agregarlo a su cuenta tendrá que unirlas en su cuenta. ¿Quiere hacer esto? 
+
+        transfer: ¿Quiere transferir el correo electrónico a su cuenta?
+        transfer_or_merge: |-
+          Puede transferir su cuenta de correo electrónico a su cuenta o unir el usuario a su cuenta. ¿Qué le gustaría hacer?
+
+      page_title: Reclame la Dirección de Correo Electrónico
+    try_merge: 
+      messages: 
+        success: |-
+          ¡Petición lograda! Un correo electrónico ha sido enviado a *%{email}* con un enlace que puede seguir para agregar ese correo electrónico a su cuenta.
+            Porfavor asegúrese de revisar su bandeja de spam, por si acaso.
+      page_title: Reclame el Correo Electrónico
+  conferences: 
+    disabled_error: Conferencias en línea no han sido activadas para este sitio de Canvas
+    general_error: Hubo un error al unirse a la conferencia
+    inactive_error: Esa conferencia no está activa actualmente
+    index: 
+      buttons: 
+        create: Crear una Conferencia
+      default_name: "Conferencia %{type}"
+      description_for_course_admins: Conferencias en línea les permiten comunicarse remotamente con miembros de la clase. Los profesores pueden presentar clases usando la cámara y micrófono de su computadora, demonstrar cómo usar las herramientas de la computadora al compartir su pantalla, o tener también horas de trabajo extras.
+      description_for_course_members: Conferencias en línea son una forma de reunirse remotamente con otros miembros del curso para cosas como sesiones de studio, horas de oficina virtuales, etc. Conferencias en línea le permiten compartir video y audio usando la cámara de su computadora, y también las herramientas adicionales como compartir la pantalla de la computadora y pizarras digitales.
+      description_for_group_admins: Conferencias en línea permiten comunicarse remotamente con miembros del grupo. Se pueden organizar reuniones o sesiones de estudio sin tener que reunirse en persona, usando la cámara, micrófono, compartir la pantalla de la computadora o usando pizarras digitales.
+      description_for_group_members: Conferencias en línea son una manera de reunirse remotamente con miembros del grupo para sesiones de estudio, horas de trabajo virtuales, etc. Herramientas de conferencias en línea permiten compartir video y audio usando la cámara de la computadora y también ofrecen herramientas adicionales como compartir la pantalla de la computadora y pizarras digitales.
+      duration_input: "%{text_field} minutos"
+      instructions_for_new: Para iniciar una conferencia ahora, haga click en el enlace "%{link_text}".
+      labels: 
+        duration: Duración
+        labels: 
+          all_users: Invite a todos los Miembros del Curso
+        long_running: Esta es una conferencia de larga duración y no debería cerrarse automáticamente
+        members: Miembros
+        name: Nombre
+        options: Opciones
+        type: Tipo
+      new_conference_heading: Iniciar una Conferencia Nueva
+      new_conference_link: Crear una Conferencia Nueva
+      page_title: Conferencias en línea
+      title: Conferencias en línea
+    show: 
+      basic_info: Información Básica
+      buttons: 
+        end: Finalícelo ahora
+        join: Únase ahora
+        restart: Reinícielo ahora
+        start: Comience ahora
+      conference_details: Detalles de la Conferencia
+      duration_long_running: N/A, larga duración
+      edit_link: Editar la Conferencia
+      external_links: Enlaces Externos
+      labels: 
+        description: Descripción
+        duration: Duración
+        members: Miembros
+        name: Nombre
+        status: Estatus
+        type: Tipo
+      minute: 
+        one: 1 minuto
+        other: "%{count} minutos"
+      page_title: Conferencia en Línea
+      status: 
+        finished: Finalizado %{date_and_time} (%{duration})
+        new: No ha comenzado aun
+        started: Iniciado %{time}
+    type_disabled_error: Este tipo de conferencia ya no esta activada para este sitio de Canvas
+  content_exports: 
+    errors: 
+      couldnt_create: No se pudo crear la exportación del curso.
+      not_found: La exportación no existe
+    index: 
+      buttons: 
+        create: Crear una Exportación de Curso
+      crumbs: 
+        course_exports: Exportaciones del Curso
+      links: 
+        download: "Exportación del Curso desde %{date}: *Haga click aquí para descargar*"
+      message: 
+        export_started: The export process has started. This can take awhile for large courses. *You can leave the page* and you'll get an email when the export is complete.
+      page_title: Course Exports
+  content_imports: 
+    assignment_form: 
+      buttons: 
+        save_assignment: Save Assignment
+      options: 
+        assignment: Tarea
+        discussion: Discusión
+        file_upload: Carga de Archivos
+        new_group: "[ Grupo Nuevo ]"
+        not_graded: No Calificado
+        quiz: Evaluación
+    assignment_groups: 
+      labels: 
+        weight_groups: Dar peso a la calificación final por grupos
+      links: 
+        add_group: Agregar un Grupo de Trabajo
+        delete_group: Borrar Grupo
+        edit_group: Editar el Nombre del Grupo
+      titles: 
+        assignment_groups: Grupos de Trabajo
+    copy_course: 
+      buttons: 
+        copy_from_course: Copiar desde este Curso
+        copy_topics: Sólo Copie los Temas
+        copy_topics_and_replies: Copiar Temas y Respuestas
+        import: Importar Contenido del Curso
+      crumbs: 
+        copy_from: Copiar desde Otro Curso
+        copy_from_course: Copiar desde %{course}
+      descriptions: 
+        copy_content: |-
+          Seleccionar el contenido que quiere copier hacia este curso. Trataremos de autocorregir fechas de vencimiento y eventos del calendario no coincidentes.
+        copy_discussion_replies: |-
+         Además de copiar discusiones, ¿Le gustaría también copiar las respuestas de los estudiantes a las respuestas de los temas?
+
+        copy_from: |-
+          Para copiar contenido desde otro curso a este, necesitará seleccionar el curso del cual quiere copiar. Luego tiene que especificar exactamente lo que quiere copiar.
+
+        day_substitutions: |-
+          Puede definir explícitamente las substituciones de día para ajustar para cambiar los horarios de clases (i.e. mueva todo lo que sucedía el Lunes para que ahora suceda el Martes)
+      from_to: "*de* %{start_date} **hasta** %{end_date}"
+      labels: 
+        assignment: Tareas para %{course}
+        copy: incluya las entradas desde el curso viejo
+        copy_everything: Copiar todo desde %{course}
+        copy_settings: Configuraciones para %{course}
+        dates_range: "Rango de fechas para **%{course}** "
+        discussions: Discusiones para %{course}
+        events: Eventos para %{course}
+        files: Archivos para %{course}
+        learning_outcomes: Resultados de Aprendizaje para %{course}
+        modules: Módulos para %{course}
+        quizzes: Evaluaciones para %{course}
+        search_for_course: Buscar el Curso
+        select_course: O seleccione de la lista
+        shift_dates: Ajuste los eventos y fechas límite
+        wiki_ages: Páginas Wiki para %{course}
+      links: 
+        add_day_substitution: Definir una sustitución de día
+      move_from_to: Mover todo en %{old_day} para que ocurra en %{new_day}
+      options: 
+        select_course: "[Seleccionar el Curso]"
+      page_title: Copiar desde Otro Curso
+      titles: 
+        copy_discussion_replies: ¿Copiar Respuestas a Discusiones?
+        copy_from: Copiar desde otro Curso
+        copy_from_course: Copiar Contenido desde %{course}
+      warnings: 
+        no_other_courses: No tiene acceso a cualquier curso adicional.
+    copy_course_content: 
+      crumbs: 
+        copy_from_course: Copiar desde %{course}
+      descriptions: 
+        copy_succeeded: |
+          ¡Contenido de curso importado con éxito! Puede revisar los resultados de la importación a continuación.
+          
+          Si no le gustan estas fechas para tareas o eventos, las puede cambiar [fácilmente arrastrándolo al calendario del curso](%{url}).
+
+      labels: 
+        assignment: Tareas para %{course}
+        discussions: Discusiones para %{course}
+        events: Eventos para %{course}
+        files: Archivos para %{course}
+        modules: Módulos para %{course}
+        quizzes: Evaluaciones para %{course}
+        wiki_ages: Páginas Wiki para %{course}
+      links: 
+        back: Retorno a la Página de Inicio de %{course}
+      page_title: Copiar los Resultados de %{course}
+      titles: 
+        copy_succeeded: Copia del Curso se hizo con Exito
+        just_added: Recientemente agregado al Curso
+        what_it_looks_like_now: Cómo se mira %{course} ahora
+    crumbs: 
+      content_imports: Importación de Contenido
+    date_header: 
+      no_date_set: No se ha fijado fecha
+    files: 
+      buttons: 
+        skip: Saltar este Paso
+      description: |-
+        Puede cargar una colección de archivos comprimidos zip hacia su curso y los extraeremos para usted. Esto se puede hacer fácilmente para mover archivos desde otro sistema hacia Canvas.
+
+      instructions: 
+        webct: 
+          "1": Ingrese a WebCT y vaya al Administrador de Archivos
+          "2": Seleccione todos los archivos que quiere exportar
+          "3": Haga click en la opción zip para guardar los archivos
+          "4": Guarde el archive a su computadora local
+      links: 
+        zip_from_webct: ¿Cómo consiguo un archivo .zip desde WebCT?
+      page_title: Importar Archivos
+    index: 
+      crumbs: 
+        migrations: Migraciones
+      failed_migration: |-
+        Migración de %{plugin_type} – Hubo un error con esta migración. Por favor provea su administrador con este identificador de migración: %{id}
+      migration_in_progress: "Migración de %{plugin_type} – Esta migración está siendo procesada."
+      migration_needing_action: "Migración de %{plugin_type} - *Haga click aquí para escoger el contenido a importar.*"
+      page_title: Activar Migraciones
+      successful_migration: "Migración de %{plugin_type} – Esta migración fue importada con éxito."
+      titles: 
+        failed_migrations: Migraciones Fallaron
+        migrations_in_progress: Migraciones Siendo Procesadas
+        migrations_needing_action: Migraciones Necesitan Acción
+        successful_migrations: Migraciones exitosas
+    intro: 
+      description: |-
+        Si se está moviendo de Canvas desde otro sistema de manejo de cursos, existe la posibilidad de que hay archivos, evaluaciones, tareas y otros archivos que necesitará sean movidos aquí. El ayudante debería hacer el proceso más fácil
+      if_any: (en cualquier caso)
+      links: 
+        copy_course: Copiar el contenido desde **otro curso de Canvas**
+        import_files: Importar Archivos
+        import_package: Importar contenido desde un **paquete de contenido** o desde **otro sistema**
+        import_quizzes: Importar Evaluaciones
+      page_title: Importar el Ayudante
+      skip_steps: Puede saltar cualquier paso que no se aplican.
+      titles: 
+        you_can_also: "Puede también:"
+    migrate_content: 
+      buttons: 
+        import: Importar el Curso
+      choose_file: Seleccionar un archivo %{file_extension} para importar
+      details: 
+        selective_import: |-
+          Extraeremos solo las áreas que seleccione a continuación. No todos los cursos tendrán estas características. Después que hemos terminado con la extracción, puede decidir exactamente de qué área importar hacia su curso.
+      errors: 
+        choos_file: Debe seleccionar un archivo .zip para cargar
+      instructions: 
+        selective_import: Escoja qué partes del curso quiere mover
+      labels: 
+        question_banks: Grupos de Preguntas
+        quizzes: Evaluaciones y Tareas
+      links: 
+        view_migrations: Ver Migraciones
+      messages: 
+        import_started: "**¡Gracias!** Comenzaremos exportando su curso, recibirá un correo electrónico al final y sera capaz de seleccionar las secciones que quiere importar."
+      options: 
+        source_system: Seleccione el sistema del que quiere importar
+      page_details: |-
+        Hemos integrado con otros Sistemas de Manejo de Aprendizaje para proveer un proceso de migración simple y automatizado. Si mira su sistema actual en la lista, seleccione esa opción y provea la información necesaria. Extraeremos el contenido de su curso, y luego puede especificar que partes le gustaría haber agregado a su curso nuevo.
+
+      page_title: Migrar desde Otro Sistema
+      previous_migrations: "Hay migraciones previas para este curso:"
+      question_bank_configuration: Configuración del Grupo de Preguntas
+      selective_import: Importación Selectiva
+    migrate_content_choose: 
+      buttons: 
+        import: Importar Contenido del Curso
+      crumbs: 
+        migrate: Migrar desde Otro Sistema
+      descriptions: 
+        day_substitutions: |-
+          Puede definir explícitamente las sustituciones de día para ajustar horarios de la clase (i.e. mover todo que estaba en el Lunes para que ahora suceda el Martes)
+      from_to: "*de* %{start_date} **a** %{end_date}"
+      instructions: |-
+        Seleccione el contenido que le gustaría que sea copiado a este curso. Al final se puede escoger todas las fechas para cosas migradas en caso que se ha movido a un semestre nuevo.
+
+      labels: 
+        assignment_groups: Grupos de Trabajo
+        content_folders: Carpeta de Contenido
+        copy_all_question_banks: Copiar todo el Grupo de Preguntas
+        copy_everything: Copiar Todo
+        dates_range: "Rango de fechas para %{course}"
+        include_posts: Importar también mensajes en este tema
+        shift_dates: Ajustar eventos y fechas límites
+        this_course_date_range: "Rango de fechas de **This Course**"
+      links: 
+        add_day_substitution: Definir un día de sustitución
+        back: Regreso a la Página del Curso
+      messages: 
+        import_started: ¡El proceso de importación ha comenzado! Esto puede llevar unas cuantas horas para cursos más grandes, entonces siéntase libre de dejar esta página. Le enviaremos un correo electrónico cuando el proceso de importación se haya completado.
+        importing: "**¡Gracias!** Importaremos el contenido seleccionado desde %{course}, y enviaremos un correo electrónico cuando el proceso se haya completado. El proceso normalmente termina en una hora."
+        loading: Cargando la lisa de recursos migrados...
+      move_from_to: Mueva todo en %{old_day} para que ocurra en %{new_day}
+      page_title: Migrar desde otro Sistema
+      special_schools: |-
+        Estamos trabajando con un grupo selecto de universidades para proveer una forma más simple, más automatizada de migración de otros sistemas de manejo de enseñanza. Si su universidad está en la lista, todo lo que se necesita es que nos provea con su cuenta de inicio y su contraseña. Extraeremos el contenido, y usted puede especificar que partes quiere agregar a su curso.
+
+      titles: 
+        copy_from: Copiar desde %{course}
+    migration_warnings: 
+      labels: 
+        last_error: Último Error
+        warnings: Alertas
+      links: 
+        warnings: Alertas/Errores
+    notices: 
+      already_imported: Esa extracción ya ha sido importado a este curso
+    question_bank_config: 
+      labels: 
+        default_question_bank: Si no se ha especificado en la exportación, las preguntas entrarán en el grupo de preguntas
+        new_question_bank: Nombre de grupo de preguntas nuevo
+      options: 
+        new_question_bank: "[ Grupo de Preguntas Nuevo ]"
+    quizzes: 
+      buttons: 
+        back: He completado la importación, regresemos al Curso.
+        import: Importar Evaluación
+        import_more: Importar otro archivo QTI
+      defaults: 
+        unnamed_quiz: Evaluación sin Nombre
+      details: |-
+        Canvas puede importar evaluaciones en el formato IMS QTI. La mayoría de los sistemas le permite exportar sus evaluaciones en este formato. Puede usar también herramientas populares de evaluaciones como Respondus para crear y exportar IMS QTI.
+          Cargar el archivo a continuación y luego recibirá un correo electrónico cuando se haya completado la importación.
+      errors: 
+        choose_file: Debe seleccionar el archivo .zip para cargarlo
+      instructions: 
+        respondus: 
+          "1": Abra Respondus y seleccione el sistema que está usando actualmente
+          "2": Haga click en “Recuperación y Reportes” a la izquierda
+          "3": Seleccione o establezca la configuración de su sistema actual
+          "4": Haga click en el botón de "Recuperar"
+          "5": Haga click en en la lengüeta de “Inicio”
+          "6": Cambie la “Personalidad Actual” a "IMS QTI 1.1+"
+          "7": Haga click en "Vista Previa y Publicar”, luego en "Guardar Archivo QTI XML"
+          "8": Seleccione "Puntos como numerous decimales" y "Archivo zip QTI xml" para las configuraciones
+          "9": Haga click en "Guardar como" y guarder el archivo comprimido zip en su computadora local
+      links: 
+        quiz_from_respondus: ¿Cómo guardo una evaluación usando Respondus?
+      messages: 
+        file_uploaded: "**¡Gracias!** Comenzaremos importando su información QTI y le enviaremos un correo electrónico cuando este complete. El proceso normalmente se completa en 10 minutos."
+        uploading: Cargando y procesando su archivo comprimido zip, si es más grande puede tomar un tiempo.
+      page_title: Importar las Evaluaciones
+      question_count: 
+        one: 1 Pregunta
+        other: "%{count} Preguntas"
+      titles: 
+        current_quizzes: Evaluaciones Actuales
+        uploading: Cargando, Por favor espere.
+    wizard_secondary_nav: 
+      wizard_steps: 
+        import_files: Importar Archivos
+        import_quizzes: Importar Evaluaciones
+        intro: Introducción
+  content_migration: 
+    unknown: Desconocido
+  content_tag: 
+    no_title: Sin título
+  context: 
+    all_marked_read: Mensajes de la bandeja de correos marcados como leídos
+    bad_message: Este mensaje no se pudo mostrar
+    chat: 
+      titles: 
+        chat: Chat
+    chat_not_enabled: Chat no ha sido activado para este sitio de Canvas
+    communication: 
+      headings: 
+        discussions: Discusiones
+      links: 
+        feeds: 
+          course_discussions: Canal Atom para Discusiones del Curso
+        start_collaboration: Comenzar una Colaboración
+        start_conference: Comenzar una Conferencia en Línea
+        start_topic: Comenzar una Tema Nuevo
+      titles: 
+        communication: Comunicación
+    context_message: 
+      from_to: "%{from_user} *a %{to_user}*"
+      images: 
+        alt: 
+          email: correo electrónico
+          mark_as_read: Marcar como Leído
+          reply: Contestar
+        title: 
+          email: Mensaje de Correo Electrónico
+          mark_as_read: Marcar como Leído
+          reply_to_recipients: Contestar a Destinatarios
+          reply_to_sender: Responder al Remitente
+      links: 
+        show_full: Mostrar mensaje completo
+      no_title: Sin Título
+      recipients_count: 
+        one: "*1* Destinatario"
+        other: "*%{count}* Destinatarios"
+      recipients_protected: Lista de destinatarios está protegida
+    context_message_inbox: 
+      loading_results: Cargando más resultados
+      no_messages: Perdón, todavía no hay mensajes.
+    dashboard_conference: 
+      images: 
+        alt: 
+          web_conference: Conferencia en Línea
+        title: 
+          web_conference: Conferencia en Línea
+      last_viewed: Última vista en *%{date_time}*
+      links: 
+        participants: 
+          one: 1 Participante
+          other: "%{count} Participantes"
+    dashboard_context_message: 
+      headings: 
+        recipients: Destinatarios del Mensaje
+      images: 
+        alt: 
+          email: correo electrónico
+          reply: Contestar
+        title: 
+          email: Mensaje de Correo Electrónico
+          reply: Responder al Remitente
+      links: 
+        more_messages: Más Mensajes
+        reply_to_all: Contestar a todos los Destinatarios...
+        reply_to_sender: Contestar al Remitente Original...
+        show_messages: 
+          one: Mostrar %{count} Mensaje
+          other: Mostrar %{count} Mensajes
+      no_title: Sin Título
+      recipients_count: 
+        one: 1 Destinatario
+        other: "%{count} Destinatarios"
+      recipients_protected: Lista de Destinatarios está protegida
+      sent: enviado
+      to: para
+    dashboard_context_sub_message: 
+      labels: 
+        to: Para
+      links: 
+        title: 
+          author_name: Nombre del Autor
+    dashboard_ignore_link: 
+      images: 
+        alt: 
+          ignore: ignorar
+      links: 
+        title: 
+          ignore: Ignorar este artículo del flujo
+    dashboard_notification: 
+      images: 
+        alt: 
+          notification: notificación
+    dashboard_submission: 
+      images: 
+        alt: 
+          submission: envío
+        title: 
+          submission: Envío de Tarea
+      links: 
+        add_comment: Agregar un Comentario...
+        show_more_comments: 
+          one: Mostrar 1 Comentario más
+          other: Mostrar %{count} Comentarios
+        view_original_submission: Ver el Envío Original
+      pending_review: (necesita todavía la revision del profesor)
+      state: 
+        graded: calificado
+        posted: publicado
+        submitted: enviado
+    dashboard_topic: 
+      delayed_posting: Este tema no sera visible a usuarios hasta *%{date_time}*
+      images: 
+        alt: 
+          announcement: anuncio
+          topic: tema
+        title: 
+          announcement: Anuncio
+          topic: Discusión
+      labels: 
+        attached_file: Archivo Adjunto
+      links: 
+        add_comment: Agregar un Comentario...
+        show_more_entries: 
+          one: Mostrar 1 Colaboración más
+          other: Mostrar %{count} Colaboraciones
+        view_topic: Ver todo el Tema 
+      no_title: Sin Título
+      post_date: Publicado *%{post_date}*
+      posts_for_grading: Mensajes serán usados para la calificación.
+      read_more: más
+      topic_for_assignment: Este tema es para la tarea, %{assignment_name_link}.
+    dashboard_topic_entry: 
+      links: 
+        title: 
+          author_name: Nombre del Autor
+    deleted_item: 
+      created: creado
+      last_updated: última actualización
+      links: 
+        restore: restaurar
+    inbox: 
+      alerts: 
+        recipients_not_available: Algunos de los destinatarios originales ya no están disponibles. %{newline} Esto puede ser porque ya no son un miembro active del curso o grupo. Pueden haber sido borrados o dados de baja.
+      buttons: 
+        add_recipients: Agregar Destinatarios
+        mark_all_as_read: Marcar Todos los Mensajes como Leídos
+        select_recipients: Seleccionar Destinatarios
+      discussion_replies: Respuestas a la Discusión
+      headings: 
+        possible_recipients: Destinatarios Posibles
+        select_group: Seleccionar un Grupo
+        select_recipients: Destinatarios
+        show_message_types: Mostrar los Tipos de Mensajes
+      helps: 
+        messages_email_warning: Recuerde que este mensaje sera enviado como un correo electrónico a los destinatarios seleccionados, y no podemos prometerle que no sera leído por usuarios no registrados si comparten cuentas de correo electrónico.
+      inbox: Bandeja de Entrada
+      labels: 
+        add_to_faculty_journal: Agregar como una entrada de Revista de Facultad
+        also_announcement: Publicar también como un anuncio
+        labels: 
+          recipients: Destinatarios
+          subject: Asunto
+        select_message_types: Seleccione que tipo de mensaje le gustaría que aparezca en su bandeja de entrada
+      links: 
+        add_attachment: Agregar Archivo Adjunto
+        add_media_comment: Comentario acerca de Contenido Audiovisual
+        current_observers: Observadores Actuales
+        current_students: Estudiantes Actuales
+        current_teachers: Profesores Actuales
+        inbox: Bandeja de Entrada
+        received_messages: Mensajes Recibidos
+        sent_messages: Mensajes Enviados
+        write_message: Escribir un Mensaje
+      media_comment: Commentario acerca de Contenido Audiovisual
+      new_message_select: Nuevo Mensaje para
+      no_recipients: Sin Destinatarios
+      private_messages: Mensajes Privados
+      received_messages: Mensajes Recibidos
+      sent_messages: Mensajes Enviados
+      submission_comments: Comentarios Enviados
+      user_name: nombre de usuario
+    inbox_item: 
+      images: 
+        alt: 
+          email: correo electrónico
+          grading: calificación
+          topic: tema
+        title: 
+          email: 
+            read: Mensaje - leído
+            unread: Mensaje de Correo Electrónico
+          grading: 
+            read: Mensaje para Calificación - leído
+            unread: Mensaje para Calificación
+          topic: 
+            read: Mensaje de Discusión - leído
+            unread: Mensaje de Discusión
+      links: 
+        remove: Remover
+        title: 
+          remove_message: Remover este Mensaje
+      no_title: Sin Título
+    inbox_items: 
+      inbox_delete_confirm: ¿Seguro que quiere borrar este mensaje de su bandeja de entrada?
+      loading_results: Cargando más resultados
+      no_messages: Perdón, todavía no tiene mensajes.
+    media_object_inline: 
+      titles: 
+        media_playback: Reproducción de Contenido Audiovisual
+    media_objects_not_configured: Contenido Audiovisual no configurado
+    message_deleted: Este mensaje ha sido borrado
+    message_removed: El mensaje que estaba tratando de ver ha sido removido
+    no_user: 
+      course: Ese usuario no existe o no es un miembro actual de este curso
+      group: Ese usuario no existe o no es un miembro actual de este grupo
+    prior_users: 
+      headings: 
+        prior_users: Usuarios Anteriores
+      links: 
+        back_to_people: De regreso a la Gente
+      titles: 
+        prior_users: Usuarios Anteriores
+    roster: 
+      group_members: Miembros del Grupo
+      headings: 
+        send_message: Enviar un Mensaje
+      links: 
+        manage_users: Administrar Usuarios
+        message_all_group_members: Enviar un Mensaje a todos los Miembros del Grupo
+        message_all_students: Enviar un Mensaje a todos los Estudiantes
+        message_recipients: Enviar un Mensaje a Destinatarios Seleccionados 
+        message_teachers: Enviar un Mensaje a Profesores y Asistentes
+        view_faculty_journals: Ver Revistas de Facultad
+        view_prior_enrollments: Ver Inscripciones Anteriores
+        view_services: Ver Servicios Registrados
+        view_student_groups: Ver Grupos de Estudiantes
+        write_message: Escribir un Mensaje
+      students: Estudiantes
+      teachers: Profesores y Asistentes
+      titles: 
+        course_roster: Lista del Curso
+        group_roster: Lista del Grupo
+    roster_message_attachment_not_found: Parece que algo salió mal cuando se cargo este archive, y no podemos encontrar el archivo actual. Puede que deba notificar al dueño del archive y dejar que los vuelvan a cargar.
+    roster_user: 
+      completed_enrollment: completado *%{completed_at}*
+      confirm: 
+        conclude_student: ¿Esta seguro que quiere terminar la inscripción del estudiante?
+        delete_enrollment: ¿Esta seguro que quiere borrar la inscripción del estudiante?
+      enrolled_as: Inscrito como %{enrollment_type}
+      enrollment_change_failed: Cambio del Privilegio de Inscripción falló, intente de nuevo
+      enrollment_linked_to: enlazado a %{linked_user}
+      headings: 
+        recent_messages: Mensajes Recientes
+        user_details: Detalles del Usuario
+        user_services: "Servicios de %{user}"
+        users_details: "Detalles de %{user}"
+      help: 
+        list_services: No ha activado su lista de servicios registrados. Permitir esta lista dejará que miembros del curso y grupos puedan conectarse más fácilmente fuera de la clase.
+        services: No ha enlazado su perfil de usuario a ningun servicio externo. Puede enlazar su cuenta de Canvas a servicios como Facebook y Twitter. Esto facilitará que miembros del curso y grupos puedan conectarse más fácilmente fuera de la clase.
+      labels: 
+        public_list_services: Permitir que miembros del curso/grupo vean los servicios a los que he enlazado mi perfil
+        user_privileges: Privilegios
+      legends: 
+        memberships: Membresía (s)
+      links: 
+        access_report: Reportar Acceso para %{user}
+        cant_delete: No se puede borrar
+        conclude_enrollment: Interrumpir esta Inscripción
+        delete_enrollment: Borrar esta Inscripción
+        faculty_journal: Revista de Facultad para %{user}
+        link_enrollment: Enlazar esta Inscripción
+        link_services: Enlazar servicios en línea a mi cuenta
+        message_user: Enviar mensaje a %{user}
+        more_user_details: más detalles del usuario...
+        remove_avatar: Remover la foto
+        report_avatar: Reportar una foto inapropiada
+        restore_enrollment: Restaurar esta Inscripción
+        title: 
+          enrollment_sis_defined: Esta inscripción fue definida por la Universidad, y no puede ser borrada
+        user_account_details: Detalles de la Cuenta del Usuario
+        user_grades: Calificaciones para %{user}
+        user_only_view_section: limitar este usuario para que solo vea usuarios de sección
+        user_outcomes: Resultados para %{user}
+        user_view_all_sections: permitir que este usuario vea todos los usuarios de este curso
+      no_messages: Sin Mensajes
+      no_services: "%{user} no ha sido enlazado a servicios externos para su cuenta."
+      services_not_visible: "Los servicios registrados de %{user} no son visibles en este momento."
+      user_only_view_section: este usuario solo puede ver estudiantes dentro de sus sección(es) asignadas del curso
+      user_view_all_sections: este usuario puede ver los estudiantes en cualquier sección del curso
+
+    roster_user_services: 
+      headings: 
+        registered_services: Servicios Registrados
+        service_types: Tipos de Servicio
+      help: 
+        no_services: No ha enlazado su perfil de usuario a ningun servicio externo. Puede enlazar su cuenta de Canvas a servicios como Facebook y Twitter.
+        services_private: No ha activado su lista de servicios registrados. Activar esta list permitirá que miembros del mismo curso y grupos vean cuales servicios ha enlazado a su cuenta de Canvas.
+        user_services: Si otros miembros deciden, pueden dejar que vea cuales servicios externos han sido enlazados a su cuenta de Canvas. Esto puede facilitar la coordinación de proyectos de grupo y también tener conexión fuera de clases.
+      labels: 
+        allow_view_services: Permitir que miembros del mismo curso/grupo vean cuales servicios he enlazado a mi perfil
+      links: 
+        alt: 
+          skype_status: estatus de skype
+        back_to_roster: Retornar a la Nómina
+        link_existing_service_account: Enlazar una Cuenta Existente
+        link_service: Enlazar servicios en línea a mí cuenta
+        sign_up_for_service: Registrarse
+      titles: 
+        registered_services: Servicios Registrados
+    roster_user_usage: 
+      headings: 
+        user_access_report: "Reporte de Acceso de %{user}"
+      links: 
+        back_to_user: Retornar a la Página del Usuario
+      table_headings: 
+        content: Contenido
+        last_viewed_time: Últimos
+        num_times_participated: Veces que ha Participado
+        num_times_viewed: Veces Visto
+      titles: 
+        access_report: Reporte de Acceso
+    undelete_index: 
+      headings: 
+        restore__items: Restaurar Artículos Borrados
+      help: 
+        restore_items: Recuerde que a veces algunos artículos pueden haber perdido alguna de la información asociada cuando son borrados. Asegúrese de confirmar los resultados de cualquier restauración que haga.
+  context_message: 
+    unknown_user: Usuario Desconocido
+  context_module: 
+    requirements: 
+      max_score: debe obtener no más de %{score}
+      min_score: debe obtener no menos de %{score}
+      must_contribute: debe contribuir a la página
+      must_submit: debe enviar la tarea
+      must_view: debe ver la página
+  context_modules: 
+    buttons: 
+      add_module: Agregar un Módulo Nuevo
+    content: 
+      add_prerequisite: Agregar prerrequisito a *%{module}*
+      assignment_points_possible: de %{points_possible}
+      buttons: 
+        add_module: Agregar Módulo
+        add_prerequisite: Agregar Prerrequisito
+      criterion_for_assignment: Para %{assignment} usuarios deben %{select_criterion}
+      headings: 
+        add_prerequisite: Agregar Prerrequisito a %{name}
+        student_progress: Progreso del Módulo por Estudiante
+        student_progress_for_module: Progreso del Estudiante para %{module}
+        students_completed: Estudiantes que han Completado el Módulo
+        students_in_progress: Estudiantes que están trabajando en el Módulo
+        students_locked: Estudiantes que no han Desbloqueado el Módulo
+        students_unlocked: Estudiantes que han Desbloqueado (pero sin comenzar) el Módulo
+      help: 
+        create: |
+          Módulos del Curso permiten organizar sus tareas, páginas, archivos, etc. en secciones más pequeñas o unidades. Módulos pueden centrarse alrededor de un tema, enfocados en un tema específico, o simplemente agrupados cronológicamente.
+          
+          Puede también ordenar los módulos definiendo los criterios y prerrequisitos para cada módulo. Los estudiantes no podrán tener acceso los módulos hasta que hayan desbloqueado todos sus prerrequisitos. Así puede prevenir que los estudiantes tengan acceso a cierto contenido o archivos hasta que hayan obtenido un 75% en una evaluación de resumen.
+          
+          Para comenzar organizando su curso en módulos, haga click en el botón "%{button}" a la derecha.
+
+        no_modules: Ningún modulo ha sido definido para este curso.
+      images: 
+        alt: 
+          min_score: calificación mínima
+          must_contribute: debe contribuir
+          must_submit: debe enviar
+          must_view: debe ver
+        title: 
+          min_score: Los estudiantes deben obtener al menos %{min_score} en esta evaluación antes de que el módulo se considere como completo
+          must_contribute: Los estudiantes deben contribuir para que el modulo se considere como completo
+          must_submit: Los estudiantes deben enviar esta tarea antes de que el módulo se considere como completo
+          must_view: Los estudiantes deben observar este elemento antes de que el modulo se considere como completo
+      indent: 
+        n: 
+          one: Colocar 1 sangría
+          other: Colocar %{count} sangrías
+          zero: No colocar sangrías
+      key: 
+        description: 
+          delete: Borrar el Módulo Actual/Elemento
+          edit: Editar el Módulo/Elemento
+          indent: Colocar una sangría en el elemento actual
+          new: Módulo Nuevo
+          next: Siguiente Módulo/Elemento
+          outdent: Anular sangría del Elemento Actual
+          previous: Módulo/Elemento Previo
+      keycodes: 
+        delete: d
+        edit: e
+        indent: i
+        new: n
+        next: j
+        outdent: o
+        previous: k
+      labels: 
+        indent: Sangría
+        module_complete_when: Este módulo está completo cuando
+        module_name: Nombre
+        modules: 
+          before_students_view: Antes que los estudiantes puedan ver este módulo
+        require_sequential_progress: los estudiantes deben seguir los requerimientos en este módulo en orden secuencial
+        sort_by: Ordenar por
+        title: Título
+        unlock_at: Desbloquear en
+        url: URL
+      links: 
+        add_prerequisite: Agregar prerrequisito
+        add_requirement: Agregar requerimiento
+        reload_student: Recargar el Progreso del Estudiante
+        sort_by_name: Nombre
+        sort_by_progress: Progreso
+        title: 
+          remove_prerequisite: Remover este prerrequisito
+      module: módulo
+      module_details: Módulos se muestran en orden secuencial, solo módulos por encima de %{name} pueden ser establecidos como prerrequisitos.
+      must_complete_prerequisites: Deben completar
+      no_preprequisites: No se han definido prerrequisitos
+      no_requirements: No se han definido requerimientos
+      prerequisites: 
+        another_module: Otro Módulo
+      prerequisites_need_item: Necesitará agregar elementos antes de poder especificar como un usuario completará este módulo
+      requirements: 
+        must_contribute: contribuir a la página
+        must_score_at_least: calificar al menos
+        must_submit: enviar la tarea
+        must_view: ver el elemento
+      select_module: 
+        instructions: Seleccionar el Módulo
+        name: el módulo, %{module}
+      select_prerequisite: Seleccionar el tipo de prerrequisitos. Los estudiantes no pueden ver un módulo hasta que todos los prerrequisitos se han cumplido.
+      student_name: Nombre del Estudiante
+      table_headings: 
+        module: Módulo
+        state: Estado
+    context_module: 
+      default_module_name: módulo
+      images: 
+        alt: 
+          complete: completo
+          incomplete: incompleto
+          locked: bloqueado
+        title: 
+          complete: Módulo finalizado
+          incomplete: Módulo Incompleto
+          locked: Módulo Bloqueado
+      labels: 
+        prerequisites: Prerrequisitos
+      links: 
+        add_item: Agregar elemento al módulo
+        hide_contents: Esconder el contenido del módulo
+        settings: Configuraciones del Módulo
+        show_contents: Mostrar el contenido del módulo
+        title: 
+          delete_module: Borrar este módulo
+          edit_module: Editar las configuraciones del módulo
+          remove_prerequisite: Remover este prerrequisito
+          student_progress: Ver el Progreso del Estudiante para este Módulo
+      module_will_unlock_at: se desbloqueará en *%{unlock_date}*
+      progression_complete_count: "*%{count}*Completo"
+      progression_started_count: "*%{count}* En Progreso"
+      reorder_modules: Arrastrar para reordenar los módulos
+    context_module_right_side: 
+      links: 
+        student_progress: Ver el Progreso del Estudiante para los Módulos
+      loading_progressions: Cargando el Progreso del Estudiante...
+    index: 
+      headings: 
+        course_modules: Módulos del Curso
+      titles: 
+        course_modules: Módulos del Curso
+    module_empty: No hay elementos en el módulo "%{module}"
+    module_item: 
+      drag_to_reorder: Arrastrar para reordenar o mover un elemento a otro módulo
+      images: 
+        alt: 
+          complete: completo
+          incomplete: incompleto
+          max_score: calificación máxima
+          min_score: calificación mínima
+          must_contribute: debe contribuir
+          must_submit: debe enviar
+          must_view: debe observar
+        title: 
+          complete: El Elemento del Módulo está Completo
+          incomplete: El Elemento del Módulo está Incompleto
+          max_score: Los estudiantes no deben exceder la calificación máxima en este element antes que el modulo se considere como completo
+          min_score: Los estudiantes deben alcanzar la calificación mínima se considere como completo
+          must_contribute: Los estudiantes deben contribuir a este elemento antes que el modulo se considere como completo
+          must_submit: Los estudiantes deben enviar esta tarea antes que el modulo se considere como completo
+          must_view: Los estudiantes deben ver este elemento antes que el modulo se considere como completo
+      links: 
+        edit_item: Editar los detalles del elemento
+        indent: Agregar sangría al elemento
+        outdent: Eliminar sangría del elemento
+        remove_item: Remover este elemento del modulo
+      max_score: 
+        fulfilled: obtuvo una calificación no mayor de %{score}
+        unfulfilled: debe obtener una calificación no mayor de %{score}
+      min_score: 
+        fulfilled: obtuvo una calificación de al menos %{score}
+        unfulfilled: debe obtener una calificación de al menos %{score}
+      must_contribute: 
+        fulfilled: contribuyó al contenido de la página
+        unfulfilled: debe contribuir al contenido de la página
+      must_submit: 
+        fulfilled: envió la tarea
+        unfulfilled: debe enviar la tarea
+      must_view: 
+        fulfilled: observó la página
+        unfulfilled: debe ver la página
+  course_section: 
+    sis_id_taken: ID SIS "%{sis_id}" ya está en uso
+  crumb: 
+    inbox: Bandeja de Entrada
+  crumbs: 
+    access_report: Reportar el Acceso
+    assignments: Tareas
+    calendar_events: Eventos del Calendario
+    chat: Chat
+    conferences: Conferencias
+    discussions: Discusiones
+    eportfolio_welcome: Bienvenido a Su ePortafolio
+    error_reports: Reportes de Errores
+    files: Archivos
+    grading_schemes: Esquemas de Calificación
+    groups: Grupos
+    media: Contenido Audiovisual
+    modules: Módulos
+    people: Personas
+    plugins: Complementos
+    prior_users: Usuarios Anteriores
+    registered_services: Servicios Registrados
+    results: Resultados
+    revisions: Revisiones
+    syllabus: Plan de Estudio
+    users: Usuarios
+    wiki_page_revisions: Revisiones
+    wiki_pages: Páginas
+  date: 
+    days: 
+      today: Hoy
+      tomorrow: Mañana
+      yesterday: Ayer
+  defaults: 
+    assignment: Tarea
+  discussion_entries: 
+    created_entry_notice: Contribución creada con éxito.
+    deleted_entry_notice: Contribución ha sido borrada
+    disabled_podcasts_notice: Podcasts no han sido activados para este tema.
+    podcast_description: Cualquier archivo de contenido audiovisual desde o dentro de contribuciones en el tema "%{title}" aparecerá en este canal.
+    podcast_feed_title: "Canal de Contribuciones de Podcast %{title}"
+    posts_feed_title: "Canal de Contribuciones %{title}"
+    updated_entry_notice: La contribución se actualizó con éxito.
+  discussion_entry: 
+    default_user_name: Nombre de usuario
+    file_added_warning: Se agregó el archivo "%{file_path}" el cual es necesario para una contribución al tema "%{discussion_topic_title}"
+  discussion_topic: 
+    default_title: Sin Título
+    default_user_name: Nombre de Usuario
+    empty_message: Sin mensajes
+  discussion_topics: 
+    deleted_topic_notice: Ese tema ha sido borrado
+    discussion_feed_title: "Canal de Discusión %{title}"
+    entry: 
+      authors_name: Nombre del Autor
+      delete_message: Borrar este Mensaje
+      edit_message: Editar este Mensaje
+      edited_comment: Este comentario fue editado por %{user}.
+      labels: 
+        attached_file: Archivo Adjunto
+      make_side_comment: Hacer un comentario...
+      reply_to_message: Contestar a este Mensaje
+      show_more_entries: 
+        one: Mostrar 1 Contribución más
+        other: Mostrar %{count} más Contribuciones
+    group_assignment_discussion_entry: 
+      posts: 
+        one: 1 Contribución
+        other: "%{count} Contribuciones"
+      separated_conversation_notice: La conversación para este tema ha sido separado en grupos diferentes. Debajo están todos los grupos de temas al que se tiene acceso.
+    index: 
+      course_discussions_atom_feed_title: Canal Atom de Discusiones del Curso
+      drag_and_drop_notice: Puede definir manualmente el orden en que aparecen las discusiones. Haga click y arrastre el tema para cambiar en donde aparecerá en la lista.
+      locked_message: Este tema está bloqueado. Visitar la página de detalles del tema para más información.
+      locked_title: bloqueado
+      manage_announcements: Administrar Anuncios
+      reorder_topics: Reordenar los Temas
+      start_new_topic: Comenzar un Tema Nuevo
+      view_only_topics: Ver todos los Temas
+      view_topics_and_announcements: Ver los Temas y Anuncios
+    reordered_topics_notice: Temas reordenados con éxito
+    show: 
+      add_new_entry: Agregar una Contribución Nueva
+      add_new_topic: Agregar una Contribución Nueva
+      attach_file: Adjuntar archivo
+      delete_confirm: ¿Seguro que quiere borrar este tema?
+      delete_current_message: Borrar el Mensaje Actual
+      delete_topic: Borrar el Tema
+      discussion_atom_feed_title: Canal de Discusión Atom
+      discussion_podcast_feed_title: Canal de Discusión de Podcasts
+      edit_assignment_settings: Editar Configuraciones de la Tarea
+      edit_current_message: Editar el Mensaje Actual
+      edit_topic: Editar el Tema
+      initial_post_required: Contestaciones solo son visibles a aquellos quienes han contribuido por lo menos 1 vez.
+      just_due: entregar en %{date}
+      labels: 
+        file: Archivo
+        file_attached: Archivo Adjunto
+      locked_topic: Este tema está bloqueado.
+      message_count: 
+        one: "*1* **contribución**"
+        other: "*%{count}* **contribuciones**"
+      next_message: Siguiente Mensaje
+      points_possible: 
+        one: 1 pt
+        other: "%{count} pts"
+      points_possible_and_due: 
+        one: 1 pt, entregar en %{date}
+        other: "%{count} pts, entregar en %{date}"
+      post_count: 
+        one: 1 Contribución
+        other: "%{count} Contribuciones"
+      post_entry: Publicar Contribución
+      previous_message: Mensajes Previos
+      replace_file: Reemplazar el Archivo
+      reply_to_message: Contestar al Mensaje Actual
+      reply_to_topic: Contestar al Tema
+      separated_conversation_notice: La conversación para este tema ha sido separado en grupos diferentes. Debajo esta la lista de los grupos de temas a que tiene acceso.
+      show_all_posts: Mostrar Contribuciones de todos los Temas
+      show_assignment_rubric: Mostrar la Rúbrica de la Tarea
+      speed_grader: Calificador Rápido
+      switch_views: Cambiar de Vista
+      topic: Tema
+      topic_agglomerated_notice: Esta vista muestra todos los mensajes de todos los grupos de temas. Si quiere hacer comentarios o editar contribuciones, tendrá que visitar cada tema individualmente.
+      topic_for_assignment: |-
+        Este tema es para la tarea **%{title}**
+      topic_podcast_feed_link: Canal de Podcast del Tema
+      total_message_count: "*%{count}* incluyendo temas secundarios"
+    sub_entry: 
+      authors_name: Nombre del Autor
+      post_message: Enviar Mensaje
+    topic_created_notice: Tema se creó exitosamente.
+    topic_updated_notice: Tema fue actualizado exitosamente.
+  editor: 
+    switch_views: Cambiar Vistas
+  enrollment: 
+    default_course_name: Curso
+    default_email: Sin Correo Electrónico
+    default_user_name: Usuario Desconocido
+    title: "%{user_name} en %{course_name}"
+    with_section: "%{course_name}, %{section_name}"
+  enrollment_term: 
+    errors: 
+      not_unique: ID SIS "%{sis_source_id}" ya está en uso
+  errors: 
+    index: 
+      all_categories: " – Todas las Categorías -"
+      default_category: predeterminado
+      labels: 
+        category: categoría
+      message_contains: El Mensaje contiene
+    sis_id_in_use: ID SIS "%{sis_id}" ya está en uso
+  external_content: 
+    cancel: 
+      canceling: Cancelando...
+      popup_failure: No se puede encontrar la ventana principal, deberá cerrar está ventana emergente manualmente.
+      popup_success: ¡Se ha logrado! Esta ventana emergente debería cerrarse por sí misma...
+    success: 
+      content_failure:  Content retrieval failed, please try again or notify your system administrator of the error.
+      popup_success: Success! This popup should close on its own...
+      retrieving_content: Recuperando Contenido...
+  external_feed: 
+    original_article: Artículo Original
+    short_feed_title: "Canal %{short_url}"
+  external_tools: 
+    external_tool: 
+      delete_tool: Borrar la Herramienta
+      edit_tool: Editar la Herramienta
+      labels: 
+        consumer_key: Código de Consumidor
+        description: Descripción
+        domain: Dominio
+        privacy: Privacidad
+        url: URL
+    external_tools: 
+      anonymous: Anónimo
+      domain: Dominio
+      external_tools_note: Herramientas externas son aquellas afuera de Canvas que sirven como soporte para integraciones Basic LTI. Deberá revisar con el autor de la herramienta para agregar los parámetros correctos de configuración. Las herramientas están configuradas en la cuenta, y pueden ser agregadas como contenido en los módulos para cursos en esta cuenta.
+      labels: 
+        consumer_key: Código del Consumidor
+        description: Descripción
+        domain: Dominio
+        match_by: Igualar por
+        name: Nombre
+        privacy_level: Privacidad
+        shared_secret: Secreto Compartido
+        url: URL
+      name_only: Sólo el Nombre
+      public: Público
+      shared_secret_note: ingrese un valor nuevo que debe cambiar 
+      url: URL
+    finished: 
+      load_failure_message: Hubo un problema cargando la herramienta específica. Contacte a su administrador si estos problemas persisten.
+      load_failure_title: La herramienta no se pudo Cargar
+      load_success_message: Puede navegar a otra página.
+      load_success_title: Uso de la herramienta se completo
+    tool_show: 
+      load_tool_button: Cargar %{tool}
+  facebook: 
+    authorization_required: Solo usuarios autorizados pueden tener acceso a esa página
+    authorization_success: ¡Autorización completa! Canvas y Facebook ahora son amigos.
+    deleted: Borrado
+    index: 
+      all_set: ¡Ya está listo!
+      bookmark_notice: |-
+        Puede ver el número de nuevas notificaciones de Canvas desde su página de Facebook si agrega esta aplicación como favorito.
+      canvas_messages: Mensaje de Canvas
+      configure_notification_preferences_notice: Despúes que *configure sus preferencias de notificación* debería comenzar a ver notificaciones aparecer aquí permitiéndole saber que sucede en su cuenta de Canvas.
+      installation_about: Para instalar la aplicación de Canvas en Facebook, vaya a su página de perfil en Canvas y haga click en el botón de Facebook para conectar su cuenta a Facebook.
+      learn_more: Aprenda más en instructure.com
+      more_information: Más información en %{domain_list}
+      no_messages_notice: Al suceder cosas en el curso comenzará a ver notificaciones aquí permitiendole conocer qué ocurre en su cuenta de Canvas.
+      notification_about: La aplicación de Canvas en Facebook le permite tener fácil acceso a las interacciones que suceden en sus cursos. Puede configurarlo para que le envíe notificaciones cuando sus tareas sean calificadas, cuando fechas límite cambien, etc. Su información privada seguirá siendolo en Canvas.
+      notification_settings: Configuraciones de Notificación
+      notifications_notice: Debajo puede ver una lista de sus notificaciones provenientes de Canvas más recientes. Puede ver el número de notificaciones nuevas de Canvas desde su página de Facebook si marca esta página como favorita.
+      welcome: Bienvenido(a), %{name}!
+      welcome_message: Bienvenido(a) a una nueva generación de software de enseñanza en línea, cortesía de Instructure. Estamos aquí para facilitarle el uso del internet para mejorar el aprendizaje. Nuestro sistema de comunicación es simple, fácil y abierto, y trabajamos con las herramientas que usted o sus estudiantes ya están usando – herramientas como Facebook – para proveer una experiencia más fácil y colaborativa de aprendizaje. Lo juntamos todo en un paquete que hace más que dar seguimiento a tareas. Fomenta la interacción y fomenta el aprendizaje.
+      welcome_title: Bienvenido(a) a Instructure Canvas
+    index_disabled: 
+      disabled_notice: Este sitio de Canvas no está configurado para comunicarse con Facebook.
+      get_help: Reciba ayuda en support.instructure.com
+      instructure_canvas: Instructure Canvas
+    invalid_signature: Firma Inválida de Facebook
+    message: 
+      hide: Esconder
+    notification_policies: 
+      alerts: Alertas
+      cancel: Cancelar
+      change_settings: Cambiar Configuraciones
+      daily: Diario
+      loading: cargando...
+      never: Nunca
+      notification_type: Tipo de Notificación
+      right_away: Inmediato
+      send_to_facebook: ¿Enviar a Facebook?
+      update_preferences: Actualizar las Preferencias
+      updating_preferences: Actualizando las Preferencias...
+      weekly: Semanalmente
+    settings: 
+      back_to_messages: De Regreso a los Mensajes
+      link_needed: Antes que pueda configurar la aplicación de Canvas en Facebook debe enlazarlo a su inicio de sesión de Canvas. Haga click en “Bienvenido(a)” para más información.
+      notifications_config_notice: Notificaciones desde Canvas pueden ser enviados automáticamente a su cuenta de Facebook. Debajo podrá ver los tipos de notificaciones que pudo haber enviado. Puede cambiar sus preferencias de notificación en cualquier momento, aquí o en Canvas.
+      settings_title: Configuraciones de Notificación de Canvas
+      updating_preferences: Actualizando Preferencias...
+  files: 
+    content_file: 
+      links: 
+        delete: Borrar este Archivo
+        drag_to_reorder: Arrastrar para reordenar archivos en esta carpeta
+        edit: Haga click para editar, arrastre para mover a otra carpeta
+        preview_file: Vista previa de este archivo
+        rename: Renombrar este archivo
+    errors: 
+      empty_file: Ese archivo está vacío. Cargue otro tipo de archivo.
+      missing_field: Carga falló, no se encuentra el campo esperado en el formulario
+      not_found: Parece como algo salió mal cuando se cargó este archivo, y no podemos encontrar el archivo. Puede que tenga que notificar al propietario del archivo y pedir que lo vuelvan a cargar.
+      server_error: La carga falló, error del servidor, intente de nuevo.
+      too_large: Este archivo es muy grande para editarlo
+      upload_failed: La carga falló, intente de nuevo.
+    feed_title: "Canal del Archivo %{course_or_group}"
+    fields: 
+      file: Archivo
+    full_index: 
+      alts: 
+        drag_to_reorder: Arrastrar para Reordenar
+        file_locked: bloqueado
+        folder_locked: bloqueado
+      buttons: 
+        add_collaboration: Agregar Colaboración
+        lock_file: Bloquear este Archivo
+        lock_folder: Bloquear esta Carpeta
+        update: Actualizar el Archivo
+      descriptions: 
+        etherpad: "Etherpad es un sitio que le permite compartir documentos. Es lo suficientemente rápido que otros pueden ver lo que está escribiendo al momento que lo estan haciendo – aunque \"tabletas\" no están protegidas por una contraseña y así cualquiera que la conozca las pueda editar. Etherpad puede ser mejor que Google Docs para poder tomar notas porque es muy rápido."
+        file_locked_after: Estará bloqueado después de %{lock_at}.
+        file_locked_until: Estará bloqueado hasta %{unlock_at}.
+        folder_locked: Esta carpeta está bloqueada y no puede ser vista por los estudiantes.
+        folder_locked_after: Estará bloqueado después de %{lock_at}.
+        folder_locked_until: Estará bloqueado hasta %{unlock_at}.
+        google_docs: "Google Docs es un buen lugar para colaborar en un proyecto de grupo. Es como Microsoft Word, pero le permite trabajar en conjunto con otros en el mismo archivo sin el envío de correos electrónicos. Necesitará una cuenta de Google para poder participar en colaboraciones de Google Docs."
+        lock_file: Cuando un archivo está bloqueado, solo los profesores y asistentes pueden tener acceso a él.
+        lock_folder: Cuando una carpeta está bloqueada, solo los profesores y asistentes pueden tener acceso a ella.
+      drop_here: Ponga archivos aquí para agregarlos a esta carpeta.
+      drop_zip_files: Puede también poner archivos zip y poder extraer sus contenidos dentro de esta carpeta.
+      labels: 
+        collaborate_with: Colaborar con
+        description: Descripción
+        just_hide_file: Permita que los estudiantes descarguen o vean el archivo si los enlazo, solo que no los muestre en el listado de archivos para los estudiantes
+        just_hide_folder: Permita que los estudiantes descarguen o vean archivos en esta carpeta si los enlazo, solo que no lo muestre en los listados de archivos para estudiantes
+        last_viewed: Última Vista
+        lock_after: Bloquear Después
+        lock_until: Bloquear Hasta
+        locked: Bloquear hasta que lo desbloquee manualmente
+        title: Nombre del Documento
+      links: 
+        add_file: Agregar Archivo
+        add_folder: Agregar Carpeta
+        all_collaborations: TODAS las Colaboraciones
+        delete_file: Borrar este Archivo
+        delete_folder: Borrar esta Carpeta
+        download_as_zip: Descargar archivos de esta carpeta como un archivo zip comprimido
+        download_file: Descargar este Archivo
+        download_with_size: descargue el archivo (%{size})
+        edit_collaboration: Edite esta Colaboración
+        edit_content: edite el contenido
+        import_zip: Importar un archivo comprimido zip
+        lock_file: Bloquear este Archivo
+        lock_folder: Bloquear esta Carpeta
+        new_collaboration: Nueva Colaboración
+        preview: vista previa
+        rename_file: Renombrar este Archivo
+        rename_folder: Renombrar esta Carpeta
+        show_all_files: ver archivos para todos los cursos/grupos
+        show_personal_files: solo mostrar mis archivos personales
+        unlock_file: Desbloquear este Archivo
+        unlock_folder: Desbloquear esta Carpeta
+        view_collaboration: Ver esta Colaboración
+        view_item: Hacer click para ver %{name}
+      locked: Este archivo no ha sido desbloqueado, entonces no puede descargarse.
+      locked2: Este archivo está bloqueado y no puede ser descargado por estudiantes.
+      messages: 
+        gathering_and_zipping: |-
+          **Los contenidos de esta carpeta están siendo recolectados** y comprimidos en un archivo zip. Esto puede tomar algún tiempo, dependiendo en el tamaño y número de archivos.
+        gathering_files: Recolectando Archivos...
+        no_preview_avaialble: Vista Previa No Disponible
+        uploading: Cargando 5 Archivos...
+      page_title: Archivos
+      storage_used: "Almacenaje Usado: %{size1} de %{size2}"
+      titles: 
+        collaborations: Colaboraciones para %{name}
+        collaborators: Colaboradores
+        created_by_etherpad: Este documento fue creado usando EtherPad.
+        created_by_google_docs: Este documento fue creado usando Google Docs.
+        edit_file: Editar %{file}
+        edit_file_contents: Editar el Contenido del Archivo
+        file_locked: Bloqueado
+        folder_locked: Bloqueado
+        lock_file: Bloquear %{file_name}
+        lock_folder: Bloquear %{folder_name}
+      warnings: 
+        too_many: Hay demasiados cursos/grupos para mostrar de una vez. Debajo están los primeros 15 resultados.
+    new: 
+      buttons: 
+        create: Crear
+      titles: 
+        upload: Cargar un Archivo
+    notices: 
+      deleted: El archivo %{display_name} ha sido borrado
+      updated: El archivo fue actualizado exitosamente.
+    show: 
+      messages: 
+        file_locked: Este archivo aún no ha sido desbloqueado.
+        folder_locked: La carpeta "%{folder}," la cual incluye este archivo, ha sido bloqueada.
+    text_show: 
+      page_title: Vista Previa del Archivo
+  folder: 
+    folder_created: Carpeta "%{name}" creada
+  folders: 
+    event_updated: Evento actualizado.
+    file_zip_in_process: Compresión del archivo en proceso...
+    folder_created: Carpeta creada.
+    folder_filename: carpeta
+  getting_started: 
+    assignments: 
+      add_assignment_group_link: Agregar un Grupo de Trabajo
+      add_assignment_link: "*Agregar Tarea* a %{group_name}"
+      confused_notice: ¿Confundido? Haga click en el enlace “¿Cómo lo hago?" a la derecha para más ayuda.
+      default_group_notice: |-
+        *¡Hemos logrado algo!* Luego querrá agregar sus tareas del curso. Tareas son organizadas en grupos (evaluaciones, ensayos, etc.), y a cada grupo puede dársele importancia para contar como un porcentaje del puntaje final. Hemos agregado un grupo predeterminado para que pueda arrancar. Puede agregar tareas a él para que pueda comenzar. Puede agregar tareas haciendo click en el icono de positivo, o usar enlaces a la derecha para crear sus propios grupos. 
+
+      grade_groups_notice: Bien hecho. Ahora querrá definir las tareas para su curso. La mayoría de clases basan sus calificaciones en puntos o en puntos de acuerdo a tipos (50% de su calificación de evaluaciones, 20% de ensayos, etc). En Canvas puede agregar tareas, evaluaciones o cualquier cosa en grupos y darle importancia a esos grupos. Convierta su curso de Canvas para coincidir el esquema de calificación de su curso actual, y nosotros nos encargaremos de la computación del grado final.
+      grade_weight_label: Darle importancia al grado final basado en grupos de trabajo
+      how_do_i: ¿Como hago …?
+      save_and_skip: Guarde y Salte el Resto
+      skip_assignments_notice: ¿No está listo para crear sus tareas? Siéntase libre de saltarse este paso, puede regresar a esto después de que su curso esté listo.
+      student_next_step_link: "Siguiente Paso: Estudiantes"
+    authorization_code: 
+      authorization_code_notice: Antes de continuar, debe ingresar su código de autorización. Debió haber recibido este código de Instructure o de su administrador.
+    course_created_notice: ¡Curso creado! Necesitará un nombre de usuario o registrarse para reclamar este curso.
+    name: 
+      assignment_next_step_link: "Siguiente Paso: Tareas"
+      course_code_example: (algo como BIO 100, ENG 315, etc.)
+      course_name_notice: |-
+        Primero lo primero, díganos el nombre del curso que le gustaría seguir.
+      course_name_notice_longer: Listo. ¡Construyamos el curso! El proceso completo debería tomar sólo unos minutos. Primero consiga un nombre para su curso. Luego agrega las tareas y estudiantes. No debería tomar mucho.
+      labels: 
+        course_code: Y un código de referencia más corto
+        license: Licencia para el contenido del curso
+        name: Ingrese un nombre para su curso
+      save_and_skip: Guardar y Saltar el Resto
+      student_data_privacy: (información del estudiante permanecerá privada)
+      teacherless_grades_notice: Puede usar Canvas para darle seguimiento a todos sus cursos, si están usando Canvas o no. Sólo díganos como tiene establecida su póliza de calificación y luego ingrese las calificaciones manualmente. Puede invitar también a sus compañeros de curso para que usen el curso que creó para que puedan seguir sus calificaciones también.
+    setup: 
+      assignments: Tareas
+      labels: 
+        course_name: Nombre del Curso
+        students: Estudiantes
+      new_student: Estudiante Nuevo
+      no_assignments: Tareas No Creadas 
+      no_email: sin correo electrónico
+      no_students: Estudiantes No Agregados
+      short_header: 
+        assignment: Tarea
+        due: Fecha Límite
+        email: Correo Electrónico
+        points: Pts
+        student: Estudiante
+        type: Tipo
+      summary_notice: "*¡Así es! ¡Ha terminado!* Aquí está el resumen de todo lo que incluyó en el curso. Haga click en cualquier sección para volver y editar su información. Cuando esté seguro que tiene toda la información correcta, haga click en el botón para ir a la página de su curso."
+      total_assignment_count: 
+        one: Total de 1 Tarea
+        other: "Total de %{count} Tareas"
+      total_students_count: 
+        one: Total de 1 Estudiante 
+        other: "Total de %{count} Estudiantes"
+      unpublished_notice: No se preocupe, este curso permanecerá visible solo para usted hasta que lo publique. Cuando lo publique, su curso estará active y los estudiantes serán notificados que ha sido creado y que están inscritos. Puede publicar cursos en cualquier momento desde la página principal del curso.
+    student: 
+      edit_name_title: Haga click para Editar el Nombre
+      missing_email: sin correo electrónico
+      new_student_name: Estudiante Nuevo
+      remove_student_title: Remover este Estudiante
+      student_name_title: Nombre de Estudiante
+    students: 
+      go_back_and_edit: Regrese y edite la lista de correos electrónicos
+      looks_good: OK se ve bien, Agregue estos Usuarios
+      no_enrollments: Ningún Estudiante Inscrito
+      save_and_skip: Guardar y Saltar el Resto
+      save_next_step_link: "Siguiente Paso: Guardar"
+      teacher_add_student_notice: "*Siguiente, querrá agregar estudiantes a su curso.* Puede agregarlos uno a uno o como una lista completa. Pegue sólo los correos electrónicos (bob@example.com) o nombres con direcciones #(\"Jones, Bob M.\" <bob@example.com>)# separadas por comas o en líneas diferentes."
+      teacher_add_student_skip: Si no está seguro de quién estará en su clase, puede obviar este paso y agregar los estudiantes (junto con los asistentes y otros profesores) en cualquier momento después de haber terminado con el programa de instalación.
+      teacherless_add_student_notice: Si quiere, puede invitar a sus compañeros de clase para que usen este curso. De esa manera no tendrán que establecer las pólizas de calificación otra vez, y le daremos un lugar para compartir archivos y colaborar. Sólo pegue una lista de correos electrónicos para invitar a otros.
+      teacherless_add_student_skip: Puede saltar este paso e invitar a sus compañeros de clase (o a sus profesores) para compartir este curso más adelante.
+    teacherless: 
+      get_started: Haga click aquí para comenzar
+      setup: Establecer un Curso Nuevo en Canvas
+      teacherless_explanation: Puede usar Canvas para darle seguimiento a sus calificaciones. Sólo díganos como está establecida su póliza de calificación y luego ingrese las calificaciones manualmente. ¡Puede invitar a sus compañeros de clase para que usen su curso y que puedan seguir sus calificaciones también!
+      use_canvas_for_grading: Usar Canvas para Calificar Evaluaciones
+    unauthorized: No autorizado
+    wizard_secondary_nav: 
+      assignments: Tareas
+      course_name: Nombre del Curso
+      review_and_save: Revisar y Guardar
+      start_from_scratch: Comenzar desde cero
+      step1: Paso 1
+      step2: Paso 2
+      step3: Paso 3
+      step4: Paso 4
+      students: Estudiantes
+      visit_course_page: Visitar la Página del Curso
+  grading_standard: 
+    unknown_grading_details: Detalles Desconocidos
+  grading_standards: 
+    index: 
+      buttons: 
+        add: Agregar un Esquema de Calificación
+      heading_grading_schemes: Esquemas de Calificación
+      title: Estándares de Calificación
+  group: 
+    tabs: 
+      chat: Chat
+      discussions: Discusiones
+      files: Archivos
+      home: Página Principal
+      pages: Páginas
+      people: Personas
+  groups: 
+    category: 
+      actions: 
+        collapse_all: Colapsar Todo
+        expand_all: Expandir Todo
+        load_all: Cargar Lista Completa de Estudiantes
+        load_more: Cargar más
+      buttons: 
+        add_group: Agregar Otro Grupo
+        delete_category: Remover esta Serie de Grupos
+      group_category_all: Todos
+      group_category_unassigned: No asignado
+      group_name: Nombre
+      instructions: 
+        group_assignment: Arrastrar estudiantes para asignarlos a grupos
+      random_distribution_explanation: Distribuir Estudiantes No Asignados por igual entre Grupos
+      randomly_distribute_students: Asignar estudiantes al azar
+      status: 
+        loading: cargando...
+      student: 
+        one: 1 estudiante
+        other: "%{count} estudiantes"
+      warnings: 
+        studend_groups: Estos grupos son organizados por los estudiantes. A diferencia a otros tipos de grupos, los estudiantes pueden pertenecer a más de un grupo a la vez, entonces estos grupos puede que no sean la mejor solución para tareas con calificación.
+    context_groups: 
+      account_groups: Reporte de Grupos
+      actions: 
+        add: Comenzar un Grupo Nuevo
+      buttons: 
+        create: Crear un Grupo
+      course_groups: Grupos del Curso
+      group_explanation: |
+        Grupos son un buen lugar para colaborar en proyectos o para establecer calendarios para sesiones de estudio y otras. Todos los grupos tienen un calendario, un wiki, discusiones, y un poco de espacio para almacenar archivos. Grupos pueden colaborar en documentos, o programar conferencias en línea. En realidad es un mini-curso donde puede trabajar con un número más pequeño de estudiantes o en un proyecto más enfocado.
+
+      groups_disabled: Grupos organizados por estudiantes han sido desactivados para este curso, entonces solo tendrá los grupos creados por el maestro para usted.
+      headings: 
+        available_groups: Grupos Disponibles
+        new_group: Crear un Grupo Nuevo
+      labels: 
+        restrictions_for_joining_groups: Unirse
+        users_to_invite: Invitar
+      no_groups_assigned: Ningún Grupo Asignado
+      options: 
+        course_member_can_request_access: Miembros del Curso pueden solicitar membresía
+        invite_only: Membresía solo por invitación
+        open_to_course_members: Miembros del Curso pueden suscribirse
+      student_group_warning: |
+        Si su profesor ha hablado acerca de colocarlo en un grupo como parte de una tarea o trabajo, esta no es la forma de hacerlo. Los grupos que organiza usted mismo no pueden usarse para calificación… aún puede formar sus propios grupos, pero no podrá de entregar copias electrónicas de tareas a menos que su profesor construya grupos para usted.
+
+    context_manage_groups: 
+      account_group_explanation: "Cuentas de grupos de estudiantes son una buena forma de agrupar estudiantes sin tenerlos agrupados en un curso específico. Cada grupo de estudiantes reciben su propio calendario, foro y herramientas de colaboración para poder organizarlos y trabajar en conjunto más eficientemente."
+      actions: 
+        add_students: Agregar Estudiantes al Curso
+      buttons: 
+        add_group: Hacer una Serie Nueva de Grupos
+      course_group_explanation: "Grupos de estudiantes son una forma útil de organizar a sus estudiantes para proyectos en grupo. Cada grupo de estudiantes tendrá su propio calendario, foro y herramientas de colaboración para que puedan organizarse y trabajar más eficientemente."
+      drag_and_drop_instructions: Haga click y arrastre para mover al estudiante a otro grupo.
+      get_started_info: Para comenzar, haga click en el enlace “Crear una Serie Nueva de Grupos” a su derecha.
+      group_assignment_instructions: "Puede asignar a sus estudiantes al azar a grupos de un tamaño específico o crearlos y organizarlos manualmente. Una vez se han completado los grupos, puede establecer tareas, que significa que cada grupo tendrán un envío para todos los usuarios de ese grupo."
+      group_pages: Páginas del Grupo
+      headings: 
+        account_groups: Grupos de Estudiantes de Nivel Básico
+        course_groups: Grupos de Estudiantes
+      messages: 
+        no_students: Ningún estudiante se ha agregado a este curso
+    default_category_title: Grupos de Estudio
+    edit: 
+      buttons: 
+        delete: Borrar el Grupo
+        delete_group: Borrar este Grupo
+        update: Actualizar el Grupo
+      confirm: 
+        delete: ¿Seguro que quiere borrar este grupo?
+      group_settings_title: "Configuraciones de %{group_name}"
+      title: 
+        confirm_delete: Confirmar el Borrado del Grupo
+    feed_title: "Canal de %{course_or_account_name}"
+    group_detailed: 
+      actions: 
+        ask_to_join_group: solicitar unirse a este grupo
+        join_group: unirse a este grupo
+      member: 
+        one: 1 miembro
+        other: "%{count} miembros"
+    index: 
+      heading_current_groups: Grupos Actuales
+      no_groups: No hay Grupos
+    membership_pending: 
+      group_join_request: Solicitud de Suscripción a un Grupo
+      group_join_request_acknowledged: Gracias por la solicitud, siga pendiente
+      group_join_request_info: Este grupo ha recibido su solicitud de suscripción. Será notificado una vez que acepten o rechacen su solicitud.
+    notices: 
+      already_deleted: Ese grupo ha sido borrado
+      create_success: El grupo fue creado con éxito.
+      delete_success: El grupo fue borrado con éxito.
+      update_success: El grupo fue actualizado con éxito.
+      welcome: ¡Bienvenido al grupo %{group_name}!
+    show: 
+      coming_up: Siguiente
+      group_atom_feed: Canal Atom del Grupo
+      new_announcement: Nuevo Anuncio
+      next_week: la próxima semana
+    student: 
+      drag_drop_instructions: Haga click y arrastre al estudiante para moverlo a otro grupo
+  info: 
+    feedback_subject: "Retroalimentación del Estudiante: %{comment_preview}"
+    no_comments: Sin comentarios
+    notices: 
+      error_reported: ¡Gracias por su ayuda! Comenzaremos rápidamente
+      feedback_sent: ¡Gracias por su retroalimentación! Su profesor ha sido notificado.
+  instructions: 
+    authorize_google_docs: |-
+      Antes de poder colaborar en documentos, debe autorizar a Canvas para poder tener acceso a su cuenta de Google Docs:
+  jobs: 
+    index: 
+      actions: 
+        show: mostrar
+      buttons: 
+        delete: borrar
+        hold: esperar
+        select_all: seleccionar todo
+        un_hold: seguir
+      headings: 
+        jobs_list: Lista de Trabajos
+        popular_tags: Etiquetas Populares
+        running_jobs: Trabajos en Ejecución
+        selected_job: Trabajos Seleccionados
+      job_options: 
+        all: Todo
+        current: Actual
+        failed: Falló
+        future: Futuro
+      labels: 
+        failed_at: Falló en
+        handler: Gestor
+        id: id
+        last_error: Último Error
+        max_attempts: Intentos Máximos
+        num_attempts: Intentos
+        priority: Prioridad
+        run_at: Correr en
+        strand: hilo
+        tag: etiqueta
+        total_jobs: Total
+        with_selection: Con Selección
+      search_jobs: Buscar trabajos
+      title: PM de Trabajos
+  labels: 
+    announcements: Anuncios
+    assignments: Tareas
+    calendar_events: Eventos del Calendario
+    discussion_responses: Respuestas a Discusiones
+    discussions: Discusiones
+    files: Archivos
+    goals: Metas
+    groups: Grupos
+    learning_modules: Módulos de Aprendizaje
+    lock_module_until: bloquear el modulo hasta una fecha dada
+    quizzes: Evaluaciones
+    rubrics: Rubricas
+    tasks: Funciones
+    web_links: Enlaces del Internet
+    wikis: Wikis
+  layouts: 
+    application: 
+      instructure_description: Instructure, creadores del sistema de manejo de aprendizaje Canvas
+      links: 
+        close: Cerrar
+        courses: Cursos
+        courses_and_groups: Cursos & Grupos
+        dashboard: Mi Tablero
+        feedback: Retroalimentación
+        home: Inicio
+        skip_to_content: Saltar al Contenido
+        support: Apoyo
+      menu: 
+        all_enrollments: Ver todas las Inscripciones
+        assignments: Tareas
+        assignments_needing_grading: Necesitan Calificación
+        assignments_needing_submitting: A ser entregados
+        assignments_recently_graded: Calificados Recientemente
+        calendar: Calendario
+        current_groups: Grupos Actuales
+        grades: Calificaciones
+        managed_accounts: Administrar Cuentas
+        my_courses: Mis Cursos
+      missing_page_title: Agregar un título de página aquí.
+      open_source_learning_management_system: Código Abierto LMS
+    eportfolio: 
+      links: 
+        close: Cerrar
+        home: Inicio de Instructure
+        skip_navigation: Saltar la Navegación
+      messages: 
+        loading: Cargando...
+    facebook: 
+      title: Página de Facebook
+  learning_outcome: 
+    no_comment: Sin Comentario
+  lib: 
+    auth: 
+      authentication_required: Autorización del Usuario Requerida
+      errors: 
+        admin_impersonation_disallowed: No puede personificar a otros administradores del sitio. Perdón.
+        not_authenticated: Debe estar conectado para tener acceso a esta página
+        not_authorized: No está autorizado para ver esta página
+        student_not_found: No se encontró ningún estudiante
+        teacher_not_found: No se encontró ningún profesor
+    google_docs: 
+      default_document_name: Documento de Instructure
+    incoming_message_processor: 
+      failure_message: 
+        body: |
+          El mensaje titulado "%{subject}" no pudo ser enviado. El mensaje fue enviado a una dirección desconocida. Si está intentando contactar a alguien a través de Canvas puede hacerlo ingresando a su cuenta y enviándole un mensaje usando la herramienta de Bandeja de Entrada.
+          
+          Gracia,
+          Apoyo de Canvas
+
+        subject: "Respuesta al Mensaje Falló: %{subject}"
+    send_to_inbox: 
+      default_subject: Sin Asunto
+    text_helper: 
+      ellipsis: ...
+      quoted_text_toggle: mostrar texto citado
+  links: 
+    clear_all: Borrar Todo
+    deselect_all: Deseleccionar Todo
+    more_options: más opciones
+    select_all: Seleccionar Todo
+    show_me_where: Mostrarme Todo
+    switch_views: Cambiar Vistas
+  message: 
+    default_from_name: Instructure Canvas
+    default_subject: Alerta de Canvas 
+  messages: 
+    account_user_notification: 
+      email: 
+        subject: Notificación del Administrador de la Cuenta
+        url_info: |-
+          Visite la página de la cuenta aquí: %{url}
+    account_user_registration: 
+      email: 
+        added_message: Ha sido agregado como un %{role_type} para la cuenta %{account} en %{website}.
+        email_info: "Correo Electrónico: %{email}"
+        name_info: "Nombre: %{name}"
+        subject: Invitación de Administrador de la Cuenta de Canvas
+        url_info: |-
+          Deberá registrarse con Canvas antes de poder participar como un administrador de la cuenta. Puede terminar el proceso de suscripción aquí:
+          %{url}
+        username_info: "Nombre de Usuario: %{username}"
+    assignment_changed: 
+      email: 
+        body: |
+          La tarea "%{title}" para %{course} ha cambiado.  
+          
+          Haga click aquí para ver la tarea: %{url}
+
+        subject: "Tarea Cambió: %{title}, %{course}"
+      facebook: 
+        body: La tarea %{title_link} para %{course} ha cambiado.
+      sms: 
+        body: |
+          %{title}, %{course} ha cambiado.
+          
+          Más información en %{website}
+
+      summary: 
+        subject: "Tarea Cambió: %{title}, %{course}"
+  notification: 
+    all_submissions_description: Para todas las presentaciones de tareas en cursos que enseña
+    announcement_description: Para anuncios nuevos
+    calendar_description: Para cambios del calendario
+    course_content_description: Para cambios a las páginas de cursos
+    discussion_description: Para temas nuevos
+    discussion_entry_description: Para temas en los que he comentado
+    due_date_description: Para cambios en fechas límite
+    files_description: Para archivos nuevos
+    grading_description: Para alertas en la calificación del grupo
+    grading_policies_description: Para cambios en la póliza de calificación
+    invitation_description: Para nuevas invitaciones
+    late_grading_description: Para tareas entregadas tarde
+    message_description: Para mensajes electrónicos nuevos
+    missing_description_description: Para alertas %{category}
+    no_comments: Sin comentarios
+    no_subject: Sin Tema
+    other_description: Para cualquier otro alerta
+    student_message_description: Para mensajes privados de estudiantes
+    submission_comment_description: Para comentarios en entregas de tareas
+
+  notifications: 
+    index: 
+      clear_all_link: Borrar todas las Notificaciones
+      clear_all_short_link: Borrar todo
+      clear_hover: Borrar la Notificación
+      collapse_all_link: Colapsar todas las Notificaciones
+      collapse_hover: Colapsar
+      coming_up: Siguiente
+      expand_all_link: Expandir todas las Notificaciones
+      expand_over: Expandir
+      message_type_notifications: "Notificaciones de %{message_type}"
+      no_notifications: Sin Notificaciones
+      notification_navigation_notice: Haga click en cualquier notificación para expandirlo y ver los detalles. Puede también cerrar la notificación o hacer click en el título para visitar la página del asunto asociado.
+      recent: Reciente
+      undo_hover: Este mensaje está marcado como leído y será borrado. Haga click para cancelar esta acción.
+  page_comment: 
+    default_user_name: Anónimo
+  page_comments: 
+    errors: 
+      create_failed: Creación del comentario falló
+  plugins: 
+    big_blue_button: 
+      description: Apoyo de conferencias en línea Big Blue Button
+      name: Big Blue Button
+    big_blue_button_settings: 
+      description: Necesitará acceso a [BigBlueButton](%{url}).
+      domain_description: "**nombre del huésped ** o **dirección ip ** de su instalación BigBlueButton (e.g. bigbluebutton.mycompany.com)"
+      labels: 
+        domain: Dominio
+        secret: Secreto
+      secret_description: Este es el parametro %{parameter_name} que puede encontrarse en el archivo de configuración %{filename}.
+    dim_dim: 
+      description: Apoyo de conferencias en línea DimDim
+      name: DimDim
+    dim_dim_settings: 
+      description: Necesitara acceso a Dim Dim.
+      labels: 
+        domain: Dominio
+    error_reporting_settings: 
+      description: "Reporte de errors pueden ser activados en la consola accesando %{console_command}. Una vez que esto está activado puede especificar un correo electrónico o un URL donde mensajes de errores serán enviados."
+      hints: 
+        body_param: El cuerpo del mensaje será enviado con este código
+        subject_param: El tema del mensaje será enviado con este código
+      labels: 
+        action: Acción
+        email: Dirección de Correo Electrónico
+        subject_parameter: Parámetro del Tema
+        url: URL
+      options: 
+        email: Enviar un Correo Electrónico
+        nothing: No hacer nada
+        post: Publicar a un URL
+    errors: 
+      plugin_doesnt_exist: El complemento %{id} no existe.
+      setting_update_failed: Ocurrió un error guardando las configuraciones del complemento.
+    etherpad_settings: 
+      description: "EtherPad ahora es un proyecto de código abierto. Hay un número de programas gratis de EtherPad que puede usar si quiere. Estos incluyen: "
+      edupad: eduPad
+      hints: 
+        domain: No incluya "http://" o las barras diagonales
+      host_your_own: O puede [configurar su propio sitio de EtherPad](%{etherpad_url}).
+      labels: 
+        domain: Dominio
+        name: Nombre
+      pirate_pad: Pirate Pad
+      primary_pad: Primary Pad
+      sketchpad: SketchPad
+      typewithme: TypeWith.me
+    facebook_settings: 
+      description: |
+        Necesita crear una [aplicación nueva en facebook.com](%{facebook_url}).
+        Establezca las siguientes opciones de configuración para asegurar que su aplicación de Facebook funcione correctamente:
+        
+        * **Web Site -- Site URL:** ajustado a %{site_url}
+        * **Web Site -- Site Domain:**dominio en su sitio principal de Canvas. Este debe coincidir con la configuración del URL
+        * **Facebook Integration -- Canvas Page:** tomar nota de lo escogido e incluirlo en el formulario siguiente
+        * **Facebook Integration -- Canvas URL:** ajustado a %{canvas_url}
+        * Make sure **Advanced -- OAuth 2.0 para Canvas** está activado
+        * Después de guardar su aplicación, tome nota del App ID, API Key y App Secret
+
+      headers: 
+        domain_settings: Configuraciones del Dominio
+      hints: 
+        canvas_domain: este es el dominio especificado en "Canvas URL"
+        canvas_name: este es la ruta especificada en "Página Canvas"
+        disable_ssl: Usar solo para evaluación local
+      labels: 
+        api_key: Código API
+        app_id: ID de Aplicación
+        canvas_domain: Dominio de Canvas
+        canvas_name: Nombre de Canvas
+        disable_ssl: Desactivar SSL
+        secret: Aplicación Secreta
+    google_docs_settings: 
+      description: |
+        Necesitará [registrar su dominio con Google](%{google_url}).
+        Haga una nota de sus valores de "Código de Consumidor OAuth" y "Secreto de Consumidor OAuth".
+
+      labels: 
+        api_key: Código de Consumidor OAuth
+        secret_key: Secreto de Consumidor OAuth
+    grade_export_settings: 
+      labels: 
+        enabled: Activado
+        format_type: Tipo de formato de emisión
+        publish_endpoint: Punto final a donde publicar
+        success_timeout: Notificación de éxito se venció 
+        wait_for_success: Esperar la notificación de éxito
+    index: 
+      author: Autor
+      configure_plugin: Configurar
+      description: Descripción
+      name: Nombre
+      no_plugins: No hay complementos de Canvas instalados
+      page_title: Complementos de Canvas 
+      tag: Etiqueta
+      version: Versión
+      website: Sitio Web
+    kaltura_settings: 
+      account_settings: Estos valores pueden encontrarse en la Consola de Manejo Kaltura bajo “Configuraciones -> Configuraciones de Integración"
+      description: |
+        Necesitará una cuenta en [Kaltura.com](%{kaltura_url}) o con una instancia auto organizada de Kaltura.
+        
+        **Nota: ** una vez que tiene Kaltura configurado dentro de Canvas, debe ir a la Consola de Manejo de Kaltura y bajo “Configuraciones -> 
+        Configuraciones de Integración” permite notificaciones del servido con un URL de notificación de:
+        
+        %{notification_url}
+        
+        Luego marque las cajas para “Agregar Entrada” y “Borrar Entrada” en la columna de “Envío por Servidor”.
+
+      headers: 
+        account_settings: Configuraciones de Cuenta
+        domain_settings: Configuraciones de Dominio
+        ui_conf_ids: Identidad de Configuración UI
+      hints: 
+        domain: Para cuentas en otro huésped, use "www.kaltura.com"
+        resource_domain: Para cuentas en otro huésped, use "cdn.kaltura.com"
+      labels: 
+        domain: Dominio
+        kcw_ui_conf: ID de Configuración KCW UI 
+        partner_id: Partner ID
+        player_ui_conf: ID de Configuración del Jugador UI
+        resource_domain: Dominio de Recursos
+        secret_key: Secreto de Administrador
+        subpartner_id: ID Sub Partner 
+        upload_ui_conf: ID de Configuración Uploader UI 
+        user_secret_key: Secreto de Usuario
+      ui_conf_ids: Para clientes alojados en Kaltura, puede pedirle a Kaltura que le provea estas identidades. En casos no alojados, puede encontrar estos valores en la tabla de configuración_ui.
+    linked_in_settings: 
+      description: |
+        Necesitará registrar una [aplicación nueva en LinkedIn](%{linkedin_url}).
+        Establecer las siguientes opciones de configuración para asegurar que su integración de LinkedIn funciona correctamente:
+        
+        * **Application Type:** ajustar a "Aplicación de Web"
+        * **Live Status:**  ajustar a "En Vivo"
+        * **OAuth Redirect URL:** ajustar a %{oauth_url}
+        * Después de guardar su aplicación, hacer una nota del código API y las etiquetas de código secreto: 
+
+      labels: 
+        api_key: Código API
+        secret_key: Código Secreto
+    notices: 
+      settings_updated: Configuraciones del complemento actualizado con éxito.
+    qti_exporter: 
+      file_description: archivo QTI .zip
+      name: Exportador QTI
+    registration_form_recaptcha: 
+      description: Complemento CAPTCHA para el formulario de inscripción
+      name: Formulario de Inscripción ReCAPTCHA
+    scribd_settings: 
+      description: |
+        Deberá [registrarse para una Cuenta Scribd API](%{scribd_url}).
+        Hacer una nota de su código API y del secreto API. Estos están disponibles desde "Configuraciones -> API" en su perfil después de la creación.
+
+      labels: 
+        api_key: Código API
+        secret_key: Secreto API 
+    show: 
+      back_to_list: Volver a las lista de complementos
+    sis_import_settings: 
+      labels: 
+        minimum_rows_for_parallel: Cantidad de filas mínimas en una importación SIS antes de usar procesamiento paralelo
+        parallelism: Número de procesadores del trabajo para usar en el procesamiento de importaciones SIS en paralelos
+        queue_for_parallel_jobs: Lista de trabajos a usarse para trabajos paralelos (en blanco como predeterminado)
+    tinychat_settings: 
+      description: |
+        Deberá registrar una [aplicación nueva en Tinychat](%{tinychat_url}).
+        Hacer una nota del código público de su aplicación y los valores del código secreto.
+
+      labels: 
+        api_key: Código Público
+        secret_key: Código Secreto
+    twitter_settings: 
+      description: |
+        Deberá crear una [aplicación nueva en Twitter](%{twitter_url}).
+        Establecer las opciones de configuración para asegurar que su aplicación de Twitter funciona correctamente:
+        
+        * **Application Type:** ajustar a "Navegador"
+        * **Callback URL:** ajustar a %{callback_url}
+        * **Default Access type:** ajustar a "Leer, Escribir & Mensaje Privado "
+        * Después de salvar su aplicación, tome nota del código de consumidor y secreto de consumidor
+
+
+
+      labels: 
+        api_key: Código de Consumidor
+        secret_key: Secreto de Consumidor
+    wimba: 
+      description: Apoyo de conferencia en línea Wimba
+      name: Wimba
+    wimba_settings: 
+      description: Deberá tener acceso a una cuenta de [Wimba](%{url}).
+      domain_description: (e.g. mycompany.wimba.com)
+      labels: 
+        domain: Dominio
+        password: Contraseña
+        username: Nombre de Usuario
+  pseudonym: 
+    errors: 
+      invalid_email_address: "\"%{email}\" no es un correo electrónico válido"
+  pseudonym_sessions: 
+    errors: 
+      invalid_credentials: Nombre de usuario y/o contraseña incorrecta
+      login_error: Hubo un problema al ingresar a %{institution}
+      no_matching_user: "Canvas no tiene una cuenta para el usuario: %{user}"
+      user_deleted: Esa cuenta de usuario ha sido borrada. Por favor contacte a su administrador del sistema para que su cuenta sea reactivada.
+    new: 
+      details: |-
+        Antes de poder ingresar debe terminar su proceso de inscripción. Deberá haber recibido un correo electrónico con un enlace de confirmación de regreso a Canvas. Siga el enlace para completar el proceso. Asegúrese de revisar su bandeja de spam.
+      links: 
+        resend_email: Reenviar el Correo Electrónico
+      page_title: Ingresar a Canvas
+      titles: 
+        registration_complete: Inscripción Incompleto
+    notices: 
+      logged_out: Esta desconectado
+      login_success: Ingreso exitoso.
+  pseudonyms: 
+    claim_pseudonym: 
+      details: |-
+        Para terminar el registro de *%{email}* haga click en una de las siguientes opciones:
+      details_enrollment: |-
+        La invitación de inscripción para %{course} fue para *%{email}*
+           el cual aún no es un usuario de Canvas. Puede ingresar y reclamarlo o crear un usuario nuevo.
+      links: 
+        accept: Completar mi inscripción como %{email}
+        add: Agregar %{email} a mi cuenta existente, **%{username}**
+        login_as_another_user: Ingresar como Otro Usuario
+        registered_with_a_different_address: Ya me registre con una dirección diferente
+        registered_with_a_different_email: Ya me registre con una cuenta de correo electrónico diferente
+        registered_with_a_different_sms: Ya me registre con un número de cellular diferente
+      page_title: Reclamar la Dirección
+      page_title_email: Reclamar la Dirección de Correo Electrónico
+      page_title_sms: Reclamar el Número de Celular
+    confirm_change_password: 
+      buttons: 
+        update_password: Actualizar la Contraseña
+      labels: 
+        login_to_change: Ingresar para Cambiar
+        new_password: Contraseña Nueva
+        password: Contraseña
+        password_confirmation: Confirmar la Contraseña Nueva
+      page_title: Cambiar la Contraseña
+      titles: 
+        change_password: Cambiar la contraseña de ingreso para %{user}
+    errors: 
+      already_registered: El %{email} de ingreso ya ha sido registrado. Si no está seguro de cómo ingresar, haga click en “No conozco mi Contraseña” e ingrese el "%{email}" de ingreso
+      cant_change_password: No se puede cambiar la contraseña para esa cuenta o la cuenta no existe
+      login_required: Usuarios deben tener por lo menos una cuenta
+      password_too_short: Debe escribir una contraseña con al menos 6 caracteres.
+    form: 
+      labels: 
+        change_password: Cambiar la Contraseña
+        password: Contraseña
+        password_confirmation: Confirmar la contraseña
+        unique_id: Ingresar
+    notices: 
+      account_registered: ¡Cuenta Registrada!
+      account_updated: ¡Cuenta Actualizada!
+      email_sent: Correo de confirmación enviado a %{email}, asegúrese de revisar su bandeja de spam
+      link_invalid: El enlace que usó parece no ser válido. Si no puede ingresar, intente haciendo click en “No sé mi contraseña” y se le enviará un correo electrónico.
+      password_changed: Contraseña cambiada
+      registration_confirmed: ¡Inscripción confirmada!
+      registration_failed: Inscripción falló.
+    registration_confirmation: 
+      buttons: 
+        register: Registrar
+      details: "Para poder terminar su ingreso, necesitaremos un poco más de información. Por favor complete el formulario a continuación:"
+      details_with_course: |-
+        Para poder completar su ingreso al curso **%{course}**, necesitaremos un poco más de información. Por favor complete el formulario a continuación:
+      labels: 
+        name: Nombre Completo
+        password: Contraseña
+        password_confirmation: Confirmar Contraseña
+        short_name: Nombre 
+        subscribe_to_emails: Quiero recibir información, noticias y ayuda de Instructure
+        time_zone: Zona Horaria
+      page_title: Registrar %{email}
+      tips: 
+        name: Profesores usarán este nombre para calificar.
+        short_name: Personas verán este nombre en discusiones, mensajes y comentarios.
+      titles: 
+        email_confirmed: "Correo electrónico: %{email} confirmado."
+        welcome_aboard: ¡Bienvenido!
+    registration_confirmation_failed: 
+      details: |-
+        Parece que ya ha confirmado su inscripción. Intente *ingresar* 
+            Con el correo electrónico y su contraseña con la cual se inscribió. Si no puede recordar su contraseña, haga click en “Olvide mi Contraseña” y debería recibir un enlace nuevo que puede usar para cambiar su contraseña.
+      feedback: |-
+        Si continua con problemas, haga click en “Retroalimentación” en la parte superior derecha y mencione los problemas que está teniendo.
+      page_title: Confirmación de la Inscripción Falló
+      titles: 
+        problems_with_registration: Problema con la Inscripción
+  question_banks: 
+    bank_fail: Falló la creación del grupo de preguntas.
+    bank_success: ¡Se creó el grupo de preguntas!
+    index: 
+      add_bank: Agregar un grupo de preguntas
+      course_question_banks: Grupo de Preguntas para el Curso
+      labels: 
+        title: Nombre del Grupo
+      see_bookmarked_banks: Ver mis Grupos de Preguntas Favoritos
+      user_question_banks: Grupos de Preguntas del Usuario
+    question_bank: 
+      bookmark_bank: Marca como favorito este Grupo de Preguntas
+      last_updated: "Última actualización: *%{datetime}*"
+      no_name: Sin Nombre
+      no_questions: Sin Preguntas
+      question_count: 
+        one: 1 Pregunta
+        other: "%{count} Preguntas"
+      unbookmark_bank: No contar como favorito este Grupo de Preguntas
+    question_teaser: 
+      full_details: Haga click para mostrar los detalles de la pregunta
+      move_bank: mover/copiar la pregunta a otros grupos
+    show: 
+      button: 
+        cancel: Cancelar
+        move_copy_question: Mover/Copiar Pregunta
+      edit_warning: Recuerde, cambios hechos a las plantillas de las preguntas no actualizarán evaluaciones que ya están usando esas preguntas.
+      loading_banks: Cargando grupos de preguntas...
+      move_copy: Mover/Copiar
+      labels:
+        keep_copy: Retener una copia en este grupo de preguntas también
+        new_bank_name: Nombre Nuevo de Grupo de Preguntas
+        new_question_bank: Nuevo Grupo de Preguntas
+      select_bank: "Seleccione el destino del grupo de preguntas para esta pregunta:"
+      show_details: Mostrar los Detalles de la Pregunta
+  quiz_question: 
+    defaults: 
+      question_name: Pregunta
+  quiz_submissions: 
+    errors: 
+      late_quiz: Envió esta evaluación tarde, y sus preguntas pueden no haber sido grabadas.
+      protected_quiz: Esta evaluación está protegida y solo está disponible para ciertos lugares. La computadora que está usando no parece ser un lugar válido para tomar esta evaluación.
+    show: 
+      score_out_of: Obtuvo %{score} de %{points_possible}
+  score_out_of: "%{score} de %{points_possible}"
+  shared: 
+    conference: 
+      buttons: 
+        delete: Borrar Conferencia
+        edit: Editar los Detalles de la Conferencia
+      course_conference: Conferencia del Curso
+      group_conference: Conferencia del Grupo
+      participant: 
+        one: 1 participante
+        other: "%{count} participantes"
+    email_lists: 
+      copy_and_paste_notice: Copiar y pegar una lista de correos electrónicos para agregar usuarios a este curso.
+      example_user_emails: |-
+        "Ejemplo de Estudiante" <estudiante@ejemplo.com>
+        "Otro Estudiante" <otroestudiante@ejemplo.com>
+        "Apellido, Nombre" <nombreapellido@ejemplo.com>
+        <justAnEmailAddress@example.com>
+      labels: 
+        alert: Alerta
+        notice: Noticia
+      no_valid_emails: "*Perdón,* parece que no se ingresó un correo electrónico válido, por favor intente de nuevo."
+      user_email_example: usuario@dominio.com
+      user_name_example: Apellido, Nombre
+    zip_file_import_form: 
+      buttons: 
+        upload_file: Cargar Archivo
+      labels: 
+        upload_to: Cargar a
+      notices: 
+        uploading_progress_info: Cargando y procesando su archivo comprimido zip, si hay muchos archivos en su carpeta zip o es muy grande, esto puede tomar un tiempo.
+      prompts: 
+        select_file: Por favor seleccione un archivo comprimido zip para cargarlo
+  subject_reply_to: "Re: %{subject}"
+  support: 
+    array: 
+      or: 
+        last_word_connector: ", o "
+        two_words_connector: " o "
+  table_headings: 
+    name: Nombre
+    total: Total
+    type: Tipo
+  time: 
+    due_date: "%{date} hasta %{time}"
+    event: "%{date} en %{time}"
+    ranges: 
+      different_days: "%{start_date_and_time} hasta %{end_date_and_time}"
+      same_day: "%{date} desde %{start_time} hasta %{end_time}"
+      times: "%{start_time} hasta %{end_time}"
+    unknown_date: Fecha desconocida

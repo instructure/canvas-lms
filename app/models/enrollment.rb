@@ -66,8 +66,7 @@ class Enrollment < ActiveRecord::Base
     SQL
   end
 
-  adheres_to_policy
-  
+
 
   has_a_broadcast_policy
   
@@ -211,19 +210,22 @@ class Enrollment < ActiveRecord::Base
     self.root_account_id = self.course_section.root_account_id rescue nil
   end
   
+  def course_name
+    self.course.name || t('#enrollment.default_course_name', "Course")
+  end
+
   def short_name(length=nil)
     return @short_name if @short_name
     @short_name = self.course_section.display_name if self.course_section && self.root_account && self.root_account.show_section_name_as_course_name
-    @short_name ||= self.course.name
-    @short_name ||= "Course"
+    @short_name ||= self.course_name
     @short_name = @short_name[0..length] if length
     @short_name
   end
   
   def long_name
     return @long_name if @long_name
-    @long_name = self.course.name || "Course"
-    @long_name += ", #{self.course_section.display_name}" if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course.name
+    @long_name = self.course_name
+    @long_name = t('#enrollment.with_section', "%{course_name}, %{section_name}", :course_name => @long_name, :section_name => self.course_section.display_name) if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course.name
     @long_name
   end
   
@@ -343,11 +345,11 @@ class Enrollment < ActiveRecord::Base
   end
   
   def email
-    self.user.email rescue "No Email"
+    self.user.email rescue t('#enrollment.default_email', "No Email")
   end
   
   def user_name
-    read_attribute(:user_name) || self.user.name rescue "Unknown User"
+    read_attribute(:user_name) || self.user.name rescue t('#enrollment.default_user_name', "Unknown User")
   end
   
   def context
@@ -374,17 +376,34 @@ class Enrollment < ActiveRecord::Base
   def self.readable_type(type)
     case type
     when 'TeacherEnrollment'
-      "Teacher"
+      t('#enrollment.roles.teacher', "Teacher")
     when 'StudentEnrollment'
-      "Student"
+      t('#enrollment.roles.student', "Student")
     when 'TaEnrollment'
-      "TA"
+      t('#enrollment.roles.ta', "TA")
     when 'ObserverEnrollment'
-      "Observer"
+      t('#enrollment.roles.observer', "Observer")
     when 'DesignerEnrollment'
-      "Designer"
+      t('#enrollment.roles.designer', "Designer")
     else
-      "Student"
+      t('#enrollment.roles.student', "Student")
+    end
+  end
+  
+  def workflow_readable_type
+    case self.workflow_state
+      when 'active'
+        t('#enrollment.workflow.active', "Active")
+      when 'completed'
+        t('#enrollment.workflow.completed', "Completed")
+      when 'deleted'
+        t('#enrollment.workflow.deleted', "Deleted")
+      when 'invited'
+        t('#enrollment.workflow.invited', "Invited")
+      when 'pending'
+        t('#enrollment.workflow.pending', "Pending")
+      when 'rejected'
+        t('#enrollment.workflow.rejected', "Rejected")
     end
   end
   
@@ -424,7 +443,7 @@ class Enrollment < ActiveRecord::Base
   
   def to_atom
     Atom::Entry.new do |entry|
-      entry.title     = "#{self.user.name} in #{self.course.name}"
+      entry.title     = t('#enrollment.title', "%{user_name} in %{course_name}", :user_name => self.user_name, :course_name => self.course_name)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.links    << Atom::Link.new(:rel => 'alternate', 
@@ -434,23 +453,23 @@ class Enrollment < ActiveRecord::Base
   
   set_policy do
     given { |user| self.user == user }
-    set { can :read and can :read_grades }
+    can :read and can :read_grades
     
     given {|user, session| self.course.grants_right?(user, session, :participate_as_student) && self.user.show_user_services }
-    set { can :read_services }
+    can :read_services
 
     # read_services says this person has permission to see what web services this enrollment has linked to their account
     given {|user, session| self.course.grants_right?(user, session, :manage_students) && self.user.show_user_services }
-    set { can :read and can :read_services }
+    can :read and can :read_services
     
     given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :manage_grades) }
-    set { can :read and can :read_grades }
+    can :read and can :read_grades
     
     given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :read_as_admin) }
-    set { can :read and can :read_grades }
+    can :read and can :read_grades
     
     given { |user| !!Enrollment.active.find_by_user_id_and_associated_user_id(user.id, self.user_id) }
-    set { can :read and can :read_grades and can :read_services}
+    can :read and can :read_grades and can :read_services
   end
   
   named_scope :before, lambda{|date|
@@ -511,11 +530,11 @@ class Enrollment < ActiveRecord::Base
     end
   end
   
-  # this is just used to get a pseudonym_id in the email_lists.js stuff. 
+  # this is just used to get a pseudonym_id in the user_lists.js stuff. 
   def users_pseudonym_id
     self.user.pseudonym.id
   end
-  # this is also just used to get a communication_channel_id in the email_lists.js stuff
+  # this is also just used to get a communication_channel_id in the user_lists.js stuff
   def communication_channel_id
     self.user.communication_channel.id rescue nil
   end

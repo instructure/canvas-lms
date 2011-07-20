@@ -26,8 +26,6 @@ class Eportfolio < ActiveRecord::Base
   belongs_to :user
   validates_presence_of :user_id
 
-  adheres_to_policy  
-  
   workflow do
     state :active
     state :deleted
@@ -50,21 +48,21 @@ class Eportfolio < ActiveRecord::Base
 
   set_policy do
     given {|user| user }
-    set {can :create}
+    can :create
     
     given {|user| self.user == user}
-    set {can :read and can :manage and can :update and can :delete}
+    can :read and can :manage and can :update and can :delete
     
     given {|user| self.public }
-    set {can :read }
+    can :read
     
     given {|user, session| session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
-    set {can :read }
+    can :read
   end
   
   def setup_defaults
-    cat = self.eportfolio_categories.create(:name => "Home") if self.eportfolio_categories.empty?
-    entry = cat.eportfolio_entries.create(:eportfolio => self, :name => "Welcome", :content => "Nothing entered yet") if cat && cat.eportfolio_entries.empty?
+    cat = self.eportfolio_categories.create(:name => t(:first_category, "Home")) if self.eportfolio_categories.empty?
+    entry = cat.eportfolio_entries.create(:eportfolio => self, :name => t('first_entry.title', "Welcome"), :content => t('first_entry.content', "Nothing entered yet")) if cat && cat.eportfolio_entries.empty?
     cat
   end
   def self.serialization_excludes; [:uuid]; end

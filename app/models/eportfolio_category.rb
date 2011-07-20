@@ -29,7 +29,7 @@ class EportfolioCategory < ActiveRecord::Base
   
   def infer_unique_slug
     categories = self.eportfolio.eportfolio_categories
-    self.name ||= "Section Name"
+    self.name ||= t(:default_section, "Section Name")
     self.slug = self.name.gsub(/[\s]+/, "_").gsub(/[^\w\d]/, "")
     match_cnt = categories.select{|c| c != self && c.slug && c.slug == self.slug}.length
     if match_cnt > 0

@@ -3,8 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  Web Conference Invitation: <%= asset.context.name %>
+  <%= t :subject, "Web Conference Invitation: %{name}", :name => asset.context.name %>
 <% end %>
 
-You've been invited to participate in a web conference, <%= asset.title %> for 
-<%= asset.context.name %>.
+<%= t :body, "You've been invited to participate in a web conference, %{title} for %{name}.", :title => asset.title, :name => asset.context.name %>

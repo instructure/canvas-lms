@@ -1,10 +1,10 @@
-<% tag = module_item || nil; completion_criteria ||= nil; new_module = @context.context_modules.new; editable ||= false
+<% tag = module_item || nil; completion_criteria ||= nil; editable ||= false
 @module_item_image_tags ||= {
-  'min_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => "minimum score", :title => "Students must reach the minimum score on this item before the module is considered complete", :style => "vertical-align: top; padding-top: 2px;"),
-  'max_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => "maximum score", :title => "Students must not exceed the maximum score on this item before the module is considered complete", :style => "vertical-align: top; padding-top: 2px;"),
-  'must_view' => image_tag("preview_dim.png", :class => "image not_blank", :alt => "must view", :title => "Students must view this item before the module is considered complete", :style => "vertical-align: top; padding-top: 2px;"),
-  'must_contribute' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => "must contribute", :title => "Students must contribute to this item before the module is considered complete", :style => "vertical-align: top; padding-top: 2px;"),
-  'must_submit' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => "must submit", :title => "Students must submit this assignment before the module is considered complete", :style => "vertical-align: top; padding-top: 2px;"),
+  'min_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => t('images.alt.min_score', "minimum score"), :title => t('images.title.min_score', "Students must reach the minimum score on this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
+  'max_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => t('images.alt.max_score', "maximum score"), :title => t('images.title.max_score', "Students must not exceed the maximum score on this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
+  'must_view' => image_tag("preview_dim.png", :class => "image not_blank", :alt => t('images.alt.must_view', "must view"), :title => t('images.title.must_view', "Students must view this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
+  'must_contribute' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => t('images.alt.must_contribute', "must contribute"), :title => t('images.title.must_contribute', "Students must contribute to this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
+  'must_submit' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => t('images.alt.must_submit', "must submit"), :title => t('images.title.must_submit', "Students must submit this assignment before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
   'indent' => image_tag('indent_thin.png'),
   'outdent' => image_tag('outdent_thin.png'),
   'edit' => image_tag('edit.png'),
@@ -17,10 +17,10 @@
   <tr>
     <td class="module_item_icons">
       <div class="nobr">
-      <span style="cursor: move;" title="Drag to reorder or move item to another module" class="move_item_link"><%= image_tag "move.png" %></span>
+      <span style="cursor: move;" title="<%= t('drag_to_reorder', %{Drag to reorder or move item to another module}) %>" class="move_item_link"><%= image_tag "move.png" %></span>
       <span class="completion_status">
-        <%= image_tag "blank.png", :alt => "done", :title => "Module Item Completed", :class => "complete_item_icon" %>
-        <%= image_tag "blank.png", :alt => "incomplete", :title => "Module Item Incomplete", :class => "incomplete_item_icon" %>
+        <%= image_tag "blank.png", :alt => t('images.alt.complete', "done"), :title => t('images.title.complete', "Module Item Completed"), :class => "complete_item_icon" %>
+        <%= image_tag "blank.png", :alt => t('images.alt.incomplete', "incomplete"), :title => t('images.title.incomplete', "Module Item Incomplete"), :class => "incomplete_item_icon" %>
       </span>
       <span class="type_icon" title="<%= module_item.content_type if module_item %>"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
       <span class="criterion <%= 'defined' if criterion %>">
@@ -31,7 +31,6 @@
       <span class="id" style="display: none;"><%= tag ? tag.id : nbsp %></span>
       </div>
     </td>
-    <% cache([(tag.try_rescue(:cache_key) || @context.asset_string), 'module_item_details'].join('/')) do %>
     <td style="text-align: left;" class="item_name">
       <a class="title <%= '_explicit_external_link' if tag && tag.content_type == 'ExternalUrl' %>" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
       <span class="title locked_title"><%= tag && tag.title %></span>
@@ -42,26 +41,26 @@
       <span class="url" style="display: none;"><%= tag.try_rescue(:url) if editable %></span>
       <div class="completion_requirement">
         <div class="requirement_type min_score_requirement">
-          <span class="unfulfilled">must score at least a </span>
-          <span class="fulfilled">scored at least a </span>
-          <span class='min_score'><%= (criterion && criterion[:min_score]) || nbsp %></span>
+          <% score_display = %{<span class='min_score'>#{(criterion && criterion[:min_score]) || nbsp}</span>}.html_safe %>
+          <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'must score at least a %{score}', :score => score_display %></span>
+          <span class="fulfilled"><%= t 'min_score.fulfilled', 'scored at least a %{score}', :score => score_display %></span>
         </div>
         <div class="requirement_type max_score_requirement">
-          <span class="unfulfilled">must score no more than a </span>
-          <span class="fulfilled">scored no more than a </span>
-          <span class='min_score'><%= (criterion && criterion[:max_score]) || nbsp %></span>
+          <% score_display = %{<span class='min_score'>#{(criterion && criterion[:max_score]) || nbsp}</span>}.html_safe %>
+          <span class="unfulfilled"><%= t 'max_score.unfulfilled', 'must score no more than a %{score}', :score => score_display %></span>
+          <span class="fulfilled"><%= t 'max_score.fulfilled', 'scored no more than a%{score}', :score => score_display %></span>
         </div>
         <div class="requirement_type must_view_requirement">
-          <span class="unfulfilled">must view the page</span>
-          <span class="fulfilled">viewed the page</span>
+          <span class="unfulfilled"><%= t('must_view.unfulfilled', %{must view the page}) %></span>
+          <span class="fulfilled"><%= t('must_view.fulfilled', %{viewed the page}) %></span>
         </div>
         <div class="requirement_type must_contribute_requirement">
-          <span class="unfulfilled">must contribute to the content of the page</span>
-          <span class="fulfilled">contributed to the content of the page</span>
+          <span class="unfulfilled"><%= t('must_contribute.unfulfilled', %{must contribute to the content of the page}) %></span>
+          <span class="fulfilled"><%= t('must_contribute.fulfilled', %{contributed to the content of the page}) %></span>
         </div>
         <div class="requirement_type must_submit_requirement">
-          <span class="unfulfilled">must submit the assignment</span>
-          <span class="fulfilled">submitted the assignment</span>
+          <span class="unfulfilled"><%= t('must_submit.unfulfilled', %{must submit the assignment}) %></span>
+          <span class="fulfilled"><%= t('must_submit.fulfilled', %{submitted the assignment}) %></span>
         </div>
       </div>
     </td>
@@ -69,11 +68,10 @@
     <td class="points_possible_display">&nbsp;</td>
     <td class="links">
       &nbsp;
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="outdent_item_link" title="Outdent item"><%= @module_item_image_tags['outdent'] %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="indent_item_link" title="Indent item"><%= @module_item_image_tags['indent'] %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="edit_item_link edit_link" title="Edit item details"><%= @module_item_image_tags['edit'] %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link" title="Remove this item from the module"><%= @module_item_image_tags['delete'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('links.outdent', %{Outdent item}) %>"><%= @module_item_image_tags['outdent'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('links.indent', %{Indent item}) %>"><%= @module_item_image_tags['indent'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('links.edit_item', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('links.remove_item', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %></a>
     </td>
-    <% end %>
   </tr>
 </table>

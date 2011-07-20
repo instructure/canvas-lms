@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+I18n.scoped("prerequisites_lookup", function(I18n) {
 $(document).ready(function() {
-  var $link = $("#module_prerequisites_lookup_link")
+  var $link = $("#module_prerequisites_lookup_link");
   var url = $link.attr('href');
   $.ajaxJSON(url, 'GET', {}, function(data) {
     if(data.locked === false) {
       window.reload();
       return;
     }
-    var $ul = $("<ul/>")
+    var $ul = $("<ul/>");
     $ul.attr('id', 'module_prerequisites_list');
     for(var idx in data.modules) {
       var module = data.modules[idx];
@@ -62,7 +62,10 @@ $(document).ready(function() {
       $ul.append($li);
     }
     $link.after($ul);
-    $link.after("<br/><h3 style='margin-top: 15px;'>Completion Prerequisites</h3>The following requirements need to be completed before this page will be unlocked:");
+    var header = I18n.t("headers.completion_prerequisites", "Completion Prerequisites");
+    var sentence = I18n.beforeLabel("requirements_must_be_completed", "The following requirements need to be completed before this page will be unlocked");
+    $link.after("<br/><h3 style='margin-top: 15px;'>" + $.h(header) + "</h3>" + $.h(sentence));
     $link.prev("a").hide();
   }, function(data) {});
+});
 });

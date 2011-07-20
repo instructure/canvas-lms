@@ -30,7 +30,7 @@ class QuizSubmissionsController < ApplicationController
     redirect_params = {}
     @quiz = @context.quizzes.find(params[:quiz_id])
     if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-      flash[:error] = "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz."
+      flash[:error] = t('errors.protected_quiz', "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz.")
     elsif @quiz.grants_right?(@current_user, :submit)
       @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id) if @current_user
       # If the submission is a preview, we don't add it to the user's submission history,
@@ -51,7 +51,7 @@ class QuizSubmissionsController < ApplicationController
         hash = @submission.submission_data if @submission.submission_data.is_a?(Hash) && @submission.submission_data[:attempt] == @submission.attempt
         params_hash = hash.deep_merge(params) rescue params
         @submission.submission_data = params_hash if !@submission.overdue?
-        flash[:notice] = "You submitted this quiz late, and your answers may not have been recorded." if @submission.overdue?
+        flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         @submission.grade_submission
       end
       if preview

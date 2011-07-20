@@ -1,4 +1,4 @@
-<% content_for :page_title do %>Merge User Accounts<% end %>
+<% content_for :page_title do %><%= t('titles.merge_users', 'Merge User Accounts') %><% end %>
 <% content_for :stylesheets do %>
 <style>
 .merge_results {
@@ -30,46 +30,51 @@
 <% end %>
 <div style="width: 700px; margin-left: auto; margin-right: auto; margin-top: 10px;">
   <% if @other_user %>
-    <h2>Really Merge User Accounts?</h2>
-    <p><strong>This process cannot be undone, so please make sure you're certain before
-    you continue.</strong></p>
+    <h2><%= t('titles.really_merge', 'Really Merge User Accounts?') %></h2>
+    <p><strong>
+      <%= t('no_merge_undo', "This process cannot be undone, so please make sure you're certain before you continue.") %>
+    </strong></p>
     <p>
-    Are you sure you want to merge the account, <%= @user.name %> (<%= @user.email %>) into
-    this account, <%= @current_user.name %> (<%= @current_user.email %>)?  This process will have
-    the following end result:
+      <%= t('merge_result_explanation', "Are you sure you want to merge the account, %{user_name}
+      (%{user_email}) into this account, %{current_user_name} (%{current_user_email})? This
+      process will have the following end result:", 
+            :user_name => @user.name, :user_email => @user.email,
+            :current_user_name => @current_user.name, :current_user_email => @current_user.email) %>
     <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @other_user} %>
     </p>
     <% form_tag user_merge_path(@user, :new_user_uuid => @other_user.uuid), :method => :post do %>
       <div class="button-container">
-        <button type="submit" class="button">Merge User Accounts</button>
-        <a href="<%= dashboard_path %>" class="button button-secondary">Cancel</a>
+        <button type="submit" class="button"><%= t('buttons.merge_user_account', 'Merge User Accounts') %></button>
+        <a href="<%= dashboard_path %>" class="button button-secondary"><%= t('#buttons.cancel', 'Cancel') %></a>
       </div>
     <% end %>
   <% else %>
-    <h2>Merge User Accounts</h2>
+    <h2><%= t('titles.merge_users', 'Merge User Accounts') %></h2>
     <% if @pending_other_user %>
-      You've selected to merge the user, <%= @user.name %> (<%= @user.email %>) into
-      the account, <%= @pending_other_user.name %> (<%= @pending_other_user.email %>).
-      This process will have the following end result:
+      <%= t('merge_result_explanation_again', "You've selected to merge the user, %{user_name} (%{user_email}) into
+      the account, %{pending_other_user_name} (%{pending_other_user_email}).
+      This process will have the following end result:", 
+            :user_name => @user.name, :user_email => @user.email,
+            :pending_other_user_name => @pending_other_user.name, :pending_other_user_email => @pending_other_user.email) %>
       <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @pending_other_user} %>
-      <a class="button" href="<%= user_admin_merge_url(@user.id, :new_user_id => @pending_other_user.id) %>">Prepare to<br/> Merge Users</a>
+      <a class="button" style="width: 6em;" href="<%= user_admin_merge_url(@user.id, :new_user_id => @pending_other_user.id) %>"><%= t('prepare_to_merge', "Prepare to Merge Users") %></a>
       <span style="font-size: 0.8em; padding-left: 50px;">
-        <a class="button" href="<%= user_admin_merge_url(@pending_other_user.id, :pending_user_id => @user.id) %>">Switch User<br/> Positions</a>
-        <a class="button" href="<%= user_admin_merge_url(@user.id, :clear => 1) %>">Merge Someone Else With<br/><%= @user.name %></a>
-        <a class="button" href="<%= user_admin_merge_url(@pending_other_user.id, :clear => 1) %>">Merge Someone Else With<br/><%= @pending_other_user.name %></a>
+        <a class="button" style="width: 6em;" href="<%= user_admin_merge_url(@pending_other_user.id, :pending_user_id => @user.id) %>"><%= t('switch_user_positions', "Switch User Positions") %></a>
+        <a class="button" style="width: 13em;" href="<%= user_admin_merge_url(@user.id, :clear => 1) %>"><%= t('merge_somone_else', 'Merge Someone Else With %{user_name}', :user_name => @user.name) %></a>
+        <a class="button" style="width: 13em;" href="<%= user_admin_merge_url(@pending_other_user.id, :clear => 1) %>"><%= t('merge_somone_else', 'Merge Someone Else With %{user_name}', :user_name => @pending_other_user.name) %></a>
       </span>
     <% else %>
-      <p>You've selected to merge the user, <%= @user.name %> (<%= @user.email %>) with another account.
+      <p><%= t('merge_user_initial_instructions', "You've selected to merge the user, %{user_name} (%{user_email}) with another account.
       You can search for the user you'd like to merge with this user using the form below, or 
-      just navigate to that user's page and click "Merge User" again to merge someone else with this
-      user.</p>
+      just navigate to that user's page and click \"Merge User\" again to merge someone else with this
+      user.", :user_name => @user.name, :user_email => @user.email) %></p>
       <table>
         <tr>
           <td style="vertical-align: top; padding: 10px 30px 10px;">
-            <h3>Find a User</h3>
+            <h3><%= t('titles.find_user', 'Find a User') %></h3>
             <% accounts = @current_user.associated_accounts.sort_by(&:name).uniq %>
             <% if accounts.empty? %>
-              You don't have permission to search any accounts
+              <%= t('no_permission', "You don't have permission to search any accounts") %>
             <% else %>
               <select id="account_select" style="<%= hidden unless accounts.length > 1%>">
                 <% accounts.each do |account| %>
@@ -79,23 +84,23 @@
               <div style="margin-top: 10px; margin-bottom: 20px;">
                 <% accounts.each do |account| %>
                   <div id="account_search_<%= account.id %>" class="account_search" style="display: none;">
-                    <label for="user_name_<%= account.id %>">Name:</label>
+                    <label for="user_name_<%= account.id %>"><%= before_label('name', 'Name') %></label>
                     <input id="user_name_<%= account.id %>" rel="<%= account_users_path(account) %>" class="user_name" type="search" />
                   </div>
                 <% end %>
               </div>
               <div style="margin-top: 20px;">
                 <span id="selected_name" style="font-weight: bold; padding-right: 10px;"></span>
-                <a href="#" style="display: none;" rel="<%= user_admin_merge_url(@user.id, :pending_user_id => "{{ id }}") %>" id="select_name" type='button' class='button small-button select_button'>Select</a>
+                <a href="#" style="display: none;" rel="<%= user_admin_merge_url(@user.id, :pending_user_id => "{{ id }}") %>" id="select_name" type='button' class='button small-button select_button'><%= t 'links.select', "Select" %></a>
               </div>
             <% end %>
           </td>
           <td style="vertical-align: top; padding: 10px 10px 10px 30px;">
-            <h3>Or Enter a User ID</h3>
+            <h3><%= t('titles.enter_user_id', 'Or Enter a User ID') %></h3>
             <% form_tag user_admin_merge_url(@user.id), {:method => :get} do %>
-              <label for="manual_user_id">User ID:</label>
+              <label for="manual_user_id"><%= before_label('user_id', 'User ID') %></label>
               <input id="manual_user_id" name="pending_user_id" type="text" style="width: 50px;"/>
-              <button type="submit" class="button">Go</button>
+              <button type="submit" class="button"><%= t('buttons.go', 'Go') %></button>
             <% end %>
           </td>
         </tr>

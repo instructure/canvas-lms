@@ -40,6 +40,7 @@ class WikiPage < ActiveRecord::Base
     return if deleted?
     self.title ||= (self.url || "page").to_cased_title
     return unless self.wiki
+    # TODO i18n (see wiki.rb)
     if self.title == "Front Page" && self.new_record?
       baddies = self.wiki.wiki_pages.not_deleted.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = p.url.to_cased_title; p.save_without_broadcasting! }
@@ -100,16 +101,15 @@ class WikiPage < ActiveRecord::Base
   
   validates_each :title do |record, attr, value|
     if value.blank?
-      record.errors.add(attr, "Title can't be blank")
+      record.errors.add(attr, t('errors.blank_title', "Title can't be blank"))
     elsif value.size > maximum_string_length
-      record.errors.add(attr, "Title can't exceed #{maximum_string_length} characters")
+      record.errors.add(attr, t('errors.title_too_long', "Title can't exceed %{max_characters} characters", :max_characters => maximum_string_length))
     elsif value.to_url.blank?
-      record.errors.add(attr, "Title must contain at least one letter or number") # it's a bit more liberal than this, but let's not complicate things
+      record.errors.add(attr, t('errors.title_characters', "Title must contain at least one letter or number")) # it's a bit more liberal than this, but let's not complicate things
     end
   end
   
   has_a_broadcast_policy
-  adheres_to_policy
   simply_versioned
   after_save :remove_changed_flag
   
@@ -218,19 +218,19 @@ class WikiPage < ActiveRecord::Base
   
   set_policy do
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :read) && can_read_page?(user) }
-    set { can :read }
+    can :read
     
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :contribute) && can_read_page?(user) }
-    set { can :read }
+    can :read
 
     given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
-    set { can :read and can :update_content and can :create }
+    can :read and can :update_content and can :create
     
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :manage) }
-    set { can :create and can :read and can :update and can :delete and can :update_content }
+    can :create and can :read and can :update and can :delete and can :update_content
     
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :manage_content) }
-    set { can :create and can :read and can :update and can :delete and can :update_content }
+    can :create and can :read and can :update and can :delete and can :update_content
     
   end
   
@@ -328,18 +328,18 @@ class WikiPage < ActiveRecord::Base
     namespace = self.wiki.wiki_namespaces.find_by_context_id(context && context.id) || self.wiki.wiki_namespaces.find(:first)
     prefix = namespace.context_prefix || ""
     Atom::Entry.new do |entry|
-      entry.title     = "Wiki Page#{", " + namespace.context.name}: #{self.title}"
+      entry.title     = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", :course_or_group_name => namespace.context.name, :page_title => self.title)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
       entry.links    << Atom::Link.new(:rel => 'alternate', 
                                     :href => "http://#{HostUrl.context_host(namespace.context)}/#{prefix}/wiki/#{self.url}")
-      entry.content   = Atom::Content::Html.new(self.body || "no content")
+      entry.content   = Atom::Content::Html.new(self.body || t('defaults.no_content', "no content"))
     end
   end
   
   def user_name
-    (user && user.name) || "Anonymous"
+    (user && user.name) || t('anonymous_user_name', "Anonymous")
   end
   
   def to_param
@@ -369,7 +369,7 @@ class WikiPage < ActiveRecord::Base
     end
     dup.wiki = context.wiki
     dup.body = context.migrate_content_links(self.body, options[:old_context] || self.context) if options[:migrate]
-    context.log_merge_result("Wiki Page \"#{dup.title}\" created")
+    context.log_merge_result(t('notices.wiki_page_created', 'Wiki Page "%{title}" created', :title => dup.title))
     context.may_have_links_to_migrate(dup)
     dup.updated_at = Time.now
     dup.clone_updated = true
@@ -382,20 +382,28 @@ class WikiPage < ActiveRecord::Base
     to_import = migration.to_import 'outline_folders'
 
     outline['root_folder'] = true
-    import_from_migration(outline.merge({:outline_folders_to_import => to_import}), migration.context)
+    begin
+      import_from_migration(outline.merge({:outline_folders_to_import => to_import}), migration.context)
+    rescue
+      migration.add_warning("Error importing the course outline.", $!)
+    end
   end
 
   def self.process_migration(data, migration)
     wikis = data['wikis'] ? data['wikis']: []
     wikis.each do |wiki|
-      import_from_migration(wiki, migration.context) if wiki
+      begin
+        import_from_migration(wiki, migration.context) if wiki
+      rescue
+        migration.add_warning("Couldn't import the wiki page \"#{wiki[:title]}\"", $!)
+      end
     end
   end
   
   def self.import_from_migration(hash, context, item=nil)
     hash = hash.with_indifferent_access
-    item ||= find_by_wiki_id_and_id(context.wiki.id, hash[:id]) #find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-    item ||= find_by_wiki_id_and_migration_id(context.wiki.id, hash[:migration_id]) #context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
+    item ||= find_by_wiki_id_and_id(context.wiki.id, hash[:id])
+    item ||= find_by_wiki_id_and_migration_id(context.wiki.id, hash[:migration_id])
     item ||= context.wiki.wiki_pages.new
     # force the url to be the same as the url_name given, since there are
     # likely other resources in the import that link to that url
@@ -482,7 +490,7 @@ class WikiPage < ActiveRecord::Base
       allow_save = false if !description || description.empty?
     elsif hash[:page_type] == 'module_toc'
     elsif hash[:topics]
-      item.title = "#{hash[:category_name]} Topics"
+      item.title = t('title_for_topics_category', '%{category} Topics', :category => hash[:category_name])
       description = "#{hash[:category_description]}"
       description += "\n\n<ul>\n"
       topic_count = 0
@@ -506,34 +514,6 @@ class WikiPage < ActiveRecord::Base
     else
       allow_save = false
     end
-    # item.title = hash[:title_in_gradebook] || hash[:name] || hash[:title]
-    # if hash[:instructions_in_html] == false
-      # self.extend TextHelper
-    # end
-    # description = hash[:instructions_in_html] == false ? format_message(hash[:description] || "") : (hash[:description] || "")
-    # description += hash[:instructions_in_html] == false ? format_message(hash[:instructions] || "") : (hash[:instructions] || "")
-    # description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
-    # item.description = description
-    # if ['discussion_topic'].include?(hash[:submission_format])
-      # item.submission_types = "discussion_topic"
-    # elsif ['online_file_upload','textwithattachments'].include?(hash[:submission_format])
-      # item.submission_types = "online_file_upload,online_text_entry"
-    # elsif ['online_file_upload'].include?(hash[:submision_format])
-      # item.submission_types = "online_file_upload"
-    # elsif ['online_text_entry'].include?(hash[:submission_format])
-      # item.submission_types = "online_text_entry"
-    # elsif ['webpage'].include?(hash[:submission_format])
-      # item.submission_types = "online_file_upload"
-    # end
-    # if hash[:gradeable]
-      # if hash[:grade_type] == 'numeric'
-        # item.points_possible = hash[:max_grade] ? hash[:max_grade].to_i : 10
-      # elsif hash[:grade_type] == 'alphanumeric'
-        # item.points_possible = 10
-      # end
-    # end
-    # timestamp = hash[:due_date].to_i rescue 0
-    # item.due_at = Time.at(timestamp / 1000) if timestamp > 0
     if allow_save && hash[:migration_id]
       item.save_without_broadcasting!
       context.imported_migration_items << item if context.imported_migration_items
