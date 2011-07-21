@@ -18,7 +18,7 @@
 
 class HostUrl
   class << self
-    attr_accessor :outgoing_email_address, :outgoing_email_domain
+    attr_accessor :outgoing_email_address, :outgoing_email_domain, :outgoing_email_default_name
 
     @@default_host = nil
     @@file_host = nil
@@ -54,7 +54,11 @@ class HostUrl
     def outgoing_email_address(preferred_user="notifications")
       @outgoing_email_address.presence || "#{preferred_user}@#{outgoing_email_domain}"
     end
-    
+
+    def outgoing_email_default_name
+      @outgoing_email_default_name.presence || I18n.t("#email.default_from_name", "Instructure Canvas")
+    end
+
     def file_host=(val)
       @@file_host = val
     end

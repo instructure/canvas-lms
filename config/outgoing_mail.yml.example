@@ -6,6 +6,7 @@ development:
   authentication: "plain" # plain, login, or cram_md5
   domain: "example.com"
   outgoing_address: "canvas@example.com"
+  default_name: "Instructure Canvas"
 
 # or to use sendmail --
 #
@@ -23,4 +24,4 @@ production:
   authentication: "plain" # plain, login, or cram_md5
   domain: "example.com"
   outgoing_address: "canvas@example.com"
-
+  default_name: "Instructure Canvas"
