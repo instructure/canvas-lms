@@ -26,7 +26,7 @@ class InstallCustomFields < ActiveRecord::Migration
       t.string  :default_value
 
       t.string  :scoper_type
-      t.integer :scoper_id
+      t.integer :scoper_id, :limit => 8
 
       t.string  :target_type
 
@@ -35,11 +35,11 @@ class InstallCustomFields < ActiveRecord::Migration
     add_index :custom_fields, %w(scoper_type scoper_id target_type name)
 
     create_table :custom_field_values, :force => true do |t|
-      t.integer :custom_field_id
+      t.integer :custom_field_id, :limit => 8
       t.string  :value
 
       t.string  :customized_type
-      t.integer :customized_id
+      t.integer :customized_id, :limit => 8
 
       t.timestamps
     end
