@@ -22,6 +22,7 @@
 # id in these URLs is the id of the student in the course, there is no separate
 # submission id exposed in these APIs.
 class SubmissionsApiController < ApplicationController
+  include Api
   before_filter :require_context
 
   # @API
@@ -249,7 +250,7 @@ class SubmissionsApiController < ApplicationController
                                                         sc.media_comment_type)
         end
         sc_hash['attachments'] = sc.attachments.map do |a|
-          attachment_json(a, assignment, {:comment_id => sc.id, :id => submission.user_id})
+          attachment_json(a, :assignment => assignment, :url_params => {:comment_id => sc.id, :id => submission.user_id})
         end unless sc.attachments.blank?
         sc_hash
       end
@@ -287,7 +288,7 @@ class SubmissionsApiController < ApplicationController
     attachments = attempt.versioned_attachments.dup
     attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
     hash['attachments'] = attachments.map do |attachment|
-      attachment_json(attachment, assignment, :id => attempt.user_id)
+      attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
     end unless attachments.blank?
 
     # include the discussion topic entries
@@ -308,29 +309,13 @@ class SubmissionsApiController < ApplicationController
         )
         attachments = (entry.attachments.dup + [entry.attachment]).compact
         ehash['attachments'] = attachments.map do |attachment|
-          attachment_json(attachment, assignment, :id => attempt.user_id)
+          attachment_json(attachment, :assignment => assignment, :url_params => {:id => attempt.user_id})
         end unless attachments.blank?
         ehash
       end
     end
 
     hash
-  end
-
-  def attachment_json(attachment, assignment, url_params = {})
-    url = case attachment.context_type
-          when "Course"
-            course_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
-          else
-            course_assignment_submission_url(@context, assignment,
-                                             url_params.merge(:download => attachment.id))
-          end
-    {
-      'content-type' => attachment.content_type,
-      'display_name' => attachment.display_name,
-      'filename' => attachment.filename,
-      'url' => url,
-    }
   end
 
   # a media comment looks just like an attachment to the API

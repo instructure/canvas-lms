@@ -664,6 +664,14 @@ ActionController::Routing::Routes.draw do |map|
       course.student_submissions 'students/submissions.:format',
         :controller => 'submissions_api', :action => 'for_students',
         :conditions => { :method => :get }
+      course.resources :discussion_topics,
+                       :only => %w(index)
+    end
+    api.resources :groups,
+                  :name_prefix => "api_v1_",
+                  :only => %w() do |group|
+      group.resources :discussion_topics,
+                       :only => %w(index)
     end
     api.resources :accounts, :only => %{} do |account|
       account.resources :sis_imports,

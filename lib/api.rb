@@ -67,6 +67,47 @@ module Api
       raise ArgumentError, "need to add support for table name: #{collection.table_name}"
     end
   end
+  
+  # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
+  # The collection needs to be a will_paginate collection
+  def self.set_pagination_headers!(collection, response, base_url)
+    return unless collection.respond_to?(:next_page)
+    links = []
+    template = "<#{base_url}.json?page=%s&per_page=#{collection.per_page}>; rel=\"%s\""
+    if collection.next_page
+      links << template % [collection.next_page, "next"]
+    end
+    if collection.previous_page
+      links << template % [collection.previous_page, "prev"]
+    end
+    if collection.total_pages > 1
+      links << template % [1, "first"]
+      links << template % [collection.total_pages, "last"]
+    end
+    response.headers["Link"] = links.join(',') if links.length > 0
+  end
+  
+  def attachment_json(attachment, opts={})
+    url_params = opts[:url_params] || {}
+    
+    url = case attachment.context_type
+      when "Course"
+        course_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
+      when "Group"
+        group_file_download_url(url_params.merge(:file_id => attachment.id, :id => nil))
+      when /Submission|User/
+        return nil unless opts[:assignment]
+        course_assignment_submission_url(@context, opts[:assignment], url_params.merge(:download => attachment.id))
+      else
+        return nil
+    end
+    {
+      'content-type' => attachment.content_type,
+      'display_name' => attachment.display_name,
+      'filename' => attachment.filename,
+      'url' => url,
+    }
+  end
 
   # See User.submissions_for_given_assignments and SubmissionsApiController#for_students
   mattr_accessor :assignment_ids_for_students_api
