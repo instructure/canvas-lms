@@ -114,7 +114,7 @@ class Assignment < ActiveRecord::Base
       if due_at && due_at <= Time.now
         # do_auto_peer_review
       elsif due_at
-       self.send_at(due_at, :do_auto_peer_review)
+        self.send_at(due_at, :do_auto_peer_review, :strand => "assignment:auto_peer_review:#{self.id}")
       end
     end
     true
