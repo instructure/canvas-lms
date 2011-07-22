@@ -25,13 +25,13 @@ module EnrollmentDateRestrictions
       do_it_now = false
       
       if start_at && start_at > Time.now
-        EnrollmentDateRestrictions.send_at(:start_at, :update_restricted_enrollments, self)
+        EnrollmentDateRestrictions.send_at(start_at, :update_restricted_enrollments, self)
       elsif start_at
         do_it_now = true
       end
       
       if end_at && end_at > Time.now
-        EnrollmentDateRestrictions.send_at(:end_at, :update_restricted_enrollments, self)
+        EnrollmentDateRestrictions.send_at(end_at, :update_restricted_enrollments, self)
       elsif end_at
         do_it_now = true
       end
