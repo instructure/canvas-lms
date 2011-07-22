@@ -25,8 +25,10 @@ shared_examples_for "quiz selenium tests" do
     
     driver.find_elements(:css, "#question_form_template option.missing_word").length.should == 1
 
-    driver.find_element(:css, ".add_question .add_question_link").click
-    keep_trying_until{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    keep_trying_until {
+      driver.find_element(:css, ".add_question .add_question_link").click
+      driver.find_elements(:css, "#questions .question_holder").length > 0
+    }
     driver.find_elements(:css, "#questions .question_holder option.missing_word").length.should == 0
   end
   
@@ -211,8 +213,10 @@ shared_examples_for "quiz selenium tests" do
     harder.save!
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     find_questions_link = driver.find_element(:link, "Find Questions")
-    find_questions_link.click
-    keep_trying_until { driver.find_element(:link, "Select All") }.click
+    keep_trying_until {
+      find_questions_link.click
+      driver.find_element(:link, "Select All")
+    }.click
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
