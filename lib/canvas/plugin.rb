@@ -100,6 +100,11 @@ module Canvas
       @meta[:base]
     end
 
+    # arbitrary meta key/value pairs (these aren't configurable settings)
+    def metadata(name)
+      t_if_proc(@meta[name])
+    end
+
     def translate(key, default, options={})
       key = "canvas.plugins.#{@id}.#{key}" unless key =~ /\A#/
       I18n.translate(key, default, options)
