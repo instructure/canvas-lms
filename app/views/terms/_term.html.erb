@@ -31,7 +31,7 @@
   <% types = [StudentEnrollment, TeacherEnrollment, TaEnrollment] %>
   <td class="permissions">
     <table>
-      <tr>
+      <tr class="general_dates">
         <td>
           <%= mt :term_runs_from, "**Term Runs** from" %>&nbsp;
         </td>
@@ -41,7 +41,7 @@
       <% override = term.enrollment_dates_overrides.find_by_context_type_and_context_id_and_enrollment_type(@context.class.to_s, @context.id, type.to_s) if term %>
       <% override ||= OpenStruct.new %>
       <% type_string = type.to_s.underscore %>
-      <tr>
+      <tr class="<%= "#{type_string}_dates"%>">
         <td>
           <% case type_string
               when 'student_enrollment'
@@ -61,7 +61,7 @@
           <%= access_label %>
           &nbsp;
         </td>
-        <%= render :partial => 'timespan', :locals => { :object => override, :key => "[overrides][#{type_string}]", :start_tooltip => start_tooltip, :end_tooltip => end_tooltip } %>
+        <%= render :partial => 'timespan', :locals => { :object => override, :key => "[overrides][#{type_string}]", :start_tooltip => start_tooltip, :end_tooltip => end_tooltip, :date_class_prefix => "#{type_string}_" } %>
       </tr>
     <% end %>
     </table>
