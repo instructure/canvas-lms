@@ -60,7 +60,7 @@ module SeleniumTestsHelperMethods
         :desired_capabilities => caps
       )
     end
-    driver.manage.timeouts.implicit_wait = 3
+    driver.manage.timeouts.implicit_wait = 1
     driver
   end
   
@@ -305,6 +305,10 @@ shared_examples_for "all selenium tests" do
 
   append_after(:each) do
     ALL_MODELS.each { |m| truncate_table(m) }
+  end
+
+  append_before(:each) do
+    driver.manage.timeouts.implicit_wait = 1
   end
 
   append_before(:all) do
