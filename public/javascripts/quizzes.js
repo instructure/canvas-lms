@@ -418,15 +418,14 @@ I18n.scoped('quizzes', function(I18n) {
       $formQuestion.attr('class', 'question').addClass('selectable');
       $formQuestion.find(".missing_word_after_answer").hide().end()
         .find(".matching_answer_incorrect_matches_holder").hide().end()
-        .find(".question_comment").css('display', '').end()
-        .find(".question_neutral_comment").css('display', 'none');
+        .find(".question_comment").css('display', '').end();
       if($("#questions").hasClass('survey_quiz')) {
         $formQuestion.find(".question_comment").css('display', 'none').end()
           .find(".question_neutral_comment").css('display', '');
       }
       $formQuestion.find(".question_header").text("Question:");
       $formQuestion.addClass(question_type);
-      $formQuestion.find(".question_points_holder").showIf(!$formQuestion.closest(".question_holder").hasClass('group') && question_type != 'text_only_question');
+        $formQuestion.find(".question_points_holder").showIf(!$formQuestion.closest(".question_holder").hasClass('group') && question_type != 'text_only_question');
       $formQuestion.find("textarea.comments").each(function() {
         $(this).val($.trim($(this).val()));
         if($(this).val()) {
