@@ -96,7 +96,14 @@ describe "OAuth2", :type => :integration do
           response['Location'].should match(%r{/login/oauth2/auth?})
           code = response['Location'].match(/code=([^\?&]+)/)[1]
           code.should be_present
-          reset!
+
+          get response['Location']
+          response.should be_success
+
+          # make sure the user is now logged out, or the app also has full access to their session
+          get '/'
+          response.should be_redirect
+          response['Location'].should == 'http://www.example.com/login'
 
           # we have the code, we can close the browser session
           if opts[:basic_auth]
