@@ -78,7 +78,7 @@
       </tr>
       <% if can_manage_admin_users %>
         <tr>
-          <td><%= f.blabel 'time_zone', :en => "Time Zone" %></td>
+          <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
           <td><%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :default => ((@domain_root_account && @domain_root_account.default_time_zone) || "Mountain Time (US & Canada)") %></td>
         </tr>
       <% end %>
