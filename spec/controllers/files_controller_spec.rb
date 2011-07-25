@@ -31,6 +31,10 @@ describe FilesController do
     @file = factory_with_protected_attributes(@course.attachments, :uploaded_data => io)
   end
   
+  def user_file
+    @file = factory_with_protected_attributes(@user.attachments, :uploaded_data => io)
+  end
+  
   def folder_file
     @file = @folder.active_file_attachments.build(:uploaded_data => io)
     @file.context = @course
@@ -110,14 +114,6 @@ describe FilesController do
       response.should be_success
       assigns[:contexts].should_not be_nil
       assigns[:contexts][0].should eql(@course)
-    end
-    
-    it "should select a default folder" do
-      course_with_teacher_logged_in(:active_all => true)
-      get 'index', :course_id => @course.id, :format => 'json'
-      response.should be_success
-      assigns[:current_folder].should_not be_nil
-      assigns[:current_folder].name.should eql("course files")
     end
     
     it "should return data for sub_folder if specified" do
@@ -423,6 +419,57 @@ describe FilesController do
         :context_code => @course.asset_string,
         :filename => "bob.txt"
       }}
+      response.should be_success
+      assigns[:attachment].should_not be_nil
+      assigns[:attachment].id.should_not be_nil
+      json = JSON.parse(response.body) rescue nil
+      json.should_not be_nil
+      json['id'].should eql(assigns[:attachment].id)
+      json['upload_url'].should_not be_nil
+      json['upload_params'].should be_present
+      json['upload_params']['AWSAccessKeyId'].should == 'stub_id'
+      json['remote_url'].should eql(true)
+    end
+    
+    it "should not allow going over quota for file uploads" do
+      Attachment.stub!(:s3_storage?).and_return(true)
+      Attachment.stub!(:local_storage?).and_return(false)
+      conn = mock(AWS::S3::Connection)
+      AWS::S3::Base.stub!(:connection).and_return(conn)
+      conn.stub!(:access_key_id).and_return('stub_id')
+      conn.stub!(:secret_access_key).and_return('stub_key')
+
+      Attachment.s3_storage?.should eql(true)
+      Attachment.local_storage?.should eql(false)
+      course_with_student_logged_in(:active_all => true)
+      Setting.set('user_default_quota', -1)
+      post 'create_pending', {:attachment => {
+        :context_code => @user.asset_string,
+        :filename => "bob.txt"
+      }}
+      response.should be_redirect
+      assigns[:quota_used].should > assigns[:quota]
+    end
+    
+    it "should allow going over quota for homework submissions" do
+      Attachment.stub!(:s3_storage?).and_return(true)
+      Attachment.stub!(:local_storage?).and_return(false)
+      conn = mock(AWS::S3::Connection)
+      AWS::S3::Base.stub!(:connection).and_return(conn)
+      conn.stub!(:access_key_id).and_return('stub_id')
+      conn.stub!(:secret_access_key).and_return('stub_key')
+
+      Attachment.s3_storage?.should eql(true)
+      Attachment.local_storage?.should eql(false)
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
+      Setting.set('user_default_quota', -1)
+      post 'create_pending', {:attachment => {
+        :context_code => @assignment.context_code,
+        :asset_string => @assignment.asset_string,
+        :intent => 'submit',
+        :filename => "bob.txt"
+      }, :format => :json}
       response.should be_success
       assigns[:attachment].should_not be_nil
       assigns[:attachment].id.should_not be_nil

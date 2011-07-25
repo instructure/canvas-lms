@@ -52,6 +52,7 @@ describe "Quiz Import" do
     data = get_import_data ['vista', 'quiz'], 'text_only_quiz_data'
     Quiz.import_from_migration(data, context, question_data)
     quiz = Quiz.find_by_migration_id data[:migration_id]
+    quiz.unpublished_question_count.should == 2
     quiz.quiz_questions.count.should == 2
     sorted_questions = quiz.quiz_questions.sort { |a, b| a.id <=> b.id }
     sorted_questions.first.question_data[:question_text].should == data[:questions].first[:question_text]

@@ -1,1 +1,1 @@
-<%= delayed_messages.length %> new notifications at <%= HostUrl.default_host %>
+<%= t :notifications_sms, "%{notifications_count} new notifications at %{url}", :notifications_count => delayed_messages.length, :url => HostUrl.default_host %>

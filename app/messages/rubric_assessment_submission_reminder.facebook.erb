@@ -2,4 +2,4 @@
   http://<%= HostUrl.context_host(asset.rubric_association.context) %>/<%= asset.rubric_association.context.class.to_s.downcase.pluralize %>/<%= asset.rubric_association.context_id %>/rubrics/<%= asset.rubric_association.rubric_id %>
 <% end %>
 
-You've been reminded to assess: <b><a href="<%= content :link %>"><%= asset.rubric_association.title %></a></b> for <%= asset.rubric_association.context.name %>.
+<%= t :body, "You've been reminded to assess: *%{title}* for %{context}.", :title => asset.rubric_association.title, :context => asset.rubric_association.context.name, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>" %>

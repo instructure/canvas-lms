@@ -5,7 +5,7 @@
     <div class="post_date">
       <span class="time_ago_date created_at" style="padding-right: 45px;"><%= datetime_string(inbox_item.try_rescue(:created_at)) || nbsp %></span>
       <% if !inbox_item || inbox_item.asset_type == 'ContextMessage' %>
-        <a href="#" class="reply_inbox_item_link no-hover" title="Reply to this Message"><%= image_tag "reply.png" %></a>
+        <a href="#" class="reply_inbox_item_link no-hover" title="<%= t 'links.reply_to_message', 'Reply to this Message' %>"><%= image_tag "reply.png" %></a>
       <% end %>
       <a href="<%= inbox_item_path(inbox_item ? inbox_item.id : "{{ id }}") %>" class="delete_inbox_item_link no-hover" title="<%= t('links.title.remove_message', %{Remove this Message}) %>"><%= image_tag "delete_circle.png" %></a>
     </div>

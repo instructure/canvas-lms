@@ -83,6 +83,33 @@ describe Pseudonym do
     @pseudonym.destroy(true).should eql(true)
     @pseudonym.should be_deleted
   end
+
+  it "should gracefully handle unreachable LDAP servers" do
+    require 'net/ldap'
+    module Net
+      class LDAP
+        alias_method :bind_as_old, :bind_as
+        def bind_as(opts = {})
+          raise Net::LDAP::LdapError, "no connection to server"
+        end
+      end
+    end
+    user_with_pseudonym(:active_all => true)
+    @pseudonym.account.account_authorization_configs.create!(
+      :auth_type      => 'ldap',
+      :auth_base      => "ou=people,dc=example,dc=com",
+      :auth_host      => "ldap.example.com",
+      :auth_username  => "cn=query,dc=example,dc=com",
+      :auth_port      => 636,
+      :auth_filter    => "(uid={{login}})",
+      :auth_over_tls  => true
+    )
+    lambda{ @pseudonym.ldap_bind_result('blech') }.should_not raise_error
+    ErrorReport.last.message.should eql("no connection to server")
+    module Net; class LDAP; def bind_as(opts={}); true; end; end; end
+    @pseudonym.ldap_bind_result('yay!').should be_true
+    module Net; class LDAP; alias_method :bind_as, :bind_as_old; end; end
+  end
   
   context "Needs a pseudonym with an active user" do
     before do

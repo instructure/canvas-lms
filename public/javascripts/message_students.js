@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+I18n.scoped("message_students", function(I18n) {
 (function() {
   var $message_students_dialog = $("#message_students_dialog");
   var currentSettings = {};
@@ -52,7 +52,7 @@
     $message_students_dialog.find(".asset_title").text(title);
     $message_students_dialog.find(".out_of").showIf(settings.points_possible != null);
     $message_students_dialog.find(".subject").val(title);
-    $message_students_dialog.find(".send_button").text("Send Message");
+    $message_students_dialog.find(".send_button").text(I18n.t("send_message", "Send Message"));
     $message_students_dialog.find(".points_possible").text(settings.points_possible);
     
     $message_students_dialog.find("textarea").val("");
@@ -61,7 +61,7 @@
     $message_students_dialog.dialog('close').dialog({
       width: 600,
       height: 400
-    }).dialog('open').dialog('option', 'title', "Message Students for " + title);
+    }).dialog('open').dialog('option', 'title', I18n.t("message_student", "Message Students for %{course_name}", {course_name: title}));
   };
   $(document).ready(function() {
     $message_students_dialog.find(".cutoff_score").bind('change blur keyup', function() {
@@ -81,18 +81,18 @@
         return data;
       },
       beforeSubmit: function(data) {
-        $(this).find("button").attr('disabled', true).filter(".send_button").text("Sending Message...");
+        $(this).find("button").attr('disabled', true).filter(".send_button").text(I18n.t("buttons.sending_message", "Sending Message..."));
       },
       success: function(data) {
         $(this).find(".send_button").text("Message Sent!");
         var $form = $(this);
         setTimeout(function() {
-          $form.find("button").attr('disabled', false).filter(".send_button").text("Send Message");
+          $form.find("button").attr('disabled', false).filter(".send_button").text(I18n.t("buttons.send_message", "Send Message"));
           $("#message_students_dialog").dialog('close');
         }, 2000);
       },
       error: function(data) {
-        $(this).find("button").attr('disabled', false).filter(".send_button").text("Sending Message Failed, please try again");
+        $(this).find("button").attr('disabled', false).filter(".send_button").text(I18n.t("buttons.send_message_failed", "Sending Message Failed, please try again"));
       }
     });
     $message_students_dialog.find("select").change(function() {
@@ -129,3 +129,4 @@
     });
   });
 })();
+});

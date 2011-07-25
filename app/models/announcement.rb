@@ -20,7 +20,6 @@ class Announcement < DiscussionTopic
   
   belongs_to :context, :polymorphic => true
   
-  adheres_to_policy
   has_a_broadcast_policy
   include HasContentTags
   
@@ -47,19 +46,19 @@ class Announcement < DiscussionTopic
     
   set_policy do
     given { |user| self.user == user }
-    set { can :update and can :reply and can :read }
+    can :update and can :reply and can :read
     
     given { |user| self.user == user and self.discussion_entries.active.empty? }
-    set { can :delete }
+    can :delete
     
     given { |user, session| self.context.grants_rights?(user, session, :read)[:read] }
-    set {can :read }
+    can :read
     
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
-    set {can :reply } 
+    can :reply
     
     given { |user, session| self.context.grants_right?(user, session, :moderate_forum) } #admins.include?(user) }
-    set { can :update and can :delete and can :reply and can :create and can :read and can :attach }
+    can :update and can :delete and can :reply and can :create and can :read and can :attach
   end
   
   def is_announcement; true end

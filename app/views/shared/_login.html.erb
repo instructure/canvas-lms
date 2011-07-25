@@ -56,7 +56,7 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
-<% login_handle_name = @domain_root_account.login_handle_name rescue t('email_address', "Email Address") %>
+<% login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name %>
 <% @is_delegated = @domain_root_account.delegated_authentication? if @domain_root_account and @is_delegated.nil? %>
 <div id="modal-box">
   <div id="modal-box-inner">
@@ -88,7 +88,7 @@ $(document).ready(function() {
           </div>
           <div>
             <div style="float: left;">
-              <%= f.check_box :remember_me %><%= f.blabel :remember_me, :en => "Stay logged in" %>
+              <%= f.check_box :remember_me %><%= f.label :remember_me, :en => "Stay logged in" %>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <% url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || "#" %>
               <%= link_to t('dont_know_password', "I don't know my password"), url, :class => (url != '#' ? "not_external" : "forgot_password_link"), :id => "login_forgot_password" %>

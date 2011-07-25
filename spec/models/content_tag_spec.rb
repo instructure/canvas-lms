@@ -41,5 +41,23 @@ describe ContentTag do
     tag.content_type.should eql(nil)
     tag.content_id.should eql(nil)
   end
-  
+
+  it "should return content for a assignment" do
+    course
+    assignment = course.assignments.create!
+    tag = ContentTag.new(:content => assignment, :context => @course)
+    tag.assignment.should == assignment
+  end
+
+  it "should return associated assignment for a quiz" do
+    course
+    quiz = course.quizzes.create!
+    tag = ContentTag.new(:content => quiz, :context => @course)
+    tag.assignment.should == quiz.assignment
+  end
+
+  it "should return nil assignment for something else" do
+    tag = ContentTag.new
+    tag.assignment.should be_nil
+  end
 end

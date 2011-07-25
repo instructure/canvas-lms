@@ -35,7 +35,7 @@ shared_examples_for "equation editor selenium tests" do
       equation_editor = find_with_jquery("#instructure_equation_prompt:visible")
       equation_editor.find_element(:css, 'button').click
       question.find_element(:link, "Switch Views").click
-      question.find_element(:css, 'textarea.question_content').value.should include('<img class="equation_image" title="1+1" src="http://latex.codecogs.com/gif.latex?1+1" alt="1+1" />')
+      question.find_element(:css, 'textarea.question_content').attribute(:value).should include('<img class="equation_image" title="1+1" src="http://latex.codecogs.com/gif.latex?1+1" alt="1+1" />')
       save_question_and_wait(question)
 
       question.find_elements(:css, 'img.equation_image').size.should == 1

@@ -59,7 +59,8 @@ module SIS
           until row.nil?
             update_progress(count)
             count = 0
-            ActiveRecord::Base.transaction do
+            # this transaction assumes that the users and pseudonyms are in the same database
+            User.transaction do
               remaining_in_transaction = @sis.updates_every
 
               begin
@@ -118,7 +119,7 @@ module SIS
                 pseudo.sis_ssha = row['ssha_password'] if !row['ssha_password'].blank?
 
                 begin
-                  ActiveRecord::Base.transaction(:requires_new => true) do
+                  User.transaction(:requires_new => true) do
                     if user.changed?
                       user.creation_sis_batch_id = @batch.id if @batch
                       raise user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0

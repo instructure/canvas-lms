@@ -38,7 +38,7 @@
     <%= f.hidden_field :user_id, :value=>@user.id %>
     <table class="formtable" style="width: 100%;">
       <tr>
-        <td style="font-weight: bold">Title:</td>
+        <td style="font-weight: bold"><%= before_label :title, "Title" %></td>
         <td><%= f.text_field :title, :class => "title" %></td>
       </tr>
       <tr>

@@ -1,8 +1,8 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<-TEXT, :site_url => raw('<span class="nobr">https://&lt; domain &gt;/</span>'), :canvas_url => raw('<span class="nobr">https://&lt; domain &gt;/facebook</span>'))
-You will need to create a [new app on facebook.com](http://www.facebook.com/developers).
+      <td colspan="2"><%= mt(:description, <<-TEXT, :site_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/</span>'), :canvas_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/facebook</span>'), :facebook_url => "http://www.facebook.com/developers")
+You will need to create a [new app on facebook.com](%{facebook_url}).
 Set the following configuration options to ensure your Facebook app
 works correctly:
 

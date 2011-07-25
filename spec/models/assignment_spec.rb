@@ -224,6 +224,7 @@ describe Assignment do
       end
       # log.info("adding submissions #{Time.now - n}")
       # n = Time.now
+      @a.reload
       users.each do |u|
         @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
@@ -239,10 +240,18 @@ describe Assignment do
       end
     end
     
+    it "should allow setting peer_reviews_assign_at" do
+      setup_assignment
+      assignment_model
+      now = Time.now
+      @assignment.peer_reviews_assign_at = now
+      @assignment.peer_reviews_assign_at.should == now
+    end
+    
     it "should assign multiple peer reviews" do
       setup_assignment
       assignment_model
-      
+      @a.reload
       @submissions = []
       3.times do |i|
         e = @c.enroll_user(User.create(:name => "user #{i}"))
@@ -269,6 +278,7 @@ describe Assignment do
       @submissions = []
       5.times do |i|
         e = @c.enroll_user(User.create(:name => "user #{i}"))
+        @a.context.reload
         @submissions << @a.submit_homework(e.user, :submission_type => "online_url", :url => "http://www.google.com")
       end
       @a.peer_review_count = 2
@@ -296,7 +306,7 @@ describe Assignment do
     it "should assign late peer reviews to each other if there is more than one" do
       setup_assignment
       assignment_model
-      
+      @a.reload
       @submissions = []
       10.times do |i|
         e = @c.enroll_user(User.create(:name => "user #{i}"))
@@ -461,7 +471,7 @@ describe Assignment do
       @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
       @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
       @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
-
+      @assignment.reload
       @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'C').first
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
@@ -478,7 +488,7 @@ describe Assignment do
       @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
       @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
       @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
-
+      @assignment.reload
       @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'c').first
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
@@ -1148,6 +1158,7 @@ def setup_assignment_with_group
   @u3 = @a.context.enroll_user(User.create(:name => "user 3")).user
   @group.add_user(@u1)
   @group.add_user(@u2)
+  @assignment.reload
 end
 def setup_assignment_without_submission
   # Established course too, as a context
@@ -1156,6 +1167,7 @@ def setup_assignment_without_submission
   e = @course.enroll_student(@user)
   e.invite
   e.accept
+  @assignment.reload
 end
 
 def setup_assignment_with_homework

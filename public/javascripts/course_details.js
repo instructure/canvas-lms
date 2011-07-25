@@ -264,7 +264,7 @@ I18n.scoped('course_details', function(I18n) {
       beforeSubmit: function(data) {
         $(this).loadingImage().removeClass('editing');
         $(this).find(".readable_license,.account_name,.term_name,.grading_scheme_set").text("...");
-        $(this).find(".quota").text(data['course[storage_quota]']);
+        $(this).find(".storage_quota_mb").text(data['course[storage_quota_mb]']);
         $(".course_form_more_options").hide();
       },
       success: function(data) {

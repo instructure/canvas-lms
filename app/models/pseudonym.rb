@@ -331,8 +331,12 @@ class Pseudonym < ActiveRecord::Base
     self.account.account_authorization_configs.each do |config|
       ldap = config.ldap_connection
       filter = config.ldap_filter(self.unique_id)
-      res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
-      return res if res
+      begin
+        res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
+        return res if res
+      rescue Net::LDAP::LdapError
+        ErrorReport.log_exception(:ldap, $!)
+      end
     end
     nil
   end

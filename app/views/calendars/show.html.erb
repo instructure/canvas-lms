@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= t :page_title, "Calendar - %{course_or_group_name}", :course_or_group_name => @context.name %><% end %>
+<% content_for :page_title do %><%= join_title t(:page_title, "Calendar"), @context.name %><% end %>
 <% add_crumb t('crumbs.my_calendar', "My Calendar"), calendar_url %>
 
 <% content_for :auto_discovery do %>

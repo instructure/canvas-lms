@@ -1,7 +1,7 @@
 <% fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<-TEXT, :linkedin_url => 'https://www.linkedin.com/secure/developer', :oauth_url => raw('<span class="nobr">https://&lt; domain &gt;/oauth_success?service=linked_in</span>'))
+      <td colspan="2"><%= mt(:description, <<-TEXT, :linkedin_url => 'https://www.linkedin.com/secure/developer', :oauth_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/oauth_success?service=linked_in</span>'))
 You will need to register a [new app on LinkedIn](%{linkedin_url}).
 Set the following configuration options to ensure your LinkedIn integration
 works correctly:

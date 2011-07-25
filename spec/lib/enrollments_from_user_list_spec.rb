@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-describe EnrollmentsFromEmailList do
+describe EnrollmentsFromUserList do
   
   # before(:each) do
   #   # This probably means that I need more mocks.
@@ -38,50 +38,49 @@ describe EnrollmentsFromEmailList do
   #   @txt = %<david@example.com
   #   george@example.com
   #   >
-  #   @loader = PseudonymFromEmailLoader.new(@course.id, @txt)
+  #   @loader = PseudonymFromUserLoader.new(@course.id, @txt)
   # end
 
   context "initialized object" do
     
     before do
       course_model(:reusable => true)
-      @efel = EnrollmentsFromEmailList.new(@course)
-      @el = EmailList.new(list_to_parse)
+      @el = UserList.new(list_to_parse)
     end
     
     it "should initialize with a course id" do
-      lambda{EnrollmentsFromEmailList.new}.should raise_error(ArgumentError, 'wrong number of arguments (0 for 1)')
-      e = EnrollmentsFromEmailList.new(@course.id)
+      lambda{EnrollmentsFromUserList.new}.should raise_error(ArgumentError, 'wrong number of arguments (0 for 1)')
+      e = EnrollmentsFromUserList.new(@course)
       e.course.should eql(@course)
     end
     
-    it "should process with an email list" do
-      enrollments = @efel.process(@el)
+    it "should process with an user list" do
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.all? {|e| e.should be_is_a(StudentEnrollment)}
     end
     
     it "should process repeat addresses without creating new users" do
-      @el = EmailList.new(list_to_parse_with_repeats)
-      enrollments = EnrollmentsFromEmailList.process(@el, :course_id => @course)
+      @el = UserList.new(list_to_parse_with_repeats)
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.length.should eql(3)
     end
 
     it "should process repeat addresses without creating new users, even if the existing user isn't fully registered yet" do
       u = factory_with_protected_attributes(User, :name => "Bob", :workflow_state => "creation_pending")
       u.pseudonyms.create!(:unique_id => "david_richards_jr@example.com", :path => "david_richards_jr@example.com", :password => "dave4Instructure", :password_confirmation => "dave4Instructure")
-      @el = EmailList.new(list_to_parse_with_repeats)
-      enrollments = EnrollmentsFromEmailList.process(@el, :course_id => @course)
+      @el = UserList.new(list_to_parse_with_repeats)
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.length.should eql(3)
       enrollments.map(&:user).should be_include(u)
     end
 
   end
   
-  context "EnrollmentsFromEmailList.process" do
+  context "EnrollmentsFromUserList.process" do
     it "should be able to process from the class" do
       course_model(:reusable => true)
-      @el = EmailList.new(list_to_parse)
-      enrollments = EnrollmentsFromEmailList.process(@el, :course_id => @course)
+      @el = UserList.new(list_to_parse)
+      enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.all? {|e| e.should be_is_a(StudentEnrollment)}
     end
   end

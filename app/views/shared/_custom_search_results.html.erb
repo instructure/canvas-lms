@@ -1,8 +1,8 @@
 <div style="margin-top: 20px; display: none;">
-  <a href="#" class="custom_search_results_link find">Search for Open Resources Related to this Page</a>
+  <a href="#" class="custom_search_results_link find"><%= t 'links.search_for_resources', 'Search for Open Resources Related to this Page' %></a>
 </div>
 <div id="custom_search_results_dialog" style="display: none;">
-  <div id="cse" style="width: 100%;">Loading</div>
+  <div id="cse" style="width: 100%;"><%= t 'status.loading', 'Loading' %></div>
 </div>
 <script src="//www.google.com/jsapi" type="text/javascript"></script>
 <script type="text/javascript">

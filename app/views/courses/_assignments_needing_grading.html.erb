@@ -61,7 +61,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading'])) do
             <b><%= assignment.submission_action_string %> <%= assignment.title %></b>
             <em><%= t 'due_at', 'Due %{date}', :date => datetime_string(assignment.due_at) %></em>
           </a>
-          <a class='disable_item_link submitting' title="Ignore this assignment"  href="<%= dashboard_ignore_item_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
+          <a class='disable_item_link submitting' title="<%= t('links.title.ignore', %{Ignore this assignment}) %>"  href="<%= dashboard_ignore_item_url(assignment.asset_string, 'submitting') %>"><%= image_tag "earmark_hover.png", :alt => t('images.alt.ignore', 'ignore') %></a>
         </li>
       <% end %>
     <% end %>

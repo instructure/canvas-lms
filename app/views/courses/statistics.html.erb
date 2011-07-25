@@ -5,7 +5,7 @@
   add_crumb t('#crumbs.stats', "Statistics")
  %>
 
-<% content_for :page_title, t('titles.stats', "Course Statistics: %{course}", :course => @context.name) %>
+<% content_for :page_title, join_title(t(:page_title, "Course Statistics"), @context.name) %>
 
 <div style="padding: 0 20px;" id="stats">
 <h2><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h2>

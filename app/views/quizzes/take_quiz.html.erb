@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= @quiz.readable_type %>: <%= @quiz.quiz_title %><% end %>
+<% content_for :page_title do %><%= join_title @quiz.readable_type, @quiz.quiz_title %><% end %>
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">

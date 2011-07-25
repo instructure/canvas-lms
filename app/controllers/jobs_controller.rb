@@ -86,7 +86,7 @@ class JobsController < ApplicationController
       if params[:q].to_i > 0
         @jobs = @jobs.scoped(:conditions => { :id => params[:q].to_i })
       else
-        @jobs = @jobs.scoped(:conditions => ["#{ActiveRecord::Base.wildcard('tag', params[:q])} OR strand = ?", params[:q]])
+        @jobs = @jobs.scoped(:conditions => ["#{Delayed::Job.wildcard('tag', params[:q])} OR strand = ?", params[:q]])
       end
     end
 

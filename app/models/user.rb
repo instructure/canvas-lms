@@ -127,10 +127,10 @@ class User < ActiveRecord::Base
   }
   named_scope :for_course_section, lambda{|sections|
     section_ids = Array(sections).map{|s| s.is_a?(Fixnum) ? s : s.id }
-    {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{ActiveRecord::Base.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
+    {:conditions => "enrollments.limit_priveleges_to_course_section IS NULL OR enrollments.limit_priveleges_to_course_section != #{User.connection.quoted_true} OR enrollments.course_section_id IN (#{section_ids.join(",")})" }
   }
   named_scope :name_like, lambda { |name|
-    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", ActiveRecord::Base.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
+    { :conditions => ["(", wildcard('users.name', 'users.short_name', name), " OR exists (select 1 from pseudonyms where ", wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name), " and pseudonyms.user_id = users.id and (", User.send(:sanitize_sql_array, Pseudonym.active.proxy_options[:conditions]), ")))"].join }
   }
   named_scope :active, lambda {
     { :conditions => ["users.workflow_state != ?", 'deleted'] }
@@ -167,7 +167,6 @@ class User < ActiveRecord::Base
     }
   }
 
-  adheres_to_policy
   has_a_broadcast_policy
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
@@ -572,7 +571,6 @@ class User < ActiveRecord::Base
   def move_to_user(new_user)
     return unless new_user
     return if new_user == self
-    conn = ActiveRecord::Base.connection
     max_position = (new_user.pseudonyms.last.position || 0) rescue 0
     new_user.creation_email ||= self.creation_email
     new_user.creation_unique_id ||= self.creation_unique_id
@@ -583,7 +581,7 @@ class User < ActiveRecord::Base
       max_position += 1
       updates << "WHEN id=#{p.id} THEN #{max_position}"
     end
-    ActiveRecord::Base.connection.execute("UPDATE pseudonyms SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.pseudonyms.map(&:id).join(',')})") unless self.pseudonyms.empty?
+    Pseudonym.connection.execute("UPDATE pseudonyms SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.pseudonyms.map(&:id).join(',')})") unless self.pseudonyms.empty?
     max_position = (new_user.communication_channels.last.position || 0) rescue 0
     updates = []
     enrollment_emails = []
@@ -592,8 +590,9 @@ class User < ActiveRecord::Base
       updates << "WHEN id=#{cc.id} THEN #{max_position}"
       enrollment_emails << cc.path if cc.path && cc.path_type == 'email'
     end
-    conn.execute("UPDATE communication_channels SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.communication_channels.map(&:id).join(',')})") unless self.communication_channels.empty?
-    conn.execute("UPDATE enrollments SET user_id=#{new_user.id} WHERE user_id=#{self.id} AND invitation_email IN (#{enrollment_emails.map{|email| conn.quote(email)}.join(',')})") unless enrollment_emails.empty?
+    CommunicationChannel.connection.execute("UPDATE communication_channels SET user_id=#{new_user.id}, position=CASE #{updates.join(" ")} ELSE NULL END WHERE id IN (#{self.communication_channels.map(&:id).join(',')})") unless self.communication_channels.empty?
+    e_conn = Enrollment.connection
+    e_conn.execute("UPDATE enrollments SET user_id=#{new_user.id} WHERE user_id=#{self.id} AND invitation_email IN (#{enrollment_emails.map{|email| e_conn.quote(email)}.join(',')})") unless enrollment_emails.empty?
     [
       [:quiz_id, :quiz_submissions], 
       [:assignment_id, :submissions]
@@ -626,7 +625,7 @@ class User < ActiveRecord::Base
       begin
         klass = table.classify.constantize
         if klass.new.respond_to?("#{column}=".to_sym)
-          conn.execute("UPDATE #{table} SET #{column}=#{new_user.id} WHERE #{column}=#{self.id}")
+          klass.connection.execute("UPDATE #{table} SET #{column}=#{new_user.id} WHERE #{column}=#{self.id}")
         end
       rescue => e
         logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
@@ -690,10 +689,10 @@ class User < ActiveRecord::Base
   
   set_policy do
     given { |user| user == self }
-    set { can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar }
+    can :rename and can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :become_user
 
     given {|user| self.courses.any?{|c| c.user_is_teacher?(user)}}
-    set { can :rename and can :create_user_notes and can :read_user_notes}
+    can :rename and can :create_user_notes and can :read_user_notes
     
     given do |user|
       user && (
@@ -701,7 +700,7 @@ class User < ActiveRecord::Base
         self.all_courses.any? { |c| c.grants_right?(user, nil, :read_reports) }
       )
     end
-    set { can :rename and can :remove_avatar and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes}
+    can :rename and can :remove_avatar and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
     
     given do |user|
       user && (
@@ -709,7 +708,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_students) })
       )
     end
-    set { can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes}
+    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
     
     given do |user|
       user && (
@@ -717,8 +716,27 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) })
       )
     end
-    set { can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes}
-    
+    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
+
+    given do |user|
+      user && ((
+        # or, if the user we are given can masquerade in *all* of this user's accounts
+        # (to prevent an account admin from masquerading and gaining access to another root account)
+        (self.associated_accounts.all?{|a| a.grants_right?(user, nil, :become_user) } && !self.associated_accounts.empty?)
+      ) && (
+        # account admins can't masquerade as other account admins
+        self.account_users.empty? || (
+          # unless they're a site admin
+          Account.site_admin.grants_right?(user, nil, :become_user) &&
+          # and not wanting to become a site admin
+          !Account.site_admin_user?(self)
+        )
+      ) || (
+        # only site admins can masquerade as users that don't belong to any account
+        self.associated_accounts.empty? && Account.site_admin.grants_right?(user, nil, :become_user)
+      ))
+    end
+    can :become_user
   end
 
   def self.infer_id(obj)
@@ -953,9 +971,6 @@ class User < ActiveRecord::Base
       }
     end
   }
-  
-  # Import stuff
-  attr_accessor :comparison, :prior, :focus
   
   def sorted_rubrics
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)

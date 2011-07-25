@@ -55,7 +55,7 @@ class ApplicationController < ActionController::Base
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
   # see http://codetunes.com/2009/01/31/rails-222-ajax-and-respond_to/ for why
   def fix_xhr_requests
-    request.format = :js if request.xhr? && request.format == :html
+    request.format = :js if request.xhr? && request.format == :html && !params[:html_xhr]
   end
   
   # scopes all time objects to the user's specified time zone
@@ -153,9 +153,6 @@ class ApplicationController < ActionController::Base
     object ||= User.new
     object.errors.add_to_base(t "#application.errors.unauthorized", "You are not authorized to perform this action")
     respond_to do |format|
-      if !request.xhr?
-        flash[:notice] = t "#application.errors.unauthorized", "You are not authorized to perform this action"
-      end
       @show_left_side = false
       clear_crumbs
       params = request.path_parameters
@@ -406,12 +403,7 @@ class ApplicationController < ActionController::Base
     return unless @context
     @quota = Setting.get_cached('context_default_quota', 50.megabytes.to_s).to_i
     @quota = @context.quota if (@context.respond_to?("quota") && @context.quota)
-    # TODO: remove this once values in the db have been migrated to be in bytes and not MB.
-    @quota = @quota.megabytes if @quota < 1.megabyte
-    @quota_used = 0
-    @context.attachments.active.select{|a| !a.root_attachment_id }.each do |a|
-      @quota_used += a.size || 0.0
-    end
+    @quota_used = @context.attachments.active.sum('COALESCE(size, 0)', :conditions => { :root_attachment_id => nil }).to_i
   end
   
   # Renders a quota exceeded message if the @context's quota is exceeded
@@ -424,9 +416,9 @@ class ApplicationController < ActionController::Base
       elsif @context.is_a?(Course)
         error = t "#application.errors.quota_exceeded_course", "Course storage quota exceeded"
       elsif @context.is_a?(Group)
-        error = t "#application.errors.quota_exceeded_group", "Course storage quota exceeded"
+        error = t "#application.errors.quota_exceeded_group", "Group storage quota exceeded"
       elsif @context.is_a?(User)
-        error = t "#application.errors.quota_exceeded_user", "Course storage quota exceeded"
+        error = t "#application.errors.quota_exceeded_user", "User storage quota exceeded"
       else
         error = t "#application.errors.quota_exceeded", "Storage quota exceeded"
       end
@@ -538,7 +530,7 @@ class ApplicationController < ActionController::Base
   end
   
   def generate_page_view
-    @page_view = PageView.new(:url => request.url[0,255], :user => @current_user, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'])
+    @page_view = PageView.new(:url => request.url[0,255], :user => @current_user, :controller => request.path_parameters['controller'], :action => request.path_parameters['action'], :session_id => request.session_options[:id], :developer_key => @developer_key, :user_agent => request.headers['User-Agent'], :real_user => @real_current_user)
     @page_view.interaction_seconds = 5
     @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.method == :get)
     @page_view.created_at = Time.now
@@ -712,12 +704,12 @@ class ApplicationController < ActionController::Base
   # we also check for the session token not being set at all here, to catch
   # those who have cookies disabled.
   def verify_authenticity_token
-    params[request_forgery_protection_token] = params[request_forgery_protection_token].gsub(" ", "+") rescue nil
-    if params[:api_key] && api_request?
-      @developer_key = DeveloperKey.find_by_api_key(params[:api_key])
-      @developer_key || raise(InvalidDeveloperAPIKey)
-    elsif protect_against_forgery? &&
+    token = params[request_forgery_protection_token].try(:gsub, " ", "+")
+    params[request_forgery_protection_token] = token if token
+
+    if    protect_against_forgery? &&
           request.method != :get &&
+          !api_request? &&
           verifiable_request_format?
       if session[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
         # the session should have the token stored by now, but doesn't? sounds
@@ -731,8 +723,10 @@ class ApplicationController < ActionController::Base
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
+  API_REQUEST_REGEX = /\A\/api\//
+
   def api_request?
-    @api_request ||= !!request.path.match(/\A\/api\//)
+    @api_request ||= !!request.path.match(API_REQUEST_REGEX)
   end
 
   def session_loaded?

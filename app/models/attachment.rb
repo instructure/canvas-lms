@@ -19,7 +19,6 @@
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data
-  adheres_to_policy
   include HasContentTags
   
   belongs_to :enrollment
@@ -674,7 +673,12 @@ class Attachment < ActiveRecord::Base
   def filename
     read_attribute(:filename) || (self.root_attachment && self.root_attachment.filename)
   end
-  
+
+  def thumbnail_with_root_attachment
+    self.thumbnail_without_root_attachment || self.root_attachment.try(:thumbnail)
+  end
+  alias_method_chain :thumbnail, :root_attachment
+
   def content_directory
     self.directory_name || Folder.root_folders(self.context).first.name
   end
@@ -758,22 +762,22 @@ class Attachment < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) } #admins.include? user }
-    set { can :read and can :update and can :delete and can :create and can :download }
+    can :read and can :update and can :delete and can :create and can :download
     
     given { |user, session| self.public? }
-    set { can :read and can :download }
+    can :read and can :download
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) } #students.include? user }
-    set { can :read }
+    can :read
     
     given { |user, session| 
       self.cached_context_grants_right?(user, session, :read) && 
       (self.cached_context_grants_right?(user, session, :manage_files) || !self.locked_for?(user))
     }
-    set { can :download }
+    can :download
     
     given { |user, session| self.context_type == 'Submission' && self.context.grant_rights?(user, session, :comment) }
-    set { can :create }
+    can :create
     
     given { |user, session|
         session && session['file_access_user_id'].present? &&
@@ -781,7 +785,7 @@ class Attachment < ActiveRecord::Base
         self.cached_context_grants_right?(u, session, :read) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
-    set { can :read }
+    can :read
     
     given { |user, session|
         session && session['file_access_user_id'].present? &&
@@ -790,7 +794,7 @@ class Attachment < ActiveRecord::Base
         (self.cached_context_grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
-    set { can :download }
+    can :download
   end
   
   def locked_for?(user, opts={})
@@ -1101,7 +1105,7 @@ class Attachment < ActiveRecord::Base
     @@domain_namespace ||= nil
   end
   
-  def self.serialization_methods; [:mime_class, :thumbnail_url, :scribdable?, :currently_locked]; end
+  def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked]; end
   cattr_accessor :skip_thumbnails
   
   

@@ -19,8 +19,9 @@ TEXT
 <div id="context_modules_sortable_container">
   <div id="context_modules" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
     <% editable = can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
-    <% cache([@context, editable, 'all_context_modules']) do %>
-      <% @context.context_modules.active.each do |m| %>
+    <% cache([@context.cache_key, editable, 'all_context_modules'].join('/')) do %>
+      <% ContextModule.send(:preload_associations, @modules, [:context_module_progressions, {:content_tags => :content}]) %>
+      <% @modules.each do |m| %>
         <%= render :partial => 'context_modules/context_module', :object => m, :locals => {:editable => editable } %>
       <% end %>
     <% end %>
@@ -168,7 +169,7 @@ TEXT
       </div>
     </p>
   </div>
-  <div id="student_progression_dialog" style="display: none;" title="Module Progression By Student">
+  <div id="student_progression_dialog" style="display: none;" title="<%= t 'titles.student_progression', 'Module Progression by Student' %>">
     <h2 style="margin-top: 0;"><%= t('headings.student_progress', %{Module Progress by Student}) %></h2>
     <table class="side_tabs_table" style="width: 100%;">
       <tr>

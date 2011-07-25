@@ -128,7 +128,7 @@
           <td><%= t 'headers.account_permissions', "Account Permissions" %></td>
           <td colspan='<%= @role_types.size %>'></td>
         </tr>
-        <%= render :partial => 'permission', :collection => permissions.select { |k, p| p[:account_only] == true } %>
+        <%= render :partial => 'permission', :collection => permissions.select { |k, p| p[:account_only] == true || p[:account_only] == :root && @context.root_account? } %>
         <tr class='ui-widget-header'>
           <td><%=  t 'headers.course_permissions',  "Course & Account Permissions" %></td>
           <td colspan='<%= @role_types.size %>'></td>

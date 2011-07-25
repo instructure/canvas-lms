@@ -191,8 +191,8 @@ class UsersController < ApplicationController
   end
 
   def masquerade
-    if user_is_site_admin?(@real_current_user || @current_user, :become_user)
-      @user = User.find_by_id(params[:user_id])
+    @user = User.find_by_id(params[:user_id])
+    if (authorized_action(@user, @real_current_user || @current_user, :become_user))
       if request.post?
         if @user == @real_current_user
           session[:become_user_id] = nil
@@ -203,9 +203,6 @@ class UsersController < ApplicationController
         session[:masquerade_return_to] = nil
         return return_to(return_url, request.referer)
       end
-      return
-    else
-      render_unauthorized_action
     end
   end
 
@@ -314,17 +311,13 @@ class UsersController < ApplicationController
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
     @user = params[:id] ? User.find(params[:id]) : @current_user
     if current_user_is_site_admin? || authorized_action(@user, @current_user, :view_statistics)
-      add_crumb("#{@user.short_name}'s profile", @user == @current_user ? profile_path : user_path(@user) )
+      add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? profile_path : user_path(@user) )
       @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC'
       
       # TODO this is ugly
       @enrollments = []
       @enrollments = @user.enrollments.select{|e| !e.deleted? && e.course && !e.course.deleted? }.sort_by{|e| [e.state_sortable, e.rank_sortable, e.course.name] }
-      @courses = @enrollments.map{|e| e.course }
       @group_memberships = @user.group_memberships
-      @context_groups = []
-      @courses.each{|c| @context_groups += c.groups.select{|g| g.grants_right?(@user, session, :manage)} }
-      @contexts = @courses + @group_memberships + @context_groups
       @pending_enrollments = if @context.is_a?(Account)
                                @user.enrollments
                              else

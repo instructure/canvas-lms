@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= @quiz.title %>: Statistics<% end %>
+<% content_for :page_title, join_title(@quiz.title, t(:page_title, "Statistics")) %>
 <% content_for :stylesheets do %>
 <style>
 #statistics { 

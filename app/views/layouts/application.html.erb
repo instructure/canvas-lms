@@ -16,8 +16,7 @@
   @body_classes << "with-right-side" if right_side and not right_side.strip.empty? 
   @body_classes << "padless-content" if @padless
   @body_classes << "context-#{@context.asset_string}" if @context
--%>
-<!DOCTYPE html>
+-%><!DOCTYPE html>
 <!--[if IE 7 ]>    <html class="ie ie7" lang="en"> <![endif]-->
 <!--[if IE 8 ]>    <html class="ie ie8" lang="en"> <![endif]-->
 <!--[if gte IE 9 ]><html class="ie ie9" lang="en"> <![endif]-->
@@ -299,6 +298,9 @@
 </script>
 
 <%= include_javascripts :common %>
+<script>
+  I18n.locale = <%= raw I18n.locale.to_json %>;
+</script>
 
 <%= include_javascripts(*jammit_js_bundles) unless jammit_js_bundles.empty?  %>
 <%= render_js_blocks %>

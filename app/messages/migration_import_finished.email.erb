@@ -3,16 +3,13 @@
 <% end %>
 
 <% define_content :subject do %>
-  Course Import Finished: <%= asset.context.name %>
+  <%= t :subject, "Course Import Finished: %{course_name}", :course_name => asset.context.name %>
 <% end %>
       
 <% if asset.warnings.blank? %>
-Importing <%= asset.migration_settings[:course_name] %> into <%= asset.context.name %> has finished.  Everything you selected should now be imported into your course.
+  <%= t :body_no_warnings, "Importing %{source} into %{destination} has finished.  Everything you selected should now be imported into your course.", :source => asset.migration_settings[:course_name], :destination => asset.context.name %>
 <% else %>
-Importing <%= asset.migration_settings[:course_name] %> into <%= asset.context.name %> has finished, but not everything was imported successfully:
-
-<%= asset.warnings.join("\n\n") %>
-
+  <%= t :body_with_warnings, "Importing %{source} into %{destination} has finished, but not everything was imported successfully: %{warnings}", :source => asset.migration_settings[:course_name], :destination => asset.context.name, :warnings => "\n\n#{asset.warnings.join("\n\n")}\n\n" %>
 <% end %>
 
 <%= content :link %>

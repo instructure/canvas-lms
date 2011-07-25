@@ -56,7 +56,6 @@ class Assignment < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
 
   acts_as_list :scope => :assignment_group_id
-  adheres_to_policy
   has_a_broadcast_policy
   simply_versioned :keep => 5
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
@@ -91,9 +90,10 @@ class Assignment < ActiveRecord::Base
                 :infer_grading_type, 
                 :process_if_quiz,
                 :default_values,
-                :update_grades_if_details_changed
+                :update_submissions_if_details_changed
   
-  after_save    :generate_reminders_if_changed,
+  after_save    :update_grades_if_details_changed,
+                :generate_reminders_if_changed,
                 :touch_assignment_group,
                 :touch_context,
                 :update_grading_standard,
@@ -113,15 +113,18 @@ class Assignment < ActiveRecord::Base
       # handle if it has already come due, but has not yet been auto_peer_reviewed
       if due_at && due_at <= Time.now
         # do_auto_peer_review
-      else
-       self.send_at(due_at, :do_auto_peer_review)
+      elsif due_at
+        self.send_later_enqueue_args(:do_auto_peer_review, {
+          :run_at => due_at,
+          :strand => "assignment:auto_peer_review:#{self.id}"
+        })
       end
     end
     true
   end
   
   def do_auto_peer_review
-    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at <= Time.now
+    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && due_at && due_at <= Time.now
   end
   
   def touch_assignment_group
@@ -129,7 +132,7 @@ class Assignment < ActiveRecord::Base
     true
   end
   
-  def update_student_grades(old_points_possible, old_grading_type)
+  def update_student_submissions(old_points_possible, old_grading_type)
     submissions.graded.each do |submission|
       submission.grade = score_to_grade(submission.score)
       submission.save
@@ -139,9 +142,20 @@ class Assignment < ActiveRecord::Base
   # if a teacher changes the settings for an assignment and students have
   # already been graded, then we need to update the "grade" column to
   # reflect the changes
-  def update_grades_if_details_changed
+  def update_submissions_if_details_changed
     if !new_record? && (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) && !submissions.graded.empty?
-      send_later_if_production(:update_student_grades, points_possible_was, grading_type_was)
+      send_later_if_production(:update_student_submissions, points_possible_was, grading_type_was)
+    end
+    true
+  end
+  
+  def update_grades_if_details_changed
+    if @points_possible_was != self.points_possible
+      begin
+        self.context.recompute_student_scores
+      rescue
+        ErrorReport.log_exception(:grades, $!)
+      end
     end
     true
   end
@@ -627,35 +641,36 @@ class Assignment < ActiveRecord::Base
   
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }
-    set { can :read and can :read_own_submission }
+    can :read and can :read_own_submission
     
     given { |user, session| self.submittable_type? && 
       self.cached_context_grants_right?(user, session, :participate_as_student) &&
       !self.locked_for?(user)
     }
-    set { can :submit and can :attach_submission_comment_files }
+    can :submit and can :attach_submission_comment_files
     
     given { |user, session| !self.locked_for?(user) && 
       (self.context.allow_student_assignment_edits rescue false) && 
       self.cached_context_grants_right?(user, session, :participate_as_student)
     }
-    set { can :update_content }
+    can :update_content
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
-    set { can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files }
+    can :update and can :update_content and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
-    set { can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files }
+    can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
   def self.search(query)
     find(:all, :conditions => wildcard('title', 'description', query))
   end
   
-  def grade_distribution
+  def grade_distribution(submissions = nil)
+    submissions ||= self.submissions
     tally = 0
     cnt = 0
-    scores = self.submissions.map{|s| s.score}.compact
+    scores = submissions.map{|s| s.score}.compact
     scores.each do |score|
       tally += score
       cnt += 1
@@ -1070,7 +1085,7 @@ class Assignment < ActiveRecord::Base
   end
   
   def peer_reviews_assign_at=(val)
-    peer_reviews_due_at = val
+    write_attribute(:peer_reviews_due_at, val)
   end
   
   def has_peer_reviews?
@@ -1353,7 +1368,7 @@ class Assignment < ActiveRecord::Base
       end
     end
     migration_ids = assignments.map{|m| m['assignment_id'] }.compact
-    conn = ActiveRecord::Base.connection
+    conn = self.connection
     cases = []
     max = migration.context.assignments.map(&:position).compact.max || 0
     migration.context.assignments
@@ -1384,12 +1399,12 @@ class Assignment < ActiveRecord::Base
       item.submission_types = hash[:submission_types]
     elsif ['discussion_topic'].include?(hash[:submission_format])
       item.submission_types = "discussion_topic"
-    elsif ['online_file_upload','textwithattachments'].include?(hash[:submission_format])
-      item.submission_types = "online_file_upload,online_text_entry"
+    elsif ['online_upload','textwithattachments'].include?(hash[:submission_format])
+      item.submission_types = "online_upload,online_text_entry"
     elsif ['online_text_entry'].include?(hash[:submission_format])
       item.submission_types = "online_text_entry"
     elsif ['webpage'].include?(hash[:submission_format])
-      item.submission_types = "online_file_upload"
+      item.submission_types = "online_upload"
     elsif ['online_quiz'].include?(hash[:submission_format])
       item.submission_types = "online_quiz"
     end

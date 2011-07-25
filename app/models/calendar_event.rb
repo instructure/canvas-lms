@@ -27,8 +27,7 @@ class CalendarEvent < ActiveRecord::Base
   
   include Workflow
   
-  adheres_to_policy
-  
+
   belongs_to :context, :polymorphic => true
   belongs_to :user
   belongs_to :cloned_item
@@ -288,13 +287,13 @@ class CalendarEvent < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
-    set { can :read }
+    can :read
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
-    set { can :read and can :create }
+    can :read and can :create
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
-    set { can :update and can :update_content and can :delete }
+    can :update and can :update_content and can :delete
     
   end
 end

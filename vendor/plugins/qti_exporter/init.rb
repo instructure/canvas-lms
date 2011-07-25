@@ -8,10 +8,10 @@ Rails.configuration.to_prepare do
           :description => 'This enables exporting QTI .zip files to Canvas quiz json.',
           :version => '1.0.0',
           :settings_partial => 'plugins/qti_exporter_settings',
+          :select_text => proc { t(:file_description, 'QTI .zip file') },
           :settings => {
             :enabled => python_converter_found,
             :worker=> 'QtiWorker',
-            :select_text => proc { t(:file_description, 'QTI .zip file') },
           },
           :validator => 'QtiPluginValidator'
   }

@@ -18,7 +18,7 @@
 
 class OutcomesController < ApplicationController
   before_filter :require_user_for_context, :except => [:build_outcomes]
-  add_crumb("Outcomes", :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
+  add_crumb(lambda{ t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_filter { |c| c.active_tab = "outcomes" }
   
   def index
@@ -243,11 +243,11 @@ class OutcomesController < ApplicationController
       respond_to do |format|
         if @outcome.save
           @outcome_group.add_item(@outcome)
-          flash[:notice] = "Outcome successfully created!"
+          flash[:notice] = t :successful_outcome_creation, "Outcome successfully created!"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
           format.json { render :json => @outcome.to_json }
         else
-          flash[:error] = "Outcome creation failed"
+          flash[:error] = t :failed_outcome_creation, "Outcome creation failed"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
           format.json { render :json => @outcome.errors.to_json, :status => :bad_request }
         end
@@ -261,11 +261,11 @@ class OutcomesController < ApplicationController
       respond_to do |format|
       
         if @outcome.update_attributes(params[:learning_outcome])
-          flash[:notice] = "Outcome successfully updated!"
+          flash[:notice] = t :successful_outcome_update, "Outcome successfully updated!"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
           format.json { render :json => @outcome.to_json }
         else
-          flash[:error] = "Outcome update failed"
+          flash[:error] = t :failed_outcome_update, "Outcome update failed"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
           format.json { render :json => @outcome.errors.to_json, :statue => :bad_request }
         end
@@ -281,18 +281,18 @@ class OutcomesController < ApplicationController
         if @outcome
           if @outcome.context_code == @context.asset_string
             @outcome.destroy
-            flash[:notice] = "Outcome successfully deleted"
+            flash[:notice] = t :successful_outcome_delete, "Outcome successfully deleted"
           else
             @tags = LearningOutcomeGroup.default_for(@context).all_tags_for_context.select{|t| t.content_type == 'LearningOutcome' && t.content_id == @outcome.id }
             @tags.each{|t| t.destroy }
-            flash[:notice] = "Outcome successfully removed"
+            flash[:notice] = t :successful_outcome_removal, "Outcome successfully removed"
           end
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
           format.json { render :json => @outcome.to_json }
         else
-          flash[:notice] = "Couldn't find that learning outcome"
+          flash[:notice] = t :missing_outcome, "Couldn't find that learning outcome"
           format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-          format.json { render :json => {:errors => {:base => "Couldn't find that learning outcome"}}, :status => :bad_request }
+          format.json { render :json => {:errors => {:base => t(:missing_outcome, "Couldn't find that learning outcome")}}, :status => :bad_request }
         end
       end
     end

@@ -27,6 +27,8 @@ module CC
     include WebResources
     include WebLinks
     include BasicLTILinks
+    
+    delegate :add_error, :set_progress, :to => :@manifest
 
     def initialize(manifest, manifest_node)
       @manifest = manifest
@@ -48,27 +50,35 @@ module CC
     def create_resources
       @manifest_node.resources do |resources|
         @resources = resources
-        add_canvas_non_cc_data
-        set_progress(15)
-        add_wiki_pages
-        set_progress(30)
-        add_assignments
-        set_progress(35)
-        add_topics
-        add_web_links
-        set_progress(40)
-        QTI::QTIGenerator.generate_qti(@manifest, resources, @html_exporter)
+        run_and_set_progress(:add_canvas_non_cc_data, 15, I18n.t('course_exports.errors.canvas_meta', "Failed to export canvas-specific meta data"))
+        run_and_set_progress(:add_wiki_pages, 30, I18n.t('course_exports.errors.wiki_pages', "Failed to export wiki pages"))
+        run_and_set_progress(:add_assignments, 35, I18n.t('course_exports.errors.assignments', "Failed to export some assignments"))
+        run_and_set_progress(:add_topics, 37, I18n.t('course_exports.errors.topics', "Failed to export some topics"))
+        run_and_set_progress(:add_web_links, 40, I18n.t('course_exports.errors.web_links', "Failed to export some web links"))
+        
+        begin
+          QTI::QTIGenerator.generate_qti(@manifest, resources, @html_exporter)
+        rescue
+          add_error(I18n.t('course_exports.errors.quizzes', "Some quizzes failed to export"), $!)
+        end
         set_progress(60)
+        
         # these need to go last, to gather up all the references to the files
-        add_course_files
-        add_media_objects(@html_exporter)
-        set_progress(90)
-        create_basic_lti_links
+        run_and_set_progress(:add_course_files, 70, I18n.t('course_exports.errors.files', "Failed to export some files"))
+        run_and_set_progress(:add_media_objects, 90, I18n.t('course_exports.errors.media_files', "Failed to export some media files"), @html_exporter)
+        run_and_set_progress(:create_basic_lti_links, 91, I18n.t('course_exports.errors.lti_links', "Failed to export some web links"))
       end
     end
     
-    def set_progress(progress)
-      @manifest.set_progress(progress)
+    def run_and_set_progress(method, progress, fail_message, *args)
+      res = nil
+      begin
+        res = self.send(method, *args)
+      rescue
+        add_error(fail_message, $!)
+      end
+      set_progress(progress) if progress
+      res
     end
     
   end

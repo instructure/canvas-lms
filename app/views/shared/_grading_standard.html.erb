@@ -21,15 +21,15 @@
               <%= grading_standard.title rescue nbsp %>
             </div>
             <div class="editing_box">
-              <%= before_label('labels.scheme_name', 'Scheme Name') %>
+              <%= before_label('scheme_name', 'Scheme Name') %>
               <input type="text" name="grading_standard[title]" class="scheme_name" value="<%= grading_standard.title rescue "" %>" style="width: 100px;"/>
             </div>
           </th>
         </tr>
         <tr>
-          <th style="text-align: left; padding-right: 10px; width: 25%;"><%= before_label('labels.name', 'Name') %></th>
+          <th style="text-align: left; padding-right: 10px; width: 25%;"><%= before_label('name', 'Name') %></th>
           <th colspan="3" style="width: 75%;">
-            <div style="float: left; margin-left: 10px;"><%= before_label('labels.range', 'Range') %></div>
+            <div style="float: left; margin-left: 10px;"><%= before_label('range', 'Range') %></div>
             <div class="clear"></div>
           </th>
         </tr>

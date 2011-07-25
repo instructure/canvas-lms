@@ -41,7 +41,6 @@ class DiscussionEntry < ActiveRecord::Base
   
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
   
-  adheres_to_policy
   has_a_broadcast_policy
   attr_accessor :new_record_header
   
@@ -192,25 +191,25 @@ class DiscussionEntry < ActiveRecord::Base
   
   set_policy do
     given { |user| self.user && self.user == user }
-    set { can :update and can :reply and can :read }
+    can :update and can :reply and can :read
     
     given { |user| self.user && self.user == user and self.discussion_subentries.empty? }
-    set { can :delete }
+    can :delete
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) }#
-    set { can :read }
+    can :read
     
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
-    set { can :reply and can :create and can :read }
+    can :reply and can :create and can :read
     
     given { |user, session| self.discussion_topic.context.respond_to?(:allow_student_forum_attachments) && self.discussion_topic.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
-    set { can :attach }
+    can :attach
     
     given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }#admins.find_by_id(user) }
-    set { can :update and can :delete and can :reply and can :create and can :read and can :attach }
+    can :update and can :delete and can :reply and can :create and can :read and can :attach
 
     given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }#admins.find_by_id(user) }
-    set { can :update and can :delete and can :reply and can :create and can :read and can :attach }
+    can :update and can :delete and can :reply and can :create and can :read and can :attach
   end
   
   named_scope :for_user, lambda{|user|
@@ -268,11 +267,11 @@ class DiscussionEntry < ActiveRecord::Base
     created = Time.at(hash[:date] / 1000).to_s(:db) rescue Time.now.to_s(:db)
     hash[:body] = ImportedHtmlConverter.convert_text(hash[:body], context)
     hash[:body] += "<br/><br/>-#{hash[:author]}" if hash[:author]
-    hash[:body] = ActiveRecord::Base.connection.quote hash[:body]
+    hash[:body] = self.connection.quote hash[:body]
     Sanitize.clean(hash[:body], Instructure::SanitizeField::SANITIZE)
     query = "INSERT INTO discussion_entries (message, discussion_topic_id, parent_id, created_at, updated_at, migration_id)"
     query += " VALUES (#{hash[:body]},#{topic.id},#{parent.id},'#{created}','#{Time.now.to_s(:db)}','#{hash[:migration_id]}')"
-    ActiveRecord::Base.connection.execute(query)
+    self.connection.execute(query)
 
     hash[:replies].each do |reply|
       DiscussionEntry.import_from_migration(reply, context, nil, parent, topic)

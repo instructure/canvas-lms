@@ -119,6 +119,9 @@ namespace :canvas do
     puts "--> Compiling static assets [jammit]"
     output = `bundle exec jammit 2>&1`
     raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
+
+    puts "--> Generating documentation [yardoc]"
+    Rake::Task['doc:api'].invoke
   end
 end
 

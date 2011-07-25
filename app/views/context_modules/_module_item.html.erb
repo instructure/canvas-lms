@@ -1,4 +1,4 @@
-<% tag = module_item || nil; completion_criteria ||= nil; new_module = @context.context_modules.new; editable ||= false
+<% tag = module_item || nil; completion_criteria ||= nil; editable ||= false
 @module_item_image_tags ||= {
   'min_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => t('images.alt.min_score', "minimum score"), :title => t('images.title.min_score', "Students must reach the minimum score on this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
   'max_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => t('images.alt.max_score', "maximum score"), :title => t('images.title.max_score', "Students must not exceed the maximum score on this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
@@ -31,7 +31,6 @@
       <span class="id" style="display: none;"><%= tag ? tag.id : nbsp %></span>
       </div>
     </td>
-    <% cache([(tag.try_rescue(:cache_key) || @context.asset_string), 'module_item_details'].join('/')) do %>
     <td style="text-align: left;" class="item_name">
       <a class="title <%= '_explicit_external_link' if tag && tag.content_type == 'ExternalUrl' %>" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
       <span class="title locked_title"><%= tag && tag.title %></span>
@@ -42,16 +41,12 @@
       <span class="url" style="display: none;"><%= tag.try_rescue(:url) if editable %></span>
       <div class="completion_requirement">
         <div class="requirement_type min_score_requirement">
-          <% score_display = capture { %>
-            <span class='min_score'><%= (criterion && criterion[:min_score]) || nbsp %></span>
-          <% } %>
+          <% score_display = %{<span class='min_score'>#{(criterion && criterion[:min_score]) || nbsp}</span>}.html_safe %>
           <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'must score at least a %{score}', :score => score_display %></span>
           <span class="fulfilled"><%= t 'min_score.fulfilled', 'scored at least a %{score}', :score => score_display %></span>
         </div>
         <div class="requirement_type max_score_requirement">
-          <% score_display = capture { %>
-            <span class='min_score'><%= (criterion && criterion[:max_score]) || nbsp %></span>
-          <% } %>
+          <% score_display = %{<span class='min_score'>#{(criterion && criterion[:max_score]) || nbsp}</span>}.html_safe %>
           <span class="unfulfilled"><%= t 'max_score.unfulfilled', 'must score no more than a %{score}', :score => score_display %></span>
           <span class="fulfilled"><%= t 'max_score.fulfilled', 'scored no more than a%{score}', :score => score_display %></span>
         </div>
@@ -78,6 +73,5 @@
       <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('links.edit_item', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %></a>
       <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('links.remove_item', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %></a>
     </td>
-    <% end %>
   </tr>
 </table>

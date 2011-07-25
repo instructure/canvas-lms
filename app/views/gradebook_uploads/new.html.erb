@@ -1,2 +1,2 @@
-<% content_for :page_title do %><%= t('titles.new_upload', "Upload Gradebook - %{course}", :course => @context.name) %><% end %>
+<% content_for :page_title do %><%= join_title t('titles.new_upload', "Upload Gradebook"), @context.name %><% end %>
 <%= render :partial => 'form' %>

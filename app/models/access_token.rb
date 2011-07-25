@@ -1,7 +1,7 @@
 class AccessToken < ActiveRecord::Base
   belongs_to :developer_key
   belongs_to :user
-  attr_accessible :purpose, :expires_at, :developer_key, :regenerate
+  attr_accessible :user, :purpose, :expires_at, :developer_key, :regenerate
   # For user-generated tokens, purpose can be manually set.
   # For app-generated tokens, this should be generated based
   # on the scope defined in the auth process (scope has not

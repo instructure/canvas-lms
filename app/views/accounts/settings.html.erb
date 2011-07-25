@@ -161,11 +161,11 @@
           <% end %>
           <div>
             <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
-            <label for="enable_equella">Equella</label>
+            <label for="enable_equella"><%= t 'labels.equella', 'Equella' %></label>
           </div>
           <div>
             <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
-            <label for="turnitin">Turnitin</label>
+            <label for="turnitin"><%= t 'labels.turnitin', 'Turnitin' %></label>
           </div>
         </fieldset>
 
@@ -194,7 +194,7 @@
                 <td style="vertical-align: top;"><%= settings.label :equella_endpoint, :en => "Equella Endpoint" %></td>
                 <td>
                   <%= settings.text_field :equella_endpoint, :value => @account.settings[:equella_endpoint] %>
-                  <div style="font-size: 0.9em;"><%= t(:equall_endpoint_help, "This is the URL to your equella service.  It will probably look something like \"http://oer.equella.com/signon.do\".") %></div>
+                  <div style="font-size: 0.9em;"><%= t(:equall_endpoint_help, "This is the URL to your equella service.  It will probably look something like \"%{sample_url}\".", :sample_url => "http://oer.equella.com/signon.do") %></div>
                 </td>
               </tr>
               <tr>
@@ -266,7 +266,7 @@
                   "(namely those using an iPad/iPhone) do not have Flash Player installed, that preview " +
                   "will not work.  By leaving Google Docs Previews enabled, when a browser does not have " +
                   "Flash enabled, or if Scribd is not enabled, it will use preview powered by Google Docs. " +
-                  "Using this service is subject to Google's viewer [terms of service](https://docs.google.com/viewer/TOS)") %>
+                  "Using this service is subject to Google's viewer [terms of service](%{terms_url})", :terms_url => "https://docs.google.com/viewer/TOS") %>
               </div>
             </div>
           </fieldset>

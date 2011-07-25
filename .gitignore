@@ -48,4 +48,5 @@ public/*/*/*/*/*/*/*/*/*.gz
 public/assets/*
 doc/api/*
 doc/plugins/*
+public/doc/api/*
 .yardoc/*

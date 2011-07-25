@@ -187,6 +187,7 @@ module CC
             end
             
             lid_node.render_choice do |rc_node|
+              next unless question['matches']
               question['matches'].each do |match|
                 rc_node.response_label(:ident=>match['match_id']) do |r_node|
                   r_node.material do |mat_node|

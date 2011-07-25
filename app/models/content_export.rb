@@ -58,9 +58,7 @@ class ContentExport < ActiveRecord::Base
         self.workflow_state = 'failed'
       end
     rescue
-      message = $!.to_s
-      stack = "#{$!}: #{$!.backtrace.join("\n")}"
-      add_error(message, stack)
+      add_error("Error running course export.", $!)
       self.workflow_state = 'failed'
     ensure
       self.save
@@ -69,13 +67,21 @@ class ContentExport < ActiveRecord::Base
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
   
   def error_message
-    self.settings[:last_error]
+    self.settings[:errors] ? self.settings[:errors].last : nil
   end
   
-  def add_error(message, stack)
-    self.settings[:error_messages] ||= []
-    self.settings[:error_messages] << [message, stack]
-    self.settings[:last_error] = message
+  def error_messages
+    self.settings[:errors] ||= []
+  end
+  
+  def add_error(user_message, exception_or_info)
+    self.settings[:errors] ||= []
+    if exception_or_info.is_a?(Exception)
+      er = ErrorReport.log_exception(:course_export, exception_or_info)
+      self.settings[:errors] << [user_message, "ErrorReport id: #{er.id}"]
+    else
+      self.settings[:errors] << [user_message, exception_or_info]
+    end
   end
   
   def root_account
@@ -94,7 +100,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def settings
-    read_attribute(:settings) || write_attribute(:settings,{}.with_indifferent_access)
+    read_attribute(:settings) || write_attribute(:settings,{})
   end
   
   def fast_update_progress(val)

@@ -20,14 +20,13 @@ require 'rubygems'
 require 'spec'
 require File.join(File.dirname(__FILE__), "/../lib/adheres_to_policy")
 
-include ::Instructure::Adheres
+include ::Instructure::AdheresToPolicy
 
 describe Policy, "set_policy" do
   
   before(:all) do
     class AnotherModel
-      extend Policy::ClassMethods
-      adheres_to_policy
+      extend ClassMethods
     end
   end
     
@@ -42,50 +41,18 @@ describe Policy, "set_policy" do
   end
 end
 
-describe Policy::ClassMethods do
-  it "should allow a class to extend itself via adheres_to_policy" do
-    lambda{
-      class A
-        extend Policy::ClassMethods
-        adheres_to_policy
-      end
-    }.should_not raise_error
-
-    A.methods.should be_include("set_policy")
-    A.methods.should be_include("set_permissions")
-    
-    a = A.new
-    %w(policy check_policy grants_rights? has_rights?).each do |method|
-      a.methods.should be_include(method)
-    end
-  end
-  
-  after(:all) do
-    Object.send(:remove_const, :A)
-  end
-end
-
-describe Policy::SingletonMethods do
+describe ClassMethods do
   before(:all) do
     class A
-      extend Policy::ClassMethods
-      adheres_to_policy
+      extend ClassMethods
     end
   end
-  
-  it "should have policy_block available" do
-    A.methods.should be_include("policy_block")
-    A.methods.should be_include("policy_block=")
-    A.policy_block = "Devlin Rocks!"
-    A.policy_block.should eql("Devlin Rocks!")
-  end
-  
+
   it "should filter policy_block through a block filter with set_policy" do
     A.methods.should be_include("set_policy")
     lambda {A.set_policy(1)}.should raise_error
     b = lambda {1}
     lambda {A.set_policy(&b)}.should_not raise_error
-    A.policy_block.should eql(b)
   end
   
   it "should use set_permissions as set_policy" do
@@ -93,7 +60,14 @@ describe Policy::SingletonMethods do
     lambda {A.set_permissions(1)}.should raise_error
     b = lambda {1}
     lambda {A.set_permissions(&b)}.should_not raise_error
-    A.policy_block.should eql(b)
+  end
+
+  it "should provide a Policy instance through policy" do
+    A.policy.should be_is_a(Policy)
+  end
+
+  it "should continue to use the same Policy instance (an important check, since this is also a constructor)" do
+    A.policy.should eql(A.policy)
   end
 
   after(:all) do
@@ -101,15 +75,14 @@ describe Policy::SingletonMethods do
   end
 end
 
-describe Policy::InstanceMethods do
+describe InstanceMethods do
   before(:all) do
     class A
       attr_accessor :user
-      extend Policy::ClassMethods
-      adheres_to_policy
+      extend ClassMethods
       set_policy do
         given { |user| self.user == user }
-        set { can :read }
+        can :read
       end
     end
   end
@@ -119,139 +92,139 @@ describe Policy::InstanceMethods do
   end
   
   it "should have setup a series of methods on the instance" do
-    %w(policy check_policy grants_rights? has_rights?).each do |method|
+    %w(check_policy grants_rights? has_rights?).each do |method|
       @a.methods.should be_include(method)
     end
   end
-  
-  it "should provide a Policy instance through policy" do
-    @a.policy.should be_is_a(Policy)
-  end
-  
-  it "should continue to use the same Policy instance (an important check, since this is also a constructor)" do
-    @a.policy.should eql(@a.policy)
-  end
-  
+
   it "should be able to check a policy" do
     @a.user = 1
     @a.check_policy(1).should eql([:read])
   end
+
+  it "should allow multiple forms of can statements" do
+    class B
+      extend Policy::ClassMethods
+      set_policy do
+        given { |user| user == 1}
+        can :read and can :write
+
+        given { |user| user == 2}
+        can :update, :delete
+
+        given { |user| user == 3}
+        can [:manage, :set_permissions]
+      end
+    end
+
+    b = B.new
+    b.check_policy(1).should == [:read, :write]
+    b.check_policy(2).should == [:update, :delete]
+    b.check_policy(3).should == [:manage, :set_permissions]
+  end
+
+  it "should execute all conditions when searching for all rights" do
+    class B
+      attr_accessor :total
+      extend Policy::ClassMethods
+      def initialize
+        @total = 0
+      end
+
+      set_policy do
+        given { |user| @total = @total + 1}
+        can :read
+
+        given { |user| @total = @total + 1}
+        can :write
+
+        given { |user| @total = @total + 1}
+        can :update
+      end
+    end
+
+    b = B.new
+    b.check_policy(nil).should == [:read, :write, :update]
+    b.total.should == 3
+  end
+
+  it "should skip duplicate conditions when searching for all rights" do
+    class B
+      attr_accessor :total
+      extend ClassMethods
+      def initialize
+        @total = 0
+      end
+
+      set_policy do
+        given { |user| @total = @total + 1}
+        can :read, :write
+
+        given { |user| raise "don't execute me" }
+        can :write
+
+        given { |user| @total = @total + 1}
+        can :update
+      end
+    end
+
+    b = B.new
+    b.check_policy(nil).should == [:read, :write, :update]
+    b.total.should == 2
+  end
+
+  it "should only execute relevant conditions when searching for specific rights" do
+    class B
+      attr_accessor :total
+      extend ClassMethods
+      def initialize
+        @total = 0
+      end
+
+      set_policy do
+        given { |user| @total = @total + 1}
+        can :read
+
+        given { |user| raise "don't execute me" }
+        can :write
+
+        given { |user| raise "me either" }
+        can :update
+      end
+    end
+
+    b = B.new
+    b.check_policy(nil, nil, :read).should == [:read]
+    b.total.should == 1
+  end
+
+  it "should skip duplicate conditions when searching for specific rights" do
+    class B
+      attr_accessor :total
+      extend ClassMethods
+      def initialize
+        @total = 0
+      end
+
+      set_policy do
+        given { |user| @total = @total + 1}
+        can :read
+
+        given { |user| @total = @total + 1 }
+        can :write
+
+        given { |user| raise "me either" }
+        can :read and can :write
+      end
+    end
+
+    b = B.new
+    b.check_policy(nil, nil, :read, :write).should == [:read, :write]
+    b.total.should == 2
+  end
   
   after(:all) do
     Object.send(:remove_const, :A)
+    Object.send(:remove_const, :B)
   end
 end
-
-# describe Policy::InstanceMethods do
-#   
-#   before(:all) do
-#     class AnotherModel
-#       extend Policy::ClassMethods
-#       
-#       set_policy do
-#         given 1 do
-#           can :read
-#         end
-#       end
-#     end
-#   end
-# 
-#   it "should make the policy available" do
-#     AnotherModel.policy.should be_is_a(Policy)
-#   end
-#   
-#   it "should have a policy" do
-#     a = AnotherModel.new
-#     a.policy.should eql(AnotherModel.policy)
-#   end
-#   
-#   it "should be able to check a policy" do
-#     a = AnotherModel.new
-#     user = mock_model(User)
-#     lambda{a.check_policy(user)}.should_not raise_error
-#   end  
-# 
-#   after(:all) do
-#     Object.send(:remove_const, :AnotherModel)
-#   end
-# end
-# 
-# describe Policy, "DSL" do
-#     
-#   it "should be able to extend another class" do
-#     lambda{
-#       class AModel
-#         extend Policy::ClassMethods
-#         set_policy do
-#           given true do
-#             can :read
-#           end
-#           given false do
-#             can :write
-#           end
-#         end
-#       end
-#     }.should_not raise_error
-#   end
-#   
-#   it "should record the permissions from the passing given statements" do
-#     a = AModel.new
-#     a.check_policy(mock_model(User)).should be_include(:read)
-#   end
-#   
-#   it "should not record the permissions from the failing given statements" do
-#     a = AModel.new
-#     a.check_policy(mock_model(User)).should_not be_include(:write)
-#   end
-#   
-#   it "should provide a can_bucket (things that can be done)" do
-#     a = AModel.new
-#     a.check_policy(mock_model(User))
-#     a.policy.can_bucket.should eql([:read])
-#   end
-#   
-#   it "should have hierarchal rules" do
-#     class BModel
-#       extend Policy::ClassMethods
-#       set_policy do
-#         given true do
-#           can :read
-#         end
-#         given true do
-#           cannot :read
-#         end
-#       end
-#     end
-# 
-#     b = BModel.new
-#     b.check_policy(mock_model(User)).should eql([])
-#     Object.send(:remove_const, :BModel)
-#   end
-#   
-#   after(:all) do
-#     Object.send(:remove_const, :AModel)
-#   end
-# end
-# 
-# describe Policy, "scoping" do
-#   class CModel
-#     attr_accessor :x
-#     extend Policy::ClassMethods
-#     # set_policy do
-#     #   given x == 1 do
-#     #     can :read
-#     #   end
-#     # end
-#   end
-#   
-#   it "should read the context of the local class" do
-#     # c1 = CModel.new; c1.x = 0
-#     # c2 = CModel.new; c2.x = 1
-#     # c1.check_policy(mock_model(User)).should_not be_include?(:read)
-#     # c2.check_policy(mock_model(User)).should_ be_include?(:read)
-#   end
-#   
-#   after(:all) do
-#     Object.send(:remove_const, :CModel)
-#   end
-# end

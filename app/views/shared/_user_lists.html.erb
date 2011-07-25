@@ -1,0 +1,47 @@
+<div id="user_list_boxes">
+  <a id="user_lists_path" style="display:none;" href="<%= url_for course_user_lists_path(@context, :format => :json) %>"></a>
+  <div id="user_list_textarea_container" style="z-index: 2;">
+    <input type="hidden" name="enrollment_type" value="StudentEnrollment" />
+    <span style="font-size: 0.8em;"><%= @context.root_account.login_handle_name_is_customized? ? t(:copy_and_paste_notice_with_login_handle, "Copy and paste a list of users to add to this course. You can use their email address or %{login_handle_name}.", :login_handle_name => @context.root_account.login_handle_name) : t(:copy_and_paste_notice_just_email, "Copy and paste a list of email addresses to add users to this course.") %></span>
+    <textarea name="user_list" class="user_list"><% if @students && @students.empty? %><%= t :example_user_list, '"Example Student" <student@example.com>
+"Other Student" <otherstudent@example.com>
+"Lastname, Firstname" <firstlast@example.com>
+<justAnEmailAddress@example.com>' %>
+<% end %></textarea>
+  </div>
+  <div id="user_list_parsed" style="z-index: 1; display:none;">
+    <div class="ui-helper-reset ui-widget-content ui-corner-all" id="user_lists_processed_people">
+      <div id="user_list_duplicates_found" class="ui-widget">
+        <div class="ui-state-highlight ui-corner-all">
+          <p>
+            <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
+            <strong><%= before_label :notice, "Notice" %></strong>
+            <span class="message_content"></span>
+          </p>
+        </div>
+      </div>
+      <div id="user_list_no_valid_users" class="ui-widget">
+        <div class="ui-state-highlight ui-corner-all">
+          <p><span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-info"></span>
+          <%= t :no_valid_users, "*Sorry,* it does not seem as if there were any valid email addresses or login IDs typed in, please go back and try again.", :wrapper => "<strong>\\1</strong>" %></p>
+        </div>
+      </div>
+      <div id="user_list_with_errors" class="ui-widget">
+        <div class="ui-state-highlight ui-corner-all">
+          <p>
+            <span style="float: left; margin-right: 0 0.3em;" class="ui-icon ui-icon-alert"></span>
+            <strong><%= before_label :alert, "Alert" %></strong>
+            <span class="message_content"></span>
+          </p>
+        </div>
+      </div>
+
+      <div class="person ui-helper-reset ui-state-default ui-corner-all" id="user_lists_processed_person_template" style="display:none;">
+        <div class="name"></div>
+        <div class="address"></div>
+        <div class="login"></div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,4 +1,4 @@
-<% content_for :page_title, t('titles.chat', "Chat: %{context_name}", :context_name => @context.name) %>
+<% content_for :page_title, join_title(t('titles.chat', "Chat"), @context.name) %>
 
 <div style="height: 600px; width: 800px; margin: 0 auto;">
   <div id="client"></div> 

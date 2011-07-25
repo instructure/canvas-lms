@@ -33,7 +33,6 @@ class CourseSection < ActiveRecord::Base
   has_many :users, :through => :enrollments
   has_many :course_account_associations
   
-  adheres_to_policy
   before_validation :infer_defaults, :verify_unique_sis_source_id
   validates_presence_of :course_id
   
@@ -42,10 +41,10 @@ class CourseSection < ActiveRecord::Base
 
   set_policy do
     given {|user, session| self.cached_course_grants_right?(user, session, :manage_admin_users) }
-    set { can :read and can :create and can :update and can :delete }
+    can :read and can :create and can :update and can :delete
     
     given {|user, session| self.enrollments.find_by_user_id(user.id) }
-    set { can :read }
+    can :read
   end
 
   def set_update_account_associations_if_changed

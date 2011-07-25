@@ -34,7 +34,7 @@ class WikiPagesController < ApplicationController
         @page.with_versioning(false) do |page|
           page.context_module_action(@current_user, @context, :read)
           view_count = (page.view_count || 0) + 1
-          ActiveRecord::Base.connection.execute("UPDATE wiki_pages SET view_count=#{view_count} WHERE id=#{page.id}")
+          WikiPage.connection.execute("UPDATE wiki_pages SET view_count=#{view_count} WHERE id=#{page.id}")
         end
         log_asset_access(@page, "wiki", @namespace)
       end

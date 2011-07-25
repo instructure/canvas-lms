@@ -221,6 +221,7 @@
           handle_files: (options.upload_only ? options.success : options.handle_files),
           single_file: options.singleFile,
           context_code: $.isFunction(options.context_code) ? (options.context_code.call($form)) : options.context_code,
+          asset_string: options.asset_string,
           intent: options.intent,
           folder_id: $.isFunction(options.folder_id) ? (options.folder_id.call($form)) : options.folder_id,
           file_elements: $form.find("input[type='file']"),
@@ -2003,6 +2004,7 @@
         uploadFile.call($this, $.extend({
           'attachment[folder_id]': options.folder_id,
           'attachment[intent]': options.intent,
+          'attachment[asset_string]': options.asset_string,
           'attachment[filename]': item.name,
           'attachment[context_code]': options.context_code
         }, options.formData || {}), item);

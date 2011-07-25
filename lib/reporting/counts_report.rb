@@ -28,16 +28,10 @@ class CountsReport
   COUNTS_DETAILED = 'counts_detailed'
   COUNTS_PROGRESSIVE_OVERVIEW = 'counts_progressive_overview'
   COUNTS_PROGRESSIVE_DETAILED = 'counts_progressive_detailed'
-  
+
   MONTHS_TO_KEEP = 24
   WEEKS_TO_KEEP = 52
 
-  DISTINCT_ENROLLMENT_USERS = "SELECT COUNT(DISTINCT user_id) FROM enrollments e WHERE course_id IN (%s)"
-  DISTINCT_ENROLLMENT_USERS_WITH_TYPE = "SELECT COUNT(DISTINCT user_id) FROM enrollments e WHERE type = '%s' AND course_id IN (%s)"
-  PAGE_VIEWS_FOR_ACCOUNT = "SELECT count(request_id) FROM #{PageView.table_name} WHERE account_id = '%s' AND created_at > '%s' AND created_at < '%s'"
-  ATTACHMENT_BYTES_FOR_ACCOUNT = "SELECT COUNT(id), SUM(size) FROM attachments WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'"
-  MEDIA_OBJECT_KILOBYTES_FOR_ACCOUNT = "SELECT COUNT(id), SUM(total_size) FROM media_objects WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'"
-  
   def self.process
     # use the slave, if we can
     config = ActiveRecord::Base.configurations["#{Rails.env}_slave"]
@@ -77,18 +71,19 @@ class CountsReport
       account[:name] = a.name
       account[:external_status] = a.external_status
       account[:last_activity] = activity
-      account[:page_views_in_last_week] = get_count_from_query(PAGE_VIEWS_FOR_ACCOUNT % [a.id, (@yesterday - 1.week).to_s(:db), @yesterday.to_s(:db)])
-      account[:page_views_in_last_month] = get_count_from_query(PAGE_VIEWS_FOR_ACCOUNT % [a.id, (@yesterday - 1.month).to_s(:db), @yesterday.to_s(:db)])
+      account[:page_views_in_last_week] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", a.id, @yesterday - 1.week, @yesterday])
+      account[:page_views_in_last_month] = PageView.count(:request_id, :conditions => ["account_id = ? AND created_at > ? AND created_at < ?", a.id, @yesterday - 1.month, @yesterday])
 
       course_ids = []
       get_course_ids(a, course_ids)
 
       account[:courses] = course_ids.length
-      account[:teachers] = course_ids.length == 0 ? 0 : get_count_from_query(DISTINCT_ENROLLMENT_USERS_WITH_TYPE % ["TeacherEnrollment", course_ids.join(',')])
-      account[:students] = course_ids.length == 0 ? 0 : get_count_from_query(DISTINCT_ENROLLMENT_USERS_WITH_TYPE % ["StudentEnrollment", course_ids.join(',')])
-      account[:users] = course_ids.length == 0 ? 0 : get_count_from_query(DISTINCT_ENROLLMENT_USERS % course_ids.join(','))
-      account[:files], account[:files_size] = course_ids.length == 0 ? [0, 0] : get_count_and_size_from_query(ATTACHMENT_BYTES_FOR_ACCOUNT % [a.id])
-      account[:media_files], account[:media_files_size] = course_ids.length == [0, 0] ? 0 : get_count_and_size_from_query(MEDIA_OBJECT_KILOBYTES_FOR_ACCOUNT % [a.id])
+      account[:teachers] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'TeacherEnrollment' })
+      account[:students] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids, :type => 'StudentEnrollment' })
+      account[:users] = course_ids.length == 0 ? 0 : Enrollment.count(:user_id, :distinct => true, :conditions => { :course_id => course_ids })
+      # ActiveRecord::Base.calculate doesn't support multiple calculations in a single pass
+      account[:files], account[:files_size] = course_ids.length == 0 ? [0, 0] : Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace='account_%s' AND root_attachment_id IS NULL AND file_state != 'deleted'" % [a.id]).first.map(&:to_i)
+      account[:media_files], account[:media_files_size] = course_ids.length == [0, 0] ? 0 : MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [a.id]).first.map(&:to_i)
       account[:media_files_size] *= 1000
       add_account_stats(account)
     end
@@ -222,8 +217,7 @@ class CountsReport
   end
 
   def last_activity(account_id)
-    query = "SELECT max(created_at) FROM #{PageView.table_name} WHERE account_id = #{account_id}"
-    ActiveRecord::Base.connection.select_value(query)
+    PageView.maximum(:created_at, :conditions => { :account_id => account_id })
   end
 
   def get_course_ids(account, course_ids)
@@ -234,14 +228,6 @@ class CountsReport
     account.sub_accounts.each do |sa|
       get_course_ids(sa, course_ids)
     end
-  end
-
-  def get_count_from_query(query)
-    ActiveRecord::Base.connection.select_value(query).to_i
-  end
-  
-  def get_count_and_size_from_query(query)
-    ActiveRecord::Base.connection.select_rows(query).first.map(&:to_i)
   end
 
   def should_use_default_account_course(course)

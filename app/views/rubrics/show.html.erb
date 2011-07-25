@@ -1,5 +1,5 @@
 <% content_for :page_title do %><%= @actual_rubric.title %><% end %>
-<% add_crumb "Rubrics", context_url(@context, :context_rubrics_url) %>
+<% add_crumb t('#crumbs.rubrics', 'Rubrics'), context_url(@context, :context_rubrics_url) %>
 <% add_crumb @actual_rubric.title %>
 
 <% content_for :right_side do %>

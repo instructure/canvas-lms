@@ -64,8 +64,7 @@ class Group < ActiveRecord::Base
   before_save :ensure_defaults
   after_save :close_memberships_if_deleted
   
-  adheres_to_policy
-  
+
   def wiki
     res = self.wiki_id && Wiki.find_by_id(self.wiki_id)
     unless res
@@ -274,26 +273,26 @@ class Group < ActiveRecord::Base
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
     given { |user| user && self.participating_group_memberships.find_by_user_id(user.id) }
-    set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and
+    can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and
       can :manage_files and can :moderate_forum and
       can :post_to_forum and
       can :send_messages and can :create_conferences and
       can :create_collaborations and can :read_roster and
       can :manage_calendar and
       can :update and can :delete and can :create and
-      can :manage_wiki }
+      can :manage_wiki
     
     given { |user| user && self.invited_users.include?(user) }
-    set { can :read }
+    can :read
     
     given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
-    set { can :create }
+    can :create
     
     given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
-    set { can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum and can :manage_wiki and can :manage_files }
+    can :read and can :read_roster and can :manage and can :manage_content and can :manage_students and can :manage_admin_users and can :update and can :delete and can :create and can :moderate_forum and can :post_to_forum and can :manage_wiki and can :manage_files
     
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
-    set { can :read and can :read_roster }
+    can :read and can :read_roster
   end
 
   def file_structure_for(user)

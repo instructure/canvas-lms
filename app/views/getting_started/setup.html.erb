@@ -1,4 +1,4 @@
-<% content_for :page_title do %>Try It: Save<% end %>
+<% content_for :page_title, t(:page_title, "Try It: Save") %>
 
 <% content_for :right_side do %>
   <% unless @context.teacherless? %>
@@ -47,7 +47,7 @@
           <%= @assignments && !@assignments.empty? ? t(:total_assignment_count, { :one => "1 Assignment Total", :other => "%{count} Assignments Total" }, :count => @assignments.length) : t(:no_assignments, "No Assignments Created") %>
         </b>
         <% if @assignments && !@assignments.empty? %>
-        <a href="#" style="padding-left: 20px; font-size: 0.9em; display: none;" class="hide_assignments_link">Hide</a>
+        <a href="#" style="padding-left: 20px; font-size: 0.9em; display: none;" class="hide_assignments_link"><%= t '#buttons.hide', "Hide" %></a>
         <a href="#" style="padding-left: 20px; font-size: 0.9em;" class="show_assignments_link"><%= t "#buttons.show", "Show" %></a>
         <div id="assignment_list" style="display:none;">
           <table style="width: 100%;" class="summary">

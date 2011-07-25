@@ -347,7 +347,7 @@ class I18nJsExtractor
     line_offset = options[:line_offset] || 1
     scopes = find_matches(source, SCOPED_BLOCK_START, SCOPED_BLOCK, :start_prefix => /\s*/, :line_offset => line_offset, :expression => "I18n scope")
     scopes.each do |(v, v, scope, scope_source, v, offset)|
-      process_block scope_source, scope, options.merge(:line_offset => offset)
+      process_block scope_source, scope.sub(/\A#/, ''), options.merge(:line_offset => offset)
     end
     # see if any other I18n calls happen outside of a scope
     chunks = source.split(/(#{SCOPED_BLOCK.to_s.gsub(/\\1/, '\\\\2')})/m) # captures subpatterns too, so we need to pick and choose what we want

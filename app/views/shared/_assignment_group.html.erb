@@ -22,7 +22,7 @@
         <a href="<%= context_url(@context, :controller => :assignment_groups, :action => :update, :id => (group ? group.id : "{{ id }}")) %>" class="assignment_group_url">&nbsp;</a>
       </div>
       <div style="float: right; margin-right: 5px; display: block;" class="links">
-        <span class="more_info_brief" style="font-weight: bold; display: none; font-size: 0.8em; padding-right: 10px;" title="Percent of Final Grade"><span class="group_weight"><%= (group.try_rescue(:group_weight) || "0") %></span>%</span>
+        <span class="more_info_brief" style="font-weight: bold; display: none; font-size: 0.8em; padding-right: 10px;" title="<%= t 'titles.percent_of_final_grade', 'Percent of Final Grade' %>"><span class="group_weight"><%= (group.try_rescue(:group_weight) || "0") %></span>%</span>
         <a href="<%= context_url(@context, :new_context_assignment_url, :assignment_group_id => (group ? group.id : "{{ id }}")) %>" class="add_assignment_link no-hover" style="padding-right: 15px;">
           <%= image_tag 'add.png', :alt => t('alts.add_assignment', "Add Assignment"), :title => t('links.add_assignment', "Add Assignment") %>
         </a>
