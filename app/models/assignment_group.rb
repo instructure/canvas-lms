@@ -23,7 +23,6 @@ class AssignmentGroup < ActiveRecord::Base
   attr_accessible :name, :rules, :assignment_weighting_scheme, :group_weight, :position, :default_assignment_name
   attr_readonly :context_id, :context_type
   acts_as_list :scope => :context
-  adheres_to_policy
   has_a_broadcast_policy
   
   has_many :assignments, :order => 'position, due_at, title', :dependent => :destroy
@@ -57,7 +56,11 @@ class AssignmentGroup < ActiveRecord::Base
   
   def update_student_grades
     if @grades_changed
-      self.context.recompute_student_scores rescue nil
+      begin
+        self.context.recompute_student_scores
+      rescue
+        ErrorReport.log_exception(:grades, $!)
+      end
     end
   end
   
@@ -67,13 +70,13 @@ class AssignmentGroup < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.context.grants_rights?(user, session, :read)[:read] } #self.context.students.include? user }
-    set { can :read }
+    can :read
     
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    set { can :update and can :delete and can :create and can :read }
+    can :update and can :delete and can :create and can :read
 
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
-    set { can :update and can :delete and can :create and can :read }
+    can :update and can :delete and can :create and can :read
   end
   
   workflow do

@@ -16,19 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class EmailListsController < ApplicationController
+class UserListsController < ApplicationController
   skip_before_filter :verify_authenticity_token
+  before_filter :require_context
   
-  # POST /email_lists.js
+  # POST /courses/:course_id/user_lists.json
   def create
-    @email_list = EmailList.new(params[:user_emails])
-
     respond_to do |format|
-      if @email_list
-        format.json  { render :json => @email_list }
-      else
-        format.json  { render :json => @email_list.errors, :status => :unprocessable_entity }
-      end
+      format.json { render :json => UserList.new(params[:user_list], @context.root_account, @context.grants_right?(@current_user, session, :manage_students)) }
     end
   end
 end

@@ -1,5 +1,5 @@
 <% 
-  content_for :page_title, t('titles.details', "Course Details: %{course}", :course => @context.name)
+  content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   jammit_css :course_details
   jammit_js :course_details
   @active_tab = "settings"
@@ -234,16 +234,16 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           </div>
         </td>
       </tr><tr>
-        <td style="width: 10%;"><%= f.blabel :storage_quota, :en => "File Storage" %></td>
+        <td style="width: 10%;"><%= f.blabel :storage_quota_mb, :storage_quota, :en => "File Storage" %></td>
         <td>
           <span class="course_form">
             <% if can_do(@context.account, @current_user, :manage_courses) %>
-              <%= f.text_field :storage_quota_mb, :style => "width: 50px;", :title => t('megabytes', "megabytes"), :value => @context.quota %>
+              <%= f.text_field :storage_quota_mb, :style => "width: 50px;", :title => t('megabytes', "megabytes"), :value => @context.storage_quota_mb %>
             <% else %>
-              <%= @context.quota %>
+              <%= @context.storage_quota_mb %>
             <% end %>
           </span>
-          <span class="course_info quota"><%= @context.quota %></span>
+          <span class="course_info storage_quota_mb"><%= @context.storage_quota_mb %></span>
           <%= t('megabytes', %{megabytes}) %>
         </td>
       <% if @context.turnitin_enabled? %>
@@ -381,7 +381,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
         </li>
       <% end %>
       <li class="section_blank" style="display: none;">
-        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="Delete Section" class="delete_section_link no-hover" ><%= image_tag "delete_circle.png", :alt => t('images.alt.delete', "delete") %></a>
+        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.delete_section', %{Delete Section}) %>" class="delete_section_link no-hover" ><%= image_tag "delete_circle.png", :alt => t('images.alt.delete', "delete") %></a>
         <a class="edit_section_link no-hover" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.edit_section', %{Edit Section}) %>"><%= image_tag "edit.png", :alt => t('images.alt.edit', "edit") %></a>
         <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name">
         </a>
@@ -460,7 +460,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     <div style="margin-top: 5px;">
       <div>
         <%= label_tag :enrollment_type, :en => "Add More" %>
-        <select name="enrollment_type" title="Enrollment Type" id="enrollment_type">
+        <select name="enrollment_type" title="<%= t('titles.enrollment_type', 'Enrollment Type') %>" id="enrollment_type">
           <% if can_do(@context, @current_user, :manage_students) %>
             <option value="StudentEnrollment"><%= t('option.students', %{Students}) %></option>
           <% end %>
@@ -485,7 +485,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </div>
       <div style="<%= hidden unless has_multiple_sections %>" id="course_section_id_holder">
         <%= label_tag :course_section_id, :en => 'For the section' %>
-        <select title="Course Section" name="course_section_id" id="course_section_id">
+        <select title="<%= t('titles.course_section', 'Course Section') %>" name="course_section_id" id="course_section_id">
           <% @context.course_sections.active.each do |section| %>
             <option value="<%= section.id %>" class="option_for_section_<%= section.id %>"><%= section.display_name %></option>
           <% end %>
@@ -494,7 +494,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       <div class="teacherless_invite_message" style="<%= hidden unless @context.teacherless? %> font-size: 0.8em;">
         <%= t('teacherless_invite_details', %{If you invite a teacher and they accept, you will give up administrative priveleges for this course.}) %>
       </div>
-      <%= render :partial => 'shared/email_lists' %>
+      <%= render :partial => 'shared/user_lists' %>
       <% unless @context.available? %>
       <div style="font-size: 0.8em;">
         <i><%= t('invite_to_unpublished_course', %{Since the course hasn't been published, students and TA's will be added, but won't be invited to join the course.  Invitations will be sent out when the course is published.}) %></i>
@@ -504,7 +504,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     <div class="button-container">
       <button type="button" class="button verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
       <button type="submit" class="button add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
-      <button type="button" class="go_back_button button-secondary"><%= t('buttons.modify_users', %{Go back and edit the list of emails}) %></button>
+      <button type="button" class="go_back_button button-secondary"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
       <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
     <% end %>

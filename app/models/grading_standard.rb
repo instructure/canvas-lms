@@ -26,8 +26,7 @@ class GradingStandard < ActiveRecord::Base
   
   before_save :update_usage_count
   
-  adheres_to_policy
-  
+
   workflow do
     state :active
     state :deleted
@@ -42,10 +41,10 @@ class GradingStandard < ActiveRecord::Base
   
   set_policy do
     given {|user| true }
-    set { can :read and can :create }
+    can :read and can :create
     
     given {|user| self.assignments.active.length < 2}
-    set { can :update and can :delete }
+    can :update and can :delete
   end
   
   def update_data(params)

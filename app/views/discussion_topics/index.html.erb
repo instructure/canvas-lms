@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= before_label(t('#titles.discussions', "Discussions")) %> <%= @context.name %><% end %>
+<% content_for :page_title do %><%= join_title t('#titles.discussions', "Discussions"), @context.name %><% end %>
 
 <% content_for :auto_discovery do %>
   <% if @context_enrollment %>

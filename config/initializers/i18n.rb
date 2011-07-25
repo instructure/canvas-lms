@@ -1,5 +1,7 @@
 I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
                   Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
+I18n.load_path -= Dir[Rails.root.join('config', 'locales', 'generated', '**', '*.{rb,yml}')] unless ENV["RAILS_ENV"] == "production"
+I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
 Gem.loaded_specs.values.each do |spec|
   path = spec.full_gem_path
@@ -21,7 +23,7 @@ module I18nUtilities
     end
     text = method if text.nil? && method.is_a?(Symbol)
     if text.is_a?(Symbol)
-      text = 'labels.#{text}' unless text.to_s =~ /\A#/
+      text = "labels.#{text}" unless text.to_s =~ /\A#/
       text = t(text, options.delete(:en))
     end
     text = before_label(text) if options[:before]

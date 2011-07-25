@@ -16,6 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'lib/api_route_set'
+require 'bundler'
+Bundler.setup
+require 'action_controller'
+require 'config/routes'
+
 # Extend YARD to generate our API documentation
 YARD::Tags::Library.define_tag("Is an API method", :API)
 YARD::Tags::Library.define_tag("API method argument", :argument)

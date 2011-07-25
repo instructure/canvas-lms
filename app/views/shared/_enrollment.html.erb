@@ -63,6 +63,7 @@
             end
         end
       %>
+    </div>
   <% end %>
   <div class="email"><%= enrollment.try_rescue(:user).try_rescue(:email) %></div>
   <div class="associated_user associated" style="<%= hidden unless enrollment.try_rescue(:associated_user_id) %>">

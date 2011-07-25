@@ -33,10 +33,10 @@ timing = {
     var result = {};
     result.referenceDate = Date.parse(end_at);
     result.isDeadline = true;
-    $(".time_header").text(I18n.beforeLabel('labels.time_remaining', "Time Remaining"));
+    $(".time_header").text(I18n.beforeLabel('time_remaining', "Time Remaining"));
     if(!result.referenceDate) {
       result.isDeadline = false;
-      $(".time_header").text(I18n.beforeLabel('labels.time_elapsed', "Time Elapsed"));
+      $(".time_header").text(I18n.beforeLabel('time_elapsed', "Time Elapsed"));
       result.referenceDate = Date.parse(started_at);
     }
     result.clientServerDiff = timing.clientServerDiff;

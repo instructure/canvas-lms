@@ -63,7 +63,7 @@
       </div>
     </th>
   </tr>
-  <tr style="<%= hidden unless has_assessments %>">
+  <tr style="<%= hidden unless edit_view && has_assessments %>">
     <td colspan="4" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use2', "You've already rated students with this rubric.  Any major changes could affect their assessment results." %>
     </td>
   </tr>

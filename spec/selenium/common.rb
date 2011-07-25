@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
+require "timeout"
 require File.expand_path(File.dirname(__FILE__) + '/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/server')
 
@@ -33,6 +34,9 @@ $app_host_and_port = nil
 
 module SeleniumTestsHelperMethods
   def setup_selenium
+    if SELENIUM_CONFIG[:host] && SELENIUM_CONFIG[:port] && !SELENIUM_CONFIG[:host_and_port]
+      SELENIUM_CONFIG[:host_and_port] = "#{SELENIUM_CONFIG[:host]}:#{SELENIUM_CONFIG[:port]}"
+    end
     if !SELENIUM_CONFIG[:host_and_port]
       browser = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       options = {}
@@ -41,10 +45,15 @@ module SeleniumTestsHelperMethods
       end
       driver = Selenium::WebDriver.for(browser, options)
     else
+      caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
+      if caps == :firefox && SELENIUM_CONFIG[:firefox_profile]
+        profile = Selenium::WebDriver::Firefox::Profile.from_name SELENIUM_CONFIG[:firefox_profile]
+        caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
+      end
       driver = Selenium::WebDriver.for(
         :remote, 
         :url => 'http://' + (SELENIUM_CONFIG[:host_and_port] || "localhost:4444") + '/wd/hub', 
-        :desired_capabilities => (SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox)
+        :desired_capabilities => caps
       )
     end
     driver.manage.timeouts.implicit_wait = 3
@@ -136,8 +145,14 @@ module SeleniumTestsHelperMethods
     end
     at_exit { shutdown.call }
     for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
-      break if s
+      begin
+        Timeout::timeout(5) do
+          s = TCPSocket.open('127.0.0.1', $server_port) rescue nil
+          break if s
+        end
+      rescue Timeout::Error
+        # pass
+      end
       sleep 1
     end
     raise "Failed starting script/server" unless s
@@ -296,7 +311,18 @@ shared_examples_for "all selenium tests" do
     @webserver_shutdown.call
     @selenium_driver.quit
   end
- 
+
+  append_before(:all) do
+    unless $check_screen_dimensions
+      w, h = driver.execute_script <<-JS
+        if (window.screen) {
+          return [window.screen.availWidth, window.screen.availHeight];
+        }
+      JS
+      raise("desktop dimensions (#{w}x#{h}) are too small to successfully run the selenium specs, minimum size of 1024x768 is required.") unless w >= 1024 && h >= 768
+      $check_screen_dimensions = true
+    end
+  end
 end
 
 shared_examples_for "in-process server selenium tests" do

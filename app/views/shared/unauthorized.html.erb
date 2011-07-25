@@ -1,9 +1,8 @@
-<% flash.delete(:notice) if flash[:notice] == "You are not authorized to perform this action" %>
 <% content_for :page_title do %>
   <% if !@files_domain && (!@current_user || @unauthorized_user)  %>
-    Please Log In
+    <%= t('titles.log_in', %{Please Log In}) %>
   <% else %>
-    Unauthorized
+    <%= t('titles.unauthorized_action', %{Unauthorized}) %>
   <% end %>
 
 <% end %>
@@ -19,41 +18,36 @@
   <div class="ui-state-error" style="margin:30px auto 0; padding: 1em; width: 640px;" >
     <h2 style="text-align:center;">
       <% if @needs_cookies -%>
-        Cookies Required
+        <%= t('headings.needs_cookies', %{Cookies Required}) %>
       <% elsif !@files_domain && (!@current_user || @unauthorized_user) -%>
-        Please Log In
+        <%= t('headings.needs_login', %{Please Log In}) %>
       <% else -%>
-        Unauthorized
+        <%= t('headings.unauthorized_action', %{Unauthorized}) %>
       <% end -%>
     </h2>
     <% if @unauthorized_user && @current_user && @current_user != @unauthorized_user %>
-      <p><%= @current_user.name %>, you are not authorized to view this page.  The link
-        you followed to get here was for <strong><%= @unauthorized_user.name %> (<%= @unauthorized_user.email %>)</strong>.
-        If that's you, you may want to log out and log back in with that email address
-        to gain access to this page.
+      <p><%= mt 'unauthorized_user_is_other', "%{current_user}, you are not authorized to view this page.  The link you followed to get here was for **%{unauthorized_user} (%{unauthorized_user_email})**.  If that's you, you may want to log out and log back in with that email address to gain access to this page.", :current_user => @current_user.name, :unauthorized_user => @unauthorized_user.name, :unauthorized_user_email => @unauthorized_user.email %>
       </p>
     <% elsif @unauthorized_user %>
-      <p><%= @unauthorized_user.name %>, you'll need to log in before you can view that page.
-        Click "Forgot Password" if you forgot or don't know your password.
+      <p>
+        <%= t 'unauthorized_user', %[%{user_name}, you'll need to log in before you can view that page.  Click "Forgot Password" if you forgot or don't know your password.], :user_name => @unauthorized_user.name %>
       </p>
     <% elsif @unauthorized_message %>
       <p><%= @unauthorized_message %></p>
     <% elsif @needs_cookies %>
-      <p>Cookies are not enabled on your browser. Please adjust this in your security preferences before continuing.</p>
+      <p><%= t('needs_cookies', %{Cookies are not enabled on your browser. Please adjust this in your security preferences before continuing.}) %></p>
     <% elsif @files_domain %>
-      <p>Access to this page is limited to authorized users.  You do not have currently have permission to view this page.</p>
+      <p><%= t('needs_login', %{Access to this page is limited to authorized users.  You do not have currently have permission to view this page.}) %></p>
     <% elsif !@current_user %>
-      <p>Access to this page is limited to authorized users.  You will need to log in before you
-      can view the content on this page.</p>
+      <p><%= t('unauthorized_action', %{Access to this page is limited to authorized users.  You will need to log in before you can view the content on this page.}) %></p>
     <% elsif @context %>
       <p>
-      <% if @context.try_rescue(:is_public) %>This page is part of the content for the <%= @context.class.to_s.downcase %>, <strong><%= @context.name %></strong>.<% end %>
-      It appears that you don't 
-      have permission to access this page.  Please make sure you're authorized to 
-      view content in this <%= @context.class.to_s.downcase %>.  
+        <% if @context.try_rescue(:is_public) %>
+          <%= mt 'public_course', 'This page is part of the content for the course, **%{course}**.', :course => @context.name %>
+        <% end %>
+      <%= t('unauthorized_1', %{It appears that you don't have permission to access this page.  Please make sure you're authorized to view this content.}) %>
       <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
-        If you think you should be able to view this page, please use the
-        "Feedback" link to notify support of the problem.
+        <%= t('unauthorized_2', %{If you think you should be able to view this page, please use the "Feedback" link to notify support of the problem.}) %>
       <% end %>
       </p>
     <% end %>

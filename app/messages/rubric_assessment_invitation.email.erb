@@ -3,12 +3,12 @@
 <% end %>
 
 <% define_content :subject do %>
-  Assessment Invitation: <%= asset.rubric_association.title %>, <%= asset.rubric_association.context.name %>
+  <%= t :subject, "Assessment Invitation: %{rubric}, %{context}", :rubric => asset.rubric_association.title, :context => asset.rubric_association.context.name %>
 <% end %>
 
-You've been invited by <%= asset.user.name %> to assess their submission for <%= asset.rubric_association.title %>:
+<%= t :body, "You've been invited by %{user} to assess their submission for %{rubric}:", :user => asset.user.name, :rubric => asset.rubric_association.title %>
 
 <%= asset.rubric_association.description %>
 
-You can review and evaluate the entry here: 
+<%= t :link_message, "You can review and evaluate the entry here:" %>
 <%= content :link %>

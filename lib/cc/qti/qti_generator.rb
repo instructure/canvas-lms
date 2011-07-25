@@ -20,6 +20,7 @@ module CC
     class QTIGenerator
       include CC::CCHelper
       include QTIItems
+      delegate :add_error, :to => :@manifest
 
       def initialize(manifest, resources_node, html_exporter)
         @manifest = manifest
@@ -33,7 +34,7 @@ module CC
         qti = QTI::QTIGenerator.new(*args)
         qti.generate
       end
-
+      
       # Common Cartridge QTI doesn't support many of the quiz features needed
       # for canvas so this will export a CC-friendly QTI file and one that supports
       # everything needed for Canvas quizzes. In addition to the canvas-specific
@@ -43,64 +44,82 @@ module CC
         FileUtils::mkdir_p non_cc_folder
         
         @course.assessment_question_banks.active.each do |bank|
-          bank_mig_id = create_key(bank)
-          
-          rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, bank_mig_id + ".xml")
-          full_path = File.join(@export_dir, rel_path)
-          File.open(full_path, 'w') do |file|
-            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
-            generate_bank(doc, bank, bank_mig_id)
+          begin
+            generate_question_bank(bank)
+          rescue
+            title = bank.title rescue I18n.t('unknown_question_bank', "Unknown question bank")
+            add_error(I18n.t('course_exports.errors.question_bank', "The question bank \"%{title}\" failed to export", :title => title), $!)
           end
         end
         
         @course.quizzes.active.each do |quiz|
-          cc_qti_migration_id = create_key(quiz)
-          resource_dir = File.join(@export_dir, cc_qti_migration_id)
-          FileUtils::mkdir_p resource_dir
-
-          # Create the CC-friendly QTI
-          cc_qti_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_CC_QTI)
-          cc_qti_path = File.join(resource_dir, ASSESSMENT_CC_QTI)
-          File.open(cc_qti_path, 'w') do |file|
-            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
-            generate_assessment(doc, quiz, cc_qti_migration_id)
-          end
-
-          # Create the Canvas-specific QTI data
-          canvas_qti_rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, cc_qti_migration_id + ".xml")
-          canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
-          File.open(canvas_qti_path, 'w') do |file|
-            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
-            generate_assessment(doc, quiz, cc_qti_migration_id, false)
-          end
-
-          # Create the canvas metadata
-          alt_migration_id = create_key(quiz, 'canvas_')
-          meta_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_META)
-          meta_path = File.join(resource_dir, ASSESSMENT_META)
-          File.open(meta_path, 'w') do |file|
-            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
-            generate_assessment_meta(doc, quiz, cc_qti_migration_id)
-          end
-
-          @resources_node.resource(
-                  :identifier => cc_qti_migration_id,
-                  "type" => ASSESSMENT_TYPE
-          ) do |res|
-            res.file(:href=>cc_qti_rel_path)
-            res.dependency(:identifierref=>alt_migration_id)
-          end
-          @resources_node.resource(
-                  :identifier => alt_migration_id,
-                  :type => LOR,
-                  :href => meta_rel_path
-          ) do |res|
-            res.file(:href=>meta_rel_path)
-            res.file(:href=>canvas_qti_rel_path)
+          begin
+            generate_quiz(quiz)
+          rescue
+            title = quiz.title rescue I18n.t('unknown_quiz', "Unknown quiz")
+            add_error(I18n.t('course_exports.errors.quiz', "The quiz \"%{title}\" failed to export", :title => title), $!)
           end
         end
       end
-      
+
+      def generate_quiz(quiz)
+        cc_qti_migration_id = create_key(quiz)
+        resource_dir = File.join(@export_dir, cc_qti_migration_id)
+        FileUtils::mkdir_p resource_dir
+
+        # Create the CC-friendly QTI
+        cc_qti_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_CC_QTI)
+        cc_qti_path = File.join(resource_dir, ASSESSMENT_CC_QTI)
+        File.open(cc_qti_path, 'w') do |file|
+          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          generate_assessment(doc, quiz, cc_qti_migration_id)
+        end
+
+        # Create the Canvas-specific QTI data
+        canvas_qti_rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, cc_qti_migration_id + ".xml")
+        canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
+        File.open(canvas_qti_path, 'w') do |file|
+          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          generate_assessment(doc, quiz, cc_qti_migration_id, false)
+        end
+
+        # Create the canvas metadata
+        alt_migration_id = create_key(quiz, 'canvas_')
+        meta_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_META)
+        meta_path = File.join(resource_dir, ASSESSMENT_META)
+        File.open(meta_path, 'w') do |file|
+          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          generate_assessment_meta(doc, quiz, cc_qti_migration_id)
+        end
+
+        @resources_node.resource(
+                :identifier => cc_qti_migration_id,
+                "type" => ASSESSMENT_TYPE
+        ) do |res|
+          res.file(:href=>cc_qti_rel_path)
+          res.dependency(:identifierref=>alt_migration_id)
+        end
+        @resources_node.resource(
+                :identifier => alt_migration_id,
+                :type => LOR,
+                :href => meta_rel_path
+        ) do |res|
+          res.file(:href=>meta_rel_path)
+          res.file(:href=>canvas_qti_rel_path)
+        end
+      end
+
+      def generate_question_bank(bank)
+        bank_mig_id = create_key(bank)
+
+        rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, bank_mig_id + ".xml")
+        full_path = File.join(@export_dir, rel_path)
+        File.open(full_path, 'w') do |file|
+          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+          generate_bank(doc, bank, bank_mig_id)
+        end
+      end
+
       def generate_assessment_meta(doc, quiz, migration_id)
         doc.instruct!
         doc.quiz("identifier" => migration_id,

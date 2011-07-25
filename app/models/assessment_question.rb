@@ -24,7 +24,6 @@ class AssessmentQuestion < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :assessment_question_bank, :touch => true
   simply_versioned :automatic => false
-  adheres_to_policy
   acts_as_list :scope => :assessment_question_bank_id
   before_save :infer_defaults
   after_save :translate_links_if_changed
@@ -41,7 +40,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   set_policy do
     given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
-    set { can :read and can :create and can :update and can :delete }
+    can :read and can :create and can :update and can :delete
   end
   
   def infer_defaults
@@ -471,11 +470,11 @@ class AssessmentQuestion < ActiveRecord::Base
     end
     context.imported_migration_items << bank if context.imported_migration_items && !context.imported_migration_items.include?(bank)
     prep_for_import(hash, context)
-    question_data = ActiveRecord::Base.connection.quote hash.to_yaml
-    question_name = ActiveRecord::Base.connection.quote hash[:question_name]
+    question_data = AssessmentQuestion.connection.quote hash.to_yaml
+    question_name = AssessmentQuestion.connection.quote hash[:question_name]
     query = "INSERT INTO assessment_questions (name, question_data, context_id, context_type, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
     query += " VALUES (#{question_name},#{question_data},#{context.id},'#{context.class}','active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
-    id = ActiveRecord::Base.connection.insert(query)
+    id = AssessmentQuestion.connection.insert(query)
     hash['assessment_question_id'] = id
     hash
   end

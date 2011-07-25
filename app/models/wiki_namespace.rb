@@ -23,8 +23,7 @@ class WikiNamespace < ActiveRecord::Base
   belongs_to :wiki
   belongs_to :context, :polymorphic => true
   
-  adheres_to_policy
-  
+
   def to_atom
     Atom::Entry.new do |entry|
       entry.title     = self.name
@@ -49,16 +48,16 @@ class WikiNamespace < ActiveRecord::Base
   
   set_policy do
     given {|user| self.context.is_public }
-    set { can :read }
+    can :read
     
     given {|user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
-    set { can :read }
+    can :read
     
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
-    set { can :contribute and can :read and can :update and can :delete and can :create and can :create_page and can :update_page }
+    can :contribute and can :read and can :update and can :delete and can :create and can :create_page and can :update_page
     
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki) }#admins.include?(user) }
-    set { can :manage and can :read and can :update and can :create and can :delete and can :create_page and can :update_page }
+    can :manage and can :read and can :update and can :create and can :delete and can :create_page and can :update_page
   end
   
   def self.default_for_context(context)

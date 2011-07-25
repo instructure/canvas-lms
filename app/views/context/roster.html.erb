@@ -3,9 +3,9 @@
   @active_tab="people"
   content_for :page_title, case @context
   when Course
-    t('titles.course_roster', "Course Roster: %{course_name}", :course_name => @context.name)
+    join_title t('titles.course_roster', "Course Roster"), @context.name
   when Group
-    t('titles.group_roster', "Group Roster: %{group_name}", :group_name => @context.name)
+    join_title t('titles.group_roster', "Group Roster"), @context.name
   end
 %>
 
@@ -48,13 +48,13 @@
     </div>
     <% if !@categories.empty? %>
       <div class="rs-margin-lr rs-margin-top">
-      <h3 style="margin-bottom: 0;">Message a Group</h3>
+      <h3 style="margin-bottom: 0;"><%= t 'headings.send_message_to_group', 'Message a Group' %></h3>
       <% @categories.each do |category| %>
         <%= category %>
         <ul class="unstyled_list" style="margin-left: 10px;">
           <% @groups.select{|g| g.category == category}.each do |group| %>
             <li class="message_group">
-              <a href="#" class="message_group_link mail">Message <%= group.name %></a>
+              <a href="#" class="message_group_link mail"><%= t 'links.send_message_to', "Message %{group_name}", :group_name => group.name %></a>
               <% group.users.each do |user| %>
               <div class="recipient" style="display: none;">
                 <a href="<%= context_url(@context, :context_user_url, user.id) %>" class="recipient_name"><%= context_user_name(@context, user) %></a>

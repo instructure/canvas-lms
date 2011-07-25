@@ -1,7 +1,7 @@
 <% user_name = @quiz.survey? && @quiz.anonymous_submissions ? t(:anonymous_username, "Student") : context_user_name(@context, @user) %>
 <% content_for :page_title, (@quiz.survey? ?
-     t(:page_title_survey, "%{user}'s Survey History: %{quiz_title}", :user => user_name, :quiz_title => @quiz.quiz_title || "Survey #{@context.name}") :
-     t(:page_title_quiz, "%{user}'s Quiz History: %{quiz_title}", :user => user_name, :quiz_title => @quiz.quiz_title || "Quiz #{@context.name}"))
+     join_title(t(:page_title_survey, "%{user}'s Survey History", :user => user_name), @quiz.quiz_title || t(:default_survey_name, "Survey %{course_name}", :course_name => @context.name)) :
+     join_title(t(:page_title_quiz, "%{user}'s Quiz History", :user => user_name), @quiz.quiz_title || t(:default_quiz_name, "Quiz %{course_name}", :course_name => @context.name)))
 %>
 
 <% unless params[:headless] %>

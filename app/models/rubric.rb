@@ -25,7 +25,6 @@ class Rubric < ActiveRecord::Base
   has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
-  adheres_to_policy
   before_save :default_values
   after_save :update_outcome_tags
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -48,28 +47,28 @@ class Rubric < ActiveRecord::Base
   
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_grades)}
-    set {can :read and can :create and can :delete_associations }
+    can :read and can :create and can :delete_associations
     
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
-    set {can :read and can :create and can :delete_associations }
+    can :read and can :create and can :delete_associations
     
     given {|user, session| self.cached_context_grants_right?(user, session, :manage)}
-    set {can :read and can :create and can :delete_associations }
+    can :read and can :create and can :delete_associations
     
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_assignments)}
-    set {can :update and can :delete }
+    can :update and can :delete
     
     given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_grades)}
-    set {can :update and can :delete }
+    can :update and can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
-    set {can :delete }
+    can :delete
     
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_grades)}
-    set {can :delete }
+    can :delete
 
     given {|user, session| self.cached_context_grants_right?(user, session, :read) }
-    set {can :read }
+    can :read
   end
   
   workflow do

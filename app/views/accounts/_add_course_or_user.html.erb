@@ -19,7 +19,7 @@
         <td><%= f.blabel :name, :full_name, :en => "Full Name" %></td>
         <td>
           <%= f.text_field :name %>
-          <div style="font-size: 0.8em; color: #888;">This name will be used by teachers for grading.</div>
+          <div style="font-size: 0.8em; color: #888;"><%= t :full_name_description, 'This name will be used by teachers for grading.' %></div>
         </td>
       <tr>
         <td><%= f.blabel :short_name, :en => "Display Name" %></td>
@@ -28,7 +28,7 @@
           <div style="font-size: 0.8em; color: #888;"><%= t(:display_name_help, "People will see this name in discussions, messages and comments.") %></div>
         </td>
       </tr>
-      <% if @root_account.login_handle_name != "Email" %>
+      <% if @root_account.login_handle_name_is_customized? %>
       <tr>
         <td><%= blabel :pseudonym, :path, :en => "Email" %></td>
         <td><%= text_field :pseudonym, :path %></td>

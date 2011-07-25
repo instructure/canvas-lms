@@ -48,6 +48,7 @@ public/*/*/*/*/*/*/*/*/*.gz
 public/assets/*
 doc/api/*
 doc/plugins/*
+public/doc/api/*
 .yardoc/*
 debian/canvas-lms.postinst.debhelper
 debian/canvas-lms.postrm.debhelper

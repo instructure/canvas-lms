@@ -24,6 +24,7 @@ class PageView < ActiveRecord::Base
   belongs_to :developer_key
   belongs_to :user
   belongs_to :account
+  belongs_to :real_user, :class_name => 'User'
   
   before_save :ensure_account
   before_save :cap_interaction_seconds
@@ -38,7 +39,7 @@ class PageView < ActiveRecord::Base
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
-  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent
+  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user
   
   def ensure_account
     self.account_id ||= (self.context_type == 'Account' ? self.context_id : self.context.account_id) rescue nil
@@ -101,7 +102,6 @@ class PageView < ActiveRecord::Base
   end
 
   def self.page_views_enabled?
-    return false if Rails.env.test?
     !!page_view_method
   end
 

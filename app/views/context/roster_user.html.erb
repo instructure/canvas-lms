@@ -3,7 +3,7 @@
   add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
   @active_tab="people"
 %>
-<% content_for :page_title do %><%= context_user_name(@context, @user) %>, <%= @context.name %><% end %>
+<% content_for :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
 
 <% content_for :right_side do %>
   <h2><%= context_user_name(@context, @user) %></h2>

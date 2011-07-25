@@ -143,8 +143,8 @@ class NotificationPolicy < ActiveRecord::Base
         end
       end
     end
-    Notification.transaction do 
-      ActiveRecord::Base.connection.execute("DELETE FROM notification_policies WHERE id IN (#{@old_policies.map(&:id).join(',')})") unless @old_policies.empty?
+    NotificationPolicy.transaction do 
+      NotificationPolicy.connection.execute("DELETE FROM notification_policies WHERE id IN (#{@old_policies.map(&:id).join(',')})") unless @old_policies.empty?
       prefs_to_save.each{|p| p.save! }
     end
     categories = Notification.dashboard_categories

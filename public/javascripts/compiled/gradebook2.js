@@ -70,6 +70,7 @@
             $.htmlEscapeValues(student);
             student.computed_current_score || (student.computed_current_score = 0);
             student.computed_final_score || (student.computed_final_score = 0);
+            student.secondary_identifier = student.sis_login_id || student.login_id;
             this.students[student.id] = student;
             student.section = section;
             _ref2 = this.assignments;

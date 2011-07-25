@@ -4,11 +4,9 @@ AdheresToPolicy
 This allows us to do something like:
 
 class Account < ActiveRecord::Base
-  adheres_to_policy
-  
   set_policy do
     given { |u| self.user == u }
-    set { can :read and can :write }
+    can :read and can :write
   end
 end
 

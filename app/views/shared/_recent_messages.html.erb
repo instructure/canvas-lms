@@ -1,5 +1,5 @@
 <% show_limit ||= 15; conferences ||= []; show_context ||= false; recent_messages ||= [] %>
-<h2>Recent Activity</h2>
+<h2><%= t 'headings.recent_activity', 'Recent Activity' %></h2>
 <div class="clear"></div>
 <div id="topic_list" class="recent_messages_list <%= 'recent_messages_show_context' if show_context %>">
   <%= render :partial => 'users/account_notification', :collection => @account_notifications %>

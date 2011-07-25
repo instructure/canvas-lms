@@ -20,6 +20,7 @@ module CC
     ZIP_DIR = 'zip_dir'
     
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file
+    delegate :add_error, :to => :@content_export, :allow_nil => true
 
     def initialize(content_export, opts={})
       @content_export = content_export
@@ -31,6 +32,7 @@ module CC
       @zip_name = nil
       @logger = Rails.logger
       @migration_config = Setting.from_config('external_migration')
+      @migration_config ||= {:keep_after_complete => false} 
     end
 
     def self.export(content_export, opts={})
@@ -60,9 +62,7 @@ module CC
           end
         end
       rescue
-        message = $!.to_s
-        stack = "#{$!}: #{$!.backtrace.join("\n")}"
-        @content_export.add_error(message, stack) if @content_export
+        add_error(I18n.t('course_exports.errors.course_export', "Error running course export."), $!)
         @logger.error $!
         return false
       ensure
@@ -78,6 +78,14 @@ module CC
       @content_export.fast_update_progress(progress) if @content_export  
     end
     
+    def errors
+      @content_export ? @content_export.error_messages : []
+    end
+    
+    def export_id
+      @content_export ? @content_export.id : nil
+    end
+    
     private
     
     def copy_all_to_zip
@@ -90,7 +98,7 @@ module CC
 
     def create_export_dir
       slug = "common_cartridge_#{@course.id}_user_#{@user.id}"
-      if @migration_config && @migration_config[:data_folder]
+      if @migration_config[:data_folder]
         folder = @migration_config[:data_folder]
       else
         folder = Dir.tmpdir

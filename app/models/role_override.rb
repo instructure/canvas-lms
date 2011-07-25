@@ -477,7 +477,7 @@ class RoleOverride < ActiveRecord::Base
       },
       :become_user => {
         :label => lambda { t('permissions.become_user', "Become other users") },
-        :account_only => :site_admin,
+        :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },

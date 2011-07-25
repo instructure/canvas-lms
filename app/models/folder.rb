@@ -42,8 +42,7 @@ class Folder < ActiveRecord::Base
   validates_presence_of :context_id
   validates_presence_of :context_type
   
-  adheres_to_policy
-  
+
   workflow do
     # Anyone who has read access to the course can view
     state :visible
@@ -319,15 +318,15 @@ class Folder < ActiveRecord::Base
   
   set_policy do
     given { |user, session| self.visible? && self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
-    set { can :read }
+    can :read
 
     given { |user, session| self.visible? && !self.locked? && self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
-    set { can :read_contents }
+    can :read_contents
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) }#admins.include?(user) }
-    set { can :update and can :delete and can :create and can :read and can :read_contents}
+    can :update and can :delete and can :create and can :read and can :read_contents
 
     given {|user, session| self.protected? && !self.locked? && self.cached_context_grants_right?(user, session, :read) && self.context.users.include?(user) }
-    set { can :read and can :read_contents }
+    can :read and can :read_contents
   end
 end

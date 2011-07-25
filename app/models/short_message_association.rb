@@ -21,19 +21,18 @@ class ShortMessageAssociation < ActiveRecord::Base
   belongs_to :short_message
   belongs_to :context, :polymorphic => true
   
-  adheres_to_policy
-  
+
   set_policy do
     given {|user, session| self.context.grants_rights?(user, session, :read)[:read] }
-    set { can :read }
+    can :read
     
     given {|user, session| self.context.grants_right?(user, session, :participate_as_student) }
-    set { can :read and can :create }
+    can :read and can :create
     
     given {|user, session| user && self.short_message && self.short_message.user_id == user.id }
-    set { can :read and can :delete }
+    can :read and can :delete
     
     given {|user, session| self.context.grants_rights?(user, session, :manage)[:manage] }
-    set { can :read and can :create and can :delete }
+    can :read and can :create and can :delete
   end
 end

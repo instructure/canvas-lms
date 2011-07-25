@@ -23,21 +23,26 @@ module CC
       FileUtils::mkdir_p wiki_folder
       
       @course.wiki.wiki_pages.active.each do |page|
-        migration_id = CCHelper.create_key(page)
-        file_name = "#{page.url}.html"
-        relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)
-        path = File.join(wiki_folder, file_name)
-        
-        File.open(path, 'w') do |file|
-          file << @html_exporter.html_page(page.body, page.title, @course, @manifest.exporter.user, migration_id)
-        end
-        
-        @resources.resource(
-                :identifier => migration_id,
-                "type" => CCHelper::WEBCONTENT,
-                :href => relative_path
-        ) do |res|
-          res.file(:href=>relative_path)
+        begin
+          migration_id = CCHelper.create_key(page)
+          file_name = "#{page.url}.html"
+          relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)
+          path = File.join(wiki_folder, file_name)
+
+          File.open(path, 'w') do |file|
+            file << @html_exporter.html_page(page.body, page.title, @course, @manifest.exporter.user, migration_id)
+          end
+          
+          @resources.resource(
+                  :identifier => migration_id,
+                  "type" => CCHelper::WEBCONTENT,
+                  :href => relative_path
+          ) do |res|
+            res.file(:href=>relative_path)
+          end
+        rescue
+          title = page.title rescue I18n.t('course_exports.unknown_titles.wiki_page', "Unknown wiki page")
+          add_error(I18n.t('course_exports.errors.wiki_page', "The wiki page \"%{title}\" failed to export", :title => title), $!)
         end
       end
     end

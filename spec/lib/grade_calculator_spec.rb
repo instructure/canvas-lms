@@ -30,6 +30,41 @@ describe GradeCalculator do
       @user.enrollments.first.computed_final_score.should eql(25.0)
     end
     
+    it "should recompute when an assignment's points_possible changes'" do
+      course_with_student
+      @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
+      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @submission = @assignment.grade_student(@user, :grade => "5")
+      @user.enrollments.first.computed_current_score.should eql(50.0)
+      @user.enrollments.first.computed_final_score.should eql(50.0)
+      
+      @assignment.points_possible = 5
+      @assignment.save!
+      
+      @user.enrollments.first.computed_current_score.should eql(100.0)
+      @user.enrollments.first.computed_final_score.should eql(100.0)
+    end
+    
+    it "should recompute when an assignment group's weight changes'" do
+      course_with_student
+      @course.group_weighting_scheme = "percent"
+      @course.save
+      @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 50)
+      @group2 = @course.assignment_groups.create!(:name => "some group2", :group_weight => 50)
+      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @assignment.grade_student(@user, :grade => "10")
+      @user.enrollments.first.computed_current_score.should eql(100.0)
+      @user.enrollments.first.computed_final_score.should eql(50.0)
+      
+      @group.group_weight = 60
+      @group2.group_weight = 40
+      @group.save!
+      @group2.save!
+      
+      @user.enrollments.first.computed_current_score.should eql(100.0)
+      @user.enrollments.first.computed_final_score.should eql(60.0)
+    end
+    
     it "should ignore groups with no grades for current grade but not final grade" do
       course_with_student
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 50)

@@ -122,28 +122,27 @@ class Submission < ActiveRecord::Base
   attr_reader :suppress_broadcast
   attr_reader :group_broadcast_submission
 
-  adheres_to_policy
-  
+
   has_a_broadcast_policy
 
   simply_versioned :explicit => true
   
   set_policy do
     given {|user| user && user.id == self.user_id }
-    set {can :read and can :comment and can :make_group_comment and can :read_grade and can :submit }
+    can :read and can :comment and can :make_group_comment and can :read_grade and can :submit
     
     given {|user| self.assignment && self.assignment.context && user && self.user &&
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active') }
-    set {can :read and can :read_comments}
+    can :read and can :read_comments
     
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
-    set {can :read and can :comment and can :make_group_comment and can :read_grade and can :grade }
+    can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
     
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :read_as_admin) }
-    set {can :read and can :read_grade }
+    can :read and can :read_grade
     
     given {|user| user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
-    set {can :read and can :comment}
+    can :read and can :comment
   end
   
   on_update_send_to_streams do
@@ -828,20 +827,6 @@ class Submission < ActiveRecord::Base
                                     :href => "http://#{HostUrl.context_host(self.assignment.context)}/#{prefix}/assignments/#{self.assignment_id}/submissions/#{self.id}")
       entry.content   = Atom::Content::Html.new(self.body || "")
       # entry.author    = Atom::Person.new(self.user)
-    end
-  end
-
-  # Import stuff
-  attr_accessor :comparison, :prior, :focus
-  
-  # Stuff Ryan stuck in to get the json to print the right stuff.
-  def set_serialization_options
-    if comparison == :equal
-      @serialization_methods = [:comparison, :focus]
-      #default_options = { :methods => [ :comparison, :focus ]}
-    else
-      @serialization_methods = [:comparison, :prior, :focus]
-      #default_options = { :methods => [ :comparison, :prior, :focus ]}
     end
   end
 

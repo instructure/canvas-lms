@@ -118,7 +118,7 @@ Spec::Runner.configure do |config|
   end
 
   def user(opts={})
-    @user = User.create!
+    @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
     @user
   end
@@ -273,6 +273,22 @@ Spec::Runner.configure do |config|
     importer = process_csv_data(*lines)
     importer.errors.should == []
     importer.warnings.should == []
+  end
+
+  def enable_cache
+    old_cache = RAILS_CACHE
+    silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
+    yield
+  ensure
+    silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
+  end
+
+  # enforce forgery protection, so we can verify usage of the authenticity token
+  def enable_forgery_protection
+    ActionController::Base.class_eval { alias_method :_old_protect, :allow_forgery_protection; def allow_forgery_protection; true; end }
+    yield
+  ensure
+    ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
   end
 
 end

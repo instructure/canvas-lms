@@ -110,7 +110,6 @@ class WikiPage < ActiveRecord::Base
   end
   
   has_a_broadcast_policy
-  adheres_to_policy
   simply_versioned
   after_save :remove_changed_flag
   
@@ -219,19 +218,19 @@ class WikiPage < ActiveRecord::Base
   
   set_policy do
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :read) && can_read_page?(user) }
-    set { can :read }
+    can :read
     
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :contribute) && can_read_page?(user) }
-    set { can :read }
+    can :read
 
     given {|user, session| self.editing_role?(user) && !self.locked_for?(nil, user) }
-    set { can :read and can :update_content and can :create }
+    can :read and can :update_content and can :create
     
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :manage) }
-    set { can :create and can :read and can :update and can :delete and can :update_content }
+    can :create and can :read and can :update and can :delete and can :update_content
     
     given {|user, session| self.current_namespace(user).grants_right?(user, session, :manage_content) }
-    set { can :create and can :read and can :update and can :delete and can :update_content }
+    can :create and can :read and can :update and can :delete and can :update_content
     
   end
   

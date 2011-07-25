@@ -27,11 +27,10 @@ class LearningOutcome < ActiveRecord::Base
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
-  adheres_to_policy
-  
+
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_outcomes) }
-    set { can :create and can :read and can :update and can :delete }
+    can :create and can :read and can :update and can :delete
   end
   
   def infer_defaults
@@ -66,7 +65,7 @@ class LearningOutcome < ActiveRecord::Base
       tag.position = idx + 1
       updates << "WHEN id=#{tag.id} THEN #{idx + 1}"
     end
-    ActiveRecord::Base.connection.execute("UPDATE content_tags SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{tags.map(&:id).join(",")})")
+    ContentTag.connection.execute("UPDATE content_tags SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{tags.map(&:id).join(",")})")
     self.touch
     tags
   end

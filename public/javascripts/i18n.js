@@ -13,11 +13,7 @@ I18n.locale = null;
 // Set the placeholder format. Accepts `{{placeholder}}` and `%{placeholder}`.
 I18n.PLACEHOLDER = /(?:\{\{|%\{)(.*?)(?:\}\}?)/gm;
 
-I18n.isValidNode = function(obj, node) {
-    // local undefined variable in case another library corrupts window.undefined
-    var undef;
-    return obj[node] !== null && obj[node] !== undef;
-}
+I18n.isValidNode = function(obj, node) { return (node in obj); }
 
 I18n.lookup = function(scope, options) {
   var translations = this.prepareOptions(I18n.translations);

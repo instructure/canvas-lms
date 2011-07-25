@@ -25,7 +25,6 @@ class AssessmentQuestionBank < ActiveRecord::Base
   has_many :learning_outcome_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_many :quiz_groups
   before_save :infer_defaults
-  adheres_to_policy
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   
   workflow do
@@ -35,10 +34,10 @@ class AssessmentQuestionBank < ActiveRecord::Base
   
   set_policy do
     given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
-    set { can :read and can :create and can :update and can :delete and can :manage }
+    can :read and can :create and can :update and can :delete and can :manage
     
     given{|user, session| user && self.assessment_question_bank_users.exists?(:user_id => user.id) }
-    set { can :read }
+    can :read
   end
 
   def self.default_imported_title
@@ -85,7 +84,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
   
   def select_for_submission(count)
-    ids = ActiveRecord::Base.connection.select_all("SELECT id FROM assessment_questions WHERE workflow_state != 'deleted' AND assessment_question_bank_id = #{self.id}")
+    ids = AssessmentQuestion.connection.select_all("SELECT id FROM assessment_questions WHERE workflow_state != 'deleted' AND assessment_question_bank_id = #{self.id}")
     ids = ids.sort_by{rand}[0...count].map{|i|i['id']}
     ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids)
   end

@@ -24,8 +24,13 @@ def init
   @page_title = options[:title]
 
   if @file
-    @contents = File.read_binary(@file)
-    @file = File.basename(@file)
+    if @file.is_a?(String)
+      @contents = File.read(@file)
+      @file = File.basename(@file)
+    else
+      @contents = @file.contents
+      @file = File.basename(@file.path)
+    end
     sections :layout, [:diskfile]
   elsif options[:controllers]
     sections :layout, [T('topic')]

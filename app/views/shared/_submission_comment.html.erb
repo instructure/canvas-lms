@@ -3,8 +3,8 @@
 <div class="communication_message submission_comment" style="<%= hidden unless submission_comment %>" id="submission_comment_<%= submission_comment ? submission_comment.id : "blank" %>">
   <div class="header">
     <div class="post_date created_at"><%= datetime_string(submission_comment.created_at) rescue nbsp %></div>
-    <%= image_tag "grading_icon.png", :class => "topic_icon", :alt => "grading", :title => "Submission Comment", :style => brief ? "padding: 2px;" : "" %>
-    <a href="<%= context_url(context, :context_assignment_submission_url, submission_comment.submission.assignment_id, submission_comment.submission.user_id) %>" class="title subject"><%= submission_comment.submission.assignment.title rescue "Assignment" %>, <%= context_user_name(context, submission_comment.submission.user) %></a>
+    <%= image_tag "grading_icon.png", :class => "topic_icon", :alt => t(:grading_alt, "grading"), :title => t(:submission_comment, "Submission Comment"), :style => brief ? "padding: 2px;" : "" %>
+    <a href="<%= context_url(context, :context_assignment_submission_url, submission_comment.submission.assignment_id, submission_comment.submission.user_id) %>" class="title subject"><%= submission_comment.submission.assignment.title rescue t(:assignment, "Assignment") %>, <%= context_user_name(context, submission_comment.submission.user) %></a>
     <a span="padding-left: 10px;" href="<%= context_url(context, :context_user_url, submission_comment ? submission_comment.author_id : '{{ user_id }}') %>" class="user_name"><%= context_user_name(context, submission_comment.author) rescue nbsp %></a>
     <div class="clear"></div>
   </div>

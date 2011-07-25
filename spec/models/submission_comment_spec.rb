@@ -44,6 +44,7 @@ describe SubmissionComment do
     @course.offer
     te = @course.enroll_teacher(user)
     se = @course.enroll_student(user)
+    @assignment.reload
     @submission = @assignment.submit_homework(se.user, :body => 'some message')
     @submission.created_at = Time.now - 60
     @submission.save
@@ -59,6 +60,7 @@ describe SubmissionComment do
     @course.offer
     @course.enroll_teacher(user)
     se = @course.enroll_student(user)
+    @assignment.reload
     @submission = @assignment.submit_homework(se.user, :body => 'some message')
     @submission.created_at = Time.now - 60
     @submission.save
@@ -123,6 +125,7 @@ This text has a http://www.google.com link in it...
     @course.offer
     @course.enroll_teacher(user)
     se = @course.enroll_student(user)
+    @assignment.reload
     @submission = @assignment.submit_homework(se.user, :body => 'some message')
     @submission.created_at = Time.now - 60
     @submission.save
@@ -144,6 +147,7 @@ This text has a http://www.google.com link in it...
     @course.offer
     te = @course.enroll_teacher(@user)
     se = @course.enroll_student(user)
+    @assignment.reload
     @submission = @assignment.submit_homework(se.user, :body => 'some message')
     @submission.created_at = Time.now - 60
     @submission.save

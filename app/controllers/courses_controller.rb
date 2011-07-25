@@ -221,17 +221,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def api_student_enrollments(context)
-    enrollments = context.student_enrollments
-    enrollments.map do |e|
-      hash = e.user.as_json(:include_root => false, :only => STUDENT_API_FIELDS)
-      hash.merge!(
-        :secondary_identifier   => e.user.secondary_identifier,
-        :computed_final_score   => e.computed_final_score,
-        :computed_current_score => e.computed_current_score)
-    end
-  end
-
   def destroy
     @context = Course.find(params[:id])
     if authorized_action(@context, @current_user, :delete)
@@ -260,10 +249,10 @@ class CoursesController < ApplicationController
       @range_end = Date.tomorrow
       
       query = "SELECT COUNT(id), SUM(size) FROM attachments WHERE context_id=%s AND context_type='Course' AND root_attachment_id IS NULL AND file_state != 'deleted'"
-      row = ActiveRecord::Base.connection.select_rows(query % [@context.id]).first
+      row = Attachment.connection.select_rows(query % [@context.id]).first
       @file_count, @files_size = [row[0].to_i, row[1].to_i]
       query = "SELECT COUNT(id), SUM(max_size) FROM media_objects WHERE context_id=%s AND context_type='Course' AND attachment_id IS NULL AND workflow_state != 'deleted'"
-      row = ActiveRecord::Base.connection.select_rows(query % [@context.id]).first
+      row = MediaObject.connection.select_rows(query % [@context.id]).first
       @media_file_count, @media_files_size = [row[0].to_i, row[1].to_i]
       
       if params[:range] && params[:date]
@@ -524,10 +513,9 @@ class CoursesController < ApplicationController
       end
       email = (@current_user && @current_user.email) || params[:email]
       @user = @current_user
-      email_list = EmailList.new(params[:email])
-      @enrollments = EnrollmentsFromEmailList.process(email_list, :course_id => @context.id, :enrollment_type => 'StudentEnrollment', :limit => 1)
+      @enrollments = EnrollmentsFromUserList.process(UserList.new(params[:email], @context.root_account), @context, :enrollment_type => 'StudentEnrollment', :limit => 1)
       if @enrollments.length == 0
-        flash[:error] = t('errors.invalid_email', "Invalid email address, please try again")
+        flash[:error] = t('errors.invalid_user', "Invalid user, please try again")
         render :action => 'open_enrollment'
         return
       else
@@ -594,7 +582,7 @@ class CoursesController < ApplicationController
         get_sorted_assignments
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
-        @modules = ContextModule.fast_cached_for_context(@context)
+        @modules = @context.context_modules.active
         @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).scoped(:select => ['context_module_id, collapsed']).select{|p| p.collapsed? }.map(&:context_module_id)
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
@@ -736,16 +724,14 @@ class CoursesController < ApplicationController
     can_add ||= params[:enrollment_type] == 'TeacherEnrollment' && @context.teacherless? && @context.grants_right?(@current_user, session, :manage_students)
     can_add ||= @context.grants_right?(@current_user, session, :manage_admin_users)
     if can_add
-      params[:user_emails] ||= ""
+      params[:user_list] ||= ""
       
-      email_list = EmailList.new(params[:user_emails])
-
       respond_to do |format|
         @enrollment_state = nil
         if params[:auto_accept] && @context.account.grants_right?(@current_user, session, :manage_admin_users)
           @enrollment_state = 'active'
         end
-        if (@enrollments = EnrollmentsFromEmailList.process(email_list, :course_id => @context.id, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_priveleges_to_course_section => params[:limit_priveleges_to_course_section] == '1', :enrollment_state => @enrollment_state))
+        if (@enrollments = EnrollmentsFromUserList.process(UserList.new(params[:user_list], @context.root_account), @context, :course_section_id => params[:course_section_id], :enrollment_type => params[:enrollment_type], :limit_priveleges_to_course_section => params[:limit_priveleges_to_course_section] == '1', :enrollment_state => @enrollment_state))
           format.json { render :json => @enrollments.to_json(:include => :user, :methods => [:type, :email, :last_name_first, :users_pseudonym_id, :communication_channel_id]) }
         else
           format.json { render :json => "", :status => :bad_request }
@@ -851,6 +837,7 @@ class CoursesController < ApplicationController
       end
       if !@course.account.grants_right?(@current_user, session, :manage_courses)
         params[:course].delete :storage_quota
+        params[:course].delete :storage_quota_mb
         if @course.root_account.settings[:prevent_course_renaming_by_teachers]
           params[:course].delete :name
           params[:course].delete :course_code
@@ -876,7 +863,7 @@ class CoursesController < ApplicationController
           flash[:notice] = t('notices.updated', 'Course was successfully updated.')
           format.html { redirect_to((!params[:continue_to] || params[:continue_to].empty?) ? course_url(@course) : params[:continue_to]) }
           format.xml  { head :ok }
-          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title]), :status => :ok }
+          format.json { render :json => @course.to_json(:methods => [:readable_license, :quota, :account_name, :term_name, :grading_standard_title, :storage_quota_mb]), :status => :ok }
         else
           format.html { render :action => "edit" }
           format.xml  { render :xml => @course.errors.to_xml }

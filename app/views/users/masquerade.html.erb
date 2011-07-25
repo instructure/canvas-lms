@@ -9,6 +9,13 @@
   <% else %>
     <span class="warning-text"><%= t('are_you_sure_start', 'Are you sure you want to masquerade as this user?') %></span>
     <% link_text = "Masquerade as user" %>
+    <p><%= mt 'details', <<-HEREDOC
+Masquerading is essentially logging in as this user without a password.
+You will be able to take any action as if you were this user, and from other users' points of views,
+it will be as if this user performed them. However, audit logs record the fact that
+**you** were the one that actually performed the actions on behalf of this user.
+HEREDOC
+      %></p>
   <% end %>
 
   <div style="float: right">

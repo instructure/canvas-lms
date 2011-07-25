@@ -40,7 +40,7 @@ shared_examples_for "grading standards selenium tests" do
     driver.find_element(:css, ".edit_full_assignment_link").click
     form = driver.find_element(:css, "#edit_assignment_form")
     form.find_element(:css, ".more_options_link").click
-    form.find_element(:css, ".grading_type option[value='letter_grade']").select
+    form.find_element(:css, ".grading_type option[value='letter_grade']").click
     form.find_element(:css, ".edit_letter_grades_link").displayed?.should be_true
     form.find_element(:css, ".edit_letter_grades_link").click
     

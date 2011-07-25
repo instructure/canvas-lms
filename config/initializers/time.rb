@@ -16,3 +16,11 @@ if RUBY_VERSION < "1.9."
     alias_method_chain :strftime, :'1_9_parity'
   end
 end
+
+# Object#blank? calls respond_to?, which has to instantiate the time object
+# by doing an expensive time zone calculation.  So just skip that.
+class ActiveSupport::TimeWithZone
+  def blank?
+    false
+  end
+end

@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= @quiz.quiz_title || @quiz.readable_type %>: <%= @context.name %><% end %>
+<% content_for :page_title do %><%= join_title(@quiz.quiz_title || @quiz.readable_type, @context.name) %><% end %>
 
 <% if @headers %>
   <% content_for :right_side do %>

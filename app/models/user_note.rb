@@ -19,7 +19,6 @@
 class UserNote < ActiveRecord::Base
   include Workflow
   attr_accessible :user, :note, :title, :creator
-  adheres_to_policy
   belongs_to :user
   belongs_to :creator, :class_name => 'User', :foreign_key => :created_by_id
   validates_length_of :note, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -37,13 +36,13 @@ class UserNote < ActiveRecord::Base
   
   set_policy do
     given { |user| self.creator == user }
-    set { can :delete and can :read }
+    can :delete and can :read
     
     given { |user| self.user.grants_right?(user, nil, :delete_user_notes) }
-    set { can :delete and can :read }
+    can :delete and can :read
     
     given { |user| self.user.grants_right?(user, nil, :read_user_notes) }
-    set { can :read }
+    can :read
   end
   
   alias_method :destroy!, :destroy

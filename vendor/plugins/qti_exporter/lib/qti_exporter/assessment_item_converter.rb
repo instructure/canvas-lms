@@ -200,7 +200,7 @@ class AssessmentItemConverter
     end
     text = node.inner_html.strip
     # Clear WebCT-specific relative paths
-    text.gsub(%r{/webct/RelativeResourceManager/Template/}, '')
+    text.gsub!(%r{/webct/RelativeResourceManager/Template/}, '')
     text.gsub(%r{/webct/urw/[^/]+/RelativeResourceManager\?contentID=(\d*)}, "$CANVAS_OBJECT_REFERENCE$/attachments/\\1")
   end
   

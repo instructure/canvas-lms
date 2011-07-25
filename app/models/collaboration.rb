@@ -37,8 +37,7 @@ class Collaboration < ActiveRecord::Base
   
   before_destroy :destroy_collaborators
   
-  adheres_to_policy
-  
+
   workflow do
     state :active
     state :deleted
@@ -103,16 +102,16 @@ class Collaboration < ActiveRecord::Base
   
   set_policy do
     given {|user, session| !self.new_record? && (self.user_id == user.id || self.users.include?(user)) }
-    set { can :read }
+    can :read
     
     given {|user, session| self.cached_context_grants_right?(user, session, :create_collaborations) }
-    set { can :create }
+    can :create
     
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_content) }
-    set { can :read and can :update and can :delete }
+    can :read and can :update and can :delete
     
     given {|user, session| user && self.user_id == user.id && self.cached_context_grants_right?(user, session, :create_collaborations) }
-    set { can :read and can :update and can :delete }
+    can :read and can :update and can :delete
   end
   
   def assign_uuid

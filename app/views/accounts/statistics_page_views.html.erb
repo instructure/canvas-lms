@@ -10,18 +10,22 @@
 
 <h2><%= t(:title, "Page View Reports") %></h2>
 <% form_tag account_statistics_page_views_url(@account), :method => :post do %>
-  <div style="float: left;">
-    <label for="range_from">from&nbsp;</label>
-  </div>
-  <div style="float: left;">
-    <input type="text" id="range_from" name="start_at" class="date_field" value="<%= date_string(@start_at) %>" style="width: 75px;"/>
-  </div>
-  <div style="float: left;">
-    <label for="range_to">&nbsp;to&nbsp;</label>
-  </div>
-  <div style="float: left;">
-    <input type="text" id="range_to" name="end_at" class="date_field" value="<%= date_string(@end_at) %>" style="width: 75px;"/>
-  </div>
+  <% ot "date_range", "*from* %{start_date} **to** %{end_date}",
+        :start_date => capture { %>
+          <div style="float: left;">
+            <input type="text" id="range_from" name="start_at" class="date_field" value="<%= date_string(@start_at) %>" style="width: 75px;"/>
+          </div>
+        <% },
+        :end_date => capture { %>
+          <div style="float: left;">
+            <input type="text" id="range_to" name="end_at" class="date_field" value="<%= date_string(@end_at) %>" style="width: 75px;"/>
+          </div>
+        <% },
+        :wrapper => {
+          '*' => '<div style="float: left;"><label for="range_from">\1&nbsp;</label></div>',
+          '**' => '<div style="float: left;"><label for="range_to">&nbsp;\1&nbsp;</label></div>',
+        }
+  %>
   <div style="float: left; padding-left: 5px;">
     <button type="submit" class="button small-button"><%= t(:go_button, "Go") %></button>
   </div>
@@ -44,7 +48,7 @@
     try {
       var pageViewHourlyReport = <%= raw @account.page_view_hourly_report(@start_at, @end_at).to_json %>;
       var r = Raphael('hourly_usage');
-      var x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]; //'12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'];
+      var x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
       var y = [];
       var anyFound = false;
       for(var idx = 0; idx < 24; idx++) {
@@ -53,8 +57,8 @@
       }
       if(anyFound) {
         r.g.linechart(40, 10, 500, 220, x, y, {nostroke: false, smooth: true})
-        r.g.axis(40, 230, 220, 0, 100, 5, 1, [' ', '20%', '40%', '60%', '80%', '100%'], '|');
-        r.g.axis(40, 230, 500, 0, 23, 24, 0, ['12am','1am','2am','3am','4am','5am','6am','7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm','8pm','9pm','10pm','11pm', '12am'], '+');
+        r.g.axis(40, 230, 220, 0, 100, 5, 1, <%= raw ([' '] + [20, 40, 60, 80, 100].map{ |n| number_to_percentage(n, :precision => 0) }).to_json %>, '|');
+        r.g.axis(40, 230, 500, 0, 23, 24, 0, <%= raw (0..24).map{|i| I18n.l(Time.now.to_date + i.hours, :format => :tiny_on_the_hour).strip }.to_json %>, '+');
       } else {
         $("#hourly_usage").text(I18n.t('no_data', "No data found for report"));
       }

@@ -6,8 +6,8 @@
       <a href="#" class="question_name question_teaser_link" title="<%= t('full_details', 'Click to show full question details') %>"><%= hash_get(data, :question_name) %></a>
     </div>
     <div class="links">
-      <a href="#" class="edit_teaser_link no-hover" title="Edit this Question"><%= image_tag "edit.png" %></a>
-      <a href="#" class="delete_question_link no-hover" title="Delete this Question"><%= image_tag "delete.png" %></a>
+      <a href="#" class="edit_teaser_link no-hover" title="<%= t 'links.edit_question', 'Edit this Question' %>"><%= image_tag "edit.png" %></a>
+      <a href="#" class="delete_question_link no-hover" title="<%= t 'links.delete_question', 'Delete this Question' %>"><%= image_tag "delete.png" %></a>
       <a href="<%= context_url(@context, :context_assessment_question_url, question_teaser ? question_teaser.id : "{{ id }}") %>" class="update_question_url">&nbsp;</a>
     </div>
     <div class="text">

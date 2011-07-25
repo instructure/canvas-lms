@@ -130,11 +130,11 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :author_website => 'http://www.instructure.com',
   :description => lambda{ t :description, 'This enables converting a canvas CC export to the intermediary json format to be imported' },
   :version => '1.0.0',
+  :select_text => lambda{ t :file_description, "Canvas Course Export" },
   :settings => {
     :worker => 'CCWorker',
     :migration_partial => 'cc_config',
-    :select_text => lambda{ t :file_description, "Canvas Course Export" }
-  }
+  },
 }
 Canvas::Plugin.register('grade_export', :sis, {
   :name => lambda{ t :name, "Grade Export" },

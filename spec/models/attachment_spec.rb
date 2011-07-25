@@ -369,6 +369,16 @@ describe Attachment do
       new_a.filename.should eql(a.filename)
       new_a.root_attachment_id.should eql(a.id)
     end
+
+    it "should link the thumbnail" do
+      a = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
+      a.thumbnail.should_not be_nil
+      course
+      new_a = a.clone_for(@course)
+      new_a.thumbnail.should_not be_nil
+      new_a.thumbnail_url.should_not be_nil
+      new_a.thumbnail_url.should == a.thumbnail_url
+    end
   end
   
   context "adheres_to_policy" do

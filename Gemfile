@@ -62,9 +62,9 @@ group :test do
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.1'
   gem 'rspec-rails',  '1.3.3'
-  gem 'selenium-webdriver', '0.2.0'
+  gem 'selenium-webdriver', '2.0.1'
   gem 'webrat',       '0.7.2'
-  gem 'yard',         '0.6.3'
+  gem 'yard',         '0.7.2'
 end
 
 group :development do

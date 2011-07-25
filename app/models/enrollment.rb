@@ -66,8 +66,7 @@ class Enrollment < ActiveRecord::Base
     SQL
   end
 
-  adheres_to_policy
-  
+
 
   has_a_broadcast_policy
   
@@ -454,23 +453,23 @@ class Enrollment < ActiveRecord::Base
   
   set_policy do
     given { |user| self.user == user }
-    set { can :read and can :read_grades }
+    can :read and can :read_grades
     
     given {|user, session| self.course.grants_right?(user, session, :participate_as_student) && self.user.show_user_services }
-    set { can :read_services }
+    can :read_services
 
     # read_services says this person has permission to see what web services this enrollment has linked to their account
     given {|user, session| self.course.grants_right?(user, session, :manage_students) && self.user.show_user_services }
-    set { can :read and can :read_services }
+    can :read and can :read_services
     
     given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :manage_grades) }
-    set { can :read and can :read_grades }
+    can :read and can :read_grades
     
     given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :read_as_admin) }
-    set { can :read and can :read_grades }
+    can :read and can :read_grades
     
     given { |user| !!Enrollment.active.find_by_user_id_and_associated_user_id(user.id, self.user_id) }
-    set { can :read and can :read_grades and can :read_services}
+    can :read and can :read_grades and can :read_services
   end
   
   named_scope :before, lambda{|date|
@@ -531,11 +530,11 @@ class Enrollment < ActiveRecord::Base
     end
   end
   
-  # this is just used to get a pseudonym_id in the email_lists.js stuff. 
+  # this is just used to get a pseudonym_id in the user_lists.js stuff. 
   def users_pseudonym_id
     self.user.pseudonym.id
   end
-  # this is also just used to get a communication_channel_id in the email_lists.js stuff
+  # this is also just used to get a communication_channel_id in the user_lists.js stuff
   def communication_channel_id
     self.user.communication_channel.id rescue nil
   end

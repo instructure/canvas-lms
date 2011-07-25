@@ -29,13 +29,12 @@ class EportfolioEntry < ActiveRecord::Base
   validates_presence_of :eportfolio_category_id
   has_many :page_comments, :as => :page, :include => :user, :order => 'page_comments.created_at DESC'
   
-  adheres_to_policy
-  
+
   serialize :content
 
   set_policy do
     given {|user, session| user && self.allow_comments }
-    set { can :comment }
+    can :comment
   end
   
   def infer_comment_visibility

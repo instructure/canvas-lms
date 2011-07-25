@@ -21,7 +21,7 @@ class FoldersController < ApplicationController
   
   def index
     if authorized_action(@context, @current_user, :read)
-      render :json => @folders.to_json(:methods => [:id, :currently_locked], :permissions => {:user => @current_user, :session => session})
+      render :json => Folder.root_folders(@context).to_json(:permissions => {:user => @current_user, :session => session})
     end
   end
   
@@ -35,12 +35,14 @@ class FoldersController < ApplicationController
                 else
                   @folder.visible_file_attachments
                 end
+        files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size, :scribdable?], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :scribd_doc]}
+        folders_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class], :only => [:id, :context_id, :context_type, :lock_at, :last_lock_at, :last_unlock_at, :name, :parent_folder_id, :position, :unlock_at]}
         res = {
-          :actual_folder => @folder,
-          :sub_folders => @folder.active_sub_folders,
-          :files => files
+          :actual_folder => @folder.as_json(folders_options),
+          :sub_folders => @folder.active_sub_folders.map { |f| f.as_json(folders_options) },
+          :files => files.map { |f| f.as_json(files_options)}
         }
-        format.json { render :json => res.to_json(:permissions => {:user => @current_user}, :methods => [:readable_size,:mime_class,:currently_locked]) }
+        format.json { render :json => res }
       end
     end
   end

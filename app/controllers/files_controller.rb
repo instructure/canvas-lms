@@ -57,33 +57,19 @@ class FilesController < ApplicationController
   end
   protected :check_file_access_flags
   
-  def retrieve_folders
-    Folder.root_folders(@context)
-    @all_folders = @context.active_folders_detailed.to_a
-    @folders = @all_folders.select {|f| f.grants_rights?(@current_user, session, :read)[:read] }
-    @root_folders = @all_folders.select {|f| f.parent_folder_id == nil}
-    @current_folder ||= @root_folders[0]
-  end
-  protected :retrieve_folders
-  
   def index
     if request.format == :json
       if authorized_action(@context.attachments.new, @current_user, :read)
         @current_folder = Folder.find_folder(@context, params[:folder_id])
-        get_quota
-        retrieve_folders if !@current_folder
         if !@current_folder || authorized_action(@current_folder, @current_user, :read)
           if params[:folder_id]
             if @context.grants_right?(@current_user, session, :manage_files)
               @current_attachments = @current_folder.active_file_attachments
             else
               @current_attachments = @current_folder.visible_file_attachments
-              @root_folders = @root_folders.select{|f| f.visible? } rescue []
-              @folders = @folders.select{|f| f.visible? } rescue []
-              @current_folder = @root_folders[0] if !@current_folder.visible?
             end
             @current_attachments = @current_attachments.scoped(:include => [:thumbnail, :media_object])
-            render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked], :permissions => {:user => @current_user, :session => session})
+            render :json => @current_attachments.to_json(:methods => [:readable_size, :currently_locked, :thumbnail_url], :permissions => {:user => @current_user, :session => session})
           else
             render :json => @context.file_structure_for(@current_user).to_json(:permissions => {:user => @current_user}, :methods => [:readable_size, :mime_class, :currently_locked, :collaborator_ids])
           end
@@ -96,13 +82,18 @@ class FilesController < ApplicationController
   
   def list
     if authorized_action(@context, @current_user, :read)
-      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
       json = Rails.cache.fetch(['file_list_json', @context.cache_key, (@current_user.cache_key rescue 'nobody')].cache_key) do
         @visible_folders = @context.active_folders_detailed.select{|f| f.grants_right?(@current_user, session, :read_contents)}
         @files = @context.active_attachments.scoped(:include => [:thumbnail, :media_object])
-        visible_folders_hash = {}
-        @visible_folders.each{|f| visible_folders_hash[f.id] = true }
-        @visible_files = @files.select{|a| can_manage_files || (!a.currently_locked && visible_folders_hash[a.folder_id]) }
+        # preload the reverse associations
+        @files.each { |f| f.thumbnail.attachment = f if f.thumbnail; f.context = @context }
+        if @context.grants_right?(@current_user, session, :manage_files)
+          @visible_files = @files
+        else
+          visible_folders_hash = {}
+          @visible_folders.each{|f| visible_folders_hash[f.id] = true }
+          @visible_files = @files.select{|a| !a.currently_locked && visible_folders_hash[a.folder_id] }
+        end
         (@visible_folders + @visible_files).to_json
       end
       render :json => json
@@ -374,10 +365,12 @@ class FilesController < ApplicationController
   
   def create_pending
     @context = Context.find_by_asset_string(params[:attachment][:context_code])
+    @asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string], @context) if params[:attachment][:asset_string]
     @attachment = Attachment.new
-    @attachment.context = @context
+    @check_quota = true
     permission_object = @attachment
     permission = :create
+    intent = params[:attachment][:intent]
     
     # Using workflow_state we can keep track of the files that have been built
     # but we don't know that there's an s3 component for yet (it's still being
@@ -387,29 +380,36 @@ class FilesController < ApplicationController
     # is to upload it to a context.  In the other cases we need to check the
     # permission related to the purpose to make sure the file isn't being
     # uploaded just to disappear later
-    if @context.is_a?(Assignment) && params[:intent] == 'comment'
-      permission_object = @context
+    if @asset.is_a?(Assignment) && intent == 'comment'
+      permission_object = @asset
       permission = :attach_submission_comment_files
-    elsif @context.is_a?(Assignment) && params[:intent] == 'submit'
-      permission_object = @context
-      permission = (@context.submission_types || "").match(/online_file_upload/) ? :submit : :nothing
-    elsif @context.respond_to?(:is_a_context) && params[:intent] == 'attach_discussion_file'
+      @context = @asset
+      @check_quota = false
+    elsif @asset.is_a?(Assignment) && intent == 'submit'
+      permission_object = @asset
+      permission = (@asset.submission_types || "").match(/online_upload/) ? :submit : :nothing
+      @context = @current_user
+      @check_quota = false
+    elsif @context && intent == 'attach_discussion_file'
       permission_object = @context.discussion_topics.new
       permission = :attach
-    elsif @context.respond_to?(:is_a_context) && params[:intent] == 'message'
+    elsif @context && intent == 'message'
       permission_object = @context
       permission = :send_messages
       workflow_state = 'unattached_temporary'
-    elsif @context.respond_to?(:is_a_context) && params[:intent] && params[:intent] != 'upload'
+      @check_quota = false
+    elsif @context && intent && intent != 'upload'
       # In other cases (like unzipping a file, extracting a QTI, etc.
       # we don't actually want the uploaded file to show up in the context's
       # file listings.  If you set its workflow_state to unattached_temporary
       # then it will never be activated.
       workflow_state = 'unattached_temporary'
+      @check_quota = false
     end
     
+    @attachment.context = @context
     if authorized_action(permission_object, @current_user, permission)
-      if @context.respond_to?(:is_a_context) && params[:intent] == 'upload'
+      if @context.respond_to?(:is_a_context?) && @check_quota
         get_quota
         return if quota_exceeded(named_context_url(@context, :context_files_url))
       end
@@ -506,8 +506,8 @@ class FilesController < ApplicationController
         if success
           @attachment.move_to_bottom
           format.html { return_to(params[:return_to], named_context_url(@context, :context_files_url)) }
-          format.json { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}) }
-          format.text { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}) }
+          format.json { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}) }
+          format.text { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}) }
         else
           format.html { render :action => "new" }
           format.json { render :json => @attachment.errors.to_json }

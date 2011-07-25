@@ -481,6 +481,22 @@ describe Course, "backup" do
       @new_course.discussion_topics.count.should eql(0)
     end
 
+    it "should migrate syllabus links on copy" do
+      course_model
+      @old_topic = @course.discussion_topics.create!(:title => "some topic", :message => "some text")
+      @old_course = @course
+      @old_course.syllabus_body = "<a href='/courses/#{@old_course.id}/discussion_topics/#{@old_topic.id}'>link</a>"
+      @old_course.save!
+      @new_course = course_model
+      @new_course.merge_into_course(@old_course, :course_settings => true, :all_topics => true)
+      @old_topic.reload
+      @new_topic = @new_course.discussion_topics.find_by_cloned_item_id(@old_topic.cloned_item_id)
+      @new_topic.should_not be_nil
+      @old_topic.cloned_item_id.should == @new_topic.cloned_item_id
+      @new_course.reload
+      @new_course.syllabus_body.should match(/\/courses\/#{@new_course.id}\/discussion_topics\/#{@new_topic.id}/)
+    end
+
     it "should merge implied content into another course" do
       course_model
       attachment_model

@@ -175,7 +175,7 @@
 <% end %>
 <div id="recipients_dialogs" style="display: none;">
 <% @message_contexts.each do |context| %>
-  <div id="<%= context.asset_string %>_recipients_dialog" class="recipients_dialog" title="Recipients for <%=h context.name %>">
+  <div id="<%= context.asset_string %>_recipients_dialog" class="recipients_dialog" title="<%= context.is_a?(Course) ? t('recipients_for_course', 'Recipient for %{course_name}', :course_name => context.name) : t('recipients_for_group', 'Recipient for %{group_name}', :group_name => context.name) %>">
     <div class="left_side <%= 'not_course' unless context.is_a?(Course) %>" style="float: left; width: 35%; height: 300px; overflow: auto;">
       <% if context.is_a?(Course) %>
       <div>

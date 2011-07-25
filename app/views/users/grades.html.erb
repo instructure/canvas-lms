@@ -1,9 +1,7 @@
 <% add_crumb(@current_user.short_name, context_url(@current_user, :context_url))
-   add_crumb(t('crumbs.grades', '"Grades"'), grades_path) %>
+   add_crumb(t('crumbs.grades', 'Grades'), grades_path) %>
 
-<% content_for :page_title do %>
-  Grades - <%= @current_user.name %>
-<% end %>
+<% content_for :page_title, join_title(t(:page_title, "Grades"), @current_user.name) %>
 
 <% if false %>
 <% #TODO: implement previous courses  %>

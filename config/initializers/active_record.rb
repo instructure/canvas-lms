@@ -152,26 +152,27 @@ class ActiveRecord::Base
     self.save
     @skip_touch_context = false
   end
-  
+
   def touch_context
     return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
-      conn = ActiveRecord::Base.connection
-      conn.execute("UPDATE #{self.context_type.underscore.pluralize} SET updated_at=#{conn.quote(Time.now.utc.to_s(:db))} WHERE id=#{self.context_id}") rescue nil
+      self.context_type.constantize.update_all({ :updated_at => Time.now }, { :id => self.context_id })
     end
+  rescue
+    ErrorReport.log_exception(:touch_context, $!)
   end
-  
+
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
-      conn = ActiveRecord::Base.connection
-      conn.execute("UPDATE users SET updated_at=#{conn.quote(Time.now.utc.to_s(:db))} WHERE id=#{self.user_id}") rescue nil
+      User.update_all({ :updated_at => Time.now }, { :id => self.user_id })
       User.invalidate_cache(self.user_id)
     end
     true
   rescue
+    ErrorReport.log_exception(:touch_user, $!)
     false
   end
-  
+
   def context_url_prefix
     "#{self.context_type.downcase.pluralize}/#{self.context_id}"
   end
@@ -179,17 +180,23 @@ class ActiveRecord::Base
   # Example: 
   # obj.to_json(:permissions => {:user => u, :policies => [:read, :write, :update]})
   def as_json(options = nil)
-    options ||= {}
+    options = options.try(:dup) || {}
 
-    self.set_serialization_options rescue nil
-    options[:except] = [options[:except]] 
-    options[:methods] = [options[:methods]]
+    self.set_serialization_options if self.respond_to?(:set_serialization_options)
 
-    options[:except] = (options[:except] + ([self.class.serialization_excludes] rescue []) + [@serialization_excludes]).flatten.compact
-    options[:methods] = (options[:methods] + ([self.class.serialization_methods] rescue []) + [@serialization_methods]).flatten.compact
+    except = options.delete(:except) || []
+    except = Array(except)
+    except.concat(self.class.serialization_excludes) if self.class.respond_to?(:serialization_excludes)
+    except.concat(@serialization_excludes) if @serialization_excludes
+    except.uniq!
+    methods = options.delete(:methods) || []
+    methods = Array(methods)
+    methods.concat(self.class.serialization_methods) if self.class.respond_to?(:serialization_methods)
+    methods.concat(@serialization_methods) if @serialization_methods
+    methods.uniq!
 
-    options.delete :except if options[:except].empty?
-    options.delete :methods if options[:methods].empty?
+    options[:except] = except unless except.empty?
+    options[:methods] = methods unless methods.empty?
 
     # We include a root in all the association json objects (if it's a
     # collection), which is different than the rails behavior of just including
@@ -213,7 +220,7 @@ class ActiveRecord::Base
       end
     end
 
-    self.revert_from_serialization_options rescue nil
+    self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)
 
     hash
   end

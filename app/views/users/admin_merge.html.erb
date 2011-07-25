@@ -91,7 +91,7 @@
               </div>
               <div style="margin-top: 20px;">
                 <span id="selected_name" style="font-weight: bold; padding-right: 10px;"></span>
-                <a href="#" style="display: none;" rel="<%= user_admin_merge_url(@user.id, :pending_user_id => "{{ id }}") %>" id="select_name" type='button' class='button small-button select_button'>Select</a>
+                <a href="#" style="display: none;" rel="<%= user_admin_merge_url(@user.id, :pending_user_id => "{{ id }}") %>" id="select_name" type='button' class='button small-button select_button'><%= t 'links.select', "Select" %></a>
               </div>
             <% end %>
           </td>

@@ -118,7 +118,7 @@
       </div>
     <% end %>
     <div style="text-align: right; font-size: 0.8em; margin-top: 0;">
-      <a href="#" class="toggle_rubric_link">Show Rubric</a>
+      <a href="#" class="toggle_rubric_link"><%= t 'links.show_rubric', 'Show Rubric' %></a>
     </div>
     <div class="rubric_holder" style="display: none;">
       <%= render :partial => "shared/rubric", :object => (association.rubric rescue nil), :locals => {:editable => true, :rubric_association => association} %>

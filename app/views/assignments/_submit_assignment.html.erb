@@ -28,7 +28,9 @@ $(document).ready(function() {
           data['submission[attachment_ids]'] = ids.join(",");
           return data;
         },
-        context_code: $("#submit_assignment .context_code").text(),
+        context_code: $("#submit_assignment").data('context_code'),
+        asset_string: $("#submit_assignment").data('asset_string'),
+        intent: "submit",
         file_elements: $(this).find("input[type='file']:visible"),
         data: $(this).getFormData(),
         url: $(this).attr('action'),
@@ -151,8 +153,7 @@ window.submissionAttachmentIndex = -1;
 <script type="text/javascript">
   var allowed_extensions = <%= raw((@assignment.allowed_extensions || []).to_json) %>
 </script>
-<div style="display: none;" id="submit_assignment">
-  <span class="context_code" style="display: none;"><%= @current_user.asset_string %></span>
+<div style="display: none;" id="submit_assignment" data-context_code="<%= @assignment.context_code %>" data-asset_string="<%= @assignment.asset_string %>">
   <div class="content" id="submit_assignment_tabs">
     <ul>
       <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
@@ -165,7 +166,7 @@ window.submissionAttachmentIndex = -1;
         <li><a href="#submit_online_url_form" class="submit_online_url_option"><%= t 'links.submit.website', "Website URL" %></a></li>
       <% end %>
       <% if show_google_docs %>
-        <li><a href="#submit_google_doc_form" class="submit_online_url_option">Google Doc</a></li>
+        <li><a href="#submit_google_doc_form" class="submit_online_url_option"><%= t 'links.submit.google_doc', 'Google Doc' %></a></li>
       <% end %>
       <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
         <li><a href="#submit_media_recording_form" class="submit_media_recording_option"><%= t 'links.submit.media', "Media" %></a></li>
@@ -348,7 +349,7 @@ window.submissionAttachmentIndex = -1;
                       <% @google_docs.files.select{|f| f.folder == folder}.each do |file| %>
                         <li class="file <%= file.extension %>" id="document_<%= file.document_id %>">
                           <span class="filename"><%= file.entry.title %></span>
-                          <a class="popout no-hover" href="<%= file.alternate_url %>" title="View in Separate Window" target="_blank"><%= image_tag "popout.png " %></a>
+                          <a class="popout no-hover" href="<%= file.alternate_url %>" title="<%= t 'titles.view_in_separate_window', 'View in Separate Window' %>" target="_blank"><%= image_tag "popout.png " %></a>
                           <div class="clear"></div>
                         </li>
                       <% end %>
