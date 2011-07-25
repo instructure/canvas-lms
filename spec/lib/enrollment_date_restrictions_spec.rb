@@ -117,6 +117,28 @@ describe EnrollmentDateRestrictions do
   end
   
   describe "update_restricted_enrollments" do
+    describe "should activate inactive enrollments if the start_at restriction is removed" do
+      it "should work on the enrollment_dates_override model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @term = @course.enrollment_term
+        @term.should_not be_nil
+        @term.save!
+        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term, :start_at => start_at, :end_at => end_at)
+        @enrollment.workflow_state = 'inactive'
+        @enrollment.save!
+        @enrollment.state.should eql(:inactive)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@override)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @override.start_at = nil
+        @override.save
+        EnrollmentDateRestrictions.update_restricted_enrollments(@override)
+        @enrollment.reload.state.should eql(:active)
+      end
+    end
+    
     describe "should activate inactive enrollments once start_at has passed" do
       it "should work on the enrollment model" do
         course_with_student(:active_all => true)
@@ -201,7 +223,7 @@ describe EnrollmentDateRestrictions do
         @enrollment.state.should eql(:inactive)
         @override.reload
         EnrollmentDateRestrictions.update_restricted_enrollments(@override)
-        @enrollment.reload.state.should eql(:inactive)
+        @enrollment.reload.state.should eql(:active)
       end
       
       it "should work on the enrollment_term model" do
@@ -225,7 +247,7 @@ describe EnrollmentDateRestrictions do
         @enrollment.save!
         @enrollment.state.should eql(:inactive)
         EnrollmentDateRestrictions.update_restricted_enrollments(@term)
-        @enrollment.reload.state.should eql(:inactive)
+        @enrollment.reload.state.should eql(:active)
       end
     end
     
