@@ -72,7 +72,7 @@ module EnrollmentDateRestrictions
     
     return if all_enrollment_ids.empty?
     
-    if start_at && end_at && start_at <= Time.now && end_at >= Time.now
+    if (!start_at || start_at <= Time.now) && (!end_at || end_at >= Time.now)
       Enrollment.find_all_by_id_and_workflow_state(all_enrollment_ids, 'inactive').each do |enrollment|
         course = lookup_enrollment_course(enrollment)
         if course.enrollment_state_based_on_date(enrollment) == 'active'
