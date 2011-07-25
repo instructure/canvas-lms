@@ -1082,6 +1082,9 @@ class Quiz < ActiveRecord::Base
         if item_id = migration.migration_settings[:quiz_id_to_update]
           allow_update = true
           assessment[:id] = item_id.to_i
+          if assessment[:assignment]
+            assessment[:assignment][:id] = Quiz.find(item_id.to_i).try(:assignment_id)
+          end
         end
         begin
           Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
