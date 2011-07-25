@@ -63,9 +63,13 @@ module Canvas
       Bundler.require 'redis'
       Canvas::Redis.patch
       # merge in redis.yml, but give precedence to cache_store.yml
+      #
+      # the only options currently supported in redis-cache are the list of
+      # servers, not key prefix or database names.
       cache_store_config = (Setting.from_config('redis') || {}).merge(cache_store_config)
       cache_store_config['key_prefix'] ||= cache_store_config['key']
-      config = :redis_store, cache_store_config
+      servers = cache_store_config['servers']
+      config = :redis_store, servers
     end
     unless config
       config = :nil_store
