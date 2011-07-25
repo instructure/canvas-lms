@@ -74,6 +74,14 @@ class SyslogWrapper
   
   def close; end
 
+  SEVERITY_MAP = {
+    Logger::DEBUG => :debug,
+    Logger::INFO => :info,
+    Logger::WARN => :warning,
+    Logger::ERROR => :err,
+    Logger::FATAL => :crit,
+    Logger::UNKNOWN => :notice }
+
   def add(severity, message=nil, progname=nil)
     severity ||= Logger::UNKNOWN
     return if @level > severity
@@ -89,12 +97,7 @@ class SyslogWrapper
       context = Thread.current[:context] || {}
       message = "[#{context[:session_id] || "-"} #{context[:request_id] || "-"}] #{message}"
     end
-    $syslog.send({ Logger::DEBUG => :debug,
-                   Logger::INFO => :info,
-                   Logger::WARN => :warning,
-                   Logger::ERROR => :err,
-                   Logger::FATAL => :crit,
-                   Logger::UNKNOWN => :notice }[severity], "%s", message)
+    $syslog.send(SEVERITY_MAP[severity], "%s", message)
   end
   alias_method :log, :add
   
