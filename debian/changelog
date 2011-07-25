@@ -1,3 +1,110 @@
+canvas-lms (1.1-43) professional; urgency=low
+
+  * [+bac7acd] i18n shared partials
+  * [+9fb8923] migration messages i18n
+  * [+3411439] grade changed submission message i18n
+  * [+e242819] submission graded messages i18n
+  * [+0465682] submission comment for teacher messages i18n
+  * [+a3cd7a1] submission comment messages i18n
+  * [+293027a] rubric association created messages i18n
+  * [+011c640] report and registration message i18n
+  * [+35e3022] don't fail i18n interpolation when the interpolated value is null or value-undefined
+  * [+828bf5a] outcomes i18n
+  * [+903c44d] teacher context message i18n
+  * [+195b944] in selenium config, use host and port separately if provided
+  * [+e64fcba] student context message i18n
+  * [+3fd0c63] fix buggy spec for teacher activity report
+  * [+736a13f] rubric assessment submission reminder messages i18n
+  * [+1f1607a] rubric assessment invitation message i18n
+  * [+60b7baa] optimize grade_summary page
+  * [+d5d7e62] fix an i18n oddity, plus some graph i18n
+  * [+2b48315] shared views _s* i18n
+  * [+5c0c158] avoid requesting all google docs just to see if we still have access
+  * [+7928b69] fix a few i18n issues
+  * [+5c62e43] summary messages i18n
+  * [+724057f] correctly handle explicit scopes
+  * [+eb8cfed] pulled some urls out of extracted strings
+  * [+d298cd7] missed i18n
+  * [+69e1ac6] fix two common delayed job errors
+  * [+248f989] remove a now-unused stream_item_instances index, closes #4586
+  * [+473b153] syllabus links not being updated on course copy
+  * [+51f4eb9] don't load stuff we never use in UsersController#show
+  * [+47eea0b] fixed up a few i18n keys
+  * [+649f2a5] remove our workaround for the rails cookie problem in tests
+  * [+6f0e2a1] misc title/alt attribute i18n
+  * [+b4f08dd] improve error handling for course exports
+  * [+cb864c6] misc view i18n
+  * [+ee8b8d9] don't crash when ldap can't be reached. fixes #5001
+  * [+36db840] remove unused api controller action
+  * [+dd41f5e] better view scope inference
+  * [+831aa9f] fix label key prefixing
+  * [+5e49878] get appropriate default login handle name when @domain_root_account is undefined
+  * [+b7c6249] peer_reviews_assign_at not getting set
+  * [+340792c] optimize modules page
+  * [+68e337f] link cloned attachment thumbnails to original thumbnails, fixes #4876
+  * [+4f2b20e] set the current locale for i18n.js
+  * [+6ef2b3c] get rid of whitespace above doctype
+  * [+f3c5cd2] record real_user in page_view fixes #5013
+  * [+fb1df9c] correct xhr request for more page views
+  * [+cd3f3c6] etherpad should actually use configured setting
+  * [+1f4f1bd] fix file storage quota enforcement
+  * [+fe9c593] recalculate grades when assignment points changes
+  * [+fd5293e] i18n javascript for message_student and prereq lookup
+  * [+f2c42c1] fix content export error reporting
+  * [+316af23] fix student assignment files#create_pending permissions checks
+  * [+45f0fbd] renaming EmailList to UserList
+  * [+98ffbbc] allow enrollments through the UI with usernames
+  * [+76fed4b] prevent users without permission from using the user list parsing feature
+  * [+2592c8a] i18n login_handle_name
+  * [+7ac0729] get rid of 'prior', 'comparison', and 'focus' fields
+  * [+6eb5e17] return secondary_identifier fields if can manage_students
+  * [+4a5da60] also include user's sortable_name in api response
+  * [+1503a7e] show secondary identifier in gradebook 2
+  * [+07c17ea] expand masquerade capabilities to root account admins
+  * [+68cd8cb] js translation bundle generator, refs #4993
+  * [+f2f0041] first batch of es translations
+  * [+177d2e5] fix url references for imported quizzes
+  * [+004e0ea] fix and improve error message for failed media file importing
+  * [+ed233ae] import quizzes into correct assignment group
+  * [+467830d] allow configuring a firefox profile for remote selenium setups
+  * [+cf75405] upgrade selenium-webdriver gem to 2.0.1
+  * [+03dc848] fix discussions selenium failure
+  * [+fb67cb1] optimize FoldersController#show
+  * [+69a10d4] optimize json creation and serialization
+  * [+7f5cc06] optimize AdheresToPolicy
+  * [+2ca18da] optimize files/list
+  * [+0bb49eb] include config file localizations in i18n:generate output
+  * [+09eef3b] don't force second look up for module items during import
+  * [+8668f45] recoginize urls with a '+' for spaces on html import
+  * [+0dd5ab2] flush the redis db before using it in a test
+  * [+5543fb4] don't load a bajillion records into memory if a simple db query will suffice
+  * [+39099d0] don't load a ton of stuff, just to discard it
+  * [+92feb2b] replace ActiveRecord::Base calls with subclass calls where it makes sense
+  * [+1bcae47] fix displaying rubric criterion on learning outcomes; fixes #4557
+  * [+319f023] use ActiveSupport::SecureRandom when generating random tokens
+  * [+f7e7cdb] don't show 'rubric in use' message to students; fixes #5081
+  * [+6a2cc50] document our oauth2 native app flow
+  * [+65ed1da] implement oauth2 native app flow, closes #5029
+  * [+384e1d2] fix 1048576x inflation of storage_quota in ui (and db)
+  * [+51082ff] finish conversion of storage_quota to bytes from MB
+  * [+4160823] don't require api_key when access_token is given to api request
+  * [+526202b] some api doc updates for oauth, and make the api accessible from canvas
+  * [+cc96fa2] don't require loading the whole rails stack to generate api docs
+  * [+5950e5b] put back missing </div>; fixes #5106
+  * [+e50b420] fix typo in account
+  * [+1ba4950] fix mini-calendar day highlights; fixes #5129
+  * [+93b6d55] move select_text from settings to metadata
+  * [+3990012] send submission comment to individual by default, not whole group
+  * [+1baef81] fix editing term dates; fixes #5058
+  * [+275ee2d] fix automatic peer review assignment concurrency
+  * [+1cfdb1c] fix auto_peer_review jobs
+  * [+f2d11f2] fix i18n bug on login screen (trailing colon)
+  * [+79ad5ff] fix i18n bug on user edit panel (Time Zone field not showing)
+  * [+3c41e6d] repair oauth2 fallback page, and destroy secondary auth cookie
+  * [+af6fa32] fix typo breaking enrollment date restrictions; refs #4588
+
+ -- JT Olds <jt@instructure.com>  Mon, 25 Jul 2011 12:59:16 -0600
+
 canvas-lms (1.1-42) professional; urgency=low
 
   * [+b3ac332] remove whitespace from en defaults (only for non-mt translate calls in html views)
