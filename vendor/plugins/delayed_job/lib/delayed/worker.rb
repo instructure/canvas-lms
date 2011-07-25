@@ -43,7 +43,7 @@ class Worker
   end
 
   def name
-    @name ||= "#{Socket.gethostname rescue "X"}:#{Process.pid}"
+    @name ||= "#{Socket.gethostname rescue "X"}:#{self.id}"
   end
 
   def set_process_name(new_name)
@@ -88,6 +88,7 @@ class Worker
       max_priority)
 
     if job
+      configure_logging(job)
       perform(job)
 
       @job_count += 1
@@ -113,7 +114,7 @@ class Worker
 
   def perform(job)
     set_process_name("run:#{job.id}:#{job.name}")
-    say_job(job, "Processing #{log_job(job, :long)}", :info)
+    say("Processing #{log_job(job, :long)}", :info)
     runtime = Benchmark.realtime do
       Timeout.timeout(self.class.max_run_time.to_i, Delayed::TimeoutError) { job.invoke_job }
       Delayed::Stats.job_complete(job, self)
@@ -121,14 +122,14 @@ class Worker
         job.destroy
       end
     end
-    say_job(job, "Completed #{log_job(job)} %.0fms" % (runtime * 1000), :info)
+    say("Completed #{log_job(job)} %.0fms" % (runtime * 1000), :info)
   rescue Exception => e
     handle_failed_job(job, e)
   end
 
   def handle_failed_job(job, error)
     job.last_error = error.message + "\n" + error.backtrace.join("\n")
-    say_job(job, "Failed with #{error.class} [#{error.message}] (#{job.attempts} attempts)", :error)
+    say("Failed with #{error.class} [#{error.message}] (#{job.attempts} attempts)", :error)
     reschedule(job, error)
   end
 
@@ -143,7 +144,7 @@ class Worker
       end
 
       if destroy_job
-        say_job(job, "destroying job because of #{job.attempts} failures", :info)
+        say("destroying job because of #{job.attempts} failures", :info)
         job.destroy
       else
         job.fail!
@@ -156,12 +157,12 @@ class Worker
     end
   end
 
-  def say(msg, level = :debug)
-    Rails.logger.send(level, "[#{Process.pid}]W #{msg}")
+  def id
+    Process.pid
   end
 
-  def say_job(job, msg, level = :debug)
-    say("job_id:#{job.id} #{msg}", level)
+  def say(msg, level = :debug)
+    Rails.logger.send(level, msg)
   end
 
   def log_job(job, format = :short)
@@ -171,6 +172,15 @@ class Worker
     else
       job.full_name
     end
+  end
+
+  # set up the session context information, so that it gets logged with the job log lines
+  def configure_logging(job)
+    Thread.current[:context] = {
+      # these keys aren't terribly well named for this, since they were intended for http requests
+      :request_id => job.id,
+      :session_id => self.name,
+    }
   end
 
 end
