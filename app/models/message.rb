@@ -21,6 +21,7 @@ class Message < ActiveRecord::Base
   include SendToStream
   include Twitter
   include TextHelper
+  include ActionController::UrlWriter
 
   has_many :attachments, :as => :context
   belongs_to :notification
@@ -29,7 +30,7 @@ class Message < ActiveRecord::Base
   belongs_to :user
   belongs_to :asset_context, :polymorphic => true
 
-  attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type, :from_name, :sent_at, :notification, :user, :communication_channel, :notification_name
+  attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type, :from_name, :sent_at, :notification, :user, :communication_channel, :notification_name, :asset_context
 
   after_save :stage_message
   before_save :move_messages_for_deleted_users
@@ -38,7 +39,17 @@ class Message < ActiveRecord::Base
   before_save :set_asset_context_code
   validates_length_of :body, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :transmission_errors, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-    
+
+  def polymorphic_url_with_context_host(record_or_hash_or_array, options = {})
+    if record_or_hash_or_array.is_a? Array
+      options[:host] = HostUrl.context_host(record_or_hash_or_array.first)
+    else
+      options[:host] = HostUrl.context_host(record_or_hash_or_array)
+    end
+    polymorphic_url_without_context_host(record_or_hash_or_array, options)
+  end
+  alias_method_chain :polymorphic_url, :context_host
+
   def move_messages_for_deleted_users
     self.workflow_state = 'closed' if self.context_type != "ErrorReport" && (!self.user || self.user.deleted?)
   end
@@ -251,7 +262,8 @@ class Message < ActiveRecord::Base
     # to prevent confusion.
     @context = self.context
     @asset = @context
-    context, asset, user, delayed_messages = [@context, @asset, @user, @delayed_messages]
+    @asset_context = self.asset_context
+    context, asset, user, delayed_messages, asset_context = [@context, @asset, @user, @delayed_messages, @asset_context]
     @time_zone = Time.zone
     time_zone = Time.zone
     path_type ||= self.communication_channel.path_type rescue path_type

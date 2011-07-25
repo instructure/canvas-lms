@@ -108,6 +108,9 @@
     <% if publishing_enabled %>
       <li><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
     <% end %>
+    <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+      <li><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
+    <% end %>
   </ul>
   <div id="tab-details">
     <h2><%= t('headings.details', %{Course Details}) %></h2>
@@ -645,6 +648,12 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       <% end %>
       <a href="#" id="publish_grades_link" class="button disabled"><%= t('links.publishing_to_sis', %{Publishing grades to SIS...}) %></a>
       <span id="publish_grades_error" style="display: none;">&nbsp;<%= t('errors.sis_publish', %{An error occurred on the last attempt to publish grades to SIS.}) %></span>
+    </div>
+  <% end %>
+  <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+    <div id="tab-alerts">
+      <h2><%= t(:alerts_title, "Alerts") %></h2>
+      <%= render :partial => 'alerts/alerts' %>
     </div>
   <% end %>
 </div>

@@ -69,6 +69,8 @@ class Account < ActiveRecord::Base
   has_many :page_views
   has_many :error_reports
   has_many :account_notifications
+  has_many :alerts, :as => :context, :include => :criteria
+  has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
@@ -113,6 +115,7 @@ class Account < ActiveRecord::Base
   add_setting :self_enrollment
   add_setting :equella_endpoint
   add_setting :equella_teaser
+  add_setting :enable_alerts, :boolean => true, :root_only => true
   
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -819,7 +822,7 @@ class Account < ActiveRecord::Base
   TAB_FACULTY_JOURNAL = 10
   TAB_SIS_IMPORT = 11
   TAB_GRADING_STANDARDS = 12
-  
+
   def tabs_available(user=nil, opts={})
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?

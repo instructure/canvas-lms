@@ -1,0 +1,23 @@
+<% define_content :link do %>
+  <%= polymorphic_url asset_context.course %>
+<% end %>
+
+<%=
+  if asset_context.user_id == user.id
+    t('body_student', {:one => "An alert has been triggered for you because the following condition has been met:", :other => "An alert has been triggered for you because the following conditions have been met:"}, :count => asset.criteria.length)
+  else
+    t('body', {:one => "An alert has been triggered for %{student} because the following condition has been met:", :other => "An alert has been triggered for %{student} because the following conditions have been met:"}, :count => asset.criteria.length, :student => asset_context.user.name)
+  end
+%>
+<% asset.criteria.each do |criterion| %>
+  <%=
+    case criterion.criterion_type
+    when 'Interaction'
+      t('interaction_description', 'No student/teacher interaction for %{count} days', :count => criterion.threshold)
+    when 'UngradedCount'
+      t('ungraded_count_description', '%{count} or more assignments have not been graded', :count => criterion.threshold)
+    when 'UserNote'
+      t('usernote_description', 'No faculty journal entries for %{count} days', :count => criterion.threshold)
+    end
+  %>
+<% end %>

@@ -16,16 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
+class AlertCriterion < ActiveRecord::Base
+  belongs_to :alert
 
-describe 'rubric_assessment_submission_reminder.sms' do
-  it "should render" do
-    user_model
-    rubric_assessment_model(:user => @user)
-    @object = @rubric_assessment
-    @object.rubric_association.should_not be_nil
-    @object.rubric_association.context.should_not be_nil
-    generate_message(:rubric_assessment_submission_reminder, :sms, @object, :user => @user)
-  end
+  attr_accessible :criterion_type, :threshold
+
+  validates_numericality_of :threshold, :only_integer => true, :greater_than_or_equal_to => 0
+
 end

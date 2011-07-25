@@ -1124,6 +1124,7 @@ I18n.scoped('instructure', function(I18n) {
     }
     var $form = this;
     var errors = {};
+    var elementErrors = [];
     if(data_errors && data_errors['errors']) {
       data_errors = data_errors['errors'];
     }
@@ -1135,6 +1136,9 @@ I18n.scoped('instructure', function(I18n) {
         var newval = [];
         newval.push(val);
         val = newval;
+      } else if(typeof(i) == "number" && val.length == 2 && (val[0] instanceof jQuery) && typeof(val[1]) == "string") {
+        elementErrors.push(val);
+        return;
       } else if(typeof(i) == "number" && val.length == 2 && typeof(val[1]) == "string") {
         newval = [];
         newval.push(val[1]);
@@ -1157,8 +1161,6 @@ I18n.scoped('instructure', function(I18n) {
       }
       if($form.find(":input[name='" + i + "'],:input[name*='[" + i + "]']").length > 0) {
         $.each(val, function(idx, msg) {
-          if(!msg.match(i)) {
-          }
           if(!errors[i]) {
             errors[i] = msg;
           } else {
@@ -1192,6 +1194,15 @@ I18n.scoped('instructure', function(I18n) {
         highestTop = offset.top;
       }
     });
+    for(var idx in elementErrors) {
+      var $obj = elementErrors[idx][0];
+      var msg = elementErrors[idx][1];
+      hasErrors = true;
+      var offset = $obj.errorBox(msg).offset();
+      if(offset.top > highestTop) {
+        highestTop = offset.top;
+      }
+    }
     if(hasErrors) {
       $('html,body').scrollTo({top: highestTop, left:0});
     }
@@ -2110,7 +2121,7 @@ I18n.scoped('instructure', function(I18n) {
             $.ajaxJSON.ignoredXHRs.push(xhr);
           }
         } else if(success && $.isFunction(success)) {
-          success(data);
+          success(data, xhr);
         }
       },
       error: function() {

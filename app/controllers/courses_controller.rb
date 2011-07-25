@@ -290,6 +290,8 @@ class CoursesController < ApplicationController
   def course_details
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
+      @alerts = @context.alerts
+      @role_types = []
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
       render :action => :course_details
     end

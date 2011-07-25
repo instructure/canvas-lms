@@ -991,6 +991,10 @@ namespace :db do
 
       <%= strip_and_truncate(asset.body, :max_length => 200) %>
     }
+
+    create_notification 'Other', 'Alert', 0,
+      'Alert',
+      'Alert'
     
     create_notification 'Summary', 'Summaries', 0,
     'http://<%= HostUrl.context_host(namespace.context) %>', %{

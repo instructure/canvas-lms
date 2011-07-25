@@ -89,8 +89,9 @@ class Course < ActiveRecord::Base
   has_many :observers, :through => :observer_enrollments, :source => :user
   has_many :observer_enrollments, :class_name => 'ObserverEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :admins, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment'"
+  has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
   has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment') and enrollments.workflow_state = 'active'"
-  
+
   has_many :learning_outcomes, :through => :learning_outcome_tags, :source => :learning_outcome_content
   has_many :learning_outcome_tags, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
   has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
@@ -147,6 +148,7 @@ class Course < ActiveRecord::Base
   has_many :page_views, :as => :context
   has_many :role_overrides, :as => :context
   has_many :content_exports
+  has_many :alerts, :as => :context, :include => :criteria
   attr_accessor :import_source
   
   before_save :assign_uuid

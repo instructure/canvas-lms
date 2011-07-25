@@ -138,6 +138,8 @@ class AccountsController < ApplicationController
       end
       @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.membership_type] || 999, au.user.sortable_name] }
       @account_notifications = AccountNotification.for_account(@account)
+      @alerts = @account.alerts
+      @role_types = RoleOverride.account_membership_types(@account)
     end
   end
   

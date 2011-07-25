@@ -259,6 +259,7 @@ ActionController::Routing::Routes.draw do |map|
     
     course.resources :user_lists, :only => :create
     course.reset 'reset', :controller => 'courses', :action => 'reset_content', :conditions => {:method => :post}
+    course.resources :alerts
   end
 
   map.resources :page_views, :only => [:update,:index]
@@ -445,6 +446,7 @@ ActionController::Routing::Routes.draw do |map|
     account.courses_redirect 'courses/:id', :controller => 'accounts', :action => 'courses_redirect'
     account.user_notes 'user_notes', :controller => 'user_notes', :action => 'user_notes'
     account.run_report 'run_report', :controller => 'accounts', :action => 'run_report'
+    account.resources :alerts
   end
   map.avatar_image 'images/users/:user_id', :controller => 'info', :action => 'avatar_image_url', :conditions => {:method => :get}
   map.thumbnail_image 'images/thumbnails/:id/:uuid', :controller => 'files', :action => 'image_thumbnail'

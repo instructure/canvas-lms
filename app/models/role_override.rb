@@ -57,6 +57,8 @@ class RoleOverride < ActiveRecord::Base
     KNOWN_ROLE_TYPES
   end
 
+  # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts
+  # for legacy reasons
   PERMISSIONS =
     {
       :manage_wiki => {
@@ -450,7 +452,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_alerts => {
-        :label => lambda { t('permissions.manage_alerts', "Manage account user alerts") },
+        :label => lambda { t('permissions.manage_alerts', "Manage global alerts") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
@@ -529,6 +531,11 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'AccountAdmin'
         ]
+      },
+      :manage_interaction_alerts => {
+        :label => lambda { t('permissions.manage_interaction_alerts', "Manage alerts") },
+        :true_for => %w(AccountAdmin TeacherEnrollment),
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment),
       }
     }.freeze
   def self.permissions
