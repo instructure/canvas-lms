@@ -286,6 +286,7 @@ class Enrollment < ActiveRecord::Base
       event :reject, :transitions_to => :rejected
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
+      event :deactivate, :transitions_to => :inactive
     end
     
     state :creation_pending do
@@ -296,6 +297,7 @@ class Enrollment < ActiveRecord::Base
       event :reject, :transitions_to => :rejected
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
+      event :deactivate, :transitions_to => :inactive
     end
     
     state :inactive do
