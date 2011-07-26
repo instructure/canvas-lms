@@ -2214,8 +2214,8 @@ var fileUpload = {
       $file.data('success_url', data.success_url);
       if(!$file.hasClass('done')) {
         fileUpload.swfQueuedAndPendingFiles.push(file);
-        fileUpload.swfUploadNext(file);
-      } 
+        fileUpload.swfUploadNext();
+      }
       fileUpload.updateUploadCount();
     }, function(data) {
       $("#file_swf").uploadifyCancel(id);
@@ -2223,9 +2223,9 @@ var fileUpload = {
         .find(".status").text("Upload Failed ");
     });
   },
-  swfUploadNext: function(file) {
-    if(file || fileUpload.swfQueuedAndPendingFiles.length > 0) {
-      file = file || fileUpload.swfQueuedAndPendingFiles.shift();
+  swfUploadNext: function() {
+    if(fileUpload.swfQueuedAndPendingFiles.length > 0) {
+      file = fileUpload.swfQueuedAndPendingFiles.shift();
       if(file) {
         $("#file_swf").uploadifySettings('script', file.upload_url);
         $("#file_swf").uploadifySettings('scriptData', file.upload_params);
