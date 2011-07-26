@@ -2072,6 +2072,30 @@ var fileUpload = {
   swfUploadCount: 0,
   queuedAjaxUploads: [],
   currentlyUploading: false,
+  status_status: "hidden",
+  status_request: "hidden",
+  showStatus: function() {
+    fileUpload.status_request = "shown";
+    if(fileUpload.status_status == "hidden") {
+      fileUpload.status_status = "showing";
+      $("#file_uploads_progress").slideDown(null,null,function() {
+        setTimeout(function() {
+          fileUpload.status_status = "shown";
+          if(fileUpload.status_request == "hidden") fileUpload.hideStatus();
+        }, 3000);
+      });
+    }
+  },
+  hideStatus: function() {
+    fileUpload.status_request = "hidden";
+    if(fileUpload.status_status == "shown") {
+      fileUpload.status_status = "hiding";
+      $("#file_uploads_progress").slideUp(null,null,function() {
+        fileUpload.status_status = "hidden";
+        if(fileUpload.status_request == "shown") fileUpload.showStatus();
+      });
+    }
+  },
   queueAjaxUpload: function(file, folder_id) {
     fileUpload.ajaxUploadCount = fileUpload.queuedAjaxUploads.length;
     var fileWrapper = {
@@ -2140,8 +2164,7 @@ var fileUpload = {
     var count = (fileUpload.swfFiles.length + fileUpload.ajaxUploadCount);
     var errorCount = $("#file_uploads .file_upload.errored:visible").length;
     if(count === 0 && errorCount == 0) {
-      $("#file_uploads_progress").slideUp();
-      $("#file_uploads_spinner").slideUp();
+      fileUpload.hideStatus();
       var $msg = $("#file_upload_blank").clone(true).removeAttr('id').addClass('finished_message').empty();
       $msg.text("Finished uploading all files");
       if(!$("#file_uploads .file_upload:visible:first").hasClass('finished_message')) {
@@ -2164,7 +2187,7 @@ var fileUpload = {
       if(count === 0) {
         $("#file_uploads_dialog_link").text(I18n.t('messages.error_count', {one: "1 Error", other: "%{count} Errors"}, { count: errorCount}));
       }
-      $("#file_uploads_progress").slideDown();
+      fileUpload.showStatus();
     }
   },
   fileDialogComplete: function(numFilesSelected, numFilesQueued) {
@@ -2259,7 +2282,7 @@ var fileUpload = {
     }, 50);
     fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
     $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
-    $("#file_uploads_progress").slideDown();
+    fileUpload.showStatus();
     $file.find(".cancel_upload_link").hide().end()
       .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info} ", {error_info: error.info}));
     $file.addClass('done').addClass('errored');
