@@ -2,6 +2,8 @@ module Delayed
 
 class TimeoutError < RuntimeError; end
 
+require 'tmpdir'
+
 class Worker
 
   Settings = [ :max_run_time, :max_attempts ]
@@ -79,6 +81,7 @@ class Worker
   def run
     # need to do this here, since we're avoiding db calls in the master process pre-fork
     @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '5.0').to_f
+    @make_tmpdir ||= Setting.get_cached('delayed_jobs_unique_tmpdir', 'true') == 'true'
 
     job = Delayed::Job.get_and_lock_next_available(
       name,
@@ -88,22 +91,23 @@ class Worker
       max_priority)
 
     if job
-      configure_logging(job)
-      perform(job)
+      configure_for_job(job) do
+        perform(job)
 
-      @job_count += 1
-      if @max_job_count > 0 && @job_count >= @max_job_count
-        say "Max job count of #{@max_job_count} exceeded, dying"
-        @exit = true
-      end
-
-      if @max_memory_usage > 0
-        memory = Canvas.sample_memory
-        if memory > @max_memory_usage
-          say "Memory usage of #{memory} exceeds max of #{@max_memory_usage}, dying"
+        @job_count += 1
+        if @max_job_count > 0 && @job_count >= @max_job_count
+          say "Max job count of #{@max_job_count} exceeded, dying"
           @exit = true
-        else
-          say "Memory usage: #{memory}"
+        end
+
+        if @max_memory_usage > 0
+          memory = Canvas.sample_memory
+          if memory > @max_memory_usage
+            say "Memory usage of #{memory} exceeds max of #{@max_memory_usage}, dying"
+            @exit = true
+          else
+            say "Memory usage: #{memory}"
+          end
         end
       end
     else
@@ -175,12 +179,26 @@ class Worker
   end
 
   # set up the session context information, so that it gets logged with the job log lines
-  def configure_logging(job)
+  # also set up a unique tmpdir, which will get removed at the end of the job.
+  def configure_for_job(job)
+    previous_tmpdir = ENV['TMPDIR'] if @make_tmpdir
     Thread.current[:context] = {
       # these keys aren't terribly well named for this, since they were intended for http requests
       :request_id => job.id,
       :session_id => self.name,
     }
+
+    if @make_tmpdir
+      Dir.mktmpdir("job-#{job.id}-#{self.name.gsub(/[^\w\.]/, '.')}-") do |dir|
+        ENV['TMPDIR'] = dir
+        yield
+      end
+    else
+      yield
+    end
+  ensure
+    ENV['TMPDIR'] = previous_tmpdir if @make_tmpdir
+    Thread.current[:context] = nil
   end
 
 end
