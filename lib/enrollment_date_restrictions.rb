@@ -79,8 +79,15 @@ module EnrollmentDateRestrictions
           enrollment.activate
         end
       end
+    elsif start_at && start_at >= Time.now
+      Enrollment.find_all_by_id_and_workflow_state(all_enrollment_ids, ['active']).each do |enrollment|
+        course = lookup_enrollment_course(enrollment)
+        if course.enrollment_state_based_on_date(enrollment) == 'inactive'
+          enrollment.deactivate
+        end
+      end
     elsif end_at && end_at <= Time.now
-      Enrollment.find_all_by_id_and_workflow_state(all_enrollment_ids, ['active','invited']).each do |enrollment|
+      Enrollment.find_all_by_id_and_workflow_state(all_enrollment_ids, ['active', 'invited']).each do |enrollment|
         course = lookup_enrollment_course(enrollment)
         if course.enrollment_state_based_on_date(enrollment) == 'completed'
           enrollment.complete
