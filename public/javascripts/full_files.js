@@ -2042,7 +2042,7 @@ var fileStructureData = [];
         scriptAccess: 'always',
         multi: true,
         auto: false,
-        sizeLimit: 52428800,
+        sizeLimit: 10737418240,
         simUploadLimit: 1,
         buttonText: "",
         hideButton: true,
