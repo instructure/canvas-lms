@@ -76,6 +76,23 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     keep_trying_until { @image_list.find_elements(:css, 'img.img').length }.should == 2
   end
 
+  it "should properly clone images, including thumbnails, and display" do
+    old_course = @course
+    new_course = old_course.clone_for(old_course.account)
+    new_course.merge_into_course(old_course, :everything => true)
+    new_course.enroll_teacher(@user)
+
+    get "/courses/#{new_course.id}/wiki"
+    @tree1 = driver.find_element(:id, :tree1)
+    @image_list = driver.find_element(:css, '#editor_tabs_3 .image_list')
+    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+    keep_trying_until {
+      images = @image_list.find_elements(:css, 'img.img')
+      images.length.should == 2
+      images.each { |i| i.attribute('complete').should == 'true' }
+    }
+  end
+
   it "should infini-scroll images" do
     90.times do |i|
       image = @root_folder.attachments.build(:context => @course)
