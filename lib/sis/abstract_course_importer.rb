@@ -77,7 +77,7 @@ module SIS
           course.sis_batch_id = @batch.id if @batch
           course.save!
         elsif @batch
-          abstract_courses_to_update_sis_batch_id << @batch.id
+          abstract_courses_to_update_sis_batch_id << course.id
         end
         @sis.counts[:abstract_courses] += 1
       end

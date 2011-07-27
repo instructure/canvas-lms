@@ -86,7 +86,7 @@ class FilesController < ApplicationController
         @visible_folders = @context.active_folders_detailed.select{|f| f.grants_right?(@current_user, session, :read_contents)}
         @files = @context.active_attachments.scoped(:include => [:thumbnail, :media_object])
         # preload the reverse associations
-        @files.each { |f| f.thumbnail.attachment = f if f.thumbnail; f.context = @context }
+        @files.each { |f| f.thumbnail.attachment = f if f.thumbnail.try(:parent_id) == f.id; f.context = @context }
         if @context.grants_right?(@current_user, session, :manage_files)
           @visible_files = @files
         else
@@ -94,7 +94,7 @@ class FilesController < ApplicationController
           @visible_folders.each{|f| visible_folders_hash[f.id] = true }
           @visible_files = @files.select{|a| !a.currently_locked && visible_folders_hash[a.folder_id] }
         end
-        (@visible_folders + @visible_files).to_json
+        (@visible_folders + @visible_files).to_json(:methods => [:thumbnail_url])
       end
       render :json => json
     end

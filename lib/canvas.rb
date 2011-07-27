@@ -47,6 +47,36 @@ module Canvas
     @redis_enabled ||= Setting.from_config('redis').present?
   end
 
+  def self.cache_store_config
+    cache_store_config = {
+      'cache_store' => 'mem_cache_store',
+    }.merge(Setting.from_config('cache_store') || {})
+    config = nil
+    case cache_store_config.delete('cache_store')
+    when 'mem_cache_store'
+      cache_store_config['namespace'] ||= cache_store_config['key']
+      servers = cache_store_config['servers'] || (Setting.from_config('memcache'))
+      if servers
+        config = :mem_cache_store, servers, cache_store_config
+      end
+    when 'redis_store'
+      Bundler.require 'redis'
+      Canvas::Redis.patch
+      # merge in redis.yml, but give precedence to cache_store.yml
+      #
+      # the only options currently supported in redis-cache are the list of
+      # servers, not key prefix or database names.
+      cache_store_config = (Setting.from_config('redis') || {}).merge(cache_store_config)
+      cache_store_config['key_prefix'] ||= cache_store_config['key']
+      servers = cache_store_config['servers']
+      config = :redis_store, servers
+    end
+    unless config
+      config = :nil_store
+    end
+    config
+  end
+
   # `sample` reports KB, not B
   if File.directory?("/proc")
     # linux w/ proc fs
