@@ -141,7 +141,7 @@ module SIS
               course.sis_batch_id = @batch.id if @batch
               course.save_without_broadcasting!
             elsif @batch
-              courses_to_update_sis_batch_id << @batch.id
+              courses_to_update_sis_batch_id << course.id
             end
             @sis.counts[:courses] += 1
 
