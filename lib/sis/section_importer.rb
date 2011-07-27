@@ -113,7 +113,7 @@ module SIS
             section.sis_batch_id = @batch.id if @batch
             section.save
           elsif @batch
-            sections_to_update_sis_batch_ids << section
+            sections_to_update_sis_batch_ids << section.id
           end
           
           courses_to_update_associations.map(&:update_account_associations)
