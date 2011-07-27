@@ -1,3 +1,17 @@
+canvas-lms (1.1-44) professional; urgency=low
+
+  * [+a9ae4d3] support redis as well as memcache for a rails cache store
+  * [+2e7027f] fix initialization of redis-cache cache store
+  * [+782574f] fix displaying thumbnails in wiki sidebar
+  * [+e9c23c0] fix typos in sis importer causing wrong object ids to update batch id
+  * [+09ae262] raise uploadify file size limit
+  * [+d8b5130] don't upload every file twice
+  * [+05788b9] active enrollments when removing term date restrictions; fixes #4988
+  * [+9fe401e] deactivate enrollments when date restrictions are added
+  * [+d0f98af] fix thumbnail url for attachments that have a root_attachment_id
+
+ -- JT Olds <jt@instructure.com>  Wed, 27 Jul 2011 14:52:38 -0600
+
 canvas-lms (1.1-43) professional; urgency=low
 
   * [+bac7acd] i18n shared partials
