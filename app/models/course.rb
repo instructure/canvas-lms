@@ -337,10 +337,10 @@ class Course < ActiveRecord::Base
     }
   }
   named_scope :recently_started, lambda {
-    {:conditions => ['start_at < ? and start_at > ?', Time.now, 1.month.ago], :order => 'start_at DESC', :limit => 10}
+    {:conditions => ['start_at < ? and start_at > ?', Time.now.utc, 1.month.ago], :order => 'start_at DESC', :limit => 10}
   }
   named_scope :recently_ended, lambda {
-    {:conditions => ['conclude_at < ? and conclude_at > ?', Time.now, 1.month.ago], :order => 'start_at DESC', :limit => 10}
+    {:conditions => ['conclude_at < ? and conclude_at > ?', Time.now.utc, 1.month.ago], :order => 'start_at DESC', :limit => 10}
   }
   named_scope :recently_created, lambda {
     {:conditions => ['created_at > ?', 1.month.ago], :order => 'created_at DESC', :limit => 50, :include => :teachers}
@@ -852,7 +852,11 @@ class Course < ActiveRecord::Base
   def end_at_changed?
     conclude_at_changed?
   end
-  
+
+  def recently_ended?
+    conclude_at && conclude_at < Time.now.utc && conclude_at > 1.month.ago
+  end
+
   def state_sortable
     case state
     when :invited

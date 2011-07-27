@@ -39,7 +39,7 @@ class ConversationParticipant < ActiveRecord::Base
       :id => id,
       :participants => participants(private?),
       :workflow_state => workflow_state,
-      :last_message => truncate_text(messages.first.body, :max_length => 100),
+      :last_message => messages.first ? truncate_text(messages.first.body, :max_length => 100) : nil,
       :last_message_at => last_message_at,
       :subscribed => subscribed?,
       :private => private?,
@@ -67,7 +67,7 @@ class ConversationParticipant < ActiveRecord::Base
     participants = conversation.participants - [self.user]
     return participants unless include_context_info
     # we do this to find out the contexts they share with the user
-    user.messageable_users(:ids => participants.map(&:id)).each { |user|
+    user.messageable_users(:ids => participants.map(&:id), :no_check_context => true).each { |user|
       context_info[user.id] = user
     }
     participants.each { |user|
@@ -83,7 +83,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def flags
     flags = []
-    flags << :last_author if messages.first.author_id == user_id
+    flags << :last_author if messages.first && messages.first.author_id == user_id
     flags << :attachments if has_attachments?
     flags << :media_objects if has_media_objects?
     flags

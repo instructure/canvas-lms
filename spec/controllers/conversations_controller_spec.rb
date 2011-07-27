@@ -60,6 +60,20 @@ describe ConversationsController do
     end
   end
 
+  describe "POST 'create'" do
+    it "should create the conversation" do
+      course_with_student_logged_in(:active_all => true)
+
+      new_user = User.create
+      enrollment = @course.enroll_student(new_user)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+      post 'create', :recipients => [new_user.id.to_s], :body => "yo"
+      response.should be_success
+      assigns[:conversation].should_not be_nil
+    end
+  end
+
   describe "POST 'update'" do
     it "should update the conversation" do
       course_with_student_logged_in(:active_all => true)
@@ -102,7 +116,7 @@ describe ConversationsController do
       enrollment = @course.enroll_student(new_user)
       enrollment.workflow_state = 'active'
       enrollment.save
-      post 'add_recipients', :conversation_id => @conversation.id, :users => [new_user.id.to_s]
+      post 'add_recipients', :conversation_id => @conversation.id, :recipients => [new_user.id.to_s]
       response.should be_success
       @conversation.participants.size.should == 3 # doesn't include @user
     end

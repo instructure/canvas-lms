@@ -128,8 +128,6 @@ ul.messages
     border-top: 1px solid #fff
     border-bottom: 1px solid #ddd
     position: relative
-    a
-      display: none
     p
       margin: 0
       min-height: 30px
@@ -180,6 +178,16 @@ ul.messages
       font-weight: bold
       font-style: normal
 
+ul.messages li.other:hover
+  .actions
+    display: inline
+    border-left: 1px solid #ddd
+    padding-left: 1em
+    margin-left: 1em
+ul.messages, ul.messages.private, ul.messages.private li:hover
+  .actions
+    display: none
+
 #messages
   width: 100%
   float: left
@@ -210,6 +218,8 @@ ul.messages
     margin: 2em 1em
     text-align: center
   ul.messages
+    a
+      display: none
     > li
       color: #636363
       .audience
@@ -225,6 +235,218 @@ ul.messages
       cursor: pointer
 #message_blank
   display: none
+
+.token_input
+  line-height: 1.1em
+  min-height: 1.25em
+  display: -moz-inline-box
+  display: inline-block
+  border: 1px solid #999999
+  border-top-color: #737373
+  padding: 0
+  box-sizing: border-box
+  -webkit-box-sizing: border-box
+  -moz-box-sizing: border-box
+  cursor: text
+  overflow: hidden
+  a.browser
+    float: right
+    margin: 0px 4px
+    cursor: pointer
+    overflow: hidden
+    height: 18px
+    width: 28px
+    text-indent: -9999em
+    background: transparent url(/images/messages/browse.png) 2px 1px no-repeat
+  span
+    float: left
+    color: #888
+    margin: 2px 1px 0
+  ul
+    list-style: none
+    margin: 0
+    padding: 0
+  li
+    div
+      display: inline
+    a
+      position: absolute
+      right: 1px
+      top: 1px
+      width: 13px
+      height: 100%
+      color: #c4cbcf
+      vertical-align: top
+      cursor: pointer
+      background: transparent url(/images/messages/token-delete.png) 12px center no-repeat
+    white-space: nowrap
+    float: left
+    margin: 1px 2px 1px 4px
+    padding: 0 14px 0 11px
+    color: #000
+    background-color: #dee7fa
+    border: 1px solid #a5bcf0
+    +border-radius(10px)
+    cursor: default
+    position: relative
+  li:hover
+    background-color: #bccef4
+    border-color: #6f94e6
+    a
+      background-position: 1px center
+  li.selected
+    background-color: #5b89f3
+    border-color: #5b89f3
+    color: #fff
+    a
+      background-position: -10px center
+  input
+    -webkit-box-shadow: none
+    -moz-box-shadow: none
+    box-shadow: none
+    float: left
+    border: 0
+    outline: none
+    padding: 0
+    margin: 1px 0
+
+.token_input.active
+  box-shadow: #68B4DF 0 0 3px 2px
+
+.autocomplete_menu
+  position: absolute
+  z-index: 1000
+  overflow: hidden
+  margin-left: -12px
+  padding: 0 12px 12px
+  > div
+    background: #ebebeb
+    border: 1px solid #999999
+    +border-radius(0 0 10px 10px)
+    +box-shadow( rgba(0,0,0,0.15), 0, 0, 12px, 3px)
+    overflow: hidden
+    width: 341px
+    > div // gets shifted left/right as menu slides
+      position: relative
+      > div // each menu level (contains two uls)
+        float: left
+        width: 341px
+  ul.heading
+    margin: 0
+    overflow: visible
+  ul
+    list-style: none
+    padding: 0
+    margin: 0 0 10px
+    overflow: auto
+    li
+      border-top: 1px solid #fff
+      border-bottom: 1px solid #d4d5d7
+      padding: 5px
+    li.first
+      border-top: none
+    li.last
+      border-bottom: none
+    li.expanded
+      cursor: default
+      background: #fff
+      position: relative
+      z-index: 1
+      +box-shadow( rgba(0,0,0,0.1), 0, 0, 4px, 2px)
+    li.message
+      line-height: 32px
+      text-align: center
+      border-bottom: none
+    li.active
+      border-top-color: #d7eefb
+      border-bottom-color: #297fd1
+      background: #2da5f0 url(/images/messages/finder-active.png) repeat-x 0 0
+    li.active.expanded
+      background: #f4fbff
+      border-top-color: #fff
+      border-bottom-color: #d4d5d7
+        
+
+.autocomplete_menu
+  ul
+    max-height: 218px
+    position: relative
+  li, li.active.expanded
+    height: 32px
+    cursor: pointer
+    a
+      position: relative
+      padding: 1px
+      background: transparent
+    i
+      display: block
+      width: 30px
+      height: 30px
+    a.expand
+      float: right
+      i
+        background: transparent url(/images/messages/expand-context.png) no-repeat 10px -23px
+    a.toggle
+      float: left
+      margin: 0 14px 0 6px
+      i
+        width: 16px
+        height: 16px
+        margin: 7px
+        background: transparent url(/images/messages/checkbox-sprite.png) no-repeat 0 0
+    a.toggle:hover i
+      background-position: 0 -16px
+    img
+      width: 32px
+      height: 32px
+      float: left
+      margin-right: 6px
+    b
+      display: block
+      color: #000
+      text-shadow: none
+    span
+      display: block
+      color: #2571bd
+      font-weight: bold
+      font-size: 0.8em
+  li.active
+    a.expand
+      i
+        background-position: 10px 10px
+    a.expand:hover
+      padding: 0
+      border: 1px solid #2da5f0
+      background: #2da5f0 url(/images/messages/finder-active.png) repeat-x 0 0
+    b
+      color: #fff
+      text-shadow: 0px 1px 1px #0587bb
+    span
+      color: #0d4276
+    a.toggle i
+      background-position: 0 -48px
+  li.on .toggle i
+    background-position: 0 -32px
+  li.on.active .toggle i
+    background-position: 0 -80px
+  li.on.active .toggle:hover i
+    background-position: 0 -64px
+  li.expanded, li.active.expanded
+    cursor: default
+    a.expand
+      i
+        background-position: 10px -55px
+    a.toggle
+      display: none
+    img
+      margin: 0 14px 0 6px
+  li.active.expanded
+    a.expand:hover
+      cursor: pointer
+      background: #fff
+      border-color: #e4ebef
+
+
 #create_message_form
   display: none
   position: relative
@@ -251,12 +473,16 @@ ul.messages
       vertical-align: top
     td
       width: 100%
-      padding: 0 1.5em 0 4px
+      padding: 0 0 2px 0
     th
       text-align: right
-      padding: 0 4px 0 1.5em
+      padding: 0 8px 2px 0
       color: #2571bd
+form
   input
     width: 100%
   textarea
+    box-sizing: border-box
+    -webkit-box-sizing: border-box
+    -moz-box-sizing: border-box
     width: 100%

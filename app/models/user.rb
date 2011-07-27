@@ -39,7 +39,8 @@ class User < ActiveRecord::Base
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]  
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments
-  has_many :all_courses, :source => :course, :through => :enrollments
+  has_many :concluded_courses, :source => :course, :through => :concluded_enrollments
+  has_many :all_courses, :source => :course, :through => :enrollments  
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
   has_many :user_account_associations
@@ -1505,28 +1506,41 @@ class User < ActiveRecord::Base
   MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source']
   MESSAGEABLE_USER_COLUMN_SQL = "users." + (MESSAGEABLE_USER_COLUMNS.join(", users."))
   def messageable_users(options = {})
-    course_ids = courses.active.map(&:id)
-    group_ids = groups.active.map(&:id)
+    course_ids = courses.map(&:id) + concluded_courses.map(&:id)
+    group_ids = groups.map(&:id)
 
-    if options[:context] && options[:context] =~ /\Acourse_(\d+)\z/
-      course_ids &= [$1.to_i]
-      group_ids = []
-    elsif options[:context] && options[:context] =~ /\Agroup_(\d+)\z/
-      group_ids &= [$1.to_i]
-      course_ids = []
+    if options[:context]
+      limited_course_ids = []
+      limited_group_ids = []
+      Array(options[:context]).each do |context|
+        if context =~ /\Acourse_(\d+)\z/
+          limited_course_ids << $1.to_i
+        elsif context =~ /\Agroup_(\d+)\z/
+          limited_group_ids << $1.to_i
+        end
+      end
+      course_ids &= limited_course_ids
+      group_ids &= limited_group_ids
     end
-    return [] if course_ids.empty? && group_ids.empty? && !options[:ids]
+    return [] if course_ids.empty? && group_ids.empty? && !options[:ids] || options[:ids] == []
 
     user_condition_sql = "users.id <> #{self.id}"
-    user_condition_sql << " AND users.id IN (#{options[:ids].join(', ')})" if options[:ids]
-    user_condition_sql << " AND #{wildcard('users.name', 'users.short_name', options[:search])}" if options[:search]
+    user_condition_sql << " AND users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
+    user_condition_sql << " AND users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
+    if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
+      parts.each do |part|
+        user_condition_sql << " AND (#{wildcard('users.name', 'users.short_name', part)})"
+      end
+    end
     user_sql = []
 
     user_sql << <<-SQL if course_ids.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, null AS group_id
       FROM users, enrollments, courses
       WHERE course_id IN (#{course_ids.join(',')}) AND users.id = user_id AND courses.id = course_id
-        AND #{self.class.reflections[:current_enrollments].options[:conditions]}
+        AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
+          OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
+        )
         AND #{user_condition_sql}
     SQL
 
@@ -1534,14 +1548,30 @@ class User < ActiveRecord::Base
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, group_id
       FROM users, group_memberships
       WHERE group_id IN (#{group_ids.join(',')}) AND users.id = user_id
+        AND group_memberships.workflow_state <> 'deleted'
         AND #{user_condition_sql}
     SQL
 
-    user_sql << <<-SQL if options[:ids]
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
-      FROM users
-      WHERE #{user_condition_sql}
-    SQL
+    if options[:ids]
+      # provides a way for this user to start a conversation with someone
+      # that isn't normally messageable (requires that they already be in a
+      # conversation with that user)
+      if options[:conversation_id].present?
+        user_sql << <<-SQL
+          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+          FROM users, conversation_participants
+          WHERE #{user_condition_sql}
+            AND conversation_participants.user_id = users.id
+            AND conversation_participants.conversation_id = #{options[:conversation_id].to_i}
+        SQL
+      elsif options[:no_check_context]
+        user_sql << <<-SQL
+          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+          FROM users
+          WHERE #{user_condition_sql}
+        SQL
+      end
+    end
 
     users = User.find_by_sql(<<-SQL)
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL},
@@ -1551,7 +1581,9 @@ class User < ActiveRecord::Base
         #{user_sql.join(' UNION ')}
       ) users
       GROUP BY #{connection.group_by(*MESSAGEABLE_USER_COLUMNS)}
-      ORDER BY short_name
+      ORDER BY LOWER(COALESCE(short_name, name))
+      #{options[:offset] ? "OFFSET #{options[:offset].to_i}" : ""}
+      #{options[:limit] ? "LIMIT #{options[:limit].to_i}" : ""}
     SQL
     users.each do |user|
       user.common_course_ids = user.common_course_ids.to_s.split(",").map(&:to_i)

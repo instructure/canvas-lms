@@ -52,14 +52,18 @@ module ConversationsHelper
     if conversation.participants.size == 1
       avatar_url_for_user(conversation.participants.first)
     else
-      "/images/messages/avatar-group.png"
+      avatar_url_for_group
     end
   end
 
+  def avatar_url_for_group
+    "/images/messages/avatar-group-#{avatar_size}.png"
+  end
+
   def avatar_url_for_user(user)
-    default_avatar = "/images/messages/avatar.png"
+    default_avatar = "/images/messages/avatar-#{avatar_size}.png"
     if service_enabled?(:avatars)
-      user.avatar_url(50, nil, "#{request.protocol}#{request.host_with_port}#{default_avatar}")
+      user.avatar_url(avatar_size, nil, "#{request.protocol}#{request.host_with_port}#{default_avatar}")
     else
       default_avatar
     end

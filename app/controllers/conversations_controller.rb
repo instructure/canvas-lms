@@ -20,6 +20,7 @@ class ConversationsController < ApplicationController
   include ConversationsHelper
 
   before_filter :require_user
+  before_filter lambda { @avatar_size = 32 }, :only => :find_recipients
   before_filter :get_conversation, :only => [:show, :update, :destroy, :workflow_event, :add_recipients, :add_message, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
@@ -43,6 +44,7 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end.map{ |c| jsonify_conversation(c) }
     @scope ||= params[:scope].to_sym
+    @user_cache = Hash[*jsonify_users([@current_user]).map{|u| [u[:id], u] }.flatten]
   end
 
   def create
@@ -123,41 +125,70 @@ class ConversationsController < ApplicationController
   end
 
   def find_recipients
-    max_results = 20
+    max_results = params[:limit] ? params[:limit].to_i : 5
+    max_results = nil if max_results < 0
     recipients = []
     if params[:context]
       recipients = matching_participants(:search => params[:search], :context => params[:context], :limit => max_results)
     elsif params[:search]
-      recipients = matching_contexts(params[:search]) + matching_participants(:search => params[:search], :limit => max_results)
+      exclude = params[:exclude] || []
+      contexts = params[:type] != 'user' ? matching_contexts(params[:search], exclude.grep(/\A(course|group)_\d+\z/)) : []
+      participants = params[:type] != 'context' ? matching_participants(:search => params[:search], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)) : []
+      if max_results
+        if contexts.size < max_results / 2
+          recipients = contexts + participants
+        elsif participants.size < max_results / 2
+          recipients = contexts[0, max_results - participants.size] + participants
+        else
+          recipients = contexts[0, max_results / 2] + participants
+        end
+        recipients = recipients[0, max_results]
+      else
+        recipients = contexts + participants
+      end
     end
-    render :json => recipients[0, max_results]
+    render :json => recipients
   end
 
   private
 
   def normalize_recipients
-    if params[:users]
-      @recipient_ids = matching_participants(:ids => params[:users].map(&:to_i)).map{ |p| p[:id] }
-    elsif params[:context]
-      @recipient_ids = matching_participants(:context => params[:context]).map{ |p| p[:id] }
+    if params[:recipients]
+      @recipient_ids = (
+        matching_participants(:ids => params[:recipients].grep(/\A\d+\z/), :conversation_id => params[:from_conversation_id]).map{ |p| p[:id] } +
+        matching_participants(:context => params[:recipients].grep(/\A(course|group)_\d+\z/)).map{ |p| p[:id] }
+      ).uniq
     end
   end
 
   def load_all_contexts
     @contexts = {:courses => {}, :groups => {}}
-    @current_user.courses.active.each do |course|
-      @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course}
+    @current_user.concluded_courses.each do |course|
+      @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => course.recently_ended? }
     end
-    @current_user.groups.active.each do |group|
-      @contexts[:groups][group.id] = {:id => group.id, :name => group.name, :type => :group}
+    @current_user.courses.each do |course|
+      @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => true }
+    end
+    @current_user.groups.each do |group|
+      @contexts[:groups][group.id] = {:id => group.id, :name => group.name, :type => :group, :active => group.active? }
     end
   end
 
-  def matching_contexts(search)
+  def matching_contexts(search, exclude = [])
+    avatar_url = service_enabled?(:avatars) ? avatar_url_for_group : nil
     @contexts.values.map(&:values).flatten.
-      select{ |context| context[:name].downcase.include?(search.downcase) }.
+      select{ |context| search.downcase.strip.split(/\s+/).all?{ |part| context[:name].downcase.include?(part) } }.
+      select{ |context| context[:active] }.
       sort_by{ |context| context[:name] }.
-      map{ |context| {:id => "#{context[:type]}_#{context[:id]}", :name => context[:name], :type => :context } }
+      map{ |context|
+        {:id => "#{context[:type]}_#{context[:id]}",
+         :name => context[:name],
+         :avatar => avatar_url,
+         :type => :context }
+      }.
+      reject{ |context|
+        exclude.include?(context[:id])
+      }
   end
 
   def matching_participants(options)
@@ -184,5 +215,9 @@ class ConversationsController < ApplicationController
        :group_ids => ids_present ? user.common_group_ids : []
       }
     }
+  end
+
+  def avatar_size
+    @avatar_size ||= 50
   end
 end
