@@ -94,7 +94,7 @@ class FilesController < ApplicationController
           @visible_folders.each{|f| visible_folders_hash[f.id] = true }
           @visible_files = @files.select{|a| !a.currently_locked && visible_folders_hash[a.folder_id] }
         end
-        (@visible_folders + @visible_files).to_json
+        (@visible_folders + @visible_files).to_json(:methods => [:thumbnail_url])
       end
       render :json => json
     end
