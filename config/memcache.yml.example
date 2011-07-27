@@ -1,5 +1,4 @@
-# if an environment has no servers defined, we'll use NilStore instead, which
-# effectively disables caching
+# see also config/cache_store.yml.example
 production:
 
 development:

@@ -74,7 +74,7 @@ group :development do
 end
 
 group :redis do
-  gem 'redis-store', '1.0.0.beta4'
+  gem 'redis-store', '1.0.0.rc1'
 end
 
 # The closure-compiler gem has an undocumented

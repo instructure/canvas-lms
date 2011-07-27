@@ -32,3 +32,5 @@ Canvas.dynamic_finder_type_cast_error = :raise
 
 # eval <env>-local.rb if it exists
 Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
+
+config.cache_store = :nil_store
