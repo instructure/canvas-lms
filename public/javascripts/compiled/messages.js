@@ -20,7 +20,7 @@
       this.node = node;
       this.options = options;
       this.node.data('token_input', this);
-      this.fake_input = $('<div />').css('width', this.node.css('width')).css('font-family', this.node.css('font-family')).insertAfter(this.node).addClass('token_input').bind('selectstart', false).click(__bind(function() {
+      this.fake_input = $('<div />').css('font-family', this.node.css('font-family')).insertAfter(this.node).addClass('token_input').bind('selectstart', false).click(__bind(function() {
         return this.input.focus();
       }, this));
       this.node_name = this.node.attr('name');
@@ -74,7 +74,12 @@
         }
         this.selector = new type(this, this.node.attr('finder_url'), this.options.selector);
       }
+      this.base_exclude = [];
+      this.resize();
     }
+    TokenInput.prototype.resize = function() {
+      return this.fake_input.css('width', this.node.css('width'));
+    };
     TokenInput.prototype.add_token = function(data) {
       var $close, $text, $token, id, text, val, _ref, _ref2, _ref3;
       if (!this.tokens.find('#' + id).length) {
@@ -182,6 +187,11 @@
     };
     return TokenInput;
   })();
+  $.fn.tokenInput = function(options) {
+    return this.each(function() {
+      return new TokenInput($(this), $.extend(true, {}, options));
+    });
+  };
   TokenSelector = (function() {
     function TokenSelector(input, url, options) {
       this.input = input;
@@ -301,8 +311,13 @@
         case 'Esc':
         case 'U+001B':
         case 27:
-          this.close();
-          return false;
+          if (this.menu.is(":visible")) {
+            this.close();
+            return true;
+          } else {
+            return false;
+          }
+          break;
         case 'U+0020':
         case 32:
           if (this.selection_toggleable() && this.mode === 'menu') {
@@ -613,7 +628,7 @@
       post_data = $.extend(data, {
         search: this.input.val()
       });
-      post_data.exclude = this.input.token_values();
+      post_data.exclude = this.input.base_exclude.concat(this.stack.length ? [] : this.input.token_values());
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
@@ -675,6 +690,9 @@
       }
     };
     reset_message_form = function() {
+      if ($selected_conversation != null) {
+        $form.find('.audience').html($selected_conversation.find('.audience').html());
+      }
       return $form.find('input, textarea').val('').change();
     };
     parse_query_string = function(query_string) {
@@ -805,6 +823,9 @@
       $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id);
       if (data.author_id !== MessageInbox.user_id) {
         $message.addClass('other');
+      }
+      if (data.generated) {
+        $message.addClass('generated');
       }
       user = MessageInbox.user_cache[data.author_id];
       if (avatar = user != null ? user.avatar : void 0) {
@@ -973,7 +994,7 @@
       MessageInbox: MessageInbox
     });
     return $(document).ready(function() {
-      var conversation, input, match, _i, _len, _ref;
+      var conversation, match, _i, _len, _ref;
       $conversations = $('#conversations');
       $conversation_list = $conversations.find("ul");
       $messages = $('#messages');
@@ -1011,13 +1032,39 @@
           return $(this).loadingImage('remove');
         }
       });
+      $('#add_recipients_form').submit(function(e) {
+        var valid;
+        valid = !!($(this).find('.token_input li').length);
+        if (!valid) {
+          e.stopImmediatePropagation();
+        }
+        return valid;
+      });
+      $('#add_recipients_form').formSubmit({
+        beforeSubmit: function() {
+          return $(this).loadingImage();
+        },
+        success: function(data) {
+          $(this).loadingImage('remove');
+          build_message(data.message.conversation_message).prependTo($message_list).slideDown('fast');
+          update_conversation($selected_conversation, data.conversation);
+          reset_message_form();
+          return $(this).dialog('close');
+        },
+        error: function(data) {
+          $(this).loadingImage('remove');
+          return $(this).dialog('close');
+        }
+      });
       $message_list.click(function(e) {
         var $message;
         $message = $(e.target).closest('li');
-        if ($selected_conversation != null) {
-          $selected_conversation.addClass('inactive');
+        if (!$message.hasClass('generated')) {
+          if ($selected_conversation != null) {
+            $selected_conversation.addClass('inactive');
+          }
+          return $message.toggleClass('selected');
         }
-        return $message.toggleClass('selected');
       });
       $('#action_compose_message').click(function() {
         return select_conversation();
@@ -1051,6 +1098,7 @@
           if ($selected_conversation.hasClass('private')) {
             $('#action_add_recipients, #action_subscribe, #action_unsubscribe').parent().hide();
           } else {
+            $('#action_add_recipients').parent().show();
             $('#action_unsubscribe').parent().showIf(!$selected_conversation.hasClass('unsubscribed'));
             $('#action_subscribe').parent().showIf($selected_conversation.hasClass('unsubscribed'));
           }
@@ -1110,6 +1158,30 @@
           },
           error: function($node) {
             return set_conversation_state($node, 'read');
+          }
+        });
+      });
+      $('#action_add_recipients').click(function() {
+        return $('#add_recipients_form').attr('action', inbox_action_url_for($(this))).dialog('close').dialog({
+          width: 400,
+          open: function() {
+            var node, token_input;
+            token_input = $('#add_recipients').data('token_input');
+            token_input.base_exclude = (function() {
+              var _i, _len, _ref, _results;
+              _ref = $selected_conversation.find('.participant');
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                node = _ref[_i];
+                _results.push($(node).data('id'));
+              }
+              return _results;
+            })();
+            token_input.resize();
+            return $(this).find("input").val('').change().last().focus();
+          },
+          close: function() {
+            return $('#add_recipients').data('token_input').input.blur();
           }
         });
       });
@@ -1197,7 +1269,7 @@
         conversation = _ref[_i];
         add_conversation(conversation, true);
       }
-      input = new TokenInput($('#recipients'), {
+      $('.recipients').tokenInput({
         placeholder: I18n.t('recipient_field_placeholder', "Enter a name, email, course, or group"),
         selector: {
           messages: {
@@ -1243,7 +1315,7 @@
           }
         }
       });
-      input.fake_input.css('width', '100%');
+      $('#recipients').data('token_input').fake_input.css('width', '100%');
       if (match = location.hash.match(/^#\/messages\/(\d+)$/)) {
         return $('#conversation_' + match[1]).click();
       } else {

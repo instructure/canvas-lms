@@ -35,11 +35,12 @@ class ConversationParticipant < ActiveRecord::Base
   attr_accessible :subscribed
 
   def as_json(options = {})
+    latest = messages.human.first
     super.merge(
       :id => id,
       :participants => participants(private?),
       :workflow_state => workflow_state,
-      :last_message => messages.first ? truncate_text(messages.first.body, :max_length => 100) : nil,
+      :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
       :last_message_at => last_message_at,
       :subscribed => subscribed?,
       :private => private?,
@@ -82,8 +83,9 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def flags
+    latest = messages.human.first
     flags = []
-    flags << :last_author if messages.first && messages.first.author_id == user_id
+    flags << :last_author if latest && latest.author_id == user_id
     flags << :attachments if has_attachments?
     flags << :media_objects if has_media_objects?
     flags
@@ -98,8 +100,8 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def update_cached_data
-    if messages.first
-      self.last_message_at = messages.first.created_at
+    if latest = messages.human.first
+      self.last_message_at = latest.created_at
       self.has_attachments = attachments.size > 0
       self.has_media_objects = media_objects.size > 0
     else

@@ -11,7 +11,6 @@ class TokenInput
   constructor: (@node, @options) ->
     @node.data('token_input', this)
     @fake_input = $('<div />')
-      .css('width', @node.css('width'))
       .css('font-family', @node.css('font-family'))
       .insertAfter(@node)
       .addClass('token_input')
@@ -70,7 +69,14 @@ class TokenInput
           .click =>
             @selector.browse(@browser.data)
           .prependTo(@fake_input)
-      @selector = new type(this, @node.attr('finder_url'), @options.selector)        
+      @selector = new type(this, @node.attr('finder_url'), @options.selector)
+
+    @base_exclude = []
+
+    @resize()
+
+  resize: () ->
+    @fake_input.css('width', @node.css('width'))
 
   add_token: (data) ->
     unless @tokens.find('#' + id).length
@@ -158,6 +164,10 @@ class TokenInput
     else
       -1
 
+$.fn.tokenInput = (options) ->
+  @each ->
+    new TokenInput $(this), $.extend(true, {}, options)
+
 class TokenSelector
 
   constructor: (@input, @url, @options={}) ->
@@ -237,8 +247,11 @@ class TokenSelector
       when 'Shift', 16 # noop, but we don't want to set the mode to input
         return false
       when 'Esc', 'U+001B', 27
-        @close()
-        return false
+        if @menu.is(":visible")
+          @close()
+          return true
+        else
+          return false
       when 'U+0020', 32 # space
         if @selection_toggleable() and @mode is 'menu'
           @toggle_selection()
@@ -459,7 +472,7 @@ class TokenSelector
 
   prepare_post: (data) ->
     post_data = $.extend(data, {search: @input.val()})
-    post_data.exclude = @input.token_values()
+    post_data.exclude = @input.base_exclude.concat(if @stack.length then [] else @input.token_values())
     post_data.context = @stack[@stack.length - 1][0].data('id') if @list_expanded()
     post_data.limit ?= @options.limiter?(level: @stack.length)
     post_data
@@ -501,6 +514,7 @@ I18n.scoped 'conversations', (I18n) ->
         $form.find(':input:visible:first').focus()
 
   reset_message_form = ->
+    $form.find('.audience').html $selected_conversation.find('.audience').html() if $selected_conversation?
     $form.find('input, textarea').val('').change()
 
   parse_query_string = (query_string = window.location.search.substr(1)) ->
@@ -579,6 +593,7 @@ I18n.scoped 'conversations', (I18n) ->
   build_message = (data) ->
     $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id)
     $message.addClass('other') unless data.author_id is MessageInbox.user_id
+    $message.addClass('generated') if data.generated
     user = MessageInbox.user_cache[data.author_id]
     if avatar = user?.avatar
       $message.prepend $('<img />').attr('src', avatar).addClass('avatar')
@@ -712,10 +727,29 @@ I18n.scoped 'conversations', (I18n) ->
         $('.error_box').filter(':visible').css('z-index', 10) # TODO: figure out why this is necessary
         $(this).loadingImage 'remove'
 
+    $('#add_recipients_form').submit (e) ->
+      valid = !!($(this).find('.token_input li').length)
+      e.stopImmediatePropagation() unless valid
+      valid
+    $('#add_recipients_form').formSubmit
+      beforeSubmit: ->
+        $(this).loadingImage()
+      success: (data) ->
+        $(this).loadingImage 'remove'
+        build_message(data.message.conversation_message).prependTo($message_list).slideDown 'fast'
+        update_conversation($selected_conversation, data.conversation)
+        reset_message_form()
+        $(this).dialog('close')
+      error: (data) ->
+        $(this).loadingImage 'remove'
+        $(this).dialog('close')
+
+
     $message_list.click (e) ->
       $message = $(e.target).closest('li')
-      $selected_conversation?.addClass('inactive')
-      $message.toggleClass('selected')
+      unless $message.hasClass('generated')
+        $selected_conversation?.addClass('inactive')
+        $message.toggleClass('selected')
 
     $('#action_compose_message').click ->
       select_conversation()
@@ -745,6 +779,7 @@ I18n.scoped 'conversations', (I18n) ->
         if $selected_conversation.hasClass('private')
           $('#action_add_recipients, #action_subscribe, #action_unsubscribe').parent().hide()
         else
+          $('#action_add_recipients').parent().show()
           $('#action_unsubscribe').parent().showIf !$selected_conversation.hasClass('unsubscribed')
           $('#action_subscribe').parent().showIf $selected_conversation.hasClass('unsubscribed')
         $('#action_forward').parent().show()
@@ -786,6 +821,19 @@ I18n.scoped 'conversations', (I18n) ->
       inbox_action $(this),
         before: ($node) -> set_conversation_state $node, 'unread'
         error: ($node) -> set_conversation_state $node, 'read'
+
+    $('#action_add_recipients').click ->
+      $('#add_recipients_form')
+        .attr('action', inbox_action_url_for($(this)))
+        .dialog('close').dialog
+          width: 400
+          open: ->
+            token_input = $('#add_recipients').data('token_input')
+            token_input.base_exclude = ($(node).data('id') for node in $selected_conversation.find('.participant'))
+            token_input.resize()
+            $(this).find("input").val('').change().last().focus()
+          close: ->
+            $('#add_recipients').data('token_input').input.blur()
 
     $('#action_subscribe').click ->
       inbox_action $(this),
@@ -841,7 +889,7 @@ I18n.scoped 'conversations', (I18n) ->
     for conversation in MessageInbox.initial_conversations
       add_conversation conversation, true
 
-    input = new TokenInput $('#recipients'),
+    $('.recipients').tokenInput
       placeholder: I18n.t('recipient_field_placeholder', "Enter a name, email, course, or group")
       selector:
         messages: {no_results: I18n.t('no_results', 'No results found')}
@@ -868,7 +916,9 @@ I18n.scoped 'conversations', (I18n) ->
           data:
             limit: -1
             type: 'context'
-    input.fake_input.css('width', '100%')
+
+    # since it doesn't infer percentage widths, just whatever the current pixels are
+    $('#recipients').data('token_input').fake_input.css('width', '100%')
 
     if match = location.hash.match(/^#\/messages\/(\d+)$/)
       $('#conversation_' + match[1]).click()

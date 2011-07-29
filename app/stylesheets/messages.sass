@@ -163,6 +163,17 @@ ul.messages
           padding: 0 1em
           border: none
           color: #000
+  li.generated
+    padding: 10px
+    font-size: 0.9em
+    color: #888
+    p
+      text-align: center
+      min-height: 0
+      margin: 0
+    img.avatar, span.date, .audience
+      display: none
+    
   li.selected
     background: #f4fbff url(/images/messages/selected.png) repeat-x 0 0
   li.selected.inactive
@@ -315,7 +326,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
 
 .autocomplete_menu
   position: absolute
-  z-index: 1000
+  z-index: 2000
   overflow: hidden
   margin-left: -12px
   padding: 0 12px 12px
@@ -486,3 +497,6 @@ form
     -webkit-box-sizing: border-box
     -moz-box-sizing: border-box
     width: 100%
+
+#add_recipients_form
+  display: none

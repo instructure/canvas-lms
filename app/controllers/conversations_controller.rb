@@ -108,8 +108,12 @@ class ConversationsController < ApplicationController
   end
 
   def add_recipients
-    @conversation.add_participants(@recipient_ids) if @recipient_ids.present?
-    render :json => {}
+    if @recipient_ids.present?
+      @conversation.add_participants(@recipient_ids)
+      render :json => {:conversation => jsonify_conversation(@conversation.reload), :message => @conversation.messages.first}
+    else
+      render :json => {}, :status => :bad_request
+    end
   end
 
   def add_message
@@ -140,10 +144,10 @@ class ConversationsController < ApplicationController
     max_results = params[:limit] ? params[:limit].to_i : 5
     max_results = nil if max_results < 0
     recipients = []
+    exclude = params[:exclude] || []
     if params[:context]
-      recipients = matching_participants(:search => params[:search], :context => params[:context], :limit => max_results)
+      recipients = matching_participants(:search => params[:search], :context => params[:context], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i))
     elsif params[:search]
-      exclude = params[:exclude] || []
       contexts = params[:type] != 'user' ? matching_contexts(params[:search], exclude.grep(/\A(course|group)_\d+\z/)) : []
       participants = params[:type] != 'context' ? matching_participants(:search => params[:search], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)) : []
       if max_results

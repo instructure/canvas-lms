@@ -24,5 +24,29 @@ class ConversationMessage < ActiveRecord::Base
   has_many :media_objects, :as => :context
   attr_accessible
 
+  named_scope :human, :conditions => "NOT generated"
+
   validates_length_of :body, :maximum => maximum_text_length
+
+  def body
+    body = read_attribute(:body)
+    if generated?
+      instance_eval body
+    else
+      body
+    end
+  end
+
+  private
+  def message_users_added(*user_ids)
+    users = User.find_all_by_id(user_ids).map(&:short_name)
+    t :message_users_added, {
+        :one => "%{user} was added to the conversation by %{current_user}",
+        :other => "%{list_of_users} were added to the conversation by %{current_user}"
+     },
+     :count => users.size,
+     :user => users.first,
+     :list_of_users => users.to_sentence,
+     :current_user => author.short_name
+  end
 end
