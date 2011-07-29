@@ -194,11 +194,38 @@ shared_examples_for "quiz selenium tests" do
     q.workflow_state = 'available'
     q.save!
 
+    # add a student to the course
+    student = student_in_course(:active_enrollment => true).user
+    student.conversations.size.should eql(0)
+
     get "/courses/#{@course.id}/quizzes/#{q.id}"
 
     driver.find_element(:partial_link_text, "Message Students Who...").click
     dialog = find_all_with_jquery("#message_students_dialog:visible")
     dialog.length.should eql(1)
+    dialog = dialog.first
+
+    dialog.
+      find_element(:css, 'select.message_types').
+      find_element(:css, 'option[value="0"]').click # Have taken the quiz
+    students = find_all_with_jquery(".student_list > .student:visible")
+
+    students.length.should eql(0)
+
+    dialog.
+      find_element(:css, 'select.message_types').
+      find_element(:css, 'option[value="1"]').click # Have NOT taken the quiz
+    students = find_all_with_jquery(".student_list > .student:visible")
+    students.length.should eql(1)
+
+    dialog.find_element(:css, 'textarea#body').send_keys('This is a test message.')
+    
+    button = dialog.find_element(:css, "button.send_button")
+    button.click
+    keep_trying_until{ button.text != "Sending message..." }
+    button.text.should eql("Message Sent!")
+
+    student.conversations(true).size.should eql(1)
   end
 
   it "should tally up question bank question points" do

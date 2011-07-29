@@ -51,7 +51,6 @@ I18n.scoped("message_students", function(I18n) {
     $message_students_dialog.data('students_hash', students_hash),
     $message_students_dialog.find(".asset_title").text(title);
     $message_students_dialog.find(".out_of").showIf(settings.points_possible != null);
-    $message_students_dialog.find(".subject").val(title);
     $message_students_dialog.find(".send_button").text(I18n.t("send_message", "Send Message"));
     $message_students_dialog.find(".points_possible").text(settings.points_possible);
     
@@ -77,7 +76,7 @@ I18n.scoped("message_students", function(I18n) {
           ids.push($(this).data('id'));
         });
         if(ids.length == 0) { return false; }
-        data['context_message[recipients]'] = ids.join(",");
+        data['recipients'] = ids.join(",");
         return data;
       },
       beforeSubmit: function(data) {

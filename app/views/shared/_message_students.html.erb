@@ -1,7 +1,6 @@
 <div id="message_students_dialog" style="display: none;">
-  <% form_for :context_message, :url => context_url(@context, :context_roster_messages_url), :html => {:id => "message_assignment_recipients"} do |f| %>
-    <%= f.hidden_field :recipients, :class => "recipient_ids" %>
-    <%= f.hidden_field :protect_recipients, :value => true %>
+  <% form_tag conversations_batch_pm_url, :id => "message_assignment_recipients" do %>
+    <%= hidden_field_tag :recipients, "", :class => "recipient_ids" %>
     <h2><%= t('message_students_who', 'Message students who...') %></h2>
     <div style="margin-bottom: 15px; margin-top: -1.4em;">
       <%= t('for_title', 'for %{title}', :title => '<span class="asset_title">&nbsp;</span>'.html_safe) %>
@@ -20,12 +19,9 @@
     <div class="clear"></div>
     <table class="formtable" style="width: 100%;">
       <tr>
-        <td style="font-weight: bold; width: 5px;"><%= f.blabel :subject, :en => "Subject" %></td>
-        <td><%= f.text_field :subject, :class => "subject" %></td>
-      </tr><tr>
         <td style="font-weight: bold;" colspan="2">
-          <%= f.blabel :body, :en => "Message" %>
-          <%= f.text_area :body, :style => "width: 90%; height: 100px;" %>
+          <%= label_tag :body, before_label(:body, "Message") %>
+          <%= text_area_tag :body, "", :style => "width: 90%; height: 100px;" %>
         </td>
       </tr>
     </table>

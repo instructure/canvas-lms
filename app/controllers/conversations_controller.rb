@@ -23,7 +23,7 @@ class ConversationsController < ApplicationController
   before_filter lambda { @avatar_size = 32 }, :only => :find_recipients
   before_filter :get_conversation, :only => [:show, :update, :destroy, :workflow_event, :add_recipients, :add_message, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
-  before_filter :normalize_recipients, :only => [:create, :add_recipients]
+  before_filter :normalize_recipients, :only => [:create, :batch_pm, :add_recipients]
   add_crumb(lambda { I18n.t 'crumbs.messages', "Messages" }) { |c| c.send :conversations_url }
 
   def index
@@ -54,6 +54,18 @@ class ConversationsController < ApplicationController
       render :json => {:participants => jsonify_users(@conversation.participants),
                        :conversation => jsonify_conversation(@conversation.reload),
                        :message => message}
+    else
+      render :json => {}, :status => :bad_request
+    end
+  end
+
+  def batch_pm
+    if @recipient_ids.present? && params[:body].present?
+      @recipient_ids.each do |recipient_id|
+        conversation = @current_user.initiate_conversation([recipient_id], true)
+        message = conversation.add_message(params[:body])
+      end
+      render :json => {}, :status => :ok
     else
       render :json => {}, :status => :bad_request
     end
@@ -154,9 +166,13 @@ class ConversationsController < ApplicationController
 
   def normalize_recipients
     if params[:recipients]
+      recipient_ids = params[:recipients]
+      if recipient_ids.is_a?(String)
+        recipient_ids = recipient_ids.split(/,/)
+      end
       @recipient_ids = (
-        matching_participants(:ids => params[:recipients].grep(/\A\d+\z/), :conversation_id => params[:from_conversation_id]).map{ |p| p[:id] } +
-        matching_participants(:context => params[:recipients].grep(/\A(course|group)_\d+\z/)).map{ |p| p[:id] }
+        matching_participants(:ids => recipient_ids.grep(/\A\d+\z/), :conversation_id => params[:from_conversation_id]).map{ |p| p[:id] } +
+        matching_participants(:context => recipient_ids.grep(/\A(course|group)_\d+\z/)).map{ |p| p[:id] }
       ).uniq
     end
   end
