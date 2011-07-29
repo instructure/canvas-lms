@@ -1,14 +1,14 @@
 development:
   storage: local
-  path: tmp/files
-     
+  path_prefix: tmp/files
+
 test:
   storage: local
-  path: tmp/files
+  path_prefix: tmp/files
 
 production:
   storage: local
-  path: tmp/files
+  path_prefix: tmp/files
 
 ## amazon storage example. requires valid amazon_s3.yml
 #
