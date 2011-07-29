@@ -45,7 +45,7 @@ module Multipart
     BOUNDARY = AutoHandle.generate('canvas-rules', 15)
     HEADER = {"Content-type" => "multipart/form-data, boundary=" + BOUNDARY + " "}
 
-    def prepare_query (params)
+    def prepare_query (params, field_priority=[])
       fp = []
       creds = params.delete :basic_auth
       if creds
@@ -54,13 +54,22 @@ module Multipart
         puts creds[:password]
         puts Base64.encode64("#{creds[:username]}:#{creds[:password]}")
       end
-      params.each {|k,v|
-        if v.respond_to?(:read)
-          fp.push(FileParam.new(k, v.path, v.read))
+      def file_param(k, v)
+        file_data = v.read rescue nil
+        if file_data
+          FileParam.new(k, v.path, file_data)
         else
-          fp.push(Param.new(k,v))
+          Param.new(k,v)
         end
-      }
+      end
+      completed_fields = {}
+      field_priority.each do |k|
+        if params.has_key?(k) && !completed_fields.has_key?(k)
+          fp.push(file_param(k, params[k]))
+          completed_fields[k] = true
+        end
+      end
+      params.each {|k,v| fp.push(file_param(k, v)) unless completed_fields.has_key?(k) }
       query = fp.collect {|p| "--" + BOUNDARY + "\r\n" + p.to_multipart }.join("") + "--" + BOUNDARY + "--"
       return query, HEADER
     end
