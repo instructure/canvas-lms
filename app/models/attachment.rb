@@ -462,11 +462,17 @@ class Attachment < ActiveRecord::Base
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
     @file_store_config ||= YAML.load_file(RAILS_ROOT + "/config/file_store.yml")[RAILS_ENV] rescue nil
-    @file_store_config ||= {'path_prefix' => 'tmp/files', 'storage' => 'local'}
+    @file_store_config ||= {'storage' => 'local'}
+    @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
+    if RAILS_ENV == "test"
+      file_storage_test_override = Setting.get("file_storage_test_override", nil)
+      return @file_store_config.merge({"storage" => file_storage_test_override}) if file_storage_test_override
+    end
+    return @file_store_config
   end
   
   def self.s3_storage?
-    (RAILS_ENV == "test" && Setting.get("file_storage_test_override", nil) || file_store_config['storage'] rescue nil) == 's3' && s3_config
+    (file_store_config['storage'] rescue nil) == 's3' && s3_config
   end
   
   def self.local_storage?
@@ -487,7 +493,7 @@ class Attachment < ActiveRecord::Base
   # too, it cares about local vs s3 storage.
   if local_storage?
     has_attachment(
-        :path_prefix => (file_store_config['path_prefix'] || 'tmp/files'),
+        :path_prefix => file_store_config['path_prefix'],
         :thumbnails => { :thumb => '200x50' }, 
         :thumbnail_class => 'Thumbnail'
     )
