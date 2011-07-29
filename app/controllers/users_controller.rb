@@ -419,23 +419,6 @@ class UsersController < ApplicationController
     end
   end
   
-  def sent_messages
-    get_context
-    @messages_view = :sentbox
-    @messages = @context.sentbox_context_messages
-    @messages_view_header = t('sent_messages_header', "Sent Messages")
-    @per_page = 10
-    @messages = @messages.paginate(:page => params[:page], :per_page => @per_page)
-    get_all_pertinent_contexts
-    @past_message_contexts = @messages.once_per(&:context_code).map(&:context).compact.uniq rescue []
-    @message_contexts = @contexts.select{|c| c.grants_right?(@current_user, session, :send_messages) }
-    @all_message_contexts = (@past_message_contexts + @message_contexts).uniq
-    respond_to do |format|
-      format.html
-      format.json { render :json => @messages.to_json(:include => [:attachments, :users], :methods => :formatted_body) }
-    end
-  end
-  
   def update
     @user = params[:id] ? User.find(params[:id]) : @current_user
     rename = params[:rename]
@@ -748,15 +731,6 @@ class UsersController < ApplicationController
       :group => 'recipient_id',
       :conditions => ["author_id = ? AND recipient_id IN (?)", teacher.id, ids])
     last_comment_dates.each do |user_id, date|
-      next unless student = data[user_id]
-      student[:last_interaction] = [student[:last_interaction], date].compact.max
-    end
-    last_message_dates = ContextMessage.for_context(course).from_user(teacher).maximum(
-      :created_at,
-      :joins => :context_message_participants,
-      :group => 'context_message_participants.user_id',
-      :conditions => ["context_message_participants.user_id IN (?)", ids])
-    last_message_dates.each do |user_id, date|
       next unless student = data[user_id]
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end

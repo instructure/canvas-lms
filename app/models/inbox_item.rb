@@ -39,11 +39,8 @@ class InboxItem < ActiveRecord::Base
     self.context_code ||= self.asset.context.asset_string rescue nil
   end
   
-  def mark_as_read(update_context_message = true)
+  def mark_as_read
     update_attribute(:workflow_state, 'read')
-    if asset_type == 'ContextMessage' && self.asset && update_context_message
-      self.asset.read(self.user)
-    end
   end
   
   def sender_name

@@ -495,15 +495,6 @@ jQuery(function($) {
             htmlValues: ['message']
           });
         }
-      } else if($(this).hasClass('context_message_form')) {
-        var message = data.context_message;
-        message.post_date = $.parseFromISO(message.created_at).datetime_formatted;
-        message.message = message.formatted_body;
-        
-        $message.fillTemplateData({
-          data: message,
-          htmlValues: ['message']
-        });
       } else {
         var entry = data.discussion_entry;
         entry.post_date = $.parseFromISO(entry.created_at).datetime_formatted;
@@ -548,9 +539,6 @@ jQuery(function($) {
     var params = null;
     if($form.hasClass('submission_comment_form')) {
       params = {comment: ($form.find("textarea:visible:first").val() || "")};
-    } else if($form.hasClass('context_message_form')) {
-      var data = $form.getFormData({object_name: 'context_message'});
-      params = {context_code: data.context_code, reply_id: data.root_context_message_id, body: data.body, recipients: data.recipients, subject: data.subject};
     } else {
       params = {message: ($form.find("textarea:visible:first").val() || "")};
     }
@@ -633,7 +621,6 @@ jQuery(function($) {
           $(this).parents(".communication_message").slideUp();
           $(this).parents(".communication_message").prev(".new_activity_message").slideDown();
         } else if($(this).hasClass('announcement_form')) { // do nothing
-        } else if($(this).hasClass('context_message_form')) { // do nothing
         } else {
           location.reload();
         }

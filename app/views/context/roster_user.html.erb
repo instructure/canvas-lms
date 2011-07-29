@@ -157,8 +157,6 @@
 <% @messages[0,10].each do |message| %>
   <% if message.is_a?(DiscussionEntry) %>
     <%= render :partial => 'discussion_topics/entry', :object => message, :locals => {:out_of_context => true, :show_context => true} %>
-  <% elsif message.is_a?(ContextMessage) %>
-    <%= render :partial => 'context/context_message', :object => message %>
   <% end %>
 <% end %>
 

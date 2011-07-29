@@ -44,11 +44,11 @@
     <div class="attachments_list" style="margin-top: 5px; <%= hidden unless message && !message.attachments.empty? %>">
       <% (message.try_rescue(:attachments) || []).select{|a| a }.each do |attachment| %>
         <div class="attachment">
-          <a href="<%= context_prefix(message.try_rescue(:context_code)) %>/messages/<%= message.id %>/files/<%= attachment.id %>" class="download <%= 'instructure_scribd_file' if attachment.scribdable? %>"><%= attachment.display_name %> - <%= attachment.readable_size %></a>
+          <a href="<%= context_prefix(message.try_rescue(:context_code)) %>/files/<%= attachment.id %>" class="download <%= 'instructure_scribd_file' if attachment.scribdable? %>"><%= attachment.display_name %> - <%= attachment.readable_size %></a>
         </div>
       <% end %>
       <div class="attachment_blank" style="display: none;">
-        <a href="<%= context_prefix(message.try_rescue(:context_code)) %>/messages/{{ id }}/files/{{ attachment_id }}" class="download"><span class="display_name">&nbsp;</span> - <span class="readable_size">&nbsp;</span></a>
+        <a href="<%= context_prefix(message.try_rescue(:context_code)) %>/files/{{ attachment_id }}" class="download"><span class="display_name">&nbsp;</span> - <span class="readable_size">&nbsp;</span></a>
       </div>
     </div>
     <% if message && !message.sub_messages.empty? %>

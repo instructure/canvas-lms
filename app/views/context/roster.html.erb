@@ -11,7 +11,6 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-    <a href="<%= inbox_url %>#reply" class="_message_link button button-sidebar-wide"><%= image_tag "email.png" %> <%= t('links.write_message', %{Write a Message}) %></a>
     <% if @context.is_a?(Course) %>
       <a href="<%= context_url(@context, :context_groups_url) %>" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= t('links.view_student_groups', %{View Student Groups}) %></a>
       <% if can_do(@context, @current_user, :manage_students) && @context.enable_user_notes %>
@@ -28,57 +27,10 @@
       <a href="<%= context_url(@context, :context_details_url) %>#tab-users" class="button button-sidebar-wide"><%= image_tag "group.png" %> <%= t('links.manage_users', %{Manage Users}) %></a>
     <% end %>
   </div>
-  
-  <div class="message_options" style="width: auto; margin: 00px; border: 0px solid #888; -moz-border-radius: 5px; padding: 0px 10px; display: none;">
-    <a href="#" class="close_message_link no-hover" style="float: right;"><%= image_tag 'delete_circle.png', :alt => 'close' %></a>
-    <h3 style="margin-bottom: 0;"><%= t('headings.send_message', %{Send a Message}) %></h3>
-    <div style="padding-left: 10px; line-height: 1.7em;">
-      <div class="message_selected_recipients_link" style="display: none; margin-bottom: 10px;">
-        <a href="#" class="message_selected_recipients_link email" style="display: none;"><%= t('links.message_recipients', %{Message Selected Recipients}) %></a>
-      </div>
-      <a href="#" class="message_all_students_link email">
-        <%= case @context
-            when Course
-            t('links.message_all_students', "Message all Students")
-            when Group
-            t('links.message_all_group_members', "Mesage all Group Members")
-            end %>
-      </a><br/>
-      <a href="#" class="message_all_teachers_link email" style="<%= hidden if @secondary_users.empty? %>"><%= t('links.message_teachers', "Message Teachers & TA's") %></a><br/>
-    </div>
-    <% if !@categories.empty? %>
-      <div class="rs-margin-lr rs-margin-top">
-      <h3 style="margin-bottom: 0;"><%= t 'headings.send_message_to_group', 'Message a Group' %></h3>
-      <% @categories.each do |category| %>
-        <%= category %>
-        <ul class="unstyled_list" style="margin-left: 10px;">
-          <% @groups.select{|g| g.category == category}.each do |group| %>
-            <li class="message_group">
-              <a href="#" class="message_group_link mail"><%= t 'links.send_message_to', "Message %{group_name}", :group_name => group.name %></a>
-              <% group.users.each do |user| %>
-              <div class="recipient" style="display: none;">
-                <a href="<%= context_url(@context, :context_user_url, user.id) %>" class="recipient_name"><%= context_user_name(@context, user) %></a>
-                <span class="id" style="display: none;"><%= user.id %></span>
-              </div>
-              <% end %>
-              <% %>
-            </li>
-          <% end %>
-        </ul>
-      <% end %>
-      </div>
-    <% end %>
-  </div>
 <% end %>
 
 <% content_for :stylesheets do %>
 <style>
-.context_message .recipients_list {
-  padding: 0;
-  margin: 3px 10px;
-  font-size: 0.8em;
-  list-style-type: none;
-}
 .recipient .email {
   margin-left: 10px;
   font-size: 0.85em;
@@ -101,7 +53,6 @@
       <table>
       <% @primary_users[@primary_users.keys.first].each do |student| %>
         <tr class="recipient" id="recipient_<%= student.id %>">
-          <td style="display: none;" class="selector"><input type="checkbox" class="recipient_selected" id="recipient_<%= student.id %>"/></td>
           <td>
             <a href="<%= context_url(@context, :context_user_url, student.id) %>" class="recipient_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a>
             <% if can_do(@context, @current_user, :manage_students) %>
@@ -111,7 +62,6 @@
                 <div class="short_name course_section"><%= e.course_section.display_name %></div>
               <% end %>
             <% end %>
-            <span class="id" style="display: none;"><%= student.id %></span>
           </td>
         </tr>
       <% end %>
@@ -125,7 +75,6 @@
       <table>
       <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
         <tr class="recipient" id="recipient_<%= teacher.id %>">
-          <td style="display: none;" class="selector"><input type="checkbox" class="recipient_selected" id="recipient_<%= teacher.id %>"/></td>
           <td>
             <a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="recipient_name"><%= teacher.name %></a>
             <% if can_do(@context, @current_user, :manage_admin_users) %>
@@ -135,7 +84,6 @@
                 <div class="short_name course_section"><%= e.course_section.display_name %></div>
               <% end %>
             <% end %>
-            <span class="id" style="display: none;"><%= teacher.id %></span>
           </td>
         </tr>
       <% end %>

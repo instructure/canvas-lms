@@ -6,7 +6,6 @@ ActionController::Routing::Routes.draw do |map|
   map.inbox 'inbox', :controller => 'context', :action => 'inbox'
   map.destroy_inbox_item 'inbox/:id', :controller => 'context', :action => 'destroy_inbox_item', :conditions => {:method => :delete}
   map.inbox_item 'inbox/:id', :controller => 'context', :action => 'inbox_item'
-  map.context_message_reply 'messages/:id/reply', :controller => 'context', :action => 'context_message_reply'
 
   map.messages_unread 'messages/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
   map.messages_archived 'messages/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
@@ -73,11 +72,6 @@ ActionController::Routing::Routes.draw do |map|
     course.statistics 'statistics', :controller => 'courses', :action => 'statistics'
     course.prior_users 'users/prior', :controller => 'context', :action => 'prior_users'
     course.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
-    course.roster_messages 'messages', :controller => 'context', :action => 'create_roster_message', :conditions => {:method => :post}
-    course.formatted_roster_messages 'messages.:format', :controller => 'context', :action => 'create_roster_message', :conditions => {:method => :post}
-    course.message_recipients 'messages/recipients', :controller => 'context', :action => 'recipients'
-    course.roster_message 'messages/:id', :controller => 'context', :action => 'read_roster_message', :conditions => {:method => :put}
-    course.roster_message_attachment 'messages/:message_id/files/:id', :controller => 'context', :action => 'roster_message_attachment'
     course.unenroll 'unenroll/:id', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
     course.move_enrollment 'move_enrollment/:id', :controller => 'courses', :action => 'move_enrollment', :conditions => {:method => :post}
     course.formatted_unenroll 'unenroll/:id.:format', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
@@ -277,7 +271,6 @@ ActionController::Routing::Routes.draw do |map|
   map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
 
   map.resources :page_views, :only => [:update,:index]
-  map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
   map.media_object_redirect 'media_objects/:id/redirect', :controller => 'context', :action => 'media_object_redirect'
@@ -337,11 +330,6 @@ ActionController::Routing::Routes.draw do |map|
     group.user_services 'user_services', :controller => 'context', :action => 'roster_user_services'
     group.user_usage 'users/:user_id/usage', :controller => 'context', :action => 'roster_user_usage'
     group.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
-    group.roster_messages 'messages', :controller => 'context', :action => 'create_roster_message', :conditions => {:method => :post}
-    group.formatted_roster_messages 'messages.:format', :controller => 'context', :action => 'create_roster_message', :conditions => {:method => :post}
-    group.message_recipients 'messages/recipients', :controller => 'context', :action => 'recipients'
-    group.roster_message 'messages/:id', :controller => 'context', :action => 'resend_roster_message', :conditions => {:method => :put}
-    group.roster_message_attachment 'messages/:message_id/files/:id', :controller => 'context', :action => 'roster_message_attachment'
     group.remove_user 'remove_user/:id', :controller => 'groups', :action => 'remove_user', :conditions => {:method => :delete}
     group.add_user 'add_user', :controller => 'groups', :action => 'add_user'
     group.members 'members.:format', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
@@ -507,7 +495,6 @@ ActionController::Routing::Routes.draw do |map|
     user.resources :question_banks, :only => [:index]
     user.assignments_needing_grading 'assignments_needing_grading', :controller => 'users', :action => 'assignments_needing_grading'
     user.assignments_needing_submitting 'assignments_needing_submitting', :controller => 'users', :action => 'assignments_needing_submitting'
-    user.sent_messages 'messages/sent', :controller => 'users', :action => 'sent_messages'
     user.admin_merge 'admin_merge', :controller => 'users', :action => 'admin_merge', :conditions => {:method => :get}
     user.confirm_merge 'merge', :controller => 'users', :action => 'confirm_merge', :conditions => {:method => :get}
     user.merge 'merge', :controller => 'users', :action => 'merge', :conditions => {:method => :post}
