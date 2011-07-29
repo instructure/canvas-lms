@@ -38,7 +38,6 @@ class ContextMessage < ActiveRecord::Base
   before_save :set_defaults, :infer_values
   after_save :set_attachments
   after_save :record_participants
-  has_a_broadcast_policy
   
   workflow do
     state :active
@@ -74,16 +73,6 @@ class ContextMessage < ActiveRecord::Base
     
     given { |user, session| self.cached_context_grants_right?(user, session, :read) && self.users.include?(user) }
     can :read
-  end
-  
-  set_broadcast_policy do |p|
-    p.dispatch :teacher_context_message
-    p.to { self.recipient_users }
-    p.whenever {|record| (record.just_created || @re_send_message) && record.context.admins.include?(record.user) }
-    
-    p.dispatch :student_context_message
-    p.to { self.recipient_users }
-    p.whenever {|record| (record.just_created || @re_send_message) && !record.context.admins.include?(record.user) && record.context.students.include?(record.user) }
   end
   
   def set_defaults

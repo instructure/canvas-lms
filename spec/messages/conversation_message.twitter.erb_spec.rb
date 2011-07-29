@@ -19,11 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'teacher_context_message.email' do
+describe 'conversation_message.twitter' do
   it "should render" do
-    course_with_student
-    message = @course.context_messages.create!(:user => @user, :body => "some message")
-    @object = message
-    generate_message(:teacher_context_message, :email, @object)
+    course_with_teacher
+    student_in_course
+    conversation = @teacher.initiate_conversation([@user.id])
+    message = conversation.add_message("some message")
+    generate_message(:conversation_message, :twitter, message)
   end
 end

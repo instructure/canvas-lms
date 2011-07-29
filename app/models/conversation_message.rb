@@ -22,11 +22,41 @@ class ConversationMessage < ActiveRecord::Base
   has_many :conversation_message_participants
   has_many :attachments, :as => :context
   has_many :media_objects, :as => :context
+  delegate :participants, :to => :conversation
+  delegate :subscribed_participants, :to => :conversation
   attr_accessible
 
   named_scope :human, :conditions => "NOT generated"
 
   validates_length_of :body, :maximum => maximum_text_length
+  has_a_broadcast_policy
+  
+  set_broadcast_policy do |p|
+    p.dispatch :conversation_message
+    p.to { self.recipients }
+    p.whenever {|record| (record.just_created || @re_send_message) && !record.generated}
+
+    p.dispatch :added_to_conversation
+    p.to { self.new_recipients }
+    p.whenever {|record| (record.just_created || @re_send_message) && record.generated && record.event_data[:event_type] == :users_added}
+  end
+  
+  # TODO do this in SQL
+  def recipients
+    self.subscribed_participants - [self.author]
+  end
+
+  def new_recipients
+    return [] unless generated? and event_data[:event_type] == :users_added
+    recipients.select{ |u| event_data[:user_ids].include?(u.id) }
+  end
+
+  # for developer use on console only
+  def resend_message!
+    @re_send_message = true
+    self.save!
+    @re_send_message = false
+  end
 
   def body
     if generated?

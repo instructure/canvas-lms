@@ -18,11 +18,19 @@
 
 class Conversation < ActiveRecord::Base
   has_many :conversation_participants
+  has_many :subscribed_conversation_participants,
+           :conditions => "subscribed",
+           :class_name => 'ConversationParticipant'
   has_many :conversation_messages, :order => "created_at DESC"
 
   # see also User#messageable_users
   has_many :participants,
     :through => :conversation_participants,
+    :source => :user,
+    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
+    :order => 'last_authored_at DESC, LOWER(COALESCE(short_name, name))'
+  has_many :subscribed_participants,
+    :through => :subscribed_conversation_participants,
     :source => :user,
     :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
     :order => 'last_authored_at DESC, LOWER(COALESCE(short_name, name))'

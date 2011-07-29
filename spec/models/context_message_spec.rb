@@ -19,32 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextMessage do
-  context "notifications" do
-    it "should create teacher context messages" do
-      Notification.create(:name => "Teacher Context Message")
-      course_with_teacher(:active_all => true)
-      @teacher = @user
-      e = @course.enroll_student(user(:active_all => true))
-      e.accept
-      
-      m = @course.context_messages.build
-      m.update_attributes(:user => @teacher, :recipients => "#{@teacher.id},#{@user.id}", :subject => 'Some Message', :body => 'Some Body')
-      m.messages_sent.should be_include("Teacher Context Message")
-    end
-    
-    it "should create student context messages" do
-      Notification.create(:name => "Student Context Message")
-      course_with_teacher(:active_all => true)
-      @teacher = @user
-      e = @course.enroll_student(user(:active_all => true))
-      e.accept
-      
-      m = @course.context_messages.build
-      m.update_attributes(:user => @user, :recipients => "#{@teacher.id},#{@user.id}", :subject => 'Some Message', :body => 'Some Body')
-      m.messages_sent.should be_include("Student Context Message")
-    end
-  end
-  
   context "stream_items" do
     it "should not delete the root stream_item if a sub-message is deleted, only if the root message is deleted" do
       pre_cnt = StreamItem.count

@@ -1,0 +1,13 @@
+<% define_content :link do %>
+  http://<%= HostUrl.default_host %>/messages/#/messages/<%= asset.conversation_id %>
+<% end %>
+<% define_content :user_name do %>
+  <%= asset.author.short_name rescue t(:unknown_user, "Unknown User") %>
+<% end %>
+<% define_content :subject do %>
+  <%= t :subject, "%{user_name} just sent you a message in Canvas.", :user_name => content(:user_name) %>
+<% end %>
+
+<%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => content(:user_name) %>
+
+<%= strip_and_truncate(asset.body, :max_length => 200) %>
