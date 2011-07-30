@@ -51,6 +51,7 @@ class ConversationsController < ApplicationController
     if @recipient_ids.present? && params[:body].present?
       @conversation = @current_user.initiate_conversation(@recipient_ids)
       message = @conversation.add_message(params[:body])
+      message.generate_user_note if params[:user_note]
       render :json => {:participants => jsonify_users(@conversation.participants),
                        :conversation => jsonify_conversation(@conversation.reload),
                        :message => message}
@@ -119,6 +120,7 @@ class ConversationsController < ApplicationController
   def add_message
     if params[:body].present?
       message = @conversation.add_message(params[:body])
+      message.generate_user_note if params[:user_note]
       render :json => {:conversation => jsonify_conversation(@conversation.reload), :message => message}
     else
       render :json => {}, :status => :bad_request

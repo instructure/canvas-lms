@@ -105,6 +105,23 @@ describe ConversationsController do
       response.should be_success
       @conversation.messages.size.should == 2
     end
+
+    it "should generate a user note when requested" do
+      course_with_teacher_logged_in(:active_all => true)
+      conversation
+
+      post 'add_message', :conversation_id => @conversation.id, :body => "hello world"
+      response.should be_success
+      message = @conversation.messages.first # newest message is first
+      student = message.recipients.first
+      student.user_notes.size.should == 0
+
+      post 'add_message', :conversation_id => @conversation.id, :body => "make a note", :user_note => 1
+      response.should be_success
+      message = @conversation.messages.first
+      student = message.recipients.first
+      student.user_notes.size.should == 1
+    end
   end
 
   describe "POST 'add_recipients'" do

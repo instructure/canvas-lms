@@ -85,4 +85,15 @@ class ConversationMessage < ActiveRecord::Base
        :current_user => author.short_name
     end
   end
+
+  def generate_user_note
+    return unless recipients.size == 1
+    recipient = recipients.first
+    return unless recipient.grants_right?(author, :create_user_notes)
+
+    self.extend TextHelper
+    title = t(:subject, "Private message, %{timestamp}", :timestamp => date_string(created_at))
+    note = format_message(body).first
+    recipient.user_notes.create(:creator => author, :title => title, :note => note)
+  end
 end

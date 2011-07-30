@@ -92,4 +92,31 @@ describe ConversationMessage do
       event.messages_sent["Added To Conversation"].map(&:user_id).should_not be_include(@first_student.id)
     end
   end
+
+  context "generate_user_note" do
+    it "should add a user note under nominal circumstances" do
+      course_with_teacher
+      student = student_in_course.user
+      conversation = @teacher.initiate_conversation([student.id])
+      message = conversation.add_message("reprimanded!")
+      message.created_at = Time.at(0) # Jan 1, 1970 00:00:00 UTC
+      note = message.generate_user_note
+      student.user_notes.size.should be(1)
+      student.user_notes.first.should eql(note)
+      note.creator.should eql(@teacher)
+      note.title.should eql("Private message, Jan  1, 1970")
+      note.note.should eql("reprimanded!")
+    end
+
+    it "should fail if there's more than one recipient" do
+      course_with_teacher
+      student1 = student_in_course.user
+      student2 = student_in_course.user
+      conversation = @teacher.initiate_conversation([student1.id, student2.id])
+      message = conversation.add_message("message")
+      message.generate_user_note.should be_nil
+      student1.user_notes.size.should be(0)
+      student2.user_notes.size.should be(0)
+    end
+  end
 end
