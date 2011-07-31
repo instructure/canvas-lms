@@ -85,10 +85,6 @@ class User < ActiveRecord::Base
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
   
-  has_many :context_message_participants
-  has_many :context_messages, :through => :context_message_participants
-  has_many :inbox_context_messages, :source => :context_message, :through => :context_message_participants, :conditions => ['context_message_participants.participation_type = ?', 'recipient'], :include => [:attachments, :users], :order => 'context_messages.created_at DESC'
-  has_many :sentbox_context_messages, :source => :context_message, :through => :context_message_participants, :conditions => ['context_message_participants.participation_type = ?', 'sender'], :include => [:attachments, :users], :order => 'context_messages.created_at DESC'
   has_many :inbox_items, :order => 'created_at DESC'
   has_many :submission_comment_participants
   has_many :submission_comments, :through => :submission_comment_participants, :include => {:submission => {:assignment => {}, :user => {}} }
@@ -615,7 +611,7 @@ class User < ActiveRecord::Base
     updates = {}
     ['account_users','asset_user_accesses',
       'assignment_reminders','attachments',
-      'calendar_events','collaborations','context_messages',
+      'calendar_events','collaborations','conversation_participants',
       'context_module_progressions','discussion_entries','discussion_topics',
       'enrollments','group_memberships','page_comments','page_views',
       'rubric_assessments','short_messages',
@@ -624,6 +620,7 @@ class User < ActiveRecord::Base
       updates[key] = "user_id"
     end
     updates['submission_comments'] = 'author_id'
+    updates['conversation_messages'] = 'author_id'
     updates.each do |table, column|
       begin
         klass = table.classify.constantize

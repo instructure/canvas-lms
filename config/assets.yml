@@ -99,9 +99,9 @@ javascripts:
     - public/javascripts/calendar_move.js
   collaborations:
     - public/javascripts/collaborations.js
-  context_messages:
-    - public/javascripts/context_messages.js
-    - public/javascripts/translations/context_messages.js
+  context_inbox:
+    - public/javascripts/context_inbox.js
+    - public/javascripts/translations/context_inbox.js
   context_modules:
     - public/javascripts/context_modules.js
   course_details:
@@ -234,7 +234,7 @@ stylesheets:
     - public/stylesheets/compiled/g_assignments.css
     - public/stylesheets/compiled/g_content_imports.css
     - public/stylesheets/compiled/g_gradebook_history.css
-    - public/stylesheets/compiled/g_context_messages.css
+    - public/stylesheets/compiled/g_context_inbox.css
     - public/stylesheets/compiled/g_groups.css
     - public/stylesheets/compiled/g_media_comments.css
     - public/stylesheets/compiled/g_context_modules.css

@@ -1245,28 +1245,6 @@ es:
         start_topic: Comenzar una Tema Nuevo
       titles: 
         communication: Comunicación
-    context_message: 
-      from_to: "%{from_user} *a %{to_user}*"
-      images: 
-        alt: 
-          email: correo electrónico
-          mark_as_read: Marcar como Leído
-          reply: Contestar
-        title: 
-          email: Mensaje de Correo Electrónico
-          mark_as_read: Marcar como Leído
-          reply_to_recipients: Contestar a Destinatarios
-          reply_to_sender: Responder al Remitente
-      links: 
-        show_full: Mostrar mensaje completo
-      no_title: Sin Título
-      recipients_count: 
-        one: "*1* Destinatario"
-        other: "*%{count}* Destinatarios"
-      recipients_protected: Lista de destinatarios está protegida
-    context_message_inbox: 
-      loading_results: Cargando más resultados
-      no_messages: Perdón, todavía no hay mensajes.
     dashboard_conference: 
       images: 
         alt: 
@@ -1278,36 +1256,6 @@ es:
         participants: 
           one: 1 Participante
           other: "%{count} Participantes"
-    dashboard_context_message: 
-      headings: 
-        recipients: Destinatarios del Mensaje
-      images: 
-        alt: 
-          email: correo electrónico
-          reply: Contestar
-        title: 
-          email: Mensaje de Correo Electrónico
-          reply: Responder al Remitente
-      links: 
-        more_messages: Más Mensajes
-        reply_to_all: Contestar a todos los Destinatarios...
-        reply_to_sender: Contestar al Remitente Original...
-        show_messages: 
-          one: Mostrar %{count} Mensaje
-          other: Mostrar %{count} Mensajes
-      no_title: Sin Título
-      recipients_count: 
-        one: 1 Destinatario
-        other: "%{count} Destinatarios"
-      recipients_protected: Lista de Destinatarios está protegida
-      sent: enviado
-      to: para
-    dashboard_context_sub_message: 
-      labels: 
-        to: Para
-      links: 
-        title: 
-          author_name: Nombre del Autor
     dashboard_ignore_link: 
       images: 
         alt: 
@@ -1553,8 +1501,6 @@ es:
         restore__items: Restaurar Artículos Borrados
       help: 
         restore_items: Recuerde que a veces algunos artículos pueden haber perdido alguna de la información asociada cuando son borrados. Asegúrese de confirmar los resultados de cualquier restauración que haga.
-  context_message: 
-    unknown_user: Usuario Desconocido
   context_module: 
     requirements: 
       max_score: debe obtener no más de %{score}

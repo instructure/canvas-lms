@@ -138,7 +138,6 @@ class Course < ActiveRecord::Base
   has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
   has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :grading_standards, :as => :context
-  has_many :context_messages, :as => :context, :dependent => :destroy
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
   has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
   has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy

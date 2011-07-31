@@ -31,11 +31,11 @@
 
 <% content_for :stylesheets do %>
 <style>
-.recipient .email {
+.roster .email {
   margin-left: 10px;
   font-size: 0.85em;
 }
-.recipient .short_name {
+.roster .short_name {
   margin-left: 10px;
   font-size: 0.85em;
 }
@@ -45,16 +45,16 @@
 </style>
 <% end %>
 
-<table id="select_recipients" style="width: 100%;">
+<table style="width: 100%;">
   <tr>
-    <td style="width: 50%; vertical-align: top;" class="recipients student_recipients">
+    <td style="width: 50%; vertical-align: top;" class="roster student_roster">
       <h2><%= @primary_users.keys.first %></h2>
       <div style="max-height: 300px; margin-right: 20px;" class="fill_height_div">
       <table>
       <% @primary_users[@primary_users.keys.first].each do |student| %>
-        <tr class="recipient" id="recipient_<%= student.id %>">
+        <tr class="user" id="user_<%= student.id %>">
           <td>
-            <a href="<%= context_url(@context, :context_user_url, student.id) %>" class="recipient_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a>
+            <a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= can_do(@context, @current_user, :manage_students) ? student.name : student.short_name %></a>
             <% if can_do(@context, @current_user, :manage_students) %>
               <div class="short_name"><%= student.short_name %></div>
               <div class="email"><%= student.email %></div>
@@ -69,14 +69,14 @@
       </div>
     </td>
     <% unless !@secondary_users || @secondary_users.empty? %>
-    <td style="vertical-align: top;" class="recipients teacher_recipients">
+    <td style="vertical-align: top;" class="roster teacher_roster">
       <h2><%= @secondary_users.keys.first %></h2>
       <div style="max-height: 300px;" class="fill_height_div">
       <table>
       <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
-        <tr class="recipient" id="recipient_<%= teacher.id %>">
+        <tr class="user" id="user_<%= teacher.id %>">
           <td>
-            <a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="recipient_name"><%= teacher.name %></a>
+            <a href="<%= context_url(@context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a>
             <% if can_do(@context, @current_user, :manage_admin_users) %>
               <div class="short_name"><%= teacher.short_name %></div>
               <div class="email"><%= teacher.email %></div>
