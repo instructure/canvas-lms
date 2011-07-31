@@ -664,7 +664,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_message, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, show_message_form, update_conversation;
+    var add_conversation, build_message, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, is_selected, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, show_message_form, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -709,9 +709,12 @@
       }
       return hash;
     };
+    is_selected = function($conversation) {
+      return $selected_conversation && $selected_conversation.attr('id') === ($conversation != null ? $conversation.attr('id') : void 0);
+    };
     select_conversation = function($conversation) {
       var $c, match, params;
-      if ($selected_conversation && $selected_conversation.attr('id') === ($conversation != null ? $conversation.attr('id') : void 0)) {
+      if (is_selected($conversation)) {
         $selected_conversation.removeClass('inactive');
         $message_list.find('li.selected').removeClass('selected');
         return;
@@ -741,7 +744,7 @@
       $('#menu_actions').triggerHandler('prepare_menu');
       $('#menu_actions').toggleClass('disabled', !$('#menu_actions').parent().find('ul[style*="block"]').length);
       if ($selected_conversation) {
-        location.hash = $selected_conversation.attr('id').replace('conversation_', '/messages/');
+        location.hash = '/messages/' + $selected_conversation.data('id');
       } else {
         if (match = location.hash.match(/^#\/messages\?(.*)$/)) {
           params = parse_query_string(match[1]);
@@ -845,7 +848,7 @@
       $pm_action = $message.find('a.send_private_message');
       pm_url = $.replaceTags($pm_action.attr('href'), 'user_id', data.author_id);
       pm_url = $.replaceTags(pm_url, 'user_name', encodeURIComponent(user_name));
-      pm_url = $.replaceTags(pm_url, 'from_conversation_id', $selected_conversation.attr('id').replace('conversation_', ''));
+      pm_url = $.replaceTags(pm_url, 'from_conversation_id', $selected_conversation.data('id'));
       $pm_action.attr('href', pm_url).click(__bind(function() {
         return setTimeout(__bind(function() {
           return select_conversation();
@@ -854,7 +857,7 @@
       return $message;
     };
     inbox_action_url_for = function($action) {
-      return $.replaceTags($action.attr('href'), 'id', $selected_conversation.attr('id').replace('conversation_', ''));
+      return $.replaceTags($action.attr('href'), 'id', $selected_conversation.data('id'));
     };
     inbox_action = function($action, options) {
       var defaults, _ref;
@@ -888,6 +891,7 @@
     add_conversation = function(data, append) {
       var $conversation;
       $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id);
+      $conversation.data('id', data.id);
       if (data.avatar_url) {
         $conversation.prepend($('<img />').attr('src', data.avatar_url).addClass('avatar'));
       }
@@ -897,8 +901,9 @@
       });
       update_conversation($conversation, data, true);
       if (!append) {
-        return $conversation.hide().slideDown('fast');
+        $conversation.hide().slideDown('fast');
       }
+      return $conversation;
     };
     update_conversation = function($conversation, data, no_move) {
       var $a, $p, flag, move_direction;
@@ -1017,12 +1022,14 @@
         success: function(data) {
           var $conversation;
           $(this).loadingImage('remove');
-          build_message(data.message.conversation_message).prependTo($message_list).slideDown('fast');
           $conversation = $('#conversation_' + data.conversation.id);
           if ($conversation.length) {
             update_conversation($conversation, data.conversation);
+            if (is_selected($conversation)) {
+              build_message(data.message.conversation_message).prependTo($message_list).slideDown('fast');
+            }
           } else {
-            add_conversation(data.conversation);
+            select_conversation(add_conversation(data.conversation));
           }
           return reset_message_form();
         },

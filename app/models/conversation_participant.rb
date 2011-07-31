@@ -36,8 +36,8 @@ class ConversationParticipant < ActiveRecord::Base
 
   def as_json(options = {})
     latest = messages.human.first
-    super.merge(
-      :id => id,
+    {
+      :id => conversation_id,
       :participants => participants(private?),
       :workflow_state => workflow_state,
       :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
@@ -45,7 +45,7 @@ class ConversationParticipant < ActiveRecord::Base
       :subscribed => subscribed?,
       :private => private?,
       :flags => flags
-    )
+    }
   end
 
   [:attachments, :media_objects].each do |association|

@@ -216,7 +216,7 @@ class ConversationsController < ApplicationController
   end
 
   def get_conversation
-    @conversation = @current_user.conversations.find(params[:id] || params[:conversation_id] || 0)
+    @conversation = @current_user.conversations.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
   end
 
   def jsonify_conversation(conversation)

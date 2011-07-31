@@ -524,8 +524,11 @@ I18n.scoped 'conversations', (I18n) ->
       hash[decodeURIComponent(key)] = decodeURIComponent(value)
     hash
 
+  is_selected = ($conversation) ->
+    $selected_conversation && $selected_conversation.attr('id') == $conversation?.attr('id')
+
   select_conversation = ($conversation) ->
-    if $selected_conversation && $selected_conversation.attr('id') == $conversation?.attr('id')
+    if is_selected($conversation)
       $selected_conversation.removeClass 'inactive'
       $message_list.find('li.selected').removeClass 'selected'
       return
@@ -553,7 +556,7 @@ I18n.scoped 'conversations', (I18n) ->
       !$('#menu_actions').parent().find('ul[style*="block"]').length
 
     if $selected_conversation
-      location.hash = $selected_conversation.attr('id').replace('conversation_', '/messages/')
+      location.hash = '/messages/' + $selected_conversation.data('id')
     else
       if match = location.hash.match(/^#\/messages\?(.*)$/)
         params = parse_query_string(match[1])
@@ -605,14 +608,14 @@ I18n.scoped 'conversations', (I18n) ->
     $pm_action = $message.find('a.send_private_message')
     pm_url = $.replaceTags($pm_action.attr('href'), 'user_id', data.author_id)
     pm_url = $.replaceTags(pm_url, 'user_name', encodeURIComponent(user_name))
-    pm_url = $.replaceTags(pm_url, 'from_conversation_id', $selected_conversation.attr('id').replace('conversation_', ''))
+    pm_url = $.replaceTags(pm_url, 'from_conversation_id', $selected_conversation.data('id'))
     $pm_action.attr('href', pm_url).click =>
       setTimeout => 
         select_conversation()
     $message
 
   inbox_action_url_for = ($action) ->
-    $.replaceTags $action.attr('href'), 'id', $selected_conversation.attr('id').replace('conversation_', '')
+    $.replaceTags $action.attr('href'), 'id', $selected_conversation.data('id')
 
   inbox_action = ($action, options) ->
     defaults =
@@ -636,6 +639,7 @@ I18n.scoped 'conversations', (I18n) ->
 
   add_conversation = (data, append) ->
     $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id)
+    $conversation.data('id', data.id)
     if data.avatar_url
       $conversation.prepend $('<img />').attr('src', data.avatar_url).addClass('avatar')
     $conversation[if append then 'appendTo' else 'prependTo']($conversation_list).click (e) ->
@@ -643,6 +647,7 @@ I18n.scoped 'conversations', (I18n) ->
       select_conversation $(this)
     update_conversation($conversation, data, true)
     $conversation.hide().slideDown('fast') unless append
+    $conversation
 
   update_conversation = ($conversation, data, no_move) ->
     $a = $conversation.find('a')
@@ -715,12 +720,12 @@ I18n.scoped 'conversations', (I18n) ->
         $(this).loadingImage()
       success: (data) ->
         $(this).loadingImage 'remove'
-        build_message(data.message.conversation_message).prependTo($message_list).slideDown 'fast'
         $conversation = $('#conversation_' + data.conversation.id)
         if $conversation.length
           update_conversation($conversation, data.conversation)
+          build_message(data.message.conversation_message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
         else
-          add_conversation(data.conversation)
+          select_conversation add_conversation(data.conversation)
         reset_message_form()
       error: (data) ->
         $form.find('.token_input').errorBox(I18n.t('recipient_error', 'The course or group you have selected has no valid recipients'))

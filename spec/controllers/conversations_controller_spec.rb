@@ -45,7 +45,7 @@ describe ConversationsController do
 
       get 'index'
       response.should be_success
-      assigns[:conversations].map{|c|c[:id]}.should == @user.conversations.map(&:id)
+      assigns[:conversations].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
     end
   end
 
@@ -54,7 +54,7 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation
 
-      get 'show', :id => @conversation.id
+      get 'show', :id => @conversation.conversation_id
       response.should be_success
       assigns[:conversation].should == @conversation
     end
@@ -79,7 +79,7 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation.mark_as_unread
 
-      post 'update', :id => @conversation.id, :conversation => {:subscribed => "0"}
+      post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0"}
       response.should be_success
       @conversation.reload.subscribed?.should be_false
     end
@@ -90,7 +90,7 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation
 
-      post 'workflow_event', :conversation_id => @conversation.id, :event => "mark_as_unread"
+      post 'workflow_event', :conversation_id => @conversation.conversation_id, :event => "mark_as_unread"
       response.should be_success
       @conversation.unread?.should be_true
     end
@@ -101,7 +101,7 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation
 
-      post 'add_message', :conversation_id => @conversation.id, :body => "hello world"
+      post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
       response.should be_success
       @conversation.messages.size.should == 2
     end
@@ -116,7 +116,7 @@ describe ConversationsController do
       enrollment = @course.enroll_student(new_user)
       enrollment.workflow_state = 'active'
       enrollment.save
-      post 'add_recipients', :conversation_id => @conversation.id, :recipients => [new_user.id.to_s]
+      post 'add_recipients', :conversation_id => @conversation.conversation_id, :recipients => [new_user.id.to_s]
       response.should be_success
       @conversation.participants.size.should == 3 # doesn't include @user
     end
@@ -127,7 +127,7 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       message = conversation.add_message('another')
 
-      post 'remove_messages', :conversation_id => @conversation.id, :remove => [message.id.to_s]
+      post 'remove_messages', :conversation_id => @conversation.conversation_id, :remove => [message.id.to_s]
       response.should be_success
       @conversation.messages.size.should == 1
     end
@@ -138,7 +138,7 @@ describe ConversationsController do
       course_with_student_logged_in(:active_all => true)
       conversation
 
-      delete 'destroy', :id => @conversation.id
+      delete 'destroy', :id => @conversation.conversation_id
       response.should be_success
       @user.conversations.should be_blank # the conversation_participant is no longer there
       @conversation.conversation.should_not be_nil # though the conversation is
