@@ -17,6 +17,8 @@
 #
 
 class ConversationMessage < ActiveRecord::Base
+  include SendToStream
+
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
   has_many :conversation_message_participants
@@ -29,8 +31,8 @@ class ConversationMessage < ActiveRecord::Base
   named_scope :human, :conditions => "NOT generated"
 
   validates_length_of :body, :maximum => maximum_text_length
+
   has_a_broadcast_policy
-  
   set_broadcast_policy do |p|
     p.dispatch :conversation_message
     p.to { self.recipients }
@@ -39,6 +41,10 @@ class ConversationMessage < ActiveRecord::Base
     p.dispatch :added_to_conversation
     p.to { self.new_recipients }
     p.whenever {|record| (record.just_created || @re_send_message) && record.generated && record.event_data[:event_type] == :users_added}
+  end
+
+  on_create_send_to_streams do
+    self.recipients
   end
   
   # TODO do this in SQL
@@ -74,15 +80,8 @@ class ConversationMessage < ActiveRecord::Base
   def format_event_message
     case event_data[:event_type]
     when :users_added
-      users = User.find_all_by_id(event_data[:user_ids]).map(&:short_name)
-      t :message_users_added, {
-          :one => "%{user} was added to the conversation by %{current_user}",
-          :other => "%{list_of_users} were added to the conversation by %{current_user}"
-       },
-       :count => users.size,
-       :user => users.first,
-       :list_of_users => users.to_sentence,
-       :current_user => author.short_name
+      user_names = User.find_all_by_id(event_data[:user_ids]).map(&:short_name)
+      EventFormatter.users_added(author.short_name, user_names)
     end
   end
 
@@ -96,4 +95,25 @@ class ConversationMessage < ActiveRecord::Base
     note = format_message(body).first
     recipient.user_notes.create(:creator => author, :title => title, :note => note)
   end
+  
+  def formatted_body(truncate=nil)
+    self.extend TextHelper
+    res = format_message(body).first
+    res = truncate_html(res, :max_length => truncate, :words => true) if truncate
+    res
+  end
+
+  class EventFormatter
+    def self.users_added(author_name, user_names)
+      I18n.t 'conversation_message.users_added', {
+          :one => "%{user} was added to the conversation by %{current_user}",
+          :other => "%{list_of_users} were added to the conversation by %{current_user}"
+       },
+       :count => user_names.size,
+       :user => user_names.first,
+       :list_of_users => user_names.to_sentence,
+       :current_user => author_name
+    end
+  end
 end
+

@@ -468,6 +468,50 @@ jQuery(function($) {
       }
     });
   });
+  $(".communication_sub_message .add_conversation_message_form").formSubmit({
+    beforeSubmit: function(data) {
+      $(this).find("button").attr('disabled', true);
+      $(this).find(".submit_button").text("Posting Message...");
+      $(this).loadingImage();
+    },
+    success: function(data) {
+      $(this).loadingImage('remove');
+
+      // message is the message div containing this form, and conversation the
+      // owning conversation. we make a copy of this div before filling it out
+      // so that we can use it for the next message (if any)
+      var $message = $(this).parents(".communication_sub_message")
+      var $conversation = $message.parents(".communication_message");
+
+      // fill out this message, display the new info, and remove the form
+      message_data = data.message.conversation_message;
+      $message.fillTemplateData({
+        data: {
+          post_date: $.parseFromISO(message_data.created_at).datetime_formatted,
+          message: message_data.body
+        },
+        htmlValues: ['message']
+      });
+      $message.find(".message").show();
+      $(this).remove();
+
+      // turn the "add message" button back on
+      $conversation.find(".reply_message").show();
+
+      // notify the user and any other watchers in the document
+      $.flashMessage('Message Sent!');
+      $(document).triggerHandler('user_content_change');
+      if(location.href.match(/dashboard/)) {
+        $.trackEvent('dashboard_comment', 'create');
+      }
+    },
+    error: function(data) {
+      $(this).loadingImage('remove');
+      $(this).find("button").attr('disabled', false);
+      $(this).find(".submit_button").text("Post Failed, Try Again");
+      $(this).formErrors(data);
+    }
+  });
   $(".communication_sub_message .add_sub_message_form").formSubmit({
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true);

@@ -1,0 +1,55 @@
+<% conversation = dashboard_conversation %>
+<% conversation_path = "#{conversations_path}#/messages/#{conversation ? conversation.id : '{{ id }}'}" %>
+<div class="communication_message conversation message_no_context" style="<%= hidden unless conversation %>" id="conversation_<%= conversation ? conversation.id : "blank" %>">
+  <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
+  <% if conversation %><a name="conversation_<%= conversation.id %>"></a><% end %>
+  <div class="header">
+    <%= image_tag "email_big.png", :class => "header_icon", :alt => t('images.alt.email', "email"), :title => t('images.title.conversation', "Conversation"), :style => "width: 20px;" %>
+    <a href="<%= conversation_path %>" class="title subject"><%= t(:conversation, "Conversation Activity") %></a>
+    <div class="sub_title">
+      <span class="user_name">
+        <% if conversation %>
+          <% if conversation.participants %>
+            <% participants = conversation.participants.map{ |participant| capture{ %>
+              <a href="<%= user_path(participant.id) %>"><%= participant.short_name %></a>
+            <% }} %>
+            <%= participants.to_sentence.html_safe %>
+          <% else %>
+            <a href="<%= conversation_path %>"><%= t(:participant_count, "participants", :count => conversation.participant_count) %></a>
+          <% end %>
+        <% end %>
+      </span>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="content">
+    <div class="subcontent">
+      <% if conversation %>
+        <% messages = conversation.recent_messages.reverse %>
+        <% if conversation.message_count > 3 %>
+          <div class="communication_sub_message">
+            <div class="content behavior_content">
+              <% show_more_link_text = t('links.show_messages', { :one => "Show %{count} More Message", :other => "Show %{count} More Messages" }, :count => conversation.message_count - 2) %>
+              <% if conversation.message_count > messages.length %>
+                <a href="<%= conversation_path %>"><%= show_more_link_text %></a>
+              <% else %>
+                <a href="#" class="show_sub_messages_link"><%= show_more_link_text %></a>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        <% messages.each_with_index do |m, idx| %>
+          <% type = m.generated ? :event : :message %>
+          <%= render :partial => "context/dashboard_conversation_#{type}", :object => m, :locals => {:hide_message => conversation.message_count > 3 && idx < messages.size - 2, :conversation => conversation} %>
+        <% end %>
+      <% end %>
+      <div class="communication_sub_message reply_message">
+        <div class="content behavior_content">
+          <a href="<%= conversation_add_message_path(conversation ? conversation.id : '{{ id }}') %>" class="add_entry_link textarea"><%= t('links.add_message', "Add Message") %></a>
+        </div>
+      </div>
+      <%= render :partial => "context/dashboard_conversation_message", :object => nil, :locals => {:conversation => conversation} %>
+    </div>
+    <div class="clear"></div>
+  </div>
+</div>

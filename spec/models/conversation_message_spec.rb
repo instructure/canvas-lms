@@ -119,4 +119,51 @@ describe ConversationMessage do
       student2.user_notes.size.should be(0)
     end
   end
+
+  context "stream_items" do
+    it "should create a stream item based on the conversation" do
+      old_count = StreamItem.count
+
+      course_with_teacher
+      student_in_course
+      conversation = @teacher.initiate_conversation([@user.id])
+      message = conversation.add_message("initial message")
+
+      StreamItem.count.should eql(old_count + 1)
+      stream_item = StreamItem.last
+      stream_item.item_asset_string.should eql(message.conversation.asset_string)
+    end
+
+    it "should not create additional stream_items for additional messages in the same conversation" do
+      old_count = StreamItem.count
+
+      course_with_teacher
+      student_in_course
+      conversation = @teacher.initiate_conversation([@user.id])
+      conversation.add_message("first message")
+      stream_item = StreamItem.last
+      conversation.add_message("second message")
+      conversation.add_message("third message")
+
+      StreamItem.count.should eql(old_count + 1)
+      StreamItem.last.should eql(stream_item)
+    end
+
+    it "should not delete the stream_item if a message is deleted, just regenerate" do
+      old_count = StreamItem.count
+
+      course_with_teacher
+      student_in_course
+      conversation = @teacher.initiate_conversation([@user.id])
+      conversation.add_message("initial message")
+      message = conversation.add_message("second message")
+
+      stream_item = StreamItem.last
+      
+      message.destroy
+      StreamItem.count.should eql(old_count + 1)
+    end
+
+    it "should delete the stream_item if the conversation is deleted" # not yet implemented
+  end
 end

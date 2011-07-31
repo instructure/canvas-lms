@@ -317,3 +317,5 @@ stylesheets:
     - public/stylesheets/compiled/select_content_dialog.css
   messages:
     - public/stylesheets/compiled/messages.css
+  dashboard:
+    - public/stylesheets/compiled/g_dashboard_conversations.css

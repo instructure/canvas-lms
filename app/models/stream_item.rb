@@ -31,32 +31,54 @@ class StreamItem < ActiveRecord::Base
     res = data.is_a?(OpenObject) ? data : OpenObject.new
     res.assert_hash_data
     res.user_id ||= viewing_user_id
-    if res.type == 'ContextMessage'
-      res.sub_messages = (res.all_sub_messages || []).select{|m| m.user_id == viewing_user_id || m.recipients.include?(viewing_user_id) }
+    res
+  end
+  
+  def prepare_user(user)
+    res = user.attributes.slice('id', 'name', 'short_name')
+    res['short_name'] ||= res['name']
+    res
+  end
+
+  def prepare_conversation(conversation)
+    res = conversation.attributes.slice('id', 'has_attachments')
+    res['private'] = conversation.private?
+    res['participant_count'] = conversation.participants.size
+    # arbitrary limit. would be nice to say "John, Jane, Michael, and 6
+    # others." if there's too many recipients, where those listed are the N
+    # most active posters in the conversation, but we'll just leave it at "9
+    # Participants" for now when the count is > 8.
+    if res['participant_count'] <= 8
+      res['participants'] = conversation.participants.map{ |u| prepare_user(u) }
+    end
+    res['message_count'] = conversation.conversation_messages.size
+    # .first(10) instead of (:limit => 10) since the association has already
+    # been loaded at this point
+    res['recent_messages'] = conversation.conversation_messages.first(10).map do |message|
+      prepare_conversation_message(message)
     end
     res
   end
   
-  def prepare_context_message(message)
-    res = message.attributes
-    users = message.recipient_users.map{|u| u.attributes.slice('id', 'name', 'short_name')}
-    res['recipients_count'] = users.length
-    res['recipient_users'] = users if users.length <= 15
-    res['formatted_body'] = message.formatted_body(250)
+  def prepare_conversation_message(message)
+    res = message.attributes.slice('id', 'created_at', 'generated', 'body')
+    res['author'] = prepare_user(message.author)
+    if res['generated']
+      event = message.event_data
+      if event[:event_type] == :users_added
+        event[:users] = User.find_all_by_id(event[:user_ids]).map{ |u| prepare_user(u) }
+      end
+      res['event_data'] = event
+    else
+      res['formatted_body'] = message.formatted_body(250)
+    end
     res.delete 'body'
-    res[:attachments] = message.attachments.map do |file|
+    res['attachments'] = message.attachments.map do |file|
       hash = file.attributes
       hash['readable_size'] = file.readable_size
       hash['scribdable?'] = file.scribdable?
       hash
     end
-    code = message.context_code rescue nil
-    if code
-      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', code].cache_key) do
-        Context.find_by_asset_string(code).short_name rescue ""
-      end
-    end
-    res['user_short_name'] = message.user.short_name if message.user
     res
   end
   
@@ -100,9 +122,9 @@ class StreamItem < ActiveRecord::Base
   
   def self.valid_asset_types
     [
-      :assignment,:submission,:submission_comment,:context_message,
-      :discussion_topic, :discussion_entry, :message,
-      :collaboration, :web_conference
+      :assignment, :submission, :submission_comment, :conversation,
+      :discussion_topic, :discussion_entry, :message, :collaboration,
+      :web_conference
     ]
   end
   
@@ -114,12 +136,10 @@ class StreamItem < ActiveRecord::Base
     case object
     when DiscussionEntry
       object.discussion_topic
-    when Submission
-      object
-    when ContextMessage
-      object.root_context_message || object
     when SubmissionComment
       object.submission
+    when ConversationMessage
+      object.conversation
     else
       object
     end
@@ -148,16 +168,8 @@ class StreamItem < ActiveRecord::Base
         hash['scribdable?'] = object.attachment.scribdable?
         res[:attachment] = hash
       end
-    when ContextMessage
-      if object.root_context_message
-        object = object.root_context_message
-        res = prepare_context_message(object)
-        res[:all_sub_messages] = object.sub_messages.map do |message|
-          prepare_context_message(message)
-        end
-      else
-        res = prepare_context_message(object)
-      end
+    when Conversation
+      res = prepare_conversation(object)
     when Message
       res = object.attributes
       res['notification_category'] = object.notification_category
@@ -187,10 +199,10 @@ class StreamItem < ActiveRecord::Base
       end
     when Collaboration
       res = object.attributes
-      res['users'] = object.users.map{|u| u.attributes.slice('id', 'name', 'short_name')}
+      res['users'] = object.users.map{|u| prepare_user(u)}
     when WebConference
       res = object.attributes
-      res['users'] = object.users.map{|u| u.attributes.slice('id', 'name', 'short_name')}
+      res['users'] = object.users.map{|u| prepare_user(u)}
     else
       raise "Unexpected stream item type: #{object.class.to_s}"
     end
@@ -271,7 +283,7 @@ class StreamItem < ActiveRecord::Base
   def self.get_parent_for_stream(object)
     object = object.discussion_topic if object.is_a?(DiscussionEntry)
     object = object.submission if object.is_a?(SubmissionComment)
-    object = object.root_context_message || object if object.is_a?(ContextMessage)
+    object = object.conversation if object.is_a?(ConversationMessage)
     object
   end
 

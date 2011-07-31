@@ -110,13 +110,13 @@ describe ConversationsController do
       course_with_teacher_logged_in(:active_all => true)
       conversation
 
-      post 'add_message', :conversation_id => @conversation.id, :body => "hello world"
+      post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
       response.should be_success
       message = @conversation.messages.first # newest message is first
       student = message.recipients.first
       student.user_notes.size.should == 0
 
-      post 'add_message', :conversation_id => @conversation.id, :body => "make a note", :user_note => 1
+      post 'add_message', :conversation_id => @conversation.conversation_id, :body => "make a note", :user_note => 1
       response.should be_success
       message = @conversation.messages.first
       student = message.recipients.first

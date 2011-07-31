@@ -18,8 +18,6 @@
 
 class ContextMessage < ActiveRecord::Base
   include Workflow
-  include SendToInbox
-  include SendToStream
   attr_accessible :context, :user, :body, :subject, :recipients, :root_context_message, :protect_recipients, :media_comment_id, :media_comment_type
   belongs_to :context, :polymorphic => true
   belongs_to :root_context_message, :class_name => 'ContextMessage'
@@ -42,25 +40,6 @@ class ContextMessage < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
-  end
-  
-  on_create_send_to_streams do
-    (self.recipients || []).uniq
-  end
-  
-  on_update_send_to_streams do
-    if self.recipients && !self.recipients.empty? && !@skip_send_to_stream
-      self.recipients
-    end
-  end
-  
-  on_create_send_to_inboxes do
-    {
-      :recipients => self.recipients,
-      :subject => self.subject,
-      :body => self.body,
-      :sender => self.user_id
-    }
   end
 
   
@@ -143,12 +122,6 @@ class ContextMessage < ActiveRecord::Base
       p = self.context_message_participants.find_by_user_id_and_participation_type(user_id, 'recipient')
       p ||= self.context_message_participants.create(:user_id => user_id, :participation_type => 'recipient')
     end
-  end
-  
-  def resend_message!
-    @re_send_message = true
-    self.save!
-    @re_send_message = false
   end
   
   def recipient_users
