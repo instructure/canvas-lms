@@ -29,24 +29,30 @@ class ConversationMessage < ActiveRecord::Base
   validates_length_of :body, :maximum => maximum_text_length
 
   def body
-    body = read_attribute(:body)
     if generated?
-      instance_eval body
+      format_event_message
     else
-      body
+      read_attribute(:body)
     end
   end
 
-  private
-  def message_users_added(*user_ids)
-    users = User.find_all_by_id(user_ids).map(&:short_name)
-    t :message_users_added, {
-        :one => "%{user} was added to the conversation by %{current_user}",
-        :other => "%{list_of_users} were added to the conversation by %{current_user}"
-     },
-     :count => users.size,
-     :user => users.first,
-     :list_of_users => users.to_sentence,
-     :current_user => author.short_name
+  def event_data
+    return {} unless generated?
+    @event_data ||= YAML.load(read_attribute(:body))
+  end
+
+  def format_event_message
+    case event_data[:event_type]
+    when :users_added
+      users = User.find_all_by_id(event_data[:user_ids]).map(&:short_name)
+      t :message_users_added, {
+          :one => "%{user} was added to the conversation by %{current_user}",
+          :other => "%{list_of_users} were added to the conversation by %{current_user}"
+       },
+       :count => users.size,
+       :user => users.first,
+       :list_of_users => users.to_sentence,
+       :current_user => author.short_name
+    end
   end
 end

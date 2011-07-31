@@ -81,8 +81,12 @@ class Conversation < ActiveRecord::Base
       SQL
 
       # announce their arrival
-      add_message(current_user, "message_users_added #{user_ids.join(', ')}", true)
+      add_event_message(current_user, :event_type => :users_added, :user_ids => user_ids)
     end
+  end
+
+  def add_event_message(current_user, event_data={})
+    add_message(current_user, event_data.to_yaml, true)
   end
 
   def add_message(current_user, body, generated = false)
