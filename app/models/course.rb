@@ -2036,15 +2036,9 @@ class Course < ActiveRecord::Base
     elsif !message || message.empty?
       raise "Message body cannot be blank"
     else
-      recipients = (self.teachers.map(&:id) - [user.id]).join(",")
-      ContextMessage.create!({
-        :context_id => self.id,
-        :context_type => self.class.to_s,
-        :user_id => user.id,
-        :subject => subject,
-        :recipients => recipients,
-        :body => message
-      })
+      recipients = self.teachers.map(&:id) - [user.id]
+      conversation = user.initiate_conversation(recipients)
+      conversation.add_message(message)
     end
   end
   

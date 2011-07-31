@@ -184,28 +184,6 @@ class ContextMessage < ActiveRecord::Base
     res
   end
   
-  def reply_from(opts)
-    user = opts[:user]
-    subject = opts[:subject].strip rescue nil
-    subject ||= "Re: #{self.subject.sub(/\ARe: /, "")}"
-    message = opts[:text].strip
-    user = nil unless user && self.context_message_participants.map(&:user_id).include?(user.id)
-    if !user
-      raise "Only message participants may reply to messages"
-    elsif !message || message.empty?
-      raise "Message body cannot be blank"
-    else
-      ContextMessage.create!({
-        :context => self.context,
-        :user => user,
-        :subject => subject,
-        :recipients => "#{self.user_id}",
-        :root_context_message_id => self.root_context_message_id || self.id,
-        :body => message
-      })
-    end
-  end
-  
   # This is a bit of funkiness because we have a callback to create a notification
   # as soon as the message is created, but the attachments can't actually be linked to
   # the message until AFTER the context_message is saved

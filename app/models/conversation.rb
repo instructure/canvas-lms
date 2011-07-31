@@ -134,4 +134,17 @@ class Conversation < ActiveRecord::Base
       message
     end
   end
+
+  def reply_from(opts)
+    user = opts[:user]
+    message = opts[:text].strip
+    user = nil unless user && self.participants.map(&:id).include?(user.id)
+    if !user
+      raise "Only message participants may reply to messages"
+    elsif !message || message.empty?
+      raise "Message body cannot be blank"
+    else
+      add_message(user, message)
+    end
+  end
 end
