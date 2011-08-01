@@ -40,6 +40,7 @@ class SubmissionComment < ActiveRecord::Base
   after_save :update_submission
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
+  after_create :generate_conversation_message
 
   serialize :cached_attachments
   
@@ -200,6 +201,12 @@ class SubmissionComment < ActiveRecord::Base
   
   def context_code
     "#{self.context_type.downcase}_#{self.context_id}"
+  end
+
+  def generate_conversation_message
+    return unless author_id && submission_id && author_id != submission.user_id
+    conversation = author.initiate_conversation([submission.user_id])
+    conversation.add_message(comment)
   end
 
   named_scope :after, lambda{|date|

@@ -157,4 +157,17 @@ This text has a http://www.google.com link in it...
     ii.sender_id.should == se.user_id
     ii.user_id.should == te.user_id
   end
+
+  it "should not generate a conversation message when created by the submission_owner" do
+    old_count = ConversationMessage.count
+    SubmissionComment.create(@valid_attributes.merge(:author => @user))
+    ConversationMessage.count.should eql(old_count)
+  end
+
+  it "should generate a conversation message when created by someone other than the submission_owner" do
+    old_count = ConversationMessage.count
+    commentor = factory_with_protected_attributes(User, :name => "some other student", :workflow_state => "registered")
+    SubmissionComment.create(@valid_attributes.merge(:author => commentor))
+    ConversationMessage.count.should eql(old_count+1)
+  end
 end
