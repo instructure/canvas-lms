@@ -484,7 +484,7 @@ jQuery(function($) {
       var $conversation = $message.parents(".communication_message");
 
       // fill out this message, display the new info, and remove the form
-      message_data = data.message.conversation_message;
+      message_data = data.message;
       $message.fillTemplateData({
         data: {
           post_date: $.parseFromISO(message_data.created_at).datetime_formatted,
