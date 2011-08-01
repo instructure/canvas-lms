@@ -21,7 +21,7 @@ class Conversation < ActiveRecord::Base
   has_many :subscribed_conversation_participants,
            :conditions => "subscribed",
            :class_name => 'ConversationParticipant'
-  has_many :conversation_messages, :order => "created_at DESC"
+  has_many :conversation_messages, :order => "created_at DESC, id DESC"
 
   # see also User#messageable_users
   has_many :participants,

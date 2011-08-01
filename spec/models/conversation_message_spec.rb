@@ -91,6 +91,20 @@ describe ConversationMessage do
       event = add_last_student
       event.messages_sent["Added To Conversation"].map(&:user_id).should_not be_include(@first_student.id)
     end
+
+    it "should add a new message when a user replies to a notification" do
+      conversation_message = add_message
+      message = conversation_message.messages_sent["Conversation Message"].first
+
+      message.context.should == conversation_message
+      message.context.reply_from(:user => message.user, :purpose => 'general',
+        :subject => message.subject,
+        :text => "Reply to notification")
+      # The initial message, the one the sent the notification,
+      # and the response to the notification
+      @conversation.messages.size.should == 3
+      @conversation.messages.first.body.should match(/Reply to notification/)
+    end
   end
 
   context "generate_user_note" do

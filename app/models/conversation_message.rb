@@ -103,6 +103,10 @@ class ConversationMessage < ActiveRecord::Base
     res
   end
 
+  def reply_from(opts)
+    conversation.reply_from(opts)
+  end
+
   class EventFormatter
     def self.users_added(author_name, user_names)
       I18n.t 'conversation_message.users_added', {

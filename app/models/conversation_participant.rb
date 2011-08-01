@@ -24,7 +24,7 @@ class ConversationParticipant < ActiveRecord::Base
   belongs_to :user
   has_many :conversation_message_participants
   has_many :messages, :source => :conversation_message, :through => :conversation_message_participants,
-           :order => "created_at DESC", :conditions => 'conversation_id = #{conversation_id}'
+           :order => "created_at DESC, id DESC", :conditions => 'conversation_id = #{conversation_id}'
            # conditions are redundant, but they let us use the best index
 
   named_scope :default, :conditions => "workflow_state IN ('read', 'unread')"
