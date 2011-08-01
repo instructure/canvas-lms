@@ -374,4 +374,37 @@ describe User do
       @site_admin.grants_right?(user, nil, :become_user).should be_false
     end
   end
+
+  context "messageable_users" do
+    before(:each) do
+      @admin = user_model
+      @student = user_model
+      tie_user_to_account(@admin, :membership_type => 'AccountAdmin')
+      tie_user_to_account(@student, :membership_type => 'Student')
+    end
+
+    it "should include users with no shared contexts iff admin" do
+      @admin.messageable_users(:ids => [@user.id]).should_not be_empty
+      @user.messageable_users(:ids => [@admin.id]).should be_empty
+    end
+
+    it "should not do admin catch-all if specific contexts requested" do
+      course1 = course_model
+      course2 = course_model
+      course2.offer!
+
+      enrollment = course2.enroll_teacher(@admin)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+      @admin.reload
+
+      enrollment = course2.enroll_student(@student)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+
+      @admin.messageable_users(:context => ["course_#{course1.id}"], :ids => [@student.id]).should be_empty
+      @admin.messageable_users(:context => ["course_#{course2.id}"], :ids => [@student.id]).should_not be_empty
+      @student.messageable_users(:context => ["course_#{course2.id}"], :ids => [@admin.id]).should_not be_empty
+    end
+  end
 end

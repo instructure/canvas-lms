@@ -47,6 +47,17 @@ describe ConversationsController do
       response.should be_success
       assigns[:conversations].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
     end
+
+    it "should work for an admin as well" do
+      course
+      account_admin_user
+      user_session(@user)
+      conversation
+
+      get 'index'
+      response.should be_success
+      assigns[:conversations].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
+    end
   end
 
   describe "GET 'show'" do

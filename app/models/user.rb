@@ -1505,6 +1505,7 @@ class User < ActiveRecord::Base
   def messageable_users(options = {})
     course_ids = courses.map(&:id) + concluded_courses.map(&:id)
     group_ids = groups.map(&:id)
+    account_ids = []
 
     if options[:context]
       limited_course_ids = []
@@ -1518,8 +1519,16 @@ class User < ActiveRecord::Base
       end
       course_ids &= limited_course_ids
       group_ids &= limited_group_ids
+    else
+      # if we're not searching with context(s) in mind, include any users we
+      # have admin access to know about
+      account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
+      account_ids &= options[:account_ids] if options[:account_ids]
     end
-    return [] if course_ids.empty? && group_ids.empty? && !options[:ids] || options[:ids] == []
+
+    # if :ids is present but empty (different than just not present), don't
+    # bother doing a query that's guaranteed to return no results.
+    return [] if options[:ids] && options[:ids].empty?
 
     user_condition_sql = "users.id <> #{self.id}"
     user_condition_sql << " AND users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
@@ -1549,6 +1558,14 @@ class User < ActiveRecord::Base
         AND #{user_condition_sql}
     SQL
 
+    user_sql << <<-SQL if account_ids.present?
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+      FROM users, user_account_associations
+      WHERE user_account_associations.account_id IN (#{account_ids.join(',')})
+        AND user_account_associations.user_id = users.id
+        AND #{user_condition_sql}
+    SQL
+
     if options[:ids]
       # provides a way for this user to start a conversation with someone
       # that isn't normally messageable (requires that they already be in a
@@ -1569,6 +1586,9 @@ class User < ActiveRecord::Base
         SQL
       end
     end
+
+    # if none of our potential sources was included, we're done
+    return [] if user_sql.empty?
 
     users = User.find_by_sql(<<-SQL)
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL},
