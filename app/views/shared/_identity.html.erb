@@ -11,11 +11,7 @@
     <% if @real_current_user && @real_current_user != @current_user %>
       <li class="stop_masquerading"><%= link_to t('links.stop_masquerading', "[Stop Masquerading]"), user_masquerade_url(@real_current_user.id), :method => :post %></li>
     <% end %>
-    <li class="first inbox"><a href="<%= inbox_path %>"><span><%= t 'links.inbox', "Inbox" %></span>
-    <% unread = @current_user.unread_inbox_items_count; if unread > 0 %>
-      <b class="unread-messages-count"><%= unread %></b>
-    <% end %>
-    </a></li>
+    <li class="first inbox"><a href="<%= conversations_path %>"><span><%= t 'links.inbox', "Inbox" %></span></a></li>
     <li><%= link_to t('links.profile', "Profile"), profile_path %></li>
     <li class="user_id" style="display: none;"><%= @current_user.id %></li>
     <li class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></li>
