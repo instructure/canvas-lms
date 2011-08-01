@@ -31,7 +31,7 @@ module ConversationsHelper
       hash
     }
 
-    audience = audience[0, cutoff - 1] + [audience[cutoff - 1, audience.size - cutoff]] if audience.size > cutoff
+    audience = audience[0, cutoff - 1] + [audience[cutoff - 1, audience.size + 1 - cutoff]] if audience.size > cutoff
     audience.map{ |user_or_array|
       if user_or_array.is_a?(User)
         "<span class='participant' data-id='#{user_or_array.id}'>#{ERB::Util.h(user_or_array.short_name)}</span>".html_safe
@@ -39,9 +39,9 @@ module ConversationsHelper
         others = I18n.t('conversations.other_recipients', "other", :count => user_or_array.size)
         (
           "<span class='others'>#{ERB::Util.h(others)}" +
-          "<ul>" + 
+          "<span><ul>" + 
           user_or_array.map{ |user| "<li class='participant' data-id='#{user.id}'>#{ERB::Util.h(user.short_name)}</li>" }.join +
-          "</ul>" +
+          "</ul></span>" +
           "</span>"
         ).html_safe
       end
@@ -56,12 +56,16 @@ module ConversationsHelper
     end
   end
 
-  def avatar_url_for_group
-    "/images/messages/avatar-group-#{avatar_size}.png"
+  def avatar_url_for_group(blank_fallback=false)
+    blank_fallback ?
+      "/images/blank.png" :
+      "/images/messages/avatar-group-#{avatar_size}.png"
   end
 
-  def avatar_url_for_user(user)
-    default_avatar = "/images/messages/avatar-#{avatar_size}.png"
+  def avatar_url_for_user(user, blank_fallback=false)
+    default_avatar = blank_fallback ?
+      "/images/blank.png" :
+      "/images/messages/avatar-#{avatar_size}.png"
     if service_enabled?(:avatars)
       user.avatar_url(avatar_size, nil, "#{request.protocol}#{request.host_with_port}#{default_avatar}")
     else

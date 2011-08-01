@@ -107,6 +107,16 @@ class ConversationMessage < ActiveRecord::Base
     conversation.reply_from(opts)
   end
 
+  def forwarded_messages
+    @forwarded_messages ||= forwarded_message_ids && self.class.find_all_by_id(forwarded_message_ids.split(',')) || []
+  end
+
+  def as_json(options = {})
+    super(options)['conversation_message'].merge({
+      'forwarded_messages' => forwarded_messages
+    })
+  end
+
   class EventFormatter
     def self.users_added(author_name, user_names)
       I18n.t 'conversation_message.users_added', {
@@ -115,7 +125,7 @@ class ConversationMessage < ActiveRecord::Base
        },
        :count => user_names.size,
        :user => user_names.first,
-       :list_of_users => user_names.to_sentence,
+       :list_of_users => user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence,
        :current_user => author_name
     end
   end

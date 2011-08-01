@@ -1,54 +1,52 @@
 @import environment.sass
-#inbox
-  margin: 0 -1em -1em
-  background: #ebebeb
+body
   overflow: hidden
-#inbox_content
-  border-right: 1px solid #ddd
-  background: #fff
-  width: 50%
+#inbox
+  margin: -1em
+  background: #a3a3a3 url(/images/messages/messages-background.png) 0 0 repeat
+  a
+    color: #2571bd
 #actions
-  background: #4a4b4d url(/images/messages/actions-bg.png) repeat-x top left
-  margin: -1em -1em 0 -1em
-  padding: 0
-  height: 53px
+  height: 42px
+  background: #dddde1 url(/images/messages/actions-bg.png) 0 0 repeat-x
+  border-top: 1px solid #eaeaec
+  border-bottom: 1px solid #acacac
+  position: relative
   ul, li
     margin: 0
     padding: 0
     list-style: none
   .buttons
-    margin: 16px 0 0 13px
-    float: left
+    margin: 7px 16px 0 0
+    float: right
     a
       background-position: 0 0
-      width: 26px
-      height: 26px
+      width: 27px
+      height: 27px
       overflow: hidden
       display: block
-      text-indent: -1000em
+      text-indent: -9999em
     a:hover
-      background-position: -26px 0
+      background-position: 0 -27px
     a.active
-      background-position: -52px 0
+      background-position: 0 -54px
     
-  border-bottom: 1px solid #898989
   .menus
+    float: left
     font-size: 0.9em
-    float: right
-    margin-right: 16px
+    margin: 7px 0 0 16px
     > li
       float: left
       position: relative
       z-index: 3
-      margin: 14px 8px 0 0
       > a
         display: block
         background-color: transparent !important
-        background-image: url(/images/messages/button-sprite.png) !important
+        background-image: url(/images/messages/small-button-sprite.png) !important
         border: none !important
         color: #525252
-        width: 124px
-        height: 28px
+        width: 98px
+        height: 26px
         text-indent: 18px
         line-height: 28px
         font-size: 12px
@@ -62,71 +60,118 @@
         display: none
     > li:hover
       > a
-        background-position: 0 -28px
+        background-position: 0 -26px
     > li.selected
       > a
         text-shadow: 0px 1px 1px #ddd
-        background-position: 0 -56px
-      > span
+        background-position: 0 -52px
+
+
+#actions .menus > li.selected, #conversation_actions.selected
+  > span
+    display: block
+    position: absolute
+    background: transparent url(/images/messages/menu-top.png) 0 0 no-repeat
+    width: 20px
+    height: 11px
+    left: 39px
+    top: 22px
+    z-index: 1
+  > div
+    left: 50%
+    cursor: default
+    top: 32px
+    position: absolute
+    display: block
+    background-color: #e6e7e9
+    border: 1px solid #b0afaf
+    +border-radius(10px)
+    +box-shadow( rgba(0,0,0,0.1), 0, 0, 6px, 3px)
+    padding: 8px 0
+    ul
+      list-style: none
+      border-bottom: 1px solid #d4d5d7
+      border-top: 1px solid #f2f2f3
+      margin: 0 1px
+      padding: 4px 0
+    ul.first
+      border-top: none
+    ul.last
+      border-bottom: none
+    li.checked
+      a
+        background-image: url(/images/messages/menu-checked-sprites.png)
+        background-position: 2px 2px
+        background-repeat: no-repeat
+      a:hover
+        background-position: 2px -16px
+    li
+      margin: 0 -1px
+      padding: 0
+      color: #7d7d7d
+      font-weight: bold
+      a, b
+        padding: 2px 22px 2px 22px
+        white-space: pre
+        text-shadow: 0px 1px 1px #f0f1f2
         display: block
-        position: absolute
-        background: transparent url(/images/messages/menu-top.png) 0 0 no-repeat
-        width: 20px
+      a
+        text-decoration: none
+        color: #525252
+      a:hover
+        background-color: #05a5e9
+        color: #fff
+        text-shadow: 0px 1px 1px #0276aa
+    li.label_group
+      overflow: hidden
+      padding: 2px 22px 2px 22px
+      min-width: 110px
+      a.label_icon
+        overflow: hidden
+        text-indent: -9999em
+        float: left
+        padding: 0
+        margin: 2px
+        top: 4px
+        left: 24px
         height: 11px
-        left: 50px
-        top: 24px
-        z-index: 1
-      div
-        left: 50%
-        cursor: default
-        top: 34px
-        position: absolute
-        display: block
-        background-color: #e6e7e9
-        border: 1px solid #b0afaf
-        +border-radius(10px)
-        +box-shadow( rgba(0,0,0,0.1), 0, 0, 6px, 3px)
-        padding: 8px 0
-        ul
-          border-bottom: 1px solid #d4d5d7
-          border-top: 1px solid #f2f2f3
-          margin: 0 1px
-          padding: 4px 0
-        ul.first
-          border-top: none
-        ul.last
-          border-bottom: none
-        li.checked
-          background: transparent url(/images/messages/menu-checked.png) 7px 6px no-repeat
-        li
-          margin: 0 -1px
-          padding: 0
-          color: #7d7d7d
-          a, b
-            padding: 2px 22px 2px 22px
-            white-space: pre
-            font-weight: bold
-            text-shadow: 0px 1px 1px #f0f1f2
-            display: block
-          a
-            text-decoration: none
-            color: #525252
-          a:hover
-            background: #05a5e9
-            color: #fff
-            text-shadow: 0px 1px 1px #0276aa
-      
-ul.messages
-  background-color: #fff
+        width: 11px
+        z-index: 4
+        background-color: #fff
+        background-repeat: no-repeat
+        border: 1px solid #aaa
+      a:hover, a.checked
+        border: 3px solid #05a5e9
+        margin: 0
+
+#conversation_actions
+  font-size: 0.9em
+  display: none
+  position: absolute
+  z-index: 100
+
+#conversation_actions.selected
+  display: block
+  > span
+    position: relative
+    top: 0
+    left: 0
+    margin: 0 auto
+  > div
+    position: relative
+    top: -1px
+    left: 0
+    li.label_group
+      min-width: 120px
+
+ul.messages, ul.conversations
+  overflow: auto
   list-style: none
   margin: 0
   padding: 0
-  li
+  > li
     font-size: 0.9em
     margin: 0
-    padding: 13px 18px 13px 86px
-    border-top: 1px solid #fff
-    border-bottom: 1px solid #ddd
     position: relative
     p
       margin: 0
@@ -139,45 +184,36 @@ ul.messages
       top: 13px
     span.date
       color: #2571bd
-      position: absolute
-      right: 18px
-      top: 13px
+      float: right
       font-size: 1.1em
+      margin-left: 1em
     span.others
       cursor: pointer
       color: #2571bd
-      ul
+      > span
+        display: block
         cursor: auto
         z-index: 4
         background: #fff
-        border: 1px solid #ddd
+        border: 1px solid #ccc
         padding: 0.5em
         display: none
         position: absolute
+        +border-radius(10px)
+        +box-shadow( rgba(0,0,0,0.2), 0, 3px, 6px, 0)
+      ul
+        padding: 0
+        margin: 0
         max-height: 120px
         overflow: auto
         list-style: none
-        +border-radius(10px)
-        +box-shadow( rgba(0,0,0,0.1), 0, 3px, 6px, 0)
         li
+          font-weight: normal
           padding: 0 1em
           border: none
           color: #000
-  li.generated
-    padding: 10px
-    font-size: 0.9em
-    color: #888
-    p
-      text-align: center
-      min-height: 0
-      margin: 0
-    img.avatar, span.date, .audience
-      display: none
-    
-  li.selected
-    background: #f4fbff url(/images/messages/selected.png) repeat-x 0 0
-  li.selected.inactive
-    background: #f2f3f3 url(/images/messages/selected-inactive.png) repeat-x 0 0
+  > li.selected
+    background-color: #e5f3ff
   .audience
     color: #222
     font-size: 1.2em
@@ -189,61 +225,302 @@ ul.messages
       font-weight: bold
       font-style: normal
 
+ul.private .audience em
+  display: none
+
+ul.conversations
+  border-right: 1px solid #ddd
+  background-color: #fff
+  > li
+    padding: 12px 30px 12px 86px
+    .date
+      margin-right: -13px
+
+#messages > ul.messages
+  display: none
+  > li
+    +box-shadow( rgba(0,0,0,0.25), 0, 3px, 6px, 3px)
+  > li.generated
+    line-height: 1
+    +box-shadow( none )
+    background: transparent
+    padding: 0
+    font-size: 0.9em
+    color: #222
+    text-shadow: 0px 1px 1px #ccc
+    p
+      text-align: center
+      min-height: 0
+      margin: 0
+    img.avatar, span.date, .audience, input, .actions
+      display: none
+ul.messages
+  position: relative
+  z-index: 1
+  > li
+    padding: 14px 50px 14px 78px
+    background: #fff
+    margin: 12px
+    input
+      position: absolute
+      right: 8px
+      top: 50%
+      margin-top: -5px
+    img.avatar
+      top: 14px
+      left: 14px
+    ul.messages
+      border-left: 2px solid #ddd
+      overflow: visible
+      margin: 0
+      > li
+        background: transparent
+        margin: 0
+        padding: 7px 0 7px 64px
+        img.avatar
+          top: 7px
+          left: 7px
+      input
+        display: none
+  > li.self
+    background-color: #ebebeb
+  > li.selected
+    background-color: #e5f3ff
+  .date
+    margin-right: -40px
+  .audience
+    color: #636363
+
 ul.messages li.other:hover
   .actions
-    display: inline
-    border-left: 1px solid #ddd
-    padding-left: 1em
     margin-left: 1em
+    display: inline
+    .send_private_message
+      height: 18px
+      display: inline-block
+      background: transparent url(/images/messages/compose-button-sm_sprite.png) 0 0 no-repeat
+      padding-left: 20px
+    .send_private_message:hover
+      background-position: 0 -18px
 ul.messages, ul.messages.private, ul.messages.private li:hover
   .actions
     display: none
 
+button.button
+  padding: 0 22px
+  height: 24px
+  line-height: 22px
+  font-size: 12px
+  color: #525252
+  text-decoration: none
+  font-weight: bold
+  text-shadow: 0px 1px 1px #fff
+  border-width: 1px
+  border-style: solid
+  border-color: #aaa
+  +border-radius(13px)
+  background: #bbb url(/images/messages/button-bg.png) 0 0 repeat-x !important
+  +box-shadow( rgba(0,0,0,0.1), 0, 1px, 2px, 1px )
+button.button:hover
+  background-position: 0 -22px !important
+  border-color: #aaa
+  +box-shadow( rgba(0,0,0,0.1), 0, 1px, 2px, 1px )
+
 #messages
-  width: 100%
+  width: 50%
+  min-height: 300px
   float: left
-  margin: 0 -101% 6px 0
-  padding: 0 0 6px 1px
+  margin: 0 -101% 0 0
+  padding: 0 0 0 1px
   overflow: hidden
-  > ul
-    border-left: 1px solid #ddd
+  position: relative
+  #message_actions
     display: none
-    position: relative
-    z-index: 1
-    padding: 6px 0 0 0
-    margin: 0 0 -6px -1px
-    .audience
-      color: #636363
+    position: absolute
+    height: 42px
+    border-top: 1px solid #f4f5f7
+    border-bottom: 1px solid #acacac
+    width: 100%
+    background-color: #edeef2
+    z-index: 3
+    +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
+    a
+      background-image: url(/images/messages/message-action-sprites.png) 
+      background-repeat: no-repeat
+    a:hover
+      background-color: #fff
+    ul
+      list-style: none
+      margin: 10px 1em 0 1em
+      padding: 0
+      float: left
+    li
+      margin: 0 0.5em 0 0
+      padding: 0
+      float: left
+      a
+        font-weight: bold
+        font-size: 0.9em
+        color: #525252
+        display: block
+        border: 1px solid #b0b0b1
+        +border-radius(10px)
+        padding: 0 2.5em 0 1em
+        text-decoration: none
+        min-width: 3em
+    #action_delete
+      background-position: 90% 0
+    #action_forward
+      background-position: 90% -18px
+    #cancel_bulk_message_action
+      background-color: transparent
+      background-position: 0 -36px
+      text-indent: -9999em
+      overflow: hidden
+      width: 18px
+      height: 18px
+      float: right
+      margin: 10px 1em 0 0
 #conversations
   background: #fff
   margin: 0 -1px 0 0
   padding: 0
-  width: 100%
-  border-right: 1px solid #ddd
+  width: 50%
   position: relative
   z-index: 2
   float: left
-  min-height: 370px
   +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
   #no_messages
+    position: absolute
+    top: 44px
+    width: 100%
     margin: 2em 1em
     text-align: center
-  ul.messages
-    a
+  ul.conversations
+    position: relative
+    a.details_link
       display: none
+    .actions
+      position: absolute
+      right: 17px
+      top: 5px
+      display: none
+      > a
+        display: block
+        background: transparent url(/images/messages/actions-dd-sprite.png) 0 0 no-repeat
+        text-indent: -9999em
+        overflow: hidden
+        width: 32px
+        height: 22px
+    .actions > a:hover
+      background-position: 0 -22px
+    .actions.selected
+      display: block
+      a, a:hover
+        background-position: 0 -44px
+    .count
+      display: none
+      color: #fff
+      font-size: 0.9em
+      position: absolute
+      padding: 0 0.4em
+      font-weight: bold
+      background-color: #acacac
+      +border-radius(3px)
+      right: 20px
+      top: 50%
+      margin-top: -0.5em
     > li
+      border-top: 1px solid #fff
+      border-bottom: 1px solid #ddd
       color: #636363
       .audience
         color: #222
-      i.flag_last_author:before
-        content: "⇽"
+      .action_remove_label, .action_add_label, .action_mark_as_read, .action_mark_as_unread
+        text-indent: -9999em
+        overflow: hidden
+        position: absolute
+      .action_remove_label, .action_add_label
+        top: -1px
+        left: 0
+        width: 24px
+        height: 24px
+        background-color: transparent
+      .action_remove_label
+        display: none
+      .action_mark_as_read, .action_mark_as_unread
+        top: 50%
+        left: 0
+        width: 24px
+        height: 24px
+        margin-top: -12px
+        background: transparent url(/images/messages/new-replied-icon_sprite.png) 1px 0 no-repeat
+      .action_mark_as_read, .action_remove_label
+        display: none
+      .action_mark_as_unread
+        background-position: 1px 48px
+      .attachments, .media_objects
+        display: none
+        width: 16px
+        height: 16px
+        margin: 0 2px 0 0
     > li.unread
       color: #000
-      a.audience
+      .action_mark_as_read
+        display: block
+      .action_mark_as_unread
+        display: none
+      .audience
         font-weight: bold
-        color: #2571bd
-    > li:hover
+    > li.last_author
+      .action_mark_as_unread
+        background-position: 1px -48px
+    > li:hover, > li.menu_active
+      .action_mark_as_unread:hover
+        background-position: 1px -24px
       cursor: pointer
+      .actions
+        display: block
+      .date
+        visibility: hidden
+    > li.labeled
+      .action_add_label
+        display: none
+      .action_remove_label
+        background-position: 1px -24px
+        display: block
+    > li.attachments .attachments, > li.media_objects .media_objects
+      display: inline
+
+.label_icon
+  background-repeat: no-repeat
+  background-image: url(/images/messages/flag.png)
+  background-position: 0 24px
+ul.red li .label_icon:hover
+  background-position: 1px 1px
+li.red .label_icon, .red.label_icon
+  background-position: 1px -23px !important
+ul.orange li .label_icon:hover
+  background-position: 1px -47px
+li.orange .label_icon, .orange.label_icon
+  background-position: 1px -71px !important
+ul.yellow li .label_icon:hover
+  background-position: 1px -95px
+li.yellow .label_icon, .yellow.label_icon
+  background-position: 1px -119px !important
+ul.green li .label_icon:hover
+  background-position: 1px -143px
+li.green .label_icon, .green.label_icon
+  background-position: 1px -167px !important
+ul.blue li .label_icon:hover
+  background-position: 1px -191px
+li.blue .label_icon, .blue.label_icon
+  background-position: 1px -215px !important
+ul.purple li .label_icon:hover
+  background-position: 1px -239px
+li.purple .label_icon, .purple.label_icon
+  background-position: 1px -263px !important
+
 #message_blank
   display: none
 
@@ -262,13 +539,15 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
   overflow: hidden
   a.browser
     float: right
-    margin: 0px 4px
+    margin: 1px 1px 1px 8px
     cursor: pointer
     overflow: hidden
     height: 18px
-    width: 28px
+    width: 18px
     text-indent: -9999em
-    background: transparent url(/images/messages/browse.png) 2px 1px no-repeat
+    background: transparent url(/images/messages/address-book-icon-sprite.png) 0 0 no-repeat
+  a.browser:hover
+    background-position: 0 -18px
   span
     float: left
     color: #888
@@ -320,6 +599,9 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
     outline: none
     padding: 0
     margin: 1px 0
+.token_input.browse
+  a.browser
+    background-position: 0 -36px
 
 .token_input.active
   box-shadow: #68B4DF 0 0 3px 2px
@@ -412,6 +694,7 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       height: 32px
       float: left
       margin-right: 6px
+      background: transparent url(/images/messages/avatar-sprites.png) 0 0 no-repeat
     b
       display: block
       color: #000
@@ -421,6 +704,12 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       color: #2571bd
       font-weight: bold
       font-size: 0.8em
+  li.context img, li.context.active.expanded img
+    background-position: 0 -64px
+  li.user.active img
+    background-position: 0 -32px
+  li.context.active img
+    background-position: 0 -96px
   li.active
     a.expand
       i
@@ -436,6 +725,10 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       color: #0d4276
     a.toggle i
       background-position: 0 -48px
+    img.user
+      background-position: 0 -32px
+    img.context
+      background-position: 0 -96px
   li.on .toggle i
     background-position: 0 -32px
   li.on.active .toggle i
@@ -466,8 +759,15 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
   margin: 0
   padding: 1em
   border-bottom: 1px solid #ddd
-  ul.messages
-    display: block
+  #action_add_recipients
+    padding: 0 0 0 20px
+    background: transparent url(/images/messages/add-person-sprite.png) 0 0 no-repeat
+    float: right
+    font-size: 1.1em
+  #action_add_recipients:hover
+    background-position: 0 -18px
+  ul.conversations
+    overflow: visible
     border: 0
     padding: 0
     margin: 0
@@ -475,6 +775,12 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       padding: 0
       border: 0
   +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
+#create_message_form.new
+  .audience
+    display: block
+    padding-left: 24px
+    background: transparent url(/images/messages/compose-icon.png) 0 0 no-repeat
+#create_message_form, #forward_message_form
   table
     margin-top: 0.5em
     width: 100%
@@ -489,6 +795,8 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
       text-align: right
       padding: 0 8px 2px 0
       color: #2571bd
+#create_message_form.disabled
+  opacity: 0.3  
 form
   input
     width: 100%
@@ -498,5 +806,17 @@ form
     -moz-box-sizing: border-box
     width: 100%
 
-#add_recipients_form
+#forward_message_form
+  input, textarea
+    width: 400px
+  > ul.messages
+    li
+      padding: 14px 14px 14px 78px
+      .actions
+        display: none
+    max-height: 200px
+    input
+      display: none
+#add_recipients_form, #forward_message_form
+  padding: 1em 1em 2em
   display: none

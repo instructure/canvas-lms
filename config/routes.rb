@@ -8,6 +8,7 @@ ActionController::Routing::Routes.draw do |map|
   map.inbox_item 'inbox/:id', :controller => 'context', :action => 'inbox_item'
 
   map.messages_unread 'messages/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
+  map.messages_labeled 'messages/labeled', :controller => 'conversations', :action => 'index', :scope => 'labeled'
   map.messages_archived 'messages/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
   map.messages_find_recipients 'messages/find_recipients', :controller => 'conversations', :action => 'find_recipients'
   map.messages_mark_all_as_read 'messages/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}

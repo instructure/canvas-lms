@@ -74,6 +74,96 @@ describe Conversation do
     end
   end
 
+  context "message counts" do
+    it "should increment when adding messages" do
+      sender = user
+      recipient = user
+      Conversation.initiate([sender.id, recipient.id], false).add_message(sender, 'test')
+      sender.conversations.first.message_count.should eql 1
+      recipient.conversations.first.message_count.should eql 1
+    end
+
+    it "should decrement when removing messages" do
+      sender = user
+      recipient = user
+      root_convo = Conversation.initiate([sender.id, recipient.id], false)
+      root_convo.add_message(sender, 'test')
+      msg = root_convo.add_message(sender, 'test2')
+      sender.conversations.first.message_count.should eql 2
+      recipient.conversations.first.message_count.should eql 2
+
+      sender.conversations.first.remove_messages(msg)
+      sender.conversations.first.reload.message_count.should eql 1
+      recipient.conversations.first.reload.message_count.should eql 2
+    end
+  end
+
+  context "unread counts" do
+    it "should increment when creating a conversation" do
+      sender = user
+      recipient = user
+      root_convo = Conversation.initiate([sender.id, recipient.id], false)
+      root_convo.add_message(sender, 'test')
+      sender.reload.unread_conversations_count.should eql 0
+      recipient.reload.unread_conversations_count.should eql 1
+    end
+
+    it "should increment for subscribed recipients when adding a message to a read conversation" do
+      sender = user
+      unread_guy = user
+      subscribed_guy = user
+      unsubscribed_guy = user
+      root_convo = Conversation.initiate([sender.id, unread_guy.id, subscribed_guy.id, unsubscribed_guy.id], false)
+      root_convo.add_message(sender, 'test')
+      
+      unread_guy.reload.unread_conversations_count.should eql 1
+      subscribed_guy.conversations.first.mark_as_read
+      subscribed_guy.reload.unread_conversations_count.should eql 0
+      unsubscribed_guy.conversations.first.update_attributes(:subscribed => false)
+      unsubscribed_guy.reload.unread_conversations_count.should eql 0
+
+      root_convo.add_message(sender, 'test2')
+
+      unread_guy.reload.unread_conversations_count.should eql 1
+      subscribed_guy.reload.unread_conversations_count.should eql 1
+      unsubscribed_guy.reload.unread_conversations_count.should eql 0
+    end
+
+    it "should decrement when deleting an unread conversation" do
+      sender = user
+      unread_guy = user
+      root_convo = Conversation.initiate([sender.id, unread_guy.id], false)
+      root_convo.add_message(sender, 'test')
+      
+      unread_guy.reload.unread_conversations_count.should eql 1
+      unread_guy.conversations.first.remove_messages(:all)
+      unread_guy.reload.unread_conversations_count.should eql 0
+    end
+
+    it "should decrement when marking as read" do
+      sender = user
+      unread_guy = user
+      root_convo = Conversation.initiate([sender.id, unread_guy.id], false)
+      root_convo.add_message(sender, 'test')
+      
+      unread_guy.reload.unread_conversations_count.should eql 1
+      unread_guy.conversations.first.mark_as_read
+      unread_guy.reload.unread_conversations_count.should eql 0
+    end
+
+    it "should indecrement when marking as unread" do
+      sender = user
+      unread_guy = user
+      root_convo = Conversation.initiate([sender.id, unread_guy.id], false)
+      root_convo.add_message(sender, 'test')
+      unread_guy.conversations.first.mark_as_read
+      
+      unread_guy.reload.unread_conversations_count.should eql 0
+      unread_guy.conversations.first.mark_as_unread
+      unread_guy.reload.unread_conversations_count.should eql 1
+    end
+  end
+
   context "adding messages" do
     it "should deliver the message to all participants" do
       sender = user

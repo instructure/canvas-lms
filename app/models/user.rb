@@ -1618,6 +1618,11 @@ class User < ActiveRecord::Base
     end
   end
 
+  def mark_all_conversations_as_read!
+    conversations.unread.update_all(:workflow_state => 'read')
+    User.update_all 'unread_conversations_count = 0', :id => id
+  end
+
   # association with dynamic, filtered join condition for submissions.
   # This is messy, but in ActiveRecord 2 this is the only way to do an eager
   # loading :include condition that has dynamic join conditions. It looks like

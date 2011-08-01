@@ -225,6 +225,7 @@ javascripts:
   messages:
     - public/javascripts/compiled/messages.js
     - public/javascripts/jquery.elastic.js
+    - public/javascripts/jquery.cookie.js
 
 stylesheets:
   common:

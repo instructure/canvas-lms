@@ -83,6 +83,20 @@ describe ConversationsController do
       response.should be_success
       assigns[:conversation].should_not be_nil
     end
+
+    it "should allow messages to be forwarded the conversation" do
+      course_with_student_logged_in(:active_all => true)
+      conversation.mark_as_unread
+
+      new_user = User.create
+      enrollment = @course.enroll_student(new_user)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+      post 'create', :recipients => [new_user.id.to_s], :body => "here's the info", :forwarded_message_ids => @conversation.messages.map(&:id)
+      response.should be_success
+      assigns[:conversation].should_not be_nil
+      assigns[:conversation].messages.first.forwarded_message_ids.should eql(@conversation.messages.first.id.to_s)
+    end
   end
 
   describe "POST 'update'" do

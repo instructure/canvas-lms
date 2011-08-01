@@ -28,12 +28,12 @@ class Conversation < ActiveRecord::Base
     :through => :conversation_participants,
     :source => :user,
     :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
-    :order => 'last_authored_at DESC, LOWER(COALESCE(short_name, name))'
+    :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
   has_many :subscribed_participants,
     :through => :subscribed_conversation_participants,
     :source => :user,
     :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
-    :order => 'last_authored_at DESC, LOWER(COALESCE(short_name, name))'
+    :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
   has_many :attachments, :through => :conversation_messages
   has_many :media_objects, :through => :conversation_messages
 
@@ -57,6 +57,7 @@ class Conversation < ActiveRecord::Base
           participant.user_id = user_id
           participant.save!
         end
+        User.update_all('unread_conversations_count = unread_conversations_count + 1', :id => user_ids)
       end
       conversation
     end
@@ -70,11 +71,15 @@ class Conversation < ActiveRecord::Base
       user_ids -= conversation_participants.map(&:user_id)
       next if user_ids.empty?
 
+      User.update_all('unread_conversations_count = unread_conversations_count + 1', :id => user_ids)
+
       last_message_at = conversation_messages.human.first.created_at
+      num_messages = conversation_messages.human.size
       user_ids.each do |user_id|
         participant = conversation_participants.build
         participant.user_id = user_id
         participant.last_message_at = last_message_at
+        participant.message_count = num_messages
         participant.save!
       end
 
@@ -97,7 +102,7 @@ class Conversation < ActiveRecord::Base
     add_message(current_user, event_data.to_yaml, true)
   end
 
-  def add_message(current_user, body, generated = false)
+  def add_message(current_user, body, generated = false, forward_message_ids = [])
     transaction do
       lock!
 
@@ -105,6 +110,14 @@ class Conversation < ActiveRecord::Base
       message.author_id = current_user.id
       message.body = body
       message.generated = generated
+      if forward_message_ids.present?
+        messages = ConversationMessage.find_all_by_id(forward_message_ids.map(&:to_i))
+        conversation_ids = messages.map(&:conversation_id).uniq
+        raise "can only forward one conversation at a time" if conversation_ids.size != 1
+        raise "user doesn't have permission to forward these messages" unless current_user.conversations.find_by_conversation_id(conversation_ids.first)
+        # TODO: optimize me
+        message.forwarded_message_ids = messages.map(&:id).join(',')
+      end
       message.save!
 
       # TODO: attachments and media comments
@@ -116,19 +129,32 @@ class Conversation < ActiveRecord::Base
       SQL
 
       unless generated
+        connection.execute("UPDATE conversation_participants SET message_count = message_count + 1 WHERE conversation_id = #{id}")
+
         # make sure this jumps to the top of the inbox and is marked as unread for anyone who's subscribed
+        User.update_all 'unread_conversations_count = unread_conversations_count + 1',
+                        ["id IN (SELECT user_id
+                                 FROM conversation_participants
+                                 WHERE conversation_id = ?
+                                   AND workflow_state <> 'unread'
+                                   AND (last_message_at IS NULL OR subscribed) AND user_id <> ?)",
+                          self.id, current_user.id]
         conversation_participants.update_all(
           {:last_message_at => Time.now.utc, :workflow_state => 'unread'},
           ["(last_message_at IS NULL OR subscribed) AND user_id <> ?", current_user.id]
         )
+
         # for the sender, auto-mark as 'read', and update the last_authored_at
+        if conversation_participants.find_by_user_id_and_workflow_state(current_user.id, 'unread')
+          User.update_all 'unread_conversations_count = unread_conversations_count - 1', :id => current_user.id
+        end
         conversation_participants.update_all(
           {:last_message_at => Time.now.utc, :workflow_state => 'read', :last_authored_at => Time.now.utc},
           ["user_id = ?", current_user.id]
         )
   
-        conversation_participants.update_all({:has_attachments => true}, "NOT has_attachments") if message.attachments
-        conversation_participants.update_all({:has_media_objects => true}, "NOT has_media_objects") if message.media_objects
+        conversation_participants.update_all({:has_attachments => true}, "NOT has_attachments") if message.attachments.present?
+        conversation_participants.update_all({:has_media_objects => true}, "NOT has_media_objects") if message.media_objects.present?
       end
       
       message

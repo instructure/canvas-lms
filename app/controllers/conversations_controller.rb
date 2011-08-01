@@ -20,11 +20,11 @@ class ConversationsController < ApplicationController
   include ConversationsHelper
 
   before_filter :require_user
-  before_filter lambda { @avatar_size = 32 }, :only => :find_recipients
+  before_filter lambda { |c| c.avatar_size = 32 }, :only => :find_recipients
   before_filter :get_conversation, :only => [:show, :update, :destroy, :workflow_event, :add_recipients, :add_message, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
   before_filter :normalize_recipients, :only => [:create, :batch_pm, :add_recipients]
-  add_crumb(lambda { I18n.t 'crumbs.messages', "Messages" }) { |c| c.send :conversations_url }
+  add_crumb(lambda { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
   def index
     @conversations = case params[:scope]
@@ -32,6 +32,19 @@ class ConversationsController < ApplicationController
         @view_name = I18n.t('index.inbox_views.unread', 'Unread')
         @no_messages = I18n.t('no_unread_messages', 'You have no unread messages')
         @current_user.conversations.unread
+      when 'labeled'
+        @label, @view_name = ConversationParticipant.labels.detect{ |l| l.first == params[:label] }
+        @view_name ||= I18n.t('index.inbox_views.labeled', 'Labeled')
+        @no_messages = case @label
+          when 'red': I18n.t('no_red_messages', 'You have no red messages')
+          when 'orange': I18n.t('no_orange_messages', 'You have no orange messages')
+          when 'yellow': I18n.t('no_yellow_messages', 'You have no yellow messages')
+          when 'green': I18n.t('no_green_messages', 'You have no green messages')
+          when 'blue': I18n.t('no_blue_messages', 'You have no blue messages')
+          when 'purple': I18n.t('no_purple_messages', 'You have no purple messages')
+          else I18n.t('no_labeled_messages', 'You have no labeled messages')
+        end
+        @current_user.conversations.labeled(@label)
       when 'archived'
         @view_name = I18n.t('index.inbox_views.archived', 'Archived')
         @no_messages = I18n.t('no_archived_messages', 'You have no archived messages')
@@ -50,9 +63,9 @@ class ConversationsController < ApplicationController
   def create
     if @recipient_ids.present? && params[:body].present?
       @conversation = @current_user.initiate_conversation(@recipient_ids)
-      message = @conversation.add_message(params[:body])
+      message = @conversation.add_message(params[:body], params[:forwarded_message_ids])
       message.generate_user_note if params[:user_note]
-      render :json => {:participants => jsonify_users(@conversation.participants),
+      render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
                        :conversation => jsonify_conversation(@conversation.reload),
                        :message => message}
     else
@@ -74,7 +87,7 @@ class ConversationsController < ApplicationController
 
   def show
     @conversation.mark_as_read! if @conversation.unread?
-    render :json => {:participants => jsonify_users(@conversation.participants),
+    render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
                      :messages => @conversation.messages}
   end
 
@@ -98,13 +111,12 @@ class ConversationsController < ApplicationController
   end
 
   def mark_all_as_read
-    @current_user.conversations.unread.update_all(:workflow_state => 'read')
+    @current_user.mark_all_conversations_as_read!
     render :json => {}
   end
 
   def destroy
-    @conversation.messages.clear
-    @conversation.update_cached_data
+    @conversation.remove_messages(:all)
     render :json => {}
   end
 
@@ -133,11 +145,7 @@ class ConversationsController < ApplicationController
       @conversation.messages.each do |message|
         to_delete << message if params[:remove].include?(message.id.to_s)
       end
-      @conversation.messages.delete(*to_delete)
-      # if the only messages left are generated ones, e.g. "added
-      # bob to the conversation", delete those too
-      @conversation.messages.clear if @conversation.messages.all?(&:generated?)
-      @conversation.update_cached_data
+      @conversation.remove_messages(*to_delete)
       render :json => @conversation
     end
   end
@@ -148,10 +156,10 @@ class ConversationsController < ApplicationController
     recipients = []
     exclude = params[:exclude] || []
     if params[:context]
-      recipients = matching_participants(:search => params[:search], :context => params[:context], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i))
+      recipients = matching_participants(:search => params[:search], :context => params[:context], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i), :blank_avatar_fallback => true)
     elsif params[:search]
       contexts = params[:type] != 'user' ? matching_contexts(params[:search], exclude.grep(/\A(course|group)_\d+\z/)) : []
-      participants = params[:type] != 'context' ? matching_participants(:search => params[:search], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i)) : []
+      participants = params[:type] != 'context' ? matching_participants(:search => params[:search], :limit => max_results, :exclude_ids => exclude.grep(/\A\d+\z/).map(&:to_i), :blank_avatar_fallback => true) : []
       if max_results
         if contexts.size < max_results / 2
           recipients = contexts + participants
@@ -167,6 +175,8 @@ class ConversationsController < ApplicationController
     end
     render :json => recipients
   end
+
+  attr_writer :avatar_size
 
   private
 
@@ -197,7 +207,7 @@ class ConversationsController < ApplicationController
   end
 
   def matching_contexts(search, exclude = [])
-    avatar_url = service_enabled?(:avatars) ? avatar_url_for_group : nil
+    avatar_url = avatar_url_for_group(true)
     @contexts.values.map(&:values).flatten.
       select{ |context| search.downcase.strip.split(/\s+/).all?{ |part| context[:name].downcase.include?(part) } }.
       select{ |context| context[:active] }.
@@ -214,7 +224,7 @@ class ConversationsController < ApplicationController
   end
 
   def matching_participants(options)
-    jsonify_users(@current_user.messageable_users(options))
+    jsonify_users(@current_user.messageable_users(options), options.delete(:blank_avatar_fallback))
   end
 
   def get_conversation
@@ -222,17 +232,17 @@ class ConversationsController < ApplicationController
   end
 
   def jsonify_conversation(conversation)
-    hash = {:audience => formatted_audience(conversation, 4)}
+    hash = {:audience => formatted_audience(conversation, 3)}
     hash[:avatar_url] = avatar_url_for(conversation)
     conversation.as_json.merge(hash)
   end
 
-  def jsonify_users(users)
+  def jsonify_users(users, blank_avatar_fallback = false)
     ids_present = users.first.respond_to?(:common_course_ids)
     users.map { |user|
       {:id => user.id,
        :name => user.short_name,
-       :avatar => avatar_url_for_user(user),
+       :avatar => avatar_url_for_user(user, blank_avatar_fallback),
        :course_ids => ids_present ? user.common_course_ids : [],
        :group_ids => ids_present ? user.common_group_ids : []
       }
