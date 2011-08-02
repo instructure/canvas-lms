@@ -63,7 +63,7 @@ class ConferencesController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json { render :json => WebConference.find(@conference).to_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :action => "new" }
+          format.html { render :action => 'index' }
           format.xml { render :xml => @conference.errors.to_xml, :status => :bad_request }
           format.json { render :json => @conference.errors.to_json, :status => :bad_request }
         end
