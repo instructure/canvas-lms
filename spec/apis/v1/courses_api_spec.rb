@@ -165,6 +165,11 @@ describe CoursesController, :type => :integration do
             { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:my-course-sis', :format => 'json' })
     json.should == api_json_response([first_user, new_user],
         :only => USER_API_FIELDS)
+
+    json = api_call(:get, "/api/v1/courses/sis_course_id:my-course-sis.json",
+            { :controller => 'courses', :action => 'show', :id => 'sis_course_id:my-course-sis', :format => 'json' })
+    json['id'].should == @course2.id
+    json['sis_course_id'].should == 'my-course-sis'
   end
 
   it "should return the needs_grading_count for all assignments" do
@@ -204,5 +209,10 @@ describe CoursesController, :type => :integration do
       },
     ]
   end
-  
+
+  it "should get individual course data" do
+    json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
+            { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
+    json['id'].should == @course1.id
+  end
 end
