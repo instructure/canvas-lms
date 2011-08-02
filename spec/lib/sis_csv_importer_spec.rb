@@ -18,6 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+def gen_ssha_password(password)
+  salt = ActiveSupport::SecureRandom.random_bytes(10)
+  "{SSHA}" + Base64.encode64(Digest::SHA1.digest(password+salt).unpack('H*').first+salt).gsub(/\s/, '')
+end
+
 describe SIS::SisCsv do
   before do
     account_model
@@ -380,7 +385,7 @@ describe SIS::SisCsv do
   
   context "user importing" do
     it "should create new users and update names" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active"
       )
@@ -396,7 +401,7 @@ describe SIS::SisCsv do
       cc = user.communication_channels.first
       cc.path.should eql("user@example.com")
       
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno 2,user@example.com,active"
       )
@@ -413,7 +418,7 @@ describe SIS::SisCsv do
       user.name = "My Awesome Name"
       user.save
       
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno 2,user@example.com,active"
       )
@@ -423,10 +428,10 @@ describe SIS::SisCsv do
     end
 
     it "should set passwords and not overwrite current passwords" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
         "user_1,user1,badpassword,User,Uno 2,user@example.com,active,",
-        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}Y2FiODZkZDYyNjE3MTA4OTFlOGNiNTZlZTM2MjU2OTFhNzVkZjM0NHNhbHRzYWx0"
+        "user_2,user2,,User,Uno 2,user2@example.com,active,#{gen_ssha_password("password")}"
       )
       user1 = User.find_by_email('user@example.com')
       p = user1.pseudonyms.first
@@ -447,10 +452,10 @@ describe SIS::SisCsv do
       p.valid_arbitrary_credentials?('password').should be_false
       p.valid_arbitrary_credentials?('newpassword').should be_true
 
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
         "user_1,user1,badpassword2,User,Uno 2,user@example.com,active",
-        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}ZDg1ZmJhMjNmZWU0ZmFiMmYzYTJhNTMxNzZiNjcyZWFhMzE0ZTQzMXNhbHR5"
+        "user_2,user2,,User,Uno 2,user2@example.com,active,#{gen_ssha_password("changedpassword")}"
       )
       
       user1.reload
@@ -467,6 +472,78 @@ describe SIS::SisCsv do
       p.valid_ssha?('changedpassword').should be_true
     end
     
+    it "should allow setting and resetting of passwords" do
+      User.find_by_email("user1@example.com").should be_nil
+      User.find_by_email("user2@example.com").should be_nil
+
+      process_csv_data_cleanly(
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,password1,User,Uno,user1@example.com,active,",
+        "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass1")}"
+      )
+
+      User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('password1').should be_true
+        p.valid_arbitrary_credentials?('password2').should be_false
+        p.valid_arbitrary_credentials?('password3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+      end
+
+      User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('encpass1').should be_true
+        p.valid_arbitrary_credentials?('encpass2').should be_false
+        p.valid_arbitrary_credentials?('encpass3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+      end
+
+      process_csv_data_cleanly(
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,password2,User,Uno,user1@example.com,active,",
+        "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass2")}"
+      )
+
+      User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('password1').should be_false
+        p.valid_arbitrary_credentials?('password2').should be_true
+        p.valid_arbitrary_credentials?('password3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+
+        p.password_confirmation = p.password = 'password4'
+        p.save
+      end
+
+      User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('encpass1').should be_false
+        p.valid_arbitrary_credentials?('encpass2').should be_true
+        p.valid_arbitrary_credentials?('encpass3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+
+        p.password_confirmation = p.password = 'password4'
+        p.save
+      end
+
+      process_csv_data_cleanly(
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,password3,User,Uno,user1@example.com,active,",
+        "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass3")}"
+      )
+
+      User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('password1').should be_false
+        p.valid_arbitrary_credentials?('password2').should be_false
+        p.valid_arbitrary_credentials?('password3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_true
+      end
+
+      User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('encpass1').should be_false
+        p.valid_arbitrary_credentials?('encpass2').should be_false
+        p.valid_arbitrary_credentials?('encpass3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_true
+      end
+
+    end
+
     it "should warn for duplicate rows" do
       importer = process_csv_data(
         "user_id,login_id,first_name,last_name,email,status",
