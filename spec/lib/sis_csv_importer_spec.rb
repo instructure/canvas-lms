@@ -212,14 +212,52 @@ describe SIS::SisCsv do
       }
     end
 
-    it 'should disallow instantiations of nonexistent abstract courses' do
-      beforecount = Course.count
+    it 'should skip references to nonexistent abstract courses' do
+      process_csv_data_cleanly(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter13,active,,"
+      )
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount,active"
+      )
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
-        "C001,,,,,active,AC001"
-      ).tap{|i| i.errors.should == []; i.warnings.map(&:last).should == [
-          "unknown abstract course id AC001"]}
-      Course.count.should == beforecount
+        "C001,shortname,longname,,,active,AC001"
+      ).tap do |i|
+        i.errors.should == []
+        i.warnings.map(&:last).should == [
+            "unknown abstract course id AC001, ignoring abstract course reference"]
+      end
+      Course.last.tap{|c|
+        c.sis_source_id.should == "C001"
+        c.abstract_course.should be_nil
+        c.short_name.should == "shortname"
+        c.name.should == "longname"
+        c.enrollment_term.should == @account.default_enrollment_term
+        c.account.should == @account
+        c.root_account.should == @account
+      }
+      process_csv_data_cleanly(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        "AC001,Hum101,Humanities,A001,T001,active"
+      )
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
+        "C001,shortname,longname,,,active,AC001"
+      )
+      Course.last.tap{|c|
+        c.sis_source_id.should == "C001"
+        c.abstract_course.should == AbstractCourse.last
+        c.abstract_course.sis_source_id.should == "AC001"
+        c.short_name.should == "shortname"
+        c.name.should == "longname"
+        c.enrollment_term.should == EnrollmentTerm.last
+        c.enrollment_term.name.should == "Winter13"
+        c.account.should == Account.last
+        c.account.name.should == "TestAccount"
+        c.root_account.should == @account
+      }
     end
 
     it "should support falling back to a fallback account if the primary one doesn't exist" do
