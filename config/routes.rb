@@ -645,7 +645,7 @@ ActionController::Routing::Routes.draw do |map|
   ApiRouteSet.new(map, "/api/v1") do |api|
     api.resources :courses,
                   :name_prefix => "api_v1_",
-                  :only => %w(index) do |course|
+                  :only => %w(index show) do |course|
       course.students 'students.:format',
         :controller => 'courses', :action => 'students',
         :conditions => { :method => :get }
