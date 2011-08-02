@@ -88,10 +88,10 @@ module SIS
             abstract_course = nil
             if row['abstract_course_id'].present? 
               abstract_course = AbstractCourse.find_by_root_account_id_and_sis_source_id(@root_account.id, row['abstract_course_id'])
-              unless abstract_course
-                add_warning(csv, "unknown abstract course id #{row['abstract_course_id']}")
-                next
-              end
+              add_warning(csv, "unknown abstract course id #{row['abstract_course_id']}, ignoring abstract course reference") unless abstract_course
+            end
+
+            if abstract_course
               if row['term_id'].blank? && course.enrollment_term_id != abstract_course.enrollment_term
                 course.send(:association_instance_set, :enrollment_term, nil)
                 course.enrollment_term_id = abstract_course.enrollment_term_id
