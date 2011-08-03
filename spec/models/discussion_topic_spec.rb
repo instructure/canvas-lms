@@ -60,18 +60,39 @@ describe DiscussionTopic do
   end
   
   context "delayed posting" do
+    def delayed_discussion_topic(opts = {})
+      @topic = @course.discussion_topics.build(opts)
+      @topic.workflow_state = 'post_delayed'
+      @topic.save!
+      @topic
+    end
+    
     it "shouldn't send to streams on creation or update if it's delayed" do
       course_with_student(:active_all => true)
       @user.register
       topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
       StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
       
-      topic = @course.discussion_topics.create!(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
+      topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
       StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
       
       topic.message = "content changed!"
       topic.save
       StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+    end
+
+    it "should send to streams on update from delayed to active" do
+      course_with_student(:active_all => true)
+      @user.register
+      topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
+      topic.workflow_state.should == 'post_delayed'
+      StreamItem.find_by_item_asset_string(topic.asset_string).should be_nil
+      
+      topic.delayed_post_at = nil
+      topic.title = "this isn't delayed any more"
+      topic.workflow_state = 'active'
+      topic.save!
+      StreamItem.find_by_item_asset_string(topic.asset_string).should_not be_nil
     end
   end
   
