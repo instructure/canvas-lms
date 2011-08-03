@@ -32,7 +32,7 @@ javascripts:
     - public/javascripts/ajax_errors.js
     - public/javascripts/page_views.js
     - public/javascripts/feedback.js
-    - public/javascripts/license_help.js
+    - public/javascripts/compiled/license_help.js
     - public/javascripts/wiki_sidebar.js
     - public/javascripts/translations/_core_en.js
   speed_grader:
