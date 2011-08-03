@@ -60,7 +60,11 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   def ldap_ip
-    Socket::getaddrinfo(self.auth_host, 'http', nil, Socket::SOCK_STREAM)[0][3]
+    begin
+      return Socket::getaddrinfo(self.auth_host, 'http', nil, Socket::SOCK_STREAM)[0][3]
+    rescue SocketError
+      return nil
+    end
   end
   
   def auth_password=(password)
