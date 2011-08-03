@@ -555,9 +555,7 @@ class Account < ActiveRecord::Base
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     unless self.root_account_id
-      # TODO i18n
-      t '#account.default_term_name', "Default Term"
-      @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name("Default Term")
+      @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
     end
   end
   
