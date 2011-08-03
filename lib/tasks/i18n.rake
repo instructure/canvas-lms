@@ -146,9 +146,18 @@ namespace :i18n do
   end
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
-  task :generate_js => :environment do
+  task :generate_js do
+    require 'bundler'
+    Bundler.setup
+    require 'action_controller'
+    require 'i18n'
+    require 'sexp_processor'
+    require 'jammit'
+    require 'lib/i18n_extractor.rb'
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
+                      Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
+
     Hash.send :include, HashExtensions
-    I18nExtractor
 
     files = Dir.glob('public/javascripts/*.js').
       reject{ |file| file =~ /\Apublic\/javascripts\/(i18n.js|translations\/)/ }
