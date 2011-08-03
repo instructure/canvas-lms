@@ -26,7 +26,7 @@ class ApplicationController < ActionController::Base
   include LocaleSelection
   around_filter :set_locale
 
-  add_crumb "home", :root_path, :class => "home"
+  add_crumb(lambda { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
   helper :all
   filter_parameter_logging :password
   
