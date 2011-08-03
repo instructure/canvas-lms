@@ -15,10 +15,11 @@ module LocaleSelection
       account_locale
     elsif root_account && root_account.default_locale
       root_account.default_locale
-    elsif accept_language
-      locale = infer_browser_locale(accept_language, I18n.available_locales)
-      user.update_attribute(:browser_locale, locale) if user && locale && user.browser_locale != locale
+    elsif accept_language && locale = infer_browser_locale(accept_language, I18n.available_locales)
+      user.update_attribute(:browser_locale, locale) if user && user.browser_locale != locale
       locale
+    elsif user && user.browser_locale
+      user.browser_locale
     end || I18n.default_locale.to_s
   end
 
