@@ -230,7 +230,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
   
   on_update_send_to_streams do
-    if should_send_to_stream && (@delayed_just_posted || @content_changed)
+    if should_send_to_stream && (@delayed_just_posted || @content_changed || changed_state(:active, :post_delayed))
       self.participants
     end
   end
