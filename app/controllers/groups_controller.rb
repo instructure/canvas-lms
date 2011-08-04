@@ -71,7 +71,7 @@ class GroupsController < ApplicationController
       redirect_to named_context_url(@group.context, :context_url)
       return
     end
-    @current_conferences = @group.context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
+    @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
     @groups = @current_user.group_memberships_for(@group.context) if @current_user
     if params[:join] && @group.allow_join_request?(@current_user)
       @group.request_user(@current_user)

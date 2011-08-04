@@ -364,6 +364,7 @@ ActionController::Routing::Routes.draw do |map|
     group.named_wiki_page 'wiki/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
     group.resources :conferences do |conference|
       conference.join "join", :controller => "conferences", :action => "join"
+      conference.close "close", :controller => "conferences", :action => "close"
     end
     group.chat 'chat', :controller => 'context', :action => 'chat'
     group.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'

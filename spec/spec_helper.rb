@@ -195,6 +195,7 @@ Spec::Runner.configure do |config|
     pseudonym ||= mock_model(Pseudonym, {:record => user})
     pseudonym.stub!(:user_id).and_return(user.id)
     pseudonym.stub!(:user).and_return(user)
+    pseudonym.stub!(:login_count).and_return(1)
     session = mock_model(PseudonymSession)
     session.stub!(:record).and_return(pseudonym)
     session.stub!(:session_credentials).and_return(nil)

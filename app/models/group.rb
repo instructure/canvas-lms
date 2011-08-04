@@ -322,6 +322,7 @@ class Group < ActiveRecord::Base
   TAB_DISCUSSIONS = 3
   TAB_CHAT = 4
   TAB_FILES = 5
+  TAB_CONFERENCES = 6
   def tabs_available(user=nil, opts={})
     available_tabs = [
       { :id => TAB_HOME,        :label => t("#group.tabs.home", "Home"), :href => :group_path }, 
@@ -331,6 +332,8 @@ class Group < ActiveRecord::Base
       { :id => TAB_CHAT,        :label => t("#group.tabs.chat", "Chat"), :href => :group_chat_path }, 
       { :id => TAB_FILES,       :label => t("#group.tabs.files", "Files"), :href => :group_files_path }
     ]
+    available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :href => :group_conferences_path } if user && self.grants_right?(user, nil, :create_conferences)
+    available_tabs
   end
 
   def self.serialization_excludes; [:uuid]; end

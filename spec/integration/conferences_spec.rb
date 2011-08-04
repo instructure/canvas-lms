@@ -53,4 +53,21 @@ describe ConferencesController do
     response.should be_redirect
     Set.new(Message.all.map(&:user)).should == Set.new([@teacher, @student1, @student2, @student3])
   end
+
+  it "should render the correct conferences for group news feed" do
+    course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
+    @group = @course.groups.create!(:name => "some group")
+    @group.add_user(@user)
+
+    course_conference = @course.web_conferences.create!(:conference_type => 'Wimba') { |c| c.start_at = Time.now }
+    group_conference = @group.web_conferences.create!(:conference_type => 'Wimba') { |c| c.start_at = Time.now }
+    course_conference.add_initiator(@user)
+    group_conference.add_initiator(@user)
+
+    get "/courses/#{@course.id}/groups/#{@group.id}"
+    response.should be_success
+
+    response.body.should_not match(/conference_#{course_conference.id}/)
+    response.body.should match(/conference_#{group_conference.id}/)
+  end
 end
