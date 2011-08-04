@@ -272,7 +272,7 @@ var I18n = I18n || {};
   def section_tabs
     @section_tabs ||= begin
       if @context 
-        Rails.cache.fetch([@context, @current_user, "section_tabs"].cache_key) do
+        Rails.cache.fetch([@context, @current_user, "section_tabs", I18n.locale].cache_key) do
           if @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user).empty?
             html = []
             html << '<nav role="navigation"><ul id="section-tabs">'
@@ -446,5 +446,13 @@ var I18n = I18n || {};
 
   def join_title(*parts)
     parts.join(t('#title_separator', ': '))
+  end
+
+  def cache(name = {}, options = nil, &block)
+    unless options && options[:no_locale]
+      name = name.cache_key if name.respond_to?(:cache_key)
+      name = name + "/#{I18n.locale}" if name.is_a?(String)
+    end
+    super
   end
 end
