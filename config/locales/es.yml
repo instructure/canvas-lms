@@ -8092,18 +8092,18 @@ es:
         allow_file_uploads: "Permitir Cargas de Archivos"
         allow_media_recordings: "Permitir Grabaciones de Media"
         allow_text_entry: "Permitir Ingreso de Texto"
-        allow_url: "Permitir el URL de la P‡gina Web"
+        allow_url: "Permitir el URL de la Página Web"
         allowed_extensions: "Extensiones de Archivo Permisibles"
         assign_grades_individually: "Asignar calificaciones a cada estudiante individualmente"
         assign_grades_individually_subtext: "(normalmente todos los estudiantes reciben la misma Calificación  en tareas de grupo)"
-        assignment_description: "Descripció n de la Tarea"
+        assignment_description: "Descripción de la Tarea"
         assignment_group_id: "Grupo de Trabajo"
-        due: "Fecha L’mite"
-        grades_from_quiz: "Calificaciones para esta tarea vienen de la evaluació n"
+        due: "Fecha Límite"
+        grades_from_quiz: "Calificaciones para esta tarea vienen de la evaluación"
         grading_type: "Calificar por"
         group_assignment: "Esta es una Tarea de Grupo"
         group_set: "Grupo Establecido"
-        lock_submits_after: "Bloquear los Env’os despuŽs de"
+        lock_submits_after: "Bloquear los Envíos después de"
         locked_until: "Bloqueado Hasta"
         manually_assign_peer_reviews: "Asignar Revisiones por Pares Manualmente"
         master_level: "Nivel de Dominio"
@@ -8112,23 +8112,23 @@ es:
         peer_review_count: "Revisiones por Usuario"
         peer_reviews_assign_at: "Asignar Revisiones"
         points_possible: Puntos
-        quiz_summary: "Resumen/Introducció n de la Evaluació n"
+        quiz_summary: "Resumen/Introducción de la Evaluación"
         require_peer_reviews: "Requerir Revisiones por Pares"
         restrict_file_extensions: "Restringir las Extensiones de Cargas de Archivos Permisibles"
         score_range: "Rango de Calificaciones"
-        submission: Env’o
-        title: T’tulo
-        turnitin_enabled: "Activar Env’os de Evaluaciones en Turnitin"
+        submission: Enviío
+        title: Título
+        turnitin_enabled: "Activar Envíos de Evaluaciones en Turnitin"
         type: Tipo
       lables: 
         automatically_assign_peer_reviews: "Asignar Revisiones por Pares Automáticamente"
-      linked_to_discussion: "Esta tarea est‡ enlazada a la discusió n %{discussion_topic}. La Calificación  estar‡ basada en contribuciones en el tema."
+      linked_to_discussion: "Esta tarea está enlazada a la discusión %{discussion_topic}. La Calificación estará basada en contribuciones en el tema."
       links: 
-        discussion: "Haga click aqu’ para ir a la discusió n"
+        discussion: "Haga click aquií para ir a la discusión"
         edit_assignment_details: "Editar los Detalles de la Tarea"
-        more_grading_options: "m‡s opciones de Calificación"
-        more_options: "m‡s opciones"
-        quiz: "Haga click aqu’ para ir a la evaluació n"
+        more_grading_options: "más opciones de Calificación"
+        more_options: "más opciones"
+        quiz: "Haga click aquí para ir a la evaluación"
         switch_views: "Cambiar de Vistas"
         view_grading_levels: "Ver los Niveles de Calificación"
       mastery_level: "%{points} pts o más"
@@ -8147,7 +8147,7 @@ es:
         pass_fail: Completo/Incompleto
         percentage: Porcentaje
         points: Puntos
-        quiz: "Evaluació n"
+        quiz: "Evaluación"
         select_group_set: "[ Seleccionar una Serie de Grupo ]"
       out_of: "de %{points}"
       score_range: "%{min_score} a %{max_score}"
