@@ -492,7 +492,7 @@ jQuery(function($) {
   $(".communication_sub_message .add_conversation_message_form").formSubmit({
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true);
-      $(this).find(".submit_button").text("Posting Message...");
+      $(this).find(".submit_button").text(I18n.t('status.posting_message', "Posting Message..."));
       $(this).loadingImage();
     },
     success: function(data) {
