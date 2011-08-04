@@ -15,7 +15,13 @@ module BasicLTI
     })
     path = uri.path
     path = '/' if path.empty?
-    path += "?" + uri.query if !uri.query.blank?
+    if !uri.query.blank?
+      CGI.parse(uri.query).each do |query_key, query_values|
+        unless params[query_key]
+          params[query_key] = query_values.first
+        end
+      end
+    end
     request = consumer.send(:create_http_request, :post, path, params)
     options = {
                 :request_uri      => request.send(:oauth_full_request_uri, consumer.http),
