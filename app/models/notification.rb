@@ -139,7 +139,6 @@ class Notification < ActiveRecord::Base
     current_locale = I18n.locale
 
     tos = tos.flatten.compact.uniq
-    mailbox = asset.messaging_mailbox
     @delayed_messages_to_save = []
     recipient_ids = []
     recipients = []
@@ -203,7 +202,6 @@ class Notification < ActiveRecord::Base
         message.body = self.body
         message.body = self.sms_body if c.respond_to?("path_type") && c.path_type == "sms"
         message.notification_name = self.name
-        message.from = mailbox ? mailbox.path : nil
         message.communication_channel = c if c.is_a?(CommunicationChannel)
         message.dispatch_at = nil
         message.user = user
