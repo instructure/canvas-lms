@@ -77,7 +77,7 @@ def generate_assets
 end
 
 def serialize_static_pages
-  %w( basics.md oauth.md ).each do |file|
+  %w( authentication.md object_ids.md pagination.md oauth.md ).each do |file|
     options[:file] = "doc/templates/rest/#{file}"
     serialize(file.sub(/\..*$/, '.html'))
     options.delete(:file)

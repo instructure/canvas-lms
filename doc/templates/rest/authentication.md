@@ -1,17 +1,5 @@
-Request/Response Basics
-=======================
-
-Schema
-------
-
-All API access is over HTTPS and is of the form
-
-    /api/v1/<path>.json
-
-All responses are in <a href="http://www.json.org/">JSON format</a>.
-
 Authentication
---------------
+==============
 
 ### Access Tokens
 
@@ -96,20 +84,6 @@ list the courses that your user is enrolled in as a teacher:
       }
     ]
 
-SSL
----
-
-Canvas Cloud Edition requires all API access to be over SSL, using
-HTTPS. By default, open source installs have this requirement as well.
-Open source installs are strongly encouraged to require SSL for API
-calls, since the username and password are sent in the clear for HTTP
-Basic Auth, or the access token for oauth, if SSL is not used.
-
-Note that if you make an API call using HTTP instead of HTTPS, you will
-be redirected to HTTPS. However, at that point, the credentials
-have already been sent in clear over the internet. Please make
-sure that you are using HTTPS.
-
 API Keys
 --------
 
@@ -136,31 +110,3 @@ request, for example:
 
 If you have trouble getting your Rails console to start, please see the
 Rails console section on our <a href="https://github.com/instructure/canvas-lms/wiki/Troubleshooting">Troubleshooting wiki page</a>.
-
-Object IDs
-----------
-
-Throughout the API, objects are referenced by internal ids. You can also
-reference objects by sis id, by prepending the sis id with the name of
-the sis field, like "sis\_course\_id:". For instance, to retrieve the
-list of assignments for a course with sis id of 'A1234':
-
-    /api/v1/courses/sis_course_id:A1234/assignments.json
-    
-Pagination
-----------
-
-Requests that return multiple items will be paginated to 10 items by default. Further pages
-can be requested with the `?page` query parameter. You can set a custom per-page amount
-with the `?per_page` parameter.
-
-Pagination information is provided in the [link Header](http://www.w3.org/Protocols/9707-link-header.html):
-
-    Link: </courses/:id/discussion_topics.json?page=2&per_page=10>; rel="next",</courses/:id/discussion_topics.json?page=1&per_page=10>; rel="first",</courses/:id/discussion_topics.json?page=5&per_page=10>; rel="last"
-
-The possible `rel` values are:
-
-* next - link to the next page of results. None is sent if there is no next page.
-* prev - link to the previous page of results. None is sent if there is no previous page.
-* first - link to the first page of results. None is sent if there are no pages.
-* last - link to the last page of results. None is sent if there are no pages.

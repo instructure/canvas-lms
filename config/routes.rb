@@ -645,42 +645,40 @@ ActionController::Routing::Routes.draw do |map|
 
   Jammit::Routes.draw(map) if defined?(Jammit)
 
-  # API routes
-  ApiRouteSet.new(map, "/api/v1") do |api|
-    api.resources :courses,
-                  :name_prefix => "api_v1_",
-                  :only => %w(index show) do |course|
-      course.students 'students.:format',
-        :controller => 'courses', :action => 'students',
-        :conditions => { :method => :get }
-      course.sections 'sections.:format',
-        :controller => 'courses', :action => 'sections',
-        :conditions => { :method => :get }
-      course.resources :assignments,
-                        :controller => 'assignments_api',
-                        :only => %w(show index create update) do |assignment|
-        assignment.resources :submissions,
-                        :controller => 'submissions_api',
-                        :only => %w(index show update)
-      end
-      course.resources :assignment_groups,
-                        :only => %w(index)
-      course.student_submissions 'students/submissions.:format',
-        :controller => 'submissions_api', :action => 'for_students',
-        :conditions => { :method => :get }
-      course.resources :discussion_topics,
-                       :only => %w(index)
+  ### API routes ###
+
+  ApiRouteSet::V1.route(map) do |api|
+    api.with_options(:controller => :courses) do |courses|
+      courses.get 'courses', :action => :index
+      courses.get 'courses/:id', :action => :show
+      courses.get 'courses/:course_id/sections', :action => :sections
+      courses.get 'courses/:course_id/students', :action => :students
+      courses.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students
     end
-    api.resources :groups,
-                  :name_prefix => "api_v1_",
-                  :only => %w() do |group|
-      group.resources :discussion_topics,
-                       :only => %w(index)
+
+    api.with_options(:controller => :assignments_api) do |assignments|
+      assignments.get 'courses/:course_id/assignments', :action => :index
+      assignments.get 'courses/:course_id/assignments/:id', :action => :show
+      assignments.post 'courses/:course_id/assignments', :action => :create
+      assignments.put 'courses/:course_id/assignments/:id', :action => :update
     end
-    api.resources :accounts, :only => %{} do |account|
-      account.resources :sis_imports,
-                        :controller => 'sis_imports_api',
-                        :only => %w(show create)
+
+    api.with_options(:controller => :submissions_api) do |submissions|
+      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions', :action => :index
+      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show
+      submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update
+    end
+
+    api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index
+
+    api.with_options(:controller => :discussion_topics) do |topics|
+      topics.get 'courses/:course_id/discussion_topics', :action => :index, :path_name => 'course_discussion_topics'
+      topics.get 'groups/:group_id/discussion_topics', :action => :index, :path_name => 'group_discussion_topics'
+    end
+
+    api.with_options(:controller => :sis_imports_api) do |sis|
+      sis.post 'accounts/:account_id/sis_imports', :action => :create
+      sis.get 'accounts/:account_id/sis_imports/:id', :action => :show
     end
   end
 
