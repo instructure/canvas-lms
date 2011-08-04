@@ -3,21 +3,64 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "profile selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
-  it "should not have any javascript errors while adding an email address" do
-    course_with_student_logged_in
-    
+  it "should add a new email address" do
+    course_with_teacher_logged_in
+    notification_model(:category => 'Grading')
+    notification_policy_model(:notification_id => @notification.id)
     get "/profile"
-    driver.find_element(:css, ".add_email_link").click
+
+    #Add email address to profile
+    driver.find_element(:css, '#right-side .add_email_link').click
+    driver.find_element(:css, '#communication_channels a[href="#register_sms_number"]').click
+    driver.find_element(:css, '#communication_channels a[href="#register_email_address"]').click
     form = driver.find_element(:id, "register_email_address")
-    form.find_element(:id, "pseudonym_unique_id").send_keys("nobody+1234@example.com")
-    form.find_element(:class, "button").click
-    
+    test_email = 'nobody+1234@example.com'
+    form.find_element(:id, 'pseudonym_unique_id').send_keys(test_email)
+    form.find_element(:id, 'register_email_address').submit
+
     confirmation_dialog = driver.find_element(:id, "confirm_email_channel")
     keep_trying_until { confirmation_dialog.displayed? }
-    
     driver.execute_script("return INST.errorCount;").should == 0
     confirmation_dialog.find_element(:css, "button").click
-    confirmation_dialog.displayed?.should be_false
+    confirmation_dialog.should_not be_displayed
+
+    driver.find_element(:link, test_email).should be_displayed
+  end
+
+  it "should modify user notification policies" do
+    course_with_teacher_logged_in
+    second_email = 'nobody+1234@example.com'
+    communication_channel_model(:user_id => @user.id, :path => second_email, :path_type => 'email')
+
+    notification_model(:category => 'Grading')
+    notification_policy_model(:notification_id => @notification.id)
+    get "/profile"
+   
+    #Test modifying notifications
+    driver.find_element(:css, '#section-tabs .notifications').click
+    content_tbody = driver.find_element(:css, '#content > table > tbody')
+
+    content_tbody.find_element(:css, 'tr:nth-child(2) > td').
+      should include_text(I18n.t(:grading_description, 'For course grading alerts'))
+    #add new notification and select different email
+    content_tbody.find_element(:css, '.add_notification_link').click
+    wait_for_dom_ready
+    email_select_css = '#content > table > tbody > tr:nth-child(4) > td > span > select'
+    option_value = find_option_value(:css, email_select_css, second_email)
+    driver.find_element(:css, email_select_css+' > option[value="'+option_value+'"]').click
+
+    #change notification setting for first notification
+    daily_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(4) > div')
+    daily_select.click
+    daily_select.find_element(:xpath, '..').should have_class('selected_pending')
+    #change notification setting for second notification
+    never_select = content_tbody.find_element(:css, 'tr:nth-child(4) > td:nth-child(3) > div')
+    never_select.click
+    never_select.find_element(:xpath, '..').should have_class('selected_pending')
+    driver.find_element(:css, '#content .save_preferences_button').click
+    driver.navigate.refresh
+    wait_for_dom_ready
+    driver.find_element(:css, email_select_css + ' > option[selected]').text.should == second_email 
   end
 
   it "should successfully upload profile pictures" do
@@ -43,6 +86,7 @@ shared_examples_for "profile selenium tests" do
     
     Attachment.last.folder.should == @user.profile_pics_folder
   end
+
 end
 
 describe "course Windows-Firefox-Tests" do

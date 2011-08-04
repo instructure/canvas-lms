@@ -203,6 +203,36 @@ Spec::Runner.configure do |config|
     PseudonymSession.stub!(:find).and_return(session)
   end
 
+  def outcome_with_rubric(opts={})
+    @outcome = @course.learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>')
+    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
+    @rubric.data = [
+      {
+        :points => 3,
+        :description => "Outcome row",
+        :long_description => @outcome.description,
+        :id => 1,
+        :ratings => [
+          {
+            :points => 3,
+            :description => "Rockin'",
+            :criterion_id => 1,
+            :id => 2
+          },
+          {
+            :points => 0,
+            :description => "Lame",
+            :criterion_id => 1,
+            :id => 3
+          }
+        ],
+        :learning_outcome_id => @outcome.id
+      }
+    ]
+    @rubric.instance_variable_set('@outcomes_changed', true)
+    @rubric.save!
+  end
+
   def eportfolio(opts={})
     user(opts)
     @portfolio = @user.eportfolios.create!

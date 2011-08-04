@@ -1004,12 +1004,12 @@ I18n.scoped('gradebook', function(I18n) {
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
 	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
 	                  .replace("{{attachmentId}}", attachment.id);
-	        $iframe_holder.html('<iframe src="'+src+'" frameborder="0"></iframe>').show();
+	        $iframe_holder.html('<iframe src="'+src+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
 	      }
 	      else {
 	        //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
 	        $iframe_holder.html(
-            '<iframe src="/courses/' + jsonData.context_id  +
+            '<iframe id="speedgrader_iframe" src="/courses/' + jsonData.context_id  +
             '/assignments/' + this.currentStudent.submission.assignment_id +
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (

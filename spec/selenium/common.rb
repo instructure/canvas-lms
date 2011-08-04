@@ -300,7 +300,54 @@ shared_examples_for "all selenium tests" do
     yield
     driver.switch_to.window saved_window_handle
   end
-  
+
+  def find_option_value(selector_type, selector_css, option_text)
+    select = driver.find_element(selector_type, selector_css)
+    select.click
+    options = select.find_elements(:css, 'option')
+    option_value = ''
+    for option in options
+      if option.text == option_text
+        option_value = option.attribute('value')
+        break
+      end
+    end
+    option_value
+  end 
+
+  def element_exists(selector_type, selector)
+    exists = false
+    begin
+      driver.find_element(selector_type, selector)
+      exists = true
+    rescue
+    end
+    exists
+  end
+
+  def datepicker_prev
+   sleep 1
+  end
+
+  def datepicker_next
+    sleep 1
+  end
+ 
+  def stub_kaltura
+    # trick kaltura into being activated
+    Kaltura::ClientV3.stub!(:config).and_return({
+          :domain => 'kaltura.example.com',
+          :resource_domain => 'kaltura.example.com',
+          :partner_id => '100',
+          :subpartner_id => '10000',
+          :secret_key => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+          :user_secret_key => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+          :player_ui_conf => '1',
+          :kcw_ui_conf => '1',
+          :upload_ui_conf => '1'
+    })
+  end
+
   def get(link)
     driver.get(app_host + link)
     wait_for_dom_ready
