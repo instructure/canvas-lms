@@ -2051,7 +2051,7 @@ var fileStructureData = [];
         height: 22,
         cancelImg: '/images/blank.png',
         onInit: function() {
-          $add_file_link.text("Add Files").triggerHandler('show'); 
+          $add_file_link.text(I18n.t('links.add_files', "Add Files")).triggerHandler('show');
         },
         onSelect: fileUpload.swfFileQueue,
         onCancel: fileUpload.swfCancel,

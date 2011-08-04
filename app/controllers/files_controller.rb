@@ -91,7 +91,7 @@ class FilesController < ApplicationController
   def full_index
     get_context
     get_quota
-    add_crumb("Files", named_context_url(@context, :context_files_url))
+    add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url))
     @contexts = [@context]
     if !@context.is_a?(User) || (@context == @current_user && params[:show_all_contexts])
       get_all_pertinent_contexts
