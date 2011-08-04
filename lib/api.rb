@@ -47,7 +47,10 @@ module Api
       if_id ? if_id.call(id) : id
     else
       id = id.to_s
-      if id =~ %r{^(sis_[\w_]+):(.+)$} && valid_columns.key?($1)
+      if id =~ %r{^hex:(sis_[\w_]+):(.+)$} && valid_columns.key?($1)
+        val = [$2].pack('H*')
+        if_sis_id ? if_sis_id.call(valid_columns[$1], val) : val
+      elsif id =~ %r{^(sis_[\w_]+):(.+)$} && valid_columns.key?($1)
         if_sis_id ? if_sis_id.call(valid_columns[$1], $2) : $2
       else
         if_id ? if_id.call(id) : id
@@ -73,7 +76,7 @@ module Api
   def self.set_pagination_headers!(collection, response, base_url)
     return unless collection.respond_to?(:next_page)
     links = []
-    template = "<#{base_url}.json?page=%s&per_page=#{collection.per_page}>; rel=\"%s\""
+    template = "<#{base_url}?page=%s&per_page=#{collection.per_page}>; rel=\"%s\""
     if collection.next_page
       links << template % [collection.next_page, "next"]
     end

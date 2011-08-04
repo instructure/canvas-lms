@@ -26,7 +26,7 @@ describe CoursesController, :type => :integration do
     @course1 = @course
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
-    @course2.update_attribute(:sis_source_id, 'my-course-sis')
+    @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
     @user.pseudonym.update_attribute(:sis_source_id, 'login-id')
   end
@@ -47,7 +47,7 @@ describe CoursesController, :type => :integration do
         'name' => @course2.name,
         'course_code' => @course2.course_code,
         'enrollments' => [{'type' => 'student'}],
-        'sis_course_id' => 'my-course-sis',
+        'sis_course_id' => 'TEST-SIS-ONE.2011',
       },
     ]
   end
@@ -158,18 +158,29 @@ describe CoursesController, :type => :integration do
   it "should allow specifying course sis id" do
     first_user = @user
     new_user = User.create!(:name => 'Zombo')
-    @course2.update_attribute(:sis_source_id, 'my-course-sis')
+    @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
     @course2.enroll_student(new_user).accept!
 
-    json = api_call(:get, "/api/v1/courses/sis_course_id:my-course-sis/students.json",
-            { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:my-course-sis', :format => 'json' })
+    json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/students.json",
+            { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
     json.should == api_json_response([first_user, new_user],
         :only => USER_API_FIELDS)
 
-    json = api_call(:get, "/api/v1/courses/sis_course_id:my-course-sis.json",
-            { :controller => 'courses', :action => 'show', :id => 'sis_course_id:my-course-sis', :format => 'json' })
+    json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011.json",
+            { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
     json['id'].should == @course2.id
-    json['sis_course_id'].should == 'my-course-sis'
+    json['sis_course_id'].should == 'TEST-SIS-ONE.2011'
+  end
+
+  it "should allow sis id in hex packed format" do
+    sis_id = 'This.Sis/Id\\Has Nasty?Chars'
+    # sis_id.unpack('H*').first
+    packed_sis_id = '546869732e5369732f49645c486173204e617374793f4368617273'
+    @course1.update_attribute(:sis_source_id, sis_id)
+    json = api_call(:get, "/api/v1/courses/hex:sis_course_id:#{packed_sis_id}.json",
+            { :controller => 'courses', :action => 'show', :id => "hex:sis_course_id:#{packed_sis_id}", :format => 'json' })
+    json['id'].should == @course1.id
+    json['sis_course_id'].should == sis_id
   end
 
   it "should return the needs_grading_count for all assignments" do

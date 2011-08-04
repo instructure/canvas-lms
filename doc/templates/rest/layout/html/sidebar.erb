@@ -1,7 +1,9 @@
 <nav>
   <h2 class='first'>Basics</h2>
-  <a href="<%= url_for("basics.html") %>" class="<%= 'current' if options[:object] == 'basics.html' %>">API Basics</a>
+  <a href="<%= url_for("authentication.html") %>" class="<%= 'current' if options[:object] == 'authentication.html' %>">Authentication</a>
   <a href="<%= url_for("oauth.html") %>" class="<%= 'current' if options[:object] == 'oauth.html' %>">OAuth</a>
+  <a href="<%= url_for("object_ids.html") %>" class="<%= 'current' if options[:object] == 'object_ids.html' %>">SIS IDs</a>
+  <a href="<%= url_for("pagination.html") %>" class="<%= 'current' if options[:object] == 'pagination.html' %>">Pagination</a>
   <h2>Resources</h2>
   <% options[:resources].each_with_index do |(resource, controllers), i| %>
     <% link = url_for("#{topicize resource}.html")
