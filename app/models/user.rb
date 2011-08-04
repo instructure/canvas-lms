@@ -1477,6 +1477,15 @@ class User < ActiveRecord::Base
     res
   end
   
+  def profile_pics_folder
+    folder = self.active_folders.find_by_name(Folder::PROFILE_PICS_FOLDER_NAME)
+    unless folder
+      folder = self.folders.create!(:name => Folder::PROFILE_PICS_FOLDER_NAME,
+        :parent_folder => Folder.root_folders(self).find {|f| f.name == Folder::MY_FILES_FOLDER_NAME })
+    end
+    folder
+  end
+  
   def quota
     read_attribute(:storage_quota) || Setting.get_cached('user_default_quota', 50.megabytes.to_s).to_i
   end
