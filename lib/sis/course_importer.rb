@@ -56,10 +56,11 @@ module SIS
             course ||= Course.new
             course.enrollment_term = term if term
             course.root_account = @root_account
-            if row['account_id'].present?
-              account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
-              course.account = account if account
-            end
+
+            account = nil
+            account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) if row['account_id'].present?
+            account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['fallback_account_id']) if row['fallback_account_id'].present?
+            course.account = account if account
             course.account ||= @root_account
 
             courses_to_update_associations.add course if course.account_id_changed? || course.root_account_id_changed?
