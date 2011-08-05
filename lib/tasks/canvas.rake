@@ -101,7 +101,7 @@ namespace :canvas do
     
     desc "Checks all js files for sytax errors."
     task :all do
-      bundles = YAML.load_file('config/assets.yml')['javascripts']
+      bundles = YAML.load(ERB.new(File.read('config/assets.yml')).result)['javascripts']
       bundles.each do |bundle_name, bundle_files|
         puts "------------------------------------------------------------"
         puts "checking bundle: " + bundle_name

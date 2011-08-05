@@ -4,6 +4,7 @@ gzip_assets: off
 css_compressor_options:
   line_break: 0
 
+<% saved = _erbout; _erbout = '' %>
 javascripts:
   common:
     - public/javascripts/firebugx.js
@@ -33,7 +34,7 @@ javascripts:
     - public/javascripts/feedback.js
     - public/javascripts/license_help.js
     - public/javascripts/wiki_sidebar.js
-    - public/javascripts/translations/_core.js
+    - public/javascripts/translations/_core_en.js
   speed_grader:
     - public/javascripts/jquery.elastic.js
     - public/javascripts/ui.selectmenu.js
@@ -222,6 +223,27 @@ javascripts:
   teacher_activity_report:
     - public/javascripts/jquery.tablesorter.min.js
     - public/javascripts/compiled/teacher_activity_report.js
+<% base_js = _erbout; _erbout = saved %>
+
+<%=
+  def conflict(key, oldval, newval)
+    if oldval.is_a?(Hash) && newval.is_a?(Hash)
+      oldval.merge(newval) { |key, oldval, newval| conflict(key, oldval, newval) }
+    elsif oldval.is_a?(Array) && newval.is_a?(Array)
+      oldval + newval
+    else
+      oldval
+    end
+  end
+
+  localization_file = 'config/localization_assets.yml'
+  if File.exists?(localization_file)
+    localization_js_hash = YAML.load_file(localization_file)
+    base_js_hash = YAML.load(base_js)
+    base_js = base_js_hash.merge(localization_js_hash) { |key, oldval, newval| conflict(key, oldval, newval) }.to_yaml.sub(/---/, '')
+  end
+  base_js
+%>
 
 stylesheets:
   common:
