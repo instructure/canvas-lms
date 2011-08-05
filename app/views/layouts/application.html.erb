@@ -276,7 +276,7 @@
     <div id="ajax_authenticity_token"><%= form_authenticity_token %></div>
     <div id="time_zone_offset"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).utc_offset / -60 %></div>
     <% if @context && session && temp_type = session["role_#{@context.asset_string}"] %>
-      <span id="switched_role_type" class="<%= @context.asset_string %>"><%= Enrollment.readable_type(temp_type) %></span>
+      <span id="switched_role_type" class="<%= @context.asset_string %>" data-role="<%= temp_type %>"><%= Enrollment.readable_type(temp_type) %></span>
     <% end %>
     <% if @page_view %>
       <a href="<%= page_view_path(@page_view.id || @page_view.temporary_id) %>" id="page_view_update_path">&nbsp;</a>

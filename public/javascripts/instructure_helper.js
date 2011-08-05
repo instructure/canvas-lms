@@ -16,12 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-;(function($) { // hide the namespace
-  
-  //create a global object "INST" that we will have be Instructure's namespace.
-  if (typeof(window.INST) == "undefined") {
-    window.INST = {}; //this is our "namespace"
-  }
+//create a global object "INST" that we will have be Instructure's namespace.
+if (typeof(window.INST) == "undefined") {
+  window.INST = {}; //this is our "namespace"
+}
+
+I18n.scoped('instructure', function(I18n) {
   // ============================================================================================
   // = Try to figure out what browser they are using and set INST.broswer.theirbrowser to true  =
   // = and add a css class to the body for that browser                                       =
@@ -1046,7 +1046,7 @@
           if (!errors[name]) { 
             errors[name] = []; 
           }
-          errors[name].push("This field is required");
+          errors[name].push(I18n.t('errors.field_is_required', "This field is required"));
         }
       });
     }
@@ -1057,29 +1057,7 @@
           if (!errors[name]) { 
             errors[name] = []; 
           }
-          errors[name].push("Invalid date/time value");
-        }
-      });
-    }
-    if (options.dates) {
-      $.each(options.dates, function(i, name){
-        var val = data[name];
-        if (val && val.length > 0  && !val.match(/^(0?[0-9]|1[1-2])\/([0-2]?\d|3[0-1])\/(19|20)\d{2}$/) ) {
-          if (!errors[name]) { 
-            errors[name] = []; 
-          }
-          errors[name].push("This should be a date: MM/DD/YYYY");
-        }
-      });
-    }
-    if (options.times) {
-      $.each(options.times, function(i, name){
-        var val = data[name];
-        if(val && val.length > 0  && !val.match(/^(0?[0-9]|1[0-2]):[0-5][0-9]\s*(am|pm)?$/) ) {
-          if(!errors[name]) { 
-            errors[name] = []; 
-          }
-          errors[name].push("This should be a time: HH:MMam");
+          errors[name].push(I18n.t('errors.invalid_datetime', "Invalid date/time value"));
         }
       });
     }
@@ -1090,7 +1068,7 @@
           if(!errors[name]) { 
             errors[name] = []; 
           }
-          errors[name].push("This should be a number.");
+          errors[name].push(I18n.t('errors.invalid_number', "This should be a number."));
         }
       });
     }
@@ -1100,7 +1078,7 @@
           var result = validation.call($form, data[name], data);
           if(result) {
             if(typeof(result) != "string") {
-              result = "Invalid entry: " + name;
+              result = I18n.t('errors.invalid_entry_for_field', "Invalid entry: %{field}", {field: name});
             }
             if(!errors[name]) { errors[name] = []; }
             errors[name].push(result);
@@ -1723,27 +1701,6 @@
   };
   $.fn.parseFromISO = $.parseFromISO;
 
-  $.timeDiff = function(seconds, format) {
-    format = 'short';
-    var dateString = null;
-    if(seconds < (24 * 3600 * 2)) { //date > now.addHours(-24)) {
-      if(seconds < (3600)) { //date > now.addHours(-1)) {
-        if(seconds < (60)) { //date > now.addMinutes(-1)) {
-          dateString = seconds + " sec";
-        } else {
-          var minutes = parseInt(seconds / (60), 10);
-          dateString = minutes + " min" + (minutes > 1 ? "s" : "");
-        }
-      } else {
-        var hours = parseInt(seconds / (3600), 10);
-        dateString = hours + " hour" + (hours > 1 ? "s" : "");
-      }
-    } else {
-      var days = parseInt(seconds / (24 * 3600), 10);
-      dateString = days + " days";
-    }
-    return dateString;
-  };
   // Returns the width of the browser's scroll bars.
   $.fn.scrollbarWidth = function() {
       var $div = $('<div style="width:50px;height:50px;overflow:hidden;position:absolute;top:-200px;left:-200px;"><div style="height:100px;"></div>').appendTo(this),
@@ -1934,7 +1891,7 @@
     }
   };
   $.fn.confirmDelete.defaults = {
-    message: "Are you sure you want to delete this?"
+    message: I18n.t('confirms.default_delete_thing', "Are you sure you want to delete this?")
   };
   $.originalGetJSON = $.getJSON;
   $.getJSON = function(url, data, callback) {
@@ -2373,7 +2330,7 @@
       var ampm = inst.input.data('time-ampm') || "";
       var selectedAM = (ampm == "am") ? "selected" : "";
       var selectedPM = (ampm == "pm") ? "selected" : "";
-      html += "<div class='datepicker-time'><label for='ui-datepicker-time-hour'>Time:</label> <input id='ui-datepicker-time-hour' type='text' value='" + hr + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + min + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm' title='am/pm'><option value=''>&nbsp;</option><option value='am' " + selectedAM + ">am</option><option value='pm' " + selectedPM + ">pm</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='button small-button ui-datepicker-ok'>Done</button></div>";
+      html += "<div class='datepicker-time'><label for='ui-datepicker-time-hour'>" + $.h(I18n.beforeLabel('datepicker.time', "Time")) + "</label> <input id='ui-datepicker-time-hour' type='text' value='" + hr + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + min + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm' title='" + $.h(I18n.t('datepicker.titles.am_pm', "am/pm")) + "'><option value=''>&nbsp;</option><option value='am' " + selectedAM + ">" + $.h(I18n.t('#time.am', "am")) + "</option><option value='pm' " + selectedPM + ">" + $.h(I18n.t('#time.pm', "pm")) + "</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='button small-button ui-datepicker-ok'>" + $.h(I18n.t('#buttons.done', "Done")) + "</button></div>";
     }
     return html;
   };
@@ -2520,7 +2477,7 @@
           }
         }
         var d = Date.parse((val || "").toString().replace(/ (at|by)/, ""));
-        var parse_error_message = "That's not a date!"; 
+        var parse_error_message = I18n.t('errors.not_a_date', "That's not a date!"); 
         var text = parse_error_message;
         if(!$(this).val()) { text = ""; }
         if(d) {
@@ -2707,8 +2664,8 @@
     pickerHtml += "<div class='clear'></div>";
     pickerHtml += "</div>";
     pickerHtml += "<div class='widget_group ampm_group'>";
-    pickerHtml += "<div class='ui-widget ui-state-default time_slot'>am</div>";
-    pickerHtml += "<div class='ui-widget ui-state-default time_slot'>pm</div>";
+    pickerHtml += "<div class='ui-widget ui-state-default time_slot'>" + $.h(I18n.t('#time.am', "am")) + "</div>";
+    pickerHtml += "<div class='ui-widget ui-state-default time_slot'>" + $.h(I18n.t('#time.pm', "pm")) + "</div>";
     pickerHtml += "<div class='clear'></div>";
     pickerHtml += "</div>";
     $picker.html(pickerHtml);
@@ -2848,19 +2805,6 @@
       results.push(property);
     return results;
   };
-
-  $.ordinalize = function(number) {
-    if (11 <= parseInt(number, 10) % 100 && parseInt(number, 10) % 100 <= 13) {
-      return number + "th";
-    } else {
-      switch (parseInt(number, 10) % 10) {
-        case  1: return number + "st";
-        case  2: return number + "nd";
-        case  3: return number + "rd";
-        default: return number + "th";
-      }
-    }
-  };
   
   $.fn.hasScrollbar = function(){
     return this.length && (this[0].clientHeight < this[0].scrollHeight);
@@ -2908,7 +2852,7 @@
       mozilla: /mozilla/.test( userAgent ) && !(/(compatible|webkit)/.test( userAgent )),
       speedgrader: /speedgrader/.test( userAgent )
     };
-    var browser = "Unrecognized Browser";
+    var browser = null;
     if(data.chrome) {
       browser = "Chrome";
     } else if(data.safari) {
@@ -2924,7 +2868,9 @@
     } else if(data.speedgrader) {
       browser = "SpeedGrader for iPad";
     }
-    if(browser != "Unrecognized Browser" && data.version) {
+    if (!browser) {
+      browser = I18n.t('browsers.unrecognized', "Unrecognized Browser");
+    } else if(data.version) {
       data.version = data.version.split(/\./).slice(0,2).join(".");
       browser = browser + " " + data.version;
     }
@@ -2972,8 +2918,8 @@
       $dialog.append("<form id='bookmark_search_form' style='margin-bottom: 5px;'>" +
                        "<img src='/images/blank.png'/>&nbsp;&nbsp;" +
                        "<input type='text' class='query' style='width: 230px;'/>" +
-                       "<button class='button search_button' type='submit'>Search</button>" +
-                     "</form>");
+                       "<button class='button search_button' type='submit'>" +
+                       $.h(I18n.t('buttons.search', "Search")) + "</button></form>");
       $dialog.append("<div class='results' style='max-height: 200px; overflow: auto;'/>");
       $dialog.find("form").submit(function(event) {
         event.preventDefault();
@@ -2985,17 +2931,17 @@
             $dialog.find("form").submit();
           }, 15000 - (now - lastLookup));
           $dialog.find(".results").empty()
-            .append("Diigo limits users to one search every ten seconds.  Please wait...");
+            .append($.h(I18n.t('status.diigo_search_throttling', "Diigo limits users to one search every ten seconds.  Please wait...")));
           return;
         }
-        $dialog.find(".results").empty().append("Searching...");
+        $dialog.find(".results").empty().append($.h(I18n.t('status.searching', "Searching...")));
         lastLookup = new Date();
         var query = $dialog.find(".query").val();
         var url = $.replaceTags($dialog.data('reference_url'), 'query', query);
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $dialog.find(".results").empty();
           if( !data.length ) {
-            $dialog.find(".reults").append("No Results Found");
+            $dialog.find(".results").append($.h(I18n.t('no_results_found', "No Results Found")));
           }
           for(var idx in data) {
             data[idx].short_title = data[idx].title;
@@ -3009,11 +2955,11 @@
                   title: data[idx].title
                 }).text(data[idx].short_title)
               )
-              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>").text(data[idx].description || "No description"));
+              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>").text(data[idx].description || I18n.t('no_description', "No description")));
           }
         }, function() {
           $dialog.find(".results").empty()
-            .append("Search failed, please try again.");
+            .append($.h(I18n.t('errors.search_failed', "Search failed, please try again.")));
         });
       });
       $dialog.delegate('.bookmark_link', 'click', function(event) {
@@ -3027,7 +2973,7 @@
         });
       });
     }
-    $dialog.find(".search_button").text(service_type == 'delicious' ? "Search by Tag" : "Search");
+    $dialog.find(".search_button").text(service_type == 'delicious' ? I18n.t('buttons.search_by_tag', "Search by Tag") : I18n.t('buttons.search', "Search"));
     $dialog.find("form img").attr('src', '/images/' + service_type + '_small_icon.png');
     var url = "/search/bookmarks?q=%7B%7B+query+%7D%7D&service_type=%7B%7B+service_type+%7D%7D";
     url = $.replaceTags(url, 'service_type', service_type);
@@ -3036,7 +2982,7 @@
       .find(".query").val("");
     $dialog.dialog('close').dialog({
       autoOpen: false,
-      title: $.titleize(service_type) + " Bookmark Search",
+      title: I18n.t('titles.bookmark_search', "Bookmark Search: %{service_name}", {service_name: $.titleize(service_type)}),
       open: function() {
         $dialog.find("input:visible:first").focus().select();
       },
@@ -3051,9 +2997,10 @@
       $dialog = $("<div id='instructure_image_search'/>")
                   .append("<form id='image_search_form' style='margin-bottom: 5px;'>" +
                             "<img src='/images/flickr_creative_commons_small_icon.png'/>&nbsp;&nbsp;" + 
-                            "<input type='text' class='query' style='width: 250px;' title='enter search terms'/>" + 
-                            "<button class='button' type='submit'>Search</button>" +
-                          "</form>")
+                            "<input type='text' class='query' style='width: 250px;' title='" +
+                            $.h(I18n.t('tooltips.enter_search_terms', "enter search terms")) + "'/>" + 
+                            "<button class='button' type='submit'>" +
+                            $.h(I18n.t('buttons.search', "Search")) + "</button></form>")
                   .append("<div class='results' style='max-height: 240px; overflow: auto;'/>");
       
       $dialog.find("form .query").formSuggestion();
@@ -3062,7 +3009,7 @@
         event.stopPropagation();
         var now = new Date();
         $dialog.find("button").attr('disabled', true);
-        $dialog.find(".results").empty().append("Searching...");
+        $dialog.find(".results").empty().append(I18n.t('status.searching', "Searching..."));
         $dialog.bind('search_results', function(event, data) {
           $dialog.find("button").attr('disabled', false);
           if(data && data.photos && data.photos.photo) {
@@ -3088,7 +3035,7 @@
               );
             }
           } else {
-            $dialog.find(".results").empty().append("Search failed, please try again.");
+            $dialog.find(".results").empty().append($.h(I18n.t('errors.search_failed', "Search failed, please try again.")));
           }
         });
         var query = encodeURIComponent($dialog.find(".query").val());
@@ -3115,7 +3062,7 @@
       .dialog('close')
       .dialog({
         autoOpen: false,
-        title: $.titleize(service_type) + " Image Search",
+        title: I18n.t('titles.image_search', "Image Search: %{service_name}", {service_name: $.titleize(service_type)}),
         width: 440,
         open: function() {
           $dialog.find("input:visible:first").focus().select();
@@ -3360,7 +3307,7 @@
         }
       } else {
         // else fall back with a message that the document can't be viewed inline
-        $this.html('<p>This document cannot be viewed inline, you might not have permission to view it or it might have been deleted.</p>');
+        $this.html('<p>' + $.h(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline, you might not have permission to view it or it might have been deleted.')) + '</p>');
       }
     });
   };
@@ -3397,5 +3344,4 @@
   $.regexEscape = function(string) {
     return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
   }
-  
-})(jQuery);
+});
