@@ -1746,7 +1746,7 @@ var fileStructureData = [];
       if($item.length === 0) { return; }
       var old_name = $item.getTemplateData({textValues: ['name']}).name;
       var new_name = $(this).val();
-      if(update !== false && old_name != new_name) {
+      if(update !== false && new_name != "" && old_name != new_name) {
         $item.find(".name").text(new_name);
         var data = files.itemData($item.data('node'));
         var context_string = data.root_context_string;

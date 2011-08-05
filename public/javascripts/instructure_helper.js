@@ -2047,6 +2047,7 @@ I18n.scoped('instructure', function(I18n) {
       dataType: "json",
       type: submit_type,
       success: function(data) {
+        $.ajaxJSON.inFlighRequests -= 1;
         data = data || {};
         var page_view_id = null;
         if(xhr && xhr.getResponseHeader && (page_view_id = xhr.getResponseHeader("X-Canvas-Page-View-Id"))) {
@@ -2066,6 +2067,7 @@ I18n.scoped('instructure', function(I18n) {
         }
       },
       error: function() {
+        $.ajaxJSON.inFlighRequests -= 1;
         ajaxError.apply(this, arguments);
       },
       data: data
@@ -2073,10 +2075,12 @@ I18n.scoped('instructure', function(I18n) {
     if(options && options.timeout) {
       params['timeout'] = options.timeout;
     }
+    $.ajaxJSON.inFlighRequests += 1;
     var xhr = $.ajax(params);
     $.ajaxJSON.storeRequest(xhr, url, submit_type, data);
     return xhr;
   };
+  $.ajaxJSON.inFlighRequests = 0;
   $.ajaxJSON.unhandledXHRs = [];
   $.ajaxJSON.ignoredXHRs = [];
   $.ajaxJSON.passedRequests = [];
