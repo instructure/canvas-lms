@@ -420,7 +420,8 @@ class FilesController < ApplicationController
               :no_redirect => params[:no_redirect],
               :upload_params => {
                 'attachment[folder_id]' => params[:attachment][:folder_id] || '',
-                'attachment[unattached_attachment_id]' => @attachment.id
+                'attachment[unattached_attachment_id]' => @attachment.id,
+                'check_quota_after' => @check_quota ? '1' : '0'
               },
               :ssl => request.ssl?)
       render :json => res.to_json
@@ -458,7 +459,9 @@ class FilesController < ApplicationController
     @attachment ||= @context.attachments.new
     if authorized_action(@attachment, @current_user, :create)
       get_quota
-      return if quota_exceeded(named_context_url(@context, :context_files_url))
+      return if (params[:check_quota_after].nil? || params[:check_quota_after] == '1') &&
+                  quota_exceeded(named_context_url(@context, :context_files_url))
+
       respond_to do |format|
         @attachment.folder_id ||= @folder.id
         @attachment.workflow_state = nil
