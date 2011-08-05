@@ -81,4 +81,73 @@ describe "account authentication configs" do
 
     Account.default.account_authorization_configs.length.should == 0
   end
+  
+  it "should be able to update term dates" do
+    course_with_admin_logged_in
+    
+    def verify_displayed_term_dates(term, dates)
+      dates.each do |en_type, dates|
+        term.find_element(:css, ".#{en_type}_dates .start_date .show_term").text.should match /#{dates[0]}/
+        term.find_element(:css, ".#{en_type}_dates .end_date .show_term").text.should match /#{dates[1]}/
+      end
+    end
+    
+    get "/accounts/#{Account.default.id}/terms"
+    term = driver.find_element(:css, "tr.term")
+    term.find_element(:css, ".edit_term_link").click
+    term.find_element(:css, ".editing_term .general_dates .start_date .edit_term input").send_keys("2011-07-01")
+    term.find_element(:css, ".editing_term .general_dates .end_date .edit_term input").send_keys("2011-07-31")
+    term.find_element(:css, ".enrollment_term_form .submit_button").click
+    keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+    verify_displayed_term_dates(term, {
+      :general => [ "Jul 1", "Jul 31" ],
+      :student_enrollment => [ "whenever", "whenever" ],
+      :teacher_enrollment => [ "whenever", "whenever" ],
+      :ta_enrollment => [ "whenever", "whenever" ]
+    })
+    
+    get "/accounts/#{Account.default.id}/terms"
+    term = driver.find_element(:css, "tr.term")
+    term.find_element(:css, ".edit_term_link").click
+    term.find_element(:css, ".editing_term .student_enrollment_dates .start_date .edit_term input").send_keys("2011-07-02")
+    term.find_element(:css, ".editing_term .student_enrollment_dates .end_date .edit_term input").send_keys("2011-07-30")
+    term.find_element(:css, ".enrollment_term_form .submit_button").click
+    keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+    verify_displayed_term_dates(term, {
+      :general => [ "Jul 1", "Jul 31" ],
+      :student_enrollment => [ "Jul 2", "Jul 30" ],
+      :teacher_enrollment => [ "whenever", "whenever" ],
+      :ta_enrollment => [ "whenever", "whenever" ]
+    })
+    
+    get "/accounts/#{Account.default.id}/terms"
+    term = driver.find_element(:css, "tr.term")
+    term.find_element(:css, ".edit_term_link").click
+    term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").send_keys("2011-07-03")
+    term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").send_keys("2011-07-29")
+    term.find_element(:css, ".editing_term .ta_enrollment_dates .start_date .edit_term input").send_keys("2011-07-04")
+    term.find_element(:css, ".editing_term .ta_enrollment_dates .end_date .edit_term input").send_keys("2011-07-28")
+    term.find_element(:css, ".enrollment_term_form .submit_button").click
+    keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+    verify_displayed_term_dates(term, {
+      :general => [ "Jul 1", "Jul 31" ],
+      :student_enrollment => [ "Jul 2", "Jul 30" ],
+      :teacher_enrollment => [ "Jul 3", "Jul 29" ],
+      :ta_enrollment => [ "Jul 4", "Jul 28" ]
+    })
+    
+    get "/accounts/#{Account.default.id}/terms"
+    term = driver.find_element(:css, "tr.term")
+    term.find_element(:css, ".edit_term_link").click
+    term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").clear
+    term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").clear
+    term.find_element(:css, ".enrollment_term_form .submit_button").click
+    keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+    verify_displayed_term_dates(term, {
+      :general => [ "Jul 1", "Jul 31" ],
+      :student_enrollment => [ "Jul 2", "Jul 30" ],
+      :teacher_enrollment => [ "whenever", "whenever" ],
+      :ta_enrollment => [ "Jul 4", "Jul 28" ]
+    })
+  end
 end

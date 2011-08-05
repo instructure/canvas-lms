@@ -74,7 +74,7 @@
 <% end %>
 <div style="display: none;" id="context_urls">
   <% @contexts.each do |context| %>
-    <% cache(context, 'assignment_groups_for_cal') do %>
+    <% cache([context, 'assignment_groups_for_cal']) do %>
       <a href="<%= context_url(context, :context_calendar_events_url) %>" class="<%= context.class.to_s.downcase %>_<%= context.id %>_add_event_url">&nbsp;</a>
       <a href="<%= context_url(context, :context_calendar_event_url, "{{ id }}") %>" class="<%= context.class.to_s.downcase %>_<%= context.id %>_event_url">&nbsp;</a>
       <% if context.respond_to?("assignments") %>
@@ -118,8 +118,6 @@
       <% 7.times do %>
         <td id="day_<%= day.strftime("%Y_%m_%d") %>" tabindex="0" class="calendar_day_holder <%= day <= last_day ? 'visible' : '' %>"><div class="calendar_day <%= day.month == current.month ? 'current_month' : 'other_month' %>">
           <div class="day_number" title="<%= day.strftime("%m/%d/%Y") %>"><%= day.day %></div>
-          <% today_events = [] #@events.find_all { |e| (e.all_day ? e.all_day_date : e.start_at).to_date == day } %>
-          <%= render :partial => 'event', :collection => today_events %>
         </div></td>
         <% day = day.next %>
       <% end %>

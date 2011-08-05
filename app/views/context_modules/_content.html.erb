@@ -303,7 +303,7 @@ TEXT
 <% if can_do(@context, @current_user, :manage_grades) %>
 <div style="display: none;" id="progression_list">
   <a href="#" class="progression_list_url">&nbsp;</a>
-  <% cache([@context, @current_user, 'students_visible_to_user'].cache_key) do %>
+  <% cache([@context, @current_user, 'students_visible_to_user'].cache_key, :no_locale => true) do %>
     <% @context.students_visible_to(@current_user).scoped(:select => "id, name").each do |student| %>
       <div class="student student_<%= student.id %>">
         <div class="id"><%= student.id %></div>

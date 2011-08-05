@@ -17,3 +17,9 @@ config.action_view.cache_template_loading            = true
 
 # eval <env>-local.rb if it exists
 Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
+
+# initialize cache store
+# this needs to happen in each environment config file, rather than a
+# config/initializer/* file, to allow Rails' full initialization of the cache
+# to take place, including middleware inserts and such.
+config.cache_store = Canvas.cache_store_config

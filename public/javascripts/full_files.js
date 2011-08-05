@@ -1672,7 +1672,7 @@ var fileStructureData = [];
       var url = $item.find(".download_url").attr('href');
       var display_name = $item.find(".name:first").text();
       var $dialog = $("#edit_content_dialog");
-      $dialog.data('update_url', $item.find(".rename_item_link").attr('href')).data('content_type', data.content_type || '').data('filename', data.filename || '');
+      $dialog.data('update_url', $item.find(".rename_item_link").attr('href')).data('content_type', data.content_type || '').data('filename', data.filename || 'file_to_update');
       $dialog.find(".display_name").text(display_name);
       $dialog.find(".loading_message").text("Loading File Contents...").show().end()
         .find(".content").hide();
@@ -2042,7 +2042,7 @@ var fileStructureData = [];
         scriptAccess: 'always',
         multi: true,
         auto: false,
-        sizeLimit: 52428800,
+        sizeLimit: 10737418240,
         simUploadLimit: 1,
         buttonText: "",
         hideButton: true,
@@ -2051,7 +2051,7 @@ var fileStructureData = [];
         height: 22,
         cancelImg: '/images/blank.png',
         onInit: function() {
-          $add_file_link.text("Add Files").triggerHandler('show'); 
+          $add_file_link.text(I18n.t('links.add_files', "Add Files")).triggerHandler('show');
         },
         onSelect: fileUpload.swfFileQueue,
         onCancel: fileUpload.swfCancel,
@@ -2214,8 +2214,8 @@ var fileUpload = {
       $file.data('success_url', data.success_url);
       if(!$file.hasClass('done')) {
         fileUpload.swfQueuedAndPendingFiles.push(file);
-        fileUpload.swfUploadNext(file);
-      } 
+        fileUpload.swfUploadNext();
+      }
       fileUpload.updateUploadCount();
     }, function(data) {
       $("#file_swf").uploadifyCancel(id);
@@ -2223,9 +2223,9 @@ var fileUpload = {
         .find(".status").text("Upload Failed ");
     });
   },
-  swfUploadNext: function(file) {
-    if(file || fileUpload.swfQueuedAndPendingFiles.length > 0) {
-      file = file || fileUpload.swfQueuedAndPendingFiles.shift();
+  swfUploadNext: function() {
+    if(fileUpload.swfQueuedAndPendingFiles.length > 0) {
+      file = fileUpload.swfQueuedAndPendingFiles.shift();
       if(file) {
         $("#file_swf").uploadifySettings('script', file.upload_url);
         $("#file_swf").uploadifySettings('scriptData', file.upload_params);

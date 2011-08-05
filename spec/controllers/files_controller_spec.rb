@@ -172,11 +172,8 @@ describe FilesController do
     it "should redirect for download" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
-      begin
-        get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-      rescue => e
-        e.to_s.should eql("Not Found")
-      end
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      response.should be_redirect
     end
     
     it "should allow concluded teachers to read and download files" do
@@ -185,11 +182,8 @@ describe FilesController do
       @enrollment.conclude
       get 'show', :course_id => @course.id, :id => @file.id
       response.should be_success
-      begin
-        get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-      rescue => e
-        e.to_s.should eql("Not Found")
-      end
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      response.should be_redirect
     end
     
     it "should allow concluded students to read and download files" do
@@ -198,11 +192,8 @@ describe FilesController do
       @enrollment.conclude
       get 'show', :course_id => @course.id, :id => @file.id
       response.should be_success
-      begin
-        get 'show', :course_id => @course.id, :id => @file.id, :download => 1
-      rescue => e
-        e.to_s.should eql("Not Found")
-      end
+      get 'show', :course_id => @course.id, :id => @file.id, :download => 1
+      response.should be_redirect
     end
     
     it "should mark files as viewed for module progressions if the file is downloaded" do
@@ -336,12 +327,10 @@ describe FilesController do
     it "should update file" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
-      # TODO: attachment_fu is not playing nice with this test.
-      # TODO: attachment_fu gets mad if there's no actual file
-      # put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:display_name => "new name", :uploaded_data => nil}
-      # response.should be_redirect
-      # assigns[:attachment].should eql(@file)
-      # assigns[:attachment].display_name.should eql("new name")
+      put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:display_name => "new name", :uploaded_data => nil}
+      response.should be_redirect
+      assigns[:attachment].should eql(@file)
+      assigns[:attachment].display_name.should eql("new name")
     end
     
     it "should move file into a folder" do
@@ -367,11 +356,10 @@ describe FilesController do
     it "should delete file" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
-      # TODO: attachment_fu is not playing nice with this test
-      # delete 'destroy', :course_id => @course.id, :id => @file.id
-      # response.should be_redirect
-      # assigns[:attachment].should eql(@file)
-      # assigns[:attachment].should be_frozen
+      delete 'destroy', :course_id => @course.id, :id => @file.id
+      response.should be_redirect
+      assigns[:attachment].should eql(@file)
+      assigns[:attachment].file_state.should == 'deleted'
     end
   end
   

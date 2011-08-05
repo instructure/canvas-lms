@@ -17,6 +17,8 @@
 #
 
 class Notification < ActiveRecord::Base
+  include LocaleSelection
+
   validates_length_of :body, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   include Workflow
   
@@ -134,6 +136,8 @@ class Notification < ActiveRecord::Base
   end
   
   def create_message(asset, *tos)
+    current_locale = I18n.locale
+
     tos = tos.flatten.compact.uniq
     mailbox = asset.messaging_mailbox
     @delayed_messages_to_save = []
@@ -174,6 +178,7 @@ class Notification < ActiveRecord::Base
         user = recipient
         cc = user.communication_channels.first
       end
+      I18n.locale = infer_locale(:user => user)
       
       # For non-essential messages, check if too many have gone out, and if so
       # send this message as a daily summary message instead of immediate.
@@ -235,6 +240,8 @@ class Notification < ActiveRecord::Base
     @user_counts.each{|user_id, cnt| recent_messages_for_user(user_id, cnt) }
 
     messages
+  ensure
+    I18n.locale = current_locale
   end
   
   def category_spaceless

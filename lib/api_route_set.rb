@@ -22,14 +22,23 @@ class ApiRouteSet
   cattr_accessor :apis
   self.apis = []
 
-  def initialize(mapper, prefix)
-    @prefix = prefix
-    mapper.with_options(:path_prefix => @prefix) do |api|
-      yield api
-    end
+  def initialize
     ApiRouteSet.apis << self
+    # mapper.with_options(:path_prefix => @path_prefix,
+    #                     :name_prefix => @name_prefix,
+    #                     :requirements => { :id => ID_REGEX }) do |api|
+    #   yield api
+    # end
   end
-  attr_reader :prefix
+  attr_accessor :mapper
+
+  def self.route(mapper)
+    route_set = self.new
+    route_set.mapper = mapper
+    yield route_set
+  ensure
+    route_set.mapper = nil
+  end
 
   def self.routes_for(prefix)
     builder = ActionController::Routing::RouteBuilder.new
@@ -43,5 +52,44 @@ class ApiRouteSet
 
   def api_methods_for_controller_and_action(controller, action)
     self.class.routes_for(prefix).find_all { |r| r.matches_controller_and_action?(controller, action) }
+  end
+
+  class V1 < ::ApiRouteSet
+    # match a path component, including periods, but excluding the string ".json" for backwards compat
+    # for api v2, we'll just drop the .json completely
+    # unfortunately, this means that api v1 can't match a sis id that ends with
+    # .json -- but see the api docs for info on sending hex-encoded sis ids,
+    # which allows any string.
+    ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}
+    ID_PARAM = %r{^:(id|[\w_]+_id)$}
+
+    def prefix
+      "/api/v1"
+    end
+
+    def get(path, opts = {})
+      route(:get, path, opts)
+    end
+    def put(path, opts = {})
+      route(:put, path, opts)
+    end
+    def post(path, opts = {})
+      route(:post, path, opts)
+    end
+    def delete(path, opts = {})
+      route(:delete, path, opts)
+    end
+
+    def route(method, path, opts)
+      opts ||= {}
+      if opts[:path_name]
+        path_name = "api_v1_#{opts.delete(:path_name)}"
+      else
+        path_name = :connect
+      end
+      path.split('/').each { |segment| opts[segment[1..-1].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
+      mapper.__send__ path_name, "/api/v1/#{path}", (opts || {}).merge(:conditions => { :method => method }, :format => 'json')
+      mapper.__send__ path_name, "/api/v1/#{path}.json", (opts || {}).merge(:conditions => { :method => method }, :format => 'json')
+    end
   end
 end

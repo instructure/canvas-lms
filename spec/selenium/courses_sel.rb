@@ -62,6 +62,9 @@ shared_examples_for "course selenium tests" do
   end
 
   it "should allow moving a student to a different section" do
+    # this spec does lots of find_element where we expect that it won't exist.
+    driver.manage.timeouts.implicit_wait = 0
+    
     c = course :active_course => true
     users = {:plain => {}, :sis => {}}
     [:plain, :sis].each do |sis_type|
@@ -96,7 +99,7 @@ shared_examples_for "course selenium tests" do
     users[:plain].each do |user_type, logged_in_user|
       # Students and Observers can't do anything
       next if user_type == :student || user_type == :observer
-      login_as(logged_in_user[:username], logged_in_user[:password])
+      create_session(logged_in_user[:user].pseudonyms.first, false)
 
       get "/courses/#{c.id}/details"
 

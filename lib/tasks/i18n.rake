@@ -146,9 +146,18 @@ namespace :i18n do
   end
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
-  task :generate_js => :environment do
+  task :generate_js do
+    require 'bundler'
+    Bundler.setup
+    require 'action_controller'
+    require 'i18n'
+    require 'sexp_processor'
+    require 'jammit'
+    require 'lib/i18n_extractor.rb'
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
+                      Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
+
     Hash.send :include, HashExtensions
-    I18nExtractor
 
     files = Dir.glob('public/javascripts/*.js').
       reject{ |file| file =~ /\Apublic\/javascripts\/(i18n.js|translations\/)/ }
@@ -380,12 +389,12 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
     placeholder_mismatches = {}
     markdown_mismatches = {}
     new_translations.keys.each do |key|
-      p1 = placeholders(source_translations[key])
-      p2 = placeholders(new_translations[key])
+      p1 = placeholders(source_translations[key].to_s)
+      p2 = placeholders(new_translations[key].to_s)
       placeholder_mismatches[key] = [p1, p2] if p1 != p2
 
-      m1 = markdown_and_wrappers(source_translations[key])
-      m2 = markdown_and_wrappers(new_translations[key])
+      m1 = markdown_and_wrappers(source_translations[key].to_s)
+      m2 = markdown_and_wrappers(new_translations[key].to_s)
       markdown_mismatches[key] = [m1, m2] if m1 != m2
     end
 

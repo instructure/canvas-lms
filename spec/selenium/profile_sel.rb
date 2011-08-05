@@ -19,6 +19,28 @@ shared_examples_for "profile selenium tests" do
     confirmation_dialog.find_element(:css, "button").click
     confirmation_dialog.displayed?.should be_false
   end
+
+  it "should successfully upload profile pictures" do
+    a = Account.default
+    a.enable_service('avatars')
+    a.save!
+    
+    course_with_student_logged_in
+    
+    get "/profile"
+    keep_trying_until { driver.find_element(:css, ".profile_pic_link.none") }.click
+    dialog = driver.find_element(:id, "profile_pic_dialog")
+    dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img").length.should == 2
+    dialog.find_element(:css, ".add_pic_link").click
+    filename, fullpath, data = get_file("graded.png")
+    dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
+    dialog.find_element(:css, 'button[type="submit"]').click
+    spans = dialog.find_element(:css, ".profile_pic_list").find_elements(:css, "span.img")
+    spans.length.should == 3
+    keep_trying_until { spans.last.attribute('class') =~ /selected/ }
+    dialog.find_element(:css, 'button.select_button').click
+    keep_trying_until { driver.find_element(:css, '.profile_pic_link img').attribute('src') =~ %r{/images/thumbnails/} }
+  end
 end
 
 describe "course Windows-Firefox-Tests" do

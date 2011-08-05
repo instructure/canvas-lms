@@ -59,6 +59,12 @@ module Canvas
       saved_settings
     end
 
+    def enabled?
+      ps = PluginSetting.find_by_name(self.id.to_s)
+      return false unless ps
+      ps.valid_settings? && ps.enabled?
+    end
+
     def encrypted_settings
       @meta[:encrypted_settings]
     end
@@ -98,6 +104,11 @@ module Canvas
     # base class/module for this plugin
     def base
       @meta[:base]
+    end
+
+    # arbitrary meta key/value pairs (these aren't configurable settings)
+    def metadata(name)
+      t_if_proc(@meta[name])
     end
 
     def translate(key, default, options={})

@@ -157,7 +157,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :submissions
     course.resources :calendar_events
     course.resources :chats
-    course.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
+    course.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
       file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
@@ -166,6 +166,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    course.images 'images', :controller => 'files', :action => 'images'
     course.relative_file_path "file_contents/:file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     course.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -345,7 +346,7 @@ ActionController::Routing::Routes.draw do |map|
     group.announcements_external_feeds "announcements/external_feeds", :controller => 'announcements', :action => 'create_external_feed', :conditions => { :method => :post }
     group.announcements_external_feed "announcements/external_feeds/:id", :controller => 'announcements', :action => 'destroy_external_feed', :conditions => { :method => :delete }
     group.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
-    group.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
+    group.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
       file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
@@ -354,6 +355,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    group.images 'images', :controller => 'files', :action => 'images'
     group.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
@@ -405,6 +407,10 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :account_authorization_configs
     account.update_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'update_all', :conditions => {:method => :put}
     account.remove_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'destroy_all', :conditions => {:method => :delete}
+    account.test_ldap_connections 'test_ldap_connections', :controller => 'account_authorization_configs', :action => 'test_ldap_connection'
+    account.test_ldap_binds 'test_ldap_binds', :controller => 'account_authorization_configs', :action => 'test_ldap_bind'
+    account.test_ldap_searches 'test_ldap_searches', :controller => 'account_authorization_configs', :action => 'test_ldap_search'
+    account.test_ldap_logins 'test_ldap_logins', :controller => 'account_authorization_configs', :action => 'test_ldap_login'
     account.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
@@ -471,7 +477,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users do |user|
     user.masquerade 'masquerade', :controller => 'users', :action => 'masquerade'
     user.delete 'delete', :controller => 'users', :action => 'delete'
-    user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
+    user.resources :files, :collection => {:quota => :get, :reorder => :post} do |file|
       file.text_inline 'inline', :controller => 'files', :action => 'text_show'
       file.download 'download', :controller => 'files', :action => 'show', :download => '1'
       file.typed_download 'download.:type', :controller => 'files', :action => 'show', :download => '1'
@@ -480,6 +486,7 @@ ActionController::Routing::Routes.draw do |map|
       file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
       file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
     end
+    user.images 'images', :controller => 'files', :action => 'images'
     user.resources :page_views, :only => [:index]
     user.resources :folders do |folder|
       folder.download 'download', :controller => 'folders', :action => 'download'
@@ -503,14 +510,6 @@ ActionController::Routing::Routes.draw do |map|
     user.manageable_courses 'manageable_courses', :controller => 'users', :action => 'manageable_courses'
     user.outcomes 'outcomes', :controller => 'outcomes', :action => 'user_outcome_results'
     user.resources :zip_file_imports, :only => [:new, :create], :collection => [:import_status]
-    user.resources :files, :collection => {:quota => :get, :reorder => :post, :list => :get} do |file|
-      file.text_inline 'inline', :controller => 'files', :action => 'text_show'
-      file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-      file.preview 'preview', :controller => 'files', :action => 'show', :preview => '1'
-      file.inline_view 'inline_view', :controller => 'files', :action => 'show', :inline => '1'
-      file.attachment_content 'contents', :controller => 'files', :action => 'attachment_content'
-      file.relative_path ":file_path", :file_path => /.+/, :controller => 'files', :action => 'show_relative'
-    end
     user.course_teacher_activity 'teacher_activity/course/:course_id', :controller => 'users', :action => 'teacher_activity'
     user.student_teacher_activity 'teacher_activity/student/:student_id', :controller => 'users', :action => 'teacher_activity'
   end
@@ -648,34 +647,40 @@ ActionController::Routing::Routes.draw do |map|
 
   Jammit::Routes.draw(map) if defined?(Jammit)
 
-  # API routes
-  ApiRouteSet.new(map, "/api/v1") do |api|
-    api.resources :courses,
-                  :name_prefix => "api_v1_",
-                  :only => %w(index) do |course|
-      course.students 'students.:format',
-        :controller => 'courses', :action => 'students',
-        :conditions => { :method => :get }
-      course.sections 'sections.:format',
-        :controller => 'courses', :action => 'sections',
-        :conditions => { :method => :get }
-      course.resources :assignments,
-                        :controller => 'assignments_api',
-                        :only => %w(show index create update) do |assignment|
-        assignment.resources :submissions,
-                        :controller => 'submissions_api',
-                        :only => %w(index show update)
-      end
-      course.resources :assignment_groups,
-                        :only => %w(index)
-      course.student_submissions 'students/submissions.:format',
-        :controller => 'submissions_api', :action => 'for_students',
-        :conditions => { :method => :get }
+  ### API routes ###
+
+  ApiRouteSet::V1.route(map) do |api|
+    api.with_options(:controller => :courses) do |courses|
+      courses.get 'courses', :action => :index
+      courses.get 'courses/:id', :action => :show
+      courses.get 'courses/:course_id/sections', :action => :sections
+      courses.get 'courses/:course_id/students', :action => :students
+      courses.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students
     end
-    api.resources :accounts, :only => %{} do |account|
-      account.resources :sis_imports,
-                        :controller => 'sis_imports_api',
-                        :only => %w(show create)
+
+    api.with_options(:controller => :assignments_api) do |assignments|
+      assignments.get 'courses/:course_id/assignments', :action => :index
+      assignments.get 'courses/:course_id/assignments/:id', :action => :show
+      assignments.post 'courses/:course_id/assignments', :action => :create
+      assignments.put 'courses/:course_id/assignments/:id', :action => :update
+    end
+
+    api.with_options(:controller => :submissions_api) do |submissions|
+      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions', :action => :index
+      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show
+      submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update
+    end
+
+    api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index
+
+    api.with_options(:controller => :discussion_topics) do |topics|
+      topics.get 'courses/:course_id/discussion_topics', :action => :index, :path_name => 'course_discussion_topics'
+      topics.get 'groups/:group_id/discussion_topics', :action => :index, :path_name => 'group_discussion_topics'
+    end
+
+    api.with_options(:controller => :sis_imports_api) do |sis|
+      sis.post 'accounts/:account_id/sis_imports', :action => :create
+      sis.get 'accounts/:account_id/sis_imports/:id', :action => :show
     end
   end
 

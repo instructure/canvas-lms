@@ -16,16 +16,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+module Api::V1::Course
+  def course_json(course, includes, enrollments)
+    include_grading = includes.include?('needs_grading_count')
+    include_syllabus = includes.include?('syllabus_body')
 
-describe "/wiki_pages/_tree_node" do
-  it "should render" do
-    course_with_student
-    view_context
-    a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
-    render :partial => "wiki_pages/tree_node", :object => a
-    response.should_not be_nil
+    hash = course.as_json(
+      :include_root => false, :only => %w(id name course_code))
+    hash['sis_course_id'] = course.sis_source_id
+    hash['enrollments'] = enrollments.map { |e| { :type => e.readable_type.downcase } }
+    if include_grading && enrollments.any? { |e| e.participating_admin? }
+      hash['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
+    end
+    if include_syllabus
+      hash['syllabus_body'] = course.syllabus_body
+    end
+    hash
   end
 end
 

@@ -24,7 +24,7 @@ class Mailer < ActionMailer::Base
     recipients m.to
     bcc m.bcc if m.bcc
     cc m.cc if m.cc
-    from ("#{m.from_name || "Instructure"} <" + HostUrl.outgoing_email_address + ">")
+    from ("#{m.from_name || HostUrl.outgoing_email_default_name} <" + HostUrl.outgoing_email_address + ">")
     reply_to m.reply_to_address
     subject m.subject
     body m.body

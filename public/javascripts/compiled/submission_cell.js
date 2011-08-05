@@ -9,8 +9,6 @@
     return child;
   }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   this.SubmissionCell = SubmissionCell = (function() {
-    var tooltipTexts;
-    tooltipTexts = {};
     function SubmissionCell(opts) {
       this.opts = opts;
       this.init();
@@ -86,10 +84,9 @@
       opts.assignment || (opts.assignment = this.opts.column.object);
       specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment);
       tooltipText = $.map(specialClasses, function(c) {
-        var _ref;
-        return (_ref = tooltipTexts[c]) != null ? _ref : tooltipTexts[c] = $("#submission_tooltip_" + c).text();
+        return GRADEBOOK_TRANSLATIONS["submission_tooltip_" + c];
       }).join(', ');
-      return "<div class=\"gradebook-cell " + (opts.editable ? 'gradebook-cell-editable focus' : '') + " " + opts.classes + " " + (specialClasses.join(' ')) + "\">\n  " + (tooltipText ? '<div class="gradebook-tooltip">' + tooltipText + '</div>' : '') + "\n  <a href=\"#\" class=\"gradebook-cell-comment\"><span class=\"gradebook-cell-comment-label\">submission comments</span></a>\n  " + innerContents + "\n</div>";
+      return "" + (tooltipText ? '<div class="gradebook-tooltip">' + tooltipText + '</div>' : '') + "\n<div class=\"gradebook-cell " + (opts.editable ? 'gradebook-cell-editable focus' : '') + " " + opts.classes + " " + (specialClasses.join(' ')) + "\">\n  <a href=\"#\" class=\"gradebook-cell-comment\"><span class=\"gradebook-cell-comment-label\">submission comments</span></a>\n  " + innerContents + "\n</div>";
     };
     SubmissionCell.classesBasedOnSubmission = function(submission, assignment) {
       var classes;
@@ -108,6 +105,9 @@
       }
       if (submission.drop) {
         classes.push('dropped');
+      }
+      if ('' + assignment.submission_types === "not_graded") {
+        classes.push('ungraded');
       }
       return classes;
     };

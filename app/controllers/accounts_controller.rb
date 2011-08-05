@@ -104,6 +104,7 @@ class AccountsController < ApplicationController
       new_login = @pseudonym.new_record?
       if !@pseudonym.new_record?
         user = @pseudonym.user
+        self.extend TextHelper
         render :json => {:errors => {'pseudonym[unique_id]' => mt(:login_in_use_notice, "The login specified is already in use by [%{username}](%{url})", :username => user.name, :url => "/users/#{user.id}")}}.to_json, :status => :bad_request
         return
       end

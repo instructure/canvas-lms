@@ -218,7 +218,7 @@
                 </div>
                 <div>
                   <input type="radio" name="assignment[automatic_peer_reviews]" value="1" id="auto_peer_reviews" <%= 'checked' if @assignment && @assignment.automatic_peer_reviews %> />
-                  <label for="auto_peer_reviews"><%= t 'lables.automatically_assign_peer_reviews', "Automatically Assign Peer Reviews" %></label>
+                  <label for="auto_peer_reviews"><%= t 'labels.automatically_assign_peer_reviews', "Automatically Assign Peer Reviews" %></label>
                 </div>
               </td>
             </tr>
@@ -241,7 +241,7 @@
         <td style="vertical-align: top;" colspan="1">
           <select name="submission_type" class="submission_type_option">
             <option value="none" <%= "selected" if (!assignment.submission_types || assignment.submission_types == "none") %>><%= t 'options.no_submission', "No Submission" %></option>
-            <option value="online" <%= "selected" if (assignment.submission_types && (assignment.submission_types.match(/media/) || assignment.submission_types.match(/online/))) %>><%= t 'options.online_submission', "Online Submission" %></option>
+            <option value="online" <%= "selected" if (assignment.submission_types && assignment.submission_types.match(/media|online_text_entry|online_upload|online_url/)) %>><%= t 'options.online_submission', "Online Submission" %></option>
             <option value="on_paper" <%= "selected" if (assignment.submission_types == "on_paper") %>><%= t 'options.on_paper', "On Paper" %></option>
           </select>
         </td>

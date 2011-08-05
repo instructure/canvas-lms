@@ -43,4 +43,16 @@ describe "assignment selenium tests" do
     driver.find_element(:css, ".criterion_description .long_description_link").click
     el = driver.find_element(:css, ".ui-dialog div.long_description").text.should == "This is awesome."
   end
+  
+  it "should highlight mini-calendar dates where stuff is due" do
+    course_with_student_logged_in
+    
+    due_date = Time.now.utc + 2.days
+    @assignment = @course.assignments.create(:name => 'assignment', :due_at => due_date)
+    
+    get "/courses/#{@course.id}/assignments/syllabus"
+    
+    driver.find_element(:css, ".mini_calendar_day.date_#{due_date.strftime("%m_%d_%Y")}").
+      attribute('class').should match /has_event/
+  end
 end

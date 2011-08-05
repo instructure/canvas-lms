@@ -184,7 +184,6 @@ I18n.scoped('quizzes.take_quiz', function(I18n) {
     var timeMod = 0;
     return {
       referenceDate: null,
-      referenceOffset: 0,
       countDown: null,
       isDeadline: true,
       fiveMinuteDeadline: false,

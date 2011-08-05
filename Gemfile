@@ -62,7 +62,7 @@ group :test do
   gem 'rcov',         '0.9.9'
   gem 'rspec',        '1.3.1'
   gem 'rspec-rails',  '1.3.3'
-  gem 'selenium-webdriver', '2.0.1'
+  gem 'selenium-webdriver', '2.1.0'
   gem 'webrat',       '0.7.2'
   gem 'yard',         '0.7.2'
 end
@@ -75,7 +75,7 @@ group :development do
 end
 
 group :redis do
-  gem 'redis-store', '1.0.0.beta4'
+  gem 'redis-store', '1.0.0.rc1'
 end
 
 # The closure-compiler gem has an undocumented

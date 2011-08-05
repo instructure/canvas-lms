@@ -59,8 +59,14 @@ describe "OAuth2", :type => :integration do
     get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
     response.should be_client_error
     get "/api/v1/courses.json", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
-    response.should be_client_error
+    response.should be_success
     get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+    response.should be_success
+    reset!
+
+    # don't need developer key when we have an actual application session
+    post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+    get "/api/v1/courses.json", {}
     response.should be_success
     JSON.parse(response.body).size.should == 1
     reset!
@@ -74,6 +80,15 @@ describe "OAuth2", :type => :integration do
     @course.assignments.count.should == 1
     @course.assignments.first.title.should == 'test assignment'
     @course.assignments.first.points_possible.should == 5.3
+    # still need an authenticity token for posts when they have an actual application session
+    reset!
+    post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+    post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => 'asdf' }
+    response.should be_client_error
+    $now = true
+    post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => session[:_csrf_token] }
+    response.should be_success
+    @course.assignments.count.should == 2
   end
 
   describe "oauth2 native app flow" do
@@ -96,7 +111,14 @@ describe "OAuth2", :type => :integration do
           response['Location'].should match(%r{/login/oauth2/auth?})
           code = response['Location'].match(/code=([^\?&]+)/)[1]
           code.should be_present
-          reset!
+
+          get response['Location']
+          response.should be_success
+
+          # make sure the user is now logged out, or the app also has full access to their session
+          get '/'
+          response.should be_redirect
+          response['Location'].should == 'http://www.example.com/login'
 
           # we have the code, we can close the browser session
           if opts[:basic_auth]

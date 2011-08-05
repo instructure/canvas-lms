@@ -34,7 +34,6 @@ javascripts:
     - public/javascripts/license_help.js
     - public/javascripts/wiki_sidebar.js
     - public/javascripts/translations/_core.js
-    - public/javascripts/translations/common.js
   speed_grader:
     - public/javascripts/jquery.elastic.js
     - public/javascripts/ui.selectmenu.js
@@ -79,7 +78,6 @@ javascripts:
     - public/javascripts/topic.js
   account_statistics:
     - public/javascripts/account_statistics.js
-    - public/javascripts/translations/account_statistics.js
   assignments:
     - public/javascripts/assignments.js
   edit_rubric:
@@ -101,7 +99,6 @@ javascripts:
     - public/javascripts/collaborations.js
   context_inbox:
     - public/javascripts/context_inbox.js
-    - public/javascripts/translations/context_inbox.js
   context_modules:
     - public/javascripts/context_modules.js
   course_details:
@@ -127,6 +124,17 @@ javascripts:
     - public/javascripts/user_lists.js
   datagrid:
     - public/javascripts/datagrid.js
+  jquery_ui_menu:
+    - public/javascripts/jquery-1.6.2.js
+    - public/javascripts/jquery.ui.core-1.9.js
+    - public/javascripts/jquery.ui.position-1.9.js
+    - public/javascripts/jquery.ui.widget-1.9.js
+    - public/javascripts/jquery.ui.menu-1.9.js
+    - public/javascripts/jquery.ui.button-1.9.js
+    - public/javascripts/jquery.ui.popup-1.9.js
+    - public/javascripts/jquery.ui.menu.inputmenu.js
+    - public/javascripts/compiled/jquery.kylemenu.js
+    - public/javascripts/jquery.ui.menu-1.9_unsetup.js
   gradebook2:
     - public/javascripts/compiled/multi_grid.js
     - public/javascripts/compiled/grade_calculator.js
@@ -152,7 +160,6 @@ javascripts:
     - public/javascripts/supercalc.js
     - public/javascripts/calcCmd.js
     - public/javascripts/quiz_rubric.js
-    - public/javascripts/translations/quizzes_bundle.js
   quizzes_index:
     - public/javascripts/quiz_index.js
     - public/javascripts/content_locks.js
@@ -198,7 +205,6 @@ javascripts:
     - public/javascripts/user.js
   manage_groups:
     - public/javascripts/manage_groups.js
-    - public/javascripts/translations/manage_groups.js
   manage_avatars:
     - public/javascripts/manage_avatars.js
   ie7:
@@ -213,7 +219,9 @@ javascripts:
     - public/javascripts/content_exports.js
   conferences:
     - public/javascripts/conferences.js
-    - public/javascripts/translations/conferences.js
+  teacher_activity_report:
+    - public/javascripts/jquery.tablesorter.min.js
+    - public/javascripts/compiled/teacher_activity_report.js
   messages:
     - public/javascripts/compiled/messages.js
     - public/javascripts/jquery.elastic.js
@@ -223,6 +231,8 @@ stylesheets:
     - public/stylesheets/compiled/g_reset.css
     - public/stylesheets/compiled/g_base.css
     - public/stylesheets/static/jquery-ui-theme.css
+    - public/stylesheets/compiled/jquery-ui-button.css
+    - public/stylesheets/compiled/jquery-ui-menu.css
     - public/stylesheets/static/jquery.autocomplete.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/g_util_misc.css

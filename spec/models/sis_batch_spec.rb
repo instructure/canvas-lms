@@ -50,6 +50,7 @@ describe SisBatch do
     it "should remove only from the specific term if it is given" do
       @subacct = @account.sub_accounts.create(:name => 'sub1')
       @term1 = @account.enrollment_terms.first
+      @term1.update_attribute(:sis_source_id, 'term1')
       @term2 = @account.enrollment_terms.create!(:name => 'term2')
 
       @c1 = factory_with_protected_attributes(@subacct.courses, :name => "delete me", :enrollment_term => @term1, :sis_batch_id => "previous")
@@ -58,6 +59,13 @@ describe SisBatch do
       @c2.offer!
       @c3 = factory_with_protected_attributes(@account.courses, :name => "delete me if terms", :enrollment_term => @term2, :sis_batch_id => "previous")
       @c3.offer!
+
+      # initial import of one course, to test courses that haven't changed at all between imports
+      process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+another_course,not-delete,not deleted not changed,,term1,active}
+      ])
+      @c4 = @account.courses.find_by_course_code('not-delete')
 
       # sections are keyed off what term their course is in
       @s1 = factory_with_protected_attributes(@c1.course_sections, :name => "delete me", :sis_batch_id => 'old')
@@ -77,7 +85,8 @@ describe SisBatch do
       @batch = process_csv_data(
         [
 %{course_id,short_name,long_name,account_id,term_id,status
-test_1,TC 101,Test Course 101,,,active},
+test_1,TC 101,Test Course 101,,term1,active
+another_course,not-delete,not deleted not changed,,term1,active},
 %{course_id,user_id,role,status,section_id
 test_1,user_1,student,active,
 my_course,user_2,student,active,
@@ -91,16 +100,17 @@ s2,test_1,section2,active},
       @c1.reload.should be_deleted
       @c2.reload.should be_available
       @c3.reload.should be_available
-      @c4 = @account.reload.courses.find_by_course_code('TC 101')
-      @c4.should_not be_nil
-      @c4.sis_batch_id.should == @batch.id.to_s
-      @c4.should be_claimed
+      @c4.reload.should be_claimed
+      @cnew = @account.reload.courses.find_by_course_code('TC 101')
+      @cnew.should_not be_nil
+      @cnew.sis_batch_id.should == @batch.id.to_s
+      @cnew.should be_claimed
 
       @s1.reload.should be_deleted
       @s2.reload.should be_active
       @s3.reload.should be_active
       @s4.reload.should be_deleted
-      @s5 = @c4.course_sections.find_by_sis_source_id('s2')
+      @s5 = @cnew.course_sections.find_by_sis_source_id('s2')
       @s5.should_not be_nil
 
       @e1.reload.should be_deleted

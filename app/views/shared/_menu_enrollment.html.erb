@@ -1,6 +1,10 @@
+<% enrollment = menu_enrollment[:enrollment] %>
 <li>
   <a href="<%= menu_enrollment[:enrollment].workflow_state == "invited" ? course_path(menu_enrollment[:enrollment].course_id, :invitation => menu_enrollment[:enrollment].uuid) : course_path(menu_enrollment[:enrollment].course_id) %>">
     <span class="name ellipsis" title="<%= menu_enrollment[:enrollment].long_name %>"><%= menu_enrollment[:enrollment].short_name %></span>
+    <% if enrollment.course && !enrollment.course.enrollment_term.default_term? && course_name_counts[enrollment.course.name] > 1 %>
+      <span class="subtitle ellipsis enrollment_term" style="float: right"><%= menu_enrollment[:enrollment].course.enrollment_term.name %></span>
+    <% end %>
     <span class="subtitle ellipsis"><%= menu_enrollment[:enrollment].workflow_state == "invited" ? content_tag('b', before_label(:invited_as, 'Invited as')) : before_label(:enrolled_as, "Enrolled as") %> <%= raw(menu_enrollment[:types].sort.map{|t| content_tag('b', t) }.uniq.to_sentence) %></span>
   </a>  
 </li>

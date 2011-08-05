@@ -31,7 +31,7 @@ jQuery(function($){
   function highlightDaysWithEvents() {
     $mini_month.find(".day.has_event").removeClass('has_event');
     $syllabus.find("tr.date").each(function() {
-      var splitDate = $(this).find(".day_date").attr('title').split('/'),
+      var splitDate = $(this).find(".day_date").attr('data-date').split('/'),
           monthDayYearDate = splitDate.join('_'),
           yearMonthDayDate = [splitDate[2], splitDate[0], splitDate[1]].join('_');
       // the 2 different selectors here are because when the page loads, it hs .date_21_10_2010 classes,

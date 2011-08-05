@@ -117,7 +117,237 @@ describe EnrollmentDateRestrictions do
   end
   
   describe "update_restricted_enrollments" do
-    describe "should activate inactive enrollments once start_at has passed" do
+    describe "should activate inactive enrollments if the start_at restriction is removed" do
+      it "should work on the enrollment model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @enrollment.start_at = start_at
+        @enrollment.end_at = end_at
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@enrollment)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @enrollment.start_at = nil
+        @enrollment.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@enrollment)
+        @enrollment.reload.state.should eql(:active)
+      end
+      
+      it "should work on the course_section model" do
+        course_with_student(:active_all => true)
+        @section = @course.course_sections.first
+        @section.should_not be_nil
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @enrollment.course_section = @section
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        @section.start_at = start_at
+        @section.end_at = end_at
+        @section.restrict_enrollments_to_section_dates = true
+        @section.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@section)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @section.start_at = nil
+        @section.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@section)
+        @enrollment.reload.state.should eql(:active)
+      end
+      
+      it "should work on the course model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @course.start_at = start_at
+        @course.conclude_at = end_at
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@course)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @course.start_at = nil
+        @course.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@course)
+        @enrollment.reload.state.should eql(:active)
+      end
+      
+      it "should work on the enrollment_dates_override model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @term = @course.enrollment_term
+        @term.should_not be_nil
+        @term.save!
+        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term, :start_at => start_at, :end_at => end_at)
+        @enrollment.workflow_state = 'inactive'
+        @enrollment.save!
+        @enrollment.state.should eql(:inactive)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@override)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @override.start_at = nil
+        @override.save
+        EnrollmentDateRestrictions.update_restricted_enrollments(@override)
+        @enrollment.reload.state.should eql(:active)
+      end
+      
+      it "should work on the enrollment_term model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @term = @course.enrollment_term
+        @term.should_not be_nil
+        @term.start_at = start_at
+        @term.end_at = end_at
+        @term.save!
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@term)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @term.start_at = nil
+        @term.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@term)
+        @enrollment.reload.state.should eql(:active)
+      end
+    end
+    
+    describe "should deactivate active enrollments if the start_at restriction is added, and activate it if removed" do
+      it "should work on the enrollment model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @enrollment.start_at = start_at
+        @enrollment.end_at = end_at
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@enrollment)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @enrollment.start_at = nil
+        @enrollment.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@enrollment)
+        @enrollment.reload.state.should eql(:active)
+      end
+      
+      it "should work on the course_section model" do
+        course_with_student(:active_all => true)
+        @section = @course.course_sections.first
+        @section.should_not be_nil
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @enrollment.course_section = @section
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        @section.start_at = start_at
+        @section.end_at = end_at
+        @section.restrict_enrollments_to_section_dates = true
+        @section.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@section)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @section.start_at = nil
+        @section.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@section)
+        @enrollment.reload.state.should eql(:active)
+        
+        @section.restrict_enrollments_to_section_dates = false
+        @section.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@section)
+        @enrollment.reload.state.should eql(:active)
+      end
+      
+      it "should work on the course model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @course.start_at = start_at
+        @course.conclude_at = end_at
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@course)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @course.start_at = nil
+        @course.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@course)
+        @enrollment.reload.state.should eql(:active)
+        
+        @course.restrict_enrollments_to_course_dates = false
+        @course.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@course)
+        @enrollment.reload.state.should eql(:active)
+      end
+      
+      it "should work on the enrollment_dates_override model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @term = @course.enrollment_term
+        @term.should_not be_nil
+        @term.save!
+        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term, :start_at => start_at, :end_at => end_at)
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@override)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @override.start_at = nil
+        @override.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@override)
+        @enrollment.reload.state.should eql(:active)
+        
+        @term.ignore_term_date_restrictions = true
+        @term.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@override)
+        @enrollment.reload.state.should eql(:active)
+      end
+      
+      it "should work on the enrollment_term model" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @term = @course.enrollment_term
+        @term.should_not be_nil
+        @term.start_at = start_at
+        @term.end_at = end_at
+        @term.save!
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        @enrollment.state.should eql(:active)
+        EnrollmentDateRestrictions.update_restricted_enrollments(@term)
+        @enrollment.reload.state.should eql(:inactive)
+        
+        @term.start_at = nil
+        @term.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@term)
+        @enrollment.reload.state.should eql(:active)
+        
+        @term.ignore_term_date_restrictions = true
+        @term.save!
+        EnrollmentDateRestrictions.update_restricted_enrollments(@term)
+        @enrollment.reload.state.should eql(:active)
+      end
+    end
+    
+    describe "should activate inactive enrollments once start_at has passed, or once restrictions are ignored" do
       it "should work on the enrollment model" do
         course_with_student(:active_all => true)
         start_at = 2.days.ago
@@ -201,7 +431,7 @@ describe EnrollmentDateRestrictions do
         @enrollment.state.should eql(:inactive)
         @override.reload
         EnrollmentDateRestrictions.update_restricted_enrollments(@override)
-        @enrollment.reload.state.should eql(:inactive)
+        @enrollment.reload.state.should eql(:active)
       end
       
       it "should work on the enrollment_term model" do
@@ -225,7 +455,7 @@ describe EnrollmentDateRestrictions do
         @enrollment.save!
         @enrollment.state.should eql(:inactive)
         EnrollmentDateRestrictions.update_restricted_enrollments(@term)
-        @enrollment.reload.state.should eql(:inactive)
+        @enrollment.reload.state.should eql(:active)
       end
     end
     
@@ -337,6 +567,21 @@ describe EnrollmentDateRestrictions do
         @enrollment.state.should eql(:active)
         EnrollmentDateRestrictions.update_restricted_enrollments(@term)
         @enrollment.reload.state.should eql(:active)
+      end
+    end
+    
+    describe "scheduling future updates" do
+      it "should schedule a delayed job at the right time to update enrollments" do
+        course_with_student(:active_all => true)
+        start_at = 2.days.from_now
+        end_at = 4.days.from_now
+        @course.start_at = start_at
+        @course.conclude_at = end_at
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+        jobs = Delayed::Job.all(:limit => 2, :order => 'id desc').reverse
+        jobs[0].run_at.should be_close start_at, 1
+        jobs[1].run_at.should be_close end_at, 1
       end
     end
   end

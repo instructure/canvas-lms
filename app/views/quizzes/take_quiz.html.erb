@@ -66,7 +66,6 @@
   <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).iso8601 %></span>
   <span class="end_at"><%= @submission.end_at && @submission.end_at.iso8601 %></span>
   <span class="time_limit"><%= @quiz.time_limit || nbsp %></span>
-  <span class="utc_offset"><%= Time.now.utc_offset %></span>
 </div>
 <%= render :partial => "display_question", :collection => @submission.questions_as_object, :locals => {:assessing => true } %>
 <div class="button-container">

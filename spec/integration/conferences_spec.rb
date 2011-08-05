@@ -19,6 +19,19 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ConferencesController do
+    before(:all) do
+    WebConference.instance_eval do
+      def plugins
+        [OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true, :enabled? => true)]
+      end
+    end
+  end
+  after(:all) do
+    WebConference.instance_eval do
+      def plugins; Canvas::Plugin.all_for_tag(:web_conferencing); end
+    end
+  end
+
   it "should notify participants" do
     notification_model(:name => "Web Conference Invitation")
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)

@@ -15,7 +15,7 @@
       <div id="combo_box_container"></div>
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
       <div id='x_of_x_students'>
-        (<%= t(:portion_of_students, "%{x} of %{y} students", :x => raw('<span>???</span>'), :y => @assignment.context.students.length) %>)<br />
+        (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students.length) %>)<br />
         <a href="<%= context_url(@context, :context_gradebook_url) %>#assignment/<%= @assignment.id %>"><%= t('links.gradebook', "Gradebook") %></a> | 
         <a href="<%= context_url(@context, :context_url) %>"><%= t('links.course_home', "Course Home") %></a>
       </div>
@@ -175,7 +175,7 @@
                 </div>
                 <% if @assignment.group_category %>
                   <div id="group_comment_wrapper">
-                    <input type="checkbox" name="group_comment" id="submission_group_comment" checked/>
+                    <input type="checkbox" name="group_comment" id="submission_group_comment"/>
                     <label for="submission_group_comment"><%= t('labels.group_comment', "Send Comment to the Whole Group") %></label>
                   </div>
                 <% end %>

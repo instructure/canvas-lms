@@ -88,6 +88,7 @@
               <% 
                 max_to_show = 8 # Need to keep this low for users with limited screen real estate
                 coalesced_enrollments = []
+                course_name_counts = {}
                 @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).each do |e|
                   coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] } if !e.course
                   existing_enrollment_info = coalesced_enrollments.find { |en|
@@ -99,6 +100,8 @@
                     existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || [999,999, 999], [e.rank_sortable, e.state_sortable, 0 - e.id]].min
                   else
                     coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
+                    course_name_counts[e.course.name] ||= 0
+                    course_name_counts[e.course.name] += 1
                   end
                 end
                 coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] || [999,999, 999] }
@@ -113,7 +116,8 @@
                            :collection_size => triple.first.length,
                            :max_to_show => max_to_show,
                            :more_link_for_over_max => triple[3],
-                           :title => triple[2] }) %>
+                           :title => triple[2],
+                           :course_name_counts => course_name_counts }) %>
               <% end %>
             </tr>
           </table>
@@ -272,7 +276,7 @@
     <div id="ajax_authenticity_token"><%= form_authenticity_token %></div>
     <div id="time_zone_offset"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone).utc_offset / -60 %></div>
     <% if @context && session && temp_type = session["role_#{@context.asset_string}"] %>
-      <span id="switched_role_type" class="<%= @context.asset_string %>"><%= Enrollment.readable_type(temp_type) %></span>
+      <span id="switched_role_type" class="<%= @context.asset_string %>" data-role="<%= temp_type %>"><%= Enrollment.readable_type(temp_type) %></span>
     <% end %>
     <% if @page_view %>
       <a href="<%= page_view_path(@page_view.id || @page_view.temporary_id) %>" id="page_view_update_path">&nbsp;</a>

@@ -325,6 +325,7 @@ class PseudonymSessionsController < ApplicationController
       # hopefully the user never sees this, since it's an oob response and the
       # browser should be closed automatically. but we'll at least display
       # something basic.
+      @pseudonym_session.try(:destroy)
       reset_session
       return render()
     end

@@ -88,10 +88,10 @@ module SIS
             abstract_course = nil
             if row['abstract_course_id'].present? 
               abstract_course = AbstractCourse.find_by_root_account_id_and_sis_source_id(@root_account.id, row['abstract_course_id'])
-              unless abstract_course
-                add_warning(csv, "unknown abstract course id #{row['abstract_course_id']}")
-                next
-              end
+              add_warning(csv, "unknown abstract course id #{row['abstract_course_id']}, ignoring abstract course reference") unless abstract_course
+            end
+
+            if abstract_course
               if row['term_id'].blank? && course.enrollment_term_id != abstract_course.enrollment_term
                 course.send(:association_instance_set, :enrollment_term, nil)
                 course.enrollment_term_id = abstract_course.enrollment_term_id
@@ -141,7 +141,7 @@ module SIS
               course.sis_batch_id = @batch.id if @batch
               course.save_without_broadcasting!
             elsif @batch
-              courses_to_update_sis_batch_id << @batch.id
+              courses_to_update_sis_batch_id << course.id
             end
             @sis.counts[:courses] += 1
 

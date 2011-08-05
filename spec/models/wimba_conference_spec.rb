@@ -22,7 +22,7 @@ describe WimbaConference do
   before(:all) do
     WebConference.instance_eval do
       def plugins
-        [OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true)]
+        [OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true, :enabled? => true)]
       end
     end
 

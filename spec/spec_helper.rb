@@ -89,7 +89,7 @@ Spec::Runner.configure do |config|
   end
 
   def course(opts={})
-    @course = Course.create!
+    @course = Course.create!(:name => opts[:course_name])
     @course.offer! if opts[:active_course] || opts[:active_all]
     if opts[:active_all]
       u = User.create!

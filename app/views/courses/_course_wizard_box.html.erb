@@ -69,7 +69,7 @@ $(document).ready(function() {
       <li class="option <%= 'completed' unless @context.tas.empty? %>">
         <a href="<%= context_url(@context, :context_details_url, :wizard => 1) %>#add_tas" class="header"><%= t('links.tas', %{Add TAs to the Course}) %></a>
         <div class="details" style="display: none;">
-          <%= t 'details.tas', %{You may want to assign some TA's to help you with the course.  TA's can grade student submissions, help moderate the discussions and even update due dates and assignment details for you.} %>
+          <%= t 'details.tas', %{You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you.} %>
         </div>
       </li>
       <% if !@context.available? %>

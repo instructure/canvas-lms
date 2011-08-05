@@ -185,12 +185,11 @@ module ApplicationHelper
   def load_wiki_sidebar
     return if @wiki_sidebar_data
     logger.warn "database lookups happening in view code instead of controller code for wiki sidebar (load_wiki_sidebar)"
-    Folder.root_folders(@context)
     @wiki_sidebar_data = {}
-    includes = [:default_wiki_wiki_pages, :active_assignments, :active_discussion_topics, :active_folders, :active_quizzes, :active_context_modules]
+    includes = [:default_wiki_wiki_pages, :active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
     includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).scoped({:limit => 150}) if @context.respond_to?(i) }
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
-    @wiki_sidebar_data[:root_folders] = @wiki_sidebar_data[:active_folders].select{|f| f.parent_folder_id == nil && f.visible? }.to_a.sort_by{|f| f.position || 999 }
+    @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
     @wiki_sidebar_data
   end
   
@@ -273,7 +272,7 @@ var I18n = I18n || {};
   def section_tabs
     @section_tabs ||= begin
       if @context 
-        Rails.cache.fetch([@context, @current_user, "section_tabs"].cache_key) do
+        Rails.cache.fetch([@context, @current_user, "section_tabs", I18n.locale].cache_key) do
           if @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user).empty?
             html = []
             html << '<nav role="navigation"><ul id="section-tabs">'
@@ -447,5 +446,13 @@ var I18n = I18n || {};
 
   def join_title(*parts)
     parts.join(t('#title_separator', ': '))
+  end
+
+  def cache(name = {}, options = nil, &block)
+    unless options && options[:no_locale]
+      name = name.cache_key if name.respond_to?(:cache_key)
+      name = name + "/#{I18n.locale}" if name.is_a?(String)
+    end
+    super
   end
 end
