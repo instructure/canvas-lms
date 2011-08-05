@@ -26,7 +26,7 @@ require File.expand_path(File.dirname(__FILE__) + '/server')
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
 SERVER_IP = UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
 SECONDS_UNTIL_COUNTDOWN = 5
-SECONDS_UNTIL_GIVING_UP = 60
+SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 60
 
 $server_port = nil
@@ -249,7 +249,12 @@ shared_examples_for "all selenium tests" do
     seconds.times do |i|
       puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN
       if i < seconds - 2
-        val = (yield rescue false)
+        val = false
+        begin
+          val = yield
+        rescue => e
+          puts "exception: #{e}" if i > SECONDS_UNTIL_COUNTDOWN
+        end
         break(val) if val
       elsif i == seconds - 1
         yield
