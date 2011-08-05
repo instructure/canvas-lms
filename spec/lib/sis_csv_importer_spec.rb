@@ -216,6 +216,25 @@ describe SIS::SisCsv do
           "unknown abstract course id AC001"]}
       Course.count.should == beforecount
     end
+
+    it "should support falling back to a fallback account if the primary one doesn't exist" do
+      before_count = AbstractCourse.count
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount,active"
+      )
+      process_csv_data_cleanly(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status,fallback_account_id",
+        "C001,Hum101,Humanities,NOEXIST,T001,active,A001"
+      )
+      AbstractCourse.count.should == before_count + 1
+      AbstractCourse.last.tap{|c|
+        c.account.should == Account.last
+        c.account.name.should == "TestAccount"
+        c.root_account.should == @account
+      }
+    end
+
   end
   
   context "course importing" do
@@ -281,6 +300,20 @@ describe SIS::SisCsv do
       course.associated_accounts.map(&:id).sort.should == [account.id, @account.id].sort
     end
     
+    it "should support falling back to a fallback account if the primary one doesn't exist" do
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,Humanities,active"
+      )
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,fallback_account_id",
+        "test_1,TC 101,Test Course 101,NOEXIST,,active,A001"
+      )
+      account = @account.sub_accounts.find_by_sis_source_id("A001")
+      course = account.courses.find_by_sis_source_id("test_1")
+      course.account.should == account
+    end
+
     it "should rename courses that have not had their name manually changed" do
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
