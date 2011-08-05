@@ -428,4 +428,18 @@ describe Account do
     end
   end
 
+  it "should correctly return sub-accounts as options" do
+    a = Account.default
+    sub = Account.create!(:name => 'sub', :parent_account => a)
+    sub2 = Account.create!(:name => 'sub2', :parent_account => a)
+    sub2_1 = Account.create!(:name => 'sub2-1', :parent_account => sub2)
+    options = a.sub_accounts_as_options
+    options.should ==
+      [
+        ["Default Account", a.id],
+        ["&nbsp;&nbsp;sub", sub.id],
+        ["&nbsp;&nbsp;sub2", sub2.id],
+        ["&nbsp;&nbsp;&nbsp;&nbsp;sub2-1", sub2_1.id]
+      ]
+  end
 end

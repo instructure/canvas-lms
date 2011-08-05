@@ -34,7 +34,7 @@ class Account < ActiveRecord::Base
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id'
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
-  has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id'
+  has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
   has_many :account_users, :dependent => :destroy
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :learning_outcomes, :as => :context
@@ -219,10 +219,18 @@ class Account < ActiveRecord::Base
     !self.root_account_id
   end
   
-  def sub_accounts_as_options(indent=0)
+  def sub_accounts_as_options(indent = 0, preloaded_accounts = nil)
+    unless preloaded_accounts
+      preloaded_accounts = {}
+      (self.root_account || self).all_accounts.active.each do |account|
+        (preloaded_accounts[account.parent_account_id] ||= []) << account
+      end
+    end
     res = [[("&nbsp;&nbsp;" * indent).html_safe + self.name, self.id]]
-    self.sub_accounts.each do |account|
-      res += account.sub_accounts_as_options(indent + 1)
+    if preloaded_accounts[self.id]
+      preloaded_accounts[self.id].each do |account|
+        res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
+      end
     end
     res
   end
