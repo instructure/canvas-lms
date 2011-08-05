@@ -273,10 +273,10 @@ var I18n = I18n || {};
     @section_tabs ||= begin
       if @context 
         Rails.cache.fetch([@context, @current_user, "section_tabs", I18n.locale].cache_key) do
-          if @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user).empty?
+          if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user)).empty?
             html = []
             html << '<nav role="navigation"><ul id="section-tabs">'
-            tabs = @context.tabs_available(@current_user).select do |tab|
+            tabs = tabs.select do |tab|
               if (tab[:id] == @context.class::TAB_CHAT rescue false)
                 tab[:href] && tab[:label] && feature_enabled?(:tinychat)
               elsif (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
@@ -289,7 +289,7 @@ var I18n = I18n || {};
             end
             tabs.each do |tab|
               path = tab[:no_args] ? send(tab[:href]) : send(tab[:href], @context)
-              html << "<li class='section #{"hidden" if tab[:hidden] || tab[:hidden_unused] }'>" + link_to(tab[:label], path, :class => tab[:label].to_css_class) + "</li>" if tab[:href]
+              html << "<li class='section #{"hidden" if tab[:hidden] || tab[:hidden_unused] }'>" + link_to(tab[:label], path, :class => tab[:css_class].to_css_class) + "</li>" if tab[:href]
             end
             html << "</ul></nav>"
             html.join("")
