@@ -40,6 +40,8 @@ shared_examples_for "profile selenium tests" do
     keep_trying_until { spans.last.attribute('class') =~ /selected/ }
     dialog.find_element(:css, 'button.select_button').click
     keep_trying_until { driver.find_element(:css, '.profile_pic_link img').attribute('src') =~ %r{/images/thumbnails/} }
+    
+    Attachment.last.folder.should == @user.profile_pics_folder
   end
 end
 
