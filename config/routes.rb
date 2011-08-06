@@ -652,9 +652,9 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :courses) do |courses|
       courses.get 'courses', :action => :index
       courses.get 'courses/:id', :action => :show
-      courses.get 'courses/:course_id/sections', :action => :sections
+      courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
-      courses.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students
+      courses.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
@@ -665,12 +665,12 @@ ActionController::Routing::Routes.draw do |map|
     end
 
     api.with_options(:controller => :submissions_api) do |submissions|
-      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions', :action => :index
+      submissions.get 'courses/:course_id/assignments/:assignment_id/submissions', :action => :index, :path_name => 'course_assignment_submissions'
       submissions.get 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :show
-      submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update
+      submissions.put 'courses/:course_id/assignments/:assignment_id/submissions/:id', :action => :update, :path_name => 'course_assignment_submission'
     end
 
-    api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index
+    api.get 'courses/:course_id/assignment_groups', :controller => :assignment_groups, :action => :index, :path_name => 'course_assignment_groups'
 
     api.with_options(:controller => :discussion_topics) do |topics|
       topics.get 'courses/:course_id/discussion_topics', :action => :index, :path_name => 'course_discussion_topics'
