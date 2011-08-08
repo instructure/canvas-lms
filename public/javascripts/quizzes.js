@@ -68,6 +68,10 @@ I18n.scoped('quizzes', function(I18n) {
         if($answers.filter(".correct_answer").length === 0) {
           $answers.filter(":first").addClass('correct_answer');
         }
+        $answers.find('.select_answer_link').attr('title', I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"));
+      } else {
+        $answer.filter(".correct_answer").find('.select_answer_link').attr('title', I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct"));
+        $answer.filter(":not(.correct_answer)").find('.select_answer_link').attr('title', I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"));
       }
       $answer.find(".numerical_answer_type").change();
       var templateData = {
@@ -104,10 +108,11 @@ I18n.scoped('quizzes', function(I18n) {
         $answer.addClass('answer_idx_' + answer.blank_index);
       }
       $answer.fillTemplateData({data: templateData, htmlValues: ['answer_html', 'answer_match_left_html'] });
-      if(answer.answer_weight == 100) {
+      if(answer.answer_weight > 0) {
         $answer.addClass('correct_answer');
-      } else if(answer.answer_weight > 0) {
-        $answer.addClass('correct_answer');
+        if(answer.answer_selection_type == "multiple_answer") {
+          $answer.find('.select_answer_link').attr('title', I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct"));
+        }
       } else if(answer.answer_weight < 0) {
         $answer.addClass('negative_answer');
       }
@@ -1276,6 +1281,11 @@ I18n.scoped('quizzes', function(I18n) {
         $(this).parents(".answer").addClass('correct_answer');
       } else {
         $(this).parents(".answer").toggleClass('correct_answer');
+        if($(this).parents(".answer").hasClass('correct_answer')) {
+          $(this).attr('title', I18n.t('titles.click_to_unset_as_correct', "Click to unset this answer as correct"));
+        } else {
+          $(this).attr('title', I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"));
+        }
       }
       $(this).blur();
     });
