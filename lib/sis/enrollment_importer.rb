@@ -56,6 +56,7 @@ module SIS
               # course_sections are all in the same database
               Enrollment.transaction do
                 remaining_in_transaction = @sis.updates_every
+                tx_end_time = Time.now + Setting.get('sis_transaction_seconds', '1').to_i.seconds
 
                 begin
                   logger.debug("Processing Enrollment #{row.inspect}")
@@ -157,7 +158,7 @@ module SIS
                   end
 
                   @sis.counts[:enrollments] += 1
-                end while !(row = csv_object.shift).nil? && remaining_in_transaction > 0
+                end while !(row = csv_object.shift).nil? && remaining_in_transaction > 0 && tx_end_time > Time.now
               end
             end
           end

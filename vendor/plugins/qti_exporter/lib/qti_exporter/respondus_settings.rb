@@ -19,6 +19,12 @@ class RespondusSettings
     apply_if_set(assessment, :ip_filter, 'ipRestriction') { |v| v == 'unlimited' ? nil : v }
     apply_if_set(assessment, :shuffle_answers, 'shuffleAnswers') { |v| v == 'true' }
     apply_if_set(assessment, :due_at, 'dueDate') { |v| readtime(v) }
+    if read_setting('publishNow') == 'true'
+      assessment[:available] = true
+      assessment[:assignment] = {
+        :title => assessment[:title],
+      }
+    end
 
     feedback = read_csv_setting('feedbackOptions')
     if feedback.include?('showResults') || feedback.include?('all')

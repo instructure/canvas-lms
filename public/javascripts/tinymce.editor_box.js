@@ -186,7 +186,7 @@
           $(ed.contentDocument).bind("DOMNodeInserted", function(e){
             var target = e.target, 
                 mceSrc;
-            if (target.nodeType === 1 && target.nodeName === 'IMG'  && (mceSrc = $(target).attr('_mce_src')) ) {
+            if (target.nodeType === 1 && target.nodeName === 'IMG'  && (mceSrc = $(target).data('url')) ) {
               $(target).attr('src', tinyMCE.activeEditor.documentBaseURI.toAbsolute(mceSrc));
             }
           });

@@ -62,6 +62,7 @@ module SIS
             # this transaction assumes that the users and pseudonyms are in the same database
             User.transaction do
               remaining_in_transaction = @sis.updates_every
+              tx_end_time = Time.now + Setting.get('sis_transaction_seconds', '1').to_i.seconds
 
               begin
                 logger.debug("Processing User #{row.inspect}")
@@ -169,7 +170,7 @@ module SIS
                 user.update_account_associations if update_account_association
 
                 @sis.counts[:users] += 1
-              end while !(row = csv_object.shift).nil? && remaining_in_transaction > 0
+              end while !(row = csv_object.shift).nil? && remaining_in_transaction > 0 && tx_end_time > Time.now
             end
           end
           User.update_all({:creation_sis_batch_id => @batch.id}, {:id => users_to_set_sis_batch_ids}) if @batch && !users_to_set_sis_batch_ids.empty?

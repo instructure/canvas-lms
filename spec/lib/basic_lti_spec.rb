@@ -40,6 +40,27 @@ describe BasicLTI do
       }, 'http://dr-chuck.com/ims/php-simple/tool.php', '12345', 'secret')
       res['oauth_signature'].should eql('TPFPK4u3NwmtLt0nDMP1G1zG30U=')
     end
+
+    it "should generate a correct signature with URL query parameters" do
+      BasicLTI.explicit_signature_settings('1251600739', 'c8350c0e47782d16d2fa48b2090c1d8f')
+      res = BasicLTI.generate_params({
+        :resource_link_id                   => '120988f929-274612',
+        :user_id                            => '292832126',
+        :roles                              => 'Instructor',
+        :lis_person_name_full               => 'Jane Q. Public',
+        :lis_person_contact_email_primary   => 'user@school.edu',
+        :lis_person_sourced_id              => 'school.edu:user',
+        :context_id                         => '456434513',
+        :context_title                      => 'Design of Personal Environments',
+        :context_label                      => 'SI182',
+        :lti_version                        => 'LTI-1p0',
+        :lti_message_type                   => 'basic-lti-launch-request',
+        :tool_consumer_instance_guid        => 'lmsng.school.edu',
+        :tool_consumer_instance_description => 'University of School (LMSng)',
+        :basiclti_submit                    => 'Launch Endpoint with BasicLTI Data'
+      }, 'http://dr-chuck.com/ims/php-simple/tool.php?a=1&b=2', '12345', 'secret')
+      res['oauth_signature'].should eql('eCJ7qILcordyJC2/Unhchp6RAcs=')
+    end
   end
   
   describe "generate" do
@@ -64,6 +85,22 @@ describe BasicLTI do
       hash['tool_consumer_instance_guid'].should == "#{@course.root_account.opaque_identifier(:asset_string)}.#{HostUrl.context_host(@course)}"
       hash['tool_consumer_instance_name'].should == @course.root_account.name
       hash['tool_consumer_instance_contact_email'].should == HostUrl.outgoing_email_address
+      hash['oauth_callback'].should == 'about:blank'
+    end
+    
+    it "should include URI query parameters" do
+      course_with_teacher(:active_all => true)
+      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
+      hash = BasicLTI.generate('http://www.yahoo.com?a=1&b=2', @tool, @user, @course, '123456', 'http://www.google.com')
+      hash['a'].should == '1'
+      hash['b'].should == '2'
+    end
+    
+    it "should not allow overwriting other parameters from the URI query string" do
+      course_with_teacher(:active_all => true)
+      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
+      hash = BasicLTI.generate('http://www.yahoo.com?user_id=123&oauth_callback=1234', @tool, @user, @course, '123456', 'http://www.google.com')
+      hash['user_id'].should == @user.opaque_identifier(:asset_string)
       hash['oauth_callback'].should == 'about:blank'
     end
     

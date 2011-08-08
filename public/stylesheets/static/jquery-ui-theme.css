@@ -219,8 +219,12 @@
 .ui-icon-help { background-position: -48px -144px; }
 .ui-icon-check { background-position: -64px -144px; }
 .ui-icon-bullet { background-position: -80px -144px; }
-.ui-icon-radio-off { background-position: -96px -144px; }
-.ui-icon-radio-on { background-position: -112px -144px; }
+/*.ui-icon-radio-off { background-position: -96px -144px; }
+.ui-icon-radio-on { background-position: -112px -144px; }*/
+.ui-icon-radio-off { background: none !important; }
+.ui-icon-radio-on { background: url(/images/jqueryui/ui-icon-radio-on.png) 0 0 no-repeat !important; }
+.ui-icon-sections { background: url(/images/jqueryui/ui-icon-sections.png) 0 0 no-repeat !important; }
+.ui-icon-cog { background: url(/images/jqueryui/ui-icon-cog.png) 0 0 no-repeat !important; }
 .ui-icon-pin-w { background-position: -128px -144px; }
 .ui-icon-pin-s { background-position: -144px -144px; }
 .ui-icon-play { background-position: 0 -160px; }
@@ -331,75 +335,37 @@
 
 /* Menu
 ----------------------------------*/
-.ui-menu {
-	list-style:none;
-	padding: 2px;
-	margin: 0;
-	display:block;
+/*.ui-menu {
+  list-style:none;
+  padding: 2px;
+  margin: 0;
+  display:block;
 }
 .ui-menu .ui-menu {
-	margin-top: -3px;
+  margin-top: -3px;
 }
 .ui-menu .ui-menu-item {
-	margin:0;
-	padding: 0;
-	width: 100%;
+  margin:0;
+  padding: 0;
+  width: 100%;
 }
 .ui-menu .ui-menu-item a {
-	text-decoration:none;
-	display:block;
-	border: 0px none;
-	padding:.2em .4em;
-	line-height:1.5;
-	-moz-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px;
+  text-decoration:none;
+  display:block;
+  border: 0px none;
+  padding:.2em .4em;
+  line-height:1.5;
+  -moz-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px;
 }
 .ui-menu .ui-menu-item a.ui-state-hover,
 .ui-menu .ui-menu-item a.ui-state-active {
   background: url(/images/jqueryui/button_bg.png) repeat-x left center;
-	background-color: #5f83b9;
-	color: #FFFFFF;
-	text-shadow: 0px 1px 1px #234386;
-}
-/* Button
-----------------------------------*/
+  background-color: #5f83b9;
+  color: #FFFFFF;
+  text-shadow: 0px 1px 1px #234386;
+}*/
 
-.ui-button {  display: inline-block; position: relative; padding: 0; margin-right: .1em; text-decoration: none !important; cursor: pointer; text-align: center; zoom: 1; overflow: visible; border: 0px none; -moz-border-radius: 0px; -webkit-border-radius: 0px; border-radius: 0px; } /* the overflow property removes extra width in IE */
-.ui-button-icon-only { width: 2.2em; } /* to make room for the icon, a width needs to be set here */
-button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a little more width */
-.ui-button-icons-only { width: 3em; } 
-button.ui-button-icons-only { width: 3.2em; } 
-.ui-button span { -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; border: 1px solid; }
 
-.ui-state-default .ui-button-text { background: url(/images/jqueryui/button_bg.png) 0px 0px repeat-x !important; color: #4f4f4f; border-color: #b6b6b6; }
-.ui-state-hover .ui-button-text { background: url(/images/jqueryui/button_bg.png) 0px 0px repeat-x !important; color: #313131; border-color: #9d9d9d; -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0px 0px 8px rgba(212,212,212,1); box-shadow: 0px 0px 8px rgba(212,212,212,1); }
-.ui-state-active .ui-button-text { background: url(/images/jqueryui/button_bg.png) 0px bottom repeat-x !important; color: #4f4f4f; border-color: #b6b6b6; }
-
-/*button text element */
-.ui-button .ui-button-text { display: block; line-height: 1.4; font-weight: bold; font-size: 14px; text-shadow: 0px 1px 0px rgba(255,255,255,0.8); }
-.ui-button-text-only .ui-button-text { padding: 5px 12px; }
-.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: 5px; text-indent: -9999999px; }
-.ui-button-text-icon .ui-button-text, .ui-button-text-icons .ui-button-text { padding: 5px 12px 5px 25px; }
-.ui-button-text-icons .ui-button-text { padding-right: 1.8em; }
-/* no icon support for input elements, provide padding by default */
-input.ui-button { padding: .4em 1em; outline: none; }
-
-/*button icon element(s) */
-.ui-button .ui-icon { border: 0px none; }
-.ui-button-icon-only .ui-icon, .ui-button-text-icon .ui-icon, .ui-button-text-icons .ui-icon, .ui-button-icons-only .ui-icon { position: absolute; top: 50%; margin-top: -8px; margin-left: 6px; }
-.ui-button-icon-only .ui-icon { left: 50%; margin-left: -8px; }
-.ui-button-text-icon .ui-icon-primary, .ui-button-text-icons .ui-icon-primary, .ui-button-icons-only .ui-icon-primary { left: .5em; }
-.ui-button-text-icons .ui-button-icon-secondary, .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
-
-/*button sets*/
-.ui-buttonset { margin-right: 7px; }
-.ui-buttonset .ui-button { margin-left: 0; margin-right: -.3em; }
-.ui-buttonset, .ui-buttonset span { -moz-border-radius: 0px !important; -webkit-border-radius: 0px !important; border-radius: 0px !important; }
-.ui-corner-left .ui-button-text { -moz-border-radius-topleft: 4px !important; -webkit-border-top-left-radius: 4px !important; border-top-left-radius: 4px !important; -moz-border-radius-bottomleft: 4px !important; -webkit-border-bottom-left-radius: 4px !important; border-bottom-left-radius: 4px !important; }
-.ui-corner-right .ui-button-text { -moz-border-radius-topright: 4px !important; -webkit-border-top-right-radius: 4px !important; border-top-right-radius: 4px !important; -moz-border-radius-bottomright: 4px !important; -webkit-border-bottom-right-radius: 4px !important; border-bottom-right-radius: 4px !important; }
-.ui-buttonset .ui-state-active .ui-button-text { cursor: default; background: url(/images/jqueryui/button_bg.png) 0px -33px repeat-x !important; color: #1c4257; border-color: #7096ab; -moz-box-shadow: none !important; -webkit-box-shadow: none !important; box-shadow: none !important; }
-
-/* workarounds */
-button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
 
 
 

@@ -29,7 +29,6 @@
   </div>
   <% end %>
 <% end %>
-
 <div>
 <% if session[:conflict_channel] %>
   <div class="reminder">
@@ -50,6 +49,7 @@
   </div>
 <% end %>
 <% if @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).empty? %>
+  <%= render :partial => 'ie7_upgrade' %>
   <div class="communication_message dashboard_notification">
     <div class="header">
       <div class="header_title">

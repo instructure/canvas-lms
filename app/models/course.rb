@@ -57,7 +57,8 @@ class Course < ActiveRecord::Base
                   :storage_quota_mb,
                   :restrict_enrollments_to_course_dates,
                   :grading_standard,
-                  :grading_standard_enabled
+                  :grading_standard_enabled,
+                  :locale
 
   serialize :tab_configuration
   belongs_to :root_account, :class_name => 'Account'
@@ -110,6 +111,7 @@ class Course < ActiveRecord::Base
   has_many :active_announcements, :as => :context, :class_name => 'Announcement', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :order => 'created_at DESC'
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :active_attachments, :as => :context, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted'], :order => 'attachments.display_name'
+  has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.title, assignments.position'
   has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
@@ -155,6 +157,7 @@ class Course < ActiveRecord::Base
   after_save :update_account_associations_if_changed
   before_validation :verify_unique_sis_source_id
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_locale :allow_nil => true
   
   sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
   

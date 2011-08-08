@@ -16,24 +16,85 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Discussion Topics
+#
+# API for accessing and participating in discussion topics in groups and courses.
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
   
   add_crumb(lambda { t('#crumbs.discussions', "Discussions")}, :except => [:public_feed]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_discussion_topics_url }
   before_filter { |c| c.active_tab = "discussions" }  
-
+  
+  include Api::V1::DiscussionTopics
+  
+  # @API
+  #
+  # Returns the list of discussion topics for this course.
+  #
+  # @response_field assignment_id The unique identifier of the assignment if the topic is for grading, otherwise null
+  # @response_field attachments Array of attachments
+  # @response_field delayed_post_at The datetime to post the topic (if not right away) 
+  # @response_field discussion_subentry_count The count of entries in the topic
+  # @response_field id The unique identifier for the discussion topic.
+  # @response_field last_reply_at The datetime for when the last reply was in the topic
+  # @response_field message The HTML content of the topic 
+  # @response_field permissions A hash of permissions for the current user. If a key is not present then the permission is false. 
+  #   Example:
+  #           {"delete"=>true,"reply"=>true,"read"=>true,"attach"=>true,"create"=>true,"update"=>true}
+  # @response_field podcast_url If the topic is a podcast topic this is the feed url for the current user
+  # @response_field posted_at The datetime the topic was posted. If it is null it hasn't been posted yet. (see delayed_post_at)
+  # @response_field require_initial_post If true then a user may not respond to other replies until that user has made an initial reply
+  # @response_field root_topic_id If the topic is for grading and a group assignment this will point to the original topic in the course
+  # @response_field title The title of the topic
+  # @response_field topic_children An array of topic_ids for the group discussions the user is a part of
+  # @response_field user_name The username of the creator
+  #
+  # @example_response
+  #     [
+  #      {
+  #        "id":1,
+  #        "title":"Topic 1",
+  #        "message":"<p>content here</p>",
+  #        "posted_at":"2037-07-21T13:29:31Z",
+  #        "last_reply_at":"2037-07-28T19:38:31Z",
+  #        "require_initial_post":null,
+  #        "discussion_subentry_count":0,
+  #        "assignment_id":null,
+  #        "delayed_post_at":null,
+  #        "user_name":"User Name",
+  #        "permissions":{"reply":true,"read":true},
+  #        "topic_children":[],
+  #        "root_topic_id":null,
+  #        "podcast_url":"/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
+  #        "attachments":[
+  #          {
+  #            "content-type":"unknown/unknown",
+  #            "url":"http://www.example.com/courses/1/files/1/download",
+  #            "filename":"content.txt",
+  #            "display_name":"content.txt"
+  #          }
+  #        ]
+  #      }
+  #     ]
   def index
     @context.assert_assignment_group rescue nil
     @all_topics = @context.discussion_topics.active
     @all_topics = @all_topics.only_discussion_topics if params[:include_announcements] != "1"
-    @topics = @all_topics.paginate(:page => params[:page]).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    @topics = @all_topics.paginate(:page => params[:page], :per_page => params[:per_page] || 10).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
     if authorized_action(@context.discussion_topics.new, @current_user, :read)
       return child_topic if params[:root_discussion_topic_id] && @context.respond_to?(:context) && @context.context && @context.context.discussion_topics.find(params[:root_discussion_topic_id])
       log_asset_access("topics:#{@context.asset_string}", "topics", 'other')
       respond_to do |format|
         format.html
         format.xml  { render :xml => @topics.to_xml }
-        format.json  { render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count], :permissions => {:user => @current_user, :session => session }) }
+        format.json do 
+          if api_request?
+            api_pagination_headers(@topics)
+            render :json => discussion_topic_api_json(@topics) 
+          else
+            render :json => @topics.to_json(:methods => [:user_name, :discussion_subentry_count], :permissions => {:user => @current_user, :session => session })
+          end
+        end
       end
     end
   end

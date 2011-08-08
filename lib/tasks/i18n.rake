@@ -1,4 +1,26 @@
 namespace :i18n do
+  module HashExtensions
+    def flatten(result={}, prefix='')
+      each_pair do |k, v|
+        if v.is_a?(Hash)
+          v.flatten(result, "#{prefix}#{k}.")
+        else
+          result["#{prefix}#{k}"] = v
+        end
+      end
+      result
+    end
+
+    def expand(result = {})
+      each_pair do |k, v|
+        parts = k.split('.')
+        last = parts.pop
+        parts.inject(result){ |h, k2| h[k2] ||= {}}[last] = v
+      end
+      result
+    end
+  end
+
   desc "Verifies all translation calls"
   task :check => :environment do
     only = if ENV['ONLY']
@@ -116,50 +138,26 @@ namespace :i18n do
   task :generate => :check do
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
-    class Hash
-      # for sorted goodness
-      def to_yaml( opts = {} )
-        YAML::quick_emit( object_id, opts ) do |out|
-          out.map( taguri, to_yaml_style ) do |map|
-            sort.each do |k, v|
-              map.add( k, v )
-            end
-          end
-        end
-      end
-    end
     yaml_file = File.join(yaml_dir, "en.yml")
     File.open(File.join(RAILS_ROOT, yaml_file), "w") do |file|
-      file.write({'en' => @extractor.translations}.to_yaml)
+      file.write({'en' => @extractor.translations}.ya2yaml(:syck_compatible => true))
     end
     print "Wrote new #{yaml_file}\n\n"
   end
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
-  task :generate_js => :environment do
-    I18nExtractor
+  task :generate_js do
+    require 'bundler'
+    Bundler.setup
+    require 'action_controller'
+    require 'i18n'
+    require 'sexp_processor'
+    require 'jammit'
+    require 'lib/i18n_extractor.rb'
+    I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
+                      Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
 
-    class Hash
-      def flatten(result={}, prefix='')
-        each_pair do |k, v|
-          if v.is_a?(Hash)
-            v.flatten(result, "#{prefix}#{k}.")
-          else
-            result["#{prefix}#{k}"] = v
-          end
-        end
-        result
-      end
-
-      def expand(result = {})
-        each_pair do |k, v|
-          parts = k.split('.')
-          last = parts.pop
-          parts.inject(result){ |h, k2| h[k2] ||= {}}[last] = v
-        end
-        result
-      end
-    end
+    Hash.send :include, HashExtensions
 
     files = Dir.glob('public/javascripts/*.js').
       reject{ |file| file =~ /\Apublic\/javascripts\/(i18n.js|translations\/)/ }
@@ -235,5 +233,184 @@ $.extend(true, (I18n = I18n || {}), {translations: #{translations.to_json}});
     if orig_assets_content != assets_content
       File.open(assets_file, "w"){ |f| f.write assets_content }
     end
+  end
+
+  desc "Exports new/changed English strings to be translated"
+  task :export => :environment do
+    Hash.send :include, HashExtensions
+
+    begin
+      base_filename = "config/locales/generated/en.yml"
+      export_filename = 'en.yml'
+
+      prevgit = {}
+      prevgit[:branch] = `git branch | grep '\*'`.sub(/^\* /, '').strip
+      prevgit.delete(:branch) if prevgit[:branch].blank? || prevgit[:branch] == 'master'
+      unless `git status -s | grep -v '^\?\?' | wc -l`.strip == '0'
+        `git stash`
+        prevgit[:stashed] = true
+      end
+
+      last_export = nil
+      begin
+        puts "Enter path or hash of previous export base (omit to export all):"
+        arg = $stdin.gets.strip
+        if arg.blank?
+          last_export = {:type => :none}
+        elsif arg =~ /\A[a-z0-9]{7,}\z/
+          puts "Fetching previous export..."
+          ret = `git show --name-only --oneline #{arg}`
+          if $?.exitstatus == 0
+            if ret.include?(base_filename)
+              `git checkout #{arg}`
+              if previous = YAML.load(File.read(arg)).flatten rescue nil
+                last_export = {:type => :file, :data => previous}
+              else
+                $stderr.puts "Unable to load en.yml file"
+              end
+            else
+              $stderr.puts "Commit contains no en.yml file"
+            end
+          else
+            $stderr.puts "Invalid commit hash"
+          end
+          `git status -s | grep -v '^\?\?' | wc -l`
+        else
+          puts "Loading previous export..."
+          if File.exist?(arg)
+            if previous = YAML.load(File.read(arg)).flatten rescue nil
+              last_export = {:type => :file, :data => previous}
+            else
+              $stderr.puts "Unable to load yml file"
+            end
+          else
+            $stderr.puts "Invalid path"
+          end
+        end
+      end until last_export
+
+      puts "Extracting current en translations..."
+      `git checkout master; git pull --rebase`
+      Rake::Task["i18n:generate"].invoke
+
+      puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
+      current_strings = YAML.load(File.read(base_filename)).flatten
+      new_strings = last_export[:data] ?
+        current_strings.inject({}){ |h, (k, v)| h[k] = v unless last_export[:data][k] == v } :
+        current_strings
+      File.open(export_filename, "w"){ |f| f.write new_strings.expand }
+
+      push = 'n'
+      begin
+        puts "Commit and push current translations? (Y/N)"
+        push = $stdin.gets.strip.downcase[0, 1]
+      end until ["y", "n"].include?(push)
+      if push == 'y'
+        `git add #{base_filename}`
+        if `git status -s | grep -v '^\?\?' | wc -l`.strip == '0'
+          puts "Exported en.yml, current translations unmodified (check git log for last change)"
+        else
+          `git commit -a -m"generated en.yml for translation"`
+          `git push -u origin master`
+          puts "Exported en.yml, committed/pushed current translations (#{`git log --oneline|head -n 1`.sub(/ .*/m, '')})"
+        end
+      else
+        puts "Exported en.yml, dumped current translations (not committed)"
+      end
+    ensure
+      `git checkout #{prevgit[:branch]}` if prevgit[:branch]
+      `git stash pop` if prevgit[:stashed]
+    end
+  end
+
+  desc "Validates and imports new translations"
+  task :import => :environment do
+    Hash.send :include, HashExtensions
+
+    def placeholders(str)
+      str.scan(/%\{[^\}]+\}/).sort
+    end
+
+    def markdown_and_wrappers(str)
+      # some stuff this doesn't check (though we don't use):
+      #   blockquotes, e.g. "> some text"
+      #   reference links, e.g. "[an example][id]"
+      #   indented code
+      (
+        str.scan(/\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) +
+        str.scan(/(\*+|_+|`+)[^\s].*?[^\s]?\1/).map{|m|"#{m}-wrap"} +
+        str.scan(/(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map{|m|"link:#{m.last}"} +
+        str.scan(/^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map{"hr"} +
+        str.scan(/^[^=\-\n]+\n^(=+|-+)$/).map{|m|m.first[0]=='=' ? 'h1' : 'h2'} +
+        str.scan(/^(\#{1,6})\s+[^#]*#*$/).map{|m|"h#{m.first.size}"} +
+        str.scan(/^ {0,3}(\d+\.|\*|\+|\-)\s/).map{|m|m.first =~ /\d/ ? "1." : "*"}
+      ).sort
+    end
+
+    begin
+      puts "Enter path to original en.yml file:"
+      arg = $stdin.gets.strip
+      source_translations = File.exist?(arg) && YAML.load(File.read(arg)) rescue nil
+    end until source_translations
+    raise "Source does not have any English strings" unless source_translations.keys.include?('en')
+    source_translations = source_translations['en'].flatten
+
+    begin
+      puts "Enter path to translated file:"
+      arg = $stdin.gets.strip
+      new_translations = File.exist?(arg) && YAML.load(File.read(arg)) rescue nil
+    end until new_translations
+    raise "Translation file contains multiple languages" if new_translations.size > 1
+    language = new_translations.keys.first
+    raise "Translation file appears to have only English strings" if language == 'en'
+    new_translations = new_translations[language].flatten
+
+    item_warning = lambda { |error_items, description|
+      begin
+        puts "Warning: #{error_items.size} #{description}. What would you like to do?"
+        puts " [C] continue anyway"
+        puts " [V] view #{description}"
+        puts " [D] debug"
+        puts " [Q] quit"
+        command = $stdin.gets.upcase.strip
+        return false if command == 'Q'
+        debugger if command == 'D'
+        puts error_items.join("\n") if command == 'V'
+      end while command != 'C'
+      true
+    }
+
+    missing_keys = source_translations.keys - new_translations.keys
+    next unless item_warning.call(missing_keys.sort, "missing translations") if missing_keys.present?
+
+    unexpected_keys = new_translations.keys - source_translations.keys
+    next unless item_warning.call(unexpected_keys.sort, "unexpected translations") if unexpected_keys.present?
+
+    placeholder_mismatches = {}
+    markdown_mismatches = {}
+    new_translations.keys.each do |key|
+      p1 = placeholders(source_translations[key].to_s)
+      p2 = placeholders(new_translations[key].to_s)
+      placeholder_mismatches[key] = [p1, p2] if p1 != p2
+
+      m1 = markdown_and_wrappers(source_translations[key].to_s)
+      m2 = markdown_and_wrappers(new_translations[key].to_s)
+      markdown_mismatches[key] = [m1, m2] if m1 != m2
+    end
+
+    if placeholder_mismatches.size > 0
+      next unless item_warning.call(placeholder_mismatches.map{|k,(p1,p2)| "#{k}: expected #{p1.inspect}, got #{p2.inspect}"}.sort, "placeholder mismatches")
+    end
+
+    if markdown_mismatches.size > 0
+      next unless item_warning.call(markdown_mismatches.map{|k,(p1,p2)| "#{k}: expected #{p1.inspect}, got #{p2.inspect}"}.sort, "markdown/wrapper mismatches")
+    end
+
+    I18n.available_locales
+
+    new_translations = (I18n.backend.send(:translations)[language.to_sym] || {}).flatten.merge(new_translations)
+    File.open("config/locales/#{language}.yml", "w") { |f|
+      f.write({language => new_translations.expand}.ya2yaml(:syck_compatible => true))
+    }
   end
 end

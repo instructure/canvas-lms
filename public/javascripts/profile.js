@@ -74,6 +74,16 @@ $(function() {
       },
       success: function(data) {
         var user = data.user;
+        var templateData = {
+          short_name: user.short_name,
+          full_name: user.name,
+          time_zone: user.time_zone,
+          locale: $("#user_locale option[value='" + user.locale + "']").text()
+        };
+        if (templateData.locale != $update_profile_form.find('.locale').text()) {
+          location.reload();
+          return;
+        }
         $update_profile_form.loadingImage('remove');
         if ($default_email_id.length > 0) {
           var default_email = $default_email_id.find('option:selected').text();
@@ -81,11 +91,6 @@ $(function() {
         }
         $('.channel').removeClass('default');
         $("#channel_" + user.communication_channel.id).addClass('default');
-        var templateData = {
-          short_name: user.short_name,
-          full_name: user.name,
-          time_zone: user.time_zone
-        };
         $update_profile_form.fillTemplateData({
           data: templateData
         }).find(".cancel_button").click();
@@ -303,12 +308,15 @@ $(function() {
       var $img = $span.find("img");
       $img.attr('src', '/images/ajax-loader.gif');
       $img.addClass('pending');
-      return $img;
+      $("#profile_pic_dialog .profile_pic_list div").before($span);
+      return $span;
     },
-    success: function(data, $img) {
+    success: function(data, $span) {
       $(this).find("button").attr('disabled', false).text(I18n.t('buttons.add_file', "Add File"));
+      $("#add_pic_form").slideToggle();
       var attachment = data.attachment;
-      if($img) {
+      if ($span) {
+        var $img = $span.find("img");
         $img.removeClass('pending');
         $img.attr('src', '/images/thumbnails/' + attachment.id + '/' + attachment.uuid);
         $img.attr('data-type', 'attachment');
@@ -316,14 +324,13 @@ $(function() {
         $img[0].onerror = function() {
           $img.attr('src', '/images/dotted_pic.png');
         }
-        $("#profile_pic_dialog .profile_pic_list div").before($img);
         $img.click();
       }
     },
-    error: function(data, $img) {
+    error: function(data, $span) {
       $(this).find("button").attr('disabled', false).text(I18n.t('errors.adding_file_failed', "Adding File Failed"));
-      if($img) {
-        $img.remove();
+      if ($span) {
+        $span.remove();
       }
     }
   });

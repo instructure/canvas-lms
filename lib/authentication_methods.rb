@@ -50,25 +50,20 @@ module AuthenticationMethods
   end
 
   def load_user
-    if api_request?
-      if params[:access_token]
-        @access_token = AccessToken.find_by_token(params[:access_token])
-        @developer_key = @access_token.try(:developer_key)
-        if !@access_token.try(:usable?)
-          render :json => {:errors => "Invalid access token"}, :status => :bad_request
-          return false
-        end
-        @current_user = @access_token.user
-        @current_pseudonym = @current_user.pseudonym
-        unless @current_user
-          render :json => {:errors => "Invalid access token"}, :status => :bad_request
-          return false
-        end
-        @access_token.used!
-      else
-        @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) if params[:api_key].present?
-        @developer_key || raise(ApplicationController::InvalidDeveloperAPIKey)
+    if api_request? && params[:access_token]
+      @access_token = AccessToken.find_by_token(params[:access_token])
+      @developer_key = @access_token.try(:developer_key)
+      if !@access_token.try(:usable?)
+        render :json => {:errors => "Invalid access token"}, :status => :bad_request
+        return false
       end
+      @current_user = @access_token.user
+      @current_pseudonym = @current_user.pseudonym
+      unless @current_user
+        render :json => {:errors => "Invalid access token"}, :status => :bad_request
+        return false
+      end
+      @access_token.used!
     end
 
     if !@access_token
@@ -89,6 +84,11 @@ module AuthenticationMethods
         return redirect_to(login_url(:needs_cookies => '1'))
       end
       @current_user = @current_pseudonym && @current_pseudonym.user
+
+      if api_request?
+        @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) if params[:api_key].present?
+        @developer_key || request.get? || form_authenticity_token == form_authenticity_param || raise(ApplicationController::InvalidDeveloperAPIKey)
+      end
     end
 
     if @current_user && @current_user.unavailable?

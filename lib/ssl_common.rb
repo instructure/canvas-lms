@@ -20,7 +20,7 @@ require 'net/https'
 
 class SSLCommon
   SSL_CA_PATH = "/etc/ssl/certs/"
-  
+
   class << self
     def get_http_conn(host, port, ssl)
       http = Net::HTTP.new(host, port)
@@ -29,24 +29,34 @@ class SSLCommon
         http.ca_path = SSL_CA_PATH
         http.verify_mode = OpenSSL::SSL::VERIFY_PEER
       end
-      http 
+      http
     end
-    
-    def post_form(url, form_data)
+
+    def raw_post(url, payload, headers = {}, form_data = nil)
       url = URI.parse(url)
       http = self.get_http_conn(url.host, url.port, url.scheme.downcase == 'https')
-      req = Net::HTTP::Post.new(url.path)
-      req.form_data = form_data
-      http.start {|http| http.request(req) }
+      req = Net::HTTP::Post.new(url.request_uri, headers)
+      req.form_data = form_data if form_data
+      http.start {|http| http.request(req, payload) }
     end
-    
-    def post_data(url, data, content_type)
+
+    def get(url, headers={})
       url = URI.parse(url)
       http = self.get_http_conn(url.host, url.port, url.scheme.downcase == 'https')
-      req = Net::HTTP::Post.new(url.path)
-      req['Content-Type'] = content_type
-      http.start {|http| http.request(req, data) }
+      http.get(url.request_uri, headers)
+    end
+
+    def post_form(url, form_data, headers={})
+      self.raw_post(url, nil, headers, form_data)
+    end
+
+    def post_multipart_form(url, form_data, headers={}, field_priority=[])
+      payload, mp_headers = Multipart::MultipartPost.new.prepare_query(form_data, field_priority)
+      self.raw_post(url, payload, mp_headers.merge(headers))
+    end
+
+    def post_data(url, data, content_type, headers={})
+      self.raw_post(url, data, {"Content-Type" => content_type}.merge(headers))
     end
   end
 end
-

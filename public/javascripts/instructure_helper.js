@@ -2118,6 +2118,7 @@
     }
     var xhr = $.ajax(params);
     $.ajaxJSON.storeRequest(xhr, url, submit_type, data);
+    return xhr;
   };
   $.ajaxJSON.unhandledXHRs = [];
   $.ajaxJSON.ignoredXHRs = [];

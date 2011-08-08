@@ -21,7 +21,7 @@ class Account < ActiveRecord::Base
   attr_accessible :name, :turnitin_account_id,
     :turnitin_shared_secret, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
-    :default_storage_quota_mb, :storage_quota, :ip_filters
+    :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale
 
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'
@@ -80,6 +80,13 @@ class Account < ActiveRecord::Base
   serialize :settings, Hash
 
   scopes_custom_fields
+
+  validates_locale :default_locale, :allow_nil => true
+
+  def default_locale(recurse = false)
+    read_attribute(:default_locale) ||
+    (recurse && parent_account ? parent_account.default_locale(true) : nil)
+  end
 
   cattr_accessor :account_settings_options
   self.account_settings_options = {}
@@ -548,9 +555,7 @@ class Account < ActiveRecord::Base
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     unless self.root_account_id
-      # TODO i18n
-      t '#account.default_term_name', "Default Term"
-      @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name("Default Term")
+      @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
     end
   end
   

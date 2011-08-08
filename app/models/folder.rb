@@ -21,6 +21,8 @@ class Folder < ActiveRecord::Base
   attr_accessible :name, :full_name, :parent_folder, :workflow_state, :lock_at, :unlock_at, :locked, :hidden, :context
 
   ROOT_FOLDER_NAME = "course files"
+  PROFILE_PICS_FOLDER_NAME = "profile pictures"
+  MY_FILES_FOLDER_NAME = "my files"
 
   belongs_to :context, :polymorphic => true
   belongs_to :cloned_item
@@ -222,8 +224,8 @@ class Folder < ActiveRecord::Base
     elsif context.is_a? User
       # TODO i18n 
       t :my_files_folder_name, 'my files'
-      if root_folders.select{|f| f.name == "my files" }.empty?
-        root_folders << context.folders.create(:name => "my files", :full_name => "my files", :workflow_state => "visible")
+      if root_folders.select{|f| f.name == MY_FILES_FOLDER_NAME }.empty?
+        root_folders << context.folders.create(:name => MY_FILES_FOLDER_NAME, :full_name => MY_FILES_FOLDER_NAME, :workflow_state => "visible")
       end
     else
       # TODO i18n 
@@ -284,7 +286,7 @@ class Folder < ActiveRecord::Base
         t :course_content_folder_name, 'course content'
         current_folder = context.folders.active.find_by_full_name("course content")
       elsif @context.is_a? User
-        current_folder = context.folders.active.find_by_full_name("my files")
+        current_folder = context.folders.active.find_by_full_name(MY_FILES_FOLDER_NAME)
       end
     end
   end

@@ -123,7 +123,7 @@ class ProfileController < ApplicationController
       :type => 'none',
       :alt => 'no pic'
     }
-    @current_user.attachments.scoped({:include => :thumbnail}).select{|a| a.content_type.match(/\Aimage\//) && a.thumbnail}.sort_by(&:id).reverse.each do |image|
+    @current_user.profile_pics_folder.active_file_attachments({:include => :thumbnail}).select{|a| a.content_type.match(/\Aimage\//) && a.thumbnail}.sort_by(&:id).reverse.each do |image|
       @pics << {
         :url => "/images/thumbnails/#{image.id}/#{image.uuid}",
         :type => 'attachment',

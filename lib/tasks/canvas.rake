@@ -116,6 +116,9 @@ namespace :canvas do
     output = `bundle exec compass -s compressed --force 2>&1`
     raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
     
+    puts "--> Generating js localization bundles"
+    Rake::Task['i18n:generate_js'].invoke
+
     puts "--> Compiling static assets [jammit]"
     output = `bundle exec jammit 2>&1`
     raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0

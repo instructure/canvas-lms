@@ -160,7 +160,7 @@ jQuery(function($){
         }
       },
       '=submission_type': function(value, data) {
-        if(value == "online") {
+        if(value == "online" && data.assignment_type == 'assignment') {
           if(!data.online_upload && !data.online_text_entry && !data.online_url && !data.media_recording) {
             return I18n.t('messages.need_online_submission_type', "Please choose at least one type of online submission");
           }

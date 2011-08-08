@@ -16,12 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'set'
+
 # @API Courses
 #
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
   before_filter :require_user_for_context, :only => [:roster, :roster_user, :locks, :switch_role, :publish_to_sis]
+
+  include Api::V1::Course
 
   # @API
   # Returns the list of active courses for the current user.
@@ -45,6 +49,7 @@ class CoursesController < ApplicationController
   # @response_field course_code The course code.
   # @response_field enrollments A list of enrollments linking the current user
   #   to the course.
+  # @response_field sis_course_id The SIS id of the course, if defined.
   #
   # @response_field needs_grading_count Number of submissions needing grading
   #   for all the course assignments. Only returned if
@@ -66,28 +71,18 @@ class CoursesController < ApplicationController
           enrollments = enrollments.reject { |e| e.class.name != e_type }
         end
 
-        include_grading = Array(params[:include]).include?('needs_grading_count')
-        include_syllabus = Array(params[:include]).include?('syllabus_body')
+        includes = Set.new(Array(params[:include]))
 
         hash = []
         enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
           course = course_enrollments.first.course
-          hash << course.as_json(
-            :include_root => false, :only => %w(id name course_code))
-          hash.last['sis_course_id'] = course.sis_source_id
-          hash.last['enrollments'] = course_enrollments.map { |e| { :type => e.readable_type.downcase } }
-          if include_grading && course_enrollments.any? { |e| e.participating_admin? }
-            hash.last['needs_grading_count'] = course.assignments.active.sum('needs_grading_count')
-          end
-          if include_syllabus
-            hash.last['syllabus_body'] = course.syllabus_body
-          end
+          hash << course_json(course, includes, course_enrollments)
         end
         render :json => hash.to_json
       }
     end
   end
-  
+
   def create
     @account = Account.find(params[:account_id])
     if authorized_action(@account, @current_user, :manage_courses)
@@ -550,8 +545,23 @@ class CoursesController < ApplicationController
     @public_view = true unless @current_user && @context.grants_right?(@current_user, session, :read_roster)
   end
   protected :check_unknown_user
-  
+
+  # @API
+  # Return information on a single course.
+  #
+  # Accepts the same include[] parameters as the list action, and returns a
+  # single course with the same fields as that action.
   def show
+    if api_request?
+      @context = Api.find(Course, params[:id])
+      if authorized_action(@context, @current_user, :read)
+        enrollments = @context.current_enrollments.all(:conditions => { :user_id => @current_user.id })
+        includes = Set.new(Array(params[:include]))
+        render :json => course_json(@context, includes, enrollments)
+      end
+      return
+    end
+
     @context = Course.find(params[:id])
     @context_enrollment = @context.enrollments.find_by_user_id(@current_user.id) if @context && @current_user
     @unauthorized_message = t('unauthorized.invalid_link', "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.") if params[:invitation]

@@ -72,7 +72,7 @@ shared_examples_for "grading standards selenium tests" do
 
     @standard = @course.grading_standards.create!(:title => "some standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
 
-    get "/courses/#{@course.id}/details"
+    get "/courses/#{@course.id}/details#tab-details"
     driver.find_element(:css, ".edit_course_link").click
     form = driver.find_element(:css, "#course_form")
     form.find_element(:css, "#course_grading_standard_enabled").click
