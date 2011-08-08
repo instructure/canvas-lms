@@ -589,10 +589,9 @@ class DiscussionTopic < ActiveRecord::Base
       elsif media_object.deleted? || media_object.context != context
         media_object = nil
       end
-      if !media_object.podcast_format_details
-        media_object = nil
+      if media_object.try(:podcast_format_details)
+        media_object.podcast_associated_asset = messages_hash[media_object.media_id]
       end
-      media_object.podcast_associated_asset = messages_hash[media_object.media_id] if media_object
       media_object
     end
     to_podcast(attachments + media_objects.compact)
