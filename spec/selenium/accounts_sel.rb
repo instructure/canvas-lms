@@ -64,6 +64,10 @@ describe "account authentication configs" do
     config.login_handle_name.should be_nil
     config.change_password_url.should be_nil
 
+    shown_hosts = driver.find_elements(:css, ".auth_info.auth_host")
+    shown_hosts[0].text.should == "primary.host.example.com"
+    shown_hosts[1].text.should == "secondary.host.example.com"
+
     # test removing the secondary config
     driver.find_element(:css, '.edit_auth_link').click
     ldap_form = driver.find_element(:css, 'form.ldap_form')
