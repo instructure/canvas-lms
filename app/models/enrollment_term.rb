@@ -17,6 +17,8 @@
 #
 
 class EnrollmentTerm < ActiveRecord::Base
+  DEFAULT_TERM_NAME = "Default Term"
+  
   include EnrollmentDateRestrictions
   include Workflow
 
@@ -27,6 +29,30 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :course_sections
   before_validation :verify_unique_sis_source_id
   validates_length_of :sis_data, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  
+  def self.i18n_default_term_name
+    t '#account.default_term_name', "Default Term"
+  end
+  
+  def default_term?
+    read_attribute(:name) == EnrollmentTerm::DEFAULT_TERM_NAME
+  end
+  
+  def name
+    if default_term?
+      EnrollmentTerm.i18n_default_term_name
+    else
+      read_attribute(:name)
+    end
+  end
+  
+  def name=(new_name)
+    if new_name == EnrollmentTerm.i18n_default_term_name
+      write_attribute(:name, DEFAULT_TERM_NAME)
+    else
+      write_attribute(:name, new_name)
+    end
+  end
   
   def set_overrides(context, params)
     return unless params && context

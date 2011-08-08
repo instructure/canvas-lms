@@ -16,6 +16,7 @@ end
 Rails.configuration.to_prepare do
   HostUrl.outgoing_email_address = config[:outgoing_address]
   HostUrl.outgoing_email_domain = config[:domain]
+  HostUrl.outgoing_email_default_name = config[:default_name]
 end
 
 # delivery_method can be :smtp, :sendmail or :test

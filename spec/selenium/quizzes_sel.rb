@@ -25,8 +25,10 @@ shared_examples_for "quiz selenium tests" do
     
     driver.find_elements(:css, "#question_form_template option.missing_word").length.should == 1
 
-    driver.find_element(:css, ".add_question .add_question_link").click
-    keep_trying_until{ driver.find_elements(:css, "#questions .question_holder").length > 0 }
+    keep_trying_until {
+      driver.find_element(:css, ".add_question .add_question_link").click
+      driver.find_elements(:css, "#questions .question_holder").length > 0
+    }
     driver.find_elements(:css, "#questions .question_holder option.missing_word").length.should == 0
   end
   
@@ -54,6 +56,12 @@ shared_examples_for "quiz selenium tests" do
       el.send_keys(value)
     end
     
+    def set_feedback_content(el, text)
+      el.find_element(:css, ".comment_focus").click
+      el.find_element(:css, "textarea").should be_displayed
+      el.find_element(:css, "textarea").send_keys(text)
+    end
+    
     #### Multiple Choice Question
     
     new_question_link.click
@@ -73,9 +81,15 @@ shared_examples_for "quiz selenium tests" do
     answers = question.find_elements(:css, ".form_answers > .answer")
     answers.length.should eql(4)
     replace_content(answers[0].find_element(:css, ".select_answer input"), "Correct Answer")
+    set_feedback_content(answers[0].find_element(:css, ".answer_comments"), "Good job!")
     replace_content(answers[1].find_element(:css, ".select_answer input"), "Wrong Answer #1")
+    set_feedback_content(answers[1].find_element(:css, ".answer_comments"), "Bad job :(")
     replace_content(answers[2].find_element(:css, ".select_answer input"), "Second Wrong Answer")
     replace_content(answers[3].find_element(:css, ".select_answer input"), "Wrongest Answer")
+    
+    set_feedback_content(question.find_element(:css, "div.text .question_correct_comment"), "Good job on the question!")
+    set_feedback_content(question.find_element(:css, "div.text .question_incorrect_comment"), "You know what they say - study long study wrong.")
+    set_feedback_content(question.find_element(:css, "div.text .question_neutral_comment"), "Pass or fail, you're a winner!")
     
     save_question_and_wait(question)
     driver.find_element(:css, "#right-side .points_possible").text.should eql("1")
@@ -94,7 +108,9 @@ shared_examples_for "quiz selenium tests" do
     question_data[:answers][3][:weight].should == 0
     question_data[:points_possible].should == 1
     question_data[:question_type].should == "multiple_choice_question"
-    
+    question_data[:correct_comments].should == "Good job on the question!"
+    question_data[:incorrect_comments].should == "You know what they say - study long study wrong."
+    question_data[:neutral_comments].should == "Pass or fail, you're a winner!"
     
     #### True False Question
     
@@ -211,8 +227,10 @@ shared_examples_for "quiz selenium tests" do
     harder.save!
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
     find_questions_link = driver.find_element(:link, "Find Questions")
-    find_questions_link.click
-    keep_trying_until { driver.find_element(:link, "Select All") }.click
+    keep_trying_until {
+      find_questions_link.click
+      driver.find_element(:link, "Select All")
+    }.click
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
   end

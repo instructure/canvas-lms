@@ -168,6 +168,24 @@ describe Notification do
       messages.each {|m| m.subject.should eql("This is 5!")}
     end
     
+    it "should localize the notification" do
+      notification_set
+
+      I18n.backend.store_translations :piglatin, {:messages => {:test_name => {:email => {:subject => "Isthay isay ivefay!"}}}}
+      @user.browser_locale = 'piglatin'
+      @user.save(false) # the validation was declared before :piglatin was added, so we skip it
+      messages = @notification.create_message(@assignment, @user)
+      messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
+      I18n.locale.should eql(:en)
+
+      I18n.backend.store_translations :shouty, {:messages => {:test_name => {:email => {:subject => "THIS IS *5*!!!!?!11eleventy1"}}}}
+      @user.locale = 'shouty'
+      @user.save(false)
+      messages = @notification.create_message(@assignment, @user)
+      messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
+      I18n.locale.should eql(:en)
+    end
+    
     it "should not get confused with nil values in the to list" do
       notification_set
       messages = @notification.create_message(@assignment, nil)
@@ -316,7 +334,7 @@ def notification_set(opts={})
   notification_opts = opts.delete(:notification_opts)  || {}
   
   assignment_model
-  notification_model({:subject => "This is <%= '5' %>!", :name => "Test Name"}.merge(notification_opts))
+  notification_model({:subject => "<%= t :subject, 'This is 5!' %>", :name => "Test Name"}.merge(notification_opts))
   user_model({:workflow_state => 'registered'}.merge(user_opts))
   communication_channel_model(:user_id => @user).confirm!
   notification_policy_model(

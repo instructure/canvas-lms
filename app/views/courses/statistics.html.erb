@@ -141,7 +141,7 @@
     <table>
       <tr>
         <td><%= before_label('allotted_storage', %{Allotted Storage}) %></td>
-        <td style="padding-left: 10px; text-align: right;"><%= number_to_human_size(@context.quota.megabytes) %></td>
+        <td style="padding-left: 10px; text-align: right;"><%= number_to_human_size(@context.quota) %></td>
         <td></td>
       </tr>
       <tr>

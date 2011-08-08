@@ -69,6 +69,16 @@
               </td>
               <td><%= t(:megabytes_field, "%{text_field} megabytes", :text_field => f.text_field(:default_storage_quota_mb, :style => "width: 50px;", :title => t(:megabytes_tooltip, "megabytes"))) %></td>
             </tr>
+            <% if available_locales.size > 1 %>
+            <tr>
+              <td><%= f.blabel :default_locale, :default_language, :en => "Default Language" %></td>
+              <td>
+                <% no_language = t(:no_language_preference, "Not set (defaults to %{language})", :language => available_locales[infer_locale(:context => @context.parent_account)]) %>
+                <%= f.select :default_locale, [[no_language, nil]] + available_locales.invert.sort, :selected => @context.default_locale %>
+                <p style="font-size: 0.9em;"><%= t(:default_language_description, "This will override any browser/OS language settings. Preferred languages can still be set at the course/user level.") %></p>
+              </td>
+            </tr>
+            <% end %>
             <% if @account.root_account_id == nil %>
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>

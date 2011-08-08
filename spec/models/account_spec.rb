@@ -306,7 +306,7 @@ describe Account do
   it "should make a default enrollment term if necessary" do
     a = Account.create!(:name => "nada")
     a.enrollment_terms.size.should == 1
-    a.enrollment_terms.first.name.should == "Default Term"
+    a.enrollment_terms.first.name.should == EnrollmentTerm::DEFAULT_TERM_NAME
 
     # don't create a new default term for sub-accounts
     a2 = a.all_accounts.create!(:name => "sub")

@@ -13,8 +13,8 @@
   <% end %>
   <div class="scoring">
     <%= t :scoring, "%{points} out of %{possible_points}",
-          :points => raw('<span class="score">' + (outcome_result.try_rescue(:score) || nbsp) + '</span>'),
-          :possible_points => raw('<span class="possible">' + (outcome_result.try_rescue(:possible) || nbsp) + '</span>')
+          :points => raw("<span class=\"score\">#{outcome_result.try_rescue(:score) || nbsp}</span>"),
+          :possible_points => raw("<span class=\"possible\">#{outcome_result.try_rescue(:possible) || nbsp}</span>")
     %>
     <span class="mastery">(<%= image_tag "graded.16px.png", :alt => "" %> <%= t :outcome_mastered, 'mastered' %>)</span>
   </div>

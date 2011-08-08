@@ -1672,7 +1672,7 @@ var fileStructureData = [];
       var url = $item.find(".download_url").attr('href');
       var display_name = $item.find(".name:first").text();
       var $dialog = $("#edit_content_dialog");
-      $dialog.data('update_url', $item.find(".rename_item_link").attr('href')).data('content_type', data.content_type || '').data('filename', data.filename || '');
+      $dialog.data('update_url', $item.find(".rename_item_link").attr('href')).data('content_type', data.content_type || '').data('filename', data.filename || 'file_to_update');
       $dialog.find(".display_name").text(display_name);
       $dialog.find(".loading_message").text("Loading File Contents...").show().end()
         .find(".content").hide();

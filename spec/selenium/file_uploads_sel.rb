@@ -1,26 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-TEST_FILE_UUIDS = { "testfile1.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
-                "testfile1copy.txt" => "63f46f1c-dd4a-467d-a136-333f262f1366",
-                    "testfile2.txt" => "5d714eca-2cff-4737-8604-45ca098165cc",
-                    "testfile3.txt" => "72476b31-58ab-48f5-9548-a50afe2a2fe3",
-                    "testfile4.txt" => "38f6efa6-aff0-4832-940e-b6f88a655779",
-                    "testfile5.zip" => "3dc43133-840a-46c8-ea17-3e4bef74af37" }
-
-def get_file(filename)
-  data = TEST_FILE_UUIDS[filename]
-  if !SELENIUM_CONFIG[:host_and_port]
-    @file = Tempfile.new(filename.split(/(?=\.)/))
-    @file.write data
-    @file.close
-    fullpath = @file.path
-    filename = File.basename(@file.path)
-  else
-    fullpath = "C:\\testfiles\\#{filename}"
-  end
-  [filename, fullpath, data]
-end
-
 shared_examples_for "file uploads selenium tests" do
   it_should_behave_like "forked server selenium tests"
   
@@ -64,13 +43,14 @@ shared_examples_for "file uploads selenium tests" do
         $('#editor_tabs ul li:eq(1) a').click();
       JS
       
-      keep_trying_until { driver.find_element(:css, '#tree1 .folder') }
       driver.find_element(:css, '#tree1 .folder').text.should eql("course files")
-      no_files = driver.execute_script("return $('#tree1 .leaf:contains(\"No Files\")')[0]")
+      driver.find_element(:css, '#tree1 .folder .sign.plus').click
+      keep_trying_until { find_with_jquery('#tree1 .folder .loading').blank? }
+      files = driver.find_elements(:css, '#tree1 .folder .file')
       if first_time
-        no_files.should_not be_nil
+        files.should be_empty
       else
-        no_files.should be_nil
+        files.should_not be_empty
       end
       first_time = false
 
@@ -92,10 +72,12 @@ shared_examples_for "file uploads selenium tests" do
     end
   end
 
-  it "should upload a file on the homework submissions page" do
+  it "should upload a file on the homework submissions page, even over quota" do
     a = @course.assignments.create!(:submission_types => "online_upload")
 
     login_as(@student.email, @password)
+    @student.storage_quota = 1
+    @student.save
 
     # and attempt some assignment submissions
     ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |orig_filename|

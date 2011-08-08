@@ -1,0 +1,78 @@
+@import "environment.sass";
+
+.ui-button { display: inline-block; position: relative; padding: 0; margin-right: .1em; text-decoration: none !important; cursor: pointer; text-align: center; zoom: 1; overflow: visible; } /* the overflow property removes extra width in IE */
+
+.ui-button-icon-only { width: 2.2em; } /* to make room for the icon, a width needs to be set here */
+button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a little more width */
+.ui-button-icons-only { width: 3.4em; } 
+button.ui-button-icons-only { width: 3.7em; } 
+
+/*button text element */
+.ui-button .ui-button-text { display: block; line-height: 1.4;  }
+
+.ui-button-text-only .ui-button-text { padding: .4em 1em; }
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: .4em; text-indent: -9999999px; }
+.ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }
+.ui-button-text-icon-secondary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
+.ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
+/* no icon support for input elements, provide padding by default */
+input.ui-button { padding: .4em 1em; }
+
+/*button icon element(s) */
+.ui-button-icon-only .ui-icon, .ui-button-text-icon-primary .ui-icon, .ui-button-text-icon-secondary .ui-icon, .ui-button-text-icons .ui-icon, .ui-button-icons-only .ui-icon { position: absolute; top: 50%; margin-top: -8px; }
+.ui-button-icon-only .ui-icon { left: 50%; margin-left: -8px; }
+.ui-button-text-icon-primary .ui-button-icon-primary, .ui-button-text-icons .ui-button-icon-primary, .ui-button-icons-only .ui-button-icon-primary { left: .5em; }
+.ui-button-text-icon-secondary .ui-button-icon-secondary, .ui-button-text-icons .ui-button-icon-secondary, .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
+.ui-button-text-icons .ui-button-icon-secondary, .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
+
+/*button sets*/
+.ui-buttonset { margin-right: 7px; }
+.ui-buttonset .ui-button { margin-left: 0; margin-right: -.3em; }
+
+/* workarounds */
+button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
+
+
+/* Instructure Changes */
+$button-text-color: #525252;
+.ui-button { 
+  @include vertical-gradiant(#f3f3f3, #cecece);
+  @include border-radius(10px);
+  @include box-shadow(rgba(0,0,0,0.5), 0px, 1px, 2px, 0);
+  border: 1px solid #bdbdbd;
+  &.ui-state-hover {
+    @include vertical-gradiant(#ffffff, #dfdfdf);
+    transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.9s ease-in-out;
+    -moz-transition: all 0.9s ease-in-out;
+  }
+  &.ui-state-active { @include vertical-gradiant(#a8a8a8, #c6c6c6) }
+  
+  .ui-button-text {
+    font-size: 12px;
+    color: $button-text-color;
+    text-shadow: #fff 0 1px 1px;
+  }
+  
+  $triangle-edge-size: 5px;
+  .ui-icon-droparrow {
+    background-image: none;
+    border: solid transparent;
+    border-width: $triangle-edge-size $triangle-edge-size 0 $triangle-edge-size;
+    width: 0;
+    height: 0;
+    border-top-color: $button-text-color;
+    margin: -2px 2px 0px;
+  }
+  .ui-icon-droparrow:before {
+    border-color: $button-text-color transparent;
+    border-style: solid;
+    border-width: $triangle-edge-size+1px $triangle-edge-size+1px 0 $triangle-edge-size+1px;
+    position: absolute;
+    width: 0;
+    content: "asfsadf";
+    width: 300px;
+    height: 400px;
+    background-color: red;
+  }
+}

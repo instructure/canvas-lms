@@ -23,7 +23,7 @@ require 'zip/zip'
 # This is used to take a zipped file, unzip it, add directories to a
 # course, and attach the files in the correct directories.
 class UnzipAttachment
-  THINGS_TO_IGNORE_REGEX  = /(__MACOSX|thumbs.db|.DS_Store)/
+  THINGS_TO_IGNORE_REGEX  = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
 
   class << self
     def process(opts={})

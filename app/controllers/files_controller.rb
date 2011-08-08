@@ -79,24 +79,12 @@ class FilesController < ApplicationController
       full_index
     end
   end
-  
-  def list
-    if authorized_action(@context, @current_user, :read)
-      json = Rails.cache.fetch(['file_list_json', @context.cache_key, (@current_user.cache_key rescue 'nobody')].cache_key) do
-        @visible_folders = @context.active_folders_detailed.select{|f| f.grants_right?(@current_user, session, :read_contents)}
-        @files = @context.active_attachments.scoped(:include => [:thumbnail, :media_object])
-        # preload the reverse associations
-        @files.each { |f| f.thumbnail.attachment = f if f.thumbnail.try(:parent_id) == f.id; f.context = @context }
-        if @context.grants_right?(@current_user, session, :manage_files)
-          @visible_files = @files
-        else
-          visible_folders_hash = {}
-          @visible_folders.each{|f| visible_folders_hash[f.id] = true }
-          @visible_files = @files.select{|a| !a.currently_locked && visible_folders_hash[a.folder_id] }
-        end
-        (@visible_folders + @visible_files).to_json(:methods => [:thumbnail_url])
-      end
-      render :json => json
+
+  def images
+    if authorized_action(@context.attachments.new, @current_user, :read)
+      @images = @context.active_images.paginate :page => params[:page]
+      headers['X-Total-Pages'] = @images.total_pages.to_s
+      render :partial => "shared/wiki_image", :collection => @images
     end
   end
 
@@ -432,7 +420,8 @@ class FilesController < ApplicationController
               :no_redirect => params[:no_redirect],
               :upload_params => {
                 'attachment[folder_id]' => params[:attachment][:folder_id] || '',
-                'attachment[unattached_attachment_id]' => @attachment.id
+                'attachment[unattached_attachment_id]' => @attachment.id,
+                'check_quota_after' => @check_quota ? '1' : '0'
               },
               :ssl => request.ssl?)
       render :json => res.to_json
@@ -470,7 +459,9 @@ class FilesController < ApplicationController
     @attachment ||= @context.attachments.new
     if authorized_action(@attachment, @current_user, :create)
       get_quota
-      return if quota_exceeded(named_context_url(@context, :context_files_url))
+      return if (params[:check_quota_after].nil? || params[:check_quota_after] == '1') &&
+                  quota_exceeded(named_context_url(@context, :context_files_url))
+
       respond_to do |format|
         @attachment.folder_id ||= @folder.id
         @attachment.workflow_state = nil

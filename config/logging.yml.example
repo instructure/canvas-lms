@@ -1,5 +1,7 @@
 development:
   logger: rails
+# log_context: false
+# (log_context defaults to true)
 
 test:
   logger: rails

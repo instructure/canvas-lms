@@ -19,7 +19,7 @@
 class User < ActiveRecord::Base
   include Context
 
-  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails
+  attr_accessible :name, :short_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale
   attr_accessor :original_id
   
   before_save :infer_defaults
@@ -59,6 +59,7 @@ class User < ActiveRecord::Base
   has_many :tags, :class_name => 'ContentTag', :as => 'context', :order => 'LOWER(title)', :dependent => :destroy
   has_many :attachments, :as => 'context', :dependent => :destroy
   has_many :active_attachments, :as => :context, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted']
+  has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :folders, :as => 'context', :order => 'folders.name'
@@ -170,6 +171,7 @@ class User < ActiveRecord::Base
   has_a_broadcast_policy
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  validates_locale :locale, :browser_locale, :allow_nil => true
 
   before_save :assign_uuid
   before_save :update_avatar_image
@@ -1473,6 +1475,15 @@ class User < ActiveRecord::Base
     end
     res[:user] = user
     res
+  end
+  
+  def profile_pics_folder
+    folder = self.active_folders.find_by_name(Folder::PROFILE_PICS_FOLDER_NAME)
+    unless folder
+      folder = self.folders.create!(:name => Folder::PROFILE_PICS_FOLDER_NAME,
+        :parent_folder => Folder.root_folders(self).find {|f| f.name == Folder::MY_FILES_FOLDER_NAME })
+    end
+    folder
   end
   
   def quota
