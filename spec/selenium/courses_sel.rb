@@ -172,6 +172,26 @@ shared_examples_for "course selenium tests" do
       end
     end
   end
+
+  it "should not redirect to the gradebook when switching courses when viewing a student's grades" do
+    teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
+    student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
+    course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1).course
+    student_in_course :user => student, :active_all => 1
+    course2 = course_with_teacher(:user => teacher, :active_all => 1).course
+    student_in_course :user => student, :active_all => 1
+    create_session(teacher.pseudonyms.first, false)
+
+    get "/courses/#{course1.id}/grades/#{student.id}"
+
+    select = driver.find_element(:id, 'course_url')
+    options = select.find_elements(:css, 'option')
+    options.length.should == 2
+    select.click
+    find_with_jquery('#course_url option:not([selected])').click
+
+    driver.current_url.should match %r{/courses/#{course2.id}/grades/#{student.id}}
+  end
 end
 
 describe "course Windows-Firefox-Tests" do

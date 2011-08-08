@@ -44,7 +44,16 @@
   <%= t(:for_course, "For the course,") %>
   <select id="course_url">
     <% @courses_with_grades.each do |course| %>
-      <option value="<%= context_url(course, :context_grades_url) %>" <%= 'selected' if course == @context %>><%= course.name %></option>
+      <%
+         student_enrollment = course.all_student_enrollments.find_by_user_id(@student.id)
+         next unless student_enrollment.grants_rights?(@current_user, nil, :read_grades)
+         if course.grants_rights?(@current_user, nil, :manage_grades) || course.grants_rights?(@current_user, nil, :read_as_admin)
+           url = context_url(course, :context_student_grades_url, @student.id)
+         else
+           url = context_url(course, :context_grades_url)
+         end
+      %>
+      <option value="<%= url %>" <%= 'selected' if course == @context %>><%= course.name %></option>
     <% end %>
   </select>
   </div>
