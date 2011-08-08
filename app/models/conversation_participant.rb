@@ -78,7 +78,7 @@ class ConversationParticipant < ActiveRecord::Base
           EXISTS (
             SELECT 1
             FROM conversation_message_participants
-            WHERE conversation_participant_id = \#{user_id}
+            WHERE conversation_participant_id = \#{id}
               AND conversation_message_id = conversation_messages.id
           )
           SQL
@@ -127,8 +127,8 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_participants(user, user_ids)
   end
 
-  def add_message(body, forwarded_message_ids = [])
-    conversation.add_message(user, body, false, forwarded_message_ids)
+  def add_message(body, forwarded_message_ids = [], &blk)
+    conversation.add_message(user, body, false, forwarded_message_ids, &blk)
   end
 
   def remove_messages(*to_delete)

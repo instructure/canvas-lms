@@ -62,11 +62,38 @@
       <table>
         <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :finder_url => conversations_find_recipients_url, :class => "recipients" %></td></tr>
         <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
+        <tr>
+          <th>&nbsp;</th>
+          <td>
+            <% if feature_enabled?(:kaltura) %>
+              <div class="media_comment" style="display: none;" title="<%= t('titles.audio_comment', "Recorded audio comment") %>">
+                <%= image_tag "messages/audio-gray.png" %>
+                <%= t('audio_comment', %{Audio Comment}) %>
+                <a href="#" class="remove_link" style="float: right;" title="<%= t('titles.remove_audio_comment', "Remove audio comment") %>"><%= image_tag "delete_circle.png" %></a>
+                <div class="clear"></div>
+              </div>
+              <input type="hidden" name="media_comment_id" id="media_comment_id">
+              <input type="hidden" name="media_comment_type" id="media_comment_type">
+            <% end %>
+            <ul id="attachment_list">
+              <li id="attachment_blank" class="attachment" style="display: none;" title="<%= t('titles.attachment', "File to attach") %>">
+                <%= image_tag "messages/attach-gray.png" %> 
+                <input type="file" class="file_input"/>
+                <a href="#" class="remove_link" style="float: right;" title="<%= t('titles.remove_attachment', "Remove attachment") %>"><%= image_tag "delete_circle.png" %></a>
+                <div class="clear"></div>
+              </li>
+            </ul>
+            <a id="action_add_attachment" href="#" title="<%= t('titles.add_attachment', "Add an attachment") %>"><%= image_tag "messages/attach-blue.png" %> <%= t('links.add_attachment', %{Attach}) %></a>
+            <% if feature_enabled?(:kaltura) %>
+              <a id="action_media_comment" href="#" title="<%= t('titles.record_audio_comment', "Record an audio comment") %>"><%= image_tag "messages/audio-blue.png" %> <%= t('links.audio_comment', %{Record}) %></a>
+            <% end %>
+            <div style="float: right">
+              <input type="hidden" name="from_conversation_id" id="from_conversation_id">
+              <button type="submit" class="button"><%= t('buttons.send_message', 'Send') %></button>
+            </div>
+          </td>
+        </tr>
       </table>
-      <div style="text-align:right">
-        <input type="hidden" name="from_conversation_id" id="from_conversation_id">
-        <button type="submit" class="button"><%= t('buttons.send_message', 'Send') %></button>
-      </div>
     <% end %>
     <ul class="messages">
     </ul>
@@ -80,7 +107,7 @@
     <%= link_to t('inbox_actions.mark_as_read', "Mark as Read"), conversation_mark_as_read_url('{{ id }}'), :title => t('inbox_actions.mark_as_read', "Mark as Read"), :class => :action_mark_as_read %>
     <span class="date"></span>
     <img class="attachments" src="/images/messages/attach-gray.png" title="<%= t('has_attachments', 'This conversation has one or more attachments') %>">
-    <img class="media_objects" src="/images/messages/media.png" title="<%= t('has_audio', 'This conversation has one or more audio comments') %>">
+    <img class="media_objects" src="/images/messages/audio-gray.png" title="<%= t('has_audio', 'This conversation has one or more audio comments') %>">
     <span class="audience"></span>
     <span class="count"></span>
     <p></p>
@@ -93,6 +120,21 @@
     <span class="actions"><a href="#/conversations?user_id={{ user_id }}&amp;user_name={{ user_name }}&amp;from_conversation_id={{ from_conversation_id }}" class="send_private_message"><%= t :send_private_message, "New message..." %></a></span>
     <p></p>
     <input type="checkbox" />
+    <ul class='message_attachments'>
+      <li class='media_object_blank'>
+        <a href="#" class="instructure_inline_media_comment audio_comment no-underline" title="<%= t('titles.play_audio_comment', "Play audio comment") %>">
+          <%= image_tag "messages/audio-gray.png" %> 
+          <span class="media_comment_id" style="display: none;"></span>
+          <span class='title'></span>
+        </a>
+      </li>
+      <li class='attachment_blank'>
+        <a href="<%= file_download_path('{{ id }}', :verifier => '{{ uuid }}') %>" title="<%= t('titles.download_attachment', "Download attachment") %>">
+          <%= image_tag "messages/attach-gray.png" %> 
+          <span class='title'></span>
+        </a>
+      </li>
+    </ul>
   </li>
 </ul>
 <div id="conversation_actions">

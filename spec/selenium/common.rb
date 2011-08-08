@@ -361,9 +361,10 @@ def get_file(filename)
     fullpath = @file.path
     filename = File.basename(@file.path)
   else
+    @file = nil
     fullpath = "C:\\testfiles\\#{filename}"
   end
-  [filename, fullpath, data]
+  [filename, fullpath, data, @file]
 end
 
 shared_examples_for "in-process server selenium tests" do

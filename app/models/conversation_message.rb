@@ -22,7 +22,7 @@ class ConversationMessage < ActiveRecord::Base
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
   has_many :conversation_message_participants
-  has_many :attachments, :as => :context
+  has_many :attachments, :as => :context, :order => 'created_at, id'
   has_many :media_objects, :as => :context
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
@@ -113,7 +113,9 @@ class ConversationMessage < ActiveRecord::Base
 
   def as_json(options = {})
     super(options)['conversation_message'].merge({
-      'forwarded_messages' => forwarded_messages
+      'forwarded_messages' => forwarded_messages,
+      'attachments' => attachments.map{ |a| a.as_json['attachment'].merge({'uuid' => a.uuid}) },
+      'media_objects' => media_objects.map{ |o| o.as_json['media_object'] }
     })
   end
 

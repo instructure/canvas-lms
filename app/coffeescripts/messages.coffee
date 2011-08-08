@@ -525,12 +525,15 @@ I18n.scoped 'conversations', (I18n) ->
       $form.attr action: $selected_conversation.find('a.details_link').attr('add_url')
 
     reset_message_form()
-    inbox_resize()
     $form.show().find(':input:visible:first').focus()
 
   reset_message_form = ->
     $form.find('.audience').html $selected_conversation.find('.audience').html() if $selected_conversation?
-    $form.find('input, textarea').val('').change()
+    $form.find('input[name!=authenticity_token], textarea').val('').change()
+    $form.find(".attachment:visible").remove()
+    $form.find(".media_comment").hide()
+    $form.find("#action_media_comment").show()
+    inbox_resize()
 
   parse_query_string = (query_string = window.location.search.substr(1)) ->
     hash = {}
@@ -632,7 +635,35 @@ I18n.scoped 'conversations', (I18n) ->
       for submessage in data.forwarded_messages
         $ul.append build_message(submessage)
       $message.append $ul
+
+    $ul = $message.find('ul.message_attachments').detach()
+    $media_object_blank = $ul.find('.media_object_blank').detach()
+    $attachment_blank = $ul.find('.attachment_blank').detach()
+    if data.media_objects?.length or data.attachments?.length
+      $message.append $ul
+      if data.media_objects?
+        for media_object in data.media_objects
+          $ul.append build_media_object($media_object_blank, media_object)
+      if data.attachments?
+        for attachment in data.attachments
+          $ul.append build_attachment($attachment_blank, attachment)
+
     $message
+
+  build_media_object = (blank, data) ->
+    $media_object = blank.clone(true).attr('id', 'media_object_' + data.id)
+    $media_object.data('id', data.id)
+    $media_object.find('span.title').html $.h(data.title)
+    $media_object.find('span.media_comment_id').html $.h(data.media_id)
+    $media_object
+
+  build_attachment = (blank, data) ->
+    $attachment = blank.clone(true).attr('id', 'attachment_' + data.id)
+    $attachment.data('id', data.id)
+    $attachment.find('span.title').html $.h(data.display_name)
+    $link = $attachment.find('a')
+    $link.attr('href', $.replaceTags($.replaceTags($link.attr('href'), 'id', data.id), 'uuid', data.uuid))
+    $attachment
 
   inbox_action_url_for = ($action, $conversation) ->
     $.replaceTags $action.attr('href'), 'id', $conversation.data('id')
@@ -813,6 +844,8 @@ I18n.scoped 'conversations', (I18n) ->
       e.stopImmediatePropagation() unless valid
       valid
     $form.formSubmit
+      fileUpload: ->
+        return $(this).find(".file_input:visible").length > 0
       beforeSubmit: ->
         $(this).loadingImage()
       success: (data) ->
@@ -850,12 +883,17 @@ I18n.scoped 'conversations', (I18n) ->
 
 
     $message_list.click (e) ->
-      $message = $(e.target).closest('#messages > ul > li')
-      unless $message.hasClass('generated')
-        $selected_conversation?.addClass('inactive')
-        $message.toggleClass('selected')
-        $message.find('> :checkbox').attr('checked', $message.hasClass('selected'))
-      toggle_message_actions()
+      if $(e.target).closest('a.instructure_inline_media_comment').length
+        # a.instructure_inline_media_comment clicks have to propagate to the
+        # top due to "live" handling; if it's one of those, it's not really
+        # intended for us, just let it go
+      else
+        $message = $(e.target).closest('#messages > ul > li')
+        unless $message.hasClass('generated')
+          $selected_conversation?.addClass('inactive')
+          $message.toggleClass('selected')
+          $message.find('> :checkbox').attr('checked', $message.hasClass('selected'))
+        toggle_message_actions()
 
     $('.menus > li > a').click (e) ->
       e.preventDefault()
@@ -948,7 +986,7 @@ I18n.scoped 'conversations', (I18n) ->
             token_input = $('#add_recipients').data('token_input')
             token_input.base_exclude = ($(node).data('id') for node in $selected_conversation.find('.participant'))
             token_input.resize()
-            $(this).find("input").val('').change().last().focus()
+            $(this).find("input[name!=authenticity_token]").val('').change().last().focus()
           close: ->
             $('#add_recipients').data('token_input').input.blur()
 
@@ -1002,7 +1040,7 @@ I18n.scoped 'conversations', (I18n) ->
         open: ->
           token_input = $('#forward_recipients').data('token_input')
           token_input.resize()
-          $(this).find("input").val('').change().last().focus()
+          $(this).find("input[name!=authenticity_token]").val('').change().last().focus()
           $preview = $(this).find('ul.messages').first()
           $preview.html('')
           $preview.html($message_list.find('> li.selected').clone(true).removeAttr('id').removeClass('self'))
@@ -1051,6 +1089,39 @@ I18n.scoped 'conversations', (I18n) ->
           $others.css('top', $others.parent().height() + $others.parent().position().top)
         e.preventDefault()
         return false
+
+    nextAttachmentIndex = 0
+    $('#action_add_attachment').click (e) ->
+      e.preventDefault()
+      $attachment = $("#attachment_blank").clone(true)
+      $attachment.attr('id', null)
+      $attachment.find("input[type='file']").attr('name', 'attachments[' + (nextAttachmentIndex++) + ']')
+      $('#attachment_list').append($attachment)
+      $attachment.slideDown "fast", ->
+        inbox_resize()
+      return false
+
+    $("#attachment_blank a.remove_link").click (e) ->
+      e.preventDefault()
+      $(this).parents(".attachment").slideUp "fast", ->
+        inbox_resize()
+        $(this).remove()
+      return false
+
+    $('#action_media_comment').click (e) ->
+      e.preventDefault()
+      $("#create_message_form .media_comment").mediaComment 'create', 'audio', (id, type) ->
+        $("#media_comment_id").val(id)
+        $("#media_comment_type").val(type)
+        $("#create_message_form .media_comment").show()
+        $("#action_media_comment").hide()
+
+    $('#create_message_form .media_comment a.remove_link').click (e) ->
+      e.preventDefault()
+      $("#media_comment_id").val('')
+      $("#media_comment_type").val('')
+      $("#create_message_form .media_comment").hide()
+      $("#action_media_comment").show()
 
     for conversation in MessageInbox.initial_conversations
       add_conversation conversation, true

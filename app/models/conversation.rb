@@ -120,8 +120,7 @@ class Conversation < ActiveRecord::Base
       end
       message.save!
 
-      # TODO: attachments and media comments
-
+      yield message if block_given?
 
       connection.execute(<<-SQL)
         INSERT INTO conversation_message_participants(conversation_message_id, conversation_participant_id)
@@ -161,8 +160,18 @@ class Conversation < ActiveRecord::Base
           ["user_id = ?", current_user.id]
         )
   
-        conversation_participants.update_all({:has_attachments => true}, "NOT has_attachments") if message.attachments.present?
-        conversation_participants.update_all({:has_media_objects => true}, "NOT has_media_objects") if message.media_objects.present?
+        updated = false
+        if message.attachments.present?
+          self.has_attachments = true
+          conversation_participants.update_all({:has_attachments => true}, "NOT has_attachments")
+          updated = true
+        end
+        if message.media_objects.present?
+          self.has_media_objects = true
+          conversation_participants.update_all({:has_media_objects => true}, "NOT has_media_objects")
+          updated = true
+        end
+        self.save if updated
       end
       
       message

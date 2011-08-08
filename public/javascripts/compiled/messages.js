@@ -677,7 +677,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_message, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -699,14 +699,17 @@
         });
       }
       reset_message_form();
-      inbox_resize();
       return $form.show().find(':input:visible:first').focus();
     };
     reset_message_form = function() {
       if ($selected_conversation != null) {
         $form.find('.audience').html($selected_conversation.find('.audience').html());
       }
-      return $form.find('input, textarea').val('').change();
+      $form.find('input[name!=authenticity_token], textarea').val('').change();
+      $form.find(".attachment:visible").remove();
+      $form.find(".media_comment").hide();
+      $form.find("#action_media_comment").show();
+      return inbox_resize();
     };
     parse_query_string = function(query_string) {
       var hash, key, parts, value, _i, _len, _ref, _ref2;
@@ -833,7 +836,7 @@
       return $.htmlEscape(user.name) + (shared_contexts.length ? " <em>" + $.htmlEscape(shared_contexts) + "</em>" : '');
     };
     build_message = function(data) {
-      var $message, $pm_action, $ul, avatar, pm_url, submessage, user, user_name, _i, _len, _ref, _ref2, _ref3, _ref4;
+      var $attachment_blank, $media_object_blank, $message, $pm_action, $ul, attachment, avatar, media_object, pm_url, submessage, user, user_name, _i, _j, _k, _len, _len2, _len3, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
       $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id);
       $message.data('id', data.id);
       $message.addClass(data.generated ? 'generated' : data.author_id === MessageInbox.user_id ? 'self' : 'other');
@@ -868,7 +871,44 @@
         }
         $message.append($ul);
       }
+      $ul = $message.find('ul.message_attachments').detach();
+      $media_object_blank = $ul.find('.media_object_blank').detach();
+      $attachment_blank = $ul.find('.attachment_blank').detach();
+      if (((_ref5 = data.media_objects) != null ? _ref5.length : void 0) || ((_ref6 = data.attachments) != null ? _ref6.length : void 0)) {
+        $message.append($ul);
+        if (data.media_objects != null) {
+          _ref7 = data.media_objects;
+          for (_j = 0, _len2 = _ref7.length; _j < _len2; _j++) {
+            media_object = _ref7[_j];
+            $ul.append(build_media_object($media_object_blank, media_object));
+          }
+        }
+        if (data.attachments != null) {
+          _ref8 = data.attachments;
+          for (_k = 0, _len3 = _ref8.length; _k < _len3; _k++) {
+            attachment = _ref8[_k];
+            $ul.append(build_attachment($attachment_blank, attachment));
+          }
+        }
+      }
       return $message;
+    };
+    build_media_object = function(blank, data) {
+      var $media_object;
+      $media_object = blank.clone(true).attr('id', 'media_object_' + data.id);
+      $media_object.data('id', data.id);
+      $media_object.find('span.title').html($.h(data.title));
+      $media_object.find('span.media_comment_id').html($.h(data.media_id));
+      return $media_object;
+    };
+    build_attachment = function(blank, data) {
+      var $attachment, $link;
+      $attachment = blank.clone(true).attr('id', 'attachment_' + data.id);
+      $attachment.data('id', data.id);
+      $attachment.find('span.title').html($.h(data.display_name));
+      $link = $attachment.find('a');
+      $link.attr('href', $.replaceTags($.replaceTags($link.attr('href'), 'id', data.id), 'uuid', data.uuid));
+      return $attachment;
     };
     inbox_action_url_for = function($action, $conversation) {
       return $.replaceTags($action.attr('href'), 'id', $conversation.data('id'));
@@ -1095,7 +1135,7 @@
       MessageInbox: MessageInbox
     });
     return $(document).ready(function() {
-      var conversation, _i, _len, _ref, _ref2;
+      var conversation, nextAttachmentIndex, _i, _len, _ref, _ref2;
       $conversations = $('#conversations');
       $conversation_list = $conversations.find("ul.conversations");
       set_last_label((_ref = $.cookie('last_label')) != null ? _ref : 'red');
@@ -1112,6 +1152,9 @@
         return valid;
       });
       $form.formSubmit({
+        fileUpload: function() {
+          return $(this).find(".file_input:visible").length > 0;
+        },
         beforeSubmit: function() {
           return $(this).loadingImage();
         },
@@ -1164,15 +1207,19 @@
       });
       $message_list.click(function(e) {
         var $message;
-        $message = $(e.target).closest('#messages > ul > li');
-        if (!$message.hasClass('generated')) {
-          if ($selected_conversation != null) {
-            $selected_conversation.addClass('inactive');
+        if ($(e.target).closest('a.instructure_inline_media_comment').length) {
+          ;
+        } else {
+          $message = $(e.target).closest('#messages > ul > li');
+          if (!$message.hasClass('generated')) {
+            if ($selected_conversation != null) {
+              $selected_conversation.addClass('inactive');
+            }
+            $message.toggleClass('selected');
+            $message.find('> :checkbox').attr('checked', $message.hasClass('selected'));
           }
-          $message.toggleClass('selected');
-          $message.find('> :checkbox').attr('checked', $message.hasClass('selected'));
+          return toggle_message_actions();
         }
-        return toggle_message_actions();
       });
       $('.menus > li > a').click(function(e) {
         e.preventDefault();
@@ -1310,7 +1357,7 @@
               return _results;
             })();
             token_input.resize();
-            return $(this).find("input").val('').change().last().focus();
+            return $(this).find("input[name!=authenticity_token]").val('').change().last().focus();
           },
           close: function() {
             return $('#add_recipients').data('token_input').input.blur();
@@ -1393,7 +1440,7 @@
             var $preview, token_input;
             token_input = $('#forward_recipients').data('token_input');
             token_input.resize();
-            $(this).find("input").val('').change().last().focus();
+            $(this).find("input[name!=authenticity_token]").val('').change().last().focus();
             $preview = $(this).find('ul.messages').first();
             $preview.html('');
             $preview.html($message_list.find('> li.selected').clone(true).removeAttr('id').removeClass('self'));
@@ -1454,6 +1501,43 @@
           e.preventDefault();
           return false;
         }
+      });
+      nextAttachmentIndex = 0;
+      $('#action_add_attachment').click(function(e) {
+        var $attachment;
+        e.preventDefault();
+        $attachment = $("#attachment_blank").clone(true);
+        $attachment.attr('id', null);
+        $attachment.find("input[type='file']").attr('name', 'attachments[' + (nextAttachmentIndex++) + ']');
+        $('#attachment_list').append($attachment);
+        $attachment.slideDown("fast", function() {
+          return inbox_resize();
+        });
+        return false;
+      });
+      $("#attachment_blank a.remove_link").click(function(e) {
+        e.preventDefault();
+        $(this).parents(".attachment").slideUp("fast", function() {
+          inbox_resize();
+          return $(this).remove();
+        });
+        return false;
+      });
+      $('#action_media_comment').click(function(e) {
+        e.preventDefault();
+        return $("#create_message_form .media_comment").mediaComment('create', 'audio', function(id, type) {
+          $("#media_comment_id").val(id);
+          $("#media_comment_type").val(type);
+          $("#create_message_form .media_comment").show();
+          return $("#action_media_comment").hide();
+        });
+      });
+      $('#create_message_form .media_comment a.remove_link').click(function(e) {
+        e.preventDefault();
+        $("#media_comment_id").val('');
+        $("#media_comment_type").val('');
+        $("#create_message_form .media_comment").hide();
+        return $("#action_media_comment").show();
       });
       _ref2 = MessageInbox.initial_conversations;
       for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
