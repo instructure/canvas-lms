@@ -246,6 +246,7 @@ I18n.scoped('wiki.sidebar', function(I18n) {
               loaderMsg: I18n.t('loading_more_results', "Loading more results"),
               scrape: function(data, xhr) {
                 this.totalPages = parseInt(xhr.getResponseHeader('X-Total-Pages'));
+                return data;
               }
             });
           }
