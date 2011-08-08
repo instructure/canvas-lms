@@ -1,3 +1,66 @@
+canvas-lms (1.1-45) professional; urgency=low
+
+  * [-d0f98af] fix thumbnail url for attachments that have a root_attachment_id
+  * [-782574f] fix displaying thumbnails in wiki sidebar
+  * [+b801ccc] disable stdout while requiring erubis rails helpers
+  * [+7b96596] allow audio comments in speedgrader comments; fixes #5095
+  * [+b5035fe] translation import/export scripts
+  * [+5e66286] locale detection and selection, refs #4994
+  * [+b4116e5] workaround tinymce resizing issue in selenium test
+  * [+823cb75] speed up selenium by not doing setup/teardown after every set of specs
+  * [+e295e45] can't create graded quiz from assignments more options page
+  * [+d5c8be2] allow for configuration of outgoing email name
+  * [+0021e56] fix typo in spec filename
+  * [+e3f02ec] upgrade selenium-webdriver gem
+  * [+d6c51c4] ie7 upgrade notice
+  * [+b5e23ca] safer regex of filenames to ignore in zips
+  * [+3f5d10c] fix migration
+  * [+9855c5d] spec for qti migration tool duplicate use file fix, closes #5126
+  * [+8ceac6c] hack around periodic disappearing clicks in selenium
+  * [+87ea066] change rspec output format to nested
+  * [+3bafa68] speed up courses selenium test
+  * [+353204e] log context when using local rails buffered logger
+  * [+6cd7e20] log job id and worker id with all log lines for delayed jobs
+  * [+3b2f4d1] re-work wiki sidebar fixes #3975
+  * [+25169e7] latest es.yml translations (w/ some manual fixes)
+  * [+8ce1e30] sel spec for cloned image thumbnails displaying in wiki sidebar
+  * [+c7c7bf4] use unminified version of jquery.event.drag
+  * [+7b5d34b] patch jquery.event.drag to handle 'live' better
+  * [+91d1bdb] column reordering/resizing/sorting in gradebook2
+  * [+d97df4e] enable gradebook2 sorting by name and secondary_id
+  * [+b3167f4] start discussion topic api
+  * [+e06d3ba] support publishNow respondus setting, closes #5137
+  * [+8259d2b] create a unique temp directory for each job, underneath the master tmpdir
+  * [+1b03b2f] don't multiply quota by 2^20 on the statistics page
+  * [+323348f] can't add floats to strings in ruby
+  * [+b970f4a] limit sis import transaction time
+  * [+8df4bc8] update batch mode sis import documentation
+  * [+821c648] wrong key name in file_store.yml.example
+  * [+d2d99c0] removing invalid copyright
+  * [+3ac246b] re-enable these disabled files controller specs
+  * [+eb4b0b2] fix mt usage in AccountsController
+  * [+670605f] fix i18n for default term name
+  * [+fc72ae4] api to retrieve a single course
+  * [+c4e4b7d] continue to allow the previous api behavior when the user has a canvas session
+  * [+378a3b9] wiki_sidebar doesn't need active folders, but does need non-truncated root folders
+  * [+81e53e9] localize notifications according to user's locale (or browser_locale)
+  * [+1cbcbd7] support general feedback on quiz questions; fixes #4912
+  * [+ac261b0] show terms in courses dropdown when it's necessary; fixes #4803
+  * [+36632fe] new gradebook2 features
+  * [+367e8ed] fix announcements not going to dashboard on delayed change; fixes #5185
+  * [+b5addd8] generate js translation files as part of compiling assets
+  * [+57d19fa] enable español
+  * [+b3a20c0] support query parameters in Basic LTI
+  * [+b7f56ed] fix uploading profile pictures
+  * [+68a1087] fix api support for sis ids in url with special chars, closes #5176
+  * [+85bf554] folder_controller optimizations stopped sending filename field
+  * [+c1f79ad] fix ignoring a student's quota when submitting homework (local file storage); fixes #5203
+  * [+d2ebba4] restore restful api route names that gradebook2 uses
+  * [+beea242] upload profile pics to the right folder
+  * [+fe75d72] fix pageless plugin with scrape method
+
+ -- JT Olds <jt@instructure.com>  Mon, 08 Aug 2011 10:29:24 -0600
+
 canvas-lms (1.1-44) professional; urgency=low
 
   * [+a9ae4d3] support redis as well as memcache for a rails cache store
