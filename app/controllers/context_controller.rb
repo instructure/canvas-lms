@@ -17,10 +17,26 @@
 #
 
 class ContextController < ApplicationController
-  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :kaltura_notifications, :media_object_redirect, :media_object_inline, :object_snippet]
+  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :object_snippet]
   before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image]
   protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
 
+  def create_media_object
+    @context = Context.find_by_asset_string(params[:context_code])
+    if authorized_action(@context, @current_user, :read)
+      if params[:id] && params[:type] && @context.respond_to?(:media_objects)
+        @media_object = @context.media_objects.find_or_initialize_by_media_id_and_media_type(params[:id], params[:type])
+        @media_object.title = params[:title] if params[:title]
+        @media_object.user = @current_user
+        @media_object.media_type = params[:type]
+        @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
+        @media_object.user_entered_title = params[:user_entered_title] if params[:user_entered_title] && !params[:user_entered_title].empty?
+        @media_object.save
+      end
+      render :json => @media_object.to_json
+    end
+  end
+  
   def media_object_inline
     @show_left_side = false
     @show_right_side = false

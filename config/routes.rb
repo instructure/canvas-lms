@@ -272,6 +272,7 @@ ActionController::Routing::Routes.draw do |map|
   map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
 
   map.resources :page_views, :only => [:update,:index]
+  map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
   map.media_object 'media_objects/:id', :controller => 'context', :action => 'media_object_inline'
   map.media_object_redirect 'media_objects/:id/redirect', :controller => 'context', :action => 'media_object_redirect'

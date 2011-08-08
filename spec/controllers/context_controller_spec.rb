@@ -116,4 +116,53 @@ describe ContextController do
       response['X-XSS-Protection'].should == '0'
     end
   end
+
+  describe "POST '/media_objects'" do
+    before :each do
+      course_with_student_logged_in(:active_all => true)
+    end
+
+    it "should match the create_media_object route" do
+      assert_recognizes({:controller => 'context', :action => 'create_media_object'}, {:path => 'media_objects', :method => :post})
+    end
+
+    it "should update the object if it already exists" do
+      @media_object = @user.media_objects.build(:media_id => "new_object")
+      @media_object.media_type = "audio"
+      @media_object.title = "original title"
+      @media_object.save
+
+      @original_count = @user.media_objects.count
+
+      post :create_media_object,
+        :context_code => "user_#{@user.id}",
+        :id => @media_object.media_id,
+        :type => @media_object.media_type,
+        :title => "new title"
+
+      @media_object.reload
+      @media_object.title.should == "new title"
+
+      @user.reload
+      @user.media_objects.count.should == @original_count
+    end
+
+    it "should create the object if it doesn't already exist" do
+      @original_count = @user.media_objects.count
+
+      post :create_media_object,
+        :context_code => "user_#{@user.id}",
+        :id => "new_object",
+        :type => "audio",
+        :title => "title"
+
+      @user.reload
+      @user.media_objects.count.should == @original_count + 1
+      @media_object = @user.media_objects.last
+
+      @media_object.media_id.should == "new_object"
+      @media_object.media_type.should == "audio"
+      @media_object.title.should == "title"
+    end
+  end
 end
