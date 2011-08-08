@@ -1,3 +1,11 @@
+canvas-lms (1.1-46) professional; urgency=low
+
+  * Package ref: fe75d72df6206677702ab3d5c1129490ca0eaf86
+  *
+  * [+13080d0] specify bundler version
+
+ -- JT Olds <jt@instructure.com>  Mon, 08 Aug 2011 11:57:35 -0600
+
 canvas-lms (1.1-45) professional; urgency=low
 
   * [-d0f98af] fix thumbnail url for attachments that have a root_attachment_id
