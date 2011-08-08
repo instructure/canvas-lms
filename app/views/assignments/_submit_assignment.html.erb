@@ -419,8 +419,7 @@ window.submissionAttachmentIndex = -1;
         </script>
         <% end %>
         <div id="uploading_google_doc_message" style="display: none;">
-          <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may
-          take a little while, depending on the size of the file..." %>
+          <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may take a little while, depending on the size of the file..." %>
           <div style="text-align: center; margin: 10px;">
             <%= image_tag "ajax-loader-bar.gif" %>
           </div>
@@ -428,8 +427,7 @@ window.submissionAttachmentIndex = -1;
         <% end %>
       <% else %>
         <div id="submit_google_doc_form">
-          <%= t 'messages.google_docs_auth_required', "Before you can submit assignments directly from Google Docs you need to
-          authorize Canvas to access your Google Docs account:" %>
+          <%= t 'messages.google_docs_auth_required', "Before you can submit assignments directly from Google Docs you need to authorize Canvas to access your Google Docs account:" %>
           <div style="font-size: 1.1em; text-align: center; margin: 10px;">
             <a class="button" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_docs', "Authorize Google Docs Access" %></a>
           </div>
@@ -440,10 +438,7 @@ window.submissionAttachmentIndex = -1;
       <% if !feature_enabled?(:kaltura) %>
         <div id="submit_media_recording_form">
           <h3><%= t 'titles.media_recordings_disabled', "Media recordings are not enabled for this Canvas site" %></h3>
-          <p><%= t 'messages.media_recordings_disabled', "Media recordings are not enabled for this Canvas site, and you will not be
-          able to submit these types of assignments.  Please contact your instructor about
-          changing the settings for this assignment, or your system administrator about enabling
-          media recordings." %></p>
+          <p><%= t 'messages.media_recordings_disabled', "Media recordings are not enabled for this Canvas site, and you will not be able to submit these types of assignments.  Please contact your instructor about changing the settings for this assignment, or your system administrator about enabling media recordings." %></p>
         </div>
       <% else %>
         <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
