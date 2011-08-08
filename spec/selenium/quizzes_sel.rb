@@ -3,6 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "quiz selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  it "should allow a teacher to create a quiz from the quizzes tab directly" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/quizzes"
+    driver.find_element(:css, ".new-quiz-link").click
+    driver.find_element(:css, ".save_quiz_button").click
+    assert_flash_notice_message /Quiz data saved/
+  end
+
   it "should correctly hide form when cancelling quiz edit" do
     course_with_teacher_logged_in
 
@@ -253,4 +261,3 @@ end
 describe "quiz Windows-Firefox-Tests" do
   it_should_behave_like "quiz selenium tests"
 end
-

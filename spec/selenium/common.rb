@@ -305,6 +305,14 @@ shared_examples_for "all selenium tests" do
     JS
   end
 
+  def assert_flash_notice_message(okay_message_regex)
+    keep_trying_until do
+      text = driver.find_element(:css, "#flash_notice_message").text
+      raise "server error" if text =~ /The last request didn't work out/
+      text =~ okay_message_regex
+    end
+  end
+
   self.use_transactional_fixtures = false
 
   append_after(:each) do
