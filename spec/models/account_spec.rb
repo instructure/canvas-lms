@@ -351,6 +351,7 @@ describe Account do
     hash[:sub_sub] = { :account => sub_sub_account}
 
     hash.each do |k, v|
+      v[:account].update_attribute(:settings, {:no_enrollments_can_create_courses => false})
       admin, user = account_with_admin_and_restricted_user(v[:account])
       hash[k][:admin] = admin
       hash[k][:user] = user

@@ -386,28 +386,9 @@ var I18n = I18n || {};
   end
 
   def show_user_create_course_button(user)
-    return false if user.nil?
-    root_account = @domain_root_account || user.account.root_account || user.account
-    
-    # admins can always create courses
-    return true if root_account.account_users.find_by_user_id(user.id)
-    
-    if root_account.settings[:teachers_can_create_courses] != false
-      count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('TeacherEnrollment', 'DesignerEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
-      return true if count > 0
-    end
-    if root_account.settings[:students_can_create_courses] != false
-      count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('StudentEnrollment', 'ObserverEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
-      return true if count > 0
-    end
-    if root_account.settings[:no_enrollments_can_create_courses] != false
-      count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.workflow_state != 'deleted' AND root_account_id = #{root_account.id}").count
-      return true if count == 0
-    end
-    
-    false
+    @domain_root_account.manually_created_courses_account.grants_right?(user, session, [:create_courses, :manage_courses])
   end
-  
+
   def hash_get(hash, key, default=nil)
     if hash
       if hash[key.to_s] != nil

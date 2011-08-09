@@ -41,7 +41,6 @@ class Account < ActiveRecord::Base
   has_many :sis_batches
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
-  has_many :authorization_codes, :dependent => :destroy
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user
   has_many :role_overrides, :as => :context
@@ -540,6 +539,28 @@ class Account < ActiveRecord::Base
 
     given { |user| !site_admin? && Account.site_admin_user?(user, :manage) }
     can :read and can :manage and can :update and can :delete
+
+    given { |user|
+      root_account = self.root_account || self
+      result = false
+      site_admin = self.site_admin?
+
+      if !site_admin && user && root_account.settings[:teachers_can_create_courses] != false
+        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('TeacherEnrollment', 'DesignerEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
+        result = true if count > 0
+      end
+      if !site_admin && user && !result && root_account.settings[:students_can_create_courses] != false
+        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('StudentEnrollment', 'ObserverEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
+        result = true if count > 0
+      end
+      if !site_admin && user && !result && root_account.settings[:no_enrollments_can_create_courses] != false
+        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.workflow_state != 'deleted' AND root_account_id = #{root_account.id}").count
+        result = true if count == 0
+      end
+
+      result
+    }
+    can :create_courses
   end
 
   alias_method :destroy!, :destroy
@@ -996,6 +1017,10 @@ class Account < ActiveRecord::Base
       child_ids = self.class.connection.select_values("SELECT id FROM accounts WHERE parent_account_id IN (#{child_ids.join(",")})").map(&:to_i)
     end
     return false
+  end
+
+  def manually_created_courses_account
+    (self.root_account || self).sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
   end
 
   named_scope :sis_sub_accounts, lambda{|account, *sub_account_source_ids|
