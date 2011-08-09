@@ -22,4 +22,22 @@ class PseudonymSession < Authlogic::Session::Base
   login_field :unique_id
   find_by_login_method :custom_find_by_unique_id
   remember_me_for 2.weeks
+
+  # we need to know if the session came from http basic auth, so we override
+  # authlogic's method here to add a flag that we can check
+  def persist_by_http_auth
+    controller.authenticate_with_http_basic do |login, password|
+      if !login.blank? && !password.blank?
+        send("#{login_field}=", login)
+        send("#{password_field}=", password)
+        @valid_basic_auth = valid?
+        return @valid_basic_auth
+      end
+    end
+
+    false
+  end
+  def used_basic_auth?
+    @valid_basic_auth
+  end
 end
