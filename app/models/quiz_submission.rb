@@ -27,7 +27,7 @@ class QuizSubmission < ActiveRecord::Base
   belongs_to :submission, :touch => true
   before_save :update_kept_score
   before_save :sanitize_responses
-  after_save :update_assignment_submission
+  before_save :update_assignment_submission
  
   serialize :quiz_data
   serialize :submission_data
@@ -298,7 +298,7 @@ class QuizSubmission < ActiveRecord::Base
     self.finished_at = opts[:finished_at] if opts[:finished_at]
     if self.quiz.for_assignment?
       assignment_submission = self.quiz.assignment.find_or_create_submission(self.user_id)
-      self.submission_id = assignment_submission.id
+      self.submission = assignment_submission
     end
     self.with_versioning(true) do |s|
       s.save

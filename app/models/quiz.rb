@@ -44,8 +44,8 @@ class Quiz < ActiveRecord::Base
   
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
-  before_save :set_defaults
   before_save :build_assignment
+  before_save :set_defaults
   after_save :update_assignment
   after_save :touch_context
   
@@ -206,12 +206,11 @@ class Quiz < ActiveRecord::Base
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
       Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz'})
+      self.quiz_submissions.each { |q| q.submission.try(:destroy); q.submission = nil; q.save }
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
       ContentTag.delete_for(Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     end
-    if @update_existing_submissions
-      send_later(:update_existing_submissions)
-    end
+    send_later_if_production(:update_existing_submissions) if @update_existing_submissions
     if self.assignment && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
       if !self.graded? && @old_assignment_id
       else
