@@ -116,6 +116,7 @@ module SIS
                 if !row['password'].blank? && (pseudo.new_record? || pseudo.password_auto_generated)
                   pseudo.password = row['password']
                   pseudo.password_confirmation = row['password']
+                  pseudo.password_auto_generated = true
                 end
                 pseudo.sis_ssha = row['ssha_password'] if !row['ssha_password'].blank?
 
