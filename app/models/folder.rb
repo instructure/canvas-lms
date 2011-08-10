@@ -291,6 +291,18 @@ class Folder < ActiveRecord::Base
     end
   end
 
+  def self.find_attachment_in_context_with_path(context, path)
+    components = path.split('/')
+    component = components.shift
+    context.folders.active.find_all_by_parent_folder_id(nil).each do |folder|
+      if folder.name == component
+        attachment = folder.find_attachment_with_components(components.dup)
+        return attachment if attachment
+      end
+    end
+    nil
+  end
+
   def find_attachment_with_components(components)
     component = components.shift
     if components.empty?
