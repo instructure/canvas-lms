@@ -1,3 +1,15 @@
+canvas-lms (1.1-47) professional; urgency=low
+
+  * Package ref: 7ae98758c04bfd81f3425d6c7c733dd2e642033a
+  *
+  * [+bb9c075] support falling back to a fallback account with course sis imports
+  * [+038393a] allow unchanged passwords to be reset via sis
+  * [+4679816] don't bail when an abstract course is not available
+  * [+547a6ac] sort files alphabetically in the modules file picker; fixes #4082
+  * [+7ae9875] pin macaddr gem to 1.0.0 , 1.2.0 has a dependency issue
+
+ -- JT Olds <jt@instructure.com>  Wed, 10 Aug 2011 12:33:19 -0600
+
 canvas-lms (1.1-46) professional; urgency=low
 
   * Package ref: fe75d72df6206677702ab3d5c1129490ca0eaf86
