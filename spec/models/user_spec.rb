@@ -374,4 +374,18 @@ describe User do
       @site_admin.grants_right?(user, nil, :become_user).should be_false
     end
   end
+  
+  context "avatars" do
+    it "should find only users with avatars set" do
+      user_model
+      @user.avatar_state = 'submitted'
+      @user.save!
+      User.with_avatar_state('submitted').count.should == 0
+      User.with_avatar_state('any').count.should == 0
+      @user.avatar_image_url = 'http://www.example.com'
+      @user.save!
+      User.with_avatar_state('submitted').count.should == 1
+      User.with_avatar_state('any').count.should == 1
+    end
+  end
 end

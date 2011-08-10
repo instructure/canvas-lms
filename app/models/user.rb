@@ -963,12 +963,12 @@ class User < ActiveRecord::Base
   named_scope :with_avatar_state, lambda{|state|
     if state == 'any'
       {
-        :conditions =>['avatar_state IS NOT NULL AND avatar_state != ?', 'none'],
+        :conditions =>['avatar_image_url IS NOT NULL AND avatar_state IS NOT NULL AND avatar_state != ?', 'none'],
         :order => 'avatar_image_updated_at DESC'
       }
     else
       {
-        :conditions => {:avatar_state => state},
+        :conditions => ['avatar_image_url IS NOT NULL AND avatar_state = ?', state],
         :order => 'avatar_image_updated_at DESC'
       }
     end
