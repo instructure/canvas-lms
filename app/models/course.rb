@@ -58,9 +58,11 @@ class Course < ActiveRecord::Base
                   :restrict_enrollments_to_course_dates,
                   :grading_standard,
                   :grading_standard_enabled,
-                  :locale
+                  :locale,
+                  :settings
 
   serialize :tab_configuration
+  serialize :settings, Hash
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :abstract_course
   belongs_to :enrollment_term
@@ -2186,5 +2188,50 @@ class Course < ActiveRecord::Base
     self.save
     User.update_account_associations(user_ids)
   end
-  
+
+
+  cattr_accessor :settings_options
+  self.settings_options = {}
+
+  def self.add_setting(setting, opts=nil)
+    self.settings_options[setting.to_sym] = opts || {}
+  end
+
+  # these settings either are or could be easily added to
+  # the course settings page
+  add_setting :hide_final_grade, :boolean => true
+
+  def settings=(hash)
+
+    if hash.is_a?(Hash)
+      hash.each do |key, val|
+        if settings_options[key.to_sym]
+          opts = settings_options[key.to_sym]
+          if opts[:boolean]
+            settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
+          elsif opts[:hash]
+            new_hash = {}
+            if val.is_a?(Hash)
+              val.each do |inner_key, inner_val|
+                if opts[:values].include?(inner_key.to_sym)
+                  new_hash[inner_key.to_sym] = inner_val.to_s
+                end
+              end
+            end
+            settings[key.to_sym] = new_hash.empty? ? nil : new_hash
+          else
+            settings[key.to_sym] = val.to_s
+          end
+        end
+      end
+    end
+    settings
+  end
+
+  def settings
+    result = self.read_attribute(:settings)
+    return result if result
+    return self.write_attribute(:settings, {}) unless frozen?
+    {}.freeze
+  end
 end

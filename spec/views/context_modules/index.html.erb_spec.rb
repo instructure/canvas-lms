@@ -38,7 +38,7 @@ describe "/context_modules/index" do
     assigns[:collapsed_modules] = []
     render 'context_modules/index'
     response.should_not be_nil
-    page = Nokogiri('<document>' + response.body + '</document')
+    page = Nokogiri('<document>' + response.body + '</document>')
     page.css("#context_module_item_#{content_tag.id}").length.should == 1
   end
 
@@ -52,7 +52,7 @@ describe "/context_modules/index" do
     assigns[:collapsed_modules] = []
     render 'context_modules/index'
     response.should_not be_nil
-    page = Nokogiri('<document>' + response.body + '</document')
+    page = Nokogiri('<document>' + response.body + '</document>')
     page.css("#context_module_item_#{content_tag.id}").length.should == 0
   end
 end
