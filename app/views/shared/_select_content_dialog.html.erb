@@ -120,7 +120,7 @@
                               folder.visible_file_attachments
                             end
               %>
-              <% attachments.each do |file| %>
+              <% attachments.sort_by{|file| file.display_name }.each do |file| %>
                 <option value="<%= file.id %>"><%= file.display_name %></option>
               <% end %>
             </optgroup>

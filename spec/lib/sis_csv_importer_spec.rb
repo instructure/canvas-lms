@@ -18,6 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+def gen_ssha_password(password)
+  salt = ActiveSupport::SecureRandom.random_bytes(10)
+  "{SSHA}" + Base64.encode64(Digest::SHA1.digest(password+salt).unpack('H*').first+salt).gsub(/\s/, '')
+end
+
 describe SIS::SisCsv do
   before do
     account_model
@@ -207,15 +212,72 @@ describe SIS::SisCsv do
       }
     end
 
-    it 'should disallow instantiations of nonexistent abstract courses' do
-      beforecount = Course.count
+    it 'should skip references to nonexistent abstract courses' do
+      process_csv_data_cleanly(
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter13,active,,"
+      )
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount,active"
+      )
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
-        "C001,,,,,active,AC001"
-      ).tap{|i| i.errors.should == []; i.warnings.map(&:last).should == [
-          "unknown abstract course id AC001"]}
-      Course.count.should == beforecount
+        "C001,shortname,longname,,,active,AC001"
+      ).tap do |i|
+        i.errors.should == []
+        i.warnings.map(&:last).should == [
+            "unknown abstract course id AC001, ignoring abstract course reference"]
+      end
+      Course.last.tap{|c|
+        c.sis_source_id.should == "C001"
+        c.abstract_course.should be_nil
+        c.short_name.should == "shortname"
+        c.name.should == "longname"
+        c.enrollment_term.should == @account.default_enrollment_term
+        c.account.should == @account
+        c.root_account.should == @account
+      }
+      process_csv_data_cleanly(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status",
+        "AC001,Hum101,Humanities,A001,T001,active"
+      )
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,abstract_course_id",
+        "C001,shortname,longname,,,active,AC001"
+      )
+      Course.last.tap{|c|
+        c.sis_source_id.should == "C001"
+        c.abstract_course.should == AbstractCourse.last
+        c.abstract_course.sis_source_id.should == "AC001"
+        c.short_name.should == "shortname"
+        c.name.should == "longname"
+        c.enrollment_term.should == EnrollmentTerm.last
+        c.enrollment_term.name.should == "Winter13"
+        c.account.should == Account.last
+        c.account.name.should == "TestAccount"
+        c.root_account.should == @account
+      }
     end
+
+    it "should support falling back to a fallback account if the primary one doesn't exist" do
+      before_count = AbstractCourse.count
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,TestAccount,active"
+      )
+      process_csv_data_cleanly(
+        "abstract_course_id,short_name,long_name,account_id,term_id,status,fallback_account_id",
+        "C001,Hum101,Humanities,NOEXIST,T001,active,A001"
+      )
+      AbstractCourse.count.should == before_count + 1
+      AbstractCourse.last.tap{|c|
+        c.account.should == Account.last
+        c.account.name.should == "TestAccount"
+        c.root_account.should == @account
+      }
+    end
+
   end
   
   context "course importing" do
@@ -281,6 +343,20 @@ describe SIS::SisCsv do
       course.associated_accounts.map(&:id).sort.should == [account.id, @account.id].sort
     end
     
+    it "should support falling back to a fallback account if the primary one doesn't exist" do
+      process_csv_data_cleanly(
+        "account_id,parent_account_id,name,status",
+        "A001,,Humanities,active"
+      )
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status,fallback_account_id",
+        "test_1,TC 101,Test Course 101,NOEXIST,,active,A001"
+      )
+      account = @account.sub_accounts.find_by_sis_source_id("A001")
+      course = account.courses.find_by_sis_source_id("test_1")
+      course.account.should == account
+    end
+
     it "should rename courses that have not had their name manually changed" do
       process_csv_data(
         "course_id,short_name,long_name,account_id,term_id,status",
@@ -347,7 +423,7 @@ describe SIS::SisCsv do
   
   context "user importing" do
     it "should create new users and update names" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active"
       )
@@ -363,7 +439,7 @@ describe SIS::SisCsv do
       cc = user.communication_channels.first
       cc.path.should eql("user@example.com")
       
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno 2,user@example.com,active"
       )
@@ -380,7 +456,7 @@ describe SIS::SisCsv do
       user.name = "My Awesome Name"
       user.save
       
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno 2,user@example.com,active"
       )
@@ -390,10 +466,10 @@ describe SIS::SisCsv do
     end
 
     it "should set passwords and not overwrite current passwords" do
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
         "user_1,user1,badpassword,User,Uno 2,user@example.com,active,",
-        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}Y2FiODZkZDYyNjE3MTA4OTFlOGNiNTZlZTM2MjU2OTFhNzVkZjM0NHNhbHRzYWx0"
+        "user_2,user2,,User,Uno 2,user2@example.com,active,#{gen_ssha_password("password")}"
       )
       user1 = User.find_by_email('user@example.com')
       p = user1.pseudonyms.first
@@ -414,10 +490,10 @@ describe SIS::SisCsv do
       p.valid_arbitrary_credentials?('password').should be_false
       p.valid_arbitrary_credentials?('newpassword').should be_true
 
-      process_csv_data(
+      process_csv_data_cleanly(
         "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
         "user_1,user1,badpassword2,User,Uno 2,user@example.com,active",
-        "user_2,user2,,User,Uno 2,user2@example.com,active,{SSHA}ZDg1ZmJhMjNmZWU0ZmFiMmYzYTJhNTMxNzZiNjcyZWFhMzE0ZTQzMXNhbHR5"
+        "user_2,user2,,User,Uno 2,user2@example.com,active,#{gen_ssha_password("changedpassword")}"
       )
       
       user1.reload
@@ -434,6 +510,78 @@ describe SIS::SisCsv do
       p.valid_ssha?('changedpassword').should be_true
     end
     
+    it "should allow setting and resetting of passwords" do
+      User.find_by_email("user1@example.com").should be_nil
+      User.find_by_email("user2@example.com").should be_nil
+
+      process_csv_data_cleanly(
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,password1,User,Uno,user1@example.com,active,",
+        "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass1")}"
+      )
+
+      User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('password1').should be_true
+        p.valid_arbitrary_credentials?('password2').should be_false
+        p.valid_arbitrary_credentials?('password3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+      end
+
+      User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('encpass1').should be_true
+        p.valid_arbitrary_credentials?('encpass2').should be_false
+        p.valid_arbitrary_credentials?('encpass3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+      end
+
+      process_csv_data_cleanly(
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,password2,User,Uno,user1@example.com,active,",
+        "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass2")}"
+      )
+
+      User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('password1').should be_false
+        p.valid_arbitrary_credentials?('password2').should be_true
+        p.valid_arbitrary_credentials?('password3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+
+        p.password_confirmation = p.password = 'password4'
+        p.save
+      end
+
+      User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('encpass1').should be_false
+        p.valid_arbitrary_credentials?('encpass2').should be_true
+        p.valid_arbitrary_credentials?('encpass3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_false
+
+        p.password_confirmation = p.password = 'password4'
+        p.save
+      end
+
+      process_csv_data_cleanly(
+        "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
+        "user_1,user1,password3,User,Uno,user1@example.com,active,",
+        "user_2,user2,,User,Dos,user2@example.com,active,#{gen_ssha_password("encpass3")}"
+      )
+
+      User.find_by_email('user1@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('password1').should be_false
+        p.valid_arbitrary_credentials?('password2').should be_false
+        p.valid_arbitrary_credentials?('password3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_true
+      end
+
+      User.find_by_email('user2@example.com').pseudonyms.first.tap do |p|
+        p.valid_arbitrary_credentials?('encpass1').should be_false
+        p.valid_arbitrary_credentials?('encpass2').should be_false
+        p.valid_arbitrary_credentials?('encpass3').should be_false
+        p.valid_arbitrary_credentials?('password4').should be_true
+      end
+
+    end
+
     it "should warn for duplicate rows" do
       importer = process_csv_data(
         "user_id,login_id,first_name,last_name,email,status",

@@ -56,10 +56,11 @@ module SIS
             course ||= Course.new
             course.enrollment_term = term if term
             course.root_account = @root_account
-            if row['account_id'].present?
-              account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
-              course.account = account if account
-            end
+
+            account = nil
+            account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) if row['account_id'].present?
+            account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['fallback_account_id']) if row['fallback_account_id'].present?
+            course.account = account if account
             course.account ||= @root_account
 
             courses_to_update_associations.add course if course.account_id_changed? || course.root_account_id_changed?
@@ -88,10 +89,10 @@ module SIS
             abstract_course = nil
             if row['abstract_course_id'].present? 
               abstract_course = AbstractCourse.find_by_root_account_id_and_sis_source_id(@root_account.id, row['abstract_course_id'])
-              unless abstract_course
-                add_warning(csv, "unknown abstract course id #{row['abstract_course_id']}")
-                next
-              end
+              add_warning(csv, "unknown abstract course id #{row['abstract_course_id']}, ignoring abstract course reference") unless abstract_course
+            end
+
+            if abstract_course
               if row['term_id'].blank? && course.enrollment_term_id != abstract_course.enrollment_term
                 course.send(:association_instance_set, :enrollment_term, nil)
                 course.enrollment_term_id = abstract_course.enrollment_term_id
