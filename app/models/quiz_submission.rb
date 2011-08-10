@@ -292,7 +292,6 @@ class QuizSubmission < ActiveRecord::Base
     @user_answers.each do |answer|
       self.workflow_state = "pending_review" if answer[:correct] == "undefined"
     end
-    self.context_module_action
     self.finished_at = Time.now
     self.manually_unlocked = nil
     self.finished_at = opts[:finished_at] if opts[:finished_at]
@@ -303,6 +302,7 @@ class QuizSubmission < ActiveRecord::Base
     self.with_versioning(true) do |s|
       s.save
     end
+    self.context_module_action
     track_outcomes(self.attempt)
     true
   end
@@ -347,7 +347,7 @@ class QuizSubmission < ActiveRecord::Base
   def context_module_action
     if self.quiz && self.user
       if self.score
-        self.quiz.context_module_action(self.user, :scored, self.score)
+        self.quiz.context_module_action(self.user, :scored, self.kept_score)
       elsif self.submitted_at
         self.quiz.context_module_action(self.user, :submitted)
       end
@@ -402,7 +402,6 @@ class QuizSubmission < ActiveRecord::Base
     end
     self.score = tally
     self.submission_data = res
-    self.context_module_action
 
     update_submission_version(version)
     if version == versions.current
@@ -414,6 +413,7 @@ class QuizSubmission < ActiveRecord::Base
       self.reload
       self.without_versioning(&:save)
     end
+    self.context_module_action
     track_outcomes(version.model.attempt)
     
     true
