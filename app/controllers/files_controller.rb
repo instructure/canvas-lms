@@ -158,6 +158,7 @@ class FilesController < ApplicationController
   end
   
   def show
+    original_params = params.dup
     params[:id] ||= params[:file_id]
     get_context
     if @context && !@context.is_a?(User)
@@ -171,6 +172,13 @@ class FilesController < ApplicationController
     @context = UserProfile.new(@context) if @context == @current_user
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
+      # before telling them it's deleted, try to find another active attachment with the same full path
+      if new_attachment = Folder.find_attachment_in_context_with_path(@context, @attachment.full_display_path)
+        original_params[:id] = new_attachment.id
+        redirect_to original_params
+        return
+      end
+      
       flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
       if params[:preview] && @attachment.mime_class == 'image'
         redirect_to '/images/blank.png'
@@ -255,17 +263,7 @@ class FilesController < ApplicationController
       end
     end
 
-    if !@attachment
-      # The relative path is for a different file, try to find it
-      components = path.split('/')
-      component = components.shift
-      @context.folders.active.find_all_by_parent_folder_id(nil).each do |folder|
-        if folder.name == component
-          @attachment = folder.find_attachment_with_components(components.dup)
-          break if @attachment
-        end
-      end
-    end
+    @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
 
     raise ActiveRecord::RecordNotFound if !@attachment
     params[:id] = @attachment.id
