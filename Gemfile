@@ -20,6 +20,7 @@ gem 'jammit',         '0.6.0'
 gem 'json',           '1.5.1'
 # native xml parsing, diigo
 gem 'libxml-ruby',    '1.1.3',  :require => 'xml/libxml'
+gem 'macaddr',        '1.0.0'  # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mailman',        '0.4.0'
 gem 'mime-types',     '1.16',   :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
