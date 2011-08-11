@@ -26,15 +26,8 @@ ActionController::Routing::Routes.draw do |map|
   # callback urls for oauth authorization processes
   map.oauth "oauth", :controller => "users", :action => "oauth"
   map.oauth_success "oauth_success", :controller => "users", :action => "oauth_success"
-  map.resources :files do |file|
-    file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-  end
+  
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
-
-  # assignments at the top level (without a context) -- we have some specs that
-  # assert these routes exist, but just 404. I'm not sure we ever actually want
-  # top-level assignments available, maybe we should change the specs instead.
-  map.resources :assignments, :only => %w(index show)
 
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
@@ -257,11 +250,6 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :user_lists, :only => :create
   end
 
-  map.resources :rubrics do |rubric|
-    rubric.resources :rubric_assessments, :as => 'assessments'
-  end
-  map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
-
   map.resources :page_views, :only => [:update,:index]
   map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
@@ -457,7 +445,6 @@ ActionController::Routing::Routes.draw do |map|
   map.show_thumbnail_image 'images/thumbnails/show/:id/:uuid', :controller => 'files', :action => 'show_thumbnail'
   map.report_avatar_image 'images/users/:user_id/report', :controller => 'users', :action => 'report_avatar_image', :conditions => {:method => :post}
   map.update_avatar_image 'images/users/:user_id', :controller => 'users', :action => 'update_avatar_image', :conditions => {:method => :put}
-  map.resources :account_authorization_configs
   
   map.grades "grades", :controller => "users", :action => "grades"
   
@@ -574,14 +561,6 @@ ActionController::Routing::Routes.draw do |map|
   map.getting_started_finalize 'getting_started/finalize',
     :controller => 'getting_started', :action => 'finalize', :conditions => { :method => :post }
     
-  # Need to check if these routes are even necessary, since the
-  # controller/action map is still enabled.
-  map.get_web_screenshot 'processors/webshots', :controller => 'processors', :action => 'get_web_screenshot', :conditions => { :method => :get }
-  map.update_web_screenshot 'processors/webshots/:id', :controller => 'processors', :action => 'update_web_screenshot', :conditions => { :method => :post }
-  map.retrieve_external_feed 'processors/external_feeds', :controller => 'processors', :action => 'retrieve_external_feed', :conditions => { :method => :get }
-  map.retrieve_twitter_search 'processors/twitter_searches', :controller => 'processors', :action => 'retrieve_twitter_search', :conditions => { :method => :get }
-  map.retrieve_twitter_user_results 'processors/twitter_users', :controller => 'processors', :action => 'retrieve_twitter_user_results', :conditions => { :method => :get }
-
   map.calendar 'calendar', :controller => 'calendars', :action => 'show', :conditions => { :method => :get }
   map.files 'files', :controller => 'files', :action => 'full_index', :conditions => { :method => :get }
   map.s3_success 'files/s3_success/:id', :controller => 'files', :action => 's3_success'
@@ -685,6 +664,20 @@ ActionController::Routing::Routes.draw do |map|
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
   map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }
+
+  # assignments at the top level (without a context) -- we have some specs that
+  # assert these routes exist, but just 404. I'm not sure we ever actually want
+  # top-level assignments available, maybe we should change the specs instead.
+  map.resources :assignments, :only => %w(index show)
+
+  map.resources :files do |file|
+    file.download 'download', :controller => 'files', :action => 'show', :download => '1'
+  end
+
+  map.resources :rubrics do |rubric|
+    rubric.resources :rubric_assessments, :as => 'assessments'
+  end
+  map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
 
   # See how all your routes lay out with "rake routes"
 end
