@@ -199,9 +199,8 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '.add_assignment_link').click
     driver.find_element(:id, 'assignment_title').send_keys(assignment_name)
     driver.find_element(:css, '.ui-datepicker-trigger').click
-    driver.find_element(:css, '#ui-datepicker-div .ui-datepicker-next').click
-    driver.find_element(:css, '.ui-datepicker-calendar tr:first-child td:last-child a').click
-    driver.find_element(:css, '#ui-datepicker-div .ui-datepicker-ok').click
+    datepicker = datepicker_next
+    datepicker.find_element(:css, '.ui-datepicker-ok').click
     driver.find_element(:id, 'assignment_points_possible').send_keys('5')
     driver.
       find_element(:id, 'add_assignment_form').submit
@@ -256,9 +255,8 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '#edit_assignment_form #auto_peer_reviews').click
     driver.find_element(:css, '#edit_assignment_form #assignment_peer_review_count').send_keys('2')
     driver.find_element(:css, '#edit_assignment_form #assignment_peer_reviews_assign_at + img').click
-    driver.find_element(:css, '#ui-datepicker-div .ui-datepicker-next').click
-    driver.find_element(:css, '.ui-datepicker-calendar tr:first-child td:last-child a').click
-    driver.find_element(:css, '#ui-datepicker-div .ui-datepicker-ok').click
+    datepicker = datepicker_next
+    datepicker.find_element(:css, '.ui-datepicker-ok').click
 
     #save changes
     driver.find_element(:id, 'edit_assignment_form').submit
@@ -286,6 +284,31 @@ describe "assignment selenium tests" do
     driver.find_element(:id, 'edit_rubric_form').submit
     wait_for_animations
     driver.find_element(:css, '#rubrics .rubric .rubric_title .displaying .title').should include_text('new rubric')
+  end
+
+  it "should import rubric to assignment" do
+    course_with_teacher_logged_in
+    assignment_name = 'first test assignment'
+    due_date = Time.now.utc + 2.days
+    group = @course.assignment_groups.create!(:name => "default")
+    second_group = @course.assignment_groups.create!(:name => "second default")
+    assignment = @course.assignments.create!(
+      :name => assignment_name,
+      :due_at => due_date,
+      :assignment_group => group
+      )    
+    outcome_with_rubric
+    @rubric.associate_with(@course, @course, :purpose => 'grading')
+ 
+    get "/courses/#{@course.id}/assignments/#{assignment.id}"
+
+    driver.find_element(:css, '.add_rubric_link').click
+    driver.find_element(:css, '#rubric_new .editing .find_rubric_link').click
+    wait_for_ajax_requests
+    driver.find_element(:css, '#rubric_dialog_'+@rubric.id.to_s+' .title').should include_text(@rubric.title)
+    driver.find_element(:css, '#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
+    driver.find_element(:css, '#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
+
   end
 
   context "turnitin" do

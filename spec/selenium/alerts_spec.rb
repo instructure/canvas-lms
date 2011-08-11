@@ -164,6 +164,7 @@ describe "Alerts" do
     alert = driver.find_element(:css, '.alert.new')
     alert.find_element(:css, 'input[name="repetition"][value="value"]').click
     alert.find_element(:css, '.submit_button').click
+    wait_for_ajaximations
 
     keep_trying_until { driver.find_elements(:css, '.error_box').length == 4 }
 

@@ -51,4 +51,24 @@ describe "context_modules selenium tests" do
     requirement_picker.find_element(:css, 'option[value="min_score"]').click
     driver.execute_script('return $(".points_possible_parent:visible").length').should == 0
   end
+
+  it "should rearrange modules" do
+    course_with_teacher_logged_in
+    m1 = @course.context_modules.create!(:name => 'module 1')
+    m2 = @course.context_modules.create!(:name => 'module 2')
+
+    get "/courses/#{@course.id}/modules"
+    sleep 2 #not sure what we are waiting on but drag and drop will not work, unless we wait 
+  
+    m1_img = driver.find_element(:css, '#context_modules .context_module:first-child .reorder_module_link img')
+    m2_img = driver.find_element(:css, '#context_modules .context_module:last-child .reorder_module_link img')
+    driver.action.drag_and_drop(m2_img, m1_img).perform
+    wait_for_ajax_requests
+
+    m1.reload
+    m1.position.should == 2
+    m2.reload
+    m2.position.should == 1
+  end
+
 end

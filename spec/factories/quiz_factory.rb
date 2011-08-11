@@ -16,22 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def assignment_model(opts={})
-  unless opts.delete :course
-    course_model(:reusable => true)
-  end
-  @assignment = factory_with_protected_attributes(@course.assignments, assignment_valid_attributes.merge(opts))
-  @assignment.context.should eql(@course) rescue false
-  @a = @assignment
-  @c = @course
-  @a
+def quiz_model(opts={})
+  @context ||= course_model(:reusable => true)
+  @quiz = @context.quizzes.build(valid_quiz_attributes.merge(opts))
+  @quiz.published_at = Time.now
+  @quiz.workflow_state = 'available'
+  @quiz.save!
+  @quiz
 end
 
-def assignment_valid_attributes
+def valid_quiz_attributes
   {
-    :title => "value for title",
-    :description => "value for description",
-    :due_at => Time.now,
-    :points_possible => "1.5"
+    :title => "Test Quiz",
+    :description => "Test Quiz Description"
   }
 end

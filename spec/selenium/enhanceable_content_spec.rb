@@ -68,7 +68,8 @@ describe "enhanceable_content selenium tests" do
     
     get "/courses/#{@course.id}/wiki/#{page.url}"
     dialog = driver.find_element(:css, ".enhanceable_content.dialog")
-    dialog.should_not be_displayed
+    # need to wait for the content to get enhanced
+    keep_trying_until { dialog.should_not(be_displayed) == false }
     driver.find_element(:css, "#link1").click
     dialog.should be_displayed
     dialog.should have_class('ui-dialog')

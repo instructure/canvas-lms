@@ -24,8 +24,8 @@ shared_examples_for "course selenium tests" do
     keep_trying_until { wizard_box.displayed? }
     wizard_box.find_element(:css, ".close_wizard_link").click
 
-    driver.navigate.refresh
-    sleep 1 # we need to give the wizard a chance to pop up
+    refresh_page
+    wait_for_animations# we need to give the wizard a chance to pop up
     wizard_box = driver.find_element(:id, "wizard_box")
     wizard_box.displayed?.should be_false
   end
@@ -98,14 +98,10 @@ shared_examples_for "course selenium tests" do
     driver.find_element(:id, 'copy_shift_dates').click
     #adjust start dates
     driver.find_element(:css, '#copy_old_start_date + img').click
-    datepicker = driver.find_element(:id, 'ui-datepicker-div')
-    datepicker.find_element(:css, 'a.ui-datepicker-prev').click
-    datepicker.find_element(:css, '.ui-datepicker-calendar tr:first-child td:last-child a').click
+    datepicker_prev
     #adjust end dates
     driver.find_element(:css, '#copy_old_end_date + img').click
-    datepicker = driver.find_element(:id, 'ui-datepicker-div')
-    datepicker.find_element(:css, 'a.ui-datepicker-next').click
-    datepicker.find_element(:css, '.ui-datepicker-calendar tr:first-child td:last-child a').click
+    datepicker_next
     #adjust day substitutions
     driver.find_element(:css, '.shift_dates_settings .add_substitution_link').click
     driver.find_element(:css, '.substitutions > .substitution').should be_displayed

@@ -216,7 +216,11 @@ Spec::Runner.configure do |config|
   end
 
   def outcome_with_rubric(opts={})
-    @outcome = @course.learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>')
+    @outcome_group ||= LearningOutcomeGroup.default_for(@course)
+    @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
+    @outcome_group.add_item(@outcome)
+    @outcome_group.save! 
+
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
     @rubric.data = [
       {
@@ -239,10 +243,37 @@ Spec::Runner.configure do |config|
           }
         ],
         :learning_outcome_id => @outcome.id
+      },
+      {
+        :points => 5,
+        :description => "no outcome row",
+        :long_description => 'non outcome criterion',
+        :id => 2,
+        :ratings => [
+          {
+            :points => 5,
+            :description => "Amazing",
+            :criterion_id => 2,
+            :id => 4
+          },
+          {
+            :points => 3,
+            :description => "not too bad",
+            :criterion_id => 2,
+            :id => 5
+          },
+          {
+            :points => 0,
+            :description => "no bueno",
+            :criterion_id => 2,
+            :id => 6
+          }
+        ]
       }
     ]
     @rubric.instance_variable_set('@outcomes_changed', true)
     @rubric.save!
+    @rubric.update_outcome_tags
   end
 
   def eportfolio(opts={})

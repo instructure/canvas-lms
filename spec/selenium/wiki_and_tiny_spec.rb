@@ -4,7 +4,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   # it_should_behave_like "forked server selenium tests"
   it_should_behave_like "in-process server selenium tests"
 
-  before(:each) do
+  def file_tree_setup
     course_with_teacher_logged_in
     @root_folder = Folder.root_folders(@course).first
     @sub_folder = @root_folder.sub_folders.create!(:name => 'subfolder', :context => @course);
@@ -40,8 +40,9 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       SCRIPT
     end
   end
-  
+
   it "should lazy load files" do
+    file_tree_setup
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
 
     root_folders = @tree1.find_elements(:css, 'li.folder')
@@ -69,6 +70,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   end
 
   it "should lazy load images" do
+    file_tree_setup
     @image_list.attribute('class').should_not match(/initialized/)
     @image_list.find_elements(:css, 'img.img').length.should == 0
 
@@ -77,6 +79,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   end
 
   it "should properly clone images, including thumbnails, and display" do
+    file_tree_setup
     old_course = @course
     new_course = old_course.clone_for(old_course.account)
     new_course.merge_into_course(old_course, :everything => true)
@@ -94,6 +97,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   end
 
   it "should infini-scroll images" do
+    file_tree_setup
     90.times do |i|
       image = @root_folder.attachments.build(:context => @course)
       path = File.expand_path(File.dirname(__FILE__) + '/../../public/images/graded.png')
@@ -120,6 +124,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   end
 
   it "should lazy load directory structure for upload form" do
+    file_tree_setup
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
 
     select = driver.find_element(:css, '#sidebar_upload_file_form select#attachment_folder_id')
@@ -138,28 +143,52 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     keep_trying_until { find_all_with_jquery("#{form}:visible").empty? }
   end
 
-  it "should be able to upload a file when nothing has been loaded" do
-    wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
-    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-    driver.find_element(:css, '.upload_new_file_link').click
-    driver.find_element(:css, '.wiki_switch_views_link').click
+  def clear_rce
     wiki_page_body = driver.find_element(:id, :wiki_page_body)
     wiki_page_body.clear
     wiki_page_body[:value].should be_empty
-
-    upload_file('#sidebar_upload_file_form', :text)
-
-    wiki_page_body[:value].should match(/a class="instructure_file_link/)
+    wiki_page_body
   end
 
-  it "should show uploaded files in file tree" do
+  it "should be able to upload a file when nothing has been loaded" do
+    file_tree_setup
+    keep_trying_until { driver.find_element(:css, "form#new_wiki_page").should be_displayed }
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    wiki_page_body = clear_rce
+    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+    first_folder = @tree1.find_elements(:css, 'li.folder').first
+    first_folder.find_element(:css, '.sign.plus').click
+    subfolder = first_folder.find_element(:css, '.folder')
+    subfolder.find_element(:css, '.sign.plus').click
+    wait_for_ajax_requests
+
+    driver.find_element(:css, '.upload_new_file_link').click
+    wait_for_ajax_requests
+    #testing adding to a subfolder
+    select_element = driver.find_element(:id, 'attachment_folder_id')
+    select_element.click
+    options = select_element.find_elements(:css, 'option')
+    for option in options
+      if option.text.include?('subfolder')
+        option.click
+        break
+      end
+    end
+    upload_file('#sidebar_upload_file_form', :text)
+    wait_for_ajax_requests
+
+
+    subfolder.find_elements(:css, '.file.text').length.should == 1
+  end
+
+  it "should show uploaded files in file tree and add them to the rce" do
+    file_tree_setup
     wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    wiki_page_body = clear_rce
+    driver.find_element(:css, '.wiki_switch_views_link').click
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     driver.find_element(:css, '.upload_new_file_link').click
-    driver.find_element(:css, '.wiki_switch_views_link').click
-    wiki_page_body = driver.find_element(:id, :wiki_page_body)
-    wiki_page_body.clear
-    wiki_page_body[:value].should be_empty
 
     root_folders = @tree1.find_elements(:css, 'li.folder')
     root_folders.first.find_element(:css, '.sign.plus').click
@@ -168,17 +197,26 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     upload_file('#sidebar_upload_file_form', :text)
 
     root_folders.first.find_elements(:css, '.file.text').length.should == 2
-    wiki_page_body[:value].should match(/a class="instructure_file_link/)
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:id, 'tinymce').should include_text('txt')
+    end
+
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    check_file( driver.find_element(:css, '#wiki_body .instructure_file_link_holder a') )
+
   end
 
   it "should not show uploaded files in image list" do
+    file_tree_setup
     wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
     driver.find_element(:css, '.upload_new_image_link').click
     driver.find_element(:css, '.wiki_switch_views_link').click
-    wiki_page_body = driver.find_element(:id, :wiki_page_body)
-    wiki_page_body.clear
-    wiki_page_body[:value].should be_empty
+    wiki_page_body = clear_rce
 
     @image_list.find_elements(:css, 'img.img').length.should == 2
 
@@ -188,24 +226,34 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     wiki_page_body[:value].should be_empty
   end
 
-  it "should show uploaded images in image list" do
+  it "should be able to upload a file and add the file to the rce" do
+    file_tree_setup
     wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
-    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
-    driver.find_element(:css, '.upload_new_image_link').click
     driver.find_element(:css, '.wiki_switch_views_link').click
-    wiki_page_body = driver.find_element(:id, :wiki_page_body)
-    wiki_page_body.clear
-    wiki_page_body[:value].should be_empty
+    wiki_page_body = clear_rce
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+    root_folders = @tree1.find_elements(:css, 'li.folder')
+    root_folders.first.find_element(:css, '.sign.plus').click
+    root_folders.first.find_elements(:css, '.file.text').length.should == 1
+    root_folders.first.find_elements(:css, '.file.text span').first.click
 
-    @image_list.find_elements(:css, 'img.img').length.should == 2
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:id, 'tinymce').should include_text('txt')
+    end
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    wiki_page_body.attribute('value').should match(/class="instructure_file_link/)
 
-    upload_file('#sidebar_upload_image_form', :image)
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
 
-    @image_list.find_elements(:css, 'img.img').length.should == 3
-    wiki_page_body[:value].should match(/img/)
+    check_file( driver.find_element(:css, '#wiki_body .instructure_file_link_holder a') )
   end
 
   it "should show files uploaded on the images tab in the file tree" do
+    file_tree_setup
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     root_folders = @tree1.find_elements(:css, 'li.folder')
     root_folders.first.find_element(:css, '.sign.plus').click
@@ -215,9 +263,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
     driver.find_element(:css, '.upload_new_image_link').click
     driver.find_element(:css, '.wiki_switch_views_link').click
-    wiki_page_body = driver.find_element(:id, :wiki_page_body)
-    wiki_page_body.clear
-    wiki_page_body[:value].should be_empty
+    wiki_page_body = clear_rce
 
     @image_list.find_elements(:css, 'img.img').length.should == 2
 
@@ -229,6 +275,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   end
 
   it "should show images uploaded on the files tab in the image list" do
+    file_tree_setup
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
     driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     root_folders = @tree1.find_elements(:css, 'li.folder')
@@ -238,9 +285,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
     driver.find_element(:css, '.upload_new_file_link').click
     driver.find_element(:css, '.wiki_switch_views_link').click
-    wiki_page_body = driver.find_element(:id, :wiki_page_body)
-    wiki_page_body.clear
-    wiki_page_body[:value].should be_empty
+    wiki_page_body = clear_rce
 
     @image_list.find_elements(:css, 'img.img').length.should == 2
 
@@ -251,7 +296,202 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     wiki_page_body[:value].should match(/a class="instructure_file_link/)
   end
 
+  it "should show uploaded images in image list and add the image to the rce" do
+    file_tree_setup
+    wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    wiki_page_body = clear_rce
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+
+    @image_list.find_elements(:css, 'img.img').length.should == 2
+    @image_list.find_elements(:css, 'img.img').first.click
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:css, '#tinymce img').should be_displayed
+    end
+
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    check_image( driver.find_element(:css, '#wiki_body img') )
+  end
+
+  it "should be able to upload an image and add the image to the rce" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/wiki"
+
+    wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    wiki_page_body = clear_rce
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    driver.find_element(:css, '#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+    driver.find_element(:css, '.upload_new_image_link').click
+    upload_file('#sidebar_upload_image_form', :image)
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:css, '#tinymce img').should be_displayed
+    end
+
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    check_image( driver.find_element(:css, '#wiki_body img') )
+  end
+
+  it "should add bold and italic text to the rce" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/wiki"
+
+    wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
+    driver.find_element(:css, '.mceIcon.mce_bold').click
+    driver.find_element(:css, '.mceIcon.mce_italic').click
+    first_text = 'This is my text.'
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:id, 'tinymce').send_keys(first_text)
+      driver.find_element(:id, 'tinymce').text.include?(first_text).should be_true
+    end
+    #make sure each view uses the proper format
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    driver.execute_script("return $('#wiki_page_body').val()").
+      include?('<p><strong><em>').should be_true
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:id, 'tinymce').text.include?('<p>').should be_false
+    end
+
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    source = driver.page_source
+    source.should match(/<p><strong><em>This is my text\./)
+  end
+
+  it "should add a quiz to the rce" do
+    course_with_teacher_logged_in
+    #create test quiz
+    @context = @course
+    quiz = quiz_model
+    quiz.generate_quiz_data
+    quiz.save!
+
+    get "/courses/#{@course.id}/wiki"
+    # add quiz to rce
+    accordion = driver.find_element(:css, '#editor_tabs #pages_accordion')
+    accordion.find_element(:link, I18n.t('links_to.quizzes','Quizzes')).click
+    keep_trying_until{ accordion.find_element(:link, quiz.title).should be_displayed }
+    accordion.find_element(:link, quiz.title).click
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:id, 'tinymce').should include_text(quiz.title)
+    end
+
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    driver.find_element(:css, '#wiki_body').find_element(:link, quiz.title).should be_displayed
+  end
+
+  it "should add an assignment to the rce" do
+    course_with_teacher_logged_in
+    assignment_name = 'first assignment'
+    @assignment = @course.assignments.create(:name => assignment_name)
+    get "/courses/#{@course.id}/wiki"
+
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    clear_rce
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    #check assigment accordion
+    accordion = driver.find_element(:css, '#editor_tabs #pages_accordion')
+    accordion.find_element(:link, I18n.t('links_to.assignments','Assignments')).click
+    keep_trying_until{ accordion.find_element(:link, assignment_name).should be_displayed }
+    accordion.find_element(:link, assignment_name).click
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:id, 'tinymce').should include_text(assignment_name)
+    end
+
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    driver.find_element(:css, '#wiki_body').find_element(:link, assignment_name).should be_displayed
+  end
+
+  it "should add an equation to the rce" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/wiki"
+
+    driver.find_element(:css, '.mce_instructure_equation').click
+    wait_for_animations
+    equation_dialog = driver.find_element(:id, 'instructure_equation_prompt') 
+    misc_tab = driver.find_element(:css, '.mathquill-tab-bar > li:last-child a')
+    driver.action.move_to(misc_tab).perform
+    driver.find_element(:css, '#Misc_tab li:nth-child(35) a').click
+    basic_tab = driver.find_element(:css, '.mathquill-tab-bar > li:first-child a')
+    driver.action.move_to(basic_tab).perform
+    driver.find_element(:css, '#Basic_tab li:nth-child(27) a').click
+    driver.find_element(:id, 'instructure_equation_prompt_form').submit
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:css, '#tinymce img').should be_displayed
+    end
+
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    check_image( driver.find_element(:css, '#wiki_body img') )
+  end
+
+  it "should add image from flickr" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/wiki"
+
+    #add image from flickr to rce
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    clear_rce
+    driver.find_element(:css, '.wiki_switch_views_link').click
+    driver.find_element(:css, '.mce_instructure_embed').click
+    driver.find_element(:css, '.flickr_search_link').click
+    driver.find_element(:css, '#image_search_form > input').send_keys('angel')
+    driver.find_element(:id, 'image_search_form').submit
+    wait_for_ajax_requests
+    keep_trying_until{ driver.find_element(:css, '.image_link').should be_displayed }
+    driver.find_element(:css, '.image_link').click
+    in_frame "wiki_page_body_ifr" do
+      driver.find_element(:css, '#tinymce img').should be_displayed
+    end
+
+    driver.find_element(:id, 'wiki_page_submit').click
+    wait_for_ajax_requests
+    get "/courses/#{@course.id}/wiki"#can't just wait for the dom, for some reason it stays in edit mode
+    wait_for_ajax_requests
+
+    check_image( driver.find_element(:css, '#wiki_body img') )
+  end
+
+  it "should display record video dialog" do
+    stub_kaltura
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/wiki"
+
+    driver.find_element(:css, '.mce_instructure_record').click
+    keep_trying_until{ driver.find_element(:id, 'record_media_tab').should be_displayed }
+    driver.find_element(:css, '#media_comment_dialog #upload_media_tab').click
+    driver.find_element(:css, '#media_comment_dialog #audio_upload').should be_displayed
+    driver.find_element(:css, '#ui-dialog-title-media_comment_dialog + a .ui-icon-closethick').click
+    driver.find_element(:id, 'media_comment_dialog').should_not be_displayed
+  end
+
+
   it "should resize the WYSIWYG editor height gracefully" do
+    file_tree_setup
     wait_for_tiny(keep_trying_until { driver.find_element(:css, "form#new_wiki_page") })
     make_full_screen
     resizer = driver.find_element(:class, 'editor_box_resizer')
@@ -267,9 +507,9 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     # now move it down 30px from 200px high
     resizer = driver.find_element(:class, 'editor_box_resizer')
     keep_trying_until { driver.action.drag_and_drop_by(resizer, 0, 30).perform; true }
-    driver.execute_script("return $('#wiki_page_body_ifr').height()").should be_close 230, 2
+    driver.execute_script("return $('#wiki_page_body_ifr').height()").should be_close(230, 5)
     resizer.attribute('style').should be_blank
   end
-  
+
 end
 

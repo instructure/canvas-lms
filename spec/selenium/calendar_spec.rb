@@ -10,14 +10,16 @@ describe "calendar selenium tests" do
     assignment.locked_for?(@user).should_not be_nil
     
     get "/calendar"
-    div = keep_trying_until { driver.find_element(:id, "event_assignment_#{assignment.id}") }
-    div.click
-    keep_trying_until { driver.find_element(:id, "event_details").displayed? }
+
+    wait_for_ajax_requests
+    driver.find_element(:id, "event_assignment_#{assignment.id}").click
+    wait_for_ajax_requests
     details = driver.find_element(:id, "event_details")
     details.find_element(:css, ".description").text.should_not match /secret/
-    details.find_element(:css, ".lock_explanation").text.should match /is locked until/
+    details.find_element(:css, ".lock_explanation").should 
+      include_text(I18n.t('messages.quiz_locked_at', "This quiz was locked %{at}.", :at => ""))
   end
-  
+
   it "should show the wiki sidebar when looking at the full event page" do
     course_with_teacher_logged_in
     
@@ -28,4 +30,41 @@ describe "calendar selenium tests" do
     expect_new_page_load { form.find_element(:css, ".more_options_link").click }
     keep_trying_until { driver.find_element(:id, "editor_tabs").should be_displayed }
   end
+
+  it "should only display events for selected course" do
+    course_with_student_logged_in
+    @course.name = 'first course'
+    @course.save!
+    due_date = Time.now.utc
+    first_assignment = @course.assignments.create(:name => 'first assignment', :due_at => due_date)
+    first_course = @course
+    student = @user
+    second_course = course_model({:name => 'second course'})
+    second_course.offer!
+    enrollment = second_course.enroll_student(student)
+    enrollment.workflow_state = 'active'
+    enrollment.save!
+    second_course.reload
+    second_assignment = second_course.assignments.create(:name => 'second assignment', :due_at => due_date)
+
+    get "/calendar"
+    wait_for_ajax_requests
+
+    #verify both assignments are visible
+    unless get_checkbox_state("#group_course_#{first_course.id}")
+      driver.find_element(:id, "group_course_#{first_course.id}").click
+    end
+    unless get_checkbox_state("#group_course_#{second_course.id}")
+      driver.find_element(:id, "group_course_#{second_course.id}").click
+    end
+    date_holder_id = "day_#{due_date.year}_#{due_date.strftime('%m')}_#{due_date.strftime('%d')}"
+    driver.find_element(:css, "##{date_holder_id} #event_assignment_#{first_assignment.id}").should be_displayed
+    driver.find_element(:css, "##{date_holder_id} #event_assignment_#{second_assignment.id}").should be_displayed
+
+    #verify first assignment is visible and not the second
+    driver.find_element(:id, "group_course_#{second_course.id}").click
+    driver.find_element(:css, "##{date_holder_id} #event_assignment_#{first_assignment.id}").should be_displayed
+    driver.find_element(:css, "##{date_holder_id} #event_assignment_#{second_assignment.id}").should_not be_displayed
+  end
+
 end

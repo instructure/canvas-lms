@@ -48,7 +48,6 @@ shared_examples_for "profile selenium tests" do
     email_select_css = '#content > table > tbody > tr:nth-child(4) > td > span > select'
     option_value = find_option_value(:css, email_select_css, second_email)
     driver.find_element(:css, email_select_css+' > option[value="'+option_value+'"]').click
-
     #change notification setting for first notification
     daily_select = content_tbody.find_element(:css, 'tr:nth-child(3) > td:nth-child(4) > div')
     daily_select.click
@@ -58,8 +57,8 @@ shared_examples_for "profile selenium tests" do
     never_select.click
     never_select.find_element(:xpath, '..').should have_class('selected_pending')
     driver.find_element(:css, '#content .save_preferences_button').click
-    driver.navigate.refresh
-    wait_for_dom_ready
+    wait_for_ajax_requests
+    refresh_page
     driver.find_element(:css, email_select_css + ' > option[selected]').text.should == second_email 
   end
 
@@ -85,6 +84,17 @@ shared_examples_for "profile selenium tests" do
     keep_trying_until { driver.find_element(:css, '.profile_pic_link img').attribute('src') =~ %r{/images/thumbnails/} }
     
     Attachment.last.folder.should == @user.profile_pics_folder
+  end
+
+  it "should display file uploader link on files page" do
+    course_with_teacher_logged_in
+
+    get "/profile"
+    
+    driver.find_element(:css, '#left-side .files').click
+    wait_for_dom_ready
+    driver.find_element(:id, 'file_swfUploader').should be_displayed
+
   end
 
 end
