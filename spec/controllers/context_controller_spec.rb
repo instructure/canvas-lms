@@ -71,6 +71,21 @@ describe ContextController do
       assigns[:entries].should_not be_nil
     end
   end
+
+  describe "GET 'inbox_item'" do
+    it "should exclude recipients if protect_recipients" do
+      course_with_student_logged_in(:active_all => true)
+      @student = @user
+      @teacher = @course.enroll_teacher(user(:active_all => true)).user
+      @cm = @course.context_messages.build(:subject => 'hai', :body => 'test', :user => @teacher, :protect_recipients => '1')
+      @cm.recipients = [@student.id]
+      @cm.save!
+      get 'inbox_item', :course_id => @course.id, :id => InboxItem.find_by_user_id(@student.id), :format => 'json'
+      json = JSON.parse(response.body)
+      json['context_message']['recipients'].should be_nil
+      json['context_message']['viewed_user_ids'].should be_nil
+    end
+  end
   
   describe "GET 'chat'" do
     it "should redirect if no chats enabled" do
