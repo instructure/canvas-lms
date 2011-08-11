@@ -209,6 +209,11 @@ class UsersController < ApplicationController
 
   def user_dashboard
     get_context
+    
+    # dont show crubms on dashboard because it does not make sense to have a breadcrumb
+    # trail back to home if you are already home
+    clear_crumbs 
+    
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
