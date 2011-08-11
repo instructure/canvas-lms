@@ -662,6 +662,13 @@ class Assignment < ActiveRecord::Base
     can :update and can :update_content and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
+  def filter_attributes_for_user(hash, user, session)
+    if lock_info = self.locked_for?(user)
+      hash.delete('description')
+      hash['lock_info'] = lock_info
+    end
+  end
+
   def self.search(query)
     find(:all, :conditions => wildcard('title', 'description', query))
   end
@@ -1140,7 +1147,7 @@ class Assignment < ActiveRecord::Base
   named_scope :only_graded, :conditions => "submission_types != 'not_graded'"
   
   named_scope :with_just_calendar_attributes, lambda {
-    { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id'] - ['cloned_item_id', 'migration_id']).join(", ") }
+    { :select => ((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types'] - ['cloned_item_id', 'migration_id']).join(", ") }
   }
 
   named_scope :due_between, lambda { |start, ending|

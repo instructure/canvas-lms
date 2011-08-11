@@ -96,6 +96,7 @@ javascripts:
   calendar:
     - public/javascripts/calendar.js
     - public/javascripts/calendar_move.js
+    - public/javascripts/content_locks.js
   collaborations:
     - public/javascripts/collaborations.js
   context_messages:

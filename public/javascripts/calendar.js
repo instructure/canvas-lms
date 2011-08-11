@@ -670,6 +670,9 @@ I18n.scoped('calendars', function(I18n) {
     }
     data.description = $event.data('description');
     $box.fillTemplateData({data: data, htmlValues: ['description']});
+    if (data.lock_info) {
+      $box.find(".lock_explanation").html(INST.lockExplanation(data.lock_info, 'assignment'));
+    }
     $("#edit_event").dialog('close');
     $("#event_details").dialog('close');
     $("#event_details").find(".description").css("max-height", Math.max($(window).height() - 200, 150));

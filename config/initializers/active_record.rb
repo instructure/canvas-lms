@@ -212,12 +212,12 @@ class ActiveRecord::Base
     hash = Serializer.new(self, options).serializable_record
 
     if options[:permissions]
-      permissions_hash = self.grants_rights?(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
-      if options[:include_root]
-        hash[self.class.base_ar_class.model_name.element]["permissions"] = permissions_hash
-      else
-        hash["permissions"] = permissions_hash
+      obj_hash = options[:include_root] ? hash[self.class.base_ar_class.model_name.element] : hash
+      if self.respond_to?(:filter_attributes_for_user)
+        self.filter_attributes_for_user(obj_hash, options[:permissions][:user], options[:permissions][:session])
       end
+      permissions_hash = self.grants_rights?(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
+      obj_hash["permissions"] = permissions_hash
     end
 
     self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)
