@@ -808,7 +808,7 @@ class Course < ActiveRecord::Base
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||=
       if session && temp_type = session["role_course_#{self.id}"]
-        [Enrollment.typed_enrollment(temp_type).new(:course_id => self.id, :user_id => user.id, :workflow_state => 'active')] rescue nil
+        [Enrollment.typed_enrollment(temp_type).new(:course => self, :user => user, :workflow_state => 'active')]
       else
         self.enrollments.active_or_pending.for_user(user).reject { |e| [:inactive, :completed].include?(e.state_based_on_date)}
       end
