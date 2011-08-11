@@ -493,6 +493,32 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
+      :read_course_list => {
+        :label => lambda { t('permissions.read_course_list', "View the list of courses") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
+      },
+      :view_statistics => {
+        :label => lambda { t('permissions.view_statistics', "View Statistics") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
+      },
+      :manage_user_notes => {
+        :label => lambda { t('permissions.manage_user_notes', "Manage Faculty Journal Entries") },
+        :available_to => [
+          'TaEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'TaEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ]
+      }
     }.freeze
   def self.permissions
     PERMISSIONS

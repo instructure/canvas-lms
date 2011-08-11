@@ -1,9 +1,15 @@
-<% hide_add_course ||= false; hide_add_user ||= false %>
+<%
+  hide_add_course ||= false; hide_add_user ||= false
+  show_course = !hide_add_course && can_do(@account, @current_user, :manage_courses)
+  show_user = !hide_add_user && can_do(@account, @current_user, :manage_admin_users)
+%>
+
+<% if show_course || show_user %>
 <div class="rs-margin-all">
-  <% if !hide_add_course && can_do(@account, @current_user, :manage_courses) %>
+  <% if show_course %>
     <a href="#" class="add_course_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t(:add_course_link, "Add a New Course") %></a>
   <% end %>
-  <% if !hide_add_user && can_do(@account, @current_user, :manage_admin_users) %>
+  <% if show_user %>
     <a href="#" class="add_user_link button button-sidebar-wide"><%= image_tag "add.png" %> <%= t(:add_user_link, "Add a New User") %></a>
   <% end %>
 </div>
@@ -179,4 +185,5 @@
     });
   });
 </script>
+<% end %>
 <% end %>

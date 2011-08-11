@@ -113,6 +113,7 @@ Spec::Runner.configure do |config|
 
   def account_admin_user(opts={})
     user(opts)
+    @admin = @user
     @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
     @user
   end
@@ -148,7 +149,7 @@ Spec::Runner.configure do |config|
 
   def student_in_course(opts={})
     @course ||= opts[:course] || course(opts)
-    @user = opts[:user] || user(opts)
+    @student = @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
