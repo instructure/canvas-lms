@@ -23,9 +23,88 @@
   </div>
 <% end %>
 
+<% content_for :stylesheets do %>
+<style>
+#conversations_teaser {
+  background: url(/images/conversations_teaser_ribbon.png) no-repeat center -10px;
+  width: 150px;
+  height: 200px;
+  position: absolute;
+  top: 0;
+  right: 301px;
+  z-index: 2;
+  color: #2f487a;
+}
+#conversations_teaser.collapsed {
+  top: -145px;
+  cursor: pointer;
+}
+#conversations_teaser.collapsed:hover {
+  top: -140px;
+}
+#conversations_teaser a.close_link {
+  position: absolute;
+  right: 15px;
+  top: 1px;
+  visibility: hidden;
+}
+#conversations_teaser:hover a.close_link {
+  visibility: visible;
+}
+#conversations_teaser a.conversations_dialog_link {
+  position: absolute;
+  display: block;
+  width: 130px;
+  height: 60px;
+  left: 12px;
+  top: 90px;
+}
+#conversations_teaser .padding {
+  padding: 3px 15px 0 25px;
+}
+</style>
+<% end %>
+
+<div id="conversations_teaser">
+  <div class="padding">
+    <a href="#" class="close_link" title="Hide this note"><%= image_tag "conversations_teaser_ribbon_hover.png" %></a>
+    On <%= Setting.get('conversations_rollout_date', "Aug 20th") %>
+    <a href="#" class="conversations_dialog_link" title="Your inbox is about to evolve. Find out about all the exciting new fetures.">&nbsp;</a>
+  </div>
+  <div id="conversations_dialog" style="display: none;" title="Introduction to Canvas Conversations">
+    Heads up, on <%= Setting.get('conversations_rollout_date', "Aug 20th") %> we'll be releasing an improved Inbox tool for Canvas called Conversations. It's got a lot of great new features, and is based on the feedback we've gotten from all of you. All your current messages will automatically be updated. Check out the introduction below, and watch for the update <%= Setting.get('conversations_rollout_date', "Aug 20th") %>!
+    <div class="video" style="margin: 10px 20px;"></div>
+  </div>
+</div>
+
 <% js_block do %>
   <script type="text/javascript">
+    if($.store.userGet('conversations_collapsed')) {
+      $("#conversations_teaser").addClass('collapsed');
+    }
     $(document).ready(function() {
+      $("#conversations_teaser").click(function(event) {
+        if($(this).hasClass('collapsed')) {
+          event.preventDefault();
+          $(this).removeClass('collapsed');
+          $.store.userSet('conversations_collapsed', false);
+        }
+      });
+      $("#conversations_teaser .close_link").click(function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        $.store.userSet('conversations_collapsed', true);
+        $("#conversations_teaser").addClass('collapsed');
+      });
+      $("#conversations_teaser .conversations_dialog_link").click(function(event) {
+        event.preventDefault();
+        if($("#conversations_teaser").hasClass('collapsed')) { return; }
+        $("#conversations_dialog").dialog({
+          width: 620,
+          height: 475
+        }).find(".video").html('<iframe width="560" height="349" src="http://www.youtube.com/embed/NWqIaEyVWZM?hl=en&amp;autoplay=1&amp;rel=0&amp;hd=1" frameborder="0" allowfullscreen></iframe>');
+        
+      });
       var send_message_form = $(".send_message_form");
       send_message_form.find(".media_comment_link").click(function(event) {
         event.preventDefault();
