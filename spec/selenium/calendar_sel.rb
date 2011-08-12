@@ -17,4 +17,15 @@ describe "calendar selenium tests" do
     details.find_element(:css, ".description").text.should_not match /secret/
     details.find_element(:css, ".lock_explanation").text.should match /is locked until/
   end
+  
+  it "should show the wiki sidebar when looking at the full event page" do
+    course_with_teacher_logged_in
+    
+    get "/calendar"
+    driver.find_element(:id, Time.now.strftime("day_%Y_%m_%d")).find_element(:css, ".calendar_day").click
+    form = driver.find_element(:id, "edit_calendar_event_form")
+    form.find_element(:css, "select.context_id option[value=\"course_#{@course.id}\"]").click
+    expect_new_page_load { form.find_element(:css, ".more_options_link").click }
+    driver.find_element(:id, "editor_tabs").should be_displayed
+  end
 end
