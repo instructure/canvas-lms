@@ -290,6 +290,57 @@ ul.messages
     margin-right: -40px
   .audience
     color: #636363
+  > li.submission
+    padding: 0px
+    margin: 12px 24px 12px 48px
+    ul
+      margin: 0px
+      padding: 0px
+      list-style: none
+      > li
+        position: relative
+        padding: 14px 50px 14px 78px
+        margin: 0
+      > li.header
+        padding: 10px
+        background-color: #ebebeb
+        color: #888
+        b.title
+          display: block
+          font-size: 1.2em
+          color: black
+          &:after
+            content: ""
+            position: absolute
+            margin-left: 0.5em
+            padding: 0
+            width: 16px
+            height: 16px
+            background-image: url(/images/messages/open_in_new_window-sprite.png)
+        .audience
+          font-size: 1em
+        span.submission_date
+          float: right
+          margin-left: 1em
+          span.date
+            float: none
+            margin-left: 0.2em
+            margin-right: 0
+        span.score
+          float: right
+          clear: right
+          margin-left: 1em
+          font-size: 1.5em
+          font-weight: bold
+      > li.comment
+        border-top: 1px solid #ccc
+      > li.more
+        border-top: 1px solid #ccc
+        padding: 0
+        text-align: right
+        a
+          padding: 10px
+          display: block
 
 ul.messages
   li

@@ -115,7 +115,7 @@
     <span class="actions"><a href="#" title="<%= t(:inbox_actions_description, "Actions") %>"><%= t(:inbox_actions_description, "Actions") %></a></span>
     <a href="<%= conversation_url('{{ id }}') %>" add_url="<%= conversation_add_message_url('{{ id }}') %>" class="details_link"><%= t :read_more, "more..." %></a>
   </li>
-  <li id="message_blank">
+  <li id="message_blank" class="message">
     <span class="date"></span>
     <b class="audience"></b>
     <span class="actions"><a href="#/conversations?user_id={{ user_id }}&amp;user_name={{ user_name }}&amp;from_conversation_id={{ from_conversation_id }}" class="send_private_message"><%= t :send_private_message, "New message..." %></a></span>
@@ -133,6 +133,33 @@
         <a href="<%= file_download_path('{{ id }}', :verifier => '{{ uuid }}') %>" title="<%= t('titles.download_attachment', "Download attachment") %>">
           <%= image_tag "messages/attach-gray.png" %> 
           <span class='title'></span>
+        </a>
+      </li>
+    </ul>
+  </li>
+  <li id="submission_blank" class="submission">
+    <ul>
+      <li class="header">
+        <span class="submission_date"><%= before_label('submitted', "Submitted") %> <span class="date"></span></span>
+        <a target="_blank" href="<%= course_assignment_submission_path(
+          :course_id => '{{ course_id }}',
+          :assignment_id => '{{ assignment_id }}',
+          :id => '{{ id }}') %>" style="text-decoration: none;" title="<%= t('titles.view_submission', "Open submission in new window.") %>">
+          <b class="title"></b>
+        </a>
+        <span class="audience" title="<%= t('titles.submission_author', "Submission Author") %>"></span>
+        <span class="score" title="<%= t('titles.submission_score', "Submission Score") %>"></span>
+        <div class="clear"></div>
+      </li>
+      <li class="comment">
+        <span class="date"></span>
+        <b class="audience"></b>
+        <p></p>
+        <div class="clear"></div>
+      </li>
+      <li class="more">
+        <a href="#">
+          <%= t('more_messages', "%{count} more...", :count => raw('<span class="hidden"></span>')) %>
         </a>
       </li>
     </ul>

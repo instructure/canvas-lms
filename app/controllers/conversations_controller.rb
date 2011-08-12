@@ -84,8 +84,34 @@ class ConversationsController < ApplicationController
 
   def show
     @conversation.mark_as_read! if @conversation.unread?
+    submissions = []
+    if @conversation.one_on_one?
+      submissions = Submission.for_conversation_participant(@conversation).with_comments.map do |submission|
+        assignment = submission.assignment
+        recent_comments = submission.submission_comments.last(10).reverse
+        {
+          :id => submission.id,
+          :course_id => assignment.context_id,
+          :assignment_id => assignment.id,
+          :author_id => submission.user_id,
+          :created_at => submission.submitted_at,
+          :updated_at => recent_comments.first.created_at,
+          :title => assignment.title,
+          :score => submission.score && assignment.max_score ? "#{submission.score} / #{assignment.max_score}" : submission.score,
+          :comment_count => submission.submission_comments_count,
+          :recent_comments => recent_comments.map{ |comment| {
+            :id => comment.id,
+            :author_id => comment.author_id,
+            :created_at => comment.created_at,
+            :body => comment.comment
+          }}
+        }
+      end
+      submissions = submissions.sort_by{ |s| s[:updated_at] }.reverse
+    end
     render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
-                     :messages => @conversation.messages}
+                     :messages => @conversation.messages,
+                     :submissions => submissions}
   end
 
   def update

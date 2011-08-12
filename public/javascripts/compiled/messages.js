@@ -688,7 +688,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_attachment, build_media_object, build_message, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -788,7 +788,7 @@
       $form.loadingImage();
       $c = $selected_conversation;
       return $.ajaxJSON($selected_conversation.find('a.details_link').attr('href'), 'GET', {}, function(data) {
-        var message, user, _i, _j, _len, _len2, _ref, _ref2;
+        var i, j, message, submission, user, _i, _len, _ref;
         if (!is_selected($c)) {
           return;
         }
@@ -801,10 +801,17 @@
           }
         }
         $messages.show();
-        _ref2 = data.messages;
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-          message = _ref2[_j];
-          $message_list.append(build_message(message));
+        i = j = 0;
+        message = data.messages[0];
+        submission = data.submissions[0];
+        while (message || submission) {
+          if (message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO(submission.updated_at).datetime)) {
+            $message_list.append(build_message(message));
+            message = data.messages[++i];
+          } else {
+            $message_list.append(build_submission(submission));
+            submission = data.submissions[++j];
+          }
         }
         $form.loadingImage('remove');
         $message_list.hide().slideDown('fast');
@@ -915,8 +922,98 @@
       $attachment.data('id', data.id);
       $attachment.find('span.title').html($.h(data.display_name));
       $link = $attachment.find('a');
-      $link.attr('href', $.replaceTags($.replaceTags($link.attr('href'), 'id', data.id), 'uuid', data.uuid));
+      $link.attr('href', $.replaceTags($link.attr('href'), {
+        id: data.id,
+        uuid: data.uuid
+      }));
       return $attachment;
+    };
+    build_submission = function(data) {
+      var $comment_blank, $header, $inline_more, $more_link, $submission, $ul, comment, href, index, initially_shown, score, user, user_name, _i, _len, _ref, _ref2, _ref3, _ref4;
+      $submission = $("#submission_blank").clone(true).attr('id', 'submission_' + data.id);
+      $submission.data('id', data.id);
+      $ul = $submission.find('ul');
+      $header = $ul.find('li.header');
+      href = $.replaceTags($header.find('a').attr('href'), {
+        course_id: data.course_id,
+        assignment_id: data.assignment_id,
+        id: data.author_id
+      });
+      $header.find('a').attr('href', href);
+      user = MessageInbox.user_cache[data.author_id];
+      if (user) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
+          user.html_name = html_name_for_user(user);
+        };
+      }
+      user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
+      $header.find('.title').html($.h(data.title));
+      $header.find('span.date').text($.parseFromISO(data.created_at).datetime_formatted);
+      $header.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
+      score = (_ref3 = data.score) != null ? _ref3 : I18n.t('not_scored', 'no score');
+      $header.find('.score').html(score);
+      $comment_blank = $ul.find('.comment').detach();
+      index = 0;
+      initially_shown = 4;
+      _ref4 = data.recent_comments;
+      for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+        comment = _ref4[_i];
+        index++;
+        comment = build_submission_comment($comment_blank, comment);
+        if (index > initially_shown) {
+          comment.hide();
+        }
+        $ul.append(comment);
+      }
+      $more_link = $ul.find('.more').detach();
+      if (data.recent_comments.length > initially_shown) {
+        $inline_more = $more_link.clone(true);
+        $inline_more.find('.hidden').text(data.comment_count - initially_shown);
+        $inline_more.attr('title', $.h(I18n.t('titles.expand_inline', "Show more comments")));
+        $inline_more.click(function() {
+          var submission;
+          submission = $(this).closest('.submission');
+          submission.find('.more:hidden').show();
+          $(this).hide();
+          submission.find('.comment:hidden').slideDown('fast');
+          inbox_resize();
+          return false;
+        });
+        $ul.append($inline_more);
+      }
+      if (data.comment_count > data.recent_comments.length) {
+        $more_link.find('a').attr('href', href).attr('target', '_blank');
+        $more_link.find('.hidden').text(data.comment_count - data.recent_comments.length);
+        $more_link.attr('title', $.h(I18n.t('titles.view_submission', "Open submission in new window.")));
+        if (data.recent_comments.length > initially_shown) {
+          $more_link.hide();
+        }
+        $ul.append($more_link);
+      }
+      return $submission;
+    };
+    build_submission_comment = function(blank, data) {
+      var $comment, avatar, user, user_name, _ref, _ref2;
+      $comment = blank.clone(true).attr('id', 'submission_comment_' + data.id);
+      $comment.data('id', data.id);
+      user = MessageInbox.user_cache[data.author_id];
+      if (avatar = user != null ? user.avatar : void 0) {
+        $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
+      }
+      if (user) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
+          user.html_name = html_name_for_user(user);
+        };
+      }
+      user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
+      $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
+      $comment.find('span.date').text($.parseFromISO(data.created_at).datetime_formatted);
+      $comment.find('p').html($.h(data.body).replace(/\n/g, '<br />'));
+      return $comment;
     };
     inbox_action_url_for = function($action, $conversation) {
       return $.replaceTags($action.attr('href'), 'id', $conversation.data('id'));
@@ -1239,7 +1336,7 @@
           ;
         } else {
           $message = $(e.target).closest('#messages > ul > li');
-          if (!$message.hasClass('generated')) {
+          if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {
               $selected_conversation.addClass('inactive');
             }
@@ -1447,7 +1544,7 @@
               })()
             },
             success: function($node, data) {
-              if ($message_list.find('li').not('.selected, .generated').length) {
+              if ($message_list.find('> li').not('.selected, .generated, .submission').length) {
                 $selected_messages.remove();
                 return update_conversation($node, data);
               } else {
