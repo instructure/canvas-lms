@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item ident="OBJ_3503039" label="QUES_968905_1181391" d2l_2p0:page="1" title="multi select">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Multi-Select</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>1.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/html">&lt;p&gt;how about the even numbers?&lt;/p&gt;</mattext>
+            </material>
+            <response_extension>
+              <d2l_2p0:display_style>2</d2l_2p0:display_style>
+              <d2l_2p0:enumeration>6</d2l_2p0:enumeration>
+              <d2l_2p0:grading_type>0</d2l_2p0:grading_type>
+            </response_extension>
+            <response_lid ident="QUES_968905_1181391_LID" rcardinality="Multiple">
+              <render_choice shuffle="no">
+                <flow_label class="Block">
+                  <response_label ident="QUES_968905_1181391_A4710353">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">
+                          &lt;p&gt;1&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+                <flow_label class="Block">
+                  <response_label ident="QUES_968905_1181391_A4710354">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">
+                          &lt;p&gt;2&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+                <flow_label class="Block">
+                  <response_label ident="QUES_968905_1181391_A4710355">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">
+                          &lt;p&gt;3&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+                <flow_label class="Block">
+                  <response_label ident="QUES_968905_1181391_A4710356">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">
+                          &lt;p&gt;4&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+              </render_choice>
+            </response_lid>
+          </flow>
+        </presentation>
+        <resprocessing>
+          <outcomes>
+            <decvar vartype="Integer" defaultval="0"/>
+          </outcomes>
+          <respcondition title="Scoring for the correct answers" continue="yes">
+            <conditionvar>
+              <varequal respident="QUES_968905_1181391_LID">
+                QUES_968905_1181391_A4710354
+              </varequal>
+              <varequal respident="QUES_968905_1181391_LID">
+                QUES_968905_1181391_A4710356
+              </varequal>
+              <not>
+                <varequal respident="QUES_968905_1181391_LID">
+                  QUES_968905_1181391_A4710353
+                </varequal>
+                <varequal respident="QUES_968905_1181391_LID">
+                  QUES_968905_1181391_A4710355
+                </varequal>
+              </not>
+            </conditionvar>
+            <setvar action="Add">1</setvar>
+          </respcondition>
+          <respcondition title="Scoring for the incorrect answers" continue="no">
+            <conditionvar>
+              <and>
+                <not>
+                  <varequal respident="QUES_968905_1181391_LID">
+                    QUES_968905_1181391_A4710354
+                  </varequal>
+                  <varequal respident="QUES_968905_1181391_LID">
+                    QUES_968905_1181391_A4710356
+                  </varequal>
+                  <not>
+                    <varequal respident="QUES_968905_1181391_LID">
+                      QUES_968905_1181391_A4710353
+                    </varequal>
+                    <varequal respident="QUES_968905_1181391_LID">
+                      QUES_968905_1181391_A4710355
+                    </varequal>
+                  </not>
+                </not>
+              </and>
+            </conditionvar>
+            <setvar action="Add">0</setvar>
+          </respcondition>
+        </resprocessing>
+        <itemfeedback ident="QUES_968905_1181391_IF4710353">
+          <material>
+            <mattext texttype="text/html">&lt;p&gt;a&lt;/p&gt;</mattext>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_968905_1181391_IF4710354">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_968905_1181391_IF4710355">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_968905_1181391_IF4710356">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+      </item>
+
+    </section>
+  </objectbank>
+</questestinterop>

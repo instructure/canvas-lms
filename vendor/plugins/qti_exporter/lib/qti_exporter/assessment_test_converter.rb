@@ -5,7 +5,7 @@ class AssessmentTestConverter
 
   attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :quiz
 
-  def initialize(manifest_node, base_dir, is_webct=true, converted_questions = [])
+  def initialize(manifest_node, base_dir, is_webct=false, converted_questions = [])
     @log = Canvas::Migration::logger
     @manifest_node = manifest_node
     @base_dir = base_dir
@@ -51,6 +51,7 @@ class AssessmentTestConverter
       # Get the actual assessment file
       doc = Nokogiri::XML(open(@href))
       parse_quiz_data(doc)
+      parse_instructure_metadata(doc)
       
       if @quiz[:quiz_type] == 'assignment'
         grading = {}
@@ -69,14 +70,31 @@ class AssessmentTestConverter
 
     @quiz
   end
+  
+  def parse_instructure_metadata(doc)
+    if meta = doc.at_css('instructureMetadata')
+      if password = get_node_att(meta, 'instructureField[name=password]',  'value')
+        @quiz[:access_code] = password
+      end
+      if id = get_node_att(meta, 'instructureField[name=assignment_identifierref]', 'value')
+        @quiz[:assignment_migration_id] = id
+      end
+    end
+  end
 
   def parse_quiz_data(doc)
     @quiz[:title] = @title || get_node_att(doc, 'assessmentTest', 'title')
     @quiz[:quiz_name] = @quiz[:title]
     @quiz[:migration_id] = get_node_att(doc, 'assessmentTest', 'identifier')
+    if limit = doc.at_css('timeLimits')
+      limit = limit['maxTime'].to_i
+      #instructure uses minutes, QTI uses seconds
+      @quiz[:time_limit] = limit / 60
+    end
     if part = doc.at_css('testPart[identifier=BaseTestPart]')
       if control = part.at_css('itemSessionControl')
         if max = control['maxAttempts']
+          max = -1 if max =~ /unlimited/i
           max = max.to_i
           # -1 means no limit in instructure, 0 means no limit in QTI
           @quiz[:allowed_attempts] = max >= 1 ? max : -1
@@ -84,11 +102,6 @@ class AssessmentTestConverter
         if show = control['showSolution']
           show = show
           @quiz[:show_correct_answers] = show.downcase == "true" ? true : false
-        end
-        if limit = doc.search('timeLimits').first
-          limit = limit['maxTime'].to_i
-          #instructure uses minutes, QTI uses seconds
-          @quiz[:time_limit] = limit / 60
         end
       end
 

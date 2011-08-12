@@ -30,7 +30,7 @@ module Qti
     questions
   end
 
-  def self.convert_assessments(manifest_path, is_webct=true, questions = [])
+  def self.convert_assessments(manifest_path, is_webct=false, questions = [])
     assessments = []
     doc = Nokogiri::XML(open(manifest_path))
     doc.css('manifest resources resource[type=imsqti_assessment_xmlv2p1]').each do |item|

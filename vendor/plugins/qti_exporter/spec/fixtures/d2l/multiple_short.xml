@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item ident="OBJ_3503044" label="QUES_968910_1181396" d2l_2p0:page="1" title="multiple short answer">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Multi-Short Answer</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>6.200000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/html">&lt;p&gt;What is a multiple short answer?&lt;/p&gt;</mattext>
+            </material>
+            <response_str ident="QUES_968910_1181396_A4710365_STR" rcardinality="Single">
+              <render_fib d2l_2p0:input_boxes="3" rows="1" columns="40" prompt="Box" fibtype="String">
+                <response_label ident="QUES_968910_1181396_A4710365_ANS"/>
+              </render_fib>
+            </response_str>
+          </flow>
+        </presentation>
+        <resprocessing>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_968910_1181396_A4710365_ANS" case="no">answer 1</varequal>
+            </conditionvar>
+            <setvar action="Set">33.330000000</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_968910_1181396_A4710365_ANS" case="no">answer 2</varequal>
+            </conditionvar>
+            <setvar action="Set">33.330000000</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_968910_1181396_A4710365_ANS" case="no">answer 3</varequal>
+            </conditionvar>
+            <setvar action="Set">33.330000000</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+    </section>
+  </objectbank>
+</questestinterop>

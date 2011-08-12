@@ -1,6 +1,7 @@
 module Qti
 class ExtendedTextInteraction < AssessmentItemConverter
-
+  import Canvas::XMLHelper
+  
   def initialize(opts)
     super(opts)
     @short_answer = opts[:interaction_type] =~ /short_answer_question/i ? true : false
@@ -40,8 +41,9 @@ class ExtendedTextInteraction < AssessmentItemConverter
       @question.delete :is_vista_fib
     end
     @doc.search('responseProcessing responseCondition').each do |cond|
-      cond.css('stringMatch').each do |match|
-        text = match.at_css('baseValue[baseType=string]').text.strip
+      cond.css('stringMatch,match').each do |match|
+        text = get_node_val(match, 'baseValue[baseType=string]')
+        text ||= get_node_val(match, 'baseValue[baseType=identifier]')
         existing = false
         if answer = @question[:answers].find { |a| a[:text] == text }
           existing = true

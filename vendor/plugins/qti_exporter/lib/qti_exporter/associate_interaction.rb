@@ -1,6 +1,7 @@
 module Qti
 class AssociateInteraction < AssessmentItemConverter
-
+  include Canvas::XMLHelper
+  
   def initialize(opts)
     super(opts)
     @question[:matches] = []
@@ -150,6 +151,7 @@ class AssociateInteraction < AssessmentItemConverter
         match[:text] = m.text.strip
         match[:match_id] = unique_local_id
         match_map[match[:text]] = match[:match_id]
+        match_map[m['identifier']] = match[:match_id]
       end
     end
   end
@@ -164,6 +166,18 @@ class AssociateInteraction < AssessmentItemConverter
       
       if option = a.at_css('simpleAssociableChoice[identifier^=MATCH]')
         answer[:match_id] = match_map[option.text.strip]
+      elsif resp_id = a['responseIdentifier']
+        @doc.css("match variable[identifier=#{resp_id}]").each do |variable|
+          match = variable.parent
+          response_if = match.parent
+          if response_if.name =~ /response(Else)?If/
+            if response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
+              match_id = get_node_val(match, 'baseValue', '').strip
+              answer[:match_id] = match_map[match_id]
+              break
+            end
+          end
+        end
       end
     end
   end
@@ -174,7 +188,7 @@ class AssociateInteraction < AssessmentItemConverter
       @question[:matches].each_with_index do |match, i|
         match[:text] = long_matches[i].text.strip.gsub(/ +/, " ") if long_matches[i]
       end
-      if not long_matches.size == @question[:matches].size
+      if long_matches.size > 0 && long_matches.size != @question[:matches].size
         @question[:qti_warning] = "The matching options for this question may have been incorrectly imported."
       end
     end

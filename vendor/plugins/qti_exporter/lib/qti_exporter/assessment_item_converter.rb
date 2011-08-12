@@ -236,7 +236,7 @@ class AssessmentItemConverter
           opts[:custom_type] = 'canvas_matching'
         elsif type == 'matching'
           opts[:custom_type] = 'respondus_matching'
-        elsif type == 'fill_in_multiple_blanks_question'
+        elsif type =~ /fill_in_multiple_blanks_question|fill in the blanks/i
           opts[:interaction_type] = 'fill_in_multiple_blanks_question'
         elsif type == 'multiple_dropdowns_question'
           opts[:interaction_type] = 'multiple_dropdowns_question'
@@ -289,7 +289,7 @@ class AssessmentItemConverter
     feedback_hash = {}
     @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
       id = feedback['identifier']
-      text = clear_html((feedback.at_css('p') || feedback.at_css('div')).text.gsub(/\s+/, " ")).strip
+      text = clear_html((get_node_val(feedback,'p') || get_node_val(feedback, 'div', '')).gsub(/\s+/, " ")).strip
       feedback_hash[id] = text
 
       if @question[:feedback_id] == id

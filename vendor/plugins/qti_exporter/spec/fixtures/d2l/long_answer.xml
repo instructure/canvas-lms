@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item d2l_2p0:id="16" ident="OBJ_1519344" label="QUES_516158_630298" d2l_2p0:page="1">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Long Answer</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>5.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/plain">Write an essay on writing essays</mattext>
+            </material>
+            <response_extension>
+              <d2l_2p0:has_signed_comments>no</d2l_2p0:has_signed_comments>
+              <d2l_2p0:has_htmleditor>yes</d2l_2p0:has_htmleditor>
+            </response_extension>
+            <response_str ident="QUES_516158_630298_STR" rcardinality="Multiple">
+              <render_fib rows="10" columns="80" prompt="Box" fibtype="String">
+                <response_label ident="QUES_516158_630298_LA">
+                  <material>
+                    <mattext texttype="text/plain"/>
+                  </material>
+                </response_label>
+              </render_fib>
+            </response_str>
+          </flow>
+        </presentation>
+      </item>
+    </section>
+  </objectbank>
+</questestinterop>
