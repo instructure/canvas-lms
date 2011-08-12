@@ -43,7 +43,6 @@ ActionController::Routing::Routes.draw do |map|
     course.backup 'backup', :controller => 'courses', :action => 'backup'
     course.unconclude 'unconclude', :controller => 'courses', :action => 'unconclude'
     course.students 'students', :controller => 'courses', :action => 'students'
-    course.resources :role_overrides, :only => [:index, :create]
     course.enrollment_invitation 'enrollment_invitation', :controller => 'courses', :action => 'enrollment_invitation'
     course.users 'users', :controller => 'context', :action => 'roster'
     course.user_services 'user_services', :controller => 'context', :action => 'roster_user_services'

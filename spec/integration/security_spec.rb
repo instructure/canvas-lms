@@ -55,7 +55,7 @@ describe "security" do
       get "/courses/#{@course.to_param}/users"
       assert_response :success
 
-      RoleOverride.create!(:context => @course,
+      RoleOverride.create!(:context => Account.default,
                            :permission => 'read_roster',
                            :enrollment_type => 'TeacherEnrollment',
                            :enabled => false)
