@@ -465,7 +465,10 @@ class Attachment < ActiveRecord::Base
     @file_store_config ||= {'storage' => 'local'}
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
     if RAILS_ENV == "test"
-      file_storage_test_override = Setting.get("file_storage_test_override", nil)
+      # yes, a rescue nil; the problem is that in an automated test environment, this may be
+      # in the auto-require path, before the DB is even created; obviously it hasn't been
+      # overridden yet
+      file_storage_test_override = Setting.get("file_storage_test_override", nil) rescue nil
       return @file_store_config.merge({"storage" => file_storage_test_override}) if file_storage_test_override
     end
     return @file_store_config
