@@ -736,13 +736,24 @@ I18n.scoped('instructure', function(I18n) {
     return result;
   };
   $.fn.getFormData.defaults = {object_name: null};
-  $.replaceTags = function(text, name, value) {
+  $.replaceOneTag = function(text, name, value) {
     if(!text) { return text; }
     name = (name || "").toString();
     value = (value || "").toString().replace(/\s/g, "+");
     var itemExpression = new RegExp("(%7B|{){2}[\\s|%20|\+]*" + name + "[\\s|%20|\+]*(%7D|}){2}", 'g');
     return text.replace(itemExpression, value);
   };
+  // backwards compatible with only one tag
+  $.replaceTags = function(text, mapping_or_name, maybe_value) {
+    if (typeof mapping_or_name == 'object') {
+      for (var name in mapping_or_name) {
+        text = $.replaceOneTag(text, name, mapping_or_name[name])
+      }
+      return text;
+    } else {
+      return $.replaceOneTag(text, mapping_or_name, maybe_value)
+    }
+  }
   
   $.encodeToHex = function(str) {
     var hex = "";
