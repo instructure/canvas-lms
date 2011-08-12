@@ -755,7 +755,7 @@ class Course < ActiveRecord::Base
     given { |user| self.available? && self.is_public }
     can :read
     
-    RoleOverride.permissions.each do |permission, params|
+    RoleOverride.permissions.each_key do |permission|
       given {|user, session| self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission) }
       can permission
     end
@@ -890,12 +890,21 @@ class Course < ActiveRecord::Base
     return (self.account || self.root_account).name
   end
   memoize :institution_name
-  
+
+  def account_users_for(user)
+    @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id: nil }.compact
+    @account_users ||= {}
+    @account_users[user] ||= AccountUser.find(:all, :conditions => { :account_id => @associated_account_ids, :user_id => user.id }) if user
+    @account_users[user] ||= nil
+    @account_users[user]
+  end
+
   def account_membership_allows(user, session, permission)
-    return false unless user && permission && AccountUser.any_for?(user) #.for_user(user).length > 0
+    return false unless user && permission
     return false if session && session["role_course_#{self.id}"]
+
     @membership_allows ||= {}
-    @membership_allows[[user.id, permission]] ||= (self.associated_accounts + [Account.site_admin]).uniq.any?{|a| a.membership_allows(user, permission) }
+    @membership_allows[[user.id, permission]] ||= self.account_users_for(user).any? { |au| au.has_permission_to?(permission) }
   end
   
   def teacherless?

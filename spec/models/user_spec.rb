@@ -356,7 +356,8 @@ describe User do
       user.grants_right?(@admin, nil, :become_user).should be_false
       user.grants_right?(@site_admin, nil, :become_user).should be_true
       @account2.add_user(@admin)
-      user.grants_right?(@admin, nil, :become_user).should be_true
+      user.grants_right?(@admin, nil, :become_user).should be_false
+      user.grants_right?(@site_admin, nil, :become_user).should be_true
     end
 
     it "should not grant become_user for dis-associated users" do

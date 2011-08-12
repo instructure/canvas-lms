@@ -358,7 +358,7 @@ class Account < ActiveRecord::Base
     Canvas::Security.decrypt_password(self.turnitin_crypted_secret, self.turnitin_salt, 'instructure_turnitin_secret_shared')
   end
   
-  def account_chain
+  def account_chain(opts = {})
     res = [self]
     account = self
     while account.parent_account
@@ -366,6 +366,7 @@ class Account < ActiveRecord::Base
       res << account
     end
     res << self.root_account unless res.include?(self.root_account)
+    res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     res.compact
   end
   
@@ -483,13 +484,7 @@ class Account < ActiveRecord::Base
     self.membership_types = self.account_membership_types.select{|t| t != type}.join(',')
     self.save
   end
-  
-  def membership_allows(user, permission)
-    return false unless user && permission
-    account_users = AccountUser.for_user(user).select{|a| a.account_id == self.id}
-    result = account_users.any?{|e| e.has_permission_to?(permission) }
-  end
-  
+
   def account_authorization_config
     # We support multiple auth configs per account, but several places we assume there is only one.
     # This is for compatibility with those areas. TODO: migrate everything to supporting multiple
@@ -518,26 +513,22 @@ class Account < ActiveRecord::Base
     state :active
     state :deleted
   end
+
+  def account_users_for(user)
+    @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
+    @account_users_cache ||= {}
+    @account_users_cache[user] ||= AccountUser.find(:all, :conditions => { :account_id => @account_chain_ids, :user_id => user.id }) if user
+    @account_users_cache[user] ||= []
+    @account_users_cache[user]
+  end
   
   set_policy do
-    RoleOverride.permissions.each do |permission, params|
-      given {|user, session| self.membership_allows(user, permission) }
-      can permission
-      
-      given {|user, session| self.parent_account && self.parent_account.grants_right?(user, session, permission) }
-      can permission
-
-      given {|user, session| !site_admin? && Account.site_admin.grants_right?(user, session, permission) }
+    RoleOverride.permissions.each_key do |permission|
+      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
       can permission
     end
 
-    given { |user| self.active? && self.users.include?(user) }
-    can :read and can :manage and can :update and can :delete
-
-    given { |user| self.parent_account && self.parent_account.grants_right?(user, nil, :manage) }
-    can :read and can :manage and can :update and can :delete
-
-    given { |user| !site_admin? && Account.site_admin_user?(user, :manage) }
+    given { |user| !self.account_users_for(user).empty? }
     can :read and can :manage and can :update and can :delete
 
     given { |user|
