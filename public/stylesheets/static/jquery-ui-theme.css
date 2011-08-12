@@ -498,3 +498,11 @@
 ----------------------------------*/
 .ui-progressbar { height:2em; text-align: left; background: url(/images/jqueryui/progress_bar.gif) 0px -50px repeat-x; }
 .ui-progressbar .ui-progressbar-value {margin: -1px; height:100%; background: url(/images/jqueryui/progress_bar.gif) 0px 0px repeat-x; }
+
+
+.use-css-transitions-for-show-hide {
+  -webkit-transition: opacity 1.5s;
+  -moz-transition: opacity 1.5s;
+  -o-transition: opacity 1.5;
+  transition: opacity 1.5s;
+}

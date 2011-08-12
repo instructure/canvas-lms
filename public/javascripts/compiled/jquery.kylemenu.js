@@ -4,7 +4,7 @@
       return this.each(function() {
         var $menu, opts;
         opts = $.extend(true, {}, $.fn.kyleMenu.defaults, options);
-        $menu = $(this).button(opts.buttonOpts).next().menu(opts.menuOpts).popup(opts.popupOpts).addClass("ui-kyle-menu");
+        $menu = $(this).button(opts.buttonOpts).next().menu(opts.menuOpts).popup(opts.popupOpts).addClass("ui-kyle-menu use-css-transitions-for-show-hide");
         return $menu.bind("menuselect", function() {
           return $(this).removeClass("ui-state-open");
         });

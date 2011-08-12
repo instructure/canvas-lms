@@ -126,6 +126,50 @@ I18n.scoped('instructure', function(I18n) {
     return ret.concat.apply([], ret);
   }
 
+  // add ability to handle css3 opacity transitions on show or hide
+  // if you want to use this just add the class 'use-css-transitions-for-show-hide' to an element.
+  // whenever that element is .show()n or .hide()n it will use a css opacity transition (in non-IE browsers). 
+  // if you want to override the length or details of the transition, just specify it in a css file.
+  if ($.detect(['-moz-transition', '-o-transition', '-webkit-transition'], function(){ return document.body.style[this] !== undefined })) {
+    $(function(){ //have to do it later (on dom ready) because jQuery UI is going to override show and hide as well
+      $.each(['show', 'hide', 'remove'], function(i, showHideOrRemove) {
+        var previousFn = $.fn[showHideOrRemove];
+        $.fn[showHideOrRemove] = function(){
+          if (!arguments.length) {
+            return this.each(function() {
+              var $this = $(this);
+              // if you can't add the class .use-css-transitions-for-show-hide to your element, you can
+              // add it to this selector to have it use css3 transitions.
+              if ($this.is('.use-css-transitions-for-show-hide, .webkit .ui-widget-overlay')) {
+                var oldOpacityCssAttribute = this.style.opacity,
+                    oldComputedOpacity = $this.css('opacity'),
+                    newOpacity = (showHideOrRemove === 'hide' || showHideOrRemove === 'remove') ? 0 : (!oldComputedOpacity || oldComputedOpacity == "0" ? 1 : oldComputedOpacity);
+                if (showHideOrRemove === 'show' && $this.is(':hidden')) {
+                  this.style.opacity = 0;
+                  previousFn.apply($this); //change out of display:none
+                }
+                $this.bind('transitionend oTransitionEnd webkitTransitionEnd', function(event){
+                  if (event.originalEvent.propertyName === 'opacity') {
+                    previousFn.apply($(this)); //change to display:none when we are hiding.
+                    this.style.opacity = oldOpacityCssAttribute;
+                    $(this).unbind(event);
+                  }
+                });
+                setTimeout(function(){
+                  $this.css('opacity', newOpacity);
+                }, 1);
+              } else {
+                previousFn.apply($this);
+              }
+            });
+          } else {
+            return previousFn.apply(this, arguments);
+          }
+        };
+      });
+    });
+  }
+
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
   // NOTE: because IE only allows form methods to be "POST" or "GET",
