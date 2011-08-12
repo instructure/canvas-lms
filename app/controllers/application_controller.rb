@@ -946,10 +946,6 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_is_site_admin?
 
   def require_site_admin_with_permission(permission)
-    if session[:become_user_id]
-      session[:become_user_id] = nil
-      @current_user = @real_current_user
-    end
     unless current_user_is_site_admin?(permission)
       flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
       redirect_to root_url
@@ -960,7 +956,7 @@ class ApplicationController < ActionController::Base
   # This checks if the user is an admin of the 'Site Admin' account, and has the
   # specified permission.
   def current_user_is_site_admin?(permission = :site_admin)
-    user_is_site_admin?(@current_user)
+    user_is_site_admin?(@current_user, permission)
   end
   helper_method :current_user_is_site_admin?
 

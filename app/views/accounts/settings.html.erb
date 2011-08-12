@@ -9,6 +9,7 @@
 
 <% content_for :right_side do %>
   <%= render :partial => "courses_right_side" unless @account.site_admin? %>
+  <%= render :partial => "additional_settings_right_side" %>
 <% end %>
 
 <% content_for :stylesheets do %>
@@ -113,6 +114,7 @@
             <% end %>
           </table>
         </fieldset>
+        <%= render :partial => 'additional_settings' %>
 
         <% unless @account.site_admin? %>
           <fieldset>
