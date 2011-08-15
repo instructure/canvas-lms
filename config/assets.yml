@@ -121,7 +121,7 @@ javascripts:
     - public/javascripts/eportfolio.js
   full_files:
     - public/javascripts/full_files.js
-    - public/flash/uploadify/jquery.uploadify.v2.1.0.js
+    - public/flash/uploadify/jquery.uploadify.v2.1.4.js
   user_lists:
     - public/javascripts/user_lists.js
   datagrid:

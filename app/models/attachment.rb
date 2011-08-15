@@ -439,6 +439,23 @@ class Attachment < ActiveRecord::Base
     CGI::unescape(self.filename || t(:default_filename, "File"))
   end
   
+  def handle_duplicates(method)
+    return [] unless method.present? && self.folder
+    method = method.to_sym
+    deleted_attachments = []
+    other_attachments = 
+    if method == :rename
+      self.display_name = Attachment.make_unique_filename(self.display_name, self.folder.active_file_attachments.reject {|a| a.id == self.id }.map(&:display_name))
+      self.save
+    elsif method == :overwrite
+      self.folder.active_file_attachments.find_all_by_display_name(self.display_name).reject {|a| a.id == self.id }.each do |a|
+        a.destroy
+        deleted_attachments << a
+      end
+    end
+    return deleted_attachments
+  end
+
   def self.destroy_files(ids)
     Attachment.find_all_by_id(ids).compact.each(&:destroy)
   end
