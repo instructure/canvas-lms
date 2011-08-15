@@ -14,7 +14,9 @@ class AssessmentItemConverter
     @manifest_node = opts[:manifest_node]
     @migration_type = opts[:interaction_type]
     @doc = nil
-
+    @flavor = opts[:flavor]
+    @opts = opts
+    
     if @manifest_node
       @base_dir = opts[:base_dir]
       @identifier = @manifest_node['identifier']

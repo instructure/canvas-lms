@@ -5,14 +5,14 @@ class AssessmentTestConverter
 
   attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :quiz
 
-  def initialize(manifest_node, base_dir, is_webct=false, converted_questions = [])
+  def initialize(manifest_node, base_dir, opts={})
     @log = Canvas::Migration::logger
     @manifest_node = manifest_node
     @base_dir = base_dir
     @href = File.join(@base_dir, @manifest_node['href'])
-    @is_webct = is_webct
-    @converted_questions = converted_questions
-
+    @converted_questions = opts[:converted_questions]
+    @opts = opts
+    
     @quiz = {
             :questions=>[],
             :quiz_type=>nil,
@@ -20,7 +20,7 @@ class AssessmentTestConverter
     }
   end
 
-  def create_instructure_quiz(converted_questions = [])
+  def create_instructure_quiz
     begin
       # Get manifest data
       if md = @manifest_node.at_css("instructureMetadata")
@@ -188,7 +188,7 @@ class AssessmentTestConverter
   def convert_weight_to_points(weight)
     begin
       weight = weight.to_f
-      if @is_webct
+      if @opts[:flavor] == Qti::Flavors::WEBCT
         weight = weight * 100 
       end
     rescue

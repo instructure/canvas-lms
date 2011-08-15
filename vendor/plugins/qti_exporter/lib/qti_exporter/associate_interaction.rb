@@ -7,7 +7,7 @@ class AssociateInteraction < AssessmentItemConverter
     @question[:matches] = []
     @question[:question_type] = 'matching_question'
     # to mark whether it's bb8/vista/respondus_matching if needed
-    @flavor = opts[:custom_type]
+    @custom_type = opts[:custom_type]
   end
 
   def parse_question_data
@@ -18,10 +18,10 @@ class AssociateInteraction < AssessmentItemConverter
       check_for_meta_matches
     elsif node = @doc.at_css('matchInteraction')
       get_all_match_interaction(node)
-    elsif @flavor == 'respondus_matching'
+    elsif @custom_type == 'respondus_matching'
       get_respondus_answers
       get_respondus_matches
-    elsif @flavor == 'canvas_matching'
+    elsif @custom_type == 'canvas_matching'
       match_map = {}
       get_canvas_matches(match_map)
       get_canvas_answers(match_map)

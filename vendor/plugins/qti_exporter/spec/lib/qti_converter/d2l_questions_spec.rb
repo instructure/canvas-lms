@@ -27,7 +27,7 @@ describe "Converting D2L QTI" do
   
   it "should convert matching" do
     #pp get_question_hash(d2l_question_dir, 'matching', false)
-    hash = get_question_hash(d2l_question_dir, 'matching', false)
+    hash = get_question_hash(d2l_question_dir, 'matching', false, :flavor => 'd2l')
     matches = {}
     hash[:matches].each {|m| matches[m[:match_id]] = m[:text]}
     hash[:answers].each do |a|

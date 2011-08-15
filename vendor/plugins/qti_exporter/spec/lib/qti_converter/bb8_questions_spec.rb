@@ -104,7 +104,7 @@ describe "Converting Blackboard 8 qti" do
 
   it "should convert the assessments into quizzes" do
     manifest_node=get_manifest_node('assessment', :quiz_type => 'Test')
-    a = Qti::AssessmentTestConverter.new(manifest_node, bb8_question_dir, false)
+    a = Qti::AssessmentTestConverter.new(manifest_node, bb8_question_dir)
     a.create_instructure_quiz
     a.quiz.should == BB8Expected::ASSESSMENT
   end

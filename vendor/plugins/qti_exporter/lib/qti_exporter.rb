@@ -4,6 +4,7 @@ module Qti
 end
 
 require 'canvas_migration'
+require 'qti_exporter/flavors'
 require 'qti_exporter/qti'
 require 'qti_exporter/qti_plugin_validator'
 require 'qti_exporter/qti_exporter'

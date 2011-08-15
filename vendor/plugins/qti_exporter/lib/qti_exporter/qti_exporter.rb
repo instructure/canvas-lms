@@ -32,7 +32,7 @@ class QtiExporter < Canvas::Migrator
     end
 
     @course[:assessment_questions] = convert_questions
-    @course[:assessments] = convert_assessments(@course[:assessment_questions])
+    @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
     @course[:file_map] = convert_files
 
     if settings[:apply_respondus_settings_file]
@@ -107,7 +107,7 @@ class QtiExporter < Canvas::Migrator
     raise "The QTI must be converted to 2.1 before converting to JSON" unless @converted
     begin
       manifest_file = File.join(@dest_dir_2_1, MANIFEST_FILE)
-      @quizzes[:assessments] = Qti.convert_assessments(manifest_file, false, questions[:assessment_questions])
+      @quizzes[:assessments] = Qti.convert_assessments(manifest_file, :questions => questions)
     rescue => e
       message = "Error processing assessment QTI data: #{$!}: #{$!.backtrace.join("\n")}"
       add_error "qti_assessments", message, @questions, e
