@@ -6,7 +6,7 @@
 <% if enrollment.try_rescue(:user) %>
   title="<%= enrollment.user.name %>: <%= enrollment.user.email %>"
 <% end %>>
-  <span class="links" style="<%= hidden if enrollment && (enrollment.user == @current_user || (@current_enrollment && @current_enrollment.type != 'TeacherEnrollment')) %>">
+  <span class="links" style="<%= hidden if enrollment && ((enrollment.user == @current_user && !can_do(@context.account, @current_user, :manage_admin_users)) || (@current_enrollment && @current_enrollment.type != 'TeacherEnrollment')) %>">
     <%
       lockedbysis = enrollment && enrollment.defined_by_sis?
       lockedbysis &&= !@context.account.grants_right?(@current_user, session, :manage_account_settings)
