@@ -133,7 +133,7 @@
           </div>
         </td>
       </tr>
-        <% if context.respond_to?(:enable_user_notes) && context.enable_user_notes && can_do(context, @current_user, :create_user_notes) %>
+        <% if context.respond_to?(:enable_user_notes) && context.enable_user_notes && can_do(context, @current_user, :manage_user_notes) %>
           <tr>
             <td colspan="2">
               <input type="checkbox" id="add_as_user_note" class="add_as_user_note" name="add_as_user_note" value="1" disabled/>

@@ -709,6 +709,9 @@ class User < ActiveRecord::Base
     end
     can :create_user_notes and can :read_user_notes
 
+    given { |user| user && self.all_courses.any? { |c| c.grants_right?(user, nil, :read_user_notes) } }
+    can :read_user_notes
+
     given do |user|
       user && (
         self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_notes)}
