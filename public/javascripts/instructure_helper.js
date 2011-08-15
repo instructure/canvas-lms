@@ -1716,6 +1716,36 @@ I18n.scoped('instructure', function(I18n) {
   $.timeString = function(date) {
     return (date && date.toString('h:mmtt').toLowerCase()) || "";
   };
+  $.friendlyDatetime = function(datetime, perspective) {
+    if (perspective == null) {
+      perspective = 'past';
+    }
+    var today = Date.today();
+    if (Date.equals(datetime.clone().clearTime(), today)) {
+      return I18n.l('#time.formats.tiny', datetime);
+    } else {
+      return $.friendlyDate(datetime, perspective);
+    }
+  };
+  $.friendlyDate = function(datetime, perspective) {
+    if (perspective == null) {
+      perspective = 'past';
+    }
+    var today = Date.today();
+    var date = datetime.clone().clearTime();
+    if (Date.equals(date, today)) {
+      return I18n.t('#date.days.today', 'Today');
+    } else if (Date.equals(date, today.add(-1).days())) {
+      return I18n.t('#date.days.yesterday', 'Yesterday');
+    } else if (Date.equals(date, today.add(1).days())) {
+      return I18n.t('#date.days.tomorrow', 'Tomorrow');
+    } else if (perspective == 'past' && date < today && date >= today.add(-6).days()) {
+      return I18n.l('#date.formats.weekday', date);
+    } else if (perspective == 'future' && date < today.add(7).days() && date >= today) {
+      return I18n.l('#date.formats.weekday', date);
+    }
+    return I18n.l('#date.formats.medium', date);
+  };
   $.fn.parseFromISO = $.parseFromISO;
 
   // Returns the width of the browser's scroll bars.

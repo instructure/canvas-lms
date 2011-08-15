@@ -695,7 +695,7 @@ I18n.scoped 'conversations', (I18n) ->
     if data.message_count?
       $conversation.find('.count').text data.message_count
       $conversation.find('.count').showIf data.message_count > 1
-    $conversation.find('span.date').text $.parseFromISO(data.last_message_at).datetime_formatted
+    $conversation.find('span.date').text $.friendlyDatetime($.parseFromISO(data.last_message_at).datetime)
     move_direction = if $conversation.data('last_message_at') > data.last_message_at then 'down' else 'up'
     $conversation.data 'last_message_at', data.last_message_at
     $conversation.data 'label', data.label
