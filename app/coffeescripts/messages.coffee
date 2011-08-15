@@ -19,6 +19,7 @@ class TokenInput
     @node_name = @node.attr('name')
     @node.removeAttr('name').hide().change =>
       @tokens.html('')
+      @change?(@token_values())
 
     @placeholder = $('<span />')
     @placeholder.text(@options.placeholder)
@@ -31,11 +32,7 @@ class TokenInput
         $close = $(e.target).closest('a')
         if $close.length
           $token.remove()
-        # TODO: recipient selection, virtual cursor fu
-        #  $token.removeClass('selected').remove()
-        #else
-        #  @selected_token?.removeClass('selected')
-        #  @selected_token = $token.addClass('selected')
+          @change?(@token_values())
 
     # key capture input
     @input = $('<input />')
@@ -99,6 +96,7 @@ class TokenInput
       @tokens.append($token)
     @val('') unless data?.no_clear
     @placeholder.hide()
+    @change?(@token_values())
     @selector?.reposition()
 
   has_token: (data) ->
@@ -107,10 +105,12 @@ class TokenInput
   remove_token: (data) ->
     id = 'token_' + (data?.value ? data)
     @tokens.find('#' + id).remove()
+    @change?(@token_values())
     @selector?.reposition()
 
   remove_last_token: (data) ->
     @tokens.find('li').last().remove()
+    @change?(@token_values())
     @selector?.reposition()
 
   input_keydown: (e) ->
@@ -511,6 +511,7 @@ I18n.scoped 'conversations', (I18n) ->
   show_message_form = ->
     newMessage = !$selected_conversation?
     $form.find('#recipient_info').showIf newMessage
+    $form.find('#group_conversation_info').hide()
     $('#action_compose_message').toggleClass 'active', newMessage
 
     if newMessage
@@ -698,11 +699,11 @@ I18n.scoped 'conversations', (I18n) ->
     $conversation[if append then 'appendTo' else 'prependTo']($conversation_list).click (e) ->
       e.preventDefault()
       location.hash = '/conversations/' + $(this).data('id')
-    update_conversation($conversation, data, true)
+    update_conversation($conversation, data, null)
     $conversation.hide().slideDown('fast') unless append
     $conversation
 
-  update_conversation = ($conversation, data, no_move) ->
+  update_conversation = ($conversation, data, move_mode='slide') ->
     toggle_message_actions(off)
 
     $a = $conversation.find('a.details_link')
@@ -730,10 +731,10 @@ I18n.scoped 'conversations', (I18n) ->
     $conversation.addClass('private') if data['private']
     $conversation.addClass('labeled').addClass(data['label']) if data['label']
     $conversation.addClass('unsubscribed') unless data.subscribed
-    $conversation.addClass(data.workflow_state)
-    reposition_conversation($conversation, move_direction) unless no_move
+    set_conversation_state $conversation, data.workflow_state
+    reposition_conversation($conversation, move_direction, move_mode) if move_mode
 
-  reposition_conversation = ($conversation, move_direction) ->
+  reposition_conversation = ($conversation, move_direction, move_mode) ->
     last_message = $conversation.data('last_message_at')
     $n = $conversation
     if move_direction == 'up'
@@ -741,12 +742,15 @@ I18n.scoped 'conversations', (I18n) ->
     else
       $n = $n.next() while $n.next() && $n.next().data('last_message_at') > last_message
     return if $n == $conversation
-    $dummy_conversation = $conversation.clone().insertAfter($conversation)
-    $conversation.detach()[if move_direction == 'up' then 'insertBefore' else 'insertAfter']($n).animate({opacity: 'toggle', height: 'toggle'}, 0)
-    $dummy_conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, ->
-      $(this).remove()
-    $conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, ->
-      $conversation.scrollIntoView()
+    if move_mode is 'immediate'
+      $conversation.detach()[if move_direction == 'up' then 'insertBefore' else 'insertAfter']($n).scrollIntoView()
+    else
+      $dummy_conversation = $conversation.clone().insertAfter($conversation)
+      $conversation.detach()[if move_direction == 'up' then 'insertBefore' else 'insertAfter']($n).animate({opacity: 'toggle', height: 'toggle'}, 0)
+      $dummy_conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, ->
+        $(this).remove()
+      $conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, ->
+        $conversation.scrollIntoView()
 
   remove_conversation = ($conversation) ->
     select_conversation()
@@ -849,12 +853,19 @@ I18n.scoped 'conversations', (I18n) ->
         $(this).loadingImage()
       success: (data) ->
         $(this).loadingImage 'remove'
-        $conversation = $('#conversation_' + data.conversation.id)
-        if $conversation.length
-          build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
-          update_conversation($conversation, data.conversation)
+        if data.conversations # e.g. we just sent bulk private messages
+          for conversation in data.conversations
+            $conversation = $('#conversation_' + conversation.id)
+            update_conversation($conversation, conversation, 'immediate') if $conversation.length
+          $.flashMessage(I18n.t('messages_sent', 'Messages Sent'))
         else
-          select_conversation add_conversation(data.conversation)
+          $conversation = $('#conversation_' + data.conversation.id)
+          if $conversation.length
+            build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
+            update_conversation($conversation, data.conversation)
+          else
+            select_conversation add_conversation(data.conversation)
+          $.flashMessage(I18n.t('message_sent', 'Message Sent'))
         reset_message_form()
       error: (data) ->
         $form.find('.token_input').errorBox(I18n.t('recipient_error', 'The course or group you have selected has no valid recipients'))
@@ -1155,8 +1166,16 @@ I18n.scoped 'conversations', (I18n) ->
             limit: -1
             type: 'context'
 
+    token_input = $('#recipients').data('token_input')
     # since it doesn't infer percentage widths, just whatever the current pixels are
-    $('#recipients').data('token_input').fake_input.css('width', '100%')
+    token_input.fake_input.css('width', '100%')
+    token_input.change = (tokens) ->
+      if tokens.length > 1 or tokens[0]?.match(/^(course|group)_/)
+        $form.find('#group_conversation').attr('checked', true) if !$form.find('#group_conversation_info').is(':visible')
+        $form.find('#group_conversation_info').show()
+      else
+        $form.find('#group_conversation').attr('checked', true)
+        $form.find('#group_conversation_info').hide()
 
     $(window).resize inbox_resize
     setTimeout inbox_resize

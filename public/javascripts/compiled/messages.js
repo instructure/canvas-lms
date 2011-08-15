@@ -25,7 +25,8 @@
       }, this));
       this.node_name = this.node.attr('name');
       this.node.removeAttr('name').hide().change(__bind(function() {
-        return this.tokens.html('');
+        this.tokens.html('');
+        return typeof this.change === "function" ? this.change(this.token_values()) : void 0;
       }, this));
       this.placeholder = $('<span />');
       this.placeholder.text(this.options.placeholder);
@@ -38,7 +39,8 @@
         if ($token = $(e.target).closest('li')) {
           $close = $(e.target).closest('a');
           if ($close.length) {
-            return $token.remove();
+            $token.remove();
+            return typeof this.change === "function" ? this.change(this.token_values()) : void 0;
           }
         }
       }, this));
@@ -102,6 +104,9 @@
         this.val('');
       }
       this.placeholder.hide();
+      if (typeof this.change === "function") {
+        this.change(this.token_values());
+      }
       return (_ref3 = this.selector) != null ? _ref3.reposition() : void 0;
     };
     TokenInput.prototype.has_token = function(data) {
@@ -112,11 +117,17 @@
       var id, _ref, _ref2;
       id = 'token_' + ((_ref = data != null ? data.value : void 0) != null ? _ref : data);
       this.tokens.find('#' + id).remove();
+      if (typeof this.change === "function") {
+        this.change(this.token_values());
+      }
       return (_ref2 = this.selector) != null ? _ref2.reposition() : void 0;
     };
     TokenInput.prototype.remove_last_token = function(data) {
       var _ref;
       this.tokens.find('li').last().remove();
+      if (typeof this.change === "function") {
+        this.change(this.token_values());
+      }
       return (_ref = this.selector) != null ? _ref.reposition() : void 0;
     };
     TokenInput.prototype.input_keydown = function(e) {
@@ -682,6 +693,7 @@
       var newMessage;
       newMessage = !($selected_conversation != null);
       $form.find('#recipient_info').showIf(newMessage);
+      $form.find('#group_conversation_info').hide();
       $('#action_compose_message').toggleClass('active', newMessage);
       if (newMessage) {
         $form.find('.audience').html(I18n.t('headings.new_message', 'New Message'));
@@ -954,14 +966,17 @@
         e.preventDefault();
         return location.hash = '/conversations/' + $(this).data('id');
       });
-      update_conversation($conversation, data, true);
+      update_conversation($conversation, data, null);
       if (!append) {
         $conversation.hide().slideDown('fast');
       }
       return $conversation;
     };
-    update_conversation = function($conversation, data, no_move) {
+    update_conversation = function($conversation, data, move_mode) {
       var $a, $p, move_direction, property, _i, _len, _ref;
+      if (move_mode == null) {
+        move_mode = 'slide';
+      }
       toggle_message_actions(false);
       $a = $conversation.find('a.details_link');
       $a.attr('href', $.replaceTags($a.attr('href'), 'id', data.id));
@@ -1003,12 +1018,12 @@
       if (!data.subscribed) {
         $conversation.addClass('unsubscribed');
       }
-      $conversation.addClass(data.workflow_state);
-      if (!no_move) {
-        return reposition_conversation($conversation, move_direction);
+      set_conversation_state($conversation, data.workflow_state);
+      if (move_mode) {
+        return reposition_conversation($conversation, move_direction, move_mode);
       }
     };
-    reposition_conversation = function($conversation, move_direction) {
+    reposition_conversation = function($conversation, move_direction, move_mode) {
       var $dummy_conversation, $n, last_message;
       last_message = $conversation.data('last_message_at');
       $n = $conversation;
@@ -1024,23 +1039,27 @@
       if ($n === $conversation) {
         return;
       }
-      $dummy_conversation = $conversation.clone().insertAfter($conversation);
-      $conversation.detach()[move_direction === 'up' ? 'insertBefore' : 'insertAfter']($n).animate({
-        opacity: 'toggle',
-        height: 'toggle'
-      }, 0);
-      $dummy_conversation.animate({
-        opacity: 'toggle',
-        height: 'toggle'
-      }, 200, function() {
-        return $(this).remove();
-      });
-      return $conversation.animate({
-        opacity: 'toggle',
-        height: 'toggle'
-      }, 200, function() {
-        return $conversation.scrollIntoView();
-      });
+      if (move_mode === 'immediate') {
+        return $conversation.detach()[move_direction === 'up' ? 'insertBefore' : 'insertAfter']($n).scrollIntoView();
+      } else {
+        $dummy_conversation = $conversation.clone().insertAfter($conversation);
+        $conversation.detach()[move_direction === 'up' ? 'insertBefore' : 'insertAfter']($n).animate({
+          opacity: 'toggle',
+          height: 'toggle'
+        }, 0);
+        $dummy_conversation.animate({
+          opacity: 'toggle',
+          height: 'toggle'
+        }, 200, function() {
+          return $(this).remove();
+        });
+        return $conversation.animate({
+          opacity: 'toggle',
+          height: 'toggle'
+        }, 200, function() {
+          return $conversation.scrollIntoView();
+        });
+      }
     };
     remove_conversation = function($conversation) {
       select_conversation();
@@ -1131,7 +1150,7 @@
       MessageInbox: MessageInbox
     });
     return $(document).ready(function() {
-      var conversation, nextAttachmentIndex, _i, _len, _ref, _ref2;
+      var conversation, nextAttachmentIndex, token_input, _i, _len, _ref, _ref2;
       $conversations = $('#conversations');
       $conversation_list = $conversations.find("ul.conversations");
       set_last_label((_ref = $.cookie('last_label')) != null ? _ref : 'red');
@@ -1155,16 +1174,29 @@
           return $(this).loadingImage();
         },
         success: function(data) {
-          var $conversation;
+          var $conversation, conversation, _i, _len, _ref2;
           $(this).loadingImage('remove');
-          $conversation = $('#conversation_' + data.conversation.id);
-          if ($conversation.length) {
-            if (is_selected($conversation)) {
-              build_message(data.message).prependTo($message_list).slideDown('fast');
+          if (data.conversations) {
+            _ref2 = data.conversations;
+            for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+              conversation = _ref2[_i];
+              $conversation = $('#conversation_' + conversation.id);
+              if ($conversation.length) {
+                update_conversation($conversation, conversation, 'immediate');
+              }
             }
-            update_conversation($conversation, data.conversation);
+            $.flashMessage(I18n.t('messages_sent', 'Messages Sent'));
           } else {
-            select_conversation(add_conversation(data.conversation));
+            $conversation = $('#conversation_' + data.conversation.id);
+            if ($conversation.length) {
+              if (is_selected($conversation)) {
+                build_message(data.message).prependTo($message_list).slideDown('fast');
+              }
+              update_conversation($conversation, data.conversation);
+            } else {
+              select_conversation(add_conversation(data.conversation));
+            }
+            $.flashMessage(I18n.t('message_sent', 'Message Sent'));
           }
           return reset_message_form();
         },
@@ -1588,7 +1620,20 @@
           }
         }
       });
-      $('#recipients').data('token_input').fake_input.css('width', '100%');
+      token_input = $('#recipients').data('token_input');
+      token_input.fake_input.css('width', '100%');
+      token_input.change = function(tokens) {
+        var _ref3;
+        if (tokens.length > 1 || ((_ref3 = tokens[0]) != null ? _ref3.match(/^(course|group)_/) : void 0)) {
+          if (!$form.find('#group_conversation_info').is(':visible')) {
+            $form.find('#group_conversation').attr('checked', true);
+          }
+          return $form.find('#group_conversation_info').show();
+        } else {
+          $form.find('#group_conversation').attr('checked', true);
+          return $form.find('#group_conversation_info').hide();
+        }
+      };
       $(window).resize(inbox_resize);
       setTimeout(inbox_resize);
       return $(document).fragmentChange(function(event, hash) {

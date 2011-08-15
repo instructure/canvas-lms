@@ -105,7 +105,9 @@ describe Conversation do
       root_convo = Conversation.initiate([sender.id, recipient.id], false)
       root_convo.add_message(sender, 'test')
       sender.reload.unread_conversations_count.should eql 0
+      sender.conversations.unread.size.should eql 0
       recipient.reload.unread_conversations_count.should eql 1
+      recipient.conversations.unread.size.should eql 1
     end
 
     it "should increment for subscribed recipients when adding a message to a read conversation" do
@@ -117,16 +119,22 @@ describe Conversation do
       root_convo.add_message(sender, 'test')
       
       unread_guy.reload.unread_conversations_count.should eql 1
+      unread_guy.conversations.unread.size.should eql 1
       subscribed_guy.conversations.first.mark_as_read
       subscribed_guy.reload.unread_conversations_count.should eql 0
+      subscribed_guy.conversations.unread.size.should eql 0
       unsubscribed_guy.conversations.first.update_attributes(:subscribed => false)
       unsubscribed_guy.reload.unread_conversations_count.should eql 0
+      unsubscribed_guy.conversations.unread.size.should eql 0
 
       root_convo.add_message(sender, 'test2')
 
       unread_guy.reload.unread_conversations_count.should eql 1
+      unread_guy.conversations.unread.size.should eql 1
       subscribed_guy.reload.unread_conversations_count.should eql 1
+      subscribed_guy.conversations.unread.size.should eql 1
       unsubscribed_guy.reload.unread_conversations_count.should eql 0
+      unsubscribed_guy.conversations.unread.size.should eql 0
     end
 
     it "should decrement when deleting an unread conversation" do
@@ -136,8 +144,10 @@ describe Conversation do
       root_convo.add_message(sender, 'test')
       
       unread_guy.reload.unread_conversations_count.should eql 1
+      unread_guy.conversations.unread.size.should eql 1
       unread_guy.conversations.first.remove_messages(:all)
       unread_guy.reload.unread_conversations_count.should eql 0
+      unread_guy.conversations.unread.size.should eql 0
     end
 
     it "should decrement when marking as read" do
@@ -147,8 +157,10 @@ describe Conversation do
       root_convo.add_message(sender, 'test')
       
       unread_guy.reload.unread_conversations_count.should eql 1
+      unread_guy.conversations.unread.size.should eql 1
       unread_guy.conversations.first.mark_as_read
       unread_guy.reload.unread_conversations_count.should eql 0
+      unread_guy.conversations.unread.size.should eql 0
     end
 
     it "should indecrement when marking as unread" do
@@ -159,8 +171,10 @@ describe Conversation do
       unread_guy.conversations.first.mark_as_read
       
       unread_guy.reload.unread_conversations_count.should eql 0
+      unread_guy.conversations.unread.size.should eql 0
       unread_guy.conversations.first.mark_as_unread
       unread_guy.reload.unread_conversations_count.should eql 1
+      unread_guy.conversations.unread.size.should eql 1
     end
   end
 
@@ -170,7 +184,7 @@ describe Conversation do
       recipients = 5.times.map{ user }
       Conversation.initiate([sender.id] + recipients.map(&:id), false).add_message(sender, 'test')
       convo = sender.conversations.first
-      convo.reload.read?.should be_true # but only for the sender
+      convo.reload.read?.should be_true # only for the sender, and then only on the first message
       convo.messages.size.should == 1
       convo.messages.first.body.should == 'test'
       recipients.each do |recipient|
@@ -179,6 +193,16 @@ describe Conversation do
         convo.messages.size.should == 1
         convo.messages.first.body.should == 'test'
       end
+    end
+
+    it "should not auto mark it as read for the sender" do
+      sender = user
+      recipients = 5.times.map{ user }
+      Conversation.initiate([sender.id] + recipients.map(&:id), false).add_message(sender, 'test')
+      convo = sender.conversations.first
+      convo.mark_as_unread!
+      convo.add_message('another test')
+      convo.reload.unread?.should be_true
     end
 
     it "should deliver the message to unsubscribed participants but not alert them" do

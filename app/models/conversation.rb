@@ -101,7 +101,7 @@ class Conversation < ActiveRecord::Base
     add_message(current_user, event_data.to_yaml, true)
   end
 
-  def add_message(current_user, body, generated = false, forward_message_ids = [])
+  def add_message(current_user, body, generated = false, forward_message_ids = [], update_for_sender = true)
     transaction do
       lock!
 
@@ -150,14 +150,18 @@ class Conversation < ActiveRecord::Base
           ["(last_message_at IS NULL OR subscribed) AND user_id <> ?", current_user.id]
         )
 
-        # for the sender, auto-mark as 'read', and update the last_authored_at
-        if conversation_participants.find_by_user_id_and_workflow_state(current_user.id, 'unread')
-          User.update_all 'unread_conversations_count = unread_conversations_count - 1', :id => current_user.id
+        # for the sender, update the timestamps
+        # marking it as read is a ui concern, unless it's the first message (e.g. we might be sending from outside the inbox)
+        if (sender_conversation = conversation_participants.find_by_user_id(current_user.id)) && (update_for_sender || sender_conversation.last_message_at)
+          mark_as_read = update_for_sender && sender_conversation.last_message_at.nil?
+          if mark_as_read && sender_conversation.unread? && sender_conversation.last_message_at 
+            User.update_all 'unread_conversations_count = unread_conversations_count - 1', :id => current_user.id
+          end
+          sender_conversation.last_message_at = Time.now.utc
+          sender_conversation.last_authored_at = Time.now.utc
+          sender_conversation.workflow_state = 'read' if mark_as_read
+          sender_conversation.save
         end
-        conversation_participants.update_all(
-          {:last_message_at => Time.now.utc, :workflow_state => 'read', :last_authored_at => Time.now.utc},
-          ["user_id = ?", current_user.id]
-        )
   
         updated = false
         if message.attachments.present?

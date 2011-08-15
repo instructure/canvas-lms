@@ -97,6 +97,48 @@ describe ConversationsController do
       assigns[:conversation].should_not be_nil
       assigns[:conversation].messages.first.forwarded_message_ids.should eql(@conversation.messages.first.id.to_s)
     end
+
+    it "should create one conversation shared by all recipients" do
+      old_count = Conversation.count
+
+      course_with_teacher_logged_in(:active_all => true)
+
+      new_user1 = User.create
+      enrollment1 = @course.enroll_student(new_user1)
+      enrollment1.workflow_state = 'active'
+      enrollment1.save
+
+      new_user2 = User.create
+      enrollment2 = @course.enroll_student(new_user2)
+      enrollment2.workflow_state = 'active'
+      enrollment2.save
+
+      post 'create', :recipients => [new_user1.id.to_s, new_user2.id.to_s], :body => "yo", :group_conversation => true
+      response.should be_success
+
+      Conversation.count.should eql(old_count + 1)
+    end
+
+    it "should create one conversation per recipient if not a group conversation" do
+      old_count = Conversation.count
+
+      course_with_teacher_logged_in(:active_all => true)
+
+      new_user1 = User.create
+      enrollment1 = @course.enroll_student(new_user1)
+      enrollment1.workflow_state = 'active'
+      enrollment1.save
+
+      new_user2 = User.create
+      enrollment2 = @course.enroll_student(new_user2)
+      enrollment2.workflow_state = 'active'
+      enrollment2.save
+
+      post 'create', :recipients => [new_user1.id.to_s, new_user2.id.to_s], :body => "yo"
+      response.should be_success
+
+      Conversation.count.should eql(old_count + 2)
+    end
   end
 
   describe "POST 'update'" do
@@ -198,29 +240,6 @@ describe ConversationsController do
       get 'find_recipients', :search => other.name
       response.should be_success
       response.body.should include(other.name)
-    end
-  end
-
-  describe "POST 'batch_pm'" do
-    it "should create one conversation per recipient" do
-      old_count = Conversation.count
-
-      course_with_teacher_logged_in(:active_all => true)
-
-      new_user1 = User.create
-      enrollment1 = @course.enroll_student(new_user1)
-      enrollment1.workflow_state = 'active'
-      enrollment1.save
-
-      new_user2 = User.create
-      enrollment2 = @course.enroll_student(new_user2)
-      enrollment2.workflow_state = 'active'
-      enrollment2.save
-
-      post 'batch_pm', :recipients => [new_user1.id.to_s, new_user2.id.to_s], :body => "yo"
-      response.should be_success
-
-      Conversation.count.should eql(old_count + 2)
     end
   end
 end
