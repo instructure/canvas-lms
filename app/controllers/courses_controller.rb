@@ -714,6 +714,8 @@ class CoursesController < ApplicationController
     @enrollment = @context.enrollments.find(params[:id])
     can_remove = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
     can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
+    # Teachers can't unenroll themselves unless they could re-add themselves by using account permissions
+    can_remove &&= @enrollment.user_id != @current_user.id || @context.account.grants_right?(@current_user, session, :manage_admin_users)
     if can_remove
       respond_to do |format|
         if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
