@@ -200,8 +200,8 @@ module D2LExpected
               :question_name=>"matching",
               :migration_id=>"OBJ_3503046",
               :matches=>
-                      [{:text=>"<p><strong>1</strong></p>"},
-                       {:text=>"<p><span style=\"text-decoration: underline;\">2</span></p>"}],
+                      [{:html=>"<strong>1</strong>", :text=>'1'},
+                       {:text=>'2'}],
               :correct_comments=>"",
               :question_type=>"matching_question",
               :incorrect_comments=>"",
@@ -209,14 +209,12 @@ module D2LExpected
               :question_bank_name=>"QLIB_730739",
               :points_possible=>1,
               :answers=>
-                      [{:right=>"<p><strong>1</strong></p>",
-                        :html=>
-                                "&lt;p&gt;&lt;em&gt;&lt;strong&gt;A&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;",
+                      [{:right=>"1",
+                        :html=>"<em><strong>A</strong></em>",
                         :comments=>"",
                         :text=>"A"},
-                       {:right=>"<p><span style=\"text-decoration: underline;\">2</span></p>",
-                        :html=>"&lt;p&gt;b&lt;/p&gt;",
-                        :comments=>"",
+                       {:right=>"2", 
+                        :comments=>"", 
                         :text=>"b"}]}
 
   ORDERING = {:question_bank_id=>"QLIB_730739",

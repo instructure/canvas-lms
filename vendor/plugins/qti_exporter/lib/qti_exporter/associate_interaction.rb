@@ -148,7 +148,7 @@ class AssociateInteraction < AssessmentItemConverter
       matches.css('simpleAssociableChoice').each do |m|
         match = {}
         @question[:matches] << match
-        match[:text] = m.text.strip
+        extract_answer!(match, m)
         match[:match_id] = unique_local_id
         match_map[match[:text]] = match[:match_id]
         match_map[m['identifier']] = match[:match_id]

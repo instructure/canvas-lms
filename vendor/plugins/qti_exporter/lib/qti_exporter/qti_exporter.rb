@@ -10,6 +10,7 @@ class QtiExporter < Canvas::Migrator
   QTI_2_1_ITEM_URL = 'http://www.imsglobal.org/xsd/imsqti_item_v2p1'
   QTI_2_REGEX = %r{http://www.imsglobal.org/xsd/(?:imsqti_v2p0|imsqti_item_v2p0|imsqti_v2p1|imsqti_item_v2p1)}
   IMS_MD = "http://www.imsglobal.org/xsd/imsmd_v1p2"
+  QTI_2_OUTPUT_PATH = "qti_2_1"
 
   def initialize(settings)
     super(settings, 'qti')
@@ -73,7 +74,7 @@ class QtiExporter < Canvas::Migrator
 
   def run_qti_converter
     # convert to 2.1
-    @dest_dir_2_1 = File.join(@unzipped_file_path, "qti_2_1")
+    @dest_dir_2_1 = File.join(@unzipped_file_path, QTI_2_OUTPUT_PATH)
     command = Qti.get_conversion_command(@dest_dir_2_1, @unzipped_file_path)
     logger.debug "Running migration command: #{command}"
     python_std_out = `#{command}`
