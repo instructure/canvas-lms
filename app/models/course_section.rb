@@ -40,10 +40,16 @@ class CourseSection < ActiveRecord::Base
   after_save :update_account_associations_if_changed
 
   set_policy do
-    given {|user, session| self.cached_course_grants_right?(user, session, :manage_admin_users) }
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
     can :read and can :create and can :update and can :delete
-    
-    given {|user, session| self.enrollments.find_by_user_id(user.id) }
+
+    given {|user, session| self.cached_context_grants_right?(user, session, :manage_students, :manage_admin_users) }
+    can :read
+
+    given {|user, session| self.course.account_membership_allows(user, session, :read_roster) }
+    can :read
+
+    given {|user, session| self.enrollments.find_by_user_id(user.id) && self.cached_context_grants_right?(user, session, :read_roster) }
     can :read
   end
 

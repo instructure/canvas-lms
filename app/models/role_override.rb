@@ -60,7 +60,7 @@ class RoleOverride < ActiveRecord::Base
   PERMISSIONS =
     {
       :manage_wiki => {
-        :label => lambda { t('permissions.manage_wiki', "Manage Wiki (add / edit / delete pages)") },
+        :label => lambda { t('permissions.manage_wiki', "Manage wiki (add / edit / delete pages)") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -136,7 +136,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_outcomes => {
-        :label => lambda { t('permissions.manage_outcomes', "Manage Learning Outcomes") },
+        :label => lambda { t('permissions.manage_outcomes', "Manage learning outcomes") },
         :available_to => [
           'StudentEnrollment',
           'TaEnrollment',
@@ -263,7 +263,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_students => {
-        :label => lambda { t('permissions.manage_students', "Add/Remove students for the course") },
+        :label => lambda { t('permissions.manage_students', "Add/remove students for the course") },
         :available_to => [
           'TaEnrollment',
           'DesignerEnrollment',
@@ -280,7 +280,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_admin_users => {
-        :label => lambda { t('permissions.manage_admin_users', "Add/Remove other teachers, Course Designers or TAs to the course") },
+        :label => lambda { t('permissions.manage_admin_users', "Add/remove other teachers, course designers or TAs to the course") },
         :available_to => [
           'TaEnrollment',
           'DesignerEnrollment',
@@ -294,21 +294,13 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_role_overrides => {
-        :label => lambda { t('permissions.manage_role_overrides', "Manage default role permissions (define these permissions for course role types)") },
-        :available_to => [
-          'TaEnrollment',
-          'DesignerEnrollment',
-          'TeacherEnrollment',
-          'AccountAdmin',
-          'AccountMembership'
-        ],
-        :true_for => [
-          'TeacherEnrollment',
-          'AccountAdmin'
-        ]
+        :label => lambda { t('permissions.manage_role_overrides', "Manage permissions") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_account_memberships => {
-        :label => lambda { t('permissions.manage_account_memberships', "Add/Remove other admins for the account") },
+        :label => lambda { t('permissions.manage_account_memberships', "Add/remove other admins for the account") },
         :available_to => [
           'AccountAdmin',
           'AccountMembership'
@@ -436,7 +428,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_courses => {
-        :label => lambda { t('permissions.manage_courses', "Add/Remove Courses for the account") },
+        :label => lambda { t('permissions.manage_courses', "Manage ( add / edit / delete ) courses") },
         :available_to => [
           'AccountAdmin',
           'AccountMembership'
@@ -447,7 +439,7 @@ class RoleOverride < ActiveRecord::Base
         ]
       },
       :manage_user_logins => {
-        :label => lambda { t('permissions.manage_user_logins', "Modify Login details for users") },
+        :label => lambda { t('permissions.manage_user_logins', "Modify login details for users") },
         :available_to => [
           'AccountAdmin',
           'AccountMembership'
@@ -495,13 +487,13 @@ class RoleOverride < ActiveRecord::Base
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :view_statistics => {
-        :label => lambda { t('permissions.view_statistics', "View Statistics") },
+        :label => lambda { t('permissions.view_statistics', "View statistics") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_user_notes => {
-        :label => lambda { t('permissions.manage_user_notes', "Manage Faculty Journal Entries") },
+        :label => lambda { t('permissions.manage_user_notes', "Manage faculty journal entries") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
@@ -511,6 +503,30 @@ class RoleOverride < ActiveRecord::Base
         :true_for => [
           'TaEnrollment',
           'TeacherEnrollment',
+          'AccountAdmin'
+        ]
+      },
+      :read_course_content => {
+        :label => lambda { t('permission.read_course_content', "View course content") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
+      },
+      :manage_content => {
+        :label => lambda { t('permission.manage_content', "Manage all other course content") },
+        :available_to => [
+          'TaEnrollment',
+          'TeacherEnrollment',
+          'DesignerEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'TaEnrollment',
+          'TeacherEnrollment',
+          'DesignerEnrollment',
           'AccountAdmin'
         ]
       }

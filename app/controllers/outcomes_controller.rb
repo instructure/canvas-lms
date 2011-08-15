@@ -22,8 +22,8 @@ class OutcomesController < ApplicationController
   before_filter { |c| c.active_tab = "outcomes" }
   
   def index
-    return unless tab_enabled?(@context.class::TAB_OUTCOMES)
     if authorized_action(@context, @current_user, :read)
+      return unless tab_enabled?(@context.class::TAB_OUTCOMES)
       @root_outcome_group = LearningOutcomeGroup.default_for(@context)
       @outcomes = @context.learning_outcomes
     end

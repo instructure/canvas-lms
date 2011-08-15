@@ -274,10 +274,10 @@ class CoursesController < ApplicationController
       end
     end
   end
-  
+
   def course_details
     get_context
-    if authorized_action(@context, @current_user, [:update, :add_students, :add_admin_users])
+    if authorized_action(@context, @current_user, :read_as_admin)
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
       render :action => :course_details
     end
@@ -573,6 +573,9 @@ class CoursesController < ApplicationController
     check_unknown_user
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
     @unauthorized_user = @finished_enrollment.user rescue nil
+    if !@context.grants_right?(@current_user, session, :read) && @context.grants_right?(@current_user, session, :read_as_admin)
+      return redirect_to course_details_path(@context.id)
+    end
     if authorized_action(@context, @current_user, :read)
       
       if @current_user && @context.grants_right?(@current_user, session, :manage_grades)

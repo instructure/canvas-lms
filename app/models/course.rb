@@ -748,10 +748,6 @@ class Course < ActiveRecord::Base
   end
   
   set_policy do
-    # There are two types of read permissions for a course.  If a course is public,
-    # then visitors can "read" content in the site, but shouldn't be able to see
-    # confidential information, and shouldn't be taken to things like the dashboard view.
-    # "read_full" implies access to the dashboard and course roster.
     given { |user| self.available? && self.is_public }
     can :read
     
@@ -770,10 +766,10 @@ class Course < ActiveRecord::Base
     can :read
     
     given { |user| self.available? && user &&  user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
-    can :read and can :participate_as_student and can :read_grades and can :read_groups
+    can :read and can :participate_as_student and can :read_grades
 
     given { |user| self.completed? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
-    can :read and can :read_groups
+    can :read
     
     given { |user| (self.available? || self.completed?) && user &&  user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? } }
     can :read
@@ -783,24 +779,40 @@ class Course < ActiveRecord::Base
      
     given { |user, session| self.available? && self.teacherless? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } && (!session || !session["role_course_#{self.id}"]) }
     can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
-    
+
+    # Active teachers
     given { |user, session| (self.available? || self.created? || self.claimed? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    can :read and can :manage and can :manage_content and can :update and can :read_groups and can :delete and can :read_reports
+    can :read_as_admin and can :read and can :manage and can :update and can :delete
 
     given { |user| !self.deleted? && self.prior_enrollments.map(&:user_id).include?(user && user.id) }
     can :read
-    
+
+    # Teacher of a concluded course
     given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.admin? }.map(&:user_id).include?(user && user.id) }
-    can :read_as_admin and can :read_user_notes and can :read_roster
-    
+    can :read_as_admin and can :read_user_notes and can :read_roster and can :view_all_grades and can :read_prior_users
+
+    # Student of a concluded course
     given { |user| !self.deleted? && self.prior_enrollments.select{|e| e.student? || e.assigned_observer? }.map(&:user_id).include?(user && user.id) }
     can :read and can :read_grades
-    
+
+    # Viewing as different role type
     given { |user, session| session && session["role_course_#{self.id}"] }
     can :read
 
-    given { |user, session| user && account.grants_right?(user, session, :manage) && (!session || !session["role_course_#{self.id}"]) rescue false }
-    can :read and can :manage and can :manage_content and can :update and can :read_groups and can :create
+    # Admin
+    given { |user, session| self.account_membership_allows(user, session) }
+    can :read_as_admin
+
+    given { |user, session| self.account_membership_allows(user, session, :manage_courses) }
+    can :read_as_admin and can :manage and can :update and can :delete
+
+    given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
+    can :read
+
+    # Admins with read_roster can see prior enrollments (can't just check read_roster directly,
+    # because students can't see prior enrollments)
+    given { |user, session| self.account_membership_allows(user, session, :read_roster) }
+    can :read_prior_roster
   end
   
   def enrollment_allows(user, session, permission)
@@ -899,12 +911,12 @@ class Course < ActiveRecord::Base
     @account_users[user]
   end
 
-  def account_membership_allows(user, session, permission)
-    return false unless user && permission
+  def account_membership_allows(user, session, permission = nil)
+    return false unless user
     return false if session && session["role_course_#{self.id}"]
 
     @membership_allows ||= {}
-    @membership_allows[[user.id, permission]] ||= self.account_users_for(user).any? { |au| au.has_permission_to?(permission) }
+    @membership_allows[[user.id, permission]] ||= self.account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(permission) }
   end
   
   def teacherless?
@@ -2004,7 +2016,7 @@ class Course < ActiveRecord::Base
     if section_visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
       scope
     elsif section_visibilities.empty?
-      if self.grants_right?(user, nil, :manage_grades)
+      if self.grants_rights?(user, nil, :manage_grades, :manage_students, :manage_admin_users, :read_roster)
         scope
       else
         scope.scoped({:conditions => ['enrollments.user_id = ? OR enrollments.associated_user_id = ?', user.id, user.id]})
@@ -2129,19 +2141,38 @@ class Course < ActiveRecord::Base
       tab[:hidden_unused] = true if tab[:id] == TAB_ANNOUNCEMENTS && !active_record_types[:announcements]
       tab[:hidden_unused] = true if tab[:id] == TAB_OUTCOMES && !active_record_types[:outcomes]
     end
+
+    # remove tabs that the user doesn't have access to
+    unless opts[:for_reordering]
+      unless self.grants_rights?(user, opts[:session], :read, :manage_content).values.any?
+        tabs.delete_if { |t| t[:id] == TAB_HOME }
+        tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
+        tabs.delete_if { |t| t[:id] == TAB_PAGES }
+        tabs.delete_if { |t| t[:id] == TAB_OUTCOMES }
+        tabs.delete_if { |t| t[:id] == TAB_CONFERENCES }
+        tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
+        tabs.delete_if { |t| t[:id] == TAB_MODULES }
+      end
+      unless self.grants_rights?(user, opts[:session], :read, :manage_content, :manage_assignments).values.any?
+        tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
+        tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
+        tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
+      end
+      tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read, :moderate_forum, :post_to_forum).values.any?
+      tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
+    end
+
     if !user || !self.grants_right?(user, nil, :manage_content)
-      tabs.delete_if{ |t| t[:id] == TAB_SETTINGS }
-      
       # remove some tabs for logged-out users or non-students
       if self.grants_right?(user, nil, :read_as_admin)
         tabs.delete_if {|t| [TAB_CHAT].include?(t[:id]) } 
       elsif !self.grants_right?(user, nil, :participate_as_student)
         tabs.delete_if {|t| [TAB_PEOPLE, TAB_CHAT].include?(t[:id]) } 
       end
-      if !self.grants_right?(user, nil, :read_grades) && !self.grants_right?(user, nil, :read_as_admin)
-        tabs.delete_if {|t| [TAB_GRADES].include?(t[:id]) } 
-      end
-      
+
       # remove hidden tabs from students
       tabs.delete_if {|t| t[:hidden] || (t[:hidden_unused] && !opts[:include_hidden_unused]) }
     end

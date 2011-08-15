@@ -22,6 +22,8 @@
   has_multiple_sections = @context.course_sections.active.count > 1
 
   publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true'
+
+  can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 %>
 <% content_for :right_side do %>
 
@@ -76,9 +78,13 @@
   <ul>
     <li><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
     <li><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
-    <li><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
-    <li><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
-    <li><a href="#tab-tools" id="tab-tols-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
+    <% if can_see_users %>
+      <li><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
+    <% end %>
+    <% if can_do @context, @current_user, :update %>
+      <li><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
+    <% end %>
+    <li><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
     <% if publishing_enabled %>
       <li><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
     <% end %>
@@ -387,9 +393,15 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
           <% if can_do(section, @current_user, :update) && !section.defined_by_sis? %>
             <a class="section_link edit_section_link no-hover" title="<%= t('links.title.edit_section', %{Edit Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><%= image_tag "edit.png", :alt => t('images.alt.edit', "edit") %></a>
           <% end %>
-          <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">
-            <%= section.display_name %>
-          </a>
+          <% if can_do section, @current_user, :read %>
+            <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">
+              <%= section.display_name %>
+            </a>
+          <% else %>
+            <span class="name">
+              <%= section.display_name %>
+            </span>
+          <% end %>
           <span class="users_count">
             (
               <%= t 'enrollment_count', 'User', :count => section.enrollments.count %><% if section && section.sis_source_id %>, 
@@ -421,6 +433,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       <%= f.text_field :name %>
     <% end %>
   </div>
+  <% if can_see_users %>
   <div id="tab-users">
     <h2 style="margin-top: 10px;"><%= t('headings.current_users', %{Current Users}) %></h2>
     <div style="margin-bottom: 10px; <%= hidden if (students + teachers + tas + observers).select{|e| e.invited? }.empty? %>">
@@ -562,6 +575,8 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     </div>
     <%= render :partial => 'link_enrollment' %>
   </div>
+  <% end %>
+  <% if can_do @context, @current_user, :update %>
   <div id="tab-navigation">
     <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
@@ -595,6 +610,7 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
       </p>
     <% end %>
   </div>
+  <% end %>
   <div id="tab-tools">
     <h2><%= t('headings.external_tools', %{External Tools}) %></h2>
     <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>

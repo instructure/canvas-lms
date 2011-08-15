@@ -464,12 +464,9 @@ class Enrollment < ActiveRecord::Base
     given {|user, session| self.course.grants_right?(user, session, :manage_students) && self.user.show_user_services }
     can :read and can :read_services
     
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :manage_grades) }
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
     can :read and can :read_grades
-    
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_right?(user, session, :read_as_admin) }
-    can :read and can :read_grades
-    
+
     given { |user| !!Enrollment.active.find_by_user_id_and_associated_user_id(user.id, self.user_id) }
     can :read and can :read_grades and can :read_services
   end

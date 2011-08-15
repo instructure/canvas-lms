@@ -109,7 +109,7 @@ class ApplicationController < ActionController::Base
   end
 
   def tab_enabled?(id)
-    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :include_hidden_unused => true).any?{|t| t[:id] == id }
+    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :session => session, :include_hidden_unused => true).any?{|t| t[:id] == id }
       if @context.is_a?(Account)
         flash[:notice] = t "#application.notices.page_disabled_for_account", "That page has been disabled for this account"
       elsif @context.is_a?(Course)
@@ -150,7 +150,7 @@ class ApplicationController < ActionController::Base
         @context_all_permissions ||= @context.grants_rights?(user, session, nil)
         can_do = actions.any?{|a| @context_all_permissions[a] }
       else
-        can_do = actions.any?{|a| object.grants_right?(user, action_session, a) }
+        can_do = object.grants_rights?(user, action_session, *actions).values.any?
       end
     rescue => e
       logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}"

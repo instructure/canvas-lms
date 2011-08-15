@@ -138,7 +138,7 @@ class Submission < ActiveRecord::Base
     given {|user, session| self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
     
-    given {|user, session| self.assignment.cached_context_grants_right?(user, session, :read_as_admin) }
+    given {|user, session| self.assignment.cached_context_grants_right?(user, session, :view_all_grades) }
     can :read and can :read_grade
     
     given {|user| user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
