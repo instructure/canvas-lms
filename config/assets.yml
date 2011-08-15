@@ -312,6 +312,7 @@ stylesheets:
     - public/stylesheets/compiled/jquery-ui-menu.css
     - public/stylesheets/static/jquery.autocomplete.css
     - public/stylesheets/compiled/g_instructure.css
+    - public/stylesheets/compiled/ellipsis.css
     - public/stylesheets/compiled/g_util_misc.css
     - public/stylesheets/compiled/g_util_fancy_links.css
     - public/stylesheets/compiled/g_util_buttons.css

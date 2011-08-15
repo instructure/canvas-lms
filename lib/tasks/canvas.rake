@@ -112,8 +112,8 @@ namespace :canvas do
   
   desc "Compile javascript and css assets."
   task :compile_assets do
-    puts "--> Compiling static assets [compass -s compressed --force]"
-    output = `bundle exec compass -s compressed --force 2>&1`
+    puts "--> Compiling static assets [compass compile -e production --force]"
+    output = `bundle exec compass compile -e production --force 2>&1`
     raise "Error running compass: \n#{output}\nABORTING" if $?.exitstatus != 0
     
     puts "--> Generating js localization bundles"
