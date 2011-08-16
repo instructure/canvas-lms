@@ -799,7 +799,7 @@ class CoursesController < ApplicationController
       account = @context.account
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])
-        account = nil unless account.grants_right?(@current_user, session, [:create_courses, :manage_courses])
+        account = nil unless account.grants_right?(@current_user, session, :create_courses, :manage_courses)
       end
       account ||= @domain_root_account.manually_created_courses_account
       return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
