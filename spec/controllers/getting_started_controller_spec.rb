@@ -50,6 +50,13 @@ describe GettingStartedController do
       response.status.should == '401 Unauthorized'
     end
 
+    it "should allow teachers to create courses" do
+      Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
+      course_with_teacher_logged_in
+      get 'name'
+      response.should be_success
+    end
+
     it "should have a route for name" do
       params_from(:get, "/getting_started/name").should == {:controller => "getting_started", :action => "name"}
     end
