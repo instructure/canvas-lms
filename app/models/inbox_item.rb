@@ -32,6 +32,8 @@ class InboxItem < ActiveRecord::Base
     state :unread
     state :read
     state :deleted
+    state :retired
+    state :retired_unread
   end
   
   def infer_context_code
@@ -79,9 +81,7 @@ class InboxItem < ActiveRecord::Base
     "#{self.asset_type.underscore}_#{self.asset_id}"
   end
   
-  named_scope :active, lambda {
-    {:conditions => ['workflow_state != ?', 'deleted']}
-  }
+  named_scope :active, :conditions => "workflow_state NOT IN ('deleted', 'retired', 'retired_unread')"
   named_scope :unread, lambda {
     {:conditions => ['workflow_state = ?', 'unread']}
   }
