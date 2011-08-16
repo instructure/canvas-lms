@@ -23,7 +23,7 @@ require 'set'
 # API for accessing course information.
 class CoursesController < ApplicationController
   before_filter :require_user, :only => [:index]
-  before_filter :require_user_for_context, :only => [:roster, :roster_user, :locks, :switch_role, :publish_to_sis]
+  before_filter :require_user_for_context, :only => [:roster, :locks, :switch_role]
 
   include Api::V1::Course
 
@@ -791,13 +791,15 @@ class CoursesController < ApplicationController
   
   def copy
     get_context
-    authorized_action(@context, @current_user, :update) &&
-        authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
+    authorized_action(@context, @current_user, :read) &&
+      authorized_action(@context, @current_user, :read_as_admin) &&
+      authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
   end
   
   def copy_course
     get_context
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :read) &&
+      authorized_action(@context, @current_user, :read_as_admin)
       args = params[:course].slice(:name, :start_at, :conclude_at)
       account = @context.account
       if params[:course][:account_id]
@@ -912,12 +914,15 @@ class CoursesController < ApplicationController
   end
 
   def publish_to_sis
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_grades)
     @context.publish_final_grades(@current_user)
     render :json => {:sis_publish_status => @context.grade_publishing_status}.to_json
   end
 
   def sis_publish_status
     get_context
+    return unless authorized_action(@context, @current_user, :manage_grades)
     render :json => {:sis_publish_status => @context.grade_publishing_status}
   end
 end

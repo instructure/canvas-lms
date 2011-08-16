@@ -8,22 +8,29 @@
   over here.  This wizard should make that process pretty easy." %>
   </p>
   <ul class="content-imports-instructions">
-    <li><a href="<%= context_url(@context, :context_import_files_url) %>"><%= t 'links.import_files', "Import Files" %></a> <%= t :if_any, "(if any)" %></li>
-    <% if qti_enabled? %>
+    <% steps = 0 %>
+    <% if can_do(@context, @current_user, :manage_content, :manage_files) %>
+      <% steps = steps +1 %>
+      <li><a href="<%= context_url(@context, :context_import_files_url) %>"><%= t 'links.import_files', "Import Files" %></a> <%= t :if_any, "(if any)" %></li>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_content, :manage_quizzes) && qti_enabled? %>
+        <% steps = steps +1 %>
         <li><a href="<%= context_url(@context, :context_import_quizzes_url) %>"><%= t 'links.import_quizzes', "Import Quizzes" %></a> <%= t :if_any, "(if any)" %></li>
     <% end %>
   </ul>
-  <% if qti_enabled? %>
+  <% if steps > 1 %>
     <p><%= t :skip_steps, "You may skip any steps that don't apply." %></p>
   <% end %>
   <p>
-    <h4><%= t 'titles.you_can_also', "You can also:" %></h4>
-    <div>
-      <p><a class="button" href="<%= context_url(@context, :context_import_copy_url) %>"> <%= mt 'links.copy_course', "Copy content from **another Canvas course**" %></a></p>
-        
-      <% if exports_enabled? %>
-        <p><a class="button" href="<%= context_url(@context, :context_import_migrate_url) %>"> <%= mt 'links.import_package', "Import content from a **content package** or from **another system**" %></a></p>
-      <% end %>
-    </div>
+    <% if can_do(@context, @current_user, @manage_content) %>
+      <h4><%= t 'titles.you_can_also', "You can also:" %></h4>
+      <div>
+        <p><a class="button" href="<%= context_url(@context, :context_import_copy_url) %>"> <%= mt 'links.copy_course', "Copy content from **another Canvas course**" %></a></p>
+
+        <% if exports_enabled? %>
+          <p><a class="button" href="<%= context_url(@context, :context_import_migrate_url) %>"> <%= mt 'links.import_package', "Import content from a **content package** or from **another system**" %></a></p>
+        <% end %>
+      </div>
+    <% end %>
   </p>
 </div>

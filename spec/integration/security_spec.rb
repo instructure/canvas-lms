@@ -448,6 +448,7 @@ describe "security" do
     describe 'course' do
       before (:each) do
         course(:active_all => 1)
+        Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
       end
 
       it 'read_as_admin' do
@@ -596,6 +597,12 @@ describe "security" do
         get "/courses/#{@course.id}/files"
         response.status.should == '401 Unauthorized'
 
+        get "/courses/#{@course.id}/copy"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/content_exports"
+        response.status.should == '401 Unauthorized'
+
         get "/courses/#{@course.id}/details"
         response.should be_success
         html = Nokogiri::HTML(response.body)
@@ -605,6 +612,9 @@ describe "security" do
         html.css('.section .quizzes').should be_empty
         html.css('.section .discussions').should be_empty
         html.css('.section .files').should be_empty
+        response.body.should_not match /Copy this Course/
+        response.body.should_not match /Import Content into this Course/
+        response.body.should_not match /Export this Course/
 
         add_permission :read_course_content
 
@@ -632,6 +642,12 @@ describe "security" do
         get "/courses/#{@course.id}/files"
         response.should be_success
 
+        get "/courses/#{@course.id}/copy"
+        response.status.should == '401 Unauthorized'
+
+        get "/courses/#{@course.id}/content_exports"
+        response.should be_success
+
         get "/courses/#{@course.id}/details"
         response.should be_success
         html = Nokogiri::HTML(response.body)
@@ -641,6 +657,38 @@ describe "security" do
         html.css('.section .quizzes').should_not be_empty
         html.css('.section .discussions').should_not be_empty
         html.css('.section .files').should_not be_empty
+        response.body.should_not match /Copy this Course/
+        response.body.should_not match /Import Content into this Course/
+        response.body.should match /Export this Course/
+
+        add_permission :manage_courses
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should match /Copy this Course/
+        response.body.should_not match /Import Content into this Course/
+        response.body.should match /Export this Course/
+
+        get "/courses/#{@course.id}/copy"
+        response.should be_success
+      end
+
+      it 'manage_content' do
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should_not match /Import Content into this Course/
+
+        get "/courses/#{@course.id}/imports"
+        response.status.should == '401 Unauthorized'
+
+        add_permission :manage_content
+
+        get "/courses/#{@course.id}/details"
+        response.should be_success
+        response.body.should match /Import Content into this Course/
+
+        get "/courses/#{@course.id}/imports"
+        response.should be_success
       end
     end
   end

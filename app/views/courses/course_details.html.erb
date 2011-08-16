@@ -21,18 +21,20 @@
   observers = enrollment_hashes['ObserverEnrollment'].map{|k, v| v[0]}
   has_multiple_sections = @context.course_sections.active.count > 1
 
-  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true'
+  publishing_enabled = PluginSetting.settings_for_plugin('grade_export')[:enabled] == 'true' && can_do(@context, @current_user, :manage_grades)
 
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 %>
 <% content_for :right_side do %>
 
   <div class="rs-margin-lr rs-margin-top">
-    <% if can_do(@context, @current_user, :manage) %>
+    <% if can_do(@context, @current_user, :read_reports) %>
       <a href="<%= context_url(@context, :context_statistics_url) %>" class="button button-sidebar-wide"><%= image_tag "graph.png" %> <%= t('links.stats', %{Course Statistics}) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :read) %>
       <a href="<%= calendar_url_for(@context) %>" class="button button-sidebar-wide"><%= image_tag "calendar_icon.png" %> <%= t('links.calendar', %{Course Calendar}) %></a>
     <% end %>
-    
+
     <% if can_do(@context, @current_user, :update) %>
       <% if @context.completed? %>
         <% form_tag context_url(@context, :context_unconclude_url) do %>
@@ -42,11 +44,15 @@
       <% else %>
         <a href="<%= context_url(@context, :context_confirm_action_url, :event => 'conclude') %>" class="delete_course_link button button-sidebar-wide"><%= image_tag "delete.png" %><%= t('links.conclude', %{End this Course}) %></a>
       <% end %>
-      <% if show_user_create_course_button(@current_user) %>
-        <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.copy', %{Copy this Course}) %></a>
-      <% end %>
-        <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
-        <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export', %{Export this Course}) %></a>
+    <% end %>
+    <% if show_user_create_course_button(@current_user) && can_do(@context, @current_user, :read) %>
+      <a href="<%= context_url(@context, :context_start_copy_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.copy', %{Copy this Course}) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_content, :manage_files, :manage_quizzes) %>
+      <a href="<%= context_url(@context, :context_imports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.import', %{Import Content into this Course}) %></a>
+    <% end %>
+    <% if can_do(@context, @current_user, :read) %>
+      <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export', %{Export this Course}) %></a>
     <% end %>
     <table class="summary" style="margin-top: 20px;">
       <thead>
@@ -84,7 +90,9 @@
     <% if can_do @context, @current_user, :update %>
       <li><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
     <% end %>
-    <li><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
+    <% if can_do @context, @current_user, :update %>
+      <li><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{External Tools}) %></a></li>
+    <% end %>
     <% if publishing_enabled %>
       <li><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
     <% end %>
@@ -611,10 +619,12 @@ Hashtags should consist of letters, numbers, dashes and underscores (no spaces).
     <% end %>
   </div>
   <% end %>
-  <div id="tab-tools">
-    <h2><%= t('headings.external_tools', %{External Tools}) %></h2>
-    <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
-  </div>
+  <% if can_do @context, @current_user, @update %>
+    <div id="tab-tools">
+      <h2><%= t('headings.external_tools', %{External Tools}) %></h2>
+      <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
+    </div>
+  <% end %>
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
