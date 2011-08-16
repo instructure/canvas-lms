@@ -54,7 +54,7 @@ I18n.scoped('quizzes', function(I18n) {
       $answer.find('.select_answer input').showIf(!answer.answer_html);
       $answer.find('.matching_answer .answer_match_left').showIf(!answer.answer_match_left_html);
       $answer.find('.matching_answer .answer_match_left_html').showIf(answer.answer_match_left_html);
-      if(answer.answer_comment) {
+      if(answer.answer_comment || answer.answer_comment_html) {
         $answer.find(".answer_comments").removeClass('empty')
       }
       answer.answer_selection_type = answer.answer_selection_type || quiz.answerSelectionType(answer.question_type);
@@ -108,6 +108,7 @@ I18n.scoped('quizzes', function(I18n) {
         $answer.addClass('answer_idx_' + answer.blank_index);
       }
       $answer.fillTemplateData({data: templateData, htmlValues: ['answer_html', 'answer_match_left_html'] });
+      addHTMLFeedback($answer, answer, 'answer_comment');
       if(answer.answer_weight > 0) {
         $answer.addClass('correct_answer');
         if(answer.answer_selection_type == "multiple_answer") {
@@ -237,9 +238,9 @@ I18n.scoped('quizzes', function(I18n) {
       }
       $question.fillTemplateData(fillArgs);
       $question.find(".original_question_text").fillFormData(question);
-      $question.find(".question_correct_comment").toggleClass('empty', !question.correct_comments);
-      $question.find(".question_incorrect_comment").toggleClass('empty', !question.incorrect_comments);
-      $question.find(".question_neutral_comment").toggleClass('empty', !question.neutral_comments);
+      $question.find(".question_correct_comment").toggleClass('empty', !question.correct_comments && !question.correct_comments_html);
+      $question.find(".question_incorrect_comment").toggleClass('empty', !question.incorrect_comments && !question.incorrect_comments_html);
+      $question.find(".question_neutral_comment").toggleClass('empty', !question.neutral_comments && !question.neutral_comments_html);
       $question.find(".answers").empty();
       $question.find(".equation_combinations").empty();
       $question.find(".equation_combinations_holder_holder").css('display', 'none');
@@ -423,7 +424,7 @@ I18n.scoped('quizzes', function(I18n) {
       result.answer_type = "select_answer";
       result.answer_selection_type = quiz.answerSelectionType(question_type);
       result.textValues = ['answer_weight', 'answer_text', 'answer_comment', 'blank_id', 'id', 'match_id'];
-      result.htmlValues = ['answer_html', 'answer_match_left_html'];
+      result.htmlValues = ['answer_html', 'answer_match_left_html', 'answer_comment_html'];
       result.question_type = question_type;
       $formQuestion.find(".explanation").hide().filter("." + question_type + "_explanation").show();
       $formQuestion.attr('class', 'question').addClass('selectable');
@@ -555,11 +556,11 @@ I18n.scoped('quizzes', function(I18n) {
     },
     updateDisplayComments: function() {
       $(".question_holder > .question > .question_comment").each(function() {
-        var val = $.trim($(this).find(".question_comment_text").text());
+        var val = $.trim($(this).find(".question_comment_text").html());
         $(this).css('display', '').toggleClass('empty', !val);
       });
       $(".question_holder .answer_comment_holder").each(function() {
-        var val = $.trim($(this).find(".answer_comment").text());
+        var val = $.trim($(this).find(".answer_comment").html());
         $(this).css('display', '').toggleClass('empty', !val);
       });
       var tally = 0;
@@ -656,6 +657,7 @@ I18n.scoped('quizzes', function(I18n) {
     data.answer_comment = data.comments || data.answer_comment;
     data.answer_text = data.text || data.answer_text;
     data.answer_html = data.html || data.answer_html;
+    data.answer_comment_html = data.comments_html || data.answer_comment_html;
     data.answer_match_left = data.left || data.answer_match_left;
     data.answer_match_left_html = data.left_html || data.answer_match_left_html;
     data.answer_match_right = data.right || data.answer_match_right;
@@ -679,7 +681,7 @@ I18n.scoped('quizzes', function(I18n) {
     answer.answer_weight = parseFloat(answer.answer_weight);
     if(isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
     $answer.fillFormData({answer_text: answer.answer_text});
-    $answer.fillTemplateData({data: answer, htmlValues: ['answer_html', 'answer_match_left_html']});
+    $answer.fillTemplateData({data: answer, htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']});
     if(!answer.answer_comment || answer.answer_comment == "" || answer.answer_comment == I18n.t('answer_comments', "Answer comments")) {
       $answer.find(".answer_comment_holder").hide();
     }
@@ -715,7 +717,7 @@ I18n.scoped('quizzes', function(I18n) {
       var $question = $(this);
       var questionData = $question.getTemplateData({
         textValues: ['question_name', 'question_points', 'question_type', 'answer_selection_type', 'assessment_question_id', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'matching_answer_incorrect_matches', 'equation_combinations', 'equation_formulas'],
-        htmlValues: ['question_text', 'text_before_answers', 'text_after_answers']
+        htmlValues: ['question_text', 'text_before_answers', 'text_after_answers', 'correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
       questionData = $.extend(questionData, $question.find(".original_question_text").getFormData());
       questionData.assessment_question_bank_id = $(".question_bank_id").text() || "";
@@ -742,7 +744,7 @@ I18n.scoped('quizzes', function(I18n) {
           var $answer = $(this);
           var answerData = $answer.getTemplateData({
             textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment'],
-            htmlValues: ['answer_html', 'answer_match_left_html']
+            htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']
           });
           var answer = $.extend({}, quiz.defaultAnswerData, answerData);
           if(only_add_for_blank_ids && answer.blank_id && !blank_ids_hash[answer.blank_id]) {
@@ -836,6 +838,7 @@ I18n.scoped('quizzes', function(I18n) {
           data[jd + '[answer_text]'] = answer.answer_text;
           data[jd + '[answer_html]'] = answer.answer_html;
           data[jd + '[answer_comments]'] = answer.answer_comment;
+          data[jd + '[answer_comments_html]'] = answer.answer_comment_html;
           data[jd + '[answer_weight]'] = answer.answer_weight;
           data[jd + '[answer_match_left]'] = answer.answer_match_left;
           data[jd + '[answer_match_left_html]'] = answer.answer_match_left_html;
@@ -856,6 +859,15 @@ I18n.scoped('quizzes', function(I18n) {
       }
     }
     return data;
+  }
+  function addHTMLFeedback($container, question_data, name) {
+    html = question_data[name+'_html'];
+    if (html && html.length > 0) {
+      $container.find('.'+name+'_html').html(html).css('display', 'inline-block');
+      $container.find('textarea').val(html);
+      $container.find('a,textarea').hide();
+      $container.removeClass('empty');
+    }
   }
   $(document).ready(function() {
     quiz.updateDisplayComments();
@@ -1138,7 +1150,7 @@ I18n.scoped('quizzes', function(I18n) {
       var $question = $(this).parents(".question");
       var question = $question.getTemplateData({
         textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id'],
-        htmlValues: ['question_text']
+        htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'netural_comments_html']
       });
       question.question_text = $question.find("textarea[name='question_text']").val();
       var matches = [];
@@ -1151,7 +1163,10 @@ I18n.scoped('quizzes', function(I18n) {
       var $form = $("#question_form_template").clone(true).attr('id', '');
       var $formQuestion = $form.find(".question");
       $form.fillFormData(question);
-      
+      addHTMLFeedback($form.find(".question_correct_comment"), question, 'correct_comments');
+      addHTMLFeedback($form.find(".question_incorrect_comment"), question, 'incorrect_comments');
+      addHTMLFeedback($form.find(".question_neutral_comment"), question, 'neutral_comments');
+
       $formQuestion.addClass('selectable');
       $form.find(".answer_selection_type").change().show();
       if(question.question_type != 'missing_word_question') { $form.find("option.missing_word").remove(); }

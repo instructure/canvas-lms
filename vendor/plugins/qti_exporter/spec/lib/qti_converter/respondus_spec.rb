@@ -222,6 +222,8 @@ module RespondusExpected
                   :points_possible=>1,
                   :neutral_comments=>
                           "Well, the correct answer should have been \"C\". If you didn't put that, you're wrong.",
+                  :neutral_comments_html =>
+                          "Well, the correct answer should have been \"C\".  If you didn't put that, you're <b>wrong</b>.",
                   :question_type=>"multiple_choice_question",
                   :question_text=>"Please select the answer \"C\""}
 

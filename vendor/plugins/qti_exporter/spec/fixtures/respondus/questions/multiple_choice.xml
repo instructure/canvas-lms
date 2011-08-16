@@ -64,5 +64,5 @@ Warning: replacing <other/> with the base value true - what did you want me to d
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1013_IC">
 <p>No, that's not &quot;C&quot;, that's &quot;D&quot;</p></modalFeedback>
 <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="QUE_1003_ALL">
-<p>Well, the correct answer should have been &quot;C&quot;.  If you didn't put that, you're wrong.</p></modalFeedback>
+<p>Well, the correct answer should have been &quot;C&quot;.  If you didn't put that, you're <b>wrong</b>.</p></modalFeedback>
 </assessmentItem>
