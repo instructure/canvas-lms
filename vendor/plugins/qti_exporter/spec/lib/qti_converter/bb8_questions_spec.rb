@@ -217,10 +217,10 @@ module BB8Expected
 
   # removed ids on the answers
   MATCHING = {:answers=>
-          [{:right=>"right 1", :text=>"left 1", :comments=>"", :html=>"left 1&lt;br /&gt;"},
-           {:right=>"right 2", :text=>"left 2", :comments=>"", :html=>"left 2&lt;br /&gt;"},
-           {:right=>"right 3", :text=>"left 3", :comments=>"", :html=>"left 3&lt;br /&gt;"},
-           {:right=>"right 4", :text=>"left 4", :comments=>"", :html=>"left 4&lt;br /&gt;"}],
+          [{:right=>"right 1", :text=>"left 1", :comments=>""},
+           {:right=>"right 2", :text=>"left 2", :comments=>""},
+           {:right=>"right 3", :text=>"left 3", :comments=>""},
+           {:right=>"right 4", :text=>"left 4", :comments=>""}],
               :correct_comments=>"right",
               :incorrect_comments=>"wrong",
               :points_possible=>10.0,
@@ -259,7 +259,7 @@ module BB8Expected
             :question_name=>"",
             :migration_id=>"_154768_1",
             :question_text=>"You love Blackboard<br>",
-            :correct_comments=>"right? "}
+            :correct_comments=>"right?"}
 
   FILL_IN_THE_BLANK = {:question_text=>"The answer is 'purple'.<br>",
                        :answers=>

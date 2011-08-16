@@ -107,7 +107,8 @@ module D2LExpected
                     {:text=>"False",
                      :weight=>0,
                      :migration_id=>"QUES_968903_1181388_A4710346",
-                     :comments=>"False is not correct"}],
+                     :comments=>"False is not correct",
+                     :comments_html=>"False is <strong>not</strong> correct"}],
            :question_text=>
                    "<p>Is this <strong>true</strong> or false?</p><img src=\"quizzing/bunny_consumer.png\" alt=\"\">",
            :question_name=>"true false questions",

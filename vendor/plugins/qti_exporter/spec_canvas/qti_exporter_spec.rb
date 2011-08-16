@@ -82,6 +82,23 @@ describe 'QtiExporter' do
     quiz.assignment.should be_published
   end
 
+  it "should publish spec-canvas-1 correctly" do
+    setup_migration
+    do_migration
+
+    quiz = @course.quizzes.last
+    quiz.should be_present
+    quiz.quiz_questions.size.should == 2
+    # various checks on the data
+    qq = quiz.quiz_questions.first
+    d = qq.question_data
+    d['correct_comments'].should == "I can't believe you got that right. Awesome!"
+    d['correct_comments_html'].should == "I can't <i>believe </i>you got that right. <b>Awesome!</b>"
+    d['points_possible'].should == 3
+    d['question_name'].should == 'q1'
+    d['answers'].map { |a| a['weight'] }.should == [0,100,0]
+  end
+
   def fname
     File.expand_path("../fixtures/spec-canvas-1.zip", __FILE__)
   end
