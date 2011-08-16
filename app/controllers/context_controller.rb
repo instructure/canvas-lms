@@ -230,7 +230,7 @@ class ContextController < ApplicationController
         }
         if @asset.is_a?(ContextMessage) && @asset.protect_recipients && !@asset.cached_context_grants_right?(@current_user, session, :manage_students)
           json_params[:include] = [:attachments]
-          json_params[:exclude] = [:recipients]
+          json_params[:except] = [:recipients, :viewed_user_ids]
         end
         if @asset.is_a?(ContextMessage)
           @asset.root_context_message_id ||= @asset.id

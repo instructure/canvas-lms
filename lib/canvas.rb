@@ -36,6 +36,10 @@ module Canvas
     if redis_settings.is_a?(Array)
       redis_settings = { :servers => redis_settings }
     end
+    # convert string addresses to options hash, and disable redis-cache's built-in marshalling code
+    redis_settings[:servers].map! { |s|
+      ::Redis::Factory.convert_to_redis_client_options(s).merge(:marshalling => false)
+    }
     @redis = ::Redis::Factory.create(redis_settings[:servers])
     if redis_settings[:database].present?
       @redis.select(redis_settings[:database])

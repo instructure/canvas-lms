@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
+if Canvas.redis_enabled? # eventually we're going to have to just require redis to run the specs
+
 describe "OAuth2", :type => :integration do
 
   before do
@@ -94,64 +96,60 @@ describe "OAuth2", :type => :integration do
   describe "oauth2 native app flow" do
     def flow(opts = {})
       enable_forgery_protection do
-        # need a real cache here, NilStore won't cut it because the temporary
-        # code is stored in cache
-        enable_cache do
-          user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
-          course_with_teacher(:user => @user)
+        user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+        course_with_teacher(:user => @user)
 
-          # step 1
-          get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
-          response.should redirect_to(login_url(:re_login => true))
+        # step 1
+        get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+        response.should redirect_to(login_url(:re_login => true))
 
-          yield
+        yield
 
-          # step 2
-          response.should be_redirect
-          response['Location'].should match(%r{/login/oauth2/auth?})
-          code = response['Location'].match(/code=([^\?&]+)/)[1]
-          code.should be_present
+        # step 2
+        response.should be_redirect
+        response['Location'].should match(%r{/login/oauth2/auth?})
+        code = response['Location'].match(/code=([^\?&]+)/)[1]
+        code.should be_present
 
-          get response['Location']
-          response.should be_success
+        get response['Location']
+        response.should be_success
 
-          # make sure the user is now logged out, or the app also has full access to their session
-          get '/'
-          response.should be_redirect
-          response['Location'].should == 'http://www.example.com/login'
+        # make sure the user is now logged out, or the app also has full access to their session
+        get '/'
+        response.should be_redirect
+        response['Location'].should == 'http://www.example.com/login'
 
-          # we have the code, we can close the browser session
-          if opts[:basic_auth]
-            post "/login/oauth2/token", { :code => code }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
-          else
-            post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
-          end
-          response.should be_success
-          response.header['content-type'].should == 'application/json; charset=utf-8'
-          json = JSON.parse(response.body)
-          token = json['access_token']
-          reset!
-
-          # try an api call
-          get "/api/v1/courses.json?access_token=1234"
-          response.should be_client_error
-
-          get "/api/v1/courses.json?access_token=#{token}"
-          response.should be_success
-          json = JSON.parse(response.body)
-          json.size.should == 1
-          json.first['enrollments'].should == [{'type' => 'teacher'}]
-          AccessToken.last.token.should == token
-
-          # post requests should work with nothing but an access token
-          post "/api/v1/courses/#{@course.id}/assignments.json?access_token=1234", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
-          response.should be_client_error
-          post "/api/v1/courses/#{@course.id}/assignments.json?access_token=#{token}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
-          response.should be_success
-          @course.assignments.count.should == 1
-          @course.assignments.first.title.should == 'test assignment'
-          @course.assignments.first.points_possible.should == 5.3
+        # we have the code, we can close the browser session
+        if opts[:basic_auth]
+          post "/login/oauth2/token", { :code => code }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+        else
+          post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
         end
+        response.should be_success
+        response.header['content-type'].should == 'application/json; charset=utf-8'
+        json = JSON.parse(response.body)
+        token = json['access_token']
+        reset!
+
+        # try an api call
+        get "/api/v1/courses.json?access_token=1234"
+        response.should be_client_error
+
+        get "/api/v1/courses.json?access_token=#{token}"
+        response.should be_success
+        json = JSON.parse(response.body)
+        json.size.should == 1
+        json.first['enrollments'].should == [{'type' => 'teacher'}]
+        AccessToken.last.token.should == token
+
+        # post requests should work with nothing but an access token
+        post "/api/v1/courses/#{@course.id}/assignments.json?access_token=1234", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
+        response.should be_client_error
+        post "/api/v1/courses/#{@course.id}/assignments.json?access_token=#{token}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
+        response.should be_success
+        @course.assignments.count.should == 1
+        @course.assignments.first.title.should == 'test assignment'
+        @course.assignments.first.points_possible.should == 5.3
       end
     end
 
@@ -205,28 +203,28 @@ describe "OAuth2", :type => :integration do
     end
 
     it "should require the correct client secret" do
-      enable_cache do
-        # step 1
-        get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
-        response.should redirect_to(login_url(:re_login => true))
+      # step 1
+      get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+      response.should redirect_to(login_url(:re_login => true))
 
-        get response['Location']
-        response.should be_success
+      get response['Location']
+      response.should be_success
 
-        user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
-        course_with_teacher(:user => @user)
-        post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
+      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+      course_with_teacher(:user => @user)
+      post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
 
-        # step 2
-        response.should be_redirect
-        response['Location'].should match(%r{/login/oauth2/auth?})
-        code = response['Location'].match(/code=([^\?&]+)/)[1]
-        code.should be_present
+      # step 2
+      response.should be_redirect
+      response['Location'].should match(%r{/login/oauth2/auth?})
+      code = response['Location'].match(/code=([^\?&]+)/)[1]
+      code.should be_present
 
-        # we have the code, we can close the browser session
-        post "/login/oauth2/token", :client_id => @client_id, :client_secret => 'nuh-uh', :code => code
-        response.should be_client_error
-      end
+      # we have the code, we can close the browser session
+      post "/login/oauth2/token", :client_id => @client_id, :client_secret => 'nuh-uh', :code => code
+      response.should be_client_error
     end
   end
+end
+
 end
