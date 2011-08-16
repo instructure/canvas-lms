@@ -1867,7 +1867,7 @@ class Course < ActiveRecord::Base
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_all_discussion_entries, :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
-      :turnitin_comments, :self_enrollment, :license, :indexed ]
+      :turnitin_comments, :self_enrollment, :license, :indexed, :settings ]
   end
 
   def clone_for(account, opts={})
