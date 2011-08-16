@@ -88,7 +88,8 @@ class ConversationParticipant < ActiveRecord::Base
 
   def participants(include_context_info = true, include_forwarded_participants = false)
     context_info = {}
-    participants = conversation.participants - [self.user]
+    self_conversation = conversation.participants == [self.user]
+    participants = self_conversation ? conversation.participants : conversation.participants - [self.user]
     if include_forwarded_participants
       user_ids = messages.select{ |m|
         m.forwarded_messages

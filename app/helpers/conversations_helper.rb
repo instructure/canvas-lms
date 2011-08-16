@@ -15,7 +15,11 @@ module ConversationsHelper
 
   def formatted_audience(conversation, cutoff=2)
     audience = conversation.participants
-    return "<span class='participant' data-id='#{audience.first.id}'>#{ERB::Util.h(audience.first.short_name)}</span> ".html_safe + formatted_contexts(audience.first) if audience.size == 1
+    self_info = "<span class='participant' data-id='#{@current_user.id}' style='display:none'>".html_safe
+    if audience.size == 1
+      return "<span class='participant' data-id='#{@current_user.id}'>#{ERB::Util.h(I18n.t('conversations.notes_to_self', 'Monologue'))}</span> ".html_safe if audience.first.id == @current_user.id
+      return "<span class='participant' data-id='#{audience.first.id}'>#{ERB::Util.h(audience.first.short_name)}</span> ".html_safe + formatted_contexts(audience.first) + self_info
+    end
 
     # get up to two contexts that are shared by >= 50% of the audience
     contexts = audience.inject({}) { |hash, user|
@@ -45,7 +49,7 @@ module ConversationsHelper
           "</span>"
         ).html_safe
       end
-    }.to_sentence.html_safe + " " + formatted_contexts(contexts)
+    }.to_sentence.html_safe + " " + formatted_contexts(contexts) + self_info
   end
 
   def avatar_url_for(conversation)

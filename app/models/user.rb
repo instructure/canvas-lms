@@ -1517,8 +1517,9 @@ class User < ActiveRecord::Base
   end
 
   def initiate_conversation(user_ids, private = nil)
+    user_ids = ([self.id] + user_ids).uniq
     private = user_ids.size == 1 if private.nil?
-    Conversation.initiate([self.id] + user_ids, private).conversation_participants.find_by_user_id(self.id)
+    Conversation.initiate(user_ids, private).conversation_participants.find_by_user_id(self.id)
   end
 
   
@@ -1552,7 +1553,7 @@ class User < ActiveRecord::Base
     # bother doing a query that's guaranteed to return no results.
     return [] if options[:ids] && options[:ids].empty?
 
-    user_condition_sql = "users.id <> #{self.id}"
+    user_condition_sql = "TRUE"
     user_condition_sql << " AND users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
     user_condition_sql << " AND users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
     if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
