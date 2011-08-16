@@ -253,6 +253,22 @@ describe FilesController do
       @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
     end
 
+    it "should redirect to an existing attachment with the same path as a deleted attachment" do
+      course_with_student_logged_in(:active_all => true)
+      old_file = course_file
+      old_file.display_name = 'holla'
+      old_file.save
+      old_file.destroy
+      
+      new_file = course_file
+      new_file.display_name = 'holla'
+      new_file.save
+      
+      get 'show', :course_id => @course.id, :id => old_file.id
+      response.should be_redirect
+      response.redirected_to['id'].should == new_file.id
+    end
+
   end
 
   describe "GET 'show_relative'" do
