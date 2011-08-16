@@ -76,5 +76,53 @@ describe "Accounts API", :type => :integration do
         'sis_account_id' => 'sis1',
       }
   end
+
+  it "should return courses for an account" do
+    @me = @user
+    @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
+    @c1.enrollments.delete_all
+    @c2 = course_model(:name => 'c2', :account => @a2, :root_account => @a1, :sis_source_id => 'sis2')
+    @user = @me
+    json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                    { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' })
+    json.should == [
+      {
+        'id' => @c1.id,
+        'name' => 'c1',
+        'course_code' => 'c1',
+        'sis_course_id' => nil,
+      },
+      {
+        'id' => @c2.id,
+        'name' => 'c2',
+        'course_code' => 'c2',
+        'sis_course_id' => 'sis2',
+      },
+    ]
+
+    json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                    { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' },
+                      { :hide_enrollmentless_courses => '1' })
+    json.should == [
+      {
+        'id' => @c2.id,
+        'name' => 'c2',
+        'course_code' => 'c2',
+        'sis_course_id' => 'sis2',
+      },
+    ]
+
+    json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                    { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' },
+                      { :per_page => 1, :page => 2 })
+    json.should == [
+      {
+        'id' => @c2.id,
+        'name' => 'c2',
+        'course_code' => 'c2',
+        'sis_course_id' => 'sis2',
+      },
+    ]
+  end
 end
 

@@ -24,7 +24,6 @@ class AccountsController < ApplicationController
   include Api::V1::Account
 
   # @API
-  #
   # List accounts that the current user can view or manage.  Typically,
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
@@ -44,7 +43,6 @@ class AccountsController < ApplicationController
   end
 
   # @API
-  #
   # Retrieve information on an individual account, given by id or sis
   # sis_account_id.
   def show
@@ -58,6 +56,26 @@ class AccountsController < ApplicationController
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
         build_course_stats
       end
+    end
+  end
+
+  include Api::V1::Course
+
+  # @API
+  # Retrieve the list of active (non-deleted) courses in this account.
+  #
+  # @argument hide_enrollmentless_courses [optional] If set, only return courses that have at least one enrollment.
+  #
+  # @example_response
+  #   [ { 'id': 1, 'name': 'first course', 'course_code': 'first', 'sis_course_id': 'first-sis' },
+  #     { 'id': 2, 'name': 'second course', 'course_code': 'second', 'sis_course_id': null } ]
+  def courses_api
+    if authorized_action(@account, @current_user, :read)
+      @courses = @account.associated_courses.active
+      @courses = @courses.with_enrollments if params[:hide_enrollmentless_courses]
+      @courses = @courses.paginate(:order => :id, :page => params[:page], :per_page => params[:per_page] || 10)
+      Api.set_pagination_headers!(@courses, response, api_v1_account_courses_path)
+      render :json => @courses.map { |c| course_json(c, [], nil) }
     end
   end
 

@@ -429,6 +429,10 @@ class Course < ActiveRecord::Base
   }
   named_scope :not_deleted, {:conditions => ['workflow_state != ?', 'deleted']}
 
+  named_scope :with_enrollments, lambda {
+    { :conditions => ["exists (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"] }
+  }
+
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { participating_students }

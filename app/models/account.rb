@@ -244,14 +244,11 @@ class Account < ActiveRecord::Base
 
   def fast_course_base(opts)
     columns = "courses.id, courses.name, courses.section, courses.workflow_state, courses.course_code, courses.sis_source_id"
-    conditions = []
-    if opts[:hide_enrollmentless_courses]
-      conditions = ["exists (#{Enrollment.active.send(:construct_finder_sql, {:select => "1", :conditions => ["enrollments.course_id = courses.id"]})})"]
-    end
     associated_courses = self.associated_courses.active
+    associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
-    associated_courses.limit(opts[:limit]).active_first.find(:all, :select => columns, :group => columns, :conditions => conditions)
+    associated_courses.limit(opts[:limit]).active_first.find(:all, :select => columns, :group => columns)
   end
 
   def fast_all_courses(opts={})
