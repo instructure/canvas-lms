@@ -3,6 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 shared_examples_for "quiz selenium tests" do
   it_should_behave_like "in-process server selenium tests"
 
+  it "should allow a teacher to create a quiz from the quizzes tab directly" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/quizzes"
+    driver.find_element(:css, ".new-quiz-link").click
+    driver.find_element(:css, ".save_quiz_button").click
+    assert_flash_notice_message /Quiz data saved/
+  end
+
   it "should correctly hide form when cancelling quiz edit" do
     course_with_teacher_logged_in
 
@@ -261,9 +269,22 @@ shared_examples_for "quiz selenium tests" do
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
+
+  it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do
+    course_with_teacher_logged_in
+    5.times { @course.quizzes.create!(:title => "My Quiz") }
+    get "/courses/#{@course.id}/quizzes"
+    publish_multiple = driver.find_element(:css, '.publish_multiple_quizzes_link')
+    cancel = driver.find_element(:css, '#publish_multiple_quizzes_dialog .cancel_button')
+
+    5.times do
+      publish_multiple.click
+      find_all_with_jquery('#publish_multiple_quizzes_dialog .quiz_item:not(.blank)').length.should == 5
+      cancel.click
+    end
+  end
 end
 
 describe "quiz Windows-Firefox-Tests" do
   it_should_behave_like "quiz selenium tests"
 end
-

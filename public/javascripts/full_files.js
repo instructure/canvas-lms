@@ -194,14 +194,72 @@ var fileStructureData = [];
               };
               setTimeout(pollImport, 3000);
             } else {
-              for(var idx in filesToUpload) {
-                fileUpload.queueAjaxUpload(filesToUpload[idx]);
+              var folder = files.currentItemData();
+              var filenames = [];
+              for (idx in filesToUpload) {
+                filenames.push(filesToUpload[idx].name);
               }
+              files.preflight(folder.id, folder.context_string, filenames,
+                function(duplicate_handling_method) { // onChooseDuplicateHandler
+                  for (idx in filesToUpload) {
+                    filesToUpload[idx].duplicate_handling = duplicate_handling_method;
+                  }
+                },
+                function() { // onSuccess
+                  for(var idx in filesToUpload) {
+                    fileUpload.queueAjaxUpload(filesToUpload[idx]);
+                  }
+                },
+                function() { // onCancel
+                });
             }
             return false; 
           }
         }, false);
       }
+    },
+    preflight: function(folder_id, folder_context_string, filenames, on_choose, on_success, on_cancel) {
+      var params = {
+        'folder_id': folder_id,
+        'context_code': folder_context_string,
+        'filenames': filenames
+      };
+      $.ajaxJSON('/files/preflight', 'GET', params, function(data) {
+        if (data.duplicates && data.duplicates.length > 0) {
+          var $dialog = $("#duplicate_filename_dialog");
+          $dialog.find(".duplicate_filename_prompt").text(
+            I18n.t('prompts.duplicate_filenames', "Files with the following names already exist in this folder. Do you want to replace them, or rename the new files with unique names?"));
+          var duplicatesHtml = '';
+          for (idx in data.duplicates) {
+            duplicatesHtml += "<span class='duplicate_filename'>" + $.htmlEscape(data.duplicates[idx]) + "</span>";
+          }
+          $dialog.find(".duplicate_filenames").html(duplicatesHtml);
+          $dialog.dialog('close').dialog({
+            autoOpen: false,
+            title: '',
+            width: 500
+          }).dialog('open');
+          $dialog.find("button").unbind('click');
+          $dialog.find(".cancel_button").click(function() {
+            on_cancel();
+            $dialog.dialog('close');
+          });
+          $dialog.find(".rename_button").click(function() {
+            on_choose('rename');
+            on_success();
+            $dialog.dialog('close');
+          });
+          $dialog.find(".overwrite_button").click(function() {
+            on_choose('overwrite');
+            on_success();
+            $dialog.dialog('close');
+          });
+        } else {
+          on_success();
+        }
+      }, function(data) {
+        on_cancel();
+      });
     },
     context_page_view_ids: {},
     updatePageView: function(context_string) {
@@ -235,6 +293,16 @@ var fileStructureData = [];
       }
       if(!files.currentItemData().includes_files && files.currentItemData().full_name) {
         files.getFilesForFolder(files.currentItemData());
+      }
+    },
+    deleteAttachmentIds: function(ids) {
+      for(var idx in ids) {
+        var id = ids[idx];
+        var $file = $("#files_structure .file_" + id)
+        $file.prev("li.separator").remove();
+        $file.remove();
+        files.refreshView();
+        files.updateQuota();
       }
     },
     gettingFiles: {},
@@ -1746,7 +1814,7 @@ var fileStructureData = [];
       if($item.length === 0) { return; }
       var old_name = $item.getTemplateData({textValues: ['name']}).name;
       var new_name = $(this).val();
-      if(update !== false && old_name != new_name) {
+      if(update !== false && new_name != "" && old_name != new_name) {
         $item.find(".name").text(new_name);
         var data = files.itemData($item.data('node'));
         var context_string = data.root_context_string;
@@ -2054,6 +2122,7 @@ var fileStructureData = [];
           $add_file_link.text(I18n.t('links.add_files', "Add Files")).triggerHandler('show');
         },
         onSelect: fileUpload.swfFileQueue,
+        onSelectOnce: fileUpload.swfFileQueueOnce,
         onCancel: fileUpload.swfCancel,
         onClearQueue: fileUpload.swfQueueClear,
         onError: fileUpload.swfFileError,
@@ -2072,6 +2141,30 @@ var fileUpload = {
   swfUploadCount: 0,
   queuedAjaxUploads: [],
   currentlyUploading: false,
+  status_status: "hidden",
+  status_request: "hidden",
+  showStatus: function() {
+    fileUpload.status_request = "shown";
+    if(fileUpload.status_status == "hidden") {
+      fileUpload.status_status = "showing";
+      $("#file_uploads_progress").slideDown(null,null,function() {
+        setTimeout(function() {
+          fileUpload.status_status = "shown";
+          if(fileUpload.status_request == "hidden") fileUpload.hideStatus();
+        }, 3000);
+      });
+    }
+  },
+  hideStatus: function() {
+    fileUpload.status_request = "hidden";
+    if(fileUpload.status_status == "shown") {
+      fileUpload.status_status = "hiding";
+      $("#file_uploads_progress").slideUp(null,null,function() {
+        fileUpload.status_status = "hidden";
+        if(fileUpload.status_request == "shown") fileUpload.showStatus();
+      });
+    }
+  },
   queueAjaxUpload: function(file, folder_id) {
     fileUpload.ajaxUploadCount = fileUpload.queuedAjaxUploads.length;
     var fileWrapper = {
@@ -2105,7 +2198,8 @@ var fileUpload = {
         data: {
           'attachment[uploaded_data]': fileData,
           'attachment[display_name]': fileData.name,
-          'attachment[folder_id]': folder.id
+          'attachment[folder_id]': folder.id,
+          'duplicate_handling': file.file.duplicate_handling
         },
         method: 'POST',
         success: function(data) {
@@ -2122,6 +2216,9 @@ var fileUpload = {
               $file.remove();
             });
           }, 5000);
+          if (data.deleted_attachment_ids) {
+            files.deleteAttachmentIds(data.deleted_attachment_ids);
+          }
           files.updateFile(attachment.context_code, data);
         },
         error: function(data) {
@@ -2140,8 +2237,7 @@ var fileUpload = {
     var count = (fileUpload.swfFiles.length + fileUpload.ajaxUploadCount);
     var errorCount = $("#file_uploads .file_upload.errored:visible").length;
     if(count === 0 && errorCount == 0) {
-      $("#file_uploads_progress").slideUp();
-      $("#file_uploads_spinner").slideUp();
+      fileUpload.hideStatus();
       var $msg = $("#file_upload_blank").clone(true).removeAttr('id').addClass('finished_message').empty();
       $msg.text("Finished uploading all files");
       if(!$("#file_uploads .file_upload:visible:first").hasClass('finished_message')) {
@@ -2164,7 +2260,7 @@ var fileUpload = {
       if(count === 0) {
         $("#file_uploads_dialog_link").text(I18n.t('messages.error_count', {one: "1 Error", other: "%{count} Errors"}, { count: errorCount}));
       }
-      $("#file_uploads_progress").slideDown();
+      fileUpload.showStatus();
     }
   },
   fileDialogComplete: function(numFilesSelected, numFilesQueued) {
@@ -2188,9 +2284,41 @@ var fileUpload = {
       .find(".cancel_upload_link").hide();
     $file.append(message);
   },
+  swfPreQueued: [],
   swfQueuedAndPendingFiles: [],
   swfFiles: [],
-  swfFileQueue: function(event, id, file) { //onSelect
+  swfFileQueueOnce: function(event, data) {
+    var queue = fileUpload.swfPreQueued;
+    fileUpload.swfPreQueued = [];
+    var folder = files.currentItemData();
+    var filenames = [];
+    for (idx in queue) {
+      filenames.push(queue[idx].name);
+    }
+    files.preflight(folder.id, folder.context_string, filenames,
+      function(method) {
+        for (idx in queue) {
+          queue[idx].duplicate_handling = method;
+        }
+      },
+      function() {
+        for (idx in queue) {
+          var file = queue[idx];
+          fileUpload.swfFileQueueReal(event, file.id, file);
+        }
+      },
+      function() {
+        for (idx in queue) {
+          $("#file_swf").uploadifyCancel(queue[idx].id);
+        }
+      }
+    );
+  },
+  swfFileQueue: function(event, id, file) {
+    file.id = id;
+    fileUpload.swfPreQueued.push(file);
+  },
+  swfFileQueueReal: function(event, id, file) { //onSelect
     file.id = id;
     var $file = fileUpload.initFile(file);
     $file.data('folder', files.currentItemData());
@@ -2201,8 +2329,10 @@ var fileUpload = {
       'attachment[folder_id]': folder.id,
       'attachment[filename]': file.name,
       'attachment[context_code]': folder.context_string,
-      'no_redirect': true
+      'no_redirect': true,
+      'attachment[duplicate_handling]': file.duplicate_handling
     };
+    $("#file_swf").uploadifySettings('folder', '' + folder.id);
     fileUpload.updateUploadCount();
     $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {
       file.upload_url = data.proxied_upload_url || data.upload_url;
@@ -2259,7 +2389,7 @@ var fileUpload = {
     }, 50);
     fileUpload.swfFiles = $.grep(fileUpload.swfFiles, function(f) { return f.id != file.id; });
     $("#file_uploads_dialog_link").text(I18n.t('errors.uploading', "Uploading Error"));
-    $("#file_uploads_progress").slideDown();
+    fileUpload.showStatus();
     $file.find(".cancel_upload_link").hide().end()
       .find(".status").text(I18n.t('errors.failed_uploading', "Failed uploading: %{error_info} ", {error_info: error.info}));
     $file.addClass('done').addClass('errored');
@@ -2294,6 +2424,9 @@ var fileUpload = {
       $.ajaxJSON($file.data('success_url'), 'GET', {}, function(data) {
         if(data && data.attachment) {
           fileUpload.swfFileComplete({}, file.id, file, JSON.stringify(data), {});
+          if (data.deleted_attachment_ids) {
+            files.deleteAttachmentIds(data.deleted_attachment_ids);
+          }
         } else {
           errored();
         }
@@ -2319,6 +2452,9 @@ var fileUpload = {
         } else {
           data.swf = true;
           setTimeout(function() {
+            if (data.deleted_attachment_ids) {
+              files.deleteAttachmentIds(data.deleted_attachment_ids);
+            }
             files.updateFile(context_string, data);
           }, 500);
         }

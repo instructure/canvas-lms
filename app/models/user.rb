@@ -701,15 +701,27 @@ class User < ActiveRecord::Base
         self.all_courses.any? { |c| c.grants_right?(user, nil, :read_reports) }
       )
     end
-    can :rename and can :remove_avatar and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
-    
+    can :rename and can :remove_avatar and can :view_statistics
+
+    given do |user|
+      user && self.all_courses.any? { |c| c.grants_right?(user, nil, :manage_user_notes) }
+    end
+    can :create_user_notes and can :read_user_notes
+
+    given do |user|
+      user && (
+        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_notes)}
+      )
+    end
+    can :create_user_notes and can :read_user_notes and can :delete_user_notes
+
     given do |user|
       user && (
         # or, if the user we are given is an admin in one of this user's accounts
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_students) })
       )
     end
-    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
+    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics
     
     given do |user|
       user && (
@@ -717,7 +729,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) })
       )
     end
-    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
+    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics
 
     given do |user|
       user && ((
@@ -962,12 +974,12 @@ class User < ActiveRecord::Base
   named_scope :with_avatar_state, lambda{|state|
     if state == 'any'
       {
-        :conditions =>['avatar_state IS NOT NULL AND avatar_state != ?', 'none'],
+        :conditions =>['avatar_image_url IS NOT NULL AND avatar_state IS NOT NULL AND avatar_state != ?', 'none'],
         :order => 'avatar_image_updated_at DESC'
       }
     else
       {
-        :conditions => {:avatar_state => state},
+        :conditions => ['avatar_image_url IS NOT NULL AND avatar_state = ?', state],
         :order => 'avatar_image_updated_at DESC'
       }
     end

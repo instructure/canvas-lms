@@ -356,7 +356,8 @@ describe User do
       user.grants_right?(@admin, nil, :become_user).should be_false
       user.grants_right?(@site_admin, nil, :become_user).should be_true
       @account2.add_user(@admin)
-      user.grants_right?(@admin, nil, :become_user).should be_true
+      user.grants_right?(@admin, nil, :become_user).should be_false
+      user.grants_right?(@site_admin, nil, :become_user).should be_true
     end
 
     it "should not grant become_user for dis-associated users" do
@@ -405,6 +406,20 @@ describe User do
       @admin.messageable_users(:context => ["course_#{course1.id}"], :ids => [@student.id]).should be_empty
       @admin.messageable_users(:context => ["course_#{course2.id}"], :ids => [@student.id]).should_not be_empty
       @student.messageable_users(:context => ["course_#{course2.id}"], :ids => [@admin.id]).should_not be_empty
+    end
+  end
+  
+  context "avatars" do
+    it "should find only users with avatars set" do
+      user_model
+      @user.avatar_state = 'submitted'
+      @user.save!
+      User.with_avatar_state('submitted').count.should == 0
+      User.with_avatar_state('any').count.should == 0
+      @user.avatar_image_url = 'http://www.example.com'
+      @user.save!
+      User.with_avatar_state('submitted').count.should == 1
+      User.with_avatar_state('any').count.should == 1
     end
   end
 end

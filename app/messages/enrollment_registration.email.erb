@@ -11,7 +11,7 @@
     case asset.type
     when 'TeacherEnrollment'
       t :body_teacher, "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a teacher.", :website => website, :course => asset.course.name
-    when 'TAEnrollment'
+    when 'TaEnrollment'
       t :body_ta, "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a TA.", :website => website, :course => asset.course.name
     when 'ObserverEnrollment'
       t :body_observer, "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a observer.", :website => website, :course => asset.course.name

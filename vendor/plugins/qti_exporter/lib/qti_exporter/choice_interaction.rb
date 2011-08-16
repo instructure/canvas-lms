@@ -127,11 +127,11 @@ class ChoiceInteraction < AssessmentItemConverter
         answer[:weight] = get_response_weight(cond)
         answer[:feedback_id] ||= get_feedback_id(cond)
         @question[:question_type] = "true_false_question"
-      elsif cond.at_css('and > member')
-        cond.css('and > member').each do |m|
+      elsif cond.at_css('responseIf and > member')
+        cond.css('responseIf > and > member').each do |m|
           migration_id = m.at_css('baseValue[baseType=identifier]').text.strip()
           answer = answers_hash[migration_id]
-          answer[:weight] = get_response_weight(cond)
+          answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
           answer[:feedback_id] ||= get_feedback_id(cond)
         end
       else

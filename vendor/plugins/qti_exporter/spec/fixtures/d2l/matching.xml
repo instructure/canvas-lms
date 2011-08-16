@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item ident="OBJ_3503046" label="QUES_968912_1181398" d2l_2p0:page="1" title="matching">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Matching</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>5.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/html">&lt;p&gt;letter to number&lt;/p&gt;</mattext>
+            </material>
+            <response_extension>
+              <d2l_2p0:grading_type>1</d2l_2p0:grading_type>
+            </response_extension>
+            <response_grp respident="QUES_968912_1181398_C4710374" rcardinality="Single">
+              <material>
+                <mattext texttype="text/html">&lt;p&gt;&lt;em&gt;&lt;strong&gt;A&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;</mattext>
+              </material>
+              <render_choice shuffle="yes">
+                <flow_label class="Block">
+                  <response_label ident="QUES_968912_1181398_M4710372">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">&lt;p&gt;&lt;strong&gt;1&lt;/strong&gt;&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                  <response_label ident="QUES_968912_1181398_M4710373">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">&lt;p&gt;&lt;span style="text-decoration: underline;"&gt;2&lt;/span&gt;&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+              </render_choice>
+            </response_grp>
+            <response_grp respident="QUES_968912_1181398_C4710375" rcardinality="Single">
+              <material>
+                <mattext texttype="text/html">&lt;p&gt;b&lt;/p&gt;</mattext>
+              </material>
+              <render_choice shuffle="yes">
+                <flow_label class="Block">
+                  <response_label ident="QUES_968912_1181398_M4710372">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">&lt;p&gt;&lt;strong&gt;1&lt;/strong&gt;&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                  <response_label ident="QUES_968912_1181398_M4710373">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">&lt;p&gt;&lt;span style="text-decoration: underline;"&gt;2&lt;/span&gt;&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+              </render_choice>
+            </response_grp>
+          </flow>
+        </presentation>
+        <resprocessing>
+          <outcomes>
+            <decvar vartype="Integer" defaultval="0" varname="D2L_Correct" minvalue="0" maxvalue="100"/>
+            <decvar vartype="Integer" defaultval="0" varname="D2L_Incorrect" minvalue="0" maxvalue="100"/>
+            <decvar vartype="Decimal" defaultval="0" varname="que_score" minvalue="0" maxvalue="100"/>
+          </outcomes>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_968912_1181398_C4710374">QUES_968912_1181398_M4710372</varequal>
+            </conditionvar>
+            <setvar varname="D2L_Correct" action="Add">1</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_968912_1181398_C4710374">QUES_968912_1181398_M4710373</varequal>
+            </conditionvar>
+            <setvar varname="D2L_Incorrect" action="Add">1</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_968912_1181398_C4710375">QUES_968912_1181398_M4710372</varequal>
+            </conditionvar>
+            <setvar varname="D2L_Incorrect" action="Add">1</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_968912_1181398_C4710375">QUES_968912_1181398_M4710373</varequal>
+            </conditionvar>
+            <setvar varname="D2L_Correct" action="Add">1</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <vargte respident="D2L_Incorrect">0</vargte>
+            </conditionvar>
+            <setvar varname="que_score" action="Set">0</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="D2L_Incorrect">0</varequal>
+            </conditionvar>
+            <setvar varname="que_score" action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+    </section>
+  </objectbank>
+</questestinterop>

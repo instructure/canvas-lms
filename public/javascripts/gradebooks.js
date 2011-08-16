@@ -1189,9 +1189,9 @@ I18n.scoped('gradebook', function(I18n) {
           } else if($button.hasClass('by_section')) {
             return [student.course_section, student.display_name, student.secondary_identifier];
           } else if($button.hasClass('by_grade_desc')) { 
-            return [Math.round((1000 - student.grade) * 10.0), student.display_name, student.secondary_identifier, student.course_section];
+            return [ -student.grade, student.display_name, student.secondary_identifier, student.course_section];
           } else if($button.hasClass('by_grade_asc')) {
-            return [10000 + Math.round(student.grade * 10.0), student.display_name, student.secondary_identifier, student.course_section];
+            return [ student.grade, student.display_name, student.secondary_identifier, student.course_section];
           } else {
             return [student.display_name, student.secondary_identifier, student.course_section];
           }
@@ -1745,7 +1745,16 @@ I18n.scoped('gradebook', function(I18n) {
       list.student = s;
       sorts.push(list);
     }
-    sorts = sorts.sort();
+    sorts = sorts.sort(function(a, b) {
+      for(var idx in a) {
+        var a1 = a[idx], b1 = b[idx];
+        if(a1 < b1)
+          return -1;
+        if(a1 > b1)
+          return 1;
+      }
+      return 0;
+    });
     students = [];
     for(var idx in sorts) {
       students.push(sorts[idx].student);

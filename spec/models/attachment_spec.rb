@@ -464,6 +464,34 @@ describe Attachment do
     end
   end
 
+  context "duplicate handling" do
+    before(:each) do
+      course_model
+      @a1 = attachment_with_context(@course, :display_name => "a1")
+      @a2 = attachment_with_context(@course, :display_name => "a2")
+      @a = attachment_with_context(@course)
+    end
+    
+    it "should handle overwriting duplicates" do
+      @a.display_name = 'a1'
+      deleted = @a.handle_duplicates(:overwrite)
+      @a.file_state.should == 'available'
+      @a1.reload
+      @a1.file_state.should == 'deleted'
+      deleted.should == [ @a1 ]
+    end
+    
+    it "should handle renaming duplicates" do
+      @a.display_name = 'a1'
+      deleted = @a.handle_duplicates(:rename)
+      deleted.should be_empty
+      @a.file_state.should == 'available'
+      @a1.reload
+      @a1.file_state.should == 'available'
+      @a.display_name.should == 'a1-1'
+    end
+  end
+
   describe "make_unique_filename" do
     it "should find a unique name for files" do
       existing_files = %w(a.txt b.txt c.txt)

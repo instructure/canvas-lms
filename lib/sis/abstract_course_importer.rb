@@ -52,10 +52,11 @@ module SIS
         course ||= AbstractCourse.new
         course.enrollment_term = term if term
         course.root_account = @root_account
-        if row['account_id'].present?
-          account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id'])
-          course.account = account if account
-        end
+
+        account = nil
+        account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['account_id']) if row['account_id'].present?
+        account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, row['fallback_account_id']) if row['fallback_account_id'].present?
+        course.account = account if account
         course.account ||= @root_account
 
         # only update the name/short_name on new records, and ones that haven't been changed

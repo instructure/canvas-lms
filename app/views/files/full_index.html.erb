@@ -571,6 +571,15 @@ into a zip file.  This may take some time, depending on the size and number of f
     <%= image_tag "ajax-loader-small.gif", :style => "visibility: hidden;", :class => "status_loader" %>&nbsp;<span class="status"><%= t 'messages.gathering_files', "Gathering Files..." %></span>
   </div>
 </div>
+<div id="duplicate_filename_dialog" style="display: none;">
+  <span class="duplicate_filename_prompt"></span><br /><br />
+  <span class="duplicate_filenames"></span><br /><br />
+  <div class="buttons" style="text-align: right; width: 100%">
+    <button type="button" class="button button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+    <button type="button" class="button rename_button"><%= t 'buttons.rename_duplicate_attachment', "Rename New Files" %></button>
+    <button type="button" class="button overwrite_button"><%= t 'buttons.overwrite_duplicate_attachment', "Overwrite" %></button>
+  </div>
+</div>
 <% unless showing_all_contexts %>
   <a href="<%= context_url(@context.is_a?(UserProfile) ? @context.user : @context, :quota_context_files_url) %>" class="quota_url" style="display: none;">&nbsp;</a>
 <% end %>

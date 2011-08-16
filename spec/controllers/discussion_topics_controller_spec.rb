@@ -207,6 +207,36 @@ describe DiscussionTopicsController do
       assigns[:topic].editor.should eql(@teacher)
       assigns[:topic].user.should eql(@student)
     end
+
+    it "should not duplicate when adding or removing an assignment" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic
+
+      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '1' }}
+      @topic.reload
+      @topic.assignment_id.should_not be_nil
+      @topic.old_assignment_id.should_not be_nil
+      old_assignment_id = @topic.old_assignment_id
+      DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
+
+      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '0' }}
+      @topic.reload
+      @topic.assignment_id.should be_nil
+      @topic.old_assignment_id.should == old_assignment_id
+      DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
+
+      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '1' }}
+      @topic.reload
+      @topic.assignment_id.should == old_assignment_id
+      @topic.old_assignment_id.should == old_assignment_id
+      DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
+
+      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => {:assignment => { :set_assignment => '0' }}
+      @topic.reload
+      @topic.assignment_id.should be_nil
+      @topic.old_assignment_id.should == old_assignment_id
+      DiscussionTopic.find_all_by_old_assignment_id(old_assignment_id).should == [ @topic ]
+    end
   end
   
   describe "DELETE 'destroy'" do

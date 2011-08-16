@@ -71,7 +71,7 @@ describe ContextController do
       assigns[:entries].should_not be_nil
     end
   end
-  
+
   describe "GET 'chat'" do
     it "should redirect if no chats enabled" do
       course_with_teacher(:active_all => true)

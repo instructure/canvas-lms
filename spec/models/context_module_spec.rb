@@ -470,7 +470,7 @@ describe ContextModule do
       course_module
       @module.require_sequential_progress = true
       @module.save!
-      @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+      @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
       @quiz.workflow_state = 'available'
       @quiz.save!
       @assignment = @course.assignments.create!(:title => "some assignment")
@@ -495,9 +495,38 @@ describe ContextModule do
       
       @submission = @quiz.generate_submission(@user)
       @submission.score = 100
-      @submission.save
-      
+      @submission.workflow_state = 'complete'
+      @submission.submission_data = nil
+      @submission.with_versioning(&:save)
+
       @progression = @module.evaluate_for(@user, true, true)
+      @progression.should_not be_nil
+      @progression.should be_completed
+      @progression.current_position.should eql(@tag2.position)
+      @quiz.reload; @assignment = Assignment.find(@assignment.id)
+      @quiz.locked_for?(@user).should be_false
+      @assignment.locked_for?(@user).should be_false
+
+      # the quiz keeps the highest score; should still be unlocked
+      @submission.score = 50
+      @submission.with_versioning(&:save)
+      @submission.kept_score.should == 100
+
+      @progression = @module.evaluate_for(@user, true, true)
+      @progression.should_not be_nil
+      @progression.should be_completed
+      @progression.current_position.should eql(@tag2.position)
+      @quiz.reload; @assignment = Assignment.find(@assignment.id)
+      @quiz.locked_for?(@user).should be_false
+      @assignment.locked_for?(@user).should be_false
+
+      # the quiz keeps the highest score; should still be unlocked
+      @submission.update_scores(nil)
+      @submission.score.should == 0
+      @submission.kept_score.should == 100
+
+      # update_for was called; don't re-evaluate
+      @progression.reload
       @progression.should_not be_nil
       @progression.should be_completed
       @progression.current_position.should eql(@tag2.position)

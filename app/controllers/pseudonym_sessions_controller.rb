@@ -302,7 +302,7 @@ class PseudonymSessionsController < ApplicationController
         # (right now we don't support redirect, just oob response using a canvas url)
         code = ActiveSupport::SecureRandom.hex(64)
         code_data = { 'user' => user.id, 'client_id' => session[:oauth2][:client_id] }
-        Rails.cache.write("oauth2:#{code}", code_data.to_json, :expires_in => 1.day)
+        Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
         format.html { redirect_to oauth2_auth_url(:code => code) }
       elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
         claim_session_course(course, user)
@@ -361,7 +361,7 @@ class PseudonymSessionsController < ApplicationController
     end
 
     code = params[:code]
-    code_data = JSON.parse(Rails.cache.read("oauth2:#{code}").presence || "{}")
+    code_data = JSON.parse(Canvas.redis.get("oauth2:#{code}").presence || "{}")
     unless code_data.present? && code_data['client_id'] == key.id
       return render(:status => 400, :json => { :message => "invalid code" })
     end

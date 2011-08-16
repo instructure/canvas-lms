@@ -58,9 +58,11 @@ class Course < ActiveRecord::Base
                   :restrict_enrollments_to_course_dates,
                   :grading_standard,
                   :grading_standard_enabled,
-                  :locale
+                  :locale,
+                  :settings
 
   serialize :tab_configuration
+  serialize :settings, Hash
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :abstract_course
   belongs_to :enrollment_term
@@ -752,7 +754,7 @@ class Course < ActiveRecord::Base
     given { |user| self.available? && self.is_public }
     can :read
     
-    RoleOverride.permissions.each do |permission, params|
+    RoleOverride.permissions.each_key do |permission|
       given {|user, session| self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission) }
       can permission
     end
@@ -891,12 +893,21 @@ class Course < ActiveRecord::Base
     return (self.account || self.root_account).name
   end
   memoize :institution_name
-  
+
+  def account_users_for(user)
+    @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id: nil }.compact
+    @account_users ||= {}
+    @account_users[user] ||= AccountUser.find(:all, :conditions => { :account_id => @associated_account_ids, :user_id => user.id }) if user
+    @account_users[user] ||= nil
+    @account_users[user]
+  end
+
   def account_membership_allows(user, session, permission)
-    return false unless user && permission && AccountUser.any_for?(user) #.for_user(user).length > 0
+    return false unless user && permission
     return false if session && session["role_course_#{self.id}"]
+
     @membership_allows ||= {}
-    @membership_allows[[user.id, permission]] ||= (self.associated_accounts + [Account.site_admin]).uniq.any?{|a| a.membership_allows(user, permission) }
+    @membership_allows[[user.id, permission]] ||= self.account_users_for(user).any? { |au| au.has_permission_to?(permission) }
   end
   
   def teacherless?
@@ -2066,22 +2077,22 @@ class Course < ActiveRecord::Base
 
   def self.default_tabs
     [
-      { :id => TAB_HOME, :label => t('#tabs.home', "Home"), :href => :course_path },
-      { :id => TAB_ANNOUNCEMENTS, :label => t('#tabs.announcements', "Announcements"), :href => :course_announcements_path },
-      { :id => TAB_ASSIGNMENTS, :label => t('#tabs.assignments', "Assignments"), :href => :course_assignments_path },
-      { :id => TAB_DISCUSSIONS, :label => t('#tabs.discussions', "Discussions"), :href => :course_discussion_topics_path },
-      { :id => TAB_GRADES, :label => t('#tabs.grades', "Grades"), :href => :course_grades_path },
-      { :id => TAB_PEOPLE, :label => t('#tabs.people', "People"), :href => :course_users_path },
-      { :id => TAB_CHAT, :label => t('#tabs.chat', "Chat"), :href => :course_chat_path },
-      { :id => TAB_PAGES, :label => t('#tabs.pages', "Pages"), :href => :course_wiki_pages_path },
-      { :id => TAB_FILES, :label => t('#tabs.files', "Files"), :href => :course_files_path },
-      { :id => TAB_SYLLABUS, :label => t('#tabs.syllabus', "Syllabus"), :href => :syllabus_course_assignments_path },
-      { :id => TAB_OUTCOMES, :label => t('#tabs.outcomes', "Outcomes"), :href => :course_outcomes_path },
-      { :id => TAB_QUIZZES, :label => t('#tabs.quizzes', "Quizzes"), :href => :course_quizzes_path },
-      { :id => TAB_MODULES, :label => t('#tabs.modules', "Modules"), :href => :course_context_modules_path },
-      { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :href => :course_conferences_path },
-      { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :href => :course_collaborations_path },
-      { :id => TAB_SETTINGS, :label => t('#tabs.settings', "Settings"), :href => :course_details_path },
+      { :id => TAB_HOME, :label => t('#tabs.home', "Home"), :css_class => 'home', :href => :course_path },
+      { :id => TAB_ANNOUNCEMENTS, :label => t('#tabs.announcements', "Announcements"), :css_class => 'announcements', :href => :course_announcements_path },
+      { :id => TAB_ASSIGNMENTS, :label => t('#tabs.assignments', "Assignments"), :css_class => 'assignments', :href => :course_assignments_path },
+      { :id => TAB_DISCUSSIONS, :label => t('#tabs.discussions', "Discussions"), :css_class => 'discussions', :href => :course_discussion_topics_path },
+      { :id => TAB_GRADES, :label => t('#tabs.grades', "Grades"), :css_class => 'grades', :href => :course_grades_path },
+      { :id => TAB_PEOPLE, :label => t('#tabs.people', "People"), :css_class => 'people', :href => :course_users_path },
+      { :id => TAB_CHAT, :label => t('#tabs.chat', "Chat"), :css_class => 'chat', :href => :course_chat_path },
+      { :id => TAB_PAGES, :label => t('#tabs.pages', "Pages"), :css_class => 'pages', :href => :course_wiki_pages_path },
+      { :id => TAB_FILES, :label => t('#tabs.files', "Files"), :css_class => 'files', :href => :course_files_path },
+      { :id => TAB_SYLLABUS, :label => t('#tabs.syllabus', "Syllabus"), :css_class => 'syllabus', :href => :syllabus_course_assignments_path },
+      { :id => TAB_OUTCOMES, :label => t('#tabs.outcomes', "Outcomes"), :css_class => 'outcomes', :href => :course_outcomes_path },
+      { :id => TAB_QUIZZES, :label => t('#tabs.quizzes', "Quizzes"), :css_class => 'quizzes', :href => :course_quizzes_path },
+      { :id => TAB_MODULES, :label => t('#tabs.modules', "Modules"), :css_class => 'modules', :href => :course_context_modules_path },
+      { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :course_conferences_path },
+      { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :course_collaborations_path },
+      { :id => TAB_SETTINGS, :label => t('#tabs.settings', "Settings"), :css_class => 'settings', :href => :course_details_path },
     ]
   end
   
@@ -2094,6 +2105,7 @@ class Course < ActiveRecord::Base
       if default_tab
         tab[:label] = default_tab[:label]
         tab[:href] = default_tab[:href]
+        tab[:css_class] = default_tab[:css_class]
         default_tabs.delete_if {|t| t[:id] == tab[:id] }
         tab
       else
@@ -2182,5 +2194,50 @@ class Course < ActiveRecord::Base
     self.save
     User.update_account_associations(user_ids)
   end
-  
+
+
+  cattr_accessor :settings_options
+  self.settings_options = {}
+
+  def self.add_setting(setting, opts=nil)
+    self.settings_options[setting.to_sym] = opts || {}
+  end
+
+  # these settings either are or could be easily added to
+  # the course settings page
+  add_setting :hide_final_grade, :boolean => true
+
+  def settings=(hash)
+
+    if hash.is_a?(Hash)
+      hash.each do |key, val|
+        if settings_options[key.to_sym]
+          opts = settings_options[key.to_sym]
+          if opts[:boolean]
+            settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
+          elsif opts[:hash]
+            new_hash = {}
+            if val.is_a?(Hash)
+              val.each do |inner_key, inner_val|
+                if opts[:values].include?(inner_key.to_sym)
+                  new_hash[inner_key.to_sym] = inner_val.to_s
+                end
+              end
+            end
+            settings[key.to_sym] = new_hash.empty? ? nil : new_hash
+          else
+            settings[key.to_sym] = val.to_s
+          end
+        end
+      end
+    end
+    settings
+  end
+
+  def settings
+    result = self.read_attribute(:settings)
+    return result if result
+    return self.write_attribute(:settings, {}) unless frozen?
+    {}.freeze
+  end
 end

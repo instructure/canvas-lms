@@ -58,7 +58,7 @@ class UsersController < ApplicationController
     @user = User.find_by_id(params[:user_id]) if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
-      @current_enrollments = @user.current_enrollments
+      @current_enrollments = @user.current_enrollments.scoped(:include => :course)
       
       @student_enrollments = @current_enrollments.select{|e| e.is_a?(StudentEnrollment) }
       
@@ -68,6 +68,7 @@ class UsersController < ApplicationController
         @observed_enrollments << StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)
       end
       @observed_enrollments = @observed_enrollments.uniq.compact
+      Enrollment.send(:preload_associations, @observed_enrollments, :course)
       
       if @current_enrollments.length + @observed_enrollments.length == 1
         redirect_to course_grades_url(@current_enrollments.first.course_id)
@@ -76,18 +77,15 @@ class UsersController < ApplicationController
       
       @teacher_enrollments = @current_enrollments.select{|e| e.admin? }
       @prior_enrollments = @user.concluded_enrollments.select{|e| e.is_a?(StudentEnrollment) }
-      @course_names = {}
+      Enrollment.send(:preload_associations, @prior_enrollments, :course)
       @course_grade_summaries = {}
-      @courses = Course.find_all_by_id((@current_enrollments + @prior_enrollments + @observed_enrollments).map(&:course_id))
       @teacher_enrollments.each do |enrollment|
-        @course = @courses.detect{|c| c.id == enrollment.course_id }
-        @course_grade_summaries[enrollment.course_id] = Rails.cache.fetch(['computed_avg_grade_for', @course].cache_key) do
-          goodies = @course.student_enrollments.map(&:computed_current_score).compact
+        @course_grade_summaries[enrollment.course_id] = Rails.cache.fetch(['computed_avg_grade_for', enrollment.course].cache_key) do
+          goodies = enrollment.course.student_enrollments.map(&:computed_current_score).compact
           score = (goodies.sum.to_f * 100.0 / goodies.length.to_f).round.to_f / 100.0 rescue nil
           {:score => score, :students => goodies.length }
         end
       end
-      @courses.each{|c| @course_names[c.id] = c.name }
     end
   end
   

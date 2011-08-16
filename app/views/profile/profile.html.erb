@@ -516,6 +516,7 @@ TEXT
   <a href="#" class="add_pic_link add"><%= t('links.upload_new_image', "Upload a new Image") %></a>
   <% form_for :attachment, :url => context_url(@user, :context_files_url), :html => {:id => "add_pic_form", :style => "display: none;"} do |f| %>
     <input type="hidden" name="format" value="text" />
+    <%= f.hidden_field :folder_id, :value => @user.profile_pics_folder.id %>
     <%= f.file_field :uploaded_data %>
     <button type="submit" class="button small-button"><%= t('buttons.add_picture_file', "Add File") %></button>
   <% end %>

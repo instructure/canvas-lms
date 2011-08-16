@@ -169,7 +169,7 @@
       $.get( settings.url
            , settings.params
            , function (data, text, xhr) {
-               $.isFunction(settings.scrape) ? settings.scrape(data, xhr) : data;
+               var data = $.isFunction(settings.scrape) ? settings.scrape(data, xhr) : data;
                loader ? loader.before(data) : element.append(data);
                loading(FALSE);
                // if there is a complete callback we call it

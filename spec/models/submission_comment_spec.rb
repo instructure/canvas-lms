@@ -53,6 +53,25 @@ describe SubmissionComment do
     @comment.messages_sent.should_not be_include('Submission Comment')
   end
   
+  it "should dispatch notifications on create regardless of how long ago the submission was created" do
+    assignment_model
+    @assignment.workflow_state = 'published'
+    @assignment.save
+    @course.offer
+    te = @course.enroll_teacher(user)
+    se = @course.enroll_student(user)
+    @assignment.reload
+    @submission = @assignment.submit_homework(se.user, :body => 'some message')
+    @submission.save
+    Notification.create(:name => 'Submission Comment')
+    Notification.create(:name => 'Submission Comment For Teacher')
+    @comment = @submission.add_comment(:author => te.user, :comment => "some comment")
+    @comment.messages_sent.keys.sort.should == ["Submission Comment"]
+    @comment.clear_broadcast_messages
+    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
+    @comment.messages_sent.keys.sort.should == ["Submission Comment", "Submission Comment For Teacher"]
+  end
+
   it "should dispatch notification on create if assignment is published" do
     assignment_model
     @assignment.workflow_state = 'published'

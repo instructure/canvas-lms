@@ -26,7 +26,7 @@ require File.expand_path(File.dirname(__FILE__) + '/server')
 SELENIUM_CONFIG = Setting.from_config("selenium") || {}
 SERVER_IP = UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
 SECONDS_UNTIL_COUNTDOWN = 5
-SECONDS_UNTIL_GIVING_UP = 60
+SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 60
 
 $server_port = nil
@@ -241,11 +241,20 @@ shared_examples_for "all selenium tests" do
     end
   end
   
+  def wait_for_ajax_requests
+    keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlighRequests") == 0 }
+  end
+  
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
     seconds.times do |i|
       puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN
       if i < seconds - 2
-        val = (yield rescue false)
+        val = false
+        begin
+          val = yield
+        rescue => e
+          puts "exception: #{e}" if i > SECONDS_UNTIL_COUNTDOWN
+        end
         break(val) if val
       elsif i == seconds - 1
         yield
@@ -299,6 +308,14 @@ shared_examples_for "all selenium tests" do
         window.resizeTo(window.screen.availWidth, window.screen.availHeight);
       }
     JS
+  end
+
+  def assert_flash_notice_message(okay_message_regex)
+    keep_trying_until do
+      text = driver.find_element(:css, "#flash_notice_message").text
+      raise "server error" if text =~ /The last request didn't work out/
+      text =~ okay_message_regex
+    end
   end
 
   self.use_transactional_fixtures = false

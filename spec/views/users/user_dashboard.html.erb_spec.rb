@@ -31,13 +31,6 @@ describe "/users/user_dashboard" do
     assigns[:recent_events] = []
     assigns[:upcoming_events] = []
     
-    # Settings are frozen so mock an empty hash
-    fake_account = Object.new
-    fake_account.stub!(:settings).and_return({})
-    fake_account.stub!(:id).and_return(@user.account.id)
-    fake_account.stub!(:account_users).and_return(@user.account.account_users)
-    assigns[:domain_root_account] = fake_account
-    
     render "users/user_dashboard"
     response.should_not be_nil
   end

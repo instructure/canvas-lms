@@ -113,6 +113,7 @@ Spec::Runner.configure do |config|
 
   def account_admin_user(opts={})
     user(opts)
+    @admin = @user
     @user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
     @user
   end
@@ -148,7 +149,7 @@ Spec::Runner.configure do |config|
 
   def student_in_course(opts={})
     @course ||= opts[:course] || course(opts)
-    @user = opts[:user] || user(opts)
+    @student = @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
@@ -195,6 +196,7 @@ Spec::Runner.configure do |config|
     pseudonym ||= mock_model(Pseudonym, {:record => user})
     pseudonym.stub!(:user_id).and_return(user.id)
     pseudonym.stub!(:user).and_return(user)
+    pseudonym.stub!(:login_count).and_return(1)
     session = mock_model(PseudonymSession)
     session.stub!(:record).and_return(pseudonym)
     session.stub!(:session_credentials).and_return(nil)
@@ -289,6 +291,30 @@ Spec::Runner.configure do |config|
     yield
   ensure
     ActionController::Base.class_eval { alias_method :allow_forgery_protection, :_old_protect }
+  end
+
+  def start_test_http_server
+    post_lines = []
+    server = TCPServer.open(0)
+    port = server.addr[1]
+    post_lines = []
+    server_thread = Thread.new(server, post_lines) do |server, post_lines|
+      client = server.accept
+      content_length = 0
+      loop do
+        line = client.readline
+        post_lines << line.strip unless line =~ /\AHost: localhost:|\AContent-Length: /
+        content_length = line.split(":")[1].to_i if line.strip =~ /\AContent-Length: [0-9]+\z/
+        if line.strip.blank?
+          post_lines << client.read(content_length)
+          break
+        end
+      end
+      client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
+      client.close
+      server.close
+    end
+    return server, server_thread, post_lines
   end
 
 end

@@ -279,4 +279,170 @@ describe "security" do
     get "http://test.host/login"
     response.should be_success
   end
+
+  describe "admin permissions" do
+    before(:each) do
+      account_admin_user(:account => Account.site_admin, :membership_type => 'Limited Admin')
+      user_session(@admin)
+    end
+
+    def add_permission(permission)
+      Account.site_admin.role_overrides.create!(:permission => permission.to_s,
+        :enrollment_type => 'Limited Admin',
+        :enabled => true)
+    end
+
+    describe "site admin" do
+      it "role_overrides" do
+        get "/accounts/#{Account.site_admin.id}/settings"
+        response.should be_success
+        response.body.should_not match /Permissions/
+
+        get "/accounts/#{Account.site_admin.id}/role_overrides"
+        response.status.should == "401 Unauthorized"
+
+        add_permission :manage_role_overrides
+
+        get "/accounts/#{Account.site_admin.id}/role_overrides"
+        response.should be_success
+
+        get "/accounts/#{Account.site_admin.id}/settings"
+        response.should be_success
+        response.body.should match /Permissions/
+      end
+    end
+
+    describe 'root account' do
+      it "read_roster" do
+        add_permission :view_statistics
+
+        get "/accounts/#{Account.default.id}/users"
+        response.status.should == "401 Unauthorized"
+
+        get "/accounts/#{Account.default.id}/settings"
+        response.should be_success
+        response.body.should_not match /Find A User/
+
+        get "/accounts/#{Account.default.id}/statistics"
+        response.should be_success
+        response.body.should_not match /Recently Logged-In Users/
+
+        add_permission :read_roster
+
+        get "/accounts/#{Account.default.id}/users"
+        response.should be_success
+
+        get "/accounts/#{Account.default.id}/settings"
+        response.should be_success
+        response.body.should match /Find A User/
+
+        get "/accounts/#{Account.default.id}/statistics"
+        response.should be_success
+        response.body.should match /Recently Logged-In Users/
+      end
+
+      it "read_course_list" do
+        add_permission :view_statistics
+
+        course
+        get "/accounts/#{Account.default.id}"
+        response.should be_redirect
+
+        get "/accounts/#{Account.default.id}/settings"
+        response.should be_success
+        response.body.should_not match /Course Filtering/
+        response.body.should_not match /Find a Course/
+
+        get "/accounts/#{Account.default.id}/statistics"
+        response.should be_success
+        response.body.should_not match /Recently Started Courses/
+        response.body.should_not match /Recently Ended Courses/
+
+        add_permission :read_course_list
+
+        get "/accounts/#{Account.default.id}"
+        response.should be_success
+        response.body.should match /Courses/
+        response.body.should match /Course Filtering/
+        response.body.should match /Find a Course/
+
+        get "/accounts/#{Account.default.id}/statistics"
+        response.should be_success
+        response.body.should match /Recently Started Courses/
+        response.body.should match /Recently Ended Courses/
+      end
+
+      it "view_statistics" do
+        get "/accounts/#{Account.default.id}/statistics"
+        response.status.should == "401 Unauthorized"
+
+        get "/accounts/#{Account.default.id}/statistics/page_views"
+        response.status.should == "401 Unauthorized"
+
+        get "/accounts/#{Account.default.id}/settings"
+        response.should be_success
+        response.body.should_not match /Statistics/
+
+        add_permission :view_statistics
+
+        get "/accounts/#{Account.default.id}/statistics"
+        response.should be_success
+
+        get "/accounts/#{Account.default.id}/statistics/page_views"
+        response.should be_success
+
+        get "/accounts/#{Account.default.id}/settings"
+        response.should be_success
+        response.body.should match /Statistics/
+      end
+
+      it "manage_user_notes" do
+        Account.default.update_attribute(:enable_user_notes, true)
+        course_with_teacher
+        student_in_course
+        @student.update_account_associations
+        @user_note = UserNote.create!(:creator => @teacher, :user => @student)
+
+        get "/accounts/#{Account.default.id}/user_notes"
+        response.status.should == "401 Unauthorized"
+
+        get "/accounts/#{Account.default.id}/settings"
+        response.should be_success
+        response.body.should_not match /Faculty Journal/
+
+        get "/users/#{@student.id}/user_notes"
+        response.status.should == "401 Unauthorized"
+
+        post "/users/#{@student.id}/user_notes"
+        response.status.should == "401 Unauthorized"
+
+        get "/users/#{@student.id}/user_notes/#{@user_note.id}"
+        response.status.should == "401 Unauthorized"
+
+        delete "/users/#{@student.id}/user_notes/#{@user_note.id}"
+        response.status.should == "401 Unauthorized"
+
+        add_permission :manage_user_notes
+
+        get "/accounts/#{Account.default.id}/user_notes"
+        response.should be_success
+
+        get "/accounts/#{Account.default.id}/settings"
+        response.should be_success
+        response.body.should match /Faculty Journal/
+
+        get "/users/#{@student.id}/user_notes"
+        response.should be_success
+
+        post "/users/#{@student.id}/user_notes.json"
+        response.should be_success
+
+        get "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+        response.should be_success
+
+        delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+        response.should be_success
+      end
+    end
+  end
 end

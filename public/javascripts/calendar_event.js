@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-I18n.scoped('calendar_events', function(I18n) {
 var wikiSidebar;
+I18n.scoped('calendar_events', function(I18n) {
 jQuery(function($) {
   var $full_calendar_event        = $("#full_calendar_event"),
       $edit_calendar_event_form   = $("#edit_calendar_event_form"),

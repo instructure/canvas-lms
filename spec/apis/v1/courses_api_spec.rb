@@ -146,11 +146,13 @@ describe CoursesController, :type => :integration do
     user2 = User.create!(:name => 'Zombo')
     section1 = @course2.default_section
     section2 = @course2.course_sections.create!(:name => 'Section B')
+    section2.update_attribute :sis_source_id, 'sis-section'
     @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
 
     json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
             { :controller => 'courses', :action => 'sections', :course_id => @course2.id.to_s, :format => 'json' }, { :include => ['students'] })
     json.size.should == 2
+    json.find { |s| s['name'] == section2.name }['sis_section_id'].should == 'sis-section'
     json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => USER_API_FIELDS)
     json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => USER_API_FIELDS)
   end

@@ -72,10 +72,12 @@ shared_examples_for "file uploads selenium tests" do
     end
   end
 
-  it "should upload a file on the homework submissions page" do
+  it "should upload a file on the homework submissions page, even over quota" do
     a = @course.assignments.create!(:submission_types => "online_upload")
 
     login_as(@student.email, @password)
+    @student.storage_quota = 1
+    @student.save
 
     # and attempt some assignment submissions
     ["testfile1.txt", "testfile1copy.txt", "testfile2.txt", "testfile3.txt"].each do |orig_filename|

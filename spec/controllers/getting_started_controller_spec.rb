@@ -42,13 +42,14 @@ describe GettingStartedController do
       get 'name'
       assigns[:context].class.should eql(Course)
     end
-    
-    # it "should require authorization code" do
-      # user_session(user)
-      # get 'name'
-      # response.should render_template("authorization_code")
-    # end
-    
+
+    it "should require permission" do
+      Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
+      user_session(user)
+      get 'name'
+      response.status.should == '401 Unauthorized'
+    end
+
     it "should have a route for name" do
       params_from(:get, "/getting_started/name").should == {:controller => "getting_started", :action => "name"}
     end

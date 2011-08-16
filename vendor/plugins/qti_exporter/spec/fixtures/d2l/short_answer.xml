@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item d2l_2p0:id="20" ident="OBJ_1545059" label="QUES_522317_638596" d2l_2p0:page="1">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Short Answer</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>1.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/plain">Who is winning the Tour of California today?</mattext>
+            </material>
+            <response_str ident="QUES_522317_638596_A2928585_STR" rcardinality="Single">
+              <render_fib rows="3" columns="40" prompt="Box" fibtype="String">
+                <response_label ident="QUES_522317_638596_A2928585_ANS"/>
+              </render_fib>
+            </response_str>
+          </flow>
+        </presentation>
+        <resprocessing>
+          <outcomes>
+            <decvar vartype="Integer" minvalue="0" maxvalue="100" varname="Blank_1"/>
+          </outcomes>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_522317_638596_A2928585_ANS" case="no">Nydam</varequal>
+            </conditionvar>
+            <setvar action="Set">100.000000000</setvar>
+          </respcondition>
+        </resprocessing>
+      </item>
+    </section>
+  </objectbank>
+</questestinterop>

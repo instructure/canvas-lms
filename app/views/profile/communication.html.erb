@@ -2,14 +2,6 @@
 
 <% content_for :right_side do %>
   <%= render :partial => "ways_to_contact" %>
-  <% if service = @current_user.user_services.find_by_service('twitter') %>
-    <div class='rs-margin-lr' style="text-align: right;">
-      <a href="#" id="no_tweets" class="help"><%= t('links.not_receiving_tweets', "Not Receiving Tweets?") %></a>
-      <div id="no_tweets_dialog">
-        
-      </div>
-    </div>
-  <% end %>
 <% end %>
 <% js_block :i18n_scope => 'profile.communication' do %>
 <script>
