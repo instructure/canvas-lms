@@ -1,3 +1,16 @@
+canvas-lms (1.1-48) professional; urgency=low
+
+  * Package ref: d7b633089707c33a412749f37a394b0a2e9a0074
+  *
+  * [+15761b5] use the redis data instance rather than rails cache for oauth codes
+  * [+3614447] pass the voiceBridge parameter to BBB create; fixes #5031
+  * [+8dc8fce] zero-pad the voiceBridge id
+  * [+cbae45c] redirect to new files with the same path as deleted files
+  * [+0230103] typo in protect_recipients functionality, fixes #5278
+  * [+d7b6330] conversations teaser
+
+ -- JT Olds <jt@instructure.com>  Tue, 16 Aug 2011 11:00:47 -0600
+
 canvas-lms (1.1-47) professional; urgency=low
 
   * Package ref: 7ae98758c04bfd81f3425d6c7c733dd2e642033a
