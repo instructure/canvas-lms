@@ -4,6 +4,6 @@ class MessageForwards < ActiveRecord::Migration
   end
 
   def self.down
-    drop_column :conversation_messages, :forwarded_message_ids
+    remove_column :conversation_messages, :forwarded_message_ids
   end
 end

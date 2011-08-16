@@ -14,6 +14,6 @@ class UnreadCounts < ActiveRecord::Migration
   end
 
   def self.down
-    drop_column :users, :unread_conversations_count
+    remove_column :users, :unread_conversations_count
   end
 end

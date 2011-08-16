@@ -4,6 +4,6 @@ class ConversationTweaks < ActiveRecord::Migration
   end
 
   def self.down
-    drop_column :conversation_participants, :last_authored_at
+    remove_column :conversation_participants, :last_authored_at
   end
 end

@@ -7,9 +7,9 @@ class MessageAttachmentsAndMediaObjects < ActiveRecord::Migration
   end
 
   def self.down
-    drop_column :conversations, :has_attachments
-    drop_column :conversations, :has_media_objects
-    drop_column :conversation_participants, :has_attachments
-    drop_column :conversation_participants, :has_media_objects
+    remove_column :conversations, :has_attachments
+    remove_column :conversations, :has_media_objects
+    remove_column :conversation_participants, :has_attachments
+    remove_column :conversation_participants, :has_media_objects
   end
 end

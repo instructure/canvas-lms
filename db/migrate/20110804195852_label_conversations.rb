@@ -4,6 +4,6 @@ class LabelConversations < ActiveRecord::Migration
   end
 
   def self.down
-    drop_column :conversation_participants, :label
+    remove_column :conversation_participants, :label
   end
 end
