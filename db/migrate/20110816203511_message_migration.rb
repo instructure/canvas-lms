@@ -48,7 +48,7 @@ class MessageMigration < ActiveRecord::Migration
 
     execute <<-SQL
       CREATE TEMPORARY TABLE __migrated_message_participants #{table_opts}
-      SELECT
+      SELECT DISTINCT
         context_message_id AS migrated_message_id,
         user_id
       FROM
