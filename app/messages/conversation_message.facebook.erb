@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.default_host %>/messages/#/messages/<%= asset.conversation_id %>
+  http://<%= HostUrl.default_host %>/conversations/#/conversations/<%= asset.conversation_id %>
 <% end %>
 <%= t :body, "%{user_name} just sent you a message in Canvas.", :user_name => (asset.author.short_name rescue t(:unknown_user, "Unknown User")) %><br/>
 <b><a href="<%= content :link %>"><%= t :link_text, "View Message" %></a></b>

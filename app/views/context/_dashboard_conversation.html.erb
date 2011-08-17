@@ -1,5 +1,5 @@
 <% conversation = dashboard_conversation %>
-<% conversation_path = "#{conversations_path}#/messages/#{conversation ? conversation.id : '{{ id }}'}" %>
+<% conversation_path = "#{conversations_path}#/conversations/#{conversation ? conversation.id : '{{ id }}'}" %>
 <div class="communication_message conversation message_no_context" style="<%= hidden unless conversation %>" id="conversation_<%= conversation ? conversation.id : "blank" %>">
   <%= render :partial => 'context/dashboard_ignore_link', :object => stream_item %>
   <% if conversation %><a name="conversation_<%= conversation.id %>"></a><% end %>
