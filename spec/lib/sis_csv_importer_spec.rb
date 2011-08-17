@@ -1902,7 +1902,28 @@ describe SIS::SisCsv do
         Course.find_by_sis_source_id("C001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
         Course.find_by_sis_source_id("X001").associated_accounts.map(&:id).sort.should == [Account.find_by_sis_source_id('A001').id, @account.id].sort
       end
-    
+      
+      it 'should import active enrollments with states based on enrollment date restrictions' do
+        process_csv_data(
+          "term_id,name,status,start_date,end_date",
+          "T001,Winter13,active,#{2.days.from_now.strftime("%Y-%m-%d 00:00:00")},#{4.days.from_now.strftime("%Y-%m-%d 00:00:00")}"
+        )
+        process_csv_data(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "C001,TC 101,Test Course 101,,T001,active"
+        )
+        process_csv_data(
+          "user_id,login_id,first_name,last_name,email,status",
+          "user_1,user1,User,Uno,user@example.com,active"
+        )
+        process_csv_data(
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "C001,user_1,student,,active,"
+        )
+        course = Course.find_by_sis_source_id("C001")
+        course.enrollments.length.should == 1
+        course.enrollments.first.workflow_state.should == 'inactive'
+      end
     end
   end
 
