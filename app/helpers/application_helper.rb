@@ -386,7 +386,7 @@ var I18n = I18n || {};
   end
 
   def show_user_create_course_button(user)
-    @domain_root_account.manually_created_courses_account.grants_right?(user, session, [:create_courses, :manage_courses])
+    @domain_root_account.manually_created_courses_account.grants_rights?(user, session, :create_courses, :manage_courses).values.any?
   end
 
   def hash_get(hash, key, default=nil)
