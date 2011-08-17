@@ -542,7 +542,7 @@ I18n.scoped 'conversations', (I18n) ->
   is_selected = ($conversation) ->
     $selected_conversation && $selected_conversation.attr('id') == $conversation?.attr('id')
 
-  select_conversation = ($conversation) ->
+  select_conversation = ($conversation, params={}) ->
     toggle_message_actions(off)
 
     if is_selected($conversation)
@@ -570,14 +570,10 @@ I18n.scoped 'conversations', (I18n) ->
 
     if $selected_conversation
       $selected_conversation.scrollIntoView()
-      location.hash = '/messages/' + $selected_conversation.data('id')
     else
-      if match = location.hash.match(/^#\/messages\?(.*)$/)
-        params = parse_query_string(match[1])
-        if params.user_id and params.user_name and params.from_conversation_id
-          $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name
-          $('#from_conversation_id').val(params.from_conversation_id)
-      location.hash = ''
+      if params and params.user_id and params.user_name and params.from_conversation_id
+        $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name
+        $('#from_conversation_id').val(params.from_conversation_id)
       return
 
     $form.loadingImage()
@@ -626,12 +622,11 @@ I18n.scoped 'conversations', (I18n) ->
     $message.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
     $message.find('p').html $.h(data.body).replace(/\n/g, '<br />')
     $pm_action = $message.find('a.send_private_message')
-    pm_url = $.replaceTags($pm_action.attr('href'), 'user_id', data.author_id)
-    pm_url = $.replaceTags(pm_url, 'user_name', encodeURIComponent(user_name))
-    pm_url = $.replaceTags(pm_url, 'from_conversation_id', $selected_conversation.data('id'))
-    $pm_action.attr('href', pm_url).click =>
-      setTimeout => 
-        select_conversation()
+    pm_url = $.replaceTags $pm_action.attr('href'),
+      user_id: data.author_id
+      user_name: encodeURIComponent(user_name)
+      from_conversation_id: $selected_conversation.data('id')
+    $pm_action.attr 'href', pm_url
     if data.forwarded_messages?.length
       $ul = $('<ul class="messages"></ul>')
       for submessage in data.forwarded_messages
@@ -672,7 +667,7 @@ I18n.scoped 'conversations', (I18n) ->
       $conversation.prepend $('<img />').attr('src', data.avatar_url).addClass('avatar')
     $conversation[if append then 'appendTo' else 'prependTo']($conversation_list).click (e) ->
       e.preventDefault()
-      select_conversation $(this)
+      location.hash = '/messages/' + $(this).data('id')
     update_conversation($conversation, data, true)
     $conversation.hide().slideDown('fast') unless append
     $conversation
@@ -861,9 +856,6 @@ I18n.scoped 'conversations', (I18n) ->
         $message.toggleClass('selected')
         $message.find('> :checkbox').attr('checked', $message.hasClass('selected'))
       toggle_message_actions()
-
-    $('#action_compose_message').click ->
-      select_conversation()
 
     $('.menus > li > a').click (e) ->
       e.preventDefault()
@@ -1099,7 +1091,12 @@ I18n.scoped 'conversations', (I18n) ->
     $(window).resize inbox_resize
     setTimeout inbox_resize
 
-    if match = location.hash.match(/^#\/messages\/(\d+)$/)
-      $('#conversation_' + match[1]).click()
-    else
-      $('#action_compose_message').click()
+    $(document).fragmentChange (event, hash) ->
+      if match = hash.match(/^#\/messages\/(\d+)$/)
+        select_conversation($('#conversation_' + match[1]))
+      else if $('#action_compose_message').length
+        params = {}
+        if match = hash.match(/^#\/messages\?(.*)$/)
+          params = parse_query_string(match[1])
+        select_conversation(null, params)
+    .triggerHandler('document_fragment_change', location.hash)
