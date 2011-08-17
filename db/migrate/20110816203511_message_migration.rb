@@ -51,7 +51,7 @@ class MessageMigration < ActiveRecord::Migration
       FROM
         context_message_participants
     SQL
-    add_index :__migrated_message_participants, :context_message_id
+    add_index :__migrated_message_participants, :migrated_message_id
 
     if mysql
       execute  <<-SQL
