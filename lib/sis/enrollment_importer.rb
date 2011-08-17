@@ -91,7 +91,7 @@ module SIS
                     section ||= course.default_section
                   end
 
-                  course ||= section.course
+                  course = section.course if !course || (course.id != section.course_id && section.nonxlist_course_id == course.id)
 
                   if course.id != section.course_id
                     add_warning csv, "An enrollment listed a section and a course that are unrelated"
