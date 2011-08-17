@@ -158,17 +158,4 @@ This text has a http://www.google.com link in it...
     @item.data.submission_comments[0].id.should eql(@comment.id)
     @item.data.submission_comments[0].formatted_body.should eql(@comment.formatted_body(250))
   end
-
-  it "should not generate a conversation message when created by the submission_owner" do
-    old_count = ConversationMessage.count
-    SubmissionComment.create(@valid_attributes.merge(:author => @user))
-    ConversationMessage.count.should eql(old_count)
-  end
-
-  it "should generate a conversation message when created by someone other than the submission_owner" do
-    old_count = ConversationMessage.count
-    commentor = factory_with_protected_attributes(User, :name => "some other student", :workflow_state => "registered")
-    SubmissionComment.create(@valid_attributes.merge(:author => commentor))
-    ConversationMessage.count.should eql(old_count+1)
-  end
 end

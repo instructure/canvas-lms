@@ -39,7 +39,32 @@ class SubmissionComment < ActiveRecord::Base
   after_save :update_submission
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
-  after_create :generate_conversation_message
+
+  trigger.after(:insert) do
+    <<-SQL
+    UPDATE submissions
+    SET has_admin_comment=EXISTS(
+      SELECT 1 FROM submission_comments AS sc, assignments AS a, courses AS c, enrollments AS e
+      WHERE sc.submission_id = submissions.id AND a.id = submissions.assignment_id
+        AND c.id = a.context_id AND a.context_type = 'Course' AND e.course_id = c.id
+        AND e.user_id = sc.author_id AND e.workflow_state = 'active'
+        AND e.type IN ('TeacherEnrollment', 'TaEnrollment'))
+    WHERE id = NEW.submission_id;
+    SQL
+  end
+
+  trigger.after(:delete) do
+    <<-SQL
+    UPDATE submissions
+    SET has_admin_comment=EXISTS(
+      SELECT 1 FROM submission_comments AS sc, assignments AS a, courses AS c, enrollments AS e
+      WHERE sc.submission_id = submissions.id AND a.id = submissions.assignment_id
+        AND c.id = a.context_id AND a.context_type = 'Course' AND e.course_id = c.id
+        AND e.user_id = sc.author_id AND e.workflow_state = 'active'
+        AND e.type IN ('TeacherEnrollment', 'TaEnrollment'))
+    WHERE id = OLD.submission_id;
+    SQL
+  end
 
   serialize :cached_attachments
   
@@ -180,12 +205,6 @@ class SubmissionComment < ActiveRecord::Base
   
   def context_code
     "#{self.context_type.downcase}_#{self.context_id}"
-  end
-
-  def generate_conversation_message
-    return unless author_id && submission_id && author_id != submission.user_id
-    conversation = author.initiate_conversation([submission.user_id])
-    conversation.add_message(comment)
   end
 
   named_scope :after, lambda{|date|
