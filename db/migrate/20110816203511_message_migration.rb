@@ -207,8 +207,8 @@ class MessageMigration < ActiveRecord::Migration
     SQL
 
     # hide inbox_items from the users
-    execute "UPDATE inbox_items SET workflow_state = 'retired' WHERE asset_type = 'ContextMessage' AND workflow_state = 'read'"
-    execute "UPDATE inbox_items SET workflow_state = 'retired_unread' WHERE asset_type = 'ContextMessage' AND workflow_state = 'unread'"
+    execute "UPDATE inbox_items SET workflow_state = 'retired' WHERE asset_type IN ('ContextMessage', 'SubmissionComment') AND workflow_state = 'read'"
+    execute "UPDATE inbox_items SET workflow_state = 'retired_unread' WHERE asset_type = ('ContextMessage', 'SubmissionComment') AND workflow_state = 'unread'"
 
 
     execute <<-SQL

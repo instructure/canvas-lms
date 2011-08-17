@@ -159,24 +159,6 @@ This text has a http://www.google.com link in it...
     @item.data.submission_comments[0].formatted_body.should eql(@comment.formatted_body(250))
   end
 
-  it "should send the comment to inbox" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save
-    @course.offer
-    te = @course.enroll_teacher(@user)
-    se = @course.enroll_student(user)
-    @assignment.reload
-    @submission = @assignment.submit_homework(se.user, :body => 'some message')
-    @submission.created_at = Time.now - 60
-    @submission.save
-    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    ii = InboxItem.last
-    ii.asset.should == @submission.submission_comments.last
-    ii.sender_id.should == se.user_id
-    ii.user_id.should == te.user_id
-  end
-
   it "should not generate a conversation message when created by the submission_owner" do
     old_count = ConversationMessage.count
     SubmissionComment.create(@valid_attributes.merge(:author => @user))

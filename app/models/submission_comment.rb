@@ -17,7 +17,6 @@
 #
 
 class SubmissionComment < ActiveRecord::Base
-  include SendToInbox
   include SendToStream
   
   belongs_to :submission #, :touch => true
@@ -58,24 +57,6 @@ class SubmissionComment < ActiveRecord::Base
   
   has_a_broadcast_policy
 
-  on_create_send_to_inboxes do
-    if self.submission
-      users = []
-      if self.author_id == self.submission.user_id
-        users = self.submission.context.admins_in_charge_of(self.author_id)
-      else
-        users = self.submission.user_id
-      end
-      submission = self.submission
-      {
-        :recipients => users,
-        :subject => "#{submission.assignment.title}: #{submission.user.name}",
-        :body => self.comment,
-        :sender => self.author_id
-      }
-    end
-  end
-  
   def media_comment?
     self.media_comment_id && self.media_comment_type
   end
