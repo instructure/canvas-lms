@@ -688,7 +688,7 @@
         $form.addClass('new');
         $form.find('#action_add_recipients').hide();
         $form.attr({
-          action: '/messages'
+          action: '/conversations'
         });
       } else {
         $form.find('.audience').html($selected_conversation.find('.audience').html());
@@ -916,7 +916,7 @@
       }
       $conversation[append ? 'appendTo' : 'prependTo']($conversation_list).click(function(e) {
         e.preventDefault();
-        return location.hash = '/messages/' + $(this).data('id');
+        return location.hash = '/conversations/' + $(this).data('id');
       });
       update_conversation($conversation, data, true);
       if (!append) {
@@ -1513,11 +1513,11 @@
       setTimeout(inbox_resize);
       return $(document).fragmentChange(function(event, hash) {
         var match, params;
-        if (match = hash.match(/^#\/messages\/(\d+)$/)) {
+        if (match = hash.match(/^#\/conversations\/(\d+)$/)) {
           return select_conversation($('#conversation_' + match[1]));
         } else if ($('#action_compose_message').length) {
           params = {};
-          if (match = hash.match(/^#\/messages\?(.*)$/)) {
+          if (match = hash.match(/^#\/conversations\?(.*)$/)) {
             params = parse_query_string(match[1]);
           }
           return select_conversation(null, params);

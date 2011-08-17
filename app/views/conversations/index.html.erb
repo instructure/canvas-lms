@@ -20,16 +20,19 @@
             </ul>
             <ul>
               <li class="<%= 'checked' if @scope == :inbox %>"><%= link_to t('inbox_views.inbox', "Inbox"), conversations_url %></li>
-              <li class="<%= 'checked' if @scope == :unread %>"><%= link_to t('inbox_views.unread_messages', "Unread"), messages_unread_url %></li>
+              <li class="<%= 'checked' if @scope == :unread %>"><%= link_to t('inbox_views.unread_messages', "Unread"), conversations_unread_url %></li>
               <li class="label_group">
               <%= before_label t('labels.conversation_label', 'Label') %><br />
               <% ConversationParticipant.labels.each do |label, text| %>
-                <%= link_to text, messages_labeled_url(:label => label), :class => 'label_icon ' + label + (label == @label ? ' checked' : '') %>
+                <%= link_to text, conversations_labeled_url(:label => label), :class => 'label_icon ' + label + (label == @label ? ' checked' : '') %>
               <% end %>
               </li>
             </ul>
+            <ul>
+              <li class="<%= 'checked' if @scope == :archived %>"><%= link_to t('inbox_views.archived_messages', "Archived"), conversations_archived_url %></li>
+            </ul>
             <ul class="last">
-              <li class="<%= 'checked' if @scope == :archived %>"><%= link_to t('inbox_views.archived_messages', "Archived"), messages_archived_url %></li>
+              <li><%= link_to t('inbox_views.discussion_replies', "Discussion Replies"), discussion_replies_url %></li>
             </ul>
           </div>
         </li>
@@ -57,7 +60,7 @@
         </li>
       </ul>
       <table>
-        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :finder_url => messages_find_recipients_url, :class => "recipients" %></td></tr>
+        <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :finder_url => conversations_find_recipients_url, :class => "recipients" %></td></tr>
         <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
       </table>
       <div style="text-align:right">
@@ -122,13 +125,13 @@
   <p>
     <%= t :add_recipients_instructions, "People you add to the conversation will see all previous messages." %>
   </p>
-  <%= text_field_tag :recipients, nil, :id => 'add_recipients', :finder_url => messages_find_recipients_url, :class => "recipients", :style => "width: 370px" %>
+  <%= text_field_tag :recipients, nil, :id => 'add_recipients', :finder_url => conversations_find_recipients_url, :class => "recipients", :style => "width: 370px" %>
   <div class='actions' style='padding-top: 10px'><button type='submit' class='button' style='float: right'><%= t 'buttons.add_people', "Add People" %></button></div>
 </form>
 
 <% form_tag conversations_url, :id => 'forward_message_form' do %>
   <table>
-    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, :finder_url => messages_find_recipients_url, :class => "recipients" %></td></tr>
+    <tr id="recipient_info"><th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :id => :forward_recipients, :finder_url => conversations_find_recipients_url, :class => "recipients" %></td></tr>
     <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body, nil, :id => :forward_body %></td></tr>
   </table>
   <ul class="messages"></ul>

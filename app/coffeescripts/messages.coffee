@@ -517,7 +517,7 @@ I18n.scoped 'conversations', (I18n) ->
       $form.find('.audience').html I18n.t('headings.new_message', 'New Message')
       $form.addClass('new')
       $form.find('#action_add_recipients').hide()
-      $form.attr action: '/messages'
+      $form.attr action: '/conversations'
     else
       $form.find('.audience').html $selected_conversation.find('.audience').html()
       $form.removeClass('new')
@@ -667,7 +667,7 @@ I18n.scoped 'conversations', (I18n) ->
       $conversation.prepend $('<img />').attr('src', data.avatar_url).addClass('avatar')
     $conversation[if append then 'appendTo' else 'prependTo']($conversation_list).click (e) ->
       e.preventDefault()
-      location.hash = '/messages/' + $(this).data('id')
+      location.hash = '/conversations/' + $(this).data('id')
     update_conversation($conversation, data, true)
     $conversation.hide().slideDown('fast') unless append
     $conversation
@@ -1092,11 +1092,11 @@ I18n.scoped 'conversations', (I18n) ->
     setTimeout inbox_resize
 
     $(document).fragmentChange (event, hash) ->
-      if match = hash.match(/^#\/messages\/(\d+)$/)
+      if match = hash.match(/^#\/conversations\/(\d+)$/)
         select_conversation($('#conversation_' + match[1]))
       else if $('#action_compose_message').length
         params = {}
-        if match = hash.match(/^#\/messages\?(.*)$/)
+        if match = hash.match(/^#\/conversations\?(.*)$/)
           params = parse_query_string(match[1])
         select_conversation(null, params)
     .triggerHandler('document_fragment_change', location.hash)
