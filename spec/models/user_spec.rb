@@ -254,7 +254,23 @@ describe User do
     user.remove_from_root_account account1
     user.associated_root_accounts.should eql [account2]
   end
-  
+
+  it "should support incrementally adding to account associations" do
+    user = User.create!
+    user.user_account_associations.should == []
+
+    sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
+
+    User.update_account_associations([user], :incremental => true, :precalculated_associations => {1 => 0})
+    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.should == [{1 => 0}]
+
+    User.update_account_associations([user], :incremental => true, :precalculated_associations => {2 => 1})
+    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{1 => 0}, {2 => 1}].sort(&sort_account_associations)
+
+    User.update_account_associations([user], :incremental => true, :precalculated_associations => {3 => 1, 1 => 2, 2 => 0})
+    user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{1 => 0}, {2 => 0}, {3 => 1}].sort(&sort_account_associations)
+  end
+
   context "move_to_user" do
     it "should delete the old user" do
       @user1 = user_model

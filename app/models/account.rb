@@ -720,19 +720,16 @@ class Account < ActiveRecord::Base
 
   # Updates account associations for all the courses and users associated with this account
   def update_account_associations
+    account_chain_cache = {}
     all_user_ids = []
-    self.associated_courses.compact.uniq.each do |course|
-      # Don't update the user associations yet, we'll do that afterwards so we only do it once per user
-      course.update_account_associations(false)
-      all_user_ids += course.user_ids
-    end
-    
+    all_user_ids += Course.update_account_associations(self.associated_courses.uniq, :skip_user_account_associations => true, :account_chain_cache => account_chain_cache)
+
     # Make sure we have all users with existing account associations.
     # (This should catch users with Pseudonyms associated with the account.)
-    all_user_ids += UserAccountAssociation.scoped(:select => 'user_id', :conditions => { :account_id => id }).map(&:user_id)
-    
+    all_user_ids += UserAccountAssociation.scoped(:select => 'user_id', :conditions => { :account_id => self.id }).map(&:user_id)
+
     # Update the users' associations as well
-    User.update_account_associations(all_user_ids.uniq)
+    User.update_account_associations(all_user_ids.uniq, :account_chain_cache => account_chain_cache)
   end
   
   # this will take an account and make it a sub_account of

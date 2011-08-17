@@ -184,20 +184,21 @@ describe CourseSection, "moving to new course" do
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     cs1 = course1.course_sections.create!
-    cs2 = course2.course_sections.create!
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
-    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.should == [account2.id]
     cs1.account = account2
+    cs1.course.course_sections.reset
     cs1.save
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).sort.should == [account1.id, account2.id].sort
-    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.sort.should == [account1.id, account2.id].sort
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.should == [account2.id]
     cs1.account = nil
+    cs1.course.course_sections.reset
     cs1.save
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
-    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).should == [account2.id]
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.should == [account2.id]
     cs1.crosslist_to_course(course2)
-    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).should == [account1.id]
-    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).sort.should == [account1.id, account2.id].sort
+    CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.should == [account1.id]
+    CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.sort.should == [account1.id, account2.id].sort
   end
   
 end

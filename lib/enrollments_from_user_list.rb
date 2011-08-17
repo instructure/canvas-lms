@@ -31,7 +31,7 @@ class EnrollmentsFromUserList
     @enrollment_state = opts[:enrollment_state]
     @enrollment_type = opts[:enrollment_type] || 'StudentEnrollment'
     @limit = opts[:limit]
-    @section = (opts[:course_section_id].present? ? @course.course_sections.active.find_by_id(opts[:course_section_id]) : nil) || @course.default_section
+    @section = (opts[:course_section_id].present? ? @course.course_sections.active.find_by_id(opts[:course_section_id].to_i) : nil) || @course.default_section
     @limit_privileges_to_course_section = opts[:limit_priveleges_to_course_section] # doh, misspelling
     @enrolled_users = {}
   end

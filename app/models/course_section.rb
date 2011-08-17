@@ -126,10 +126,13 @@ class CourseSection < ActiveRecord::Base
   
   def move_to_course(course, delay_jobs = true)
     return self if self.course_id == course.id
+    old_course = self.course
     self.course = course
     root_account_change = (self.root_account != course.root_account)
     self.root_account = course.root_account if root_account_change
     self.default_section = (course.course_sections.active.size == 0)
+    old_course.course_sections.reset
+    course.course_sections.reset
     self.save!
     user_ids = self.enrollments.map(&:user_id).uniq
     if root_account_change

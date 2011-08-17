@@ -908,9 +908,9 @@ describe SIS::SisCsv do
         "test_2,TC 102,Test Course 102,,,active"
       )
       bad_course = @account.courses.find_by_sis_source_id("test_1")
-      bad_course.course_sections.length.should == 1
+      bad_course.course_sections.length.should == 0
       good_course = @account.courses.find_by_sis_source_id("test_2")
-      good_course.course_sections.length.should == 1
+      good_course.course_sections.length.should == 0
       process_csv_data(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user@example.com,active"

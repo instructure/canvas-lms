@@ -267,10 +267,100 @@ class Course < ActiveRecord::Base
     license_data[:readable_license]
   end
 
-  def self.update_account_associations(course_ids)
-    Course.find_all_by_id(course_ids).compact.each do |course|
-      course.update_account_associations
+  def self.update_account_associations(courses_or_course_ids, opts = {})
+    return [] if courses_or_course_ids.empty?
+    opts.reverse_merge! :account_chain_cache => {}
+    account_chain_cache = opts[:account_chain_cache]
+
+    # Split it up into manageable chunks
+    user_ids_to_update_account_associations = []
+    if courses_or_course_ids.length > 500
+      opts = opts.dup
+      opts.reverse_merge! :skip_user_account_associations => true
+      courses_or_course_ids.uniq.compact.each_slice(500) do |courses_or_course_ids_slice|
+        user_ids_to_update_account_associations += update_account_associations(courses_or_course_ids_slice, opts)
+      end
+    else
+
+      if courses_or_course_ids.first.is_a? Course
+        courses = courses_or_course_ids
+        Course.send(:preload_associations, courses, :course_sections => :nonxlist_course)
+        course_ids = courses.map(&:id)
+      else
+        course_ids = courses_or_course_ids
+        courses = Course.find(:all, :conditions => {:id => course_ids }, :include => { :course_sections => :nonxlist_course })
+      end
+      course_ids_to_update_user_account_associations = []
+      CourseAccountAssociation.transaction do
+        current_associations = {}
+        to_delete = []
+        CourseAccountAssociation.find(:all, :conditions => { :course_id => course_ids }).each do |aa|
+          key = [aa.course_section_id, aa.account_id]
+          # duplicates
+          current_course_associations = current_associations[aa.course_id] ||= {}
+          if current_course_associations.has_key?(key)
+            to_delete << aa.id
+            next
+          end
+          current_course_associations[key] = [aa.id, aa.depth]
+        end
+
+        courses.each do |course|
+          did_an_update = false
+          current_course_associations = current_associations[course.id] || {}
+
+          # Courses are tied to accounts directly and through sections and crosslisted courses
+          (course.course_sections + [nil]).each do |section|
+            next if section && !section.active?
+            section.course = course if section
+            starting_account_ids = [course.account_id, section.try(:account_id), section.try(:nonxlist_course).try(:account_id)].compact.uniq
+
+            account_ids_with_depth = User.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache).map
+
+            account_ids_with_depth.each do |account_id_with_depth|
+              account_id = account_id_with_depth[0]
+              depth = account_id_with_depth[1]
+              key = [section.try(:id), account_id]
+              association = current_course_associations[key]
+              if association.nil?
+                # new association, create it
+                CourseAccountAssociation.create! do |aa|
+                  aa.course_id = course.id
+                  aa.course_section_id = section.try(:id)
+                  aa.account_id = account_id
+                  aa.depth = depth
+                end
+                did_an_update = true
+              else
+                if association[1] != depth
+                  CourseAccountAssociation.update_all("depth=#{depth}", :id => association[0])
+                  did_an_update = true
+                end
+                # remove from list of existing
+                current_course_associations.delete(key)
+              end
+            end
+          end
+          did_an_update ||= !current_course_associations.empty?
+          if did_an_update
+            course.course_account_associations.reset
+            course.non_unique_associated_accounts.reset
+            course_ids_to_update_user_account_associations << course.id
+          end
+        end
+
+        to_delete += current_associations.map { |k, v| v.map { |k2, v2| v2[0] } }.flatten
+        unless to_delete.empty?
+          CourseAccountAssociation.delete_all(:id => to_delete)
+        end
+      end
+
+      user_ids_to_update_account_associations = Enrollment.find(:all, :select => 'user_id', :group => :user_id,
+        :conditions => [ 'course_id IN(?) AND workflow_state <> ?', course_ids_to_update_user_account_associations, 'deleted' ]).map(&:user_id) unless
+          course_ids_to_update_user_account_associations.empty?
     end
+    User.update_account_associations(user_ids_to_update_account_associations, :account_chain_cache => account_chain_cache) unless user_ids_to_update_account_associations.empty? || opts[:skip_user_account_associations]
+    user_ids_to_update_account_associations
   end
   
   def has_outcomes
@@ -279,51 +369,8 @@ class Course < ActiveRecord::Base
     end
   end
   
-  def update_account_associations(update_user_account_associations = true)
-    # Look up the current associations, and remove any duplicates.
-    associations_hash = {}
-    to_delete = {}
-    self.course_account_associations.each do |association|
-      key = [association.account_id, association.course_section_id]
-      if !associations_hash[key]
-        associations_hash[key] = association
-        to_delete[key] = association
-      else
-        association.destroy
-      end
-    end
-    
-    did_an_update = false
-    
-    # Courses are tied to accounts directly and through sections and crosslisted courses
-    all_sections = self.course_sections.active.find(:all)
-    initial_entities = ([self] + all_sections + all_sections.map(&:nonxlist_course)).compact.uniq
-    Course.skip_updating_account_associations do
-      initial_entities.each do |entity|
-        accounts = entity.account ? entity.account.account_chain : []
-        section = (entity.is_a?(Course) ? entity.default_section : entity)
-        accounts.each_with_index do |account, idx|
-          key = [account.id, section.id]
-          if associations_hash[key]
-            unless associations_hash[key].depth == idx
-              associations_hash[key].update_attributes(:depth => idx)
-              did_an_update = true
-            end
-            to_delete.delete(key)
-          else
-            associations_hash[key] = self.course_account_associations.create(:account => account, :depth => idx, :course_section => section)
-            did_an_update = true
-          end
-        end
-      end
-    end
-    to_delete.each_value {|association| association.destroy; did_an_update = true }
-    
-    if did_an_update && update_user_account_associations
-      self.users.each {|u| u.update_account_associations }
-    end
-    
-    true
+  def update_account_associations
+    Course.update_account_associations([self])
   end
   
   def associated_accounts
