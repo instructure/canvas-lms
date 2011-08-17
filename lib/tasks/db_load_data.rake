@@ -362,28 +362,6 @@ namespace :db do
       <%= asset.title %>, <%= assset.context.name %> has been graded.
     }
 
-    create_notification 'Attachment', 'Files', 0,
-    'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.id %>', %{
-      New File Added
-      
-      New File Added: <%= asset.title %>, <%= asset.context.name %>
-      
-      A new file has been added for the course, <%= asset.context.name %>:
-      
-      <%= asset.title %>
-      
-      <%= asset.readable_size %>
-      
-      
-      You can view it here:
-      <%= main_link %>
-    }, %{
-      New file added for <%= asset.context.name %>:
-      <%= asset.title %>
-      
-      <%= asset.readable_size %>
-    }
-    
     create_notification 'CalendarEvent', 'Calendar', 0,
     'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>', %{
       New Event Created
