@@ -41,6 +41,7 @@ class MessageMigration < ActiveRecord::Migration
         context_messages
     SQL
     change_column :__migrated_messages, :signature, :text if mysql
+    add_index :__migrated_messages, :id
 
     execute <<-SQL
       CREATE TEMPORARY TABLE __migrated_message_participants #{mysql ? '' : 'AS'}
@@ -50,39 +51,34 @@ class MessageMigration < ActiveRecord::Migration
       FROM
         context_message_participants
     SQL
-    add_index :__migrated_message_participants, [:context_message_id, :user_id]
+    add_index :__migrated_message_participants, :context_message_id
 
-    grouper = if mysql
-      <<-SQL
-        SELECT GROUP_CONCAT(DISTINCT user_id ORDER BY user_id)
+    if mysql
+      execute  <<-SQL
+        CREATE TEMPORARY TABLE __migrated_message_participant_strings
+        SELECT migrated_message_id, GROUP_CONCAT(DISTINCT user_id ORDER BY user_id) AS participants, COUNT(DISTINCT user_id) <= 2 AS private
         FROM __migrated_message_participants
-        WHERE migrated_message_id = __migrated_messages.id
+        GROUP BY migrated_message_id
       SQL
     else
-      <<-SQL
-        SELECT STRING_AGG(user_id::TEXT, ',')
+      execute <<-SQL
+        CREATE TEMPORARY TABLE __migrated_message_participant_strings AS
+        SELECT migrated_message_id, STRING_AGG(user_id::TEXT, ',') AS participants, COUNT(DISTINCT user_id) <= 2 AS private
         FROM (
-          SELECT DISTINCT user_id
+          SELECT DISTINCT migrated_message_id, user_id
           FROM __migrated_message_participants
-          WHERE migrated_message_id = __migrated_messages.id
-          ORDER BY user_id
+          ORDER BY migrated_message_id, user_id
         ) p
+        GROUP BY migrated_message_id
       SQL
     end
+    add_index :__migrated_message_participant_strings, :migrated_message_id
 
-    # private conversations and monologues
     execute <<-SQL
-      UPDATE __migrated_messages
-      SET signature = (
-        #{grouper}
-        HAVING COUNT(DISTINCT user_id) <= 2
-      )
-    SQL
-    # group conversations
-    execute <<-SQL
-      UPDATE __migrated_messages
-      SET signature = root_context_message_id || ':' || (#{grouper})
-      WHERE signature IS NULL
+      UPDATE __migrated_messages #{mysql ? ", __migrated_message_participant_strings" : ""}
+      SET signature = CASE WHEN private THEN '' ELSE root_context_message_id || ':' END || participants
+      #{mysql ? "" : " FROM __migrated_message_participant_strings"}
+      WHERE migrated_message_id = __migrated_messages.id
     SQL
     if mysql
       execute "CREATE INDEX index___migrated_messages_on_signature ON __migrated_messages (signature(767))"
