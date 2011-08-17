@@ -38,14 +38,15 @@ module SIS
     def process(csv)
       start = Time.now
       course = nil
+      course_ids_to_update_associations = [].to_set
+
       Course.skip_callback(:update_enrollments_later) do
         FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
           update_progress
           logger.debug("Processing CrossListing #{row.inspect}")
           
           Course.skip_updating_account_associations do
-            courses_to_update_associations = [].to_set
-            
+
             section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, row['section_id'])
             unless section
               add_warning(csv, "A cross-listing referenced a non-existent section #{row['section_id']}")
@@ -68,8 +69,8 @@ module SIS
                 course.sis_batch_id = @batch.id if @batch
                 course.workflow_state = 'claimed'
                 course.template_course = section.course
-                Course.skip_updating_account_associations { course.save_without_broadcasting! }
-                course.update_account_associations
+                course.save_without_broadcasting!
+                course_ids_to_update_associations.add course.id
               end
             end
 
@@ -80,19 +81,17 @@ module SIS
                   course.workflow_state = 'claimed'
                   course.save_without_broadcasting!
                   course.update_enrolled_users
-                  courses_to_update_associations.add course
+                  course_ids_to_update_associations.add course.id
                 end
 
                 if section.course_id == course.id
-                  courses_to_update_associations.map(&:update_account_associations)
                   @sis.counts[:xlists] += 1
                   next
                 end
 
                 begin
-                  courses_to_update_associations.add section.course
-                  courses_to_update_associations.add course
-                  section.crosslist_to_course(course, false, false)
+                  course_ids_to_update_associations.merge [course.id, section.course_id, section.nonxlist_course_id].compact
+                  section.crosslist_to_course(course, :run_jobs_immediately, :nonsticky)
                 rescue => e
                   add_warning(csv, "An active cross-listing failed: #{e}")
                   next
@@ -105,9 +104,8 @@ module SIS
                 end
 
                 begin
-                  courses_to_update_associations.add section.course
-                  section.uncrosslist(false)
-                  courses_to_update_associations.add section.course
+                  course_ids_to_update_associations.merge [section.course_id, section.nonxlist_course_id]
+                  section.uncrosslist(:run_jobs_immediately)
                 rescue => e
                   add_warning(csv, "A deleted cross-listing failed: #{e}")
                   next
@@ -119,11 +117,11 @@ module SIS
 
               @sis.counts[:xlists] += 1
             end
-
-            courses_to_update_associations.map(&:update_account_associations)
           end
         end
       end
+      Course.update_account_associations(course_ids_to_update_associations.to_a) unless course_ids_to_update_associations.empty?
+
     end
     
   end

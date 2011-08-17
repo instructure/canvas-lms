@@ -48,7 +48,7 @@ module SIS
       course = section = nil
 
       Enrollment.skip_callback(:belongs_to_touch_after_save_or_destroy_for_course) do
-        User.skip_updating_user_account_associations do
+        User.skip_updating_account_associations do
           FasterCSV.open(csv[:fullpath], "rb", :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |csv_object|
             row = csv_object.shift
             count = 0

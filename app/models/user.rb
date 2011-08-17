@@ -196,18 +196,18 @@ class User < ActiveRecord::Base
   end
   memoize :page_views_by_day
   
-  def self.skip_updating_user_account_associations(&block)
-    @skip_updating_user_account_associations = true
+  def self.skip_updating_account_associations(&block)
+    @skip_updating_account_associations = true
     block.call
   ensure
-    @skip_updating_user_account_associations = false
+    @skip_updating_account_associations = false
   end
-  def self.skip_updating_user_account_associations?
-    !!@skip_updating_user_account_associations
+  def self.skip_updating_account_associations?
+    !!@skip_updating_account_associations
   end
   
   def update_account_associations_later
-    self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_user_account_associations?
+    self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_account_associations?
   end
   
   def update_account_associations

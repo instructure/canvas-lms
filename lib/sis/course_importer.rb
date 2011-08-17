@@ -43,12 +43,13 @@ module SIS
     def process(csv)
       start = Time.now
       courses_to_update_sis_batch_id = []
+      course_ids_to_update_associations = [].to_set
+
       Course.skip_callback(:update_enrollments_later) do
         FasterCSV.foreach(csv[:fullpath], :headers => :first_row, :skip_blanks => true, :header_converters => :downcase) do |row|
           update_progress
 
           Course.skip_updating_account_associations do
-            courses_to_update_associations = [].to_set
 
             logger.debug("Processing Course #{row.inspect}")
             term = @root_account.enrollment_terms.find_by_sis_source_id(row['term_id'])
@@ -63,7 +64,7 @@ module SIS
             course.account = account if account
             course.account ||= @root_account
 
-            courses_to_update_associations.add course if course.account_id_changed? || course.root_account_id_changed?
+            update_account_associations = course.account_id_changed? || course.root_account_id_changed?
 
             course.sis_source_id = row['course_id']
             if row['status'] =~ /active/i
@@ -136,20 +137,22 @@ module SIS
                 end
                 templated_course.enrollment_term = course.enrollment_term
                 templated_course.sis_batch_id = @batch.id if @batch
-                courses_to_update_associations.add templated_course if templated_course.account_id_changed? || templated_course.root_account_id_changed?
+                course_ids_to_update_associations.add(templated_course.id) if templated_course.account_id_changed? || templated_course.root_account_id_changed?
                 templated_course.save_without_broadcasting!
               end
               course.sis_batch_id = @batch.id if @batch
               course.save_without_broadcasting!
+              course_ids_to_update_associations.add(course.id) if update_account_associations
             elsif @batch
               courses_to_update_sis_batch_id << course.id
             end
             @sis.counts[:courses] += 1
 
-            courses_to_update_associations.map(&:update_account_associations)
             course.update_enrolled_users if update_enrollments
           end
         end
+        Course.update_account_associations(course_ids_to_update_associations.to_a) unless course_ids_to_update_associations.empty?
+
         Course.update_all({:sis_batch_id => @batch.id}, {:id => courses_to_update_sis_batch_id}) if @batch && !courses_to_update_sis_batch_id.empty?
         logger.debug("Courses took #{Time.now - start} seconds")
       end
