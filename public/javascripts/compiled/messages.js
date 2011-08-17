@@ -1408,7 +1408,7 @@
       });
       $('#forward_message_form').submit(function(e) {
         var valid;
-        valid = !!($form.find('#forward_body').val() && $(this).find('.token_input li').length);
+        valid = !!($(this).find('#forward_body').val() && $(this).find('.token_input li').length);
         if (!valid) {
           e.stopImmediatePropagation();
         }

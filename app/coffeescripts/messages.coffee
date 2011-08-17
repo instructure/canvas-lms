@@ -1017,7 +1017,7 @@ I18n.scoped 'conversations', (I18n) ->
           $('#forward_recipients').data('token_input').input.blur()
 
     $('#forward_message_form').submit (e) ->
-      valid = !!($form.find('#forward_body').val() and $(this).find('.token_input li').length)
+      valid = !!($(this).find('#forward_body').val() and $(this).find('.token_input li').length)
       e.stopImmediatePropagation() unless valid
       valid
     $('#forward_message_form').formSubmit
