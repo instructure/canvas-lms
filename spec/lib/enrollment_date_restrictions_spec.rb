@@ -579,9 +579,10 @@ describe EnrollmentDateRestrictions do
         @course.conclude_at = end_at
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
-        jobs = Delayed::Job.all(:limit => 2, :order => 'id desc').reverse
+        jobs = Delayed::Job.all(:limit => 3, :order => 'id desc').reverse
         jobs[0].run_at.should be_close start_at, 1
         jobs[1].run_at.should be_close end_at, 1
+        jobs[2].run_at.should be_close Time.now, 1
       end
     end
   end

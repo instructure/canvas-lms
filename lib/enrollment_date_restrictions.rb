@@ -22,23 +22,17 @@ module EnrollmentDateRestrictions
   
   def schedule_date_restrictions_update
     if @schedule_restrictions_update
-      do_it_now = false
-      
+      strand = "enrollment_date_restriction:update_restricted_enrollments:#{self.asset_string}"
       if start_at && start_at > Time.now
-        EnrollmentDateRestrictions.send_at(start_at, :update_restricted_enrollments, self)
-      elsif start_at
-        do_it_now = true
+        EnrollmentDateRestrictions.send_later_enqueue_args(:update_restricted_enrollments,
+          { :run_at => start_at, :strand => strand }, self)
       end
-      
       if end_at && end_at > Time.now
-        EnrollmentDateRestrictions.send_at(end_at, :update_restricted_enrollments, self)
-      elsif end_at
-        do_it_now = true
+        EnrollmentDateRestrictions.send_later_enqueue_args(:update_restricted_enrollments,
+          { :run_at => end_at, :strand => strand }, self)
       end
-      
-      if do_it_now
-        EnrollmentDateRestrictions.send_later(:update_restricted_enrollments, self)
-      end
+      EnrollmentDateRestrictions.send_later_enqueue_args(:update_restricted_enrollments,
+        { :strand => strand }, self)
     end
   end
   
