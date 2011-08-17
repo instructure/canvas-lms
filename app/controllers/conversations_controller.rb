@@ -240,8 +240,13 @@ class ConversationsController < ApplicationController
       media_id = params[:media_comment_id]
       media_type = params[:media_comment_type]
       if media_id.present? && media_type.present?
-        media_object = MediaObject.find_by_media_id_and_media_type(media_id, media_type)
-        m.media_objects << media_object if media_object
+        media_comment = MediaObject.find_by_media_id_and_media_type(media_id, media_type)
+        if media_comment
+          media_comment.context = @current_user
+          media_comment.save
+          m.media_comment = media_comment
+          m.save
+        end
       end
     end
     message.generate_user_note if params[:user_note]

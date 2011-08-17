@@ -71,7 +71,7 @@ class ConversationParticipant < ActiveRecord::Base
     }
   end
 
-  [:attachments, :media_objects].each do |association|
+  [:attachments].each do |association|
     class_eval <<-ASSOC
       def #{association}
         @#{association} ||= conversation.#{association}.scoped(:conditions => <<-SQL)
@@ -178,7 +178,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.message_count = messages.human.size if recalculate_count
       self.last_message_at = latest.created_at
       self.has_attachments = attachments.size > 0
-      self.has_media_objects = media_objects.size > 0
+      self.has_media_objects = messages.with_media_comments.size > 0
     else
       self.workflow_state = 'read' if unread?
       self.message_count = 0

@@ -35,7 +35,6 @@ class Conversation < ActiveRecord::Base
     :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
     :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
   has_many :attachments, :through => :conversation_messages
-  has_many :media_objects, :through => :conversation_messages
 
   attr_accessible
 
@@ -166,7 +165,7 @@ class Conversation < ActiveRecord::Base
           conversation_participants.update_all({:has_attachments => true}, "NOT has_attachments")
           updated = true
         end
-        if message.media_objects.present?
+        if message.media_comment_id.present?
           self.has_media_objects = true
           conversation_participants.update_all({:has_media_objects => true}, "NOT has_media_objects")
           updated = true

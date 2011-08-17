@@ -639,11 +639,10 @@ I18n.scoped 'conversations', (I18n) ->
     $ul = $message.find('ul.message_attachments').detach()
     $media_object_blank = $ul.find('.media_object_blank').detach()
     $attachment_blank = $ul.find('.attachment_blank').detach()
-    if data.media_objects?.length or data.attachments?.length
+    if data.media_comment? or data.attachments?.length
       $message.append $ul
-      if data.media_objects?
-        for media_object in data.media_objects
-          $ul.append build_media_object($media_object_blank, media_object)
+      if data.media_comment?
+        $ul.append build_media_object($media_object_blank, data.media_comment)
       if data.attachments?
         for attachment in data.attachments
           $ul.append build_attachment($attachment_blank, attachment)

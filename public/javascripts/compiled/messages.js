@@ -836,7 +836,7 @@
       return $.htmlEscape(user.name) + (shared_contexts.length ? " <em>" + $.htmlEscape(shared_contexts) + "</em>" : '');
     };
     build_message = function(data) {
-      var $attachment_blank, $media_object_blank, $message, $pm_action, $ul, attachment, avatar, media_object, pm_url, submessage, user, user_name, _i, _j, _k, _len, _len2, _len3, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
+      var $attachment_blank, $media_object_blank, $message, $pm_action, $ul, attachment, avatar, pm_url, submessage, user, user_name, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
       $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id);
       $message.data('id', data.id);
       $message.addClass(data.generated ? 'generated' : data.author_id === MessageInbox.user_id ? 'self' : 'other');
@@ -874,19 +874,15 @@
       $ul = $message.find('ul.message_attachments').detach();
       $media_object_blank = $ul.find('.media_object_blank').detach();
       $attachment_blank = $ul.find('.attachment_blank').detach();
-      if (((_ref5 = data.media_objects) != null ? _ref5.length : void 0) || ((_ref6 = data.attachments) != null ? _ref6.length : void 0)) {
+      if ((data.media_comment != null) || ((_ref5 = data.attachments) != null ? _ref5.length : void 0)) {
         $message.append($ul);
-        if (data.media_objects != null) {
-          _ref7 = data.media_objects;
-          for (_j = 0, _len2 = _ref7.length; _j < _len2; _j++) {
-            media_object = _ref7[_j];
-            $ul.append(build_media_object($media_object_blank, media_object));
-          }
+        if (data.media_comment != null) {
+          $ul.append(build_media_object($media_object_blank, data.media_comment));
         }
         if (data.attachments != null) {
-          _ref8 = data.attachments;
-          for (_k = 0, _len3 = _ref8.length; _k < _len3; _k++) {
-            attachment = _ref8[_k];
+          _ref6 = data.attachments;
+          for (_j = 0, _len2 = _ref6.length; _j < _len2; _j++) {
+            attachment = _ref6[_j];
             $ul.append(build_attachment($attachment_blank, attachment));
           }
         }
