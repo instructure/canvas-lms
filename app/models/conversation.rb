@@ -132,13 +132,21 @@ class Conversation < ActiveRecord::Base
         connection.execute("UPDATE conversation_participants SET message_count = message_count + 1 WHERE conversation_id = #{id}")
 
         # make sure this jumps to the top of the inbox and is marked as unread for anyone who's subscribed
-        User.update_all 'unread_conversations_count = unread_conversations_count + 1',
-                        ["id IN (SELECT user_id
-                                 FROM conversation_participants
-                                 WHERE conversation_id = ?
-                                   AND workflow_state <> 'unread'
-                                   AND (last_message_at IS NULL OR subscribed) AND user_id <> ?)",
-                          self.id, current_user.id]
+        cp_conditions = self.class.send :sanitize_sql_array, [
+          "cp.conversation_id = ? AND cp.workflow_state <> 'unread' AND (cp.last_message_at IS NULL OR cp.subscribed) AND cp.user_id <> ?",
+          self.id,
+          current_user.id
+        ]
+        if connection.adapter_name =~ /mysql/i
+          connection.execute <<-SQL
+            UPDATE users, conversation_participants cp
+            SET unread_conversations_count = unread_conversations_count + 1
+            WHERE users.id = cp.user_id AND #{cp_conditions}
+          SQL
+        else
+          User.update_all 'unread_conversations_count = unread_conversations_count + 1',
+                          "id IN (SELECT user_id FROM conversation_participants cp WHERE #{cp_conditions})"
+        end
         conversation_participants.update_all(
           {:last_message_at => Time.now.utc, :workflow_state => 'unread'},
           ["(last_message_at IS NULL OR subscribed) AND user_id <> ?", current_user.id]
