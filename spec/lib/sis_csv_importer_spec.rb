@@ -923,6 +923,52 @@ describe SIS::SisCsv do
       importer.errors.length.should == 0
       good_course.teachers.first.name.should == "User Uno"
     end
+
+    it "should properly handle repeated courses and sections" do
+      #create course, users, and sections
+      process_csv_data_cleanly(
+        "course_id,short_name,long_name,account_id,term_id,status",
+        "test_1,TC 101,Test Course 101,,,active",
+        "test_2,TC 102,Test Course 102,,,active"
+      )
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user@example.com,active",
+        "user_2,user2,User,Dos,user2@example.com,active",
+        "user_3,user3,User,Tres,user3@example.com,active",
+        "user_4,user4,User,Cuatro,user4@example.com,active",
+        "user_5,user5,User,Cinco,user5@example.com,active",
+        "user_6,user6,User,Seis,user6@example.com,active"
+      )
+      process_csv_data_cleanly(
+        "section_id,course_id,name,status,start_date,end_date",
+        "S101,test_1,Sec1.1,active,,",
+        "S102,test_1,Sec1.2,active,,",
+        "S201,test_2,Sec2.1,active,,",
+        "S202,test_2,Sec2.2,active,,"
+      )
+      # the enrollments
+      process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id",
+        "test_1,user_1,student,,active,",
+        "test_1,user_2,student,S101,active,",
+        "test_1,user_3,student,S102,active,",
+        "test_2,user_4,student,S201,active,",
+        ",user_5,student,S201,active,",
+        ",user_6,student,S202,active,"
+      )
+      course1 = @account.courses.find_by_sis_source_id("test_1")
+      course2 = @account.courses.find_by_sis_source_id("test_2")
+      course1.default_section.users.first.name.should == "User Uno"
+      section1_1 = course1.course_sections.find_by_sis_source_id("S101")
+      section1_1.users.first.name.should == "User Dos"
+      section1_2 = course1.course_sections.find_by_sis_source_id("S102")
+      section1_2.users.first.name.should == "User Tres"
+      section2_1 = course2.course_sections.find_by_sis_source_id("S201")
+      section2_1.users.map(&:name).sort.should == ["User Cuatro", "User Cinco"].sort
+      section2_2 = course2.course_sections.find_by_sis_source_id("S202")
+      section2_2.users.first.name.should == "User Seis"
+    end
   end
 
   context 'account importing' do

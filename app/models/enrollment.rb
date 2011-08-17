@@ -35,7 +35,6 @@ class Enrollment < ActiveRecord::Base
   
   before_save :assign_uuid
   before_save :assert_section
-  after_save :touch_user
   before_save :update_user_account_associations_if_necessary
 
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_priveleges_to_course_section, :invitation_email
