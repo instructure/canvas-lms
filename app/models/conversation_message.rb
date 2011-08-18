@@ -29,6 +29,14 @@ class ConversationMessage < ActiveRecord::Base
 
   named_scope :human, :conditions => "NOT generated"
   named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL"
+  named_scope :latest_for_conversations, lambda{ |conversation_participants| {
+    :select => 'conversation_messages.*',
+    :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
+    :conditions => [
+        "conversation_participant_id in (?) AND conversation_messages.created_at = (SELECT MAX(created_at) FROM conversation_messages cm2 WHERE cm2.conversation_id = conversation_messages.conversation_id)",
+        conversation_participants.map(&:id)
+      ]
+  }}
 
   validates_length_of :body, :maximum => maximum_text_length
 

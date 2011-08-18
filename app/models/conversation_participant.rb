@@ -56,7 +56,7 @@ class ConversationParticipant < ActiveRecord::Base
   validates_inclusion_of :label, :in => labels.map(&:first), :allow_nil => true
 
   def as_json(options = {})
-    latest = messages.human.first
+    latest = options[:last_message] || messages.human.first
     {
       :id => conversation_id,
       :participants => participants(private?),
@@ -67,7 +67,7 @@ class ConversationParticipant < ActiveRecord::Base
       :subscribed => subscribed?,
       :private => private?,
       :label => label,
-      :properties => properties
+      :properties => properties(latest)
     }
   end
 
@@ -114,8 +114,8 @@ class ConversationParticipant < ActiveRecord::Base
     self.has_media_objects = conversation.has_media_objects?
   end
 
-  def properties
-    latest = messages.human.first
+  def properties(latest = nil)
+    latest ||= messages.human.first
     properties = []
     properties << :last_author if latest && latest.author_id == user_id
     properties << :attachments if has_attachments?
