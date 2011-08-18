@@ -686,7 +686,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -1055,7 +1055,7 @@
       }
       $conversation[append ? 'appendTo' : 'prependTo']($conversation_list).click(function(e) {
         e.preventDefault();
-        return location.hash = '/conversations/' + $(this).data('id');
+        return set_hash('#/conversations/' + $(this).data('id'));
       });
       update_conversation($conversation, data, null);
       if (!append) {
@@ -1076,6 +1076,7 @@
         $conversation.find('.audience').html(data.audience);
       }
       $conversation.find('.actions a').click(function(e) {
+        e.preventDefault();
         e.stopImmediatePropagation();
         close_menus();
         return open_conversation_menu($(this));
@@ -1153,10 +1154,14 @@
       }
     };
     remove_conversation = function($conversation) {
-      select_conversation();
+      var deselect;
+      deselect = is_selected($conversation);
       return $conversation.fadeOut('fast', function() {
         $(this).remove();
-        return $('#no_messages').showIf(!$conversation_list.find('li').length);
+        $('#no_messages').showIf(!$conversation_list.find('li').length);
+        if (deselect) {
+          return set_hash('');
+        }
       });
     };
     set_conversation_state = function($conversation, state) {
@@ -1237,6 +1242,12 @@
       $.cookie('last_label', label);
       return $last_label = label;
     };
+    set_hash = function(hash) {
+      if (hash !== location.hash) {
+        location.hash = hash;
+        return $(document).triggerHandler('document_fragment_change', hash);
+      }
+    };
     $.extend(window, {
       MessageInbox: MessageInbox
     });
@@ -1285,7 +1296,8 @@
               }
               update_conversation($conversation, data.conversation);
             } else {
-              select_conversation(add_conversation(data.conversation));
+              add_conversation(data.conversation);
+              set_hash('#/conversations/' + data.conversation.id);
             }
             $.flashMessage(I18n.t('message_sent', 'Message Sent'));
           }
@@ -1591,10 +1603,10 @@
               build_message(data.message).prependTo($message_list).slideDown('fast');
             }
             update_conversation($conversation, data.conversation);
-            select_conversation($conversation);
           } else {
-            select_conversation(add_conversation(data.conversation));
+            add_conversation(data.conversation);
           }
+          set_hash('#/conversations/' + data.conversation.id);
           reset_message_form();
           return $(this).dialog('close');
         },
@@ -1725,10 +1737,11 @@
       };
       $(window).resize(inbox_resize);
       setTimeout(inbox_resize);
-      return $(document).fragmentChange(function(event, hash) {
-        var match, params;
-        if (match = hash.match(/^#\/conversations\/(\d+)$/)) {
-          return select_conversation($('#conversation_' + match[1]));
+      return $(window).bind('hashchange', function() {
+        var $c, hash, match, params;
+        hash = location.hash;
+        if ((match = hash.match(/^#\/conversations\/(\d+)$/)) && ($c = $('#conversation_' + match[1])) && $c.length) {
+          return select_conversation($c);
         } else if ($('#action_compose_message').length) {
           params = {};
           if (match = hash.match(/^#\/conversations\?(.*)$/)) {
@@ -1736,7 +1749,7 @@
           }
           return select_conversation(null, params);
         }
-      }).triggerHandler('document_fragment_change', location.hash);
+      }).triggerHandler('hashchange');
     });
   });
 }).call(this);

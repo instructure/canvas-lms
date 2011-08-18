@@ -27,7 +27,7 @@ class TokenInput
 
     @tokens = $('<ul />')
       .appendTo(@fake_input)
-    @tokens.click (e) => 
+    @tokens.click (e) =>
       if $token = $(e.target).closest('li')
         $close = $(e.target).closest('a')
         if $close.length
@@ -325,7 +325,7 @@ class TokenSelector
         (data) =>
           @ui_locked=false
     , 100
-  
+
   open: ->
     @container.show()
     @reposition()
@@ -435,7 +435,7 @@ class TokenSelector
       $node.text(data.text)
     $node.addClass('first') if options.first
     $node.addClass('last') if options.last
-  
+
   render_list: (data, options={}) ->
     if data.length or @list_expanded()
       @open()
@@ -448,7 +448,7 @@ class TokenSelector
       $list = @new_list()
     else
       $list = @list
-  
+
     @selection = null
     $uls = $list.find('ul')
     $uls.html('')
@@ -556,7 +556,7 @@ I18n.scoped 'conversations', (I18n) ->
 
     $message_list.removeClass('private').hide().html ''
     $message_list.addClass('private') if $conversation?.hasClass('private')
-    
+
     if $selected_conversation
       $selected_conversation.removeClass 'selected inactive'
       if MessageInbox.scope == 'unread'
@@ -766,7 +766,7 @@ I18n.scoped 'conversations', (I18n) ->
       $conversation.prepend $('<img />').attr('src', data.avatar_url).addClass('avatar')
     $conversation[if append then 'appendTo' else 'prependTo']($conversation_list).click (e) ->
       e.preventDefault()
-      location.hash = '/conversations/' + $(this).data('id')
+      set_hash '#/conversations/' + $(this).data('id')
     update_conversation($conversation, data, null)
     $conversation.hide().slideDown('fast') unless append
     $conversation
@@ -779,6 +779,7 @@ I18n.scoped 'conversations', (I18n) ->
     $a.attr 'add_url', $.replaceTags($a.attr('add_url'), 'id', data.id)
     $conversation.find('.audience').html data.audience if data.audience
     $conversation.find('.actions a').click (e) ->
+      e.preventDefault()
       e.stopImmediatePropagation()
       close_menus()
       open_conversation_menu($(this))
@@ -821,10 +822,11 @@ I18n.scoped 'conversations', (I18n) ->
         $conversation.scrollIntoView()
 
   remove_conversation = ($conversation) ->
-    select_conversation()
+    deselect = is_selected($conversation)
     $conversation.fadeOut 'fast', ->
       $(this).remove()
       $('#no_messages').showIf !$conversation_list.find('li').length
+      set_hash '' if deselect
 
   set_conversation_state = ($conversation, state) ->
     $conversation.removeClass('read unread archived').addClass state
@@ -897,6 +899,11 @@ I18n.scoped 'conversations', (I18n) ->
     $.cookie('last_label', label)
     $last_label = label
 
+  set_hash = (hash) ->
+    if hash isnt location.hash
+      location.hash = hash
+      $(document).triggerHandler('document_fragment_change', hash)
+
   $.extend window,
     MessageInbox: MessageInbox
 
@@ -932,7 +939,8 @@ I18n.scoped 'conversations', (I18n) ->
             build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
             update_conversation($conversation, data.conversation)
           else
-            select_conversation add_conversation(data.conversation)
+            add_conversation(data.conversation)
+            set_hash '#/conversations/' + data.conversation.id
           $.flashMessage(I18n.t('message_sent', 'Message Sent'))
         reset_message_form()
       error: (data) ->
@@ -1145,16 +1153,16 @@ I18n.scoped 'conversations', (I18n) ->
         if $conversation.length
           build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
           update_conversation($conversation, data.conversation)
-          select_conversation $conversation
         else
-          select_conversation add_conversation(data.conversation)
+          add_conversation(data.conversation)
+        set_hash '#/conversations/' + data.conversation.id
         reset_message_form()
         $(this).dialog('close')
       error: (data) ->
         $(this).loadingImage 'remove'
         $(this).dialog('close')
 
-    
+
     $('#cancel_bulk_message_action').click ->
       toggle_message_actions off
 
@@ -1248,12 +1256,13 @@ I18n.scoped 'conversations', (I18n) ->
     $(window).resize inbox_resize
     setTimeout inbox_resize
 
-    $(document).fragmentChange (event, hash) ->
-      if match = hash.match(/^#\/conversations\/(\d+)$/)
-        select_conversation($('#conversation_' + match[1]))
+    $(window).bind 'hashchange', ->
+      hash = location.hash
+      if (match = hash.match(/^#\/conversations\/(\d+)$/)) and ($c = $('#conversation_' + match[1])) and $c.length
+        select_conversation($c)
       else if $('#action_compose_message').length
         params = {}
         if match = hash.match(/^#\/conversations\?(.*)$/)
           params = parse_query_string(match[1])
         select_conversation(null, params)
-    .triggerHandler('document_fragment_change', location.hash)
+    .triggerHandler('hashchange')
