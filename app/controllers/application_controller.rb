@@ -120,7 +120,7 @@ class ApplicationController < ActionController::Base
   end
 
   def tab_enabled?(id)
-    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :session => session, :include_hidden_unused => true).any?{|t| t[:id] == id }
+    if @context && @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user, :session => session, :include_hidden_unused => true, :root_account => @domain_root_account).any?{|t| t[:id] == id }
       if @context.is_a?(Account)
         flash[:notice] = t "#application.notices.page_disabled_for_account", "That page has been disabled for this account"
       elsif @context.is_a?(Course)
@@ -813,6 +813,9 @@ class ApplicationController < ActionController::Base
       render :template => 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
+      @resource_title = @tag.title
+      @resource_url = @tag.url
+      @opaque_id = @tag.opaque_identifier(:asset_string)
       @tool = ContextExternalTool.find_external_tool(tag.url, context)
       @target = '_blank' if tag.new_tab
       tag.context_module_action(@current_user, :read)
@@ -820,7 +823,8 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
-        @launch = BasicLTI::ToolLaunch.new(@tag.url, @tool, @current_user, @context, @tag.opaque_identifier(:asset_string), named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true), @tag.context)
+        @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :only_path => false)
+        @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
         if @tag.context.is_a?(Assignment) && @context.students.include?(@current_user)
           @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@context, @tag.context, @current_user))
         end

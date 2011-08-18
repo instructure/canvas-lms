@@ -1111,6 +1111,160 @@ describe Course, 'grade_publishing' do
   
 end
 
+describe Course, 'tabs_available' do
+  it "should not include external tools if not configured for course navigation" do
+    course_model
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool.save!
+    tool.has_course_navigation.should == false
+    @teacher = user_model
+    @course.enroll_teacher(@teacher).accept
+    tabs = @course.tabs_available(@teacher)
+    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+  end
+  
+  it "should include external tools if configured on the course" do
+    course_model
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool.save!
+    tool.has_course_navigation.should == true
+    @teacher = user_model
+    @course.enroll_teacher(@teacher).accept
+    tabs = @course.tabs_available(@teacher)
+    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    tab = tabs.detect{|t| t[:id] == tool.asset_string }
+    tab[:label].should == tool.settings[:course_navigation][:text]
+    tab[:href].should == :course_external_tool_path
+    tab[:args].should == [@course.id, tool.id]
+  end
+  
+  it "should include external tools if configured on the account" do
+    course_model
+    @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
+    @course.move_to_account(@account.root_account, @account)
+    tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool.save!
+    tool.has_course_navigation.should == true
+    @teacher = user_model
+    @course.enroll_teacher(@teacher).accept
+    tabs = @course.tabs_available(@teacher)
+    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    tab = tabs.detect{|t| t[:id] == tool.asset_string }
+    tab[:label].should == tool.settings[:course_navigation][:text]
+    tab[:href].should == :course_external_tool_path
+    tab[:args].should == [@course.id, tool.id]
+  end
+  
+  it "should include external tools if configured on the root account" do
+    course_model
+    @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
+    @course.move_to_account(@account.root_account, @account)
+    tool = @account.root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool.save!
+    tool.has_course_navigation.should == true
+    @teacher = user_model
+    @course.enroll_teacher(@teacher).accept
+    tabs = @course.tabs_available(@teacher)
+    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    tab = tabs.detect{|t| t[:id] == tool.asset_string }
+    tab[:label].should == tool.settings[:course_navigation][:text]
+    tab[:href].should == :course_external_tool_path
+    tab[:args].should == [@course.id, tool.id]
+  end
+  
+  it "should only include admin-only external tools for course admins" do
+    course_model
+    @course.offer
+    @course.is_public = true
+    @course.save!
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'admins'}
+    tool.save!
+    tool.has_course_navigation.should == true
+    @teacher = user_model
+    @course.enroll_teacher(@teacher).accept
+    @student = user_model
+    @student.register!
+    @course.enroll_student(@student).accept
+    tabs = @course.tabs_available(nil)
+    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    tabs = @course.tabs_available(@student)
+    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    tabs = @course.tabs_available(@teacher)
+    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    tab = tabs.detect{|t| t[:id] == tool.asset_string }
+    tab[:label].should == tool.settings[:course_navigation][:text]
+    tab[:href].should == :course_external_tool_path
+    tab[:args].should == [@course.id, tool.id]
+  end
+  
+  it "should not include member-only external tools for unauthenticated users" do
+    course_model
+    @course.offer
+    @course.is_public = true
+    @course.save!
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'members'}
+    tool.save!
+    tool.has_course_navigation.should == true
+    @teacher = user_model
+    @course.enroll_teacher(@teacher).accept
+    @student = user_model
+    @student.register!
+    @course.enroll_student(@student).accept
+    tabs = @course.tabs_available(nil)
+    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    tabs = @course.tabs_available(@student)
+    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    tabs = @course.tabs_available(@teacher)
+    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    tab = tabs.detect{|t| t[:id] == tool.asset_string }
+    tab[:label].should == tool.settings[:course_navigation][:text]
+    tab[:href].should == :course_external_tool_path
+    tab[:args].should == [@course.id, tool.id]
+  end
+  
+  it "should allow reordering external tool position in course navigation" do
+    course_model
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool.save!
+    tool.has_course_navigation.should == true
+    @teacher = user_model
+    @course.enroll_teacher(@teacher).accept
+    @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string})
+    @course.save!
+    tabs = @course.tabs_available(@teacher)
+    tabs[1][:id].should == tool.asset_string
+  end
+  
+  it "should not show external tools that are hidden in course navigation" do
+    course_model
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+    tool.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+    tool.save!
+    tool.has_course_navigation.should == true
+    @teacher = user_model
+    @course.enroll_teacher(@teacher).accept
+    tabs = @course.tabs_available(@teacher)
+    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+    
+    @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string, :hidden => true})
+    @course.save!
+    @course = Course.find(@course.id)
+    tabs = @course.tabs_available(@teacher)
+    tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    
+    tabs = @course.tabs_available(@teacher, :for_reordering => true)
+    tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+  end
+  
+end
+
 describe Course, 'scoping' do
   it 'should search by multiple fields' do
     c1 = Course.new

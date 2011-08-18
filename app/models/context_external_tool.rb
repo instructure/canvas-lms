@@ -27,6 +27,11 @@ class ContextExternalTool < ActiveRecord::Base
     read_attribute(:settings) || write_attribute(:settings, {})
   end
   
+  def label_for(key, lang=nil)
+    labels = settings[key] && settings[key][:labels]
+    (labels && labels[lang]) || (settings[key] && settings[key][:text]) || name || "External Tool"
+  end
+  
   def readable_state
     workflow_state.titleize
   end
@@ -61,8 +66,14 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def infer_defaults
-    url = nil if url.blank?
-    domain = nil if domain.blank?
+    self.url = nil if url.blank?
+    self.domain = nil if domain.blank?
+    self.has_user_navigation = !!settings[:user_navigation]
+    self.has_course_navigation = !!settings[:course_navigation]
+    self.has_account_navigation = !!settings[:account_navigation]
+    self.has_resource_selection = !!settings[:resource_selection]
+    self.has_editor_button = !!settings[:editor_button]
+    true
   end
   
   def self.standardize_url(url)
@@ -178,7 +189,33 @@ class ContextExternalTool < ActiveRecord::Base
     nil
   end
   
+  named_scope :having_setting, lambda{|setting|
+    {:conditions => {"has_#{setting.to_s}" => true} }
+  }
+  
+  def self.find_for(id, context, type)
+    tool = context.context_external_tools.having_setting(type).find_by_id(id)
+    if !tool && context.is_a?(Group)
+      context = context.context
+      tool = context.context_external_tools.having_setting(type).find_by_id(id)
+    end
+    if !tool
+      account_ids = context.account_chain_ids
+      tool = ContextExternalTool.having_setting(type).find_by_context_type_and_context_id_and_id('Account', account_ids, id)
+    end
+    raise ActiveRecord::RecordNotFound if !tool
+    tool
+  end
   named_scope :active, :conditions => ['context_external_tools.workflow_state != ?', 'deleted']
+  
+  def self.find_all_for(context, type)
+    tools = []
+    if !context.is_a?(Account) && context.respond_to?(:context_external_tools)
+      tools += context.context_external_tools.having_setting(type.to_s)
+    end
+    account_ids = context.account_chain_ids
+    tools += ContextExternalTool.having_setting(type.to_s).find_all_by_context_type_and_context_id('Account', account_ids)
+  end
   
   def self.serialization_excludes; [:shared_secret,:settings]; end
   
@@ -195,8 +232,8 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
   
-  def set_custom_fields(hash)
-    fields = settings[:custom_fields]
+  def set_custom_fields(hash, resource_type)
+    fields = resource_type ? settings[resource_type.to_sym][:custom_fields] : settings[:custom_fields]
     (fields || {}).each do |key, val|
       key = key.gsub(/[^\w]/, '_').downcase
       if key.match(/^custom_/)

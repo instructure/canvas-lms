@@ -1,9 +1,11 @@
-<% content_for :page_title do %><%= @tag.title %><% end %>
-<% add_crumb(@tag.context_module.name, context_url(@context, :context_context_modules_url)) if @tag.context_module %>
-<% add_crumb @tag.title %>
+<% content_for :page_title do %><%= @resource_title %><% end %>
+<% if @tag.try(:context_module) %>
+  <% add_crumb @tag.context_module.name, context_url(@context, :context_context_modules_url) %>
+<% end %>
+<% add_crumb @resource_title %>
 
 <% jammit_js :tool_inline %>
-<form action="<%= @tag.url %>" method="POST" target="<%= @target || 'tool_content' %>" id="tool_form" class="<%= 'new_tab' if @tag.new_tab %>">
+<form action="<%= @resource_url %>" method="POST" target="<%= @target || 'tool_content' %>" id="tool_form" class="<%= 'new_tab' if @tag.new_tab %>">
   <% @tool_settings.each do |key, value| %>
     <%= hidden_field_tag key, value %>
   <% end %>
@@ -23,7 +25,9 @@
     <button class="button" type="submit"><%= t :load_tool_button, "Load %{tool}", :tool => @tool.name %></button>
   <% end %>
 </form>
-<% unless @tag.new_tab %>
+<% unless @tag.try(:new_tab) %>
   <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
 <% end %>
-<%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>
+<% if @tag %>
+  <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>
+<% end %>

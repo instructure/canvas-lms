@@ -2243,17 +2243,41 @@ class Course < ActiveRecord::Base
     ]
   end
   
+  def external_tool_tabs(opts)
+    tools = self.context_external_tools.having_setting('course_navigation')
+    account_ids = self.account_chain_ids
+    tools += ContextExternalTool.having_setting('course_navigation').find_all_by_context_type_and_context_id('Account', account_ids)
+    tools.sort_by(&:id).map do |tool|
+     {
+        :id => tool.asset_string,
+        :label => tool.label_for(:course_navigation, opts[:language]),
+        :css_class => tool.asset_string,
+        :href => :course_external_tool_path,
+        :visibility => tool.settings[:course_navigation][:visibility],
+        :external => true,
+        :hidden => tool.settings[:course_navigation][:default] == 'disabled',
+        :args => [self.id, tool.id]
+     }
+    end
+  end
+  
   def tabs_available(user=nil, opts={})
     # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
     tabs = self.tab_configuration.compact
     default_tabs = Course.default_tabs
+    settings_tab = default_tabs[-1]
+    external_tabs = external_tool_tabs(opts)
     tabs = tabs.map do |tab|
-      default_tab = default_tabs.find {|t| t[:id] == tab[:id] }
+      default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
       if default_tab
         tab[:label] = default_tab[:label]
         tab[:href] = default_tab[:href]
         tab[:css_class] = default_tab[:css_class]
+        tab[:args] = default_tab[:args]
+        tab[:visibility] = default_tab[:visibility]
+        tab[:external] = default_tab[:external]
         default_tabs.delete_if {|t| t[:id] == tab[:id] }
+        external_tabs.delete_if {|t| t[:id] == tab[:id] }
         tab
       else
         # Remove any tabs we don't know about in default_tabs (in case we removed them or something, like Groups)
@@ -2262,7 +2286,11 @@ class Course < ActiveRecord::Base
     end
     tabs.compact!
     tabs += default_tabs
-    
+    tabs += external_tabs
+    # Ensure that Settings is always at the bottom
+    tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
+    tabs << settings_tab
+
     tabs.each do |tab|
       tab[:hidden_unused] = true if tab[:id] == TAB_MODULES && !active_record_types[:modules]
       tab[:hidden_unused] = true if tab[:id] == TAB_FILES && !active_record_types[:files]
@@ -2285,16 +2313,21 @@ class Course < ActiveRecord::Base
         tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
         tabs.delete_if { |t| t[:id] == TAB_MODULES }
       end
+      unless self.grants_rights?(user, opts[:session], :participate_as_student, :manage_content).values.any?
+        tabs.delete_if{ |t| t[:visibility] == 'members' }
+      end
       unless self.grants_rights?(user, opts[:session], :read, :manage_content, :manage_assignments).values.any?
         tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
         tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
       end
+      tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :manage_content)
       if self.grants_rights?(user, opts[:session], :manage_content, :manage_assignments).values.any?
         tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
         tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
         tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
       end
+      tabs.delete_if { |t| t[:hidden] && t[:external] } 
       tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
       tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
       tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?

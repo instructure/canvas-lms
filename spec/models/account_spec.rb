@@ -545,4 +545,44 @@ describe Account do
     users = @account.paginate_users_not_in_groups([], 1)
     users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
   end
+
+  context "tabs_available" do
+    it "should not include external tools if not configured for course navigation" do
+      @account = Account.default.sub_accounts.create!(:name => "sub-account")
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool.settings[:user_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.save!
+      tool.has_account_navigation.should == false
+      tabs = @account.tabs_available(nil)
+      tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+    end
+    
+    it "should include external tools if configured on the account" do
+      @account = Account.default.sub_accounts.create!(:name => "sub-account")
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool.settings[:account_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.save!
+      tool.has_account_navigation.should == true
+      tabs = @account.tabs_available(nil)
+      tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+      tab = tabs.detect{|t| t[:id] == tool.asset_string }
+      tab[:label].should == tool.settings[:account_navigation][:text]
+      tab[:href].should == :account_external_tool_path
+      tab[:args].should == [@account.id, tool.id]
+    end
+    
+    it "should include external tools if configured on the root account" do
+      @account = Account.default.sub_accounts.create!(:name => "sub-account")
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
+      tool.settings[:account_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.save!
+      tool.has_account_navigation.should == true
+      tabs = @account.tabs_available(nil)
+      tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+      tab = tabs.detect{|t| t[:id] == tool.asset_string }
+      tab[:label].should == tool.settings[:account_navigation][:text]
+      tab[:href].should == :account_external_tool_path
+      tab[:args].should == [@account.id, tool.id]
+    end
+  end
 end

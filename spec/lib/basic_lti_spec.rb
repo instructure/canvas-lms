@@ -100,7 +100,7 @@ describe BasicLTI do
     it "should generate correct parameters" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
-      hash = BasicLTI.generate('http://www.yahoo.com', @tool, @user, @course, '123456', 'http://www.google.com')
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
       hash['lti_message_type'].should == 'basic-lti-launch-request'
       hash['lti_version'].should == 'LTI-1p0'
       hash['resource_link_id'].should == '123456'
@@ -124,7 +124,7 @@ describe BasicLTI do
     it "should include URI query parameters" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
-      hash = BasicLTI.generate('http://www.yahoo.com?a=1&b=2', @tool, @user, @course, '123456', 'http://www.google.com')
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com?a=1&b=2', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
       hash['a'].should == '1'
       hash['b'].should == '2'
     end
@@ -132,7 +132,7 @@ describe BasicLTI do
     it "should not allow overwriting other parameters from the URI query string" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
-      hash = BasicLTI.generate('http://www.yahoo.com?user_id=123&oauth_callback=1234', @tool, @user, @course, '123456', 'http://www.google.com')
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com?user_id=123&oauth_callback=1234', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
       hash['user_id'].should == @user.opaque_identifier(:asset_string)
       hash['oauth_callback'].should == 'about:blank'
     end
@@ -140,7 +140,7 @@ describe BasicLTI do
     it "should include custom fields" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123}, :name => 'tool')
-      hash = BasicLTI.generate('http://www.yahoo.com', @tool, @user, @course, '123456', 'http://www.yahoo.com')
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
       hash.keys.select{|k| k.match(/^custom_/) }.sort.should == ['custom___taa____', 'custom_bob', 'custom_fred', 'custom_john']
       hash['custom_bob'].should eql('bob')
       hash['custom_fred'].should eql('fred')
@@ -155,7 +155,7 @@ describe BasicLTI do
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
       @tool.include_name?.should eql(false)
       @tool.include_email?.should eql(false)
-      hash = BasicLTI.generate('http://www.yahoo.com', @tool, @user, @course, '123456', 'http://www.yahoo.com')
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
       hash['lis_person_name_given'].should be_nil
       hash['lis_person_name_family'].should be_nil
       hash['lis_person_name_full'].should be_nil
@@ -167,7 +167,7 @@ describe BasicLTI do
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'name_only', :name => 'tool')
       @tool.include_name?.should eql(true)
       @tool.include_email?.should eql(false)
-      hash = BasicLTI.generate('http://www.yahoo.com', @tool, @user, @course, '123456', 'http://www.yahoo.com')
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
       hash['lis_person_name_given'].should == 'User'
       hash['lis_person_name_family'].should == nil
       hash['lis_person_name_full'].should == @user.name
@@ -179,7 +179,7 @@ describe BasicLTI do
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
       @tool.include_name?.should eql(true)
       @tool.include_email?.should eql(true)
-      hash = BasicLTI.generate('http://www.yahoo.com', @tool, @user, @course, '123456', 'http://www.yahoo.com')
+      hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
       hash['lis_person_name_given'].should == 'User'
       hash['lis_person_name_family'].should == nil
       hash['lis_person_name_full'].should == @user.name
@@ -190,7 +190,7 @@ describe BasicLTI do
   it "should include assignment outcome service params" do
     course_with_teacher(:active_all => true)
     @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
-    launch = BasicLTI::ToolLaunch.new("http://www.yahoo.com", @tool, @user, @course, '123456', 'http://www.yahoo.com')
+    launch = BasicLTI::ToolLaunch.new(:url => "http://www.yahoo.com", :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
     assignment_model(:submission_types => "external_tool", :course => @course)
     launch.for_assignment!(@assignment, "/my/test/url")
     hash = launch.generate

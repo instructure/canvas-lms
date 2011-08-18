@@ -47,15 +47,21 @@ module BasicLTI
     end
     hash
   end
-
-  def self.generate(url, tool, user, context, link_code, return_url)
-    ToolLaunch.new(url, tool, user, context, link_code, return_url).generate
+  
+  def self.generate(*args)
+    BasicLTI::ToolLaunch.new(*args).generate
   end
 
-  class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_url, :hash)
+  class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_url, :resource_type, :hash)
 
-    def initialize(*a)
-      super
+    def initialize(options)
+      self.url = options[:url]                     || raise("URL required for generating Basic LTI content")
+      self.tool = options[:tool]                   || raise("Tool required for generating Basic LTI content")
+      self.user = options[:user]                   || raise("User required for generating Basic LTI content")
+      self.context = options[:context]             || raise("Context required for generating Basic LTI content")
+      self.link_code = options[:link_code]         || raise("Link Code required for generating Basic LTI content")
+      self.return_url = options[:return_url]       || raise("Return URL required for generating Basic LTI content")
+      self.resource_type = options[:resource_type]
       self.hash = {}
     end
 
@@ -86,6 +92,7 @@ module BasicLTI
         hash['custom_canvas_user_id'] = user.id
         hash['custom_canvas_course_id'] = context.id
       end
+
       hash['context_id'] = context.opaque_identifier(:asset_string)
       hash['context_title'] = context.name
       hash['context_label'] = context.course_code rescue nil
@@ -94,10 +101,11 @@ module BasicLTI
       hash['launch_presentation_width'] = 600
       hash['launch_presentation_height'] = 400
       hash['launch_presentation_return_url'] = return_url
-      hash['tool_consumer_instance_guid'] = "#{(context.root_account || context).opaque_identifier(:asset_string)}.#{HostUrl.context_host(context)}"
-      hash['tool_consumer_instance_name'] = (context.root_account || context).name
+      root_context = (context.respond_to?(:root_account) && context.root_account) || context
+      hash['tool_consumer_instance_guid'] = "#{root_context.opaque_identifier(:asset_string)}.#{HostUrl.context_host(context)}"
+      hash['tool_consumer_instance_name'] = root_context.name
       hash['tool_consumer_instance_contact_email'] = HostUrl.outgoing_email_address # TODO: find a better email address to use here
-      tool.set_custom_fields(hash)
+      tool.set_custom_fields(hash, resource_type)
 
       hash['oauth_callback'] = 'about:blank'
       BasicLTI.generate_params(hash, url, tool.consumer_key, tool.shared_secret)

@@ -155,7 +155,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :assignment_groups, :collection => {:reorder => :post} do |group|
       group.reorder_assignments 'reorder', :controller => 'assignment_groups', :action => 'reorder_assignments'
     end
-    course.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
+    course.resources :external_tools do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
     course.resources :submissions
@@ -413,7 +413,7 @@ ActionController::Routing::Routes.draw do |map|
     account.test_ldap_binds 'test_ldap_binds', :controller => 'account_authorization_configs', :action => 'test_ldap_bind'
     account.test_ldap_searches 'test_ldap_searches', :controller => 'account_authorization_configs', :action => 'test_ldap_search'
     account.test_ldap_logins 'test_ldap_logins', :controller => 'account_authorization_configs', :action => 'test_ldap_login'
-    account.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
+    account.resources :external_tools do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
     account.resources :chats
@@ -499,6 +499,7 @@ ActionController::Routing::Routes.draw do |map|
       folder.download 'download', :controller => 'folders', :action => 'download'
     end
     user.resources :calendar_events
+    user.external_tool 'external_tools/:id', :controller => 'users', :action => 'external_tool'
     user.resources :notifications, :only => [:destroy, :update], :collection => {:clear => :post}
     user.resources :rubrics
     user.resources :rubric_associations do |association|

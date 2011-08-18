@@ -28,7 +28,7 @@ class UsersController < ApplicationController
   include Twitter
   include LinkedIn
   include DeliciousDiigo
-  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade]
+  before_filter :require_user, :only => [:grades, :delete_user_service, :create_user_service, :confirm_merge, :merge, :kaltura_session, :ignore_channel, :ignore_item, :close_notification, :mark_avatar_image, :user_dashboard, :masquerade, :external_tool]
   before_filter :require_open_registration, :only => [:new, :create]
   
   def grades
@@ -462,6 +462,19 @@ class UsersController < ApplicationController
         format.html
       end
     end
+  end
+  
+  def external_tool
+    @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
+    @resource_title = @tool.label_for(:user_navigation)
+    @resource_url = @tool.settings[:user_navigation][:url]
+    @opaque_id = @current_user.opaque_identifier(:asset_string)
+    @context = UserProfile.new(@current_user)
+    @resource_type = 'user_navigation'
+    @return_url = profile_url(:only_path => false)
+    @active_tab = @tool.asset_string
+    add_crumb(@current_user.short_name, profile_path)
+    render :template => 'external_tools/tool_show'
   end
   
   def new
