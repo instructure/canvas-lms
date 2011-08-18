@@ -236,10 +236,33 @@ ul.conversations
     .date
       margin-right: -13px
 
+#messages > ul.messages, #forward_message_form > ul.messages
+  ul.messages
+    border-left: 2px solid #ddd
+    overflow: visible
+    margin: 0
+    span.date
+      margin-right: 0
+    > li
+      background: transparent
+      margin: 0
+      padding: 7px 0 7px 64px
+      img.avatar
+        top: 7px
+        left: 7px
+    input
+      display: none
+  > li.self, > li.selected
+    background-color: #ebebeb
+    ul.messages
+      border-left-color: #ccc
+
 #messages > ul.messages
   display: none
   > li
     +box-shadow( rgba(0,0,0,0.25), 0, 3px, 6px, 3px)
+  > li.selected
+    background-color: #e5f3ff
   > li.generated
     line-height: 1
     +box-shadow( none )
@@ -254,6 +277,7 @@ ul.conversations
       margin: 0
     img.avatar, span.date, .audience, input, .actions
       display: none
+
 ul.messages
   position: relative
   z-index: 1
@@ -269,23 +293,6 @@ ul.messages
     img.avatar
       top: 14px
       left: 14px
-    ul.messages
-      border-left: 2px solid #ddd
-      overflow: visible
-      margin: 0
-      > li
-        background: transparent
-        margin: 0
-        padding: 7px 0 7px 64px
-        img.avatar
-          top: 7px
-          left: 7px
-      input
-        display: none
-  > li.self
-    background-color: #ebebeb
-  > li.selected
-    background-color: #e5f3ff
   .date
     margin-right: -40px
   .audience
