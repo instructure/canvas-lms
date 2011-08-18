@@ -1522,11 +1522,34 @@ class User < ActiveRecord::Base
     Conversation.initiate(user_ids, private).conversation_participants.find_by_user_id(self.id)
   end
 
-  
+  def enrollment_visibility
+    Rails.cache.fetch(['enrollment_visibility', self].cache_key, :expires_in => 1.hour) do
+      full_course_ids = []
+      section_id_hash = {}
+      restricted_course_hash = {}
+      (courses + concluded_courses).each do |course|
+        section_visibilities = course.section_visibilities_for(self)
+        case course.enrollment_visibility_level_for(self, section_visibilities)
+          when :full then full_course_ids << course.id
+          when :sections then section_id_hash[course.id] = section_visibilities.map{|s| s[:course_section_id]}
+          when :restricted
+            section_visibilities.each do |s|
+              (restricted_course_hash[course.id] ||= []) << s[:associated_user_id] if s[:associated_user_id]
+            end
+        end
+      end
+      {:full_course_ids => full_course_ids, :section_id_hash => section_id_hash, :restricted_course_hash => restricted_course_hash}
+    end
+  end
+
   MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source']
   MESSAGEABLE_USER_COLUMN_SQL = "users." + (MESSAGEABLE_USER_COLUMNS.join(", users."))
   def messageable_users(options = {})
-    course_ids = courses.map(&:id) + concluded_courses.map(&:id)
+    hash = enrollment_visibility
+    full_course_ids = hash[:full_course_ids]
+    section_id_hash = hash[:section_id_hash]
+    restricted_course_hash = hash[:restricted_course_hash]
+
     group_ids = groups.map(&:id)
     account_ids = []
 
@@ -1540,9 +1563,12 @@ class User < ActiveRecord::Base
           limited_group_ids << $1.to_i
         end
       end
-      course_ids &= limited_course_ids
+      full_course_ids &= limited_course_ids
+      section_ids = section_id_hash.values_at(limited_course_ids).flatten.compact
+      restricted_course_hash.delete_if{|course_id, ids| !limited_course_ids.include?(course_id)}
       group_ids &= limited_group_ids
     else
+      section_ids = section_id_hash.values.flatten
       # if we're not searching with context(s) in mind, include any users we
       # have admin access to know about
       account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
@@ -1563,10 +1589,14 @@ class User < ActiveRecord::Base
     end
     user_sql = []
 
-    user_sql << <<-SQL if course_ids.present?
+    course_sql = []
+    course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
+    course_sql << "(course_section_id IN (#{section_ids.join(',')}))" if section_ids.present?
+    course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
+    user_sql << <<-SQL if course_sql.present?
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, null AS group_id
       FROM users, enrollments, courses
-      WHERE course_id IN (#{course_ids.join(',')}) AND users.id = user_id AND courses.id = course_id
+      WHERE (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
           OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
         )
