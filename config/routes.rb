@@ -7,13 +7,14 @@ ActionController::Routing::Routes.draw do |map|
   map.destroy_inbox_item 'inbox/:id', :controller => 'context', :action => 'destroy_inbox_item', :conditions => {:method => :delete}
   map.inbox_item 'inbox/:id', :controller => 'context', :action => 'inbox_item'
 
-  map.messages_unread 'messages/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
-  map.messages_labeled 'messages/labeled', :controller => 'conversations', :action => 'index', :scope => 'labeled'
-  map.messages_archived 'messages/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
-  map.messages_find_recipients 'messages/find_recipients', :controller => 'conversations', :action => 'find_recipients'
-  map.messages_mark_all_as_read 'messages/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
-  map.conversations_batch_pm 'messages/batch_pm', :controller => 'conversations', :action => 'batch_pm', :conditions => {:method => :post}
-  map.resources :conversations, :as => :messages, :only => [:index, :show, :update, :create, :destroy] do |conversation|
+  map.discussion_replies 'conversations/discussion_replies', :controller => 'context', :action => 'discussion_replies'
+  map.conversations_unread 'conversations/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
+  map.conversations_labeled 'conversations/labeled', :controller => 'conversations', :action => 'index', :scope => 'labeled'
+  map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
+  map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
+  map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
+  map.conversations_batch_pm 'conversations/batch_pm', :controller => 'conversations', :action => 'batch_pm', :conditions => {:method => :post}
+  map.resources :conversations, :only => [:index, :show, :update, :create, :destroy] do |conversation|
     conversation.add_recipients 'add_recipients', :controller => 'conversations', :action => 'add_recipients', :conditions => {:method => :post}
     conversation.add_message 'add_message', :controller => 'conversations', :action => 'add_message', :conditions => {:method => :post}
     conversation.remove_messages 'remove_messages', :controller => 'conversations', :action => 'remove_messages', :conditions => {:method => :post}

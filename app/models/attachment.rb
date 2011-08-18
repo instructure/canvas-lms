@@ -44,10 +44,14 @@ class Attachment < ActiveRecord::Base
   before_validation :assert_attachment
   before_destroy :delete_scribd_doc
   acts_as_list :scope => :folder
-  after_save :touch_context
+  after_save :touch_context_if_appropriate
   after_create :build_media_object
   
   attr_accessor :podcast_associated_asset
+
+  def touch_context_if_appropriate
+    touch_context unless context_type == 'ConversationMessage'
+  end
 
   # this is a magic method that gets run by attachment-fu after it is done sending to s3,
   # that is the moment that we also want to submit it to scribd.

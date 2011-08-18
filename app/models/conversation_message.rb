@@ -22,13 +22,13 @@ class ConversationMessage < ActiveRecord::Base
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
   has_many :conversation_message_participants
-  has_many :attachments, :as => :context
-  has_many :media_objects, :as => :context
+  has_many :attachments, :as => :context, :order => 'created_at, id'
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
 
   named_scope :human, :conditions => "NOT generated"
+  named_scope :with_media_comments, :conditions => "media_comment_id IS NOT NULL"
 
   validates_length_of :body, :maximum => maximum_text_length
 
@@ -47,6 +47,35 @@ class ConversationMessage < ActiveRecord::Base
     self.recipients
   end
   
+  before_save :infer_values
+  
+  def infer_values
+    self.media_comment_id = nil if self.media_comment_id && self.media_comment_id.strip.empty?
+    if self.media_comment_id && self.media_comment_id_changed?
+      @media_comment = MediaObject.find_by_media_id(self.media_comment_id)
+      self.media_comment_id = nil unless @media_comment
+      self.media_comment_type = @media_comment.media_type if @media_comment
+    end
+    self.media_comment_type = nil unless self.media_comment_id
+  end
+
+  def has_media_comment?
+    !self.media_comment_id.nil?
+  end
+
+  def media_comment
+    if !@media_comment && self.media_comment_id
+      @media_comment = MediaObject.find_by_media_id(self.media_comment_id)
+    end
+    @media_comment
+  end
+
+  def media_comment=(media_comment)
+    self.media_comment_id = media_comment.media_id
+    self.media_comment_type = media_comment.media_type
+    @media_comment = media_comment
+  end
+
   # TODO do this in SQL
   def recipients
     self.subscribed_participants - [self.author]
@@ -113,7 +142,9 @@ class ConversationMessage < ActiveRecord::Base
 
   def as_json(options = {})
     super(options)['conversation_message'].merge({
-      'forwarded_messages' => forwarded_messages
+      'forwarded_messages' => forwarded_messages,
+      'attachments' => attachments.map{ |a| a.as_json['attachment'].merge({'uuid' => a.uuid}) },
+      'media_comment' => media_comment.as_json['media_object']
     })
   end
 

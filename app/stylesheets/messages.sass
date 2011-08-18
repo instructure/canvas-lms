@@ -291,6 +291,21 @@ ul.messages
   .audience
     color: #636363
 
+ul.messages
+  li
+    .message_attachments
+      padding-top: 0.5em
+      margin-left: 0
+      padding-left: 1em
+      border-top: 1px solid #cccccc
+      list-style: none
+  li.self
+    .message_attachments
+      border-top-color: #bcbcbc
+  li.selected
+    .message_attachments
+      border-top-color: #b7c2cc
+
 ul.messages li.other:hover
   .actions
     margin-left: 1em
@@ -302,6 +317,7 @@ ul.messages li.other:hover
       padding-left: 20px
     .send_private_message:hover
       background-position: 0 -18px
+
 ul.messages, ul.messages.private, ul.messages.private li:hover
   .actions
     display: none
@@ -766,6 +782,8 @@ li.purple .label_icon, .purple.label_icon
     font-size: 1.1em
   #action_add_recipients:hover
     background-position: 0 -18px
+  #action_add_attachment, #action_media_comment
+    padding-right: 1em
   ul.conversations
     overflow: visible
     border: 0
@@ -774,6 +792,22 @@ li.purple .label_icon, .purple.label_icon
     > li
       padding: 0
       border: 0
+  #attachment_list
+    overflow: visible
+    border: 0
+    padding: 0
+    margin: 0
+    list-style-type: none
+    input
+      width: 90%
+    > li
+      padding: 0 0 5px 0
+      border: 0
+  .media_comment
+    overflow: visible
+    border: 0
+    padding: 0 0 5px 0
+    margin: 0
   +box-shadow( rgba(0,0,0,0.25), 0, 0, 6px, 3px)
 #create_message_form.new
   .audience

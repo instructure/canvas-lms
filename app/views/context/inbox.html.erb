@@ -1,4 +1,4 @@
-<% content_for :page_title do %><%= t('inbox.inbox', "Inbox") %><% end %>
+<% content_for :page_title do %><%= t('inbox.discussion_replies', "Discussion Replies") %><% end %>
 
 <% content_for :right_side do %>
   <% if @current_user && @current_user.unread_inbox_items_count && @current_user.unread_inbox_items_count > 0 %>
@@ -8,18 +8,8 @@
       <% end %>
     </div>
   <% end %>
-  <h2><%= t('headings.show_message_types', %{Show Message Types}) %></h2>
-  <div class="rs-margin-lr">
-    <a href="<%= user_path(@current_user) %>" class="update_user_url" style="display: none;">&nbsp;</a>
-    <%= before_label('select_message_types', %{Select which message types you'd like to show up in your inbox}) %>
-    <ul class="unstyled_list" id="visible_message_types">
-      <% [['SubmissionComment', t('submission_comments', 'Submission Comments')], ['DiscussionEntry', t('discussion_replies', 'Discussion Replies')]].each do |type, desc| %>
-        <li><input type="checkbox" value="<%= type.underscore %>" id="show_<%= type.underscore %>" <%= 'checked' if @current_user.show_in_inbox?(type) %> /><label for="show_<%= type.underscore %>"><%= desc %></label></li>
-      <% end %>
-    </ul>
-  </div>
 <% end %>
 
-<h2 id="messages_view" style="float: left;" data-view="action_items"><%= t('inbox.inbox', "Inbox") %></h2>
+<h2 id="messages_view" style="float: left;" data-view="action_items"><%= t('inbox.discussion_replies', "Discussion Replies") %></h2>
 <div class="clear"></div>
 <%= render :partial => "inbox_items" %>

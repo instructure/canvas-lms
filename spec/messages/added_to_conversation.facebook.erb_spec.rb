@@ -22,9 +22,9 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'added_to_conversation.facebook' do
   it "should render" do
     course_with_teacher
-    student1 = student_in_course
-    student2 = student_in_course
-    student3 = student_in_course
+    student1 = student_in_course.user
+    student2 = student_in_course.user
+    student3 = student_in_course.user
     conversation = @teacher.initiate_conversation([student1.id, student2.id])
     conversation.add_message("some message")
     event = conversation.add_participants([student3.id])

@@ -1,4 +1,4 @@
-<% item_types = ['SubmissionComment', 'DiscussionEntry'] %>
+<% item_types = ['DiscussionEntry'] %>
 <div id="message_list" class="communication_messages_list <%= item_types.map{|t| @current_user.show_in_inbox?(t) ? "show_#{t.underscore}" : ""}.join(" ") %>">
   <div class="no_messages" style="<%= hidden unless !@message && @messages.empty? %>">
     <%= t('no_messages', %{Sorry, no messages yet.}) %>

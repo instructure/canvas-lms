@@ -17,8 +17,8 @@
 #
 
 class ContextController < ApplicationController
-  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :object_snippet]
-  before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image]
+  before_filter :require_user_for_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :object_snippet, :discussion_replies]
+  before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
   protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
 
   def create_media_object
@@ -234,12 +234,16 @@ class ContextController < ApplicationController
   end
   
   def inbox
-    add_crumb(@current_user.short_name, named_context_url(@current_user, :context_url))
-    add_crumb(t('#crumb.inbox', "Inbox"), inbox_url)
+    redirect_to conversations_url, :status => :moved_permanently
+  end
+
+  def discussion_replies
+    add_crumb(t('#crumb.conversations', "Conversations"), conversations_url)
+    add_crumb(t('#crumb.discussion_replies', "Discussion Replies"), discussion_replies_url)
     @messages = @current_user.inbox_items.active.paginate(:page => params[:page], :per_page => 15)
     log_asset_access("inbox:#{@current_user.asset_string}", "inbox", 'other')
     respond_to do |format|
-      format.html
+      format.html { render :action => :inbox }
       format.json { render :json => @messages.to_json(:methods => [:sender_name]) }
     end
   end

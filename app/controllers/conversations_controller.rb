@@ -63,8 +63,7 @@ class ConversationsController < ApplicationController
   def create
     if @recipient_ids.present? && params[:body].present?
       @conversation = @current_user.initiate_conversation(@recipient_ids)
-      message = @conversation.add_message(params[:body], params[:forwarded_message_ids])
-      message.generate_user_note if params[:user_note]
+      message = create_message_on_conversation
       render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
                        :conversation => jsonify_conversation(@conversation.reload),
                        :message => message}
@@ -77,7 +76,7 @@ class ConversationsController < ApplicationController
     if @recipient_ids.present? && params[:body].present?
       @recipient_ids.each do |recipient_id|
         conversation = @current_user.initiate_conversation([recipient_id], true)
-        message = conversation.add_message(params[:body])
+        message = create_message_on_conversation(conversation)
       end
       render :json => {}, :status => :ok
     else
@@ -131,8 +130,7 @@ class ConversationsController < ApplicationController
 
   def add_message
     if params[:body].present?
-      message = @conversation.add_message(params[:body])
-      message.generate_user_note if params[:user_note]
+      message = create_message_on_conversation
       render :json => {:conversation => jsonify_conversation(@conversation.reload), :message => message}
     else
       render :json => {}, :status => :bad_request
@@ -229,6 +227,30 @@ class ConversationsController < ApplicationController
 
   def get_conversation
     @conversation = @current_user.conversations.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
+  end
+
+  def create_message_on_conversation(conversation=@conversation)
+    message = conversation.add_message(params[:body], params[:forwarded_message_ids]) do |m|
+      if params[:attachments]
+        params[:attachments].sort_by{ |k,v| k.to_i }.each do |k,v|
+          m.attachments.create(:uploaded_data => v) if v.present?
+        end
+      end
+
+      media_id = params[:media_comment_id]
+      media_type = params[:media_comment_type]
+      if media_id.present? && media_type.present?
+        media_comment = MediaObject.find_by_media_id_and_media_type(media_id, media_type)
+        if media_comment
+          media_comment.context = @current_user
+          media_comment.save
+          m.media_comment = media_comment
+          m.save
+        end
+      end
+    end
+    message.generate_user_note if params[:user_note]
+    message
   end
 
   def jsonify_conversation(conversation)

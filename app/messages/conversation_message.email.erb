@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.default_host %>/messages/#/messages/<%= asset.conversation_id %>
+  http://<%= HostUrl.default_host %>/conversations/#/conversations/<%= asset.conversation_id %>
 <% end %>
 <% define_content :user_name do %>
   <%= asset.author.short_name rescue t(:unknown_user, "Unknown User") %>
@@ -12,10 +12,10 @@
 <%= asset.body %>
 
 
-<% if asset.media_objects.empty? %>
-<%= t :reply_message, "To reply to this message, click the link below:" %>
-<% else %>
+<% if asset.has_media_comment? %>
 <%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %>
+<% else %>
+<%= t :reply_message, "To reply to this message, click the link below:" %>
 <% end %>
 
 <%= content :link %>

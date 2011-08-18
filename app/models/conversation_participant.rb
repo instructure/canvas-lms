@@ -71,14 +71,14 @@ class ConversationParticipant < ActiveRecord::Base
     }
   end
 
-  [:attachments, :media_objects].each do |association|
+  [:attachments].each do |association|
     class_eval <<-ASSOC
       def #{association}
         @#{association} ||= conversation.#{association}.scoped(:conditions => <<-SQL)
           EXISTS (
             SELECT 1
             FROM conversation_message_participants
-            WHERE conversation_participant_id = \#{user_id}
+            WHERE conversation_participant_id = \#{id}
               AND conversation_message_id = conversation_messages.id
           )
           SQL
@@ -127,8 +127,8 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_participants(user, user_ids)
   end
 
-  def add_message(body, forwarded_message_ids = [])
-    conversation.add_message(user, body, false, forwarded_message_ids)
+  def add_message(body, forwarded_message_ids = [], &blk)
+    conversation.add_message(user, body, false, forwarded_message_ids, &blk)
   end
 
   def remove_messages(*to_delete)
@@ -178,7 +178,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.message_count = messages.human.size if recalculate_count
       self.last_message_at = latest.created_at
       self.has_attachments = attachments.size > 0
-      self.has_media_objects = media_objects.size > 0
+      self.has_media_objects = messages.with_media_comments.size > 0
     else
       self.workflow_state = 'read' if unread?
       self.message_count = 0
