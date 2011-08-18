@@ -781,6 +781,7 @@ I18n.scoped 'conversations', (I18n) ->
       set_hash '#/conversations/' + $(this).data('id')
     update_conversation($conversation, data, null)
     $conversation.hide().slideDown('fast') unless append
+    $conversation_list.append $("#conversations_loader")
     $conversation
 
   update_conversation = ($conversation, data, move_mode='slide') ->
@@ -1267,6 +1268,25 @@ I18n.scoped 'conversations', (I18n) ->
 
     $(window).resize inbox_resize
     setTimeout inbox_resize
+
+    setTimeout () ->
+      $conversation_list.pageless
+        totalPages: Math.ceil(MessageInbox.initial_conversations_count / MessageInbox.conversation_page_size)
+        container: $conversation_list
+        params:
+          format: 'json'
+        loader: $("#conversations_loader")
+        scrape: (data) ->
+          if typeof(data) == 'string'
+            try
+              data = JSON.parse(data)
+            catch error
+              data = []
+            for conversation in data
+              add_conversation conversation, true
+          $conversation_list.append $("#conversations_loader")
+          false
+      , 1
 
     $(window).bind 'hashchange', ->
       hash = location.hash

@@ -1083,6 +1083,7 @@
       if (!append) {
         $conversation.hide().slideDown('fast');
       }
+      $conversation_list.append($("#conversations_loader"));
       return $conversation;
     };
     update_conversation = function($conversation, data, move_mode) {
@@ -1759,6 +1760,32 @@
       };
       $(window).resize(inbox_resize);
       setTimeout(inbox_resize);
+      setTimeout(function() {
+        return $conversation_list.pageless({
+          totalPages: Math.ceil(MessageInbox.initial_conversations_count / MessageInbox.conversation_page_size),
+          container: $conversation_list,
+          params: {
+            format: 'json'
+          },
+          loader: $("#conversations_loader"),
+          scrape: function(data) {
+            var conversation, _j, _len2;
+            if (typeof data === 'string') {
+              try {
+                data = JSON.parse(data);
+              } catch (error) {
+                data = [];
+              }
+              for (_j = 0, _len2 = data.length; _j < _len2; _j++) {
+                conversation = data[_j];
+                add_conversation(conversation, true);
+              }
+            }
+            $conversation_list.append($("#conversations_loader"));
+            return false;
+          }
+        }, 1);
+      });
       return $(window).bind('hashchange', function() {
         var $c, hash, match, params;
         hash = location.hash;
