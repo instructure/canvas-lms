@@ -20,6 +20,24 @@ class ExternalToolsController < ApplicationController
     end
   end
   
+  def retrieve
+    get_context
+    if authorized_action(@context, @current_user, :read)
+      @tool = ContextExternalTool.find_external_tool(params[:url], @context)
+      if !@tool
+        flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
+        redirect_to named_context_url(@context, :context_url)
+        return
+      end
+      @resource_title = @tool.name
+      @resource_url = params[:url]
+      @opaque_id = @context.opaque_identifier(:asset_string)
+      add_crumb(@context.name, named_context_url(@context, :context_url))
+      @return_url = url_for(@context)
+      render :template => 'external_tools/tool_show'
+    end
+  end
+  
   def show
     get_context
     @tool = ContextExternalTool.find_for(params[:id], @context, "#{@context.class.base_ar_class.to_s.downcase}_navigation")
