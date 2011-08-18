@@ -254,7 +254,7 @@ $(document).ready(function() {
     $bank.find("label").attr('for', "question_bank_" + bank.id)
       .find(".bank_name").text(bank.title || I18n.t('default_name', "No Name")).end()
       .find(".context_name").text(bank.cached_context_short_name);
-    $dialog.find("ul.banks").find("li.bank.bank:first").before($bank.show());
+    $bank.show().insertBefore($dialog.find("ul.banks .bank.blank:last"));
   };
   var loadBanks = function() {
     var url = $("#bank_urls .managed_banks_url").attr('href');
