@@ -633,10 +633,19 @@ I18n.scoped 'conversations', (I18n) ->
       , ->
         $form.loadingImage('remove')
 
-  MessageInbox.shared_contexts_for_user = (user) ->
+  MessageInbox.shared_contexts_for_user = (user, limit=2) ->
     shared_contexts = (course.name for course_id in user.course_ids when course = @contexts.courses[course_id]).
                 concat(group.name for group_id in user.group_ids when group = @contexts.groups[group_id])
-    shared_contexts.join(", ")
+    shared_contexts.sort (a, b) ->
+      a = a.toLowerCase()
+      b = b.toLowerCase()
+      if a < b
+        -1
+      else if a > b
+        1
+      else
+        0
+    .slice(0, limit).join(", ") # TODO: [].to_sentence for js
 
   html_name_for_user = (user) ->
     shared_contexts = MessageInbox.shared_contexts_for_user(user)
@@ -1286,6 +1295,7 @@ I18n.scoped 'conversations', (I18n) ->
           $span = $('<span />')
           $span.text(MessageInbox.shared_contexts_for_user(data)) if data.course_ids?
           $node.append($b, $span)
+          $node.attr('title', data.name)
           $node.data('id', data.id)
           $node.addClass(if data.type then data.type else 'user')
           if options.level > 0

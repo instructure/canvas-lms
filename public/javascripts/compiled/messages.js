@@ -860,8 +860,11 @@
         });
       }
     };
-    MessageInbox.shared_contexts_for_user = function(user) {
+    MessageInbox.shared_contexts_for_user = function(user, limit) {
       var course, course_id, group, group_id, shared_contexts;
+      if (limit == null) {
+        limit = 2;
+      }
       shared_contexts = ((function() {
         var _i, _len, _ref, _results;
         _ref = user.course_ids;
@@ -885,7 +888,17 @@
         }
         return _results;
       }).call(this));
-      return shared_contexts.join(", ");
+      return shared_contexts.sort(function(a, b) {
+        a = a.toLowerCase();
+        b = b.toLowerCase();
+        if (a < b) {
+          return -1;
+        } else if (a > b) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }).slice(0, limit).join(", ");
     };
     html_name_for_user = function(user) {
       var shared_contexts;
@@ -1783,6 +1796,7 @@
               $span.text(MessageInbox.shared_contexts_for_user(data));
             }
             $node.append($b, $span);
+            $node.attr('title', data.name);
             $node.data('id', data.id);
             $node.addClass(data.type ? data.type : 'user');
             if (options.level > 0) {
