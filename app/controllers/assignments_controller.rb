@@ -60,6 +60,7 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
+      @context.require_assignment_group
       @assignment_groups = @context.assignment_groups.active
       if !@assignment.new_record? && !@assignment_groups.map(&:id).include?(@assignment.assignment_group_id)
         @assignment.assignment_group = @assignment_groups.first
