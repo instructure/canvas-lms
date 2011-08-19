@@ -187,7 +187,7 @@ function fix_ownership {
   echo "fixing canvas ownership..."
   getent passwd $USERNAME >/dev/null || adduser --system --home $HOMEDIR \
       --disabled-password --shell /bin/sh $USERNAME
-  touch $BASEDIR/Gemfile.lock
+  echo > $BASEDIR/Gemfile.lock
   touch $BASEDIR/db/schema.rb
   chown $USERNAME $BASEDIR/{config/environment.rb,log,tmp/pids,tmp,public/assets} \
       $BASEDIR/{public/stylesheets/compiled,Gemfile.lock,db/schema.rb,.bundle} \
