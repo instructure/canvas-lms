@@ -698,6 +698,8 @@ I18n.scoped 'conversations', (I18n) ->
     $attachment.find('span.title').html $.h(data.display_name)
     $link = $attachment.find('a')
     $link.attr('href', $.replaceTags($link.attr('href'), id: data.id, uuid: data.uuid))
+    $link.click (e) ->
+      e.stopPropagation()
     $attachment
 
   build_submission = (data) ->

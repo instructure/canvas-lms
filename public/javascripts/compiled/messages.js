@@ -962,6 +962,9 @@
         id: data.id,
         uuid: data.uuid
       }));
+      $link.click(function(e) {
+        return e.stopPropagation();
+      });
       return $attachment;
     };
     build_submission = function(data) {
