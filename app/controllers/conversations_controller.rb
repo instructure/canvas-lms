@@ -128,7 +128,8 @@ class ConversationsController < ApplicationController
     end
     render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
                      :messages => @conversation.messages,
-                     :submissions => submissions}
+                     :submissions => submissions,
+                     :conversation => params[:include_conversation] ? jsonify_conversation(@conversation) : nil}
   end
 
   def update

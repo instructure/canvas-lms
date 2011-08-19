@@ -558,6 +558,12 @@ I18n.scoped 'conversations', (I18n) ->
   is_selected = ($conversation) ->
     $selected_conversation && $selected_conversation.attr('id') == $conversation?.attr('id')
 
+  select_unloaded_conversation = (conversation_id) ->
+    $.ajaxJSON '/conversations/' + conversation_id, 'GET', { include_conversation: 1 }, (data) ->
+      add_conversation data.conversation, true
+      $("#conversation_" + conversation_id).hide()
+      select_conversation $("#conversation_" + conversation_id), data: data
+
   select_conversation = ($conversation, params={}) ->
     toggle_message_actions(off)
 
@@ -594,7 +600,8 @@ I18n.scoped 'conversations', (I18n) ->
 
     $form.loadingImage()
     $c = $selected_conversation
-    $.ajaxJSON $selected_conversation.find('a.details_link').attr('href'), 'GET', {}, (data) ->
+    
+    completion = (data) ->
       return unless is_selected($c)
       for user in data.participants when !MessageInbox.user_cache[user.id]
         MessageInbox.user_cache[user.id] = user
@@ -617,8 +624,14 @@ I18n.scoped 'conversations', (I18n) ->
       if $selected_conversation.hasClass 'unread'
         # we've already done this server-side
         set_conversation_state $selected_conversation, 'read'
-    , ->
-      $form.loadingImage('remove')
+
+    if params.data
+      completion params.data
+    else
+      $.ajaxJSON $selected_conversation.find('a.details_link').attr('href'), 'GET', {}, (data) ->
+        completion(data)
+      , ->
+        $form.loadingImage('remove')
 
   MessageInbox.shared_contexts_for_user = (user) ->
     shared_contexts = (course.name for course_id in user.course_ids when course = @contexts.courses[course_id]).
@@ -772,7 +785,11 @@ I18n.scoped 'conversations', (I18n) ->
 
   add_conversation = (data, append) ->
     $('#no_messages').hide()
-    $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id)
+    $conversation = $("#conversation_" + data.id)
+    if $conversation.length
+      $conversation.show()
+    else
+      $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id)
     $conversation.data('id', data.id)
     if data.avatar_url
       $conversation.prepend $('<img />').attr('src', data.avatar_url).addClass('avatar')
@@ -817,6 +834,7 @@ I18n.scoped 'conversations', (I18n) ->
     reposition_conversation($conversation, move_direction, move_mode) if move_mode
 
   reposition_conversation = ($conversation, move_direction, move_mode) ->
+    $conversation.show()
     last_message = $conversation.data('last_message_at')
     $n = $conversation
     if move_direction == 'up'
@@ -1311,8 +1329,11 @@ I18n.scoped 'conversations', (I18n) ->
 
     $(window).bind 'hashchange', ->
       hash = location.hash
-      if (match = hash.match(/^#\/conversations\/(\d+)$/)) and ($c = $('#conversation_' + match[1])) and $c.length
-        select_conversation($c)
+      if match = hash.match(/^#\/conversations\/(\d+)$/)
+        if ($c = $('#conversation_' + match[1])) and $c.length
+          select_conversation($c)
+        else
+          select_unloaded_conversation(match[1])
       else if $('#action_compose_message').length
         params = {}
         if match = hash.match(/^#\/conversations\?(.*)$/)
