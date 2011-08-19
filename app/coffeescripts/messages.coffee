@@ -558,6 +558,12 @@ I18n.scoped 'conversations', (I18n) ->
   is_selected = ($conversation) ->
     $selected_conversation && $selected_conversation.attr('id') == $conversation?.attr('id')
 
+  select_unloaded_conversation = (conversation_id) ->
+    $.ajaxJSON '/conversations/' + conversation_id, 'GET', { include_conversation: 1 }, (data) ->
+      add_conversation data.conversation, true
+      $("#conversation_" + conversation_id).hide()
+      select_conversation $("#conversation_" + conversation_id), data: data
+
   select_conversation = ($conversation, params={}) ->
     toggle_message_actions(off)
 
@@ -587,14 +593,15 @@ I18n.scoped 'conversations', (I18n) ->
     if $selected_conversation
       $selected_conversation.scrollIntoView()
     else
-      if params and params.user_id and params.user_name and params.from_conversation_id
+      if params and params.user_id and params.user_name
         $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name
         $('#from_conversation_id').val(params.from_conversation_id)
       return
 
     $form.loadingImage()
     $c = $selected_conversation
-    $.ajaxJSON $selected_conversation.find('a.details_link').attr('href'), 'GET', {}, (data) ->
+    
+    completion = (data) ->
       return unless is_selected($c)
       for user in data.participants when !MessageInbox.user_cache[user.id]
         MessageInbox.user_cache[user.id] = user
@@ -617,8 +624,14 @@ I18n.scoped 'conversations', (I18n) ->
       if $selected_conversation.hasClass 'unread'
         # we've already done this server-side
         set_conversation_state $selected_conversation, 'read'
-    , ->
-      $form.loadingImage('remove')
+
+    if params.data
+      completion params.data
+    else
+      $.ajaxJSON $selected_conversation.find('a.details_link').attr('href'), 'GET', {}, (data) ->
+        completion(data)
+      , ->
+        $form.loadingImage('remove')
 
   MessageInbox.shared_contexts_for_user = (user) ->
     shared_contexts = (course.name for course_id in user.course_ids when course = @contexts.courses[course_id]).
@@ -685,6 +698,8 @@ I18n.scoped 'conversations', (I18n) ->
     $attachment.find('span.title').html $.h(data.display_name)
     $link = $attachment.find('a')
     $link.attr('href', $.replaceTags($link.attr('href'), id: data.id, uuid: data.uuid))
+    $link.click (e) ->
+      e.stopPropagation()
     $attachment
 
   build_submission = (data) ->
@@ -772,7 +787,11 @@ I18n.scoped 'conversations', (I18n) ->
 
   add_conversation = (data, append) ->
     $('#no_messages').hide()
-    $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id)
+    $conversation = $("#conversation_" + data.id)
+    if $conversation.length
+      $conversation.show()
+    else
+      $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id)
     $conversation.data('id', data.id)
     if data.avatar_url
       $conversation.prepend $('<img />').attr('src', data.avatar_url).addClass('avatar')
@@ -817,6 +836,7 @@ I18n.scoped 'conversations', (I18n) ->
     reposition_conversation($conversation, move_direction, move_mode) if move_mode
 
   reposition_conversation = ($conversation, move_direction, move_mode) ->
+    $conversation.show()
     last_message = $conversation.data('last_message_at')
     $n = $conversation
     if move_direction == 'up'
@@ -904,7 +924,7 @@ I18n.scoped 'conversations', (I18n) ->
       $message_list.find('> li :checkbox').attr('checked', false)
     else
       state = !!$message_list.find('li.selected').length
-    $('#message_actions').showIf(state)
+    if state then $("#message_actions").slideDown(100) else $("#message_actions").slideUp(100)
     $form[if state then 'addClass' else 'removeClass']('disabled')
 
   set_last_label = (label) ->
@@ -927,8 +947,14 @@ I18n.scoped 'conversations', (I18n) ->
     $messages = $('#messages')
     $message_list = $messages.find('ul.messages')
     $form = $('#create_message_form')
+    $add_form = $('#add_recipients_form')
+    $forward_form = $('#forward_message_form')
 
-    $form.find("textarea").elastic()
+    $('#create_message_form, #forward_message_form').find('textarea').elastic().keypress (e) ->
+      if e.which is 13 and e.shiftKey
+        e.preventDefault()
+        $(this).closest('form').submit()
+        false
 
     $form.submit (e) ->
       valid = !!($form.find('#body').val() and ($form.find('#recipient_info').filter(':visible').length is 0 or $form.find('.token_input li').length > 0))
@@ -963,11 +989,11 @@ I18n.scoped 'conversations', (I18n) ->
     $form.click ->
       toggle_message_actions off
 
-    $('#add_recipients_form').submit (e) ->
+    $add_form.submit (e) ->
       valid = !!($(this).find('.token_input li').length)
       e.stopImmediatePropagation() unless valid
       valid
-    $('#add_recipients_form').formSubmit
+    $add_form.formSubmit
       beforeSubmit: ->
         $(this).loadingImage()
       success: (data) ->
@@ -1076,7 +1102,7 @@ I18n.scoped 'conversations', (I18n) ->
 
     $('#action_add_recipients').click (e) ->
       e.preventDefault()
-      $('#add_recipients_form')
+      $add_form
         .attr('action', inbox_action_url_for($(this), $selected_conversation))
         .dialog('close').dialog
           width: 420
@@ -1142,7 +1168,6 @@ I18n.scoped 'conversations', (I18n) ->
             $selected_messages.show()
 
     $('#action_forward').click ->
-      $forward_form = $('#forward_message_form')
       $forward_form.find("input[name!=authenticity_token], textarea").val('').change()
       $preview = $forward_form.find('ul.messages').first()
       $preview.html('')
@@ -1174,11 +1199,11 @@ I18n.scoped 'conversations', (I18n) ->
         close: ->
           $('#forward_recipients').data('token_input').input.blur()
 
-    $('#forward_message_form').submit (e) ->
+    $forward_form.submit (e) ->
       valid = !!($(this).find('#forward_body').val() and $(this).find('.token_input li').length)
       e.stopImmediatePropagation() unless valid
       valid
-    $('#forward_message_form').formSubmit
+    $forward_form.formSubmit
       beforeSubmit: ->
         $(this).loadingImage()
       success: (data) ->
@@ -1248,7 +1273,7 @@ I18n.scoped 'conversations', (I18n) ->
     $('#no_messages').showIf !$conversation_list.find('li').length
 
     $('.recipients').tokenInput
-      placeholder: I18n.t('recipient_field_placeholder', "Enter a name, email, course, or group")
+      placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
       selector:
         messages: {no_results: I18n.t('no_results', 'No results found')}
         populator: ($node, data, options={}) ->
@@ -1311,8 +1336,11 @@ I18n.scoped 'conversations', (I18n) ->
 
     $(window).bind 'hashchange', ->
       hash = location.hash
-      if (match = hash.match(/^#\/conversations\/(\d+)$/)) and ($c = $('#conversation_' + match[1])) and $c.length
-        select_conversation($c)
+      if match = hash.match(/^#\/conversations\/(\d+)$/)
+        if ($c = $('#conversation_' + match[1])) and $c.length
+          select_conversation($c)
+        else
+          select_unloaded_conversation(match[1])
       else if $('#action_compose_message').length
         params = {}
         if match = hash.match(/^#\/conversations\?(.*)$/)

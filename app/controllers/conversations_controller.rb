@@ -88,14 +88,14 @@ class ConversationsController < ApplicationController
         @conversation
       end
       if batch_private_messages
-        render :json => {:conversations => conversations.each(&:reload).select{|c|c.last_message_at}.map{|c|jsonify_conversation(c)}}
+        render :text => {:conversations => conversations.each(&:reload).select{|c|c.last_message_at}.map{|c|jsonify_conversation(c)}}.to_json
       else
-        render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
+        render :text => {:participants => jsonify_users(@conversation.participants(true, true)),
                          :conversation => jsonify_conversation(@conversation.reload),
-                         :message => @message}
+                         :message => @message}.to_json
       end
     else
-      render :json => {}, :status => :bad_request
+      render :text => {}.to_json, :status => :bad_request
     end
   end
 
@@ -128,7 +128,8 @@ class ConversationsController < ApplicationController
     end
     render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
                      :messages => @conversation.messages,
-                     :submissions => submissions}
+                     :submissions => submissions,
+                     :conversation => params[:include_conversation] ? jsonify_conversation(@conversation) : nil}
   end
 
   def update
@@ -173,9 +174,9 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
       message = create_message_on_conversation
-      render :json => {:conversation => jsonify_conversation(@conversation.reload), :message => message}
+      render :text => {:conversation => jsonify_conversation(@conversation.reload), :message => message}.to_json
     else
-      render :json => {}, :status => :bad_request
+      render :text => {}.to_json, :status => :bad_request
     end
   end
 

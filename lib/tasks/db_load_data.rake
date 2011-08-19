@@ -705,6 +705,8 @@ namespace :db do
       <%= strip_and_truncate(asset.body, :max_length => 50) %>
     }
 
+    create_notification 'AddedToConversation', 'Added To Conversation', 0, 'http://<%= HostUrl.default_host %>', ""
+
     create_notification 'GroupMembership', 'Membership Update', 0,
     'http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/groups', %{
       New Context Group Membership

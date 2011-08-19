@@ -678,13 +678,11 @@
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-            if ((_ref = post_data.limit) != null) {
-        _ref;
-      } else {
+      if ((_ref = post_data.limit) == null) {
         post_data.limit = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
-      };
+      }
       return post_data;
     };
     return TokenSelector;
@@ -710,7 +708,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, select_unloaded_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -762,8 +760,19 @@
     is_selected = function($conversation) {
       return $selected_conversation && $selected_conversation.attr('id') === ($conversation != null ? $conversation.attr('id') : void 0);
     };
+    select_unloaded_conversation = function(conversation_id) {
+      return $.ajaxJSON('/conversations/' + conversation_id, 'GET', {
+        include_conversation: 1
+      }, function(data) {
+        add_conversation(data.conversation, true);
+        $("#conversation_" + conversation_id).hide();
+        return select_conversation($("#conversation_" + conversation_id), {
+          data: data
+        });
+      });
+    };
     select_conversation = function($conversation, params) {
-      var $c;
+      var $c, completion;
       if (params == null) {
         params = {};
       }
@@ -798,7 +807,7 @@
       if ($selected_conversation) {
         $selected_conversation.scrollIntoView();
       } else {
-        if (params && params.user_id && params.user_name && params.from_conversation_id) {
+        if (params && params.user_id && params.user_name) {
           $('#recipients').data('token_input').add_token({
             value: params.user_id,
             text: params.user_name
@@ -809,7 +818,7 @@
       }
       $form.loadingImage();
       $c = $selected_conversation;
-      return $.ajaxJSON($selected_conversation.find('a.details_link').attr('href'), 'GET', {}, function(data) {
+      completion = function(data) {
         var i, j, message, submission, user, _i, _len, _ref;
         if (!is_selected($c)) {
           return;
@@ -840,9 +849,16 @@
         if ($selected_conversation.hasClass('unread')) {
           return set_conversation_state($selected_conversation, 'read');
         }
-      }, function() {
-        return $form.loadingImage('remove');
-      });
+      };
+      if (params.data) {
+        return completion(params.data);
+      } else {
+        return $.ajaxJSON($selected_conversation.find('a.details_link').attr('href'), 'GET', {}, function(data) {
+          return completion(data);
+        }, function() {
+          return $form.loadingImage('remove');
+        });
+      }
     };
     MessageInbox.shared_contexts_for_user = function(user) {
       var course, course_id, group, group_id, shared_contexts;
@@ -886,11 +902,9 @@
         $message.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $message.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -948,6 +962,9 @@
         id: data.id,
         uuid: data.uuid
       }));
+      $link.click(function(e) {
+        return e.stopPropagation();
+      });
       return $attachment;
     };
     build_submission = function(data) {
@@ -964,11 +981,9 @@
       $header.find('a').attr('href', href);
       user = MessageInbox.user_cache[data.author_id];
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $header.find('.title').html($.h(data.title));
@@ -1027,11 +1042,9 @@
         $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1078,7 +1091,12 @@
     add_conversation = function(data, append) {
       var $conversation;
       $('#no_messages').hide();
-      $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id);
+      $conversation = $("#conversation_" + data.id);
+      if ($conversation.length) {
+        $conversation.show();
+      } else {
+        $conversation = $("#conversation_blank").clone(true).attr('id', 'conversation_' + data.id);
+      }
       $conversation.data('id', data.id);
       if (data.avatar_url) {
         $conversation.prepend($('<img />').attr('src', data.avatar_url).addClass('avatar'));
@@ -1148,6 +1166,7 @@
     };
     reposition_conversation = function($conversation, move_direction, move_mode) {
       var $dummy_conversation, $n, last_message;
+      $conversation.show();
       last_message = $conversation.data('last_message_at');
       $n = $conversation;
       if (move_direction === 'up') {
@@ -1265,7 +1284,11 @@
       } else {
         state = !!$message_list.find('li.selected').length;
       }
-      $('#message_actions').showIf(state);
+      if (state) {
+        $("#message_actions").slideDown(100);
+      } else {
+        $("#message_actions").slideUp(100);
+      }
       return $form[state ? 'addClass' : 'removeClass']('disabled');
     };
     set_last_label = function(label) {
@@ -1283,14 +1306,22 @@
       MessageInbox: MessageInbox
     });
     return $(document).ready(function() {
-      var conversation, nextAttachmentIndex, token_input, _i, _len, _ref, _ref2;
+      var $add_form, $forward_form, conversation, nextAttachmentIndex, token_input, _i, _len, _ref, _ref2;
       $conversations = $('#conversations');
       $conversation_list = $conversations.find("ul.conversations");
       set_last_label((_ref = $.cookie('last_label')) != null ? _ref : 'red');
       $messages = $('#messages');
       $message_list = $messages.find('ul.messages');
       $form = $('#create_message_form');
-      $form.find("textarea").elastic();
+      $add_form = $('#add_recipients_form');
+      $forward_form = $('#forward_message_form');
+      $('#create_message_form, #forward_message_form').find('textarea').elastic().keypress(function(e) {
+        if (e.which === 13 && e.shiftKey) {
+          e.preventDefault();
+          $(this).closest('form').submit();
+          return false;
+        }
+      });
       $form.submit(function(e) {
         var valid;
         valid = !!($form.find('#body').val() && ($form.find('#recipient_info').filter(':visible').length === 0 || $form.find('.token_input li').length > 0));
@@ -1343,7 +1374,7 @@
       $form.click(function() {
         return toggle_message_actions(false);
       });
-      $('#add_recipients_form').submit(function(e) {
+      $add_form.submit(function(e) {
         var valid;
         valid = !!($(this).find('.token_input li').length);
         if (!valid) {
@@ -1351,7 +1382,7 @@
         }
         return valid;
       });
-      $('#add_recipients_form').formSubmit({
+      $add_form.formSubmit({
         beforeSubmit: function() {
           return $(this).loadingImage();
         },
@@ -1369,9 +1400,7 @@
       });
       $message_list.click(function(e) {
         var $message;
-        if ($(e.target).closest('a.instructure_inline_media_comment').length) {
-          ;
-        } else {
+        if ($(e.target).closest('a.instructure_inline_media_comment').length) {} else {
           $message = $(e.target).closest('#messages > ul > li');
           if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {
@@ -1502,7 +1531,7 @@
       });
       $('#action_add_recipients').click(function(e) {
         e.preventDefault();
-        return $('#add_recipients_form').attr('action', inbox_action_url_for($(this), $selected_conversation)).dialog('close').dialog({
+        return $add_form.attr('action', inbox_action_url_for($(this), $selected_conversation)).dialog('close').dialog({
           width: 420,
           title: I18n.t('title.add_recipients', 'Add Recipients'),
           buttons: [
@@ -1607,8 +1636,7 @@
         }
       });
       $('#action_forward').click(function() {
-        var $forward_form, $preview;
-        $forward_form = $('#forward_message_form');
+        var $preview;
         $forward_form.find("input[name!=authenticity_token], textarea").val('').change();
         $preview = $forward_form.find('ul.messages').first();
         $preview.html('');
@@ -1640,7 +1668,7 @@
           }
         });
       });
-      $('#forward_message_form').submit(function(e) {
+      $forward_form.submit(function(e) {
         var valid;
         valid = !!($(this).find('#forward_body').val() && $(this).find('.token_input li').length);
         if (!valid) {
@@ -1648,7 +1676,7 @@
         }
         return valid;
       });
-      $('#forward_message_form').formSubmit({
+      $forward_form.formSubmit({
         beforeSubmit: function() {
           return $(this).loadingImage();
         },
@@ -1733,7 +1761,7 @@
       }
       $('#no_messages').showIf(!$conversation_list.find('li').length);
       $('.recipients').tokenInput({
-        placeholder: I18n.t('recipient_field_placeholder', "Enter a name, email, course, or group"),
+        placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group"),
         selector: {
           messages: {
             no_results: I18n.t('no_results', 'No results found')
@@ -1824,8 +1852,12 @@
       return $(window).bind('hashchange', function() {
         var $c, hash, match, params;
         hash = location.hash;
-        if ((match = hash.match(/^#\/conversations\/(\d+)$/)) && ($c = $('#conversation_' + match[1])) && $c.length) {
-          return select_conversation($c);
+        if (match = hash.match(/^#\/conversations\/(\d+)$/)) {
+          if (($c = $('#conversation_' + match[1])) && $c.length) {
+            return select_conversation($c);
+          } else {
+            return select_unloaded_conversation(match[1]);
+          }
         } else if ($('#action_compose_message').length) {
           params = {};
           if (match = hash.match(/^#\/conversations\?(.*)$/)) {
