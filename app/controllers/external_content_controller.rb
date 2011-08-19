@@ -28,7 +28,7 @@ class ExternalContentController < ApplicationController
         end
       end
     elsif params[:service] == 'external_tool'
-      params[:embed_type] = nil unless ['basic_lti', 'link', 'image', 'iframe'].include?(params[:embed_type])
+      params[:embed_type] = nil unless ['oembed', 'basic_lti', 'link', 'image', 'iframe'].include?(params[:embed_type])
       @retrieved_data = request.query_parameters
       if @retrieved_data[:url]
         begin
@@ -44,6 +44,43 @@ class ExternalContentController < ApplicationController
       end
     end
     @headers = false
+  end
+  
+  def oembed_retrieve
+    endpoint = params[:endpoint]
+    url = params[:url]
+    uri = URI.parse(endpoint + (endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(url) + '&format=json')
+    res = Net::HTTP.get(uri) rescue "{}"
+    data = JSON.parse(res) rescue {}
+    if data['type']
+      if data['type'] == 'photo' && data['url'].try(:match, /^http/)
+        @retrieved_data = {
+          :embed_type => 'image',
+          :url => data['url'],
+          :width => data['width'].to_i,   # width and height are required according to the spec
+          :height => data['height'].to_i,
+          :alt => data['title']
+        }
+      elsif data['type'] == 'link' && data['url'].try(:match, /^(http|https|mailto)/)
+        @retrieved_data = {
+          :embed_type => 'link',
+          :url => data['url'] || params[:url],
+          :title => data['title'],
+          :text => data['title']
+        }
+      elsif data['type'] == 'video' || data['type'] == 'rich'
+        @retrieved_data = {
+          :embed_type => 'rich_content',
+          :html => data['html']
+        }
+      end
+    else
+      @retrieved_data = {
+        :embed_type => 'error',
+        :message => t("#application.errors.invalid_oembed_url", "There was a problem retrieving this resource. The external tool provided invalid information about the resource.")
+      }
+    end
+    render :json => @retrieved_data.to_json
   end
   
   def selection_test

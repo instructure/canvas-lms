@@ -276,6 +276,7 @@ ActionController::Routing::Routes.draw do |map|
   map.media_object_thumbnail 'media_objects/:id/thumbnail', :controller => 'context', :action => 'media_object_thumbnail'
 
   map.external_content_success 'external_content/success/:service', :controller => 'external_content', :action => 'success'
+  map.external_content_oembed_retrieve 'external_content/retrieve/oembed', :controller => 'external_content', :action => 'oembed_retrieve'
   map.external_content_cancel 'external_content/cancel/:service', :controller => 'external_content', :action => 'cancel'
   
   # We offer a bunch of atom and ical feeds for the user to get

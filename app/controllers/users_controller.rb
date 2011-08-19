@@ -471,7 +471,9 @@ class UsersController < ApplicationController
     @opaque_id = @current_user.opaque_identifier(:asset_string)
     @context = UserProfile.new(@current_user)
     @resource_type = 'user_navigation'
-    @return_url = profile_url(:only_path => false)
+    @return_url = profile_url(:include_host => true)
+    @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
+    @tool_settings = @launch.generate
     @active_tab = @tool.asset_string
     add_crumb(@current_user.short_name, profile_path)
     render :template => 'external_tools/tool_show'
