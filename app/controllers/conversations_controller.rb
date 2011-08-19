@@ -27,7 +27,7 @@ class ConversationsController < ApplicationController
   add_crumb(lambda { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
   def index
-    @conversations = case params[:scope]
+    conversations = case params[:scope]
       when 'unread'
         @view_name = I18n.t('index.inbox_views.unread', 'Unread')
         @no_messages = I18n.t('no_unread_messages', 'You have no unread messages')
@@ -55,8 +55,17 @@ class ConversationsController < ApplicationController
         @view_name = I18n.t('index.inbox_views.inbox', 'Inbox')
         @no_messages = I18n.t('no_messages', 'You have no messages')
         @current_user.conversations.default
-    end.map{ |c| jsonify_conversation(c) }
+    end
     @scope ||= params[:scope].to_sym
+    # optimize loading the most recent messages for each conversation into a single query
+    last_messages = ConversationMessage.latest_for_conversations(conversations).human.
+                      inject({}) { |hash, message|
+                        if !hash[message.conversation_id] || hash[message.conversation_id].id < message.id
+                          hash[message.conversation_id] = message
+                        end
+                        hash
+                      }
+    @conversations_json = conversations.map{ |c| jsonify_conversation(c, last_messages[c.conversation_id]) }
     @user_cache = Hash[*jsonify_users([@current_user]).map{|u| [u[:id], u] }.flatten]
   end
 
@@ -277,10 +286,10 @@ class ConversationsController < ApplicationController
     message
   end
 
-  def jsonify_conversation(conversation)
+  def jsonify_conversation(conversation, last_message = nil)
     hash = {:audience => formatted_audience(conversation, 3)}
     hash[:avatar_url] = avatar_url_for(conversation)
-    conversation.as_json.merge(hash)
+    conversation.as_json(:last_message => last_message).merge(hash)
   end
 
   def jsonify_users(users, blank_avatar_fallback = false)

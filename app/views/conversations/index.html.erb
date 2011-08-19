@@ -216,7 +216,7 @@
     MessageInbox.user_id = <%= @current_user.id %>;
     MessageInbox.user_cache = <%= raw @user_cache.to_json %>;
     MessageInbox.contexts = <%= raw @contexts.to_json %>;
-    MessageInbox.initial_conversations = <%= raw @conversations.to_json %>;
+    MessageInbox.initial_conversations = <%= raw @conversations_json.to_json %>;
     MessageInbox.scope = <%= raw @scope.to_json %>;
     MessageInbox.label_scope = <%= raw @label.to_json %>;
   </script>
