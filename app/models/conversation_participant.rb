@@ -27,6 +27,7 @@ class ConversationParticipant < ActiveRecord::Base
            :order => "created_at DESC, id DESC", :conditions => 'conversation_id = #{conversation_id}'
            # conditions are redundant, but they let us use the best index
 
+  named_scope :visible, :conditions => "last_message_at IS NOT NULL"
   named_scope :default, :conditions => "workflow_state IN ('read', 'unread')"
   named_scope :unread, :conditions => "workflow_state = 'unread'"
   named_scope :archived, :conditions => "workflow_state = 'archived'"
