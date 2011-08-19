@@ -106,7 +106,7 @@ class ConversationsController < ApplicationController
           :created_at => submission.submitted_at,
           :updated_at => recent_comments.first.created_at,
           :title => assignment.title,
-          :score => submission.score && assignment.max_score ? "#{submission.score} / #{assignment.max_score}" : submission.score,
+          :score => submission.score && assignment.points_possible ? "#{submission.score} / #{assignment.points_possible}" : submission.score,
           :comment_count => submission.submission_comments_count,
           :recent_comments => recent_comments.map{ |comment| {
             :id => comment.id,

@@ -686,7 +686,8 @@ I18n.scoped 'conversations', (I18n) ->
     user.html_name ?= html_name_for_user(user) if user
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
     $header.find('.title').html $.h(data.title)
-    $header.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
+    if data.created_at
+      $header.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
     $header.find('.audience').html user?.html_name || $.h(user_name)
     score = data.score ? I18n.t('not_scored', 'no score')
     $header.find('.score').html(score)
