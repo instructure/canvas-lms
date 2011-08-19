@@ -1,4 +1,4 @@
-<% content_for :page_title, t(:page_title, "Messages") %>
+<% content_for :page_title, t(:page_title, "Conversations") %>
 
 <% jammit_js :messages %>
 <% jammit_css :messages %>
@@ -39,6 +39,9 @@
       </ul>
     </div>
     <ul class="conversations">
+      <li id="conversations_loader" style="<%= hidden %>">
+        <%= image_tag "ajax-loader.gif" %> <%= t :loading_conversations, "Loading..." %>
+      </li>
     </ul>
     <p id="no_messages" style="<%= hidden %>">
       <%= @no_messages %>
@@ -140,7 +143,7 @@
   <li id="submission_blank" class="submission">
     <ul>
       <li class="header">
-        <span class="submission_date"><%= before_label('submitted', "Submitted") %> <span class="date"></span></span>
+        <span class="submission_date"><%= before_label('submitted', "Submitted") %> <span class="date">&nbsp;</span></span>
         <a target="_blank" href="<%= course_assignment_submission_path(
           :course_id => '{{ course_id }}',
           :assignment_id => '{{ assignment_id }}',
@@ -217,6 +220,8 @@
     MessageInbox.user_cache = <%= raw @user_cache.to_json %>;
     MessageInbox.contexts = <%= raw @contexts.to_json %>;
     MessageInbox.initial_conversations = <%= raw @conversations_json.to_json %>;
+    MessageInbox.conversation_page_size = <%= @page_max %>;
+    MessageInbox.initial_conversations_count = <%= @conversations_count %>;
     MessageInbox.scope = <%= raw @scope.to_json %>;
     MessageInbox.label_scope = <%= raw @label.to_json %>;
   </script>

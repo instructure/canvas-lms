@@ -27,7 +27,9 @@ class ConversationsController < ApplicationController
   add_crumb(lambda { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
   def index
-    conversations = case params[:scope]
+    @page_max = params[:count].try(:to_i) || 25
+    @page = params[:page].try(:to_i) || 1
+    conversations_scope = case params[:scope]
       when 'unread'
         @view_name = I18n.t('index.inbox_views.unread', 'Unread')
         @no_messages = I18n.t('no_unread_messages', 'You have no unread messages')
@@ -57,6 +59,8 @@ class ConversationsController < ApplicationController
         @current_user.conversations.default
     end
     @scope ||= params[:scope].to_sym
+    @conversations_count = conversations_scope.count
+    conversations = conversations_scope.scoped(:limit => @page_max, :offset => (@page - 1) * @page_max).all
     # optimize loading the most recent messages for each conversation into a single query
     last_messages = ConversationMessage.latest_for_conversations(conversations).human.
                       inject({}) { |hash, message|
@@ -67,6 +71,10 @@ class ConversationsController < ApplicationController
                       }
     @conversations_json = conversations.map{ |c| jsonify_conversation(c, last_messages[c.conversation_id]) }
     @user_cache = Hash[*jsonify_users([@current_user]).map{|u| [u[:id], u] }.flatten]
+    respond_to do |format|
+      format.html
+      format.json { render :json => @conversations_json }
+    end
   end
 
   def create
@@ -106,7 +114,7 @@ class ConversationsController < ApplicationController
           :created_at => submission.submitted_at,
           :updated_at => recent_comments.first.created_at,
           :title => assignment.title,
-          :score => submission.score && assignment.max_score ? "#{submission.score} / #{assignment.max_score}" : submission.score,
+          :score => submission.score && assignment.points_possible ? "#{submission.score} / #{assignment.points_possible}" : submission.score,
           :comment_count => submission.submission_comments_count,
           :recent_comments => recent_comments.map{ |comment| {
             :id => comment.id,

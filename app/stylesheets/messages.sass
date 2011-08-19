@@ -236,10 +236,33 @@ ul.conversations
     .date
       margin-right: -13px
 
+#messages > ul.messages, #forward_message_form > ul.messages
+  ul.messages
+    border-left: 2px solid #ddd
+    overflow: visible
+    margin: 0
+    span.date
+      margin-right: 0
+    > li
+      background: transparent
+      margin: 0
+      padding: 7px 0 7px 64px
+      img.avatar
+        top: 7px
+        left: 7px
+    input
+      display: none
+  > li.self, > li.selected
+    background-color: #ebebeb
+    ul.messages
+      border-left-color: #ccc
+
 #messages > ul.messages
   display: none
   > li
     +box-shadow( rgba(0,0,0,0.25), 0, 3px, 6px, 3px)
+  > li.selected
+    background-color: #e5f3ff
   > li.generated
     line-height: 1
     +box-shadow( none )
@@ -254,6 +277,7 @@ ul.conversations
       margin: 0
     img.avatar, span.date, .audience, input, .actions
       display: none
+
 ul.messages
   position: relative
   z-index: 1
@@ -269,23 +293,6 @@ ul.messages
     img.avatar
       top: 14px
       left: 14px
-    ul.messages
-      border-left: 2px solid #ddd
-      overflow: visible
-      margin: 0
-      > li
-        background: transparent
-        margin: 0
-        padding: 7px 0 7px 64px
-        img.avatar
-          top: 7px
-          left: 7px
-      input
-        display: none
-  > li.self
-    background-color: #ebebeb
-  > li.selected
-    background-color: #e5f3ff
   .date
     margin-right: -40px
   .audience
@@ -700,6 +707,8 @@ li.purple .label_icon, .purple.label_icon
     margin: 0 0 10px
     overflow: auto
     li
+      position: relative
+      overflow: hidden
       border-top: 1px solid #fff
       border-bottom: 1px solid #d4d5d7
       padding: 5px
@@ -756,7 +765,7 @@ li.purple .label_icon, .purple.label_icon
         background: transparent url(/images/messages/checkbox-sprite.png) no-repeat 0 0
     a.toggle:hover i
       background-position: 0 -16px
-    img
+    img.avatar
       width: 32px
       height: 32px
       float: left
@@ -771,11 +780,11 @@ li.purple .label_icon, .purple.label_icon
       color: #2571bd
       font-weight: bold
       font-size: 0.8em
-  li.context img, li.context.active.expanded img
+  li.context img.avatar, li.context.active.expanded img.avatar
     background-position: 0 -64px
-  li.user.active img
+  li.user.active img.avatar
     background-position: 0 -32px
-  li.context.active img
+  li.context.active img.avatar
     background-position: 0 -96px
   li.active
     a.expand
@@ -792,9 +801,9 @@ li.purple .label_icon, .purple.label_icon
       color: #0d4276
     a.toggle i
       background-position: 0 -48px
-    img.user
+    img.user.avatar
       background-position: 0 -32px
-    img.context
+    img.context.avatar
       background-position: 0 -96px
   li.on .toggle i
     background-position: 0 -32px
@@ -809,7 +818,7 @@ li.purple .label_icon, .purple.label_icon
         background-position: 10px -55px
     a.toggle
       display: none
-    img
+    img.avatar
       margin: 0 14px 0 6px
   li.active.expanded
     a.expand:hover
@@ -908,3 +917,8 @@ form
 #add_recipients_form, #forward_message_form
   padding: 1em 1em 2em
   display: none
+
+#conversations_loader
+  font-size: 1.5em
+  color: #DDD !important
+  vertical-align: middle

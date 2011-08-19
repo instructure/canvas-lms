@@ -14,7 +14,6 @@ class TokenInput
       .css('font-family', @node.css('font-family'))
       .insertAfter(@node)
       .addClass('token_input')
-      .bind('selectstart', false)
       .click => @input.focus()
     @node_name = @node.attr('name')
     @node.removeAttr('name').hide().change =>
@@ -27,7 +26,7 @@ class TokenInput
 
     @tokens = $('<ul />')
       .appendTo(@fake_input)
-    @tokens.click (e) => 
+    @tokens.click (e) =>
       if $token = $(e.target).closest('li')
         $close = $(e.target).closest('a')
         if $close.length
@@ -301,31 +300,37 @@ class TokenSelector
       delete @timeout
       post_data = @prepare_post(options.data ? {})
       this_query = JSON.stringify(post_data)
+      if post_data.search is '' and not @list_expanded() and not options.data
+        @ui_locked = false
+        @close()
+        return
       if this_query is @last_applied_query
         @ui_locked = false
         return
       else if @query_cache[this_query]
         @last_applied_query = this_query
         @last_search = post_data.search
+        @clear_loading()
         @render_list(@query_cache[this_query], options)
         return
 
-      if post_data.search is '' and not @list_expanded() and not options.data
-        return @render_list([])
+      @set_loading()
       $.ajaxJSON @url, 'POST', $.extend({}, post_data),
         (data) =>
           @query_cache[this_query] = data
+          @clear_loading()
           if JSON.stringify(@prepare_post(options.data ? {})) is this_query # i.e. only if it hasn't subsequently changed (and thus triggered another call)
             @last_applied_query = this_query
             @last_search = post_data.search
-            @render_list(data, options)
+            @render_list(data, options) if @menu.is(":visible")
           else
             @ui_locked=false
         ,
         (data) =>
           @ui_locked=false
+          @clear_loading()
     , 100
-  
+
   open: ->
     @container.show()
     @reposition()
@@ -337,6 +342,7 @@ class TokenSelector
     for [$selection, $list, query, search], i in @stack
       @list.remove()
       @list = $list.css('height', 'auto')
+    @list.find('ul').html('')
     @stack = []
     @menu.css('left', 0)
     @select(null)
@@ -414,6 +420,7 @@ class TokenSelector
     else
       @list.find('li:first')
     , preserve_mode)
+    @select_next(preserve_mode) if @selection?.hasClass('message')
 
   select_prev: ->
     @select(if @selection
@@ -426,6 +433,7 @@ class TokenSelector
     else
       @list.find('li:last')
     )
+    @select_prev() if @selection?.hasClass('message')
 
   populate_row: ($node, data, options={}) ->
     if @options.populator
@@ -435,20 +443,24 @@ class TokenSelector
       $node.text(data.text)
     $node.addClass('first') if options.first
     $node.addClass('last') if options.last
-  
-  render_list: (data, options={}) ->
-    if data.length or @list_expanded()
+
+  set_loading: ->
+    unless @menu.is(":visible")
       @open()
-    else
-      @ui_locked = false
-      @close()
-      return
+      @list.find('ul').last().append($('<li class="message first last"></li>'))
+    @list.find('li').first().loadingImage()
+
+  clear_loading: ->
+    @list.find('li').first().loadingImage('remove')
+
+  render_list: (data, options={}) ->
+    @open()
 
     if options.expand
       $list = @new_list()
     else
       $list = @list
-  
+
     @selection = null
     $uls = $list.find('ul')
     $uls.html('')
@@ -480,7 +492,7 @@ class TokenSelector
         @list = $list
         @select_next(true)
     else
-      @select_next(true)
+      @select_next(true) unless options.loading
       @ui_locked = false
 
   prepare_post: (data) ->
@@ -556,7 +568,7 @@ I18n.scoped 'conversations', (I18n) ->
 
     $message_list.removeClass('private').hide().html ''
     $message_list.addClass('private') if $conversation?.hasClass('private')
-    
+
     if $selected_conversation
       $selected_conversation.removeClass 'selected inactive'
       if MessageInbox.scope == 'unread'
@@ -686,7 +698,8 @@ I18n.scoped 'conversations', (I18n) ->
     user.html_name ?= html_name_for_user(user) if user
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
     $header.find('.title').html $.h(data.title)
-    $header.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
+    if data.created_at
+      $header.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
     $header.find('.audience').html user?.html_name || $.h(user_name)
     score = data.score ? I18n.t('not_scored', 'no score')
     $header.find('.score').html(score)
@@ -765,9 +778,10 @@ I18n.scoped 'conversations', (I18n) ->
       $conversation.prepend $('<img />').attr('src', data.avatar_url).addClass('avatar')
     $conversation[if append then 'appendTo' else 'prependTo']($conversation_list).click (e) ->
       e.preventDefault()
-      location.hash = '/conversations/' + $(this).data('id')
+      set_hash '#/conversations/' + $(this).data('id')
     update_conversation($conversation, data, null)
     $conversation.hide().slideDown('fast') unless append
+    $conversation_list.append $("#conversations_loader")
     $conversation
 
   update_conversation = ($conversation, data, move_mode='slide') ->
@@ -778,6 +792,7 @@ I18n.scoped 'conversations', (I18n) ->
     $a.attr 'add_url', $.replaceTags($a.attr('add_url'), 'id', data.id)
     $conversation.find('.audience').html data.audience if data.audience
     $conversation.find('.actions a').click (e) ->
+      e.preventDefault()
       e.stopImmediatePropagation()
       close_menus()
       open_conversation_menu($(this))
@@ -820,10 +835,11 @@ I18n.scoped 'conversations', (I18n) ->
         $conversation.scrollIntoView()
 
   remove_conversation = ($conversation) ->
-    select_conversation()
+    deselect = is_selected($conversation)
     $conversation.fadeOut 'fast', ->
       $(this).remove()
       $('#no_messages').showIf !$conversation_list.find('li').length
+      set_hash '' if deselect
 
   set_conversation_state = ($conversation, state) ->
     $conversation.removeClass('read unread archived').addClass state
@@ -896,6 +912,11 @@ I18n.scoped 'conversations', (I18n) ->
     $.cookie('last_label', label)
     $last_label = label
 
+  set_hash = (hash) ->
+    if hash isnt location.hash
+      location.hash = hash
+      $(document).triggerHandler('document_fragment_change', hash)
+
   $.extend window,
     MessageInbox: MessageInbox
 
@@ -931,7 +952,8 @@ I18n.scoped 'conversations', (I18n) ->
             build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
             update_conversation($conversation, data.conversation)
           else
-            select_conversation add_conversation(data.conversation)
+            add_conversation(data.conversation)
+            set_hash '#/conversations/' + data.conversation.id
           $.flashMessage(I18n.t('message_sent', 'Message Sent'))
         reset_message_form()
       error: (data) ->
@@ -1144,16 +1166,16 @@ I18n.scoped 'conversations', (I18n) ->
         if $conversation.length
           build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
           update_conversation($conversation, data.conversation)
-          select_conversation $conversation
         else
-          select_conversation add_conversation(data.conversation)
+          add_conversation(data.conversation)
+        set_hash '#/conversations/' + data.conversation.id
         reset_message_form()
         $(this).dialog('close')
       error: (data) ->
         $(this).loadingImage 'remove'
         $(this).dialog('close')
 
-    
+
     $('#cancel_bulk_message_action').click ->
       toggle_message_actions off
 
@@ -1210,7 +1232,7 @@ I18n.scoped 'conversations', (I18n) ->
         messages: {no_results: I18n.t('no_results', 'No results found')}
         populator: ($node, data, options={}) ->
           if data.avatar
-            $img = $('<img />')
+            $img = $('<img class="avatar" />')
             $img.attr('src', data.avatar)
             $node.append($img)
           $b = $('<b />')
@@ -1247,12 +1269,32 @@ I18n.scoped 'conversations', (I18n) ->
     $(window).resize inbox_resize
     setTimeout inbox_resize
 
-    $(document).fragmentChange (event, hash) ->
-      if match = hash.match(/^#\/conversations\/(\d+)$/)
-        select_conversation($('#conversation_' + match[1]))
+    setTimeout () ->
+      $conversation_list.pageless
+        totalPages: Math.ceil(MessageInbox.initial_conversations_count / MessageInbox.conversation_page_size)
+        container: $conversation_list
+        params:
+          format: 'json'
+        loader: $("#conversations_loader")
+        scrape: (data) ->
+          if typeof(data) == 'string'
+            try
+              data = JSON.parse(data)
+            catch error
+              data = []
+            for conversation in data
+              add_conversation conversation, true
+          $conversation_list.append $("#conversations_loader")
+          false
+      , 1
+
+    $(window).bind 'hashchange', ->
+      hash = location.hash
+      if (match = hash.match(/^#\/conversations\/(\d+)$/)) and ($c = $('#conversation_' + match[1])) and $c.length
+        select_conversation($c)
       else if $('#action_compose_message').length
         params = {}
         if match = hash.match(/^#\/conversations\?(.*)$/)
           params = parse_query_string(match[1])
         select_conversation(null, params)
-    .triggerHandler('document_fragment_change', location.hash)
+    .triggerHandler('hashchange')

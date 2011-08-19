@@ -20,7 +20,7 @@
       this.node = node;
       this.options = options;
       this.node.data('token_input', this);
-      this.fake_input = $('<div />').css('font-family', this.node.css('font-family')).insertAfter(this.node).addClass('token_input').bind('selectstart', false).click(__bind(function() {
+      this.fake_input = $('<div />').css('font-family', this.node.css('font-family')).insertAfter(this.node).addClass('token_input').click(__bind(function() {
         return this.input.focus();
       }, this));
       this.node_name = this.node.attr('name');
@@ -406,30 +406,38 @@
         delete this.timeout;
         post_data = this.prepare_post((_ref = options.data) != null ? _ref : {});
         this_query = JSON.stringify(post_data);
+        if (post_data.search === '' && !this.list_expanded() && !options.data) {
+          this.ui_locked = false;
+          this.close();
+          return;
+        }
         if (this_query === this.last_applied_query) {
           this.ui_locked = false;
           return;
         } else if (this.query_cache[this_query]) {
           this.last_applied_query = this_query;
           this.last_search = post_data.search;
+          this.clear_loading();
           this.render_list(this.query_cache[this_query], options);
           return;
         }
-        if (post_data.search === '' && !this.list_expanded() && !options.data) {
-          return this.render_list([]);
-        }
+        this.set_loading();
         return $.ajaxJSON(this.url, 'POST', $.extend({}, post_data), __bind(function(data) {
           var _ref2;
           this.query_cache[this_query] = data;
+          this.clear_loading();
           if (JSON.stringify(this.prepare_post((_ref2 = options.data) != null ? _ref2 : {})) === this_query) {
             this.last_applied_query = this_query;
             this.last_search = post_data.search;
-            return this.render_list(data, options);
+            if (this.menu.is(":visible")) {
+              return this.render_list(data, options);
+            }
           } else {
             return this.ui_locked = false;
           }
         }, this), __bind(function(data) {
-          return this.ui_locked = false;
+          this.ui_locked = false;
+          return this.clear_loading();
         }, this));
       }, this), 100);
     };
@@ -448,6 +456,7 @@
         this.list.remove();
         this.list = $list.css('height', 'auto');
       }
+      this.list.find('ul').html('');
       this.stack = [];
       this.menu.css('left', 0);
       this.select(null);
@@ -555,14 +564,21 @@
       }
     };
     TokenSelector.prototype.select_next = function(preserve_mode) {
+      var _ref;
       if (preserve_mode == null) {
         preserve_mode = false;
       }
-      return this.select(this.selection ? this.selection.next().length ? this.selection.next() : this.selection.parent('ul').next().length ? this.selection.parent('ul').next().find('li').first() : null : this.list.find('li:first'), preserve_mode);
+      this.select(this.selection ? this.selection.next().length ? this.selection.next() : this.selection.parent('ul').next().length ? this.selection.parent('ul').next().find('li').first() : null : this.list.find('li:first'), preserve_mode);
+      if ((_ref = this.selection) != null ? _ref.hasClass('message') : void 0) {
+        return this.select_next(preserve_mode);
+      }
     };
     TokenSelector.prototype.select_prev = function() {
-      var _ref;
-      return this.select(this.selection ? ((_ref = this.selection) != null ? _ref.prev().length : void 0) ? this.selection.prev() : this.selection.parent('ul').prev().length ? this.selection.parent('ul').prev().find('li').last() : null : this.list.find('li:last'));
+      var _ref, _ref2;
+      this.select(this.selection ? ((_ref = this.selection) != null ? _ref.prev().length : void 0) ? this.selection.prev() : this.selection.parent('ul').prev().length ? this.selection.parent('ul').prev().find('li').last() : null : this.list.find('li:last'));
+      if ((_ref2 = this.selection) != null ? _ref2.hasClass('message') : void 0) {
+        return this.select_prev();
+      }
     };
     TokenSelector.prototype.populate_row = function($node, data, options) {
       if (options == null) {
@@ -581,18 +597,22 @@
         return $node.addClass('last');
       }
     };
+    TokenSelector.prototype.set_loading = function() {
+      if (!this.menu.is(":visible")) {
+        this.open();
+        this.list.find('ul').last().append($('<li class="message first last"></li>'));
+      }
+      return this.list.find('li').first().loadingImage();
+    };
+    TokenSelector.prototype.clear_loading = function() {
+      return this.list.find('li').first().loadingImage('remove');
+    };
     TokenSelector.prototype.render_list = function(data, options) {
       var $body, $heading, $li, $list, $message, $uls, i, row, _len, _ref, _ref2;
       if (options == null) {
         options = {};
       }
-      if (data.length || this.list_expanded()) {
-        this.open();
-      } else {
-        this.ui_locked = false;
-        this.close();
-        return;
-      }
+      this.open();
       if (options.expand) {
         $list = this.new_list();
       } else {
@@ -643,7 +663,9 @@
           return this.select_next(true);
         }, this));
       } else {
-        this.select_next(true);
+        if (!options.loading) {
+          this.select_next(true);
+        }
         return this.ui_locked = false;
       }
     };
@@ -656,13 +678,11 @@
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-            if ((_ref = post_data.limit) != null) {
-        _ref;
-      } else {
+      if ((_ref = post_data.limit) == null) {
         post_data.limit = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
-      };
+      }
       return post_data;
     };
     return TokenSelector;
@@ -688,7 +708,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -864,11 +884,9 @@
         $message.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $message.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -942,15 +960,15 @@
       $header.find('a').attr('href', href);
       user = MessageInbox.user_cache[data.author_id];
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $header.find('.title').html($.h(data.title));
-      $header.find('span.date').text($.parseFromISO(data.created_at).datetime_formatted);
+      if (data.created_at) {
+        $header.find('span.date').text($.parseFromISO(data.created_at).datetime_formatted);
+      }
       $header.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
       score = (_ref3 = data.score) != null ? _ref3 : I18n.t('not_scored', 'no score');
       $header.find('.score').html(score);
@@ -1003,11 +1021,9 @@
         $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1061,12 +1077,13 @@
       }
       $conversation[append ? 'appendTo' : 'prependTo']($conversation_list).click(function(e) {
         e.preventDefault();
-        return location.hash = '/conversations/' + $(this).data('id');
+        return set_hash('#/conversations/' + $(this).data('id'));
       });
       update_conversation($conversation, data, null);
       if (!append) {
         $conversation.hide().slideDown('fast');
       }
+      $conversation_list.append($("#conversations_loader"));
       return $conversation;
     };
     update_conversation = function($conversation, data, move_mode) {
@@ -1082,6 +1099,7 @@
         $conversation.find('.audience').html(data.audience);
       }
       $conversation.find('.actions a').click(function(e) {
+        e.preventDefault();
         e.stopImmediatePropagation();
         close_menus();
         return open_conversation_menu($(this));
@@ -1159,10 +1177,14 @@
       }
     };
     remove_conversation = function($conversation) {
-      select_conversation();
+      var deselect;
+      deselect = is_selected($conversation);
       return $conversation.fadeOut('fast', function() {
         $(this).remove();
-        return $('#no_messages').showIf(!$conversation_list.find('li').length);
+        $('#no_messages').showIf(!$conversation_list.find('li').length);
+        if (deselect) {
+          return set_hash('');
+        }
       });
     };
     set_conversation_state = function($conversation, state) {
@@ -1243,6 +1265,12 @@
       $.cookie('last_label', label);
       return $last_label = label;
     };
+    set_hash = function(hash) {
+      if (hash !== location.hash) {
+        location.hash = hash;
+        return $(document).triggerHandler('document_fragment_change', hash);
+      }
+    };
     $.extend(window, {
       MessageInbox: MessageInbox
     });
@@ -1291,7 +1319,8 @@
               }
               update_conversation($conversation, data.conversation);
             } else {
-              select_conversation(add_conversation(data.conversation));
+              add_conversation(data.conversation);
+              set_hash('#/conversations/' + data.conversation.id);
             }
             $.flashMessage(I18n.t('message_sent', 'Message Sent'));
           }
@@ -1332,9 +1361,7 @@
       });
       $message_list.click(function(e) {
         var $message;
-        if ($(e.target).closest('a.instructure_inline_media_comment').length) {
-          ;
-        } else {
+        if ($(e.target).closest('a.instructure_inline_media_comment').length) {} else {
           $message = $(e.target).closest('#messages > ul > li');
           if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {
@@ -1599,10 +1626,10 @@
               build_message(data.message).prependTo($message_list).slideDown('fast');
             }
             update_conversation($conversation, data.conversation);
-            select_conversation($conversation);
           } else {
-            select_conversation(add_conversation(data.conversation));
+            add_conversation(data.conversation);
           }
+          set_hash('#/conversations/' + data.conversation.id);
           reset_message_form();
           return $(this).dialog('close');
         },
@@ -1682,7 +1709,7 @@
               options = {};
             }
             if (data.avatar) {
-              $img = $('<img />');
+              $img = $('<img class="avatar" />');
               $img.attr('src', data.avatar);
               $node.append($img);
             }
@@ -1733,10 +1760,37 @@
       };
       $(window).resize(inbox_resize);
       setTimeout(inbox_resize);
-      return $(document).fragmentChange(function(event, hash) {
-        var match, params;
-        if (match = hash.match(/^#\/conversations\/(\d+)$/)) {
-          return select_conversation($('#conversation_' + match[1]));
+      setTimeout(function() {
+        return $conversation_list.pageless({
+          totalPages: Math.ceil(MessageInbox.initial_conversations_count / MessageInbox.conversation_page_size),
+          container: $conversation_list,
+          params: {
+            format: 'json'
+          },
+          loader: $("#conversations_loader"),
+          scrape: function(data) {
+            var conversation, _j, _len2;
+            if (typeof data === 'string') {
+              try {
+                data = JSON.parse(data);
+              } catch (error) {
+                data = [];
+              }
+              for (_j = 0, _len2 = data.length; _j < _len2; _j++) {
+                conversation = data[_j];
+                add_conversation(conversation, true);
+              }
+            }
+            $conversation_list.append($("#conversations_loader"));
+            return false;
+          }
+        }, 1);
+      });
+      return $(window).bind('hashchange', function() {
+        var $c, hash, match, params;
+        hash = location.hash;
+        if ((match = hash.match(/^#\/conversations\/(\d+)$/)) && ($c = $('#conversation_' + match[1])) && $c.length) {
+          return select_conversation($c);
         } else if ($('#action_compose_message').length) {
           params = {};
           if (match = hash.match(/^#\/conversations\?(.*)$/)) {
@@ -1744,7 +1798,7 @@
           }
           return select_conversation(null, params);
         }
-      }).triggerHandler('document_fragment_change', location.hash);
+      }).triggerHandler('hashchange');
     });
   });
 }).call(this);

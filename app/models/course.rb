@@ -1983,12 +1983,15 @@ class Course < ActiveRecord::Base
     )
   end
   memoize :page_views_by_day
-  
-  def visibility_limited_to_course_sections?(user)
-    section_visibilities = Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
-      Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type", :conditions => {:user_id => user.id, :course_id => self.id}).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type } }
+
+  def section_visibilities_for(user)
+    Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
+      Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id } }
     end
-    !section_visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
+  end
+
+  def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
+    !visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
   end
   
   # returns a scope, not an array of users/enrollments
@@ -1996,24 +1999,34 @@ class Course < ActiveRecord::Base
     enrollments_visible_to(user, include_priors, true)
   end
   def enrollments_visible_to(user, include_priors=false, return_users=false)
-    section_visibilities = Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
-      Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type } }
-    end
+    visibilities = section_visibilities_for(user)
     if return_users
       scope = include_priors ? self.all_students : self.students
     else
       scope = include_priors ? self.all_student_enrollments : self.student_enrollments
     end
-    if section_visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
-      scope
-    elsif section_visibilities.empty?
+    # See also Users#messageable_users (same logic used to get users across multiple courses)
+    case enrollment_visibility_level_for(user, visibilities)
+      when :full then scope
+      when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
+      else scope.scoped({:conditions => "FALSE"})
+    end
+  end
+
+  def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user))
+    if visibilities.empty? # i.e. not enrolled
       if self.grants_right?(user, nil, :manage_grades)
-        scope
+        :full
       else
-        scope.scoped({:conditions => ['enrollments.user_id = ? OR enrollments.associated_user_id = ?', user.id, user.id]})
+        :none
       end
+    elsif visibilities.all?{ |e| e[:type] == 'ObserverEnrollment' }
+      :restricted # e.g. observers shouldn't see anyone but the observed
+    elsif visibility_limited_to_course_sections?(user, visibilities)
+      :sections
     else
-      scope.scoped({:conditions => "enrollments.course_section_id IN (#{section_visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      :full
     end
   end
   
