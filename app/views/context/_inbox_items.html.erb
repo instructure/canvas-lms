@@ -50,7 +50,7 @@
         var url = $item.find(".inbox_item_url").attr('href');
         location.href = url;
       });
-      url = "<%= inbox_path(:format => :json) %>";
+      url = "<%= discussion_replies_path(:format => :json) %>";
       $('#message_list').pageless({
         totalPages: <%= @messages.total_pages %>,
         url: url,
