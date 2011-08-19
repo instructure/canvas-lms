@@ -20,7 +20,7 @@
       this.node = node;
       this.options = options;
       this.node.data('token_input', this);
-      this.fake_input = $('<div />').css('font-family', this.node.css('font-family')).insertAfter(this.node).addClass('token_input').bind('selectstart', false).click(__bind(function() {
+      this.fake_input = $('<div />').css('font-family', this.node.css('font-family')).insertAfter(this.node).addClass('token_input').click(__bind(function() {
         return this.input.focus();
       }, this));
       this.node_name = this.node.attr('name');
@@ -406,30 +406,38 @@
         delete this.timeout;
         post_data = this.prepare_post((_ref = options.data) != null ? _ref : {});
         this_query = JSON.stringify(post_data);
+        if (post_data.search === '' && !this.list_expanded() && !options.data) {
+          this.ui_locked = false;
+          this.close();
+          return;
+        }
         if (this_query === this.last_applied_query) {
           this.ui_locked = false;
           return;
         } else if (this.query_cache[this_query]) {
           this.last_applied_query = this_query;
           this.last_search = post_data.search;
+          this.clear_loading();
           this.render_list(this.query_cache[this_query], options);
           return;
         }
-        if (post_data.search === '' && !this.list_expanded() && !options.data) {
-          return this.render_list([]);
-        }
+        this.set_loading();
         return $.ajaxJSON(this.url, 'POST', $.extend({}, post_data), __bind(function(data) {
           var _ref2;
           this.query_cache[this_query] = data;
+          this.clear_loading();
           if (JSON.stringify(this.prepare_post((_ref2 = options.data) != null ? _ref2 : {})) === this_query) {
             this.last_applied_query = this_query;
             this.last_search = post_data.search;
-            return this.render_list(data, options);
+            if (this.menu.is(":visible")) {
+              return this.render_list(data, options);
+            }
           } else {
             return this.ui_locked = false;
           }
         }, this), __bind(function(data) {
-          return this.ui_locked = false;
+          this.ui_locked = false;
+          return this.clear_loading();
         }, this));
       }, this), 100);
     };
@@ -448,6 +456,7 @@
         this.list.remove();
         this.list = $list.css('height', 'auto');
       }
+      this.list.find('ul').html('');
       this.stack = [];
       this.menu.css('left', 0);
       this.select(null);
@@ -555,14 +564,21 @@
       }
     };
     TokenSelector.prototype.select_next = function(preserve_mode) {
+      var _ref;
       if (preserve_mode == null) {
         preserve_mode = false;
       }
-      return this.select(this.selection ? this.selection.next().length ? this.selection.next() : this.selection.parent('ul').next().length ? this.selection.parent('ul').next().find('li').first() : null : this.list.find('li:first'), preserve_mode);
+      this.select(this.selection ? this.selection.next().length ? this.selection.next() : this.selection.parent('ul').next().length ? this.selection.parent('ul').next().find('li').first() : null : this.list.find('li:first'), preserve_mode);
+      if ((_ref = this.selection) != null ? _ref.hasClass('message') : void 0) {
+        return this.select_next(preserve_mode);
+      }
     };
     TokenSelector.prototype.select_prev = function() {
-      var _ref;
-      return this.select(this.selection ? ((_ref = this.selection) != null ? _ref.prev().length : void 0) ? this.selection.prev() : this.selection.parent('ul').prev().length ? this.selection.parent('ul').prev().find('li').last() : null : this.list.find('li:last'));
+      var _ref, _ref2;
+      this.select(this.selection ? ((_ref = this.selection) != null ? _ref.prev().length : void 0) ? this.selection.prev() : this.selection.parent('ul').prev().length ? this.selection.parent('ul').prev().find('li').last() : null : this.list.find('li:last'));
+      if ((_ref2 = this.selection) != null ? _ref2.hasClass('message') : void 0) {
+        return this.select_prev();
+      }
     };
     TokenSelector.prototype.populate_row = function($node, data, options) {
       if (options == null) {
@@ -581,18 +597,22 @@
         return $node.addClass('last');
       }
     };
+    TokenSelector.prototype.set_loading = function() {
+      if (!this.menu.is(":visible")) {
+        this.open();
+        this.list.find('ul').last().append($('<li class="message first last"></li>'));
+      }
+      return this.list.find('li').first().loadingImage();
+    };
+    TokenSelector.prototype.clear_loading = function() {
+      return this.list.find('li').first().loadingImage('remove');
+    };
     TokenSelector.prototype.render_list = function(data, options) {
       var $body, $heading, $li, $list, $message, $uls, i, row, _len, _ref, _ref2;
       if (options == null) {
         options = {};
       }
-      if (data.length || this.list_expanded()) {
-        this.open();
-      } else {
-        this.ui_locked = false;
-        this.close();
-        return;
-      }
+      this.open();
       if (options.expand) {
         $list = this.new_list();
       } else {
@@ -643,7 +663,9 @@
           return this.select_next(true);
         }, this));
       } else {
-        this.select_next(true);
+        if (!options.loading) {
+          this.select_next(true);
+        }
         return this.ui_locked = false;
       }
     };
@@ -1686,7 +1708,7 @@
               options = {};
             }
             if (data.avatar) {
-              $img = $('<img />');
+              $img = $('<img class="avatar" />');
               $img.attr('src', data.avatar);
               $node.append($img);
             }

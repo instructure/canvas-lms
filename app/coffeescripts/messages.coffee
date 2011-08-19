@@ -14,7 +14,6 @@ class TokenInput
       .css('font-family', @node.css('font-family'))
       .insertAfter(@node)
       .addClass('token_input')
-      .bind('selectstart', false)
       .click => @input.focus()
     @node_name = @node.attr('name')
     @node.removeAttr('name').hide().change =>
@@ -301,29 +300,35 @@ class TokenSelector
       delete @timeout
       post_data = @prepare_post(options.data ? {})
       this_query = JSON.stringify(post_data)
+      if post_data.search is '' and not @list_expanded() and not options.data
+        @ui_locked = false
+        @close()
+        return
       if this_query is @last_applied_query
         @ui_locked = false
         return
       else if @query_cache[this_query]
         @last_applied_query = this_query
         @last_search = post_data.search
+        @clear_loading()
         @render_list(@query_cache[this_query], options)
         return
 
-      if post_data.search is '' and not @list_expanded() and not options.data
-        return @render_list([])
+      @set_loading()
       $.ajaxJSON @url, 'POST', $.extend({}, post_data),
         (data) =>
           @query_cache[this_query] = data
+          @clear_loading()
           if JSON.stringify(@prepare_post(options.data ? {})) is this_query # i.e. only if it hasn't subsequently changed (and thus triggered another call)
             @last_applied_query = this_query
             @last_search = post_data.search
-            @render_list(data, options)
+            @render_list(data, options) if @menu.is(":visible")
           else
             @ui_locked=false
         ,
         (data) =>
           @ui_locked=false
+          @clear_loading()
     , 100
 
   open: ->
@@ -337,6 +342,7 @@ class TokenSelector
     for [$selection, $list, query, search], i in @stack
       @list.remove()
       @list = $list.css('height', 'auto')
+    @list.find('ul').html('')
     @stack = []
     @menu.css('left', 0)
     @select(null)
@@ -414,6 +420,7 @@ class TokenSelector
     else
       @list.find('li:first')
     , preserve_mode)
+    @select_next(preserve_mode) if @selection?.hasClass('message')
 
   select_prev: ->
     @select(if @selection
@@ -426,6 +433,7 @@ class TokenSelector
     else
       @list.find('li:last')
     )
+    @select_prev() if @selection?.hasClass('message')
 
   populate_row: ($node, data, options={}) ->
     if @options.populator
@@ -436,13 +444,17 @@ class TokenSelector
     $node.addClass('first') if options.first
     $node.addClass('last') if options.last
 
-  render_list: (data, options={}) ->
-    if data.length or @list_expanded()
+  set_loading: ->
+    unless @menu.is(":visible")
       @open()
-    else
-      @ui_locked = false
-      @close()
-      return
+      @list.find('ul').last().append($('<li class="message first last"></li>'))
+    @list.find('li').first().loadingImage()
+
+  clear_loading: ->
+    @list.find('li').first().loadingImage('remove')
+
+  render_list: (data, options={}) ->
+    @open()
 
     if options.expand
       $list = @new_list()
@@ -480,7 +492,7 @@ class TokenSelector
         @list = $list
         @select_next(true)
     else
-      @select_next(true)
+      @select_next(true) unless options.loading
       @ui_locked = false
 
   prepare_post: (data) ->
@@ -1219,7 +1231,7 @@ I18n.scoped 'conversations', (I18n) ->
         messages: {no_results: I18n.t('no_results', 'No results found')}
         populator: ($node, data, options={}) ->
           if data.avatar
-            $img = $('<img />')
+            $img = $('<img class="avatar" />')
             $img.attr('src', data.avatar)
             $node.append($img)
           $b = $('<b />')
