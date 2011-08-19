@@ -1302,14 +1302,22 @@
       MessageInbox: MessageInbox
     });
     return $(document).ready(function() {
-      var conversation, nextAttachmentIndex, token_input, _i, _len, _ref, _ref2;
+      var $add_form, $forward_form, conversation, nextAttachmentIndex, token_input, _i, _len, _ref, _ref2;
       $conversations = $('#conversations');
       $conversation_list = $conversations.find("ul.conversations");
       set_last_label((_ref = $.cookie('last_label')) != null ? _ref : 'red');
       $messages = $('#messages');
       $message_list = $messages.find('ul.messages');
       $form = $('#create_message_form');
-      $form.find("textarea").elastic();
+      $add_form = $('#add_recipients_form');
+      $forward_form = $('#forward_message_form');
+      $('#create_message_form, #forward_message_form').find('textarea').elastic().keypress(function(e) {
+        if (e.which === 13 && e.shiftKey) {
+          e.preventDefault();
+          $(this).closest('form').submit();
+          return false;
+        }
+      });
       $form.submit(function(e) {
         var valid;
         valid = !!($form.find('#body').val() && ($form.find('#recipient_info').filter(':visible').length === 0 || $form.find('.token_input li').length > 0));
@@ -1362,7 +1370,7 @@
       $form.click(function() {
         return toggle_message_actions(false);
       });
-      $('#add_recipients_form').submit(function(e) {
+      $add_form.submit(function(e) {
         var valid;
         valid = !!($(this).find('.token_input li').length);
         if (!valid) {
@@ -1370,7 +1378,7 @@
         }
         return valid;
       });
-      $('#add_recipients_form').formSubmit({
+      $add_form.formSubmit({
         beforeSubmit: function() {
           return $(this).loadingImage();
         },
@@ -1519,7 +1527,7 @@
       });
       $('#action_add_recipients').click(function(e) {
         e.preventDefault();
-        return $('#add_recipients_form').attr('action', inbox_action_url_for($(this), $selected_conversation)).dialog('close').dialog({
+        return $add_form.attr('action', inbox_action_url_for($(this), $selected_conversation)).dialog('close').dialog({
           width: 420,
           title: I18n.t('title.add_recipients', 'Add Recipients'),
           buttons: [
@@ -1624,8 +1632,7 @@
         }
       });
       $('#action_forward').click(function() {
-        var $forward_form, $preview;
-        $forward_form = $('#forward_message_form');
+        var $preview;
         $forward_form.find("input[name!=authenticity_token], textarea").val('').change();
         $preview = $forward_form.find('ul.messages').first();
         $preview.html('');
@@ -1657,7 +1664,7 @@
           }
         });
       });
-      $('#forward_message_form').submit(function(e) {
+      $forward_form.submit(function(e) {
         var valid;
         valid = !!($(this).find('#forward_body').val() && $(this).find('.token_input li').length);
         if (!valid) {
@@ -1665,7 +1672,7 @@
         }
         return valid;
       });
-      $('#forward_message_form').formSubmit({
+      $forward_form.formSubmit({
         beforeSubmit: function() {
           return $(this).loadingImage();
         },

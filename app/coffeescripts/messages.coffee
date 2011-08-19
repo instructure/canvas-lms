@@ -947,8 +947,14 @@ I18n.scoped 'conversations', (I18n) ->
     $messages = $('#messages')
     $message_list = $messages.find('ul.messages')
     $form = $('#create_message_form')
+    $add_form = $('#add_recipients_form')
+    $forward_form = $('#forward_message_form')
 
-    $form.find("textarea").elastic()
+    $('#create_message_form, #forward_message_form').find('textarea').elastic().keypress (e) ->
+      if e.which is 13 and e.shiftKey
+        e.preventDefault()
+        $(this).closest('form').submit()
+        false
 
     $form.submit (e) ->
       valid = !!($form.find('#body').val() and ($form.find('#recipient_info').filter(':visible').length is 0 or $form.find('.token_input li').length > 0))
@@ -983,11 +989,11 @@ I18n.scoped 'conversations', (I18n) ->
     $form.click ->
       toggle_message_actions off
 
-    $('#add_recipients_form').submit (e) ->
+    $add_form.submit (e) ->
       valid = !!($(this).find('.token_input li').length)
       e.stopImmediatePropagation() unless valid
       valid
-    $('#add_recipients_form').formSubmit
+    $add_form.formSubmit
       beforeSubmit: ->
         $(this).loadingImage()
       success: (data) ->
@@ -1096,7 +1102,7 @@ I18n.scoped 'conversations', (I18n) ->
 
     $('#action_add_recipients').click (e) ->
       e.preventDefault()
-      $('#add_recipients_form')
+      $add_form
         .attr('action', inbox_action_url_for($(this), $selected_conversation))
         .dialog('close').dialog
           width: 420
@@ -1162,7 +1168,6 @@ I18n.scoped 'conversations', (I18n) ->
             $selected_messages.show()
 
     $('#action_forward').click ->
-      $forward_form = $('#forward_message_form')
       $forward_form.find("input[name!=authenticity_token], textarea").val('').change()
       $preview = $forward_form.find('ul.messages').first()
       $preview.html('')
@@ -1194,11 +1199,11 @@ I18n.scoped 'conversations', (I18n) ->
         close: ->
           $('#forward_recipients').data('token_input').input.blur()
 
-    $('#forward_message_form').submit (e) ->
+    $forward_form.submit (e) ->
       valid = !!($(this).find('#forward_body').val() and $(this).find('.token_input li').length)
       e.stopImmediatePropagation() unless valid
       valid
-    $('#forward_message_form').formSubmit
+    $forward_form.formSubmit
       beforeSubmit: ->
         $(this).loadingImage()
       success: (data) ->
