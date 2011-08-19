@@ -198,6 +198,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.last_message_at = nil
       self.has_attachments = false
       self.has_media_objects = false
+      self.label = nil
     end
     save
   end
