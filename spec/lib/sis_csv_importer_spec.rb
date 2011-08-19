@@ -1922,7 +1922,7 @@ describe SIS::SisCsv do
         )
         course = Course.find_by_sis_source_id("C001")
         course.enrollments.length.should == 1
-        course.enrollments.first.workflow_state.should == 'inactive'
+        course.enrollments.first.state_based_on_date.should == :inactive
       end
     end
   end

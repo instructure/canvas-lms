@@ -18,7 +18,7 @@
 
 <% unless @current_enrollments.empty? %>
   <h2><%= t('headings.my_courses', %{My Courses}) %></h2>
-  <ul class="unstyled_list context_list">
+  <ul class="unstyled_list context_list current_enrollments">
     <% @current_enrollments.each do |enrollment| %>
       <%= render :partial => "shared/current_enrollment", :object => enrollment %>
     <% end %>
@@ -27,7 +27,7 @@
 
 <% unless @past_enrollments.empty? %>
 <h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
-<ul class="unstyled_list context_list">
+<ul class="unstyled_list context_list past_enrollments">
   <% @past_enrollments.each do |enrollment| %>
     <%= render :partial => "shared/current_enrollment", :object => enrollment %>
   <% end %>
