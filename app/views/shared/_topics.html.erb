@@ -126,7 +126,7 @@
                 <td><label for="topic_assignment_group_id"><%= before_label 'assignment_group', 'Group' %></label></td>
                 <td>
                   <select name="discussion_topic[assignment][assignment_group_id]" id="topic_assignment_group_id">
-                    <% @context.assignment_groups.each do |group| %>
+                    <% @context.assignment_groups.active.each do |group| %>
                       <option value="<%= group.id %>"><%= group.name %></option>
                     <% end %>
                   </select>
