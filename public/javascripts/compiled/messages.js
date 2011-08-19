@@ -1284,7 +1284,11 @@
       } else {
         state = !!$message_list.find('li.selected').length;
       }
-      $('#message_actions').showIf(state);
+      if (state) {
+        $("#message_actions").slideDown(100);
+      } else {
+        $("#message_actions").slideUp(100);
+      }
       return $form[state ? 'addClass' : 'removeClass']('disabled');
     };
     set_last_label = function(label) {

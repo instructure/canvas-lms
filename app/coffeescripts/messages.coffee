@@ -924,7 +924,7 @@ I18n.scoped 'conversations', (I18n) ->
       $message_list.find('> li :checkbox').attr('checked', false)
     else
       state = !!$message_list.find('li.selected').length
-    $('#message_actions').showIf(state)
+    if state then $("#message_actions").slideDown(100) else $("#message_actions").slideUp(100)
     $form[if state then 'addClass' else 'removeClass']('disabled')
 
   set_last_label = (label) ->
