@@ -1757,7 +1757,7 @@
       }
       $('#no_messages').showIf(!$conversation_list.find('li').length);
       $('.recipients').tokenInput({
-        placeholder: I18n.t('recipient_field_placeholder', "Enter a name, email, course, or group"),
+        placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group"),
         selector: {
           messages: {
             no_results: I18n.t('no_results', 'No results found')
