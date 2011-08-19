@@ -674,7 +674,8 @@ I18n.scoped 'conversations', (I18n) ->
       user_id: data.author_id
       user_name: encodeURIComponent(user_name)
       from_conversation_id: $selected_conversation.data('id')
-    $pm_action.attr 'href', pm_url
+    $pm_action.attr('href', pm_url).click (e) ->
+      e.stopPropagation()
     if data.forwarded_messages?.length
       $ul = $('<ul class="messages"></ul>')
       for submessage in data.forwarded_messages
