@@ -53,8 +53,35 @@ class Submission < ActiveRecord::Base
     {:conditions => ['submitted_at > ?', date] }
   }
   
-  named_scope :for_context_codes, lambda { |context_codes| { 
-    :conditions => {:context_code => context_codes} } 
+  named_scope :for_context_codes, lambda { |context_codes|
+    { :conditions => {:context_code => context_codes} }
+  }
+
+  named_scope :for_conversation_participant, lambda { |p|
+    # John is looking at his conversation with Jane. Show submissions where:
+    #   1) John authored the submission and Jane has commented; or
+    #   2) Jane authored the submission and John is an admin in the
+    #      submission's course and anyone has commented and:
+    #      i) no admin has commented on the submission yet, or
+    #      ii) John has commented on the submission
+    { :select => 'DISTINCT submissions.*',
+      :joins => "INNER JOIN (
+          SELECT s.id AS submission_id FROM submissions AS s
+          INNER JOIN submission_comments AS sc ON sc.submission_id = s.id
+            AND sc.author_id = #{p.other_participant.id}
+          WHERE s.user_id = #{p.user_id}
+        UNION
+          SELECT DISTINCT s.id AS submission_id FROM submissions AS s
+          INNER JOIN assignments AS a ON a.id = s.assignment_id
+          INNER JOIN courses AS c ON c.id = a.context_id AND a.context_type = 'Course'
+            AND c.workflow_state NOT IN ('aborted', 'deleted')
+          INNER JOIN enrollments AS e ON e.course_id = c.id AND e.user_id = #{p.user_id}
+            AND e.workflow_state = 'active' AND e.type IN ('TeacherEnrollment', 'TaEnrollment')
+          INNER JOIN submission_comments AS sc ON sc.submission_id = s.id
+            AND (NOT s.has_admin_comment OR sc.author_id = #{p.user_id})
+          WHERE s.user_id = #{p.other_participant.id})
+        AS related_submissions ON related_submissions.submission_id = submissions.id"
+    }
   }
 
   # This should only be used in the course drop down to show assignments recently graded.

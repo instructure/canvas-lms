@@ -25,7 +25,8 @@
       }, this));
       this.node_name = this.node.attr('name');
       this.node.removeAttr('name').hide().change(__bind(function() {
-        return this.tokens.html('');
+        this.tokens.html('');
+        return typeof this.change === "function" ? this.change(this.token_values()) : void 0;
       }, this));
       this.placeholder = $('<span />');
       this.placeholder.text(this.options.placeholder);
@@ -38,7 +39,8 @@
         if ($token = $(e.target).closest('li')) {
           $close = $(e.target).closest('a');
           if ($close.length) {
-            return $token.remove();
+            $token.remove();
+            return typeof this.change === "function" ? this.change(this.token_values()) : void 0;
           }
         }
       }, this));
@@ -102,6 +104,9 @@
         this.val('');
       }
       this.placeholder.hide();
+      if (typeof this.change === "function") {
+        this.change(this.token_values());
+      }
       return (_ref3 = this.selector) != null ? _ref3.reposition() : void 0;
     };
     TokenInput.prototype.has_token = function(data) {
@@ -112,11 +117,17 @@
       var id, _ref, _ref2;
       id = 'token_' + ((_ref = data != null ? data.value : void 0) != null ? _ref : data);
       this.tokens.find('#' + id).remove();
+      if (typeof this.change === "function") {
+        this.change(this.token_values());
+      }
       return (_ref2 = this.selector) != null ? _ref2.reposition() : void 0;
     };
     TokenInput.prototype.remove_last_token = function(data) {
       var _ref;
       this.tokens.find('li').last().remove();
+      if (typeof this.change === "function") {
+        this.change(this.token_values());
+      }
       return (_ref = this.selector) != null ? _ref.reposition() : void 0;
     };
     TokenInput.prototype.input_keydown = function(e) {
@@ -677,11 +688,12 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_attachment, build_media_object, build_message, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, set_conversation_state, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
       $form.find('#recipient_info').showIf(newMessage);
+      $form.find('#group_conversation_info').hide();
       $('#action_compose_message').toggleClass('active', newMessage);
       if (newMessage) {
         $form.find('.audience').html(I18n.t('headings.new_message', 'New Message'));
@@ -776,7 +788,7 @@
       $form.loadingImage();
       $c = $selected_conversation;
       return $.ajaxJSON($selected_conversation.find('a.details_link').attr('href'), 'GET', {}, function(data) {
-        var message, user, _i, _j, _len, _len2, _ref, _ref2;
+        var i, j, message, submission, user, _i, _len, _ref;
         if (!is_selected($c)) {
           return;
         }
@@ -789,10 +801,17 @@
           }
         }
         $messages.show();
-        _ref2 = data.messages;
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-          message = _ref2[_j];
-          $message_list.append(build_message(message));
+        i = j = 0;
+        message = data.messages[0];
+        submission = data.submissions[0];
+        while (message || submission) {
+          if (message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO(submission.updated_at).datetime)) {
+            $message_list.append(build_message(message));
+            message = data.messages[++i];
+          } else {
+            $message_list.append(build_submission(submission));
+            submission = data.submissions[++j];
+          }
         }
         $form.loadingImage('remove');
         $message_list.hide().slideDown('fast');
@@ -903,8 +922,98 @@
       $attachment.data('id', data.id);
       $attachment.find('span.title').html($.h(data.display_name));
       $link = $attachment.find('a');
-      $link.attr('href', $.replaceTags($.replaceTags($link.attr('href'), 'id', data.id), 'uuid', data.uuid));
+      $link.attr('href', $.replaceTags($link.attr('href'), {
+        id: data.id,
+        uuid: data.uuid
+      }));
       return $attachment;
+    };
+    build_submission = function(data) {
+      var $comment_blank, $header, $inline_more, $more_link, $submission, $ul, comment, href, index, initially_shown, score, user, user_name, _i, _len, _ref, _ref2, _ref3, _ref4;
+      $submission = $("#submission_blank").clone(true).attr('id', 'submission_' + data.id);
+      $submission.data('id', data.id);
+      $ul = $submission.find('ul');
+      $header = $ul.find('li.header');
+      href = $.replaceTags($header.find('a').attr('href'), {
+        course_id: data.course_id,
+        assignment_id: data.assignment_id,
+        id: data.author_id
+      });
+      $header.find('a').attr('href', href);
+      user = MessageInbox.user_cache[data.author_id];
+      if (user) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
+          user.html_name = html_name_for_user(user);
+        };
+      }
+      user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
+      $header.find('.title').html($.h(data.title));
+      $header.find('span.date').text($.parseFromISO(data.created_at).datetime_formatted);
+      $header.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
+      score = (_ref3 = data.score) != null ? _ref3 : I18n.t('not_scored', 'no score');
+      $header.find('.score').html(score);
+      $comment_blank = $ul.find('.comment').detach();
+      index = 0;
+      initially_shown = 4;
+      _ref4 = data.recent_comments;
+      for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+        comment = _ref4[_i];
+        index++;
+        comment = build_submission_comment($comment_blank, comment);
+        if (index > initially_shown) {
+          comment.hide();
+        }
+        $ul.append(comment);
+      }
+      $more_link = $ul.find('.more').detach();
+      if (data.recent_comments.length > initially_shown) {
+        $inline_more = $more_link.clone(true);
+        $inline_more.find('.hidden').text(data.comment_count - initially_shown);
+        $inline_more.attr('title', $.h(I18n.t('titles.expand_inline', "Show more comments")));
+        $inline_more.click(function() {
+          var submission;
+          submission = $(this).closest('.submission');
+          submission.find('.more:hidden').show();
+          $(this).hide();
+          submission.find('.comment:hidden').slideDown('fast');
+          inbox_resize();
+          return false;
+        });
+        $ul.append($inline_more);
+      }
+      if (data.comment_count > data.recent_comments.length) {
+        $more_link.find('a').attr('href', href).attr('target', '_blank');
+        $more_link.find('.hidden').text(data.comment_count - data.recent_comments.length);
+        $more_link.attr('title', $.h(I18n.t('titles.view_submission', "Open submission in new window.")));
+        if (data.recent_comments.length > initially_shown) {
+          $more_link.hide();
+        }
+        $ul.append($more_link);
+      }
+      return $submission;
+    };
+    build_submission_comment = function(blank, data) {
+      var $comment, avatar, user, user_name, _ref, _ref2;
+      $comment = blank.clone(true).attr('id', 'submission_comment_' + data.id);
+      $comment.data('id', data.id);
+      user = MessageInbox.user_cache[data.author_id];
+      if (avatar = user != null ? user.avatar : void 0) {
+        $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
+      }
+      if (user) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
+          user.html_name = html_name_for_user(user);
+        };
+      }
+      user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
+      $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
+      $comment.find('span.date').text($.parseFromISO(data.created_at).datetime_formatted);
+      $comment.find('p').html($.h(data.body).replace(/\n/g, '<br />'));
+      return $comment;
     };
     inbox_action_url_for = function($action, $conversation) {
       return $.replaceTags($action.attr('href'), 'id', $conversation.data('id'));
@@ -954,14 +1063,17 @@
         e.preventDefault();
         return location.hash = '/conversations/' + $(this).data('id');
       });
-      update_conversation($conversation, data, true);
+      update_conversation($conversation, data, null);
       if (!append) {
         $conversation.hide().slideDown('fast');
       }
       return $conversation;
     };
-    update_conversation = function($conversation, data, no_move) {
+    update_conversation = function($conversation, data, move_mode) {
       var $a, $p, move_direction, property, _i, _len, _ref;
+      if (move_mode == null) {
+        move_mode = 'slide';
+      }
       toggle_message_actions(false);
       $a = $conversation.find('a.details_link');
       $a.attr('href', $.replaceTags($a.attr('href'), 'id', data.id));
@@ -1003,12 +1115,12 @@
       if (!data.subscribed) {
         $conversation.addClass('unsubscribed');
       }
-      $conversation.addClass(data.workflow_state);
-      if (!no_move) {
-        return reposition_conversation($conversation, move_direction);
+      set_conversation_state($conversation, data.workflow_state);
+      if (move_mode) {
+        return reposition_conversation($conversation, move_direction, move_mode);
       }
     };
-    reposition_conversation = function($conversation, move_direction) {
+    reposition_conversation = function($conversation, move_direction, move_mode) {
       var $dummy_conversation, $n, last_message;
       last_message = $conversation.data('last_message_at');
       $n = $conversation;
@@ -1024,23 +1136,27 @@
       if ($n === $conversation) {
         return;
       }
-      $dummy_conversation = $conversation.clone().insertAfter($conversation);
-      $conversation.detach()[move_direction === 'up' ? 'insertBefore' : 'insertAfter']($n).animate({
-        opacity: 'toggle',
-        height: 'toggle'
-      }, 0);
-      $dummy_conversation.animate({
-        opacity: 'toggle',
-        height: 'toggle'
-      }, 200, function() {
-        return $(this).remove();
-      });
-      return $conversation.animate({
-        opacity: 'toggle',
-        height: 'toggle'
-      }, 200, function() {
-        return $conversation.scrollIntoView();
-      });
+      if (move_mode === 'immediate') {
+        return $conversation.detach()[move_direction === 'up' ? 'insertBefore' : 'insertAfter']($n).scrollIntoView();
+      } else {
+        $dummy_conversation = $conversation.clone().insertAfter($conversation);
+        $conversation.detach()[move_direction === 'up' ? 'insertBefore' : 'insertAfter']($n).animate({
+          opacity: 'toggle',
+          height: 'toggle'
+        }, 0);
+        $dummy_conversation.animate({
+          opacity: 'toggle',
+          height: 'toggle'
+        }, 200, function() {
+          return $(this).remove();
+        });
+        return $conversation.animate({
+          opacity: 'toggle',
+          height: 'toggle'
+        }, 200, function() {
+          return $conversation.scrollIntoView();
+        });
+      }
     };
     remove_conversation = function($conversation) {
       select_conversation();
@@ -1131,7 +1247,7 @@
       MessageInbox: MessageInbox
     });
     return $(document).ready(function() {
-      var conversation, nextAttachmentIndex, _i, _len, _ref, _ref2;
+      var conversation, nextAttachmentIndex, token_input, _i, _len, _ref, _ref2;
       $conversations = $('#conversations');
       $conversation_list = $conversations.find("ul.conversations");
       set_last_label((_ref = $.cookie('last_label')) != null ? _ref : 'red');
@@ -1155,16 +1271,29 @@
           return $(this).loadingImage();
         },
         success: function(data) {
-          var $conversation;
+          var $conversation, conversation, _i, _len, _ref2;
           $(this).loadingImage('remove');
-          $conversation = $('#conversation_' + data.conversation.id);
-          if ($conversation.length) {
-            if (is_selected($conversation)) {
-              build_message(data.message).prependTo($message_list).slideDown('fast');
+          if (data.conversations) {
+            _ref2 = data.conversations;
+            for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+              conversation = _ref2[_i];
+              $conversation = $('#conversation_' + conversation.id);
+              if ($conversation.length) {
+                update_conversation($conversation, conversation, 'immediate');
+              }
             }
-            update_conversation($conversation, data.conversation);
+            $.flashMessage(I18n.t('messages_sent', 'Messages Sent'));
           } else {
-            select_conversation(add_conversation(data.conversation));
+            $conversation = $('#conversation_' + data.conversation.id);
+            if ($conversation.length) {
+              if (is_selected($conversation)) {
+                build_message(data.message).prependTo($message_list).slideDown('fast');
+              }
+              update_conversation($conversation, data.conversation);
+            } else {
+              select_conversation(add_conversation(data.conversation));
+            }
+            $.flashMessage(I18n.t('message_sent', 'Message Sent'));
           }
           return reset_message_form();
         },
@@ -1207,7 +1336,7 @@
           ;
         } else {
           $message = $(e.target).closest('#messages > ul > li');
-          if (!$message.hasClass('generated')) {
+          if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {
               $selected_conversation.addClass('inactive');
             }
@@ -1415,7 +1544,7 @@
               })()
             },
             success: function($node, data) {
-              if ($message_list.find('li').not('.selected, .generated').length) {
+              if ($message_list.find('> li').not('.selected, .generated, .submission').length) {
                 $selected_messages.remove();
                 return update_conversation($node, data);
               } else {
@@ -1588,7 +1717,20 @@
           }
         }
       });
-      $('#recipients').data('token_input').fake_input.css('width', '100%');
+      token_input = $('#recipients').data('token_input');
+      token_input.fake_input.css('width', '100%');
+      token_input.change = function(tokens) {
+        var _ref3;
+        if (tokens.length > 1 || ((_ref3 = tokens[0]) != null ? _ref3.match(/^(course|group)_/) : void 0)) {
+          if (!$form.find('#group_conversation_info').is(':visible')) {
+            $form.find('#group_conversation').attr('checked', true);
+          }
+          return $form.find('#group_conversation_info').show();
+        } else {
+          $form.find('#group_conversation').attr('checked', true);
+          return $form.find('#group_conversation_info').hide();
+        }
+      };
       $(window).resize(inbox_resize);
       setTimeout(inbox_resize);
       return $(document).fragmentChange(function(event, hash) {

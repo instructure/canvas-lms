@@ -89,7 +89,7 @@ class ConversationParticipant < ActiveRecord::Base
   def participants(include_context_info = true, include_forwarded_participants = false)
     context_info = {}
     self_conversation = conversation.participants == [self.user]
-    participants = self_conversation ? conversation.participants : conversation.participants - [self.user]
+    participants = self_conversation ? conversation.participants : self.other_participants
     if include_forwarded_participants
       user_ids = messages.select{ |m|
         m.forwarded_messages
@@ -127,8 +127,8 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_participants(user, user_ids)
   end
 
-  def add_message(body, forwarded_message_ids = [], &blk)
-    conversation.add_message(user, body, false, forwarded_message_ids, &blk)
+  def add_message(body, forwarded_message_ids = [], update_for_sender = true, &blk)
+    conversation.add_message(user, body, false, forwarded_message_ids, update_for_sender, &blk)
   end
 
   def remove_messages(*to_delete)
@@ -156,6 +156,18 @@ class ConversationParticipant < ActiveRecord::Base
 
   def label=(label)
     write_attribute(:label, label.present? ? label : nil)
+  end
+
+  def one_on_one?
+    conversation.participants.size == 2 && private?
+  end
+
+  def other_participants
+    conversation.participants - [self.user]
+  end
+
+  def other_participant
+    other_participants.first
   end
 
   workflow do

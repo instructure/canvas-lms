@@ -23,7 +23,7 @@ class ConversationsController < ApplicationController
   before_filter lambda { |c| c.avatar_size = 32 }, :only => :find_recipients
   before_filter :get_conversation, :only => [:show, :update, :destroy, :workflow_event, :add_recipients, :add_message, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
-  before_filter :normalize_recipients, :only => [:create, :batch_pm, :add_recipients]
+  before_filter :normalize_recipients, :only => [:create, :add_recipients]
   add_crumb(lambda { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
 
   def index
@@ -62,23 +62,21 @@ class ConversationsController < ApplicationController
 
   def create
     if @recipient_ids.present? && params[:body].present?
-      @conversation = @current_user.initiate_conversation(@recipient_ids)
-      message = create_message_on_conversation
-      render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
-                       :conversation => jsonify_conversation(@conversation.reload),
-                       :message => message}
-    else
-      render :json => {}, :status => :bad_request
-    end
-  end
-
-  def batch_pm
-    if @recipient_ids.present? && params[:body].present?
-      @recipient_ids.each do |recipient_id|
-        conversation = @current_user.initiate_conversation([recipient_id], true)
-        message = create_message_on_conversation(conversation)
+      batch_private_messages = !params[:group_conversation] && @recipient_ids.size > 1
+      conversations = (batch_private_messages ? @recipient_ids : [@recipient_ids]).map do |recipients|
+        recipients = Array(recipients)
+        @conversation = @current_user.initiate_conversation(recipients)
+        @message = create_message_on_conversation(@conversation, !batch_private_messages)
+        @message.generate_user_note if params[:user_note]
+        @conversation
       end
-      render :json => {}, :status => :ok
+      if batch_private_messages
+        render :json => {:conversations => conversations.each(&:reload).select{|c|c.last_message_at}.map{|c|jsonify_conversation(c)}}
+      else
+        render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
+                         :conversation => jsonify_conversation(@conversation.reload),
+                         :message => @message}
+      end
     else
       render :json => {}, :status => :bad_request
     end
@@ -86,8 +84,34 @@ class ConversationsController < ApplicationController
 
   def show
     @conversation.mark_as_read! if @conversation.unread?
+    submissions = []
+    if @conversation.one_on_one?
+      submissions = Submission.for_conversation_participant(@conversation).with_comments.map do |submission|
+        assignment = submission.assignment
+        recent_comments = submission.submission_comments.last(10).reverse
+        {
+          :id => submission.id,
+          :course_id => assignment.context_id,
+          :assignment_id => assignment.id,
+          :author_id => submission.user_id,
+          :created_at => submission.submitted_at,
+          :updated_at => recent_comments.first.created_at,
+          :title => assignment.title,
+          :score => submission.score && assignment.max_score ? "#{submission.score} / #{assignment.max_score}" : submission.score,
+          :comment_count => submission.submission_comments_count,
+          :recent_comments => recent_comments.map{ |comment| {
+            :id => comment.id,
+            :author_id => comment.author_id,
+            :created_at => comment.created_at,
+            :body => comment.comment
+          }}
+        }
+      end
+      submissions = submissions.sort_by{ |s| s[:updated_at] }.reverse
+    end
     render :json => {:participants => jsonify_users(@conversation.participants(true, true)),
-                     :messages => @conversation.messages}
+                     :messages => @conversation.messages,
+                     :submissions => submissions}
   end
 
   def update
@@ -229,8 +253,8 @@ class ConversationsController < ApplicationController
     @conversation = @current_user.conversations.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
   end
 
-  def create_message_on_conversation(conversation=@conversation)
-    message = conversation.add_message(params[:body], params[:forwarded_message_ids]) do |m|
+  def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
+    message = conversation.add_message(params[:body], params[:forwarded_message_ids], update_for_sender) do |m|
       if params[:attachments]
         params[:attachments].sort_by{ |k,v| k.to_i }.each do |k,v|
           m.attachments.create(:uploaded_data => v) if v.present?

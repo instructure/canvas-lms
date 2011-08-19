@@ -19,6 +19,7 @@ class TokenInput
     @node_name = @node.attr('name')
     @node.removeAttr('name').hide().change =>
       @tokens.html('')
+      @change?(@token_values())
 
     @placeholder = $('<span />')
     @placeholder.text(@options.placeholder)
@@ -31,11 +32,7 @@ class TokenInput
         $close = $(e.target).closest('a')
         if $close.length
           $token.remove()
-        # TODO: recipient selection, virtual cursor fu
-        #  $token.removeClass('selected').remove()
-        #else
-        #  @selected_token?.removeClass('selected')
-        #  @selected_token = $token.addClass('selected')
+          @change?(@token_values())
 
     # key capture input
     @input = $('<input />')
@@ -99,6 +96,7 @@ class TokenInput
       @tokens.append($token)
     @val('') unless data?.no_clear
     @placeholder.hide()
+    @change?(@token_values())
     @selector?.reposition()
 
   has_token: (data) ->
@@ -107,10 +105,12 @@ class TokenInput
   remove_token: (data) ->
     id = 'token_' + (data?.value ? data)
     @tokens.find('#' + id).remove()
+    @change?(@token_values())
     @selector?.reposition()
 
   remove_last_token: (data) ->
     @tokens.find('li').last().remove()
+    @change?(@token_values())
     @selector?.reposition()
 
   input_keydown: (e) ->
@@ -511,6 +511,7 @@ I18n.scoped 'conversations', (I18n) ->
   show_message_form = ->
     newMessage = !$selected_conversation?
     $form.find('#recipient_info').showIf newMessage
+    $form.find('#group_conversation_info').hide()
     $('#action_compose_message').toggleClass 'active', newMessage
 
     if newMessage
@@ -587,8 +588,18 @@ I18n.scoped 'conversations', (I18n) ->
         MessageInbox.user_cache[user.id] = user
         user.html_name = html_name_for_user(user)
       $messages.show()
-      for message in data.messages
-        $message_list.append build_message(message)
+      i = j = 0
+      message = data.messages[0]
+      submission = data.submissions[0]
+      while message || submission
+        if message && (!submission || $.parseFromISO(message.created_at).datetime > $.parseFromISO(submission.updated_at).datetime)
+          # there's another message, and the next submission (if any) is not newer than it
+          $message_list.append build_message(message)
+          message = data.messages[++i]
+        else
+          # no more messages, or the next submission is newer than the next message
+          $message_list.append build_submission(submission)
+          submission = data.submissions[++j]
       $form.loadingImage 'remove'
       $message_list.hide().slideDown 'fast'
       if $selected_conversation.hasClass 'unread'
@@ -661,8 +672,65 @@ I18n.scoped 'conversations', (I18n) ->
     $attachment.data('id', data.id)
     $attachment.find('span.title').html $.h(data.display_name)
     $link = $attachment.find('a')
-    $link.attr('href', $.replaceTags($.replaceTags($link.attr('href'), 'id', data.id), 'uuid', data.uuid))
+    $link.attr('href', $.replaceTags($link.attr('href'), id: data.id, uuid: data.uuid))
     $attachment
+
+  build_submission = (data) ->
+    $submission = $("#submission_blank").clone(true).attr('id', 'submission_' + data.id)
+    $submission.data('id', data.id)
+    $ul = $submission.find('ul')
+    $header = $ul.find('li.header')
+    href = $.replaceTags($header.find('a').attr('href'), course_id: data.course_id, assignment_id: data.assignment_id, id: data.author_id)
+    $header.find('a').attr('href', href)
+    user = MessageInbox.user_cache[data.author_id]
+    user.html_name ?= html_name_for_user(user) if user
+    user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
+    $header.find('.title').html $.h(data.title)
+    $header.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
+    $header.find('.audience').html user?.html_name || $.h(user_name)
+    score = data.score ? I18n.t('not_scored', 'no score')
+    $header.find('.score').html(score)
+    $comment_blank = $ul.find('.comment').detach()
+    index = 0
+    initially_shown = 4
+    for comment in data.recent_comments
+      index++
+      comment = build_submission_comment($comment_blank, comment)
+      comment.hide() if index > initially_shown
+      $ul.append comment
+    $more_link = $ul.find('.more').detach()
+    if data.recent_comments.length > initially_shown
+      $inline_more = $more_link.clone(true)
+      $inline_more.find('.hidden').text(data.comment_count - initially_shown)
+      $inline_more.attr('title', $.h(I18n.t('titles.expand_inline', "Show more comments")))
+      $inline_more.click ->
+        submission = $(this).closest('.submission')
+        submission.find('.more:hidden').show()
+        $(this).hide()
+        submission.find('.comment:hidden').slideDown('fast')
+        inbox_resize()
+        return false
+      $ul.append $inline_more
+    if data.comment_count > data.recent_comments.length
+      $more_link.find('a').attr('href', href).attr('target', '_blank')
+      $more_link.find('.hidden').text(data.comment_count - data.recent_comments.length)
+      $more_link.attr('title', $.h(I18n.t('titles.view_submission', "Open submission in new window.")))
+      $more_link.hide() if data.recent_comments.length > initially_shown
+      $ul.append $more_link
+    $submission
+
+  build_submission_comment = (blank, data) ->
+    $comment = blank.clone(true).attr('id', 'submission_comment_' + data.id)
+    $comment.data('id', data.id)
+    user = MessageInbox.user_cache[data.author_id]
+    if avatar = user?.avatar
+      $comment.prepend $('<img />').attr('src', avatar).addClass('avatar')
+    user.html_name ?= html_name_for_user(user) if user
+    user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
+    $comment.find('.audience').html user?.html_name || $.h(user_name)
+    $comment.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
+    $comment.find('p').html $.h(data.body).replace(/\n/g, '<br />')
+    $comment
 
   inbox_action_url_for = ($action, $conversation) ->
     $.replaceTags $action.attr('href'), 'id', $conversation.data('id')
@@ -698,11 +766,11 @@ I18n.scoped 'conversations', (I18n) ->
     $conversation[if append then 'appendTo' else 'prependTo']($conversation_list).click (e) ->
       e.preventDefault()
       location.hash = '/conversations/' + $(this).data('id')
-    update_conversation($conversation, data, true)
+    update_conversation($conversation, data, null)
     $conversation.hide().slideDown('fast') unless append
     $conversation
 
-  update_conversation = ($conversation, data, no_move) ->
+  update_conversation = ($conversation, data, move_mode='slide') ->
     toggle_message_actions(off)
 
     $a = $conversation.find('a.details_link')
@@ -730,10 +798,10 @@ I18n.scoped 'conversations', (I18n) ->
     $conversation.addClass('private') if data['private']
     $conversation.addClass('labeled').addClass(data['label']) if data['label']
     $conversation.addClass('unsubscribed') unless data.subscribed
-    $conversation.addClass(data.workflow_state)
-    reposition_conversation($conversation, move_direction) unless no_move
+    set_conversation_state $conversation, data.workflow_state
+    reposition_conversation($conversation, move_direction, move_mode) if move_mode
 
-  reposition_conversation = ($conversation, move_direction) ->
+  reposition_conversation = ($conversation, move_direction, move_mode) ->
     last_message = $conversation.data('last_message_at')
     $n = $conversation
     if move_direction == 'up'
@@ -741,12 +809,15 @@ I18n.scoped 'conversations', (I18n) ->
     else
       $n = $n.next() while $n.next() && $n.next().data('last_message_at') > last_message
     return if $n == $conversation
-    $dummy_conversation = $conversation.clone().insertAfter($conversation)
-    $conversation.detach()[if move_direction == 'up' then 'insertBefore' else 'insertAfter']($n).animate({opacity: 'toggle', height: 'toggle'}, 0)
-    $dummy_conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, ->
-      $(this).remove()
-    $conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, ->
-      $conversation.scrollIntoView()
+    if move_mode is 'immediate'
+      $conversation.detach()[if move_direction == 'up' then 'insertBefore' else 'insertAfter']($n).scrollIntoView()
+    else
+      $dummy_conversation = $conversation.clone().insertAfter($conversation)
+      $conversation.detach()[if move_direction == 'up' then 'insertBefore' else 'insertAfter']($n).animate({opacity: 'toggle', height: 'toggle'}, 0)
+      $dummy_conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, ->
+        $(this).remove()
+      $conversation.animate {opacity: 'toggle', height: 'toggle'}, 200, ->
+        $conversation.scrollIntoView()
 
   remove_conversation = ($conversation) ->
     select_conversation()
@@ -849,12 +920,19 @@ I18n.scoped 'conversations', (I18n) ->
         $(this).loadingImage()
       success: (data) ->
         $(this).loadingImage 'remove'
-        $conversation = $('#conversation_' + data.conversation.id)
-        if $conversation.length
-          build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
-          update_conversation($conversation, data.conversation)
+        if data.conversations # e.g. we just sent bulk private messages
+          for conversation in data.conversations
+            $conversation = $('#conversation_' + conversation.id)
+            update_conversation($conversation, conversation, 'immediate') if $conversation.length
+          $.flashMessage(I18n.t('messages_sent', 'Messages Sent'))
         else
-          select_conversation add_conversation(data.conversation)
+          $conversation = $('#conversation_' + data.conversation.id)
+          if $conversation.length
+            build_message(data.message).prependTo($message_list).slideDown 'fast' if is_selected($conversation)
+            update_conversation($conversation, data.conversation)
+          else
+            select_conversation add_conversation(data.conversation)
+          $.flashMessage(I18n.t('message_sent', 'Message Sent'))
         reset_message_form()
       error: (data) ->
         $form.find('.token_input').errorBox(I18n.t('recipient_error', 'The course or group you have selected has no valid recipients'))
@@ -888,7 +966,7 @@ I18n.scoped 'conversations', (I18n) ->
         # intended for us, just let it go
       else
         $message = $(e.target).closest('#messages > ul > li')
-        unless $message.hasClass('generated')
+        unless $message.hasClass('generated') or $message.hasClass('submission')
           $selected_conversation?.addClass('inactive')
           $message.toggleClass('selected')
           $message.find('> :checkbox').attr('checked', $message.hasClass('selected'))
@@ -1024,7 +1102,7 @@ I18n.scoped 'conversations', (I18n) ->
             # have the response tell us the number of messages still in
             # the conversation, and key off of that to know if we should
             # delete the conversation (or possibly reload its messages)
-            if $message_list.find('li').not('.selected, .generated').length
+            if $message_list.find('> li').not('.selected, .generated, .submission').length
               $selected_messages.remove()
               update_conversation($node, data)
             else
@@ -1155,8 +1233,16 @@ I18n.scoped 'conversations', (I18n) ->
             limit: -1
             type: 'context'
 
+    token_input = $('#recipients').data('token_input')
     # since it doesn't infer percentage widths, just whatever the current pixels are
-    $('#recipients').data('token_input').fake_input.css('width', '100%')
+    token_input.fake_input.css('width', '100%')
+    token_input.change = (tokens) ->
+      if tokens.length > 1 or tokens[0]?.match(/^(course|group)_/)
+        $form.find('#group_conversation').attr('checked', true) if !$form.find('#group_conversation_info').is(':visible')
+        $form.find('#group_conversation_info').show()
+      else
+        $form.find('#group_conversation').attr('checked', true)
+        $form.find('#group_conversation_info').hide()
 
     $(window).resize inbox_resize
     setTimeout inbox_resize
