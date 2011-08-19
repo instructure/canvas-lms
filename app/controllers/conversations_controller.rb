@@ -21,7 +21,7 @@ class ConversationsController < ApplicationController
 
   before_filter :require_user
   before_filter lambda { |c| c.avatar_size = 32 }, :only => :find_recipients
-  before_filter :get_conversation, :only => [:show, :update, :destroy, :workflow_event, :add_recipients, :add_message, :remove_messages]
+  before_filter :get_conversation, :only => [:show, :update, :destroy, :workflow_event, :add_recipients, :remove_messages]
   before_filter :load_all_contexts, :only => [:index, :find_recipients, :create, :add_message]
   before_filter :normalize_recipients, :only => [:create, :add_recipients]
   add_crumb(lambda { I18n.t 'crumbs.messages', "Conversations" }) { |c| c.send :conversations_url }
@@ -170,6 +170,7 @@ class ConversationsController < ApplicationController
   end
 
   def add_message
+    get_conversation(true)
     if params[:body].present?
       message = create_message_on_conversation
       render :json => {:conversation => jsonify_conversation(@conversation.reload), :message => message}
@@ -266,8 +267,8 @@ class ConversationsController < ApplicationController
     jsonify_users(@current_user.messageable_users(options), options.delete(:blank_avatar_fallback))
   end
 
-  def get_conversation
-    @conversation = @current_user.conversations.find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
+  def get_conversation(allow_deleted = false)
+    @conversation = (allow_deleted ? @current_user.all_conversations : @current_user.conversations).find_by_conversation_id(params[:id] || params[:conversation_id] || 0)
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)

@@ -104,7 +104,10 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
-  has_many :conversations, :class_name => 'ConversationParticipant', :include => :conversation, :conditions => "last_message_at IS NOT NULL", :order => "last_message_at DESC" # i.e. exclude any where the user has deleted all the messages
+  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC"
+  def conversations
+    all_conversations.visible # i.e. exclude any where the user has deleted all the messages
+  end
 
   named_scope :of_account, lambda { |account|
     {

@@ -380,8 +380,8 @@ ul.messages, ul.messages.private, ul.messages.private li:hover
   .actions
     display: none
 
-button.button
-  padding: 0 22px
+button.button, .ui-dialog .ui-dialog-buttonpane button.ui-button
+  padding: 0 22px !important
   height: 24px
   line-height: 22px
   font-size: 12px
@@ -395,10 +395,12 @@ button.button
   +border-radius(13px)
   background: #bbb url(/images/messages/button-bg.png) 0 0 repeat-x !important
   +box-shadow( rgba(0,0,0,0.1), 0, 1px, 2px, 1px )
-button.button:hover
+button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button:hover
   background-position: 0 -22px !important
   border-color: #aaa
   +box-shadow( rgba(0,0,0,0.1), 0, 1px, 2px, 1px )
+.ui-dialog .ui-dialog-buttonpane button.ui-button span
+  padding: 0
 
 #messages
   width: 50%
@@ -904,18 +906,25 @@ form
   input, textarea
     width: 400px
   > ul.messages
+    font-size: 1.1em
+    overflow: visible
     li
-      padding: 14px 14px 14px 78px
+      padding: 14px 14px 14px 64px
       margin: 0
+      img.avatar
+        left: 0
       .actions
         display: none
       .date
         margin-right: 0
-    max-height: 200px
+    > li
+      border-bottom: 1px solid #ddd
+    > li.last
+      border-bottom-width: 0px
     input
       display: none
 #add_recipients_form, #forward_message_form
-  padding: 1em 1em 2em
+  padding: 1em 2em 2em
   display: none
 
 #conversations_loader

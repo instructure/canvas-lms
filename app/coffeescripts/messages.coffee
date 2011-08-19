@@ -1079,13 +1079,22 @@ I18n.scoped 'conversations', (I18n) ->
       $('#add_recipients_form')
         .attr('action', inbox_action_url_for($(this), $selected_conversation))
         .dialog('close').dialog
-          width: 400
+          width: 420
           title: I18n.t('title.add_recipients', 'Add Recipients')
+          buttons: [
+            {
+              text: I18n.t('buttons.add_people', 'Add People')
+              click: -> $(this).submit()
+            }
+            {
+              text: I18n.t('#buttons.cancel', 'Cancel')
+              click: -> $(this).dialog('close')
+            }
+          ]
           open: ->
             token_input = $('#add_recipients').data('token_input')
             token_input.base_exclude = ($(node).data('id') for node in $selected_conversation.find('.participant'))
-            token_input.resize()
-            $(this).find("input[name!=authenticity_token]").val('').change().last().focus()
+            $(this).find("input[name!=authenticity_token]").val('').change()
           close: ->
             $('#add_recipients').data('token_input').input.blur()
 
@@ -1133,23 +1142,35 @@ I18n.scoped 'conversations', (I18n) ->
             $selected_messages.show()
 
     $('#action_forward').click ->
-      $('#forward_message_form').dialog('close').dialog
-        width: 500
+      $forward_form = $('#forward_message_form')
+      $forward_form.find("input[name!=authenticity_token], textarea").val('').change()
+      $preview = $forward_form.find('ul.messages').first()
+      $preview.html('')
+      $preview.html($message_list.find('> li.selected').clone(true).removeAttr('id').removeClass('self'))
+      $preview.find('> li')
+        .removeClass('selected odd')
+        .find('> :checkbox')
+        .attr('checked', true)
+        .attr('name', 'forwarded_message_ids[]')
+        .val ->
+          $(this).closest('li').data('id')
+      $preview.find('> li').last().addClass('last')
+      $forward_form.css('max-height', ($(window).height() - 300) + 'px')
+      .dialog('close').dialog
+        position: 'center'
+        height: 'auto'
+        width: 510
         title: I18n.t('title.forward_messages', 'Forward Messages')
-        open: ->
-          token_input = $('#forward_recipients').data('token_input')
-          token_input.resize()
-          $(this).find("input[name!=authenticity_token]").val('').change().last().focus()
-          $preview = $(this).find('ul.messages').first()
-          $preview.html('')
-          $preview.html($message_list.find('> li.selected').clone(true).removeAttr('id').removeClass('self'))
-          $preview.find('> li')
-            .removeClass('selected odd')
-            .find('> :checkbox')
-            .attr('checked', true)
-            .attr('name', 'forwarded_message_ids[]')
-            .val ->
-              $(this).closest('li').data('id')
+        buttons: [
+          {
+            text: I18n.t('buttons.send_message', 'Send')
+            click: -> $(this).submit()
+          }
+          {
+            text: I18n.t('#buttons.cancel', 'Cancel')
+            click: -> $(this).dialog('close')
+          }
+        ]
         close: ->
           $('#forward_recipients').data('token_input').input.blur()
 
