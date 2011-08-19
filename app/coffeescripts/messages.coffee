@@ -593,7 +593,7 @@ I18n.scoped 'conversations', (I18n) ->
     if $selected_conversation
       $selected_conversation.scrollIntoView()
     else
-      if params and params.user_id and params.user_name and params.from_conversation_id
+      if params and params.user_id and params.user_name
         $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name
         $('#from_conversation_id').val(params.from_conversation_id)
       return

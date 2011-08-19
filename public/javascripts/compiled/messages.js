@@ -807,7 +807,7 @@
       if ($selected_conversation) {
         $selected_conversation.scrollIntoView();
       } else {
-        if (params && params.user_id && params.user_name && params.from_conversation_id) {
+        if (params && params.user_id && params.user_name) {
           $('#recipients').data('token_input').add_token({
             value: params.user_id,
             text: params.user_name
