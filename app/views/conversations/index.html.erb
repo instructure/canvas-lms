@@ -199,7 +199,6 @@
     <%= t :add_recipients_instructions, "People you add to the conversation will see all previous messages." %>
   </p>
   <%= text_field_tag :recipients, nil, :id => 'add_recipients', :finder_url => conversations_find_recipients_url, :class => "recipients", :style => "width: 370px" %>
-  <div class='actions' style='padding-top: 10px'><button type='submit' class='button' style='float: right'><%= t 'buttons.add_people', "Add People" %></button></div>
 </form>
 
 <% form_tag conversations_url, :id => 'forward_message_form' do %>
@@ -209,9 +208,6 @@
   </table>
   <ul class="messages"></ul>
   <input type="hidden" name="group_conversation" value="1" />
-  <div style="text-align:right">
-    <button type="submit" class="button"><%= t('buttons.send_message', 'Send') %></button>
-  </div>
 <% end %>
 
 <% js_block do %>

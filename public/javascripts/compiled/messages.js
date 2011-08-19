@@ -678,11 +678,13 @@
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-      if ((_ref = post_data.limit) == null) {
+            if ((_ref = post_data.limit) != null) {
+        _ref;
+      } else {
         post_data.limit = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
-      }
+      };
       return post_data;
     };
     return TokenSelector;
@@ -884,9 +886,11 @@
         $message.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $message.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -960,9 +964,11 @@
       $header.find('a').attr('href', href);
       user = MessageInbox.user_cache[data.author_id];
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $header.find('.title').html($.h(data.title));
@@ -1021,9 +1027,11 @@
         $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1361,7 +1369,9 @@
       });
       $message_list.click(function(e) {
         var $message;
-        if ($(e.target).closest('a.instructure_inline_media_comment').length) {} else {
+        if ($(e.target).closest('a.instructure_inline_media_comment').length) {
+          ;
+        } else {
           $message = $(e.target).closest('#messages > ul > li');
           if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {
@@ -1493,8 +1503,21 @@
       $('#action_add_recipients').click(function(e) {
         e.preventDefault();
         return $('#add_recipients_form').attr('action', inbox_action_url_for($(this), $selected_conversation)).dialog('close').dialog({
-          width: 400,
+          width: 420,
           title: I18n.t('title.add_recipients', 'Add Recipients'),
+          buttons: [
+            {
+              text: I18n.t('buttons.add_people', 'Add People'),
+              click: function() {
+                return $(this).submit();
+              }
+            }, {
+              text: I18n.t('#buttons.cancel', 'Cancel'),
+              click: function() {
+                return $(this).dialog('close');
+              }
+            }
+          ],
           open: function() {
             var node, token_input;
             token_input = $('#add_recipients').data('token_input');
@@ -1508,8 +1531,7 @@
               }
               return _results;
             })();
-            token_input.resize();
-            return $(this).find("input[name!=authenticity_token]").val('').change().last().focus();
+            return $(this).find("input[name!=authenticity_token]").val('').change();
           },
           close: function() {
             return $('#add_recipients').data('token_input').input.blur();
@@ -1585,21 +1607,34 @@
         }
       });
       $('#action_forward').click(function() {
-        return $('#forward_message_form').dialog('close').dialog({
-          width: 500,
+        var $forward_form, $preview;
+        $forward_form = $('#forward_message_form');
+        $forward_form.find("input[name!=authenticity_token], textarea").val('').change();
+        $preview = $forward_form.find('ul.messages').first();
+        $preview.html('');
+        $preview.html($message_list.find('> li.selected').clone(true).removeAttr('id').removeClass('self'));
+        $preview.find('> li').removeClass('selected odd').find('> :checkbox').attr('checked', true).attr('name', 'forwarded_message_ids[]').val(function() {
+          return $(this).closest('li').data('id');
+        });
+        $preview.find('> li').last().addClass('last');
+        return $forward_form.css('max-height', ($(window).height() - 300) + 'px').dialog('close').dialog({
+          position: 'center',
+          height: 'auto',
+          width: 510,
           title: I18n.t('title.forward_messages', 'Forward Messages'),
-          open: function() {
-            var $preview, token_input;
-            token_input = $('#forward_recipients').data('token_input');
-            token_input.resize();
-            $(this).find("input[name!=authenticity_token]").val('').change().last().focus();
-            $preview = $(this).find('ul.messages').first();
-            $preview.html('');
-            $preview.html($message_list.find('> li.selected').clone(true).removeAttr('id').removeClass('self'));
-            return $preview.find('> li').removeClass('selected odd').find('> :checkbox').attr('checked', true).attr('name', 'forwarded_message_ids[]').val(function() {
-              return $(this).closest('li').data('id');
-            });
-          },
+          buttons: [
+            {
+              text: I18n.t('buttons.send_message', 'Send'),
+              click: function() {
+                return $(this).submit();
+              }
+            }, {
+              text: I18n.t('#buttons.cancel', 'Cancel'),
+              click: function() {
+                return $(this).dialog('close');
+              }
+            }
+          ],
           close: function() {
             return $('#forward_recipients').data('token_input').input.blur();
           }
