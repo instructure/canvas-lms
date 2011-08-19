@@ -89,7 +89,13 @@
                 max_to_show = 8 # Need to keep this low for users with limited screen real estate
                 coalesced_enrollments = []
                 course_name_counts = {}
+                found_completed = false
                 @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).each do |e|
+                  next if e.state_based_on_date == :inactive
+                  if e.state_based_on_date == :completed
+                    found_completed = true
+                    next
+                  end
                   coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] } if !e.course
                   existing_enrollment_info = coalesced_enrollments.find { |en|
                     # coalesce together enrollments for the same course and the same state
@@ -121,7 +127,7 @@
               <% end %>
             </tr>
           </table>
-          <% unless @current_user.enrollments.ended.empty? %>
+          <% unless @current_user.enrollments.ended.empty? && !found_completed %>
             <div class="menu-item-drop-padded">
               <%= link_to h(t('menu.all_enrollments', 'See All Enrollments')) + raw(' &raquo;'), courses_path, :class => "menu-item-drop-float-right" %>
             </div>

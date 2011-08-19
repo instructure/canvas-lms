@@ -21,7 +21,6 @@ class Course < ActiveRecord::Base
 
   include Context
   include Workflow
-  include EnrollmentDateRestrictions
 
   attr_accessible :name,
                   :section,
@@ -541,8 +540,7 @@ class Course < ActiveRecord::Base
     end
     self.root_account_id ||= Account.default.id
     self.account_id ||= self.root_account_id
-    self.enrollment_term
-    self.enrollment_term = nil if self.enrollment_term && self.enrollment_term.root_account_id != self.root_account_id
+    self.enrollment_term = nil if self.enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
     self.publish_grades_immediately = true if self.publish_grades_immediately == nil
     self.allow_student_wiki_edits = (self.default_wiki_editing_roles || "").split(',').include?('students')
@@ -570,21 +568,23 @@ class Course < ActiveRecord::Base
   end
   
   def update_enrollments_later
-    send_later(:update_enrolled_users) if !self.new_record? && !(self.changes.keys & ['workflow_state', 'name', 'course_code']).empty?
+    self.update_enrolled_users if !self.new_record? && !(self.changes.keys & ['workflow_state', 'name', 'course_code', 'start_at', 'conclude_at', 'enrollment_term_id']).empty?
     true
   end
   
   def update_enrolled_users
     if self.completed?
-      enrollments = self.enrollments.scoped(:select => "id, user_id, course_id", :conditions=>"workflow_state IN ('active', 'invited')")
-      Enrollment.update_all({:workflow_state => 'completed'}, {:id => enrollments.map(&:id)})
+      Enrollment.update_all({:workflow_state => 'completed'}, "course_id=#{self.id} AND workflow_state IN('active', 'invited')")
     elsif self.deleted?
-      enrollments = self.enrollments.scoped(:select => "id, user_id, course_id", :conditions=>"workflow_state != 'deleted'")
-      Enrollment.update_all({:workflow_state => 'deleted'}, {:id => enrollments.map(&:id)})
+      Enrollment.update_all({:workflow_state => 'deleted'}, "course_id=#{self.id} AND workflow_state!='deleted'")
     end
-    enrollments = self.enrollments.scoped(:select => "id, user_id, course_id")
-    Enrollment.update_all({:updated_at => Time.now}, {:id => enrollments.map(&:id)})
-    User.update_all({:updated_at => Time.now}, {:id => enrollments.map(&:user_id)})
+    case Enrollment.connection.adapter_name
+    when 'MySQL'
+      Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
+    else
+      Enrollment.update_all({:updated_at => Time.now}, :course_id => self.id)
+      User.update_all({:updated_at => Time.now}, "id IN (SELECT user_id FROM enrollments WHERE course_id=#{self.id})")
+    end
   end
   
   def self_enrollment_allowed?
@@ -808,7 +808,7 @@ class Course < ActiveRecord::Base
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && hash[:enrollment_state] == "active" && hash[:user_state] == "pre_registered" }
     can :read
     
-    given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && !e.rejected? && !e.deleted? } }
+    given { |user| self.available? && user && user.cached_current_enrollments.any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
     can :read
     
     given { |user| self.available? && user &&  user.cached_current_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
@@ -878,32 +878,6 @@ class Course < ActiveRecord::Base
   def self.find_all_by_context_code(codes)
     ids = codes.map{|c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }.compact
     Course.find(:all, :conditions => {:id => ids}, :include => :current_enrollments)
-  end
-  
-  def enrollment_dates_for(enrollment)
-    if enrollment.start_at && enrollment.end_at
-      [enrollment.start_at, enrollment.end_at]
-    elsif (section = enrollment.course_section_id && course_sections.find_by_id(enrollment.course_section_id)) && 
-          section && section.restrict_enrollments_to_section_dates && !enrollment.admin?
-      [section.start_at, section.end_at]
-    elsif self.restrict_enrollments_to_course_dates && !enrollment.admin?
-      [start_at, end_at]
-    elsif enrollment_term
-      enrollment_term.enrollment_dates_for(enrollment)
-    else
-      [nil, nil]
-    end
-  end
-  
-  def enrollment_state_based_on_date(enrollment)
-    start_at, end_at = enrollment_dates_for(enrollment)
-    if start_at && start_at >= Time.now
-      'inactive'
-    elsif end_at && end_at <= Time.now
-      'completed'
-    else
-      'active'
-    end
   end
   
   def end_at

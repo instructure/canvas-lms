@@ -18,15 +18,13 @@
 
 class CourseSection < ActiveRecord::Base
   include Workflow
-  include EnrollmentDateRestrictions
-  
+
   attr_protected :sis_source_id, :sis_batch_id, :course_id,
       :root_account_id, :enrollment_term_id, :sis_cross_listed_section_id, :sis_cross_listed_section_sis_batch_id
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :sis_cross_listed_section
-  belongs_to :enrollment_term
   belongs_to :account
   has_many :enrollments, :include => :user, :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
   has_many :student_enrollments, :class_name => 'StudentEnrollment', :conditions => ['enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ? AND enrollments.workflow_state != ?', 'deleted', 'completed', 'rejected', 'inactive'], :include => :user
@@ -37,7 +35,23 @@ class CourseSection < ActiveRecord::Base
   validates_presence_of :course_id
   
   before_save :set_update_account_associations_if_changed
+  before_save :maybe_touch_all_enrollments
   after_save :update_account_associations_if_changed
+
+  def maybe_touch_all_enrollments
+    self.touch_all_enrollments if self.start_at_changed? || self.end_at_changed? || self.restrict_enrollments_to_section_dates_changed? || self.course_id_changed?
+  end
+
+  def touch_all_enrollments
+    return if new_record?
+    self.enrollments.update_all(:updated_at => Time.now)
+    case User.connection.adapter_name
+    when 'MySQL'
+      User.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_section_id=#{self.id}")
+    else
+      User.update_all({:updated_at => Time.now}, "id IN (SELECT user_id FROM enrollments WHERE course_section_id=#{self.id})")
+    end
+  end
 
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
@@ -103,7 +117,6 @@ class CourseSection < ActiveRecord::Base
       self.section_code = self.name
       self.long_section_code = self.name
     end
-    self.enrollment_term = self.root_account.default_enrollment_term if self.enrollment_term_id.nil?
   end
   
   def defined_by_sis?
