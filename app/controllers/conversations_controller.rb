@@ -217,6 +217,14 @@ class ConversationsController < ApplicationController
     render :json => recipients
   end
 
+  def watched_intro
+    unless @current_user.watched_conversations_intro?
+      @current_user.watched_conversations_intro
+      @current_user.save
+    end
+    render :json => {}
+  end
+  
   attr_writer :avatar_size
 
   private

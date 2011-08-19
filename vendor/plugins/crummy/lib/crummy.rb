@@ -73,7 +73,7 @@ module Crummy
     
     # Add a crumb to the +crumbs+ array
     def add_crumb(name, url=nil, options = {})
-      crumbs.push [name, url]
+      crumbs.push [name, url, options]
     end
     
     # Render the list of crumbs 

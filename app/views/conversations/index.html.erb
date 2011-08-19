@@ -1,4 +1,5 @@
 <% content_for :page_title, t(:page_title, "Conversations") %>
+<% add_crumb "", '#', :id => 'help_crumb' %>
 
 <% jammit_js :messages %>
 <% jammit_css :messages %>
@@ -220,5 +221,8 @@
     MessageInbox.initial_conversations_count = <%= @conversations_count %>;
     MessageInbox.scope = <%= raw @scope.to_json %>;
     MessageInbox.label_scope = <%= raw @label.to_json %>;
+    <% unless @current_user.watched_conversations_intro? %>
+    $.conversationsIntroSlideshow()
+    <% end %>
   </script>
 <% end %>

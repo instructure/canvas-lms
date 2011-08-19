@@ -1338,6 +1338,10 @@
       $form = $('#create_message_form');
       $add_form = $('#add_recipients_form');
       $forward_form = $('#forward_message_form');
+      $('#help_crumb').click(function(e) {
+        e.preventDefault();
+        return $.conversationsIntroSlideshow();
+      });
       $('#create_message_form, #forward_message_form').find('textarea').elastic().keypress(function(e) {
         if (e.which === 13 && e.shiftKey) {
           e.preventDefault();
