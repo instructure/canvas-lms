@@ -175,7 +175,7 @@ class GradebooksController < ApplicationController
         format.csv {
           cancel_cache_buster
           send_data(
-            @context.gradebook_to_csv, 
+            @context.gradebook_to_csv(:include_sis_id => @context.grants_right?(@current_user, session, :manage_students)),
             :type => "text/csv", 
             :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv", 
             :disposition => "attachment"

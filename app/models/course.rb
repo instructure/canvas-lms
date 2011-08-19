@@ -1097,6 +1097,8 @@ class Course < ActiveRecord::Base
     read_only = t('csv.read_only_field', '(read only)')
     t 'csv.student', 'Student'
     t 'csv.id', 'ID'
+    t 'csv.sis_user_id', 'SIS User ID'
+    t 'csv.sis_login_id', 'SIS Login ID'
     t 'csv.section', 'Section'
     t 'csv.comments', 'Comments'
     t 'csv.current_score', 'Current Score'
@@ -1105,7 +1107,9 @@ class Course < ActiveRecord::Base
     t 'csv.points_possible', 'Points Possible'
     res = FasterCSV.generate do |csv|
       #First row
-      row = ["Student", "ID", "Section"]
+      row = ["Student", "ID"]
+      row.concat(["SIS User ID", "SIS Login ID"]) if options[:include_sis_id]
+      row << "Section"
       row.concat(assignments.map{|a| single ? [a.title_with_id, 'Comments'] : a.title_with_id})
       row.concat(["Current Score", "Final Score"])
       row.concat(["Final Grade"]) if self.grading_standard_id
@@ -1128,7 +1132,9 @@ class Course < ActiveRecord::Base
           single ? data : data[0]
         end
         #Last Row
-        row = [student.last_name_first, student.id, student_section]
+        row = [student.last_name_first, student.id]
+        row.concat([student.pseudonym.try(:sis_user_id), student.pseudonym.try(:sis_source_id)]) if options[:include_sis_id]
+        row << student_section
         row.concat(student_submissions)
         row.concat([student_enrollment.computed_current_score, student_enrollment.computed_final_score])
         if self.grading_standard_id

@@ -214,6 +214,31 @@ describe Course, "gradebook_to_csv" do
     rows[1][-3].should == "(read only)"
     rows[2][-3].should == "90"
   end
+
+  it "should include sis ids if enabled" do
+    user_with_pseudonym(:active_all => true)
+    course(:active_all => true)
+    student_in_course(:user => @user)
+    @user.pseudonym.sis_user_id = "SISUSERID"
+    @user.pseudonym.sis_source_id = "SISLOGINID"
+    @user.pseudonym.save!
+    @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
+    @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+    @assignment.grade_student(@user, :grade => "10")
+    @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+    @course.recompute_student_scores
+    @user.reload
+    @course.reload
+
+    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv.should_not be_nil
+    rows = FasterCSV.parse(csv)
+    rows.length.should equal(3)
+    rows[0][2].should == 'SIS User ID'
+    rows[0][3].should == 'SIS Login ID'
+    rows[2][2].should == 'SISUSERID'
+    rows[2][3].should == 'SISLOGINID'
+  end
 end
 
 describe Course, "merge_into" do
