@@ -1,3 +1,13 @@
+canvas-lms (1.1-51) professional; urgency=low
+
+  * Package ref: 7c1e9795061979475ec1d6f9b1b86de72728829b
+  *
+  * [+997fb7e] fix direct file downloads
+  * [+167f59d] fix some whitespace in conversation emails
+  * [+7c1e979] fixing some conversations slides language
+
+ -- JT Olds <jt@instructure.com>  Sat, 20 Aug 2011 13:53:00 -0600
+
 canvas-lms (1.1-50) professional; urgency=low
 
   * Package ref: 6c33d7a5d1920b7a344f4da223c8b17f244b4e8c
