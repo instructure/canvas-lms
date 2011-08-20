@@ -1,6 +1,6 @@
 I18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}')] +
                   Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'locales', '**', '*.{rb,yml}')]
-I18n.load_path -= Dir[Rails.root.join('config', 'locales', 'generated', '**', '*.{rb,yml}')] unless ENV["RAILS_ENV"] == "production"
+I18n.load_path -= Dir[Rails.root.join('config', 'locales', 'generated', '**', '*.{rb,yml}')]
 I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
 Gem.loaded_specs.values.each do |spec|
