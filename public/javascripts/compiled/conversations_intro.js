@@ -17,8 +17,8 @@
       });
       introSlideshow.addSlide(I18n.t('titles.slide3', 'Slide 3'), function(slide) {
         slide.addImage('/images/conversations/intro/image3.png', 'screenshot');
-        slide.addParagraph(I18n.t('slide3.paragraph1', 'Conversations can be marked as read/unread, labelled, or archived by color using the “actions” button on the message.'));
-        return slide.addParagraph(I18n.t('slide3.paragraph2', 'Archived messages aren’t deleted, they’re just moved out of your inbox, so you access them again if needed.'));
+        slide.addParagraph(I18n.t('slide3.paragraph1', 'Conversations can be marked as read/unread, labeled, or archived by color using the “actions” button on the message.'));
+        return slide.addParagraph(I18n.t('slide3.paragraph2', 'Archived messages aren\'t deleted, they\'re just moved out of your inbox, so you can access them again if needed.'));
       });
       introSlideshow.addSlide(I18n.t('titles.slide4', 'Slide 4'), function(slide) {
         slide.addImage('/images/conversations/intro/image4.png', 'screenshot');
@@ -30,7 +30,7 @@
       });
       introSlideshow.addSlide(I18n.t('titles.slide6', 'Slide 6'), function(slide) {
         slide.addImage('/images/conversations/intro/image6.png', 'screenshot');
-        slide.addParagraph(I18n.t('slide6.paragraph1', 'In the New Message box, start typing the person, or group’s name, and they\'ll show up in the dropdown. Alternatively, you can click the address book icon to find someone if you don’t remember a name.'));
+        slide.addParagraph(I18n.t('slide6.paragraph1', 'In the New Message box, start typing the person, or group\'s name, and they\'ll show up in the dropdown. Alternatively, you can click the address book icon to find someone if you don\'t remember a name.'));
         return slide.addParagraph(I18n.t('slide6.paragraph2', 'Type your message, click Send, and you\'re golden.'));
       });
       introSlideshow.addSlide(I18n.t('titles.slide7', 'Slide 7'), function(slide) {
@@ -45,7 +45,7 @@
       });
       introSlideshow.addSlide(I18n.t('titles.slide9', 'Slide 9'), function(slide) {
         slide.addImage('/images/conversations/intro/image9.png', 'screenshot', 'http://www.youtube.com/watch?v=NWqIaEyVWZM');
-        slide.addParagraph(I18n.t('slide9.paragraph1', 'We think you\'ll find Conversations simple, and easy to use.'));
+        slide.addParagraph(I18n.t('slide9.paragraph1', 'We think you\'ll find Conversations simple and easy to use.'));
         slide.addParagraph(I18n.t('slide9.paragraph2', 'Check out this short introduction video to see Conversations in action.'));
         return slide.addParagraph(I18n.t('slide9.paragraph3', 'Your old messages have been organized into Conversations for you. So what are you waiting for? Get started!'));
       });
