@@ -7,7 +7,6 @@
 <% define_content :subject do %>
   <%= t :subject, "%{user_name} just added you to a conversation in Canvas.", :user_name => content(:user_name) %>
 <% end %>
-
 <%= t :body, "%{user_name} just added you to a conversation in Canvas. To view the conversation, click the link below:", :user_name => content(:user_name) %>
 
 <%= content :link %>
