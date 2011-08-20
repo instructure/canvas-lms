@@ -1,3 +1,178 @@
+canvas-lms (1.1-49) professional; urgency=low
+
+  * Package ref: 44f4dd0277fdcd4c86ecd68999ae86848d286697
+  *
+  * [-d7b6330] conversations teaser
+  * [+7e9183b] models and controllers for new messaging, refs #3977
+  * [+b90efd5] Merge remote-tracking branch 'origin/master' into dev/conversations
+  * [+bfd4138] Merge remote-tracking branch 'origin/master' into dev/conversations
+  * [+a6b85ef] new messaging ui
+  * [+4e6ccff] message recipient finder/selector
+  * [+a0a014e] ConversationsController#batch_pm
+  * [+daee1ab] ability to add participants to a conversation
+  * [+3f0aa87] yamlize conversation event messages
+  * [+4b02e3b] ContextMessage->ConversationMessage notifications
+  * [+62c25da] remove ContextMessages from context/inbox
+  * [+d169efb] use conversation_id, not conversation_participant_id
+  * [+7214776] User notes from conversation messages; still needs UI
+  * [+7eff1ba] change reply_from to use conversations
+  * [+0d86332] Conversations in the dashboard stream
+  * [+8ccaabb] finish tearing out ContextMessage
+  * [+1853c72] fix attendance message user link
+  * [+f95bb47] allow admins to message anyone in their accounts
+  * [+7e0b092] generate conversation messages from new submission comments
+  * [+17921bb] fix adding message on dashboard
+  * [+d41900c] top right Inbox links to new conversations
+  * [+20c8257] ConversationMessage#reply_from for e-mail replies
+  * [+249b654] add a configuration test utility for LDAP settings
+  * [+bdca88a] improvements to teacher interactions report
+  * [+b01bc2f] don't always show Wimba conferences fixes #5071
+  * [+043c92e] don't raise when ldap host is invalid
+  * [+103116e] scope cached fragments to locale, fix some caching issues
+  * [+165d79e] dead code removal
+  * [+15d7a43] reword "nth of m students" to get rid of ordinal
+  * [+7bdbd57] use a machine-oriented value for role detection
+  * [+a32bacd] Files missed i18n
+  * [+aa69f2b] masquerading missed i18n
+  * [+828a58b] don't fail zipping empty folders.  fixes #5002
+  * [+8bd6264] s/TA's/TAs/g  fixes #5062
+  * [+0a2d17e] i18n text in instructure.js and instructure_helper.js
+  * [+de8b88c] fix some encoding issues with spanish translation
+  * [+07454ec] user lists missed I18n
+  * [+bab865a] missed I18n on teacher activity report
+  * [+64c5c0d] fix #5043 linking observers to enrollments
+  * [+0ddc615] Merge branch 'dev/datetime' into 'master'
+  * [+2d6e299] Merge branch 'master' into 'dev/conversations'
+  * [+8bdf016] fix file_uploads_progress display
+  * [+a12663b] i18n "Posting Message..."
+  * [+11aca38] speed up loading sub-accounts as options
+  * [+cd036b9] remove mailbox cruft
+  * [+57fc782] hide Copy Course button for non-authorized users fixes #4882
+  * [+16fef76] put localization js bundles in a separate assets file
+  * [+7b748e5] fix disappearing folder names on rename; fixes #5199
+  * [+80907b4] fixes #4983 conferences for groups
+  * [+cb791bd] send new submission comment notifications even when the submission is new
+  * [+fdf20c8] fix tab css classes for non-english
+  * [+629fe79] fix i18n of UserProfile tabs
+  * [+fd4af6b] fixes #5221 unpublished quiz explosions
+  * [+59af489] show tooltip on focus
+  * [+abdcdfd] use the dialog's title instead of an extra <h3>
+  * [+b09cf20] sort final grades numerically, not lexicographically
+  * [+944f901] fix error on generating podcast with deleted media object
+  * [+0dee9d2] only view rubrics in speedgrader; fixes #4550
+  * [+4428329] ensure that quiz creation has an assignment group
+  * [+5e9a713] fix showing wrong secondary ldap info; fixes #5218
+  * [+00c23f0] fix flickr image search in eportfolios; fixes #5198
+  * [+3760279] remove line breaks from I18n en strings
+  * [+cb80806] i18n typo in assignment lock_at display, fixes #5246
+  * [+ec12b72] s/TAEnrollment/TaEnrollment , fixes #5248
+  * [+a429bb8] fixes #5078 duplicate discussions
+  * [+6f65fa3] only allow api_key to replace authenticity_token if basic auth is used
+  * [+deeda33] change tooltip to "unset" for multiple answers questions fixes #3025
+  * [+dd139fd] don't redirect to gradebook when switching course in grades
+  * [+8b50ee8] put create_media_object back
+  * [+a641bc4] integrated new messaging design, added forward functionality
+  * [+a8d8775] incorrect escaping of relative file paths with safefiles, fixes #5266
+  * [+8f4265e] clearing out assignment submissions so graded -> ungraded -> graded quiz submissions show up again
+  * [+8e45db8] remove empty 'not receiving tweets' help
+  * [+f5d7c4b] clean up some routes (fix priority, remove cruft)
+  * [+3276fd7] allow both audio and video for submission comments
+  * [+b365936] use kept_score for quizzes when evaluating module requirements
+  * [+40973e1] support http basic auth for grade exchange
+  * [+cd6b327] fix avatar moderation page
+  * [+6a65bf5] add setting for hiding total in grade summary
+  * [+50ac28f] hide description from locked assignments on the calendar; fixes #5215
+  * [+5a0937c] fix auto-require problem in hudson build
+  * [+c17824c] fix content pane doesn't appear when creating an event; fixes #5072
+  * [+939fd06] let $.replaceTags take a dictionary
+  * [+1b2beb0] return sis_section_id in api response
+  * [+ff13e31] use the same wording for 'my dashboard' in crumbs
+  * [+3868e9c] make the creative commons license help accessible
+  * [+e095d9c] have qti specs use qti migrator and fix matching bug
+  * [+ba585cf] add support for another flavor of qti
+  * [+97875c1] qti options hash refactor
+  * [+6c148bc] qti importer tweeks to support new qti source
+  * [+9c3e9f7] enforce course creation permissions fixes #5188
+  * [+4db7bba] cinch up admin permissions wrt stuff available in the accounts section
+  * [+56069d8] simplify permission policies for Course and Account
+  * [+41720dd] prompt to overwrite/rename new files with duplicate names; refs #5131
+  * [+1ad1080] pin closure-compiler to 1.0.0
+  * [+be34b30] typo causing qti/respondus question groups to fail to import
+  * [+0cc2f48] Merge remote-tracking branch 'origin/stable/2011-08-20' into dev/conversations
+  * [+f5c5292] add columns for media comments so the user can be the context
+  * [+ffcfad5] added states so we can retire messages w/o deleting them yet
+  * [+59f96c6] added monologue support (i.e. notes to self) to conversations
+  * [+8e0bc39] context_message -> conversation migration
+  * [+871086c] performance fix for mysql
+  * [+44f2718] fix index typo
+  * [+02f644a] some migration speedups
+  * [+5549cfd] fix update query performance in mysql
+  * [+550970a] friendlier dates/times for conversation pane
+  * [+2cf4145] fix browser history issues and firefox bug
+  * [+bfc4f4a] fix forwarding bug and display issues
+  * [+a4177f4] de-dup context_message_participants
+  * [+1375cc9] allow admins to unenroll themselves from courses
+  * [+dd943f8] fix showing course creation in UI refs #5188
+  * [+6d80ef3] fix show create course button for realz (with tests)
+  * [+b4da106] fix importing active enrollments in courses with date restrictions
+  * [+c1e9763] Merge remote branch 'origin/stable/2011-08-20' into stable/2011-08-20-canvasations
+  * [+3c9498c] conversation url changes, old inbox linking/cleanup
+  * [+d2f04c9] submission comment inbox_item cleanup
+  * [+8360ebd] typo fix
+  * [+4bd180b] kill the "file added" notifications
+  * [+e654aa3] fix a few urls
+  * [+dd98e10] fix added_to_conversation notification specs
+  * [+c16ef14] fix auto-private of one-on-ones
+  * [+8397551] attachments and media comments for new conversations
+  * [+4a9cb12] media comments context on user
+  * [+281311b] submissions.has_admin_comment
+  * [+123e3e6] allow folder paths to be longer than 255 characters
+  * [+2d56d35] Merge remote branch 'origin/stable/2011-08-20' into stable/2011-08-20-canvasations
+  * [+b1c26e9] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [+3867012] ability to send bulk private messages
+  * [+11d27fe] submission comments inline with conversations
+  * [+073d447] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [+4f84071] load all the latest messages for conversations at once
+  * [+e931bf5] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [+1389a53] fix the submission score view in messages
+  * [+b45abf2] fix a couple fragment hash issues
+  * [+9ff5f7d] s/Messages/Conversations/
+  * [+be5c679] fix styling and ordering of forwarded messages
+  * [+1124798] section and observer visibility checks
+  * [+aaaa31e] autocomplete loading indicator
+  * [+40cc479] infinite scrolling of conversations list
+  * [+53c7c6b] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [+482213c] fix up dialog styles
+  * [+0c1374a] allow replies to deleted conversations
+  * [+009e620] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [+388e97b] generated en.yml for translation
+  * [+0f83ada] load conversation messages for a conversation not yet loaded yet
+  * [+40c86ae] fix ie file upload issue
+  * [+01a6ce1] have shift-enter submit the message form
+  * [+081668c] don't list this until it's supported
+  * [+b543701] conversation message notifications prefs
+  * [+92e5764] fix discussion reply pageless loading
+  * [+4e896d8] make "Message <User>" link work with new inbox
+  * [+c03baf4] make the message actions panel slide up and down
+  * [+699454c] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [+310ce6a] fix some display issues w/ long names and context lists
+  * [+2b19f29] don't select the current message when "New Message" is clicked
+  * [+1fe1540] clear the label if all messages have been removed, fixes #5346
+  * [+b22cb8f] get rid of hover transition
+  * [+5e7cb01] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [+834e38e] conversations intro slideshow
+  * [+1d0834a] Merge remote branch 'origin/dev/conversations' into stable/2011-08-20-canvasations
+  * [+6a96c1d] fix peer reviews
+  * [+687bdf6] Merge remote branch 'origin/stable/2011-08-20' into stable/2011-08-20-canvasations
+  * [+1c4a8c8] don't include generated locales for now
+  * [+2a9e825] Merge remote branch 'origin/stable/2011-08-20' into stable/2011-08-20-canvasations
+  * [+dfc6d62] bigger text in convo intro
+  * [+4e7f9e5] scope I18n in slideshow tooltips
+  * [+a2a97a0] compiled js for 59f29a6
+  * [+44f4dd0] fix notification pref migration
+
+ -- JT Olds <jt@instructure.com>  Sat, 20 Aug 2011 08:26:39 -0600
+
 canvas-lms (1.1-48) professional; urgency=low
 
   * Package ref: d7b633089707c33a412749f37a394b0a2e9a0074
