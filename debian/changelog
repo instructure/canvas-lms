@@ -1,3 +1,12 @@
+canvas-lms (1.1-50) professional; urgency=low
+
+  * Package ref: 6c33d7a5d1920b7a344f4da223c8b17f244b4e8c
+  *
+  * [+c1cbcea] fix adding recipients in firefox
+  * [+6c33d7a] put in name, subject, and fake body for Added To Conversation notification
+
+ -- JT Olds <jt@instructure.com>  Sat, 20 Aug 2011 09:41:22 -0600
+
 canvas-lms (1.1-49) professional; urgency=low
 
   * Package ref: 44f4dd0277fdcd4c86ecd68999ae86848d286697
