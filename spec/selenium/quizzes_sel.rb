@@ -246,10 +246,10 @@ shared_examples_for "quiz selenium tests" do
     
     button = dialog.find_element(:css, "button.send_button")
     button.click
-    keep_trying_until{ button.text != "Sending message..." }
+    keep_trying_until{ button.text != "Sending Message..." }
     button.text.should eql("Message Sent!")
 
-    student.conversations(true).size.should eql(1)
+    student.conversations.size.should eql(1)
   end
 
   it "should tally up question bank question points" do

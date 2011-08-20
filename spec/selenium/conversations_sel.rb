@@ -15,7 +15,12 @@ shared_examples_for "conversations selenium tests" do
 
       if browser = find_with_jquery("#create_message_form .browser:visible")
         browser.click
-        keep_trying_until{ find_with_jquery('.selectable:visible').click }
+        keep_trying_until{
+          if elem = find_with_jquery('.selectable:visible')
+            elem.click
+          end
+          elem
+        }
       end
 
       find_with_jquery("#create_message_form textarea").send_keys(opts[:message])
@@ -35,8 +40,13 @@ shared_examples_for "conversations selenium tests" do
       message
     end
 
-    it "should be able to add an attachment to the message form" do
+    before do
       course_with_teacher_logged_in
+      @user.watched_conversations_intro
+      @user.save
+    end
+
+    it "should be able to add an attachment to the message form" do
       new_conversation
 
       add_attachment_link = driver.find_element(:id, "action_add_attachment")
@@ -47,7 +57,6 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should be able to add multiple attachments to the message form" do
-      course_with_teacher_logged_in
       new_conversation
 
       add_attachment_link = driver.find_element(:id, "action_add_attachment")
@@ -58,7 +67,6 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should be able to remove attachments from the message form" do
-      course_with_teacher_logged_in
       new_conversation
 
       add_attachment_link = driver.find_element(:id, "action_add_attachment")
@@ -69,7 +77,6 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should save attachments on initial messages on new conversations" do
-      course_with_teacher_logged_in
       student_in_course
       filename, fullpath, data = get_file("testfile1.txt")
 
@@ -84,7 +91,6 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should save attachments on new messages on existing conversations" do
-      course_with_teacher_logged_in
       student_in_course
       filename, fullpath, data = get_file("testfile1.txt")
 
@@ -98,7 +104,6 @@ shared_examples_for "conversations selenium tests" do
     end
 
     it "should save multiple attachments" do
-      course_with_teacher_logged_in
       student_in_course
       file1 = get_file("testfile1.txt")
       file2 = get_file("testfile2.txt")
