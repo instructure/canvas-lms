@@ -3,7 +3,7 @@ module ConversationsHelper
     return [] unless @contexts
     contexts.inject([]) { |ary, (type, ids)|
       ary += ids.map { |id| @contexts[type][id.to_i] && @contexts[type][id.to_i][:name] || nil }.compact
-    }
+    }.sort_by(&:downcase)[0, 2] # TODO: return all, but only show a couple in the ui like we do with recipients (click to see others)
   end
 
   def formatted_contexts(contexts)

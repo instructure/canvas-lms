@@ -678,11 +678,13 @@
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-      if ((_ref = post_data.limit) == null) {
+            if ((_ref = post_data.limit) != null) {
+        _ref;
+      } else {
         post_data.limit = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
-      }
+      };
       return post_data;
     };
     return TokenSelector;
@@ -860,8 +862,11 @@
         });
       }
     };
-    MessageInbox.shared_contexts_for_user = function(user) {
+    MessageInbox.shared_contexts_for_user = function(user, limit) {
       var course, course_id, group, group_id, shared_contexts;
+      if (limit == null) {
+        limit = 2;
+      }
       shared_contexts = ((function() {
         var _i, _len, _ref, _results;
         _ref = user.course_ids;
@@ -885,7 +890,17 @@
         }
         return _results;
       }).call(this));
-      return shared_contexts.join(", ");
+      return shared_contexts.sort(function(a, b) {
+        a = a.toLowerCase();
+        b = b.toLowerCase();
+        if (a < b) {
+          return -1;
+        } else if (a > b) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }).slice(0, limit).join(", ");
     };
     html_name_for_user = function(user) {
       var shared_contexts;
@@ -902,9 +917,11 @@
         $message.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $message.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -916,7 +933,9 @@
         user_name: encodeURIComponent(user_name),
         from_conversation_id: $selected_conversation.data('id')
       });
-      $pm_action.attr('href', pm_url);
+      $pm_action.attr('href', pm_url).click(function(e) {
+        return e.stopPropagation();
+      });
       if ((_ref3 = data.forwarded_messages) != null ? _ref3.length : void 0) {
         $ul = $('<ul class="messages"></ul>');
         _ref4 = data.forwarded_messages;
@@ -981,9 +1000,11 @@
       $header.find('a').attr('href', href);
       user = MessageInbox.user_cache[data.author_id];
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $header.find('.title').html($.h(data.title));
@@ -1042,9 +1063,11 @@
         $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1400,7 +1423,9 @@
       });
       $message_list.click(function(e) {
         var $message;
-        if ($(e.target).closest('a.instructure_inline_media_comment').length) {} else {
+        if ($(e.target).closest('a.instructure_inline_media_comment').length) {
+          ;
+        } else {
           $message = $(e.target).closest('#messages > ul > li');
           if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {
@@ -1783,6 +1808,7 @@
               $span.text(MessageInbox.shared_contexts_for_user(data));
             }
             $node.append($b, $span);
+            $node.attr('title', data.name);
             $node.data('id', data.id);
             $node.addClass(data.type ? data.type : 'user');
             if (options.level > 0) {

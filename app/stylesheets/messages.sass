@@ -395,10 +395,13 @@ button.button, .ui-dialog .ui-dialog-buttonpane button.ui-button
   +border-radius(13px)
   background: #bbb url(/images/messages/button-bg.png) 0 0 repeat-x !important
   +box-shadow( rgba(0,0,0,0.1), 0, 1px, 2px, 1px )
-button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button:hover
+button.button:hover, .ui-dialog .ui-dialog-buttonpane button.ui-button.ui-state-hover
   background-position: 0 -22px !important
   border-color: #aaa
   +box-shadow( rgba(0,0,0,0.1), 0, 1px, 2px, 1px )
+  transition: none
+  -webkit-transition: none
+  -moz-transition: none
 .ui-dialog .ui-dialog-buttonpane button.ui-button span
   padding: 0
 
@@ -773,12 +776,14 @@ li.purple .label_icon, .purple.label_icon
       float: left
       margin-right: 6px
       background: transparent url(/images/messages/avatar-sprites.png) 0 0 no-repeat
-    b
+    b, span
       display: block
+      white-space: nowrap
+      overflow: hidden
+    b
       color: #000
       text-shadow: none
     span
-      display: block
       color: #2571bd
       font-weight: bold
       font-size: 0.8em
