@@ -7,7 +7,7 @@
           case current_enrollment.type
           when 'TeacherEnrollment'
             mt :body_teacher, "You've been invited to join %{course} as a **teacher** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
-          when 'TAEnrollment'
+          when 'TaEnrollment'
             mt :body_ta, "You've been invited to join %{course} as a **TA** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
           when 'ObserverEnrollment'
             mt :body_observer, "You've been invited to join %{course} as an **observer** for the user account **%{email_address}**.", :course => current_enrollment.long_name, :email_address => current_enrollment.user.email
@@ -47,7 +47,7 @@
        case current_enrollment.type
        when 'TeacherEnrollment'
          message = t('enrolled_as_teacher', "Enrolled as a teacher")
-       when 'TAEnrollment'
+       when 'TaEnrollment'
          message = t('enrolled_as_ta', "Enrolled as a TA")
        when 'ObserverEnrollment'
          message = t('enrolled_as_observer', "Enrolled as an observer")

@@ -32,7 +32,8 @@ class UserNotesController < ApplicationController
   
    def user_notes
     get_context
-    if authorized_action(@context, @current_user, :manage)
+    return render 'shared/unauthorized' unless (@context.root_account || @context).enable_user_notes
+    if authorized_action(@context, @current_user, :manage_user_notes)
       if @context && @context.is_a?(Account)
         @users = @context.all_users.active.has_current_student_enrollments
       else #it's a course
@@ -46,8 +47,8 @@ class UserNotesController < ApplicationController
   end
 
   def show
+    @user_note = UserNote.find_by_id(params[:id])
     if authorized_action(@user_note, @current_user, :read)
-      @user_note = UserNote.find(params[:id])
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
         format.xml { render :xml => @user_note }
@@ -58,12 +59,14 @@ class UserNotesController < ApplicationController
   end
 
   def create
-    params[:user_note][:user] = User.find(params[:user_note].delete(:user_id))
+    params[:user_note] = {} unless params[:user_note].is_a? Hash
+    params[:user_note][:user] = User.find_by_id(params[:user_note].delete(:user_id)) if params[:user_note][:user_id]
+    params[:user_note][:user] ||= User.find_by_id(params[:user_id])
     # We want notes to be an html field, but we're only using a plaintext box for now. That's why we're
     # doing the trip to html now, instead of on the way out. This should be removed once the user notes
     # entry form is replaced with the rich text editor.
     self.extend TextHelper
-    params[:user_note][:note] = format_message(params[:user_note][:note]).first
+    params[:user_note][:note] = format_message(params[:user_note][:note]).first if params[:user_note][:note]
     @user_note = UserNote.new(params[:user_note])
     @user_note.creator = @current_user
     

@@ -68,26 +68,85 @@ module ApplicationHelper
   end
 
   def lock_explanation(hash, type, context=nil)
-    res = "This #{type} "
-    hash ||= {}
+    # Any additions to this function should also be made in javascripts/content_locks.js
     if hash[:lock_at]
-      res += "was locked #{datetime_string(hash[:lock_at])}"
+      case type
+      when "quiz"
+        return I18n.t('messages.quiz_locked_at', "This quiz was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+      when "assignment"
+        return I18n.t('messages.assignment_locked_at', "This assignment was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+      when "topic"
+        return I18n.t('messages.topic_locked_at', "This topic was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+      when "file"
+        return I18n.t('messages.file_locked_at', "This file was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+      when "page"
+        return I18n.t('messages.page_locked_at', "This page was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+      else
+        return I18n.t('messages.content_locked_at', "This content was locked %{at}.", :at => datetime_string(hash[:lock_at]))
+      end
     elsif hash[:unlock_at]
-      res += "is locked until #{datetime_string(hash[:unlock_at])}"
+      case type
+      when "quiz"
+        return I18n.t('messages.quiz_locked_until', "This quiz is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+      when "assignment"
+        return I18n.t('messages.assignment_locked_until', "This assignment is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+      when "topic"
+        return I18n.t('messages.topic_locked_until', "This topic is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+      when "file"
+        return I18n.t('messages.file_locked_until', "This file is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+      when "page"
+        return I18n.t('messages.page_locked_until', "This page is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+      else
+        return I18n.t('messages.content_locked_until', "This content is locked until %{date}.", :date => datetime_string(hash[:unlock_at]))
+      end
     elsif hash[:context_module]
       obj = hash[:context_module].is_a?(ContextModule) ? hash[:context_module] : OpenObject.new(hash[:context_module])
-      res += "hasn't been unlocked yet.  It is part of the module <b>#{obj.name}</b>."
+      html = case type
+        when "quiz"
+          I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.",
+            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+        when "assignment"
+          I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.",
+            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+        when "topic"
+          I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.",
+            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+        when "file"
+          I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.",
+            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+        when "page"
+          I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.",
+            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+        else
+          I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.",
+            :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+        end
       if context
-        res += "<br/><a href='#{context_url(context, :context_context_modules_url)}'>Visit the #{context.class.to_s.downcase} modules page for information on how to unlock this content.</a>"
-        res += "<a href='#{context_url(context, :context_context_module_prerequisites_needing_finishing_url, obj.id, hash[:asset_string])}' style='display: none;' id='module_prerequisites_lookup_link'>&nbsp;</a>"
+        html << "<br/>".html_safe
+        html << I18n.t('messages.visit_modules_page', "*Visit the course modules page for information on how to unlock this content.*",
+          :wrapper => "<a href='#{context_url(context, :context_context_modules_url)}'>\\1</a>")
+        html << "<a href='#{context_url(context, :context_context_module_prerequisites_needing_finishing_url, obj.id, hash[:asset_string])}' style='display: none;' id='module_prerequisites_lookup_link'>&nbsp;</a>".html_safe
         jammit_js :prerequisites_lookup
       end
+      return html
     else
-      res += "is currently locked"
+      case type
+      when "quiz"
+        return I18n.t('messages.quiz_locked', "This quiz is currently locked.")
+      when "assignment"
+        return I18n.t('messages.assignment_locked', "This assignment is currently locked.")
+      when "topic"
+        return I18n.t('messages.topic_locked', "This topic is currently locked.")
+      when "file"
+        return I18n.t('messages.file_locked', "This file is currently locked.")
+      when "page"
+        return I18n.t('messages.page_locked', "This page is currently locked.")
+      else
+        return I18n.t('messages.content_locked', "This quiz is currently locked.")
+      end
     end
-    raw(res)
   end
-  
+
   def avatar_image(user_id, height=50)
     if session["reported_#{user_id}"]
       image_tag "no_pic.gif"
@@ -272,11 +331,11 @@ var I18n = I18n || {};
   def section_tabs
     @section_tabs ||= begin
       if @context 
-        Rails.cache.fetch([@context, @current_user, "section_tabs"].cache_key) do
-          if @context.respond_to?(:tabs_available) && !@context.tabs_available(@current_user).empty?
+        Rails.cache.fetch([@context, @current_user, "section_tabs", I18n.locale].cache_key) do
+          if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user)).empty?
             html = []
             html << '<nav role="navigation"><ul id="section-tabs">'
-            tabs = @context.tabs_available(@current_user).select do |tab|
+            tabs = tabs.select do |tab|
               if (tab[:id] == @context.class::TAB_CHAT rescue false)
                 tab[:href] && tab[:label] && feature_enabled?(:tinychat)
               elsif (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
@@ -289,7 +348,7 @@ var I18n = I18n || {};
             end
             tabs.each do |tab|
               path = tab[:no_args] ? send(tab[:href]) : send(tab[:href], @context)
-              html << "<li class='section #{"hidden" if tab[:hidden] || tab[:hidden_unused] }'>" + link_to(tab[:label], path, :class => tab[:label].to_css_class) + "</li>" if tab[:href]
+              html << "<li class='section #{"hidden" if tab[:hidden] || tab[:hidden_unused] }'>" + link_to(tab[:label], path, :class => tab[:css_class].to_css_class) + "</li>" if tab[:href]
             end
             html << "</ul></nav>"
             html.join("")
@@ -327,28 +386,9 @@ var I18n = I18n || {};
   end
 
   def show_user_create_course_button(user)
-    return false if user.nil?
-    root_account = @domain_root_account || user.account.root_account || user.account
-    
-    # admins can always create courses
-    return true if root_account.account_users.find_by_user_id(user.id)
-    
-    if root_account.settings[:teachers_can_create_courses] != false
-      count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('TeacherEnrollment', 'DesignerEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
-      return true if count > 0
-    end
-    if root_account.settings[:students_can_create_courses] != false
-      count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('StudentEnrollment', 'ObserverEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
-      return true if count > 0
-    end
-    if root_account.settings[:no_enrollments_can_create_courses] != false
-      count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.workflow_state != 'deleted' AND root_account_id = #{root_account.id}").count
-      return true if count == 0
-    end
-    
-    false
+    @domain_root_account.manually_created_courses_account.grants_rights?(user, session, :create_courses, :manage_courses).values.any?
   end
-  
+
   def hash_get(hash, key, default=nil)
     if hash
       if hash[key.to_s] != nil
@@ -446,5 +486,13 @@ var I18n = I18n || {};
 
   def join_title(*parts)
     parts.join(t('#title_separator', ': '))
+  end
+
+  def cache(name = {}, options = nil, &block)
+    unless options && options[:no_locale]
+      name = name.cache_key if name.respond_to?(:cache_key)
+      name = name + "/#{I18n.locale}" if name.is_a?(String)
+    end
+    super
   end
 end

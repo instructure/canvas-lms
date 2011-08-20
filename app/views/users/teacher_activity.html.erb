@@ -1,9 +1,15 @@
 <% jammit_css :reports %>
+<% jammit_js :teacher_activity_report %>
+<% add_crumb(t('crumbs.interaction_report', "Student Interactions Report")) %>
+
 <% content_for :page_title, t('title', 'Teacher Activity Report') %>
 <% content_for :stylesheets do %>
 <style type="text/css" media="screen">
   a.view_full_link {
     font-size: 85%;
+  }
+  table.report td {
+    vertical-align: top;
   }
 </style>
 <% end %>
@@ -16,7 +22,7 @@
   <% if students.blank? %>
     <%= t 'no_students', 'There are no students to report on.' %>
   <% else %>
-  <table class='report'>
+  <table class='report sortable <%= 'has_user_notes' if has_user_notes %>'>
     <thead>
       <tr>
         <th><%= t 'headings.student_name', %{Student} %></th>
@@ -27,12 +33,17 @@
         <th><%= t('headings.current_score', %{Current Score}) %></th>
         <th><%= t('headings.final_score', %{Final Score}) %></th>
         <th><%= t('headings.ungraded', %{Ungraded Assignments}) %></th>
+        <% if course.user_is_teacher?(@current_user) %>
+          <th>&nbsp;</th>
+        <% end %>
       </tr>
     </thead>
     <tbody>
-      <% students.each do |student| %>
+      <% students.each_with_index do |student, idx| %>
         <tr>
-          <td><%= link_to(student[:enrollment].user.name, course_user_url(course, student[:enrollment].user_id)) %></td>
+          <td data-number="<%= idx %>">
+            <%= link_to(student[:enrollment].user.name, course_user_url(course, student[:enrollment].user_id)) %>
+          </td>
           <td>
             <% if student[:last_interaction] %>
               <%= t 'last_time', { :zero => "less than 1 day ago", :one => "1 day ago", :other => "%{count} days ago" }, :count => (((Time.now - student[:last_interaction])/60)/1440).abs.to_i %>
@@ -52,11 +63,21 @@
           <% end %>
           <td><%= number_to_percentage(student[:enrollment].computed_current_score, :precision => 1) %></td>
           <td><%= number_to_percentage(student[:enrollment].computed_final_score, :precision => 1) %></td>
-          <td>
+          <td data-number="<%= (student[:ungraded].map(&:submitted_at).compact.max || 1.day.from_now).to_i / 3600 %>">
             <% student[:ungraded].each do |submission| %>
               <%= link_to(submission.assignment.title, speed_grader_course_gradebook_path(course, :assignment_id => submission.assignment.id, :anchor => { :student_id => student[:enrollment].user_id }.to_json)) %><br/>
+              <div style="padding-bottom: 5px; margin-top: -2px; padding-left: 20px; font-size: 0.8em; color: #888;">
+                <% if submission.submitted_at %>
+                  <%= t 'submitted_time', { :zero => "submitted less than 1 day ago", :one => "submitted 1 day ago", :other => "submitted %{count} days ago" }, :count => (((Time.now - submission.submitted_at)/60)/1440).abs.to_i %>
+                <% end %>
+              </div>
             <% end %>
           </td>
+          <% if course.user_is_teacher?(@current_user) %>
+          <td>
+              <a href="<%= inbox_url %>#reply<%= {'context_code' => course.asset_string, 'recipients' => student[:enrollment].user_id.to_s}.to_json %>" class="message_student_link" title="<%= t 'message_student', 'Message this student' %>"><%= image_tag "email.png" %></a>
+          </td>
+          <% end %>
         </tr>
       <% end %>
     </tbody>

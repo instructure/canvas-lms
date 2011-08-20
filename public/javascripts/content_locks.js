@@ -17,6 +17,86 @@
  */
 
 I18n.scoped('content_locks', function(I18n) {
+INST.lockExplanation = function(data, type) {
+  // Any additions to this function should also be added to similar logic in ApplicationController.rb
+  if(data.lock_at) {
+    switch (type) {
+      case "quiz":
+        return I18n.t('messages.quiz_locked_at', "This quiz was locked %{at}.", {at: $.parseFromISO(data.lock_at).datetime_formatted});
+      case "assignment":
+        return I18n.t('messages.assignment_locked_at', "This assignment was locked %{at}.", {at: $.parseFromISO(data.lock_at).datetime_formatted});
+      case "topic":
+        return I18n.t('messages.topic_locked_at', "This topic was locked %{at}.", {at: $.parseFromISO(data.lock_at).datetime_formatted});
+      case "file":
+        return I18n.t('messages.file_locked_at', "This file was locked %{at}.", {at: $.parseFromISO(data.lock_at).datetime_formatted});
+      case "page":
+        return I18n.t('messages.page_locked_at', "This page was locked %{at}.", {at: $.parseFromISO(data.lock_at).datetime_formatted});
+      default:
+        return I18n.t('messages.content_locked_at', "This content was locked %{at}.", {at: $.parseFromISO(data.lock_at).datetime_formatted});
+    }
+  } else if(data.unlock_at) {
+    switch (type) {
+      case "quiz":
+        return I18n.t('messages.quiz_locked_until', "This quiz is locked until %{date}.", {date: $.parseFromISO(data.unlock_at).datetime_formatted});
+      case "assignment":
+        return I18n.t('messages.assignment_locked_until', "This assignment is locked until %{date}.", {date: $.parseFromISO(data.unlock_at).datetime_formatted});
+      case "topic":
+        return I18n.t('messages.topic_locked_until', "This topic is locked until %{date}.", {date: $.parseFromISO(data.unlock_at).datetime_formatted});
+      case "file":
+        return I18n.t('messages.file_locked_until', "This file is locked until %{date}.", {date: $.parseFromISO(data.unlock_at).datetime_formatted});
+      case "page":
+        return I18n.t('messages.page_locked_until', "This page is locked until %{date}.", {date: $.parseFromISO(data.unlock_at).datetime_formatted});
+      default:
+        return I18n.t('messages.content_locked_until', "This content is locked until %{date}.", {date: $.parseFromISO(data.unlock_at).datetime_formatted});
+    }
+  } else if(data.context_module) {
+    var html = '';
+    switch (type) {
+      case "quiz":
+        html += I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+        break;
+      case "assignment":
+        html += I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+        break;
+      case "topic":
+        html += I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+        break;
+      case "file":
+        html += I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+        break;
+      case "page":
+        html += I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+        break;
+      default:
+        html += I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'});
+        break;
+    }
+    if ($("#context_modules_url").length > 0) {
+      html += "<br/>";
+      html += "<a href='" + $("#context_modules_url").attr('href') + "'>";
+      html += I18n.t('messages.visit_modules_page_for_details', "Visit the modules page for information on how to unlock this content.");
+      html += "</a>";
+      return html;
+    }
+  }
+  else {
+    switch(type) {
+      case "quiz":
+        return I18n.t('messages.quiz_locked_no_reason', "This quiz is locked.  No other reason has been provided.");
+      case "assignment":
+        return I18n.t('messages.assignment_locked_no_reason', "This assignment is locked.  No other reason has been provided.");
+      case "topic":
+        return I18n.t('messages.topic_locked_no_reason', "This topic is locked.  No other reason has been provided.");
+      case "file":
+        return I18n.t('messages.file_locked_no_reason', "This file is locked.  No other reason has been provided.");
+      case "page":
+        return I18n.t('messages.page_locked_no_reason', "This page is locked.  No other reason has been provided.");
+      default:
+        return I18n.t('messages.content_locked_no_reason', "This content is locked.  No other reason has been provided.");
+    }
+  }
+}
+
 $(document).ready(function() {
   $(".content_lock_icon").live('click', function(event) {
     if($(this).data('lock_reason')) {
@@ -24,50 +104,7 @@ $(document).ready(function() {
       var data = $(this).data('lock_reason');
       var type = data.type;
       var $reason = $("<div/>");
-      // Note: CourseController#locks is capable of returning locks for quiz, assignments, and discussion_topics,
-      // this is currently only ever used for quizzes (in quiz_index.js)
-      switch(type) {
-        case "quiz":
-          $reason.text(I18n.t('messages.quiz_locked_no_reason', "This quiz is locked.  No other reason has been provided."));
-          break;
-        default:
-          $reason.text(I18n.t('messages.content_locked_no_reason', "This content is locked.  No other reason has been provided."));
-          break;
-      }
-      if(data.lock_at) {
-        switch (type) {
-          case "quiz":
-            $reason.text(I18n.t('messages.quiz_locked_at', "This quiz was locked %{at}", {at: $.parseFromISO(data.lock_at).datetime_formatted}));
-            break;
-          default:
-            $reason.text(I18n.t('messages.content_locked_at', "This content was locked %{at}", {at: $.parseFromISO(data.lock_at).datetime_formatted}));
-        }
-      } else if(data.unlock_at) {
-        switch (type) {
-          case "quiz":
-            $reason.text(I18n.t('messages.quiz_locked_until', "This quiz is locked until %{date}", {date: $.parseFromISO(data.unlock_at).datetime_formatted}));
-            break;
-          default:
-            $reason.text(I18n.t('messages.quiz_locked_until', "This quiz is locked until %{date}", {date: $.parseFromISO(data.unlock_at).datetime_formatted}));
-            break;
-        }
-      } else if(data.context_module) {
-        switch (type) {
-          case "quiz":
-            $reason.html(I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'}));
-            break;
-          default:
-            $reason.html(I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.", {module: $.htmlEscape(data.context_module.name), wrapper: '<b>$1</b>'}));
-            break;
-        }
-        if($("#context_modules_url").length > 0) {
-          $reason.append("<br/>");
-          var $link = $("<a/>");
-          $link.attr('href', $("#context_modules_url").attr('href'));
-          $link.text(I18n.t('messages.visit_modules_page_for_details', "Visit the modules page for information on how to unlock this content."));
-          $reason.append($link);
-        }
-      }
+      $reason.html(INST.lockExplanation(data, type));
       var $dialog = $("#lock_reason_dialog");
       if($dialog.length === 0) {
         $dialog = $("<div/>").attr('id', 'lock_reason_dialog');

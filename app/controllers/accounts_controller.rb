@@ -25,12 +25,12 @@ class AccountsController < ApplicationController
   end
   
   def show
-    return redirect_to account_settings_url(@account) if @account.site_admin?
-    if authorized_action(@account, @current_user, :read)
-      load_course_right_side
-      @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
-      build_course_stats
-    end
+    return unless authorized_action(@account, @current_user, :read)
+    return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, nil, :read_course_list)
+
+    load_course_right_side
+    @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+    build_course_stats
   end
   
   def update
@@ -206,20 +206,24 @@ class AccountsController < ApplicationController
   protected :load_course_right_side
   
   def statistics
-    if authorized_action(@account, @current_user, :read)
+    if authorized_action(@account, @current_user, :view_statistics)
       add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
-      @recently_started_courses = @account.all_courses.recently_started
-      @recently_ended_courses = @account.all_courses.recently_ended
-      @recently_logged_users = @account.all_users.recently_logged_in[0,25]
-      if @account == Account.default
-        @recently_created_courses = @account.all_courses.recently_created
+      if @account.grants_right?(@current_user, nil, :read_course_list)
+        @recently_started_courses = @account.all_courses.recently_started
+        @recently_ended_courses = @account.all_courses.recently_ended
+        if @account == Account.default
+          @recently_created_courses = @account.all_courses.recently_created
+        end
+      end
+      if @account.grants_right?(@current_user, nil, :read_roster)
+        @recently_logged_users = @account.all_users.recently_logged_in[0,25]
       end
       @counts_report = ReportSnapshot.get_account_details_by_type_and_id('counts_detailed', @account.id)
     end
   end
   
   def statistics_graph
-    if authorized_action(@account, @current_user, :read)
+    if authorized_action(@account, @current_user, :view_statistics)
       @items = ReportSnapshot.get_account_detail_over_time('counts_progressive_detailed', @account.id, params[:attribute])
       respond_to do |format|
         format.json { render :json => @items.to_json }
@@ -244,7 +248,7 @@ class AccountsController < ApplicationController
   end
   
   def statistics_page_views
-    if authorized_action(@account, @current_user, :read)
+    if authorized_action(@account, @current_user, :view_statistics)
       start_at = Date.parse(params[:start_at]) rescue nil
       start_at ||= 1.month.ago.to_date
       end_at = Date.parse(params[:end_at]) rescue nil

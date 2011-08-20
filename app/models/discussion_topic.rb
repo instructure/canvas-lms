@@ -113,9 +113,8 @@ class DiscussionTopic < ActiveRecord::Base
       self.context_module_tag.confirm_valid_module_requirements
     end
     if @old_assignment_id
-      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => [@old_assignment_id, self.last_assignment_id].compact, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic'})
+      Assignment.update_all({:workflow_state => 'deleted', :updated_at => Time.now}, {:id => @old_assignment_id, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic'})
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
-      ContentTag.delete_for(Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     elsif self.assignment && @saved_by != :assignment
       self.assignment.title = self.title
       self.assignment.description = self.message
@@ -129,7 +128,9 @@ class DiscussionTopic < ActiveRecord::Base
   
   def restore_old_assignment
     return nil unless self.old_assignment && self.old_assignment.deleted?
-    self.old_assignment.update_attribute(:workflow_state, 'available')
+    self.old_assignment.workflow_state = 'available'
+    self.old_assignment.saved_by = :discussion_topic
+    self.old_assignment.save(false)
     self.old_assignment
   end
 
@@ -589,10 +590,9 @@ class DiscussionTopic < ActiveRecord::Base
       elsif media_object.deleted? || media_object.context != context
         media_object = nil
       end
-      if !media_object.podcast_format_details
-        media_object = nil
+      if media_object.try(:podcast_format_details)
+        media_object.podcast_associated_asset = messages_hash[media_object.media_id]
       end
-      media_object.podcast_associated_asset = messages_hash[media_object.media_id] if media_object
       media_object
     end
     to_podcast(attachments + media_objects.compact)

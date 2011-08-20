@@ -427,7 +427,7 @@ HEREDOC
   <% form_for :attachment, :url => "", :html => {:id => "lock_attachment_form", :method => :put} do |f| %>
     <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
     <h3 style="margin: 0;"><%= t 'titles.lock_file', "Lock %{file_name}", :file_name => '<span class="name">&nbsp;</span>'.html_safe %></h3>
-    <%= t 'descriptions.lock_file', "When a file is locked, only teachers and TA's can access it." %>
+    <%= t 'descriptions.lock_file', "When a file is locked, only teachers and TAs can access it." %>
     <div class="clear"></div>
     <table style="margin-top: 10px;">
       <tr>
@@ -466,7 +466,7 @@ HEREDOC
   <% form_for :folder, :url => "", :html => {:id => "lock_folder_form", :method => :put} do |f| %>
     <%= image_tag "lock_closed.png", :style => "float: left;", :alt => "" %>
     <h3 style="margin: 0;"><%= t 'titles.lock_folder', "Lock %{folder_name}", :folder_name => '<span class="name">&nbsp;</span>'.html_safe %></h3>
-    <%= t 'descriptions.lock_folder', "When a folder is locked, only teachers and TA's can access it." %>
+    <%= t 'descriptions.lock_folder', "When a folder is locked, only teachers and TAs can access it." %>
     <div class="clear"></div>
     <table style="margin-top: 10px;">
       <tr>
@@ -569,6 +569,15 @@ into a zip file.  This may take some time, depending on the size and number of f
   </div>
   <div class="status_box" style="text-align: center;">
     <%= image_tag "ajax-loader-small.gif", :style => "visibility: hidden;", :class => "status_loader" %>&nbsp;<span class="status"><%= t 'messages.gathering_files', "Gathering Files..." %></span>
+  </div>
+</div>
+<div id="duplicate_filename_dialog" style="display: none;">
+  <span class="duplicate_filename_prompt"></span><br /><br />
+  <span class="duplicate_filenames"></span><br /><br />
+  <div class="buttons" style="text-align: right; width: 100%">
+    <button type="button" class="button button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+    <button type="button" class="button rename_button"><%= t 'buttons.rename_duplicate_attachment', "Rename New Files" %></button>
+    <button type="button" class="button overwrite_button"><%= t 'buttons.overwrite_duplicate_attachment', "Overwrite" %></button>
   </div>
 </div>
 <% unless showing_all_contexts %>

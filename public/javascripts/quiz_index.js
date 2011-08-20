@@ -37,6 +37,7 @@ $(document).ready(function() {
     $("#unpublished_quizzes .quiz").each(function() {
       var $quiz_item = $template.clone(true);
       var data = $(this).getTemplateData({textValues: ['quiz_id', 'quiz_title']});
+      $quiz_item.removeClass('blank');
       $quiz_item.find(".id").val(data.quiz_id).attr('id', 'quiz_checkbox_' + data.quiz_id).end()
         .find(".title").text(data.quiz_title || I18n.t('default_title', 'Unnamed Quiz')).attr('for', 'quiz_checkbox_' + data.quiz_id);
       $list.append($quiz_item.show());

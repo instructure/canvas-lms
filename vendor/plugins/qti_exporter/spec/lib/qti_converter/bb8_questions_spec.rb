@@ -3,77 +3,47 @@ require File.dirname(__FILE__) + '/../../qti_helper'
 describe "Converting Blackboard 8 qti" do
 
   it "should convert multiple choice" do
-    manifest_node=get_manifest_node('multiple_choice', :interaction_type => 'choiceInteraction', :bb_question_type => 'Multiple Choice')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::MULTIPLE_CHOICE
+    get_question_hash(bb8_question_dir, 'multiple_choice').should == BB8Expected::MULTIPLE_CHOICE
   end
 
   it "should convert multiple choice" do
-    manifest_node=get_manifest_node('multiple_choice_blank_answers', :interaction_type => 'choiceInteraction', :bb_question_type => 'Multiple Choice')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::MULTIPLE_CHOICE_BLANK_ANSWERS
+    get_question_hash(bb8_question_dir, 'multiple_choice_blank_answers').should == BB8Expected::MULTIPLE_CHOICE_BLANK_ANSWERS
   end
 
   it "should convert either/or (yes/no) into multiple choice" do
-    manifest_node=get_manifest_node('either_or_yes_no', :interaction_type => 'choiceInteraction', :bb_question_type => 'Either/Or')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::EITHER_OR_YES_NO
+    get_question_hash(bb8_question_dir, 'either_or_yes_no').should == BB8Expected::EITHER_OR_YES_NO
   end
 
   it "should convert either/or (agree/disagree) into multiple choice" do
-    manifest_node=get_manifest_node('either_or_agree_disagree', :interaction_type => 'choiceInteraction', :bb_question_type => 'Either/Or')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::EITHER_OR_AGREE_DISAGREE
+    get_question_hash(bb8_question_dir, 'either_or_agree_disagree').should == BB8Expected::EITHER_OR_AGREE_DISAGREE
   end
 
   it "should convert either/or (true/false) into multiple choice" do
-    manifest_node=get_manifest_node('either_or_true_false', :interaction_type => 'choiceInteraction', :bb_question_type => 'Either/Or')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::EITHER_OR_TRUE_FALSE
+    get_question_hash(bb8_question_dir, 'either_or_true_false').should == BB8Expected::EITHER_OR_TRUE_FALSE
   end
 
   it "should convert either/or (right/wrong) into multiple choice" do
-    manifest_node=get_manifest_node('either_or_right_wrong', :interaction_type => 'choiceInteraction', :bb_question_type => 'Either/Or')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::EITHER_OR_RIGHT_WRONG
+    get_question_hash(bb8_question_dir, 'either_or_right_wrong').should == BB8Expected::EITHER_OR_RIGHT_WRONG
   end
 
   it "should convert multiple answer questions" do
-    manifest_node=get_manifest_node('multiple_answer', :interaction_type => 'choiceInteraction', :bb_question_type => 'Multiple Answer')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::MULTIPLE_ANSWER
+    get_question_hash(bb8_question_dir, 'multiple_answer').should == BB8Expected::MULTIPLE_ANSWER
   end
 
   it "should convert true/false questions" do
-    manifest_node=get_manifest_node('true_false', :interaction_type => 'choiceInteraction', :bb_question_type => 'True/False')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::TRUE_FALSE
+    get_question_hash(bb8_question_dir, 'true_false').should == BB8Expected::TRUE_FALSE
   end
 
   it "should convert essay questions" do
-    manifest_node=get_manifest_node('essay', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Essay')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash.should == BB8Expected::ESSAY
+    get_question_hash(bb8_question_dir, 'essay').should == BB8Expected::ESSAY
   end
 
   it "should convert short answer questions" do
-    manifest_node=get_manifest_node('short_response', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Short Response')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash.should == BB8Expected::SHORT_RESPONSE
+    get_question_hash(bb8_question_dir, 'short_response').should == BB8Expected::SHORT_RESPONSE
   end
 
   it "should convert matching questions" do
-    manifest_node=get_manifest_node('matching', :interaction_type => 'choiceInteraction', :bb_question_type => 'Matching')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    # make sure the ids are correctly referencing each other
+    hash = get_question_hash(bb8_question_dir, 'matching', false)
     matches = {}
     hash[:matches].each {|m| matches[m[:match_id]] = m[:text]}
     hash[:answers].each do |a|
@@ -86,92 +56,62 @@ describe "Converting Blackboard 8 qti" do
   end
 
   it "should convert opinion scale/likert questions into multiple choice questions" do
-    manifest_node=get_manifest_node('likert', :interaction_type => 'choiceInteraction', :bb_question_type => 'Opinion Scale')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::LIKERT
+    get_question_hash(bb8_question_dir, 'likert').should == BB8Expected::LIKERT
   end
 
   it "should convert fill in the blank questions into short answer question"do
-    manifest_node=get_manifest_node('fill_in_the_blank', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Fill in the Blank')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::FILL_IN_THE_BLANK
+    get_question_hash(bb8_question_dir, 'fill_in_the_blank').should == BB8Expected::FILL_IN_THE_BLANK
   end
 
   it "should flag file response questions as not supported" do
-    manifest_node=get_manifest_node('file_upload', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'File Upload')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash.should == BB8Expected::FILE_RESPONSE
+    get_question_hash(bb8_question_dir, 'file_upload').should == BB8Expected::FILE_RESPONSE
   end
 
   it "should flag hotspot questions as not supported" do
-    manifest_node=get_manifest_node('hot_spot', :interaction_type => nil, :bb_question_type => 'Hot Spot')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash.should == BB8Expected::HOT_SPOT
+    get_question_hash(bb8_question_dir, 'hot_spot').should == BB8Expected::HOT_SPOT
   end
 
   it "should flag quiz bowl questions as not supported" do
-    manifest_node=get_manifest_node('quiz_bowl', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Quiz Bowl')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash.should == BB8Expected::QUIZ_BOWL
+    get_question_hash(bb8_question_dir, 'quiz_bowl').should == BB8Expected::QUIZ_BOWL
   end
 
   it "should convert fill in multiple blanks questions" do
-    manifest_node=get_manifest_node('fill_in_the_blank_plus', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Fill in the Blank Plus')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::FILL_IN_MULTIPLE_BLANKS
+    get_question_hash(bb8_question_dir, 'fill_in_the_blank_plus').should == BB8Expected::FILL_IN_MULTIPLE_BLANKS
   end
 
   it "should convert jumbled sentence questions" do
-    manifest_node=get_manifest_node('jumbled_sentence', :interaction_type => 'choiceInteraction', :bb_question_type => 'Jumbled Sentence')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::JUMBLED_SENTENCE
+    get_question_hash(bb8_question_dir, 'jumbled_sentence').should == BB8Expected::JUMBLED_SENTENCE
   end
 
   it "should convert ordering questions into matching questions" do
-    manifest_node=get_manifest_node('ordering', :interaction_type => 'orderInteraction', :bb_question_type => 'Ordering')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    # compare everything without the ids
+    hash = get_question_hash(bb8_question_dir, 'ordering')
     hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
     hash[:matches].each {|m|m.delete(:match_id)}
     hash.should == BB8Expected::ORDER
   end
 
   it "should convert simple calculated questions" do
-    manifest_node=get_manifest_node('calculated_simple', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Calculated')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::CALCULATED_SIMPLE
+    get_question_hash(bb8_question_dir, 'calculated_simple').should == BB8Expected::CALCULATED_SIMPLE
   end
 
   it "should convert complex calculated questions" do
-    manifest_node=get_manifest_node('calculated_complex', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Calculated')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::CALCULATED_COMPLEX
+    get_question_hash(bb8_question_dir, 'calculated_complex').should == BB8Expected::CALCULATED_COMPLEX
   end
 
   it "should convert calculated numeric questions" do
-    manifest_node=get_manifest_node('calculated_numeric', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Numeric')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:answers].each {|a|a.delete(:id)}
-    hash.should == BB8Expected::CALCULATED_NUMERIC
+    get_question_hash(bb8_question_dir, 'calculated_numeric').should == BB8Expected::CALCULATED_NUMERIC
   end
 
   it "should convert the assessments into quizzes" do
     manifest_node=get_manifest_node('assessment', :quiz_type => 'Test')
-    a = Qti::AssessmentTestConverter.new(manifest_node, bb8_question_dir, false)
+    a = Qti::AssessmentTestConverter.new(manifest_node, bb8_question_dir)
     a.create_instructure_quiz
     a.quiz.should == BB8Expected::ASSESSMENT
   end
 
   it "should grab multiple html divs" do
-    manifest_node=get_manifest_node('with_image', :interaction_type => 'choiceInteraction', :bb_question_type => 'Multiple Choice')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>bb8_question_dir)
-    hash[:question_text].should == "San Jose, purple on this map, is an example of a ___________ culture region.\n<br/>\n<img src=\"Picture3.jpg\" alt=\"Picture3.jpg\">"
+    hash = get_question_hash(bb8_question_dir, 'with_image')
+    hash[:question_text].should == "San Jose, purple on this map, is an example of a ___________ culture region.\n<br/>\n<img src=\"5e19c40a33964748a1ec13af98715c7f/Picture3.jpg\" alt=\"Picture3.jpg\">"
   end
 
 end
@@ -196,11 +136,11 @@ module BB8Expected
                      :points_possible=>10.0,
                      :question_type=>"multiple_choice_question",
                      :question_name=>"",
-                     :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">The answer is nose.&lt;br /&gt;</p>",
-                     :migration_id=>"_153010_1"}
+                     :question_text=>"The answer is nose.<br>",
+                     :migration_id=>"_154767_1"}
 
   MULTIPLE_CHOICE_BLANK_ANSWERS = {:question_name=>"",
-                                   :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">This is a great question.&lt;br/&gt;</p>",
+                                   :question_text=>"This is a great question.<br>",
                                    :incorrect_comments=>"",
                                    :question_type=>"multiple_choice_question",
                                    :answers=>
@@ -216,7 +156,7 @@ module BB8Expected
                                             {:text=>"No answer text provided.",
                                              :weight=>0,
                                              :migration_id=>"RESPONSE_686165cd422f45669b6be25b4f90f5de"}],
-                                   :migration_id=>"_153271_1",
+                                   :migration_id=>"_154777_1",
                                    :correct_comments=>"",
                                    :points_possible=>17.0}
 
@@ -230,8 +170,8 @@ module BB8Expected
                 :points_possible=>10.0,
                 :question_type=>"true_false_question",
                 :question_name=>"",
-                :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">I am wearing a black hat.&lt;br /&gt;</p>",
-                :migration_id=>"_153015_1"}
+                :question_text=>"I am wearing a black hat.<br>",
+                :migration_id=>"_154772_1"}
 
   # removed ids on the answers
   MULTIPLE_ANSWER = {:answers=>
@@ -252,20 +192,20 @@ module BB8Expected
                      :points_possible=>10.0,
                      :question_type=>"multiple_answers_question",
                      :question_name=>"",
-                     :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">The answers are house and garage.&lt;br /&gt;</p>",
-                     :migration_id=>"_153009_1"}
+                     :question_text=>"The answers are house and garage.<br>",
+                     :migration_id=>"_154766_1"}
 
   ESSAY = {:example_solution=>"Nobody.",
-           :migration_id=>"_153002_1",
+           :migration_id=>"_154759_1",
            :answers=>[],
            :correct_comments=>"",
            :points_possible=>23.0,
            :question_name=>"",
-           :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Who likes to use Blackboard?&lt;br /&gt;</p>",
+           :question_text=>"Who likes to use Blackboard?<br>",
            :incorrect_comments=>"",
            :question_type=>"essay_question"}
 
-  SHORT_RESPONSE =  {:migration_id=>"_153014_1",
+  SHORT_RESPONSE =  {:migration_id=>"_154771_1",
                      :answers=>[],
                      :example_solution=>"A yellow submarine.",
                      :correct_comments=>"",
@@ -273,7 +213,7 @@ module BB8Expected
                      :points_possible=>10.0,
                      :question_type=>"essay_question",
                      :question_name=>"",
-                     :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">We all live in what?&lt;br /&gt;</p>"}
+                     :question_text=>"We all live in what?<br>"}
 
   # removed ids on the answers
   MATCHING = {:answers=>
@@ -286,8 +226,8 @@ module BB8Expected
               :points_possible=>10.0,
               :question_type=>"matching_question",
               :question_name=>"",
-              :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Match these.&lt;br /&gt;</p>",
-              :migration_id=>"_153008_1",
+              :question_text=>"Match these.<br>",
+              :migration_id=>"_154765_1",
               :matches=>
                       [{:text=>"right 1"},
                        {:text=>"right 2"},
@@ -317,11 +257,11 @@ module BB8Expected
             :points_possible=>10.0,
             :question_type=>"multiple_choice_question",
             :question_name=>"",
-            :migration_id=>"_153011_1",
-            :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">You love Blackboard&lt;br /&gt;</p>",
+            :migration_id=>"_154768_1",
+            :question_text=>"You love Blackboard<br>",
             :correct_comments=>"right? "}
 
-  FILL_IN_THE_BLANK = {:question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">The answer is 'purple'.&lt;br /&gt;</p>",
+  FILL_IN_THE_BLANK = {:question_text=>"The answer is 'purple'.<br>",
                        :answers=>
                                [{:text=>"purple", :comments=>"", :weight=>100},
                                 {:text=>"violet", :comments=>"", :weight=>100}],
@@ -330,7 +270,7 @@ module BB8Expected
                        :points_possible=>10.0,
                        :question_type=>"short_answer_question",
                        :question_name=>"",
-                       :migration_id=>"_153005_1"}
+                       :migration_id=>"_154762_1"}
 
   EITHER_OR_YES_NO = {:question_name=>"",
                       :answers=>
@@ -338,8 +278,8 @@ module BB8Expected
                                {:text=>"no",
                                 :migration_id=>"yes_no_false",
                                 :weight=>100}],
-                      :migration_id=>"_153126_1",
-                      :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Either or question with yes/no</p>",
+                      :migration_id=>"_154773_1",
+                      :question_text=>"Either or question with yes/no",
                       :correct_comments=>"right answer",
                       :incorrect_comments=>"Wrong answer",
                       :points_possible=>10.0,
@@ -352,8 +292,8 @@ module BB8Expected
                                         :weight=>100,
                                         :migration_id=>"agree_disagree_false"}],
                               :question_name=>"",
-                              :migration_id=>"_153127_1",
-                              :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Either or question with agree/disagree.</p>",
+                              :migration_id=>"_154774_1",
+                              :question_text=>"Either or question with agree/disagree.",
                               :correct_comments=>"correct answer",
                               :incorrect_comments=>"wrong answer",
                               :points_possible=>10.0}
@@ -365,8 +305,8 @@ module BB8Expected
                                     :weight=>100,
                                     :migration_id=>"true_false_false"}],
                           :question_name=>"",
-                          :migration_id=>"_153128_1",
-                          :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Either/or question with true/false options</p>",
+                          :migration_id=>"_154775_1",
+                          :question_text=>"Either/or question with true/false options",
                           :correct_comments=>"r",
                           :incorrect_comments=>"w",
                           :points_possible=>10.0}
@@ -378,8 +318,8 @@ module BB8Expected
                                      :migration_id=>"right_wrong_true"},
                                     {:text=>"wrong", :weight=>0, :migration_id=>"right_wrong_false"}],
                            :question_name=>"",
-                           :migration_id=>"_153001_1",
-                           :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">A duck is either a bird or a plane.&lt;br /&gt;</p>",
+                           :migration_id=>"_154776_1",
+                           :question_text=>"A duck is either a bird or a plane.<br>",
                            :correct_comments=>"right",
                            :incorrect_comments=>"wrong",
                            :points_possible=>7.0}
@@ -391,13 +331,13 @@ module BB8Expected
                    :unsupported=>true,
                    :question_type=>"File Upload",
                    :question_name=>"",
-                   :migration_id=>"_153003_1",
-                   :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">File response question. I don't know what this is.&lt;br /&gt;</p>"}
+                   :migration_id=>"_154760_1",
+                   :question_text=>"File response question. I don't know what this is.<br>"}
 
   HOT_SPOT = {:answers=>[],
               :question_name=>"",
-              :migration_id=>"_153006_1",
-              :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Where are the nuts?&lt;br /&gt;</p>",
+              :migration_id=>"_154763_1",
+              :question_text=>"Where are the nuts?<br>\n<br/>\n<img src=\"4caf48de86ab4a67ad0c294e3f228ae3/chipmunk.jpg\" alt=\"chipmunk.jpg\">",
               :correct_comments=>"",
               :incorrect_comments=>"",
               :unsupported=>true,
@@ -407,8 +347,8 @@ module BB8Expected
   QUIZ_BOWL = {:answers=>[],
                :question_type=>"Quiz Bowl",
                :question_name=>"",
-               :migration_id=>"_153013_1",
-               :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">Yellow</p>",
+               :migration_id=>"_154770_1",
+               :question_text=>"Yellow",
                :correct_comments=>"",
                :incorrect_comments=>"",
                :unsupported=>true,
@@ -422,8 +362,8 @@ module BB8Expected
                              :points_possible=>10.0,
                              :question_type=>"fill_in_multiple_blanks_question",
                              :question_name=>"",
-                             :migration_id=>"_153004_1",
-                             :question_text=>"I'm just a [poor] boy from a poor [family]",
+                             :migration_id=>"_154761_1",
+                             :question_text=>"I'm just a [poor] boy from a poor [family]<br>",
                              :correct_comments=>"right"}
 
   JUMBLED_SENTENCE = {
@@ -446,8 +386,8 @@ module BB8Expected
           :points_possible=>10.0,
           :question_type=>"multiple_dropdowns_question",
           :question_name=>"",
-          :migration_id=>"_153007_1",
-          :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">The quick [brown] fox [jumped] over the [fence].&lt;br /&gt;</p>",
+          :migration_id=>"_154764_1",
+          :question_text=>"The quick [brown] fox [jumped] over the [fence].<br>" ,
           :correct_comments=>"right"
   }
 
@@ -461,8 +401,8 @@ module BB8Expected
            :points_possible=>10.0,
            :question_type=>"matching_question",
            :question_name=>"",
-           :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">It is in numerical order.&lt;br /&gt;</p>",
-           :migration_id=>"_153012_1",
+           :question_text=>"It is in numerical order.<br>",
+           :migration_id=>"_154769_1",
            :matches=>
                    [{:text=>"b"},
                     {:text=>"a"},
@@ -486,12 +426,10 @@ module BB8Expected
                        :unit_points_percent=>15,
                        :question_name=>"",
                        :answer_tolerance=>0,
-                       :migration_id=>"_152999_1",
+                       :migration_id=>"_154757_1",
                        :unit_value=>"cm",
-                       :question_text=>
-                               "<p class=\"FORMATTED_TEXT_BLOCK\">What is 10 - [x]?&lt;br/&gt;</p>",
-                       :imported_formula=>
-                               "<math><apply><minus/><cn>10</cn><ci>x</ci></apply></math>",
+                       :question_text=>"What is 10 - [x]?<br>",
+                       :imported_formula=>"<math><apply><minus/><cn>10</cn><ci>x</ci></apply></math>",
                        :correct_comments=>"You got it right!",
                        :unit_required=>true,
                        :partial_credit_tolerance=>0.1,
@@ -508,93 +446,14 @@ module BB8Expected
                                  {:min=>20, :max=>120, :name=>"n", :scale=>0},
                                  {:min=>5, :max=>7, :name=>"r", :scale=>0}],
                         :answers=>
-                                [{:variables=>
-                                          [{:value=>37, :name=>"F"},
-                                           {:value=>26, :name=>"Y"},
-                                           {:value=>5.43, :name=>"i"},
-                                           {:value=>59, :name=>"n"},
-                                           {:value=>5, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>96.291},
-                                 {:variables=>
-                                          [{:value=>46, :name=>"F"},
-                                           {:value=>36, :name=>"Y"},
-                                           {:value=>5.22, :name=>"i"},
-                                           {:value=>104, :name=>"n"},
-                                           {:value=>6, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>112.703},
-                                 {:variables=>
-                                          [{:value=>31, :name=>"F"},
-                                           {:value=>35, :name=>"Y"},
-                                           {:value=>5.94, :name=>"i"},
-                                           {:value=>33, :name=>"n"},
-                                           {:value=>6, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>101.325},
-                                 {:variables=>
-                                          [{:value=>29, :name=>"F"},
-                                           {:value=>34, :name=>"Y"},
-                                           {:value=>4.1, :name=>"i"},
-                                           {:value=>85, :name=>"n"},
-                                           {:value=>5, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>114.764},
-                                 {:variables=>
-                                          [{:value=>34, :name=>"F"},
-                                           {:value=>25, :name=>"Y"},
-                                           {:value=>4.48, :name=>"i"},
-                                           {:value=>23, :name=>"n"},
-                                           {:value=>5, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>105.938},
-                                 {:variables=>
-                                          [{:value=>20, :name=>"F"},
-                                           {:value=>25, :name=>"Y"},
-                                           {:value=>4.87, :name=>"i"},
-                                           {:value=>76, :name=>"n"},
-                                           {:value=>5, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>102.415},
-                                 {:variables=>
-                                          [{:value=>29, :name=>"F"},
-                                           {:value=>31, :name=>"Y"},
-                                           {:value=>5.04, :name=>"i"},
-                                           {:value=>87, :name=>"n"},
-                                           {:value=>6, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>113.719},
-                                 {:variables=>
-                                          [{:value=>39, :name=>"F"},
-                                           {:value=>20, :name=>"Y"},
-                                           {:value=>4.88, :name=>"i"},
-                                           {:value=>84, :name=>"n"},
-                                           {:value=>5, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>102.09},
-                                 {:variables=>
-                                          [{:value=>32, :name=>"F"},
-                                           {:value=>26, :name=>"Y"},
-                                           {:value=>4.52, :name=>"i"},
-                                           {:value=>104, :name=>"n"},
-                                           {:value=>5, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>106.802},
-                                 {:variables=>
-                                          [{:value=>44, :name=>"F"},
-                                           {:value=>39, :name=>"Y"},
-                                           {:value=>4.9, :name=>"i"},
-                                           {:value=>30, :name=>"n"},
-                                           {:value=>5, :name=>"r"}],
-                                  :weight=>100,
-                                  :answer=>101.954}],
+                                [{:weight=>100, :variables=>[{:value=>20, :name=>"F"}, {:value=>37, :name=>"Y"}, {:value=>5.73, :name=>"i"}, {:value=>115, :name=>"n"}, {:value=>6.54, :name=>"r"}], :answer=>113.094}, {:weight=>100, :variables=>[{:value=>49, :name=>"F"}, {:value=>22, :name=>"Y"}, {:value=>4.31, :name=>"i"}, {:value=>48, :name=>"n"}, {:value=>5, :name=>"r"}], :answer=>107.024}, {:weight=>100, :variables=>[{:value=>48, :name=>"F"}, {:value=>37, :name=>"Y"}, {:value=>5.53, :name=>"i"}, {:value=>26, :name=>"n"}, {:value=>5, :name=>"r"}], :answer=>92.983}, {:weight=>100, :variables=>[{:value=>22, :name=>"F"}, {:value=>21, :name=>"Y"}, {:value=>4.49, :name=>"i"}, {:value=>35, :name=>"n"}, {:value=>5, :name=>"r"}], :answer=>104.845}, {:weight=>100, :variables=>[{:value=>21, :name=>"F"}, {:value=>34, :name=>"Y"}, {:value=>5.97, :name=>"i"}, {:value=>111, :name=>"n"}, {:value=>6, :name=>"r"}], :answer=>102.228}, {:weight=>100, :variables=>[{:value=>28, :name=>"F"}, {:value=>37, :name=>"Y"}, {:value=>4.12, :name=>"i"}, {:value=>81, :name=>"n"}, {:value=>5, :name=>"r"}], :answer=>115.316}, {:weight=>100, :variables=>[{:value=>29, :name=>"F"}, {:value=>39, :name=>"Y"}, {:value=>5.48, :name=>"i"}, {:value=>39, :name=>"n"}, {:value=>6, :name=>"r"}], :answer=>108.149}, {:weight=>100, :variables=>[{:value=>46, :name=>"F"}, {:value=>32, :name=>"Y"}, {:value=>4.42, :name=>"i"}, {:value=>58, :name=>"n"}, {:value=>5, :name=>"r"}], :answer=>108.877}, {:weight=>100, :variables=>[{:value=>22, :name=>"F"}, {:value=>36, :name=>"Y"}, {:value=>4.6, :name=>"i"}, {:value=>95, :name=>"n"}, {:value=>5, :name=>"r"}], :answer=>107.317}, {:weight=>100, :variables=>[{:value=>48, :name=>"F"}, {:value=>39, :name=>"Y"}, {:value=>4.59, :name=>"i"}, {:value=>119, :name=>"n"}, {:value=>5, :name=>"r"}], :answer=>108.153}],
                         :partial_credit_points_percent=>0,
                         :unit_points_percent=>0.0,
                         :question_name=>"",
                         :answer_tolerance=>0.1,
                         :migration_id=>"_153086_1",
                         :question_text=>
-                                "<p class=\"FORMATTED_TEXT_BLOCK\">Based on her excellent\n performance as a district sales manager, Maria receives a\n sizable bonus at work. Since her generous salary is more\n than enough to provide for the needs of her family, she\n decides to use the bonus to buy a bond as an investment.\n The par value of the bond that Maria would like to\n purchase is $[F] thousand. The bond pays [r]% interest,\n compounded semiannually (with payment on January 1 and\n July 1) and matures on July 1, 20[Y]. Maria wants a return\n of [i]%, compounded semiannually. How much would she be\n willing to pay for the bond if she buys it [n] days after\n the July 2010 interest anniversary? Give your answer in\n the format of a quoted bond price, as a percentage of par\n to three decimal places -- like you would see in the Wall\n Street Journal. Use the formula discussed in class -- and\n from the book, NOT the HP 12c bond feature. (Write only\n the digits, to three decimal palces, e.g. 114.451 and no\n $, commas, formulas, etc.)</p>",
+                                "Based on her excellent performance as a district sales manager, Maria receives a sizable bonus at work. Since her generous salary is more than enough to provide for the needs of her family, she decides to use the bonus to buy a bond as an investment. The par value of the bond that Maria would like to purchase is $[F] thousand. The bond pays [r]% interest, compounded semiannually (with payment on January 1 and July 1) and matures on July 1, 20[Y]. Maria wants a return of [i]%, compounded semiannually. How much would she be willing to pay for the bond if she buys it [n] days after the July 2010 interest anniversary? Give your answer in the format of a quoted bond price, as a percentage of par to three decimal places -- like you would see in the Wall Street Journal. Use the formula discussed in class -- and from the book, NOT the HP 12c bond feature. (Write only the digits, to three decimal palces, e.g. 114.451 and no $, commas, formulas, etc.)",
                         :imported_formula=>
                                 "<math><apply><times/><apply><power/><apply><times/><cn>10</cn><ci>F</ci></apply><apply><minus/><cn>1</cn></apply></apply><apply><plus/><apply><times/><cn>1000</cn><ci>F</ci><ci>r</ci><apply><power/><ci>i</ci><apply><minus/><cn>1</cn></apply></apply><apply><minus/><cn>1</cn><apply><power/><apply><plus/><cn>1</cn><apply><divide/><ci>i</ci><cn>200</cn></apply></apply><apply><minus/><apply><times/><cn>2</cn><apply><minus/><ci>Y</ci><cn>10</cn></apply></apply></apply></apply></apply></apply><apply><times/><cn>1000</cn><ci>F</ci><apply><power/><apply><plus/><cn>1</cn><apply><divide/><ci>i</ci><cn>200</cn></apply></apply><apply><minus/><apply><times/><cn>2</cn><apply><minus/><ci>Y</ci><cn>10</cn></apply></apply></apply></apply></apply></apply><apply><plus/><cn>1</cn><apply><times/><apply><divide/><ci>i</ci><cn>100</cn></apply><apply><divide/><ci>n</ci><cn>360</cn></apply></apply></apply></apply></math>",
                         :correct_comments=>"Right answer.",
@@ -603,10 +462,9 @@ module BB8Expected
                         :incorrect_comments=>"Wrong.",
                         :formulas=>[],
                         :unit_case_sensitive=>false,
-                        :question_bank_name=>"Pool 1",
                         :points_possible=>10}
 
-  CALCULATED_NUMERIC = {:migration_id=>"_153000_1",
+  CALCULATED_NUMERIC = {:migration_id=>"_154758_1",
                         :answers=>
                                 [{:end=>4.0,
                                   :numerical_answer_type=>"range_answer",
@@ -614,8 +472,7 @@ module BB8Expected
                                   :exact=>4.0,
                                   :comments=>"",
                                   :weight=>100}],
-                        :question_text=>"<p class=\"FORMATTED_TEXT_BLOCK\">What is 10 - 6?&lt;br /&gt;</p>",
-                        :question_bank_name=>"Pool 1",
+                        :question_text=>"What is 10 - 6?<br>",
                         :correct_comments=>"Right.",
                         :incorrect_comments=>"Left",
                         :points_possible=>10.0,

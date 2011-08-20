@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+  <assessment d2l_2p0:id="24" title="Quiz 2" ident="res_quiz_39018">
+    <rubric>
+      <flow_mat>
+        <material>
+          <mattext d2l_2p0:isdisplayed="no" texttype="text/html"/>
+        </material>
+      </flow_mat>
+    </rubric>
+    <assessmentcontrol hintswitch="no" solutionswitch="yes" feedbackswitch="no"/>
+    <presentation_material>
+      <flow_mat>
+        <material label="page header">
+          <mattext d2l_2p0:isdisplayed="no" texttype="text/html"/>
+        </material>
+        <material label="page footer">
+          <mattext d2l_2p0:isdisplayed="no" texttype="text/html"/>
+        </material>
+      </flow_mat>
+    </presentation_material>
+    <assess_procextension>
+      <d2l_2p0:intro_message d2l_2p0:isdisplayed="no" texttype="text/html"/>
+      <grade_item d2l_2p0:is_autoexport="yes" resource_code="ADEC_Highe-157982">164842</grade_item>
+      <d2l_2p0:password>insecure</d2l_2p0:password>
+      <d2l_2p0:disable_right_click>yes</d2l_2p0:disable_right_click>
+      <d2l_2p0:disable_pager_access>yes</d2l_2p0:disable_pager_access>
+      <is_active>yes</is_active>
+      <d2l_2p0:date_start/>
+      <d2l_2p0:date_end>
+        <d2l_2p0:timestamp>
+          <d2l_2p0:month>7</d2l_2p0:month>
+          <d2l_2p0:day>10</d2l_2p0:day>
+          <d2l_2p0:year>2008</d2l_2p0:year>
+          <d2l_2p0:hour>8</d2l_2p0:hour>
+          <d2l_2p0:minutes>28</d2l_2p0:minutes>
+          <d2l_2p0:seconds>0</d2l_2p0:seconds>
+        </d2l_2p0:timestamp>
+      </d2l_2p0:date_end>
+      <d2l_2p0:has_schedule_event>no</d2l_2p0:has_schedule_event>
+      <d2l_2p0:is_attempt_Rldb>no</d2l_2p0:is_attempt_Rldb>
+      <d2l_2p0:is_subview_Rldb>no</d2l_2p0:is_subview_Rldb>
+      <d2l_2p0:time_limit>15</d2l_2p0:time_limit>
+      <d2l_2p0:show_clock>yes</d2l_2p0:show_clock>
+      <d2l_2p0:enforce_time_limit>yes</d2l_2p0:enforce_time_limit>
+      <d2l_2p0:grace_period>5</d2l_2p0:grace_period>
+      <d2l_2p0:late_limit>2</d2l_2p0:late_limit>
+      <d2l_2p0:late_limit_data>0</d2l_2p0:late_limit_data>
+      <d2l_2p0:attempts_allowed>3</d2l_2p0:attempts_allowed>
+      <d2l_2p0:attempt_restrictions/>
+      <d2l_2p0:mark_calculation_type>1</d2l_2p0:mark_calculation_type>
+      <d2l_2p0:is_forward_only>no</d2l_2p0:is_forward_only>
+    </assess_procextension>
+    <assessfeedback title="">
+      <rubric>
+        <flow_mat>
+          <material>
+            <mattext texttype="yes">Your quiz has been submitted successfully.
+            </mattext>
+          </material>
+        </flow_mat>
+      </rubric>
+      <d2l_2p0:response_display_type_id>2</d2l_2p0:response_display_type_id>
+      <d2l_2p0:show_correct_answers>no</d2l_2p0:show_correct_answers>
+      <d2l_2p0:show_class_average>no</d2l_2p0:show_class_average>
+      <d2l_2p0:show_score_distribution>no</d2l_2p0:show_score_distribution>
+    </assessfeedback>
+    <section ident="CONTAINER_SECTION">
+      <section title="Quiz 2 Random" d2l_2p0:page="1" ident="RAND_1519362">
+        <qtimetadata>
+          <qti_metadatafield>
+            <fieldlabel>qmd_numberofitems</fieldlabel>
+            <fieldentry>3</fieldentry>
+          </qti_metadatafield>
+          <qti_metadatafield>
+            <fieldlabel>qmd_weighting</fieldlabel>
+            <fieldentry>1.000000000</fieldentry>
+          </qti_metadatafield>
+        </qtimetadata>
+        <sectionproc_extension>
+          <d2l_2p0:display_section_name>no</d2l_2p0:display_section_name>
+          <d2l_2p0:display_section_line>no</d2l_2p0:display_section_line>
+          <d2l_2p0:type_display_section>0</d2l_2p0:type_display_section>
+        </sectionproc_extension>
+        <itemref linkrefid="QUES_516156_630296" d2l_2p0:page="1">
+          <d2l_2p0:file href="questiondb.xml"/>
+          <d2l_2p0:points>1.000000000</d2l_2p0:points>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemref>
+        <itemref linkrefid="QUES_516157_630297" d2l_2p0:page="1">
+          <d2l_2p0:file href="questiondb.xml"/>
+          <d2l_2p0:points>1.000000000</d2l_2p0:points>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemref>
+        <itemref linkrefid="QUES_516158_630298" d2l_2p0:page="1">
+          <d2l_2p0:file href="questiondb.xml"/>
+          <d2l_2p0:points>1.000000000</d2l_2p0:points>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemref>
+      </section>
+    </section>
+  </assessment>
+</questestinterop>

@@ -288,9 +288,6 @@ describe Quiz do
     same.should eql(false)
   end
 
-  it "should choose random questions from each group for each user" do
-  end
-  
   it "should consider the number of questions in a group when determining the question count" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 10, :question_points => 2)
@@ -363,6 +360,38 @@ describe Quiz do
     a.should be_deleted
   end
   
+  it "should reattach existing graded quiz submissions to the new assignment after a graded -> ungraded -> graded transition" do
+    # create a quiz
+    q = @course.quizzes.new
+    q.quiz_type = "assignment"
+    q.workflow_state = "available"
+    q.save! && q.reload
+    q.assignment.should_not be_nil
+    q.quiz_submissions.size.should == 0
+
+    # create a graded submission
+    q.generate_submission(User.create!(:name => "some_user")).grade_submission
+    q.reload
+
+    q.quiz_submissions.size.should == 1
+    q.quiz_submissions.first.submission.should_not be_nil
+    q.quiz_submissions.first.submission.assignment.should == q.assignment
+
+    # switch to ungraded
+    q.quiz_type = "practice_quiz"
+    q.save! && q.reload
+    q.assignment.should be_nil
+    q.quiz_submissions.size.should == 1
+
+    # switch back to graded
+    q.quiz_type = "assignment"
+    q.save! && q.reload
+    q.assignment.should_not be_nil
+    q.quiz_submissions.size.should == 1
+    q.quiz_submissions.first.submission.should_not be_nil
+    q.quiz_submissions.first.submission.assignment.should == q.assignment
+  end
+
   context "clone_for" do
     it "should clone for other contexts" do
       u = User.create!(:name => "some user")

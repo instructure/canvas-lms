@@ -92,7 +92,6 @@ I18n.scoped('gradebook', function(I18n) {
         groupData = setGroupData(groups, $("#submission_group-" + data.assignment_group_id));
       }
       if(!groupData) {
-        $(this).addClass('dropped');
         return;
       }
       var score = parseFloat(data.score);
@@ -224,7 +223,7 @@ I18n.scoped('gradebook', function(I18n) {
     });
     $("tr.student_assignment").mouseover(function() {
       if($(this).hasClass('dropped')) {
-      $(this).attr('title', I18n.t('titles.dropped_assignment', 'This assignment is not being considered in the total calculation shown to the right'));
+        $(this).attr('title', I18n.t('titles.dropped_assignment_no_total', 'This assignment will not be considered in the total calculation'));
       } else {
         $(this).attr('title', '');
       }

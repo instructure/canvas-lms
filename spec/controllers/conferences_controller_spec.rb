@@ -39,7 +39,14 @@ describe ConferencesController do
       get 'index', :course_id => @course.id
       response.should be_success
     end
-    
+
+    it "should not redirect from group context" do
+      course_with_student_logged_in(:active_all => true)
+      @group = @course.groups.create!(:name => "some group")
+      @group.add_user(@user)
+      get 'index', :group_id => @group.id
+      response.should be_success
+    end
   end
 
   describe "POST 'create'" do

@@ -237,6 +237,18 @@ describe DiscussionEntriesController do
       rss.channel.title.should eql("some topic Posts Podcast Feed")
       rss.items.length.should eql(0)
     end
+
+    it "should leave out deleted media comments" do
+      topic_with_media_reply
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      @mo1.destroy
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      rss.should_not be_nil
+      rss.channel.title.should eql("some topic Posts Podcast Feed")
+      rss.items.length.should eql(0)
+    end
     
     it "should include student entries if enabled" do
       topic_with_media_reply

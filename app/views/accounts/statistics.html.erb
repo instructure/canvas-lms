@@ -80,6 +80,7 @@
   </table>
 <% end %>
 
+<% if can_do @account, @current_user, :read_course_list %>
 <% if @account == Account.default %>
 <h2><%= t(:recently_created_courses_title, "Recently Created Courses") %></h2>
 <ul class="item_list">
@@ -131,7 +132,9 @@
     <li><%= t(:none_message, "None to show") %></li>
   <% end %>
 </ul>
+<% end %>
 
+<% if can_do @account, @current_user, :read_roster %>
 <h2><%= t(:recently_logged_in_users_title, "Recently Logged-In Users") %></h2>
 <ul class="item_list">
   <% @recently_logged_users.each do |user| %>
@@ -144,6 +147,7 @@
     <li><%= t(:none_message, "None to show") %></li>
   <% end %>
 </ul>
+<% end %>
 
 <div id="over_time_dialog" style="display: none;">
   <div id='over_time' style='width: 600px; height: 240px;'></div>

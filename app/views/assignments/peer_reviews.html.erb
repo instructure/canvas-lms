@@ -100,7 +100,7 @@
         var assessor_name = $link.parents(".student_reviews").find(".assessor_name").text();
         var time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted;
         $link.attr('title', I18n.t('titles.remind', 'Remind %{assessor} about Assessment, last notified %{time}',
-          { assessor: assessor_name, time: time });
+          { assessor: assessor_name, time: time }));
       });
     });
     $(".remind_peer_reviews_link").click(function(event) {

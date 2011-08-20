@@ -225,7 +225,7 @@ class ContentZipper
   end
   
   def zip_base_folder(zip_attachment, folder)
-    @files_added = false
+    @files_added = true
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
     zip_attachment.workflow_state = 'zipping' #!(:workflow_state => 'zipping')
     zip_attachment.scribd_attempts += 1
@@ -285,9 +285,7 @@ class ContentZipper
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       path = folder_names.empty? ? attachment.filename : File.join(folder_names, attachment.unencoded_filename)
-      if add_attachment_to_zip(attachment, zipfile, path)
-        @files_added = true
-      end
+      @files_added = false unless add_attachment_to_zip(attachment, zipfile, path)
     end
     folder.active_sub_folders.select{|f| !@user || f.grants_right?(@user, nil, :read_contents)}.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name

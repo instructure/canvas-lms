@@ -82,7 +82,7 @@ describe "Converting respondus QTI" do
 
   it "should convert the assessment into a quiz" do
     manifest_node=get_manifest_node('assessment', :quiz_type => 'Test')
-    a = Qti::AssessmentTestConverter.new(manifest_node, respondus_question_dir, false)
+    a = Qti::AssessmentTestConverter.new(manifest_node, respondus_question_dir)
     a.create_instructure_quiz
     a.quiz.should == RespondusExpected::ASSESSMENT
   end

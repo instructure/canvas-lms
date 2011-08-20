@@ -51,7 +51,7 @@
 <% @users.each do |user| %>
   <tr class="<%= user.avatar_state %>">
     <td style="width: 50px;">
-      <div class="avatar"><img src="<%= user.avatar_url(50, @domain_root_account.settings[:avatars]) %>" style="width: 50px;"/></div>
+      <div class="avatar"><img src="<%= user.avatar_url(50, @domain_root_account.settings[:avatars]) %>" style="width: 50px; max-height: 75px;"/></div>
     </td>
     <td class="avatar_state">
     </td>
@@ -64,7 +64,7 @@
         <a href="#" class="update_avatar_link approve_avatar_link" data-state="approved" style="<%= hidden unless user.avatar_approvable? %>"><%= t(:approve_link, "approve") %></a>
         <a href="#" class="update_avatar_link lock_avatar_link" data-state="locked" style="<%= hidden if user.avatar_state == :locked %>"><%= t(:lock_link, "lock") %></a>
         <a href="#" class="update_avatar_link unlock_avatar_link" data-state="approved" style="<%= hidden unless user.avatar_state == :locked %>"><%= t(:unlock_link, "unlock") %></a>
-        <a href="#" class="update_avatar_link reject_avatar_link" data-state="none"><%= t(:delete_link, "delete") %>"</a>
+        <a href="#" class="update_avatar_link reject_avatar_link" data-state="none"><%= t(:delete_link, "delete") %></a>
         <div style="display: none;">
           <a href="<%= update_avatar_image_url(user.id) %>" class="user_avatar_url">&nbsp;</a>
         </div>

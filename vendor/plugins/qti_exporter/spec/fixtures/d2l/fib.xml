@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item d2l_2p0:id="24" ident="OBJ_3561822" label="QUES_979782_1194494" d2l_2p0:page="1">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Fill in the Blanks</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>1.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/html">&lt;p&gt;This a weird way to do&lt;/p&gt;</mattext>
+            </material>
+            <response_str ident="QUES_979782_1194494_A4749142_STR" rcardinality="Single">
+              <render_fib rows="1" columns="30" prompt="Box" fibtype="String">
+                <response_label ident="QUES_979782_1194494_A4749142_ANS"/>
+              </render_fib>
+            </response_str>
+            <material>
+              <mattext texttype="text/html">&lt;p&gt;in the blank&lt;/p&gt;</mattext></material>
+            <response_str ident="QUES_979782_1194494_A4749144_STR" rcardinality="Single">
+              <render_fib rows="1" columns="30" prompt="Box" fibtype="String">
+                <response_label ident="QUES_979782_1194494_A4749144_ANS"/>
+              </render_fib>
+            </response_str>
+          </flow>
+        </presentation>
+        <hint>
+          <hintmaterial>
+            <flow_mat>
+              <material>
+                <mattext texttype="text/html">&lt;p&gt;Hint?&lt;/p&gt;</mattext>
+              </material>
+            </flow_mat>
+          </hintmaterial>
+        </hint>
+        <resprocessing>
+          <outcomes>
+            <decvar vartype="Integer" minvalue="0" maxvalue="100" varname="Blank_1"/>
+            <decvar vartype="Integer" minvalue="0" maxvalue="100" varname="Blank_2"/>
+          </outcomes>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_979782_1194494_A4749142_ANS" case="no">fill</varequal>
+            </conditionvar>
+            <setvar action="Set">100.000000000</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_979782_1194494_A4749142_ANS" case="no">guess</varequal>
+            </conditionvar>
+            <setvar action="Set">50.000000000</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="QUES_979782_1194494_A4749144_ANS" case="no">questions</varequal>
+            </conditionvar>
+            <setvar action="Set">100.000000000</setvar>
+          </respcondition>
+        </resprocessing>
+        <itemfeedback ident="QUES_979782_1194494">
+          <material>
+            <mattext texttype="text/html">&lt;p&gt;No feedback for you.&lt;/p&gt;</mattext>
+          </material>
+        </itemfeedback>
+      </item>
+    </section>
+  </objectbank>
+</questestinterop>

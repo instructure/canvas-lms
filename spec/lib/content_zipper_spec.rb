@@ -47,5 +47,17 @@ describe ContentZipper do
       end
       names.sort.should == ['visible.png', 'visible/sub-vis.png']
     end
+
+    it "should not error on empty folders" do
+      course_with_student(:active_all => true)
+      folder = Folder.root_folders(@course).first
+      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment.user_id = @user.id
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = folder
+      attachment.save!
+      ContentZipper.process_attachment(attachment, @user)
+      attachment.workflow_state.should == 'zipped'
+    end
   end
 end

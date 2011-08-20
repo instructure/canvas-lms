@@ -37,3 +37,18 @@ table.report_example, table.report
         
         &.action
           text-align: center
+
+table.report.sortable
+  th.header
+    padding-right: 20px
+    cursor: pointer
+    background: url(/images/tablesorter/bg.png) no-repeat right center
+    
+    &:hover
+      background-image: url(/images/tablesorter/bg_hover.png)
+  
+    &.headerSortDown
+      background-image: url(/images/tablesorter/asc.gif)
+
+    &.headerSortUp
+      background-image: url(/images/tablesorter/desc.gif)

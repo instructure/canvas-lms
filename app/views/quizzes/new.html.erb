@@ -42,7 +42,8 @@
             <tr id="quiz_assignment_group" style="<%= hidden if @quiz.quiz_type != 'assignment' && @quiz.quiz_type != 'graded_survey' %>">
               <td><label for="quiz_assignment_group_id"><%= before_label(:group, "Group") %></label></td>
               <td><select name="quiz[assignment_group_id]" id="quiz_assignment_group_id" style="width: 100%;">
-                <% current_group_id = @quiz.assignment && @quiz.assignment.assignment_group_id || @quiz.assignment_group_id %>
+                <% current_group_id = @quiz.assignment && @quiz.assignment.assignment_group_id || @quiz.assignment_group_id
+                   @context.assert_assignment_group %>
                 <% @context.assignment_groups.active.each do |g| %>
                   <option value="<%= g.id %>" <%= 'selected' if g.id == current_group_id%>><%= g.name %></option>
                 <% end %>

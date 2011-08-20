@@ -139,7 +139,6 @@ class Notification < ActiveRecord::Base
     current_locale = I18n.locale
 
     tos = tos.flatten.compact.uniq
-    mailbox = asset.messaging_mailbox
     @delayed_messages_to_save = []
     recipient_ids = []
     recipients = []
@@ -203,7 +202,6 @@ class Notification < ActiveRecord::Base
         message.body = self.body
         message.body = self.sms_body if c.respond_to?("path_type") && c.path_type == "sms"
         message.notification_name = self.name
-        message.from = mailbox ? mailbox.path : nil
         message.communication_channel = c if c.is_a?(CommunicationChannel)
         message.dispatch_at = nil
         message.user = user
@@ -484,13 +482,13 @@ class Notification < ActiveRecord::Base
     t 'names.rubric_assessment_invitation', 'Rubric Assessment Invitation'
     t 'names.rubric_assessment_submission_reminder', 'Rubric Assessment Submission Reminder'
     t 'names.rubric_association_created', 'Rubric Association Created'
-    t 'names.student_context_message', 'Student Context Message'
+    t 'names.conversation_message', 'Conversation Message'
+    t 'names.added_to_conversation', 'Added To Conversation'
     t 'names.submission_comment', 'Submission Comment'
     t 'names.submission_comment_for_teacher', 'Submission Comment For Teacher'
     t 'names.submission_grade_changed', 'Submission Grade Changed'
     t 'names.submission_graded', 'Submission Graded'
     t 'names.summaries', 'Summaries'
-    t 'names.teacher_context_message', 'Teacher Context Message'
     t 'names.updated_wiki_page', 'Updated Wiki Page'
     t 'names.web_conference_invitation', 'Web Conference Invitation'
   end
@@ -552,6 +550,10 @@ class Notification < ActiveRecord::Base
       t(:message_description, "For new email messages")
     when 'Student Message'
       t(:student_message_description, "For private messages from students")
+    when 'Conversation Message'
+      t(:conversation_message_description, "For new conversation messages")
+    when 'Added To Conversation'
+      t(:added_to_conversation_description, "For conversations to which you're added")
     else
       t(:missing_description_description, "For %{category} alerts", :category => category)
     end

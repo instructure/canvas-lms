@@ -78,6 +78,9 @@ class CalendarsController < ApplicationController
     format = request.format.to_sym.to_s
     if format == 'json'
       args << { :user_content => %w(description) }
+      if @current_user
+        args.last[:permissions] = { :user => @current_user, :session => session }
+      end
     end
     @events.concat(@undated_events).send("to_#{format}", *args)
   end

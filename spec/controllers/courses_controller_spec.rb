@@ -190,10 +190,26 @@ describe CoursesController do
     
     it "should unenroll users" do
       course_with_teacher_logged_in(:active_all => true)
+      student_in_course
       post 'unenroll_user', :course_id => @course.id, :id => @enrollment.id
       @course.reload
       response.should be_success
-      @course.enrollments.map{|e| e.user}.should_not be_include(@user)
+      @course.enrollments.map{|e| e.user}.should_not be_include(@student)
+    end
+
+    it "should not allow teachers to unenroll themselves" do
+      course_with_teacher_logged_in(:active_all => true)
+      post 'unenroll_user', :course_id => @course.id, :id => @enrollment.id
+      assert_unauthorized
+    end
+
+    it "should allow admins to unenroll themselves" do
+      course_with_teacher_logged_in(:active_all => true)
+      @course.account.add_user(@teacher)
+      post 'unenroll_user', :course_id => @course.id, :id => @enrollment.id
+      @course.reload
+      response.should be_success
+      @course.enrollments.map{|e| e.user}.should_not be_include(@teacher)
     end
   end
   

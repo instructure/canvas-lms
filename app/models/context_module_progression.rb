@@ -80,24 +80,21 @@ class ContextModuleProgression < ActiveRecord::Base
         elsif obj.is_a?(Quiz)
           met << req if self.user.attempted_quiz_submission_for(obj.id)
         end
-      elsif req[:type] == "max_score"
+      elsif req[:type] == "max_score" || req[:type] == "min_score"
         obj = tag.content
         sub = nil
         if obj.is_a?(Assignment)
           sub = self.user.submitted_submission_for(obj.id)
+          score = sub.try(:score)
         elsif obj.is_a?(Quiz)
           sub = self.user.attempted_quiz_submission_for(obj.id)
+          score = sub.try(:kept_score)
         end
-        met << req if sub && sub.score <= req[:max_score].to_f
-      elsif req[:type] == "min_score"
-        obj = tag.content
-        sub = nil
-        if obj.is_a?(Assignment)
-          sub = self.user.submitted_submission_for(obj.id)
-        elsif obj.is_a?(Quiz)
-          sub = self.user.attempted_quiz_submission_for(obj.id)
+        if req[:type == "max_score"]
+          met << req if score && score <= req[:max_score].to_f
+        else
+          met << req if score && score >= req[:min_score].to_f
         end
-        met << req if sub && sub.score && sub.score >= req[:max_score].to_f
       end
     end
     new_reqs = met.map{|r| "#{r[:id]}_#{r[:type]}"}.sort
