@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <objectbank ident="QLIB_730739" xmlns:d2l_2p0="http://desire2learn.com/xsd/d2lcp_v2p0">
+    <section d2l_2p0:id="1" ident="SECT_3981973" title="02gilback">
+      <item ident="OBJ_3503048" label="QUES_968913_1181399" d2l_2p0:page="1" title="ordering question">
+        <itemmetadata>
+          <qtimetadata>
+            <qti_metadatafield>
+              <fieldlabel>qmd_computerscored</fieldlabel>
+              <fieldentry>yes</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_questiontype</fieldlabel>
+              <fieldentry>Ordering</fieldentry>
+            </qti_metadatafield>
+            <qti_metadatafield>
+              <fieldlabel>qmd_weighting</fieldlabel>
+              <fieldentry>1.000000000</fieldentry>
+            </qti_metadatafield>
+          </qtimetadata>
+        </itemmetadata>
+        <itemproc_extension>
+          <d2l_2p0:difficulty>1</d2l_2p0:difficulty>
+          <d2l_2p0:isbonus>no</d2l_2p0:isbonus>
+          <d2l_2p0:ismandatory>no</d2l_2p0:ismandatory>
+        </itemproc_extension>
+        <presentation>
+          <flow>
+            <material>
+              <mattext texttype="text/html">&lt;p&gt;the alphabet, heard of it?&lt;/p&gt;</mattext>
+            </material>
+            <response_extension>
+              <d2l_2p0:grading_type>1</d2l_2p0:grading_type>
+            </response_extension>
+            <response_grp respident="QUES_968913_1181399_O" rcardinality="Ordered">
+              <render_choice shuffle="yes">
+                <flow_label class="Block">
+                  <response_label ident="QUES_968913_1181399_O4710376">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">&lt;p&gt;a&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                  <response_label ident="QUES_968913_1181399_O4710377">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">&lt;p&gt;b&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                  <response_label ident="QUES_968913_1181399_O4710378">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">&lt;p&gt;c&lt;/p&gt;</mattext>
+                      </material>
+                    </flow_mat>
+                  </response_label>
+                  <response_label ident="QUES_968913_1181399_O4710379">
+                    <flow_mat>
+                      <material>
+                        <mattext texttype="text/html">&lt;p&gt;d&lt;/p&gt;</mattext></material>
+                    </flow_mat>
+                  </response_label>
+                </flow_label>
+              </render_choice>
+            </response_grp>
+          </flow>
+        </presentation>
+        <hint>
+          <hintmaterial>
+            <flow_mat>
+              <material>
+                <mattext texttype="text/html">&lt;p&gt;abcd&lt;/p&gt;</mattext>
+              </material>
+            </flow_mat>
+          </hintmaterial>
+        </hint>
+        <resprocessing>
+          <outcomes>
+            <decvar vartype="Integer" defaultval="0" varname="D2L_Correct" minvalue="0" maxvalue="100"/>
+            <decvar vartype="Integer" defaultval="0" varname="D2L_Incorrect" minvalue="0"/>
+            <decvar vartype="Integer" defaultval="0" varname="que_score" minvalue="0"/>
+          </outcomes>
+          <respcondition title="Correct Condition">
+            <conditionvar>
+              <varequal respident="QUES_968913_1181399_O4710376">1</varequal>
+            </conditionvar>
+            <setvar varname="D2L_Correct" action="Add">1</setvar>
+          </respcondition>
+          <respcondition title="Incorrect Condition">
+            <conditionvar>
+              <not>
+                <varequal respident="QUES_968913_1181399_O4710376">1</varequal>
+              </not>
+            </conditionvar>
+            <setvar varname="D2L_Incorrect" action="Add">1</setvar>
+          </respcondition>
+          <respcondition title="Correct Condition">
+            <conditionvar>
+              <varequal respident="QUES_968913_1181399_O4710377">2</varequal>
+            </conditionvar>
+            <setvar varname="D2L_Correct" action="Add">1</setvar>
+          </respcondition>
+          <respcondition title="Incorrect Condition">
+            <conditionvar>
+              <not>
+                <varequal respident="QUES_968913_1181399_O4710377">2</varequal>
+              </not>
+            </conditionvar>
+            <setvar varname="D2L_Incorrect" action="Add">1</setvar>
+          </respcondition>
+          <respcondition title="Correct Condition">
+            <conditionvar>
+              <varequal respident="QUES_968913_1181399_O4710378">3</varequal>
+            </conditionvar>
+            <setvar varname="D2L_Correct" action="Add">1</setvar>
+          </respcondition>
+          <respcondition title="Incorrect Condition">
+            <conditionvar>
+              <not>
+                <varequal respident="QUES_968913_1181399_O4710378">3</varequal>
+              </not>
+            </conditionvar>
+            <setvar varname="D2L_Incorrect" action="Add">1</setvar>
+          </respcondition>
+          <respcondition title="Correct Condition">
+            <conditionvar>
+              <varequal respident="QUES_968913_1181399_O4710379">4</varequal>
+            </conditionvar>
+            <setvar varname="D2L_Correct" action="Add">1</setvar>
+          </respcondition>
+          <respcondition title="Incorrect Condition">
+            <conditionvar>
+              <not>
+                <varequal respident="QUES_968913_1181399_O4710379">4</varequal>
+              </not>
+            </conditionvar>
+            <setvar varname="D2L_Incorrect" action="Add">1</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <vargte respident="D2L_Incorrect">0</vargte>
+            </conditionvar>
+            <setvar varname="que_score" action="Set">0</setvar>
+          </respcondition>
+          <respcondition>
+            <conditionvar>
+              <varequal respident="D2L_Incorrect">0</varequal>
+            </conditionvar>
+            <setvar varname="que_score" action="Set">1</setvar>
+          </respcondition>
+        </resprocessing>
+        <itemfeedback ident="QUES_968913_1181399_IF4710376">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_968913_1181399_IF4710377">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_968913_1181399_IF4710378">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+        <itemfeedback ident="QUES_968913_1181399_IF4710379">
+          <material>
+            <mattext texttype="text/html"/>
+          </material>
+        </itemfeedback>
+      </item>
+    </section>
+  </objectbank>
+</questestinterop>

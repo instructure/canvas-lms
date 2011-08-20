@@ -20,6 +20,10 @@ def user_model(opts={})
   @user = factory_with_protected_attributes(User, valid_user_attributes.merge(opts))
 end
 
+def tie_user_to_account(user, opts={})
+  user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
+end
+
 def valid_user_attributes
   {
     :name => 'value for name',

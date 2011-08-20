@@ -17,7 +17,6 @@
 #
 
 class SubmissionComment < ActiveRecord::Base
-  include SendToInbox
   include SendToStream
   
   belongs_to :submission #, :touch => true
@@ -41,6 +40,32 @@ class SubmissionComment < ActiveRecord::Base
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
 
+  trigger.after(:insert) do
+    <<-SQL
+    UPDATE submissions
+    SET has_admin_comment=EXISTS(
+      SELECT 1 FROM submission_comments AS sc, assignments AS a, courses AS c, enrollments AS e
+      WHERE sc.submission_id = submissions.id AND a.id = submissions.assignment_id
+        AND c.id = a.context_id AND a.context_type = 'Course' AND e.course_id = c.id
+        AND e.user_id = sc.author_id AND e.workflow_state = 'active'
+        AND e.type IN ('TeacherEnrollment', 'TaEnrollment'))
+    WHERE id = NEW.submission_id;
+    SQL
+  end
+
+  trigger.after(:delete) do
+    <<-SQL
+    UPDATE submissions
+    SET has_admin_comment=EXISTS(
+      SELECT 1 FROM submission_comments AS sc, assignments AS a, courses AS c, enrollments AS e
+      WHERE sc.submission_id = submissions.id AND a.id = submissions.assignment_id
+        AND c.id = a.context_id AND a.context_type = 'Course' AND e.course_id = c.id
+        AND e.user_id = sc.author_id AND e.workflow_state = 'active'
+        AND e.type IN ('TeacherEnrollment', 'TaEnrollment'))
+    WHERE id = OLD.submission_id;
+    SQL
+  end
+
   serialize :cached_attachments
   
   def delete_other_comments_in_this_group
@@ -57,24 +82,6 @@ class SubmissionComment < ActiveRecord::Base
   
   has_a_broadcast_policy
 
-  on_create_send_to_inboxes do
-    if self.submission
-      users = []
-      if self.author_id == self.submission.user_id
-        users = self.submission.context.admins_in_charge_of(self.author_id)
-      else
-        users = self.submission.user_id
-      end
-      submission = self.submission
-      {
-        :recipients => users,
-        :subject => "#{submission.assignment.title}: #{submission.user.name}",
-        :body => self.comment,
-        :sender => self.author_id
-      }
-    end
-  end
-  
   def media_comment?
     self.media_comment_id && self.media_comment_type
   end
@@ -107,16 +114,14 @@ class SubmissionComment < ActiveRecord::Base
     p.whenever {|record|
       record.just_created &&
       record.submission.assignment &&
-      (!record.submission.assignment.context.admins.include?(author) || record.submission.assignment.published?) &&
-      (record.created_at - record.submission.created_at rescue 0) > 30
+      (!record.submission.assignment.context.admins.include?(author) || record.submission.assignment.published?)
     }
 
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.admins_in_charge_of(author_id) - [author] }
     p.whenever {|record|
       record.just_created &&
-      record.submission.user_id == record.author_id &&
-      (!record.submission.submitted_at || ((record.created_at - record.submission.submitted_at rescue 0) > 30))
+      record.submission.user_id == record.author_id
     }
   end
   

@@ -53,8 +53,11 @@ class GradebooksController < ApplicationController
           add_crumb(@student.name, named_context_url(@context, :context_student_grades_url, @student.id))
           
           @groups = @context.assignment_groups.active.all
-          @assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title') +
-            groups_as_assignments(@groups, :out_of_final => true)
+          @assignments = @context.assignments.active.gradeable.find(:all, :order => 'due_at, title')
+          groups_assignments =
+            groups_as_assignments(@groups, :out_of_final => true, :exclude_total => @context.settings[:hide_final_grade])
+          @no_calculations = groups_assignments.empty?
+          @assignments.concat(groups_assignments)
           @submissions = @context.submissions.find(:all, :conditions => ['user_id = ?', @student.id], :include => [ :submission_comments, :rubric_assessments ])
           # pre-cache the assignment group for each assignment object
           @assignments.each { |a| a.assignment_group = @groups.find { |g| g.id == a.assignment_group_id } }
@@ -355,7 +358,7 @@ class GradebooksController < ApplicationController
           lambda{ |group| percentage[group.group_weight] }) :
         lambda{ |group| nil }
 
-    groups.map{ |group|
+    groups = groups.map{ |group|
       OpenObject.build('assignment',
         :id => 'group-' + group.id.to_s,
         :rules => group.rules,
@@ -366,12 +369,15 @@ class GradebooksController < ApplicationController
         :assignment_group_id => group.id,
         :group_weight => group.group_weight,
         :asset_string => "group_total_#{group.id}")
-    } << OpenObject.build('assignment',
+    }
+    groups << OpenObject.build('assignment',
         :id => 'final-grade',
         :title => t('titles.total', 'Total'),
         :points_possible => (options[:out_of_final] ? '-' : percentage[100]),
         :hard_coded => true,
         :special_class => 'final_grade',
-        :asset_string => "final_grade_column")
+        :asset_string => "final_grade_column") unless options[:exclude_total]
+    groups = [] if options[:exclude_total] && groups.length == 1
+    groups
   end
 end

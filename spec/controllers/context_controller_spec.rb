@@ -72,21 +72,6 @@ describe ContextController do
     end
   end
 
-  describe "GET 'inbox_item'" do
-    it "should exclude recipients if protect_recipients" do
-      course_with_student_logged_in(:active_all => true)
-      @student = @user
-      @teacher = @course.enroll_teacher(user(:active_all => true)).user
-      @cm = @course.context_messages.build(:subject => 'hai', :body => 'test', :user => @teacher, :protect_recipients => '1')
-      @cm.recipients = [@student.id]
-      @cm.save!
-      get 'inbox_item', :course_id => @course.id, :id => InboxItem.find_by_user_id(@student.id), :format => 'json'
-      json = JSON.parse(response.body)
-      json['context_message']['recipients'].should be_nil
-      json['context_message']['viewed_user_ids'].should be_nil
-    end
-  end
-  
   describe "GET 'chat'" do
     it "should redirect if no chats enabled" do
       course_with_teacher(:active_all => true)
@@ -129,6 +114,55 @@ describe ContextController do
       post 'object_snippet', :object_data => @data, :s => @hmac
       response.should be_success
       response['X-XSS-Protection'].should == '0'
+    end
+  end
+
+  describe "POST '/media_objects'" do
+    before :each do
+      course_with_student_logged_in(:active_all => true)
+    end
+
+    it "should match the create_media_object route" do
+      assert_recognizes({:controller => 'context', :action => 'create_media_object'}, {:path => 'media_objects', :method => :post})
+    end
+
+    it "should update the object if it already exists" do
+      @media_object = @user.media_objects.build(:media_id => "new_object")
+      @media_object.media_type = "audio"
+      @media_object.title = "original title"
+      @media_object.save
+
+      @original_count = @user.media_objects.count
+
+      post :create_media_object,
+        :context_code => "user_#{@user.id}",
+        :id => @media_object.media_id,
+        :type => @media_object.media_type,
+        :title => "new title"
+
+      @media_object.reload
+      @media_object.title.should == "new title"
+
+      @user.reload
+      @user.media_objects.count.should == @original_count
+    end
+
+    it "should create the object if it doesn't already exist" do
+      @original_count = @user.media_objects.count
+
+      post :create_media_object,
+        :context_code => "user_#{@user.id}",
+        :id => "new_object",
+        :type => "audio",
+        :title => "title"
+
+      @user.reload
+      @user.media_objects.count.should == @original_count + 1
+      @media_object = @user.media_objects.last
+
+      @media_object.media_id.should == "new_object"
+      @media_object.media_type.should == "audio"
+      @media_object.title.should == "title"
     end
   end
 end

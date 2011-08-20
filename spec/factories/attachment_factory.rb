@@ -37,7 +37,7 @@ def valid_attachment_attributes(opts={})
   }
 end
 
-def stub_png_data(filename = 'test.png', data = nil)
+def stub_png_data(filename = 'test my file? hai!&.png', data = nil)
   $stub_file_counter ||= 0
   data ||= "ohai#{$stub_file_counter += 1}"
   sio = StringIO.new(data)

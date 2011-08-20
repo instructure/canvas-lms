@@ -57,7 +57,11 @@
         <td>
           <div>
             <%= check_box :user, :all, :checked => true, :class => "all_users_checkbox" %>
-            <%= label :user, :all, :'labels.all_users', :en => "Invite All Course Members" %>
+            <% if @context.is_a?(Course) %>
+              <%= label :user, :all, :'labels.all_course_members', :en => "Invite All Course Members" %>
+            <% else %>
+              <%= label :user, :all, :'labels.all_group_members', :en => "Invite All Group Members" %>
+            <% end %>
             <ul id="members_list" style="display: none;">
               <% @users.find(:all, :order => 'sortable_name').uniq.each do |user| %>
                 <% if user != @current_user %>

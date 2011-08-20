@@ -126,7 +126,6 @@ module Instructure #:nodoc:
           include Instructure::Broadcast::Policy::InstanceMethods
           after_save :broadcast_notifications # Must be defined locally...
           before_save :set_broadcast_flags
-          has_many :mailboxes, :as => :mailboxable_entity
         end
         
         # Uses the 'context' relationship as the governing relationship.
@@ -177,31 +176,6 @@ module Instructure #:nodoc:
         
         # Some generic flags for inside the policy
         attr_accessor :just_created, :prior_version
-        
-        # Some mailboxes for general communication
-        def messaging_mailbox
-          if self.respond_to?(:reply_from)
-            @broadcast_mailbox ||= self.mailboxes.find_or_create_by_purpose_and_name(
-              'notification', 
-              ("#{self.asset_string} Notifications").strip
-            )
-          elsif (self.respond_to?(:context) && self.context rescue nil)
-            @broadcast_mailbox ||= Mailbox.find_or_create_by_mailboxable_entity_type_and_mailboxable_entity_id_and_purpose_and_name(
-              self.context.class.to_s,
-              self.context.id,
-              'general',
-              "self.context.asset_string General Notifications"
-            )
-          end
-        end
-        
-        # def incoming_mailbox
-          # @incoming_mailbox ||= mailboxes.find_or_create_by_purpose_and_name(
-            # :purpose => 'incoming', 
-            # :name => ('' + " Communication").strip
-          # )
-          # # Set pseudonyms???  Could do this with incoming_list
-        # end
         
         # Some flags for auditing policy matching
         def messages_sent

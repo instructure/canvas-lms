@@ -1,0 +1,3 @@
+<%= t :body, "%{user_name} just added you to a conversation in Canvas.", :user_name => (asset.author.short_name rescue t(:unknown_user, 'Unknown User')) %>
+
+<%= t :more_info, "More info at %{url}", :url => HostUrl.default_host %>

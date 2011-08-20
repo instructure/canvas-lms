@@ -91,6 +91,17 @@ describe "OAuth2", :type => :integration do
     post "/api/v1/courses/#{@course.id}/assignments.json", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' }, :authenticity_token => session[:_csrf_token] }
     response.should be_success
     @course.assignments.count.should == 2
+
+    # don't allow replacing the authenticity token with api_key unless basic auth is given
+    reset!
+    post '/login', 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test123'
+    post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
+    response.should be_client_error
+    # the basic auth has to be correct, too
+    post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
+    response.should be_client_error
+    post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+    response.should be_success
   end
 
   describe "oauth2 native app flow" do

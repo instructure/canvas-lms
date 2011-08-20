@@ -1,12 +1,13 @@
 module Qti
 class AssociateInteraction < AssessmentItemConverter
-
+  include Canvas::XMLHelper
+  
   def initialize(opts)
     super(opts)
     @question[:matches] = []
     @question[:question_type] = 'matching_question'
     # to mark whether it's bb8/vista/respondus_matching if needed
-    @flavor = opts[:custom_type]
+    @custom_type = opts[:custom_type]
   end
 
   def parse_question_data
@@ -17,10 +18,10 @@ class AssociateInteraction < AssessmentItemConverter
       check_for_meta_matches
     elsif node = @doc.at_css('matchInteraction')
       get_all_match_interaction(node)
-    elsif @flavor == 'respondus_matching'
+    elsif @custom_type == 'respondus_matching'
       get_respondus_answers
       get_respondus_matches
-    elsif @flavor == 'canvas_matching'
+    elsif @custom_type == 'canvas_matching'
       match_map = {}
       get_canvas_matches(match_map)
       get_canvas_answers(match_map)
@@ -122,17 +123,17 @@ class AssociateInteraction < AssessmentItemConverter
 
   def get_all_matches_from_body
     if matches = @doc.at_css('div.RIGHT_MATCH_BLOCK')
-      matches.css('p').each do |m|
+      matches.css('div').each do |m|
         match = {}
         @question[:matches] << match
-        match[:text] = clear_html m.text.strip
+        match[:text] = sanitize_html_string(m.text.strip, true)
         match[:match_id] = unique_local_id
       end
     end
   end
   
   def get_all_answers_from_body
-    @doc.css('div.RESPONSE_BLOCK p').each_with_index do |a, i|
+    @doc.css('div.RESPONSE_BLOCK div').each_with_index do |a, i|
       answer = {}
       @question[:answers] << answer
       extract_answer!(answer, a)
@@ -147,9 +148,10 @@ class AssociateInteraction < AssessmentItemConverter
       matches.css('simpleAssociableChoice').each do |m|
         match = {}
         @question[:matches] << match
-        match[:text] = m.text.strip
+        extract_answer!(match, m)
         match[:match_id] = unique_local_id
         match_map[match[:text]] = match[:match_id]
+        match_map[m['identifier']] = match[:match_id]
       end
     end
   end
@@ -164,6 +166,18 @@ class AssociateInteraction < AssessmentItemConverter
       
       if option = a.at_css('simpleAssociableChoice[identifier^=MATCH]')
         answer[:match_id] = match_map[option.text.strip]
+      elsif resp_id = a['responseIdentifier']
+        @doc.css("match variable[identifier=#{resp_id}]").each do |variable|
+          match = variable.parent
+          response_if = match.parent
+          if response_if.name =~ /response(Else)?If/
+            if response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
+              match_id = get_node_val(match, 'baseValue', '').strip
+              answer[:match_id] = match_map[match_id]
+              break
+            end
+          end
+        end
       end
     end
   end
@@ -174,7 +188,7 @@ class AssociateInteraction < AssessmentItemConverter
       @question[:matches].each_with_index do |match, i|
         match[:text] = long_matches[i].text.strip.gsub(/ +/, " ") if long_matches[i]
       end
-      if not long_matches.size == @question[:matches].size
+      if long_matches.size > 0 && long_matches.size != @question[:matches].size
         @question[:qti_warning] = "The matching options for this question may have been incorrectly imported."
       end
     end

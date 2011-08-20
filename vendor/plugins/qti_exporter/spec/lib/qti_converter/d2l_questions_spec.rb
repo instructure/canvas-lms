@@ -2,64 +2,261 @@ require File.dirname(__FILE__) + '/../../qti_helper'
 
 describe "Converting D2L QTI" do
   it "should convert multiple choice" do
-    manifest_node=get_manifest_node('multiple_choice')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>d2l_question_dir)
-    hash[:answers].each { |a| a.delete(:id) }
-    hash.should == D2LExpected::MULTIPLE_CHOICE
+    get_question_hash(d2l_question_dir, 'multiple_choice').should == D2LExpected::MULTIPLE_CHOICE
   end
 
   it "should convert true false" do
-    manifest_node=get_manifest_node('true_false')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>d2l_question_dir)
-    hash[:answers].each { |a| a.delete(:id) }
-    hash.should == D2LExpected::TRUE_FALSE
+    get_question_hash(d2l_question_dir, 'true_false').should == D2LExpected::TRUE_FALSE
   end
 
-#  it "should convert the assessment into a quiz" do
-#    manifest_node=get_manifest_node('assessment', nil, 'Test')
-#    a = Qti::AssessmentTestConverter.new(manifest_node, d2l_question_dir, false)
-#    a.create_instructure_quiz
-#    pp a.quiz
-#    a.quiz.should == D2LExpected::ASSESSMENT
-#  end
+  it "should convert short answer" do
+    get_question_hash(d2l_question_dir, 'short_answer').should == D2LExpected::SHORT_ANSWER
+  end
 
+  it "should convert multi select" do
+    get_question_hash(d2l_question_dir, 'multi_select').should == D2LExpected::MULTI_SELECT
+  end
+  
+  it "should convert multiple short" do
+    get_question_hash(d2l_question_dir, 'multiple_short').should == D2LExpected::MULTIPLE_SHORT
+  end
+  
+  it "should convert fill in the blank with multiple blanks" do
+    get_question_hash(d2l_question_dir, 'fib').should == D2LExpected::FIB
+  end
+  
+  it "should convert matching" do
+    #pp get_question_hash(d2l_question_dir, 'matching', false)
+    hash = get_question_hash(d2l_question_dir, 'matching', false, :flavor => 'd2l')
+    matches = {}
+    hash[:matches].each {|m| matches[m[:match_id]] = m[:text]}
+    hash[:answers].each do |a|
+      matches[a[:match_id]].should == a[:right]
+    end
+    # compare everything else without the ids
+    hash[:answers].each {|a|a.delete(:id); a.delete(:match_id)}
+    hash[:matches].each {|m|m.delete(:match_id)}
+    hash.should == D2LExpected::MATCHING
+  end
+  
+  it "should flag ordering question as an error" do
+    get_question_hash(d2l_question_dir, 'ordering').should == D2LExpected::ORDERING
+  end
+  
+  it "should convert math question" do
+    get_question_hash(d2l_question_dir, 'math').should == D2LExpected::MATH
+  end
+
+  it "should convert long answer" do
+    get_question_hash(d2l_question_dir, 'long_answer').should == D2LExpected::LONG_ANSWER
+  end
+
+  it "should convert the assessment into a quiz" do
+    get_quiz_data(d2l_question_dir, 'assessment').last.first.should == D2LExpected::ASSESSMENT
+  end
+
+  it "should convert the assessment into a quiz" do
+    get_quiz_data(d2l_question_dir, 'assessment_references').last.first.should == D2LExpected::ASSESSMENT_REFS
+  end
 
 end
 
 module D2LExpected
+
   MULTIPLE_CHOICE =
-          {:correct_comments=>"Good work",
-                  :incorrect_comments=>"Good work",
+          {
+                  :incorrect_comments=>"",
+                  :question_bank_name=>"QLIB_730739",
                   :answers=>
-                          [{:weight=>100,
-                                   :migration_id=>"QUES_32399_53455_A1013651",
-                                   :text=>"True",
-                                   :comments=>"Good work"},
-                           {:weight=>0,
-                                   :migration_id=>"QUES_32399_53455_A1013652",
-                                   :text=>"False",
-                                   :comments=>"That's not correct"}],
-                  :question_type=>"multiple_choice_question",
-                  :migration_id=>"d2l_multiple_choice",
+                          [
+                                  {:weight=>100,
+                                   :text=>"alpha",
+                                   :migration_id=>"QUES_516156_630296_A2899442",
+                                   :comments=>""},
+                                  {:weight=>0,
+                                   :text=>"beta",
+                                   :migration_id=>"QUES_516156_630296_A2899443",
+                                   :comments=>""},
+                                  {:weight=>0,
+                                   :text=>"gamma",
+                                   :migration_id=>"QUES_516156_630296_A2899444",
+                                   :comments=>""},
+                                  {:weight=>0,
+                                   :text=>"omega",
+                                   :migration_id=>"QUES_516156_630296_A2899445",
+                                   :comments=>""}
+                          ],
+                  :question_bank_id=>"QLIB_730739",
                   :points_possible=>1,
-                  :question_text=>
-                          "&lt;!--BBQ-001--&gt;Akkadian is a Semitic language, related to Hebrew and Arabic.",
-                  :question_name=>""}
+                  :migration_id=>"OBJ_1519236",
+                  :question_text=>"The first letter of the Greek alphabet is?",
+                  :question_name=>"",
+                  :correct_comments=>"",
+                  :question_type=>"multiple_choice_question"
+          }
+  
   TRUE_FALSE =
           {:question_type=>"multiple_choice_question",
-                  :correct_comments=>"",
+           :incorrect_comments=>"True is correct",
+           :points_possible=>1,
+           :answers=>
+                   [{:text=>"True",
+                     :weight=>100,
+                     :migration_id=>"QUES_968903_1181388_A4710345",
+                     :comments=>"True is correct"},
+                    {:text=>"False",
+                     :weight=>0,
+                     :migration_id=>"QUES_968903_1181388_A4710346",
+                     :comments=>"False is not correct"}],
+           :question_text=>
+                   "<p>Is this <strong>true</strong> or false?</p><img src=\"quizzing/bunny_consumer.png\" alt=\"\">",
+           :question_name=>"true false questions",
+           :migration_id=>"OBJ_3503037",
+           :correct_comments=>"True is correct"}
+
+  ASSESSMENT = {:migration_id=>"qti",
+                :question_count=>1,
+                :title=>"01 Early Bird Storybook Week 2",
+                :quiz_name=>"01 Early Bird Storybook Week 2",
+                :quiz_type=>nil,
+                :questions=>[{:migration_id=>"OBJ_3983699", :question_type=>"question_reference"}],
+                :time_limit => 15,
+                :allowed_attempts=>-1,
+                :assignment_migration_id=>'435646'
+  }
+
+  ASSESSMENT_REFS = {:title=>"Quiz 2",
+                     :allowed_attempts=>3,
+                     :quiz_name=>"Quiz 2",
+                     :migration_id=>"qti",
+                     :quiz_type=>nil,
+                     :questions=>
+                             [{:points_possible=>1,
+                               :migration_id=>"QUES_516156_630296",
+                               :question_type=>"question_reference"},
+                              {:points_possible=>1,
+                               :migration_id=>"QUES_516157_630297",
+                               :question_type=>"question_reference"},
+                              {:points_possible=>1,
+                               :migration_id=>"QUES_516158_630298",
+                               :question_type=>"question_reference"}],
+                     :question_count=>3,
+                     :time_limit=>15,
+                     :access_code=>"insecure",
+                     :assignment_migration_id=>'164842'}
+  
+  LONG_ANSWER = {:question_bank_name=>"QLIB_730739",
+                 :points_possible=>1,
+                 :answers=>[],
+                 :question_text=>"Write an essay on writing essays",
+                 :question_name=>"",
+                 :migration_id=>"OBJ_1519344",
+                 :correct_comments=>"",
+                 :question_type=>"essay_question",
+                 :incorrect_comments=>"",
+                 :question_bank_id=>"QLIB_730739"}
+
+  SHORT_ANSWER = {:question_type=>"short_answer_question",
+                  :incorrect_comments=>"",
+                  :question_bank_id=>"QLIB_730739",
+                  :question_bank_name=>"QLIB_730739",
+                  :points_possible=>1,
+                  :answers=>[{:weight=>100, :text=>"Nydam", :comments=>""}],
+                  :question_text=>"Who is winning the Tour of California today?",
+                  :question_name=>"",
+                  :migration_id=>"OBJ_1545059",
+                  :correct_comments=>""}
+  
+  MULTI_SELECT = {:correct_comments=>"",
+                  :question_type=>"multiple_answers_question",
+                  :incorrect_comments=>"",
+                  :question_bank_id=>"QLIB_730739",
+                  :question_bank_name=>"QLIB_730739",
                   :points_possible=>1,
                   :answers=>
-                          [{:text=>"True",
-                                   :weight=>100,
-                                   :migration_id=>"QUES_443669_562987_A2890736",
-                                   :comments=>""},
-                           {:text=>"False",
-                                   :weight=>0,
-                                   :migration_id=>"QUES_443669_562987_A2890737",
-                                   :comments=>""}],
-                  :incorrect_comments=>"",
-                  :question_text=>"I have submitted the Week 2 Storybook assignment.",
-                  :question_name=>"",
-                  :migration_id=>"d2l_true_false"}
+                          [{:text=>"1", :weight=>0, :migration_id=>"QUES_968905_1181391_A4710353"},
+                           {:text=>"2", :weight=>100, :migration_id=>"QUES_968905_1181391_A4710354"},
+                           {:text=>"3", :weight=>0, :migration_id=>"QUES_968905_1181391_A4710355"},
+                           {:text=>"4", :weight=>100, :migration_id=>"QUES_968905_1181391_A4710356"}],
+                  :question_text=>"<p>how about the even numbers?</p>",
+                  :question_name=>"multi select",
+                  :migration_id=>"OBJ_3503039"}
+
+  MULTIPLE_SHORT = {:question_name=>"multiple short answer",
+                    :migration_id=>"OBJ_3503044",
+                    :correct_comments=>"",
+                    :question_type=>"short_answer_question",
+                    :incorrect_comments=>"",
+                    :question_bank_id=>"QLIB_730739",
+                    :question_bank_name=>"QLIB_730739",
+                    :points_possible=>1,
+                    :answers=>
+                            [{:comments=>"", :text=>"answer 1", :weight=>100},
+                             {:comments=>"", :text=>"answer 2", :weight=>100},
+                             {:comments=>"", :text=>"answer 3", :weight=>100}],
+                    :question_text=>"<p>What is a multiple short answer?</p>"}
+
+  MATCHING = {:question_text=>"<p>letter to number</p>",
+              :question_name=>"matching",
+              :migration_id=>"OBJ_3503046",
+              :matches=>
+                      [{:html=>"<strong>1</strong>", :text=>'1'},
+                       {:text=>'2'}],
+              :correct_comments=>"",
+              :question_type=>"matching_question",
+              :incorrect_comments=>"",
+              :question_bank_id=>"QLIB_730739",
+              :question_bank_name=>"QLIB_730739",
+              :points_possible=>1,
+              :answers=>
+                      [{:right=>"1",
+                        :html=>"<em><strong>A</strong></em>",
+                        :comments=>"",
+                        :text=>"A"},
+                       {:right=>"2", 
+                        :comments=>"", 
+                        :text=>"b"}]}
+
+  ORDERING = {:question_bank_id=>"QLIB_730739",
+              :answers=>[],
+              :incorrect_comments=>"",
+              :qti_error=>"There was an error exporting an assessment question - No question type used when trying to parse a qti question",
+              :points_possible=>1,
+              :question_bank_name=>"QLIB_730739",
+              :question_text=>"<p>the alphabet, heard of it?</p>",
+              :question_name=>"ordering question",
+              :migration_id=>"OBJ_3503048",
+              :correct_comments=>"",
+              :question_type=>"Error"}
+
+  MATH = {:answers=>[],
+          :question_type=>"calculated_question",
+          :formulas=>[],
+          :question_bank_id=>"QLIB_730739",
+          :incorrect_comments=>"",
+          :imported_formula=>"2 * {x}   {y} - {z}",
+          :points_possible=>1,
+          :question_bank_name=>"QLIB_730739",
+          :question_text=>"<p>Solve the formula:</p>",
+          :question_name=>"multi variable math",
+          :migration_id=>"OBJ_3563546",
+          :variables=>
+                  [{:scale=>3, :min=>10, :max=>15, :name=>"x"},
+                   {:scale=>1, :min=>0.1, :max=>0.9, :name=>"y"},
+                   {:scale=>0, :min=>100, :max=>150, :name=>"z"}],
+          :correct_comments=>""}
+
+  FIB = {:migration_id=>"OBJ_3561822",
+         :answers=>
+                 [{:blank_id=>"QUES_979782_1194494_A4749142", :text=>"fill", :weight=>100},
+                  {:blank_id=>"QUES_979782_1194494_A4749142", :text=>"guess", :weight=>100},
+                  {:blank_id=>"QUES_979782_1194494_A4749144", :text=>"questions", :weight=>100}],
+         :correct_comments=>"",
+         :question_type=>"fill_in_multiple_blanks_question",
+         :question_bank_id=>"QLIB_730739",
+         :incorrect_comments=>"",
+         :points_possible=>1,
+         :question_bank_name=>"QLIB_730739",
+         :question_text=> "This a weird way to do [QUES_979782_1194494_A4749142] in the blank [QUES_979782_1194494_A4749144] ",
+         :question_name=>""}
 end

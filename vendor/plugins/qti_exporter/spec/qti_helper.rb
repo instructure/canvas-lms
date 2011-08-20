@@ -14,6 +14,18 @@ end
 require 'qti_exporter'
 require 'pp'
 
+def get_question_hash(dir, name, delete_answer_ids=true, opts={})
+  hash = get_quiz_data(dir, name, opts).first.first
+  hash[:answers].each {|a|a.delete(:id)} if delete_answer_ids
+  hash
+end
+
+def get_quiz_data(dir, name, opts={})
+  File.open(File.join(dir, '%s.xml' % name), 'r') do |file|
+    Qti.convert_xml(file.read, opts)
+  end
+end
+
 def get_manifest_node(question, opts={})
   manifest_node = {'identifier'=>nil, 'href'=>"#{question}.xml"}
   manifest_node.stub!(:at_css).and_return(nil)
@@ -91,7 +103,7 @@ def cengage_question_dir
 end
 
 def d2l_question_dir
-  File.join(D2L_FIXTURE_DIR, "questions")
+  D2L_FIXTURE_DIR
 end
 
 def html_sanitization_question_dir(type)

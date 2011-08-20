@@ -1,119 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
-Note: in future, maxattempts will probably be controllable at assessment or assessment section level
-Converting proprietary Blackboard metadata field bbmd_asi_object_id = _153004_1
-Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
-Converting proprietary Blackboard metadata field bbmd_questiontype = Fill in the Blank Plus
-Converting proprietary Blackboard metadata field qmd_absolutescore_max = 10.0
-Warning: mat_extension not supported, looking inside for needed data.
-Warning: prompt style on render_fib no longer supported, converted to style class
-Warning: minimum response no longer supported, ignoring minnumber="0"
-Warning: maxchars on render_fib no longer strictly enforced.
-Warning: charset attribute no longer supported: ignored charset="us-ascii"
-Warning: scoremodel not supported, ignoring "SumOfScores"
-Warning: min/max constraint on outcome will generate additional rules in responseProcessing
-Warning: titles on respconditions no longer supported, ignored "correct"
-Warning: titles on respconditions no longer supported, ignored "incorrect"
-Warning: replacing <other/> with the base value true - what did you want me to do??
-	-->
-
-<assessmentItem
-        xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd"
-        identifier="_153004_1"
-        title=""
-        adaptive="false"
-        timeDependent="false">
-  <instructureMetadata>
-    <instructureField name="max_score" value="10.0"/>
-    <instructureField name="bb_question_type" value="Fill in the Blank Plus"/>
-  </instructureMetadata>
-  <responseDeclaration identifier="family" cardinality="single"
-                       baseType="string"/>
-  <responseDeclaration identifier="poor" cardinality="single"
-                       baseType="string"/>
-  <outcomeDeclaration identifier="FEEDBACK" cardinality="multiple"
-                      baseType="identifier"/>
-  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
-    <defaultValue>
-      <value>0.0</value>
-    </defaultValue>
-  </outcomeDeclaration>
-  <itemBody>
-    <div class="QUESTION_BLOCK">I'm just a [poor] boy from a poor [family]</div>
-    <div class="RESPONSE_BLOCK">
-      <extendedTextInteraction responseIdentifier="poor" class="Box"/>
-      <extendedTextInteraction responseIdentifier="family" class="Box"/>
-    </div>
-  </itemBody>
-  <responseProcessing>
-    <responseCondition>
-      <responseIf>
-        <and>
-          <or>
-            <stringMatch caseSensitive="false" substring="false">
-              <variable identifier="poor"/>
-              <baseValue baseType="string">poor</baseValue>
-            </stringMatch>
-            <stringMatch caseSensitive="false" substring="false">
-              <variable identifier="poor"/>
-              <baseValue baseType="string">sad</baseValue>
-            </stringMatch>
-          </or>
-          <or>
-            <stringMatch caseSensitive="false" substring="false">
-              <variable identifier="family"/>
-              <baseValue baseType="string">family</baseValue>
-            </stringMatch>
-          </or>
-        </and>
-        <setOutcomeValue identifier="SCORE">
-          <baseValue baseType="float">SCORE.max</baseValue>
-        </setOutcomeValue>
-        <setOutcomeValue identifier="FEEDBACK">
-          <multiple>
-            <variable identifier="FEEDBACK"/>
-            <baseValue baseType="identifier">correct</baseValue>
-          </multiple>
-        </setOutcomeValue>
-      </responseIf>
-      <responseElseIf>
-        <baseValue baseType="boolean">true</baseValue>
-        <setOutcomeValue identifier="SCORE">
-          <baseValue baseType="float">0.0</baseValue>
-        </setOutcomeValue>
-        <setOutcomeValue identifier="FEEDBACK">
-          <multiple>
-            <variable identifier="FEEDBACK"/>
-            <baseValue baseType="identifier">incorrect</baseValue>
-          </multiple>
-        </setOutcomeValue>
-      </responseElseIf>
-    </responseCondition>
-    <responseCondition>
-      <responseIf>
-        <gt>
-          <variable identifier="SCORE"/>
-          <baseValue baseType="float">10.0</baseValue>
-        </gt>
-        <setOutcomeValue identifier="SCORE">
-          <baseValue baseType="float">10.0</baseValue>
-        </setOutcomeValue>
-      </responseIf>
-    </responseCondition>
-  </responseProcessing>
-  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
-                 identifier="correct">
-    <div class="flow_1">
-      <p class="FORMATTED_TEXT_BLOCK">right</p>
-    </div>
-  </modalFeedback>
-  <modalFeedback outcomeIdentifier="FEEDBACK" showHide="show"
-                 identifier="incorrect">
-    <div class="flow_1">
-      <p class="FORMATTED_TEXT_BLOCK">wrong</p>
-    </div>
-  </modalFeedback>
-</assessmentItem>
+<questestinterop xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2">
+  <item maxattempts="0">
+    <itemmetadata>
+      <bbmd_asi_object_id>_154761_1</bbmd_asi_object_id>
+      <bbmd_asitype>Item</bbmd_asitype>
+      <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+      <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+      <bbmd_questiontype>Fill in the Blank Plus</bbmd_questiontype>
+      <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+      <bbmd_numbertype>none</bbmd_numbertype>
+      <bbmd_partialcredit>true</bbmd_partialcredit>
+      <bbmd_orientationtype>vertical</bbmd_orientationtype>
+      <bbmd_is_extracredit>false</bbmd_is_extracredit>
+      <qmd_absolutescore_max>10.0</qmd_absolutescore_max>
+      <qmd_weighting>0.0</qmd_weighting>
+    </itemmetadata>
+    <presentation>
+      <flow class="Block">
+        <flow class="QUESTION_BLOCK">
+          <flow class="FORMATTED_TEXT_BLOCK">
+            <material>
+              <mat_extension>
+                <mat_formattedtext type="HTML">I'm just a [poor] boy from a poor [family]&lt;br /&gt;</mat_formattedtext>
+              </mat_extension>
+            </material>
+          </flow>
+        </flow>
+        <flow class="RESPONSE_BLOCK">
+          <response_str ident="poor" rcardinality="Single" rtiming="No">
+            <render_fib charset="us-ascii" columns="0" encoding="UTF_8"
+                        fibtype="String" maxchars="0" maxnumber="0"
+                        minnumber="0" prompt="Box" rows="0"/>
+          </response_str>
+          <response_str ident="family" rcardinality="Single" rtiming="No">
+            <render_fib charset="us-ascii" columns="0" encoding="UTF_8"
+                        fibtype="String" maxchars="0" maxnumber="0"
+                        minnumber="0" prompt="Box" rows="0"/>
+          </response_str>
+        </flow>
+      </flow>
+    </presentation>
+    <resprocessing scoremodel="SumOfScores">
+      <outcomes>
+        <decvar defaultval="0.0" maxvalue="10.0" minvalue="0.0"
+                varname="SCORE" vartype="Decimal"/>
+      </outcomes>
+      <respcondition title="correct">
+        <conditionvar>
+          <and>
+            <or>
+              <varequal case="No" respident="poor">poor</varequal>
+              <varequal case="No" respident="poor">sad</varequal>
+            </or>
+            <or>
+              <varequal case="No" respident="family">family</varequal>
+            </or>
+          </and>
+        </conditionvar>
+        <setvar action="Set" variablename="SCORE">SCORE.max</setvar>
+        <displayfeedback feedbacktype="Response" linkrefid="correct"/>
+      </respcondition>
+      <respcondition title="incorrect">
+        <conditionvar>
+          <other/>
+        </conditionvar>
+        <setvar action="Set" variablename="SCORE">0.0</setvar>
+        <displayfeedback feedbacktype="Response" linkrefid="incorrect"/>
+      </respcondition>
+    </resprocessing>
+    <itemfeedback ident="correct" view="All">
+      <flow_mat class="Block">
+        <flow_mat class="FORMATTED_TEXT_BLOCK">
+          <material>
+            <mat_extension>
+              <mat_formattedtext type="HTML">right</mat_formattedtext>
+            </mat_extension>
+          </material>
+        </flow_mat>
+      </flow_mat>
+    </itemfeedback>
+    <itemfeedback ident="incorrect" view="All">
+      <flow_mat class="Block">
+        <flow_mat class="FORMATTED_TEXT_BLOCK">
+          <material>
+            <mat_extension>
+              <mat_formattedtext type="HTML">wrong</mat_formattedtext>
+            </mat_extension>
+          </material>
+        </flow_mat>
+      </flow_mat>
+    </itemfeedback>
+  </item>
+</questestinterop>

@@ -1,5 +1,0 @@
-<%= t :message, "%{user_name} just sent you a message %{context_name}", :user_name => (asset.user.name rescue t(:unknown_user, "Unknown User")), :context_name => asset.context.name %>
-
-<%= strip_and_truncate(asset.body, :max_length => 50) %>
-
-<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>

@@ -154,7 +154,6 @@
 </div>
 <div style="display: none;">
   <span class="now"><%= ActiveSupport::TimeWithZone.new(Time.now.utc, Time.zone) %></span>
-  <span class="utc_offset"><%= Time.now.utc_offset %></span>
   <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id, :page => params[:page], :last_updated_at => "{{ update }}") %>" class="update_url">&nbsp;</span>
   <span class="last_updated_at"><%= @submissions.map(&:updated_at).max.try(:in_time_zone).try(:iso8601) %></span>
   <a href="<%= context_url(@context, :context_quiz_extensions_url, @quiz.id, "{{ user_id }}") %>" class="extension_url">&nbsp;</a>

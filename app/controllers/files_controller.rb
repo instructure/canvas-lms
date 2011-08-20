@@ -17,7 +17,7 @@
 #
 
 class FilesController < ApplicationController
-  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:create_pending,:s3_success,:show]
+  before_filter :require_context, :except => [:public_feed,:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
 
@@ -91,7 +91,7 @@ class FilesController < ApplicationController
   def full_index
     get_context
     get_quota
-    add_crumb("Files", named_context_url(@context, :context_files_url))
+    add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url))
     @contexts = [@context]
     if !@context.is_a?(User) || (@context == @current_user && params[:show_all_contexts])
       get_all_pertinent_contexts
@@ -349,6 +349,20 @@ class FilesController < ApplicationController
     end
   end
   
+  def preflight
+    @context = Context.find_by_asset_string(params[:context_code])
+    if authorized_action(@context, @current_user, :manage_files)
+      @current_folder = Folder.find_folder(@context, params[:folder_id])
+      if @current_folder
+        params[:filenames] = [] if params[:filenames].blank?
+        return render :json => {
+          :duplicates => @current_folder.active_file_attachments.map(&:display_name) & params[:filenames]
+        }
+      end
+    end
+    render :json => {}
+  end
+
   def create_pending
     @context = Context.find_by_asset_string(params[:attachment][:context_code])
     @asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string], @context) if params[:attachment][:asset_string]
@@ -413,8 +427,8 @@ class FilesController < ApplicationController
       @attachment.save!
 
       res = @attachment.ajax_upload_params(@current_pseudonym,
-              named_context_url(@context, :context_files_url, :format => :text),
-              s3_success_url(@attachment.id, :uuid => @attachment.uuid),
+              named_context_url(@context, :context_files_url, :format => :text, :duplicate_handling => params[:attachment][:duplicate_handling]),
+              s3_success_url(@attachment.id, :uuid => @attachment.uuid, :duplicate_handling => params[:attachment][:duplicate_handling]),
               :no_redirect => params[:no_redirect],
               :upload_params => {
                 'attachment[folder_id]' => params[:attachment][:folder_id] || '',
@@ -432,8 +446,12 @@ class FilesController < ApplicationController
     end
     details = AWS::S3::S3Object.about(@attachment.full_filename, @attachment.bucket_name) rescue nil
     if @attachment && details
+      deleted_attachments = @attachment.handle_duplicates(params[:duplicate_handling])
       @attachment.process_s3_details!(details)
-      render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session})
+      render_for_text({
+        :attachment => @attachment,
+        :deleted_attachment_ids => deleted_attachments.map(&:id)
+      }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?], :permissions => {:user => @current_user, :session => session}, :include_root => false))
     else
       render_for_text ""
     end
@@ -451,6 +469,7 @@ class FilesController < ApplicationController
     params[:attachment][:user] = @current_user
     params[:attachment].delete :context_id
     params[:attachment].delete :context_type
+    duplicate_handling = params.delete :duplicate_handling
     if (unattached_attachment_id = params[:attachment].delete(:unattached_attachment_id)) && unattached_attachment_id.present?
       @attachment = @context.attachments.find_by_id_and_workflow_state(unattached_attachment_id, 'unattached')
     end
@@ -481,6 +500,7 @@ class FilesController < ApplicationController
         else
           @attachment.errors.add_to_base(t('errors.missing_field', "Upload failed, expected form field missing"))
         end
+        deleted_attachments = @attachment.handle_duplicates(duplicate_handling)
         unless (@attachment.cacheable_s3_url rescue nil)
           success = false
           if (params[:attachment][:uploaded_data].size == 0 rescue false)
@@ -495,8 +515,8 @@ class FilesController < ApplicationController
         if success
           @attachment.move_to_bottom
           format.html { return_to(params[:return_to], named_context_url(@context, :context_files_url)) }
-          format.json { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}) }
-          format.text { render_for_text @attachment.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}) }
+          format.json { render_for_text({ :attachment => @attachment, :deleted_attachment_ids => deleted_attachments.map(&:id) }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}, :include_root => false))}
+          format.text { render_for_text({ :attachment => @attachment, :deleted_attachment_ids => deleted_attachments.map(&:id) }.to_json(:allow => :uuid, :methods => [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url], :permissions => {:user => @current_user, :session => session}, :include_root => false))}
         else
           format.html { render :action => "new" }
           format.json { render :json => @attachment.errors.to_json }

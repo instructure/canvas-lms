@@ -6,7 +6,23 @@ ActionController::Routing::Routes.draw do |map|
   map.inbox 'inbox', :controller => 'context', :action => 'inbox'
   map.destroy_inbox_item 'inbox/:id', :controller => 'context', :action => 'destroy_inbox_item', :conditions => {:method => :delete}
   map.inbox_item 'inbox/:id', :controller => 'context', :action => 'inbox_item'
-  map.context_message_reply 'messages/:id/reply', :controller => 'context', :action => 'context_message_reply'
+
+  map.discussion_replies 'conversations/discussion_replies', :controller => 'context', :action => 'discussion_replies'
+  map.conversations_unread 'conversations/unread', :controller => 'conversations', :action => 'index', :scope => 'unread'
+  map.conversations_labeled 'conversations/labeled', :controller => 'conversations', :action => 'index', :scope => 'labeled'
+  map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
+  map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
+  map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
+  map.conversations_watched_intro 'conversations/watched_intro', :controller => 'conversations', :action => 'watched_intro', :conditions => {:method => :post}
+  map.resources :conversations, :only => [:index, :show, :update, :create, :destroy] do |conversation|
+    conversation.add_recipients 'add_recipients', :controller => 'conversations', :action => 'add_recipients', :conditions => {:method => :post}
+    conversation.add_message 'add_message', :controller => 'conversations', :action => 'add_message', :conditions => {:method => :post}
+    conversation.remove_messages 'remove_messages', :controller => 'conversations', :action => 'remove_messages', :conditions => {:method => :post}
+    conversation.archive 'archive', :controller => 'conversations', :action => 'workflow_event', :event => 'archive', :conditions => {:method => :post}
+    conversation.unarchive 'unarchive', :controller => 'conversations', :action => 'workflow_event', :event => 'unarchive', :conditions => {:method => :post}
+    conversation.mark_as_read 'mark_as_read', :controller => 'conversations', :action => 'workflow_event', :event => 'mark_as_read', :conditions => {:method => :post}
+    conversation.mark_as_unread 'mark_as_unread', :controller => 'conversations', :action => 'workflow_event', :event => 'mark_as_unread', :conditions => {:method => :post}
+  end
   
   # So, this will look like:
   # http://instructure.com/pseudonyms/3/register/5R32s9iqwLK75Jbbj0
@@ -26,15 +42,8 @@ ActionController::Routing::Routes.draw do |map|
   # callback urls for oauth authorization processes
   map.oauth "oauth", :controller => "users", :action => "oauth"
   map.oauth_success "oauth_success", :controller => "users", :action => "oauth_success"
-  map.resources :files do |file|
-    file.download 'download', :controller => 'files', :action => 'show', :download => '1'
-  end
+  
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
-
-  # assignments at the top level (without a context) -- we have some specs that
-  # assert these routes exist, but just 404. I'm not sure we ever actually want
-  # top-level assignments available, maybe we should change the specs instead.
-  map.resources :assignments, :only => %w(index show)
 
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
@@ -58,11 +67,6 @@ ActionController::Routing::Routes.draw do |map|
     course.statistics 'statistics', :controller => 'courses', :action => 'statistics'
     course.prior_users 'users/prior', :controller => 'context', :action => 'prior_users'
     course.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
-    course.roster_messages 'messages', :controller => 'context', :action => 'create_roster_message', :conditions => {:method => :post}
-    course.formatted_roster_messages 'messages.:format', :controller => 'context', :action => 'create_roster_message', :conditions => {:method => :post}
-    course.message_recipients 'messages/recipients', :controller => 'context', :action => 'recipients'
-    course.roster_message 'messages/:id', :controller => 'context', :action => 'read_roster_message', :conditions => {:method => :put}
-    course.roster_message_attachment 'messages/:message_id/files/:id', :controller => 'context', :action => 'roster_message_attachment'
     course.unenroll 'unenroll/:id', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
     course.move_enrollment 'move_enrollment/:id', :controller => 'courses', :action => 'move_enrollment', :conditions => {:method => :post}
     course.formatted_unenroll 'unenroll/:id.:format', :controller => 'courses', :action => 'unenroll_user', :conditions => {:method => :delete}
@@ -257,11 +261,6 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :user_lists, :only => :create
   end
 
-  map.resources :rubrics do |rubric|
-    rubric.resources :rubric_assessments, :as => 'assessments'
-  end
-  map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
-
   map.resources :page_views, :only => [:update,:index]
   map.create_media_object 'media_objects', :controller => 'context', :action => 'create_media_object', :conditions => {:method => :post}
   map.kaltura_notifications 'media_objects/kaltura_notifications', :controller => 'context', :action => 'kaltura_notifications'
@@ -323,11 +322,6 @@ ActionController::Routing::Routes.draw do |map|
     group.user_services 'user_services', :controller => 'context', :action => 'roster_user_services'
     group.user_usage 'users/:user_id/usage', :controller => 'context', :action => 'roster_user_usage'
     group.user 'users/:id', :controller => 'context', :action => 'roster_user', :conditions => {:method => :get}
-    group.roster_messages 'messages', :controller => 'context', :action => 'create_roster_message', :conditions => {:method => :post}
-    group.formatted_roster_messages 'messages.:format', :controller => 'context', :action => 'create_roster_message', :conditions => {:method => :post}
-    group.message_recipients 'messages/recipients', :controller => 'context', :action => 'recipients'
-    group.roster_message 'messages/:id', :controller => 'context', :action => 'resend_roster_message', :conditions => {:method => :put}
-    group.roster_message_attachment 'messages/:message_id/files/:id', :controller => 'context', :action => 'roster_message_attachment'
     group.remove_user 'remove_user/:id', :controller => 'groups', :action => 'remove_user', :conditions => {:method => :delete}
     group.add_user 'add_user', :controller => 'groups', :action => 'add_user'
     group.members 'members.:format', :controller => 'groups', :action => 'context_group_members', :conditions => {:method => :get}
@@ -364,6 +358,7 @@ ActionController::Routing::Routes.draw do |map|
     group.named_wiki_page 'wiki/:id', :id => /[^\/]+/, :controller => 'wiki_pages', :action => 'show'
     group.resources :conferences do |conference|
       conference.join "join", :controller => "conferences", :action => "join"
+      conference.close "close", :controller => "conferences", :action => "close"
     end
     group.chat 'chat', :controller => 'context', :action => 'chat'
     group.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
@@ -404,6 +399,10 @@ ActionController::Routing::Routes.draw do |map|
     account.resources :account_authorization_configs
     account.update_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'update_all', :conditions => {:method => :put}
     account.remove_all_authorization_configs 'account_authorization_configs', :controller => 'account_authorization_configs', :action => 'destroy_all', :conditions => {:method => :delete}
+    account.test_ldap_connections 'test_ldap_connections', :controller => 'account_authorization_configs', :action => 'test_ldap_connection'
+    account.test_ldap_binds 'test_ldap_binds', :controller => 'account_authorization_configs', :action => 'test_ldap_bind'
+    account.test_ldap_searches 'test_ldap_searches', :controller => 'account_authorization_configs', :action => 'test_ldap_search'
+    account.test_ldap_logins 'test_ldap_logins', :controller => 'account_authorization_configs', :action => 'test_ldap_login'
     account.resources :external_tools, :only => [:create, :update, :destroy, :index] do |tools|
       tools.finished 'finished', :controller => 'external_tools', :action => 'finished'
     end
@@ -452,7 +451,6 @@ ActionController::Routing::Routes.draw do |map|
   map.show_thumbnail_image 'images/thumbnails/show/:id/:uuid', :controller => 'files', :action => 'show_thumbnail'
   map.report_avatar_image 'images/users/:user_id/report', :controller => 'users', :action => 'report_avatar_image', :conditions => {:method => :post}
   map.update_avatar_image 'images/users/:user_id', :controller => 'users', :action => 'update_avatar_image', :conditions => {:method => :put}
-  map.resources :account_authorization_configs
   
   map.grades "grades", :controller => "users", :action => "grades"
   
@@ -495,7 +493,6 @@ ActionController::Routing::Routes.draw do |map|
     user.resources :question_banks, :only => [:index]
     user.assignments_needing_grading 'assignments_needing_grading', :controller => 'users', :action => 'assignments_needing_grading'
     user.assignments_needing_submitting 'assignments_needing_submitting', :controller => 'users', :action => 'assignments_needing_submitting'
-    user.sent_messages 'messages/sent', :controller => 'users', :action => 'sent_messages'
     user.admin_merge 'admin_merge', :controller => 'users', :action => 'admin_merge', :conditions => {:method => :get}
     user.confirm_merge 'merge', :controller => 'users', :action => 'confirm_merge', :conditions => {:method => :get}
     user.merge 'merge', :controller => 'users', :action => 'merge', :conditions => {:method => :post}
@@ -569,18 +566,11 @@ ActionController::Routing::Routes.draw do |map|
   map.getting_started_finalize 'getting_started/finalize',
     :controller => 'getting_started', :action => 'finalize', :conditions => { :method => :post }
     
-  # Need to check if these routes are even necessary, since the
-  # controller/action map is still enabled.
-  map.get_web_screenshot 'processors/webshots', :controller => 'processors', :action => 'get_web_screenshot', :conditions => { :method => :get }
-  map.update_web_screenshot 'processors/webshots/:id', :controller => 'processors', :action => 'update_web_screenshot', :conditions => { :method => :post }
-  map.retrieve_external_feed 'processors/external_feeds', :controller => 'processors', :action => 'retrieve_external_feed', :conditions => { :method => :get }
-  map.retrieve_twitter_search 'processors/twitter_searches', :controller => 'processors', :action => 'retrieve_twitter_search', :conditions => { :method => :get }
-  map.retrieve_twitter_user_results 'processors/twitter_users', :controller => 'processors', :action => 'retrieve_twitter_user_results', :conditions => { :method => :get }
-
   map.calendar 'calendar', :controller => 'calendars', :action => 'show', :conditions => { :method => :get }
   map.files 'files', :controller => 'files', :action => 'full_index', :conditions => { :method => :get }
   map.s3_success 'files/s3_success/:id', :controller => 'files', :action => 's3_success'
   map.public_url 'files/:id/public_url.:format', :controller => 'files', :action => 'public_url'
+  map.file_preflight 'files/preflight', :controller => 'files', :action => 'preflight'
   map.file_create_pending 'files/pending', :controller=> 'files', :action => 'create_pending'
   map.assignments 'assignments', :controller => 'assignments', :action => 'index', :conditions => { :method => :get }
 
@@ -680,6 +670,20 @@ ActionController::Routing::Routes.draw do |map|
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }
   map.oauth2_token 'login/oauth2/token',:controller => 'pseudonym_sessions', :action => 'oauth2_token', :conditions => { :method => :post }
+
+  # assignments at the top level (without a context) -- we have some specs that
+  # assert these routes exist, but just 404. I'm not sure we ever actually want
+  # top-level assignments available, maybe we should change the specs instead.
+  map.resources :assignments, :only => %w(index show)
+
+  map.resources :files do |file|
+    file.download 'download', :controller => 'files', :action => 'show', :download => '1'
+  end
+
+  map.resources :rubrics do |rubric|
+    rubric.resources :rubric_assessments, :as => 'assessments'
+  end
+  map.global_outcomes 'outcomes', :controller => 'outcomes', :action => 'global_outcomes'
 
   # See how all your routes lay out with "rake routes"
 end

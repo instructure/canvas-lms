@@ -19,6 +19,7 @@
 def view_context(context=@course, current_user=@user)
   assigns[:context] = context
   assigns[:current_user] = current_user
+  assigns[:domain_root_account] = Account.default
 end
 def view_portfolio(portfolio=@portfolio, current_user=@user)
   assigns[:portfolio] = portfolio
