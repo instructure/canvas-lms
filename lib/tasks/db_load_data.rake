@@ -727,7 +727,15 @@ namespace :db do
       <%= strip_and_truncate(asset.body, :max_length => 50) %>
     }
 
-    create_notification 'AddedToConversation', 'Added To Conversation', 0, 'http://<%= HostUrl.default_host %>', ""
+    create_notification 'AddedToConversation', 'Added To Conversation', 0, 'http://<%= HostUrl.default_host %>', %{
+      Added To Conversation
+      
+      Added to a conversation by <%= user.name rescue 'Unknown User' %>
+      
+      <%= user.name rescue 'Unknown User' %> just added you to a conversation in Canvas.
+      
+      <%= main_link %>
+    }
 
     create_notification 'GroupMembership', 'Membership Update', 0,
     'http://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/groups', %{
