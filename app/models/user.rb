@@ -1010,6 +1010,14 @@ class User < ActiveRecord::Base
     read_attribute(:preferences) || write_attribute(:preferences, {})
   end
   
+  def watched_conversations_intro?
+    preferences[:watched_conversations_intro] == true
+  end
+
+  def watched_conversations_intro(value=true)
+    preferences[:watched_conversations_intro] = value
+  end
+
   def send_scores_in_emails?
     preferences[:send_scores_in_emails] == true
   end

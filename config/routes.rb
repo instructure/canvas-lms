@@ -13,6 +13,7 @@ ActionController::Routing::Routes.draw do |map|
   map.conversations_archived 'conversations/archived', :controller => 'conversations', :action => 'index', :scope => 'archived'
   map.conversations_find_recipients 'conversations/find_recipients', :controller => 'conversations', :action => 'find_recipients'
   map.conversations_mark_all_as_read 'conversations/mark_all_as_read', :controller => 'conversations', :action => 'mark_all_as_read', :conditions => {:method => :post}
+  map.conversations_watched_intro 'conversations/watched_intro', :controller => 'conversations', :action => 'watched_intro', :conditions => {:method => :post}
   map.resources :conversations, :only => [:index, :show, :update, :create, :destroy] do |conversation|
     conversation.add_recipients 'add_recipients', :controller => 'conversations', :action => 'add_recipients', :conditions => {:method => :post}
     conversation.add_message 'add_message', :controller => 'conversations', :action => 'add_message', :conditions => {:method => :post}
