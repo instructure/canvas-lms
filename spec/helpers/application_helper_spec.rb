@@ -88,4 +88,16 @@ describe ApplicationHelper do
       ApplicationHelper.cached_translation_blocks.size.should == 2
     end
   end
+
+  it "show_user_create_course_button should work" do
+    Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
+    @domain_root_account = Account.default
+    show_user_create_course_button(nil).should be_false
+    user
+    show_user_create_course_button(@user).should be_false
+    course_with_teacher
+    show_user_create_course_button(@teacher).should be_true
+    account_admin_user
+    show_user_create_course_button(@admin).should be_true
+  end
 end

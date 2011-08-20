@@ -98,7 +98,7 @@ module CC::Importer
       questions = {}
       begin
         manifest_file = File.join(@dest_dir_2_1, Qti::QtiExporter::MANIFEST_FILE)
-        questions[:assessment_questions] = Qti.convert_questions(manifest_file)
+        questions[:assessment_questions] = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::CANVAS)
       rescue
         questions[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
       end
@@ -110,7 +110,7 @@ module CC::Importer
       quizzes = {}
       begin
         manifest_file = File.join(@dest_dir_2_1, Qti::QtiExporter::MANIFEST_FILE)
-        quizzes[:assessments] = Qti.convert_assessments(manifest_file, false)
+        quizzes[:assessments] = Qti.convert_assessments(manifest_file, :flavor => Qti::Flavors::CANVAS)
       rescue
         quizzes[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
       end

@@ -59,6 +59,12 @@ module Canvas
       saved_settings
     end
 
+    def enabled?
+      ps = PluginSetting.find_by_name(self.id.to_s)
+      return false unless ps
+      ps.valid_settings? && ps.enabled?
+    end
+
     def encrypted_settings
       @meta[:encrypted_settings]
     end

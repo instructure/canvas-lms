@@ -93,11 +93,11 @@ I18n.scoped('user_lists', function(I18n) {
       $form.find(".add_users_button, .go_back_button, #user_list_parsed").hide();
       $form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").show().removeAttr('disabled');
       $form.find(".user_list").removeAttr('disabled').loadingImage('remove').focus().select();
-      $form.find(".verify_syntax_button").attr('disabled', false).text("Continue...");
+      $form.find(".verify_syntax_button").attr('disabled', false).text(I18n.t('buttons.continue', "Continue..."));
     },
 
     showProcessing: function(){
-      $form.find(".verify_syntax_button").attr('disabled', true).text("Processing...");
+      $form.find(".verify_syntax_button").attr('disabled', true).text(I18n.t('messages.processing', "Processing..."));
       $form.find(".user_list").attr('disabled', true).loadingImage();
     },
 

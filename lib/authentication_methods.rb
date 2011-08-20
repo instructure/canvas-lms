@@ -86,7 +86,9 @@ module AuthenticationMethods
       @current_user = @current_pseudonym && @current_pseudonym.user
 
       if api_request?
-        @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) if params[:api_key].present?
+        # only allow api_key to be used if basic auth was sent, not if they're
+        # just using an app session
+        @developer_key = DeveloperKey.find_by_api_key(params[:api_key]) if @pseudonym_session.try(:used_basic_auth?) && params[:api_key].present?
         @developer_key || request.get? || form_authenticity_token == form_authenticity_param || raise(ApplicationController::InvalidDeveloperAPIKey)
       end
     end
@@ -255,5 +257,4 @@ module AuthenticationMethods
     request = Onelogin::Saml::AuthRequest.create(settings)
     redirect_to(request)
   end
-
 end

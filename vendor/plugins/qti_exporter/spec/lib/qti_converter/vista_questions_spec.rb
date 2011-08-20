@@ -73,7 +73,7 @@ describe "Converting Blackboard Vista qti" do
 
   it "should convert the assessments into quizzes" do
     manifest_node=get_manifest_node('assessment', :quiz_type => 'examination')
-    a = Qti::AssessmentTestConverter.new(manifest_node, vista_question_dir, true)
+    a = Qti::AssessmentTestConverter.new(manifest_node, vista_question_dir, :flavor=>Qti::Flavors::WEBCT)
     a.create_instructure_quiz
     a.quiz.should == VistaExpected::ASSESSMENT
   end

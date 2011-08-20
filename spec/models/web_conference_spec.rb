@@ -22,10 +22,10 @@ describe WebConference do
   before(:all) do
     WebConference.instance_eval do
       def plugins
-        [OpenObject.new(:id => "dim_dim", :settings => {:domain => "dimdim.instructure.com"}, :valid_settings? => true),
-         OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}, :valid_settings? => true),
-         OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true),
-         OpenObject.new(:id => "broken_plugin", :settings => {:foo => :bar}, :valid_settings? => true)]
+        [OpenObject.new(:id => "dim_dim", :settings => {:domain => "dimdim.instructure.com"}, :valid_settings? => true, :enabled? => true),
+         OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}, :valid_settings? => true, :enabled? => true),
+         OpenObject.new(:id => "wimba", :settings => {:domain => "wimba.test"}, :valid_settings? => true, :enabled? => true),
+         OpenObject.new(:id => "broken_plugin", :settings => {:foo => :bar}, :valid_settings? => true, :enabled? => true)]
       end
     end
   end

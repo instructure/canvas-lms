@@ -212,12 +212,12 @@ class ActiveRecord::Base
     hash = Serializer.new(self, options).serializable_record
 
     if options[:permissions]
-      permissions_hash = self.grants_rights?(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
-      if options[:include_root]
-        hash[self.class.base_ar_class.model_name.element]["permissions"] = permissions_hash
-      else
-        hash["permissions"] = permissions_hash
+      obj_hash = options[:include_root] ? hash[self.class.base_ar_class.model_name.element] : hash
+      if self.respond_to?(:filter_attributes_for_user)
+        self.filter_attributes_for_user(obj_hash, options[:permissions][:user], options[:permissions][:session])
       end
+      permissions_hash = self.grants_rights?(options[:permissions][:user], options[:permissions][:session], *options[:permissions][:policies])
+      obj_hash["permissions"] = permissions_hash
     end
 
     self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)
@@ -440,4 +440,40 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
     end
   end
   alias_method_chain :construct_scope, :has_many_fix
+end
+
+
+class ActiveRecord::ConnectionAdapters::AbstractAdapter
+  # for functions that differ from one adapter to the next, use the following
+  # method (overriding as needed in non-standard adapters), e.g.
+  #
+  #   connection.func(:group_concat, :name) ->
+  #     group_concat(name)             (default)
+  #     string_agg(name::text, ',')    (postgres)
+
+  def func(name, *args)
+    "#{name}(#{args.map{ |arg| arg.is_a?(Symbol) ? arg : quote_value(arg) }.join(', ')})"
+  end
+
+  def group_by(*columns)
+    columns.first
+  end
+end
+
+if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+    def func(name, *args)
+      case name
+        when :group_concat
+          "string_agg(#{args.first}::text, ',')"
+        else
+          super
+      end
+    end
+
+    def group_by(*columns)
+      return super if postgresql_version >= 90100
+      columns.join(', ')
+    end
+  end
 end

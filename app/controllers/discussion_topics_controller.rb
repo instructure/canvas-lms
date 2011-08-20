@@ -193,6 +193,7 @@ class DiscussionTopicsController < ApplicationController
       params[:discussion_topic][:assignment] = nil
       if @topic && @topic.assignment
         @topic.update_attribute(:assignment_id, nil)
+        @topic.assignment.saved_by = :discussion_topic
         @topic.assignment.destroy
       end
       return
@@ -201,6 +202,7 @@ class DiscussionTopicsController < ApplicationController
     @assignment ||= @topic.restore_old_assignment if @topic
     @assignment ||= @context.assignments.build
     @assignment.submission_types = 'discussion_topic'
+    @context.assert_assignment_group
     @assignment.assignment_group_id = assignment[:assignment_group_id] || @assignment.assignment_group_id || @context.assignment_groups.first.id
     @assignment.title = params[:discussion_topic][:title]
     @assignment.points_possible = assignment[:points_possible] || @assignment.points_possible

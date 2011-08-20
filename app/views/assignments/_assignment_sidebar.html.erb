@@ -63,5 +63,4 @@
       
     <% end %>
   <% end %>
-  <span id="assignment_due_at_span" style="display: none;"><%= @assignment.try_rescue(:due_at).try_rescue(:strftime, "%Y-%m-%dT%H:%M:%SZ") %></span>
 </div>

@@ -360,7 +360,7 @@ I18n.scoped('gradebook', function(I18n) {
   
   function initRubricStuff(){
 
-    $("#rubric_summary_container .button-container").appendTo("#rubric_assessments_list_and_edit_button_holder").find('.edit').text(I18n.t('edit_view_rubric', "Edit/View Rubric"));
+    $("#rubric_summary_container .button-container").appendTo("#rubric_assessments_list_and_edit_button_holder").find('.edit').text(I18n.t('edit_view_rubric', "View Rubric"));
 
     $(".toggle_full_rubric, .hide_rubric_link").click(function(e){
       e.preventDefault();
@@ -938,7 +938,7 @@ I18n.scoped('gradebook', function(I18n) {
     },
 
     updateStatsInHeader: function(){
-      $x_of_x_students.html( $.ordinalize(EG.currentIndex() + 1) );
+      $x_of_x_students.html( EG.currentIndex() + 1 );
 
       var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s){
         return (s.submission && s.submission.workflow_state === 'graded');

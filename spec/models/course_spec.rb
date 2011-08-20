@@ -655,30 +655,6 @@ describe Course, 'grade_publishing' do
     PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = "no"
   end
   
-  def start_server
-    post_lines = []
-    server = TCPServer.open(0)
-    port = server.addr[1]
-    post_lines = []
-    server_thread = Thread.new(server, post_lines) do |server, post_lines|
-      client = server.accept
-      content_length = 0
-      loop do
-        line = client.readline
-        post_lines << line.strip unless line =~ /\AHost: localhost:|\AContent-Length: /
-        content_length = line.split(":")[1].to_i if line.strip =~ /\AContent-Length: [0-9]+\z/
-        if line.strip.blank?
-          post_lines << client.read(content_length)
-          break
-        end
-      end
-      client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
-      client.close
-      server.close
-    end
-    return server, server_thread, post_lines
-  end
-
   it 'should pass a quick sanity check' do
     user = User.new
     Course.valid_grade_export_types["test_export"] = {
@@ -691,7 +667,7 @@ describe Course, 'grade_publishing' do
     PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
     PluginSetting.settings_for_plugin('grade_export')[:format_type] = "test_export"
     PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = "no"
-    server, server_thread, post_lines = start_server
+    server, server_thread, post_lines = start_test_http_server
     PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
 
     @course.grading_standard_id = 0
@@ -710,7 +686,7 @@ describe Course, 'grade_publishing' do
     PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
     PluginSetting.settings_for_plugin('grade_export')[:format_type] = "instructure_csv"
     PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = "no"
-    server, server_thread, post_lines = start_server
+    server, server_thread, post_lines = start_test_http_server
     PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
     @course.grading_standard_id = 0
     @course.publish_final_grades(user)
@@ -823,7 +799,7 @@ describe Course, 'grade_publishing' do
     PluginSetting.settings_for_plugin('grade_export')[:enabled] = "true"
     PluginSetting.settings_for_plugin('grade_export')[:format_type] = "instructure_csv"
     PluginSetting.settings_for_plugin('grade_export')[:wait_for_success] = "no"
-    server, server_thread, post_lines = start_server
+    server, server_thread, post_lines = start_test_http_server
     PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
     @course.publish_final_grades(teacher.user)
     server_thread.join
@@ -842,7 +818,7 @@ describe Course, 'grade_publishing' do
         "#{teacher.id},T1,#{sec4.id},,#{stud6.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,\"\",90\n"]
     @course.grading_standard_id = 0
     @course.save
-    server, server_thread, post_lines = start_server
+    server, server_thread, post_lines = start_test_http_server
     PluginSetting.settings_for_plugin('grade_export')[:publish_endpoint] = "http://localhost:#{server.addr[1]}/endpoint"
     @course.publish_final_grades(teacher.user)
     server_thread.join

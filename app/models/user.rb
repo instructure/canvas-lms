@@ -39,7 +39,8 @@ class User < ActiveRecord::Base
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state NOT IN (?)", ['rejected', 'completed', 'deleted']]  
   has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => "enrollments.workflow_state = 'completed'", :order => 'enrollments.created_at'
   has_many :courses, :through => :current_enrollments
-  has_many :all_courses, :source => :course, :through => :enrollments
+  has_many :concluded_courses, :source => :course, :through => :concluded_enrollments
+  has_many :all_courses, :source => :course, :through => :enrollments  
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
   has_many :user_account_associations
@@ -85,10 +86,6 @@ class User < ActiveRecord::Base
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
   
-  has_many :context_message_participants
-  has_many :context_messages, :through => :context_message_participants
-  has_many :inbox_context_messages, :source => :context_message, :through => :context_message_participants, :conditions => ['context_message_participants.participation_type = ?', 'recipient'], :include => [:attachments, :users], :order => 'context_messages.created_at DESC'
-  has_many :sentbox_context_messages, :source => :context_message, :through => :context_message_participants, :conditions => ['context_message_participants.participation_type = ?', 'sender'], :include => [:attachments, :users], :order => 'context_messages.created_at DESC'
   has_many :inbox_items, :order => 'created_at DESC'
   has_many :submission_comment_participants
   has_many :submission_comments, :through => :submission_comment_participants, :include => {:submission => {:assignment => {}, :user => {}} }
@@ -107,6 +104,10 @@ class User < ActiveRecord::Base
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :stream_items, :through => :stream_item_instances
+  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation, :order => "last_message_at DESC"
+  def conversations
+    all_conversations.visible # i.e. exclude any where the user has deleted all the messages
+  end
 
   named_scope :of_account, lambda { |account|
     {
@@ -614,7 +615,7 @@ class User < ActiveRecord::Base
     updates = {}
     ['account_users','asset_user_accesses',
       'assignment_reminders','attachments',
-      'calendar_events','collaborations','context_messages',
+      'calendar_events','collaborations','conversation_participants',
       'context_module_progressions','discussion_entries','discussion_topics',
       'enrollments','group_memberships','page_comments','page_views',
       'rubric_assessments','short_messages',
@@ -623,6 +624,7 @@ class User < ActiveRecord::Base
       updates[key] = "user_id"
     end
     updates['submission_comments'] = 'author_id'
+    updates['conversation_messages'] = 'author_id'
     updates.each do |table, column|
       begin
         klass = table.classify.constantize
@@ -702,15 +704,27 @@ class User < ActiveRecord::Base
         self.all_courses.any? { |c| c.grants_right?(user, nil, :read_reports) }
       )
     end
-    can :rename and can :remove_avatar and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
-    
+    can :rename and can :remove_avatar and can :view_statistics
+
+    given do |user|
+      user && self.all_courses.any? { |c| c.grants_right?(user, nil, :manage_user_notes) }
+    end
+    can :create_user_notes and can :read_user_notes
+
+    given do |user|
+      user && (
+        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_notes)}
+      )
+    end
+    can :create_user_notes and can :read_user_notes and can :delete_user_notes
+
     given do |user|
       user && (
         # or, if the user we are given is an admin in one of this user's accounts
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_students) })
       )
     end
-    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
+    can :manage_user_details and can :remove_avatar and can :rename and can :view_statistics
     
     given do |user|
       user && (
@@ -718,7 +732,7 @@ class User < ActiveRecord::Base
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) })
       )
     end
-    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics and can :create_user_notes and can :read_user_notes and can :delete_user_notes
+    can :manage_user_details and can :manage_logins and can :rename and can :view_statistics
 
     given do |user|
       user && ((
@@ -963,12 +977,12 @@ class User < ActiveRecord::Base
   named_scope :with_avatar_state, lambda{|state|
     if state == 'any'
       {
-        :conditions =>['avatar_state IS NOT NULL AND avatar_state != ?', 'none'],
+        :conditions =>['avatar_image_url IS NOT NULL AND avatar_state IS NOT NULL AND avatar_state != ?', 'none'],
         :order => 'avatar_image_updated_at DESC'
       }
     else
       {
-        :conditions => {:avatar_state => state},
+        :conditions => ['avatar_image_url IS NOT NULL AND avatar_state = ?', state],
         :order => 'avatar_image_updated_at DESC'
       }
     end
@@ -996,6 +1010,14 @@ class User < ActiveRecord::Base
     read_attribute(:preferences) || write_attribute(:preferences, {})
   end
   
+  def watched_conversations_intro?
+    preferences[:watched_conversations_intro] == true
+  end
+
+  def watched_conversations_intro(value=true)
+    preferences[:watched_conversations_intro] = value
+  end
+
   def send_scores_in_emails?
     preferences[:send_scores_in_emails] == true
   end
@@ -1503,6 +1525,156 @@ class User < ActiveRecord::Base
 
   def sis_user_id
     pseudonym.try(:sis_user_id)
+  end
+
+  def initiate_conversation(user_ids, private = nil)
+    user_ids = ([self.id] + user_ids).uniq
+    private = user_ids.size <= 2 if private.nil?
+    Conversation.initiate(user_ids, private).conversation_participants.find_by_user_id(self.id)
+  end
+
+  def enrollment_visibility
+    Rails.cache.fetch(['enrollment_visibility', self].cache_key, :expires_in => 1.hour) do
+      full_course_ids = []
+      section_id_hash = {}
+      restricted_course_hash = {}
+      (courses + concluded_courses).each do |course|
+        section_visibilities = course.section_visibilities_for(self)
+        case course.enrollment_visibility_level_for(self, section_visibilities)
+          when :full then full_course_ids << course.id
+          when :sections then section_id_hash[course.id] = section_visibilities.map{|s| s[:course_section_id]}
+          when :restricted
+            section_visibilities.each do |s|
+              (restricted_course_hash[course.id] ||= []) << s[:associated_user_id] if s[:associated_user_id]
+            end
+        end
+      end
+      {:full_course_ids => full_course_ids, :section_id_hash => section_id_hash, :restricted_course_hash => restricted_course_hash}
+    end
+  end
+
+  MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source']
+  MESSAGEABLE_USER_COLUMN_SQL = "users." + (MESSAGEABLE_USER_COLUMNS.join(", users."))
+  def messageable_users(options = {})
+    hash = enrollment_visibility
+    full_course_ids = hash[:full_course_ids]
+    section_id_hash = hash[:section_id_hash]
+    restricted_course_hash = hash[:restricted_course_hash]
+
+    group_ids = groups.map(&:id)
+    account_ids = []
+
+    if options[:context]
+      limited_course_ids = []
+      limited_group_ids = []
+      Array(options[:context]).each do |context|
+        if context =~ /\Acourse_(\d+)\z/
+          limited_course_ids << $1.to_i
+        elsif context =~ /\Agroup_(\d+)\z/
+          limited_group_ids << $1.to_i
+        end
+      end
+      full_course_ids &= limited_course_ids
+      section_ids = section_id_hash.values_at(limited_course_ids).flatten.compact
+      restricted_course_hash.delete_if{|course_id, ids| !limited_course_ids.include?(course_id)}
+      group_ids &= limited_group_ids
+    else
+      section_ids = section_id_hash.values.flatten
+      # if we're not searching with context(s) in mind, include any users we
+      # have admin access to know about
+      account_ids = associated_accounts.select{ |a| a.grants_right?(self, nil, :read_roster) }.map(&:id)
+      account_ids &= options[:account_ids] if options[:account_ids]
+    end
+
+    # if :ids is present but empty (different than just not present), don't
+    # bother doing a query that's guaranteed to return no results.
+    return [] if options[:ids] && options[:ids].empty?
+
+    user_condition_sql = "TRUE"
+    user_condition_sql << " AND users.id IN (#{options[:ids].map(&:to_i).join(', ')})" if options[:ids].present?
+    user_condition_sql << " AND users.id NOT IN (#{options[:exclude_ids].map(&:to_i).join(', ')})" if options[:exclude_ids].present?
+    if options[:search] && (parts = options[:search].strip.split(/\s+/)).present?
+      parts.each do |part|
+        user_condition_sql << " AND (#{wildcard('users.name', 'users.short_name', part)})"
+      end
+    end
+    user_sql = []
+
+    course_sql = []
+    course_sql << "(course_id IN (#{full_course_ids.join(',')}))" if full_course_ids.present?
+    course_sql << "(course_section_id IN (#{section_ids.join(',')}))" if section_ids.present?
+    course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
+    user_sql << <<-SQL if course_sql.present?
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, null AS group_id
+      FROM users, enrollments, courses
+      WHERE (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
+        AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
+          OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
+        )
+        AND #{user_condition_sql}
+    SQL
+
+    user_sql << <<-SQL if group_ids.present?
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, group_id
+      FROM users, group_memberships
+      WHERE group_id IN (#{group_ids.join(',')}) AND users.id = user_id
+        AND group_memberships.workflow_state <> 'deleted'
+        AND #{user_condition_sql}
+    SQL
+
+    user_sql << <<-SQL if account_ids.present?
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+      FROM users, user_account_associations
+      WHERE user_account_associations.account_id IN (#{account_ids.join(',')})
+        AND user_account_associations.user_id = users.id
+        AND #{user_condition_sql}
+    SQL
+
+    if options[:ids]
+      # provides a way for this user to start a conversation with someone
+      # that isn't normally messageable (requires that they already be in a
+      # conversation with that user)
+      if options[:conversation_id].present?
+        user_sql << <<-SQL
+          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+          FROM users, conversation_participants
+          WHERE #{user_condition_sql}
+            AND conversation_participants.user_id = users.id
+            AND conversation_participants.conversation_id = #{options[:conversation_id].to_i}
+        SQL
+      elsif options[:no_check_context]
+        user_sql << <<-SQL
+          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+          FROM users
+          WHERE #{user_condition_sql}
+        SQL
+      end
+    end
+
+    # if none of our potential sources was included, we're done
+    return [] if user_sql.empty?
+
+    users = User.find_by_sql(<<-SQL)
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL},
+        #{connection.func(:group_concat, :course_id)} AS common_course_ids,
+        #{connection.func(:group_concat, :group_id)} AS common_group_ids
+      FROM (
+        #{user_sql.join(' UNION ')}
+      ) users
+      GROUP BY #{connection.group_by(*MESSAGEABLE_USER_COLUMNS)}
+      ORDER BY LOWER(COALESCE(short_name, name))
+      #{options[:offset] ? "OFFSET #{options[:offset].to_i}" : ""}
+      #{options[:limit] ? "LIMIT #{options[:limit].to_i}" : ""}
+    SQL
+    users.each do |user|
+      user.common_course_ids = user.common_course_ids.to_s.split(",").map(&:to_i)
+      user.common_group_ids = user.common_group_ids.to_s.split(",").map(&:to_i)
+    end
+  end
+
+  def mark_all_conversations_as_read!
+    conversations.unread.update_all(:workflow_state => 'read')
+    User.update_all 'unread_conversations_count = 0', :id => id
   end
 
   # association with dynamic, filtered join condition for submissions.

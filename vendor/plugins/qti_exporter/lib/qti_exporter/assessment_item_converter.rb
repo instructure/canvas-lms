@@ -14,7 +14,9 @@ class AssessmentItemConverter
     @manifest_node = opts[:manifest_node]
     @migration_type = opts[:interaction_type]
     @doc = nil
-
+    @flavor = opts[:flavor]
+    @opts = opts
+    
     if @manifest_node
       @base_dir = opts[:base_dir]
       @identifier = @manifest_node['identifier']
@@ -57,17 +59,22 @@ class AssessmentItemConverter
       @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
       # The colons are replaced with dashes in the conversion from QTI 1.2
       @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier').gsub(/:/, '-')
+      if @opts[:alternate_ids]
+        # In D2L-generated QTI the assessments reference the items by the label instead of the identifier
+        alt_id = get_node_att(@doc, 'assessmentItem', 'label')
+        @opts[:alternate_ids][alt_id] = @question[:migration_id]
+      end
       if @doc.at_css('itemBody div.html')
         @question[:question_text] = ''
         @doc.css('itemBody > div.html').each_with_index do |text, i|
           @question[:question_text] += "\n<br/>\n" if i > 0
-          @question[:question_text] += sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text))
+          @question[:question_text] += sanitize_html_string(text.text)
         end
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
         @question[:question_text] = sanitize_html!(text)
       elsif @doc.at_css('itemBody')
         if text = @doc.at_css('itemBody').children.find{|c|c.text.strip != ''}
-          @question[:question_text] = sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(text.text))
+          @question[:question_text] = sanitize_html_string(text.text)
         end
       end
       parse_instructure_metadata
@@ -175,6 +182,10 @@ class AssessmentItemConverter
   def clear_html(text)
     text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
   end
+  
+  def sanitize_html_string(string, remove_extraneous_nodes=false)
+    sanitize_html!(Nokogiri::HTML::DocumentFragment.parse(string), remove_extraneous_nodes)
+  end
 
   def sanitize_html!(node, remove_extraneous_nodes=false)
     # root may not be an html element, so we just sanitize its children so we
@@ -232,7 +243,7 @@ class AssessmentItemConverter
           opts[:custom_type] = 'canvas_matching'
         elsif type == 'matching'
           opts[:custom_type] = 'respondus_matching'
-        elsif type == 'fill_in_multiple_blanks_question'
+        elsif type =~ /fill_in_multiple_blanks_question|fill in the blanks/i
           opts[:interaction_type] = 'fill_in_multiple_blanks_question'
         elsif type == 'multiple_dropdowns_question'
           opts[:interaction_type] = 'multiple_dropdowns_question'
@@ -285,7 +296,7 @@ class AssessmentItemConverter
     feedback_hash = {}
     @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
       id = feedback['identifier']
-      text = clear_html((feedback.at_css('p') || feedback.at_css('div')).text.gsub(/\s+/, " ")).strip
+      text = clear_html((get_node_val(feedback,'p') || get_node_val(feedback, 'div', '')).gsub(/\s+/, " ")).strip
       feedback_hash[id] = text
 
       if @question[:feedback_id] == id

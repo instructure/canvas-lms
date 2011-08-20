@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+I18n.scoped('instructure', function(I18n) {
 jQuery(function($) {
   
   // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
@@ -143,7 +144,7 @@ jQuery(function($) {
   
   $(document).keycodes("shift+/", function(event) {
     $("#keyboard_navigation").dialog('close').dialog({
-      title: "Keyboard Shortcuts",
+      title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
       width: 400,
       height: "auto",
       autoOpen: false
@@ -153,8 +154,28 @@ jQuery(function($) {
   $("#switched_role_type").ifExists(function(){
     var context_class = $(this).attr('class');
     var $img = $("<img/>");
+    var switched_roles_message = null;
+    switch ($(this).data('role')) {
+      case 'TeacherEnrollment':
+        switched_roles_message = I18n.t('switched_roles_message.teacher', "You have switched roles temporarily for this course, and are now viewing the course as a teacher.  You can restore your role and permissions from the course home page.");
+        break;
+      case 'StudentEnrollment':
+        switched_roles_message = I18n.t('switched_roles_message.student', "You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.");
+        break;
+      case 'TaEnrollment':
+        switched_roles_message = I18n.t('switched_roles_message.ta', "You have switched roles temporarily for this course, and are now viewing the course as a TA.  You can restore your role and permissions from the course home page.");
+        break;
+      case 'ObserverEnrollment':
+        switched_roles_message = I18n.t('switched_roles_message.observer', "You have switched roles temporarily for this course, and are now viewing the course as an observer.  You can restore your role and permissions from the course home page.");
+        break;
+      case 'DesignerEnrollment':
+        switched_roles_message = I18n.t('switched_roles_message.designer', "You have switched roles temporarily for this course, and are now viewing the course as a designer.  You can restore your role and permissions from the course home page.");
+        break;
+      default:
+        switched_roles_message = I18n.t('switched_roles_message.student', "You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.");
+    };
     $img.attr('src', '/images/warning.png')
-      .attr('title', "You have switched roles temporarily for this course, and are now viewing the course as a " + $(this).text().toLowerCase() + ".  You can restore your role and permissions from the course home page.")
+      .attr('title', switched_roles_message)
       .css({
         paddingRight: 2,
         width: 12,
@@ -177,7 +198,7 @@ jQuery(function($) {
     var $dialog = $("#custom_search_results_dialog");
     $dialog.dialog('close').dialog({
       autoOpen: false,
-      title: "Search for Open Resources",
+      title: I18n.t('titles.search_for_open_resources', "Search for Open Resources"),
       width: 600,
       height: 400
     }).dialog('open');
@@ -203,7 +224,7 @@ jQuery(function($) {
       $link.hide(); //remove();
       if($(this).hasClass('audio_playback') || $(this).hasClass('audio_comment') || $(this).hasClass('instructure_audio_link')) { mediaType = 'audio'; }
       $div.children("span").mediaComment('show_inline', id, mediaType, $link.attr('href'));
-      $div.append("<br/><a href='#' style='font-size: 0.8em;' class='hide_flash_embed_link'>Minimize Embedded Content</a>");
+      $div.append("<br/><a href='#' style='font-size: 0.8em;' class='hide_flash_embed_link'>" + I18n.t('links.minimize_embedded_kaltura_content', "Minimize Embedded Content") + "</a>");
       $div.find(".hide_flash_embed_link").click(function(event) {
         event.preventDefault();
         $div.remove();
@@ -212,7 +233,7 @@ jQuery(function($) {
       });
       $.trackEvent('show_embedded_content', 'show_media');
     } else {
-      alert("Kaltura has been disabled for this Canvas site");
+      alert(I18n.t('alerts.kaltura_disabled', "Kaltura has been disabled for this Canvas site"));
     }
   });
   
@@ -222,8 +243,8 @@ jQuery(function($) {
     if( !$dialog.length ) {
       $dialog = $("<div/>");
       $dialog.attr('id', 'equella_preview_dialog').hide();
-      $dialog.html("<h2/><iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 350px; border: 0;' src='about:blank' borderstyle='0'/><div style='text-align: right;'><a href='#' class='original_link external external_link' target='_blank'>view the content in a new window</a>");
-      $dialog.find("h2").text($(this).attr('title') || $(this).text() || "Equella Content Preview");
+      $dialog.html("<h2/><iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 350px; border: 0;' src='about:blank' borderstyle='0'/><div style='text-align: right;'><a href='#' class='original_link external external_link' target='_blank'>" + $.h(I18n.t('links.view_equella_content_in_new_window', "view the content in a new window")) + "</a>");
+      $dialog.find("h2").text($(this).attr('title') || $(this).text() || I18n.t('titles.equella_content_preview', "Equella Content Preview"));
       var $iframe = $dialog.find("iframe");
       setTimeout(function() {
         $iframe.css('background', '#fff');
@@ -233,7 +254,7 @@ jQuery(function($) {
         autoOpen: false,
         width: 'auto',
         resizable: false,
-        title: "Equella Content Preview",
+        title: I18n.t('titles.equella_content_preview', "Equella Content Preview"),
         close: function() {
           $dialog.find("iframe").attr('src', 'about:blank');
         }
@@ -276,14 +297,14 @@ jQuery(function($) {
           .addClass('external')
           .html('<span>' + $(this).html() + '</span>')
           .attr('target', '_blank')
-          .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="Links to an external site."/>');
+          .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.h(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
       }).end()
       .find("a.instructure_file_link").each(function() {  
         var $link = $(this),
             $span = $("<span class='instructure_file_link_holder link_holder'/>"); 
         $link.removeClass('instructure_file_link').before($span).appendTo($span);
         if($link.attr('target') != '_blank') {
-          $span.append("<a href='" + $link.attr('href') + "' target='_blank' title='View in a new window' style='padding-left: 5px;'><img src='/images/popout.png'/></a>");
+          $span.append("<a href='" + $link.attr('href') + "' target='_blank' title='" + $.h(I18n.t('titles.view_in_new_window', "View in a new window")) + "' style='padding-left: 5px;'><img src='/images/popout.png'/></a>");
         }
       });
     if ($.filePreviewsEnabled()) {
@@ -291,7 +312,7 @@ jQuery(function($) {
         var $link = $(this);
         if ( $.trim($link.text()) ) {
           var $span = $("<span class='instructure_scribd_file_holder link_holder'/>"),
-              $scribd_link = $("<a class='scribd_file_preview_link' href='" + $link.attr('href') + "' title='Preview the document' style='padding-left: 5px;'><img src='/images/preview.png'/></a>");
+              $scribd_link = $("<a class='scribd_file_preview_link' href='" + $link.attr('href') + "' title='" + $.h(I18n.t('titles.preview_document', "Preview the document")) + "' style='padding-left: 5px;'><img src='/images/preview.png'/></a>");
           $link.removeClass('instructure_scribd_file').before($span).appendTo($span);
           $span.append($scribd_link);
           if($link.hasClass('auto_open')) {
@@ -316,7 +337,7 @@ jQuery(function($) {
           var $after = $('<a href="'+ href +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + id + '/2.jpg)"/></a>')
             .click(function(event) {
               event.preventDefault();
-              var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>Minimize Video</a></span>");
+              var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + id + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + $.h(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
               $video.find(".hide_youtube_embed_link").click(function(event) {
                 event.preventDefault();
                 $video.remove();
@@ -355,7 +376,7 @@ jQuery(function($) {
               public_url: attachment.authenticated_s3_url
             })
             .append(
-              $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">Minimize File Preview</a>')
+              $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' + $.h(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) + '</a>')
               .click(function(event) {
                 event.preventDefault();
                 $link.show();
@@ -372,7 +393,7 @@ jQuery(function($) {
   } else {
     $("a.scribd_file_preview_link").live('click', function(event) {
       event.preventDefault();
-      alert('File previews have been disabled for this Canvas site');
+      alert(I18n.t('alerts.file_previews_disabled', 'File previews have been disabled for this Canvas site'));
     });
   }
   $(document).bind('user_content_change', enhanceUserContent);
@@ -449,7 +470,7 @@ jQuery(function($) {
     $("#cant_record_dialog").dialog('close').dialog({
       autoOpen: false,
       modal: true,
-      title: "Can't Create Recordings?",
+      title: I18n.t('titles.cant_create_recordings', "Can't Create Recordings?"),
       width: 400
     }).dialog('open');
   });
@@ -468,10 +489,54 @@ jQuery(function($) {
       }
     });
   });
+  $(".communication_sub_message .add_conversation_message_form").formSubmit({
+    beforeSubmit: function(data) {
+      $(this).find("button").attr('disabled', true);
+      $(this).find(".submit_button").text(I18n.t('status.posting_message', "Posting Message..."));
+      $(this).loadingImage();
+    },
+    success: function(data) {
+      $(this).loadingImage('remove');
+
+      // message is the message div containing this form, and conversation the
+      // owning conversation. we make a copy of this div before filling it out
+      // so that we can use it for the next message (if any)
+      var $message = $(this).parents(".communication_sub_message")
+      var $conversation = $message.parents(".communication_message");
+
+      // fill out this message, display the new info, and remove the form
+      message_data = data.message;
+      $message.fillTemplateData({
+        data: {
+          post_date: $.parseFromISO(message_data.created_at).datetime_formatted,
+          message: message_data.body
+        },
+        htmlValues: ['message']
+      });
+      $message.find(".message").show();
+      $(this).remove();
+
+      // turn the "add message" button back on
+      $conversation.find(".reply_message").show();
+
+      // notify the user and any other watchers in the document
+      $.flashMessage('Message Sent!');
+      $(document).triggerHandler('user_content_change');
+      if(location.href.match(/dashboard/)) {
+        $.trackEvent('dashboard_comment', 'create');
+      }
+    },
+    error: function(data) {
+      $(this).loadingImage('remove');
+      $(this).find("button").attr('disabled', false);
+      $(this).find(".submit_button").text("Post Failed, Try Again");
+      $(this).formErrors(data);
+    }
+  });
   $(".communication_sub_message .add_sub_message_form").formSubmit({
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true);
-      $(this).find(".submit_button").text("Posting Message...");
+      $(this).find(".submit_button").text(I18n.t('status.posting_message', "Posting Message..."));
       $(this).loadingImage();
     },
     success: function(data) {
@@ -495,15 +560,6 @@ jQuery(function($) {
             htmlValues: ['message']
           });
         }
-      } else if($(this).hasClass('context_message_form')) {
-        var message = data.context_message;
-        message.post_date = $.parseFromISO(message.created_at).datetime_formatted;
-        message.message = message.formatted_body;
-        
-        $message.fillTemplateData({
-          data: message,
-          htmlValues: ['message']
-        });
       } else {
         var entry = data.discussion_entry;
         entry.post_date = $.parseFromISO(entry.created_at).datetime_formatted;
@@ -526,7 +582,7 @@ jQuery(function($) {
     error: function(data) {
       $(this).loadingImage('remove');
       $(this).find("button").attr('disabled', false);
-      $(this).find(".submit_button").text("Post Failed, Try Again");
+      $(this).find(".submit_button").text(I18n.t('errors.posting_message_failed', "Post Failed, Try Again"));
       $(this).formErrors(data);
     }
   });
@@ -548,9 +604,6 @@ jQuery(function($) {
     var params = null;
     if($form.hasClass('submission_comment_form')) {
       params = {comment: ($form.find("textarea:visible:first").val() || "")};
-    } else if($form.hasClass('context_message_form')) {
-      var data = $form.getFormData({object_name: 'context_message'});
-      params = {context_code: data.context_code, reply_id: data.root_context_message_id, body: data.body, recipients: data.recipients, subject: data.subject};
     } else {
       params = {message: ($form.find("textarea:visible:first").val() || "")};
     }
@@ -596,7 +649,7 @@ jQuery(function($) {
     this.find("form.message_form").formSubmit({
       beforeSubmit: function(data) {
         $("button").attr('disabled', true);
-        $("button.submit_button").text("Posting Message...");
+        $("button.submit_button").text(I18n.t('status.posting_message', "Posting Message..."));
       },
       success: function(data) {
         $("button").attr('disabled', false);
@@ -633,14 +686,13 @@ jQuery(function($) {
           $(this).parents(".communication_message").slideUp();
           $(this).parents(".communication_message").prev(".new_activity_message").slideDown();
         } else if($(this).hasClass('announcement_form')) { // do nothing
-        } else if($(this).hasClass('context_message_form')) { // do nothing
         } else {
           location.reload();
         }
       },
       error: function(data) {
         $("button").attr('disabled', false);
-        $("button.submit_button").text("Post Failed, please try again");
+        $("button.submit_button").text(I18n.t('errors.posting_message_failed', "Post Failed, Try Again"));
         $(this).formErrors(data);
       }
     });
@@ -690,17 +742,21 @@ jQuery(function($) {
         // date = date.addMinutes(-1 * timeZoneDiff);
         var defaultDateString = date.toString("MMM d, yyyy") + date.toString(" h:mmtt").toLowerCase();
         var dateString = defaultDateString;
-        if(diff < (24 * 3600 * 1000)) { //date > now.addHours(-24)) {
-          if(diff < (3600 * 1000)) { //date > now.addHours(-1)) {
-            if(diff < (60 * 1000)) { //date > now.addMinutes(-1)) {
-              dateString = "less than a minute ago";
+        if(diff < (24 * 3600 * 1000)) {
+          if(diff < (3600 * 1000)) {
+            if(diff < (60 * 1000)) {
+              dateString = I18n.t('#time.less_than_a_minute_ago', "less than a minute ago");
             } else {
               var minutes = parseInt(diff / (60 * 1000), 10);
-              dateString = minutes + " minute" + (minutes > 1 ? "s" : "") + " ago";
+              dateString = I18n.t('#time.count_minutes_ago',
+                  {one: "1 minute ago", other: "%{count} minutes ago"},
+                  {count: minutes});
             }
           } else {
             var hours = parseInt(diff / (3600 * 1000), 10);
-            dateString = hours + " hour" + (hours > 1 ? "s" : "") + " ago";
+            dateString = I18n.t('#time.count_hours_ago',
+                {one: "1 hour ago", other: "%{count} hours ago"},
+                {count: hours});
           }
         }
         $event.text(dateString);
@@ -730,7 +786,9 @@ jQuery(function($) {
             
             if (!data[label + '_item']) {
               tag.title = tag.title || tag.name;
-              tag.text = $.capitalize(label) + ' Module';
+              tag.text = (label == 'previous' ?
+                I18n.t('buttons.previous_module', "Previous Module") :
+                I18n.t('buttons.next_module', "Next Module"));
               $link.addClass('module_button');
             }
             $link.fillTemplateData({ data: tag });
@@ -802,7 +860,7 @@ jQuery(function($) {
       $this.addClass('selected');
       var $details = $wizard_box.find(".wizard_details");
       var data = $this.getTemplateData({textValues: ['header']});
-      data.link = "Click to " + data.header;
+      data.link = data.header;
       $details.fillTemplateData({ 
         data: data
       });
@@ -845,16 +903,10 @@ jQuery(function($) {
       });
     }
     if($(this).hasClass('grading')) {
-      $(this).dropdownList({
-        options: {
-          '<span class="ui-icon ui-icon-trash">&nbsp;</span> Ignore Forever': function() {
-            remove(url + "?permanent=1");
-          },
-          '<span class="ui-icon ui-icon-star">&nbsp;</span> Ignore Until New Submission': function() {
-            remove(url);
-          }
-        }
-      });
+      options = {}
+      options['<span class="ui-icon ui-icon-trash">&nbsp;</span> ' + $.h(I18n.t('ignore_forever', 'Ignore Forever'))] = function() { remove(url + "?permanent=1"); };
+      options['<span class="ui-icon ui-icon-star">&nbsp;</span> ' + $.h(I18n.t('ignore_until_new_submission', 'Ignore Until New Submission'))] = function() { remove(url); };
+      $(this).dropdownList({ options: options });
     } else {
       remove(url + "?permanent=1");
     }
@@ -882,8 +934,9 @@ jQuery(function($) {
         .children("span.ui-icon-extlink").remove().end()
         .html('<span>' + $(this).html() + '</span>')
         .attr('target', '_blank')
-        .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="Links to an external site."/>');
+        .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.h(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
     });
   }, 2000);
   
+});
 });

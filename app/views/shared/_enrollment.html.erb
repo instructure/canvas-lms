@@ -6,7 +6,7 @@
 <% if enrollment.try_rescue(:user) %>
   title="<%= enrollment.user.name %>: <%= enrollment.user.email %>"
 <% end %>>
-  <span class="links" style="<%= hidden if enrollment && (enrollment.user == @current_user || (@current_enrollment && @current_enrollment.type != 'TeacherEnrollment')) %>">
+  <span class="links" style="<%= hidden if enrollment && ((enrollment.user == @current_user && !can_do(@context.account, @current_user, :manage_admin_users)) || (@current_enrollment && @current_enrollment.type != 'TeacherEnrollment')) %>">
     <%
       lockedbysis = enrollment && enrollment.defined_by_sis?
       lockedbysis &&= !@context.account.grants_right?(@current_user, session, :manage_account_settings)
@@ -39,7 +39,7 @@
           case enrollment.try(:type)
             when 'TeacherEnrollment'
               t :enrolled_as_limited_teacher, "enrolled as a teacher with section-only access"
-            when 'TAEnrollment'
+            when 'TaEnrollment'
               t :enrolled_as_limited_ta, "enrolled as a TA with section-only access"
             when 'ObserverEnrollment'
               t :enrolled_as_limited_observer, "enrolled as an observer with section-only access"
@@ -52,7 +52,7 @@
           case enrollment.try(:type)
             when 'TeacherEnrollment'
               t :enrolled_as_teacher, "enrolled as a teacher"
-            when 'TAEnrollment'
+            when 'TaEnrollment'
               t :enrolled_as_ta, "enrolled as a TA"
             when 'ObserverEnrollment'
               t :enrolled_as_observer, "enrolled as an observer"

@@ -41,11 +41,11 @@ class UserProfile
   TAB_HOME = 4
   def tabs_available(user=nil, opts={})
     @tabs ||= [
-      { :id => TAB_HOME, :label => I18n.t('tabs.home', "Home"), :href => :dashboard_path, :no_args => true },
-      { :id => TAB_PROFILE, :label => I18n.t('tabs.profile', "Profile"), :href => :profile_path, :no_args => true },
-      { :id => TAB_COMMUNICATION_PREFERENCES, :label => I18n.t('tabs.notifications', "Notifications"), :href => :communication_profile_path, :no_args => true },
-      { :id => TAB_FILES, :label => I18n.t('tabs.files', "Files"), :href => :dashboard_files_path, :no_args => true },
-      { :id => TAB_EPORTFOLIOS, :label => I18n.t('tabs.eportfolios', "ePortfolios"), :href => :dashboard_eportfolios_path, :no_args => true }
+      { :id => TAB_HOME, :label => I18n.t('#tabs.home', "Home"), :css_class => 'home', :href => :dashboard_path, :no_args => true },
+      { :id => TAB_PROFILE, :label => I18n.t('#user_profile.tabs.profile', "Profile"), :css_class => 'profile', :href => :profile_path, :no_args => true },
+      { :id => TAB_COMMUNICATION_PREFERENCES, :label => I18n.t('#user_profile.tabs.notifications', "Notifications"), :css_class => 'notifications', :href => :communication_profile_path, :no_args => true },
+      { :id => TAB_FILES, :label => I18n.t('#tabs.files', "Files"), :css_class => 'files', :href => :dashboard_files_path, :no_args => true },
+      { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true }
     ]
   end
 end

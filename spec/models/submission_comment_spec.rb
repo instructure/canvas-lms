@@ -53,6 +53,25 @@ describe SubmissionComment do
     @comment.messages_sent.should_not be_include('Submission Comment')
   end
   
+  it "should dispatch notifications on create regardless of how long ago the submission was created" do
+    assignment_model
+    @assignment.workflow_state = 'published'
+    @assignment.save
+    @course.offer
+    te = @course.enroll_teacher(user)
+    se = @course.enroll_student(user)
+    @assignment.reload
+    @submission = @assignment.submit_homework(se.user, :body => 'some message')
+    @submission.save
+    Notification.create(:name => 'Submission Comment')
+    Notification.create(:name => 'Submission Comment For Teacher')
+    @comment = @submission.add_comment(:author => te.user, :comment => "some comment")
+    @comment.messages_sent.keys.sort.should == ["Submission Comment"]
+    @comment.clear_broadcast_messages
+    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
+    @comment.messages_sent.keys.sort.should == ["Submission Comment", "Submission Comment For Teacher"]
+  end
+
   it "should dispatch notification on create if assignment is published" do
     assignment_model
     @assignment.workflow_state = 'published'
@@ -138,23 +157,5 @@ This text has a http://www.google.com link in it...
     @item.data.id.should eql(@submission.id)
     @item.data.submission_comments[0].id.should eql(@comment.id)
     @item.data.submission_comments[0].formatted_body.should eql(@comment.formatted_body(250))
-  end
-
-  it "should send the comment to inbox" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save
-    @course.offer
-    te = @course.enroll_teacher(@user)
-    se = @course.enroll_student(user)
-    @assignment.reload
-    @submission = @assignment.submit_homework(se.user, :body => 'some message')
-    @submission.created_at = Time.now - 60
-    @submission.save
-    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
-    ii = InboxItem.last
-    ii.asset.should == @submission.submission_comments.last
-    ii.sender_id.should == se.user_id
-    ii.user_id.should == te.user_id
   end
 end

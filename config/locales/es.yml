@@ -1753,28 +1753,6 @@ es:
         start_topic: "Comenzar una Tema Nuevo"
       titles: 
         communication: Comunicación
-    context_message: 
-      from_to: "%{from_user} *a %{to_user}*"
-      images: 
-        alt: 
-          email: "correo electrónico"
-          mark_as_read: "Marcar como Leído"
-          reply: Contestar
-        title: 
-          email: "Mensaje de Correo Electrónico"
-          mark_as_read: "Marcar como Leído"
-          reply_to_recipients: "Contestar a Destinatarios"
-          reply_to_sender: "Responder al Remitente"
-      links: 
-        show_full: "Mostrar mensaje completo"
-      no_title: "Sin Título"
-      recipients_count: 
-        one: "*1* Destinatario"
-        other: "*%{count}* Destinatarios"
-      recipients_protected: "Lista de destinatarios está protegida"
-    context_message_inbox: 
-      loading_results: "Cargando más resultados"
-      no_messages: "Perdón, todavía no hay mensajes."
     dashboard_conference: 
       images: 
         alt: 
@@ -1786,36 +1764,6 @@ es:
         participants: 
           one: "1 Participante"
           other: "%{count} Participantes"
-    dashboard_context_message: 
-      headings: 
-        recipients: "Destinatarios del Mensaje"
-      images: 
-        alt: 
-          email: "correo electrónico"
-          reply: Contestar
-        title: 
-          email: "Mensaje de Correo Electrónico"
-          reply: "Responder al Remitente"
-      links: 
-        more_messages: "Más Mensajes"
-        reply_to_all: "Contestar a todos los Destinatarios..."
-        reply_to_sender: "Contestar al Remitente Original..."
-        show_messages: 
-          one: "Mostrar %{count} Mensaje"
-          other: "Mostrar %{count} Mensajes"
-      no_title: "Sin Título"
-      recipients_count: 
-        one: "1 Destinatario"
-        other: "%{count} Destinatarios"
-      recipients_protected: "Lista de Destinatarios está protegida"
-      sent: enviado
-      to: para
-    dashboard_context_sub_message: 
-      labels: 
-        to: Para
-      links: 
-        title: 
-          author_name: "Nombre del Autor"
     dashboard_ignore_link: 
       images: 
         alt: 
@@ -2083,8 +2031,6 @@ es:
         restore__items: "Restaurar Artículos Borrados"
       help: 
         restore_items: "Recuerde que a veces algunos artículos pueden haber perdido alguna de la información asociada cuando son borrados. Asegúrese de confirmar los resultados de cualquier restauración que haga."
-  context_message: 
-    unknown_user: "Usuario Desconocido"
   context_module: 
     requirements: 
       max_score: "debe obtener no más de %{score}"
@@ -8092,18 +8038,18 @@ es:
         allow_file_uploads: "Permitir Cargas de Archivos"
         allow_media_recordings: "Permitir Grabaciones de Media"
         allow_text_entry: "Permitir Ingreso de Texto"
-        allow_url: "Permitir el URL de la P‡gina Web"
+        allow_url: "Permitir el URL de la Página Web"
         allowed_extensions: "Extensiones de Archivo Permisibles"
         assign_grades_individually: "Asignar calificaciones a cada estudiante individualmente"
         assign_grades_individually_subtext: "(normalmente todos los estudiantes reciben la misma Calificación  en tareas de grupo)"
-        assignment_description: "Descripció n de la Tarea"
+        assignment_description: "Descripción de la Tarea"
         assignment_group_id: "Grupo de Trabajo"
-        due: "Fecha L’mite"
-        grades_from_quiz: "Calificaciones para esta tarea vienen de la evaluació n"
+        due: "Fecha Límite"
+        grades_from_quiz: "Calificaciones para esta tarea vienen de la evaluación"
         grading_type: "Calificar por"
         group_assignment: "Esta es una Tarea de Grupo"
         group_set: "Grupo Establecido"
-        lock_submits_after: "Bloquear los Env’os despuŽs de"
+        lock_submits_after: "Bloquear los Envíos después de"
         locked_until: "Bloqueado Hasta"
         manually_assign_peer_reviews: "Asignar Revisiones por Pares Manualmente"
         master_level: "Nivel de Dominio"
@@ -8112,23 +8058,23 @@ es:
         peer_review_count: "Revisiones por Usuario"
         peer_reviews_assign_at: "Asignar Revisiones"
         points_possible: Puntos
-        quiz_summary: "Resumen/Introducció n de la Evaluació n"
+        quiz_summary: "Resumen/Introducción de la Evaluación"
         require_peer_reviews: "Requerir Revisiones por Pares"
         restrict_file_extensions: "Restringir las Extensiones de Cargas de Archivos Permisibles"
         score_range: "Rango de Calificaciones"
-        submission: Env’o
-        title: T’tulo
-        turnitin_enabled: "Activar Env’os de Evaluaciones en Turnitin"
+        submission: Enviío
+        title: Título
+        turnitin_enabled: "Activar Envíos de Evaluaciones en Turnitin"
         type: Tipo
       lables: 
         automatically_assign_peer_reviews: "Asignar Revisiones por Pares Automáticamente"
-      linked_to_discussion: "Esta tarea est‡ enlazada a la discusió n %{discussion_topic}. La Calificación  estar‡ basada en contribuciones en el tema."
+      linked_to_discussion: "Esta tarea está enlazada a la discusión %{discussion_topic}. La Calificación estará basada en contribuciones en el tema."
       links: 
-        discussion: "Haga click aqu’ para ir a la discusió n"
+        discussion: "Haga click aquií para ir a la discusión"
         edit_assignment_details: "Editar los Detalles de la Tarea"
-        more_grading_options: "m‡s opciones de Calificación"
-        more_options: "m‡s opciones"
-        quiz: "Haga click aqu’ para ir a la evaluació n"
+        more_grading_options: "más opciones de Calificación"
+        more_options: "más opciones"
+        quiz: "Haga click aquí para ir a la evaluación"
         switch_views: "Cambiar de Vistas"
         view_grading_levels: "Ver los Niveles de Calificación"
       mastery_level: "%{points} pts o más"
@@ -8147,7 +8093,7 @@ es:
         pass_fail: Completo/Incompleto
         percentage: Porcentaje
         points: Puntos
-        quiz: "Evaluació n"
+        quiz: "Evaluación"
         select_group_set: "[ Seleccionar una Serie de Grupo ]"
       out_of: "de %{points}"
       score_range: "%{min_score} a %{max_score}"

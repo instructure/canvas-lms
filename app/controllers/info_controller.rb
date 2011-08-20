@@ -45,19 +45,13 @@ class InfoController < ApplicationController
   def record_error_for_teacher
     @admins = @course.admins
     if !@admins.empty?
-      comments = params[:error][:comments] rescue nil
-      comments ||= t(:no_comments, "No comments")
       backtrace = params[:error][:backtrace] rescue nil
-      backtrace ||= ""
-      subject = t(:feedback_subject, "Student Feedback: %{comment_preview}", :comment_preview => comments[0,50])
-      comments = backtrace + "\n" + comments
-      @message = ContextMessage.create!({
-        :context => @course,
-        :user => @current_user,
-        :body => comments,
-        :subject => subject,
-        :recipients => @admins.map(&:id).join(",")
-      })
+      comments = params[:error][:comments] rescue nil
+      comments = t(:no_comments, "No comments") unless comments.present?
+      body = t(:feedback_subject, "Student Feedback on %{course}", :course => @course.name)
+      body += "\n" + backtrace if backtrace.present?
+      body += "\n" + comments
+      @current_user.initiate_conversation(@admins.map(&:id)).add_message(comments)
       respond_to do |format|
         flash[:notice] = t('notices.feedback_sent', "Thanks for your feedback!  Your teacher has been notified.")
         format.html { redirect_to root_url }

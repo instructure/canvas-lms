@@ -55,7 +55,7 @@ class RoleOverridesController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :manage_role_overrides)
       @role_types = RoleOverride.enrollment_types
-      @role_types = RoleOverride.account_membership_types(@context) if @context.is_a?(Account) && params[:account_roles]
+      @role_types = RoleOverride.account_membership_types(@context) if @context.is_a?(Account) && (params[:account_roles] || @context == Account.site_admin)
       if params[:permissions]
         RoleOverride.permissions.each_pair do |key, permission|
           if params[:permissions][key]

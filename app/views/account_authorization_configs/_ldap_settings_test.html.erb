@@ -1,0 +1,197 @@
+<%
+ldap_tests = []
+ldap_tests << OpenStruct.new(
+  :test_type => :connection,
+  :label => t(:test_ldap_connection_label, "Testing connection..."),
+  :help_header => t(:test_ldap_connection_help_header, "Canvas can't connect to your LDAP server"),
+  :help_body => t(:test_ldap_connection_help_body, "The connection either timed out or was refused. Things to consider:"),
+  :help => [
+    t(:test_ldap_connection_help_fixes_1, "Canvas is connecting to %{ips}", :ips => @account.account_authorization_configs.map {|a| a.ldap_ip}.to_sentence),
+    t(:test_ldap_connection_help_fixes_2, "This was only a connection test. SSL certificates were not validated."),
+    t(:test_ldap_connection_help_fixes_3, "Check your firewall settings. Are all Canvas IP address allowed to access your server?")
+  ],
+  :js_function => 'testLDAPConnection',
+  :url_context => :context_test_ldap_connections_url
+)
+ldap_tests << OpenStruct.new(
+  :test_type => :bind,
+  :label => t(:test_ldap_bind_label, "Testing LDAP bind..."),
+  :help_header => t(:test_ldap_bind_help_header, "Canvas can't bind (login) to your LDAP server"),
+  :help_body => t(:test_ldap_bind_help_body, "Your LDAP server server rejected the bind attempt. Things to consider:"),
+  :help => [
+    t(:test_ldap_bind_help_fixes_1, "Verify the provided filter string (i.e. '(sAMAccountName={{login}})')."),
+    t(:test_ldap_bind_help_fixes_2, "Does the username require more scoping information? (i.e. 'cn=Canvas,ou=people,dc=example,dc=com').")
+  ],
+  :js_function => 'testLDAPBind',
+  :url_context => :context_test_ldap_binds_url
+)
+ldap_tests << OpenStruct.new(
+  :test_type => :search,
+  :label => t(:test_ldap_search_label, "Testing LDAP search..."),
+  :help_header => t(:test_ldap_search_help_header, "Canvas can't search your LDAP instance"),
+  :help_body => t(:test_ldap_search_help_body, "The search either failed or returned 0 results. Things to consider:"),
+  :help => [
+    t(:test_ldap_search_help_fixes_1, "Verify the provided filter string (i.e. '(sAMAccountName={{login}})')."),
+    t(:test_ldap_search_help_fixes_2, "Verify the provided search base (i.e. 'ou=people,dc=example,dc=com')."),
+    t(:test_ldap_search_help_fixes_3, "Verify that the user object in LDAP has search privileges for the  provided search base.")
+  ],
+  :js_function => 'testLDAPSearch',
+  :url_context => :context_test_ldap_searches_url
+)
+%>
+
+<div style="display: none;width:100%">
+  <div id="test_ldap_dialog" style="padding-top:10px;">
+    <h3><%= t(:test_ldap_dialog_page_title, "Testing Your LDAP Configuration") %></h3>
+    <table style="margin-left:20px">
+      <% ldap_tests.each do |test| %>
+        <tr>
+          <td><h4 style="width: 400px"><%= test.label %></h4></td>
+          <td><div id="ldap_<%= test.test_type %>_result"></div></td>
+        </tr>
+        <tr>
+          <td colspan="2"><div id="ldap_<%= test.test_type %>_help" style="padding-left:15px;display:none">
+            <h4><%= test.help_header %></h4>
+            <p>
+              <%= test.help_body %>
+              <ul>
+                <% test.help.each do |help| %>
+                  <li><%= help %></li>
+                <% end %>
+              </ul>
+            </p>
+          </div></td>
+        </tr>
+      <% end %>
+      <tr>
+        <td><h4><%= t(:test_ldap_login_label, "Test user login...") %></h4></td>
+        <td><div id="ldap_login_result"></div></td>
+      </tr>
+      <tr>
+        <td colspan="2"><div id="ldap_login_form" style="padding-left:15px;padding-bottom:10px;display:none;">
+          <h4><%= t(:test_ldap_login_form_header, "Supply a valid LDAP username/password to test login:") %></h4>
+          <form id="ldap_test_login_form" action="">
+          <table>
+            <tr>
+              <td style="width:86px;"><%= blabel :ldap_test_login, :user, :en => "Username" %></td>
+              <td><%= text_field :ldap_test_login, :user, :style => "width:170px" %></td>
+            </tr>
+            <tr>
+              <td><%= blabel :ldap_test_login, :pass, :en => "Password" %></td>
+              <td><%= password_field :ldap_test_login, :pass, :style => "width:170px" %></td>
+              <td style="padding-left:26px;"><input type="submit" value="<%= t(:ldap_test_login_button, "Test Login") %>" /></td>
+            </tr>
+          </table>
+          </form>
+        </div></td>
+      </tr>
+      <tr>
+        <td colspan="2"><div id="ldap_login_help" style="padding-left:15px;display:none">
+          <p id="ldap_login_help_error" style='color:red'><%= t(:test_ldap_login_help_header, "The LDAP server denied your credentials") %></p>
+        </div></td>
+      </tr>
+    </table>
+    <button type="button" class="button submit_button ldap_test_close" style="float:right"><%= t(:test_ldap_dialog_close, "Close") %></button>
+  </div>
+</div>
+
+<% js_block :i18n_scope => "accounts" do %>
+<script>
+  function testLDAP() {
+    clearTestLDAP();
+    $("#test_ldap_dialog").dialog('close').dialog({
+      autoOpen: false,
+      title: I18n.t('test_ldap_dialog_title', "Test LDAP Settings"),
+      width: 500
+    }).dialog('open');
+    <%= ldap_tests.first.js_function %>();
+  }
+  function clearTestLDAP() {
+    <% ldap_tests.each do |test| %>
+      $("#ldap_<%= test.test_type %>_result").html("");
+      $("#ldap_<%= test.test_type %>_help").hide();
+    <% end %>
+    $("#ldap_login_result").html("");
+    $("#ldap_login_form").hide();
+  }
+  <% ldap_tests.each_with_index do |test, i| %>
+    function <%= test.js_function %>() {
+      $("#ldap_<%= test.test_type %>_result").html("<img src='/images/ajax-loader.gif'/>");
+      $.getJSON('<%= context_url(@account, test.url_context) %>', function(data) {
+        status = true;
+        $.each(data, function(i, config) {
+          if (!config['ldap_<%= test.test_type %>_test']) {
+            status = false;
+          }
+        });
+        if (status == "true") {
+          $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:green'>" + I18n.t('test_ldap_result_ok', 'OK') + "</h4>");
+          <% if next_test = ldap_tests[i+1] %>
+            // proceed to the next test
+            <%= next_test.js_function %>();
+          <% else %>
+            // show login test tool
+            $("#ldap_login_form").show('blind');
+          <% end %>
+        } else {
+          $("#ldap_<%= test.test_type %>_result").html("<h4 style='color:red'>" + I18n.t('test_ldap_result_failed', 'Failed') + "</h4>");
+          $("#ldap_<%= test.test_type %>_help").show();
+          <% ldap_tests[i+1..-1].each do |next_test| %>
+            $("#ldap_<%= next_test.test_type %>_result").html("<h4 style='color:red'>" + I18n.t('test_ldap_result_canceled', 'Canceled') + "</h4>");
+          <% end %>
+          $("#ldap_login_result").html("<h4 style='color:red'>" + I18n.t('test_ldap_result_canceled', 'Canceled') + "</h4>");
+        }
+      });
+    }
+  <% end %>
+  function testLDAPLogin() {
+    $("#ldap_test_login").attr('disabled', 'true').attr('value', 'Testing...');
+    $("#ldap_login_result").html("<img src='/images/ajax-loader.gif'/>");
+    username = $("#ldap_test_login_user").val();
+    password = $("#ldap_test_login_pass").val();
+    url = '<%= context_url(@account, :context_test_ldap_logins_url) %>';
+    $.post(url, {'username': username, 'password': password, authenticity_token: '<%= form_authenticity_token %>'}, function(data) {
+      status = true;
+      message = "";
+      $.each(data, function(i, config) {
+        if (!config['ldap_login_test']) {
+          status = false;
+        }
+        if (config['errors']) {
+          $.each(config['errors'], function(i, m) {
+            $.each(m, function(err, msg) {
+              message += msg;
+            })
+          });
+        }
+      });
+      if (status == "true") {
+        $("#ldap_login_help_error").hide();
+        $("#ldap_login_result").html("<h4 style='color:green'>" + I18n.t('test_ldap_result_ok', 'OK') + "</h4>");
+        $("#ldap_test_login").attr('disabled', '').attr('value', 'Test Login');
+      } else {
+        $("#ldap_login_result").html("<h4 style='color:red'>" + I18n.t('test_ldap_result_failed', 'Failed') + "</h4>");
+        $("#ldap_login_help").show();
+        $("#ldap_test_login").attr('disabled', '').attr('value', 'Retry Login');
+        $("#ldap_login_help_error").html(message);
+      }
+    });
+  }
+
+  $(document).ready(function() {
+    $(".test_ldap_link").click(function(event) {
+      event.preventDefault();
+      // kick off our test
+      testLDAP();
+    });
+    $(".ldap_test_close").click(function(event) {
+      event.preventDefault();
+      $("#test_ldap_dialog").dialog('close')
+    });
+    $("#ldap_test_login_form").submit(function(event) {
+      event.preventDefault();
+      testLDAPLogin();
+    });
+  });
+</script>
+<% end %>

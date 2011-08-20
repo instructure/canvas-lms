@@ -5,21 +5,21 @@
   <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_host, :en => "Host" %></td>
   <td style="vertical-align: top;" class="nobr">
     <%= f.text_field :auth_host, :class => "auth_form", :style => "width: 300px;" %>
-    <span class="auth_info auth_host"><%= @account_config.auth_host %></span>
+    <span class="auth_info auth_host"><%= account_config.auth_host %></span>
   </td>
 </tr>
 <tr>
   <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_port, :en => "Port" %></td>
   <td style="vertical-align: top;" class="nobr">
     <%= f.text_field :auth_port, :class => "auth_form", :style => "width: 50px;" %>
-    <span class="auth_info auth_port"><%= @account_config.auth_port %></span>
+    <span class="auth_info auth_port"><%= account_config.auth_port %></span>
   </td>
 </tr>
 <tr>
   <td style="vertical-align: top; width: 200px;"><%= f.blabel :auth_over_tls, :en => "Over TLS?" %></td>
   <td style="vertical-align: top;" class="nobr">
     <%= f.check_box :auth_over_tls, :class => "auth_form" %>
-    <span class="auth_info auth_over_tls"><%= @account_config.auth_over_tls %></span>
+    <span class="auth_info auth_over_tls"><%= account_config.auth_over_tls %></span>
   </td>
 </tr>
 <tr>

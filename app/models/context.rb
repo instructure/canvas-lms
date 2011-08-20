@@ -38,7 +38,6 @@ module Context
     CalendarEvent = ::CalendarEvent
     Collaboration = ::Collaboration
     ContentTag = ::ContentTag
-    ContextMessage = ::ContextMessage
     ContextModule = ::ContextModule
     DiscussionEntry = ::DiscussionEntry
     DiscussionTopic = ::DiscussionTopic

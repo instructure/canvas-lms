@@ -127,24 +127,23 @@ module SIS
                     enrollment.type = 'DesignerEnrollment'
                   end
 
-                  # special-case status that bases the enrollment state
-                  # off of availability dates instead of explicitly setting it.
-                  if row['status']=~ /active_if_available/i
+                  # "active" really means "active if otherwise available"
+                  if row['status']=~ /\Aactive/i
                     row['status'] = course.enrollment_state_based_on_date(enrollment)
                   end
 
-                  if row['status']=~ /active/i
+                  if row['status']=~ /\Aactive/i
                     if user.workflow_state != 'deleted'
                       enrollment.workflow_state = 'active'
                     else
                       enrollment.workflow_state = 'deleted'
                       add_warning csv, "Attempted enrolling of deleted user #{row['user_id']} in course #{row['course_id']}"
                     end
-                  elsif  row['status']=~ /deleted/i
+                  elsif  row['status']=~ /\Adeleted/i
                     enrollment.workflow_state = 'deleted'
-                  elsif  row['status']=~ /completed/i
+                  elsif  row['status']=~ /\Acompleted/i
                     enrollment.workflow_state = 'completed'
-                  elsif  row['status']=~ /inactive/i
+                  elsif  row['status']=~ /\Ainactive/i
                     enrollment.workflow_state = 'inactive'
                   end
 

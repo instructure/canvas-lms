@@ -14,6 +14,8 @@ class FillInTheBlank < AssessmentItemConverter
   def parse_question_data
     if @type == 'angel'
       process_angel
+    elsif @doc.at_css('itemBody extendedTextInteraction')
+      process_d2l
     else
       process_canvas
     end
@@ -79,6 +81,35 @@ class FillInTheBlank < AssessmentItemConverter
         end
       end
     end
+  end
+  
+  def process_d2l
+    @question[:question_text] = ''
+    if body = @doc.at_css('itemBody')
+      body.children.each do |node|
+        next if node.name == 'text'
+        text = ''
+        if node.name == 'div'
+          text = sanitize_html_string(node.text, true)
+        elsif node.name == 'extendedTextInteraction'
+          id = node['responseIdentifier']
+          text = " [#{id}] "
+        end
+        @question[:question_text] += text
+      end
+    end
+    
+    @doc.css('responseCondition stringMatch').each do |match|
+      if blank_id = get_node_att(match, 'variable','identifier')
+        text = get_node_val(match, 'baseValue')
+        answer = {:id => unique_local_id, :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT}
+        answer[:migration_id] = blank_id
+        answer[:text] = sanitize_html_string(text, true)
+        answer[:blank_id] = blank_id
+        @question[:answers] << answer
+      end
+    end
+    
   end
   
 end

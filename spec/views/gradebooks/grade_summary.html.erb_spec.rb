@@ -31,5 +31,35 @@ describe "/gradebooks/grade_summary" do
     render "gradebooks/grade_summary"
     response.should_not be_nil
   end
-end
 
+  it "should not show totals if configured so" do
+    course_with_student
+    @course.settings[:hide_final_grade] = true
+    view_context
+    a = @course.assignments.create!(:title => "some assignment")
+    assigns[:student] = @user
+    assigns[:assignments] = [a]
+    assigns[:submissions] = []
+    assigns[:courses_with_grades] = []
+    render "gradebooks/grade_summary"
+    response.should_not be_nil
+    page = Nokogiri('<document>' + response.body + '</document>')
+    page.css(".final_grade").length.should == 0
+  end
+
+  it "should not show what if if not the student" do
+    course_with_teacher
+    student_in_course
+    @student = @user
+    @user = @teacher
+    view_context
+    a = @course.assignments.create!(:title => "some assignment")
+    assigns[:student] = @student
+    assigns[:assignments] = [a]
+    assigns[:submissions] = []
+    assigns[:courses_with_grades] = []
+    render "gradebooks/grade_summary"
+    response.should_not be_nil
+    response.body.should_not match /Click any score/
+  end
+end

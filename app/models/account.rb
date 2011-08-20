@@ -34,14 +34,13 @@ class Account < ActiveRecord::Base
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id'
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
-  has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id'
+  has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
   has_many :account_users, :dependent => :destroy
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :learning_outcomes, :as => :context
   has_many :sis_batches
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
-  has_many :authorization_codes, :dependent => :destroy
   has_many :users, :through => :account_users
   has_many :pseudonyms, :include => :user
   has_many :role_overrides, :as => :context
@@ -208,7 +207,10 @@ class Account < ActiveRecord::Base
   end
   
   def settings
-    self.read_attribute(:settings) || self.write_attribute(:settings, {})
+    result = self.read_attribute(:settings)
+    return result if result
+    return self.write_attribute(:settings, {}) unless frozen?
+    {}.freeze
   end
   
   def domain
@@ -219,10 +221,18 @@ class Account < ActiveRecord::Base
     !self.root_account_id
   end
   
-  def sub_accounts_as_options(indent=0)
+  def sub_accounts_as_options(indent = 0, preloaded_accounts = nil)
+    unless preloaded_accounts
+      preloaded_accounts = {}
+      (self.root_account || self).all_accounts.active.each do |account|
+        (preloaded_accounts[account.parent_account_id] ||= []) << account
+      end
+    end
     res = [[("&nbsp;&nbsp;" * indent).html_safe + self.name, self.id]]
-    self.sub_accounts.each do |account|
-      res += account.sub_accounts_as_options(indent + 1)
+    if preloaded_accounts[self.id]
+      preloaded_accounts[self.id].each do |account|
+        res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
+      end
     end
     res
   end
@@ -348,7 +358,7 @@ class Account < ActiveRecord::Base
     Canvas::Security.decrypt_password(self.turnitin_crypted_secret, self.turnitin_salt, 'instructure_turnitin_secret_shared')
   end
   
-  def account_chain
+  def account_chain(opts = {})
     res = [self]
     account = self
     while account.parent_account
@@ -356,6 +366,7 @@ class Account < ActiveRecord::Base
       res << account
     end
     res << self.root_account unless res.include?(self.root_account)
+    res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
     res.compact
   end
   
@@ -473,13 +484,7 @@ class Account < ActiveRecord::Base
     self.membership_types = self.account_membership_types.select{|t| t != type}.join(',')
     self.save
   end
-  
-  def membership_allows(user, permission)
-    return false unless user && permission
-    account_users = AccountUser.for_user(user).select{|a| a.account_id == self.id}
-    result = account_users.any?{|e| e.has_permission_to?(permission) }
-  end
-  
+
   def account_authorization_config
     # We support multiple auth configs per account, but several places we assume there is only one.
     # This is for compatibility with those areas. TODO: migrate everything to supporting multiple
@@ -508,27 +513,45 @@ class Account < ActiveRecord::Base
     state :active
     state :deleted
   end
+
+  def account_users_for(user)
+    @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
+    @account_users_cache ||= {}
+    @account_users_cache[user] ||= AccountUser.find(:all, :conditions => { :account_id => @account_chain_ids, :user_id => user.id }) if user
+    @account_users_cache[user] ||= []
+    @account_users_cache[user]
+  end
   
   set_policy do
-    RoleOverride.permissions.each do |permission, params|
-      given {|user, session| self.membership_allows(user, permission) }
-      can permission
-      
-      given {|user, session| self.parent_account && self.parent_account.grants_right?(user, session, permission) }
-      can permission
-
-      given {|user, session| !site_admin? && Account.site_admin.grants_right?(user, session, permission) }
+    RoleOverride.permissions.each_key do |permission|
+      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(permission) } }
       can permission
     end
 
-    given { |user| self.active? && self.users.include?(user) }
+    given { |user| !self.account_users_for(user).empty? }
     can :read and can :manage and can :update and can :delete
 
-    given { |user| self.parent_account && self.parent_account.grants_right?(user, nil, :manage) }
-    can :read and can :manage and can :update and can :delete
+    given { |user|
+      root_account = self.root_account || self
+      result = false
+      site_admin = self.site_admin?
 
-    given { |user| !site_admin? && Account.site_admin_user?(user, :manage) }
-    can :read and can :manage and can :update and can :delete
+      if !site_admin && user && root_account.settings[:teachers_can_create_courses] != false
+        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('TeacherEnrollment', 'DesignerEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
+        result = true if count > 0
+      end
+      if !site_admin && user && !result && root_account.settings[:students_can_create_courses] != false
+        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.type IN ('StudentEnrollment', 'ObserverEnrollment') AND (enrollments.workflow_state != 'deleted') AND root_account_id = #{root_account.id}").count
+        result = true if count > 0
+      end
+      if !site_admin && user && !result && root_account.settings[:no_enrollments_can_create_courses] != false
+        count = user.enrollments.scoped(:select=>'id', :conditions=>"enrollments.workflow_state != 'deleted' AND root_account_id = #{root_account.id}").count
+        result = true if count == 0
+      end
+
+      result
+    }
+    can :create_courses
   end
 
   alias_method :destroy!, :destroy
@@ -806,26 +829,26 @@ class Account < ActiveRecord::Base
   def tabs_available(user=nil, opts={})
     manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
     if site_admin?
-      tabs = [
-        { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :href => :account_role_overrides_path },
-      ]
+      tabs = []
+      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
     else
-      tabs = [ { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :href => :account_path } ]
-      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
-      tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :href => :statistics_account_path }
-      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      tabs = []
+      tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, nil, :read_course_list)
+      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
+      tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && self.grants_right?(user, nil, :view_statistics)
+      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_role_overrides_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
       if user && self.grants_right?(user, nil, :manage_outcomes)
-        tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :href => :account_outcomes_path }
-        tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :href => :account_rubrics_path }
+        tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :css_class => 'outcomes', :href => :account_outcomes_path }
+        tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
       end
-      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading Schemes"), :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
-      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :href => :account_sub_accounts_path } if manage_settings
-      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :href => :account_user_notes_path} if self.enable_user_notes
-      tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :href => :account_terms_path } if !self.root_account_id && manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
-      tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
+      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading Schemes"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
+      tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
+      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, nil, :manage_user_notes)
+      tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if !self.root_account_id && manage_settings
+      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if self.parent_account_id.nil? && manage_settings
+      tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :css_class => 'sis_import', :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
     end
-    tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :href => :account_settings_path }
+    tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :css_class => 'settings', :href => :account_settings_path }
     tabs
   end
 
@@ -985,6 +1008,10 @@ class Account < ActiveRecord::Base
       child_ids = self.class.connection.select_values("SELECT id FROM accounts WHERE parent_account_id IN (#{child_ids.join(",")})").map(&:to_i)
     end
     return false
+  end
+
+  def manually_created_courses_account
+    (self.root_account || self).sub_accounts.find_or_create_by_name(t('#account.manually_created_courses', "Manually-Created Courses"))
   end
 
   named_scope :sis_sub_accounts, lambda{|account, *sub_account_source_ids|

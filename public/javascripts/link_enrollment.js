@@ -1,5 +1,5 @@
 I18n.scoped('link_enrollment', function (I18n) {
-var link_enrollment = (function() {
+window.link_enrollment = (function() {
   return {
     choose: function(user_name, enrollment_id, current_user_id, callback) {
       var $user = $(this).parents(".user");

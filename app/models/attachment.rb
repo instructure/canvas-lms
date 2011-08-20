@@ -44,10 +44,14 @@ class Attachment < ActiveRecord::Base
   before_validation :assert_attachment
   before_destroy :delete_scribd_doc
   acts_as_list :scope => :folder
-  after_save :touch_context
+  after_save :touch_context_if_appropriate
   after_create :build_media_object
   
   attr_accessor :podcast_associated_asset
+
+  def touch_context_if_appropriate
+    touch_context unless context_type == 'ConversationMessage'
+  end
 
   # this is a magic method that gets run by attachment-fu after it is done sending to s3,
   # that is the moment that we also want to submit it to scribd.
@@ -439,6 +443,23 @@ class Attachment < ActiveRecord::Base
     CGI::unescape(self.filename || t(:default_filename, "File"))
   end
   
+  def handle_duplicates(method)
+    return [] unless method.present? && self.folder
+    method = method.to_sym
+    deleted_attachments = []
+    other_attachments = 
+    if method == :rename
+      self.display_name = Attachment.make_unique_filename(self.display_name, self.folder.active_file_attachments.reject {|a| a.id == self.id }.map(&:display_name))
+      self.save
+    elsif method == :overwrite
+      self.folder.active_file_attachments.find_all_by_display_name(self.display_name).reject {|a| a.id == self.id }.each do |a|
+        a.destroy
+        deleted_attachments << a
+      end
+    end
+    return deleted_attachments
+  end
+
   def self.destroy_files(ids)
     Attachment.find_all_by_id(ids).compact.each(&:destroy)
   end
@@ -465,7 +486,10 @@ class Attachment < ActiveRecord::Base
     @file_store_config ||= {'storage' => 'local'}
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
     if RAILS_ENV == "test"
-      file_storage_test_override = Setting.get("file_storage_test_override", nil)
+      # yes, a rescue nil; the problem is that in an automated test environment, this may be
+      # in the auto-require path, before the DB is even created; obviously it hasn't been
+      # overridden yet
+      file_storage_test_override = Setting.get("file_storage_test_override", nil) rescue nil
       return @file_store_config.merge({"storage" => file_storage_test_override}) if file_storage_test_override
     end
     return @file_store_config

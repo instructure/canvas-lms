@@ -40,11 +40,6 @@ timing = {
       result.referenceDate = Date.parse(started_at);
     }
     result.clientServerDiff = timing.clientServerDiff;
-    var offsetDiff = parseInt($(".utc_offset").text(), 10);
-    var myOffset = now.getTimezoneOffset();
-    if(!isNaN(offsetDiff) && !isNaN(myOffset)) {
-      result.referenceOffset = (offsetDiff * 1000) + (myOffset * 60000);
-    }
     return result;
   }
 };

@@ -54,6 +54,77 @@ class AccountAuthorizationConfigsController < ApplicationController
     render :json => account_configs.to_json
   end
 
+  def test_ldap_connection
+    results = []
+    @account.account_authorization_configs.each do |config|
+      h = {
+        :account_authorization_config_id => config.id,
+        :ldap_connection_test => config.test_ldap_connection
+      }
+      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+    end
+    render :json => results.to_json
+  end
+
+  def test_ldap_bind
+    results = []
+    @account.account_authorization_configs.each do |config|
+      h = {
+        :account_authorization_config_id => config.id,
+        :ldap_bind_test => config.test_ldap_bind
+      }
+      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+    end
+    render :json => results.to_json
+  end
+
+  def test_ldap_search
+    results = []
+    @account.account_authorization_configs.each do |config|
+      res = config.test_ldap_search
+      h = {
+        :account_authorization_config_id => config.id,
+        :ldap_search_test => res ? res > 0 : false,
+        :ldap_search_results => res
+      }
+      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+    end
+    render :json => results.to_json
+  end
+
+  def test_ldap_login
+    results = []
+    unless @account.ldap_authentication?
+      return render(
+        :json => {:errors => {:account => t(:account_required, 'must be LDAP-authenticated')}},
+        :status_code => 400
+      )
+    end
+    unless params[:username]
+      return render(
+        :json => {:errors => {:login => t(:login_required, 'must be supplied')}},
+        :status_code => 400
+      )
+    end
+    unless params[:password]
+      return render(
+        :json => {:errors => {:password => t(:password_required, 'must be supplied')}},
+        :status_code => 400
+      )
+    end
+    @account.account_authorization_configs.each do |config|
+      h = {
+        :account_authorization_config_id => config.id,
+        :ldap_login_test => config.test_ldap_login(params[:username], params[:password])
+      }
+      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+    end
+    render(
+      :json => results.to_json,
+      :status_code => 200
+    )
+  end
+
   def destroy_all
     @account.account_authorization_configs.each do |c|
       c.destroy

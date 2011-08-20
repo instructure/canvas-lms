@@ -93,6 +93,23 @@ shared_examples_for "files selenium tests" do
   end
 end
 
+describe "files without s3 and forked tests" do
+  it_should_behave_like "in-process server selenium tests"
+
+  it "should allow renaming folders" do
+    course_with_teacher_logged_in
+    get "/dashboard/files"
+    driver.find_element(:css, ".add_folder_link").click
+    driver.find_element(:css, "#files_content .add_folder_form #folder_name").send_keys("my folder\n")
+    wait_for_ajax_requests
+    Folder.last.name.should == "my folder"
+    driver.find_element(:css, "#files_content .folder_item .rename_item_link").click
+    driver.find_element(:css, "#files_content #rename_entry_field").send_keys("my folder 2\n")
+    wait_for_ajax_requests
+    Folder.last.name.should == "my folder 2"
+  end
+end
+
 describe "files Windows-Firefox-Local-Tests" do
   it_should_behave_like "files selenium tests"
   prepend_before(:each) {

@@ -1,3 +1,4 @@
+<% @context ||= @current_user %>
 <% cache(['wiki_sidebar_render_', @context.cache_key, can_do(@context, @current_user, :manage_content).to_s, can_do(@context, @current_user, :manage_files).to_s].cache_key.to_s) do %>
 <% load_wiki_sidebar %>
 <div id="editor_tabs" style="display: none;">

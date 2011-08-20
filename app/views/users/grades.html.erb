@@ -58,9 +58,11 @@ $(document).ready(function() {
 <table class="course_details">
 <% @student_enrollments.each do |enrollment| %>
   <tr>
-    <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= @course_names[enrollment.course_id] %></a></td>
+    <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= enrollment.course.name %></a></td>
     <td class="percent">
-      <% if enrollment.computed_current_score && enrollment.is_a?(StudentEnrollment) %>
+      <% if enrollment.course.settings[:hide_final_grade] %>
+        --
+      <% elsif enrollment.computed_current_score %>
         <%= enrollment.computed_current_score %>%
       <% else %>
         <span style="font-weight: normal; font-size: 0.9em;"><%= t('no_grade', 'no grade') %></span>
@@ -76,9 +78,11 @@ $(document).ready(function() {
 <table class="course_details">
 <% @observed_enrollments.each do |enrollment| %>
   <tr>
-    <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= context_user_name(nil, enrollment.user_id) %>, <%= @course_names[enrollment.course_id] %></a></td>
+    <td class="course"><a href="<%= course_student_grades_path(enrollment.course_id, enrollment.user_id) %>"><%= context_user_name(nil, enrollment.user_id) %>, <%= enrollment.course.name %></a></td>
     <td class="percent">
-      <% if enrollment.computed_current_score && enrollment.is_a?(StudentEnrollment) %>
+      <% if enrollment.course.settings[:hide_final_grade] %>
+        --
+      <% elsif enrollment.computed_current_score %>
         <%= enrollment.computed_current_score %>%
       <% else %>
         <span style="font-weight: normal; font-size: 0.9em;"><%= t('no_grade', 'no grade') %></span>
@@ -94,7 +98,7 @@ $(document).ready(function() {
 <table class="course_details">
 <% @teacher_enrollments.each do |enrollment| %>
   <tr>
-    <td class="course" style="vertical-align: middle;"><a href="<%= course_gradebook_path(enrollment.course_id) %>"><%= @course_names[enrollment.course_id] %></a></td>
+    <td class="course" style="vertical-align: middle;"><a href="<%= course_gradebook_path(enrollment.course_id) %>"><%= enrollment.course.name %></a></td>
     <td class="percent">
       <% if @course_grade_summaries[enrollment.course_id] && @course_grade_summaries[enrollment.course_id][:score] %>
         <%= number_to_percentage(@course_grade_summaries[enrollment.course_id][:score], :precision => 2) %>
@@ -121,9 +125,11 @@ $(document).ready(function() {
   </tr></thead>
   <% @prior_enrollments.each do |enrollment| %>
     <tr>
-      <td><%= @course_names[enrollment.course_id] %></td>
+      <td><%= enrollment.course.name %></td>
       <td>
-        <% if enrollment.computed_current_score %>
+        <% if enrollment.course.settings[:hide_final_grade] %>
+          --
+        <% elsif enrollment.computed_current_score %>
           <%= enrollment.computed_current_score %>%
         <% else %>
           --
