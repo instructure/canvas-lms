@@ -4,6 +4,6 @@ class WebConferenceSettings < ActiveRecord::Migration
   end
 
   def self.down
-    drop_column :web_conferences, :settings
+    remove_column :web_conferences, :settings
   end
 end

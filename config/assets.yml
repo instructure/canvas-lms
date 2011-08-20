@@ -99,8 +99,8 @@ javascripts:
     - public/javascripts/content_locks.js
   collaborations:
     - public/javascripts/collaborations.js
-  context_messages:
-    - public/javascripts/context_messages.js
+  context_inbox:
+    - public/javascripts/context_inbox.js
   context_modules:
     - public/javascripts/context_modules.js
   course_details:
@@ -224,6 +224,12 @@ javascripts:
   teacher_activity_report:
     - public/javascripts/jquery.tablesorter.min.js
     - public/javascripts/compiled/teacher_activity_report.js
+  messages:
+    - public/javascripts/compiled/messages.js
+    - public/javascripts/compiled/slideshow.js
+    - public/javascripts/compiled/conversations_intro.js
+    - public/javascripts/jquery.elastic.js
+    - public/javascripts/jquery.cookie.js
 <% base_js = _erbout; _erbout = saved %>
 
 <%=
@@ -264,7 +270,7 @@ stylesheets:
     - public/stylesheets/compiled/g_assignments.css
     - public/stylesheets/compiled/g_content_imports.css
     - public/stylesheets/compiled/g_gradebook_history.css
-    - public/stylesheets/compiled/g_context_messages.css
+    - public/stylesheets/compiled/g_context_inbox.css
     - public/stylesheets/compiled/g_groups.css
     - public/stylesheets/compiled/g_media_comments.css
     - public/stylesheets/compiled/g_context_modules.css
@@ -345,3 +351,8 @@ stylesheets:
     - public/stylesheets/compiled/external_tools.css
   select_content_dialog:
     - public/stylesheets/compiled/select_content_dialog.css
+  messages:
+    - public/stylesheets/compiled/messages.css
+    - public/stylesheets/compiled/slideshow.css
+  dashboard:
+    - public/stylesheets/compiled/g_dashboard_conversations.css

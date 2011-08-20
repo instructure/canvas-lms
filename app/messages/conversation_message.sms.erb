@@ -1,0 +1,5 @@
+<%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => (asset.author.short_name rescue t(:unknown_user, 'Unknown User')) %>
+
+<%= strip_and_truncate(asset.body, :max_length => 50) %>
+
+<%= t :more_info, "More info at %{url}", :url => HostUrl.default_host %>

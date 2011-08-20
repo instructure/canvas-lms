@@ -1,12 +1,11 @@
 <% collaboration ||= nil; show_context ||= false; brief ||= false %>
-<% context = context_message.context rescue @context %>
 <div id="collaboration_<%= collaboration ? collaboration.id : 'blank' %>" class="communication_message collaboration <%= collaboration.style_class rescue '' %> <%= 'brief_communication_message' if brief %> <%= 'show_context_communication_message' if show_context %>">
   <div class="header">
     <div class="header_title">
       <%= image_tag "google_docs_icon.png", :alt => t('titles.collaboration', "Collaboration"), :title => t('titles.collaboration', "Collaboration"), :style => brief ? "width: 20px;" : "" %>
       <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" target="_blank" class="title external_link"><%= collaboration.title rescue nbsp %></a>
-      <span class="context_code"><%= context.short_name rescue "" %></span>
-      <a href="<%= context_url(context, :context_user_url, collaboration ? collaboration.user_id : '{{ user_id }}') %>" class="user_name"><%= context_user_name(context, collaboration.user) rescue nbsp %></a>
+      <span class="context_code"><%= @context.short_name rescue "" %></span>
+      <a href="<%= context_url(@context, :context_user_url, collaboration ? collaboration.user_id : '{{ user_id }}') %>" class="user_name"><%= context_user_name(@context, collaboration.user) rescue nbsp %></a>
     </div>
     <div class="link_box">
       <span class="links">
@@ -26,7 +25,7 @@
       <% link = t 'links.show_participants', { :one => "*1* Participant", :other => "*%{count}* Participants" },
             :count => ((collaboration.users + [collaboration.user]).compact.uniq.length rescue "0"),
             :wrapper => '<span class="users_count">\1</span>' %>
-      <a href="<%= context_url(context, :context_users_url, :all_messages => 1) %>#message_<%= context_message.id rescue 'none' %>" class="show_participants_link brief_footer_link"><%= link %></a>
+      <a href="<%= context_url(@context, :context_users_url, :all_messages => 1) %>#message_none" class="show_participants_link brief_footer_link"><%= link %></a>
       <a href="#" class="show_participants_link verbose_footer_link"><%= link %></a>
     </div>
     <div class="clear"></div>

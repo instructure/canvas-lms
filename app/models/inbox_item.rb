@@ -32,6 +32,8 @@ class InboxItem < ActiveRecord::Base
     state :unread
     state :read
     state :deleted
+    state :retired
+    state :retired_unread
   end
   
   def infer_context_code
@@ -39,11 +41,8 @@ class InboxItem < ActiveRecord::Base
     self.context_code ||= self.asset.context.asset_string rescue nil
   end
   
-  def mark_as_read(update_context_message = true)
+  def mark_as_read
     update_attribute(:workflow_state, 'read')
-    if asset_type == 'ContextMessage' && self.asset && update_context_message
-      self.asset.read(self.user)
-    end
   end
   
   def sender_name
@@ -82,9 +81,7 @@ class InboxItem < ActiveRecord::Base
     "#{self.asset_type.underscore}_#{self.asset_id}"
   end
   
-  named_scope :active, lambda {
-    {:conditions => ['workflow_state != ?', 'deleted']}
-  }
+  named_scope :active, :conditions => "workflow_state NOT IN ('deleted', 'retired', 'retired_unread')"
   named_scope :unread, lambda {
     {:conditions => ['workflow_state = ?', 'unread']}
   }

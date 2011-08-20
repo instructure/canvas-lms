@@ -482,13 +482,13 @@ class Notification < ActiveRecord::Base
     t 'names.rubric_assessment_invitation', 'Rubric Assessment Invitation'
     t 'names.rubric_assessment_submission_reminder', 'Rubric Assessment Submission Reminder'
     t 'names.rubric_association_created', 'Rubric Association Created'
-    t 'names.student_context_message', 'Student Context Message'
+    t 'names.conversation_message', 'Conversation Message'
+    t 'names.added_to_conversation', 'Added To Conversation'
     t 'names.submission_comment', 'Submission Comment'
     t 'names.submission_comment_for_teacher', 'Submission Comment For Teacher'
     t 'names.submission_grade_changed', 'Submission Grade Changed'
     t 'names.submission_graded', 'Submission Graded'
     t 'names.summaries', 'Summaries'
-    t 'names.teacher_context_message', 'Teacher Context Message'
     t 'names.updated_wiki_page', 'Updated Wiki Page'
     t 'names.web_conference_invitation', 'Web Conference Invitation'
   end
@@ -550,6 +550,10 @@ class Notification < ActiveRecord::Base
       t(:message_description, "For new email messages")
     when 'Student Message'
       t(:student_message_description, "For private messages from students")
+    when 'Conversation Message'
+      t(:conversation_message_description, "For new conversation messages")
+    when 'Added To Conversation'
+      t(:added_to_conversation_description, "For conversations to which you're added")
     else
       t(:missing_description_description, "For %{category} alerts", :category => category)
     end

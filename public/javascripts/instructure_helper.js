@@ -712,14 +712,20 @@ I18n.scoped('instructure', function(I18n) {
         }
       } catch(e) {}
       var attr = $input.attr('name');
-      if(inputType == 'hidden') {
+      var multiValue = attr.match(/\[\]$/)
+      if(inputType == 'hidden' && !multiValue) {
         if($form.find("[name='" + attr + "']").filter("textarea,:radio:checked,:checkbox:checked,:text,:password,select,:hidden")[0] != $input[0]) {
           return;
         }
       }
-      if(attr && attr !== "" && (inputType == "checkbox" || typeof(result[attr]) == "undefined")) {
+      if(attr && attr !== "" && (inputType == "checkbox" || typeof(result[attr]) == "undefined" || multiValue)) {
         if(!options.values || $.inArray(attr, options.values) != -1) {
-          result[attr] = val;
+          if(multiValue) {
+            result[attr] = result[attr] || [];
+            result[attr].push(val);
+          } else {
+            result[attr] = val;
+          }
         }
       }
       var lastAttr = attr;
@@ -730,13 +736,24 @@ I18n.scoped('instructure', function(I18n) {
     return result;
   };
   $.fn.getFormData.defaults = {object_name: null};
-  $.replaceTags = function(text, name, value) {
+  $.replaceOneTag = function(text, name, value) {
     if(!text) { return text; }
     name = (name || "").toString();
     value = (value || "").toString().replace(/\s/g, "+");
     var itemExpression = new RegExp("(%7B|{){2}[\\s|%20|\+]*" + name + "[\\s|%20|\+]*(%7D|}){2}", 'g');
     return text.replace(itemExpression, value);
   };
+  // backwards compatible with only one tag
+  $.replaceTags = function(text, mapping_or_name, maybe_value) {
+    if (typeof mapping_or_name == 'object') {
+      for (var name in mapping_or_name) {
+        text = $.replaceOneTag(text, name, mapping_or_name[name])
+      }
+      return text;
+    } else {
+      return $.replaceOneTag(text, mapping_or_name, maybe_value)
+    }
+  }
   
   $.encodeToHex = function(str) {
     var hex = "";
@@ -1698,6 +1715,36 @@ I18n.scoped('instructure', function(I18n) {
   };
   $.timeString = function(date) {
     return (date && date.toString('h:mmtt').toLowerCase()) || "";
+  };
+  $.friendlyDatetime = function(datetime, perspective) {
+    if (perspective == null) {
+      perspective = 'past';
+    }
+    var today = Date.today();
+    if (Date.equals(datetime.clone().clearTime(), today)) {
+      return I18n.l('#time.formats.tiny', datetime);
+    } else {
+      return $.friendlyDate(datetime, perspective);
+    }
+  };
+  $.friendlyDate = function(datetime, perspective) {
+    if (perspective == null) {
+      perspective = 'past';
+    }
+    var today = Date.today();
+    var date = datetime.clone().clearTime();
+    if (Date.equals(date, today)) {
+      return I18n.t('#date.days.today', 'Today');
+    } else if (Date.equals(date, today.add(-1).days())) {
+      return I18n.t('#date.days.yesterday', 'Yesterday');
+    } else if (Date.equals(date, today.add(1).days())) {
+      return I18n.t('#date.days.tomorrow', 'Tomorrow');
+    } else if (perspective == 'past' && date < today && date >= today.add(-6).days()) {
+      return I18n.l('#date.formats.weekday', date);
+    } else if (perspective == 'future' && date < today.add(7).days() && date >= today) {
+      return I18n.l('#date.formats.weekday', date);
+    }
+    return I18n.l('#date.formats.medium', date);
   };
   $.fn.parseFromISO = $.parseFromISO;
 
@@ -3348,4 +3395,62 @@ I18n.scoped('instructure', function(I18n) {
   $.regexEscape = function(string) {
     return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
   }
+
+  $.fn.autoGrowInput = function(o) {
+
+    o = $.extend({
+        maxWidth: 1000,
+        minWidth: 0,
+        comfortZone: 70
+    }, o);
+
+    this.filter('input:text').each(function(){
+
+      var minWidth = o.minWidth || $(this).width(),
+        val = '',
+        input = $(this),
+        testSubject = $('<tester/>').css({
+          position: 'absolute',
+          top: -9999,
+          left: -9999,
+          width: 'auto',
+          fontSize: input.css('fontSize'),
+          fontFamily: input.css('fontFamily'),
+          fontWeight: input.css('fontWeight'),
+          letterSpacing: input.css('letterSpacing'),
+          whiteSpace: 'nowrap'
+        }),
+        check = function() {
+
+          setTimeout(function() {
+            if (val === (val = input.val())) {return;}
+
+            // Enter new content into testSubject
+            var escaped = val.replace(/&/g, '&amp;').replace(/\s/g,'&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            testSubject.html(escaped);
+
+            // Calculate new width + whether to change
+            var testerWidth = testSubject.width(),
+              newWidth = (testerWidth + o.comfortZone) >= minWidth ? testerWidth + o.comfortZone : minWidth,
+              currentWidth = input.width(),
+              isValidWidthChange = (newWidth < currentWidth && newWidth >= minWidth)
+                                   || (newWidth > minWidth && newWidth < o.maxWidth);
+
+            // Animate width
+            if (isValidWidthChange) {
+              input.width(newWidth);
+            }
+          });
+
+        };
+
+      testSubject.insertAfter(input);
+
+      $(this).bind('keyup keydown blur update change', check);
+
+    });
+
+    return this;
+
+  };
 });

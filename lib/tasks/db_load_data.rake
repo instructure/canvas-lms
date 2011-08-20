@@ -688,38 +688,31 @@ namespace :db do
       <%= asset.user.name %> accepted the <%= asset.readable_type %> invitation for the <%= asset.course.class.to_s.downcase %>, <%= asset.course.name %>
     }
 
-    create_notification 'ContextMessage', 'Message', 0,
+    create_notification 'ConversationMessage', 'Conversation Message', 0,
     'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>', %{
-      Teacher Context Message
+      Conversation Message
       
-      New Message: <%= asset.subject %> from <%= user.name rescue 'Unknown User' %>
+      New Message from <%= user.name rescue 'Unknown User' %>
       
-      <%= user.name rescue 'Unknown User' %> just sent you a message from the Instructure <%= asset.context.class.to_s %>, <%= asset.context.name %>:
+      <%= user.name rescue 'Unknown User' %> just sent you a message in Canvas:
       
       <%= asset.body %>
       
       <%= main_link %>
     }, %{
-      <%= user.name rescue 'Unknown User' %> just sent you a message <%= asset.context.name %>:
+      <%= user.name rescue 'Unknown User' %> just sent you a message:
       
       <%= strip_and_truncate(asset.body, :max_length => 50) %>
     }
-    
-    create_notification 'ContextMessage', 'Student Message', 0,
-    'http://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>', %{
-      Student Context Message
+
+    create_notification 'AddedToConversation', 'Added To Conversation', 0, 'http://<%= HostUrl.default_host %>', %{
+      Added To Conversation
       
-      New Message: <%= asset.subject %> from <%= user.name rescue 'Unknown User' %>
+      Added to a conversation by <%= user.name rescue 'Unknown User' %>
       
-      <%= user.name rescue 'Unknown User' %> just sent you a message from the Instructure <%= asset.context.class.to_s %>, <%= asset.context.name %>:
-      
-      <%= asset.body %>
+      <%= user.name rescue 'Unknown User' %> just added you to a conversation in Canvas.
       
       <%= main_link %>
-    }, %{
-      <%= user.name rescue 'Unknown User' %> just sent you a message <%= asset.context.name %>:
-      
-      <%= strip_and_truncate(asset.body, :max_length => 50) %>
     }
 
     create_notification 'GroupMembership', 'Membership Update', 0,

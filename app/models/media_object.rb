@@ -23,7 +23,6 @@ class MediaObject < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
   validates_presence_of :media_id, :context_id, :context_type
-  before_save :infer_defaults
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
   serialize :data
@@ -32,11 +31,6 @@ class MediaObject < ActiveRecord::Base
 
   attr_accessor :podcast_associated_asset
 
-  def infer_defaults
-    self.user_type = "admin" if self.user && self.cached_context_grants_right?(self.user, nil, :manage_content)
-    self.user_type ||= "student"
-  end
-  
   def user_entered_title=(val)
     @push_user_title = true
     write_attribute(:user_entered_title, val)

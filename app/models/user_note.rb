@@ -68,25 +68,4 @@ class UserNote < ActiveRecord::Base
     self.user.save
   end
   
-  def self.add_from_message(message)
-    return unless message && message.recipients.size == 1
-    to = message.recipient_users.first
-    from = message.user
-    if to.grants_right?(from, :create_user_notes)
-      note = to.user_notes.new
-      note.created_by_id = from.id
-      note.title = t :subject, "%{message_subject} (Added from a message)", :message_subject => message.subject
-      note.note = message.body
-      if root_note = message.root_context_message
-        note.note += "\n\n-------------------------\n"
-        note.note += t :in_reply_to, "In reply to: %{message_subject}\nFrom: %{user}\n\n", :message_subject => root_note.subject, :user => root_note.user.name
-        note.note += root_note.body
-      end
-      # The note content built up above is all plaintext, but note is an html field.
-      self.extend TextHelper
-      note.note = format_message(note.note).first
-      note.save
-    end
-  end
-  
 end

@@ -12,7 +12,7 @@
       <a class="button button-sidebar button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>"><%= image_tag "grading_icon.png" %> <%= t 'links.user_grades', "Grades for %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if can_do(@context, @current_user, :send_messages) %>
-      <a class="button button-sidebar-wide" href="<%= inbox_path %>#<%= CGI::escape("reply{\"context_code\":\"#{@context.asset_string}\",\"recipients\":\"#{@user.id}\"}") %>"><%= image_tag "email.png" %> <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %></a>
+      <a class="button button-sidebar-wide" href="<%= conversations_path %>#/conversations?<%= {:user_id => @user.id, :user_name => @user.short_name}.to_query.gsub('+', '%20') %>"><%= image_tag "email.png" %> <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %></a>
     <% end %>
     <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
       <a href="<%= user_user_notes_path(@user) %>" class="button button-sidebar-wide"> <%= t 'links.faculty_journal', "Faculty Journal for %{user}", :user => context_user_name(@context, @user) %></a>
@@ -161,8 +161,6 @@
 <% @messages[0,10].each do |message| %>
   <% if message.is_a?(DiscussionEntry) %>
     <%= render :partial => 'discussion_topics/entry', :object => message, :locals => {:out_of_context => true, :show_context => true} %>
-  <% elsif message.is_a?(ContextMessage) %>
-    <%= render :partial => 'context/context_message', :object => message %>
   <% end %>
 <% end %>
 

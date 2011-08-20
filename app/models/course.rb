@@ -141,7 +141,6 @@ class Course < ActiveRecord::Base
   has_many :short_message_associations, :as => :context, :include => :short_message, :dependent => :destroy
   has_many :short_messages, :through => :short_message_associations, :dependent => :destroy
   has_many :grading_standards, :as => :context
-  has_many :context_messages, :as => :context, :dependent => :destroy
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
   has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
   has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy
@@ -387,10 +386,10 @@ class Course < ActiveRecord::Base
     }
   }
   named_scope :recently_started, lambda {
-    {:conditions => ['start_at < ? and start_at > ?', Time.now, 1.month.ago], :order => 'start_at DESC', :limit => 10}
+    {:conditions => ['start_at < ? and start_at > ?', Time.now.utc, 1.month.ago], :order => 'start_at DESC', :limit => 10}
   }
   named_scope :recently_ended, lambda {
-    {:conditions => ['conclude_at < ? and conclude_at > ?', Time.now, 1.month.ago], :order => 'start_at DESC', :limit => 10}
+    {:conditions => ['conclude_at < ? and conclude_at > ?', Time.now.utc, 1.month.ago], :order => 'start_at DESC', :limit => 10}
   }
   named_scope :recently_created, lambda {
     {:conditions => ['created_at > ?', 1.month.ago], :order => 'created_at DESC', :limit => 50, :include => :teachers}
@@ -914,7 +913,11 @@ class Course < ActiveRecord::Base
   def end_at_changed?
     conclude_at_changed?
   end
-  
+
+  def recently_ended?
+    conclude_at && conclude_at < Time.now.utc && conclude_at > 1.month.ago
+  end
+
   def state_sortable
     case state
     when :invited
@@ -2045,12 +2048,15 @@ class Course < ActiveRecord::Base
     )
   end
   memoize :page_views_by_day
-  
-  def visibility_limited_to_course_sections?(user)
-    section_visibilities = Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
-      Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type", :conditions => {:user_id => user.id, :course_id => self.id}).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type } }
+
+  def section_visibilities_for(user)
+    Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
+      Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type, associated_user_id", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type, :associated_user_id => e.associated_user_id } }
     end
-    !section_visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
+  end
+
+  def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
+    !visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
   end
   
   # returns a scope, not an array of users/enrollments
@@ -2058,24 +2064,34 @@ class Course < ActiveRecord::Base
     enrollments_visible_to(user, include_priors, true)
   end
   def enrollments_visible_to(user, include_priors=false, return_users=false)
-    section_visibilities = Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
-      Enrollment.find(:all, :select => "course_section_id, limit_priveleges_to_course_section, type", :conditions => ['user_id = ? AND course_id = ? AND workflow_state != ?', user.id, self.id, 'deleted']).map{|e| {:course_section_id => e.course_section_id, :limit_priveleges_to_course_section => e.limit_priveleges_to_course_section, :type => e.type } }
-    end
+    visibilities = section_visibilities_for(user)
     if return_users
       scope = include_priors ? self.all_students : self.students
     else
       scope = include_priors ? self.all_student_enrollments : self.student_enrollments
     end
-    if section_visibilities.any?{|s| !s[:limit_priveleges_to_course_section] }
-      scope
-    elsif section_visibilities.empty?
+    # See also Users#messageable_users (same logic used to get users across multiple courses)
+    case enrollment_visibility_level_for(user, visibilities)
+      when :full then scope
+      when :sections then scope.scoped({:conditions => "enrollments.course_section_id IN (#{visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      when :restricted then scope.scoped({:conditions => "enrollments.user_id IN (#{(visibilities.map{|s| s[:associated_user_id]}.compact + [user.id]).join(",")})"})
+      else scope.scoped({:conditions => "FALSE"})
+    end
+  end
+
+  def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user))
+    if visibilities.empty? # i.e. not enrolled
       if self.grants_rights?(user, nil, :manage_grades, :manage_students, :manage_admin_users, :read_roster)
-        scope
+        :full
       else
-        scope.scoped({:conditions => ['enrollments.user_id = ? OR enrollments.associated_user_id = ?', user.id, user.id]})
+        :none
       end
+    elsif visibilities.all?{ |e| e[:type] == 'ObserverEnrollment' }
+      :restricted # e.g. observers shouldn't see anyone but the observed
+    elsif visibility_limited_to_course_sections?(user, visibilities)
+      :sections
     else
-      scope.scoped({:conditions => "enrollments.course_section_id IN (#{section_visibilities.map{|s| s[:course_section_id]}.join(",")})"})
+      :full
     end
   end
   
@@ -2109,15 +2125,9 @@ class Course < ActiveRecord::Base
     elsif !message || message.empty?
       raise "Message body cannot be blank"
     else
-      recipients = (self.teachers.map(&:id) - [user.id]).join(",")
-      ContextMessage.create!({
-        :context_id => self.id,
-        :context_type => self.class.to_s,
-        :user_id => user.id,
-        :subject => subject,
-        :recipients => recipients,
-        :body => message
-      })
+      recipients = self.teachers.map(&:id) - [user.id]
+      conversation = user.initiate_conversation(recipients)
+      conversation.add_message(message)
     end
   end
   

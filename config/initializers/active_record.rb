@@ -438,3 +438,39 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
   end
   alias_method_chain :construct_scope, :has_many_fix
 end
+
+
+class ActiveRecord::ConnectionAdapters::AbstractAdapter
+  # for functions that differ from one adapter to the next, use the following
+  # method (overriding as needed in non-standard adapters), e.g.
+  #
+  #   connection.func(:group_concat, :name) ->
+  #     group_concat(name)             (default)
+  #     string_agg(name::text, ',')    (postgres)
+
+  def func(name, *args)
+    "#{name}(#{args.map{ |arg| arg.is_a?(Symbol) ? arg : quote_value(arg) }.join(', ')})"
+  end
+
+  def group_by(*columns)
+    columns.first
+  end
+end
+
+if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+    def func(name, *args)
+      case name
+        when :group_concat
+          "string_agg(#{args.first}::text, ',')"
+        else
+          super
+      end
+    end
+
+    def group_by(*columns)
+      return super if postgresql_version >= 90100
+      columns.join(', ')
+    end
+  end
+end

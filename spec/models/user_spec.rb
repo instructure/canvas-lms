@@ -391,6 +391,85 @@ describe User do
       @site_admin.grants_right?(user, nil, :become_user).should be_false
     end
   end
+
+  context "messageable_users" do
+    before(:each) do
+      @admin = user_model
+      @student = user_model
+      tie_user_to_account(@admin, :membership_type => 'AccountAdmin')
+      tie_user_to_account(@student, :membership_type => 'Student')
+    end
+
+    def set_up_course_with_users
+      @course = course_model
+      @course.offer!
+
+      @this_section_user = user_model
+      @course.enroll_user(@this_section_user, 'StudentEnrollment', :enrollment_state => 'active')
+
+      @other_section_user = user_model
+      @other_section = @course.course_sections.create
+      @course.enroll_user(@other_section_user, 'StudentEnrollment', :enrollment_state => 'active', :section => @other_section)
+    end
+
+    it "should not include users from other sections if visibility is limited to sections" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_priveleges_to_course_section => true)
+      messageable_users = @student.messageable_users.map(&:id)
+      messageable_users.should include @this_section_user.id
+      messageable_users.should_not include @other_section_user.id
+    end
+
+    it "should include users from all sections if visibility is not limited to sections" do
+      set_up_course_with_users
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+      messageable_users = @student.messageable_users.map(&:id)
+      messageable_users.should include @this_section_user.id
+      messageable_users.should include @other_section_user.id
+    end
+
+    it "should only show admins and the observed if the receiver is an observer" do
+      set_up_course_with_users
+      @course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+
+      observer = user_model
+
+      enrollment = @course.enroll_user(observer, 'ObserverEnrollment', :enrollment_state => 'active')
+      enrollment.associated_user_id = @student.id
+      enrollment.save
+
+      messageable_users = observer.messageable_users.map(&:id)
+      messageable_users.should include @admin.id
+      messageable_users.should include @student.id
+      messageable_users.should_not include @this_section_user.id
+      messageable_users.should_not include @other_section_user.id
+    end
+
+    it "should include users with no shared contexts iff admin" do
+      @admin.messageable_users(:ids => [@student.id]).should_not be_empty
+      @student.messageable_users(:ids => [@admin.id]).should be_empty
+    end
+
+    it "should not do admin catch-all if specific contexts requested" do
+      course1 = course_model
+      course2 = course_model
+      course2.offer!
+
+      enrollment = course2.enroll_teacher(@admin)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+      @admin.reload
+
+      enrollment = course2.enroll_student(@student)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+
+      @admin.messageable_users(:context => ["course_#{course1.id}"], :ids => [@student.id]).should be_empty
+      @admin.messageable_users(:context => ["course_#{course2.id}"], :ids => [@student.id]).should_not be_empty
+      @student.messageable_users(:context => ["course_#{course2.id}"], :ids => [@admin.id]).should_not be_empty
+    end
+  end
   
   context "avatars" do
     it "should find only users with avatars set" do

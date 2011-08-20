@@ -301,7 +301,6 @@ class CoursesController < ApplicationController
       log_asset_access("roster:#{@context.asset_string}", "roster", "other")
       @students = @context.participating_students.find(:all, :order => 'sortable_name')
       @teachers = @context.admins.find(:all, :order => 'sortable_name')
-      @messages = @context.context_messages.find(:all, :order => 'created_at DESC')
       @groups = @context.groups.active
       @categories = @groups.map{|g| g.category}.uniq
     end
