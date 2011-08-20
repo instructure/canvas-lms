@@ -45,7 +45,7 @@ describe FilesController do
     uri = URI.parse response['Location']
     qs = Rack::Utils.parse_nested_query(uri.query)
     uri.host.should == 'files-test.host'
-    uri.path.should == "/courses/#{@course.id}/files/#{a1.id}/course%20files%2Ftest%20my%20file%3F%20hai!&.png"
+    uri.path.should == "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
     @user.valid_access_verifier?(qs['ts'], qs['sf_verifier']).should be_true
     qs['verifier'].should be_nil
 

@@ -851,6 +851,8 @@ class ApplicationController < ActionController::Base
   end
   helper_method :calendar_url_for, :files_url_for
   
+  # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
+  FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
   def safe_domain_file_url(attachment, host=nil, verifier = nil) # TODO: generalize this
     res = "#{request.protocol}#{host || HostUrl.file_host(@domain_root_account || Account.default)}"
     ts, sig = @current_user && @current_user.access_verifier
@@ -863,7 +865,9 @@ class ApplicationController < ActionController::Base
     opts[:verifier] = verifier if verifier.present?
 
     if @context
-      res += named_context_url(@context, :context_file_relative_path_url, attachment, attachment.full_display_path, opts)
+      res += named_context_url(@context, :context_file_url, attachment)
+      res += '/' + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
+      res += '?' + opts.to_query
     else
       res += file_download_url(attachment, opts.merge(:only_path => true))
     end
