@@ -7,8 +7,8 @@
 <% define_content :subject do %>
   <%= t :subject, "%{user_name} just sent you a message in Canvas.", :user_name => content(:user_name) %>
 <% end %>
-
 <%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => content(:user_name) %>
+
 <%= asset.body %>
 
 
