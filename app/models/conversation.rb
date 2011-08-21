@@ -27,12 +27,12 @@ class Conversation < ActiveRecord::Base
   has_many :participants,
     :through => :conversation_participants,
     :source => :user,
-    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
+    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups",
     :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
   has_many :subscribed_participants,
     :through => :subscribed_conversation_participants,
     :source => :user,
-    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
+    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups",
     :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
   has_many :attachments, :through => :conversation_messages
 

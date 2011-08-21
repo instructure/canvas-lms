@@ -75,7 +75,7 @@
           </td>
           <% if course.user_is_teacher?(@current_user) %>
           <td>
-              <a href="<%= inbox_url %>#reply<%= {'context_code' => course.asset_string, 'recipients' => student[:enrollment].user_id.to_s}.to_json %>" class="message_student_link" title="<%= t 'message_student', 'Message this student' %>"><%= image_tag "email.png" %></a>
+              <a href="<%= message_user_path(student[:enrollment].user) %>" class="message_student_link" title="<%= t 'message_student', 'Message this student' %>"><%= image_tag "email.png" %></a>
           </td>
           <% end %>
         </tr>

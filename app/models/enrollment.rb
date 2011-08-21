@@ -129,8 +129,10 @@ class Enrollment < ActiveRecord::Base
               :conditions => "courses.workflow_state = 'aborted' or courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
               
 
+  ENROLLMENT_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
+  ENROLLMENT_RANK_SQL = ENROLLMENT_RANK.size.times.inject('CASE '){|s, i| s << "WHEN type = '#{ENROLLMENT_RANK[i]}' THEN #{i} "} << 'END'
   def self.highest_enrollment_type(type, type2)
-    res = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment'].find{|t| t == type || t == type2}
+    res = ENROLLMENT_RANK.find{|t| t == type || t == type2}
     res ||= type || type2
     res
   end

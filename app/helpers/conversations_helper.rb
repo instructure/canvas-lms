@@ -8,7 +8,7 @@ module ConversationsHelper
 
   def formatted_contexts(contexts)
     if contexts.is_a? User
-      contexts = {:courses => contexts.common_course_ids, :groups => contexts.common_group_ids}
+      contexts = {:courses => contexts.common_courses.keys, :groups => contexts.common_groups.keys}
     end
     "<em>#{ERB::Util.h(context_names(contexts).to_sentence)}</em>".html_safe
   end
@@ -23,8 +23,8 @@ module ConversationsHelper
 
     # get up to two contexts that are shared by >= 50% of the audience
     contexts = audience.inject({}) { |hash, user|
-      user.common_course_ids.each { |id| (hash[[:courses, id]] ||= []) << user.id }
-      user.common_group_ids.each { |id| (hash[[:groups, id]] ||= []) << user.id }
+      user.common_courses.each { |id, roles| (hash[[:courses, id]] ||= []) << user.id }
+      user.common_groups.each { |id, roles| (hash[[:groups, id]] ||= []) << user.id }
       hash
     }.
     sort_by{ |c| - c.last.size}.
