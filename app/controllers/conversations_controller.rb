@@ -84,7 +84,6 @@ class ConversationsController < ApplicationController
         recipients = Array(recipients)
         @conversation = @current_user.initiate_conversation(recipients)
         @message = create_message_on_conversation(@conversation, !batch_private_messages)
-        @message.generate_user_note if params[:user_note]
         @conversation
       end
       if batch_private_messages
@@ -245,14 +244,18 @@ class ConversationsController < ApplicationController
   def load_all_contexts
     @contexts = {:courses => {}, :groups => {}}
     @current_user.concluded_courses.each do |course|
-      @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => course.recently_ended? }
+      @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => course.recently_ended?, :can_add_notes => can_add_notes_to?(course) }
     end
     @current_user.courses.each do |course|
-      @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => true }
+      @contexts[:courses][course.id] = {:id => course.id, :name => course.name, :type => :course, :active => true, :can_add_notes => can_add_notes_to?(course) }
     end
     @current_user.groups.each do |group|
       @contexts[:groups][group.id] = {:id => group.id, :name => group.name, :type => :group, :active => group.active? }
     end
+  end
+
+  def can_add_notes_to?(course)
+    course.enable_user_notes && course.grants_right?(@current_user, nil, :manage_user_notes)
   end
 
   def matching_contexts(search, exclude = [])
@@ -311,13 +314,13 @@ class ConversationsController < ApplicationController
   end
 
   def jsonify_users(users, blank_avatar_fallback = false)
-    ids_present = users.first.respond_to?(:common_course_ids)
+    ids_present = users.first.respond_to?(:common_courses)
     users.map { |user|
       {:id => user.id,
        :name => user.short_name,
        :avatar => avatar_url_for_user(user, blank_avatar_fallback),
-       :course_ids => ids_present ? user.common_course_ids : [],
-       :group_ids => ids_present ? user.common_group_ids : []
+       :common_courses => ids_present ? user.common_courses : [],
+       :common_groups => ids_present ? user.common_groups : []
       }
     }
   end

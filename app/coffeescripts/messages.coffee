@@ -20,6 +20,8 @@ class TokenInput
       @tokens.html('')
       @change?(@token_values())
 
+    @added = @options.added
+
     @placeholder = $('<span />')
     @placeholder.text(@options.placeholder)
     @placeholder.appendTo(@fake_input) if @options.placeholder
@@ -95,6 +97,7 @@ class TokenInput
       @tokens.append($token)
     @val('') unless data?.no_clear
     @placeholder.hide()
+    @added?(data.data) if data
     @change?(@token_values())
     @selector?.reposition()
 
@@ -393,7 +396,7 @@ class TokenSelector
     state = !@input.has_token(value: id) unless state?
     if state
       @selection.addClass('on') if @selection_toggleable()
-      @input.add_token value: id, text: @selection.find('b').text(), no_clear: true
+      @input.add_token value: id, text: @selection.find('b').text(), no_clear: true, data: @selection.data('user_data')
     else
       @selection.removeClass('on')
       @input.remove_token value: id
@@ -538,6 +541,7 @@ I18n.scoped 'conversations', (I18n) ->
       $form.attr action: $selected_conversation.find('a.details_link').attr('add_url')
 
     reset_message_form()
+    $form.find('#user_note_info').showIf($selected_conversation?.hasClass('private')).find('input').attr('checked', false)
     $form.show().find(':input:visible:first').focus()
 
   reset_message_form = ->
@@ -594,7 +598,7 @@ I18n.scoped 'conversations', (I18n) ->
       $selected_conversation.scrollIntoView()
     else
       if params and params.user_id and params.user_name
-        $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name
+        $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name, data: {id: params.user_id, name: params.user_name, can_add_notes: params.can_add_notes}
         $('#from_conversation_id').val(params.from_conversation_id)
       return
 
@@ -603,7 +607,7 @@ I18n.scoped 'conversations', (I18n) ->
     
     completion = (data) ->
       return unless is_selected($c)
-      for user in data.participants when !MessageInbox.user_cache[user.id]
+      for user in data.participants when !MessageInbox.user_cache[user.id]?.avatar
         MessageInbox.user_cache[user.id] = user
         user.html_name = html_name_for_user(user)
       $messages.show()
@@ -634,8 +638,8 @@ I18n.scoped 'conversations', (I18n) ->
         $form.loadingImage('remove')
 
   MessageInbox.shared_contexts_for_user = (user, limit=2) ->
-    shared_contexts = (course.name for course_id in user.course_ids when course = @contexts.courses[course_id]).
-                concat(group.name for group_id in user.group_ids when group = @contexts.groups[group_id])
+    shared_contexts = (course.name for course_id, roles of user.common_courses when course = @contexts.courses[course_id]).
+                concat(group.name for group_id, roles of user.common_groups when group = @contexts.groups[group_id])
     shared_contexts.sort (a, b) ->
       a = a.toLowerCase()
       b = b.toLowerCase()
@@ -650,6 +654,12 @@ I18n.scoped 'conversations', (I18n) ->
   html_name_for_user = (user) ->
     shared_contexts = MessageInbox.shared_contexts_for_user(user)
     $.htmlEscape(user.name) + if shared_contexts.length then " <em>" + $.htmlEscape(shared_contexts) + "</em>" else ''
+
+  can_add_notes_for = (user) ->
+    return true if user.can_add_notes
+    for course_id, roles of user.common_courses
+      return true if 'StudentEnrollment' in roles and (MessageInbox.can_add_notes or MessageInbox.contexts.courses[course_id]?.can_add_notes)
+    false
 
   build_message = (data) ->
     $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id)
@@ -1287,6 +1297,11 @@ I18n.scoped 'conversations', (I18n) ->
 
     $('.recipients').tokenInput
       placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
+      added: (data) ->
+        unless data.id and "#{data.id}".match(/^(course|group)_/)
+          data = $.extend({}, data)
+          delete data.avatar # since it's the wrong size and possibly a blank image
+          MessageInbox.user_cache[data.id] ?= data
       selector:
         messages: {no_results: I18n.t('no_results', 'No results found')}
         populator: ($node, data, options={}) ->
@@ -1297,10 +1312,11 @@ I18n.scoped 'conversations', (I18n) ->
           $b = $('<b />')
           $b.text(data.name)
           $span = $('<span />')
-          $span.text(MessageInbox.shared_contexts_for_user(data)) if data.course_ids?
+          $span.text(MessageInbox.shared_contexts_for_user(data)) if data.common_courses?
           $node.append($b, $span)
           $node.attr('title', data.name)
           $node.data('id', data.id)
+          $node.data('user_data', data)
           $node.addClass(if data.type then data.type else 'user')
           if options.level > 0
             $node.prepend('<a class="toggle"><i></i></a>')
@@ -1322,9 +1338,11 @@ I18n.scoped 'conversations', (I18n) ->
       if tokens.length > 1 or tokens[0]?.match(/^(course|group)_/)
         $form.find('#group_conversation').attr('checked', true) if !$form.find('#group_conversation_info').is(':visible')
         $form.find('#group_conversation_info').show()
+        $form.find('#user_note_info').hide()
       else
         $form.find('#group_conversation').attr('checked', true)
         $form.find('#group_conversation_info').hide()
+        $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) and can_add_notes_for(user))
 
     $(window).resize inbox_resize
     setTimeout inbox_resize
