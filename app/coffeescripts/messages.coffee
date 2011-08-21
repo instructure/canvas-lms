@@ -661,6 +661,78 @@ I18n.scoped 'conversations', (I18n) ->
       return true if 'StudentEnrollment' in roles and (MessageInbox.can_add_notes or MessageInbox.contexts.courses[course_id]?.can_add_notes)
     false
 
+  formatted_message = (message) ->
+    link_placeholder = "LINK_PLACEHOLDER"
+    link_re = ///
+      \b
+      (                                            # Capture 1: entire matched URL
+        (?:
+          https?://                                # http or https protocol
+          |                                        # or
+          www\d{0,3}[.]                            # "www.", "www1.", "www2." … "www999."
+          |                                        # or
+          [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
+        )
+        (?:                                        # One or more:
+          [^\s()<>]+                               # Run of non-space, non-()<>
+          |                                        # or
+          \(([^\s()<>]+|(\([^\s()<>]+\)))*\)       # balanced parens, up to 2 levels
+        )+
+        (?:                                        # End with:
+          \(([^\s()<>]+|(\([^\s()<>]+\)))*\)       # balanced parens, up to 2 levels
+          |                                        # or
+          [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # not a space or one of these punct chars
+        )
+      ) | (
+        LINK_PLACEHOLDER
+      )
+    ///gi
+
+    # replace any links with placeholders so we don't escape them
+    links = []
+    placeholder_blocks = []
+    message = message.replace link_re, (match, i) ->
+      placeholder_blocks.push if match == link_placeholder
+          link_placeholder
+        else
+          link = match
+          link = "http://" + link if link[0..3] == 'www'
+          links.push link
+          "<a href='#{link}'>#{match}</a>"
+      link_placeholder
+
+    # now escape html
+    message = $.h message
+
+    # now put the links back in
+    message = message.replace link_placeholder, (match, i) ->
+      placeholder_blocks.shift()
+
+    # replace newlines
+    message = message.replace /\n/g, '<br />\n'
+
+    # generate quoting clumps
+    processed_lines = []
+    quote_block = []
+    quotes_added = 0
+    quote_clump = (lines) ->
+      quotes_added += 1
+      "<div class='quoted_text_holder'>
+        <a href='#' class='show_quoted_text_link'>#{I18n.t("quoted_text_toggle", "show quoted text")}</a>
+        <div class='quoted_text' style='display: none;'>
+          #{lines.join "\n"}
+        </div>
+      </div>"
+    for idx, line of message.split("\n")
+      if line.match /^(&gt;|>)/
+        quote_block.push line
+      else
+        processed_lines.push quote_clump(quote_block) if quote_block.length
+        quote_block = []
+        processed_lines.push line
+    processed_lines.push quote_clump(quote_block) if quote_block.length
+    message = processed_lines.join "\n"
+
   build_message = (data) ->
     $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id)
     $message.data('id', data.id)
@@ -678,7 +750,14 @@ I18n.scoped 'conversations', (I18n) ->
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
     $message.find('.audience').html user?.html_name || $.h(user_name)
     $message.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
-    $message.find('p').html $.h(data.body).replace(/\n/g, '<br />')
+    $message.find('p').html formatted_message(data.body)
+    $message.find("a.show_quoted_text_link").click (event) ->
+      $text = $(this).parents(".quoted_text_holder").children(".quoted_text")
+      if $text.length
+        event.stopPropagation()
+        event.preventDefault()
+        $text.show()
+        $(this).hide()
     $pm_action = $message.find('a.send_private_message')
     pm_url = $.replaceTags $pm_action.attr('href'),
       user_id: data.author_id

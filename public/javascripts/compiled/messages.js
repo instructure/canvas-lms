@@ -685,13 +685,11 @@
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-            if ((_ref = post_data.limit) != null) {
-        _ref;
-      } else {
+      if ((_ref = post_data.limit) == null) {
         post_data.limit = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
-      };
+      }
       return post_data;
     };
     return TokenSelector;
@@ -717,7 +715,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, can_add_notes_for, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, select_unloaded_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, can_add_notes_for, close_menus, formatted_message, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, select_unloaded_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -934,6 +932,47 @@
       }
       return false;
     };
+    formatted_message = function(message) {
+      var idx, line, link_placeholder, link_re, links, placeholder_blocks, processed_lines, quote_block, quote_clump, quotes_added, _ref;
+      link_placeholder = "LINK_PLACEHOLDER";
+      link_re = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))|(LINK_PLACEHOLDER)/gi;
+      links = [];
+      placeholder_blocks = [];
+      message = message.replace(link_re, function(match, i) {
+        var link;
+        placeholder_blocks.push(match === link_placeholder ? link_placeholder : (link = match, link.slice(0, 4) === 'www' ? link = "http://" + link : void 0, links.push(link), "<a href='" + link + "'>" + match + "</a>"));
+        return link_placeholder;
+      });
+      message = $.h(message);
+      message = message.replace(link_placeholder, function(match, i) {
+        return placeholder_blocks.shift();
+      });
+      message = message.replace(/\n/g, '<br />\n');
+      processed_lines = [];
+      quote_block = [];
+      quotes_added = 0;
+      quote_clump = function(lines) {
+        quotes_added += 1;
+        return "<div class='quoted_text_holder'>        <a href='#' class='show_quoted_text_link'>" + (I18n.t("quoted_text_toggle", "show quoted text")) + "</a>        <div class='quoted_text' style='display: none;'>          " + (lines.join("\n")) + "        </div>      </div>";
+      };
+      _ref = message.split("\n");
+      for (idx in _ref) {
+        line = _ref[idx];
+        if (line.match(/^(&gt;|>)/)) {
+          quote_block.push(line);
+        } else {
+          if (quote_block.length) {
+            processed_lines.push(quote_clump(quote_block));
+          }
+          quote_block = [];
+          processed_lines.push(line);
+        }
+      }
+      if (quote_block.length) {
+        processed_lines.push(quote_clump(quote_block));
+      }
+      return message = processed_lines.join("\n");
+    };
     build_message = function(data) {
       var $attachment_blank, $media_object_blank, $message, $pm_action, $ul, attachment, avatar, pm_url, submessage, user, user_name, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
       $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id);
@@ -944,16 +983,24 @@
         $message.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $message.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
       $message.find('span.date').text($.parseFromISO(data.created_at).datetime_formatted);
-      $message.find('p').html($.h(data.body).replace(/\n/g, '<br />'));
+      $message.find('p').html(formatted_message(data.body));
+      $message.find("a.show_quoted_text_link").click(function(event) {
+        var $text;
+        $text = $(this).parents(".quoted_text_holder").children(".quoted_text");
+        if ($text.length) {
+          event.stopPropagation();
+          event.preventDefault();
+          $text.show();
+          return $(this).hide();
+        }
+      });
       $pm_action = $message.find('a.send_private_message');
       pm_url = $.replaceTags($pm_action.attr('href'), {
         user_id: data.author_id,
@@ -1027,11 +1074,9 @@
       $header.find('a').attr('href', href);
       user = MessageInbox.user_cache[data.author_id];
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $header.find('.title').html($.h(data.title));
@@ -1090,11 +1135,9 @@
         $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-                if ((_ref = user.html_name) != null) {
-          _ref;
-        } else {
+        if ((_ref = user.html_name) == null) {
           user.html_name = html_name_for_user(user);
-        };
+        }
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1454,9 +1497,7 @@
       });
       $message_list.click(function(e) {
         var $message;
-        if ($(e.target).closest('a.instructure_inline_media_comment').length) {
-          ;
-        } else {
+        if ($(e.target).closest('a.instructure_inline_media_comment').length) {} else {
           $message = $(e.target).closest('#messages > ul > li');
           if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {
