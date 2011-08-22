@@ -1630,7 +1630,7 @@ class User < ActiveRecord::Base
       FROM enrollments, courses
       WHERE
         user_id = users.id AND courses.id = course_id
-        AND #{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
+        AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]})
       ORDER BY #{Enrollment::ENROLLMENT_RANK_SQL}
       LIMIT 1
     SQL
