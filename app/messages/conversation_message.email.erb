@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.default_host %>/conversations/#/conversations/<%= asset.conversation_id %>
+  http://<%= HostUrl.context_host(user) %>/conversations/#/conversations/<%= asset.conversation_id %>
 <% end %>
 <% define_content :user_name do %>
   <%= asset.author.short_name rescue t(:unknown_user, "Unknown User") %>
@@ -24,7 +24,6 @@
 <%= t :attached_files, "Attached Files:" %>
 <% asset.attachments.each do |attachment| %>
 <%= attachment.display_name %> - <%= attachment.readable_size %> 
-http://<%= HostUrl.default_host %>/files/<%= attachment.id %>
-
+http://<%= HostUrl.context_host(user) %>/files/<%= attachment.id %>/download?verifier=<%= attachment.uuid %>
 <% end %>
 <% end %>
