@@ -685,11 +685,13 @@
       if (this.list_expanded()) {
         post_data.context = this.stack[this.stack.length - 1][0].data('id');
       }
-      if ((_ref = post_data.limit) == null) {
+            if ((_ref = post_data.limit) != null) {
+        _ref;
+      } else {
         post_data.limit = typeof (_base = this.options).limiter === "function" ? _base.limiter({
           level: this.stack.length
         }) : void 0;
-      }
+      };
       return post_data;
     };
     return TokenSelector;
@@ -983,9 +985,11 @@
         $message.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $message.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1074,9 +1078,11 @@
       $header.find('a').attr('href', href);
       user = MessageInbox.user_cache[data.author_id];
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $header.find('.title').html($.h(data.title));
@@ -1135,9 +1141,11 @@
         $comment.prepend($('<img />').attr('src', avatar).addClass('avatar'));
       }
       if (user) {
-        if ((_ref = user.html_name) == null) {
+                if ((_ref = user.html_name) != null) {
+          _ref;
+        } else {
           user.html_name = html_name_for_user(user);
-        }
+        };
       }
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $comment.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
@@ -1497,7 +1505,9 @@
       });
       $message_list.click(function(e) {
         var $message;
-        if ($(e.target).closest('a.instructure_inline_media_comment').length) {} else {
+        if ($(e.target).closest('a.instructure_inline_media_comment').length) {
+          ;
+        } else {
           $message = $(e.target).closest('#messages > ul > li');
           if (!($message.hasClass('generated') || $message.hasClass('submission'))) {
             if ($selected_conversation != null) {

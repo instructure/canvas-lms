@@ -692,13 +692,14 @@ I18n.scoped 'conversations', (I18n) ->
     links = []
     placeholder_blocks = []
     message = message.replace link_re, (match, i) ->
-      placeholder_blocks.push if match == link_placeholder
+      placeholder_blocks.push(if match == link_placeholder
           link_placeholder
         else
           link = match
           link = "http://" + link if link[0..3] == 'www'
           links.push link
           "<a href='#{link}'>#{match}</a>"
+      )
       link_placeholder
 
     # now escape html
