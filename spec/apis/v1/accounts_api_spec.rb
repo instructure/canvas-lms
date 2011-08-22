@@ -124,5 +124,14 @@ describe "Accounts API", :type => :integration do
       },
     ]
   end
+
+  it "should limit the maximum per-page returned" do
+    @me = @user
+    15.times { |i| course_model(:name => "c#{i}", :account => @a1, :root_account => @a1) }
+    @user = @me
+    api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?per_page=12", :controller => "accounts", :action => "courses_api", :account_id => @a1.to_param, :format => 'json', :per_page => '12').size.should == 12
+    Setting.set('api_max_per_page', '5')
+    api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?per_page=12", :controller => "accounts", :action => "courses_api", :account_id => @a1.to_param, :format => 'json', :per_page => '12').size.should == 5
+  end
 end
 
