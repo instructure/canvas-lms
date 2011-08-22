@@ -109,8 +109,11 @@ describe ConversationMessage do
 
   context "generate_user_note" do
     it "should add a user note under nominal circumstances" do
+      Account.default.update_attribute :enable_user_notes, true
       course_with_teacher
+      @teacher.associated_accounts << Account.default
       student = student_in_course.user
+      student.associated_accounts << Account.default
       conversation = @teacher.initiate_conversation([student.id])
       message = conversation.add_message("reprimanded!")
       message.created_at = Time.at(0) # Jan 1, 1970 00:00:00 UTC
@@ -122,10 +125,26 @@ describe ConversationMessage do
       note.note.should eql("reprimanded!")
     end
 
-    it "should fail if there's more than one recipient" do
+    it "should fail if notes are disabled on the account" do
+      Account.default.update_attribute :enable_user_notes, false
       course_with_teacher
+      @teacher.associated_accounts << Account.default
+      student = student_in_course.user
+      student.associated_accounts << Account.default
+      conversation = @teacher.initiate_conversation([student.id])
+      message = conversation.add_message("reprimanded!")
+      message.generate_user_note.should be_nil
+      student.user_notes.size.should be(0)
+    end
+
+    it "should fail if there's more than one recipient" do
+      Account.default.update_attribute :enable_user_notes, true
+      course_with_teacher
+      @teacher.associated_accounts << Account.default
       student1 = student_in_course.user
+      student1.associated_accounts << Account.default
       student2 = student_in_course.user
+      student2.associated_accounts << Account.default
       conversation = @teacher.initiate_conversation([student1.id, student2.id])
       message = conversation.add_message("message")
       message.generate_user_note.should be_nil

@@ -541,7 +541,7 @@ I18n.scoped 'conversations', (I18n) ->
       $form.attr action: $selected_conversation.find('a.details_link').attr('add_url')
 
     reset_message_form()
-    $form.find('#user_note_info').showIf($selected_conversation?.hasClass('private')).find('input').attr('checked', false)
+    $form.find('#user_note_info').hide().find('input').attr('checked', false)
     $form.show().find(':input:visible:first').focus()
 
   reset_message_form = ->
@@ -610,6 +610,13 @@ I18n.scoped 'conversations', (I18n) ->
       for user in data.participants when !MessageInbox.user_cache[user.id]?.avatar
         MessageInbox.user_cache[user.id] = user
         user.html_name = html_name_for_user(user)
+      $form.find('#user_note_info').showIf(
+          $c.hasClass('private') and
+          (user_id = $c.find('.participant').first().data('id')) and
+          (user = MessageInbox.user_cache[user_id]) and
+          can_add_notes_for(user)
+        )
+      inbox_resize()
       $messages.show()
       i = j = 0
       message = data.messages[0]
@@ -656,9 +663,10 @@ I18n.scoped 'conversations', (I18n) ->
     $.htmlEscape(user.name) + if shared_contexts.length then " <em>" + $.htmlEscape(shared_contexts) + "</em>" else ''
 
   can_add_notes_for = (user) ->
+    return false unless MessageInbox.notes_enabled
     return true if user.can_add_notes
     for course_id, roles of user.common_courses
-      return true if 'StudentEnrollment' in roles and (MessageInbox.can_add_notes or MessageInbox.contexts.courses[course_id]?.can_add_notes)
+      return true if 'StudentEnrollment' in roles and (MessageInbox.can_add_notes_for_account or MessageInbox.contexts.courses[course_id]?.can_add_notes)
     false
 
   formatted_message = (message) ->
@@ -1423,6 +1431,7 @@ I18n.scoped 'conversations', (I18n) ->
         $form.find('#group_conversation').attr('checked', true)
         $form.find('#group_conversation_info').hide()
         $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) and can_add_notes_for(user))
+      inbox_resize()
 
     $(window).resize inbox_resize
     setTimeout inbox_resize

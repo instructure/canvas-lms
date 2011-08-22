@@ -125,7 +125,7 @@ class ConversationMessage < ActiveRecord::Base
   def generate_user_note
     return unless recipients.size == 1
     recipient = recipients.first
-    return unless recipient.grants_right?(author, :create_user_notes)
+    return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
 
     self.extend TextHelper
     title = t(:subject, "Private message, %{timestamp}", :timestamp => date_string(created_at))

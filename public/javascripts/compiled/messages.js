@@ -740,7 +740,7 @@
         });
       }
       reset_message_form();
-      $form.find('#user_note_info').showIf($selected_conversation != null ? $selected_conversation.hasClass('private') : void 0).find('input').attr('checked', false);
+      $form.find('#user_note_info').hide().find('input').attr('checked', false);
       return $form.show().find(':input:visible:first').focus();
     };
     reset_message_form = function() {
@@ -834,7 +834,7 @@
       $form.loadingImage();
       $c = $selected_conversation;
       completion = function(data) {
-        var i, j, message, submission, user, _i, _len, _ref, _ref2;
+        var i, j, message, submission, user, user_id, _i, _len, _ref, _ref2;
         if (!is_selected($c)) {
           return;
         }
@@ -846,6 +846,8 @@
             user.html_name = html_name_for_user(user);
           }
         }
+        $form.find('#user_note_info').showIf($c.hasClass('private') && (user_id = $c.find('.participant').first().data('id')) && (user = MessageInbox.user_cache[user_id]) && can_add_notes_for(user));
+        inbox_resize();
         $messages.show();
         i = j = 0;
         message = data.messages[0];
@@ -922,13 +924,16 @@
     };
     can_add_notes_for = function(user) {
       var course_id, roles, _ref, _ref2;
+      if (!MessageInbox.notes_enabled) {
+        return false;
+      }
       if (user.can_add_notes) {
         return true;
       }
       _ref = user.common_courses;
       for (course_id in _ref) {
         roles = _ref[course_id];
-        if (__indexOf.call(roles, 'StudentEnrollment') >= 0 && (MessageInbox.can_add_notes || ((_ref2 = MessageInbox.contexts.courses[course_id]) != null ? _ref2.can_add_notes : void 0))) {
+        if (__indexOf.call(roles, 'StudentEnrollment') >= 0 && (MessageInbox.can_add_notes_for_account || ((_ref2 = MessageInbox.contexts.courses[course_id]) != null ? _ref2.can_add_notes : void 0))) {
           return true;
         }
       }
@@ -1933,12 +1938,13 @@
             $form.find('#group_conversation').attr('checked', true);
           }
           $form.find('#group_conversation_info').show();
-          return $form.find('#user_note_info').hide();
+          $form.find('#user_note_info').hide();
         } else {
           $form.find('#group_conversation').attr('checked', true);
           $form.find('#group_conversation_info').hide();
-          return $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) && can_add_notes_for(user));
+          $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) && can_add_notes_for(user));
         }
+        return inbox_resize();
       };
       $(window).resize(inbox_resize);
       setTimeout(inbox_resize);
