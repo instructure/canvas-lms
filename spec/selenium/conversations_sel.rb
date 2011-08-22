@@ -25,9 +25,12 @@ shared_examples_for "conversations selenium tests" do
 
       find_with_jquery("#create_message_form textarea").send_keys(opts[:message])
 
-      opts[:attachments].each do |fullpath|
+      opts[:attachments].each_with_index do |fullpath, i|
         driver.find_element(:id, "action_add_attachment").click
-        find_all_with_jquery("#create_message_form .file_input:visible").last.send_keys(fullpath)
+        
+        keep_trying_until {
+          find_all_with_jquery("#create_message_form .file_input:visible")[i]
+        }.send_keys(fullpath)
       end
 
       old_count = ConversationMessage.count
@@ -53,7 +56,7 @@ shared_examples_for "conversations selenium tests" do
       add_attachment_link.should_not be_nil
       find_all_with_jquery("#attachment_list > .attachment:visible").should be_empty
       add_attachment_link.click
-      find_all_with_jquery("#attachment_list > .attachment:visible").should_not be_empty
+      keep_trying_until{ find_all_with_jquery("#attachment_list > .attachment:visible").should be_present }
     end
 
     it "should be able to add multiple attachments to the message form" do
@@ -63,7 +66,7 @@ shared_examples_for "conversations selenium tests" do
       add_attachment_link.click
       add_attachment_link.click
       add_attachment_link.click
-      find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 3
+      keep_trying_until{ find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 3 }
     end
 
     it "should be able to remove attachments from the message form" do
@@ -72,7 +75,7 @@ shared_examples_for "conversations selenium tests" do
       add_attachment_link = driver.find_element(:id, "action_add_attachment")
       add_attachment_link.click
       add_attachment_link.click
-      find_with_jquery("#attachment_list > .attachment:visible .remove_link").click
+      keep_trying_until{ find_all_with_jquery("#attachment_list > .attachment:visible .remove_link")[1] }.click
       keep_trying_until{ find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 1 }
     end
 
