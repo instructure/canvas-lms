@@ -24,6 +24,6 @@ end
 def valid_discussion_topic_attributes
   {
     :title => "value for title",
-    :message => "vale for message"
+    :message => "value for message"
   }
 end

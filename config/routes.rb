@@ -639,6 +639,7 @@ ActionController::Routing::Routes.draw do |map|
       courses.get 'courses/:course_id/sections', :action => :sections, :path_name => 'course_sections'
       courses.get 'courses/:course_id/students', :action => :students
       courses.get 'courses/:course_id/students/submissions', :controller => :submissions_api, :action => :for_students, :path_name => 'course_student_submissions'
+      courses.get 'courses/:course_id/activity_stream', :action => :activity_stream
     end
 
     api.with_options(:controller => :assignments_api) do |assignments|
@@ -664,6 +665,10 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :sis_imports_api) do |sis|
       sis.post 'accounts/:account_id/sis_imports', :action => :create
       sis.get 'accounts/:account_id/sis_imports/:id', :action => :show
+    end
+
+    api.with_options(:controller => :users) do |users|
+      users.get 'users/activity_stream', :action => 'activity_stream'
     end
   end
 

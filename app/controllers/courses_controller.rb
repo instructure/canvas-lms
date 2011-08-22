@@ -217,6 +217,16 @@ class CoursesController < ApplicationController
     end
   end
 
+  include Api::V1::StreamItem
+  # @API
+  # Returns the current user's course-specific activity stream.
+  #
+  # For full documentation, see the API documentation for the user activity stream.
+  def activity_stream
+    get_context
+    render :json => @current_user.stream_items(:contexts => [@context]).map { |i| stream_item_json(i) }
+  end
+
   def destroy
     @context = Course.find(params[:id])
     if authorized_action(@context, @current_user, :delete)
