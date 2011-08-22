@@ -222,7 +222,9 @@
     MessageInbox.initial_conversations_count = <%= @conversations_count %>;
     MessageInbox.scope = <%= raw @scope.to_json %>;
     MessageInbox.label_scope = <%= raw @label.to_json %>;
-    MessageInbox.can_add_notes = <%= raw @current_user.associated_accounts.any?{|a| a.enable_user_notes && a.grants_right?(@current_user, nil, :manage_students) } %>;
+    <% # TODO: get note-enabled-ness per account, and cross reference with the recipient's associated account ids. this is already enforced in the model %>
+    MessageInbox.notes_enabled = <%= raw @current_user.associated_accounts.any?{|a| a.enable_user_notes } %>;
+    MessageInbox.can_add_notes_for_account = MessageInbox.notes_enabled && <%= raw @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) } %>;
     <% unless @current_user.watched_conversations_intro? %>
     $.conversationsIntroSlideshow()
     <% end %>

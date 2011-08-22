@@ -204,7 +204,7 @@ module ApplicationHelper
 
   def message_user_path(user)
     params = {:user_id => user.id, :user_name => user.short_name}
-    params[:can_add_notes] = true if user.grants_right?(@current_user, :create_user_notes)
+    params[:can_add_notes] = true if user.grants_right?(@current_user, :create_user_notes) && user.associated_accounts.any?{|a| a.enable_user_notes }
     conversations_path + "#/conversations?" + params.to_query.gsub('+', '%20')
   end
   
