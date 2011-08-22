@@ -258,6 +258,7 @@ ActionController::Routing::Routes.draw do |map|
     course.publish_to_sis 'details/sis_publish', :controller => 'courses', :action => 'publish_to_sis', :conditions => {:method => :post}
     
     course.resources :user_lists, :only => :create
+    course.reset 'reset', :controller => 'courses', :action => 'reset_content', :conditions => {:method => :post}
   end
 
   map.resources :page_views, :only => [:update,:index]

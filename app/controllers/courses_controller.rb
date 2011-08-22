@@ -934,4 +934,11 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_grades)
     render :json => {:sis_publish_status => @context.grade_publishing_status}
   end
+
+  def reset_content
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_content)
+    @context.reset_content
+    redirect_to course_details_path(@context.id)
+  end
 end

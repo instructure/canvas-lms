@@ -51,6 +51,20 @@ describe Course do
     course = Course.create!(:account => sub_sub_account)
     course.grants_right?(user, nil, :manage).should be_true
   end
+
+  it "should clear content when resetting" do
+    @course = Course.create!
+    @course.discussion_topics.create!
+    @course.quizzes.create!
+    @course.assignments.create!
+
+    @course.reset_content
+
+    @course.reload
+    @course.discussion_topics.should be_empty
+    @course.quizzes.should be_empty
+    @course.assignments.should be_empty
+  end
 end
 
 describe Course, "account" do

@@ -2337,4 +2337,17 @@ class Course < ActiveRecord::Base
     return self.write_attribute(:settings, {}) unless frozen?
     {}.freeze
   end
+
+  def reset_content
+    Course.transaction do
+      AssetTypes.constants.each do |type|
+        association_name = type.tableize if self.respond_to?(type.tableize)
+        association_name = 'all_' + type.tableize if self.respond_to?('all_' + type.tableize)
+        next unless association_name
+        find_options = self.send(association_name).send(:construct_scope)[:find]
+        next unless find_options[:joins].blank?
+        AssetTypes.const_get(type).scoped(find_options).delete_all
+      end
+    end
+  end
 end

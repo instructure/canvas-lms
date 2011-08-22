@@ -54,6 +54,18 @@
     <% if can_do(@context, @current_user, :read) %>
       <a href="<%= context_url(@context, :course_content_exports_url) %>" class="button button-sidebar-wide"><%= image_tag "file_multiple.png" %><%= t('links.export', %{Export this Course}) %></a>
     <% end %>
+    <% if can_do(@context, @current_user, :manage_content) %>
+      <a href="<%= context_url(@context, :course_reset_url) %>" class="button button-sidebar-wide reset_course_content_button"><%= image_tag "delete.png" %><%= t('links.reset', %{Reset Course Content}) %></a>
+      <div id="reset_course_content_dialog" style="display: none;">
+          <%= mt 'help.reset_course_content', %{Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content.  This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?} %>
+          <% form_for @context, :url => context_url(@context, :course_reset_url), :html => {:method => 'post'} do %>
+            <div class="button-container">
+              <button type="submit" class="submit_button button"><%= t('buttons.reset', %{Reset Course Content}) %></button>
+              <button type="button" class="cancel_button button-secondary"><%= t('#buttons.cancel', %{Cancel}) %></button>
+            </div>
+          <% end %>
+        </div>
+    <% end %>
     <table class="summary" style="margin-top: 20px;">
       <thead>
       <tr>
