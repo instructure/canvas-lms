@@ -55,4 +55,14 @@ class DeveloperKey < ActiveRecord::Base
     Setting.set("#{default_key_name}_developer_key_id", key.id)
     return @special_keys[default_key_name] = key
   end
+
+  # verify that the given uri has the same domain as this key's
+  # redirect_uri domain.
+  def redirect_domain_matches?(redirect_uri)
+    self_domain = URI.parse(self.redirect_uri).host
+    other_domain = URI.parse(redirect_uri).host
+    return self_domain.present? && self_domain == other_domain
+  rescue URI::InvalidURIError
+    return false
+  end
 end

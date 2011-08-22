@@ -33,17 +33,6 @@ describe "OAuth2", :type => :integration do
     response.should be_client_error
   end
 
-  it "should reject any redirect_uri except the oob marker" do
-    get "/login/oauth2/auth", :response_type => 'code', :redirect_uri => 'https://my-web-app.com/oauth/response/', :client_id => @client_id
-    response.should be_client_error
-
-    get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id
-    response.should be_redirect
-
-    get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
-    response.should be_redirect
-  end
-
   it "should require a valid code to get an access_token" do
     post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => 'asdf'
     response.should be_client_error
@@ -235,6 +224,63 @@ describe "OAuth2", :type => :integration do
       # we have the code, we can close the browser session
       post "/login/oauth2/token", :client_id => @client_id, :client_secret => 'nuh-uh', :code => code
       response.should be_client_error
+    end
+  end
+
+  describe "oauth2 web app flow" do
+    it "should require the developer key to have a redirect_uri" do
+      get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
+      response.should be_client_error
+      response.body.should match /invalid redirect_uri/
+    end
+
+    it "should require the redirect_uri domains to match" do
+      @key.update_attribute :redirect_uri, 'http://www.example2.com/oauth2response'
+      get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
+      response.should be_client_error
+      response.body.should match /invalid redirect_uri/
+
+      @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
+      get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
+      response.should be_redirect
+    end
+
+    it "should enable the web app flow" do
+      enable_forgery_protection do
+        enable_cache do
+          user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
+          course_with_teacher(:user => @user)
+          @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
+
+          get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/my_uri"
+          response.should redirect_to(login_url(:re_login => true))
+
+          get response['Location']
+          response.should be_success
+          post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
+
+          response.should be_redirect
+          response['Location'].should match(%r{http://www.example.com/my_uri?})
+          code = response['Location'].match(/code=([^\?&]+)/)[1]
+          code.should be_present
+
+          # exchange the code for the token
+          post "/login/oauth2/token", { :code => code }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+          response.should be_success
+          response.header['content-type'].should == 'application/json; charset=utf-8'
+          json = JSON.parse(response.body)
+          token = json['access_token']
+          reset!
+
+          # try an api call
+          get "/api/v1/courses.json?access_token=#{token}"
+          response.should be_success
+          json = JSON.parse(response.body)
+          json.size.should == 1
+          json.first['enrollments'].should == [{'type' => 'teacher'}]
+          AccessToken.last.token.should == token
+        end
+      end
     end
   end
 end

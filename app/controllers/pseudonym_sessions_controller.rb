@@ -303,7 +303,12 @@ class PseudonymSessionsController < ApplicationController
         code = ActiveSupport::SecureRandom.hex(64)
         code_data = { 'user' => user.id, 'client_id' => session[:oauth2][:client_id] }
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
-        format.html { redirect_to oauth2_auth_url(:code => code) }
+        redirect_uri = session[:oauth2][:redirect_uri]
+        if redirect_uri == OAUTH2_OOB_URI
+          format.html { redirect_to oauth2_auth_url(:code => code) }
+        else
+          format.html { redirect_to "#{redirect_uri}?code=#{code}" }
+        end
       elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
@@ -330,15 +335,14 @@ class PseudonymSessionsController < ApplicationController
       return render()
     end
 
-    # for now, this is the only allowed redirect_uri
-    redirect_uri = params[:redirect_uri].presence || OAUTH2_OOB_URI
-    unless redirect_uri == OAUTH2_OOB_URI
-      return render(:status => 400, :json => { :message => "invalid redirect_uri" })
-    end
-
     key = DeveloperKey.find_by_id(params[:client_id]) if params[:client_id].present?
     unless key
       return render(:status => 400, :json => { :message => "invalid client_id" })
+    end
+
+    redirect_uri = params[:redirect_uri].presence || ""
+    unless redirect_uri == OAUTH2_OOB_URI || key.redirect_domain_matches?(redirect_uri)
+      return render(:status => 400, :json => { :message => "invalid redirect_uri" })
     end
 
     session[:oauth2] = { :client_id => key.id, :redirect_uri => redirect_uri }
