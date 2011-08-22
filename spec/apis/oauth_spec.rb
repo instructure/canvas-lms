@@ -140,6 +140,7 @@ describe "OAuth2", :type => :integration do
         response.header['content-type'].should == 'application/json; charset=utf-8'
         json = JSON.parse(response.body)
         token = json['access_token']
+        json['user'].should == { 'id' => @user.id, 'name' => 'test1@example.com' }
         reset!
 
         # try an api call
