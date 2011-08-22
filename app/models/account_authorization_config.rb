@@ -174,7 +174,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def test_ldap_search
     begin
-      return self.ldap_connection.search.count
+      res = self.ldap_connection.search {|s| break s}
+      return true if res
     rescue
       self.errors.add(
         :ldap_search_test,
