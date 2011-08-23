@@ -19,25 +19,20 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AccountsController do
-  def account
-    @account = @course.account
-  end
-
   def account_with_admin_logged_in(opts = {})
-    course_with_teacher_logged_in({:active_all => true}.merge(opts))
-    @account = account
-    @account.add_user(@user)
-    @admin = @user
+    @account = Account.default
+    account_admin_user
+    user_session(@admin)
   end
 
   def cross_listed_course
-    course_with_teacher_logged_in(:active_all => true)
-    @account1 = account
+    account_with_admin_logged_in
+    @account1 = Account.create!
     @account1.add_user(@user)
     @course1 = @course
     @course1.account = @account1
     @course1.save!
-    @account2 = account
+    @account2 = Account.create!
     @course2 = course
     @course2.account = @account2
     @course2.save!
@@ -48,10 +43,8 @@ describe AccountsController do
 
   describe "SIS imports" do
     it "should set batch mode and term if given" do
-      course_with_teacher_logged_in(:active_all => true)
-      @account = account
+      account_with_admin_logged_in
       @account.update_attribute(:allow_sis_import, true)
-      @account.add_user(@user)
       post 'sis_import_submit', :account_id => @account.id, :import_type => 'instructure_csv_zip', :batch_mode => '1'
       batch = SisBatch.last
       batch.should_not be_nil
@@ -87,5 +80,18 @@ describe AccountsController do
     cas_client = CASClient::Client.new(config)
     get 'show', :id => account.id
     response.should redirect_to(cas_client.add_service_to_login_url(login_url))
+  end
+
+  it "should count total courses correctly" do
+    account_with_admin_logged_in
+    course
+    @course.course_sections.create!
+    @course.course_sections.create!
+    @course.update_account_associations
+    @account.course_account_associations.length.should == 3 # one for each section, and the "nil" section
+
+    get 'show', :id => @account.id, :format => 'html'
+
+    assigns[:associated_courses_count].should == 1
   end
 end
