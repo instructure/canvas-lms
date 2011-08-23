@@ -458,12 +458,12 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
 
   def group_by(*columns)
-    columns.first
+    Array(columns.first).join(", ")
   end
 end
 
-if defined?(ActiveRecord::ConnectionAdapters::MySQLAdapter)
-  ActiveRecord::ConnectionAdapters::MySQLAdapter.class_eval do
+if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
+  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
     def func(name, *args)
       case name
         when :group_concat
@@ -487,7 +487,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
     def group_by(*columns)
       return super if postgresql_version >= 90100
-      columns.join(', ')
+      columns.flatten.join(', ')
     end
   end
 end

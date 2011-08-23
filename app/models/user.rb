@@ -1691,7 +1691,7 @@ class User < ActiveRecord::Base
           OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
         )
         AND #{user_condition_sql}
-      GROUP BY #{connection.group_by(*(MESSAGEABLE_USER_COLUMNS + [:course_id]))}
+      GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
     SQL
 
     user_sql << <<-SQL if group_ids.present?

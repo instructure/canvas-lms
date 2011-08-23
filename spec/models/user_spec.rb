@@ -446,6 +446,30 @@ describe User do
       messageable_users.should_not include @other_section_user.id
     end
 
+    it "should include all shared contexts and enrollment information" do
+      set_up_course_with_users
+      @first_course = @course
+      @first_course.enroll_user(@this_section_user, 'TaEnrollment', :enrollment_state => 'active')
+      @first_course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
+
+      @other_course = course_model
+      @other_course.offer!
+      @other_course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
+      # other_section_user is a teacher in one course, student in another
+      @other_course.enroll_user(@other_section_user, 'TeacherEnrollment', :enrollment_state => 'active')
+
+      messageable_users = @admin.messageable_users
+      this_section_user = messageable_users.detect{|u| u.id == @this_section_user.id}
+      this_section_user.common_courses.keys.should include @first_course.id
+      this_section_user.common_courses[@first_course.id].sort.should eql ['StudentEnrollment', 'TaEnrollment']
+
+      two_context_guy = messageable_users.detect{|u| u.id == @other_section_user.id}
+      two_context_guy.common_courses.keys.should include @first_course.id
+      two_context_guy.common_courses[@first_course.id].sort.should eql ['StudentEnrollment']
+      two_context_guy.common_courses.keys.should include @other_course.id
+      two_context_guy.common_courses[@other_course.id].sort.should eql ['TeacherEnrollment']
+    end
+
     it "should include users with no shared contexts iff admin" do
       @admin.messageable_users(:ids => [@student.id]).should_not be_empty
       @student.messageable_users(:ids => [@admin.id]).should be_empty
