@@ -66,6 +66,8 @@ module Api
       { 'sis_term_id' => 'sis_source_id' }
     when User.table_name
       { 'sis_user_id' => 'sis_user_id', 'sis_login_id' => 'sis_source_id' }
+    when Account.table_name
+      { 'sis_account_id' => 'sis_source_id' }
     else
       raise ArgumentError, "need to add support for table name: #{collection.table_name}"
     end

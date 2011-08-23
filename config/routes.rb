@@ -671,6 +671,11 @@ ActionController::Routing::Routes.draw do |map|
     api.with_options(:controller => :users) do |users|
       users.get 'users/activity_stream', :action => 'activity_stream'
     end
+
+    api.with_options(:controller => :accounts) do |accounts|
+      accounts.get 'accounts', :action => :index, :path_name => 'accounts'
+      accounts.get 'accounts/:id', :action => :show
+    end
   end
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }

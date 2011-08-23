@@ -16,23 +16,51 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Accounts
 class AccountsController < ApplicationController
   before_filter :require_user, :only => [:index]
   before_filter :get_context
-  
+
+  include Api::V1::Account
+
+  # @API
+  #
+  # List accounts that the current user can view or manage.  Typically,
+  # students and even teachers will get an empty list in response, only
+  # account admins can view the accounts that they are in.
   def index
     @accounts = @current_user.accounts rescue []
+    respond_to do |format|
+      format.json do
+        # TODO: what would be more useful, include sub-accounts here
+        # that you implicitly have access to, or have a separate method
+        # to get the sub-accounts of an account?
+        @accounts = @accounts.paginate(:page => params[:page], :per_page => params[:per_page] || 10)
+        Api.set_pagination_headers!(@accounts, response, api_v1_accounts_path)
+        render :json => @accounts.map { |a| account_json(a, []) }
+      end
+      format.html
+    end
   end
-  
+
+  # @API
+  #
+  # Retrieve information on an individual account, given by id or sis
+  # sis_account_id.
   def show
     return unless authorized_action(@account, @current_user, :read)
-    return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, nil, :read_course_list)
 
-    load_course_right_side
-    @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
-    build_course_stats
+    respond_to do |format|
+      format.json { render :json => account_json(@account, []) }
+      format.html do
+        return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, nil, :read_course_list)
+        load_course_right_side
+        @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+        build_course_stats
+      end
+    end
   end
-  
+
   def update
     if authorized_action(@account, @current_user, :manage_account_settings)
       respond_to do |format|
