@@ -951,7 +951,7 @@
         return link_placeholder;
       });
       message = $.h(message);
-      message = message.replace(link_placeholder, function(match, i) {
+      message = message.replace(new RegExp(link_placeholder, 'g'), function(match, i) {
         return placeholder_blocks.shift();
       });
       message = message.replace(/\n/g, '<br />\n');

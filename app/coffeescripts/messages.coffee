@@ -714,7 +714,7 @@ I18n.scoped 'conversations', (I18n) ->
     message = $.h message
 
     # now put the links back in
-    message = message.replace link_placeholder, (match, i) ->
+    message = message.replace new RegExp(link_placeholder, 'g'), (match, i) ->
       placeholder_blocks.shift()
 
     # replace newlines
