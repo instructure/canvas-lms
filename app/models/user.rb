@@ -213,8 +213,8 @@ class User < ActiveRecord::Base
     self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_account_associations?
   end
   
-  def update_account_associations
-    User.update_account_associations([self])
+  def update_account_associations(opts = {})
+    User.update_account_associations([self], opts)
   end
 
   def self.add_to_account_chain_cache(account_id, account_chain_cache)
@@ -228,7 +228,7 @@ class User < ActiveRecord::Base
     account_chain_cache[account.id] = [account.id] + add_to_account_chain_cache(account.parent_account_id, account_chain_cache)
   end
 
-  def self.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
+  def self.calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache = {})
     results = {}
     remaining_ids = []
     starting_account_ids.each do |account_id|

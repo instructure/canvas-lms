@@ -187,11 +187,12 @@ class Course < ActiveRecord::Base
 
   def set_update_account_associations_if_changed
     @should_update_account_associations = self.root_account_id_changed? || self.account_id_changed?
+    @should_delay_account_associations = !self.new_record?
     true
   end
   
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if @should_update_account_associations && !self.class.skip_updating_account_associations?
+    send_now_or_later_if_production(@should_delay_account_associations ? :later : :now, :update_account_associations) if @should_update_account_associations && !self.class.skip_updating_account_associations?
   end
   
   def module_based?

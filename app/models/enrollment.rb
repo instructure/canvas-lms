@@ -140,7 +140,12 @@ class Enrollment < ActiveRecord::Base
   end
   
   def update_user_account_associations_if_necessary
-    self.user.update_account_associations_later if should_update_user_account_association?
+    if self.new_record?
+      associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
+      self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
+    elsif should_update_user_account_association?
+      self.user.update_account_associations_later
+    end
   end
   protected :update_user_account_associations_if_necessary
 

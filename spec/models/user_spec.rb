@@ -61,7 +61,8 @@ describe User do
     account1 = account_model
     account2 = account_model
     course_with_student
-    @user.associated_accounts.length.should eql(0)
+    @user.associated_accounts.length.should eql(1)
+    @user.associated_accounts.first.should eql(Account.default)
     
     @course.account = account1
     @course.save!
