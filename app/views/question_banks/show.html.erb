@@ -162,7 +162,7 @@ $(document).ready(function() {
     url = $.replaceTags(url, 'page', currentPage + 1);
     $link.text("loading more questions...").addClass('loading');
     $.ajaxJSON(url, 'GET', {}, function(data) {
-      $link.text("more questions").removeClass('loading');
+      $link.text(I18n.t('links.more_questions', "more questions")).removeClass('loading');
       $more_questions.attr('data-current-page', currentPage + 1);
       $more_questions.showIf(currentPage + 1 < totalPages);
       for(var idx in data.questions) {
@@ -170,10 +170,13 @@ $(document).ready(function() {
         question.assessment_question_id = question.id;
         var $question = $("#question_teaser_blank").clone().removeAttr('id');
         $question.fillTemplateData({
-          data: question.question_data,
-          id: 'question_teaser_id',
-          htmlValues: ['question_text'],
+          data: question,
+          id: 'question_teaser_' + question.id,
           hrefValues: ['id']
+        });
+        $question.fillTemplateData({
+          data: question.question_data,
+          htmlValues: ['question_text']
         });
         $question.data('question', question);
         $("#questions").append($question);
