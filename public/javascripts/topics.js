@@ -360,7 +360,7 @@ I18n.scoped('topics', function(I18n) {
         data.post_date = addingMessage;
         $topic.fillTemplateData({
           data: data,
-          htmlValues: ['message']
+          except: ['message']
         });
         $topic.find(".content").loadingImage();
         hideTopicForm();

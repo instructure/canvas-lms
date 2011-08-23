@@ -225,11 +225,17 @@ I18n.scoped('quizzes', function(I18n) {
       quiz.updateDisplayQuestion($question.find(".question:first"), question, true);
     },
     updateDisplayQuestion: function($question, question, escaped) {
-      $question.fillTemplateData({
+      fillArgs = {
         data: question,
         except: ['answers'],
-        htmlValues: ['question_text']
-      });
+        htmlValues: []
+      };
+      if (escaped) {
+        fillArgs['htmlValues'].push('question_text');
+      } else {
+        fillArgs['except'].push('question_text');
+      }
+      $question.fillTemplateData(fillArgs);
       $question.find(".original_question_text").fillFormData(question);
       $question.find(".question_correct_comment").toggleClass('empty', !question.correct_comments);
       $question.find(".question_incorrect_comment").toggleClass('empty', !question.incorrect_comments);
