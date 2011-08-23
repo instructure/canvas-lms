@@ -32,7 +32,13 @@ class IncomingMessageProcessor
         end
 
         msg = Message.find_by_id(params['captures'][1].to_i)
-        context = msg.context if msg && params['captures'][0] == msg.reply_to_secure_id
+        context = begin
+          msg.context if msg && params['captures'][0] == msg.reply_to_secure_id
+        rescue => e
+          ErrorReport.log_exception(:default, e, :from => message.from.first,
+                                                 :to => message.to)
+          nil
+        end
         user = msg.try(:user)
         begin
           if user && context && context.respond_to?(:reply_from)
