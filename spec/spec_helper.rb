@@ -121,6 +121,7 @@ Spec::Runner.configure do |config|
   def user(opts={})
     @user = User.create!(:name => opts[:name])
     @user.register! if opts[:active_user] || opts[:active_all]
+    @user.associated_accounts << opts[:account] if opts[:account]
     @user
   end
 

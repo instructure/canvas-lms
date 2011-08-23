@@ -94,6 +94,7 @@ class AccountsController < ApplicationController
           if params[:account][:settings]
             @account.settings[:admins_can_change_passwords] = !!params[:account][:settings][:admins_can_change_passwords]
             @account.settings[:global_includes] = !!params[:account][:settings][:global_includes]
+            @account.settings[:enable_eportfolios] = !!params[:account][:settings][:enable_eportfolios] unless @account.site_admin?
           end
         end
         if sis_id = params[:account].delete(:sis_source_id)

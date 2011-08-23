@@ -1606,6 +1606,11 @@ class User < ActiveRecord::Base
     pseudonym.try(:sis_user_id)
   end
 
+  def eportfolios_enabled?
+    accounts = associated_root_accounts.reject(&:site_admin?)
+    accounts.size == 0 || accounts.any?{ |a| a.settings[:enable_eportfolios] != false }
+  end
+
   def initiate_conversation(user_ids, private = nil)
     user_ids = ([self.id] + user_ids).uniq
     private = user_ids.size <= 2 if private.nil?

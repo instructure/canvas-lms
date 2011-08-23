@@ -50,6 +50,15 @@ describe EportfoliosController do
       assigns[:portfolios].should_not be_empty
       assigns[:portfolios][0].should eql(@portfolio)
     end
+
+    it "should redirect if eportfolios are disabled" do
+      a = Account.default
+      a.settings[:enable_eportfolios] = false
+      a.save
+      eportfolio_with_user_logged_in(:active_all => true, :account => a)
+      get 'user_index'
+      response.should be_redirect
+    end
   end
   
   describe "POST 'create'" do
@@ -69,6 +78,27 @@ describe EportfoliosController do
   end
   
   describe "GET 'show'" do
+    it "should require authorization if the eportfolio is not public" do
+      eportfolio_with_user(:active_all => true)
+      get 'show', :id => @portfolio.id
+      assert_unauthorized
+    end
+    
+    it "should complain if eportfolios are disabled" do
+      a = Account.default
+      a.settings[:enable_eportfolios] = false
+      a.save
+      eportfolio_with_user_logged_in(:active_all => true, :account => a)
+      get 'show', :id => @portfolio.id
+      assert_unauthorized
+    end
+    
+    it "should show portfolio" do
+      eportfolio_with_user_logged_in(:active_all => true)
+      get 'show', :id => @portfolio.id
+      response.should be_success
+      assigns[:portfolio].should_not be_nil
+    end
   end
   
   describe "PUT 'update'" do

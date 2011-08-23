@@ -116,6 +116,7 @@ class Account < ActiveRecord::Base
   add_setting :equella_endpoint
   add_setting :equella_teaser
   add_setting :enable_alerts, :boolean => true, :root_only => true
+  add_setting :enable_eportfolios, :boolean => true, :root_only => true
   
   def settings=(hash)
     if hash.is_a?(Hash)

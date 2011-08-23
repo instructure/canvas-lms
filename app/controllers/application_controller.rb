@@ -89,10 +89,13 @@ class ApplicationController < ActionController::Base
   # used to generate context-specific urls without having to
   # check which type of context it is everywhere
   def named_context_url(context, name, *opts)
-    context = context.user if context.is_a?(UserProfile)
-    klass = context.class.base_ar_class
-    name = name.to_s.sub(/context/, klass.name.underscore)
-    opts.unshift(context)
+    if context.is_a?(UserProfile)
+      name = name.to_s.sub(/context/, "profile")
+    else
+      klass = context.class.base_ar_class
+      name = name.to_s.sub(/context/, klass.name.underscore)
+      opts.unshift(context)
+    end
     opts.push({}) unless opts[-1].is_a?(Hash)
     include_host = opts[-1].delete(:include_host)
     if !include_host
