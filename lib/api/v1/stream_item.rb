@@ -28,6 +28,13 @@ module Api::V1::StreamItem
       hash['title'] = data.title
       hash['message'] = data.body
       hash['type'] = data.type
+      # include context information, if a context exists
+      case stream_item.context_code
+      when %r{^course_(\d+)$}
+        hash['course_id'] = $1.to_i
+      when %r{^group_(\d+)$}
+        hash['group_id'] = $1.to_i
+      end
 
       case data.type
       when 'DiscussionTopic', 'Announcement'

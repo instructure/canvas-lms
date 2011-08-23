@@ -55,6 +55,7 @@ describe UsersController, :type => :integration do
           'message' => 'hai',
         },
       ],
+      'course_id' => @course.id,
     }]
   end
 
@@ -80,6 +81,7 @@ describe UsersController, :type => :integration do
           'message' => 'hai',
         },
       ],
+      'course_id' => @course.id,
     }]
   end
 
@@ -160,6 +162,7 @@ describe UsersController, :type => :integration do
         'id' => @assignment.id,
         'points_possible' => 14.2,
       },
+      'course_id' => @course.id,
     }]
   end
 
