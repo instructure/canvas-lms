@@ -1,7 +1,7 @@
 class RemoveInactiveEnrollmentState < ActiveRecord::Migration
   def self.up
     Delayed::Job.delete_all(:tag => 'EnrollmentDateRestrictions.update_restricted_enrollments')
-    Enrollment.update_all({:workflow_state => :active}, :workflow_state => :inactive)
+    Enrollment.update_all({:workflow_state => 'active'}, :workflow_state => 'inactive')
   end
 
   def self.down
