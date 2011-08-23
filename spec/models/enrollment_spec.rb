@@ -101,6 +101,9 @@ describe Enrollment do
     @enrollment.workflow_state = 'active'
     @enrollment.save!
     @course.grants_right?(@enrollment.user, nil, :read).should eql(false)
+    # post to forum comes from role_override; inactive enrollments should not
+    # get any permissions form role_override
+    @course.grants_right?(@enrollment.user, nil, :post_to_forum).should eql(false)
   end
 
   it "should not allow read permission on a course if explicitly inactive" do
@@ -108,6 +111,27 @@ describe Enrollment do
     @enrollment.workflow_state = 'inactive'
     @enrollment.save!
     @course.grants_right?(@enrollment.user, nil, :read).should eql(false)
+    @course.grants_right?(@enrollment.user, nil, :post_to_forum).should eql(false)
+  end
+
+  it "should allow read, but not post_to_forum on a course if date completed" do
+    course_with_student(:active_all => true)
+    @enrollment.start_at = 4.days.ago
+    @enrollment.end_at = 2.days.ago
+    @enrollment.workflow_state = 'active'
+    @enrollment.save!
+    @course.grants_right?(@enrollment.user, nil, :read).should eql(true)
+    # post to forum comes from role_override; completed enrollments should not
+    # get any permissions form role_override
+    @course.grants_right?(@enrollment.user, nil, :post_to_forum).should eql(false)
+  end
+
+  it "should allow read, but not post_to_forum on a course if explicitly completed" do
+    course_with_student(:active_all => true)
+    @enrollment.workflow_state = 'completed'
+    @enrollment.save!
+    @course.grants_right?(@enrollment.user, nil, :read).should eql(true)
+    @course.grants_right?(@enrollment.user, nil, :post_to_forum).should eql(false)
   end
 
   context "typed_enrollment" do
