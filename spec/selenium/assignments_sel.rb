@@ -55,4 +55,55 @@ describe "assignment selenium tests" do
     driver.find_element(:css, ".mini_calendar_day.date_#{due_date.strftime("%m_%d_%Y")}").
       attribute('class').should match /has_event/
   end
+  
+  it "should not allow XSS attacks through rubric descriptions" do
+    course_with_teacher_logged_in
+    
+    student = user_with_pseudonym :active_user => true,
+      :username => "student@example.com",
+      :password => "password"
+    @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+    
+    @assignment = @course.assignments.create(:name => 'assignment with rubric')
+    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
+    @rubric.data = [
+      {
+        :points => 3,
+        :description => "XSS Attack!",
+        :long_description => "<b>This text should not be bold</b>",
+        :id => 1,
+        :ratings => [
+          {
+            :points => 3,
+            :description => "Rockin'",
+            :criterion_id => 1,
+            :id => 2
+          },
+          {
+            :points => 0,
+            :description => "Lame",
+            :criterion_id => 1,
+            :id => 3
+          }
+        ]
+      }
+    ]
+    @rubric.save!
+    @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+    
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    
+    driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
+    driver.find_element(:id, "rubric_long_description_dialog").
+           find_element(:css, "div.displaying .long_description").
+           text.should == "<b>This text should not be bold</b>"
+    
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    
+    driver.find_element(:css, ".toggle_full_rubric").click
+    driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
+    driver.find_element(:id, "rubric_long_description_dialog").
+           find_element(:css, "div.displaying .long_description").
+           text.should == "<b>This text should not be bold</b>"
+  end
 end

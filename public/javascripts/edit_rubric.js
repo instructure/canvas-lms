@@ -360,11 +360,12 @@ $(document).ready(function() {
     event.preventDefault();
     var editing    = $(this).parents(".rubric").hasClass('editing'),
         $criterion = $(this).parents(".criterion"),
+        is_learning_outcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion"),
         data       = $criterion.getTemplateData({textValues: ['long_description', 'description']});
     data.long_description = $criterion.find("textarea.long_description").val();
     $rubric_long_description_dialog
       .data('current_criterion', $criterion)
-      .fillTemplateData({data: data, htmlValues: ['long_description']})
+      .fillTemplateData({data: data, htmlValues: ( is_learning_outcome ? ['long_description'] : [] )})
       .fillFormData(data)
       .find(".editing").showIf(editing && !$criterion.hasClass('learning_outcome_criterion')).end()
       .find(".displaying").showIf(!editing || $criterion.hasClass('learning_outcome_criterion')).end()
