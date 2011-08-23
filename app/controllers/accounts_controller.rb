@@ -246,7 +246,7 @@ class AccountsController < ApplicationController
     end
     associated_courses = @account.associated_courses.active
     associated_courses = associated_courses.for_term(@term) if @term
-    @associated_courses_count = associated_courses.uniq.count
+    @associated_courses_count = associated_courses.count('DISTINCT course_id')
     @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
   end
   protected :load_course_right_side
