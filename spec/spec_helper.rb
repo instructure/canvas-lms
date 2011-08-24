@@ -203,6 +203,14 @@ Spec::Runner.configure do |config|
     PseudonymSession.stub!(:find).and_return(session)
   end
 
+  def login_as(username = "nobody@example.com", password = "asdfasdf")
+    post_via_redirect "/login",
+      "pseudonym_session[unique_id]" => username,
+      "pseudonym_session[password]" => password
+    assert_response :success
+    path.should eql("/?login_success=1")
+  end
+
   def outcome_with_rubric(opts={})
     @outcome = @course.learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>')
     @rubric = Rubric.new(:title => 'My Rubric', :context => @course)

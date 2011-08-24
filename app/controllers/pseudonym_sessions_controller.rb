@@ -285,7 +285,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def forbid_on_files_domain
-    if HostUrl.is_file_host?(request.host)
+    if HostUrl.is_file_host?(request.host_with_port)
       reset_session
       return redirect_to dashboard_url(:host => HostUrl.default_host)
     end
