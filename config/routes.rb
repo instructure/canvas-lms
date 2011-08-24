@@ -686,6 +686,8 @@ ActionController::Routing::Routes.draw do |map|
       accounts.get 'accounts/:id', :action => :show
       accounts.get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
     end
+
+    api.get 'users/:user_id/page_views', :controller => :page_views, :action => :index
   end
 
   map.oauth2_auth 'login/oauth2/auth', :controller => 'pseudonym_sessions', :action => 'oauth2_auth', :conditions => { :method => :get }

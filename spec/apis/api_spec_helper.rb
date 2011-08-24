@@ -29,7 +29,11 @@ def api_call(method, path, params, body_params = {}, headers = {})
   case params[:format]
   when 'json'
     response.header['content-type'].should == 'application/json; charset=utf-8'
-    JSON.parse(response.body)
+    body = response.body
+    if body.respond_to?(:call)
+      StringIO.new.tap { |sio| body.call(nil, sio); body = sio.string }
+    end
+    JSON.parse(body)
   else
     raise("Don't know how to handle response format #{params[:format]}")
   end

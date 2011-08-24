@@ -16,17 +16,31 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Users
 class PageViewsController < ApplicationController
+  include Api
+
   before_filter :require_user, :only => [:index]
   def update
     render :json => {:ok => true}
     # page view update happens in log_page_view after_filter
   end
-  
+
+  # @API
+  # Return the user's page view history in json format, similar to the
+  # available CSV download. Pagination is used as described in API basics
+  # section.
+  #
+  # @response_field interaction_seconds The number of seconds the user actively interacted with the page. This is a best guess, using heuristics such as browser input events.
+  # @response_field url The full canvas URL of the page view.
+  # @response_field user_agent The browser identifier or other user agent that was used to make the request.
+  # @response_field controller The Rails controller that processed the request.
+  # @response_field action The action in the Rails controller that processed the request.
+  # @response_field context_type The type of "context" of the request, e.g. Account or Course.
   def index
     @user = User.find(params[:user_id])
     if authorized_action(@user, @current_user, :view_statistics)
-      @page_views = @user.page_views.paginate :page => params[:page], :order => 'created_at DESC'
+      @page_views = Api.paginate(@user.page_views, self, :order => 'created_at DESC')
       respond_to do |format|
         format.html do
           if params[:html_xhr]
@@ -34,7 +48,15 @@ class PageViewsController < ApplicationController
           end
         end
         format.js { render :partial => @page_views }
-        format.json { render :partial => @page_views }
+        format.json do
+          if api_request?
+            stream_json_array(@page_views,
+                              :include_root => false,
+                              :only => (PageView.content_columns.map(&:name) + ['request_id']))
+          else
+            render :partial => @page_views
+          end
+        end
         format.csv {
           cancel_cache_buster
           send_data(
