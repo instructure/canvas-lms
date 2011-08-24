@@ -32,7 +32,7 @@ class EnrollmentTerm < ActiveRecord::Base
   before_save :update_enrollments_later
 
   def update_enrollments_later
-    self.send_later_if_production(:touch_all_enrollments) if self.start_at_changed? || self.end_at_changed?
+    self.send_later_if_production(:touch_all_enrollments) if !self.new_record? && self.start_at_changed? || self.end_at_changed?
   end
 
   def touch_all_enrollments
