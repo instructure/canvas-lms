@@ -2328,6 +2328,8 @@ class Course < ActiveRecord::Base
         next unless find_options[:joins].blank?
         AssetTypes.const_get(type).scoped(find_options).delete_all
       end
+      self.wiki_id = nil
+      self.save!
     end
   end
 end

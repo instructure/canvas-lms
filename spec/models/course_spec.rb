@@ -57,6 +57,7 @@ describe Course do
     @course.discussion_topics.create!
     @course.quizzes.create!
     @course.assignments.create!
+    @course.wiki.wiki_page.save!
 
     @course.reset_content
 
@@ -64,6 +65,7 @@ describe Course do
     @course.discussion_topics.should be_empty
     @course.quizzes.should be_empty
     @course.assignments.should be_empty
+    @course.wiki.wiki_page.should be_new_record
   end
 end
 
