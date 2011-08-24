@@ -284,7 +284,7 @@ class ConversationsController < ApplicationController
   end
 
   def create_message_on_conversation(conversation=@conversation, update_for_sender=true)
-    message = conversation.add_message(params[:body], params[:forwarded_message_ids], update_for_sender) do |m|
+    message = conversation.add_message(params[:body], :forwarded_message_ids => params[:forwarded_message_ids], :update_for_sender => update_for_sender, :context => @domain_root_account) do |m|
       if params[:attachments]
         params[:attachments].sort_by{ |k,v| k.to_i }.each do |k,v|
           m.attachments.create(:uploaded_data => v) if v.present?

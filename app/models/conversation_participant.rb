@@ -128,8 +128,8 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_participants(user, user_ids)
   end
 
-  def add_message(body, forwarded_message_ids = [], update_for_sender = true, &blk)
-    conversation.add_message(user, body, false, forwarded_message_ids, update_for_sender, &blk)
+  def add_message(body, options={}, &blk)
+    conversation.add_message(user, body, options.update(:generated => false), &blk)
   end
 
   def remove_messages(*to_delete)
