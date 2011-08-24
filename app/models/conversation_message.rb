@@ -21,6 +21,7 @@ class ConversationMessage < ActiveRecord::Base
 
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
+  belongs_to :context, :polymorphic => true
   has_many :conversation_message_participants
   has_many :attachments, :as => :context, :order => 'created_at, id'
   delegate :participants, :to => :conversation
@@ -141,7 +142,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    conversation.reply_from(opts)
+    conversation.reply_from(opts.merge(:context => self.context))
   end
 
   def forwarded_messages

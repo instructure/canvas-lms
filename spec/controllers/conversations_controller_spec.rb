@@ -85,7 +85,7 @@ describe ConversationsController do
       assigns[:conversation].should_not be_nil
     end
 
-    it "should allow messages to be forwarded the conversation" do
+    it "should allow messages to be forwarded from the conversation" do
       course_with_student_logged_in(:active_all => true)
       conversation.mark_as_unread
 
