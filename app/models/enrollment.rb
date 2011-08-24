@@ -313,11 +313,11 @@ class Enrollment < ActiveRecord::Base
     Rails.cache.fetch([self, 'enrollment_dates'].cache_key) do
       if self.start_at && self.end_at
         [self.start_at, self.end_at]
-      elsif course_section.restrict_enrollments_to_section_dates && !self.admin?
+      elsif course_section.try(:restrict_enrollments_to_section_dates) && !self.admin?
         [course_section.start_at, course_section.end_at]
-      elsif course.restrict_enrollments_to_course_dates && !self.admin?
+      elsif course.try(:restrict_enrollments_to_course_dates) && !self.admin?
         [course.start_at, course.conclude_at]
-      elsif course.enrollment_term
+      elsif course.try(:enrollment_term)
         course.enrollment_term.enrollment_dates_for(self)
       else
         [nil, nil]
