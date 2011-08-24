@@ -97,7 +97,7 @@ module D2LExpected
   
   TRUE_FALSE =
           {:question_type=>"multiple_choice_question",
-           :incorrect_comments=>"True is correct",
+           :incorrect_comments=>"",
            :points_possible=>1,
            :answers=>
                    [{:text=>"True",
@@ -113,7 +113,7 @@ module D2LExpected
                    "<p>Is this <strong>true</strong> or false?</p><img src=\"quizzing/bunny_consumer.png\" alt=\"\">",
            :question_name=>"true false questions",
            :migration_id=>"OBJ_3503037",
-           :correct_comments=>"True is correct"}
+           :correct_comments=>""}
 
   ASSESSMENT = {:migration_id=>"qti",
                 :question_count=>1,

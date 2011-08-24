@@ -158,9 +158,9 @@ class AssessmentItemConverter
   def get_feedback
     @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |f|
       id = f['identifier']
-      if id =~ /wrong|incorrect/i
+      if id =~ /wrong|incorrect|(_IC$)/i
         extract_feedback!(@question, :incorrect_comments, f)
-      elsif id =~ /correct/i
+      elsif id =~ /correct|(_C$)/i
         if f.at_css('div.solution')
           @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
         else
@@ -321,11 +321,6 @@ class AssessmentItemConverter
       id = feedback['identifier']
       node = feedback.at_css('p') || feedback.at_css('div')
       feedback_hash[id] = node
-
-      if @question[:feedback_id] == id
-        extract_feedback!(@question, :correct_comments, node)
-        extract_feedback!(@question, :incorrect_comments, node)
-      end
     end
     
     #clear extra entries
@@ -351,7 +346,7 @@ class AssessmentItemConverter
     end
     # Sometimes individual answers are assigned general feedback, don't return
     # the identifier if that's the case
-    id =~ /general|all|wrong|incorrect|correct/i ? nil : id
+    id =~ /general|all|wrong|incorrect|correct|(_IC$)|(_C$)/i ? nil : id
   end
 
 end

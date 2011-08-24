@@ -197,7 +197,8 @@ module RespondusExpected
                   :question_type=>"multiple_answers_question",
                   :question_text=>"Select all answers that rhyme with \"box\"."}
   MULTIPLE_CHOICE =
-          {:correct_comments=>"No, that's not \"C\", that's \"A\"",
+          {       :correct_comments => '',
+                  :incorrect_comments => '',
                   :question_name=>"Multiple Choice",
                   :migration_id=>"QUE_1004",
                   :answers=>
@@ -218,7 +219,6 @@ module RespondusExpected
                                    :migration_id=>"QUE_1009_A4",
                                    :text=>"E",
                                    :weight=>0}],
-                  :incorrect_comments=>"No, that's not \"C\", that's \"A\"",
                   :points_possible=>1,
                   :neutral_comments=>
                           "Well, the correct answer should have been \"C\". If you didn't put that, you're wrong.",
@@ -231,17 +231,17 @@ module RespondusExpected
           {
                   :neutral_comments=> "Like I said, the correct answer should have been \"false\". If you didn't select \"false\" you deserve to be called an idiot.",
                   :answers=>
-                          [{:comments=>"No, the correct answer is \"false\"",
+                          [{
                                    :text=>"True",
                                    :weight=>0,
                                    :migration_id=>"QUE_1017_A1"},
-                           {:comments=>"Yes, that is the correct answer!",
+                           {
                                    :text=>"False",
                                    :weight=>100,
                                    :migration_id=>"QUE_1018_A2"}],
                   :question_type=>"multiple_choice_question",
                   :question_text=>"The correct answer is \"false\"",
-                  :correct_comments=>"No, the correct answer is \"false\"",
+                  :correct_comments=>"Yes, that is the correct answer!",
                   :incorrect_comments=>"No, the correct answer is \"false\"",
                   :question_name=>"True False Question",
                   :points_possible=>1,
