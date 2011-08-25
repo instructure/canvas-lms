@@ -21,6 +21,7 @@ var wikiSidebar;
 // take a little bit of work.  I just wrapped it in a closure for now
 // to not pollute the global namespace, but it could use more.
 var quiz = {};
+var maxCombinations;
 I18n.scoped('quizzes', function(I18n) {
   quiz = {
     uniqueLocalIDStore: {},
@@ -2425,6 +2426,12 @@ I18n.scoped('quizzes', function(I18n) {
       $table.find("thead tr").append($th);
       $table.find("tbody").empty();
       var cnt = parseInt($question.find(".combination_count").val(), 10) || 10;
+      if (cnt < 0) {
+        cnt = 10;
+      } else if (cnt > maxCombinations) {
+        cnt = maxCombinations;
+      }
+      $question.find(".combination_count").val(cnt);
       var succeeded = 0;
       var existingCombinations = {};
       var mod = 0;
