@@ -695,6 +695,27 @@ describe "security" do
         get "/courses/#{@course.id}/imports"
         response.should be_success
       end
+
+      it 'read_reports' do
+        student_in_course(:active_all => 1)
+        add_permission :read_roster
+
+        get "/courses/#{@course.id}/users/#{@student.id}"
+        response.should be_success
+        response.body.should_not match "Access Report"
+
+        get "/courses/#{@course.id}/users/#{@student.id}/usage"
+        response.status.should == '401 Unauthorized'
+
+        add_permission :read_reports
+
+        get "/courses/#{@course.id}/users/#{@student.id}"
+        response.should be_success
+        response.body.should match "Access Report"
+
+        get "/courses/#{@course.id}/users/#{@student.id}/usage"
+        response.should be_success
+      end
     end
   end
 end
