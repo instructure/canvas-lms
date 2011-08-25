@@ -30,7 +30,8 @@ describe "learning outcome test" do
     threshold_input.clear
     threshold_input.send_keys('4')
     driver.find_element(:id, 'edit_outcome_form').submit
-    wait_for_dom_ready
+    wait_for_ajax_requests
+    wait_for_animations
     driver.find_element(:link, outcome_name).should be_displayed
     driver.find_element(:css, '.show_details_link').click
     find_all_with_jquery('#outcomes .rubric_criterion .rating:visible').size.should eql(3)
@@ -83,7 +84,8 @@ describe "learning outcome test" do
 
     #save and check rubric
     driver.find_element(:id, 'edit_rubric_form').submit
-    wait_for_dom_ready
+    wait_for_ajax_requests
+    wait_for_animations
     driver.find_element(:css, '#rubrics .edit_rubric_link img').should be_displayed
     find_all_with_jquery('#rubrics tr.criterion:visible').size.should == 3
     driver.find_element(:css, '#left-side .outcomes').click

@@ -7,6 +7,7 @@ describe "speedgrader selenium tests" do
     @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
     @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
     @submission = @assignment.submit_homework(@student, :body => 'first student submission text')
+    @submission.save!
   end
 
   before(:each) do
@@ -36,7 +37,7 @@ describe "speedgrader selenium tests" do
 
     #click to view next submission and check text
     driver.find_element(:css, '#gradebook_header .next').click
-    wait_for_dom_ready
+    wait_for_ajax_requests
     in_frame 'speedgrader_iframe' do
       driver.
         find_element(:id, 'main').should include_text(submission_2.body)
@@ -93,7 +94,7 @@ describe "speedgrader selenium tests" do
         find_element(:id, 'main').should_not include_text(second_message)
     end
     driver.find_element(:css, '#gradebook_header a.next').click
-    wait_for_dom_ready
+    wait_for_ajax_requests
     in_frame 'speedgrader_iframe' do
       driver.
         find_element(:id, 'main').should_not include_text(first_message)
@@ -105,13 +106,15 @@ describe "speedgrader selenium tests" do
   it "should grade assignment using rubric" do
     student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_dom_ready
+    wait_for_animations
 
     #test opening and closing rubric
-    driver.find_element(:css, '.toggle_full_rubric').click
-    driver.find_element(:id, 'rubric_full').should be_displayed
+    keep_trying_until{
+      driver.find_element(:css, '.toggle_full_rubric').click
+      driver.find_element(:id, 'rubric_full').should be_displayed
+    }
     driver.find_element(:css, '#rubric_holder .hide_rubric_link').click
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:id, 'rubric_full').should_not be_displayed
     driver.find_element(:css, '.toggle_full_rubric').click
     driver.find_element(:id, 'rubric_full').should be_displayed
@@ -129,11 +132,14 @@ describe "speedgrader selenium tests" do
   it "should create a comment on assignment" do
     student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_dom_ready
+    wait_for_animations
 
     #check media comment
-    driver.find_element(:css, ".media_comment_link").click
-    keep_trying_until{ driver.find_element(:id, "audio_record_option").should be_displayed }
+    keep_trying_until{ 
+      #driver.find_element(:css, "#add_a_comment .media_comment_link").click
+      driver.execute_script("$('#add_a_comment .media_comment_link').click();")
+      driver.find_element(:id, "audio_record_option").should be_displayed
+    }
     driver.find_element(:id, "video_record_option").should be_displayed
     driver.find_element(:css, '.ui-icon-closethick').click
     driver.find_element(:id, "audio_record_option").should_not be_displayed 

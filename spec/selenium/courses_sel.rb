@@ -27,11 +27,11 @@ shared_examples_for "course selenium tests" do
     checklist_button = driver.find_element(:css, '#course_show_secondary .wizard_popup_link')
     checklist_button.click
     wizard_box = driver.find_element(:id, "wizard_box")
-    wait_for_dom_ready
+    wait_for_animations
     wizard_box.should be_displayed
     checklist_button.should_not be_displayed
     wizard_box.find_element(:css, ".close_wizard_link").click
-    wait_for_dom_ready
+    wait_for_animations
     wizard_box.displayed?.should be_false
     checklist_button.displayed?.should be_true
 
@@ -85,7 +85,7 @@ shared_examples_for "course selenium tests" do
     driver.find_element(:css, '.substitutions > .substitution').should be_displayed
 
     driver.find_element(:id, 'copy_context_form').submit
-    wait_for_dom_ready
+    wait_for_animations
     keep_trying_until{ driver.find_element(:css, '#copy_results > h2').should include_text('Copy Succeeded') }
   end
 

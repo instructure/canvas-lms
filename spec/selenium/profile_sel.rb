@@ -44,7 +44,7 @@ shared_examples_for "profile selenium tests" do
       should include_text(I18n.t(:grading_description, 'For course grading alerts'))
     #add new notification and select different email
     content_tbody.find_element(:css, '.add_notification_link').click
-    wait_for_dom_ready
+    wait_for_animations
     email_select_css = '#content > table > tbody > tr:nth-child(4) > td > span > select'
     option_value = find_option_value(:css, email_select_css, second_email)
     driver.find_element(:css, email_select_css+' > option[value="'+option_value+'"]').click

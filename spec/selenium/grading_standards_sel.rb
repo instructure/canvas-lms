@@ -14,6 +14,7 @@ shared_examples_for "grading standards selenium tests" do
     standard.find_elements(:css, ".delete_row_link").select(&:displayed?).each_with_index do |link, i|
       if i % 2 == 1
         link.click
+        wait_for_animations
         keep_trying_until { !link.displayed? }
       end
     end

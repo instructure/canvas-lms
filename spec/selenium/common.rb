@@ -239,17 +239,30 @@ shared_examples_for "all selenium tests" do
         }, 1);
       });
     JS
-    dom_is_ready = false
+    dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
     until (dom_is_ready) do
+      sleep 1
       dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
-      sleep 1 
     end
   end
   
   def wait_for_ajax_requests
     keep_trying_until { driver.execute_script("return $.ajaxJSON.inFlighRequests") == 0 }
   end
-  
+ 
+  def wait_for_animations
+    animations = driver.execute_script("return $(':animated').length")
+    until (animations == 0) do
+      sleep 1
+      animations = driver.execute_script("return $(':animated').length")
+    end
+  end
+
+  def wait_for_ajaximations
+    wait_for_ajax_requests
+    wait_for_animations
+  end
+
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
     seconds.times do |i|
       puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN

@@ -324,10 +324,13 @@ shared_examples_for "quiz selenium tests" do
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
 
-    driver.find_element(:link, "Find Questions").click
     keep_trying_until {
-      driver.find_element(:link, "Select All")
-    }.click
+      driver.find_element(:css, '.find_question_link').click
+      driver.find_element(:id, 'find_question_dialog').should be_displayed
+      wait_for_ajaximations
+      driver.find_element(:link, "Select All").should be_displayed
+    }
+    driver.find_element(:link, "Select All").click
     find_with_jquery("div#find_question_dialog button.submit_button").click
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
 
@@ -356,14 +359,21 @@ shared_examples_for "quiz selenium tests" do
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
 
-    driver.find_element(:link, "Find Questions").click
     keep_trying_until {
-      driver.find_element(:link, "Select All")
+      driver.find_element(:css, '.find_question_link').click
+      driver.find_element(:id, 'find_question_dialog').should be_displayed
+      wait_for_ajaximations
+    driver.find_element(:link, "Select All").should be_displayed
     }
     find_all_with_jquery("#find_question_dialog .bank:visible").size.should eql 1
 
-    driver.find_element(:link, "New Question Group").click
+    driver.find_element(:css, '.ui-icon-closethick').click
+    keep_trying_until {
+      driver.find_element(:css, '.add_question_group_link').click
+      driver.find_element(:css, '.find_bank_link').should be_displayed
+    }
     driver.find_element(:link, "Link to a Question Bank").click
+    wait_for_ajaximations
     find_all_with_jquery("#find_bank_dialog .bank:visible").size.should eql 1
   end
 

@@ -64,9 +64,12 @@ shared_examples_for "conversations selenium tests" do
 
       add_attachment_link = driver.find_element(:id, "action_add_attachment")
       add_attachment_link.click
+      wait_for_animations
       add_attachment_link.click
+      wait_for_animations
       add_attachment_link.click
-      keep_trying_until{ find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 3 }
+      wait_for_animations
+      find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 3
     end
 
     it "should be able to remove attachments from the message form" do
@@ -74,9 +77,12 @@ shared_examples_for "conversations selenium tests" do
 
       add_attachment_link = driver.find_element(:id, "action_add_attachment")
       add_attachment_link.click
+      wait_for_animations
       add_attachment_link.click
-      keep_trying_until{ find_all_with_jquery("#attachment_list > .attachment:visible .remove_link")[1] }.click
-      keep_trying_until{ find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 1 }
+      wait_for_animations
+      find_all_with_jquery("#attachment_list > .attachment:visible .remove_link")[1].click
+      wait_for_animations
+      find_all_with_jquery("#attachment_list > .attachment:visible").size.should == 1
     end
 
     it "should save attachments on initial messages on new conversations" do

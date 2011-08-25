@@ -29,7 +29,7 @@ describe "assignment selenium tests" do
     driver.find_element(:css, ".mini_calendar_day.date_#{due_date.strftime("%m_%d_%Y")}").
       attribute('class').should match /has_event/
   end
-  
+
   it "should not allow XSS attacks through rubric descriptions" do
     course_with_teacher_logged_in
     
@@ -64,20 +64,21 @@ describe "assignment selenium tests" do
     ]
     @rubric.save!
     @rubric.associate_with(@assignment, @course, :purpose => 'grading')
-    
+  
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     
     driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
-    driver.find_element(:id, "rubric_long_description_dialog").
-           find_element(:css, "div.displaying .long_description").
+    driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
            text.should == "<b>This text should not be bold</b>"
-    
+    driver.find_element(:css, '.ui-icon-closethick').click 
+   
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     
     driver.find_element(:css, ".toggle_full_rubric").click
-    driver.find_element(:id, "rubric_#{@rubric.id}").find_element(:css, ".long_description_link").click
-    driver.find_element(:id, "rubric_long_description_dialog").
-           find_element(:css, "div.displaying .long_description").
+    wait_for_animations
+    driver.find_element(:css, '#criterion_1 .long_description_link').click
+    keep_trying_until { driver.find_element(:id, 'rubric_long_description_dialog').should be_displayed }
+    driver.find_element(:css, "#rubric_long_description_dialog div.displaying .long_description").
            text.should == "<b>This text should not be bold</b>"
   end
 
@@ -98,7 +99,7 @@ describe "assignment selenium tests" do
     day_id = 'day_' + due_date.year.to_s() + '_' + due_date.strftime('%m') + '_' + due_date.strftime('%d')
     day_div = driver.find_element(:id, day_id)
     day_div.find_element(:link, assignment_name).click
-    wait_for_dom_ready
+    wait_for_animations
     details_dialog = driver.find_element(:id, 'event_details').find_element(:xpath, '..')
     details_dialog.should include_text(assignment_name)
     details_dialog.find_element(:css, '.edit_event_link').click
@@ -114,11 +115,11 @@ describe "assignment selenium tests" do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/assignments"
 
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:css, '#right-side .add_group_link').click
     driver.find_element(:id, 'assignment_group_name').send_keys('test group')
     driver.find_element(:id, 'add_group_form').submit
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:id, 'add_group_form').should_not be_displayed
     driver.find_element(:css, '#groups .assignment_group').should include_text('test group')
   end
@@ -153,7 +154,7 @@ describe "assignment selenium tests" do
       I18n.t('options.never_drop', 'Never Drop')
     )
     driver.find_element(:css, never_drop_css + ' option[value="'+option_value+'"]').click
-    wait_for_dom_ready
+    wait_for_animations
     assignment_css = '.form_rules div:nth-child(3) .never_drop_assignment select'
     keep_trying_until{ driver.find_element(:css, assignment_css).displayed? }
     option_value = find_option_value(:css, assignment_css, assignment.title)
@@ -179,7 +180,7 @@ describe "assignment selenium tests" do
     # the input
     driver.find_element(:css, 'input.weight').clear
     #need to wait for the total to update
-    wait_for_dom_ready
+    wait_for_animations
     keep_trying_until{ driver.find_element(:id, 'group_weight_total').text.should == '50%' }
 
   end
@@ -205,7 +206,7 @@ describe "assignment selenium tests" do
       find_element(:id, 'add_assignment_form').submit
 
     #make sure assignment was added to correct assignment group
-    wait_for_dom_ready
+    wait_for_animations
     first_group = driver.find_element(:css, '#groups .assignment_group:nth-child(2)')
     first_group.should include_text('second group')
     first_group.should include_text(assignment_name)
@@ -241,10 +242,10 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '#assignment_grading_type option[value="letter_grade"]').click
 
     #check grading levels dialog
-    wait_for_dom_ready
+    wait_for_animations
     keep_trying_until{ driver.find_element(:css, 'a.edit_letter_grades_link').should be_displayed }
     driver.find_element(:css, 'a.edit_letter_grades_link').click
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:id, 'ui-dialog-title-edit_letter_grades_form').should be_displayed
     driver.find_element(:css, '.ui-icon-closethick').click
     driver.find_element(:id, 'ui-dialog-title-edit_letter_grades_form').should_not be_displayed
@@ -260,7 +261,7 @@ describe "assignment selenium tests" do
 
     #save changes
     driver.find_element(:id, 'edit_assignment_form').submit
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:css, 'h2.title').should include_text(assignment_name + ' edit')
   end
 
@@ -282,7 +283,7 @@ describe "assignment selenium tests" do
     driver.find_element(:css, '.rubric_title input[name="title"]').clear
     driver.find_element(:css, '.rubric_title input[name="title"]').send_keys('new rubric')
     driver.find_element(:id, 'edit_rubric_form').submit
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:css, '#rubrics .rubric .rubric_title .displaying .title').should include_text('new rubric')
   end
 

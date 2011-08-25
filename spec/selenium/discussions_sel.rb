@@ -46,10 +46,11 @@ shared_examples_for "discussions selenium tests" do
     form.find_element(:id, 'discussion_topic_podcast_enabled').click
 
     form.find_element(:css, ".submit_button").click
-    wait_for_dom_ready
+    wait_for_ajax_requests
+    wait_for_animations
 
     driver.find_element(:css, '.discussion_topic .podcast img').click
-    wait_for_dom_ready
+    wait_for_animations
     driver.find_element(:css, '#podcast_link_holder .feed').should be_displayed
 
   end
