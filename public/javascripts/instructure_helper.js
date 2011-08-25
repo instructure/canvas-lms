@@ -89,42 +89,6 @@ I18n.scoped('instructure', function(I18n) {
     });
     return result;
   };
-  
-  
-  // this is just pulled from jquery 1.6 because jquery 1.5 could not do .map on an object
-  $.map = function (elems, callback, arg) {
-    var value, key, ret = [],
-        i = 0,
-        length = elems.length,
-
-
-        // jquery objects are treated as arrays
-        isArray = elems instanceof jQuery || length !== undefined && typeof length === "number" && ((length > 0 && elems[0] && elems[length - 1]) || length === 0 || jQuery.isArray(elems));
-
-    // Go through the array, translating each of the items to their
-    if (isArray) {
-      for (; i < length; i++) {
-        value = callback(elems[i], i, arg);
-
-        if (value != null) {
-          ret[ret.length] = value;
-        }
-      }
-
-      // Go through every key on the object,
-    } else {
-      for (key in elems) {
-        value = callback(elems[key], key, arg);
-
-        if (value != null) {
-          ret[ret.length] = value;
-        }
-      }
-    }
-
-    // Flatten any nested arrays
-    return ret.concat.apply([], ret);
-  }
 
   // add ability to handle css3 opacity transitions on show or hide
   // if you want to use this just add the class 'use-css-transitions-for-show-hide' to an element.
@@ -791,7 +755,7 @@ I18n.scoped('instructure', function(I18n) {
           val = $input.editorBox('get_code', false);
         }
       } catch(e) {}
-      var attr = $input.attr('name');
+      var attr = $input.prop('name') || '';
       var multiValue = attr.match(/\[\]$/)
       if(inputType == 'hidden' && !multiValue) {
         if($form.find("[name='" + attr + "']").filter("textarea,:radio:checked,:checkbox:checked,:text,:password,select,:hidden")[0] != $input[0]) {
@@ -2853,24 +2817,33 @@ I18n.scoped('instructure', function(I18n) {
     });
     return $picker;
   };
+
+  // This is so that if you disable an element, that it also gives it the class disabled.  
+  // that way you can add css classes for our friend IE6. so rather than using selector:disabled, 
+  // you can do selector.disabled.
+  // works on both $(elem).attr('disabled', ...) AND $(elem).prop('disabled', ...)
+  $.each([ "prop", "attr" ], function(i, propOrAttr ) {
+    // set the `disabled.set` hook like this so we don't override any existing `get` hook
+    $[propOrAttr+'Hooks'].disabled = jQuery.extend( $[propOrAttr+'Hooks'].disabled, {
+      set: function( elem, value, name ) {
+        $(elem).toggleClass('disabled', !!value);
   
-  // This is a patch that so that if you disable an element, that it also gives it the class disabled.  
-  // that way you can add css classes for our friend IE6. so rather than using selector:disabled, you can do selector.disabled.
-  // I patch the $.attr method, not the $.fn.attr method because both $.fn.attr and $.fn.removeAttr use $.attr. 
-  // which means that it will get run trough this both when you disable AND remove the 'disabled' attribute on an element.
-  $.attrBeforeHandlingDisabled = $.attr;
-  $.attr = function( elem, name, value, pass ){
-    if(typeof(name) === "string" && name.toLowerCase() === 'disabled' && value !== undefined) {
-      $(elem)[(value ? "add" : "remove") + "Class"]('disabled');
-    }
-    return $.attrBeforeHandlingDisabled.apply(this, arguments);
-  };
-  
+        // have to replicate wat jQuery's boolHook does because once you define your own hook
+        // for an attribute/property it wont fall back to boolHook. and it is not exposed externally.
+        elem[value ? 'setAttribute' : 'removeAttribute' ]('disabled', 'disabled');
+        if ( 'disabled' in elem ) {
+          // Only set the IDL specifically if it already exists on the element
+          // ie for an <input> but not a <div> 
+          elem.disabled = !!value;
+        }
+        return value;
+      }
+    });
+  });
+
   // this is a patch so you can set the "method" atribute on rails' REST-ful forms.
-  $.attrBeforeHandlingFormMethod = $.attr;
-  $.attr = function( elem, name, value, pass ) {
-    // if it's an html node and if we are trying to set the 'method' attribute
-    if ( elem && value && typeof(name) === "string" && name.toLowerCase() == 'method') {
+  $.attrHooks.method = $.extend($.attrHooks.method, {
+    set: function( elem, value ) {
       var orginalVal = value;
       value = value.toUpperCase() === 'GET' ? 'GET' : 'POST';
       if ( value === 'POST' ) {
@@ -2880,10 +2853,10 @@ I18n.scoped('instructure', function(I18n) {
         }
         $input.val(orginalVal);
       }
+      elem.setAttribute('method', value);
+      return value;
     }
-    // can't do .apply because we need to pas the NEW 'value' that we set above, not the one in 'arguments'
-    return $.attrBeforeHandlingFormMethod.call( this, elem, name, value, pass );
-  };
+  });
   
   $.fn.indicate = function(options) {
     options = options || {};

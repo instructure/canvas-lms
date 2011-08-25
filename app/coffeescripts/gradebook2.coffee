@@ -316,8 +316,8 @@ I18n.scoped 'gradebook2', (I18n) ->
 
     initHeader: () =>
       if @sections_enabled
-        $courseSectionTemplate = jQUI19('#course_section_template').removeAttr('id').detach()
-        $sectionToShowMenu = jQUI19('#section_to_show').next()
+        $courseSectionTemplate = $('#course_section_template').removeAttr('id').detach()
+        $sectionToShowMenu = $('#section_to_show').next()
         allSectionsText = $('#section_being_shown').text()
         $('#section_being_shown').text(@sections[@sectionToShow].name) if @sectionToShow
         for i, section of @sections
@@ -329,7 +329,7 @@ I18n.scoped 'gradebook2', (I18n) ->
             .find('input')
               .attr(id: "section_option_#{section.id}", value: section.id)
               .prop('checked', section.id == @sectionToShow)
-        jQUI19('#section_to_show').show().kyleMenu
+        $('#section_to_show').show().kyleMenu
           buttonOpts: {icons: {primary: "ui-icon-sections", secondary: "ui-icon-droparrow"}}
         $sectionToShowMenu.bind 'menuselect', (event, ui) =>
           @sectionToShow = Number($sectionToShowMenu.find('input[name="section_to_show_radio"]:checked').val()) || undefined
@@ -337,14 +337,14 @@ I18n.scoped 'gradebook2', (I18n) ->
           $('#section_being_shown').text(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
           @buildRows()
 
-      $settingsMenu = jQUI19('#gradebook_settings').next()
+      $settingsMenu = $('#gradebook_settings').next()
       $.each ['show_attendance', 'include_ungraded_assignments'], (i, setting) =>
         $settingsMenu.find("##{setting}").prop('checked', @[setting]).change (event) =>
           @[setting] = $(event.target).is(':checked')
           $.store.userSet "#{setting}_#{@options.context_code}", (''+@[setting])
           @buildRows()
 
-      jQUI19('#gradebook_settings').show().kyleMenu
+      $('#gradebook_settings').show().kyleMenu
         buttonOpts: {icons: {primary: "ui-icon-cog", secondary: "ui-icon-droparrow"}}
 
       $settingsMenu.find('.gradebook_upload_link').click (event) ->

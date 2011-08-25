@@ -2,7 +2,7 @@
 <% js_block do %>
 <script>
 $(function() {
-  jQUI19('#section_to_show')
+  $('#section_to_show')
     .kyleMenu()
     .next().bind('menuselect', function(event, ui){
       $("<div/>").text("Selected: " + ui.item.text()).appendTo("#log");

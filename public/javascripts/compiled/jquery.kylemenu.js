@@ -23,7 +23,7 @@
         open: function(event) {
           var $trigger, actualOffset, caratOffset, differenceInWidth, triggerWidth;
           $(this).find(".ui-menu-carat").remove();
-          $trigger = jQUI19(this).popup("option", "trigger");
+          $trigger = $(this).popup("option", "trigger");
           triggerWidth = $trigger.width();
           differenceInWidth = $(this).width() - triggerWidth;
           actualOffset = event.pageX - $trigger.offset().left;

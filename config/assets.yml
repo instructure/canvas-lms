@@ -11,8 +11,38 @@ javascripts:
     - public/javascripts/datejs_to_iso_string_patch.js
     - public/javascripts/date.js
     - public/javascripts/handlebars.vm.js
-    - public/javascripts/jquery-1.5.2.js
-    - public/javascripts/jquery-ui-1.8.js
+    - public/javascripts/jquery-1.6.4.js
+    # jquery ui modules and effects that we don't actually use are commented out to reduce payload
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.core.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.widget.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.mouse.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.position.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.draggable.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.droppable.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.resizable.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.selectable.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.sortable.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.accordion.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.autocomplete.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.button.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.dialog.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.slider.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.tabs.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.datepicker.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.ui.progressbar.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.core.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.blind.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.bounce.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.clip.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.drop.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.explode.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.fold.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.highlight.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.pulsate.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.scale.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.shake.js
+    - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.slide.js
+    # - public/javascripts/jquery-ui-1.8.16/ui/jquery.effects.transfer.js
     - public/javascripts/i18n.js
     - public/javascripts/jquery.ba-throttle-debounce.js
     - public/javascripts/jquery.ba-tinypubsub.js
@@ -132,7 +162,6 @@ javascripts:
   datagrid:
     - public/javascripts/datagrid.js
   jquery_ui_menu:
-    - public/javascripts/jquery-1.6.2.js
     - public/javascripts/jquery.ui.core-1.9.js
     - public/javascripts/jquery.ui.position-1.9.js
     - public/javascripts/jquery.ui.widget-1.9.js
@@ -141,7 +170,6 @@ javascripts:
     - public/javascripts/jquery.ui.popup-1.9.js
     - public/javascripts/jquery.ui.menu.inputmenu.js
     - public/javascripts/compiled/jquery.kylemenu.js
-    - public/javascripts/jquery.ui.menu-1.9_unsetup.js
   gradebook2:
     - public/javascripts/compiled/multi_grid.js
     - public/javascripts/compiled/grade_calculator.js

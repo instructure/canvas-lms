@@ -416,8 +416,8 @@
       Gradebook.prototype.initHeader = function() {
         var $courseSectionTemplate, $sectionToShowMenu, $settingsMenu, allSectionsText, i, section, _ref;
         if (this.sections_enabled) {
-          $courseSectionTemplate = jQUI19('#course_section_template').removeAttr('id').detach();
-          $sectionToShowMenu = jQUI19('#section_to_show').next();
+          $courseSectionTemplate = $('#course_section_template').removeAttr('id').detach();
+          $sectionToShowMenu = $('#section_to_show').next();
           allSectionsText = $('#section_being_shown').text();
           if (this.sectionToShow) {
             $('#section_being_shown').text(this.sections[this.sectionToShow].name);
@@ -430,7 +430,7 @@
               value: section.id
             }).prop('checked', section.id === this.sectionToShow);
           }
-          jQUI19('#section_to_show').show().kyleMenu({
+          $('#section_to_show').show().kyleMenu({
             buttonOpts: {
               icons: {
                 primary: "ui-icon-sections",
@@ -445,7 +445,7 @@
             return this.buildRows();
           }, this));
         }
-        $settingsMenu = jQUI19('#gradebook_settings').next();
+        $settingsMenu = $('#gradebook_settings').next();
         $.each(['show_attendance', 'include_ungraded_assignments'], __bind(function(i, setting) {
           return $settingsMenu.find("#" + setting).prop('checked', this[setting]).change(__bind(function(event) {
             this[setting] = $(event.target).is(':checked');
@@ -453,7 +453,7 @@
             return this.buildRows();
           }, this));
         }, this));
-        jQUI19('#gradebook_settings').show().kyleMenu({
+        $('#gradebook_settings').show().kyleMenu({
           buttonOpts: {
             icons: {
               primary: "ui-icon-cog",

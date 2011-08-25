@@ -267,7 +267,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     # now move it down 30px from 200px high
     resizer = driver.find_element(:class, 'editor_box_resizer')
     keep_trying_until { driver.action.drag_and_drop_by(resizer, 0, 30).perform; true }
-    driver.execute_script("return $('#wiki_page_body_ifr').height()").should eql(230)
+    driver.execute_script("return $('#wiki_page_body_ifr').height()").should be_close 230, 2
     resizer.attribute('style').should be_blank
   end
   

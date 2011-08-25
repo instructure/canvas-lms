@@ -80,7 +80,7 @@ describe "learning outcome test" do
     outcome_div.find_element(:css, '.select_outcome_link').click
     driver.find_element(:id, 'find_outcome_criterion_dialog').should_not be_displayed
     driver.find_element(:css, '#criterion_3 .learning_outcome_flag').should be_displayed
-    driver.find_element(:css, '#criterion_3 td.points_form').should include_text('--')
+    driver.find_element(:css, '#criterion_3 td.points_form').should include_text('3 pts')
 
     #save and check rubric
     driver.find_element(:id, 'edit_rubric_form').submit

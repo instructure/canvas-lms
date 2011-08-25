@@ -418,24 +418,24 @@ $(document).ready(function() {
     }
     $("#copy_files_list").showIf(file_count > 0);
     $("#copy_context_form .course_name").text(data.name);
-    $("#copy_everything").attr('checked', true).change();
+    $("#copy_everything").prop('checked', true).change();
   });
   $("#copy_context_form :checkbox").change(function() {
     if($(this).hasClass('copy_all')) {
-      $(this).parent().nextAll("ul").find(":checkbox:not(.secondary_checkbox)").attr('checked', $(this).attr('checked')).each(function() { $(this).triggerHandler('change'); });
+      $(this).parent().nextAll("ul").find(":checkbox:not(.secondary_checkbox)").prop('checked', $(this).prop('checked')).each(function() { $(this).triggerHandler('change'); });
     } else if($(this).hasClass('copy_everything')) {
-      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything)").attr('checked', $(this).attr('checked')).filter(":not(.copy_all)").each(function() { $(this).triggerHandler('change'); });
+      $("#copy_context_form :checkbox:not(.secondary_checkbox):not(.copy_everything)").prop('checked', $(this).prop('checked')).filter(":not(.copy_all)").each(function() { $(this).triggerHandler('change'); });
     } else {
-      $(this).parent().find(":checkbox.secondary_checkbox").attr('checked', $(this).attr('checked'));
-      if(!$(this).attr('checked')) {
+      $(this).parent().find(":checkbox.secondary_checkbox").prop('checked', $(this).prop('checked'));
+      if(!$(this).prop('checked')) {
         $(this).parents("ul").each(function() {
-          $(this).prev("h2,h3,h4").find(":checkbox").attr('checked', false);
+          $(this).prev("h2,h3,h4").find(":checkbox").prop('checked', false);
         });
       }
     }
   });
   $(".shift_dates_checkbox").change(function() {
-    $(".shift_dates_settings").showIf($(this).attr('checked'));
+    $(".shift_dates_settings").showIf($(this).prop('checked'));
   }).change();
   $(".add_substitution_link").click(function(event) {
     event.preventDefault();

@@ -15,7 +15,7 @@
       open: (event) ->
         # handle sticking the carat right below where you clicked on the button
         $(this).find(".ui-menu-carat").remove()
-        $trigger = jQUI19(this).popup("option", "trigger")
+        $trigger = $(this).popup("option", "trigger")
         triggerWidth = $trigger.width()
         differenceInWidth = $(this).width() - triggerWidth
         actualOffset = event.pageX - $trigger.offset().left
