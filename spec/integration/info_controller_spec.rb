@@ -1,0 +1,42 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
+describe InfoController do
+  describe "#avatar_image_url" do
+    it "should clear the cache on avatar update" do
+      Account.default.tap { |a| a.enable_service(:avatars) }.save
+      enable_cache do
+        user
+        get "/images/users/#{@user.id}"
+        response.should be_redirect
+        response['Location'].should match(%r{gravatar})
+        response['Location'].should match(%r{no_pic})
+
+        @user.avatar_image = { 'type' => 'attachment', 'url' => '/images/thumbnails/blah' }
+        @user.save!
+
+        get "/images/users/#{@user.id}"
+        response.should be_redirect
+        response['Location'].should_not match(%r{gravatar})
+        response['Location'].should match(%r{/images/thumbnails/blah})
+      end
+    end
+  end
+end
