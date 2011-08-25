@@ -21,6 +21,7 @@ class ConversationMessage < ActiveRecord::Base
 
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
+  belongs_to :context, :polymorphic => true
   has_many :conversation_message_participants
   has_many :attachments, :as => :context, :order => 'created_at, id'
   delegate :participants, :to => :conversation
@@ -125,7 +126,7 @@ class ConversationMessage < ActiveRecord::Base
   def generate_user_note
     return unless recipients.size == 1
     recipient = recipients.first
-    return unless recipient.grants_right?(author, :create_user_notes)
+    return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
 
     self.extend TextHelper
     title = t(:subject, "Private message, %{timestamp}", :timestamp => date_string(created_at))
@@ -141,7 +142,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    conversation.reply_from(opts)
+    conversation.reply_from(opts.merge(:context => self.context))
   end
 
   def forwarded_messages

@@ -225,10 +225,10 @@ class AssociateInteraction < AssessmentItemConverter
   end
 
   def extract_answer!(answer, node)
-    answer[:text] = clear_html(node.text).strip.gsub(/\s+/, " ")
-    sanitized = sanitize_html!(node.at_css('div.html') ? Nokogiri::HTML::DocumentFragment.parse(node.text) : node, true)
-    if sanitized.present? && sanitized != CGI::escapeHTML(answer[:text])
-      answer[:html] = sanitized
+    text, html = detect_html(node)
+    answer[:text] = text
+    if html.present?
+      answer[:html] = html
     end
   end
 

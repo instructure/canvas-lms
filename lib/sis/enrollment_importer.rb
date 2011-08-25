@@ -127,11 +127,6 @@ module SIS
                     enrollment.type = 'DesignerEnrollment'
                   end
 
-                  # "active" really means "active if otherwise available"
-                  if row['status']=~ /\Aactive/i
-                    row['status'] = course.enrollment_state_based_on_date(enrollment)
-                  end
-
                   if row['status']=~ /\Aactive/i
                     if user.workflow_state != 'deleted'
                       enrollment.workflow_state = 'active'

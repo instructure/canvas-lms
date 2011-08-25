@@ -65,8 +65,9 @@
       </ul>
       <table>
         <tr id="recipient_info"><th><%= label_tag :recipients, :to, :en => "To", :before => true %></th><td><%= text_field_tag :recipients, nil, :finder_url => conversations_find_recipients_url, :class => "recipients" %></td></tr>
-        <tr id="group_conversation_info"><th></th><td><%= check_box_tag :group_conversation %> <%= label_tag :group_conversation, :en => "This is a group conversation. Participants will see all messages" %></td></tr>
         <tr><th><%= label_tag :body, :message, :en => "Message", :before => true %></th><td><%= text_area_tag :body %></td></tr>
+        <tr id="group_conversation_info"><th></th><td><%= check_box_tag :group_conversation %> <%= label_tag :group_conversation, :en => "This is a group conversation. Participants will see all messages" %></td></tr>
+        <tr id="user_note_info"><th></th><td><%= check_box_tag :user_note, "1", false, :id => :add_to_faculty_journal %> <%= label_tag :add_to_faculty_journal, :en => "Add as a Faculty Journal entry" %></td></tr>
         <tr>
           <th>&nbsp;</th>
           <td>
@@ -221,6 +222,9 @@
     MessageInbox.initial_conversations_count = <%= @conversations_count %>;
     MessageInbox.scope = <%= raw @scope.to_json %>;
     MessageInbox.label_scope = <%= raw @label.to_json %>;
+    <% # TODO: get note-enabled-ness per account, and cross reference with the recipient's associated account ids. this is already enforced in the model %>
+    MessageInbox.notes_enabled = <%= raw @current_user.associated_accounts.any?{|a| a.enable_user_notes } %>;
+    MessageInbox.can_add_notes_for_account = MessageInbox.notes_enabled && <%= raw @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) } %>;
     <% unless @current_user.watched_conversations_intro? %>
     $.conversationsIntroSlideshow()
     <% end %>

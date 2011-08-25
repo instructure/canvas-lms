@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  http://<%= HostUrl.default_host %>/conversations/#/conversations/<%= asset.conversation_id %>
+  http://<%= HostUrl.context_host(asset.context) %>/conversations/#/conversations/<%= asset.conversation_id %>
 <% end %>
 <% define_content :user_name do %>
   <%= asset.author.short_name rescue t(:unknown_user, "Unknown User") %>

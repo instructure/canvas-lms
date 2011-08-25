@@ -84,8 +84,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       res = config.test_ldap_search
       h = {
         :account_authorization_config_id => config.id,
-        :ldap_search_test => res ? res > 0 : false,
-        :ldap_search_results => res
+        :ldap_search_test => res
       }
       results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
     end
