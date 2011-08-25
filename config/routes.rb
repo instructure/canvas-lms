@@ -175,6 +175,7 @@ ActionController::Routing::Routes.draw do |map|
     course.resources :conferences do |conference|
       conference.join "join", :controller => "conferences", :action => "join"
       conference.close "close", :controller => "conferences", :action => "close"
+      conference.settings "settings", :controller => "conferences", :action => "settings"
     end
     
     course.resources :question_banks do |bank|
@@ -360,6 +361,7 @@ ActionController::Routing::Routes.draw do |map|
     group.resources :conferences do |conference|
       conference.join "join", :controller => "conferences", :action => "join"
       conference.close "close", :controller => "conferences", :action => "close"
+      conference.settings "settings", :controller => "conferences", :action => "settings"
     end
     group.chat 'chat', :controller => 'context', :action => 'chat'
     group.formatted_chat 'chat.:format', :controller => 'context', :action => 'chat'
