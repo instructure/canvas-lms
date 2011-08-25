@@ -1,3 +1,36 @@
+canvas-lms (1.1-52) professional; urgency=low
+
+  * Package ref: da047f047d6530a18454b8317d123e0772206219
+  *
+  * [+768b8c4] faculty note support in new inbox
+  * [+53a2937] quotify and linkify messages in conversations
+  * [+34ec7c4] tweak slideshow styling
+  * [+2cef2e6] include necessary js in discussion_replies
+  * [+89dbd50] fix coffeescript parse error
+  * [+ff5f72c] don't dump the entire customer ldap db on search test.
+  * [+a023841] use context_host, not default_host, in conversation notifications
+  * [+98ba692] fix faculty journal checks
+  * [+8c22b4a] fix broken query
+  * [+e6874de] fix linkify issue
+  * [+ba20d23] fix two mysql bugs wrt common courses and enrollment types
+  * [+c8b3c81] statelessly enforce enrollment date restrictions fixes #4996
+  * [+beab132] workflow_state is a string, not a symbol
+  * [+fc6740c] fix html escaping rubric long descriptions; fixes #5360
+  * [+b7d94e2] fix date-restricted inactive enrollments getting permissions from roleoverride
+  * [+2816979] fix mass assignment bug
+  * [+c290175] don't render un-sanitized html during edits, closes #5361
+  * [+d402682] don't stop processing incoming email on a failure
+  * [+cfc265b] speed up accounts' courses tab
+  * [+8db6a3e] add html/image support to quiz question/answer feedback
+  * [+37c1afb] fix saving new terms refs #4996
+  * [+a9a5cce] fix looking up enrollment status with no course or section; refs #4996
+  * [+6b863ba] really fix creating new terms
+  * [+16c21a6] prevent arbitrary profile viewing
+  * [+d47ff6f] fix wrong hostname in message emails
+  * [+da047f0] fix respondus qti imports feedback positioning, closes #5302
+
+ -- JT Olds <jt@instructure.com>  Thu, 25 Aug 2011 15:35:54 -0600
+
 canvas-lms (1.1-51) professional; urgency=low
 
   * Package ref: 7c1e9795061979475ec1d6f9b1b86de72728829b
