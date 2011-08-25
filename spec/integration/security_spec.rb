@@ -660,6 +660,8 @@ describe "security" do
         response.body.should_not match /Copy this Course/
         response.body.should_not match /Import Content into this Course/
         response.body.should match /Export this Course/
+        html.css('#course_account_id').should be_empty
+        html.css('#course_enrollment_term_id').should be_empty
 
         add_permission :manage_courses
 
@@ -668,6 +670,9 @@ describe "security" do
         response.body.should match /Copy this Course/
         response.body.should_not match /Import Content into this Course/
         response.body.should match /Export this Course/
+        html = Nokogiri::HTML(response.body)
+        html.css('#course_account_id').should_not be_empty
+        html.css('#course_enrollment_term_id').should_not be_empty
 
         get "/courses/#{@course.id}/copy"
         response.should be_success

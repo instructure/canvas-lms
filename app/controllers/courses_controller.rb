@@ -841,14 +841,14 @@ class CoursesController < ApplicationController
     @course = Course.find(params[:id])
     if authorized_action(@course, @current_user, :update)
       root_account_id = params[:course].delete :root_account_id
-      if root_account_id && current_user_is_site_admin?
+      if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)
       end
       standard_id = params[:course].delete :grading_standard_id
       if standard_id && @course.grants_right?(@current_user, session, :manage_grades)
         @course.grading_standard = GradingStandard.standards_for(@course, @current_user).detect{|s| s.id == standard_id.to_i }
       end
-      if @course.root_account.grants_right?(@current_user, session, :manage)
+      if @course.root_account.grants_right?(@current_user, session, :manage_courses)
         if params[:course][:account_id]
           account = Account.find(params[:course].delete(:account_id))
           @course.account = account if account != @course.account && account.grants_right?(@current_user, session, :manage)
