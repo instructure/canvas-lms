@@ -180,6 +180,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def export_content
+    check_quiz_id_prepender
     plugin = Canvas::Plugin.find(migration_settings['migration_type'])
     if plugin
       begin
@@ -204,6 +205,16 @@ class ContentMigration < ActiveRecord::Base
       migration_settings[:last_error] = message
       logger.error message
       self.save
+    end
+  end
+  
+  def check_quiz_id_prepender
+    if !migration_settings[:id_prepender] && !migration_settings[:overwrite_questions]
+      # only prepend an id if the course already has some migrated questions/quizzes
+      if self.context.assessment_questions.scoped(:conditions => 'migration_id IS NOT NULL').any? ||
+         self.context.quizzes.scoped(:conditions => 'migration_id IS NOT NULL').any?
+        migration_settings[:id_prepender] = self.id  
+      end
     end
   end
 
