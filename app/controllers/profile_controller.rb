@@ -21,7 +21,7 @@ class ProfileController < ApplicationController
   before_filter { |c| c.active_tab = "profile" }
   
   def show
-    @user = params[:id] ? User.find(params[:id]) : @current_user
+    @user = @current_user
     add_crumb(t(:crumb, "%{user}'s profile", :user => @user.short_name), profile_path )
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select{|c| c.path_type == "email"}

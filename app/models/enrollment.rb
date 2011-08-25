@@ -19,8 +19,7 @@
 class Enrollment < ActiveRecord::Base
   
   include Workflow
-  include EnrollmentDateRestrictions
-  
+
   belongs_to :course, :touch => true
   belongs_to :course_section
   belongs_to :root_account, :class_name => 'Account'
@@ -129,8 +128,10 @@ class Enrollment < ActiveRecord::Base
               :conditions => "courses.workflow_state = 'aborted' or courses.workflow_state = 'completed' or enrollments.workflow_state = 'rejected' or enrollments.workflow_state = 'completed'"
               
 
+  ENROLLMENT_RANK = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment']
+  ENROLLMENT_RANK_SQL = ENROLLMENT_RANK.size.times.inject('CASE '){|s, i| s << "WHEN type = '#{ENROLLMENT_RANK[i]}' THEN #{i} "} << 'END'
   def self.highest_enrollment_type(type, type2)
-    res = ['TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentEnrollment','ObserverEnrollment'].find{|t| t == type || t == type2}
+    res = ENROLLMENT_RANK.find{|t| t == type || t == type2}
     res ||= type || type2
     res
   end
@@ -178,7 +179,7 @@ class Enrollment < ActiveRecord::Base
   end
   
   def participating?
-    participating_student? || participating_admin? || participating_observer?
+    !self.is_a?(CourseDesignerEnrollment) && self.state_based_on_date == :active
   end
   
   def student?
@@ -190,15 +191,15 @@ class Enrollment < ActiveRecord::Base
   end
   
   def participating_student?
-    self.is_a?(StudentEnrollment) && self.active?
+    self.is_a?(StudentEnrollment) && self.state_based_on_date == :active
   end
   
   def participating_observer?
-    self.is_a?(ObserverEnrollment) && self.active?
+    self.is_a?(ObserverEnrollment) && self.state_based_on_date == :active
   end
   
   def participating_admin?
-    (self.is_a?(TeacherEnrollment) || self.is_a?(TaEnrollment)) && self.active?
+    (self.is_a?(TeacherEnrollment) || self.is_a?(TaEnrollment)) && self.state_based_on_date == :active
   end
   
   def associated_user_name
@@ -277,7 +278,7 @@ class Enrollment < ActiveRecord::Base
     ids = nil
     ids = self.user.dashboard_messages.find_all_by_context_id_and_context_type(self.id, 'Enrollment', :select => "id").map(&:id) if self.user
     Message.delete_all({:id => ids}) if ids && !ids.empty?
-    update_attribute(:workflow_state, course.enrollment_state_based_on_date(self))
+    update_attribute(:workflow_state, 'active')
     true
   end
   
@@ -286,7 +287,6 @@ class Enrollment < ActiveRecord::Base
       event :reject, :transitions_to => :rejected
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
-      event :deactivate, :transitions_to => :inactive
     end
     
     state :creation_pending do
@@ -297,21 +297,49 @@ class Enrollment < ActiveRecord::Base
       event :reject, :transitions_to => :rejected
       event :complete, :transitions_to => :completed
       event :pend, :transitions_to => :pending
-      event :deactivate, :transitions_to => :inactive
     end
-    
-    state :inactive do
-      event :activate, :transitions_to => :active
-    end
-    
+
     state :deleted
     state :rejected do
       event :unreject, :transitions_to => :invited
     end
     state :completed
-    
+
+    # Inactive is a "hard" state, i.e. tuition not paid
+    state :inactive
   end
-  
+
+  def enrollment_dates
+    Rails.cache.fetch([self, 'enrollment_dates'].cache_key) do
+      if self.start_at && self.end_at
+        [self.start_at, self.end_at]
+      elsif course_section.try(:restrict_enrollments_to_section_dates) && !self.admin?
+        [course_section.start_at, course_section.end_at]
+      elsif course.try(:restrict_enrollments_to_course_dates) && !self.admin?
+        [course.start_at, course.conclude_at]
+      elsif course.try(:enrollment_term)
+        course.enrollment_term.enrollment_dates_for(self)
+      else
+        [nil, nil]
+      end
+    end
+  end
+
+  def state_based_on_date
+    if state == :active
+      start_at, end_at = self.enrollment_dates
+      if start_at && start_at >= Time.now
+        :inactive
+      elsif end_at && end_at <= Time.now
+        :completed
+      else
+        :active
+      end
+    else
+      state
+    end
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -542,4 +570,10 @@ class Enrollment < ActiveRecord::Base
   end
   
   def self.serialization_excludes; [:uuid,:computed_final_score, :computed_current_score]; end
+
+  # enrollment term per-section is deprecated; a section's term is inherited from the
+  # course it is currently tied to
+  def enrollment_term
+    self.course.enrollment_term
+  end
 end

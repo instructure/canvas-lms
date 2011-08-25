@@ -178,18 +178,21 @@
       <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_correct_answer_comments', "Click to enter comments for a correct answer") %>">...</a>
       <div class="details"><%= t(:correct_answer_comments, "Correct answer comments") %></div>
       <textarea style="width: 90%; height: 75px;" class="comments" name="correct_comments"></textarea>
+      <span class="correct_comments_html" style="display:none;"></span>
     </div>
     <div class="question_comment question_incorrect_comment">
       <div class="comment_top"></div>
       <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_wrong_answer_comments', "Click to enter comments for a wrong answer") %>">...</a>
       <div class="details"><%= t(:wrong_answer_comments, "Wrong answer comments") %></div>
       <textarea style="width: 90%; height: 75px;" class="comments" name="incorrect_comments"></textarea>
+      <span class="incorrect_comments_html" style="display:none;"></span>
     </div>
     <div class="question_comment question_neutral_comment">
       <div class="comment_top"></div>
       <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_general_answer_comments', "Click to enter general comments") %>">...</a>
       <div class="details"><%= t(:general_answer_comments, "General answer comments") %></div>
       <textarea style="width: 90%; height: 75px;" class="comments" name="neutral_comments"></textarea>
+      <span class="neutral_comments_html" style="display:none;"></span>
     </div>
     <div class="clear"></div>
     <div class="button-container">

@@ -480,8 +480,14 @@ class AssessmentQuestion < ActiveRecord::Base
   end
   
   def self.prep_for_import(hash, context)
-    hash[:question_text] = ImportedHtmlConverter.convert(hash[:question_text], context, true) if hash[:question_text]
-    hash[:answers].each{ |answer| answer[:html] = ImportedHtmlConverter.convert(answer[:html], context, true) unless answer[:html].blank? } if hash[:answers]
+    [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
+      hash[field] = ImportedHtmlConverter.convert(hash[field], context, true) if hash[field].present?
+    end
+    hash[:answers].each do |answer|
+      [:html, :comments_html].each do |field|
+        answer[field] = ImportedHtmlConverter.convert(answer[field], context, true) if answer[field].present?
+      end
+    end if hash[:answers]
   end
   
   named_scope :active, lambda {

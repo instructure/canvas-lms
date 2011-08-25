@@ -20,6 +20,8 @@ class TokenInput
       @tokens.html('')
       @change?(@token_values())
 
+    @added = @options.added
+
     @placeholder = $('<span />')
     @placeholder.text(@options.placeholder)
     @placeholder.appendTo(@fake_input) if @options.placeholder
@@ -95,6 +97,7 @@ class TokenInput
       @tokens.append($token)
     @val('') unless data?.no_clear
     @placeholder.hide()
+    @added?(data.data) if data
     @change?(@token_values())
     @selector?.reposition()
 
@@ -393,7 +396,7 @@ class TokenSelector
     state = !@input.has_token(value: id) unless state?
     if state
       @selection.addClass('on') if @selection_toggleable()
-      @input.add_token value: id, text: @selection.find('b').text(), no_clear: true
+      @input.add_token value: id, text: @selection.find('b').text(), no_clear: true, data: @selection.data('user_data')
     else
       @selection.removeClass('on')
       @input.remove_token value: id
@@ -538,6 +541,7 @@ I18n.scoped 'conversations', (I18n) ->
       $form.attr action: $selected_conversation.find('a.details_link').attr('add_url')
 
     reset_message_form()
+    $form.find('#user_note_info').hide().find('input').attr('checked', false)
     $form.show().find(':input:visible:first').focus()
 
   reset_message_form = ->
@@ -594,7 +598,7 @@ I18n.scoped 'conversations', (I18n) ->
       $selected_conversation.scrollIntoView()
     else
       if params and params.user_id and params.user_name
-        $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name
+        $('#recipients').data('token_input').add_token value: params.user_id, text: params.user_name, data: {id: params.user_id, name: params.user_name, can_add_notes: params.can_add_notes}
         $('#from_conversation_id').val(params.from_conversation_id)
       return
 
@@ -603,9 +607,16 @@ I18n.scoped 'conversations', (I18n) ->
     
     completion = (data) ->
       return unless is_selected($c)
-      for user in data.participants when !MessageInbox.user_cache[user.id]
+      for user in data.participants when !MessageInbox.user_cache[user.id]?.avatar
         MessageInbox.user_cache[user.id] = user
         user.html_name = html_name_for_user(user)
+      $form.find('#user_note_info').showIf(
+          $c.hasClass('private') and
+          (user_id = $c.find('.participant').first().data('id')) and
+          (user = MessageInbox.user_cache[user_id]) and
+          can_add_notes_for(user)
+        )
+      inbox_resize()
       $messages.show()
       i = j = 0
       message = data.messages[0]
@@ -634,8 +645,8 @@ I18n.scoped 'conversations', (I18n) ->
         $form.loadingImage('remove')
 
   MessageInbox.shared_contexts_for_user = (user, limit=2) ->
-    shared_contexts = (course.name for course_id in user.course_ids when course = @contexts.courses[course_id]).
-                concat(group.name for group_id in user.group_ids when group = @contexts.groups[group_id])
+    shared_contexts = (course.name for course_id, roles of user.common_courses when course = @contexts.courses[course_id]).
+                concat(group.name for group_id, roles of user.common_groups when group = @contexts.groups[group_id])
     shared_contexts.sort (a, b) ->
       a = a.toLowerCase()
       b = b.toLowerCase()
@@ -650,6 +661,86 @@ I18n.scoped 'conversations', (I18n) ->
   html_name_for_user = (user) ->
     shared_contexts = MessageInbox.shared_contexts_for_user(user)
     $.htmlEscape(user.name) + if shared_contexts.length then " <em>" + $.htmlEscape(shared_contexts) + "</em>" else ''
+
+  can_add_notes_for = (user) ->
+    return false unless MessageInbox.notes_enabled
+    return true if user.can_add_notes
+    for course_id, roles of user.common_courses
+      return true if 'StudentEnrollment' in roles and (MessageInbox.can_add_notes_for_account or MessageInbox.contexts.courses[course_id]?.can_add_notes)
+    false
+
+  formatted_message = (message) ->
+    link_placeholder = "LINK_PLACEHOLDER"
+    link_re = ///
+      \b
+      (                                            # Capture 1: entire matched URL
+        (?:
+          https?://                                # http or https protocol
+          |                                        # or
+          www\d{0,3}[.]                            # "www.", "www1.", "www2." … "www999."
+          |                                        # or
+          [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
+        )
+        (?:                                        # One or more:
+          [^\s()<>]+                               # Run of non-space, non-()<>
+          |                                        # or
+          \(([^\s()<>]+|(\([^\s()<>]+\)))*\)       # balanced parens, up to 2 levels
+        )+
+        (?:                                        # End with:
+          \(([^\s()<>]+|(\([^\s()<>]+\)))*\)       # balanced parens, up to 2 levels
+          |                                        # or
+          [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # not a space or one of these punct chars
+        )
+      ) | (
+        LINK_PLACEHOLDER
+      )
+    ///gi
+
+    # replace any links with placeholders so we don't escape them
+    links = []
+    placeholder_blocks = []
+    message = message.replace link_re, (match, i) ->
+      placeholder_blocks.push(if match == link_placeholder
+          link_placeholder
+        else
+          link = match
+          link = "http://" + link if link[0..3] == 'www'
+          links.push link
+          "<a href='#{link}'>#{match}</a>"
+      )
+      link_placeholder
+
+    # now escape html
+    message = $.h message
+
+    # now put the links back in
+    message = message.replace new RegExp(link_placeholder, 'g'), (match, i) ->
+      placeholder_blocks.shift()
+
+    # replace newlines
+    message = message.replace /\n/g, '<br />\n'
+
+    # generate quoting clumps
+    processed_lines = []
+    quote_block = []
+    quotes_added = 0
+    quote_clump = (lines) ->
+      quotes_added += 1
+      "<div class='quoted_text_holder'>
+        <a href='#' class='show_quoted_text_link'>#{I18n.t("quoted_text_toggle", "show quoted text")}</a>
+        <div class='quoted_text' style='display: none;'>
+          #{lines.join "\n"}
+        </div>
+      </div>"
+    for idx, line of message.split("\n")
+      if line.match /^(&gt;|>)/
+        quote_block.push line
+      else
+        processed_lines.push quote_clump(quote_block) if quote_block.length
+        quote_block = []
+        processed_lines.push line
+    processed_lines.push quote_clump(quote_block) if quote_block.length
+    message = processed_lines.join "\n"
 
   build_message = (data) ->
     $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id)
@@ -668,7 +759,14 @@ I18n.scoped 'conversations', (I18n) ->
     user_name = user?.name ? I18n.t('unknown_user', 'Unknown user')
     $message.find('.audience').html user?.html_name || $.h(user_name)
     $message.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
-    $message.find('p').html $.h(data.body).replace(/\n/g, '<br />')
+    $message.find('p').html formatted_message(data.body)
+    $message.find("a.show_quoted_text_link").click (event) ->
+      $text = $(this).parents(".quoted_text_holder").children(".quoted_text")
+      if $text.length
+        event.stopPropagation()
+        event.preventDefault()
+        $text.show()
+        $(this).hide()
     $pm_action = $message.find('a.send_private_message')
     pm_url = $.replaceTags $pm_action.attr('href'),
       user_id: data.author_id
@@ -1287,6 +1385,11 @@ I18n.scoped 'conversations', (I18n) ->
 
     $('.recipients').tokenInput
       placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group")
+      added: (data) ->
+        unless data.id and "#{data.id}".match(/^(course|group)_/)
+          data = $.extend({}, data)
+          delete data.avatar # since it's the wrong size and possibly a blank image
+          MessageInbox.user_cache[data.id] ?= data
       selector:
         messages: {no_results: I18n.t('no_results', 'No results found')}
         populator: ($node, data, options={}) ->
@@ -1297,10 +1400,11 @@ I18n.scoped 'conversations', (I18n) ->
           $b = $('<b />')
           $b.text(data.name)
           $span = $('<span />')
-          $span.text(MessageInbox.shared_contexts_for_user(data)) if data.course_ids?
+          $span.text(MessageInbox.shared_contexts_for_user(data)) if data.common_courses?
           $node.append($b, $span)
           $node.attr('title', data.name)
           $node.data('id', data.id)
+          $node.data('user_data', data)
           $node.addClass(if data.type then data.type else 'user')
           if options.level > 0
             $node.prepend('<a class="toggle"><i></i></a>')
@@ -1322,9 +1426,12 @@ I18n.scoped 'conversations', (I18n) ->
       if tokens.length > 1 or tokens[0]?.match(/^(course|group)_/)
         $form.find('#group_conversation').attr('checked', true) if !$form.find('#group_conversation_info').is(':visible')
         $form.find('#group_conversation_info').show()
+        $form.find('#user_note_info').hide()
       else
         $form.find('#group_conversation').attr('checked', true)
         $form.find('#group_conversation_info').hide()
+        $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) and can_add_notes_for(user))
+      inbox_resize()
 
     $(window).resize inbox_resize
     setTimeout inbox_resize

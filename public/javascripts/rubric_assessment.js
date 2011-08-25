@@ -30,9 +30,10 @@ rubricAssessment = {
       .delegate(".long_description_link", 'click', function(event) {
         event.preventDefault();
         if(!$(this).parents(".rubric").hasClass('editing')) {
-          var data = $(this).parents(".criterion").getTemplateData({textValues: ['long_description', 'description']});
+          var data = $(this).parents(".criterion").getTemplateData({textValues: ['long_description', 'description']}),
+              is_learning_outcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion");
           $("#rubric_long_description_dialog")
-            .fillTemplateData({data: data, htmlValues: ['long_description']})
+            .fillTemplateData({data: data, htmlValues: ( is_learning_outcome ? ['long_description'] : [] )})
             .find(".editing").hide().end()
             .find(".displaying").show().end()
             .dialog('close').dialog({

@@ -206,7 +206,7 @@ jQuery(function($){
           due_date_string: data.due_date,
           due_time_string: data.due_time
         }),
-        htmlValues: ['description']
+        except: ['description']
       }).loadingImage();
     }, success: function(data, $assignment) {
       var assignment = data.assignment,

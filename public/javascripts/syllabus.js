@@ -136,7 +136,6 @@ jQuery(function($){
       return data;
     },
     beforeSubmit: function(data) {
-      $course_syllabus.html(data['course[syllabus_body]']);
       $edit_course_syllabus_form.triggerHandler('hide_edit');
       $course_syllabus_details.hide();
       $course_syllabus.loadingImage();

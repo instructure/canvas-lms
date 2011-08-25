@@ -63,6 +63,8 @@ class CoursesController < ApplicationController
       format.html {
         @current_enrollments = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).sort_by{|e| [e.active? ? 1 : 0, e.long_name] }
         @past_enrollments = @current_user.enrollments.ended.scoped(:conditions=>"enrollments.workflow_state NOT IN ('invited', 'deleted')")
+        @past_enrollments.concat(@current_enrollments.select { |e| e.state_based_on_date == :completed })
+        @current_enrollments.reject! { |e| [:inactive, :completed].include?(e.state_based_on_date) }
       }
       format.json {
         enrollments = @current_user.cached_current_enrollments
@@ -405,13 +407,8 @@ class CoursesController < ApplicationController
       params[:invitation] = pending_enrollment.uuid
       enrollment = pending_enrollment
     end
-    if enrollment && enrollment.inactive?
-      start_at, end_at = @context.enrollment_dates_for(enrollment)
-      if start_at && start_at > Time.now
-        flash[:notice] = t('notices.course_not_available_until', "You do not have permission to access the course, %{course}, until %{date}", :course => @context.name, :date => start_at.to_date.to_s)
-      else
-        flash[:notice] = t('notices.enrollment_not_active', "Your membership in the course, %{course}, is not yet activated", :course => @context.name)
-      end
+    if enrollment && enrollment.state_based_on_date == :inactive
+      flash[:notice] = t('notices.enrollment_not_active', "Your membership in the course, %{course}, is not yet activated", :course => @context.name)
       redirect_to dashboard_url
       return true
     end

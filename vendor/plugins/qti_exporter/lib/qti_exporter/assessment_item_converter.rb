@@ -154,31 +154,52 @@ class AssessmentItemConverter
   def reset_local_ids
     @@ids = {}
   end
-  
+
   def get_feedback
     @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |f|
       id = f['identifier']
-      feedback = clear_html(f.text.strip.gsub(/\s+/, " "))
-      if id =~ /wrong|incorrect/i
-        @question[:incorrect_comments] = feedback
-      elsif id =~ /correct/i
+      if id =~ /wrong|incorrect|(_IC$)/i
+        extract_feedback!(@question, :incorrect_comments, f)
+      elsif id =~ /correct|(_C$)/i
         if f.at_css('div.solution')
-          @question[:example_solution] = feedback
+          @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
         else
-          @question[:correct_comments] = feedback
+          extract_feedback!(@question, :correct_comments, f)
         end
       elsif id =~ /solution/i
-        @question[:example_solution] = feedback
+        @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
       elsif id =~ /general|all/i
-        @question[:neutral_comments] = feedback
+        extract_feedback!(@question, :neutral_comments, f)
       elsif id =~ /feedback_(\d*)_fb/i
         if answer = @question[:answers].find{|a|a[:migration_id]== "RESPONSE_#{$1}"}
-          answer[:comments] = feedback
+          extract_feedback!(answer, :comments, f)
         end
       end
     end
   end
-  
+
+  # returns a tuple of [text, html]
+  # html is null if it's not an html blob
+  def detect_html(node)
+    text = clear_html(node.text.gsub(/\s+/, " ")).strip
+    html_node = node.at_css('div.html') || (node.name.downcase == 'div' && node['class'] =~ /\bhtml\b/)
+    is_html = false
+    # heuristic for detecting html: the sanitized html node is more than just a container for a single text node
+    sanitized = sanitize_html!(html_node ? Nokogiri::HTML::DocumentFragment.parse(node.text) : node, true) { |s| is_html = !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
+    if is_html && sanitized.present?
+      html = sanitized
+    end
+    [text, html]
+  end
+
+  def extract_feedback!(hash, field, node)
+    text, html = detect_html(node)
+    hash[field] = text
+    if html
+      hash["#{field}_html".to_sym] = html
+    end
+  end
+
   def clear_html(text)
     text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
   end
@@ -209,6 +230,8 @@ class AssessmentItemConverter
         node = node.child
       end
     end
+    yield node if block_given?
+
     text = node.inner_html.strip
     # Clear WebCT-specific relative paths
     text.gsub!(%r{/webct/RelativeResourceManager/Template/}, '')
@@ -296,20 +319,15 @@ class AssessmentItemConverter
     feedback_hash = {}
     @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
       id = feedback['identifier']
-      text = clear_html((get_node_val(feedback,'p') || get_node_val(feedback, 'div', '')).gsub(/\s+/, " ")).strip
-      feedback_hash[id] = text
-
-      if @question[:feedback_id] == id
-        @question[:correct_comments] = text
-        @question[:incorrect_comments] = text
-      end
+      node = feedback.at_css('p') || feedback.at_css('div')
+      feedback_hash[id] = node
     end
     
     #clear extra entries
     @question.delete :feedback_id
     answers.each do |answer|
       if feedback_hash.has_key? answer[:feedback_id]
-        answer[:comments] = feedback_hash[answer[:feedback_id]]
+        extract_feedback!(answer, :comments, feedback_hash[answer[:feedback_id]])
       end
       answer.delete :feedback_id
     end
@@ -328,7 +346,7 @@ class AssessmentItemConverter
     end
     # Sometimes individual answers are assigned general feedback, don't return
     # the identifier if that's the case
-    id =~ /general|all|wrong|incorrect|correct/i ? nil : id
+    id =~ /general|all|wrong|incorrect|correct|(_IC$)|(_C$)/i ? nil : id
   end
 
 end

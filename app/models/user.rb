@@ -1553,8 +1553,8 @@ class User < ActiveRecord::Base
     end
   end
 
-  MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source']
-  MESSAGEABLE_USER_COLUMN_SQL = "users." + (MESSAGEABLE_USER_COLUMNS.join(", users."))
+  MESSAGEABLE_USER_COLUMNS = ['id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{|col|"users.#{col}"}
+  MESSAGEABLE_USER_COLUMN_SQL = MESSAGEABLE_USER_COLUMNS.join(", ")
   def messageable_users(options = {})
     hash = enrollment_visibility
     full_course_ids = hash[:full_course_ids]
@@ -1605,25 +1605,37 @@ class User < ActiveRecord::Base
     course_sql << "(course_section_id IN (#{section_ids.join(',')}))" if section_ids.present?
     course_sql << "(course_id IN (#{restricted_course_hash.keys.join(',')}) AND (enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash.values.flatten.uniq).join(',')})))" if restricted_course_hash.present?
     user_sql << <<-SQL if course_sql.present?
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, null AS group_id
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, course_id, NULL AS group_id, #{connection.func(:group_concat, :'enrollments.type', ':')} AS roles
       FROM users, enrollments, courses
       WHERE (#{course_sql.join(' OR ')}) AND users.id = user_id AND courses.id = course_id
         AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]}
           OR #{self.class.reflections[:concluded_enrollments].options[:conditions]}
         )
         AND #{user_condition_sql}
+      GROUP BY #{connection.group_by(['users.id', 'course_id'], *(MESSAGEABLE_USER_COLUMNS[1, MESSAGEABLE_USER_COLUMNS.size]))}
     SQL
 
     user_sql << <<-SQL if group_ids.present?
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, group_id
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, group_id, NULL AS roles
       FROM users, group_memberships
       WHERE group_id IN (#{group_ids.join(',')}) AND users.id = user_id
         AND group_memberships.workflow_state <> 'deleted'
         AND #{user_condition_sql}
     SQL
 
+    # if this is an account admin who doesn't have any courses/groups in common
+    # with the user, we want to know the user's highest current enrollment type
+    highest_enrollment_sql = <<-SQL
+      SELECT type
+      FROM enrollments, courses
+      WHERE
+        user_id = users.id AND courses.id = course_id
+        AND (#{self.class.reflections[:current_and_invited_enrollments].options[:conditions]})
+      ORDER BY #{Enrollment::ENROLLMENT_RANK_SQL}
+      LIMIT 1
+    SQL
     user_sql << <<-SQL if account_ids.present?
-      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+      SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, 0 AS course_id, NULL AS group_id, (#{highest_enrollment_sql}) AS roles
       FROM users, user_account_associations
       WHERE user_account_associations.account_id IN (#{account_ids.join(',')})
         AND user_account_associations.user_id = users.id
@@ -1636,7 +1648,7 @@ class User < ActiveRecord::Base
       # conversation with that user)
       if options[:conversation_id].present?
         user_sql << <<-SQL
-          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users, conversation_participants
           WHERE #{user_condition_sql}
             AND conversation_participants.user_id = users.id
@@ -1644,7 +1656,7 @@ class User < ActiveRecord::Base
         SQL
       elsif options[:no_check_context]
         user_sql << <<-SQL
-          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, null AS course_id, null AS group_id
+          SELECT #{MESSAGEABLE_USER_COLUMN_SQL}, NULL AS course_id, NULL AS group_id, NULL AS roles
           FROM users
           WHERE #{user_condition_sql}
         SQL
@@ -1654,10 +1666,12 @@ class User < ActiveRecord::Base
     # if none of our potential sources was included, we're done
     return [] if user_sql.empty?
 
+    concat_sql = connection.adapter_name =~ /postgres/i ? :"course_id::text || ':' || roles::text" : :"course_id || ':' || roles"
+
     users = User.find_by_sql(<<-SQL)
       SELECT #{MESSAGEABLE_USER_COLUMN_SQL},
-        #{connection.func(:group_concat, :course_id)} AS common_course_ids,
-        #{connection.func(:group_concat, :group_id)} AS common_group_ids
+        #{connection.func(:group_concat, concat_sql)} AS common_courses,
+        #{connection.func(:group_concat, :group_id)} AS common_groups
       FROM (
         #{user_sql.join(' UNION ')}
       ) users
@@ -1667,8 +1681,16 @@ class User < ActiveRecord::Base
       #{options[:limit] ? "LIMIT #{options[:limit].to_i}" : ""}
     SQL
     users.each do |user|
-      user.common_course_ids = user.common_course_ids.to_s.split(",").map(&:to_i)
-      user.common_group_ids = user.common_group_ids.to_s.split(",").map(&:to_i)
+      user.common_courses = user.common_courses.to_s.split(",").inject({}){ |hash, info|
+        roles = info.split(/:/)
+        hash[roles.shift.to_i] = roles
+        hash
+      }
+      user.common_groups = user.common_groups.to_s.split(",").inject({}){ |hash, info|
+        roles = info.split(/:/)
+        hash[roles.shift.to_i] = ['Member']
+        hash
+      }
     end
   end
 
