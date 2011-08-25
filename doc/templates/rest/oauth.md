@@ -15,6 +15,11 @@ secret can never be completely secured against discovery. However,
 clients should do their best to make the secret non-obvious through
 obfuscation or other means.
 
+Canvas CV Users
+---------------
+
+For open source Canvas users, you will need to generate a client\_id and client\_secret for your application. There isn't yet any UI for generating these keys. The <a href="authentication.html">Authentication</a> section of this documentation describes how to generate an API developer key -- the id of this key is the client\_id , and the api\_key is the client\_secret.
+
 Web Application Flow
 --------------------
 
@@ -169,12 +174,9 @@ currently supported value is <code>code</code>.
   <li>
     <span class="name">redirect_uri</span>
     <div class="inline">
-      optional. The URL where the user will be redirected after
-authorization. Currently, the only supported value is
+      required. For native applications, currently the only supported value is
 <code>urn:ietf:wg:oauth:2.0:oob</code>, signifying that the credentials will be
-retrieved out-of-band using and embedded browser or other functionality.
-This functionality will be expanded later, for third-party web
-application usage.
+retrieved out-of-band using an embedded browser or other functionality.
     </div>
   </li>
 </ul>
