@@ -2519,6 +2519,7 @@ I18n.scoped('instructure', function(I18n) {
     }
     this.realDatepicker(options);
     $(document).data('last_datepicker', this);
+    return this;
   };
   $.fn.date_field = function(options) {
     options = $.extend({}, options);
