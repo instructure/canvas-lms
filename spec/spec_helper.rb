@@ -152,6 +152,7 @@ Spec::Runner.configure do |config|
     @course ||= opts[:course] || course(opts)
     @student = @user = opts[:user] || user(opts)
     @enrollment = @course.enroll_student(@user)
+    @enrollment.course = @course
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
       @enrollment.save!
@@ -165,6 +166,8 @@ Spec::Runner.configure do |config|
     @user = opts[:user] || user(opts)
     @teacher = @user
     @enrollment = @course.enroll_teacher(@user)
+    # set the reverse association
+    @enrollment.course = @course
     @enrollment.accept! if opts[:active_enrollment] || opts[:active_all]
     @enrollment
   end

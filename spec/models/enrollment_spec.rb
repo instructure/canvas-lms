@@ -591,6 +591,142 @@ describe Enrollment do
         @enrollment.state_based_on_date.should eql(:inactive)
       end
     end
+
+    it "should allow teacher access if both course and term have dates" do
+      @teacher_enrollment = course_with_teacher(:active_all => 1)
+      @student_enrollment = student_in_course(:active_all => 1)
+      @term = @course.enrollment_term
+
+      @teacher_enrollment.state.should == :active
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state.should == :active
+      @student_enrollment.state_based_on_date.should == :active
+
+      # Course dates completely before Term dates, now in course dates
+      @course.start_at = 2.days.ago
+      @course.conclude_at = 2.days.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @term.start_at = 4.days.from_now
+      @term.end_at = 6.days.from_now
+      @term.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :active
+
+      # Term dates completely before Course dates, now in course dates
+      @term.start_at = 6.days.ago
+      @term.end_at = 4.days.ago
+      @term.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :active
+
+      # Terms dates superset of course dates, now in both
+      @term.start_at = 4.days.ago
+      @term.end_at = 4.days.from_now
+      @term.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :active
+
+      # Course dates superset of term dates, now in both
+      @course.start_at = 6.days.ago
+      @course.conclude_at = 6.days.from_now
+      @course.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :active
+
+      # Course dates superset of term dates, now in beginning non-overlap
+      @term.start_at = 2.days.from_now
+      @term.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :active
+
+      # Course dates superset of term dates, now in ending non-overlap
+      @term.start_at = 4.days.ago
+      @term.end_at = 2.days.ago
+      @term.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :active
+
+      # Term dates superset of course dates, now in beginning non-overlap
+      @term.start_at = 6.days.ago
+      @term.end_at = 6.days.from_now
+      @term.save!
+      @course.start_at = 2.days.from_now
+      @course.conclude_at = 4.days.from_now
+      @course.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :inactive
+
+      # Term dates superset of course dates, now in ending non-overlap
+      @course.start_at = 4.days.ago
+      @course.conclude_at = 2.days.ago
+      @course.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :completed
+
+      # Course dates completely before term dates, now in term dates
+      @course.start_at = 6.days.ago
+      @course.conclude_at = 4.days.ago
+      @course.save!
+      @term.start_at = 2.days.ago
+      @term.end_at = 2.days.from_now
+      @term.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :completed
+
+      # Course dates completely after term dates, now in term dates
+      @course.start_at = 4.days.from_now
+      @course.conclude_at = 6.days.from_now
+      @course.save!
+
+      @teacher_enrollment.state_based_on_date.should == :active
+      @student_enrollment.state_based_on_date.should == :inactive
+
+      # Now between course and term dates, term first
+      @term.start_at = 4.days.ago
+      @term.end_at = 2.days.ago
+      @term.save!
+
+      @teacher_enrollment.state_based_on_date.should == :completed
+      @student_enrollment.state_based_on_date.should == :inactive
+
+      # Now after both dates
+      @course.start_at = 4.days.ago
+      @course.conclude_at = 2.days.ago
+      @course.save!
+
+      @teacher_enrollment.state_based_on_date.should == :completed
+      @student_enrollment.state_based_on_date.should == :completed
+
+      # Now before both dates
+      @course.start_at = 2.days.from_now
+      @course.conclude_at = 4.days.from_now
+      @course.save!
+      @term.start_at = 2.days.from_now
+      @term.end_at = 4.days.from_now
+      @term.save!
+
+      @teacher_enrollment.state_based_on_date.should == :inactive
+      @student_enrollment.state_based_on_date.should == :inactive
+
+      # Now between course and term dates, course first
+      @course.start_at = 4.days.ago
+      @course.conclude_at = 2.days.ago
+      @course.save!
+
+      @teacher_enrollment.state_based_on_date.should == :completed
+      @student_enrollment.state_based_on_date.should == :completed
+
+    end
   end
   
 end

@@ -309,30 +309,45 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_dates
-    Rails.cache.fetch([self, 'enrollment_dates'].cache_key) do
+    Rails.cache.fetch([self, 'enrollment_date_ranges'].cache_key) do
+      result = []
       if self.start_at && self.end_at
-        [self.start_at, self.end_at]
-      elsif course_section.try(:restrict_enrollments_to_section_dates) && !self.admin?
-        [course_section.start_at, course_section.end_at]
-      elsif course.try(:restrict_enrollments_to_course_dates) && !self.admin?
-        [course.start_at, course.conclude_at]
+        result << [self.start_at, self.end_at]
+      elsif course_section.try(:restrict_enrollments_to_section_dates)
+        result << [course_section.start_at, course_section.end_at]
+        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
+      elsif course.try(:restrict_enrollments_to_course_dates)
+        result << [course.start_at, course.conclude_at]
+        result << course.enrollment_term.enrollment_dates_for(self) if self.course.try(:enrollment_term) && self.admin?
       elsif course.try(:enrollment_term)
-        course.enrollment_term.enrollment_dates_for(self)
+        result << course.enrollment_term.enrollment_dates_for(self)
       else
-        [nil, nil]
+        result << [nil, nil]
       end
+      result
     end
   end
 
   def state_based_on_date
     if state == :active
-      start_at, end_at = self.enrollment_dates
-      if start_at && start_at >= Time.now
-        :inactive
-      elsif end_at && end_at <= Time.now
+      ranges = self.enrollment_dates
+      ranges.each do |range|
+        start_at, end_at = range
+        if start_at && start_at >= Time.now
+          result = :inactive
+        elsif end_at && end_at <= Time.now
+          result = :completed
+        else
+          return :active
+        end
+      end
+      # not strictly within any range
+      global_start_at = ranges.map(&:first).compact.min
+      return :active unless global_start_at
+      if global_start_at < Time.now
         :completed
       else
-        :active
+        :inactive
       end
     else
       state
