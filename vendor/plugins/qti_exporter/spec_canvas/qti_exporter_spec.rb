@@ -12,9 +12,9 @@ describe 'QtiExporter' do
     setup_migration
     do_migration
 
-    @course.attachments.count.should == 1
-    attachment = @course.attachments.last
-    attachment.filename.should == 'header-logo.png'
+    @course.attachments.count.should == 2
+    @course.attachments.map(&:filename).sort.should == ['header-logo.png', 'smiley.jpg']
+    attachment = @course.attachments.detect { |a| a.filename == 'header-logo.png' }
     quiz = @course.quizzes.last
     quiz.should be_present
     quiz.quiz_questions.count.should == 2
@@ -80,6 +80,27 @@ describe 'QtiExporter' do
     quiz.assignment.should_not be_nil
     quiz.assignment.title.should == quiz.title
     quiz.assignment.should be_published
+  end
+
+  it "should publish spec-canvas-1 correctly" do
+    setup_migration
+    do_migration
+
+    quiz = @course.quizzes.last
+    quiz.should be_present
+    quiz.quiz_questions.size.should == 2
+    # various checks on the data
+    qq = quiz.quiz_questions.first
+    d = qq.question_data
+    d['correct_comments'].should == "I can't believe you got that right. Awesome!"
+    d['correct_comments_html'].should == "I can't <i>believe </i>you got that right. <b>Awesome!</b>"
+    d['incorrect_comments_html'].should == "<b>Wrong. </b>That's a bummer."
+    d['points_possible'].should == 3
+    d['question_name'].should == 'q1'
+    d['answers'].map { |a| a['weight'] }.should == [0,100,0]
+    d['answers'].map { |a| a['comments'] }.should == ['nope', 'yes!', nil]
+    attachment = @course.attachments.detect { |a| a.filename == 'smiley.jpg' }
+    d['answers'].map { |a| a['comments_html'] }.should == [nil, %{yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">}, nil]
   end
 
   def fname

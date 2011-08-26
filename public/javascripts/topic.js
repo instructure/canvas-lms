@@ -337,7 +337,7 @@ I18n.scoped('topics', function(I18n) {
         data.post_date = addingMessage;
         $entry.fillTemplateData({
           data: data, 
-          htmlValues: ['message'],
+          except: ['message'],
           avoid: '.subcontent'
         });
         removeEntryForm();

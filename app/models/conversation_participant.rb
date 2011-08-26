@@ -97,7 +97,7 @@ class ConversationParticipant < ActiveRecord::Base
       }.map{ |m|
         m.forwarded_messages.map(&:author_id)
       }.flatten.uniq - [self.user_id]
-      participants |= User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids", :conditions => {:id => user_ids})
+      participants |= User.find(:all, :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups", :conditions => {:id => user_ids})
     end
     return participants unless include_context_info
     # we do this to find out the contexts they share with the user
@@ -105,8 +105,8 @@ class ConversationParticipant < ActiveRecord::Base
       context_info[user.id] = user
     }
     participants.each { |user|
-      user.common_course_ids = context_info[user.id].common_course_ids
-      user.common_group_ids = context_info[user.id].common_group_ids
+      user.common_courses = context_info[user.id].common_courses
+      user.common_groups = context_info[user.id].common_groups
     }
   end
 
@@ -128,8 +128,8 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_participants(user, user_ids)
   end
 
-  def add_message(body, forwarded_message_ids = [], update_for_sender = true, &blk)
-    conversation.add_message(user, body, false, forwarded_message_ids, update_for_sender, &blk)
+  def add_message(body, options={}, &blk)
+    conversation.add_message(user, body, options.update(:generated => false), &blk)
   end
 
   def remove_messages(*to_delete)

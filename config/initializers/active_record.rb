@@ -447,25 +447,42 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   # for functions that differ from one adapter to the next, use the following
   # method (overriding as needed in non-standard adapters), e.g.
   #
-  #   connection.func(:group_concat, :name) ->
-  #     group_concat(name)             (default)
-  #     string_agg(name::text, ',')    (postgres)
+  #   connection.func(:group_concat, :name, '|') ->
+  #     group_concat(name, '|')           (default)
+  #     group_concat(name SEPARATOR '|')  (mysql)
+  #     string_agg(name::text, '|')       (postgres)
 
   def func(name, *args)
-    "#{name}(#{args.map{ |arg| arg.is_a?(Symbol) ? arg : quote_value(arg) }.join(', ')})"
+    "#{name}(#{args.map{ |arg| func_arg_esc(arg) }.join(', ')})"
+  end
+
+  def func_arg_esc(arg)
+    arg.is_a?(Symbol) ? arg : quote(arg)
   end
 
   def group_by(*columns)
-    columns.first
+    Array(columns.first).join(", ")
   end
 end
 
+if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
+  ActiveRecord::ConnectionAdapters::MysqlAdapter.class_eval do
+    def func(name, *args)
+      case name
+        when :group_concat
+          "group_concat(#{func_arg_esc(args.first)} SEPARATOR #{quote(args[1] || ',')})"
+        else
+          super
+      end
+    end
+  end
+end
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
     def func(name, *args)
       case name
         when :group_concat
-          "string_agg(#{args.first}::text, ',')"
+          "string_agg((#{func_arg_esc(args.first)})::text, #{quote(args[1] || ',')})"
         else
           super
       end
@@ -473,7 +490,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
     def group_by(*columns)
       return super if postgresql_version >= 90100
-      columns.join(', ')
+      columns.flatten.join(', ')
     end
   end
 end

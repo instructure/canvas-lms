@@ -25,6 +25,7 @@ describe ConversationsController do
       enrollment = @course.enroll_student(u)
       enrollment.workflow_state = 'active'
       enrollment.save
+      u.associated_accounts << Account.default
       u.id
     }
     @conversation = @user.initiate_conversation(user_ids)
@@ -84,7 +85,7 @@ describe ConversationsController do
       assigns[:conversation].should_not be_nil
     end
 
-    it "should allow messages to be forwarded the conversation" do
+    it "should allow messages to be forwarded from the conversation" do
       course_with_student_logged_in(:active_all => true)
       conversation.mark_as_unread
 
@@ -174,7 +175,9 @@ describe ConversationsController do
     end
 
     it "should generate a user note when requested" do
+      Account.default.update_attribute :enable_user_notes, true
       course_with_teacher_logged_in(:active_all => true)
+      @teacher.associated_accounts << Account.default
       conversation
 
       post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"

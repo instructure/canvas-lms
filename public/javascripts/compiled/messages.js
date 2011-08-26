@@ -28,6 +28,7 @@
         this.tokens.html('');
         return typeof this.change === "function" ? this.change(this.token_values()) : void 0;
       }, this));
+      this.added = this.options.added;
       this.placeholder = $('<span />');
       this.placeholder.text(this.options.placeholder);
       if (this.options.placeholder) {
@@ -104,6 +105,11 @@
         this.val('');
       }
       this.placeholder.hide();
+      if (data) {
+        if (typeof this.added === "function") {
+          this.added(data.data);
+        }
+      }
       if (typeof this.change === "function") {
         this.change(this.token_values());
       }
@@ -534,7 +540,8 @@
         return this.input.add_token({
           value: id,
           text: this.selection.find('b').text(),
-          no_clear: true
+          no_clear: true,
+          data: this.selection.data('user_data')
         });
       } else {
         this.selection.removeClass('on');
@@ -710,7 +717,7 @@
     }
   };
   I18n.scoped('conversations', function(I18n) {
-    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, close_menus, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, select_unloaded_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
+    var add_conversation, build_attachment, build_media_object, build_message, build_submission, build_submission_comment, can_add_notes_for, close_menus, formatted_message, html_name_for_user, inbox_action, inbox_action_url_for, inbox_resize, is_selected, open_conversation_menu, open_menu, parse_query_string, remove_conversation, reposition_conversation, reset_message_form, select_conversation, select_unloaded_conversation, set_conversation_state, set_hash, set_last_label, show_message_form, toggle_message_actions, update_conversation;
     show_message_form = function() {
       var newMessage;
       newMessage = !($selected_conversation != null);
@@ -733,6 +740,7 @@
         });
       }
       reset_message_form();
+      $form.find('#user_note_info').hide().find('input').attr('checked', false);
       return $form.show().find(':input:visible:first').focus();
     };
     reset_message_form = function() {
@@ -812,7 +820,12 @@
         if (params && params.user_id && params.user_name) {
           $('#recipients').data('token_input').add_token({
             value: params.user_id,
-            text: params.user_name
+            text: params.user_name,
+            data: {
+              id: params.user_id,
+              name: params.user_name,
+              can_add_notes: params.can_add_notes
+            }
           });
           $('#from_conversation_id').val(params.from_conversation_id);
         }
@@ -821,18 +834,20 @@
       $form.loadingImage();
       $c = $selected_conversation;
       completion = function(data) {
-        var i, j, message, submission, user, _i, _len, _ref;
+        var i, j, message, submission, user, user_id, _i, _len, _ref, _ref2;
         if (!is_selected($c)) {
           return;
         }
         _ref = data.participants;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           user = _ref[_i];
-          if (!MessageInbox.user_cache[user.id]) {
+          if (!((_ref2 = MessageInbox.user_cache[user.id]) != null ? _ref2.avatar : void 0)) {
             MessageInbox.user_cache[user.id] = user;
             user.html_name = html_name_for_user(user);
           }
         }
+        $form.find('#user_note_info').showIf($c.hasClass('private') && (user_id = $c.find('.participant').first().data('id')) && (user = MessageInbox.user_cache[user_id]) && can_add_notes_for(user));
+        inbox_resize();
         $messages.show();
         i = j = 0;
         message = data.messages[0];
@@ -863,27 +878,27 @@
       }
     };
     MessageInbox.shared_contexts_for_user = function(user, limit) {
-      var course, course_id, group, group_id, shared_contexts;
+      var course, course_id, group, group_id, roles, shared_contexts;
       if (limit == null) {
         limit = 2;
       }
       shared_contexts = ((function() {
-        var _i, _len, _ref, _results;
-        _ref = user.course_ids;
+        var _ref, _results;
+        _ref = user.common_courses;
         _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          course_id = _ref[_i];
+        for (course_id in _ref) {
+          roles = _ref[course_id];
           if (course = this.contexts.courses[course_id]) {
             _results.push(course.name);
           }
         }
         return _results;
       }).call(this)).concat((function() {
-        var _i, _len, _ref, _results;
-        _ref = user.group_ids;
+        var _ref, _results;
+        _ref = user.common_groups;
         _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          group_id = _ref[_i];
+        for (group_id in _ref) {
+          roles = _ref[group_id];
           if (group = this.contexts.groups[group_id]) {
             _results.push(group.name);
           }
@@ -907,6 +922,64 @@
       shared_contexts = MessageInbox.shared_contexts_for_user(user);
       return $.htmlEscape(user.name) + (shared_contexts.length ? " <em>" + $.htmlEscape(shared_contexts) + "</em>" : '');
     };
+    can_add_notes_for = function(user) {
+      var course_id, roles, _ref, _ref2;
+      if (!MessageInbox.notes_enabled) {
+        return false;
+      }
+      if (user.can_add_notes) {
+        return true;
+      }
+      _ref = user.common_courses;
+      for (course_id in _ref) {
+        roles = _ref[course_id];
+        if (__indexOf.call(roles, 'StudentEnrollment') >= 0 && (MessageInbox.can_add_notes_for_account || ((_ref2 = MessageInbox.contexts.courses[course_id]) != null ? _ref2.can_add_notes : void 0))) {
+          return true;
+        }
+      }
+      return false;
+    };
+    formatted_message = function(message) {
+      var idx, line, link_placeholder, link_re, links, placeholder_blocks, processed_lines, quote_block, quote_clump, quotes_added, _ref;
+      link_placeholder = "LINK_PLACEHOLDER";
+      link_re = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))|(LINK_PLACEHOLDER)/gi;
+      links = [];
+      placeholder_blocks = [];
+      message = message.replace(link_re, function(match, i) {
+        var link;
+        placeholder_blocks.push(match === link_placeholder ? link_placeholder : (link = match, link.slice(0, 4) === 'www' ? link = "http://" + link : void 0, links.push(link), "<a href='" + link + "'>" + match + "</a>"));
+        return link_placeholder;
+      });
+      message = $.h(message);
+      message = message.replace(new RegExp(link_placeholder, 'g'), function(match, i) {
+        return placeholder_blocks.shift();
+      });
+      message = message.replace(/\n/g, '<br />\n');
+      processed_lines = [];
+      quote_block = [];
+      quotes_added = 0;
+      quote_clump = function(lines) {
+        quotes_added += 1;
+        return "<div class='quoted_text_holder'>        <a href='#' class='show_quoted_text_link'>" + (I18n.t("quoted_text_toggle", "show quoted text")) + "</a>        <div class='quoted_text' style='display: none;'>          " + (lines.join("\n")) + "        </div>      </div>";
+      };
+      _ref = message.split("\n");
+      for (idx in _ref) {
+        line = _ref[idx];
+        if (line.match(/^(&gt;|>)/)) {
+          quote_block.push(line);
+        } else {
+          if (quote_block.length) {
+            processed_lines.push(quote_clump(quote_block));
+          }
+          quote_block = [];
+          processed_lines.push(line);
+        }
+      }
+      if (quote_block.length) {
+        processed_lines.push(quote_clump(quote_block));
+      }
+      return message = processed_lines.join("\n");
+    };
     build_message = function(data) {
       var $attachment_blank, $media_object_blank, $message, $pm_action, $ul, attachment, avatar, pm_url, submessage, user, user_name, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
       $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id);
@@ -926,7 +999,17 @@
       user_name = (_ref2 = user != null ? user.name : void 0) != null ? _ref2 : I18n.t('unknown_user', 'Unknown user');
       $message.find('.audience').html((user != null ? user.html_name : void 0) || $.h(user_name));
       $message.find('span.date').text($.parseFromISO(data.created_at).datetime_formatted);
-      $message.find('p').html($.h(data.body).replace(/\n/g, '<br />'));
+      $message.find('p').html(formatted_message(data.body));
+      $message.find("a.show_quoted_text_link").click(function(event) {
+        var $text;
+        $text = $(this).parents(".quoted_text_holder").children(".quoted_text");
+        if ($text.length) {
+          event.stopPropagation();
+          event.preventDefault();
+          $text.show();
+          return $(this).hide();
+        }
+      });
       $pm_action = $message.find('a.send_private_message');
       pm_url = $.replaceTags($pm_action.attr('href'), {
         user_id: data.author_id,
@@ -1791,6 +1874,14 @@
       $('#no_messages').showIf(!$conversation_list.find('li').length);
       $('.recipients').tokenInput({
         placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group"),
+        added: function(data) {
+          var _base, _name, _ref3;
+          if (!(data.id && ("" + data.id).match(/^(course|group)_/))) {
+            data = $.extend({}, data);
+            delete data.avatar;
+            return (_ref3 = (_base = MessageInbox.user_cache)[_name = data.id]) != null ? _ref3 : _base[_name] = data;
+          }
+        },
         selector: {
           messages: {
             no_results: I18n.t('no_results', 'No results found')
@@ -1808,12 +1899,13 @@
             $b = $('<b />');
             $b.text(data.name);
             $span = $('<span />');
-            if (data.course_ids != null) {
+            if (data.common_courses != null) {
               $span.text(MessageInbox.shared_contexts_for_user(data));
             }
             $node.append($b, $span);
             $node.attr('title', data.name);
             $node.data('id', data.id);
+            $node.data('user_data', data);
             $node.addClass(data.type ? data.type : 'user');
             if (options.level > 0) {
               $node.prepend('<a class="toggle"><i></i></a>');
@@ -1840,16 +1932,19 @@
       token_input = $('#recipients').data('token_input');
       token_input.fake_input.css('width', '100%');
       token_input.change = function(tokens) {
-        var _ref3;
+        var user, _ref3;
         if (tokens.length > 1 || ((_ref3 = tokens[0]) != null ? _ref3.match(/^(course|group)_/) : void 0)) {
           if (!$form.find('#group_conversation_info').is(':visible')) {
             $form.find('#group_conversation').attr('checked', true);
           }
-          return $form.find('#group_conversation_info').show();
+          $form.find('#group_conversation_info').show();
+          $form.find('#user_note_info').hide();
         } else {
           $form.find('#group_conversation').attr('checked', true);
-          return $form.find('#group_conversation_info').hide();
+          $form.find('#group_conversation_info').hide();
+          $form.find('#user_note_info').showIf((user = MessageInbox.user_cache[tokens[0]]) && can_add_notes_for(user));
         }
+        return inbox_resize();
       };
       $(window).resize(inbox_resize);
       setTimeout(inbox_resize);

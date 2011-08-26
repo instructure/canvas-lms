@@ -27,12 +27,12 @@ class Conversation < ActiveRecord::Base
   has_many :participants,
     :through => :conversation_participants,
     :source => :user,
-    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
+    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups",
     :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
   has_many :subscribed_participants,
     :through => :subscribed_conversation_participants,
     :source => :user,
-    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_course_ids, NULL AS common_group_ids",
+    :select => User::MESSAGEABLE_USER_COLUMN_SQL + ", NULL AS common_courses, NULL AS common_groups",
     :order => 'last_authored_at IS NULL, last_authored_at DESC, LOWER(COALESCE(short_name, name))'
   has_many :attachments, :through => :conversation_messages
 
@@ -98,19 +98,23 @@ class Conversation < ActiveRecord::Base
   end
 
   def add_event_message(current_user, event_data={})
-    add_message(current_user, event_data.to_yaml, true)
+    add_message(current_user, event_data.to_yaml, :generated => true)
   end
 
-  def add_message(current_user, body, generated = false, forward_message_ids = [], update_for_sender = true)
+  def add_message(current_user, body, options = {})
+    options = {:generated => false,
+               :forwarded_message_ids => [],
+               :update_for_sender => true}.update(options)
     transaction do
       lock!
 
       message = conversation_messages.build
       message.author_id = current_user.id
       message.body = body
-      message.generated = generated
-      if forward_message_ids.present?
-        messages = ConversationMessage.find_all_by_id(forward_message_ids.map(&:to_i))
+      message.generated = options[:generated]
+      message.context = options[:context]
+      if options[:forwarded_message_ids].present?
+        messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
         conversation_ids = messages.map(&:conversation_id).uniq
         raise "can only forward one conversation at a time" if conversation_ids.size != 1
         raise "user doesn't have permission to forward these messages" unless current_user.conversations.find_by_conversation_id(conversation_ids.first)
@@ -126,7 +130,7 @@ class Conversation < ActiveRecord::Base
         SELECT #{message.id}, id FROM conversation_participants WHERE conversation_id = #{id}
       SQL
 
-      unless generated
+      unless options[:generated]
         connection.execute("UPDATE conversation_participants SET message_count = message_count + 1 WHERE conversation_id = #{id}")
 
         # make sure this jumps to the top of the inbox and is marked as unread for anyone who's subscribed
@@ -152,8 +156,8 @@ class Conversation < ActiveRecord::Base
 
         # for the sender, update the timestamps
         # marking it as read is a ui concern, unless it's the first message (e.g. we might be sending from outside the inbox)
-        if (sender_conversation = conversation_participants.find_by_user_id(current_user.id)) && (update_for_sender || sender_conversation.last_message_at)
-          mark_as_read = update_for_sender && sender_conversation.last_message_at.nil?
+        if (sender_conversation = conversation_participants.find_by_user_id(current_user.id)) && (options[:update_for_sender] || sender_conversation.last_message_at)
+          mark_as_read = options[:update_for_sender] && sender_conversation.last_message_at.nil?
           if mark_as_read && sender_conversation.unread? && sender_conversation.last_message_at 
             User.update_all 'unread_conversations_count = unread_conversations_count - 1', :id => current_user.id
           end
@@ -182,15 +186,15 @@ class Conversation < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    user = opts[:user]
-    message = opts[:text].strip
-    user = nil unless user && self.participants.map(&:id).include?(user.id)
+    user = opts.delete(:user)
+    message = opts.delete(:text).to_s.strip
+    user = nil unless user && self.participants.find_by_id(user.id)
     if !user
       raise "Only message participants may reply to messages"
-    elsif !message || message.empty?
+    elsif message.blank?
       raise "Message body cannot be blank"
     else
-      add_message(user, message)
+      add_message(user, message, opts)
     end
   end
 end

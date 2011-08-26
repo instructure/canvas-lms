@@ -102,7 +102,7 @@ jQuery(function($) {
       data['calendar_event[description]'] = $(this).find("textarea").editorBox('get_code');
       $full_calendar_event_holder.fillTemplateData({
         data: data,
-        htmlValues: ['description']
+        except: ['description']
       });
       return data;
     },

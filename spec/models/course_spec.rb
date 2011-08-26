@@ -914,3 +914,52 @@ describe Course, "manageable_by_user" do
     Course.manageable_by_user(user.id).should be_empty
   end
 end
+
+describe Course, "conclusions" do
+  it "should grant concluded users read but not participate" do
+    enrollment = course_with_student(:active_all => 1)
+    @course.reload
+
+    # active
+    @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => true}
+
+    # soft conclusion
+    enrollment.start_at = 4.days.ago
+    enrollment.end_at = 2.days.ago
+    enrollment.save!
+    @course.reload
+    @user.reload
+    @user.cached_current_enrollments(:reload)
+
+    enrollment.state.should == :active
+    enrollment.state_based_on_date.should == :completed
+    enrollment.should_not be_participating_student
+
+    @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+
+    # hard enrollment conclusion
+    enrollment.start_at = enrollment.end_at = nil
+    enrollment.workflow_state = 'completed'
+    enrollment.save!
+    @course.reload
+    @user.reload
+    @user.cached_current_enrollments(:reload)
+    enrollment.state.should == :completed
+    enrollment.state_based_on_date.should == :completed
+
+    @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+
+    # course conclusion
+    enrollment.workflow_state = 'active'
+    enrollment.save!
+    @course.reload
+    @course.complete!
+    @user.reload
+    @user.cached_current_enrollments(:reload)
+    enrollment.reload
+    enrollment.state.should == :completed
+    enrollment.state_based_on_date.should == :completed
+
+    @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+  end
+end

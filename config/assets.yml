@@ -99,7 +99,7 @@ javascripts:
     - public/javascripts/content_locks.js
   collaborations:
     - public/javascripts/collaborations.js
-  context_inbox:
+  discussion_replies:
     - public/javascripts/context_inbox.js
   context_modules:
     - public/javascripts/context_modules.js

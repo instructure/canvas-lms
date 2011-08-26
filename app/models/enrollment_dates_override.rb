@@ -17,10 +17,13 @@
 #
 
 class EnrollmentDatesOverride < ActiveRecord::Base
-  include EnrollmentDateRestrictions
-  
   belongs_to :context, :polymorphic => true
   belongs_to :enrollment_term
 
   attr_accessible :enrollment_type, :enrollment_term, :start_at, :end_at
+  before_save :touch_all_enrollments
+
+  def touch_all_enrollments
+    self.enrollment_term.send_later_if_production(:touch_all_enrollments) if self.changed?
+  end
 end
