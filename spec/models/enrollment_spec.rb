@@ -444,6 +444,14 @@ describe Enrollment do
         @enrollment.accept
         @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:inactive)
+
+        @override.start_at = nil
+        @override.end_at = nil
+        @override.save!
+        @term.start_at = 2.days.from_now
+        @term.end_at = 4.days.from_now
+        @term.save!
+        @enrollment.reload.state_based_on_date.should eql(:inactive)
       end
     end
 

@@ -110,11 +110,7 @@ class EnrollmentTerm < ActiveRecord::Base
   def enrollment_dates_for(enrollment)
     return [nil, nil] if ignore_term_date_restrictions
     override = EnrollmentDatesOverride.find_by_enrollment_term_id_and_enrollment_type(self.id, enrollment.type.to_s)
-    if override
-      [override.start_at, override.end_at]
-    else
-      [start_at, end_at]
-    end
+    [ override.try(:start_at) || start_at, override.try(:end_at) || end_at ]
   end
   
   alias_method :destroy!, :destroy
