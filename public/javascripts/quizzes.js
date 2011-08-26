@@ -1150,7 +1150,7 @@ I18n.scoped('quizzes', function(I18n) {
       var $question = $(this).parents(".question");
       var question = $question.getTemplateData({
         textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id'],
-        htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'netural_comments_html']
+        htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
       question.question_text = $question.find("textarea[name='question_text']").val();
       var matches = [];
