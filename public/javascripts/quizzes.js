@@ -124,10 +124,13 @@ I18n.scoped('quizzes', function(I18n) {
     questionContentCounter: 0,
     showFormQuestion: function($form) {
       if(!$form.attr('id')) {
+        // we show and then hide the form so that the layout for the editorBox is computed correctly
+        $form.show();
         $form.find(".question_content").attr('id', 'question_content_' + quiz.questionContentCounter++);
         $form.find(".question_content").editorBox();
         $form.find(".text_after_answers").attr('id', 'text_after_answers_' + quiz.questionContentCounter++);
         $form.find(".text_after_answers").editorBox();
+        $form.hide();
       }
       return $form.show();
     },
