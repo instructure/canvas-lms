@@ -1618,22 +1618,34 @@ class User < ActiveRecord::Base
   end
 
   def enrollment_visibility
-    Rails.cache.fetch(['enrollment_visibility', self].cache_key, :expires_in => 1.hour) do
+    Rails.cache.fetch([self, 'enrollment_visibility'].cache_key, :expires_in => 1.hour) do
       full_course_ids = []
       section_id_hash = {}
       restricted_course_hash = {}
+      user_counts = {}
       (courses + concluded_courses).each do |course|
         section_visibilities = course.section_visibilities_for(self)
+        conditions = nil
         case course.enrollment_visibility_level_for(self, section_visibilities)
-          when :full then full_course_ids << course.id
-          when :sections then section_id_hash[course.id] = section_visibilities.map{|s| s[:course_section_id]}
+          when :full
+            full_course_ids << course.id
+          when :sections
+            section_id_hash[course.id] = section_visibilities.map{|s| s[:course_section_id]}
+            conditions = {:course_section_id => section_id_hash[course.id]}
           when :restricted
             section_visibilities.each do |s|
               (restricted_course_hash[course.id] ||= []) << s[:associated_user_id] if s[:associated_user_id]
             end
+            conditions = "enrollments.type = 'TeacherEnrollment' OR enrollments.type = 'TaEnrollment' OR enrollments.user_id IN (#{([self.id] + restricted_course_hash[course.id].uniq).join(',')})"
         end
+        user_counts[course.id] = course.enrollments.scoped(:conditions => self.class.reflections[:current_and_invited_enrollments].options[:conditions]).scoped(:conditions => conditions).size +
+                                 course.enrollments.scoped(:conditions => self.class.reflections[:concluded_enrollments].options[:conditions]).scoped(:conditions => conditions).size
       end
-      {:full_course_ids => full_course_ids, :section_id_hash => section_id_hash, :restricted_course_hash => restricted_course_hash}
+      {:full_course_ids => full_course_ids,
+       :section_id_hash => section_id_hash,
+       :restricted_course_hash => restricted_course_hash,
+       :user_counts => user_counts
+      }
     end
   end
 
