@@ -260,6 +260,8 @@ class ConversationsController < ApplicationController
 
   def matching_contexts(search, exclude = [])
     avatar_url = avatar_url_for_group(true)
+    course_user_counts = @current_user.enrollment_visibility[:user_counts]
+    group_user_counts = @contexts[:groups].inject({}){ |hash, group| hash[group.id] = group.users.size; hash }
     @contexts.values.map(&:values).flatten.
       select{ |context| search.downcase.strip.split(/\s+/).all?{ |part| context[:name].downcase.include?(part) } }.
       select{ |context| context[:active] }.
@@ -268,7 +270,8 @@ class ConversationsController < ApplicationController
         {:id => "#{context[:type]}_#{context[:id]}",
          :name => context[:name],
          :avatar => avatar_url,
-         :type => :context }
+         :type => :context,
+         :user_count => (context[:type] == :course ? course_user_counts : group_user_counts)[context[:id]]}
       }.
       reject{ |context|
         exclude.include?(context[:id])

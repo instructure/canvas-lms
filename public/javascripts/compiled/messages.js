@@ -86,10 +86,12 @@
       return this.fake_input.css('width', this.node.css('width'));
     };
     TokenInput.prototype.add_token = function(data) {
-      var $close, $text, $token, id, text, val, _ref, _ref2, _ref3;
+      var $close, $text, $token, id, new_token, text, val, _ref, _ref2, _ref3;
       val = (_ref = data != null ? data.value : void 0) != null ? _ref : this.val();
       id = 'token_' + val;
-      if (!this.tokens.find('#' + id).length) {
+      $token = this.tokens.find('#' + id);
+      new_token = $token.length === 0;
+      if (new_token) {
         $token = $('<li />');
         text = (_ref2 = data != null ? data.text : void 0) != null ? _ref2 : this.val();
         $token.attr('id', id);
@@ -107,7 +109,7 @@
       this.placeholder.hide();
       if (data) {
         if (typeof this.added === "function") {
-          this.added(data.data);
+          this.added(data.data, $token, new_token);
         }
       }
       if (typeof this.change === "function") {
@@ -1874,8 +1876,19 @@
       $('#no_messages').showIf(!$conversation_list.find('li').length);
       $('.recipients').tokenInput({
         placeholder: I18n.t('recipient_field_placeholder', "Enter a name, course, or group"),
-        added: function(data) {
-          var _base, _name, _ref3;
+        added: function(data, $token, new_token) {
+          var $details, _base, _name, _ref3;
+          if (new_token && data.type) {
+            $token.addClass(data.type);
+            if (data.user_count != null) {
+              $token.addClass('details');
+              $details = $('<span />');
+              $details.text(I18n.t('people_count', 'person', {
+                count: data.user_count
+              }));
+              $token.append($details);
+            }
+          }
           if (!(data.id && ("" + data.id).match(/^(course|group)_/))) {
             data = $.extend({}, data);
             delete data.avatar;
@@ -1901,6 +1914,10 @@
             $span = $('<span />');
             if (data.common_courses != null) {
               $span.text(MessageInbox.shared_contexts_for_user(data));
+            } else if (data.type && (data.user_count != null)) {
+              $span.text(I18n.t('people_count', 'person', {
+                count: data.user_count
+              }));
             }
             $node.append($b, $span);
             $node.attr('title', data.name);

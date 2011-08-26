@@ -2915,8 +2915,46 @@ I18n.scoped('instructure', function(I18n) {
     var res = (string || "").replace(/([A-Z])/g, " $1").replace(/_/g, " ").replace(/\s+/, " ").replace(/^\s/, "");
     return $.map(res.split(/\s/), function(word) { return (word[0] || "").toUpperCase() + word.substring(1); }).join(" ");
   };
+  // ported pluralizations from active_support/inflections.rb
+  // (except for cow -> kine, because nobody does that) 
+  pluralize = {
+    skip: ['equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep', 'jeans'],
+    patterns: [
+      [/person$/i, 'people'],
+      [/man$/i, 'men'],
+      [/child$/i, 'children'],
+      [/sex$/i, 'sexes'],
+      [/move$/i, 'moves'],
+      [/(quiz)$/i, '$1zes'],
+      [/^(ox)$/i, '$1en'],
+      [/([m|l])ouse$/i, '$1ice'],
+      [/(matr|vert|ind)(?:ix|ex)$/i, '$1ices'],
+      [/(x|ch|ss|sh)$/i, '$1es'],
+      [/([^aeiouy]|qu)y$/i, '$1ies'],
+      [/(hive)$/i, '$1s'],
+      [/(?:([^f])fe|([lr])f)$/i, '$1$2ves'],
+      [/sis$/i, 'ses'],
+      [/([ti])um$/i, '$1a'],
+      [/(buffal|tomat)o$/i, '$1oes'],
+      [/(bu)s$/i, '$1ses'],
+      [/(alias|status)$/i, '$1es'],
+      [/(octop|vir)us$/i, '$1i'],
+      [/(ax|test)is$/i, '$1es'],
+      [/s$/i, 's']
+    ]
+  };
   $.pluralize = function(string) {
-    return (string || "") + "s";
+    string = string || '';
+    if ($.inArray(string, pluralize.skip) > 0) {
+      return string;
+    }
+    for (var i = 0; i < pluralize.patterns.length; i++) {
+      var pair = pluralize.patterns[i];
+      if (string.match(pair[0])) {
+        return string.replace(pair[0], pair[1])
+      }
+    }
+    return string + "s";
   };
   $.pluralize_with_count = function(count, string) {
     return "" + count + " " + (count == 1 ? string : $.pluralize(string));
