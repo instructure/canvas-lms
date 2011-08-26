@@ -151,6 +151,7 @@ javascripts:
     - public/javascripts/attendance.js
   grade_summary:
     - public/javascripts/grade_summary.js
+    - public/javascripts/compiled/grade_calculator.js
   groups:
     - public/javascripts/groups.js
   learning_outcomes:

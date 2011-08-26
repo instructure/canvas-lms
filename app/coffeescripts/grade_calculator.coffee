@@ -101,5 +101,14 @@ class GradeCalculator
     result = parseFloat score
     if result && isFinite(result) then result else 0
 
+  @letter_grade: (grading_scheme, grade) ->
+    letters = $.grep grading_scheme, (row, i) ->
+      # add +1 because the grade actually extends to just below the full number
+      # above it. for example, a B+ that ends at 89, actually extends to
+      # 89.999... , and A- doesn't begin until 90.0.
+      # note this doesn't ever round up fractional values
+      grade < (row[1] * 100 + 1) || i == 0
+    letter = letters[letters.length - 1]
+    letter[0]
 
 window.INST.GradeCalculator = GradeCalculator

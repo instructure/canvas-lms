@@ -103,6 +103,19 @@ shared_examples_for "grading standards selenium tests" do
     
     form.find_element(:css, "#course_grading_standard_enabled").attribute(:checked).should be_nil
   end
+
+  it "should extend ranges to fractional values at the boundary with the next range" do
+    student = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true)
+    @course.enroll_student(student).accept!
+    @course.update_attribute :grading_standard_id, 0
+    @course.assignment_groups.create!
+    @assignment = @course.assignments.create!(:title => "new assignment", :points_possible => 1000, :assignment_group => @course.assignment_groups.first, :grading_type => 'points')
+    @assignment.grade_student(student, :grade => 899)
+    get "/courses/#{@course.id}/grades/#{student.id}"
+    driver.find_element(:css, '#right-side .final_grade .grade').text.should == '89.9'
+    driver.find_element(:css, '#right-side .final_letter_grade .grade').text.should == 'B+'
+  end
 end
 
 describe "grading standards Windows-Firefox-Tests" do

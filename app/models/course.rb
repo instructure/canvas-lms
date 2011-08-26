@@ -1139,7 +1139,11 @@ class Course < ActiveRecord::Base
   def score_to_grade(score)
     return "" unless self.grading_standard_id && score
     scheme = self.grading_standard.try(:data) || GradingStandard.default_grading_standard
-    scheme.min_by {|s| score <= s[1] * 100 ? s[1] : Float::MAX }[0]
+    # add +1 because the grade actually extends to just below the full number
+    # above it. for example, a B+ that ends at 89, actually extends to
+    # 89.999... , and A- doesn't begin until 90.0.
+    # note this doesn't ever round up fractional values
+    scheme.min_by {|s| score < (s[1] * 100 + 1) ? s[1] : Float::MAX }[0]
   end
 
   def participants
