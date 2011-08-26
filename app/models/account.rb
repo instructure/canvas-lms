@@ -762,7 +762,7 @@ class Account < ActiveRecord::Base
   end
   
   def course_count
-    self.child_courses.not_deleted.uniq.count
+    self.child_courses.not_deleted.count('DISTINCT course_id')
   end
   memoize :course_count
   
