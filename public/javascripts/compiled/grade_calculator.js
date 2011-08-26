@@ -179,12 +179,15 @@
         return 0;
       }
     };
-    GradeCalculator.letter_grade = function(grading_scheme, grade) {
+    GradeCalculator.letter_grade = function(grading_scheme, score) {
       var letter, letters;
+      if (score < 0) {
+        score = 0;
+      }
       letters = $.grep(grading_scheme, function(row, i) {
-        return grade < (row[1] * 100 + 1) || i === 0;
+        return score >= row[1] * 100 || i === (grading_scheme.length - 1);
       });
-      letter = letters[letters.length - 1];
+      letter = letters[0];
       return letter[0];
     };
     return GradeCalculator;

@@ -144,7 +144,7 @@ end
 describe Course, "score_to_grade" do
   it "should correctly map scores to grades" do
     default = GradingStandard.default_grading_standard
-    default.to_json.should eql([["A", 1], ["A-", 0.93], ["B+", 0.89], ["B", 0.86], ["B-", 0.83], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]].to_json)
+    default.to_json.should eql([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]].to_json)
     course_model
     @course.score_to_grade(95).should eql("")
     @course.grading_standard_id = 0

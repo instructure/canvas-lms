@@ -212,7 +212,7 @@ describe "Common Cartridge importing" do
   it "should import grading standards" do
     gs = @copy_from.grading_standards.new
     gs.title = "Standard eh"
-    gs.data = [["A", 1], ["A-", 0.92], ["B+", 0.88], ["B", 0.84], ["B!-", 0.82], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]]
+    gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
     gs.save!
     
     #export to xml
@@ -228,6 +228,26 @@ describe "Common Cartridge importing" do
     gs_2 = @copy_to.grading_standards.find_by_migration_id(CC::CCHelper.create_key(gs))
     gs_2.title.should == gs.title
     gs_2.data.should == gs.data
+  end
+
+  it "should import v1 grading standards" do
+    doc = Nokogiri::XML(%{
+<?xml version="1.0" encoding="UTF-8"?>
+<gradingStandards xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
+  <gradingStandard identifier="i293372c956d13a7d48d913a7d971e35d" version="1">
+    <title>Standard eh</title>
+    <data>[["A", 1], ["A-", 0.92], ["B+", 0.88], ["B", 0.84], ["B!-", 0.82], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]]</data>
+  </gradingStandard>
+</gradingStandards>
+    })
+    hash = @converter.convert_grading_standards(doc)
+    #import json into new course
+    GradingStandard.process_migration({'grading_standards'=>hash}, @migration)
+    @copy_to.save!
+
+    gs_2 = @copy_to.grading_standards.last
+    gs_2.title.should == "Standard eh"
+    gs_2.data.should == [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
   end
   
   def create_learning_outcome

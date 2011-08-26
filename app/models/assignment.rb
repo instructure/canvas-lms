@@ -445,17 +445,8 @@ class Assignment < ActiveRecord::Base
       result = score.to_f == self.points_possible ? "complete" : "incomplete"
       result = "complete" if !self.points_possible && score.to_f > 0.0
     elsif self.grading_type == "letter_grade"
-      grades = self.grading_scheme.sort_by{|s| s[1]}.reverse
-      found = false
       score = score.to_f / self.points_possible
-      result = grades[0][1]
-      grades.each do |g|
-        if score <= g[1]
-          found = true
-          result = g[0]
-        end
-      end
-      result = grades[-1] if !result
+      result = GradingStandard.score_to_grade(self.grading_scheme, score * 100)
     end
     result
   end
@@ -475,14 +466,8 @@ class Assignment < ActiveRecord::Base
       0.0
     else
       # try to treat it as a letter grade
-      if grading_scheme 
-        percentage = grading_scheme[grade]
-        percentage ||= grading_scheme.detect{|g, percent| g.downcase == grade.downcase }.try(:last)
-        if percentage
-          (points_possible * percentage * 100.0).round / 100.0
-        else
-          nil
-        end
+      if grading_scheme
+        (points_possible * GradingStandard.grade_to_score(grading_scheme, grade)).round / 100.0
       else
         nil
       end

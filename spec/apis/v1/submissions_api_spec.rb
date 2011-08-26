@@ -580,7 +580,7 @@ describe SubmissionsApiController, :type => :integration do
   end
 
   it "should allow submitting letter_grade as a numeric score" do
-    submit_with_grade({ :grading_type => 'letter_grade', :points_possible => 15 }, '11.9', 11.9, 'B-')
+    submit_with_grade({ :grading_type => 'letter_grade', :points_possible => 15 }, '11.9', 11.9, 'C+')
   end
 
   it "should allow submitting letter_grade as a percentage score" do

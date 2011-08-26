@@ -19,4 +19,27 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GradingStandard do
+  it "should upgrade the standard scheme from v1 to v2" do
+    default_standard_v1 = {
+      "A" => 1.0,
+      "A-" => 0.93,
+      "B+" => 0.89,
+      "B" => 0.86,
+      "B-" => 0.83,
+      "C+" => 0.79,
+      "C" => 0.76,
+      "C-" => 0.73,
+      "D+" => 0.69,
+      "D" => 0.66,
+      "D-" => 0.63,
+      "F" => 0.6
+    }.to_a.sort_by { |i| i[1] }.reverse
+    converted = GradingStandard.upgrade_data(default_standard_v1, 1)
+    default = GradingStandard.default_grading_standard
+    converted.size.should == default.size
+    converted.each_with_index do |row, i|
+      row[0].should == default[i][0]
+      row[1].should be_close(default[i][1], 0.001)
+    end
+  end
 end
