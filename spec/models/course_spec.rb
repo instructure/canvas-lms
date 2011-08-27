@@ -1005,3 +1005,46 @@ describe Course, "conclusions" do
     @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
   end
 end
+
+describe Course, "inherited_assessment_question_banks" do
+  it "should include the course's banks if include_self is true" do
+    @account = Account.create
+    @course = Course.create(:account => @account)
+    @course.inherited_assessment_question_banks(true).should be_empty
+
+    bank = @course.assessment_question_banks.create
+    @course.inherited_assessment_question_banks(true).should eql [bank]
+  end
+
+  it "should include all banks in the account hierarchy" do
+    @root_account = Account.create
+    root_bank = @root_account.assessment_question_banks.create
+
+    @account = Account.new
+    @account.root_account = @root_account
+    @account.save
+    account_bank = @account.assessment_question_banks.create
+
+    @course = Course.create(:account => @account)
+    @course.inherited_assessment_question_banks.sort_by(&:id).should eql [root_bank, account_bank]
+  end
+
+  it "should return a useful scope" do
+    @root_account = Account.create
+    root_bank = @root_account.assessment_question_banks.create
+
+    @account = Account.new
+    @account.root_account = @root_account
+    @account.save
+    account_bank = @account.assessment_question_banks.create
+
+    @course = Course.create(:account => @account)
+    bank = @course.assessment_question_banks.create
+
+    banks = @course.inherited_assessment_question_banks(true)
+    banks.scoped(:order => :id).should eql [root_bank, account_bank, bank]
+    banks.find_by_id(bank.id).should eql bank
+    banks.find_by_id(account_bank.id).should eql account_bank
+    banks.find_by_id(root_bank.id).should eql root_bank
+  end
+end

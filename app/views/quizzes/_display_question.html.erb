@@ -10,6 +10,7 @@
   editing ||= false
   in_group ||= false
   is_assessment_question ||= false
+  bank ||= nil
   asset_string ||= (is_assessment_question ? 'assessment_question' : 'quiz_question') + "_#{hash_get(question, :id)}"
   if question_type.display_answers == "multiple" && hash_get(question, :question_type) != "missing_word_question"
     right_answers = hash_get(question, :answers, {})
@@ -45,7 +46,7 @@
       <span class="question_type"><%= (question_type.try_rescue(:question_type)) %></span>
       <span class="answer_selection_type"></span>
       <% if is_assessment_question %>
-        <a href="<%= context_url(@context, :context_assessment_question_url, hash_get(question, :id, "{{ id }}")) %>" class="update_question_url">&nbsp;</a>
+        <a href="<%= context_url(@context, :context_question_bank_assessment_question_url, bank ? bank.id : "{{question_bank_id}}", hash_get(question, :id, "{{ id }}")) %>" class="update_question_url">&nbsp;</a>
       <% else %>
         <a href="<%= context_url(@context, :context_quiz_quiz_question_url, @quiz.id, hash_get(question, :id, "{{ id }}")) %>" class="update_question_url">&nbsp;</a>
       <% end %>

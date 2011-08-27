@@ -1001,4 +1001,20 @@ class ApplicationController < ActionController::Base
     UserContent.escape(str)
   end
   helper_method :user_content
+
+  def find_bank(id, check_context_chain=true)
+    bank = @context.assessment_question_banks.active.find_by_id(id)
+    if bank
+      (block_given? ?
+        authorized_action(bank, @current_user, :read) :
+        bank.grants_right?(@current_user, session, :read)) or return nil
+    elsif check_context_chain
+      (block_given? ?
+        authorized_action(@context, @current_user, :read_question_banks) :
+        @context.grants_right?(@current_user, session, :read_question_banks)) or return nil
+      bank = @context.inherited_assessment_question_banks.find_by_id(id)
+    end
+    yield if block_given? && (@bank = bank)
+    bank
+  end
 end

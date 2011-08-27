@@ -45,6 +45,16 @@ ActionController::Routing::Routes.draw do |map|
   
   map.message_redirect "mr/:id", :controller => 'info', :action => 'message_redirect'
 
+  question_bank_resources = lambda do |bank|
+    bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
+    bank.reorder 'reorder', :controller => 'question_banks', :action => 'reorder'
+    bank.questions 'questions', :controller => 'question_banks', :action => 'questions'
+    bank.move_questions 'move_questions', :controller => 'question_banks', :action => 'move_questions'
+    bank.resources :assessment_questions do |question|
+      question.move_question 'move', :controller => 'assessment_questions', :action => 'move'
+    end
+  end
+
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -178,15 +188,8 @@ ActionController::Routing::Routes.draw do |map|
       conference.settings "settings", :controller => "conferences", :action => "settings"
     end
     
-    course.resources :question_banks do |bank|
-      bank.bookmark 'bookmark', :controller => 'question_banks', :action => 'bookmark'
-      bank.reorder 'reorder', :controller => 'question_banks', :action => 'reorder'
-      bank.questions 'questions', :controller => 'question_banks', :action => 'questions'
-      bank.move_questions 'move_questions', :controller => 'question_banks', :action => 'move_questions'
-    end
-    course.resources :assessment_questions do |question|
-      question.move_question 'move', :controller => 'assessment_questions', :action => 'move'
-    end
+    course.resources :question_banks, &question_bank_resources
+
     course.quizzes_publish 'quizzes/publish', :controller => 'quizzes', :action => 'publish'
     course.resources :quizzes do |quiz|
       quiz.reorder "reorder", :controller => "quizzes", :action => "reorder"
@@ -449,6 +452,7 @@ ActionController::Routing::Routes.draw do |map|
     account.user_notes 'user_notes', :controller => 'user_notes', :action => 'user_notes'
     account.run_report 'run_report', :controller => 'accounts', :action => 'run_report'
     account.resources :alerts
+    account.resources :question_banks, &question_bank_resources
   end
   map.avatar_image 'images/users/:user_id', :controller => 'info', :action => 'avatar_image_url', :conditions => {:method => :get}
   map.thumbnail_image 'images/thumbnails/:id/:uuid', :controller => 'files', :action => 'image_thumbnail'

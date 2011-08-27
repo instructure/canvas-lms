@@ -1,6 +1,6 @@
 <div id="find_question_dialog" style="display: none;">
-  <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
-  <a href="/{{ context_type_plural }}/{{ context_id }}/question_banks/{{ question_bank_id }}/questions" class="question_bank_questions_url" style="display: none;">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1', :inherited => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
+  <a href="/<%= @quiz.context_url_prefix %>/question_banks/{{ question_bank_id }}/questions?inherited=1" class="question_bank_questions_url" style="display: none;">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_questions_url" style="display: none;">&nbsp;</a>
   <h2 style="margin-top: 0; float: left;"><%= t('headers.find_questions_to_add', "Find Quiz Questions to Add") %></h2>
   <div style="float: right; padding-right: 5px; line-height: 2.5em;">
@@ -58,7 +58,7 @@
   </table>
 </div>
 <div id="find_bank_dialog" style="display: none;">
-  <a href="<%= context_url(@context, :context_question_banks_url, :managed => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
+  <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1', :inherited => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
   <h2 style="margin-top: 0; float: left;"><%= t('headers.link_to_question_bank', "Link to Question Bank") %></h2>
   <div style="float: right; padding-right: 5px; line-height: 2.5em;">
     <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.manage_question_banks', "Manage Course Question Banks") %></a>

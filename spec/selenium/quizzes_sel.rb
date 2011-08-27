@@ -314,6 +314,59 @@ shared_examples_for "quiz selenium tests" do
     keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "17" }
   end
 
+  it "should allow you to use inherited question banks" do
+    course_with_teacher_logged_in
+    @course.account = Account.default
+    @course.save
+    quiz = @course.quizzes.create!(:title => "My Quiz")
+    bank = AssessmentQuestionBank.create!(:context => @course.account)
+    bank.assessment_questions << assessment_question_model
+
+    get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+
+    driver.find_element(:link, "Find Questions").click
+    keep_trying_until {
+      driver.find_element(:link, "Select All")
+    }.click
+    find_with_jquery("div#find_question_dialog button.submit_button").click
+    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "1" }
+
+    driver.find_element(:link, "New Question Group").click
+    driver.find_element(:link, "Link to a Question Bank").click
+    keep_trying_until {
+      find_with_jquery("#find_bank_dialog .bank:visible")
+    }.click
+    find_with_jquery("#find_bank_dialog .submit_button").click
+    find_with_jquery("#group_top_new button[type=submit]").click
+    keep_trying_until { find_with_jquery("#quiz_display_points_possible .points_possible").text.should == "2" }
+  end
+
+  it "should check permissions when retrieving question banks" do
+    course_with_teacher_logged_in
+    @course.account = Account.default
+    @course.account.role_overrides.create(:permission => :read_question_banks, :enrollment_type => 'TeacherEnrollment', :enabled => false)
+    @course.save
+    quiz = @course.quizzes.create!(:title => "My Quiz")
+
+    course_bank = AssessmentQuestionBank.create!(:context => @course)
+    course_bank.assessment_questions << assessment_question_model
+
+    account_bank = AssessmentQuestionBank.create!(:context => @course.account)
+    account_bank.assessment_questions << assessment_question_model
+
+    get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+
+    driver.find_element(:link, "Find Questions").click
+    keep_trying_until {
+      driver.find_element(:link, "Select All")
+    }
+    find_all_with_jquery("#find_question_dialog .bank:visible").size.should eql 1
+
+    driver.find_element(:link, "New Question Group").click
+    driver.find_element(:link, "Link to a Question Bank").click
+    find_all_with_jquery("#find_bank_dialog .bank:visible").size.should eql 1
+  end
+
   it "should not duplicate unpublished quizzes each time you open the publish multiple quizzes dialog" do
     course_with_teacher_logged_in
     5.times { @course.quizzes.create!(:title => "My Quiz") }
