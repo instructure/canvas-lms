@@ -310,7 +310,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_dates
-    Rails.cache.fetch([self, 'enrollment_dates'].cache_key) do
+    Rails.cache.fetch([self, self.course, 'enrollment_dates'].cache_key) do
       if self.start_at && self.end_at
         [self.start_at, self.end_at]
       elsif course_section.try(:restrict_enrollments_to_section_dates) && !self.admin?
