@@ -1,3 +1,12 @@
+canvas-lms (1.1-53) professional; urgency=low
+
+  * Package ref: 417d11741479173f8658bbeeb3bdea7f293596d9
+  *
+  * [+08172ac] invalidate enrollment date restrictions based on course
+  * [+417d117] only touch courses once when updating terms and overrides
+
+ -- JT Olds <jt@instructure.com>  Fri, 26 Aug 2011 23:00:51 -0600
+
 canvas-lms (1.1-52) professional; urgency=low
 
   * Package ref: da047f047d6530a18454b8317d123e0772206219
