@@ -284,7 +284,7 @@ class DiscussionTopicsController < ApplicationController
       end
       delay_posting = params[:discussion_topic].delete :delay_posting
       delayed_post_at = params[:discussion_topic].delete :delayed_post_at
-      delayed_post_at = Time.parse(delayed_post_at) if delayed_post_at
+      delayed_post_at = Time.zone.parse(delayed_post_at) if delayed_post_at
       @topic.workflow_state = (delay_posting == '1' && delayed_post_at > Time.now ? 'post_delayed' : @topic.workflow_state)
       @topic.workflow_state = 'active' if @topic.post_delayed? && (!delayed_post_at || delay_posting != '1')
       @topic.delayed_post_at = @topic.post_delayed? ? delayed_post_at : nil
