@@ -29,21 +29,15 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :course_sections
   before_validation :verify_unique_sis_source_id
   validates_length_of :sis_data, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  before_save :update_enrollments_later
+  before_save :update_courses_later
 
-  def update_enrollments_later
-    self.send_later_if_production(:touch_all_enrollments) if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
+  def update_courses_later
+    self.send_later_if_production(:touch_all_courses) if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
   end
 
-  def touch_all_enrollments
+  def touch_all_courses
     return if new_record?
-    case Enrollment.connection.adapter_name
-    when 'MySQL'
-      Enrollment.connection.execute("UPDATE users, enrollments, courses SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=courses.id AND courses.enrollment_term_id=#{self.id}")
-    else
-      Enrollment.update_all({:updated_at => Time.now}, "course_id IN (SELECT id FROM courses WHERE enrollment_term_id=#{self.id})")
-      User.update_all({:updated_at => Time.now}, "id IN (SELECT user_id FROM enrollments INNER JOIN courses ON enrollments.course_id=courses.id WHERE courses.enrollment_term_id=#{self.id})")
-    end
+    Course.update_all({:updated_at => Time.now}, "enrollment_term_id=#{self.id}")
   end
   
   def self.i18n_default_term_name

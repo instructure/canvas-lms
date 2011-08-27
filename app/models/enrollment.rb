@@ -309,7 +309,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_dates
-    Rails.cache.fetch([self, 'enrollment_date_ranges'].cache_key) do
+    Rails.cache.fetch([self, self.course, 'enrollment_date_ranges'].cache_key) do
       result = []
       if self.start_at && self.end_at
         result << [self.start_at, self.end_at]
