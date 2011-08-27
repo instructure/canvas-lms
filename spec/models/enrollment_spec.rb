@@ -550,6 +550,7 @@ describe Enrollment do
         sleep 1
         @term.start_at = 4.days.ago
         @term.end_at = 2.days.ago
+        @term.reset_touched_courses_flag
         @term.save!
         @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:completed)
@@ -557,7 +558,9 @@ describe Enrollment do
         sleep 1
         @term.start_at = 2.days.from_now
         @term.end_at = 4.days.from_now
+        @term.reset_touched_courses_flag
         @term.save!
+        @enrollment.course.reload
         @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:inactive)
       end
@@ -579,6 +582,7 @@ describe Enrollment do
         sleep 1
         @override.start_at = 4.days.ago
         @override.end_at = 2.days.ago
+        @term.reset_touched_courses_flag
         @override.save!
         @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:completed)
@@ -586,6 +590,7 @@ describe Enrollment do
         sleep 1
         @override.start_at = 2.days.from_now
         @override.end_at = 4.days.from_now
+        @term.reset_touched_courses_flag
         @override.save!
         @enrollment.reload.state.should eql(:active)
         @enrollment.state_based_on_date.should eql(:inactive)

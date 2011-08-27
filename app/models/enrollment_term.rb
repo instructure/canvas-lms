@@ -29,17 +29,27 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :course_sections
   before_validation :verify_unique_sis_source_id
   validates_length_of :sis_data, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  before_save :update_courses_later
+  before_save :update_courses_later_if_necessary
 
-  def update_courses_later
-    self.send_later_if_production(:touch_all_courses) if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
+  def update_courses_later_if_necessary
+    self.update_courses_later if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
+  end
+
+  # specifically for use in specs
+  def reset_touched_courses_flag
+    @touched_courses = false
   end
 
   def touch_all_courses
     return if new_record?
     Course.update_all({:updated_at => Time.now}, "enrollment_term_id=#{self.id}")
   end
-  
+
+  def update_courses_later
+    self.send_later_if_production(:touch_all_courses) unless @touched_courses
+    @touched_courses = true
+  end
+
   def self.i18n_default_term_name
     t '#account.default_term_name', "Default Term"
   end
@@ -69,7 +79,10 @@ class EnrollmentTerm < ActiveRecord::Base
     params.map do |type, values|
       type = type.classify
       enrollment_type = Enrollment.typed_enrollment(type).to_s
-      override = self.enrollment_dates_overrides.find_or_create_by_enrollment_type(enrollment_type)
+      override = self.enrollment_dates_overrides.find_by_enrollment_type(enrollment_type)
+      override ||= self.enrollment_dates_overrides.build(:enrollment_type => enrollment_type)
+      # preload the reverse association - VERY IMPORTANT so that @touched_enrollments is shared
+      override.enrollment_term = self
       override.start_at = values[:start_at]
       override.end_at = values[:end_at]
       override.context = context
