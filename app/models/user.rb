@@ -1607,6 +1607,14 @@ class User < ActiveRecord::Base
   def sis_user_id
     pseudonym.try(:sis_user_id)
   end
+  
+  def highest_role
+    return 'admin' unless self.accounts.empty?
+    return 'teacher' if self.cached_current_enrollments.any?(&:admin?)
+    return 'student' if self.cached_current_enrollments.any?(&:student?)
+    return 'user'
+  end
+  memoize :highest_role
 
   def eportfolios_enabled?
     accounts = associated_root_accounts.reject(&:site_admin?)

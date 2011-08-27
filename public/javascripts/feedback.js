@@ -20,10 +20,10 @@ I18n.scoped('feedback', function(I18n) {
 $(document).ready(function() {
   var dialogOpened = false;
   var $dialog = $("#feedback_dialog");
-  var feedbackInit = function(open) {
+  var courses = [];
+  function helpInit() {
     var $column = $("#menu .menu-item-drop-column:first")
     var text = $column.find("h2:first").text();
-    var courses = [];
     if(text && text.match(/courses/i)) {
       var added_ids = {};
       $column.find("li").each(function() {
@@ -44,6 +44,22 @@ $(document).ready(function() {
         }
       });
     }
+    var role = 'user';
+    if($("#identity_feedback").hasClass('admin')) {
+      role = 'admin';
+    } else if($("#identity_feedback").hasClass('teacher')) {
+      role = 'teacher';
+    } else if($("#identity_feedback").hasClass('student') && courses.length) {
+      role = 'student';
+    }
+    $("#help_dialog").children("ul").addClass(role).end()
+      .dialog('close').dialog({
+        autoOpen: false,
+        resizable: false
+      }).dialog('open')
+  }
+  var feedbackInit = function(open) {
+    $("#help_dialog").dialog('close');
     if(feedbackInit.already_initialized) { 
       $dialog.triggerHandler('feedback_click');
       return; 
@@ -62,14 +78,20 @@ $(document).ready(function() {
             }).join('');
           })
           .showIf(courses.length > 0);
-          
         $dialog.find(".feedback-type-holder, .feedback-type-teacher").showIf(courses.length > 0);
         $dialog.find(".feedback-type").change();
       }
-      $dialog.find("#feedback-type-instructure").attr('checked', true);
+      if(feedbackInit.default_view == 'message_teacher') {
+        $dialog.find("#feedback-type-teacher").attr('checked', true);
+      } else {
+        $dialog.find("#feedback-type-instructure").attr('checked', true);
+      }
+      $dialog.find(".feedback-type-holder").showIf(feedbackInit.default_view == 'message_teacher');
+      $dialog.find(".feedback_message").showIf(feedbackInit.default_view == 'problem');
       $dialog.find(".feedback-course-select option[value=" + $.trim($("#identity .course_id").text()) + "]").attr('selected', true);
       $dialog.find("#feedback_form_page_url").val(location.href);
-      $dialog.find("textarea, #feedback_form_subject").val("");
+      $dialog.find("textarea, #feedback_form_subject").val("")
+      $dialog.find("#feedback_form_subject").focus().select();
     };
     var dialogParams = {
       autoOpen: false,
@@ -150,6 +172,16 @@ $(document).ready(function() {
   });
   $("#feedback_link").click(function(event) {
     event.preventDefault();
+    helpInit();
+  });
+  $("#help_dialog .message_teacher_link").click(function(event) {
+    event.preventDefault();
+    feedbackInit.default_view = 'message_teacher';
+    feedbackInit(true);
+  });
+  $("#help_dialog .file_ticket_link").click(function(event) {
+    event.preventDefault();
+    feedbackInit.default_view = 'problem';
     feedbackInit(true);
   });
 });

@@ -875,6 +875,10 @@ class Account < ActiveRecord::Base
     true
   end
   
+  def custom_feedback_links
+    []
+  end
+  
   def self.allowable_services
     {
       :google_docs => {
