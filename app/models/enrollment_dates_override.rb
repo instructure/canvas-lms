@@ -24,6 +24,6 @@ class EnrollmentDatesOverride < ActiveRecord::Base
   before_save :touch_all_courses
 
   def touch_all_courses
-    self.enrollment_term.send_later_if_production(:touch_all_courses) if self.changed?
+    self.enrollment_term.update_courses_later if self.changed?
   end
 end
