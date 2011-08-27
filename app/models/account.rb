@@ -59,6 +59,20 @@ class Account < ActiveRecord::Base
   has_many :account_authorization_configs, :order => 'id'
   has_many :account_reports
   has_many :grading_standards, :as => :context
+  has_many :assessment_questions, :through => :assessment_question_banks
+  has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
+  def inherited_assessment_question_banks(include_self = false, *additional_contexts)
+    sql = []
+    conds = []
+    contexts = additional_contexts + account_chain
+    contexts.delete(self) unless include_self
+    contexts.each { |c|
+      sql << "context_type = ? AND context_id = ?"
+      conds += [c.class.to_s, c.id]
+    }
+    conds.unshift(sql.join(" OR "))
+    AssessmentQuestionBank.scoped :conditions => conds
+  end
   
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :learning_outcomes, :as => :context

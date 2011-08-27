@@ -393,6 +393,24 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :read_question_banks => {
+        :label => lambda { t('permissions.read_question_banks', "View and link to question banks") },
+        :available_to => [
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ]
+      },
       :manage_calendar => {
         :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
         :available_to => [

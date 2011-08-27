@@ -126,8 +126,12 @@ class Course < ActiveRecord::Base
   has_many :wiki_namespaces, :as => :context, :dependent => :destroy
   has_many :quizzes, :as => :context, :dependent => :destroy, :order => 'lock_at, title'
   has_many :active_quizzes, :class_name => 'Quiz', :as => :context, :include => :assignment, :conditions => ['quizzes.workflow_state != ?', 'deleted'], :order => 'created_at'
-  has_many :assessment_questions, :as => :context
+  has_many :assessment_questions, :through => :assessment_question_banks
   has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
+  def inherited_assessment_question_banks(include_self = false)
+    self.account.inherited_assessment_question_banks(true, *(include_self ? [self] : []))
+  end
+
   has_many :external_feeds, :as => :context, :dependent => :destroy
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
   has_many :grading_standards, :as => :context

@@ -6,7 +6,7 @@ shared_examples_for "question bank selenium tests" do
   it "deleting AJAX-loaded questions should work" do
     course_with_teacher_logged_in
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-    (1..60).each { |idx| @bank.assessment_questions.create!(:question_data => {'question_name' => "test question #{idx}", 'answers' => [{'id' => 1}, {'id' => 2}]}) { |aq| aq.context = @course } }
+    (1..60).each { |idx| @bank.assessment_questions.create!(:question_data => {'question_name' => "test question #{idx}", 'answers' => [{'id' => 1}, {'id' => 2}]}) }
     get "/courses/#{@course.id}/question_banks/#{@bank.id}"
     driver.find_element(:css, ".more_questions_link").click
     keep_trying_until { find_all_with_jquery('.question_teaser:visible').length == 60 }

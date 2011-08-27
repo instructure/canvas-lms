@@ -1595,9 +1595,9 @@ I18n.scoped('quizzes', function(I18n) {
       var $bank = $findQuestionDialog.find(".bank.selected_side_tab");
       var bank = $bank.data('bank_data');
       var url = $findQuestionDialog.find(".question_bank_questions_url").attr('href');
-      url = $.replaceTags($.replaceTags($.replaceTags(url, 'question_bank_id', bank.id), 'context_id', bank.context_id), 'context_type_plural', $.pluralize($.underscore(bank.context_type)));
+      url = $.replaceTags(url, 'question_bank_id', bank.id);
       var page = ($findQuestionDialog.find(".page_link").data('page') || 0) + 1;
-      url += "?page=" + page;
+      url += "&page=" + page;
       $.ajaxJSON(url, 'GET', {}, function(data) {
         $link.removeClass('loading');
         $findQuestionDialog.find(".page_link").data('page', page);
