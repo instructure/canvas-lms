@@ -898,7 +898,7 @@ class CoursesController < ApplicationController
           end
         end
       end
-      @course.send(params[:course].delete(:event)) if params[:course][:event]
+      @course.process_event(params[:course].delete(:event)) if params[:course][:event]
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
         if @course.update_attributes(params[:course])

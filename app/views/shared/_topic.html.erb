@@ -80,6 +80,9 @@
       <% if topic && topic.editor_id && topic.editor_id != topic.user_id %>
         <div><%= t 'edited_by', 'This topic was edited by %{user}', :user => link_to(context_user_name(topic_context, topic.editor_id), context_url(topic_context, :context_user_url, topic.editor_id)) %></div>
       <% end %>
+      <% if topic && topic.locked? %>
+        <div><%= t 'locked', 'This topic is closed for comments' %></div>
+      <% end %>
     </div>
     <div class="source" style="font-size: 0.8em; float: left; color: #888;">
       <% feed = topic.external_feed rescue nil %>

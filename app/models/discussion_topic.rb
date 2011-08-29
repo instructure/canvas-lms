@@ -198,7 +198,11 @@ class DiscussionTopic < ActiveRecord::Base
   end
   
   workflow do
-    state :active
+    state :active do
+      event :lock, :transitions_to => :locked do
+        raise "cannot lock before due date" if self.assignment.try(:due_at) && self.assignment.due_at < Time.now
+      end
+    end
     state :post_delayed do
       event :delayed_post, :transitions_to => :active do
         @delayed_just_posted = true
@@ -206,7 +210,9 @@ class DiscussionTopic < ActiveRecord::Base
         self.posted_at = Time.now
       end
     end
-    state :locked
+    state :locked do
+      event :unlock, :transitions_to => :active
+    end
     state :deleted
   end
   
@@ -316,21 +322,28 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && !self.locked? && !self.root_topic_id }
     can :delete
     
-    given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :read) }#
+    given { |user, session| (self.active? || self.locked?) && self.cached_context_grants_right?(user, session, :read) }#
     can :read
     
-    given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) && !self.locked? }#students.include?(user) }
+    given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
     can :reply and can :read
-    
+
+    given { |user, session| (self.active? || self.locked?) && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    can :read
+
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) and not self.is_announcement }
     can :create
     
     given { |user, session| self.context.respond_to?(:allow_student_forum_attachments) && self.context.allow_student_forum_attachments && self.cached_context_grants_right?(user, session, :post_to_forum) }# students.find_by_id(user) }
     can :attach
     
-    given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
+    given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.locked? }
     can :update and can :delete and can :create and can :read and can :attach
-    
+
+    # Moderators can still modify content even in locked topics (*especially* unlocking them), but can't create new content
+    given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
+    can :update and can :delete and can :read
+
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
     can :update
     

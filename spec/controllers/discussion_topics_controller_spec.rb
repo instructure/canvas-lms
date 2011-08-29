@@ -257,6 +257,17 @@ describe DiscussionTopicsController do
       @topic.reload
       @topic.delayed_post_at.should == expected_time
     end
+
+    it "should allow unlocking a locked topic" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_topic
+      @topic.lock!
+
+      put 'update', :course_id => @course.id, :id => @topic.id, :discussion_topic => { :event => 'unlock' }
+
+      @topic.reload
+      @topic.should_not be_locked
+    end
   end
   
   describe "DELETE 'destroy'" do
