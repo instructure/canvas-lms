@@ -691,14 +691,10 @@ class Account < ActiveRecord::Base
   end
 
   def self.site_admin
-    # TODO i18n
-    t '#account.default_site_administrator_account_name', 'Site Admin'
     get_special_account('site_admin', 'Site Admin')
   end
 
   def self.default
-    # TODO i18n
-    t '#account.default_account_name', 'Default Account'
     get_special_account('default', 'Default Account')
   end
 
@@ -720,6 +716,9 @@ class Account < ActiveRecord::Base
       account = Account.find_by_id(account_id)
     end
     return @special_accounts[special_account_type] = account if account
+    # TODO i18n
+    t '#account.default_site_administrator_account_name', 'Site Admin'
+    t '#account.default_account_name', 'Default Account'
     account = Account.create!(:name => default_account_name)
     Setting.set("#{special_account_type}_account_id", account.id)
     return @special_accounts[special_account_type] = account

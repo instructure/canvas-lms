@@ -20,16 +20,15 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  
+
   attr_accessor :active_tab
-  
+
   include LocaleSelection
   around_filter :set_locale
 
-  add_crumb(lambda { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
   helper :all
   filter_parameter_logging :password
-  
+
   include AuthenticationMethods
   protect_from_forgery
   before_filter :load_account, :load_user
@@ -42,8 +41,10 @@ class ApplicationController < ActionController::Base
   before_filter :fix_xhr_requests
   before_filter :init_body_classes_and_active_tab
 
+  add_crumb(lambda { I18n.t('links.dashboard', "My Dashboard") }, :root_path, :class => "home")
+
   protected
-  
+
   def set_locale
     I18n.localizer = lambda {
       infer_locale :context => @context,
