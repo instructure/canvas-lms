@@ -835,6 +835,15 @@ class UsersController < ApplicationController
       next unless student = data[user_id]
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
+    last_message_dates = ConversationMessage.maximum(
+      :created_at,
+      :joins => 'INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id',
+      :group => ['conversation_participants.user_id', 'conversation_messages.author_id'],
+      :conditions => [ 'conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher.id, ids ])
+    last_message_dates.each do |key, date|
+      next unless student = data[key.first.to_i]
+      student[:last_interaction] = [student[:last_interaction], date].compact.max
+    end
 
     # find all ungraded submissions in one query
     ungraded_submissions = course.submissions.all(
