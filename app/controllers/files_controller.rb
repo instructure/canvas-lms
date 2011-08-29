@@ -278,7 +278,7 @@ class FilesController < ApplicationController
   # a canvas URL are at least on a separate subdomain and the javascript 
   # won't be able to access or update data with AJAX requests.
   def safer_domain_available?
-    if !@files_domain && request.host_with_port != HostUrl.file_host(@domain_root_account)
+    if !@files_domain && !HostUrl.is_file_host?(request.host_with_port)
       @safer_domain_host = HostUrl.file_host(@domain_root_account)
     end
     !!@safer_domain_host
