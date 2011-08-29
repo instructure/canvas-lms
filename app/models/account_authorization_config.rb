@@ -196,7 +196,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         t(:test_login_auth_failed, "Authentication failed")
       )
     rescue Net::LDAP::LdapError
-      self.errors.add(:ldap_login_test, $!)
+      self.errors.add(
+        :ldap_login_test,
+        t(:test_login_auth_exception, "Exception on login: %{error}", :error => $!)
+      )
     end
     false
   end
