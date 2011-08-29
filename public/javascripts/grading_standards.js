@@ -208,8 +208,8 @@ I18n.scoped('grading_standards', function(I18n){
         var $row_instance = $row.clone(true);
         var row = standard.data[idx];
         $row_instance.removeClass('to_delete').removeClass('to_add');
-        $row_instance.find(".standard_name").val(row[0]).end()
-          .find(".standard_value").val(row[1] * 100);
+        $row_instance.find(".standard_name").val(row[0]).attr('name', 'grading_standard[standard_data][scheme_'+idx+'][name]').end()
+          .find(".standard_value").val(row[1] * 100).attr('name', 'grading_standard[standard_data][scheme_'+idx+'][value]');
         $table.append($row_instance.show());
         $table.append($link.clone(true).show());
       }
