@@ -167,6 +167,14 @@ module SIS
                     enrollment.workflow_state = 'inactive'
                   end
 
+                  begin
+                    enrollment.start_at = row['start_date'].blank? ? nil : DateTime.parse(row['start_date'])
+                    enrollment.end_at = row['end_date'].blank? ? nil : DateTime.parse(row['end_date'])
+                  rescue
+                    add_warning(csv, "Bad date format for user #{row['user_id']} in #{row['course_id'].blank? ? 'section' : 'course'} #{row['course_id'].blank? ? row['section_id'] : row['course_id']}")
+                  end
+
+
                   courses_to_touch_ids.add(enrollment.course)
                   if enrollment.should_update_user_account_association?
                     if enrollment.new_record? && !update_account_association_user_ids.include?(user.id)

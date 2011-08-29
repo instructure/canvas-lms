@@ -877,7 +877,8 @@ describe SIS::SisCsv do
         "user_2,user2,User,Dos,user2@example.com,active",
         "user_3,user4,User,Tres,user3@example.com,active",
         "user_5,user5,User,Quatro,user5@example.com,active",
-        "user_6,user6,User,Cinco,user6@example.com,active"
+        "user_6,user6,User,Cinco,user6@example.com,active",
+        "user_7,user7,User,Siete,user7@example.com,active"
       )
       process_csv_data(
         "section_id,course_id,name,status,start_date,end_date",
@@ -885,12 +886,13 @@ describe SIS::SisCsv do
       )
       # the enrollments
       process_csv_data(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,user_1,teacher,,active,",
-        ",user_2,student,S001,active,",
-        "test_1,user_3,ta,S001,active,",
-        "test_1,user_5,observer,S001,active,user_2",
-        "test_1,user_6,designer,S001,active,"
+        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+        "test_1,user_1,teacher,,active,,,",
+        ",user_2,student,S001,active,,,",
+        "test_1,user_3,ta,S001,active,,,",
+        "test_1,user_5,observer,S001,active,user_2,,",
+        "test_1,user_6,designer,S001,active,,,",
+        "test_1,user_7,teacher,S001,active,,1985-08-24,2011-08-29"
       )
       course = @account.courses.find_by_sis_source_id("test_1")
       course.teachers.first.name.should == "User Uno"
@@ -899,6 +901,9 @@ describe SIS::SisCsv do
       course.observers.first.name.should == "User Quatro"
       course.observer_enrollments.first.associated_user_id.should == course.students.first.id
       course.designers.first.name.should == "User Cinco"
+      course.teacher_enrollments.last.user.name.should == "User Siete"
+      course.teacher_enrollments.last.start_at.should == DateTime.new(1985, 8, 24)
+      course.teacher_enrollments.last.end_at.should == DateTime.new(2011, 8, 29)
     end
 
     it "should not try looking up a section to enroll into if the section name is empty" do
