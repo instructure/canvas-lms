@@ -29,7 +29,7 @@
           serviceUrl: $newUserForm[0].action + ".json",
           onSelect: function(value, data){
             window.location = data
-          <% if @account.all_users.count < 250 %>
+          <% if @account.user_count < 250 %>
           },
           
           lookup: <%= raw({

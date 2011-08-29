@@ -85,6 +85,7 @@ class Account < ActiveRecord::Base
   has_many :account_notifications
   has_many :alerts, :as => :context, :include => :criteria
   has_many :associated_alerts, :through => :associated_courses, :source => :alerts, :include => :criteria
+  has_many :user_account_associations
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
@@ -783,7 +784,12 @@ class Account < ActiveRecord::Base
     self.sub_accounts.active.count
   end
   memoize :sub_account_count
-  
+
+  def user_count
+    self.user_account_associations.count
+  end
+  memoize :user_count
+
   def current_sis_batch
     if (current_sis_batch_id = self.read_attribute(:current_sis_batch_id)) && current_sis_batch_id.present?
       self.sis_batches.find_by_id(current_sis_batch_id)
