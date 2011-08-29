@@ -93,6 +93,16 @@ module Delayed
           scope.by_priority
         end
 
+        # Clear all pending jobs for a specified strand
+        #
+        # Note that it *does* not clear out currently running or held jobs, for
+        # synchronization purposes: If you're using a strand for a "singleton" job,
+        # the currently running instance should complete, before the next instance
+        # starts.
+        def self.clear_strand!(strand_name)
+          self.delete_all(['strand=? AND locked_at IS NULL', strand_name])
+        end
+
         # Lock this job for this worker.
         # Returns true if we have the lock, false otherwise.
         #
