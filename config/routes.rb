@@ -388,6 +388,7 @@ ActionController::Routing::Routes.draw do |map|
     account.statistics_graph 'statistics/over_time/:attribute', :controller => 'accounts', :action => 'statistics_graph'
     account.formatted_statistics_graph 'statistics/over_time/:attribute.:format', :controller => 'accounts', :action => 'statistics_graph'
     account.turnitin_confirmation 'turnitin/:id/:shared_secret', :controller => 'accounts', :action => 'turnitin_confirmation'
+    account.resources :permissions, :controller => 'role_overrides', :only => [:index, :create], :collection => {:add_role => :post, :remove_role => :delete}
     account.resources :role_overrides, :only => [:index, :create], :collection => {:add_role => :post, :remove_role => :delete}
     account.resources :terms
     account.resources :sub_accounts
