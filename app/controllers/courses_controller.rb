@@ -937,7 +937,7 @@ class CoursesController < ApplicationController
   def reset_content
     get_context
     return unless authorized_action(@context, @current_user, :manage_content)
-    @context.reset_content
-    redirect_to course_details_path(@context.id)
+    @new_course = @context.reset_content
+    redirect_to course_details_path(@new_course.id)
   end
 end
