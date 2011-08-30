@@ -160,7 +160,7 @@ describe ConversationsController do
 
       post 'workflow_event', :conversation_id => @conversation.conversation_id, :event => "mark_as_unread"
       response.should be_success
-      @conversation.unread?.should be_true
+      @conversation.reload.unread?.should be_true
     end
   end
 
