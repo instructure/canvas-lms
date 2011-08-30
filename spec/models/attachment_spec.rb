@@ -202,6 +202,16 @@ describe Attachment do
       attachment_model(:workflow_state => 'processed')
       @attachment.submit_to_scribd!.should be_false
     end
+
+    it "should use the root attachment scribd doc" do
+      a1 = attachment_model(:workflow_state => 'processing')
+      a2 = attachment_model(:workflow_state => 'processing', :root_attachment => a1)
+      a2.root_attachment.should == a1
+      a1.scribd_doc = doc = Scribd::Document.new
+      a2.scribd_doc.should == doc
+      a2.destroy
+      a1.scribd_doc.should == doc
+    end
     
     it "should not send the secret password via to_json" do
       attachment_model
