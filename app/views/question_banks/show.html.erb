@@ -69,7 +69,7 @@
 <div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank">
   <% if @questions.total_pages <= 1 %>
     <% @questions.each do |question| %>
-      <%= render :partial => "quizzes/display_question", :object => question.data, :locals => {:is_assessment_question => true, :editing => true, :asset_string => question.asset_string} %>
+      <%= render :partial => "quizzes/display_question", :object => question.data, :locals => {:question_bank_id => @bank.id, :editing => true, :asset_string => question.asset_string} %>
     <% end %>
   <% else %>
     <%= render :partial => "question_teaser", :collection => @questions %>
@@ -84,7 +84,7 @@
 
 <%= render :partial => "question_teaser" %>
 <%= render :partial => "question_bank" %>
-<%= render :partial => "quizzes/display_question", :object => nil, :locals => {:is_assessment_question => true, :editing => true} %>
+<%= render :partial => "quizzes/display_question", :object => nil, :locals => {:question_bank_id => @bank.id, :editing => true} %>
 <%= render :partial => "quizzes/display_answer", :object => nil %>
 <%= render :partial => "quizzes/form_answer", :object => nil %>
 <%= render :partial => "quizzes/form_question", :object => nil, :locals => {:question_bank_id => @bank.id} %>
