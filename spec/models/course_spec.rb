@@ -53,19 +53,32 @@ describe Course do
   end
 
   it "should clear content when resetting" do
-    @course = Course.create!
+    course_with_student
     @course.discussion_topics.create!
     @course.quizzes.create!
     @course.assignments.create!
     @course.wiki.wiki_page.save!
+    @course.sis_source_id = 'sis_id'
+    @course.save!
+    @course.course_sections.should_not be_empty
+    @course.students.should == [@student]
 
-    @course.reset_content
+    @new_course = @course.reset_content
 
     @course.reload
-    @course.discussion_topics.should be_empty
-    @course.quizzes.should be_empty
-    @course.assignments.should be_empty
-    @course.wiki.wiki_page.should be_new_record
+    @course.course_sections.should be_empty
+    @course.students.should be_empty
+    @course.sis_source_id.should be_nil
+
+    @new_course.reload
+    @new_course.course_sections.should_not be_empty
+    @new_course.students.should == [@student]
+    @new_course.discussion_topics.should be_empty
+    @new_course.quizzes.should be_empty
+    @new_course.assignments.should be_empty
+    @new_course.sis_source_id.should == 'sis_id'
+
+    @course.replacement_course_id.should == @new_course.id
   end
 end
 

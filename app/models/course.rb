@@ -2324,16 +2324,26 @@ class Course < ActiveRecord::Base
 
   def reset_content
     Course.transaction do
-      AssetTypes.constants.each do |type|
-        association_name = type.tableize if self.respond_to?(type.tableize)
-        association_name = 'all_' + type.tableize if self.respond_to?('all_' + type.tableize)
-        next unless association_name
-        find_options = self.send(association_name).send(:construct_scope)[:find]
-        next unless find_options[:joins].blank?
-        AssetTypes.const_get(type).scoped(find_options).delete_all
+      new_course = Course.new
+      self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at].include?(k.to_sym) }.each do |key, val|
+        new_course.send("#{key}=", val)
       end
-      self.wiki_id = nil
+      # The order here is important; we have to set our sis id to nil and save first
+      # so that the new course can be saved, then we need the new course saved to
+      # get its id to move over sections and enrollments.  Setting this course to
+      # deleted has to be last otherwise it would set all the enrollments to
+      # deleted before they got moved
+      self.sis_source_id = self.sis_batch_id = nil;
       self.save!
+      new_course.save!
+      self.course_sections.update_all(:course_id => new_course.id)
+      # we also want to bring along prior enrollments, so don't use the enrollments
+      # association
+      Enrollment.update_all({:course_id => new_course.id}, {:course_id => self.id})
+      self.replacement_course_id = new_course.id
+      self.workflow_state = 'deleted'
+      self.save!
+      new_course
     end
   end
 end
